@@ -1,6 +1,17 @@
 // define child rescript
-module.exports = config => {
-    config.node.__dirname = false;
-    config.target = 'electron-renderer';
-    return config;
-}
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
+
+module.exports = {
+  config: {
+    node: {
+      __dirname: false
+    },
+    target: 'electron-renderer'
+  },
+  plugins: [
+    new MonacoWebpackPlugin({
+      // available options are documented at https://github.com/Microsoft/monaco-editor-webpack-plugin#options
+      languages: ['json']
+    })
+  ]
+};
