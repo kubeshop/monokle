@@ -21,9 +21,7 @@ function uriFromPath(_path: any) {
   return encodeURI("file://" + ensureFirstBackSlash(pathName));
 }
 
-console.log( "loader dirname: " + __dirname )
 let p = path.join(__dirname, "../../../../../../../../node_modules/monaco-editor/min/vs")
-console.log( "loading editor from " + p )
 loader.config({
   paths: {
     vs: uriFromPath( p )

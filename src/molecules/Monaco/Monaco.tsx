@@ -6,8 +6,6 @@ import path from "path";
 const Monaco = () => {
   let filename = path.join(__dirname, "../../../../../../../../deployment.yaml")
   let data = fs.readFileSync(filename, 'utf8')
-  console.log( "dirname: " + __dirname )
-  console.log( data )
 
   return (
       <div>
