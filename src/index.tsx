@@ -3,10 +3,21 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {applyMiddleware, createStore, Store} from "redux";
+import fileReducer from "./store/reducer";
+import thunk from "redux-thunk";
+import {Provider} from "react-redux";
+import {AppState, FileAction, FileDispatchType} from "./models/state";
+
+const store: Store<AppState, FileAction> & {
+  dispatch: FileDispatchType
+} = createStore(fileReducer, applyMiddleware(thunk))
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
