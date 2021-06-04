@@ -7,8 +7,15 @@ import ActionsPane from "./organisms/ActionsPane";
 import NavigatorPane from "./organisms/NavigatorPane";
 import FileTreePane from "./organisms/FileTreePane";
 import Header from "./organisms/Header";
+import {AppState} from "./models/state";
+import {useSelector} from "react-redux";
 
-function App() {
+const App: React.FC = () => {
+
+  const state: AppState = useSelector(
+    (state: AppState) => state
+  )
+
   return (
       <div>
         <Container fluid>
@@ -17,7 +24,7 @@ function App() {
           </Row>
           <Row style={debugBorder}>
             <Col sm={3} style={debugBorder}>
-              <FileTreePane/>
+              <FileTreePane rootFolder={state.rootFolder} files={state.files} />
             </Col>
 
             <Col sm={3} style={debugBorder}>

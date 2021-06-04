@@ -44,22 +44,4 @@ class Monaco extends React.Component<IProps, IState> {
   }
 }
 
-/*
-const Monaco = () => {
-  let filename = path.join(__dirname, "../../../deployment.yaml")
-  let data = fs.readFileSync(filename, 'utf8')
-
-  return (
-      <div>
-        <Editor
-            height="90vh"
-            defaultLanguage="yaml"
-            theme="vs-dark"
-            defaultValue={data}
-        />
-      </div>
-  );
-};
-*/
-
 export default Monaco;
