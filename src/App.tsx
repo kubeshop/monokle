@@ -17,29 +17,29 @@ const App: React.FC = () => {
   )
 
   return (
-      <div>
-        <Container fluid>
-          <Row style={debugBorder}>
-            <Header/>
-          </Row>
-          <Row style={debugBorder}>
-            <Col sm={3} style={debugBorder}>
-              <FileTreePane rootFolder={state.rootFolder} files={state.files} />
-            </Col>
+    <div>
+      <Container fluid>
+        <Row style={debugBorder}>
+          <Header/>
+        </Row>
+        <Row style={debugBorder}>
+          <Col sm={3} style={debugBorder}>
+            <FileTreePane rootFolder={state.rootFolder} files={state.files}/>
+          </Col>
 
-            <Col sm={3} style={debugBorder}>
-              <NavigatorPane/>
-            </Col>
+          <Col sm={3} style={debugBorder}>
+            <NavigatorPane/>
+          </Col>
 
-            <Col sm={6} style={debugBorder}>
-              <ActionsPane/>
-            </Col>
-          </Row>
-          <Row style={debugBorder}>
-            <Footer/>
-          </Row>
-        </Container>
-      </div>
+          <Col sm={6} style={debugBorder}>
+            <ActionsPane/>
+          </Col>
+        </Row>
+        <Row style={debugBorder}>
+          <Footer/>
+        </Row>
+      </Container>
+    </div>
   );
 }
 

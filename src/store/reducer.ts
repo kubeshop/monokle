@@ -2,9 +2,10 @@ import {SELECT_FILE} from "./actionTypes";
 import {AppState, FileAction} from "../models/state";
 
 const initialState: AppState = {
-  rootFolder : ".",
-  files : [
-    {name: "test.yaml",
+  rootFolder: ".",
+  files: [
+    {
+      name: "test.yaml",
       folder: ".",
       highlight: false,
       selected: false,

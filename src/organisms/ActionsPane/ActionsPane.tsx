@@ -14,7 +14,7 @@ const ActionsPane = () => (
       <Col>
         <Tabs defaultActiveKey="edit" id="uncontrolled-tab-example">
           <Tab eventKey="edit" title="edit">
-              <Monaco/>
+            <Monaco/>
           </Tab>
           <Tab eventKey="action2" title="Action 2" disabled>
             lorem ipsum etc etc
