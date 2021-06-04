@@ -1,10 +1,15 @@
 {
-  "name": "my-app",
-  "version": "0.2.0",
-  "author": "Your Name",
-  "description": "React-TypeScript-Electron sample with Create React App and Electron Builder",
-  "homepage": ".",
+  "name": "manifestui",
+  "version": "0.0.1",
+  "author": "Kubeshop",
+  "description": "UI for managing k8s manifests",
+  "homepage": "https://manifestui.io",
   "main": "build/electron/main.js",
+  "contributors" : [
+    "ole@kubeshop.io",
+    "steen@kubeshop.io"
+  ],
+  "repository" : {"type": "git", "url": "git://github.com/kubeshop/manifestui.git"},
   "private": true,
   "dependencies": {
     "@monaco-editor/react": "^4.1.3",
