@@ -1,6 +1,6 @@
 ## ManifestUI
 
-Easy to use desktop application for managing k8s manifests.
+Desktop UI for managing k8s manifests.
 
 ## Building
 
