@@ -1,1 +1,1 @@
-export { default } from './FileTreePane';
+export {default} from './FileTreePane';

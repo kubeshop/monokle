@@ -1,1 +1,1 @@
-export { default } from './Monaco';
+export {default} from './Monaco';

@@ -1,1 +1,1 @@
-export { default } from './ActionsPane';
+export {default} from './ActionsPane';

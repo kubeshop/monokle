@@ -20,4 +20,4 @@ type AppState = {
 
 type FileDispatchType = (args: FileAction) => FileAction
 
-export type { FileEntry, AppState, FileAction, FileDispatchType }
+export type {FileEntry, AppState, FileAction, FileDispatchType}

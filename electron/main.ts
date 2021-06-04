@@ -1,7 +1,7 @@
-import { app, BrowserWindow } from 'electron';
+import {app, BrowserWindow} from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
-import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
+import installExtension, {REACT_DEVELOPER_TOOLS} from "electron-devtools-installer";
 
 function createWindow() {
   const win = new BrowserWindow({

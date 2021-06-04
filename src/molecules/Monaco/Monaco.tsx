@@ -15,13 +15,16 @@ class Monaco extends React.Component<IProps, IState> {
       code: '// type your code...',
     }
   }
+
   editorDidMount(editor: any, monaco: any) {
     console.log('editorDidMount', editor);
     editor.focus();
   }
+
   onChange(newValue: any, e: any) {
     console.log('onChange', newValue, e);
   }
+
   render() {
     const code = this.state.code;
 

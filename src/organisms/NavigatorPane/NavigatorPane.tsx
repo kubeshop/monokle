@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import {Container, Row, Col} from 'react-bootstrap';
 import {debugBorder} from "../../styles/DebugStyles";
 
 const NavigatorPane = () => (

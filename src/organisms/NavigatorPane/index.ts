@@ -1,1 +1,1 @@
-export { default } from './NavigatorPane';
+export {default} from './NavigatorPane';
