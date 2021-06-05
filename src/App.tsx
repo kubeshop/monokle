@@ -36,7 +36,7 @@ const App: React.FC = () => {
           </Col>
         </Row>
         <Row style={debugBorder}>
-          <Footer/>
+          <Footer statusText={state.statusText}/>
         </Row>
       </Container>
     </div>

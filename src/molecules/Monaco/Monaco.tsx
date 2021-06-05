@@ -16,6 +16,7 @@ class Monaco extends React.Component<IProps, IState> {
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   editorDidMount(editor: any, monaco: any) {
     console.log('editorDidMount', editor);
     editor.focus();

@@ -1,1 +1,1 @@
-export const SELECT_FILE = "SELECT_FILE"
+export const SELECT_ROOT_FOLDER = "SELECT_ROOT_FOLDER"

@@ -1,5 +1,6 @@
-import {SELECT_FILE} from "./actionTypes";
-import {AppState, FileAction} from "../models/state";
+import {SELECT_ROOT_FOLDER} from "./actionTypes";
+import {AppState, FileAction, FileEntry} from "../models/state";
+import path from "path";
 
 const initialState: AppState = {
   rootFolder: ".",
@@ -11,9 +12,9 @@ const initialState: AppState = {
       selected: false,
       expanded: false,
       children: [],
-      resources: ["1"]
     }
-  ]
+  ],
+  statusText: "Welcome!"
 }
 
 const fileReducer = (
@@ -21,10 +22,14 @@ const fileReducer = (
   action: FileAction
 ): AppState => {
   switch (action.type) {
-    case SELECT_FILE:
-
+    case SELECT_ROOT_FOLDER:
+      var rootEntry: FileEntry = action.data
+      var rootFolder = path.join(rootEntry.folder, rootEntry.name);
       return {
         ...state,
+        rootFolder: rootFolder,
+        statusText: "Loaded folder " + rootFolder,
+        files: rootEntry.children
       }
   }
   return state

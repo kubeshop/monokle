@@ -5,17 +5,17 @@ interface FileEntry {
   selected: boolean,
   expanded: boolean,
   children: FileEntry[],
-  resources: string[] // list of contained resource ids
 }
 
 type FileAction = {
-  type: string
-  file: FileEntry
+  type: string,
+  data: any
 }
 
 type AppState = {
   rootFolder: string,
-  files: FileEntry[]
+  files: FileEntry[],
+  statusText: string
 }
 
 type FileDispatchType = (args: FileAction) => FileAction
