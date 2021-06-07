@@ -86,6 +86,7 @@ function extractYamlContent(folder: string, file: string, fileEntry: FileEntry, 
           kind:content.kind,
           version: content.apiVersion,
           content: content,
+          highlight: false
         }
 
         resourceMap.set(resource.id,resource)

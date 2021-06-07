@@ -26,7 +26,8 @@ interface K8sResource {
   file: string,
   kind: string,
   version: string,
-  content: any
+  highlight: boolean,
+  content: any // contains parsed yaml resource - used for filtering/etc
 }
 
 interface NavigatorSubSection {
