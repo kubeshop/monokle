@@ -3,6 +3,7 @@ import {Container, Row, Col} from 'react-bootstrap';
 import {debugBorder} from "../../styles/DebugStyles";
 import {AppConfig, K8sResource} from "../../models/state";
 import {FC} from "react";
+import micromatch from 'micromatch';
 
 interface NavigatorPaneState {
   resourceMap: Map<string, K8sResource>,
@@ -47,7 +48,10 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
                                 <Col key={subsection.name}>
                                   {subsection.name}
                                   {
-                                    Array.from(resourceMap.values()).filter(item => item.kind === subsection.kindSelector).map(item => {
+                                    Array.from(resourceMap.values()).filter(item =>
+                                      item.kind === subsection.kindSelector &&
+                                      micromatch.isMatch(item.version, subsection.apiVersionSelector)
+                                    ).map(item => {
                                       return (
                                         <div key={item.id}>- {item.name}</div>
                                       )
