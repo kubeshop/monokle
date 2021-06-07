@@ -29,7 +29,7 @@ const initialState: AppState = {
             subsections: [
               {
                 name: "Deployments",
-                apiVersionSelector: "*",
+                apiVersionSelector: "**",
                 kindSelector: "Deployment"
               }
             ]
@@ -39,7 +39,7 @@ const initialState: AppState = {
             subsections: [
               {
                 name: "ConfigMaps",
-                apiVersionSelector: "*",
+                apiVersionSelector: "**",
                 kindSelector: "ConfigMap"
               }
             ]
@@ -49,7 +49,7 @@ const initialState: AppState = {
             subsections: [
               {
                 name: "Services",
-                apiVersionSelector: "*",
+                apiVersionSelector: "**",
                 kindSelector: "Service"
               }
             ]
