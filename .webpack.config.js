@@ -5,7 +5,6 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 module.exports = config => {
   config.node.__dirname = false;
   config.target = 'electron-renderer';
-  return config
 
   return appendWebpackPlugin(
     new MonacoWebpackPlugin({
