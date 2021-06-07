@@ -21,25 +21,13 @@ interface TreeNode {
   children: TreeNode[] | null
 }
 
-const mapTreeNodeFromFileEntry= (fileEntry: FileEntry) : TreeNode => {
-  const children: TreeNode[] | null = fileEntry.children ? fileEntry.children.map( child => mapTreeNodeFromFileEntry(child)) : []
-  return {
-    name: fileEntry.name,
-    checked: fileEntry.selected ? 1 : 0,
-    isOpen: fileEntry.expanded,
-    children: children
-  }
-}
-
-const buildTreeData = (fileEntry: FileEntry): TreeNode => {
-  console.log("buildTreeData");
-  console.log(fileEntry);
-
-  const data: TreeNode = mapTreeNodeFromFileEntry(fileEntry);
-
-  console.log("data:\n", data);
-  return data;
-}
+const mapTreeNodeFromFileEntry= (fileEntry: FileEntry) : TreeNode => ({
+  name: fileEntry.name,
+  checked: fileEntry.selected ? 1 : 0,
+  isOpen: fileEntry.expanded,
+  children: fileEntry.children ?
+    fileEntry.children.map( child => mapTreeNodeFromFileEntry(child)) : []
+})
 
 const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
   const dispatch = useDispatch()
@@ -66,7 +54,7 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
     //buildTreeData(state);
   }
 
-  const treeData : TreeNode = buildTreeData({
+  const treeData : TreeNode = mapTreeNodeFromFileEntry({
     name: rootFolder,
     folder: '',
     highlight: false,
