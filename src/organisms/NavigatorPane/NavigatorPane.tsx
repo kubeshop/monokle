@@ -1,8 +1,7 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import {Container, Row, Col} from 'react-bootstrap';
 import {debugBorder} from "../../styles/DebugStyles";
 import {AppConfig, K8sResource} from "../../models/state";
-import {FC} from "react";
 import micromatch from 'micromatch';
 
 interface NavigatorPaneState {
@@ -11,6 +10,10 @@ interface NavigatorPaneState {
 }
 
 const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
+  const selectItem = function(item:string) {
+    console.log( item )
+  }
+
   return (
     <Container>
       <Row style={debugBorder}>
@@ -44,16 +47,17 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
                           </Row>
                           <Row style={debugBorder}>
                             {section.subsections.map(subsection => {
+                              const items = Array.from(resourceMap.values()).filter(item =>
+                                item.kind === subsection.kindSelector &&
+                                micromatch.isMatch(item.version, subsection.apiVersionSelector)
+                              );
                               return (
                                 <Col key={subsection.name}>
-                                  {subsection.name}
+                                  {subsection.name} {items.length > 0 ? "(" + items.length + ")":""}
                                   {
-                                    Array.from(resourceMap.values()).filter(item =>
-                                      item.kind === subsection.kindSelector &&
-                                      micromatch.isMatch(item.version, subsection.apiVersionSelector)
-                                    ).map(item => {
+                                    items.map(item => {
                                       return (
-                                        <div key={item.id}>- {item.name}</div>
+                                        <div key={item.id} onClick={() => selectItem(item.id)}>- {item.name}</div>
                                       )
                                     })
                                   }
