@@ -77,7 +77,7 @@ function extractYamlContent(folder: string, file: string, fileEntry: FileEntry, 
   if (documents) {
     documents.forEach(d => {
       const content = d.toJS();
-      if (content.apiVersion && content.kind) {
+      if (content && content.apiVersion && content.kind) {
         var resource : K8sResource = {
           folder: folder,
           file: file,

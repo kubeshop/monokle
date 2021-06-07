@@ -70,10 +70,6 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
           }
         </Col>
       </Row>
-
-      <Row style={debugBorder}>Argo Rollouts</Row>
-      <Row style={debugBorder}>Ambassador</Row>
-      <Row style={debugBorder}>Prometheus</Row>
     </Container>
   )
 }

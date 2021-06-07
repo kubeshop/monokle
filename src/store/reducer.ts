@@ -22,39 +22,58 @@ const initialState: AppState = {
     fileIncludes: ['yaml', 'yml'],
     navigators: [
       {
-        name: "k8s resources",
+        name: "K8s Resources",
         sections: [
           {
-            name: "workloads",
+            name: "Workloads",
             subsections: [
               {
-                name: "deployments",
+                name: "Deployments",
                 apiVersionSelector: "*",
                 kindSelector: "Deployment"
               }
             ]
           },
           {
-            name: "config",
+            name: "Configuration",
             subsections: [
               {
-                name: "configmaps",
+                name: "ConfigMaps",
                 apiVersionSelector: "*",
                 kindSelector: "ConfigMap"
               }
             ]
           },
           {
-            name: "network",
+            name: "Network",
             subsections: [
               {
-                name: "services",
+                name: "Services",
                 apiVersionSelector: "*",
                 kindSelector: "Service"
               }
             ]
           }
         ]
+      },
+      {
+        name: "Ambassador",
+        sections: [
+          {
+            name: "Emissary",
+            subsections: [
+              {
+                name: "Mappings",
+                apiVersionSelector: "getambassador.io/*",
+                kindSelector: "Mapping"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: "Prometheus",
+        sections:[]
       }
     ]
   },
