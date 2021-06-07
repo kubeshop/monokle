@@ -1,5 +1,5 @@
 import {SET_ROOT_FOLDER} from "./actionTypes";
-import {AppState, SetRootFolderAction, FileEntry} from "../models/state";
+import {AppState, SetRootFolderAction, FileEntry, K8sResource} from "../models/state";
 import path from "path";
 
 const initialState: AppState = {
@@ -13,12 +13,52 @@ const initialState: AppState = {
       expanded: false,
       excluded: false,
       children: [],
+      resources: []
     }
   ],
   statusText: "Welcome!",
   appConfig: {
-    scanExcludes: ['node_modules', '.git']
-  }
+    scanExcludes: ['node_modules', '.git'],
+    fileIncludes: ['yaml', 'yml'],
+    navigators: [
+      {
+        name: "k8s resources",
+        sections: [
+          {
+            name: "workloads",
+            subsections: [
+              {
+                name: "deployments",
+                apiVersionSelector: "*",
+                kindSelector: "Deployment"
+              }
+            ]
+          },
+          {
+            name: "config",
+            subsections: [
+              {
+                name: "configmaps",
+                apiVersionSelector: "*",
+                kindSelector: "ConfigMap"
+              }
+            ]
+          },
+          {
+            name: "network",
+            subsections: [
+              {
+                name: "services",
+                apiVersionSelector: "*",
+                kindSelector: "Service"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  resourceMap: new Map(),
 }
 
 const fileReducer = (
@@ -28,17 +68,21 @@ const fileReducer = (
   switch (action.type) {
     case SET_ROOT_FOLDER:
       if (action.rootEntry) {
-        var rootEntry: FileEntry = action.rootEntry
-        var rootFolder = path.join(rootEntry.folder, rootEntry.name);
-        return {
-          ...state,
-          rootFolder: rootFolder,
-          statusText: "Loaded folder " + rootFolder,
-          files: rootEntry.children
-        }
+        return reduceRootFolder(action.rootEntry, action.resourceMap, state);
       }
   }
   return state
+}
+
+function reduceRootFolder(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>, state: AppState) {
+  var rootFolder = path.join(rootEntry.folder, rootEntry.name);
+  return {
+    ...state,
+    rootFolder: rootFolder,
+    statusText: "Loaded folder " + rootFolder,
+    resourceMap: resourceMap,
+    files: rootEntry.children ? rootEntry.children : []
+  }
 }
 
 export default fileReducer

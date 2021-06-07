@@ -28,7 +28,7 @@ const App: React.FC = () => {
           </Col>
 
           <Col sm={3} style={debugBorder}>
-            <NavigatorPane/>
+            <NavigatorPane resourceMap={state.resourceMap} appConfig={state.appConfig}/>
           </Col>
 
           <Col sm={6} style={debugBorder}>

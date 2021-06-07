@@ -48,7 +48,7 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
           var className = "fileItem"
           if (item.excluded) {
             className = "excludedFileItem"
-          } else if (item.children.length > 0) {
+          } else if (item.children && item.children.length > 0) {
             className = "directoryItem"
           }
 

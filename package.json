@@ -48,7 +48,8 @@
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
     "typescript": "^4.3.2",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "yaml": "2.0.0-5"
   },
   "scripts": {
     "start": "rescripts start",

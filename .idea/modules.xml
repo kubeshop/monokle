@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/manui.iml" filepath="$PROJECT_DIR$/.idea/manui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/manifestui.iml" filepath="$PROJECT_DIR$/.idea/manifestui.iml" />
     </modules>
   </component>
 </project>
