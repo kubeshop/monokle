@@ -7,7 +7,7 @@ interface FileEntry {
   excluded: boolean,
   parent?: FileEntry,
   children?: FileEntry[],
-  resources?: string []
+  resourceIds?: string []
 }
 
 type SetRootFolderAction = {

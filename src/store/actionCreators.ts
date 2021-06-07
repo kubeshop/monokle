@@ -90,11 +90,11 @@ function extractYamlContent(folder: string, file: string, fileEntry: FileEntry, 
         }
 
         resourceMap.set(resource.id,resource)
-        if( !fileEntry.resources ){
-          fileEntry.resources = []
+        if( !fileEntry.resourceIds ){
+          fileEntry.resourceIds = []
         }
 
-        fileEntry.resources.push(resource.id)
+        fileEntry.resourceIds.push(resource.id)
       }
     })
   }

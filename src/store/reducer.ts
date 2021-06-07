@@ -13,7 +13,7 @@ const initialState: AppState = {
       expanded: false,
       excluded: false,
       children: [],
-      resources: []
+      resourceIds: []
     }
   ],
   statusText: "Welcome!",
