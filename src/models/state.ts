@@ -4,20 +4,28 @@ interface FileEntry {
   highlight: boolean,
   selected: boolean,
   expanded: boolean,
+  excluded: boolean,
   children: FileEntry[],
 }
 
-type FileAction = {
+type SetRootFolderAction = {
   type: string,
-  data: any
+  rootFolder: string,
+  appConfig: AppConfig,
+  rootEntry?: FileEntry
+}
+
+type AppConfig = {
+  scanExcludes: string[]
 }
 
 type AppState = {
   rootFolder: string,
   files: FileEntry[],
-  statusText: string
+  statusText: string,
+  appConfig: AppConfig
 }
 
-type FileDispatchType = (args: FileAction) => FileAction
+type SetRootFolderDispatchType = (args: SetRootFolderAction) => SetRootFolderAction
 
-export type {FileEntry, AppState, FileAction, FileDispatchType}
+export type {FileEntry, AppState, SetRootFolderAction, SetRootFolderDispatchType, AppConfig}

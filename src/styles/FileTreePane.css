@@ -1,0 +1,11 @@
+.fileItem {
+  color: blue;
+}
+
+.directoryItem {
+  color: darkblue;
+}
+
+.excludedFileItem {
+  color: grey;
+}

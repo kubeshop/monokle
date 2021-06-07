@@ -24,7 +24,7 @@ const App: React.FC = () => {
         </Row>
         <Row style={debugBorder}>
           <Col sm={3} style={debugBorder}>
-            <FileTreePane rootFolder={state.rootFolder} files={state.files}/>
+            <FileTreePane rootFolder={state.rootFolder} files={state.files} appConfig={state.appConfig}/>
           </Col>
 
           <Col sm={3} style={debugBorder}>

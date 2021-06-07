@@ -1,16 +1,18 @@
 import * as React from 'react';
-import {FileEntry} from "../../models/state";
+import {AppConfig, FileEntry} from "../../models/state";
 import {FC, useCallback, useRef} from "react";
 import {useDispatch} from "react-redux";
 import {setRootFolder} from "../../store/actionCreators";
 import path from 'path';
+import "../../styles/FileTreePane.css"
 
 interface FileTreeState {
   files: FileEntry[],
-  rootFolder: string
+  rootFolder: string,
+  appConfig: AppConfig
 }
 
-const FileTreePane: FC<FileTreeState> = ({files, rootFolder}) => {
+const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
   const dispatch = useDispatch()
 
   // eslint-disable-next-line no-undef
@@ -26,7 +28,7 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder}) => {
 
   const setFolder = useCallback(
     (folder: string) => {
-      dispatch(setRootFolder(folder))
+      dispatch(setRootFolder(folder, appConfig))
     }, [dispatch]
   )
 
@@ -43,8 +45,15 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder}) => {
       <h5>{rootFolder}</h5>
       {
         files.map(item => {
+          var className = "fileItem"
+          if (item.excluded) {
+            className = "excludedFileItem"
+          } else if (item.children.length > 0) {
+            className = "directoryItem"
+          }
+
           return (
-            <div key={item.name}>{item.name}</div>
+            <div className={className} key={item.name}>{item.name}</div>
           )
         })
       }
