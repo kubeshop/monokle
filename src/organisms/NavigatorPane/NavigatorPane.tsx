@@ -1,62 +1,85 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import {Container, Row, Col} from 'react-bootstrap';
 import {debugBorder} from "../../styles/DebugStyles";
+import {AppConfig, K8sResource} from "../../models/state";
+import micromatch from 'micromatch';
 
-const NavigatorPane = () => (
-  <Container>
-    <Row style={debugBorder}>
-      <h5>navigator</h5>
-    </Row>
+interface NavigatorPaneState {
+  resourceMap: Map<string, K8sResource>,
+  appConfig: AppConfig,
+}
 
-    <Row style={debugBorder}>
-      <Col>
-        <Row style={debugBorder}>
-          <h6>Kustomizations</h6>
-        </Row>
-        <Row style={debugBorder}>List</Row>
-      </Col>
-    </Row>
+const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
+  const selectItem = function(item:string) {
+    console.log( item )
+  }
 
-    <Row style={debugBorder}>
-      <Col>
-        <Row style={debugBorder}>
-          <h6>k8s Resources</h6>
-        </Row>
-        <Row style={debugBorder}>
-          <Col>
-            <Row style={debugBorder}>
-              <h6>Workloads</h6>
-            </Row>
-            <Row style={debugBorder}>
-              <Col>
-                ITEMS
-              </Col>
-            </Row>
-            <Row style={debugBorder}>
-              <h6>Configuration</h6>
-            </Row>
-            <Row style={debugBorder}>
-              <Col>
-                ITEMS
-              </Col>
-            </Row>
-            <Row style={debugBorder}>
-              <h6>Network</h6>
-            </Row>
-            <Row style={debugBorder}>
-              <Col>
-                ITEMS
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Col>
-    </Row>
+  return (
+    <Container>
+      <Row style={debugBorder}>
+        <h5>navigator</h5>
+      </Row>
 
-    <Row style={debugBorder}>Argo Rollouts</Row>
-    <Row style={debugBorder}>Ambassador</Row>
-    <Row style={debugBorder}>Prometheus</Row>
-  </Container>
-)
+      <Row style={debugBorder}>
+        <Col>
+          <Row style={debugBorder}>
+            <h6>Kustomizations</h6>
+          </Row>
+          <Row style={debugBorder}>List</Row>
+        </Col>
+      </Row>
+
+      <Row style={debugBorder}>
+        <Col>
+          {appConfig.navigators.map(navigator => {
+            return (
+              <>
+                <Row style={debugBorder}>
+                  <h4>{navigator.name}</h4>
+                </Row>
+                <Row style={debugBorder}>
+                  <Col>
+                    {navigator.sections.map(section => {
+                      return (
+                        <>
+                          <Row style={debugBorder}>
+                            <h5>{section.name}</h5>
+                          </Row>
+                          <Row style={debugBorder}>
+                            {section.subsections.map(subsection => {
+                              const items = Array.from(resourceMap.values()).filter(item =>
+                                item.kind === subsection.kindSelector &&
+                                micromatch.isMatch(item.version, subsection.apiVersionSelector)
+                              );
+                              return (
+                                <Col key={subsection.name}>
+                                  {subsection.name} {items.length > 0 ? "(" + items.length + ")":""}
+                                  {
+                                    items.map(item => {
+                                      return (
+                                        <div key={item.id} onClick={() => selectItem(item.id)}>- {item.name}</div>
+                                      )
+                                    })
+                                  }
+                                </Col>
+                              )
+                            })
+                            }
+                          </Row>
+                        </>
+                      )
+                    })
+                    }
+                  </Col>
+                </Row>
+              </>
+            )
+          })
+          }
+        </Col>
+      </Row>
+    </Container>
+  )
+}
 
 export default NavigatorPane;

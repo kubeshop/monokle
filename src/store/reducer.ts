@@ -1,5 +1,5 @@
 import {SET_ROOT_FOLDER} from "./actionTypes";
-import {AppState, SetRootFolderAction, FileEntry} from "../models/state";
+import {AppState, SetRootFolderAction, FileEntry, K8sResource} from "../models/state";
 import path from "path";
 
 const initialState: AppState = {
@@ -13,12 +13,71 @@ const initialState: AppState = {
       expanded: false,
       excluded: false,
       children: [],
+      resourceIds: []
     }
   ],
   statusText: "Welcome!",
   appConfig: {
-    scanExcludes: ['node_modules', '.git']
-  }
+    scanExcludes: ['node_modules', '.git'],
+    fileIncludes: ['yaml', 'yml'],
+    navigators: [
+      {
+        name: "K8s Resources",
+        sections: [
+          {
+            name: "Workloads",
+            subsections: [
+              {
+                name: "Deployments",
+                apiVersionSelector: "**",
+                kindSelector: "Deployment"
+              }
+            ]
+          },
+          {
+            name: "Configuration",
+            subsections: [
+              {
+                name: "ConfigMaps",
+                apiVersionSelector: "**",
+                kindSelector: "ConfigMap"
+              }
+            ]
+          },
+          {
+            name: "Network",
+            subsections: [
+              {
+                name: "Services",
+                apiVersionSelector: "**",
+                kindSelector: "Service"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: "Ambassador",
+        sections: [
+          {
+            name: "Emissary",
+            subsections: [
+              {
+                name: "Mappings",
+                apiVersionSelector: "getambassador.io/*",
+                kindSelector: "Mapping"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: "Prometheus",
+        sections:[]
+      }
+    ]
+  },
+  resourceMap: new Map(),
 }
 
 const fileReducer = (
@@ -28,17 +87,21 @@ const fileReducer = (
   switch (action.type) {
     case SET_ROOT_FOLDER:
       if (action.rootEntry) {
-        var rootEntry: FileEntry = action.rootEntry
-        var rootFolder = path.join(rootEntry.folder, rootEntry.name);
-        return {
-          ...state,
-          rootFolder: rootFolder,
-          statusText: "Loaded folder " + rootFolder,
-          files: rootEntry.children
-        }
+        return reduceRootFolder(action.rootEntry, action.resourceMap, state);
       }
   }
   return state
+}
+
+function reduceRootFolder(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>, state: AppState) {
+  var rootFolder = path.join(rootEntry.folder, rootEntry.name);
+  return {
+    ...state,
+    rootFolder: rootFolder,
+    statusText: "Loaded folder " + rootFolder,
+    resourceMap: resourceMap,
+    files: rootEntry.children ? rootEntry.children : []
+  }
 }
 
 export default fileReducer
