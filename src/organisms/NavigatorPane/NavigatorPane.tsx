@@ -35,7 +35,7 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
             return (
               <>
                 <Row style={debugBorder}>
-                  <h6>{navigator.name}</h6>
+                  <h4>{navigator.name}</h4>
                 </Row>
                 <Row style={debugBorder}>
                   <Col>
@@ -43,7 +43,7 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
                       return (
                         <>
                           <Row style={debugBorder}>
-                            <h6>{section.name}</h6>
+                            <h5>{section.name}</h5>
                           </Row>
                           <Row style={debugBorder}>
                             {section.subsections.map(subsection => {
