@@ -6,12 +6,15 @@ import reportWebVitals from './reportWebVitals';
 import {applyMiddleware, createStore, Store} from "redux";
 import fileReducer from "./store/reducer";
 import thunk from "redux-thunk";
+import { composeWithDevTools } from 'redux-devtools-extension'
 import {Provider} from "react-redux";
-import {AppState, FileAction, FileDispatchType} from "./models/state";
+import {AppState, SetRootFolderAction, SetRootFolderDispatchType} from "./models/state";
 
-const store: Store<AppState, FileAction> & {
-  dispatch: FileDispatchType
-} = createStore(fileReducer, applyMiddleware(thunk))
+const composedEnhancer = composeWithDevTools(applyMiddleware(thunk))
+
+const store: Store<AppState, SetRootFolderAction> & {
+  dispatch: SetRootFolderDispatchType
+} = createStore(fileReducer, composedEnhancer)
 
 ReactDOM.render(
   <React.StrictMode>

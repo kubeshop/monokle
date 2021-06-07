@@ -1,5 +1,6 @@
-import {SELECT_FILE} from "./actionTypes";
-import {AppState, FileAction} from "../models/state";
+import {SET_ROOT_FOLDER} from "./actionTypes";
+import {AppState, SetRootFolderAction, FileEntry} from "../models/state";
+import path from "path";
 
 const initialState: AppState = {
   rootFolder: ".",
@@ -10,21 +11,31 @@ const initialState: AppState = {
       highlight: false,
       selected: false,
       expanded: false,
+      excluded: false,
       children: [],
-      resources: ["1"]
     }
-  ]
+  ],
+  statusText: "Welcome!",
+  appConfig: {
+    scanExcludes: ['node_modules', '.git']
+  }
 }
 
 const fileReducer = (
   state: AppState = initialState,
-  action: FileAction
+  action: SetRootFolderAction
 ): AppState => {
   switch (action.type) {
-    case SELECT_FILE:
-
-      return {
-        ...state,
+    case SET_ROOT_FOLDER:
+      if (action.rootEntry) {
+        var rootEntry: FileEntry = action.rootEntry
+        var rootFolder = path.join(rootEntry.folder, rootEntry.name);
+        return {
+          ...state,
+          rootFolder: rootFolder,
+          statusText: "Loaded folder " + rootFolder,
+          files: rootEntry.children
+        }
       }
   }
   return state
