@@ -10,21 +10,6 @@ interface FileEntry {
   resourceIds?: string []
 }
 
-type SetRootFolderAction = {
-  type: string,
-  rootFolder: string,
-  appConfig: AppConfig,
-  rootEntry?: FileEntry,
-  resources: K8sResource [],
-  resourceMap: Map<string, K8sResource>,
-  fileMap: Map<string, FileEntry>
-}
-
-type SelectKustomizationAction = {
-  type: string,
-  resourceIds: string[]
-}
-
 interface K8sResource {
   id: string,
   name: string,
@@ -43,7 +28,7 @@ export enum ResourceRefType {
   KustomizationParent
 }
 
-export interface ResourceRef {
+interface ResourceRef {
   targetResourceId: string,
   refType: ResourceRefType
 }
@@ -67,7 +52,10 @@ interface ObjectNavigator {
 type AppConfig = {
   scanExcludes: string[],
   fileIncludes: string[],
-  navigators: ObjectNavigator[]
+  navigators: ObjectNavigator[],
+  settings: {
+    filterObjectsOnSelection: boolean
+  }
 }
 
 type AppState = {
@@ -79,11 +67,6 @@ type AppState = {
   fileMap: Map<string, FileEntry>
 }
 
-type SetRootFolderDispatchType = (args: SetRootFolderAction) => SetRootFolderAction
-type SelectKustomizationDispatchType = (args: SelectKustomizationAction) => SelectKustomizationAction
-
 export type {
-  FileEntry, K8sResource, AppState, SetRootFolderAction, SelectKustomizationAction,
-  SetRootFolderDispatchType,
-  SelectKustomizationDispatchType, AppConfig
+  FileEntry, K8sResource, AppState, AppConfig, ResourceRef
 }

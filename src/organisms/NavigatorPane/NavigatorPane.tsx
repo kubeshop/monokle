@@ -5,7 +5,7 @@ import {AppConfig, K8sResource} from "../../models/state";
 import micromatch from 'micromatch';
 import "../../styles/NavigatorPane.css"
 import {useDispatch} from "react-redux";
-import {selectKustomization} from "../../store/actionCreators";
+import {selectKustomization, setFilterObjectsOnSelection} from "../../store/actionCreators";
 
 interface NavigatorPaneState {
   resourceMap: Map<string, K8sResource>,
@@ -25,6 +25,13 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
     }, [dispatch, resourceMap]
   )
 
+  const onFilterChange = useCallback(
+    (e: any) => {
+      dispatch(setFilterObjectsOnSelection(e.target.checked))
+    }, [dispatch])
+
+  const hasSelection = Array.from(resourceMap.values()).some(item => item.kind === "Kustomization" && item.selected);
+
   return (
     <Container>
       <Row style={debugBorder}>
@@ -34,11 +41,13 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
       <Row style={debugBorder}>
         <Col>
           <Row style={debugBorder}>
-            <h6>Kustomizations</h6>
+            <Col>
+              <h5>Kustomizations</h5>
+            </Col>
+            <Col><input type="checkbox" onChange={onFilterChange}/> filter selected</Col>
           </Row>
           {
             Array.from(resourceMap.values()).filter(item => item.kind === "Kustomization").map(item => {
-
               let className = ""
               if (item.highlight) {
                 className = "highlightItem"
@@ -76,6 +85,7 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
                           <Row style={debugBorder}>
                             {section.subsections.map(subsection => {
                               const items = Array.from(resourceMap.values()).filter(item =>
+                                (!appConfig.settings.filterObjectsOnSelection || !hasSelection || item.highlight) &&
                                 item.kind === subsection.kindSelector &&
                                 micromatch.isMatch(item.version, subsection.apiVersionSelector)
                               );

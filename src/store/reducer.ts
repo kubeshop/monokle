@@ -1,5 +1,5 @@
-import {SELECT_KUSTOMIZATION, SET_ROOT_FOLDER} from "./actionTypes";
-import {AppState, FileEntry, K8sResource} from "../models/state";
+import {SELECT_KUSTOMIZATION, SET_FILTER_OBJECTS, SET_ROOT_FOLDER} from "./actionTypes";
+import {AppConfig, AppState, FileEntry, K8sResource} from "../models/state";
 import path from "path";
 import {AnyAction} from "redux";
 
@@ -8,6 +8,9 @@ const initialState: AppState = {
   files: [],
   statusText: "Welcome!",
   appConfig: {
+    settings: {
+      filterObjectsOnSelection: true
+    },
     scanExcludes: ['node_modules', '.git', '**/pkg/mod/**'],
     fileIncludes: ['yaml', 'yml'],
     navigators: [
@@ -81,11 +84,25 @@ const initialState: AppState = {
   fileMap: new Map()
 }
 
+function setFilterObjects(appConfig: AppConfig, filterObjectsOnSelection: boolean) {
+  return {
+    ...appConfig,
+    settings: {
+      filterObjectsOnSelection: filterObjectsOnSelection
+    }
+  }
+}
+
 const fileReducer = (
   state: AppState = initialState,
   action: AnyAction
 ): AppState => {
   switch (action.type) {
+    case SET_FILTER_OBJECTS:
+      return {
+        ...state,
+        appConfig: setFilterObjects(state.appConfig, action.filterObjectsOnSelection)
+      }
     case SET_ROOT_FOLDER:
       if (action.rootEntry) {
         return reduceRootFolder(action.rootEntry, action.resourceMap, action.fileMap, state);
