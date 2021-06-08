@@ -42,9 +42,11 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
                     {navigator.sections.map(section => {
                       return (
                         <>
-                          <Row style={debugBorder}>
-                            <h5>{section.name}</h5>
-                          </Row>
+                          {section.name.length > 0 &&
+                            <Row style={debugBorder}>
+                              <h5>{section.name}</h5>
+                            </Row>
+                          }
                           <Row style={debugBorder}>
                             {section.subsections.map(subsection => {
                               const items = Array.from(resourceMap.values()).filter(item =>

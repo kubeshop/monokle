@@ -2,6 +2,11 @@
 
 Desktop UI for managing k8s manifests.
 
+## Components used
+
+* https://github.com/shunjizhan/react-folder-tree
+
+
 ## Building
 
 This project was bootstrapped from https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, which
