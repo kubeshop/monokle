@@ -3,10 +3,11 @@ import {AppConfig, SetRootFolderAction, SetRootFolderDispatchType, FileEntry, K8
 import {SET_ROOT_FOLDER} from "./actionTypes";
 import path from "path";
 import {parseAllDocuments} from "yaml";
+import micromatch from "micromatch";
 
-export function setRootFolder(folder: string, appConfig: AppConfig) {
+export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
   return async (dispatch: SetRootFolderDispatchType) => {
-    const folderPath = path.parse(folder)
+    const folderPath = path.parse(rootFolder)
     const resourceMap : Map<string,K8sResource> = new Map()
 
     const rootEntry : FileEntry = {
@@ -19,11 +20,11 @@ export function setRootFolder(folder: string, appConfig: AppConfig) {
       children: []
     };
 
-    rootEntry.children = getAllFiles(folder, appConfig, resourceMap, rootEntry);
+    rootEntry.children = getAllFiles(rootFolder, appConfig, resourceMap, rootEntry, rootFolder);
 
     const action: SetRootFolderAction = {
       type: SET_ROOT_FOLDER,
-      rootFolder: folder,
+      rootFolder: rootFolder,
       appConfig: appConfig,
       resources: [],
       rootEntry: rootEntry,
@@ -34,7 +35,7 @@ export function setRootFolder(folder: string, appConfig: AppConfig) {
   }
 }
 
-const getAllFiles = function (folder: string, appConfig: AppConfig, resourceMap: Map<string, K8sResource>, parent : FileEntry ) {
+const getAllFiles = function (folder: string, appConfig: AppConfig, resourceMap: Map<string, K8sResource>, parent : FileEntry, rootFolder: string ) {
   const files = fs.readdirSync(folder)
   const result: FileEntry[] = []
 
@@ -50,10 +51,11 @@ const getAllFiles = function (folder: string, appConfig: AppConfig, resourceMap:
     }
 
     if (fs.statSync(folder + "/" + file).isDirectory()) {
-      if (appConfig.scanExcludes.includes(file.toLowerCase())) {
+      const folderPath = (folder + "/" + file).substr(rootFolder.length+1)
+      if ( appConfig.scanExcludes.some( e => micromatch.isMatch(folderPath, e))){
         fileEntry.excluded = true
       } else {
-        fileEntry.children = getAllFiles(folder + "/" + file, appConfig, resourceMap, fileEntry)
+        fileEntry.children = getAllFiles(folder + "/" + file, appConfig, resourceMap, fileEntry, rootFolder)
       }
     } else if (appConfig.fileIncludes.some(e => file.toLowerCase().endsWith(e))) {
       extractYamlContent(folder, file, fileEntry, resourceMap);

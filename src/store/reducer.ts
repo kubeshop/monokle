@@ -18,7 +18,7 @@ const initialState: AppState = {
   ],
   statusText: "Welcome!",
   appConfig: {
-    scanExcludes: ['node_modules', '.git'],
+    scanExcludes: ['node_modules', '.git', '**/pkg/mod/**' ],
     fileIncludes: ['yaml', 'yml'],
     navigators: [
       {
