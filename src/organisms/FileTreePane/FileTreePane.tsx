@@ -78,6 +78,9 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
       <FolderTree
         data={treeData}
         onChange={onTreeStateChange}
+        initCheckedStatus='custom'  // default: 0 [unchecked]
+        initOpenStatus='closed'  // default: 'open'
+        indentPixels={8}
       />
     </div>
   );
