@@ -32,6 +32,7 @@ const mapTreeNodeFromFileEntry = (fileEntry: FileEntry): TreeNode => ({
 const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
   const dispatch = useDispatch()
 
+
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);
 

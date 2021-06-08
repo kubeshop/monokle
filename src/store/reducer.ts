@@ -1,24 +1,14 @@
-import {SET_ROOT_FOLDER} from "./actionTypes";
-import {AppState, SetRootFolderAction, FileEntry, K8sResource} from "../models/state";
+import {SELECT_KUSTOMIZATION, SET_ROOT_FOLDER} from "./actionTypes";
+import {AppState, FileEntry, K8sResource} from "../models/state";
 import path from "path";
+import {AnyAction} from "redux";
 
 const initialState: AppState = {
-  rootFolder: ".",
-  files: [
-    {
-      name: "test.yaml",
-      folder: ".",
-      highlight: false,
-      selected: false,
-      expanded: false,
-      excluded: false,
-      children: [],
-      resourceIds: []
-    }
-  ],
+  rootFolder: "",
+  files: [],
   statusText: "Welcome!",
   appConfig: {
-    scanExcludes: ['node_modules', '.git', '**/pkg/mod/**' ],
+    scanExcludes: ['node_modules', '.git', '**/pkg/mod/**'],
     fileIncludes: ['yaml', 'yml'],
     navigators: [
       {
@@ -53,6 +43,16 @@ const initialState: AppState = {
                 kindSelector: "Service"
               }
             ]
+          },
+          {
+            name: "Security",
+            subsections: [
+              {
+                name: "ClusterRoles",
+                apiVersionSelector: "**",
+                kindSelector: "ClusterRole"
+              }
+            ]
           }
         ]
       },
@@ -73,33 +73,50 @@ const initialState: AppState = {
       },
       {
         name: "Prometheus",
-        sections:[]
+        sections: []
       }
     ]
   },
   resourceMap: new Map(),
+  fileMap: new Map()
 }
 
 const fileReducer = (
   state: AppState = initialState,
-  action: SetRootFolderAction
+  action: AnyAction
 ): AppState => {
   switch (action.type) {
     case SET_ROOT_FOLDER:
       if (action.rootEntry) {
-        return reduceRootFolder(action.rootEntry, action.resourceMap, state);
+        return reduceRootFolder(action.rootEntry, action.resourceMap, action.fileMap, state);
+      }
+      break
+    case SELECT_KUSTOMIZATION: //
+      if (action.resourceIds) {
+        action.resourceIds.forEach((e: string) => {
+          const resource = state.resourceMap.get(e)
+          if (resource) {
+            resource.highlight = true
+          }
+        })
+        return {
+          ...state,
+          resourceMap: state.resourceMap,
+        }
       }
   }
   return state
 }
 
-function reduceRootFolder(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>, state: AppState) {
+function reduceRootFolder(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>, fileMap: Map<string, FileEntry>, state: AppState) {
   var rootFolder = path.join(rootEntry.folder, rootEntry.name);
   return {
     ...state,
     rootFolder: rootFolder,
     statusText: "Loaded folder " + rootFolder,
+    fileMap: fileMap,
     resourceMap: resourceMap,
+
     files: rootEntry.children ? rootEntry.children : []
   }
 }

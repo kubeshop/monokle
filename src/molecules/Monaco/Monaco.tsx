@@ -35,7 +35,7 @@ class Monaco extends React.Component<IProps, IState> {
 
     return (
       <MonacoEditor
-        width="800"
+        width="600"
         height="600"
         language="shell"
         theme="vs-dark"
