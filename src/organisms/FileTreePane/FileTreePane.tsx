@@ -1,4 +1,6 @@
 import * as React from 'react';
+import FolderTree from 'react-folder-tree';
+import 'react-folder-tree/dist/style.css';
 import {AppConfig, FileEntry} from "../../models/state";
 import {FC, useCallback, useRef} from "react";
 import {useDispatch} from "react-redux";
@@ -11,6 +13,21 @@ interface FileTreeState {
   rootFolder: string,
   appConfig: AppConfig
 }
+
+interface TreeNode {
+  name: string,
+  checked: number,
+  isOpen: boolean,
+  children: TreeNode[] | null
+}
+
+const mapTreeNodeFromFileEntry= (fileEntry: FileEntry) : TreeNode => ({
+  name: fileEntry.name,
+  checked: fileEntry.selected ? 1 : 0,
+  isOpen: fileEntry.expanded,
+  children: fileEntry.children ?
+    fileEntry.children.map( child => mapTreeNodeFromFileEntry(child)) : []
+})
 
 const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
   const dispatch = useDispatch()
@@ -32,6 +49,21 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
     }, [dispatch]
   )
 
+  const onTreeStateChange = (state: any, event: any) => {
+    console.log("onTreeStateChange", state, event);
+    //buildTreeData(state);
+  }
+
+  const treeData : TreeNode = mapTreeNodeFromFileEntry({
+    name: rootFolder,
+    folder: '',
+    highlight: false,
+    selected: false,
+    expanded: true,
+    excluded: false,
+    children: files
+  });
+
   return (
     <div>
       <input
@@ -42,21 +74,10 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
         onChange={onUploadHandler}
         ref={folderInput}
       />
-      <h5>{rootFolder}</h5>
-      {
-        files.map(item => {
-          var className = "fileItem"
-          if (item.excluded) {
-            className = "excludedFileItem"
-          } else if (item.children && item.children.length > 0) {
-            className = "directoryItem"
-          }
-
-          return (
-            <div className={className} key={item.name}>{item.name}</div>
-          )
-        })
-      }
+      <FolderTree
+        data={ treeData }
+        onChange={ onTreeStateChange }
+      />
     </div>
   );
 };
