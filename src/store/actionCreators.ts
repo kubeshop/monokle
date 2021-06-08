@@ -38,8 +38,23 @@ export function selectKustomization(itemId: string, resourceMap: Map<string, K8s
     }
 
     // clear existing highlights
-    Array.from(resourceMap.values()).forEach(e => e.highlight = false)
-    selectKustomizationRefs(resourceMap, itemId, action);
+    Array.from(resourceMap.values()).forEach(e => {
+      e.highlight = false
+      if (e.id != itemId) {
+        e.selected = false
+      }
+    })
+
+    const resource = resourceMap.get(itemId)
+    if (resource) {
+      if (resource.selected) {
+        resource.selected = false
+      } else {
+        resource.selected = true
+        selectKustomizationRefs(resourceMap, itemId, action);
+      }
+    }
+
     dispatch(action)
   }
 }
@@ -137,7 +152,8 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
           kind: content.kind,
           version: content.apiVersion,
           content: content,
-          highlight: false
+          highlight: false,
+          selected: false
         }
 
         resourceMap.set(resource.id, resource)

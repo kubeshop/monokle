@@ -33,6 +33,7 @@ interface K8sResource {
   kind: string,
   version: string,
   highlight: boolean,
+  selected: boolean,
   content: any, // contains parsed yaml resource - used for filtering/etc
   refs?: ResourceRef[]
 }

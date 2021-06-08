@@ -1,3 +1,7 @@
-.selectedItem {
+.highlightItem {
   color: blue;
+}
+
+.selectedItem {
+  font-weight: bold;
 }
