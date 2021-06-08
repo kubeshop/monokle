@@ -32,6 +32,7 @@ const mapTreeNodeFromFileEntry = (fileEntry: FileEntry): TreeNode => ({
 const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
   const dispatch = useDispatch()
 
+
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);
 
@@ -79,7 +80,7 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
         onChange={onTreeStateChange}
         initCheckedStatus='custom'  // default: 0 [unchecked]
         initOpenStatus='closed'  // default: 'open'
-        indentPixels={ 8 }
+        indentPixels={8}
       />
     </div>
   );

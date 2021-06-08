@@ -3,16 +3,16 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import {applyMiddleware, createStore, Store} from "redux";
+import {AnyAction, applyMiddleware, createStore, Store} from "redux";
 import fileReducer from "./store/reducer";
 import thunk from "redux-thunk";
-import { composeWithDevTools } from 'redux-devtools-extension'
+import {composeWithDevTools} from 'redux-devtools-extension'
 import {Provider} from "react-redux";
-import {AppState, SetRootFolderAction, SetRootFolderDispatchType} from "./models/state";
+import {AppState, SetRootFolderDispatchType} from "./models/state";
 
 const composedEnhancer = composeWithDevTools(applyMiddleware(thunk))
 
-const store: Store<AppState, SetRootFolderAction> & {
+const store: Store<AppState, AnyAction> & {
   dispatch: SetRootFolderDispatchType
 } = createStore(fileReducer, composedEnhancer)
 

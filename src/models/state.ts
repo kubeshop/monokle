@@ -16,7 +16,13 @@ type SetRootFolderAction = {
   appConfig: AppConfig,
   rootEntry?: FileEntry,
   resources: K8sResource [],
-  resourceMap: Map<string,K8sResource>
+  resourceMap: Map<string, K8sResource>,
+  fileMap: Map<string, FileEntry>
+}
+
+type SelectKustomizationAction = {
+  type: string,
+  resourceIds: string[]
 }
 
 interface K8sResource {
@@ -27,7 +33,19 @@ interface K8sResource {
   kind: string,
   version: string,
   highlight: boolean,
-  content: any // contains parsed yaml resource - used for filtering/etc
+  selected: boolean,
+  content: any, // contains parsed yaml resource - used for filtering/etc
+  refs?: ResourceRef[]
+}
+
+export enum ResourceRefType {
+  KustomizationResource,
+  KustomizationParent
+}
+
+export interface ResourceRef {
+  targetResourceId: string,
+  refType: ResourceRefType
 }
 
 interface NavigatorSubSection {
@@ -57,9 +75,15 @@ type AppState = {
   files: FileEntry[],
   statusText: string,
   appConfig: AppConfig,
-  resourceMap: Map<string,K8sResource>
+  resourceMap: Map<string, K8sResource>,
+  fileMap: Map<string, FileEntry>
 }
 
 type SetRootFolderDispatchType = (args: SetRootFolderAction) => SetRootFolderAction
+type SelectKustomizationDispatchType = (args: SelectKustomizationAction) => SelectKustomizationAction
 
-export type {FileEntry, K8sResource, AppState, SetRootFolderAction, SetRootFolderDispatchType, AppConfig}
+export type {
+  FileEntry, K8sResource, AppState, SetRootFolderAction, SelectKustomizationAction,
+  SetRootFolderDispatchType,
+  SelectKustomizationDispatchType, AppConfig
+}
