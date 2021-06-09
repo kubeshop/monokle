@@ -3,16 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import {AnyAction, applyMiddleware, createStore, Store} from "redux";
-import fileReducer from "./store/reducer";
-import thunk from "redux-thunk";
-import {composeWithDevTools} from 'redux-devtools-extension'
 import {Provider} from "react-redux";
-import {AppState} from "./models/state";
-import {} from "./store/actionTypes";
-
-const composedEnhancer = composeWithDevTools(applyMiddleware(thunk))
-const store: Store<AppState, AnyAction> = createStore(fileReducer, composedEnhancer)
+import store from "./store/store";
 
 ReactDOM.render(
   <React.StrictMode>
