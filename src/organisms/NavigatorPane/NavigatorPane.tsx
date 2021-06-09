@@ -5,7 +5,7 @@ import {AppConfig, K8sResource} from "../../models/state";
 import micromatch from 'micromatch';
 import "../../styles/NavigatorPane.css"
 import {useDispatch} from "react-redux";
-import {selectKustomization, setFilterObjectsOnSelection} from "../../store/actionCreators";
+import {selectK8sResource, selectKustomization, setFilterObjectsOnSelection} from "../../store/actionCreators";
 
 interface NavigatorPaneState {
   resourceMap: Map<string, K8sResource>,
@@ -15,9 +15,11 @@ interface NavigatorPaneState {
 const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
   const dispatch = useDispatch()
 
-  const selectItem = function (item: string) {
-    console.log(item)
-  }
+  const selectItem = useCallback(
+    (item: string) => {
+      dispatch(selectK8sResource(item, resourceMap))
+    }, [dispatch, resourceMap]
+  )
 
   const selectKustomizationItem = useCallback(
     (item: string) => {
@@ -30,7 +32,8 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
       dispatch(setFilterObjectsOnSelection(e.target.checked))
     }, [dispatch])
 
-  const hasSelection = Array.from(resourceMap.values()).some(item => item.kind === "Kustomization" && item.selected);
+  // this should probably come from app state instead of being calculated
+  const selection = Array.from(resourceMap.values()).find(item => item.selected);
 
   return (
     <Container>
@@ -47,7 +50,8 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
             <Col><input type="checkbox" onChange={onFilterChange}/> filter selected</Col>
           </Row>
           {
-            Array.from(resourceMap.values()).filter(item => item.kind === "Kustomization").map(item => {
+            Array.from(resourceMap.values()).filter(item => item.kind === "Kustomization" &&
+              (!appConfig.settings.filterObjectsOnSelection || !selection || selection.kind === "Kustomization" || item.highlight || item.selected)).map(item => {
               let className = ""
               if (item.highlight) {
                 className = "highlightItem"
@@ -85,7 +89,7 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
                           <Row style={debugBorder}>
                             {section.subsections.map(subsection => {
                               const items = Array.from(resourceMap.values()).filter(item =>
-                                (!appConfig.settings.filterObjectsOnSelection || !hasSelection || item.highlight) &&
+                                (!appConfig.settings.filterObjectsOnSelection || !selection || item.highlight || item.selected) &&
                                 item.kind === subsection.kindSelector &&
                                 micromatch.isMatch(item.version, subsection.apiVersionSelector)
                               );

@@ -1,4 +1,4 @@
-import {SELECT_KUSTOMIZATION, SET_FILTER_OBJECTS, SET_ROOT_FOLDER} from "./actionTypes";
+import {SELECT_K8SRESOURCE, SELECT_KUSTOMIZATION, SET_FILTER_OBJECTS, SET_ROOT_FOLDER} from "./actionTypes";
 import {AppConfig, AppState, FileEntry, K8sResource} from "../models/state";
 import path from "path";
 import {AnyAction} from "redux";
@@ -9,7 +9,7 @@ const initialState: AppState = {
   statusText: "Welcome!",
   appConfig: {
     settings: {
-      filterObjectsOnSelection: true
+      filterObjectsOnSelection: false
     },
     scanExcludes: ['node_modules', '.git', '**/pkg/mod/**'],
     fileIncludes: ['yaml', 'yml'],
@@ -73,10 +73,6 @@ const initialState: AppState = {
             ]
           }
         ]
-      },
-      {
-        name: "Prometheus",
-        sections: []
       }
     ]
   },
@@ -90,6 +86,19 @@ function setFilterObjects(appConfig: AppConfig, filterObjectsOnSelection: boolea
     settings: {
       filterObjectsOnSelection: filterObjectsOnSelection
     }
+  }
+}
+
+function selectResourceFileEntry(resource: K8sResource) {
+  const fileEntry = resource.fileEntry
+  fileEntry.selected = true
+  expandParent(fileEntry)
+}
+
+function expandParent(fileEntry: FileEntry) {
+  if (fileEntry.parent) {
+    fileEntry.parent.expanded = true
+    expandParent(fileEntry.parent)
   }
 }
 
@@ -108,18 +117,43 @@ const fileReducer = (
         return reduceRootFolder(action.rootEntry, action.resourceMap, action.fileMap, state);
       }
       break
-    case SELECT_KUSTOMIZATION: //
-      if (action.resourceIds) {
-        action.resourceIds.forEach((e: string) => {
+    case SELECT_K8SRESOURCE:
+      if (action.linkedResourceIds && action.resourceId) {
+        const resource = state.resourceMap.get(action.resourceId)
+        if (resource) {
+          selectResourceFileEntry(resource)
+        }
+
+        action.linkedResourceIds.forEach((e: string) => {
           const resource = state.resourceMap.get(e)
           if (resource) {
             resource.highlight = true
           }
         })
-        return {
-          ...state,
-          resourceMap: state.resourceMap,
+      }
+      return {
+        ...state,
+        resourceMap: state.resourceMap,
+        files: state.files
+      }
+    case SELECT_KUSTOMIZATION:
+      if (action.linkedResourceIds && action.kustomizationResourceId) {
+        const resource = state.resourceMap.get(action.kustomizationResourceId)
+        if (resource) {
+          selectResourceFileEntry(resource)
         }
+
+        action.linkedResourceIds.forEach((e: string) => {
+          const resource = state.resourceMap.get(e)
+          if (resource) {
+            resource.highlight = true
+          }
+        })
+      }
+      return {
+        ...state,
+        resourceMap: state.resourceMap,
+        files: state.files
       }
   }
   return state

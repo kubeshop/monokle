@@ -1,13 +1,8 @@
 import fs from 'fs';
+import {AppConfig, FileEntry, K8sResource, ResourceRef, ResourceRefType} from "../models/state";
 import {
-  AppConfig,
-  FileEntry,
-  K8sResource,
-  ResourceRef,
-  ResourceRefType
-} from "../models/state";
-import {
-  SELECT_KUSTOMIZATION,
+  SELECT_K8SRESOURCE,
+  SELECT_KUSTOMIZATION, SelectK8sResourceAction, SelectK8sResourceDispatchType,
   SelectKustomizationAction,
   SelectKustomizationDispatchType,
   SET_FILTER_OBJECTS,
@@ -29,50 +24,89 @@ export function setFilterObjectsOnSelection(value: boolean) {
   }
 }
 
-function selectKustomizationRefs(resourceMap: Map<string, K8sResource>, itemId: string, action: SelectKustomizationAction) {
+function selectKustomizationRefs(resourceMap: Map<string, K8sResource>, itemId: string) {
+  let linkedResourceIds: string[] = []
   const kustomization = resourceMap.get(itemId)
   if (kustomization && kustomization.refs) {
     kustomization.refs.filter(r => r.refType === ResourceRefType.KustomizationResource).forEach(r => {
       const target = resourceMap.get(r.targetResourceId);
       if (target) {
-        action.resourceIds.push(r.targetResourceId)
+        linkedResourceIds.push(r.targetResourceId)
 
         if (target.kind === "Kustomization") {
-          selectKustomizationRefs(resourceMap, r.targetResourceId, action)
+          linkedResourceIds = linkedResourceIds.concat(selectKustomizationRefs(resourceMap, r.targetResourceId))
         }
       }
     })
   }
+
+  return linkedResourceIds
 }
 
-export function selectKustomization(itemId: string, resourceMap: Map<string, K8sResource>) {
-  return (dispatch: SelectKustomizationDispatchType) => {
-    const action: SelectKustomizationAction = {
-      type: SELECT_KUSTOMIZATION,
-      resourceIds: [],
-    }
+function selectLinkedResources(resourceMap: Map<string, K8sResource>, resource: K8sResource) {
+  const linkedResourceIds: string[] = []
+  resource.refs?.forEach(ref => {
+    linkedResourceIds.push(ref.targetResourceId)
+  })
 
-    // clear existing highlights
-    Array.from(resourceMap.values()).forEach(e => {
-      e.highlight = false
-      if (e.id != itemId) {
-        e.selected = false
-      }
-    })
+  return linkedResourceIds;
+}
+
+export function selectK8sResource(itemId: string, resourceMap: Map<string, K8sResource>) {
+  return (dispatch: SelectK8sResourceDispatchType) => {
+    const action: SelectK8sResourceAction = {
+      type: SELECT_K8SRESOURCE,
+    }
 
     const resource = resourceMap.get(itemId)
     if (resource) {
+      clearResourceSelections(resourceMap, itemId)
+
       if (resource.selected) {
         resource.selected = false
       } else {
         resource.selected = true
-        selectKustomizationRefs(resourceMap, itemId, action);
+        action.resourceId = resource.id
+        action.linkedResourceIds = selectLinkedResources(resourceMap, resource);
       }
     }
 
     dispatch(action)
   }
 }
+
+function clearResourceSelections(resourceMap: Map<string, K8sResource>, itemId: string) {
+  Array.from(resourceMap.values()).forEach(e => {
+    e.highlight = false
+    if (e.id != itemId) {
+      e.selected = false
+    }
+  })
+}
+
+export function selectKustomization(itemId: string, resourceMap: Map<string, K8sResource>) {
+  return (dispatch: SelectKustomizationDispatchType) => {
+    const action: SelectKustomizationAction = {
+      type: SELECT_KUSTOMIZATION,
+    }
+
+    const resource = resourceMap.get(itemId)
+    if (resource) {
+      clearResourceSelections(resourceMap, itemId);
+
+      if (resource.selected) {
+        resource.selected = false
+      } else {
+        resource.selected = true
+        action.kustomizationResourceId = resource.id
+        action.linkedResourceIds = selectKustomizationRefs(resourceMap, itemId);
+      }
+
+      dispatch(action)
+    }
+  }
+}
+
 
 export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
   return (dispatch: SetRootFolderDispatchType) => {
@@ -92,6 +126,7 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
 
     rootEntry.children = getAllFiles(rootFolder, appConfig, resourceMap, fileMap, rootEntry, rootFolder);
     processKustomizations(rootEntry, resourceMap, fileMap)
+    processServices(rootEntry, resourceMap)
 
     const action: SetRootFolderAction = {
       type: SET_ROOT_FOLDER,
@@ -160,8 +195,7 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
       const content = d.toJS();
       if (content && content.apiVersion && content.kind) {
         var resource: K8sResource = {
-          folder: fileEntry.folder,
-          file: fileEntry.name,
+          fileEntry: fileEntry,
           name: createResourceName(rootFolder, fileEntry, content),
           id: uuidv4(),
           kind: content.kind,
@@ -219,7 +253,7 @@ function isKustomization(childFileEntry: FileEntry, resourceMap: Map<string, K8s
 }
 
 function processKustomizations(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>, fileMap: Map<string, FileEntry>) {
-  Array.from(resourceMap.values()).filter(item => item.kind === "Kustomization").forEach(kustomization => {
+  getK8sResources(resourceMap, "Kustomization").forEach(kustomization => {
     if (kustomization.content.resources || kustomization.content.bases) {
       var resources = kustomization.content.resources || []
       if (kustomization.content.bases) {
@@ -227,7 +261,7 @@ function processKustomizations(rootEntry: FileEntry, resourceMap: Map<string, K8
       }
 
       resources.forEach((r: string) => {
-        const fileEntry = fileMap.get(path.join(kustomization.folder, r))
+        const fileEntry = fileMap.get(path.join(kustomization.fileEntry.folder, r))
         if (fileEntry) {
           if (fileEntry.children) {
             // resource is folder -> find contained kustomizations and link...
@@ -241,6 +275,37 @@ function processKustomizations(rootEntry: FileEntry, resourceMap: Map<string, K8
             linkParentKustomization(fileEntry, kustomization, resourceMap);
           }
         }
+      })
+    }
+  })
+}
+
+function getK8sResources(resourceMap: Map<string, K8sResource>, type: string) {
+  return Array.from(resourceMap.values()).filter(item => item.kind === type);
+}
+
+/**
+ * link services to target deployments via their label selector if specified
+ */
+function processServices(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
+  const deployments = getK8sResources(resourceMap, "Deployment").filter(d => d.content.spec?.template?.metadata?.labels)
+
+  getK8sResources(resourceMap, "Service").forEach(service => {
+    if (service.content.spec && service.content.spec.selector) {
+      Object.keys(service.content.spec.selector).forEach((e: any) => {
+        deployments.filter(d => d.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]).forEach(d => {
+          d.refs = d.refs || []
+          d.refs.push({
+            refType: ResourceRefType.ServicePodSelector,
+            targetResourceId: service.id
+          })
+
+          service.refs = service.refs || []
+          service.refs.push({
+            refType: ResourceRefType.ServicePodSelector,
+            targetResourceId: d.id
+          })
+        })
       })
     }
   })
