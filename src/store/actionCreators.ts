@@ -4,15 +4,30 @@ import {
   FileEntry,
   K8sResource,
   ResourceRef,
-  ResourceRefType, SelectKustomizationAction,
+  ResourceRefType
+} from "../models/state";
+import {
+  SELECT_KUSTOMIZATION,
+  SelectKustomizationAction,
   SelectKustomizationDispatchType,
+  SET_FILTER_OBJECTS,
+  SET_ROOT_FOLDER,
+  SetFilterObjectsDispatchType,
   SetRootFolderAction,
   SetRootFolderDispatchType
-} from "../models/state";
-import {SELECT_KUSTOMIZATION, SET_ROOT_FOLDER} from "./actionTypes";
+} from "./actionTypes";
 import path from "path";
 import {parseAllDocuments} from "yaml";
 import micromatch from "micromatch";
+
+export function setFilterObjectsOnSelection(value: boolean) {
+  return (dispatch: SetFilterObjectsDispatchType) => {
+    dispatch({
+      type: SET_FILTER_OBJECTS,
+      filterObjectsOnSelection: value
+    })
+  }
+}
 
 function selectKustomizationRefs(resourceMap: Map<string, K8sResource>, itemId: string, action: SelectKustomizationAction) {
   const kustomization = resourceMap.get(itemId)
@@ -34,7 +49,7 @@ export function selectKustomization(itemId: string, resourceMap: Map<string, K8s
   return (dispatch: SelectKustomizationDispatchType) => {
     const action: SelectKustomizationAction = {
       type: SELECT_KUSTOMIZATION,
-      resourceIds: []
+      resourceIds: [],
     }
 
     // clear existing highlights

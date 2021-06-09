@@ -8,13 +8,11 @@ import fileReducer from "./store/reducer";
 import thunk from "redux-thunk";
 import {composeWithDevTools} from 'redux-devtools-extension'
 import {Provider} from "react-redux";
-import {AppState, SetRootFolderDispatchType} from "./models/state";
+import {AppState} from "./models/state";
+import {} from "./store/actionTypes";
 
 const composedEnhancer = composeWithDevTools(applyMiddleware(thunk))
-
-const store: Store<AppState, AnyAction> & {
-  dispatch: SetRootFolderDispatchType
-} = createStore(fileReducer, composedEnhancer)
+const store: Store<AppState, AnyAction> = createStore(fileReducer, composedEnhancer)
 
 ReactDOM.render(
   <React.StrictMode>
