@@ -297,21 +297,25 @@ function processServices(rootEntry: FileEntry, resourceMap: Map<string, K8sResou
   getK8sResources(resourceMap, "Service").forEach(service => {
     if (service.content?.spec?.selector) {
       Object.keys(service.content.spec.selector).forEach((e: any) => {
-        deployments.filter(d => d.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]).forEach(d => {
-          d.refs = d.refs || []
-          d.refs.push({
-            refType: ResourceRefType.ServicePodSelector,
-            targetResourceId: service.id
-          })
-
-          service.refs = service.refs || []
-          service.refs.push({
-            refType: ResourceRefType.ServicePodSelector,
-            targetResourceId: d.id
-          })
+        deployments.filter(deployment => deployment.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]).forEach(deployment => {
+          linkResources(deployment, service, ResourceRefType.ServicePodSelector, ResourceRefType.ServicePodSelector)
         })
       })
     }
+  })
+}
+
+function linkResources(source: K8sResource, target: K8sResource, sourceRefType: ResourceRefType, targetRefType: ResourceRefType) {
+  source.refs = source.refs || []
+  source.refs.push({
+    refType: sourceRefType,
+    targetResourceId: target.id
+  })
+
+  target.refs = target.refs || []
+  target.refs.push({
+    refType: targetRefType,
+    targetResourceId: source.id
   })
 }
 
@@ -321,17 +325,7 @@ function processConfigMaps(rootEntry: FileEntry, resourceMap: Map<string, K8sRes
     getK8sResources(resourceMap, "Deployment").forEach(deployment => {
       JSONPath({path: '$..configMapRef.name', json: deployment.content}).forEach((refName: string) => {
         configMaps.filter(item => item.content.metadata.name === refName).forEach(configMapResource => {
-          configMapResource.refs = configMapResource.refs || []
-          configMapResource.refs.push({
-            refType: ResourceRefType.ConfigMapRef,
-            targetResourceId: deployment.id
-          })
-
-          deployment.refs = deployment.refs || []
-          deployment.refs.push({
-            refType: ResourceRefType.ConfigMapRef,
-            targetResourceId: configMapResource.id
-          })
+          linkResources(configMapResource, deployment, ResourceRefType.ConfigMapRef, ResourceRefType.ConfigMapRef);
         })
       })
     })
