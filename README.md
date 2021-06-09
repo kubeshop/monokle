@@ -8,6 +8,7 @@ Desktop UI for managing k8s manifests.
 * https://github.com/react-monaco-editor/react-monaco-editor for source editing
 * https://github.com/shunjizhan/react-folder-tree for file/folder tree
 * https://github.com/micromatch/micromatch for dynamic filtering in navigator and file exclusion matching
+* https://github.com/JSONPath-Plus/JSONPath for finding refs/selectors in resources
 
 ## Building
 

@@ -2,7 +2,9 @@ import fs from 'fs';
 import {AppConfig, FileEntry, K8sResource, ResourceRef, ResourceRefType} from "../models/state";
 import {
   SELECT_K8SRESOURCE,
-  SELECT_KUSTOMIZATION, SelectK8sResourceAction, SelectK8sResourceDispatchType,
+  SELECT_KUSTOMIZATION,
+  SelectK8sResourceAction,
+  SelectK8sResourceDispatchType,
   SelectKustomizationAction,
   SelectKustomizationDispatchType,
   SET_FILTER_OBJECTS,
@@ -14,6 +16,7 @@ import {
 import path from "path";
 import {parseAllDocuments} from "yaml";
 import micromatch from "micromatch";
+import {JSONPath} from 'jsonpath-plus';
 
 export function setFilterObjectsOnSelection(value: boolean) {
   return (dispatch: SetFilterObjectsDispatchType) => {
@@ -127,6 +130,7 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
     rootEntry.children = getAllFiles(rootFolder, appConfig, resourceMap, fileMap, rootEntry, rootFolder);
     processKustomizations(rootEntry, resourceMap, fileMap)
     processServices(rootEntry, resourceMap)
+    processConfigMaps(rootEntry, resourceMap)
 
     const action: SetRootFolderAction = {
       type: SET_ROOT_FOLDER,
@@ -291,7 +295,7 @@ function processServices(rootEntry: FileEntry, resourceMap: Map<string, K8sResou
   const deployments = getK8sResources(resourceMap, "Deployment").filter(d => d.content.spec?.template?.metadata?.labels)
 
   getK8sResources(resourceMap, "Service").forEach(service => {
-    if (service.content.spec && service.content.spec.selector) {
+    if (service.content?.spec?.selector) {
       Object.keys(service.content.spec.selector).forEach((e: any) => {
         deployments.filter(d => d.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]).forEach(d => {
           d.refs = d.refs || []
@@ -309,6 +313,29 @@ function processServices(rootEntry: FileEntry, resourceMap: Map<string, K8sResou
       })
     }
   })
+}
+
+function processConfigMaps(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
+  const configMaps = getK8sResources(resourceMap, "ConfigMap").filter(e => e.content?.metadata?.name)
+  if (configMaps) {
+    getK8sResources(resourceMap, "Deployment").forEach(deployment => {
+      JSONPath({path: '$..configMapRef.name', json: deployment.content}).forEach((refName: string) => {
+        configMaps.filter(item => item.content.metadata.name === refName).forEach(configMapResource => {
+          configMapResource.refs = configMapResource.refs || []
+          configMapResource.refs.push({
+            refType: ResourceRefType.ConfigMapRef,
+            targetResourceId: deployment.id
+          })
+
+          deployment.refs = deployment.refs || []
+          deployment.refs.push({
+            refType: ResourceRefType.ConfigMapRef,
+            targetResourceId: configMapResource.id
+          })
+        })
+      })
+    })
+  }
 }
 
 // taken from https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid

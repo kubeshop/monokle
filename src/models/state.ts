@@ -25,7 +25,8 @@ interface K8sResource {
 export enum ResourceRefType {
   KustomizationResource,
   KustomizationParent,
-  ServicePodSelector
+  ServicePodSelector,
+  ConfigMapRef
 }
 
 interface ResourceRef {
