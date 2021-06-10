@@ -13,8 +13,7 @@ interface FileEntry {
 interface K8sResource {
   id: string,
   name: string,
-  folder: string,
-  file: string,
+  fileEntry: FileEntry,
   kind: string,
   version: string,
   highlight: boolean,
@@ -25,7 +24,9 @@ interface K8sResource {
 
 export enum ResourceRefType {
   KustomizationResource,
-  KustomizationParent
+  KustomizationParent,
+  ServicePodSelector,
+  ConfigMapRef
 }
 
 interface ResourceRef {

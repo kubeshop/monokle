@@ -2,11 +2,19 @@ import {AppConfig, FileEntry, K8sResource} from "../models/state";
 
 export const SET_ROOT_FOLDER = "SET_ROOT_FOLDER"
 export const SELECT_KUSTOMIZATION = "SELECT_KUSTOMIZATION"
+export const SELECT_K8SRESOURCE = "SELECT_K8SRESOURCE"
 export const SET_FILTER_OBJECTS = "SET_FILTER_OBJECTS"
 
 type SelectKustomizationAction = {
   type: string,
-  resourceIds: string[]
+  kustomizationResourceId?: string,
+  linkedResourceIds?: string[]
+}
+
+type SelectK8sResourceAction = {
+  type: string,
+  resourceId?: string,
+  linkedResourceIds?: string[]
 }
 
 type SetRootFolderAction = {
@@ -26,6 +34,7 @@ type SetFilterObjectsAction = {
 
 type SetRootFolderDispatchType = (args: SetRootFolderAction) => SetRootFolderAction
 type SelectKustomizationDispatchType = (args: SelectKustomizationAction) => SelectKustomizationAction
+type SelectK8sResourceDispatchType = (args: SelectK8sResourceAction) => SelectK8sResourceAction
 type SetFilterObjectsDispatchType = (args: SetFilterObjectsAction) => SetFilterObjectsAction
 
 export type {
@@ -34,5 +43,7 @@ export type {
   SetRootFolderDispatchType,
   SelectKustomizationDispatchType,
   SetFilterObjectsAction,
-  SetFilterObjectsDispatchType
+  SetFilterObjectsDispatchType,
+  SelectK8sResourceAction,
+  SelectK8sResourceDispatchType
 }
