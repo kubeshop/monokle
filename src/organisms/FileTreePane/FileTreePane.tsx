@@ -28,7 +28,7 @@ const FileTreePane = () => {
 
   const rootFolder = useAppSelector( state => state.rootFolder )
   const appConfig = useAppSelector( state => state.appConfig)
-  const files = useAppSelector( state => state.files )
+  const files = useAppSelector( state => state.rootEntry?.children )
 
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);

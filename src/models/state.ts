@@ -63,19 +63,14 @@ type ResourceMapType = {
   [id: string]: K8sResource;
 }
 
-type FileMapType = {
-  [path: string]: FileEntry;
-}
-
 interface AppState {
   rootFolder: string,
-  files: FileEntry[],
+  rootEntry: FileEntry,
   statusText: string,
   appConfig: AppConfig,
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType
+  resourceMap: ResourceMapType
 }
 
 export type {
-  FileEntry, K8sResource, AppState, AppConfig, ResourceRef, ResourceMapType, FileMapType
+  FileEntry, K8sResource, AppState, AppConfig, ResourceRef, ResourceMapType
 };

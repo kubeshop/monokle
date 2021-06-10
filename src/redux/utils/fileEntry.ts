@@ -1,4 +1,4 @@
-import { AppConfig, FileEntry, FileMapType, K8sResource } from '../../models/state';
+import { AppConfig, FileEntry, K8sResource } from '../../models/state';
 import fs from "fs";
 import path from "path";
 import micromatch from "micromatch";
@@ -70,23 +70,29 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
   }
 }
 
-export function getFileEntry( resource: K8sResource, fileMap: FileMapType, rootFolder:string ){
-  return fileMap[path.join(rootFolder,resource.folder,resource.file)]
+function getFileEntries(resource: K8sResource, rootEntry:FileEntry) {
+  const result : FileEntry[] = []
+  const segments = resource.folder.substr(rootEntry.folder.length+1).split( path.sep );
+  segments.push( resource.file )
+
+  segments.forEach(pathSegment => {
+    const file = rootEntry.children?.find( child => child.name === pathSegment )
+    if( file ){
+      result.push( file )
+      rootEntry = file
+    }
+  })
+
+  return result
 }
 
-export function selectResourceFileEntry(resource: K8sResource, fileMap: FileMapType, rootFolder:string) {
-  const fileEntry = getFileEntry(resource,fileMap,rootFolder)
-  console.log( fileEntry.folder )
-  if( fileEntry ){
-    fileEntry.selected = true
-    expandParent(fileEntry, fileMap, rootFolder)
-  }
+export function selectResourceFileEntry(resource: K8sResource, rootEntry: FileEntry) {
+  getFileEntries( resource, rootEntry ).forEach( e => {
+    if( e.children ){
+      e.expanded = true
+    } else {
+      e.selected = true
+    }
+  })
 }
 
-function expandParent(fileEntry: FileEntry, fileMap: FileMapType, rootFolder:string) {
-  const parent = fileMap[path.join( rootFolder, fileEntry.folder, "..")]
-  if (parent) {
-    parent.expanded = true
-    expandParent(parent, fileMap, rootFolder)
-  }
-}

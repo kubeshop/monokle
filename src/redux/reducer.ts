@@ -1,7 +1,7 @@
 import {initialState} from "./initialState";
 import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import path from 'path';
-import { AppConfig, AppState, FileEntry, FileMapType, K8sResource, ResourceMapType } from '../models/state';
+import { AppConfig, AppState, FileEntry, K8sResource, ResourceMapType } from '../models/state';
 import { clearResourceSelections, getLinkedResources, selectKustomizationRefs } from './utils/selection';
 import { readFiles, selectResourceFileEntry } from './utils/fileEntry';
 import { processKustomizations } from './utils/kustomize';
@@ -11,8 +11,7 @@ type SetRootFolderPayload = {
   rootFolder: string,
   appConfig: AppConfig,
   rootEntry?: FileEntry,
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType
+  resourceMap: ResourceMapType
 }
 
 export const mainSlice = createSlice({
@@ -25,18 +24,19 @@ export const mainSlice = createSlice({
     },
     rootFolderSet: (state:Draft<AppState>, action:PayloadAction<SetRootFolderPayload>) => {
       if (action.payload.rootEntry) {
-        var rootFolder = path.join(action.payload.rootEntry.folder, action.payload.rootEntry.name);
-        state.statusText = "Loaded folder " + rootFolder
-        state.fileMap = action.payload.fileMap
+        state.statusText = "Loaded folder " + action.payload.rootFolder
         state.resourceMap = action.payload.resourceMap
-        state.files = action.payload.rootEntry.children ? action.payload.rootEntry.children : []
+        state.rootFolder = action.payload.rootFolder
+        state.rootEntry = action.payload.rootEntry
+
+        console.log( action.payload.rootEntry )
       }
     },
     selectKustomization: (state:Draft<AppState>, action:PayloadAction<string>) => {
       const resource = state.resourceMap[action.payload]
       if (resource) {
         clearResourceSelections(state.resourceMap, resource.id)
-        selectResourceFileEntry(resource, state.fileMap, state.rootFolder)
+        selectResourceFileEntry(resource, state.rootEntry)
 
         if (resource.selected) {
           resource.selected = false
@@ -50,7 +50,7 @@ export const mainSlice = createSlice({
       const resource = state.resourceMap[action.payload]
       if (resource) {
         clearResourceSelections(state.resourceMap, resource.id)
-        selectResourceFileEntry(resource, state.fileMap, state.rootFolder)
+        selectResourceFileEntry(resource, state.rootEntry)
 
         if (resource.selected) {
           resource.selected = false
@@ -89,7 +89,6 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
       appConfig: appConfig,
       rootEntry: rootEntry,
       resourceMap: toResourceMapType( resourceMap ),
-      fileMap: toFileMapType( fileMap )
     }
 
     dispatch(rootFolderSet(payload))
@@ -101,20 +100,6 @@ function toResourceMapType(resourceMap: Map<string, K8sResource>) {
   Array.from( resourceMap.values() ).forEach( e => result[e.id] = e )
   return result;
 }
-
-function toFileMapType(fileMap: Map<string, FileEntry>) {
-  const result : FileMapType = {}
-
-  Array.from( fileMap.keys() ).forEach( e => {
-    const path = fileMap.get( e );
-    if( path ){
-      result[e] = path
-    }
-  })
-
-  return result;
-}
-
 
 export const { setFilterObjects, rootFolderSet, selectKustomization, selectK8sResource } = mainSlice.actions
 export default mainSlice.reducer
