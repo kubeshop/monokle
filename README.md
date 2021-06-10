@@ -19,15 +19,26 @@ provides
 * Hot-relaod support for Electron app
 * Electron Bulder support
 
-## Available Scripts in addition to the existing ones
+Build with
 
-### `npm run electron:dev`
+```
+yarn install
+```
 
-Runs the Electron app in the development mode.
+run with
+
+```
+npm run electron:dev
+```
 
 The Electron app will reload if you make edits in the `electron` directory.<br>
 You will also see any lint errors in the console.
 
-### `npm run electron:build`
+Use
 
-Builds the Electron app package for production to the `dist` folder.
+```
+npm run electron:build
+```
+to build the Electron app package for production to the `dist` folder.
+
+See https://www.electron.build/ for more info on the electron builder
