@@ -1,18 +1,12 @@
 import * as React from 'react';
 import FolderTree from 'react-folder-tree';
 import 'react-folder-tree/dist/style.css';
-import {AppConfig, FileEntry} from "../../models/state";
-import {FC, useCallback, useRef} from "react";
-import {useDispatch} from "react-redux";
-import {setRootFolder} from "../../store/actionCreators";
+import {FileEntry} from "../../models/state";
+import {useRef} from "react";
 import path from 'path';
 import "../../styles/FileTreePane.css"
-
-interface FileTreeState {
-  files: FileEntry[],
-  rootFolder: string,
-  appConfig: AppConfig
-}
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { setRootFolder } from '../../redux/reducer';
 
 interface TreeNode {
   name: string,
@@ -29,9 +23,12 @@ const mapTreeNodeFromFileEntry = (fileEntry: FileEntry): TreeNode => ({
     fileEntry.children.map(child => mapTreeNodeFromFileEntry(child)) : null
 })
 
-const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
-  const dispatch = useDispatch()
+const FileTreePane = () => {
+  const dispatch = useAppDispatch()
 
+  const rootFolder = useAppSelector( state => state.rootFolder )
+  const appConfig = useAppSelector( state => state.appConfig)
+  const files = useAppSelector( state => state.rootEntry?.children )
 
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);
@@ -44,11 +41,9 @@ const FileTreePane: FC<FileTreeState> = ({files, rootFolder, appConfig}) => {
     }
   }
 
-  const setFolder = useCallback(
-    (folder: string) => {
-      dispatch(setRootFolder(folder, appConfig))
-    }, [dispatch]
-  )
+  const setFolder = (folder: string) => {
+    dispatch(setRootFolder(folder, appConfig))
+  }
 
   const onTreeStateChange = (state: any, event: any) => {
     console.log("onTreeStateChange", state, event);

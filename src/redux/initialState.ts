@@ -2,7 +2,14 @@ import {AppState} from "../models/state";
 
 export const initialState: AppState = {
   rootFolder: "",
-  files: [],
+  rootEntry: {
+    name:"",
+    folder :"",
+    selected:false,
+    highlight:false,
+    expanded:false,
+    excluded:false
+  },
   statusText: "Welcome!",
   appConfig: {
     settings: {
@@ -73,6 +80,5 @@ export const initialState: AppState = {
       }
     ]
   },
-  resourceMap: new Map(),
-  fileMap: new Map()
+  resourceMap: {}
 }

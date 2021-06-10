@@ -36,7 +36,7 @@ export function processKustomizations(rootEntry: FileEntry, resourceMap: Map<str
       }
 
       resources.forEach((r: string) => {
-        const fileEntry = fileMap.get(path.join(kustomization.fileEntry.folder, r))
+        const fileEntry = fileMap.get(path.join(kustomization.folder, r))
         if (fileEntry) {
           if (fileEntry.children) {
             // resource is folder -> find contained kustomizations and link...

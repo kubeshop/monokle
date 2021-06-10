@@ -1,4 +1,4 @@
-import {AppConfig, FileEntry, K8sResource} from "../../models/state";
+import { AppConfig, FileEntry, K8sResource } from '../../models/state';
 import fs from "fs";
 import path from "path";
 import micromatch from "micromatch";
@@ -17,8 +17,7 @@ export function readFiles(folder: string, appConfig: AppConfig, resourceMap: Map
       highlight: false,
       selected: false,
       expanded: false,
-      excluded: false,
-      parent: parent
+      excluded: false
     }
 
     const filePath = path.join(folder, file);
@@ -49,8 +48,9 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
       const content = d.toJS();
       if (content && content.apiVersion && content.kind) {
         var resource: K8sResource = {
-          fileEntry: fileEntry,
           name: createResourceName(rootFolder, fileEntry, content),
+          folder: fileEntry.folder,
+          file: fileEntry.name,
           id: uuidv4(),
           kind: content.kind,
           version: content.apiVersion,
@@ -70,15 +70,29 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
   }
 }
 
-export function selectResourceFileEntry(resource: K8sResource) {
-  const fileEntry = resource.fileEntry
-  fileEntry.selected = true
-  expandParent(fileEntry)
+function getFileEntries(resource: K8sResource, rootEntry:FileEntry) {
+  const result : FileEntry[] = []
+  const segments = resource.folder.substr(rootEntry.folder.length+1).split( path.sep );
+  segments.push( resource.file )
+
+  segments.forEach(pathSegment => {
+    const file = rootEntry.children?.find( child => child.name === pathSegment )
+    if( file ){
+      result.push( file )
+      rootEntry = file
+    }
+  })
+
+  return result
 }
 
-function expandParent(fileEntry: FileEntry) {
-  if (fileEntry.parent) {
-    fileEntry.parent.expanded = true
-    expandParent(fileEntry.parent)
-  }
+export function selectResourceFileEntry(resource: K8sResource, rootEntry: FileEntry) {
+  getFileEntries( resource, rootEntry ).forEach( e => {
+    if( e.children ){
+      e.expanded = true
+    } else {
+      e.selected = true
+    }
+  })
 }
+
