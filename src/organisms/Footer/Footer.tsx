@@ -1,11 +1,9 @@
 import * as React from 'react';
-import {FC} from "react";
+import { useAppSelector } from '../../redux/hooks';
 
-interface StatusBarState {
-  statusText: string
-}
+const Footer = () => {
+  const statusText = useAppSelector(state => state.statusText);
 
-const Footer: FC<StatusBarState> = ({statusText}) => {
   return (
     <div>
       ManifestUI kubeshop.io 2021 - {statusText}

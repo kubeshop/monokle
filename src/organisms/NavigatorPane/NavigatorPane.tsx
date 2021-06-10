@@ -1,39 +1,32 @@
-import React, {FC, useCallback} from 'react';
+import React from 'react';
 import {Container, Row, Col} from 'react-bootstrap';
 import {debugBorder} from "../../styles/DebugStyles";
-import {AppConfig, K8sResource} from "../../models/state";
+import {K8sResource } from '../../models/state';
 import micromatch from 'micromatch';
 import "../../styles/NavigatorPane.css"
-import {useDispatch} from "react-redux";
-import {selectK8sResource, selectKustomization, setFilterObjectsOnSelection} from "../../store/actionCreators";
+import { selectK8sResource, selectKustomization, setFilterObjects } from '../../redux/reducer';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
-interface NavigatorPaneState {
-  resourceMap: Map<string, K8sResource>,
-  appConfig: AppConfig,
-}
+const NavigatorPane = () => {
+  const dispatch = useAppDispatch()
 
-const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
-  const dispatch = useDispatch()
+  const resourceMap = useAppSelector( state => state.resourceMap )
+  const appConfig = useAppSelector( state => state.appConfig)
 
-  const selectItem = useCallback(
-    (item: string) => {
-      dispatch(selectK8sResource(item, resourceMap))
-    }, [dispatch, resourceMap]
-  )
+  const selectItem = (item: string) => {
+    dispatch(selectK8sResource(item))
+  }
 
-  const selectKustomizationItem = useCallback(
-    (item: string) => {
-      dispatch(selectKustomization(item, resourceMap))
-    }, [dispatch, resourceMap]
-  )
+  const selectKustomizationItem = (resourceId: string) => {
+    dispatch(selectKustomization(resourceId))
+  }
 
-  const onFilterChange = useCallback(
-    (e: any) => {
-      dispatch(setFilterObjectsOnSelection(e.target.checked))
-    }, [dispatch])
+  const onFilterChange = (e: any) => {
+    dispatch( setFilterObjects(e.target.checked))
+  }
 
   // this should probably come from app state instead of being calculated
-  const selection = Array.from(resourceMap.values()).find(item => item.selected);
+  const selection = Object.values(resourceMap).find(item => item.selected);
 
   return (
     <Container>
@@ -50,8 +43,9 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
             <Col><input type="checkbox" onChange={onFilterChange}/> filter selected</Col>
           </Row>
           {
-            Array.from(resourceMap.values()).filter(item => item.kind === "Kustomization" &&
-              (!appConfig.settings.filterObjectsOnSelection || !selection || selection.kind === "Kustomization" || item.highlight || item.selected)).map(item => {
+            Object.values(resourceMap).filter((item:K8sResource) => item.kind === "Kustomization" &&
+              (!appConfig.settings.filterObjectsOnSelection || !selection || selection.kind === "Kustomization" || item.highlight || item.selected))
+              .map((item:K8sResource) => {
               let className = ""
               if (item.highlight) {
                 className = "highlightItem"
@@ -88,7 +82,7 @@ const NavigatorPane: FC<NavigatorPaneState> = ({resourceMap, appConfig}) => {
                           }
                           <Row style={debugBorder}>
                             {section.subsections.map(subsection => {
-                              const items = Array.from(resourceMap.values()).filter(item =>
+                              const items = Object.values(resourceMap).filter(item =>
                                 (!appConfig.settings.filterObjectsOnSelection || !selection || item.highlight || item.selected) &&
                                 item.kind === subsection.kindSelector &&
                                 micromatch.isMatch(item.version, subsection.apiVersionSelector)

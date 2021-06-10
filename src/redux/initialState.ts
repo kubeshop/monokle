@@ -73,6 +73,6 @@ export const initialState: AppState = {
       }
     ]
   },
-  resourceMap: new Map(),
-  fileMap: new Map()
+  resourceMap: {},
+  fileMap: {}
 }

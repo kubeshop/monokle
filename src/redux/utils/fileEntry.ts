@@ -1,4 +1,4 @@
-import {AppConfig, FileEntry, K8sResource} from "../../models/state";
+import { AppConfig, FileEntry, FileMapType, K8sResource } from '../../models/state';
 import fs from "fs";
 import path from "path";
 import micromatch from "micromatch";
@@ -17,8 +17,7 @@ export function readFiles(folder: string, appConfig: AppConfig, resourceMap: Map
       highlight: false,
       selected: false,
       expanded: false,
-      excluded: false,
-      parent: parent
+      excluded: false
     }
 
     const filePath = path.join(folder, file);
@@ -49,8 +48,9 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
       const content = d.toJS();
       if (content && content.apiVersion && content.kind) {
         var resource: K8sResource = {
-          fileEntry: fileEntry,
           name: createResourceName(rootFolder, fileEntry, content),
+          folder: fileEntry.folder,
+          file: fileEntry.name,
           id: uuidv4(),
           kind: content.kind,
           version: content.apiVersion,
@@ -70,15 +70,23 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
   }
 }
 
-export function selectResourceFileEntry(resource: K8sResource) {
-  const fileEntry = resource.fileEntry
-  fileEntry.selected = true
-  expandParent(fileEntry)
+export function getFileEntry( resource: K8sResource, fileMap: FileMapType, rootFolder:string ){
+  return fileMap[path.join(rootFolder,resource.folder,resource.file)]
 }
 
-function expandParent(fileEntry: FileEntry) {
-  if (fileEntry.parent) {
-    fileEntry.parent.expanded = true
-    expandParent(fileEntry.parent)
+export function selectResourceFileEntry(resource: K8sResource, fileMap: FileMapType, rootFolder:string) {
+  const fileEntry = getFileEntry(resource,fileMap,rootFolder)
+  console.log( fileEntry.folder )
+  if( fileEntry ){
+    fileEntry.selected = true
+    expandParent(fileEntry, fileMap, rootFolder)
+  }
+}
+
+function expandParent(fileEntry: FileEntry, fileMap: FileMapType, rootFolder:string) {
+  const parent = fileMap[path.join( rootFolder, fileEntry.folder, "..")]
+  if (parent) {
+    parent.expanded = true
+    expandParent(parent, fileMap, rootFolder)
   }
 }

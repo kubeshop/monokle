@@ -5,15 +5,15 @@ interface FileEntry {
   selected: boolean,
   expanded: boolean,
   excluded: boolean,
-  parent?: FileEntry,
   children?: FileEntry[],
   resourceIds?: string []
 }
 
 interface K8sResource {
   id: string,
+  folder: string,
+  file: string,
   name: string,
-  fileEntry: FileEntry,
   kind: string,
   version: string,
   highlight: boolean,
@@ -50,7 +50,7 @@ interface ObjectNavigator {
   sections: NavigatorSection[],
 }
 
-type AppConfig = {
+interface AppConfig {
   scanExcludes: string[],
   fileIncludes: string[],
   navigators: ObjectNavigator[],
@@ -59,15 +59,23 @@ type AppConfig = {
   }
 }
 
-type AppState = {
+type ResourceMapType = {
+  [id: string]: K8sResource;
+}
+
+type FileMapType = {
+  [path: string]: FileEntry;
+}
+
+interface AppState {
   rootFolder: string,
   files: FileEntry[],
   statusText: string,
   appConfig: AppConfig,
-  resourceMap: Map<string, K8sResource>,
-  fileMap: Map<string, FileEntry>
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType
 }
 
 export type {
-  FileEntry, K8sResource, AppState, AppConfig, ResourceRef
-}
+  FileEntry, K8sResource, AppState, AppConfig, ResourceRef, ResourceMapType, FileMapType
+};
