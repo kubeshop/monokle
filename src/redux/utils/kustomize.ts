@@ -1,30 +1,14 @@
-import {FileEntry, K8sResource, ResourceRef, ResourceRefType} from "../../models/state";
-import {getK8sResources, isKustomization} from "./resource";
-import path from "path";
+import { FileEntry, K8sResource, ResourceRefType } from '../../models/state';
+import { getK8sResources, isKustomization, linkResources } from './resource';
+import path from 'path';
 
 function linkParentKustomization(fileEntry: FileEntry, kustomization: K8sResource, resourceMap: Map<string, K8sResource>) {
-  if (fileEntry.resourceIds) {
-    const parentRef: ResourceRef = {
-      targetResourceId: kustomization.id,
-      refType: ResourceRefType.KustomizationParent
+  fileEntry.resourceIds?.forEach(e => {
+    const target = resourceMap.get(e);
+    if (target) {
+      linkResources(kustomization, target, ResourceRefType.KustomizationResource, ResourceRefType.KustomizationParent);
     }
-
-    fileEntry.resourceIds.forEach(e => {
-      const target = resourceMap.get(e)
-      if (target) {
-        target.refs = target.refs || []
-        target.refs.push(parentRef)
-      }
-
-      kustomization.refs = kustomization.refs || []
-      kustomization.refs.push(
-        {
-          targetResourceId: e,
-          refType: ResourceRefType.KustomizationResource
-        }
-      )
-    })
-  }
+  });
 }
 
 export function processKustomizations(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>, fileMap: Map<string, FileEntry>) {

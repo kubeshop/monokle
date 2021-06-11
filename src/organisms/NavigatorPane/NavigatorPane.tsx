@@ -1,29 +1,30 @@
 import React from 'react';
-import {Container, Row, Col} from 'react-bootstrap';
-import {debugBorder} from "../../styles/DebugStyles";
-import {K8sResource } from '../../models/state';
+import { Container, Row, Col } from 'react-bootstrap';
+import { debugBorder } from '../../styles/DebugStyles';
+import { K8sResource } from '../../models/state';
 import micromatch from 'micromatch';
-import "../../styles/NavigatorPane.css"
+import '../../styles/NavigatorPane.css';
 import { selectK8sResource, selectKustomization, setFilterObjects } from '../../redux/reducer';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { hasIncomingRefs, hasOutgoingRefs } from '../../redux/utils/resource';
 
 const NavigatorPane = () => {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const resourceMap = useAppSelector( state => state.resourceMap )
-  const appConfig = useAppSelector( state => state.appConfig)
+  const resourceMap = useAppSelector(state => state.resourceMap);
+  const appConfig = useAppSelector(state => state.appConfig);
 
   const selectItem = (item: string) => {
-    dispatch(selectK8sResource(item))
-  }
+    dispatch(selectK8sResource(item));
+  };
 
   const selectKustomizationItem = (resourceId: string) => {
-    dispatch(selectKustomization(resourceId))
-  }
+    dispatch(selectKustomization(resourceId));
+  };
 
   const onFilterChange = (e: any) => {
-    dispatch( setFilterObjects(e.target.checked))
-  }
+    dispatch(setFilterObjects(e.target.checked));
+  };
 
   // this should probably come from app state instead of being calculated
   const selection = Object.values(resourceMap).find(item => item.selected);
@@ -40,24 +41,27 @@ const NavigatorPane = () => {
             <Col>
               <h5>Kustomizations</h5>
             </Col>
-            <Col><input type="checkbox" onChange={onFilterChange}/> filter selected</Col>
+            <Col><input type='checkbox' onChange={onFilterChange} /> filter selected</Col>
           </Row>
           {
-            Object.values(resourceMap).filter((item:K8sResource) => item.kind === "Kustomization" &&
-              (!appConfig.settings.filterObjectsOnSelection || !selection || selection.kind === "Kustomization" || item.highlight || item.selected))
-              .map((item:K8sResource) => {
-              let className = ""
-              if (item.highlight) {
-                className = "highlightItem"
-              } else if (item.selected) {
-                className = "selectedItem"
-              }
+            Object.values(resourceMap).filter((item: K8sResource) => item.kind === 'Kustomization' &&
+              (!appConfig.settings.filterObjectsOnSelection || !selection || selection.kind === 'Kustomization' || item.highlight || item.selected))
+              .map((item: K8sResource) => {
+                let className = '';
+                if (item.highlight) {
+                  className = 'highlightItem';
+                } else if (item.selected) {
+                  className = 'selectedItem';
+                }
 
-              return (
-                <div key={item.id} className={className}
-                     onClick={() => selectKustomizationItem(item.id)}>{item.name}</div>
-              )
-            })
+                return (
+                  <div key={item.id} className={className}
+                       onClick={() => selectKustomizationItem(item.id)}>
+                    {hasIncomingRefs(item) ? '>> ' : ''}
+                    {item.name}
+                    {hasOutgoingRefs(item) ? ' >>' : ''}</div>
+                );
+              })
           }
         </Col>
       </Row>
@@ -80,49 +84,53 @@ const NavigatorPane = () => {
                             <h5>{section.name}</h5>
                           </Row>
                           }
-                          <Row style={debugBorder}>
+                          <Row key={section.name} style={debugBorder}>
                             {section.subsections.map(subsection => {
                               const items = Object.values(resourceMap).filter(item =>
                                 (!appConfig.settings.filterObjectsOnSelection || !selection || item.highlight || item.selected) &&
                                 item.kind === subsection.kindSelector &&
-                                micromatch.isMatch(item.version, subsection.apiVersionSelector)
+                                micromatch.isMatch(item.version, subsection.apiVersionSelector),
                               );
                               return (
-                                <Col key={subsection.name}>
-                                  {subsection.name} {items.length > 0 ? "(" + items.length + ")" : ""}
+                                <Col key={subsection.name} style={debugBorder}>
+                                  <h6>{subsection.name} {items.length > 0 ? '(' + items.length + ')' : ''}</h6>
                                   {
                                     items.map(item => {
-                                      let className = ""
+                                      let className = '';
                                       if (item.highlight) {
-                                        className = "highlightItem"
+                                        className = 'highlightItem';
                                       } else if (item.selected) {
-                                        className = "selectedItem"
+                                        className = 'selectedItem';
                                       }
                                       return (
                                         <div key={item.id} className={className}
-                                             onClick={() => selectItem(item.id)}>- {item.name}</div>
-                                      )
+                                             onClick={() => selectItem(item.id)}>
+                                          {hasIncomingRefs(item) ? '>> ' : ''}
+                                          {item.name}
+                                          {hasOutgoingRefs(item) ? ' >>' : ''}
+                                        </div>
+                                      );
                                     })
                                   }
                                 </Col>
-                              )
+                              );
                             })
                             }
                           </Row>
                         </>
-                      )
+                      );
                     })
                     }
                   </Col>
                 </Row>
               </>
-            )
+            );
           })
           }
         </Col>
       </Row>
     </Container>
-  )
-}
+  );
+};
 
 export default NavigatorPane;

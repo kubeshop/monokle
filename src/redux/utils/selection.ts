@@ -1,19 +1,21 @@
 import { K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
 
-export function selectKustomizationRefs(resourceMap: ResourceMapType, itemId: string) {
-  let linkedResourceIds: string[] = []
-  const kustomization = resourceMap[itemId]
+export function selectKustomizationRefs(resourceMap: ResourceMapType, itemId: string, selectParent: boolean) {
+  let linkedResourceIds: string[] = [];
+  const kustomization = resourceMap[itemId];
   if (kustomization && kustomization.refs) {
-    kustomization.refs.filter(r => r.refType === ResourceRefType.KustomizationResource).forEach(r => {
+    kustomization.refs.filter(r => r.refType === ResourceRefType.KustomizationResource || (
+      selectParent && r.refType === ResourceRefType.KustomizationParent
+    )).forEach(r => {
       const target = resourceMap[r.targetResourceId];
       if (target) {
-        linkedResourceIds.push(r.targetResourceId)
+        linkedResourceIds.push(r.targetResourceId);
 
-        if (target.kind === "Kustomization") {
-          linkedResourceIds = linkedResourceIds.concat(selectKustomizationRefs(resourceMap, r.targetResourceId))
+        if (target.kind === 'Kustomization' && r.refType == ResourceRefType.KustomizationResource) {
+          linkedResourceIds = linkedResourceIds.concat(selectKustomizationRefs(resourceMap, r.targetResourceId, false));
         }
       }
-    })
+    });
   }
 
   return linkedResourceIds

@@ -26,7 +26,9 @@ export enum ResourceRefType {
   KustomizationResource,
   KustomizationParent,
   ServicePodSelector,
-  ConfigMapRef
+  SelectedPodName,
+  ConfigMapRef,
+  ConfigMapConsumer
 }
 
 interface ResourceRef {
