@@ -20,15 +20,48 @@ const mapTreeNodeFromFileEntry = (fileEntry: FileEntry): TreeNode => ({
   checked: fileEntry.selected ? 1 : 0,
   isOpen: fileEntry.expanded,
   children: fileEntry.children ?
-    fileEntry.children.map(child => mapTreeNodeFromFileEntry(child)) : null
-})
+    fileEntry.children.map(child => mapTreeNodeFromFileEntry(child)) : null,
+});
+
+// algorithm to find common root folder for selected files - since the first entry is not
+// necessarily the selected folder
+// eslint-disable-next-line no-undef
+function findRootFolder(files: FileList) {
+  var root = files[0];
+  var topIndex = -1;
+
+  for (var i = 1; i < files.length; i++) {
+    // @ts-ignore
+    var rootSegments = root.path.split(path.sep);
+    // @ts-ignore
+    var fileSegments = files[i].path.split(path.sep);
+
+    var ix = 0;
+    while (ix < rootSegments.length && ix < fileSegments.length && rootSegments[ix] === fileSegments[ix]) {
+      ix++;
+    }
+
+    if (topIndex == -1 || ix < topIndex) {
+      topIndex = ix;
+      root = files[i];
+    }
+  }
+
+  if (topIndex != -1) {
+    // @ts-ignore
+    return root.path.split(path.sep).slice(0, topIndex).join(path.sep);
+  } else {
+    // @ts-ignore
+    return root.path;
+  }
+}
 
 const FileTreePane = () => {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const rootFolder = useAppSelector( state => state.rootFolder )
-  const appConfig = useAppSelector( state => state.appConfig)
-  const files = useAppSelector( state => state.rootEntry?.children )
+  const rootFolder = useAppSelector(state => state.rootFolder);
+  const appConfig = useAppSelector(state => state.appConfig);
+  const files = useAppSelector(state => state.rootEntry?.children);
 
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);
@@ -36,8 +69,7 @@ const FileTreePane = () => {
   function onUploadHandler(e: any) {
     e.preventDefault();
     if (folderInput.current?.files && folderInput.current.files.length > 0) {
-      // @ts-ignore
-      setFolder(path.parse(folderInput.current.files[0].path).dir)
+      setFolder(findRootFolder(folderInput.current.files));
     }
   }
 
@@ -45,6 +77,7 @@ const FileTreePane = () => {
     dispatch(setRootFolder(folder, appConfig))
   }
 
+  // eslint-disable-next-line no-unused-vars
   const onTreeStateChange = (state: any, event: any) => {
     console.log("onTreeStateChange", state, event);
     //buildTreeData(state);

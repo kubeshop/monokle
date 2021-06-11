@@ -8,7 +8,7 @@ import NavigatorPane from './organisms/NavigatorPane';
 import FileTreePane from './organisms/FileTreePane';
 import Header from './organisms/Header';
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <div>
       <Container fluid>
@@ -17,7 +17,7 @@ const App: React.FC = () => {
         </Row>
         <Row style={debugBorder}>
           <Col sm={3} style={debugBorder}>
-            <FileTreePane/>
+            <FileTreePane />
           </Col>
 
           <Col sm={3} style={debugBorder}>

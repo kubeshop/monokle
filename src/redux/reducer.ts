@@ -19,7 +19,6 @@ export const mainSlice = createSlice({
   initialState,
   reducers: {
     setFilterObjects: (state:Draft<AppState>, action:PayloadAction<boolean>) => {
-      console.log( "Setting filter to " + action.payload)
       state.appConfig.settings.filterObjectsOnSelection = action.payload
     },
     rootFolderSet: (state:Draft<AppState>, action:PayloadAction<SetRootFolderPayload>) => {
@@ -28,8 +27,6 @@ export const mainSlice = createSlice({
         state.resourceMap = action.payload.resourceMap
         state.rootFolder = action.payload.rootFolder
         state.rootEntry = action.payload.rootEntry
-
-        console.log( action.payload.rootEntry )
       }
     },
     selectKustomization: (state:Draft<AppState>, action:PayloadAction<string>) => {

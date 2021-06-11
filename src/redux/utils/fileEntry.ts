@@ -71,15 +71,16 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
 }
 
 function getFileEntries(resource: K8sResource, rootEntry:FileEntry) {
-  const result : FileEntry[] = []
+  var parent = rootEntry;
+  const result: FileEntry[] = [];
   const segments = resource.folder.substr(rootEntry.folder.length+1).split( path.sep );
   segments.push( resource.file )
 
   segments.forEach(pathSegment => {
-    const file = rootEntry.children?.find( child => child.name === pathSegment )
+    const file = parent.children?.find(child => child.name === pathSegment);
     if( file ){
-      result.push( file )
-      rootEntry = file
+      result.push(file);
+      parent = file;
     }
   })
 
