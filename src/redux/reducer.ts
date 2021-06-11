@@ -38,8 +38,8 @@ export const mainSlice = createSlice({
         if (resource.selected) {
           resource.selected = false
         } else {
-          resource.selected = true
-          selectKustomizationRefs(state.resourceMap,resource.id).forEach( e => state.resourceMap[e].highlight = true)
+          resource.selected = true;
+          selectKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
         }
       }
     },
