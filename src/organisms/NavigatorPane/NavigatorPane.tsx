@@ -27,7 +27,7 @@ const NavigatorPane = () => {
   };
 
   // this should probably come from app state instead of being calculated
-  const selection = Object.values(resourceMap).find(item => item.selected);
+  const selection = Object.values(resourceMap).find(item => item.selected || item.highlight);
 
   return (
     <Container>
@@ -45,7 +45,7 @@ const NavigatorPane = () => {
           </Row>
           {
             Object.values(resourceMap).filter((item: K8sResource) => item.kind === 'Kustomization' &&
-              (!appConfig.settings.filterObjectsOnSelection || !selection || selection.kind === 'Kustomization' || item.highlight || item.selected))
+              (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selection))
               .map((item: K8sResource) => {
                 let className = '';
                 if (item.highlight) {
@@ -87,7 +87,7 @@ const NavigatorPane = () => {
                           <Row key={section.name} style={debugBorder}>
                             {section.subsections.map(subsection => {
                               const items = Object.values(resourceMap).filter(item =>
-                                (!appConfig.settings.filterObjectsOnSelection || !selection || item.highlight || item.selected) &&
+                                (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selection) &&
                                 item.kind === subsection.kindSelector &&
                                 micromatch.isMatch(item.version, subsection.apiVersionSelector),
                               );

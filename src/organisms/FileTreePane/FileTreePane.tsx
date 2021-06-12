@@ -6,7 +6,7 @@ import {useRef} from "react";
 import path from 'path';
 import "../../styles/FileTreePane.css"
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { setRootFolder } from '../../redux/reducer';
+import { selectFile, setRootFolder } from '../../redux/reducer';
 
 interface TreeNode {
   name: string,
@@ -16,7 +16,7 @@ interface TreeNode {
 }
 
 const mapTreeNodeFromFileEntry = (fileEntry: FileEntry): TreeNode => ({
-  name: fileEntry.name,
+  name: fileEntry.name + (fileEntry.resourceIds ? ` [${fileEntry.resourceIds?.length}]` : ''),
   checked: fileEntry.selected ? 1 : 0,
   isOpen: fileEntry.expanded,
   children: fileEntry.children ?
@@ -79,7 +79,7 @@ const FileTreePane = () => {
 
   // eslint-disable-next-line no-unused-vars
   const onTreeStateChange = (state: any, event: any) => {
-    console.log("onTreeStateChange", state, event);
+    //console.log("onTreeStateChange", state, event);
     //buildTreeData(state);
   }
 
@@ -90,22 +90,30 @@ const FileTreePane = () => {
     selected: false,
     expanded: true,
     excluded: false,
-    children: files
+    children: files,
   });
+
+  // custom event handler for node name click
+  // @ts-ignore
+  // eslint-disable-next-line no-unused-vars
+  const onNameClick = ({ defaultOnClick, nodeData }) => {
+    dispatch(selectFile(nodeData.path));
+  };
 
   return (
     <div>
       <input
-        type="file"
+        type='file'
         /* @ts-expect-error */
-        directory=""
-        webkitdirectory=""
+        directory=''
+        webkitdirectory=''
         onChange={onUploadHandler}
         ref={folderInput}
       />
       <FolderTree
         data={treeData}
         onChange={onTreeStateChange}
+        onNameClick={onNameClick}
         initCheckedStatus='custom'  // default: 0 [unchecked]
         initOpenStatus='closed'  // default: 'open'
         indentPixels={8}

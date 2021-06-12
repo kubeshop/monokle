@@ -2,7 +2,12 @@ import {initialState} from "./initialState";
 import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import path from 'path';
 import { AppConfig, AppState, FileEntry, K8sResource, ResourceMapType } from '../models/state';
-import { clearResourceSelections, getLinkedResources, selectKustomizationRefs } from './utils/selection';
+import {
+  clearResourceSelections,
+  getLinkedResources,
+  highlightChildren,
+  selectKustomizationRefs,
+} from './utils/selection';
 import { readFiles, selectResourceFileEntry } from './utils/fileEntry';
 import { processKustomizations } from './utils/kustomize';
 import { processConfigMaps, processServices } from './utils/resource';
@@ -46,17 +51,39 @@ export const mainSlice = createSlice({
     selectK8sResource: (state:Draft<AppState>, action:PayloadAction<string>) => {
       const resource = state.resourceMap[action.payload]
       if (resource) {
-        clearResourceSelections(state.resourceMap, resource.id)
-        selectResourceFileEntry(resource, state.rootEntry)
+        clearResourceSelections(state.resourceMap, resource.id);
+        selectResourceFileEntry(resource, state.rootEntry);
 
         if (resource.selected) {
-          resource.selected = false
+          resource.selected = false;
         } else {
-          resource.selected = true
-          getLinkedResources(resource).forEach( e => state.resourceMap[e].highlight = true)
+          resource.selected = true;
+          getLinkedResources(resource).forEach(e => state.resourceMap[e].highlight = true);
         }
       }
-    }
+    },
+    selectFile: (state: Draft<AppState>, action: PayloadAction<number[]>) => {
+      if (action.payload.length > 0) {
+        let parent = state.rootEntry;
+        for (var c = 0; c < action.payload.length; c++) {
+          const index = action.payload[c];
+          console.log('checking index ' + index);
+          // @ts-ignore
+          if (parent.children && index < parent.children.length) {
+            parent = parent.children[index];
+          } else {
+            break;
+          }
+        }
+
+        clearResourceSelections(state.resourceMap);
+        if (parent.resourceIds && parent.resourceIds.length > 0) {
+          parent.resourceIds.forEach(e => state.resourceMap[e].highlight = true);
+        } else if (parent.children) {
+          highlightChildren(parent, state.resourceMap);
+        }
+      }
+    },
   }
 })
 
@@ -98,6 +125,6 @@ function toResourceMapType(resourceMap: Map<string, K8sResource>) {
   return result;
 }
 
-export const { setFilterObjects, rootFolderSet, selectKustomization, selectK8sResource } = mainSlice.actions
+export const { setFilterObjects, rootFolderSet, selectKustomization, selectK8sResource, selectFile } = mainSlice.actions;
 export default mainSlice.reducer
 

@@ -1,4 +1,4 @@
-import { K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
+import { FileEntry, K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
 
 export function selectKustomizationRefs(resourceMap: ResourceMapType, itemId: string, selectParent: boolean) {
   let linkedResourceIds: string[] = [];
@@ -30,11 +30,21 @@ export function getLinkedResources(resource: K8sResource) {
   return linkedResourceIds;
 }
 
-export function clearResourceSelections(resourceMap: ResourceMapType, itemId: string) {
+export function clearResourceSelections(resourceMap: ResourceMapType, itemId?: string) {
   Object.values(resourceMap).forEach(e => {
-    e.highlight = false
-    if (e.id != itemId) {
-      e.selected = false
+    e.highlight = false;
+    if (!itemId || e.id != itemId) {
+      e.selected = false;
     }
-  })
+  });
+}
+
+export function highlightChildren(fileEntry: FileEntry, resourceMap: ResourceMapType) {
+  fileEntry.children?.forEach(child => {
+    if (child.resourceIds) {
+      child.resourceIds.forEach(e => resourceMap[e].highlight = true);
+    } else if (child.children) {
+      highlightChildren(child, resourceMap);
+    }
+  });
 }
