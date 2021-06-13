@@ -1,4 +1,4 @@
-import { K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
+import { FileEntry, K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
 
 export function selectKustomizationRefs(resourceMap: ResourceMapType, itemId: string, selectParent: boolean) {
   let linkedResourceIds: string[] = [];
@@ -18,23 +18,43 @@ export function selectKustomizationRefs(resourceMap: ResourceMapType, itemId: st
     });
   }
 
-  return linkedResourceIds
+  return linkedResourceIds;
 }
 
 export function getLinkedResources(resource: K8sResource) {
-  const linkedResourceIds: string[] = []
+  const linkedResourceIds: string[] = [];
   resource.refs?.forEach(ref => {
-    linkedResourceIds.push(ref.targetResourceId)
-  })
+    linkedResourceIds.push(ref.targetResourceId);
+  });
 
   return linkedResourceIds;
 }
 
-export function clearResourceSelections(resourceMap: ResourceMapType, itemId: string) {
+export function clearResourceSelections(resourceMap: ResourceMapType, itemId?: string) {
   Object.values(resourceMap).forEach(e => {
-    e.highlight = false
-    if (e.id != itemId) {
-      e.selected = false
+    e.highlight = false;
+    if (!itemId || e.id != itemId) {
+      e.selected = false;
     }
-  })
+  });
+}
+
+export function clearFileSelections(rootEntry: FileEntry) {
+  rootEntry.selected = false;
+  rootEntry.children?.forEach(e => {
+    e.selected = false;
+    if (e.children) {
+      clearFileSelections(e);
+    }
+  });
+}
+
+export function highlightChildren(fileEntry: FileEntry, resourceMap: ResourceMapType) {
+  fileEntry.children?.forEach(child => {
+    if (child.resourceIds) {
+      child.resourceIds.forEach(e => resourceMap[e].highlight = true);
+    } else if (child.children) {
+      highlightChildren(child, resourceMap);
+    }
+  });
 }

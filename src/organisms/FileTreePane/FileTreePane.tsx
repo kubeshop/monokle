@@ -6,22 +6,29 @@ import {useRef} from "react";
 import path from 'path';
 import "../../styles/FileTreePane.css"
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { setRootFolder } from '../../redux/reducer';
+import { selectFile, setRootFolder } from '../../redux/reducer';
 
 interface TreeNode {
   name: string,
   checked: number,
-  isOpen: boolean,
+  isOpen?: boolean,
   children: TreeNode[] | null
 }
 
-const mapTreeNodeFromFileEntry = (fileEntry: FileEntry): TreeNode => ({
-  name: fileEntry.name,
-  checked: fileEntry.selected ? 1 : 0,
-  isOpen: fileEntry.expanded,
-  children: fileEntry.children ?
-    fileEntry.children.map(child => mapTreeNodeFromFileEntry(child)) : null,
-});
+const mapTreeNodeFromFileEntry = (fileEntry: FileEntry): TreeNode => {
+  const result: TreeNode = {
+    name: fileEntry.name + (fileEntry.resourceIds ? ` [${fileEntry.resourceIds?.length}]` : ''),
+    checked: fileEntry.selected ? 1 : 0,
+    children: fileEntry.children ?
+      fileEntry.children.map(child => mapTreeNodeFromFileEntry(child)) : null,
+  };
+
+  if (fileEntry.children) {
+    result.isOpen = fileEntry.expanded;
+  }
+
+  return result;
+};
 
 // algorithm to find common root folder for selected files - since the first entry is not
 // necessarily the selected folder
@@ -79,9 +86,16 @@ const FileTreePane = () => {
 
   // eslint-disable-next-line no-unused-vars
   const onTreeStateChange = (state: any, event: any) => {
-    console.log("onTreeStateChange", state, event);
+    console.log('onTreeStateChange', state, event);
     //buildTreeData(state);
   }
+
+  // custom event handler for node name click
+  // @ts-ignore
+  // eslint-disable-next-line no-unused-vars
+  const onNameClick = ({ defaultOnClick, nodeData }) => {
+    dispatch(selectFile(nodeData.path));
+  };
 
   const treeData: TreeNode = mapTreeNodeFromFileEntry({
     name: rootFolder,
@@ -90,24 +104,25 @@ const FileTreePane = () => {
     selected: false,
     expanded: true,
     excluded: false,
-    children: files
+    children: files,
   });
 
   return (
     <div>
       <input
-        type="file"
+        type='file'
         /* @ts-expect-error */
-        directory=""
-        webkitdirectory=""
+        directory=''
+        webkitdirectory=''
         onChange={onUploadHandler}
         ref={folderInput}
       />
       <FolderTree
         data={treeData}
         onChange={onTreeStateChange}
+        onNameClick={onNameClick}
         initCheckedStatus='custom'  // default: 0 [unchecked]
-        initOpenStatus='closed'  // default: 'open'
+        initOpenStatus='custom'  // default: 'open'
         indentPixels={8}
       />
     </div>
