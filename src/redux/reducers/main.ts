@@ -37,11 +37,13 @@ export const mainSlice = createSlice({
       if (resource) {
         clearResourceSelections(state.resourceMap, resource.id);
         clearFileSelections(state.rootEntry);
+        state.selectedResource = undefined;
 
         if (resource.selected) {
           resource.selected = false
         } else {
           resource.selected = true;
+          state.selectedResource = resource.id;
           selectResourceFileEntry(resource, state.rootEntry);
           selectKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
         }
@@ -52,11 +54,13 @@ export const mainSlice = createSlice({
       if (resource) {
         clearResourceSelections(state.resourceMap, resource.id);
         clearFileSelections(state.rootEntry);
+        state.selectedResource = undefined;
 
         if (resource.selected) {
           resource.selected = false;
         } else {
           resource.selected = true;
+          state.selectedResource = resource.id;
           selectResourceFileEntry(resource, state.rootEntry);
           getLinkedResources(resource).forEach(e => state.resourceMap[e].highlight = true);
         }

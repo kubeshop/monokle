@@ -69,7 +69,8 @@ interface AppState {
   rootFolder: string,
   rootEntry: FileEntry,
   appConfig: AppConfig,
-  resourceMap: ResourceMapType
+  resourceMap: ResourceMapType,
+  selectedResource?: string
 }
 
 export type {

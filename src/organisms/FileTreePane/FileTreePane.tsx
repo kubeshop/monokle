@@ -86,7 +86,7 @@ const FileTreePane = () => {
 
   // eslint-disable-next-line no-unused-vars
   const onTreeStateChange = (state: any, event: any) => {
-    console.log('onTreeStateChange', state, event);
+   // console.log('onTreeStateChange', state, event);
     //buildTreeData(state);
   }
 
