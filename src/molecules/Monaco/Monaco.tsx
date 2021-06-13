@@ -36,7 +36,10 @@ const Monaco = () => {
 
   let code = '';
   if (selectedPath) {
-    code = fs.readFileSync(path.join(rootFolder, selectedPath), 'utf8');
+    const filePath = path.join(rootFolder, selectedPath);
+    if (!fs.statSync(filePath).isDirectory()) {
+      code = fs.readFileSync(filePath, 'utf8');
+    }
   }
 
   const options = {
