@@ -19,7 +19,8 @@ interface K8sResource {
   highlight: boolean,
   selected: boolean,
   content: any, // contains parsed yaml resource - used for filtering/etc
-  refs?: ResourceRef[]
+  refs?: ResourceRef[],
+  linePos: number
 }
 
 export enum ResourceRefType {
@@ -70,7 +71,8 @@ interface AppState {
   rootEntry: FileEntry,
   appConfig: AppConfig,
   resourceMap: ResourceMapType,
-  selectedResource?: string
+  selectedResource?: string,
+  selectedPath?: string
 }
 
 export type {

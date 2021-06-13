@@ -44,7 +44,7 @@ export const mainSlice = createSlice({
         } else {
           resource.selected = true;
           state.selectedResource = resource.id;
-          selectResourceFileEntry(resource, state.rootEntry);
+          state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
           selectKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
         }
       }
@@ -61,7 +61,7 @@ export const mainSlice = createSlice({
         } else {
           resource.selected = true;
           state.selectedResource = resource.id;
-          selectResourceFileEntry(resource, state.rootEntry);
+          state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
           getLinkedResources(resource).forEach(e => state.resourceMap[e].highlight = true);
         }
       }
@@ -69,12 +69,13 @@ export const mainSlice = createSlice({
     selectFile: (state: Draft<AppState>, action: PayloadAction<number[]>) => {
       if (action.payload.length > 0) {
         let parent = state.rootEntry;
+        let selectedPath = '';
         for (var c = 0; c < action.payload.length; c++) {
           const index = action.payload[c];
-          console.log('checking index ' + index);
           // @ts-ignore
           if (parent.children && index < parent.children.length) {
             parent = parent.children[index];
+            selectedPath = path.join(selectedPath, parent.name);
           } else {
             break;
           }
@@ -87,6 +88,8 @@ export const mainSlice = createSlice({
         } else if (parent.children) {
           highlightChildren(parent, state.resourceMap);
         }
+
+        state.selectedPath = selectedPath;
       }
     },
   }
