@@ -10,7 +10,6 @@ export const initialState: AppState = {
     expanded:false,
     excluded:false
   },
-  statusText: "Welcome!",
   appConfig: {
     settings: {
       filterObjectsOnSelection: false

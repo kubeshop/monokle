@@ -6,7 +6,7 @@ import {useRef} from "react";
 import path from 'path';
 import "../../styles/FileTreePane.css"
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectFile, setRootFolder } from '../../redux/reducer';
+import { selectFile, setRootFolder } from '../../redux/reducers/main';
 
 interface TreeNode {
   name: string,
@@ -66,9 +66,9 @@ function findRootFolder(files: FileList) {
 const FileTreePane = () => {
   const dispatch = useAppDispatch();
 
-  const rootFolder = useAppSelector(state => state.rootFolder);
-  const appConfig = useAppSelector(state => state.appConfig);
-  const files = useAppSelector(state => state.rootEntry?.children);
+  const rootFolder = useAppSelector(state => state.main.rootFolder);
+  const appConfig = useAppSelector(state => state.config);
+  const files = useAppSelector(state => state.main.rootEntry?.children);
 
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);

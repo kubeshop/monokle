@@ -68,7 +68,6 @@ type ResourceMapType = {
 interface AppState {
   rootFolder: string,
   rootEntry: FileEntry,
-  statusText: string,
   appConfig: AppConfig,
   resourceMap: ResourceMapType
 }
