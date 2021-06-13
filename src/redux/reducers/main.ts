@@ -1,17 +1,18 @@
-import {initialState} from "./initialState";
+import { initialState } from '../initialState';
 import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import path from 'path';
-import { AppConfig, AppState, FileEntry, K8sResource, ResourceMapType } from '../models/state';
+import { AppConfig, AppState, FileEntry, K8sResource, ResourceMapType } from '../../models/state';
 import {
   clearFileSelections,
   clearResourceSelections,
   getLinkedResources,
   highlightChildren,
   selectKustomizationRefs,
-} from './utils/selection';
-import { readFiles, selectResourceFileEntry } from './utils/fileEntry';
-import { processKustomizations } from './utils/kustomize';
-import { processConfigMaps, processServices } from './utils/resource';
+} from '../utils/selection';
+import { readFiles, selectResourceFileEntry } from '../utils/fileEntry';
+import { processKustomizations } from '../utils/kustomize';
+import { processConfigMaps, processServices } from '../utils/resource';
+import { AppDispatch } from '../store';
 
 type SetRootFolderPayload = {
   rootFolder: string,
@@ -24,12 +25,8 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
-    setFilterObjects: (state:Draft<AppState>, action:PayloadAction<boolean>) => {
-      state.appConfig.settings.filterObjectsOnSelection = action.payload
-    },
     rootFolderSet: (state:Draft<AppState>, action:PayloadAction<SetRootFolderPayload>) => {
       if (action.payload.rootEntry) {
-        state.statusText = "Loaded folder " + action.payload.rootFolder
         state.resourceMap = action.payload.resourceMap
         state.rootFolder = action.payload.rootFolder
         state.rootEntry = action.payload.rootEntry
@@ -92,10 +89,10 @@ export const mainSlice = createSlice({
 })
 
 export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
-  return async (dispatch:any) => {
-    const folderPath = path.parse(rootFolder)
-    const resourceMap: Map<string, K8sResource> = new Map()
-    const fileMap: Map<string, FileEntry> = new Map()
+  return async (dispatch: AppDispatch) => {
+    const folderPath = path.parse(rootFolder);
+    const resourceMap: Map<string, K8sResource> = new Map();
+    const fileMap: Map<string, FileEntry> = new Map();
 
     const rootEntry: FileEntry = {
       name: folderPath.name,
@@ -129,6 +126,6 @@ function toResourceMapType(resourceMap: Map<string, K8sResource>) {
   return result;
 }
 
-export const { setFilterObjects, rootFolderSet, selectKustomization, selectK8sResource, selectFile } = mainSlice.actions;
+export const { rootFolderSet, selectKustomization, selectK8sResource, selectFile } = mainSlice.actions;
 export default mainSlice.reducer
 

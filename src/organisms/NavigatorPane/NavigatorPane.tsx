@@ -4,15 +4,16 @@ import { debugBorder } from '../../styles/DebugStyles';
 import { K8sResource } from '../../models/state';
 import micromatch from 'micromatch';
 import '../../styles/NavigatorPane.css';
-import { selectK8sResource, selectKustomization, setFilterObjects } from '../../redux/reducer';
+import { selectK8sResource, selectKustomization } from '../../redux/reducers/main';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { hasIncomingRefs, hasOutgoingRefs } from '../../redux/utils/resource';
+import { setFilterObjects } from '../../redux/reducers/appConfig';
 
 const NavigatorPane = () => {
   const dispatch = useAppDispatch();
 
-  const resourceMap = useAppSelector(state => state.resourceMap);
-  const appConfig = useAppSelector(state => state.appConfig);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const appConfig = useAppSelector(state => state.config);
 
   const selectItem = (item: string) => {
     dispatch(selectK8sResource(item));
