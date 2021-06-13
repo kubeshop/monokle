@@ -3,6 +3,7 @@ import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import path from 'path';
 import { AppConfig, AppState, FileEntry, K8sResource, ResourceMapType } from '../models/state';
 import {
+  clearFileSelections,
   clearResourceSelections,
   getLinkedResources,
   highlightChildren,
@@ -37,13 +38,14 @@ export const mainSlice = createSlice({
     selectKustomization: (state:Draft<AppState>, action:PayloadAction<string>) => {
       const resource = state.resourceMap[action.payload]
       if (resource) {
-        clearResourceSelections(state.resourceMap, resource.id)
-        selectResourceFileEntry(resource, state.rootEntry)
+        clearResourceSelections(state.resourceMap, resource.id);
+        clearFileSelections(state.rootEntry);
 
         if (resource.selected) {
           resource.selected = false
         } else {
           resource.selected = true;
+          selectResourceFileEntry(resource, state.rootEntry);
           selectKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
         }
       }
@@ -52,12 +54,13 @@ export const mainSlice = createSlice({
       const resource = state.resourceMap[action.payload]
       if (resource) {
         clearResourceSelections(state.resourceMap, resource.id);
-        selectResourceFileEntry(resource, state.rootEntry);
+        clearFileSelections(state.rootEntry);
 
         if (resource.selected) {
           resource.selected = false;
         } else {
           resource.selected = true;
+          selectResourceFileEntry(resource, state.rootEntry);
           getLinkedResources(resource).forEach(e => state.resourceMap[e].highlight = true);
         }
       }
@@ -77,6 +80,7 @@ export const mainSlice = createSlice({
         }
 
         clearResourceSelections(state.resourceMap);
+        clearFileSelections(state.rootEntry);
         if (parent.resourceIds && parent.resourceIds.length > 0) {
           parent.resourceIds.forEach(e => state.resourceMap[e].highlight = true);
         } else if (parent.children) {

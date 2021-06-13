@@ -18,14 +18,14 @@ export function selectKustomizationRefs(resourceMap: ResourceMapType, itemId: st
     });
   }
 
-  return linkedResourceIds
+  return linkedResourceIds;
 }
 
 export function getLinkedResources(resource: K8sResource) {
-  const linkedResourceIds: string[] = []
+  const linkedResourceIds: string[] = [];
   resource.refs?.forEach(ref => {
-    linkedResourceIds.push(ref.targetResourceId)
-  })
+    linkedResourceIds.push(ref.targetResourceId);
+  });
 
   return linkedResourceIds;
 }
@@ -35,6 +35,16 @@ export function clearResourceSelections(resourceMap: ResourceMapType, itemId?: s
     e.highlight = false;
     if (!itemId || e.id != itemId) {
       e.selected = false;
+    }
+  });
+}
+
+export function clearFileSelections(rootEntry: FileEntry) {
+  rootEntry.selected = false;
+  rootEntry.children?.forEach(e => {
+    e.selected = false;
+    if (e.children) {
+      clearFileSelections(e);
     }
   });
 }
