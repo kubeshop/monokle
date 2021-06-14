@@ -5,6 +5,7 @@ import {
 import {debugBorder} from "../../styles/DebugStyles";
 import Monaco from '../../molecules/Monaco';
 import FormEditor from '../../molecules/FormEditor';
+import GraphView from '../../molecules/GraphView';
 
 const ActionsPane = () => (
   <Container>
@@ -14,14 +15,14 @@ const ActionsPane = () => (
     <Row style={debugBorder}>
       <Col>
         <Tabs defaultActiveKey='edit' id='uncontrolled-tab-example'>
-          <Tab eventKey='edit' title='Source'>
+          <Tab eventKey='source' title='Source'>
             <Monaco />
           </Tab>
-          <Tab eventKey='action2' title='Form'>
+          <Tab eventKey='form' title='Form'>
             <FormEditor />
           </Tab>
-          <Tab eventKey='action3' title='Graph' disabled>
-            lorem ipsum etc etc
+          <Tab eventKey='graph' title='Graph'>
+            <GraphView />
           </Tab>
         </Tabs>
       </Col>
