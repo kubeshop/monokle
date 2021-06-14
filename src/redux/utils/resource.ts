@@ -84,12 +84,21 @@ export function isKustomization(childFileEntry: FileEntry, resourceMap: Map<stri
 const incomingRefs = [ResourceRefType.KustomizationParent, ResourceRefType.ConfigMapRef, ResourceRefType.SelectedPodName];
 const outgoingRefs = [ResourceRefType.KustomizationResource, ResourceRefType.ConfigMapConsumer, ResourceRefType.ServicePodSelector];
 
+export function isIncomingRef(e: ResourceRefType) {
+  return incomingRefs.includes(e);
+}
+
+export function isOutgoingRef(e: ResourceRefType) {
+  return outgoingRefs.includes(e);
+}
+
+
 export function hasIncomingRefs(resource: K8sResource) {
-  return resource.refs?.find(e => incomingRefs.includes(e.refType));
+  return resource.refs?.find(e => isIncomingRef(e.refType));
 }
 
 export function hasOutgoingRefs(resource: K8sResource) {
-  return resource.refs?.find(e => outgoingRefs.includes(e.refType));
+  return resource.refs?.find(e => isOutgoingRef(e.refType));
 }
 
 // taken from https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid

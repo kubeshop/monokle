@@ -7,7 +7,7 @@ import {
   clearResourceSelections,
   getLinkedResources,
   highlightChildren,
-  selectKustomizationRefs,
+  getKustomizationRefs,
 } from '../utils/selection';
 import { readFiles, selectResourceFileEntry } from '../utils/fileEntry';
 import { processKustomizations } from '../utils/kustomize';
@@ -45,7 +45,7 @@ export const mainSlice = createSlice({
           resource.selected = true;
           state.selectedResource = resource.id;
           state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
-          selectKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
+          getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
         }
       }
     },
@@ -89,6 +89,7 @@ export const mainSlice = createSlice({
           highlightChildren(parent, state.resourceMap);
         }
 
+        state.selectedResource = undefined;
         state.selectedPath = selectedPath;
       }
     },

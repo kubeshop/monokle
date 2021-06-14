@@ -14,7 +14,7 @@ const ActionsPane = () => (
     </Row>
     <Row style={debugBorder}>
       <Col>
-        <Tabs defaultActiveKey='edit' id='uncontrolled-tab-example'>
+        <Tabs defaultActiveKey='source' id='uncontrolled-tab-example'>
           <Tab eventKey='source' title='Source'>
             <Monaco />
           </Tab>

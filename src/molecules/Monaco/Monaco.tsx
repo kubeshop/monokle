@@ -25,17 +25,19 @@ const Monaco = () => {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-  });
+  }, [editor, code]);
 
   function onChange(newValue: any, e: any) {
     console.log('onChange', newValue, e);
   }
 
   useEffect(() => {
+    console.log('selected path ' + selectedPath);
     if (selectedPath) {
       const filePath = path.join(rootFolder, selectedPath);
       if (selectedResource && resourceMap[selectedResource]) {
         const resource = resourceMap[selectedResource];
+        console.log('selected resource: ' + resource.name);
 
         if (fs.statSync(filePath).isFile()) {
           // reparse since we can't save the parsed document object in the state (non-serializable)
@@ -69,7 +71,6 @@ const Monaco = () => {
       editorDidMount={editorDidMount}
     />
   );
-
 };
 
 export default Monaco;
