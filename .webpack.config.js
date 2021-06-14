@@ -8,7 +8,7 @@ module.exports = config => {
 
   return appendWebpackPlugin(
     new MonacoWebpackPlugin({
-      languages: ['json'],
+      languages: ['yaml'],
     }),
     config,
   )

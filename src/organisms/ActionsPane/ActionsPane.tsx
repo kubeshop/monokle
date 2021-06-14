@@ -3,7 +3,8 @@ import {
   Col, Container, Row, Tab, Tabs,
 } from 'react-bootstrap';
 import {debugBorder} from "../../styles/DebugStyles";
-import Monaco from "../../molecules/Monaco";
+import Monaco from '../../molecules/Monaco';
+import FormEditor from '../../molecules/FormEditor';
 
 const ActionsPane = () => (
   <Container>
@@ -12,14 +13,14 @@ const ActionsPane = () => (
     </Row>
     <Row style={debugBorder}>
       <Col>
-        <Tabs defaultActiveKey="edit" id="uncontrolled-tab-example">
-          <Tab eventKey="edit" title="edit">
-            <Monaco/>
+        <Tabs defaultActiveKey='edit' id='uncontrolled-tab-example'>
+          <Tab eventKey='edit' title='Source'>
+            <Monaco />
           </Tab>
-          <Tab eventKey="action2" title="Action 2" disabled>
-            lorem ipsum etc etc
+          <Tab eventKey='action2' title='Form'>
+            <FormEditor />
           </Tab>
-          <Tab eventKey="action3" title="Action 3" disabled>
+          <Tab eventKey='action3' title='Graph' disabled>
             lorem ipsum etc etc
           </Tab>
         </Tabs>

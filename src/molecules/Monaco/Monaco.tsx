@@ -1,51 +1,75 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
+import { useAppSelector } from '../../redux/hooks';
+import fs from 'fs';
+import path from 'path';
+import { monaco } from 'react-monaco-editor';
+import { parseAllDocuments } from 'yaml';
 
-interface IProps {
-}
-
-interface IState {
-  code: any;
-}
-
-class Monaco extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
-    super(props);
-    this.state = {
-      code: '// type your code...',
-    }
-  }
+const Monaco = () => {
+  const rootFolder = useAppSelector(state => state.main.rootFolder);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const [editor, setEditor] = useState<monaco.editor.IEditor>();
+  const [code, setCode] = useState('');
 
   // eslint-disable-next-line no-unused-vars
-  editorDidMount(editor: any, monaco: any) {
+  function editorDidMount(editor: any, monaco: any) {
     console.log('editorDidMount', editor);
-    editor.focus();
+    setEditor(editor);
   }
 
-  onChange(newValue: any, e: any) {
+  useEffect(() => {
+    if (editor) {
+      editor.revealLineNearTop(1);
+      editor.setSelection(new monaco.Selection(0, 0, 0, 0));
+    }
+  });
+
+  function onChange(newValue: any, e: any) {
     console.log('onChange', newValue, e);
   }
 
-  render() {
-    const code = this.state.code;
+  useEffect(() => {
+    if (selectedPath) {
+      const filePath = path.join(rootFolder, selectedPath);
+      if (selectedResource && resourceMap[selectedResource]) {
+        const resource = resourceMap[selectedResource];
 
-    const options = {
-      selectOnLineNumbers: true
-    };
+        if (fs.statSync(filePath).isFile()) {
+          // reparse since we can't save the parsed document object in the state (non-serializable)
+          const documents = parseAllDocuments(fs.readFileSync(filePath, 'utf8'));
+          if (documents && resource.docIndex < documents.length) {
+            setCode(documents[resource.docIndex].toString());
+          }
+        }
+      } else {
+        const filePath = path.join(rootFolder, selectedPath);
+        if (!fs.statSync(filePath).isDirectory()) {
+          setCode(fs.readFileSync(filePath, 'utf8'));
+        }
+      }
+    }
+  }, [rootFolder, selectedPath, selectedResource, resourceMap]);
 
-    return (
-      <MonacoEditor
-        width="600"
-        height="600"
-        language="shell"
-        theme="vs-dark"
-        value={code}
-        options={options}
-        onChange={this.onChange}
-        editorDidMount={this.editorDidMount}
-      />
-    );
-  }
-}
+  const options = {
+    selectOnLineNumbers: true,
+  };
+
+  return (
+    <MonacoEditor
+      width='600'
+      height='600'
+      language='yaml'
+      theme='vs-dark'
+      value={code}
+      options={options}
+      onChange={onChange}
+      editorDidMount={editorDidMount}
+    />
+  );
+
+};
 
 export default Monaco;
