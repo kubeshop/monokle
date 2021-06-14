@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import { monaco } from 'react-monaco-editor';
 import { useAppSelector } from '../../redux/hooks';
 import fs from 'fs';
 import path from 'path';
+import { monaco } from 'react-monaco-editor';
+import { parseAllDocuments } from 'yaml';
 
 const Monaco = () => {
   const rootFolder = useAppSelector(state => state.main.rootFolder);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const [editor, setEditor] = useState();
+  const [editor, setEditor] = useState<monaco.editor.IEditor>();
+  const [code, setCode] = useState('');
 
   // eslint-disable-next-line no-unused-vars
   function editorDidMount(editor: any, monaco: any) {
@@ -19,14 +21,9 @@ const Monaco = () => {
   }
 
   useEffect(() => {
-    if (editor && selectedResource && resourceMap[selectedResource]) {
-      const resource = resourceMap[selectedResource];
-      if (resource.linePos) {
-        // @ts-ignore
-        editor.revealLineNearTop(resource.linePos);
-        // @ts-ignore
-        editor.setSelection(new monaco.Range(resource.linePos, 0, resource.linePos + 1, 0));
-      }
+    if (editor) {
+      editor.revealLineNearTop(1);
+      editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
   });
 
@@ -34,13 +31,27 @@ const Monaco = () => {
     console.log('onChange', newValue, e);
   }
 
-  let code = '';
-  if (selectedPath) {
-    const filePath = path.join(rootFolder, selectedPath);
-    if (!fs.statSync(filePath).isDirectory()) {
-      code = fs.readFileSync(filePath, 'utf8');
+  useEffect(() => {
+    if (selectedPath) {
+      const filePath = path.join(rootFolder, selectedPath);
+      if (selectedResource && resourceMap[selectedResource]) {
+        const resource = resourceMap[selectedResource];
+
+        if (fs.statSync(filePath).isFile()) {
+          // reparse since we can't save the parsed document object in the state (non-serializable)
+          const documents = parseAllDocuments(fs.readFileSync(filePath, 'utf8'));
+          if (documents && resource.docIndex < documents.length) {
+            setCode(documents[resource.docIndex].toString());
+          }
+        }
+      } else {
+        const filePath = path.join(rootFolder, selectedPath);
+        if (!fs.statSync(filePath).isDirectory()) {
+          setCode(fs.readFileSync(filePath, 'utf8'));
+        }
+      }
     }
-  }
+  }, [rootFolder, selectedPath, selectedResource, resourceMap]);
 
   const options = {
     selectOnLineNumbers: true,

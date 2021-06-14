@@ -45,6 +45,7 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
   const documents = parseAllDocuments(fileContent, { lineCounter });
 
   if (documents) {
+    var docIndex = 0;
     documents.forEach(d => {
       const content = d.toJS();
       if (content && content.apiVersion && content.kind) {
@@ -59,6 +60,7 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
           highlight: false,
           selected: false,
           linePos: lineCounter.linePos(d.range[0]).line,
+          docIndex: docIndex++,
         };
 
         resourceMap.set(resource.id, resource);
