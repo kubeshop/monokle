@@ -32,6 +32,7 @@ const Monaco = () => {
   }
 
   useEffect(() => {
+    let newCode = '';
     if (selectedPath) {
       const filePath = path.join(rootFolder, selectedPath);
       if (selectedResource && resourceMap[selectedResource]) {
@@ -41,16 +42,18 @@ const Monaco = () => {
           // reparse since we can't save the parsed document object in the state (non-serializable)
           const documents = parseAllDocuments(fs.readFileSync(filePath, 'utf8'));
           if (documents && resource.docIndex < documents.length) {
-            setCode(documents[resource.docIndex].toString());
+            newCode = documents[resource.docIndex].toString();
           }
         }
       } else {
         const filePath = path.join(rootFolder, selectedPath);
         if (!fs.statSync(filePath).isDirectory()) {
-          setCode(fs.readFileSync(filePath, 'utf8'));
+          newCode = fs.readFileSync(filePath, 'utf8');
         }
       }
     }
+
+    setCode(newCode);
   }, [rootFolder, selectedPath, selectedResource, resourceMap]);
 
   const options = {
