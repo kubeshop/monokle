@@ -33,7 +33,7 @@ const NavigatorPane = () => {
   return (
     <Container>
       <Row style={debugBorder}>
-        <h5>navigator</h5>
+        <h4>Navigator</h4>
       </Row>
 
       <Row style={debugBorder}>
@@ -73,7 +73,7 @@ const NavigatorPane = () => {
             return (
               <>
                 <Row style={debugBorder}>
-                  <h4>{navigator.name}</h4>
+                  <h5>{navigator.name}</h5>
                 </Row>
                 <Row style={debugBorder}>
                   <Col>
@@ -82,7 +82,7 @@ const NavigatorPane = () => {
                         <>
                           {section.name.length > 0 &&
                           <Row style={debugBorder}>
-                            <h5>{section.name}</h5>
+                            <h6>{section.name}</h6>
                           </Row>
                           }
                           <Row key={section.name} style={debugBorder}>

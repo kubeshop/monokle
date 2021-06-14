@@ -10,7 +10,7 @@ import GraphView from '../../molecules/GraphView';
 const ActionsPane = () => (
   <Container>
     <Row style={debugBorder}>
-      <h5>Actions</h5>
+      <h4>Editors/Actions</h4>
     </Row>
     <Row style={debugBorder}>
       <Col>

@@ -1,12 +1,14 @@
 import * as React from 'react';
 import FolderTree from 'react-folder-tree';
 import 'react-folder-tree/dist/style.css';
-import {FileEntry} from "../../models/state";
-import {useRef} from "react";
+import { FileEntry } from '../../models/state';
+import { useRef } from 'react';
 import path from 'path';
-import "../../styles/FileTreePane.css"
+import '../../styles/FileTreePane.css';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectFile, setRootFolder } from '../../redux/reducers/main';
+import { Row } from 'react-bootstrap';
+import { debugBorder } from '../../styles/DebugStyles';
 
 interface TreeNode {
   name: string,
@@ -109,6 +111,9 @@ const FileTreePane = () => {
 
   return (
     <div>
+      <Row style={debugBorder}>
+        <h4>File Explorer</h4>
+      </Row>
       <input
         type='file'
         /* @ts-expect-error */
