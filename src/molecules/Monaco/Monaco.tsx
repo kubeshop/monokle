@@ -32,12 +32,10 @@ const Monaco = () => {
   }
 
   useEffect(() => {
-    console.log('selected path ' + selectedPath);
     if (selectedPath) {
       const filePath = path.join(rootFolder, selectedPath);
       if (selectedResource && resourceMap[selectedResource]) {
         const resource = resourceMap[selectedResource];
-        console.log('selected resource: ' + resource.name);
 
         if (fs.statSync(filePath).isFile()) {
           // reparse since we can't save the parsed document object in the state (non-serializable)

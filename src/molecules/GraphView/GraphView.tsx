@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Row } from 'react-bootstrap';
-import ReactFlow, { Edge, Node, isNode } from 'react-flow-renderer';
+import ReactFlow, { Edge, Node, isNode, Position } from 'react-flow-renderer';
 import { useAppSelector } from '../../redux/hooks';
 import { K8sResource, ResourceRef } from '../../models/state';
 import { useEffect, useState } from 'react';
@@ -33,7 +33,7 @@ function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-const getLayoutedElements = (elements: [any]): any => {
+const getLayoutedElements = (elements: any[]): any => {
   dagreGraph.setGraph({ rankdir: 'LR', ranksep: 50 });
 
   elements.forEach((el) => {
@@ -53,10 +53,8 @@ const getLayoutedElements = (elements: [any]): any => {
   return elements.map((el: any) => {
     if (isNode(el)) {
       const nodeWithPosition = dagreGraph.node(el.id);
-      // @ts-ignore
-      el.targetPosition = 'right';
-      // @ts-ignore
-      el.sourcePosition = 'left';
+      el.targetPosition = Position.Right;
+      el.sourcePosition = Position.Left;
 
       // unfortunately we need this little hack to pass a slightly different position
       // to notify react flow about the change. Moreover we are shifting the dagre node position
@@ -80,9 +78,8 @@ const GraphView = () => {
   const [data, setData] = useState<any>([]);
   const [reactFlow, setReactFlow] = useState();
 
-  function updateGraph(data: Node<any>[]) {
+  function updateGraph(data: any[]) {
     if (reactFlow) {
-      // @ts-ignore
       setData(getLayoutedElements(data));
       // @ts-ignore
       reactFlow.fitView();
@@ -110,12 +107,9 @@ const GraphView = () => {
       }
     } else if (selectedPath) {
       const fileEntry = getFileEntryForPath(selectedPath, rootEntry);
-      console.log('File entry for path ' + selectedPath);
-      console.log(fileEntry);
       if (fileEntry && fileEntry.resourceIds) {
         let data: any[] = [];
         fileEntry.resourceIds.map(id => resourceMap[id]).forEach(r => data = data.concat(getElementData(r)));
-        console.log(data);
         updateGraph(data);
       }
     } else {
@@ -124,7 +118,6 @@ const GraphView = () => {
   }, [selectedResource, resourceMap, selectedPath, rootEntry, reactFlow]);
 
   const onLoad = (reactFlowInstance: any) => {
-    console.log('onload');
     setReactFlow(reactFlowInstance);
   };
 

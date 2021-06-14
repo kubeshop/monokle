@@ -27,9 +27,11 @@ export const mainSlice = createSlice({
   reducers: {
     rootFolderSet: (state:Draft<AppState>, action:PayloadAction<SetRootFolderPayload>) => {
       if (action.payload.rootEntry) {
-        state.resourceMap = action.payload.resourceMap
-        state.rootFolder = action.payload.rootFolder
-        state.rootEntry = action.payload.rootEntry
+        state.resourceMap = action.payload.resourceMap;
+        state.rootFolder = action.payload.rootFolder;
+        state.rootEntry = action.payload.rootEntry;
+        state.selectedResource = undefined;
+        state.selectedPath = undefined;
       }
     },
     selectKustomization: (state:Draft<AppState>, action:PayloadAction<string>) => {
