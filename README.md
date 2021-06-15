@@ -22,7 +22,7 @@ provides
 Build with
 
 ```
-yarn install
+npm install
 ```
 
 run with
