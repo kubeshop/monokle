@@ -6,11 +6,11 @@ import ReactFlow, {
   isNode,
   Position,
   MiniMap,
-  Controls, ReactFlowProvider,
+  ReactFlowProvider,
 } from 'react-flow-renderer';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { K8sResource, ResourceRef } from '../../models/state';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import dagre from 'dagre';
 import { isIncomingRef } from '../../redux/utils/resource';
 import { selectK8sResource } from '../../redux/reducers/main';
@@ -19,7 +19,10 @@ import Sidebar from './sidebar';
 function mapResourceToElement(resource: K8sResource): Node {
   return {
     id: resource.id,
-    data: { label: resource.name },
+    data: {
+      label: resource.name,
+      wasSelectedInGraphView: false,
+    },
     position: { x: 0, y: 0 },
   };
 }
@@ -106,12 +109,14 @@ const GraphView = () => {
     console.log('updated graph...');
   }, [rootFolder]);
 
-  const onLoad = (reactFlowInstance: any) => {
-    setReactFlow(reactFlowInstance);
-  };
+  const onLoad = useCallback((instance) => {
+    instance.fitView();
+    setReactFlow(instance);
+  }, []);
 
   const onSelectionChange = (elements: any) => {
     if (elements && elements[0]) {
+      elements[0].data.wasSelectedInGraphView = true;
       dispatch(selectK8sResource(elements[0].id));
     }
   };
@@ -119,9 +124,9 @@ const GraphView = () => {
   return (
     <Row>
       <span style={{ width: 600, height: 600 }}>
-<div className='zoompanflow'>
-      <ReactFlowProvider>
-        <div className='reactflow-wrapper' style={{ width: 600, height: 600 }}>
+        <div className='zoompanflow'>
+          <ReactFlowProvider>
+            <div className='reactflow-wrapper' style={{ width: 600, height: 600 }}>
               <ReactFlow
                 minZoom={0.1}
                 panOnScroll={true}
@@ -129,7 +134,6 @@ const GraphView = () => {
                 onLoad={onLoad}
                 onSelectionChange={onSelectionChange}
                 elements={nodes}>
-                  <Controls />
                   <MiniMap
                     nodeColor={(node) => {
                       switch (node.type) {
@@ -145,11 +149,10 @@ const GraphView = () => {
                     }}
                     nodeStrokeWidth={3} />
               </ReactFlow>
+            </div>
+            <Sidebar reactFlow={reactFlow} />
+          </ReactFlowProvider>
         </div>
-                        <Sidebar />
-      </ReactFlowProvider>
-</div>
-
       </span>
     </Row>
   );
