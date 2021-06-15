@@ -98,14 +98,19 @@ function getFileEntries(resource: K8sResource, rootEntry: FileEntry) {
 
 export function selectResourceFileEntry(resource: K8sResource, rootEntry: FileEntry) {
   let result = '';
-  getFileEntries( resource, rootEntry ).forEach( e => {
+  getFileEntries(resource, rootEntry).forEach(e => {
     result = path.join(result, e.name);
-    if( e.children ){
-      e.expanded = true
+    if (e.children) {
+      e.expanded = true;
     } else {
-      e.selected = true
+      e.selected = true;
     }
-  })
+  });
   return result;
+}
+
+export function getStaticResourcePath(resourcePath: string) {
+  // @ts-ignore
+  return process.env.NODE_ENV === 'development' ? path.join('resources', resourcePath) : path.join(process.resourcesPath, 'resources', resourcePath);
 }
 
