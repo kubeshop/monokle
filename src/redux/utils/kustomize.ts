@@ -1,5 +1,5 @@
 import { FileEntry, K8sResource, ResourceRefType } from '../../models/state';
-import { getK8sResources, isKustomization, linkResources } from './resource';
+import { getK8sResources, isKustomizationFile, linkResources } from './resource';
 import path from 'path';
 
 function linkParentKustomization(fileEntry: FileEntry, kustomization: K8sResource, resourceMap: Map<string, K8sResource>) {
@@ -25,7 +25,7 @@ export function processKustomizations(rootEntry: FileEntry, resourceMap: Map<str
           if (fileEntry.children) {
             // resource is folder -> find contained kustomizations and link...
             fileEntry.children.filter(
-              childFileEntry => isKustomization(childFileEntry, resourceMap)
+              childFileEntry => isKustomizationFile(childFileEntry, resourceMap),
             ).forEach(childFileEntry => {
               linkParentKustomization(childFileEntry, kustomization, resourceMap)
             })

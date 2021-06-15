@@ -1,13 +1,20 @@
 import * as React from 'react';
 import { Row } from 'react-bootstrap';
-import ReactFlow, { Edge, Node, isNode, Position } from 'react-flow-renderer';
-import { useAppSelector } from '../../redux/hooks';
+import ReactFlow, {
+  Edge,
+  Node,
+  isNode,
+  Position,
+  MiniMap,
+  Controls, ReactFlowProvider,
+} from 'react-flow-renderer';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { K8sResource, ResourceRef } from '../../models/state';
 import { useEffect, useState } from 'react';
-import { getLinkedResources } from '../../redux/utils/selection';
 import dagre from 'dagre';
 import { isIncomingRef } from '../../redux/utils/resource';
-import { getFileEntryForPath } from '../../redux/utils/fileEntry';
+import { selectK8sResource } from '../../redux/reducers/main';
+import Sidebar from './sidebar';
 
 function mapResourceToElement(resource: K8sResource): Node {
   return {
@@ -24,9 +31,6 @@ function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
     source: ref.targetResourceId,
     animated: false,
     type: 'smoothstep',
-    data: {
-      refType: ref.refType,
-    },
   };
 }
 
@@ -70,65 +74,82 @@ const getLayoutedElements = (elements: any[]): any => {
 };
 
 const GraphView = () => {
-
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const rootEntry = useAppSelector(state => state.main.rootEntry);
-  const [data, setData] = useState<any>([]);
+  const rootFolder = useAppSelector(state => state.main.rootFolder);
+
+  const dispatch = useAppDispatch();
   const [reactFlow, setReactFlow] = useState();
+  const [nodes, setNodes] = useState<any[]>([]);
 
   function updateGraph(data: any[]) {
     if (reactFlow) {
-      setData(getLayoutedElements(data));
+      setNodes(getLayoutedElements(data));
       // @ts-ignore
       reactFlow.fitView();
     }
   }
 
   function getElementData(resource: K8sResource) {
-    const linkedResources = getLinkedResources(resource);
     let data: any[] = [mapResourceToElement(resource)];
-    data = data.concat(linkedResources.map(id => resourceMap[id]).map(r => mapResourceToElement(r)));
     if (resource.refs) {
-      const refResources = resource.refs.filter(ref => linkedResources.includes(ref.targetResourceId));
-      const refs = refResources.map(ref => mapRefToElement(resource, ref));
+      const refs = resource.refs.map(ref => mapRefToElement(resource, ref));
       data = data.concat(refs);
     }
     return data;
   }
 
   useEffect(() => {
-    if (selectedResource) {
-      const resource = resourceMap[selectedResource];
-      if (resource) {
-        const data = getElementData(resource);
-        updateGraph(data);
-      }
-    } else if (selectedPath) {
-      const fileEntry = getFileEntryForPath(selectedPath, rootEntry);
-      if (fileEntry && fileEntry.resourceIds) {
-        let data: any[] = [];
-        fileEntry.resourceIds.map(id => resourceMap[id]).forEach(r => data = data.concat(getElementData(r)));
-        updateGraph(data);
-      }
-    } else {
-      updateGraph([]);
-    }
-  }, [selectedResource, resourceMap, selectedPath, rootEntry, reactFlow]);
+    let data: any[] = [];
+    Object.values(resourceMap).forEach(r => data = data.concat(getElementData(r)));
+    updateGraph(data);
+    setNodes(data);
+    console.log('updated graph...');
+  }, [rootFolder]);
 
   const onLoad = (reactFlowInstance: any) => {
     setReactFlow(reactFlowInstance);
   };
 
+  const onSelectionChange = (elements: any) => {
+    if (elements && elements[0]) {
+      dispatch(selectK8sResource(elements[0].id));
+    }
+  };
+
   return (
     <Row>
       <span style={{ width: 600, height: 600 }}>
-        <ReactFlow
-          panOnScroll={true}
-          nodesConnectable={false}
-          onLoad={onLoad}
-          elements={data} />
+<div className='zoompanflow'>
+      <ReactFlowProvider>
+        <div className='reactflow-wrapper' style={{ width: 600, height: 600 }}>
+              <ReactFlow
+                minZoom={0.1}
+                panOnScroll={true}
+                nodesConnectable={false}
+                onLoad={onLoad}
+                onSelectionChange={onSelectionChange}
+                elements={nodes}>
+                  <Controls />
+                  <MiniMap
+                    nodeColor={(node) => {
+                      switch (node.type) {
+                        case 'input':
+                          return 'red';
+                        case 'default':
+                          return '#00ff00';
+                        case 'output':
+                          return 'rgb(0,0,255)';
+                        default:
+                          return '#eee';
+                      }
+                    }}
+                    nodeStrokeWidth={3} />
+              </ReactFlow>
+        </div>
+                        <Sidebar />
+      </ReactFlowProvider>
+</div>
+
       </span>
     </Row>
   );

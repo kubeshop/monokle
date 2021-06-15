@@ -62,20 +62,22 @@ export function linkResources(source: K8sResource, target: K8sResource, sourceRe
 }
 
 export function createResourceName(rootFolder: string, fileEntry: FileEntry, content: any) {
-  if (content.kind === "Kustomization") {
-    return fileEntry.folder.substr(rootFolder.length + 1)
+  if (content.kind === 'Kustomization') {
+    return fileEntry.folder.substr(rootFolder.length + 1);
   }
 
-  var name = content.metadata?.name ? content.metadata.name + " " : ""
-  return name + content.kind + " [" + content.apiVersion + "]"
+  var name = content.metadata?.name ? content.metadata.name + ' ' : '';
+  return name + content.kind + ' [' + content.apiVersion + ']';
 }
 
-export function isKustomization(childFileEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
+export function isKustomizationResource(r: K8sResource | undefined) {
+  return r && r.kind === 'Kustomization';
+}
+
+export function isKustomizationFile(childFileEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
   if (childFileEntry.name.toLowerCase() === 'kustomization.yaml' && childFileEntry.resourceIds) {
     const r = resourceMap.get(childFileEntry.resourceIds[0]);
-    if (r && r.kind === 'Kustomization') {
-      return true;
-    }
+    return isKustomizationResource(r);
   }
 
   return false;
