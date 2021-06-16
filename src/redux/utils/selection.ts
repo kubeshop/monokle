@@ -1,8 +1,8 @@
 import { FileEntry, K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
 
-export function selectKustomizationRefs(resourceMap: ResourceMapType, itemId: string, selectParent: boolean) {
+export function getKustomizationRefs(resourceMap: ResourceMapType, kustomizationId: string, selectParent: boolean) {
   let linkedResourceIds: string[] = [];
-  const kustomization = resourceMap[itemId];
+  const kustomization = resourceMap[kustomizationId];
   if (kustomization && kustomization.refs) {
     kustomization.refs.filter(r => r.refType === ResourceRefType.KustomizationResource || (
       selectParent && r.refType === ResourceRefType.KustomizationParent
@@ -12,7 +12,7 @@ export function selectKustomizationRefs(resourceMap: ResourceMapType, itemId: st
         linkedResourceIds.push(r.targetResourceId);
 
         if (target.kind === 'Kustomization' && r.refType == ResourceRefType.KustomizationResource) {
-          linkedResourceIds = linkedResourceIds.concat(selectKustomizationRefs(resourceMap, r.targetResourceId, false));
+          linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.targetResourceId, false));
         }
       }
     });

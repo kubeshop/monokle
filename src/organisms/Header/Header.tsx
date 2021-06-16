@@ -6,7 +6,7 @@ const Header = () => (
   <Container fluid>
     <Row style={debugBorder}>
       <Col sm={5}>
-        <h4>ManifestUI logo</h4>
+        <h4>ManifestUI / Monokle logo</h4>
       </Col>
     </Row>
   </Container>

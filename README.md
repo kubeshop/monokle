@@ -9,6 +9,9 @@ Desktop UI for managing k8s manifests.
 * https://github.com/shunjizhan/react-folder-tree for file/folder tree
 * https://github.com/micromatch/micromatch for dynamic filtering in navigator and file exclusion matching
 * https://github.com/JSONPath-Plus/JSONPath for finding refs/selectors in resources
+* https://github.com/rjsf-team/react-jsonschema-form for generating forms for k8s resources
+* https://github.com/wbkd/react-flow for graph diagrams
+* https://github.com/tweenjs/es6-tween for animation tweening
 
 ## Building
 

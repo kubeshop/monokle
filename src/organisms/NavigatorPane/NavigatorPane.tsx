@@ -4,7 +4,7 @@ import { debugBorder } from '../../styles/DebugStyles';
 import { K8sResource } from '../../models/state';
 import micromatch from 'micromatch';
 import '../../styles/NavigatorPane.css';
-import { selectK8sResource, selectKustomization } from '../../redux/reducers/main';
+import { selectK8sResource } from '../../redux/reducers/main';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { hasIncomingRefs, hasOutgoingRefs } from '../../redux/utils/resource';
 import { setFilterObjects } from '../../redux/reducers/appConfig';
@@ -15,12 +15,8 @@ const NavigatorPane = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const appConfig = useAppSelector(state => state.config);
 
-  const selectItem = (item: string) => {
-    dispatch(selectK8sResource(item));
-  };
-
-  const selectKustomizationItem = (resourceId: string) => {
-    dispatch(selectKustomization(resourceId));
+  const selectResource = (resourceId: string) => {
+    dispatch(selectK8sResource(resourceId));
   };
 
   const onFilterChange = (e: any) => {
@@ -33,7 +29,7 @@ const NavigatorPane = () => {
   return (
     <Container>
       <Row style={debugBorder}>
-        <h5>navigator</h5>
+        <h4>Navigator</h4>
       </Row>
 
       <Row style={debugBorder}>
@@ -57,7 +53,7 @@ const NavigatorPane = () => {
 
                 return (
                   <div key={item.id} className={className}
-                       onClick={() => selectKustomizationItem(item.id)}>
+                       onClick={() => selectResource(item.id)}>
                     {hasIncomingRefs(item) ? '>> ' : ''}
                     {item.name}
                     {hasOutgoingRefs(item) ? ' >>' : ''}</div>
@@ -73,7 +69,7 @@ const NavigatorPane = () => {
             return (
               <>
                 <Row style={debugBorder}>
-                  <h4>{navigator.name}</h4>
+                  <h5>{navigator.name}</h5>
                 </Row>
                 <Row style={debugBorder}>
                   <Col>
@@ -82,7 +78,7 @@ const NavigatorPane = () => {
                         <>
                           {section.name.length > 0 &&
                           <Row style={debugBorder}>
-                            <h5>{section.name}</h5>
+                            <h6>{section.name}</h6>
                           </Row>
                           }
                           <Row key={section.name} style={debugBorder}>
@@ -105,7 +101,7 @@ const NavigatorPane = () => {
                                       }
                                       return (
                                         <div key={item.id} className={className}
-                                             onClick={() => selectItem(item.id)}>
+                                             onClick={() => selectResource(item.id)}>
                                           {hasIncomingRefs(item) ? '>> ' : ''}
                                           {item.name}
                                           {hasOutgoingRefs(item) ? ' >>' : ''}

@@ -74,6 +74,20 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
   }
 }
 
+export function getFileEntryForPath(filePath: string, rootEntry: FileEntry) {
+  let current = rootEntry;
+  filePath.split(path.sep).forEach(segment => {
+    const child = current.children?.find(e => e.name === segment);
+    if (child) {
+      current = child;
+    } else {
+      return undefined;
+    }
+  });
+
+  return current;
+}
+
 export function getFileEntryForResource(resource: K8sResource, rootEntry: FileEntry) {
   const entries = getFileEntries(resource, rootEntry);
   return entries.length > 0 ? entries[entries.length - 1] : undefined;

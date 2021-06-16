@@ -7,11 +7,11 @@ import {
   clearResourceSelections,
   getLinkedResources,
   highlightChildren,
-  selectKustomizationRefs,
+  getKustomizationRefs,
 } from '../utils/selection';
 import { readFiles, selectResourceFileEntry } from '../utils/fileEntry';
 import { processKustomizations } from '../utils/kustomize';
-import { processConfigMaps, processServices } from '../utils/resource';
+import { isKustomizationResource, processConfigMaps, processServices } from '../utils/resource';
 import { AppDispatch } from '../store';
 
 type SetRootFolderPayload = {
@@ -27,26 +27,11 @@ export const mainSlice = createSlice({
   reducers: {
     rootFolderSet: (state:Draft<AppState>, action:PayloadAction<SetRootFolderPayload>) => {
       if (action.payload.rootEntry) {
-        state.resourceMap = action.payload.resourceMap
-        state.rootFolder = action.payload.rootFolder
-        state.rootEntry = action.payload.rootEntry
-      }
-    },
-    selectKustomization: (state:Draft<AppState>, action:PayloadAction<string>) => {
-      const resource = state.resourceMap[action.payload]
-      if (resource) {
-        clearResourceSelections(state.resourceMap, resource.id);
-        clearFileSelections(state.rootEntry);
+        state.resourceMap = action.payload.resourceMap;
+        state.rootFolder = action.payload.rootFolder;
+        state.rootEntry = action.payload.rootEntry;
         state.selectedResource = undefined;
-
-        if (resource.selected) {
-          resource.selected = false
-        } else {
-          resource.selected = true;
-          state.selectedResource = resource.id;
-          state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
-          selectKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
-        }
+        state.selectedPath = undefined;
       }
     },
     selectK8sResource: (state:Draft<AppState>, action:PayloadAction<string>) => {
@@ -62,7 +47,12 @@ export const mainSlice = createSlice({
           resource.selected = true;
           state.selectedResource = resource.id;
           state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
-          getLinkedResources(resource).forEach(e => state.resourceMap[e].highlight = true);
+
+          if (isKustomizationResource(resource)) {
+            getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
+          } else {
+            getLinkedResources(resource).forEach(e => state.resourceMap[e].highlight = true);
+          }
         }
       }
     },
@@ -89,6 +79,7 @@ export const mainSlice = createSlice({
           highlightChildren(parent, state.resourceMap);
         }
 
+        state.selectedResource = undefined;
         state.selectedPath = selectedPath;
       }
     },
@@ -133,6 +124,6 @@ function toResourceMapType(resourceMap: Map<string, K8sResource>) {
   return result;
 }
 
-export const { rootFolderSet, selectKustomization, selectK8sResource, selectFile } = mainSlice.actions;
+export const { rootFolderSet, selectK8sResource, selectFile } = mainSlice.actions;
 export default mainSlice.reducer
 
