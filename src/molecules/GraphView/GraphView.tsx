@@ -24,6 +24,7 @@ function mapResourceToElement(resource: K8sResource): Node {
       wasSelectedInGraphView: false,
     },
     position: { x: 0, y: 0 },
+    style: { background: resource.selected ? 'lighblue' : resource.highlight ? 'lightgreen' : 'white' },
   };
 }
 
@@ -77,8 +78,8 @@ const getLayoutedElements = (elements: any[]): any => {
 };
 
 const GraphView = () => {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
   const rootFolder = useAppSelector(state => state.main.rootFolder);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const dispatch = useAppDispatch();
   const [reactFlow, setReactFlow] = useState();
@@ -108,6 +109,18 @@ const GraphView = () => {
     setNodes(data);
     console.log('updated graph...');
   }, [rootFolder]);
+
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map(nd => {
+        const resource = resourceMap[nd.id];
+        if (resource) {
+          nd.style = { background: resource.selected ? 'lightblue' : resource.highlight ? 'lightgreen' : 'white' };
+        }
+        return nd;
+      }),
+    );
+  }, [resourceMap, setNodes]);
 
   const onLoad = useCallback((instance) => {
     instance.fitView();
