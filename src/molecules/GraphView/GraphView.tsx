@@ -88,8 +88,6 @@ const GraphView = () => {
   function updateGraph(data: any[]) {
     if (reactFlow) {
       setNodes(getLayoutedElements(data));
-      // @ts-ignore
-      reactFlow.fitView();
     }
   }
 
@@ -107,7 +105,6 @@ const GraphView = () => {
     Object.values(resourceMap).forEach(r => data = data.concat(getElementData(r)));
     updateGraph(data);
     setNodes(data);
-    console.log('updated graph...');
   }, [rootFolder]);
 
   useEffect(() => {
@@ -123,7 +120,6 @@ const GraphView = () => {
   }, [resourceMap, setNodes]);
 
   const onLoad = useCallback((instance) => {
-    instance.fitView();
     setReactFlow(instance);
   }, []);
 
@@ -149,16 +145,7 @@ const GraphView = () => {
                 elements={nodes}>
                   <MiniMap
                     nodeColor={(node) => {
-                      switch (node.type) {
-                        case 'input':
-                          return 'red';
-                        case 'default':
-                          return '#00ff00';
-                        case 'output':
-                          return 'rgb(0,0,255)';
-                        default:
-                          return '#eee';
-                      }
+                          return node && node.style && node.style.background ? node.style.background.toString() : 'white';
                     }}
                     nodeStrokeWidth={3} />
               </ReactFlow>

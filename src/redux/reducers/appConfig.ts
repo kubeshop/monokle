@@ -9,8 +9,11 @@ export const configSlice = createSlice({
     setFilterObjects: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.filterObjectsOnSelection = action.payload;
     },
+    setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.settings.autoZoomGraphOnSelection = action.payload;
+    },
   },
 });
 
-export const { setFilterObjects } = configSlice.actions;
+export const { setFilterObjects, setAutoZoom } = configSlice.actions;
 export default configSlice.reducer;

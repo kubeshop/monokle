@@ -59,7 +59,8 @@ interface AppConfig {
   fileIncludes: string[],
   navigators: ObjectNavigator[],
   settings: {
-    filterObjectsOnSelection: boolean
+    filterObjectsOnSelection: boolean,
+    autoZoomGraphOnSelection: boolean
   }
 }
 
