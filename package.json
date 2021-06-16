@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
-  "homepage": "https://manifestui.io",
+  "homepage": "./",
   "main": "build/electron/main.js",
   "contributors": [
     "ole@kubeshop.io",
@@ -22,7 +22,7 @@
     "concurrently": "^6.2.0",
     "cross-env": "^7.0.3",
     "electron": "^13.0.1",
-    "electron-builder": "^22.10.5",
+    "electron-builder": "^22.11.7",
     "prettier": "2.3.0",
     "wait-on": "^5.3.0"
   },
@@ -75,9 +75,21 @@
     "eject": "react-scripts eject"
   },
   "build": {
+    "appId": "io.kubeshop.manifestui",
+    "productName": "ManifestUI",
+    "copyright": "Copyright © 2021 ${author}",
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
     "extends": null,
     "files": [
       "build/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources"
+      }
     ],
     "directories": {
       "buildResources": "assets"
