@@ -48,7 +48,7 @@
     "jsonpath-plus": "^5.0.7",
     "loglevel": "^1.7.1",
     "micromatch": "^4.0.4",
-    "monaco-editor-webpack-plugin": "^3.1.0",
+    "monaco-editor-webpack-plugin": "^4.0.0",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.0",
     "react-dom": "^17.0.2",
@@ -71,7 +71,7 @@
     "test": "rescripts test",
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "electron:build": "npm run build && tsc -p electron && electron-builder",
+    "electron:build": "yarn run build && tsc -p electron && electron-builder",
     "eject": "react-scripts eject"
   },
   "build": {
