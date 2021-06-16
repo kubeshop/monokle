@@ -62,10 +62,6 @@ const Sidebar = (reactFlow: any) => {
       zoom,
     } = reactFlow.reactFlow.toObject();
 
-    console.log(store.getState());
-    console.log('transforming from ' + x + ', ' + y + ', ' + zoom);
-    console.log('transforming to ' + JSON.stringify(transform));
-
     new Tween({ x: -x + 300, y: -y + 300, zoom })
       .to(transform, TRANSITION_TIME)
       .easing(EASING)
@@ -81,8 +77,8 @@ const Sidebar = (reactFlow: any) => {
     <aside>
       <button onClick={selectSelectedResource} disabled={selectedResource === undefined}>Selected resource</button>
       <button onClick={fit}>Fit view</button>
-      <button onClick={handleZoom(1.2)}>zoom in</button>
-      <button onClick={handleZoom(1 / 1.2)}>zoom out</button>
+      <button onClick={handleZoom(1.4)}>zoom in</button>
+      <button onClick={handleZoom(1 / 1.4)}>zoom out</button>
     </aside>
   );
 };
