@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { debugBorder } from '../../styles/DebugStyles';
-import { K8sResource } from '../../models/state';
+import { K8sResource, NavigatorSubSection } from '../../models/state';
 import micromatch from 'micromatch';
 import '../../styles/NavigatorPane.css';
 import { selectK8sResource } from '../../redux/reducers/main';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { hasIncomingRefs, hasOutgoingRefs } from '../../redux/utils/resource';
+import { getNamespaces, hasIncomingRefs, hasOutgoingRefs } from '../../redux/utils/resource';
 import { setFilterObjects } from '../../redux/reducers/appConfig';
+
+const ALL_NAMESPACES = '- all -';
 
 const NavigatorPane = () => {
   const dispatch = useAppDispatch();
+  const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
 
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const appConfig = useAppSelector(state => state.config);
@@ -23,8 +26,19 @@ const NavigatorPane = () => {
     dispatch(setFilterObjects(e.target.checked));
   };
 
+  const handleNamespaceChange = (event: any) => {
+    setNamespace(event.target.value);
+  };
+
   // this should probably come from app state instead of being calculated
   const selection = Object.values(resourceMap).find(item => item.selected || item.highlight);
+
+  function shouldBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
+    return (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selection) &&
+      item.kind === subsection.kindSelector &&
+      micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
+      (namespace === ALL_NAMESPACES || item.namespace === namespace);
+  }
 
   return (
     <Container>
@@ -63,6 +77,16 @@ const NavigatorPane = () => {
         </Col>
       </Row>
 
+      <Row>Namespace:<select onChange={handleNamespaceChange}>
+        <option>{ALL_NAMESPACES}</option>
+        {getNamespaces(resourceMap).map(n => {
+          return (
+            <option key={n}>{n}</option>
+          );
+        })}
+      </select>
+      </Row>
+
       <Row style={debugBorder}>
         <Col>
           {appConfig.navigators.map(navigator => {
@@ -84,9 +108,7 @@ const NavigatorPane = () => {
                           <Row key={section.name} style={debugBorder}>
                             {section.subsections.map(subsection => {
                               const items = Object.values(resourceMap).filter(item =>
-                                (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selection) &&
-                                item.kind === subsection.kindSelector &&
-                                micromatch.isMatch(item.version, subsection.apiVersionSelector),
+                                shouldBeVisible(item, subsection),
                               );
                               return (
                                 <Col key={subsection.name} style={debugBorder}>

@@ -1,4 +1,4 @@
-import { FileEntry, K8sResource, ResourceRefType } from '../../models/state';
+import { FileEntry, K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
 import { JSONPath } from 'jsonpath-plus';
 
 /**
@@ -58,7 +58,17 @@ export function linkResources(source: K8sResource, target: K8sResource, sourceRe
   target.refs.push({
     refType: targetRefType,
     targetResourceId: source.id,
-  })
+  });
+}
+
+export function getNamespaces(resourceMap: ResourceMapType) {
+  const namespaces: string[] = [];
+  Object.values(resourceMap).forEach(e => {
+    if (e.namespace && !namespaces.includes(e.namespace)) {
+      namespaces.push(e.namespace);
+    }
+  });
+  return namespaces;
 }
 
 export function createResourceName(rootFolder: string, fileEntry: FileEntry, content: any) {

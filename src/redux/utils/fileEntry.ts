@@ -63,6 +63,10 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
           docIndex: docIndex++,
         };
 
+        if (content.metadata && content.metadata.namespace) {
+          resource.namespace = content.metadata.namespace;
+        }
+
         resourceMap.set(resource.id, resource);
         if (!fileEntry.resourceIds) {
           fileEntry.resourceIds = [];
