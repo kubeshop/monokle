@@ -12,7 +12,8 @@ export const initialState: AppState = {
   },
   appConfig: {
     settings: {
-      filterObjectsOnSelection: false
+      filterObjectsOnSelection: false,
+      autoZoomGraphOnSelection: true,
     },
     scanExcludes: ['node_modules', '.git', '**/pkg/mod/**'],
     fileIncludes: ['yaml', 'yml'],

@@ -2,7 +2,8 @@ import React, { useCallback, useEffect } from 'react';
 // @ts-ignore
 import { Easing, Tween, autoPlay } from 'es6-tween';
 import { useStore, useZoomPanHelper } from 'react-flow-renderer';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { setAutoZoom } from '../../redux/reducers/appConfig';
 
 autoPlay(true);
 
@@ -11,8 +12,10 @@ const EASING = Easing.Quadratic.Out;
 
 const Sidebar = (reactFlow: any) => {
   const store = useStore();
+  const dispatch = useAppDispatch();
   const zoomPanHelper = useZoomPanHelper();
   const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const settings = useAppSelector(state => state.config.settings);
 
   const selectSelectedResource = useCallback(() => {
     if (selectedResource) {
@@ -35,8 +38,14 @@ const Sidebar = (reactFlow: any) => {
   }, [selectedResource]);
 
   useEffect(() => {
-    selectSelectedResource();
+    if (settings.autoZoomGraphOnSelection) {
+      selectSelectedResource();
+    }
   }, [selectedResource]);
+
+  const onZoomChange = useCallback((e: any) => {
+    dispatch(setAutoZoom(e.target.checked));
+  }, [dispatch]);
 
   function fit() {
     zoomPanHelper.fitView();
@@ -75,10 +84,12 @@ const Sidebar = (reactFlow: any) => {
 
   return (
     <aside>
-      <button onClick={selectSelectedResource} disabled={selectedResource === undefined}>Selected resource</button>
       <button onClick={fit}>Fit view</button>
-      <button onClick={handleZoom(1.4)}>zoom in</button>
-      <button onClick={handleZoom(1 / 1.4)}>zoom out</button>
+      <button onClick={handleZoom(1.4)}>Zoom in</button>
+      <button onClick={handleZoom(1 / 1.4)}>Zoom out</button>
+      <button onClick={selectSelectedResource} disabled={selectedResource === undefined}>Zoom on selected resource
+      </button>
+      <input type='checkbox' onChange={onZoomChange} checked={settings.autoZoomGraphOnSelection === true} /> auto-zoom
     </aside>
   );
 };
