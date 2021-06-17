@@ -16,6 +16,7 @@ interface K8sResource {
   name: string,
   kind: string,
   version: string,
+  namespace?: string,
   highlight: boolean,
   selected: boolean,
   content: any, // contains parsed yaml resource - used for filtering/etc
@@ -78,5 +79,5 @@ interface AppState {
 }
 
 export type {
-  FileEntry, K8sResource, AppState, AppConfig, ResourceRef, ResourceMapType
+  FileEntry, K8sResource, AppState, AppConfig, ResourceRef, ResourceMapType, NavigatorSection, NavigatorSubSection,
 };
