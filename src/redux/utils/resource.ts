@@ -4,7 +4,7 @@ import { JSONPath } from 'jsonpath-plus';
 /**
  * link services to target deployments via their label selector if specified
  */
-export function processServices(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
+export function processServices(resourceMap: Map<string, K8sResource>) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(d => d.content.spec?.template?.metadata?.labels);
 
   getK8sResources(resourceMap, 'Service').forEach(service => {
@@ -12,16 +12,16 @@ export function processServices(rootEntry: FileEntry, resourceMap: Map<string, K
       Object.keys(service.content.spec.selector).forEach((e: any) => {
         deployments.filter(deployment => deployment.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]).forEach(deployment => {
           linkResources(deployment, service, ResourceRefType.SelectedPodName, ResourceRefType.ServicePodSelector);
-        })
-      })
+        });
+      });
     }
   })
 }
 
-export function processConfigMaps(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
-  const configMaps = getK8sResources(resourceMap, "ConfigMap").filter(e => e.content?.metadata?.name)
+export function processConfigMaps(resourceMap: Map<string, K8sResource>) {
+  const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
-    getK8sResources(resourceMap, "Deployment").forEach(deployment => {
+    getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
       JSONPath({ path: '$..configMapRef.name', json: deployment.content }).forEach((refName: string) => {
         configMaps.filter(item => item.content.metadata.name === refName).forEach(configMapResource => {
           linkResources(configMapResource, deployment, ResourceRefType.ConfigMapRef, ResourceRefType.ConfigMapConsumer);

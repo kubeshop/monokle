@@ -11,16 +11,16 @@ function linkParentKustomization(fileEntry: FileEntry, kustomization: K8sResourc
   });
 }
 
-export function processKustomizations(rootEntry: FileEntry, resourceMap: Map<string, K8sResource>, fileMap: Map<string, FileEntry>) {
-  getK8sResources(resourceMap, "Kustomization").forEach(kustomization => {
+export function processKustomizations(resourceMap: Map<string, K8sResource>, fileMap: Map<string, FileEntry>) {
+  getK8sResources(resourceMap, 'Kustomization').forEach(kustomization => {
     if (kustomization.content.resources || kustomization.content.bases) {
-      var resources = kustomization.content.resources || []
+      var resources = kustomization.content.resources || [];
       if (kustomization.content.bases) {
-        resources = resources.concat(kustomization.content.bases)
+        resources = resources.concat(kustomization.content.bases);
       }
 
       resources.forEach((r: string) => {
-        const fileEntry = fileMap.get(path.join(kustomization.folder, r))
+        const fileEntry = fileMap.get(path.join(kustomization.folder, r));
         if (fileEntry) {
           if (fileEntry.children) {
             // resource is folder -> find contained kustomizations and link...

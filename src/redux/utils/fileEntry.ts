@@ -1,42 +1,51 @@
 import { AppConfig, FileEntry, K8sResource } from '../../models/state';
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 import micromatch from 'micromatch';
 import { LineCounter, parseAllDocuments } from 'yaml';
 import { createResourceName, uuidv4 } from './resource';
+import log from 'loglevel';
 
 export function readFiles(folder: string, appConfig: AppConfig, resourceMap: Map<string, K8sResource>,
                           fileMap: Map<string, FileEntry>, parent: FileEntry, rootFolder: string) {
-  const files = fs.readdirSync(folder)
-  const result: FileEntry[] = []
+  const files = fs.readdirSync(folder);
+  const result: FileEntry[] = [];
 
-  files.forEach(function (file) {
+  files.forEach(function(file) {
     const fileEntry: FileEntry = {
       name: file,
       folder: folder,
       highlight: false,
       selected: false,
       expanded: false,
-      excluded: false
-    }
+      excluded: false,
+    };
 
     const filePath = path.join(folder, file);
     if (fs.statSync(filePath).isDirectory()) {
-      const folderPath = filePath.substr(rootFolder.length + 1)
+      const folderPath = filePath.substr(rootFolder.length + 1);
       if (appConfig.scanExcludes.some(e => micromatch.isMatch(folderPath, e))) {
-        fileEntry.excluded = true
+        fileEntry.excluded = true;
       } else {
-        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, fileEntry, rootFolder)
+        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, fileEntry, rootFolder);
       }
     } else if (appConfig.fileIncludes.some(e => file.toLowerCase().endsWith(e))) {
-      extractYamlContent(rootFolder, fileEntry, resourceMap);
+      try {
+        extractYamlContent(rootFolder, fileEntry, resourceMap);
+      } catch (e) {
+        log.warn('Failed to parse yaml in file ' + fileEntry.name + '; ' + e);
+        if (fileEntry.resourceIds) {
+          fileEntry.resourceIds.forEach(entry => resourceMap.delete(entry));
+          fileEntry.resourceIds = undefined;
+        }
+      }
     }
 
-    fileMap.set(filePath, fileEntry)
-    result.push(fileEntry)
-  })
+    fileMap.set(filePath, fileEntry);
+    result.push(fileEntry);
+  });
 
-  return result
+  return result;
 }
 
 function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
@@ -68,13 +77,10 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
         }
 
         resourceMap.set(resource.id, resource);
-        if (!fileEntry.resourceIds) {
-          fileEntry.resourceIds = [];
-        }
-
+        fileEntry.resourceIds = fileEntry.resourceIds || [];
         fileEntry.resourceIds.push(resource.id);
       }
-    })
+    });
   }
 }
 
@@ -109,9 +115,9 @@ function getFileEntries(resource: K8sResource, rootEntry: FileEntry) {
       result.push(file);
       parent = file;
     }
-  })
+  });
 
-  return result
+  return result;
 }
 
 export function selectResourceFileEntry(resource: K8sResource, rootEntry: FileEntry) {
