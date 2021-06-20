@@ -1,10 +1,11 @@
 import { FileEntry, K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
 import { JSONPath } from 'jsonpath-plus';
+import path from 'path';
 
 /**
  * link services to target deployments via their label selector if specified
  */
-export function processServices(resourceMap: Map<string, K8sResource>) {
+export function processServices(resourceMap: ResourceMapType) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(d => d.content.spec?.template?.metadata?.labels);
 
   getK8sResources(resourceMap, 'Service').forEach(service => {
@@ -18,7 +19,7 @@ export function processServices(resourceMap: Map<string, K8sResource>) {
   })
 }
 
-export function processConfigMaps(resourceMap: Map<string, K8sResource>) {
+export function processConfigMaps(resourceMap: ResourceMapType) {
   const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
     getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
@@ -43,8 +44,8 @@ export function processConfigMaps(resourceMap: Map<string, K8sResource>) {
   }
 }
 
-export function getK8sResources(resourceMap: Map<string, K8sResource>, type: string) {
-  return Array.from(resourceMap.values()).filter(item => item.kind === type);
+export function getK8sResources(resourceMap: ResourceMapType, type: string) {
+  return Object.values(resourceMap).filter(item => item.kind === type);
 }
 
 export function linkResources(source: K8sResource, target: K8sResource, sourceRefType: ResourceRefType, targetRefType: ResourceRefType) {
@@ -75,9 +76,19 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
-export function createResourceName(rootFolder: string, fileEntry: FileEntry, content: any) {
+export function createResourceName(filePath: string, content: any) {
   if (content.kind === 'Kustomization') {
-    return fileEntry.folder.substr(rootFolder.length + 1);
+    const ix = filePath.lastIndexOf(path.sep);
+    if (ix > 0) {
+      const ix2 = filePath.lastIndexOf(path.sep, ix - 1);
+      if (ix2 > 0) {
+        return filePath.substr(ix2 + 1, ix - ix2 - 1);
+      } else {
+        return filePath.substr(0, ix);
+      }
+    } else {
+      return filePath;
+    }
   }
 
   var name = content.metadata?.name ? content.metadata.name + ' ' : '';
@@ -88,9 +99,9 @@ export function isKustomizationResource(r: K8sResource | undefined) {
   return r && r.kind === 'Kustomization';
 }
 
-export function isKustomizationFile(childFileEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
+export function isKustomizationFile(childFileEntry: FileEntry, resourceMap: ResourceMapType) {
   if (childFileEntry.name.toLowerCase() === 'kustomization.yaml' && childFileEntry.resourceIds) {
-    const r = resourceMap.get(childFileEntry.resourceIds[0]);
+    const r = resourceMap[childFileEntry.resourceIds[0]];
     return isKustomizationResource(r);
   }
 

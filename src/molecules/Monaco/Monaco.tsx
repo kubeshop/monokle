@@ -4,7 +4,7 @@ import { useAppSelector } from '../../redux/hooks';
 import fs from 'fs';
 import path from 'path';
 import { monaco } from 'react-monaco-editor';
-import { parseAllDocuments } from 'yaml';
+import { parseAllDocuments, stringify } from 'yaml';
 
 const Monaco = () => {
   const rootFolder = useAppSelector(state => state.main.rootFolder);
@@ -50,6 +50,12 @@ const Monaco = () => {
         if (!fs.statSync(filePath).isDirectory()) {
           newCode = fs.readFileSync(filePath, 'utf8');
         }
+      }
+    } else if (selectedResource) {
+      const resource = resourceMap[selectedResource];
+      if (resource) {
+        console.log(resource);
+        newCode = stringify(resource.content);
       }
     }
 
