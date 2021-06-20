@@ -63,6 +63,7 @@ const Monaco = () => {
 
   const options = {
     selectOnLineNumbers: true,
+    readOnly: selectedResource != undefined && resourceMap[selectedResource].path.startsWith('preview://'),
   };
 
   return (
