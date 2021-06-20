@@ -56,29 +56,34 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
   if (documents) {
     var docIndex = 0;
     documents.forEach(d => {
-      const content = d.toJS();
-      if (content && content.apiVersion && content.kind) {
-        var resource: K8sResource = {
-          name: createResourceName(rootFolder, fileEntry, content),
-          folder: fileEntry.folder,
-          file: fileEntry.name,
-          id: uuidv4(),
-          kind: content.kind,
-          version: content.apiVersion,
-          content: content,
-          highlight: false,
-          selected: false,
-          linePos: lineCounter.linePos(d.range[0]).line,
-          docIndex: docIndex++,
-        };
+      if (d.errors.length > 0) {
+        log.warn('Ignoring document ' + docIndex + ' in ' + fileEntry.name + ' due to ' + d.errors.length + ' error(s)');
+        d.errors.forEach(e => log.warn(e.message));
+      } else {
+        const content = d.toJS();
+        if (content && content.apiVersion && content.kind) {
+          var resource: K8sResource = {
+            name: createResourceName(rootFolder, fileEntry, content),
+            folder: fileEntry.folder,
+            file: fileEntry.name,
+            id: uuidv4(),
+            kind: content.kind,
+            version: content.apiVersion,
+            content: content,
+            highlight: false,
+            selected: false,
+            linePos: lineCounter.linePos(d.range[0]).line,
+            docIndex: docIndex++,
+          };
 
-        if (content.metadata && content.metadata.namespace) {
-          resource.namespace = content.metadata.namespace;
+          if (content.metadata && content.metadata.namespace) {
+            resource.namespace = content.metadata.namespace;
+          }
+
+          resourceMap.set(resource.id, resource);
+          fileEntry.resourceIds = fileEntry.resourceIds || [];
+          fileEntry.resourceIds.push(resource.id);
         }
-
-        resourceMap.set(resource.id, resource);
-        fileEntry.resourceIds = fileEntry.resourceIds || [];
-        fileEntry.resourceIds.push(resource.id);
       }
     });
   }
