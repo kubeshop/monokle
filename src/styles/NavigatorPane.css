@@ -2,6 +2,10 @@
   color: blue;
 }
 
+.disabledItem {
+  color: gray;
+}
+
 .selectedItem {
   font-weight: bold;
 }

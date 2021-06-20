@@ -70,6 +70,7 @@ const FileTreePane = () => {
 
   const rootFolder = useAppSelector(state => state.main.rootFolder);
   const appConfig = useAppSelector(state => state.config);
+  const previewResource = useAppSelector(state => state.main.previewResource);
   const files = useAppSelector(state => state.main.rootEntry?.children);
 
   // eslint-disable-next-line no-undef
@@ -96,7 +97,9 @@ const FileTreePane = () => {
   // @ts-ignore
   // eslint-disable-next-line no-unused-vars
   const onNameClick = ({ defaultOnClick, nodeData }) => {
-    dispatch(selectFile(nodeData.path));
+    if (previewResource === undefined) {
+      dispatch(selectFile(nodeData.path));
+    }
   };
 
   const treeData: TreeNode = mapTreeNodeFromFileEntry({
@@ -123,6 +126,7 @@ const FileTreePane = () => {
         ref={folderInput}
       />
       <FolderTree
+        readOnly={previewResource !== undefined}
         data={treeData}
         onChange={onTreeStateChange}
         onNameClick={onNameClick}
