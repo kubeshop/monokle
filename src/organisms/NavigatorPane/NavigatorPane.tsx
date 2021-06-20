@@ -46,6 +46,9 @@ const NavigatorPane = () => {
     <Container>
       <Row style={debugBorder}>
         <h4>Navigator</h4>
+        <Col>
+          <input type='checkbox' onChange={onFilterChange} /> filter selected
+        </Col>
       </Row>
 
       {kustomizations.length > 0 &&
@@ -56,8 +59,9 @@ const NavigatorPane = () => {
               <h5>Kustomizations</h5>
             </Col>
           </Row>
-          {
-            kustomizations.map((item: K8sResource) => {
+          {kustomizations
+            .filter(item => (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selectedResource))
+            .map((item: K8sResource) => {
               let className = '';
               if (item.highlight) {
                 className = 'highlightItem';
@@ -78,15 +82,14 @@ const NavigatorPane = () => {
       </Row>
       }
       <Row style={debugBorder}>
-        <Col>Namespace:<select onChange={handleNamespaceChange}>
-          <option>{ALL_NAMESPACES}</option>
-          {getNamespaces(resourceMap).map(n => {
-            return (
-              <option key={n}>{n}</option>
-            );
-          })}
-        </select></Col>
-        <Col><input type='checkbox' onChange={onFilterChange} /> filter selected</Col>
+        Filter namespace:<select onChange={handleNamespaceChange}>
+        <option>{ALL_NAMESPACES}</option>
+        {getNamespaces(resourceMap).map(n => {
+          return (
+            <option key={n}>{n}</option>
+          );
+        })}
+      </select>
       </Row>
 
       <Row style={debugBorder}>
