@@ -49,16 +49,20 @@ export function getK8sResources(resourceMap: Map<string, K8sResource>, type: str
 
 export function linkResources(source: K8sResource, target: K8sResource, sourceRefType: ResourceRefType, targetRefType: ResourceRefType) {
   source.refs = source.refs || [];
-  source.refs.push({
-    refType: sourceRefType,
-    targetResourceId: target.id,
-  });
+  if (!source.refs.some(ref => (ref.refType === sourceRefType && ref.targetResourceId === target.id))) {
+    source.refs.push({
+      refType: sourceRefType,
+      targetResourceId: target.id,
+    });
+  }
 
   target.refs = target.refs || [];
-  target.refs.push({
-    refType: targetRefType,
-    targetResourceId: source.id,
-  });
+  if (!target.refs.some(ref => (ref.refType === targetRefType && ref.targetResourceId === source.id))) {
+    target.refs.push({
+      refType: targetRefType,
+      targetResourceId: source.id,
+    });
+  }
 }
 
 export function getNamespaces(resourceMap: ResourceMapType) {
