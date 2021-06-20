@@ -54,7 +54,6 @@ const Monaco = () => {
     } else if (selectedResource) {
       const resource = resourceMap[selectedResource];
       if (resource) {
-        console.log(resource);
         newCode = stringify(resource.content);
       }
     }

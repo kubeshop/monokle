@@ -167,7 +167,6 @@ export function previewKustomization(id: string) {
             return;
           }
 
-          console.log(`stdout: ${stdout}`);
           const resources = extractK8sResources(stdout, 'preview://' + resource.id);
           processParsedResources(resources);
 
