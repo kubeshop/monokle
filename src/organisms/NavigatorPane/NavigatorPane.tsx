@@ -68,7 +68,8 @@ const NavigatorPane = () => {
             </Col>
           </Row>
           {kustomizations
-            .filter(k => (!appConfig.settings.filterObjectsOnSelection || k.highlight || k.selected || !selectedResource))
+            .filter(k => (!appConfig.settings.filterObjectsOnSelection
+              || k.highlight || k.selected || !selectedResource || (previewResource === k.id)))
             .map((k: K8sResource) => {
               let className = '';
               if (previewResource && previewResource != k.id) {
