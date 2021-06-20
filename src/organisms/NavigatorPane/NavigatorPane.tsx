@@ -8,6 +8,8 @@ import { selectK8sResource } from '../../redux/reducers/main';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { getNamespaces, hasIncomingRefs, hasOutgoingRefs } from '../../redux/utils/resource';
 import { setFilterObjects } from '../../redux/reducers/appConfig';
+import { selectKustomizations, selectResources } from '../../redux/selectors';
+import { useSelector } from 'react-redux';
 
 const ALL_NAMESPACES = '- all -';
 
@@ -16,7 +18,10 @@ const NavigatorPane = () => {
   const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
 
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedResource = useAppSelector(state => state.main.selectedResource);
   const appConfig = useAppSelector(state => state.config);
+  const kustomizations = useSelector(selectKustomizations);
+  const resources = useSelector(selectResources);
 
   const selectResource = (resourceId: string) => {
     dispatch(selectK8sResource(resourceId));
@@ -30,11 +35,8 @@ const NavigatorPane = () => {
     setNamespace(event.target.value);
   };
 
-  // this should probably come from app state instead of being calculated
-  const selection = Object.values(resourceMap).find(item => item.selected || item.highlight);
-
   function shouldBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
-    return (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selection) &&
+    return (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selectedResource) &&
       item.kind === subsection.kindSelector &&
       micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
       (namespace === ALL_NAMESPACES || item.namespace === namespace || (namespace === 'default' && !item.namespace));
@@ -46,45 +48,45 @@ const NavigatorPane = () => {
         <h4>Navigator</h4>
       </Row>
 
+      {kustomizations.length > 0 &&
       <Row style={debugBorder}>
         <Col>
           <Row style={debugBorder}>
             <Col>
               <h5>Kustomizations</h5>
             </Col>
-            <Col><input type='checkbox' onChange={onFilterChange} /> filter selected</Col>
           </Row>
           {
-            Object.values(resourceMap).filter((item: K8sResource) => item.kind === 'Kustomization' &&
-              (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selection))
-              .map((item: K8sResource) => {
-                let className = '';
-                if (item.highlight) {
-                  className = 'highlightItem';
-                } else if (item.selected) {
-                  className = 'selectedItem';
-                }
+            kustomizations.map((item: K8sResource) => {
+              let className = '';
+              if (item.highlight) {
+                className = 'highlightItem';
+              } else if (item.selected) {
+                className = 'selectedItem';
+              }
 
-                return (
-                  <div key={item.id} className={className}
-                       onClick={() => selectResource(item.id)}>
-                    {hasIncomingRefs(item) ? '>> ' : ''}
-                    {item.name}
-                    {hasOutgoingRefs(item) ? ' >>' : ''}</div>
-                );
-              })
+              return (
+                <div key={item.id} className={className}
+                     onClick={() => selectResource(item.id)}>
+                  {hasIncomingRefs(item) ? '>> ' : ''}
+                  {item.name}
+                  {hasOutgoingRefs(item) ? ' >>' : ''}</div>
+              );
+            })
           }
         </Col>
       </Row>
-
-      <Row>Namespace:<select onChange={handleNamespaceChange}>
-        <option>{ALL_NAMESPACES}</option>
-        {getNamespaces(resourceMap).map(n => {
-          return (
-            <option key={n}>{n}</option>
-          );
-        })}
-      </select>
+      }
+      <Row>
+        <Col>Namespace:<select onChange={handleNamespaceChange}>
+          <option>{ALL_NAMESPACES}</option>
+          {getNamespaces(resourceMap).map(n => {
+            return (
+              <option key={n}>{n}</option>
+            );
+          })}
+        </select></Col>
+        <Col><input type='checkbox' onChange={onFilterChange} /> filter selected</Col>
       </Row>
 
       <Row style={debugBorder}>
@@ -107,7 +109,7 @@ const NavigatorPane = () => {
                           }
                           <Row key={section.name} style={debugBorder}>
                             {section.subsections.map(subsection => {
-                              const items = Object.values(resourceMap).filter(item =>
+                              const items = resources.filter(item =>
                                 shouldBeVisible(item, subsection),
                               );
                               return (
