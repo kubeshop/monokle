@@ -77,7 +77,7 @@ const NavigatorPane = () => {
         </Col>
       </Row>
       }
-      <Row>
+      <Row style={debugBorder}>
         <Col>Namespace:<select onChange={handleNamespaceChange}>
           <option>{ALL_NAMESPACES}</option>
           {getNamespaces(resourceMap).map(n => {
