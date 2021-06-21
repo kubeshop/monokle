@@ -11,8 +11,7 @@ interface FileEntry {
 
 interface K8sResource {
   id: string,
-  folder: string,
-  file: string,
+  path: string,
   name: string,
   kind: string,
   version: string,
@@ -75,7 +74,8 @@ interface AppState {
   appConfig: AppConfig,
   resourceMap: ResourceMapType,
   selectedResource?: string,
-  selectedPath?: string
+  selectedPath?: string,
+  previewResource?: string
 }
 
 export type {

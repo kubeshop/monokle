@@ -15,6 +15,8 @@ import dagre from 'dagre';
 import { isIncomingRef } from '../../redux/utils/resource';
 import { selectK8sResource } from '../../redux/reducers/main';
 import Sidebar from './sidebar';
+import { selectActiveResources } from '../../redux/selectors';
+import { useSelector } from 'react-redux';
 
 function mapResourceToElement(resource: K8sResource): Node {
   return {
@@ -80,6 +82,8 @@ const getLayoutedElements = (elements: any[]): any => {
 const GraphView = () => {
   const rootFolder = useAppSelector(state => state.main.rootFolder);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const activeResources = useSelector(selectActiveResources);
+  const previewResource = useAppSelector(state => state.main.previewResource);
 
   const dispatch = useAppDispatch();
   const [reactFlow, setReactFlow] = useState();
@@ -102,10 +106,10 @@ const GraphView = () => {
 
   useEffect(() => {
     let data: any[] = [];
-    Object.values(resourceMap).forEach(r => data = data.concat(getElementData(r)));
+    activeResources.forEach(r => data = data.concat(getElementData(r)));
     updateGraph(data);
     setNodes(data);
-  }, [rootFolder]);
+  }, [rootFolder, previewResource]);
 
   useEffect(() => {
     setNodes((nds) =>

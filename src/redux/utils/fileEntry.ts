@@ -1,4 +1,4 @@
-import { AppConfig, FileEntry, K8sResource } from '../../models/state';
+import { AppConfig, FileEntry, K8sResource, ResourceMapType } from '../../models/state';
 import fs from 'fs';
 import path from 'path';
 import micromatch from 'micromatch';
@@ -6,7 +6,7 @@ import { LineCounter, parseAllDocuments } from 'yaml';
 import { createResourceName, uuidv4 } from './resource';
 import log from 'loglevel';
 
-export function readFiles(folder: string, appConfig: AppConfig, resourceMap: Map<string, K8sResource>,
+export function readFiles(folder: string, appConfig: AppConfig, resourceMap: ResourceMapType,
                           fileMap: Map<string, FileEntry>, parent: FileEntry, rootFolder: string) {
   const files = fs.readdirSync(folder);
   const result: FileEntry[] = [];
@@ -31,11 +31,18 @@ export function readFiles(folder: string, appConfig: AppConfig, resourceMap: Map
       }
     } else if (appConfig.fileIncludes.some(e => file.toLowerCase().endsWith(e))) {
       try {
-        extractYamlContent(rootFolder, fileEntry, resourceMap);
+        const result = extractK8sResourcesFromFile(rootFolder, fileEntry);
+        if (Object.keys(result).length > 0) {
+          fileEntry.resourceIds = fileEntry.resourceIds || [];
+          Object.keys(result).forEach(id => {
+            fileEntry.resourceIds?.push(id);
+            resourceMap[id] = result[id];
+          });
+        }
       } catch (e) {
         log.warn('Failed to parse yaml in file ' + fileEntry.name + '; ' + e);
         if (fileEntry.resourceIds) {
-          fileEntry.resourceIds.forEach(entry => resourceMap.delete(entry));
+          fileEntry.resourceIds.forEach(entry => delete resourceMap[entry]);
           fileEntry.resourceIds = undefined;
         }
       }
@@ -48,24 +55,23 @@ export function readFiles(folder: string, appConfig: AppConfig, resourceMap: Map
   return result;
 }
 
-function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMap: Map<string, K8sResource>) {
-  const fileContent = fs.readFileSync(path.join(fileEntry.folder, fileEntry.name), 'utf8');
+export function extractK8sResources(fileContent: string, filePath: string) {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllDocuments(fileContent, { lineCounter });
+  const result: ResourceMapType = {};
 
   if (documents) {
     var docIndex = 0;
     documents.forEach(d => {
       if (d.errors.length > 0) {
-        log.warn('Ignoring document ' + docIndex + ' in ' + fileEntry.name + ' due to ' + d.errors.length + ' error(s)');
+        log.warn('Ignoring document ' + docIndex + ' in ' + path.parse(filePath).name + ' due to ' + d.errors.length + ' error(s)');
         d.errors.forEach(e => log.warn(e.message));
       } else {
         const content = d.toJS();
         if (content && content.apiVersion && content.kind) {
           var resource: K8sResource = {
-            name: createResourceName(rootFolder, fileEntry, content),
-            folder: fileEntry.folder,
-            file: fileEntry.name,
+            name: createResourceName(filePath, content),
+            path: filePath,
             id: uuidv4(),
             kind: content.kind,
             version: content.apiVersion,
@@ -80,13 +86,18 @@ function extractYamlContent(rootFolder: string, fileEntry: FileEntry, resourceMa
             resource.namespace = content.metadata.namespace;
           }
 
-          resourceMap.set(resource.id, resource);
-          fileEntry.resourceIds = fileEntry.resourceIds || [];
-          fileEntry.resourceIds.push(resource.id);
+          result[resource.id] = resource;
         }
       }
     });
   }
+  return result;
+}
+
+function extractK8sResourcesFromFile(rootFolder: string, fileEntry: FileEntry) {
+  const filePath = path.join(fileEntry.folder, fileEntry.name);
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+  return extractK8sResources(fileContent, filePath);
 }
 
 export function getFileEntryForPath(filePath: string, rootEntry: FileEntry) {
@@ -111,16 +122,16 @@ export function getFileEntryForResource(resource: K8sResource, rootEntry: FileEn
 function getFileEntries(resource: K8sResource, rootEntry: FileEntry) {
   var parent = rootEntry;
   const result: FileEntry[] = [];
-  const segments = resource.folder.substr(rootEntry.folder.length + 1).split(path.sep);
-  segments.push(resource.file);
-
-  segments.forEach(pathSegment => {
-    const file = parent.children?.find(child => child.name === pathSegment);
-    if (file) {
-      result.push(file);
-      parent = file;
-    }
-  });
+  if (resource.path) {
+    const segments = resource.path.substr(rootEntry.folder.length + 1).split(path.sep);
+    segments.forEach(pathSegment => {
+      const file = parent.children?.find(child => child.name === pathSegment);
+      if (file) {
+        result.push(file);
+        parent = file;
+      }
+    });
+  }
 
   return result;
 }

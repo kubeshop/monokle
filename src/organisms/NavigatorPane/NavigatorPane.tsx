@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { debugBorder } from '../../styles/DebugStyles';
 import { K8sResource, NavigatorSubSection } from '../../models/state';
 import micromatch from 'micromatch';
 import '../../styles/NavigatorPane.css';
-import { selectK8sResource } from '../../redux/reducers/main';
+import { previewKustomization, selectK8sResource } from '../../redux/reducers/main';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { getNamespaces, hasIncomingRefs, hasOutgoingRefs } from '../../redux/utils/resource';
 import { setFilterObjects } from '../../redux/reducers/appConfig';
-import { selectKustomizations, selectResources } from '../../redux/selectors';
+import { selectKustomizations, selectActiveResources } from '../../redux/selectors';
 import { useSelector } from 'react-redux';
 
 const ALL_NAMESPACES = '- all -';
@@ -19,9 +19,10 @@ const NavigatorPane = () => {
 
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const previewResource = useAppSelector(state => state.main.previewResource);
   const appConfig = useAppSelector(state => state.config);
   const kustomizations = useSelector(selectKustomizations);
-  const resources = useSelector(selectResources);
+  const resources = useSelector(selectActiveResources);
 
   const selectResource = (resourceId: string) => {
     dispatch(selectK8sResource(resourceId));
@@ -33,6 +34,13 @@ const NavigatorPane = () => {
 
   const handleNamespaceChange = (event: any) => {
     setNamespace(event.target.value);
+  };
+
+  const selectPreview = (id: string) => {
+    if (id !== selectedResource) {
+      dispatch(selectK8sResource(id));
+    }
+    dispatch(previewKustomization(id));
   };
 
   function shouldBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
@@ -60,21 +68,32 @@ const NavigatorPane = () => {
             </Col>
           </Row>
           {kustomizations
-            .filter(item => (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selectedResource))
-            .map((item: K8sResource) => {
+            .filter(k => (!appConfig.settings.filterObjectsOnSelection
+              || k.highlight || k.selected || !selectedResource || (previewResource === k.id)))
+            .map((k: K8sResource) => {
               let className = '';
-              if (item.highlight) {
-                className = 'highlightItem';
-              } else if (item.selected) {
+              if (previewResource && previewResource != k.id) {
+                className = 'disabledItem';
+              } else if (k.selected || previewResource === k.id) {
                 className = 'selectedItem';
+              } else if (k.highlight) {
+                className = 'highlightItem';
               }
 
               return (
-                <div key={item.id} className={className}
-                     onClick={() => selectResource(item.id)}>
-                  {hasIncomingRefs(item) ? '>> ' : ''}
-                  {item.name}
-                  {hasOutgoingRefs(item) ? ' >>' : ''}</div>
+                <Row key={k.id}>
+                  <Col>
+                    <div className={className}
+                         onClick={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}>
+                      {hasIncomingRefs(k) ? '>> ' : ''}
+                      {k.name}
+                      {hasOutgoingRefs(k) ? ' >>' : ''} </div>
+                  </Col>
+                  <Col><Button variant='outline-dark' size='sm'
+                               onClick={() => selectPreview(k.id)}
+                               active={previewResource != undefined && previewResource === k.id}
+                               disabled={previewResource != undefined && previewResource !== k.id}>Preview</Button></Col>
+                </Row>
               );
             })
           }
