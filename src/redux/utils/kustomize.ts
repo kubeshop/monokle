@@ -39,7 +39,6 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Map
       }
 
       resources.forEach((r: string) => {
-        // @ts-ignore
         processKustomizationResource(fileMap, kustomization, r, resourceMap);
       });
 
