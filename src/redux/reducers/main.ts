@@ -15,6 +15,7 @@ import { isKustomizationResource, processConfigMaps, processServices } from '../
 import { AppDispatch } from '../store';
 import { exec } from 'child_process';
 import log from 'loglevel';
+import { PREVIEW_PREFIX } from '../../constants';
 
 type SetRootFolderPayload = {
   rootFolder: string,
@@ -46,7 +47,7 @@ export const mainSlice = createSlice({
       state.previewResource = action.payload.previewResourceId;
 
       // remove previous preview resources
-      Object.values(state.resourceMap).filter(r => r.path.startsWith('preview://')).forEach(
+      Object.values(state.resourceMap).filter(r => r.path.startsWith(PREVIEW_PREFIX)).forEach(
         r => delete state.resourceMap[r.id],
       );
 
@@ -167,7 +168,7 @@ export function previewKustomization(id: string) {
             return;
           }
 
-          const resources = extractK8sResources(stdout, 'preview://' + resource.id);
+          const resources = extractK8sResources(stdout, PREVIEW_PREFIX + resource.id);
           processParsedResources(resources);
 
           dispatch(mainSlice.actions.setPreviewData({ previewResourceId: id, previewResources: resources }));

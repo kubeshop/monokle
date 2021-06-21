@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 import { RootState } from './store';
 import { isKustomizationResource } from './utils/resource';
 import { K8sResource } from '../models/state';
+import { PREVIEW_PREFIX } from '../constants';
 
 export const selectAllResources = createSelector(
   (state: RootState) => state.main.resourceMap,
@@ -11,7 +12,7 @@ export const selectAllResources = createSelector(
 export const selectActiveResources = createSelector(
   selectAllResources,
   (state: RootState) => state.main.previewResource,
-  (resources, previewResource) => resources.filter(r => previewResource === undefined || r.path.startsWith('preview://')),
+  (resources, previewResource) => resources.filter(r => previewResource === undefined || r.path.startsWith(PREVIEW_PREFIX)),
 );
 
 export const selectKustomizations = createSelector(

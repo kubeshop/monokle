@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import MonacoEditor from 'react-monaco-editor';
+import MonacoEditor, { monaco } from 'react-monaco-editor';
 import { useAppSelector } from '../../redux/hooks';
 import fs from 'fs';
 import path from 'path';
-import { monaco } from 'react-monaco-editor';
 import { parseAllDocuments, stringify } from 'yaml';
+import { PREVIEW_PREFIX } from '../../constants';
 
 const Monaco = () => {
   const rootFolder = useAppSelector(state => state.main.rootFolder);
@@ -63,7 +63,7 @@ const Monaco = () => {
 
   const options = {
     selectOnLineNumbers: true,
-    readOnly: selectedResource != undefined && resourceMap[selectedResource].path.startsWith('preview://'),
+    readOnly: selectedResource != undefined && resourceMap[selectedResource].path.startsWith(PREVIEW_PREFIX),
   };
 
   return (
