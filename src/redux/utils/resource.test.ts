@@ -1,5 +1,5 @@
 import { getNamespaces } from './resource';
-import { ResourceMapType } from '../../models/state';
+import { ResourceMapType } from '../../models/appstate';
 
 test('get-namspaces', () => {
   expect(getNamespaces({}).length).toBe(0);
@@ -7,8 +7,7 @@ test('get-namspaces', () => {
   const resourceMapWithoutNamespaces: ResourceMapType = {};
   resourceMapWithoutNamespaces['1'] = {
     id: '1',
-    file: 'filename',
-    folder: 'folder',
+    path: 'folder/filename',
     name: 'resource name',
     kind: 'ResourceType',
     version: '1.0',

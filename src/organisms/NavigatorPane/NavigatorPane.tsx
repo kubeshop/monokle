@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { debugBorder } from '../../styles/DebugStyles';
-import { K8sResource, NavigatorSubSection } from '../../models/state';
 import micromatch from 'micromatch';
 import '../../styles/NavigatorPane.css';
 import { previewKustomization, selectK8sResource } from '../../redux/reducers/main';
@@ -10,6 +9,8 @@ import { getNamespaces, hasIncomingRefs, hasOutgoingRefs } from '../../redux/uti
 import { setFilterObjects } from '../../redux/reducers/appConfig';
 import { selectKustomizations, selectActiveResources } from '../../redux/selectors';
 import { useSelector } from 'react-redux';
+import { K8sResource } from '../../models/k8sresource';
+import { NavigatorSubSection } from '../../models/navigator';
 
 const ALL_NAMESPACES = '- all -';
 

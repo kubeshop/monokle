@@ -9,7 +9,6 @@ import ReactFlow, {
   ReactFlowProvider,
 } from 'react-flow-renderer';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { K8sResource, ResourceRef } from '../../models/state';
 import { useCallback, useEffect, useState } from 'react';
 import dagre from 'dagre';
 import { isIncomingRef } from '../../redux/utils/resource';
@@ -17,6 +16,7 @@ import { selectK8sResource } from '../../redux/reducers/main';
 import Sidebar from './sidebar';
 import { selectActiveResources } from '../../redux/selectors';
 import { useSelector } from 'react-redux';
+import { K8sResource, ResourceRef } from '../../models/k8sresource';
 
 function mapResourceToElement(resource: K8sResource): Node {
   return {

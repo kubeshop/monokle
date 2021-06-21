@@ -1,7 +1,9 @@
-import { FileEntry, K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
+import { ResourceMapType } from '../../models/appstate';
 import { getK8sResources, isKustomizationFile, linkResources } from './resource';
 import path from 'path';
 import log from 'loglevel';
+import { FileEntry } from '../../models/fileentry';
+import { K8sResource, ResourceRefType } from '../../models/k8sresource';
 
 function linkParentKustomization(fileEntry: FileEntry, kustomization: K8sResource, resourceMap: ResourceMapType) {
   fileEntry.resourceIds?.forEach(e => {

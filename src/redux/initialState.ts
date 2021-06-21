@@ -1,4 +1,4 @@
-import {AppState} from "../models/state";
+import { AppState } from '../models/appstate';
 
 export const initialState: AppState = {
   rootFolder: "",
