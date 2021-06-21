@@ -1,6 +1,6 @@
 import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
-import { AppConfig } from '../../models/state';
 import { initialState } from '../initialState';
+import { AppConfig } from '../../models/appconfig';
 
 export const configSlice = createSlice({
   name: 'config',

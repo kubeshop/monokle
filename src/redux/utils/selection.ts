@@ -1,4 +1,6 @@
-import { FileEntry, K8sResource, ResourceMapType, ResourceRefType } from '../../models/state';
+import { ResourceMapType } from '../../models/appstate';
+import { K8sResource, ResourceRefType } from '../../models/k8sresource';
+import { FileEntry } from '../../models/fileentry';
 
 export function getKustomizationRefs(resourceMap: ResourceMapType, kustomizationId: string, selectParent: boolean) {
   let linkedResourceIds: string[] = [];

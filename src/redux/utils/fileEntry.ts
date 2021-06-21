@@ -1,10 +1,13 @@
-import { AppConfig, FileEntry, K8sResource, ResourceMapType } from '../../models/state';
+import { ResourceMapType } from '../../models/appstate';
 import fs from 'fs';
 import path from 'path';
 import micromatch from 'micromatch';
 import { LineCounter, parseAllDocuments } from 'yaml';
 import { createResourceName, uuidv4 } from './resource';
 import log from 'loglevel';
+import { AppConfig } from '../../models/appconfig';
+import { FileEntry } from '../../models/fileentry';
+import { K8sResource } from '../../models/k8sresource';
 
 export function readFiles(folder: string, appConfig: AppConfig, resourceMap: ResourceMapType,
                           fileMap: Map<string, FileEntry>, parent: FileEntry, rootFolder: string) {

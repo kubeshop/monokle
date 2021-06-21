@@ -1,8 +1,8 @@
 import { createSelector } from 'reselect';
 import { RootState } from './store';
 import { isKustomizationResource } from './utils/resource';
-import { K8sResource } from '../models/state';
 import { PREVIEW_PREFIX } from '../constants';
+import { K8sResource } from '../models/k8sresource';
 
 export const selectAllResources = createSelector(
   (state: RootState) => state.main.resourceMap,

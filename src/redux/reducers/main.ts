@@ -1,7 +1,7 @@
 import { initialState } from '../initialState';
 import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import path from 'path';
-import { AppConfig, AppState, FileEntry, ResourceMapType } from '../../models/state';
+import { AppState, ResourceMapType } from '../../models/appstate';
 import {
   clearFileSelections,
   clearResourceSelections,
@@ -16,6 +16,8 @@ import { AppDispatch } from '../store';
 import { exec } from 'child_process';
 import log from 'loglevel';
 import { PREVIEW_PREFIX } from '../../constants';
+import { AppConfig } from '../../models/appconfig';
+import { FileEntry } from '../../models/fileentry';
 
 type SetRootFolderPayload = {
   rootFolder: string,

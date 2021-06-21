@@ -1,7 +1,6 @@
 import * as React from 'react';
 import FolderTree from 'react-folder-tree';
 import 'react-folder-tree/dist/style.css';
-import { FileEntry } from '../../models/state';
 import { useRef } from 'react';
 import path from 'path';
 import '../../styles/FileTreePane.css';
@@ -9,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectFile, setRootFolder } from '../../redux/reducers/main';
 import { Row } from 'react-bootstrap';
 import { debugBorder } from '../../styles/DebugStyles';
+import { FileEntry } from '../../models/fileentry';
 
 interface TreeNode {
   name: string,
