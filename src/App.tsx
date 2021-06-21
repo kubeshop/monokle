@@ -12,7 +12,7 @@ const App = () => {
   return (
     <div>
       <Container fluid>
-        <Row style={debugBorder}>
+        <Row>
           <Header />
         </Row>
         <Row style={debugBorder}>
