@@ -99,22 +99,22 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
       selected: false,
       expanded: false,
       excluded: false,
-      children: []
+      children: [],
     };
 
     rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap, rootEntry, rootFolder);
-    processKustomizations(rootEntry, resourceMap, fileMap)
-    processServices(rootEntry, resourceMap)
-    processConfigMaps(rootEntry, resourceMap)
+    processKustomizations(resourceMap, fileMap);
+    processServices(resourceMap);
+    processConfigMaps(resourceMap);
 
     const payload: SetRootFolderPayload = {
       rootFolder: rootFolder,
       appConfig: appConfig,
       rootEntry: rootEntry,
-      resourceMap: toResourceMapType( resourceMap ),
-    }
+      resourceMap: toResourceMapType(resourceMap),
+    };
 
-    dispatch(rootFolderSet(payload))
+    dispatch(rootFolderSet(payload));
   }
 }
 
