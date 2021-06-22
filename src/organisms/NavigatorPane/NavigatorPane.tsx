@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { debugBorder } from '../../styles/DebugStyles';
+import styled from 'styled-components';
+
 import micromatch from 'micromatch';
 import '../../styles/NavigatorPane.css';
 import { previewKustomization, selectK8sResource } from '../../redux/reducers/main';
@@ -13,6 +14,57 @@ import { K8sResource } from '../../models/k8sresource';
 import { NavigatorSubSection } from '../../models/navigator';
 
 const ALL_NAMESPACES = '- all -';
+
+const NavContainer = styled(Container)`
+  background: papayawhip;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+`;
+
+const TitleRow = styled(Row)`
+  border: 1px solid blue;
+  border-radius: 2px;
+  background: papayawhip;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+`
+
+const SectionRow = styled(Row)`
+  border: 1px solid blue;
+  border-radius: 2px;
+  background: papayawhip;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+`
+
+const ItemRow = styled(Row)`
+  background: papayawhip;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+`
+
+const SectionCol = styled(Col)`
+  width: 100%;
+  margin: 0;
+  padding: 0;
+`
+
+const Title = styled.h4`
+  font-size: 1.5em;
+  text-align: center;
+  color: tomato;
+`;
+
+const SectionTitle = styled.h5`
+  font-size: 1.2em;
+  text-align: center;
+  color: tomato;
+`;
 
 const NavigatorPane = () => {
   const dispatch = useAppDispatch();
@@ -52,22 +104,22 @@ const NavigatorPane = () => {
   }
 
   return (
-    <Container>
-      <Row style={debugBorder}>
-        <h4>Navigator</h4>
-        <Col>
+    <NavContainer>
+      <TitleRow>
+        <Title>Navigator</Title>
+        <SectionCol>
           <input type='checkbox' onChange={onFilterChange} /> filter selected
-        </Col>
-      </Row>
+        </SectionCol>
+      </TitleRow>
 
       {kustomizations.length > 0 &&
-      <Row style={debugBorder}>
-        <Col>
-          <Row style={debugBorder}>
-            <Col>
-              <h5>Kustomizations</h5>
-            </Col>
-          </Row>
+      <SectionRow>
+        <SectionCol>
+          <SectionRow>
+            <SectionCol>
+              <SectionTitle>Kustomizations</SectionTitle>
+            </SectionCol>
+          </SectionRow>
           {kustomizations
             .filter(k => (!appConfig.settings.filterObjectsOnSelection
               || k.highlight || k.selected || !selectedResource || (previewResource === k.id)))
@@ -82,26 +134,32 @@ const NavigatorPane = () => {
               }
 
               return (
-                <Row key={k.id}>
-                  <Col>
+                <ItemRow key={k.id}>
+                  <SectionCol sm={9}>
                     <div className={className}
-                         onClick={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}>
+                         onClick={!previewResource
+                         || previewResource === k.id ? () => selectResource(k.id) : undefined}>
                       {hasIncomingRefs(k) ? '>> ' : ''}
                       {k.name}
-                      {hasOutgoingRefs(k) ? ' >>' : ''} </div>
-                  </Col>
-                  <Col><Button variant='outline-dark' size='sm'
+                      {hasOutgoingRefs(k) ? ' >>' : ''}
+                    </div>
+                  </SectionCol>
+                  <SectionCol sm={3}>
+                    <Button variant='outline-dark' size='sm'
                                onClick={() => selectPreview(k.id)}
                                active={previewResource != undefined && previewResource === k.id}
-                               disabled={previewResource != undefined && previewResource !== k.id}>Preview</Button></Col>
-                </Row>
+                               disabled={previewResource != undefined && previewResource !== k.id}>
+                                 Preview
+                    </Button>
+                  </SectionCol>
+                </ItemRow>
               );
             })
           }
-        </Col>
-      </Row>
+        </SectionCol>
+      </SectionRow>
       }
-      <Row style={debugBorder}>
+      <SectionRow>
         Filter namespace:<select onChange={handleNamespaceChange}>
         <option>{ALL_NAMESPACES}</option>
         {getNamespaces(resourceMap).map(n => {
@@ -110,33 +168,33 @@ const NavigatorPane = () => {
           );
         })}
       </select>
-      </Row>
+      </SectionRow>
 
-      <Row style={debugBorder}>
-        <Col>
+      <SectionRow>
+        <SectionCol>
           {appConfig.navigators.map(navigator => {
             return (
               <>
-                <Row style={debugBorder}>
-                  <h5>{navigator.name}</h5>
-                </Row>
-                <Row style={debugBorder}>
-                  <Col>
+                <SectionRow>
+                  <SectionTitle>{navigator.name}</SectionTitle>
+                </SectionRow>
+                <SectionRow>
+                  <SectionCol>
                     {navigator.sections.map(section => {
                       return (
                         <>
                           {section.name.length > 0 &&
-                          <Row style={debugBorder}>
+                          <SectionRow>
                             <h6>{section.name}</h6>
-                          </Row>
+                          </SectionRow>
                           }
-                          <Row key={section.name} style={debugBorder}>
+                          <SectionRow key={section.name}>
                             {section.subsections.map(subsection => {
                               const items = resources.filter(item =>
                                 shouldBeVisible(item, subsection),
                               );
                               return (
-                                <Col key={subsection.name} style={debugBorder}>
+                                <SectionCol key={subsection.name}>
                                   <h6>{subsection.name} {items.length > 0 ? '(' + items.length + ')' : ''}</h6>
                                   {
                                     items.map(item => {
@@ -156,24 +214,24 @@ const NavigatorPane = () => {
                                       );
                                     })
                                   }
-                                </Col>
+                                </SectionCol>
                               );
                             })
                             }
-                          </Row>
+                          </SectionRow>
                         </>
                       );
                     })
                     }
-                  </Col>
-                </Row>
+                  </SectionCol>
+                </SectionRow>
               </>
             );
           })
           }
-        </Col>
-      </Row>
-    </Container>
+        </SectionCol>
+      </SectionRow>
+    </NavContainer>
   );
 };
 

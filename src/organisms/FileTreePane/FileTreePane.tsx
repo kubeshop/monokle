@@ -2,12 +2,13 @@ import * as React from 'react';
 import FolderTree from 'react-folder-tree';
 import 'react-folder-tree/dist/style.css';
 import { useRef } from 'react';
+import styled from 'styled-components';
 import path from 'path';
+
 import '../../styles/FileTreePane.css';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectFile, setRootFolder } from '../../redux/reducers/main';
 import { Row } from 'react-bootstrap';
-import { debugBorder } from '../../styles/DebugStyles';
 import { FileEntry } from '../../models/fileentry';
 
 interface TreeNode {
@@ -65,6 +66,27 @@ function findRootFolder(files: FileList) {
   }
 }
 
+const FileTreeContainer = styled.div`
+  background: papayawhip;
+  width: 100%;
+  height: 100%;
+`;
+
+const TitleRow = styled(Row)`
+  border: 1px solid blue;
+  border-radius: 2px;
+  background: papayawhip;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+`
+
+const Title = styled.h4`
+  font-size: 1.5em;
+  text-align: center;
+  color: tomato;
+`;
+
 const FileTreePane = () => {
   const dispatch = useAppDispatch();
 
@@ -113,10 +135,10 @@ const FileTreePane = () => {
   });
 
   return (
-    <div>
-      <Row style={debugBorder}>
-        <h4>File Explorer</h4>
-      </Row>
+    <FileTreeContainer>
+      <TitleRow>
+        <Title>File Explorer</Title>
+      </TitleRow>
       <input
         type='file'
         /* @ts-expect-error */
@@ -134,7 +156,7 @@ const FileTreePane = () => {
         initOpenStatus='custom'  // default: 'open'
         indentPixels={8}
       />
-    </div>
+    </FileTreeContainer>
   );
 };
 

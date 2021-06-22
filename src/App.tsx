@@ -1,13 +1,26 @@
 import React from 'react';
 import './App.css';
 import { Col, Container, Row } from 'react-bootstrap';
+import styled from 'styled-components';
+
 import Footer from './organisms/Footer';
-import { debugBorder } from './styles/DebugStyles';
 import ActionsPane from './organisms/ActionsPane';
 import NavigatorPane from './organisms/NavigatorPane';
 import FileTreePane from './organisms/FileTreePane';
 import Header from './organisms/Header';
 import MessageBox from './organisms/MessageBox/MessageBox';
+
+
+const ContentColumn = styled(Col)`
+  border: 3px solid blue;
+  border-radius: 2px;
+  background: papayawhip;
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  overflow-y: scroll;
+`;
+
 
 const App = () => {
   return (
@@ -17,20 +30,20 @@ const App = () => {
         <Row>
           <Header />
         </Row>
-        <Row style={debugBorder}>
-          <Col sm={3} style={debugBorder}>
+        <Row>
+          <ContentColumn sm={3} >
             <FileTreePane />
-          </Col>
+          </ContentColumn>
 
-          <Col sm={3} style={debugBorder}>
+          <ContentColumn sm={3}>
             <NavigatorPane/>
-          </Col>
+          </ContentColumn>
 
-          <Col sm={6} style={debugBorder}>
+          <ContentColumn sm={6}>
             <ActionsPane />
-          </Col>
+          </ContentColumn>
         </Row>
-        <Row style={debugBorder}>
+        <Row>
           <Footer/>
         </Row>
       </Container>
