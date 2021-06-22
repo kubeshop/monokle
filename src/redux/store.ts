@@ -2,11 +2,13 @@ import mainReducer from './reducers/main';
 import { configureStore } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 import { configSlice } from './reducers/appConfig';
+import { alertSlice } from './reducers/alert';
 
 const store = configureStore({
   reducer: {
     config: configSlice.reducer,
     main: mainReducer,
+    alert: alertSlice.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
 });

@@ -158,7 +158,7 @@ export function previewKustomization(id: string) {
       const resource = state.resourceMap[id];
       if (resource && resource.path) {
         const folder = resource.path.substr(0, resource.path.lastIndexOf(path.sep));
-        console.log('previewing ' + id + ' in folder ' + folder);
+        log.info('previewing ' + id + ' in folder ' + folder);
 
         exec('kubectl kustomize ./', { cwd: folder }, (error, stdout, stderr) => {
           if (error) {
