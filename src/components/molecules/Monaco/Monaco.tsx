@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import MonacoEditor, { monaco } from 'react-monaco-editor';
-import { useAppSelector } from '../../redux/hooks';
 import fs from 'fs';
 import path from 'path';
 import { parseAllDocuments, stringify } from 'yaml';
-import { PREVIEW_PREFIX } from '../../constants';
+
+import { PREVIEW_PREFIX } from '@src/constants';
+import { useAppSelector } from '@redux/hooks';
 
 const Monaco = () => {
   const rootFolder = useAppSelector(state => state.main.rootFolder);

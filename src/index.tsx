@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import * as log from 'loglevel';
+
 import './index.css';
 import App from './App';
+import store from '@redux/store';
 import reportWebVitals from './reportWebVitals';
-import { Provider } from 'react-redux';
-import store from './redux/store';
-import * as log from 'loglevel';
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   log.enableAll();

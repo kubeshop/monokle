@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@components/*": [ "src/components/*" ],
+      "@components": [ "src/components/" ],
+      "@atoms/*": [ "src/components/atoms/*"],
+      "@atoms": [ "src/components/atoms/"],
+      "@organisms/*": [ "src/components/organisms/*"],
+      "@organisms": [ "src/components/organisms/"],
+      "@molecules/*": [ "src/components/molecules/*"],
+      "@molecules": [ "src/components/molecules/"],
+      "@models/*": [ "src/models/*" ],
+      "@models": [ "src/models/" ],
+      "@redux/*": [ "src/redux/*"],
+      "@redux": [ "src/redux/"],
+      "@actions/*": [ "src/actions/*"],
+      "@actions": [ "src/actions/"],
+      "@styles/*": [ "src/styles/*"],
+      "@styles": [ "src/styles/"],
+      "@util/*": [ "src/util/*"],
+      "@util": [ "src/util/"],
+      "@src/*": [ "src/*"],
+      "@src": [ "src/"],
+      "@root/*": ["./*"],
+      "@root": ["./"]
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '@redux/hooks';
 import path from 'path';
 
 const Footer = () => {

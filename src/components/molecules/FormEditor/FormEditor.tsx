@@ -1,9 +1,10 @@
 import * as React from 'react';
 import Form from '@rjsf/bootstrap-4';
 import fs from 'fs';
-import { useAppSelector } from '../../redux/hooks';
 import log from 'loglevel';
-import { getStaticResourcePath } from '../../redux/utils/fileEntry';
+
+import { getStaticResourcePath } from '@redux/utils/fileEntry';
+import { useAppSelector } from '@redux/hooks';
 
 const FormEditor = () => {
 

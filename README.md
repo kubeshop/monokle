@@ -13,6 +13,10 @@ Desktop UI for managing k8s manifests.
 * https://github.com/wbkd/react-flow for graph diagrams
 * https://github.com/tweenjs/es6-tween for animation tweening
 
+## Dev Dependencies
+
+* https://github.com/gsoft-inc/craco for overriding CRA config for folder aliases, see https://www.npmjs.com/package/craco-alias#examples
+
 ## Building
 
 This project was bootstrapped from https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, which

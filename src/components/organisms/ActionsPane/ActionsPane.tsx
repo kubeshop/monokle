@@ -5,12 +5,12 @@ import {
 } from 'react-bootstrap';
 import styled from 'styled-components';
 
-import { appColors as colors } from '../../styles/AppColors';
-import Monaco from '../../molecules/Monaco';
-import FormEditor from '../../molecules/FormEditor';
-import GraphView from '../../molecules/GraphView';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { applyResource } from '../../actions/common/apply';
+import { appColors as colors } from '@styles/AppColors';
+import Monaco from '@molecules/Monaco';
+import FormEditor from '@molecules/FormEditor';
+import GraphView from '@molecules/GraphView';
+import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { applyResource } from '@actions/common/apply';
 
 const ActionContainer = styled(Container)`
   background: ${colors.appNormalBackgroound};
