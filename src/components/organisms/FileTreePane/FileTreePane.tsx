@@ -1,16 +1,16 @@
 import * as React from 'react';
 import FolderTree from 'react-folder-tree';
+import { Row } from 'react-bootstrap';
 import 'react-folder-tree/dist/style.css';
 import { useRef } from 'react';
 import styled from 'styled-components';
 import path from 'path';
 
-import '../../styles/FileTreePane.css';
-import { appColors as colors } from '../../styles/AppColors';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectFile, setRootFolder } from '../../redux/reducers/main';
-import { Row } from 'react-bootstrap';
-import { FileEntry } from '../../models/fileentry';
+import '@styles/FileTreePane.css';
+import { appColors as colors } from '@styles/AppColors';
+import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { selectFile, setRootFolder } from '@redux/reducers/main';
+import { FileEntry } from '@models/fileentry';
 
 interface TreeNode {
   name: string,

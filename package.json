@@ -21,6 +21,7 @@
     "@types/dagre": "^0.7.44",
     "@types/styled-components": "^5.1.10",
     "concurrently": "^6.2.0",
+    "craco-alias": "^3.0.1",
     "cross-env": "^7.0.3",
     "electron": "^13.0.1",
     "electron-builder": "^22.11.7",
@@ -28,6 +29,7 @@
     "wait-on": "^5.3.0"
   },
   "dependencies": {
+    "@craco/craco": "6.1.2",
     "@reduxjs/toolkit": "^1.6.0",
     "@rjsf/bootstrap-4": "^2.5.1",
     "@rjsf/core": "^2.5.1",
@@ -69,9 +71,9 @@
     "yaml": "2.0.0-5"
   },
   "scripts": {
-    "start": "rescripts start",
-    "build": "rescripts build",
-    "test": "rescripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm run start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:build": "npm run build && tsc -p electron && electron-builder",

@@ -2,8 +2,8 @@ import * as React from 'react';
 import {Container, Row, Col} from 'react-bootstrap';
 import styled from 'styled-components';
 
-import { useAppSelector } from '../../redux/hooks';
-import { appColors as colors } from '../../styles/AppColors';
+import { useAppSelector } from '@redux/hooks';
+import { appColors as colors } from '@styles/AppColors';
 
 const Title = styled.h4`
   font-size: 1.5em;

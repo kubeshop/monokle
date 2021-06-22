@@ -1,14 +1,14 @@
 import React from 'react';
-import './App.css';
 import { Col, Container, Row } from 'react-bootstrap';
 import styled from 'styled-components';
 
-import Footer from './organisms/Footer';
-import ActionsPane from './organisms/ActionsPane';
-import NavigatorPane from './organisms/NavigatorPane';
-import FileTreePane from './organisms/FileTreePane';
-import Header from './organisms/Header';
-import MessageBox from './organisms/MessageBox/MessageBox';
+import './App.css';
+import Footer from '@organisms/Footer';
+import ActionsPane from '@organisms/ActionsPane';
+import NavigatorPane from '@organisms/NavigatorPane';
+import FileTreePane from '@organisms/FileTreePane';
+import Header from '@organisms/Header';
+import MessageBox from '@organisms/MessageBox';
 
 
 const ContentColumn = styled(Col)`

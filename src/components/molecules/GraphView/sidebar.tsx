@@ -2,8 +2,9 @@ import React, { useCallback, useEffect } from 'react';
 // @ts-ignore
 import { Easing, Tween, autoPlay } from 'es6-tween';
 import { useStore, useZoomPanHelper } from 'react-flow-renderer';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { setAutoZoom } from '../../redux/reducers/appConfig';
+
+import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { setAutoZoom } from '@redux/reducers/appConfig';
 
 autoPlay(true);
 
