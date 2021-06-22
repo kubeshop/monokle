@@ -4,6 +4,17 @@ import styled from 'styled-components';
 
 import { useAppSelector } from '../../redux/hooks';
 
+const Title = styled.h4`
+  font-size: 1.5em;
+  text-align: left;
+  color: tomato;
+`;
+
+const EditorMode = styled.h4`
+  font-size: 1.0em;
+  text-align: right;
+  color: blue;
+`;
 
 const StyledRow = styled(Row)`
   border: 3px solid blue;
@@ -15,18 +26,6 @@ const StyledRowPreviewMode = styled(Row)`
   border: 3px solid tomato;
   border-radius: 2px;
   background: grey;
-`;
-
-const Title = styled.h4`
-  font-size: 1.5em;
-  text-align: left;
-  color: tomato;
-`;
-
-const EditorMode = styled.h4`
-  font-size: 1.0em;
-  text-align: right;
-  color: blue;
 `;
 
 const Header = () => {
