@@ -69,9 +69,9 @@ const Monaco = () => {
   return (
     <MonacoEditor
       width='600'
-      height='600'
+      height='768'
       language='yaml'
-      theme='vs-dark'
+      theme='vs-light'
       value={code}
       options={options}
       onChange={onChange}

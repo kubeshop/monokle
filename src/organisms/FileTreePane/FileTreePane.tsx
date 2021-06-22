@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import path from 'path';
 
 import '../../styles/FileTreePane.css';
+import { appColors as colors } from '../../styles/AppColors';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectFile, setRootFolder } from '../../redux/reducers/main';
 import { Row } from 'react-bootstrap';
@@ -67,7 +68,7 @@ function findRootFolder(files: FileList) {
 }
 
 const FileTreeContainer = styled.div`
-  background: papayawhip;
+  background: ${colors.appNormalBackgroound};
   width: 100%;
   height: 100%;
 `;
@@ -75,7 +76,7 @@ const FileTreeContainer = styled.div`
 const TitleRow = styled(Row)`
   border: 1px solid blue;
   border-radius: 2px;
-  background: papayawhip;
+  background: ${colors.appNormalBackgroound};
   width: 100%;
   height: 100%;
   margin: 0;
