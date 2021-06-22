@@ -7,10 +7,12 @@ import ActionsPane from './organisms/ActionsPane';
 import NavigatorPane from './organisms/NavigatorPane';
 import FileTreePane from './organisms/FileTreePane';
 import Header from './organisms/Header';
+import MessageBox from './organisms/MessageBox/MessageBox';
 
 const App = () => {
   return (
     <div>
+      <MessageBox />
       <Container fluid>
         <Row>
           <Header />

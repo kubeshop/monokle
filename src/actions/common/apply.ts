@@ -5,6 +5,9 @@ import path from 'path';
 import { isKustomizationResource } from '../../redux/utils/resource';
 import log from 'loglevel';
 import { ResourceMapType } from '../../models/appstate';
+import { setAlert } from '../../redux/reducers/alert';
+import { AlertEnum, AlertType } from '../../models/alert';
+import { AppDispatch } from '../../redux/store';
 
 function applyK8sResource(resource: K8sResource) {
   const child = spawn('kubectl', ['apply', '-f', '-']);
@@ -19,7 +22,8 @@ function applyKustomization(resource: K8sResource) {
   return child;
 }
 
-export async function applyResource(resourceId: string, resourceMap: ResourceMapType) {
+export async function applyResource(resourceId: string, resourceMap: ResourceMapType, dispatch: AppDispatch) {
+
   try {
     const resource = resourceMap[resourceId];
     if (resource && resource.content) {
@@ -30,11 +34,21 @@ export async function applyResource(resourceId: string, resourceMap: ResourceMap
       });
 
       child.stdout.on('data', (data) => {
-        log.info(`child stdout:\n${data}`);
+        const alert: AlertType = {
+          type: AlertEnum.Message,
+          title: 'Apply completed',
+          message: data.toString(),
+        };
+        dispatch(setAlert(alert));
       });
 
       child.stderr.on('data', (data) => {
-        log.error(`child stderr:\n${data}`);
+        const alert: AlertType = {
+          type: AlertEnum.Error,
+          title: 'Apply failed',
+          message: data.toString(),
+        };
+        dispatch(setAlert(alert));
       });
     }
   } catch (e) {
