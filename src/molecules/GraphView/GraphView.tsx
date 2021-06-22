@@ -136,7 +136,7 @@ const GraphView = () => {
 
   return (
     <Row>
-      <span style={{ width: 600, height: 600 }}>
+      <span style={{ width: 600, height: 768 }}>
         <div className='zoompanflow'>
           <ReactFlowProvider>
             <div className='reactflow-wrapper' style={{ width: 600, height: 600 }}>

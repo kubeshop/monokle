@@ -3,12 +3,53 @@ import {
   Button,
   Col, Container, Row, Tab, Tabs,
 } from 'react-bootstrap';
-import { debugBorder } from '../../styles/DebugStyles';
+import styled from 'styled-components';
+
+import { appColors as colors } from '../../styles/AppColors';
 import Monaco from '../../molecules/Monaco';
 import FormEditor from '../../molecules/FormEditor';
 import GraphView from '../../molecules/GraphView';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { applyResource } from '../../actions/common/apply';
+
+const ActionContainer = styled(Container)`
+  background: ${colors.appNormalBackgroound};
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+`;
+
+const TitleRow = styled(Row)`
+  border: 1px solid blue;
+  border-radius: 2px;
+  background: ${colors.appNormalBackgroound};
+  width: 100%;
+  margin: 0;
+  padding: 0;
+`
+
+const SectionRow = styled(Row)`
+  border: 1px solid blue;
+  border-radius: 2px;
+  background: ${colors.appNormalBackgroound};
+  width: 100%;
+  margin: 0;
+  padding: 0;
+`
+
+const SectionCol = styled(Col)`
+  width: 100%;
+  margin: 0;
+  padding: 0;
+`
+
+const Title = styled.h4`
+  font-size: 1.5em;
+  text-align: center;
+  color: tomato;
+`;
+
 
 const ActionsPane = () => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
@@ -22,16 +63,16 @@ const ActionsPane = () => {
   }
 
   return (
-    <Container>
-      <Row style={debugBorder}>
-        <h4>Editors/Actions</h4>
-      </Row>
-      <Row>
+    <ActionContainer>
+      <TitleRow>
+        <Title>Editors/Actions</Title>
+      </TitleRow>
+      <SectionRow>
         <Button variant='outline-dark' size='sm' onClick={applySelectedResource}
                 disabled={selectedResource === undefined}>Apply</Button>
-      </Row>
-      <Row style={debugBorder}>
-        <Col>
+      </SectionRow>
+      <SectionRow>
+        <SectionCol>
           <Tabs defaultActiveKey='source' id='uncontrolled-tab-example'>
             <Tab eventKey='source' title='Source'>
               <Monaco />
@@ -43,9 +84,9 @@ const ActionsPane = () => {
               <GraphView />
             </Tab>
           </Tabs>
-        </Col>
-      </Row>
-    </Container>
+        </SectionCol>
+      </SectionRow>
+    </ActionContainer>
   );
 };
 

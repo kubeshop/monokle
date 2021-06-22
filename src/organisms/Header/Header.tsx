@@ -3,6 +3,7 @@ import {Container, Row, Col} from 'react-bootstrap';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../redux/hooks';
+import { appColors as colors } from '../../styles/AppColors';
 
 const Title = styled.h4`
   font-size: 1.5em;
@@ -19,7 +20,7 @@ const EditorMode = styled.h4`
 const StyledRow = styled(Row)`
   border: 3px solid blue;
   border-radius: 2px;
-  background: papayawhip;
+  background: ${colors.appNormalBackgroound};
 `;
 
 const StyledRowPreviewMode = styled(Row)`
