@@ -7,10 +7,12 @@ import packageJson from '@root/package.json';
 import {appColors as colors} from '@styles/AppColors';
 
 const FooterContainer = styled.div`
+  border: 1px solid blue;
+  border-radius: 2px;
   background: ${colors.appNormalBackgroound};
   width: 100%;
   height: 100%;
-  font-size: 1em;
+  font-size: 0.9em;
   font-weight: 400;
   line-height: 1.5;
   color: #212529;
