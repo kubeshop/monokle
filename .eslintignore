@@ -3,6 +3,7 @@ build
 cache
 lib
 dist
+.husky
 webpack.*.js
 server.js
 build.js
