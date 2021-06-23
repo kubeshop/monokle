@@ -32,15 +32,17 @@ function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
     animated: false,
     type: 'smoothstep',
   };
-}"smoothstep"Graph = new dagre.graphlib.Graph();
+}
+
+const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 const getLayoutedElements = (elements: any[]): any => {
-  dagreGraph.setGraph({ rankdir: "LR", ranksep: 50 });
+  dagreGraph.setGraph({rankdir: 'LR', ranksep: 50});
 
   elements.forEach(el => {
     if (isNode(el)) {
-      dagreGraph.setNode(el.id, { width: 150, height: 30 });
+      dagreGraph.setNode(el.id, {width: 150, height: 30});
     } else if (isIncomingRef(el.data?.refType)) {
       dagreGraph.setEdge(el.source, el.target);
     } else {
@@ -108,7 +110,7 @@ const GraphView = () => {
       nds.map(nd => {
         const resource = resourceMap[nd.id];
         if (resource) {
-          nd.style = { background: resource.selected ? "lightblue" : resource.highlight ? "lightgreen" : "white" };
+          nd.style = {background: resource.selected ? 'lightblue' : resource.highlight ? 'lightgreen' : 'white'};
         }
         return nd;
       })
@@ -128,10 +130,10 @@ const GraphView = () => {
 
   return (
     <Row>
-      <span style={{ width: 600, height: 768 }}>
+      <span style={{width: 600, height: 768}}>
         <div className="zoompanflow">
           <ReactFlowProvider>
-            <div className="reactflow-wrapper" style={{ width: 600, height: 600 }}>
+            <div className="reactflow-wrapper" style={{width: 600, height: 600}}>
               <ReactFlow
                 minZoom={0.1}
                 panOnScroll
@@ -142,7 +144,7 @@ const GraphView = () => {
               >
                 <MiniMap
                   nodeColor={node => {
-                    return node && node.style && node.style.background ? node.style.background.toString() : "white";
+                    return node && node.style && node.style.background ? node.style.background.toString() : 'white';
                   }}
                   nodeStrokeWidth={3}
                 />

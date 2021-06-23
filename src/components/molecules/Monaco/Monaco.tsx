@@ -48,7 +48,6 @@ const Monaco = () => {
         const p = path.join(rootFolder, selectedPath);
         if (!fs.statSync(p).isDirectory()) {
           newCode = fs.readFileSync(p, 'utf8');
-          ('utf8');
         }
       }
     } else if (selectedResource) {
@@ -63,7 +62,7 @@ const Monaco = () => {
 
   const options = {
     selectOnLineNumbers: true,
-    readOnly: selectedResource !== undefined && resourceMap[selectedResource].path.startsith(PREVIEW_PREFIX),
+    readOnly: selectedResource !== undefined && resourceMap[selectedResource].path.startsWith(PREVIEW_PREFIX),
   };
 
   return (

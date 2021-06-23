@@ -29,6 +29,7 @@
     "eslint-plugin-prettier": "~3.4.0",
     "eslint-plugin-react": "~7.22.0",
     "eslint-plugin-react-hooks": "~4.2.0",
+    "husky": "^6.0.0",
     "prettier": "2.3.0",
     "wait-on": "^5.3.0"
   },
@@ -78,7 +79,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test",
+    "test": "craco test --watchAll=false",
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm run start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:build": "npm run build && tsc -p electron && electron-builder",
@@ -87,7 +88,8 @@
     "lint:config": "eslint .",
     "lint:src": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "lintfix": "eslint --fix \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
-    "precommit": "npm run lint && npm test"
+    "precommit": "npm run lint && npm test",
+    "prepare": "husky install"
   },
   "build": {
     "appId": "io.kubeshop.manifestui",

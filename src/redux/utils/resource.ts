@@ -31,7 +31,7 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
   const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
     getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
-      JSONPath({ path: '$..conf"$..configMapRef.name"deployment.content }).forEach((refName: string) => {
+      JSONPath({path: '$..configMapRef.name', json: deployment.content}).forEach((refName: string) => {
         configMaps
           .filter(item => item.content.metadata.name === refName)
           .forEach(configMapResource => {
@@ -44,7 +44,7 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
           });
       });
 
-      JSONPath({ path: '$..conf"$..configMapKeyRef.name"deployment.content }).forEach((refName: string) => {
+      JSONPath({path: '$..configMapKeyRef.name', json: deployment.content}).forEach((refName: string) => {
         configMaps
           .filter(item => item.content.metadata.name === refName)
           .forEach(configMapResource => {
@@ -57,7 +57,7 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
           });
       });
 
-      JSONPath({ path: '$..volu"$..volumes[*].configMap.name"deployment.content }).forEach((refName: string) => {
+      JSONPath({path: '$..volumes[*].configMap.name', json: deployment.content}).forEach((refName: string) => {
         configMaps
           .filter(item => item.content.metadata.name === refName)
           .forEach(configMapResource => {
@@ -87,7 +87,7 @@ export function linkResources(
   if (!source.refs.some(ref => ref.refType === sourceRefType && ref.targetResourceId === target.id)) {
     source.refs.push({
       refType: sourceRefType,
-      targetResourceId: target.id
+      targetResourceId: target.id,
     });
   }
 
@@ -95,7 +95,7 @@ export function linkResources(
   if (!target.refs.some(ref => ref.refType === targetRefType && ref.targetResourceId === source.id)) {
     target.refs.push({
       refType: targetRefType,
-      targetResourceId: source.id
+      targetResourceId: source.id,
     });
   }
 }
@@ -123,7 +123,7 @@ export function createResourceName(filePath: string, content: any) {
     return filePath;
   }
 
-  let name = content.metadata?.name ? `${content.metadata.name} ` : "";
+  let name = content.metadata?.name ? `${content.metadata.name} ` : '';
   return `${name + content.kind} [${content.apiVersion}]`;
 }
 
@@ -132,7 +132,7 @@ export function isKustomizationResource(r: K8sResource | undefined) {
 }
 
 export function isKustomizationFile(childFileEntry: FileEntry, resourceMap: ResourceMapType) {
-  if (childFileEntry.name.toLowerCase() === "kustomization.yaml" && childFileEntry.resourceIds) {
+  if (childFileEntry.name.toLowerCase() === 'kustomization.yaml' && childFileEntry.resourceIds) {
     const r = resourceMap[childFileEntry.resourceIds[0]];
     return isKustomizationResource(r);
   }
@@ -143,12 +143,12 @@ export function isKustomizationFile(childFileEntry: FileEntry, resourceMap: Reso
 const incomingRefs = [
   ResourceRefType.KustomizationParent,
   ResourceRefType.ConfigMapRef,
-  ResourceRefType.SelectedPodName
+  ResourceRefType.SelectedPodName,
 ];
 const outgoingRefs = [
   ResourceRefType.KustomizationResource,
   ResourceRefType.ConfigMapConsumer,
-  ResourceRefType.ServicePodSelector
+  ResourceRefType.ServicePodSelector,
 ];
 
 export function isIncomingRef(e: ResourceRefType) {

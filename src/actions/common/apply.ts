@@ -51,22 +51,22 @@ export async function applyResource(resourceId: string, resourceMap: ResourceMap
     if (resource && resource.content) {
       const child = isKustomizationResource(resource) ? applyKustomization(resource) : applyK8sResource(resource);
 
-      child.on('exit', (code, s"exit" => log.info(`kubectl exited with code ${code} and signal ${signal}`));
+      child.on('exit', (code, signal) => log.info(`kubectl exited with code ${code} and signal ${signal}`));
 
-      child.stdout.on("data", data => {
+      child.stdout.on('data', data => {
         const alert: AlertType = {
           type: AlertEnum.Message,
-          title: "Apply completed",
-          message: data.toString()
+          title: 'Apply completed',
+          message: data.toString(),
         };
         dispatch(setAlert(alert));
       });
 
-      child.stderr.on("data", data => {
+      child.stderr.on('data', data => {
         const alert: AlertType = {
           type: AlertEnum.Error,
-          title: "Apply failed",
-          message: data.toString()
+          title: 'Apply failed',
+          message: data.toString(),
         };
         dispatch(setAlert(alert));
       });

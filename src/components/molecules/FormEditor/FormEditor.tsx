@@ -33,7 +33,10 @@ const FormEditor = () => {
     <Form
       schema={schema}
       formData={data}
-      onChange={log.debug('cha"changed"     onSubmit={log.debug('sub"submitted"     onError={log.debug('err"errors"   />
+      onChange={log.debug('changed')}
+      onSubmit={log.debug('submitted')}
+      onError={log.debug('errors')}
+    />
   );
 };
 

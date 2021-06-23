@@ -1,12 +1,15 @@
 import {AppState} from '@models/appstate';
 
 export const initialState: AppState = {
-  rootFolder: ''""  rootEntry: {
-    name: ''""    folder: ''""    selected: false,
+  rootFolder: '',
+  rootEntry: {
+    name: '',
+    folder: '',
+    selected: false,
     highlight: false,
     expanded: false,
     excluded: false,
- },
+  },
   appConfig: {
     settings: {
       filterObjectsOnSelection: false,
@@ -16,65 +19,65 @@ export const initialState: AppState = {
     fileIncludes: ['yaml', 'yml'],
     navigators: [
       {
-        name: "K8s Resources",
+        name: 'K8s Resources',
         sections: [
           {
-            name: "Workloads",
+            name: 'Workloads',
             subsections: [
               {
-                name: "Deployments",
-                apiVersionSelector: "**",
-                kindSelector: "Deployment"
-              }
-            ]
+                name: 'Deployments',
+                apiVersionSelector: '**',
+                kindSelector: 'Deployment',
+              },
+            ],
           },
           {
-            name: "Configuration",
+            name: 'Configuration',
             subsections: [
               {
-                name: "ConfigMaps",
-                apiVersionSelector: "**",
-                kindSelector: "ConfigMap"
-              }
-            ]
+                name: 'ConfigMaps',
+                apiVersionSelector: '**',
+                kindSelector: 'ConfigMap',
+              },
+            ],
           },
           {
-            name: "Network",
+            name: 'Network',
             subsections: [
               {
-                name: "Services",
-                apiVersionSelector: "**",
-                kindSelector: "Service"
-              }
-            ]
+                name: 'Services',
+                apiVersionSelector: '**',
+                kindSelector: 'Service',
+              },
+            ],
           },
           {
-            name: "Security",
+            name: 'Security',
             subsections: [
               {
-                name: "ClusterRoles",
-                apiVersionSelector: "**",
-                kindSelector: "ClusterRole"
-              }
-            ]
-          }
+                name: 'ClusterRoles',
+                apiVersionSelector: '**',
+                kindSelector: 'ClusterRole',
+              },
+            ],
+          },
         ],
       },
       {
-        name: "Ambassador",
+        name: 'Ambassador',
         sections: [
           {
-            name: "Emissary",
+            name: 'Emissary',
             subsections: [
               {
-                name: "Mappings",
-                apiVersionSelector: "getambassador.io/*",
-                kindSelector: "Mapping"
-              }
-            ]
-          }
-        ]
-      }
+                name: 'Mappings',
+                apiVersionSelector: 'getambassador.io/*',
+                kindSelector: 'Mapping',
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
   resourceMap: {},

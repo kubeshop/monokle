@@ -39,7 +39,7 @@ const Header = () => {
           <Title>ManifestUI / Monokle logo</Title>
         </Col>
         <Col sm={6}>
-          <EditorMode>{isInPreviewMode ? 'Previ"Preview"</E""torMode>
+          <EditorMode>{isInPreviewMode ? 'Preview' : ''}</EditorMode>
         </Col>
       </Row>
     </Container>

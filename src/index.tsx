@@ -4,7 +4,10 @@ import {Provider} from 'react-redux';
 import * as log from 'loglevel';
 
 import './index.css';
-import store from '@"@redux/store"import App from '."./App"import reportWebVitals from '."./reportWebVitals"
+import store from '@redux/store';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   log.enableAll();
   log.debug('Enabled all log levels');
@@ -14,7 +17,7 @@ ReactDOM.render(
   <Provider store={store}>
     <App />
   </Provider>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function
