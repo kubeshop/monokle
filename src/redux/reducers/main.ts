@@ -18,6 +18,8 @@ import log from 'loglevel';
 import { PREVIEW_PREFIX } from '../../constants';
 import { AppConfig } from '../../models/appconfig';
 import { FileEntry } from '../../models/fileentry';
+// @ts-ignore
+import shellPath from 'shell-path';
 
 type SetRootFolderPayload = {
   rootFolder: string,
@@ -160,7 +162,14 @@ export function previewKustomization(id: string) {
         const folder = resource.path.substr(0, resource.path.lastIndexOf(path.sep));
         log.info('previewing ' + id + ' in folder ' + folder);
 
-        exec('kubectl kustomize ./', { cwd: folder }, (error, stdout, stderr) => {
+        // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
+        exec('kubectl kustomize ./', {
+          cwd: folder, env: {
+            NODE_ENV: process.env.NODE_ENV,
+            PUBLIC_URL: process.env.PUBLIC_URL,
+            PATH: shellPath.sync(),
+          },
+        }, (error, stdout, stderr) => {
           if (error) {
             log.error(`Failed to generate kustomizations: ${error.message}`);
             return;

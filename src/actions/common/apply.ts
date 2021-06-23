@@ -8,9 +8,21 @@ import { ResourceMapType } from '../../models/appstate';
 import { setAlert } from '../../redux/reducers/alert';
 import { AlertEnum, AlertType } from '../../models/alert';
 import { AppDispatch } from '../../redux/store';
+// @ts-ignore
+import shellPath from 'shell-path';
+
+// weird workaround to get all ENV values (accessing process.env directly only returns a subset)
+export const PROCESS_ENV = JSON.parse(JSON.stringify(process)).env;
 
 function applyK8sResource(resource: K8sResource) {
-  const child = spawn('kubectl', ['apply', '-f', '-']);
+  const child = spawn('kubectl', ['apply', '-f', '-'], {
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      PUBLIC_URL: process.env.PUBLIC_URL,
+      PATH: shellPath.sync(),
+      KUBECONFIG: PROCESS_ENV.KUBECONFIG,
+    },
+  });
   child.stdin.write(stringify(resource.content));
   child.stdin.end();
   return child;
@@ -18,7 +30,14 @@ function applyK8sResource(resource: K8sResource) {
 
 function applyKustomization(resource: K8sResource) {
   const folder = resource.path.substr(0, resource.path.lastIndexOf(path.sep));
-  const child = spawn('kubectl', ['apply', '-k', folder]);
+  const child = spawn('kubectl', ['apply', '-k', folder], {
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      PUBLIC_URL: process.env.PUBLIC_URL,
+      PATH: shellPath.sync(),
+      KUBECONFIG: PROCESS_ENV.KUBECONFIG,
+    },
+  });
   return child;
 }
 
