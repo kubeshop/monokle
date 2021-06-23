@@ -4,19 +4,15 @@ import {stringify} from 'yaml';
 import path from 'path';
 import {isKustomizationResource} from '@redux/utils/resource';
 import log from 'loglevel';
-import { ResourceMapType } from '../../models/appstate';
-import { setAlert } from '../../redux/reducers/alert';
-import { AlertEnum, AlertType } from '../../models/alert';
-import { AppDispatch } from '../../redux/store';
 // @ts-ignore
 import shellPath from 'shell-path';
+import {ResourceMapType} from '../../models/appstate';
+import {setAlert} from '../../redux/reducers/alert';
+import {AlertEnum, AlertType} from '../../models/alert';
+import {AppDispatch} from '../../redux/store';
 
 // weird workaround to get all ENV values (accessing process.env directly only returns a subset)
 export const PROCESS_ENV = JSON.parse(JSON.stringify(process)).env;
-import {ResourceMapType} from '@models/appstate';
-import {setAlert} from '@redux/reducers/alert';
-import {AlertEnum, AlertType} from '@models/alert';
-import {AppDispatch} from '@redux/store';
 
 function applyK8sResource(resource: K8sResource) {
   const child = spawn('kubectl', ['apply', '-f', '-'], {

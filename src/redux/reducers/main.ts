@@ -1,7 +1,11 @@
-import { initialState } from '../initialState';
-import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
+import {exec} from 'child_process';
+import log from 'loglevel';
+// @ts-ignore
+import shellPath from 'shell-path';
+import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import { AppState, ResourceMapType } from '../../models/appstate';
+import {initialState} from '../initialState';
+import {AppState, ResourceMapType} from '../../models/appstate';
 import {
   clearFileSelections,
   clearResourceSelections,
@@ -9,17 +13,13 @@ import {
   highlightChildren,
   getKustomizationRefs,
 } from '../utils/selection';
-import { extractK8sResources, readFiles, selectResourceFileEntry } from '../utils/fileEntry';
-import { processKustomizations } from '../utils/kustomize';
-import { isKustomizationResource, processConfigMaps, processServices } from '../utils/resource';
-import { AppDispatch } from '../store';
-import { exec } from 'child_process';
-import log from 'loglevel';
-import { PREVIEW_PREFIX } from '../../constants';
-import { AppConfig } from '../../models/appconfig';
-import { FileEntry } from '../../models/fileentry';
-// @ts-ignore
-import shellPath from 'shell-path';
+import {extractK8sResources, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
+import {processKustomizations} from '../utils/kustomize';
+import {isKustomizationResource, processConfigMaps, processServices} from '../utils/resource';
+import {AppDispatch} from '../store';
+import {PREVIEW_PREFIX} from '../../constants';
+import {AppConfig} from '../../models/appconfig';
+import {FileEntry} from '../../models/fileentry';
 
 type SetRootFolderPayload = {
   rootFolder: string;
@@ -169,27 +169,32 @@ export function previewKustomization(id: string) {
         log.info(`previewing ${id} in folder ${folder}`);
 
         // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
-        exec('kubectl kustomize ./', {
-          cwd: folder, env: {
-            NODE_ENV: process.env.NODE_ENV,
-            PUBLIC_URL: process.env.PUBLIC_URL,
-            PATH: shellPath.sync(),
+        exec(
+          'kubectl kustomize ./',
+          {
+            cwd: folder,
+            env: {
+              NODE_ENV: process.env.NODE_ENV,
+              PUBLIC_URL: process.env.PUBLIC_URL,
+              PATH: shellPath.sync(),
+            },
           },
-        }, (error, stdout, stderr) => {
-          if (error) {
-            log.error(`Failed to generate kustomizations: ${error.message}`);
-            return;
-          }
-          if (stderr) {
-            log.error(`Failed to generate kustomizations: ${stderr}`);
-            return;
-          }
+          (error, stdout, stderr) => {
+            if (error) {
+              log.error(`Failed to generate kustomizations: ${error.message}`);
+              return;
+            }
+            if (stderr) {
+              log.error(`Failed to generate kustomizations: ${stderr}`);
+              return;
+            }
 
-          const resources = extractK8sResources(stdout, PREVIEW_PREFIX + resource.id);
-          processParsedResources(resources);
+            const resources = extractK8sResources(stdout, PREVIEW_PREFIX + resource.id);
+            processParsedResources(resources);
 
-          dispatch(mainSlice.actions.setPreviewData({previewResourceId: id, previewResources: resources}));
-        });
+            dispatch(mainSlice.actions.setPreviewData({previewResourceId: id, previewResources: resources}));
+          }
+        );
       }
     }
   };
