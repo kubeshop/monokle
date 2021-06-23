@@ -13,6 +13,7 @@ import {Size} from '@models/window';
 
 const ContentColumn = styled(Col)`
   width: 100%;
+  height: 100%;
   padding: 0px;
   overflow-y: scroll;
 `;
@@ -22,12 +23,14 @@ const ContentRow = styled(Row)`
   height: ${props => props.rowHeight || '1em'};
   padding: 0px;
   margin: 0px;
+  overflow-y: hidden;
 `;
 
 const MainContainer = styled(Container)`
   width: 100%;
   height: ${props => props.mainHeight || '100px'};
   padding: 0px;
+  overflow-y: clip;
 `;
 
 
@@ -68,25 +71,20 @@ const App = () => {
 export default App;
 
 function useWindowSize(): Size {
-  // Initialize state with undefined width/height so server and client renders match
-  // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
   const [windowSize, setWindowSize] = useState<Size>({
     width: undefined,
     height: undefined,
   });
 
   useEffect(() => {
-    // Handler to call on window resize
     function handleResize() {
-      // Set window width/height to state
       setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight,
       });
     }
-    // Add event listener
+
     window.addEventListener("resize", handleResize);
-    // Call handler right away so state gets updated with initial window size
     handleResize();
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleResize);
