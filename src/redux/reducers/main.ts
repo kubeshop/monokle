@@ -4,8 +4,11 @@ import log from 'loglevel';
 import shellPath from 'shell-path';
 import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
+import {PREVIEW_PREFIX} from '@src/constants';
+import {AppConfig} from '@models/appconfig';
+import {AppState, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
 import {initialState} from '../initialState';
-import {AppState, ResourceMapType} from '../../models/appstate';
 import {
   clearFileSelections,
   clearResourceSelections,
@@ -17,9 +20,6 @@ import {extractK8sResources, readFiles, selectResourceFileEntry} from '../utils/
 import {processKustomizations} from '../utils/kustomize';
 import {isKustomizationResource, processConfigMaps, processServices} from '../utils/resource';
 import {AppDispatch} from '../store';
-import {PREVIEW_PREFIX} from '../../constants';
-import {AppConfig} from '../../models/appconfig';
-import {FileEntry} from '../../models/fileentry';
 
 type SetRootFolderPayload = {
   rootFolder: string;

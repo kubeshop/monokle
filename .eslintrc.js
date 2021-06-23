@@ -19,7 +19,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn', // Checks effect dependencies
     'no-console': 'warn',
     'no-undef': 'off',
-    semi: 'off',
+    semi: 'error',
     'no-unused-vars': 'off',
     'import/no-extraneous-dependencies': 'off',
     'prefer-destructuring': 'off',
