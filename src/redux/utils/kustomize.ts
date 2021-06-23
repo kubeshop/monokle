@@ -1,9 +1,9 @@
-import { ResourceMapType } from '../../models/appstate';
-import { getK8sResources, isKustomizationFile, linkResources } from './resource';
 import path from 'path';
 import log from 'loglevel';
-import { FileEntry } from '../../models/fileentry';
-import { K8sResource, ResourceRefType } from '../../models/k8sresource';
+import {ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
+import {K8sResource, ResourceRefType} from '@models/k8sresource';
+import {getK8sResources, isKustomizationFile, linkResources} from './resource';
 
 function linkParentKustomization(fileEntry: FileEntry, kustomization: K8sResource, resourceMap: ResourceMapType) {
   fileEntry.resourceIds?.forEach(e => {
@@ -14,16 +14,21 @@ function linkParentKustomization(fileEntry: FileEntry, kustomization: K8sResourc
   });
 }
 
-function processKustomizationResource(fileMap: Map<string, FileEntry>, kustomization: K8sResource, resource: string, resourceMap: ResourceMapType) {
+function processKustomizationResource(
+  fileMap: Map<string, FileEntry>,
+  kustomization: K8sResource,
+  resource: string,
+  resourceMap: ResourceMapType
+) {
   const fileEntry = fileMap.get(path.join(path.parse(kustomization.path).dir, resource));
   if (fileEntry) {
     if (fileEntry.children) {
       // resource is folder -> find contained kustomizations and link...
-      fileEntry.children.filter(
-        childFileEntry => isKustomizationFile(childFileEntry, resourceMap),
-      ).forEach(childFileEntry => {
-        linkParentKustomization(childFileEntry, kustomization, resourceMap);
-      });
+      fileEntry.children
+        .filter(childFileEntry => isKustomizationFile(childFileEntry, resourceMap))
+        .forEach(childFileEntry => {
+          linkParentKustomization(childFileEntry, kustomization, resourceMap);
+        });
     } else {
       // resource is file -> check for contained resources
       linkParentKustomization(fileEntry, kustomization, resourceMap);
@@ -35,7 +40,7 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Map
   getK8sResources(resourceMap, 'Kustomization')
     .filter(k => k.content.resources || k.content.bases || k.content.patchesStrategicMerge)
     .forEach(kustomization => {
-      var resources = kustomization.content.resources || [];
+      let resources = kustomization.content.resources || [];
       if (kustomization.content.bases) {
         resources = resources.concat(kustomization.content.bases);
       }
@@ -47,9 +52,11 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Map
       kustomization.content.patchesStrategicMerge?.forEach((e: string) => {
         const fileEntry = fileMap.get(path.join(path.parse(kustomization.path).dir, e));
         if (fileEntry) {
-          fileEntry.resourceIds?.forEach(id => resourceMap[id].name = 'Patch: ' + resourceMap[id].name);
+          fileEntry.resourceIds?.forEach(id => {
+            resourceMap[id].name = `Patch: ${resourceMap[id].name}`;
+          });
         } else {
-          log.warn('Failed to find patchesStrategicMerge ' + e + ' in kustomization ' + kustomization.path);
+          log.warn(`Failed to find patchesStrategicMerge ${e} in kustomization ${kustomization.path}`);
         }
       });
     });

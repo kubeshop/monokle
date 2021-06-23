@@ -1,23 +1,16 @@
 import * as React from 'react';
-import { Row } from 'react-bootstrap';
-import ReactFlow, {
-  Edge,
-  Node,
-  isNode,
-  Position,
-  MiniMap,
-  ReactFlowProvider,
-} from 'react-flow-renderer';
-import { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import {Row} from 'react-bootstrap';
+import ReactFlow, {Edge, Node, isNode, Position, MiniMap, ReactFlowProvider} from 'react-flow-renderer';
+import {useCallback, useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 import dagre from 'dagre';
 
-import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { isIncomingRef } from '@redux/utils/resource';
-import { selectK8sResource } from '@redux/reducers/main';
-import Sidebar from './sidebar';
-import { selectActiveResources } from '@redux/selectors';
-import { K8sResource, ResourceRef } from '@models/k8sresource';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {isIncomingRef} from '@redux/utils/resource';
+import {selectK8sResource} from '@redux/reducers/main';
+import {selectActiveResources} from '@redux/selectors';
+import {K8sResource, ResourceRef} from '@models/k8sresource';
+import Sidebar from './Sidebar';
 
 function mapResourceToElement(resource: K8sResource): Node {
   return {
@@ -26,36 +19,32 @@ function mapResourceToElement(resource: K8sResource): Node {
       label: resource.name,
       wasSelectedInGraphView: false,
     },
-    position: { x: 0, y: 0 },
-    style: { background: resource.selected ? 'lighblue' : resource.highlight ? 'lightgreen' : 'white' },
+    position: {x: 0, y: 0},
+    style: {background: resource.selected ? 'lighblue' : resource.highlight ? 'lightgreen' : 'white'},
   };
 }
 
 function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
   return {
-    id: source.id + '-' + ref.targetResourceId + '-' + ref.refType,
+    id: `${source.id}-${ref.targetResourceId}-${ref.refType}`,
     source: source.id,
     target: ref.targetResourceId,
     animated: false,
     type: 'smoothstep',
   };
-}
-
-const dagreGraph = new dagre.graphlib.Graph();
+}"smoothstep"Graph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 const getLayoutedElements = (elements: any[]): any => {
-  dagreGraph.setGraph({ rankdir: 'LR', ranksep: 50 });
+  dagreGraph.setGraph({ rankdir: "LR", ranksep: 50 });
 
-  elements.forEach((el) => {
+  elements.forEach(el => {
     if (isNode(el)) {
       dagreGraph.setNode(el.id, { width: 150, height: 30 });
+    } else if (isIncomingRef(el.data?.refType)) {
+      dagreGraph.setEdge(el.source, el.target);
     } else {
-      if (isIncomingRef(el.data?.refType)) {
-        dagreGraph.setEdge(el.source, el.target);
-      } else {
-        dagreGraph.setEdge(el.target, el.source);
-      }
+      dagreGraph.setEdge(el.target, el.source);
     }
   });
 
@@ -107,24 +96,26 @@ const GraphView = () => {
 
   useEffect(() => {
     let data: any[] = [];
-    activeResources.forEach(r => data = data.concat(getElementData(r)));
+    activeResources.forEach(r => {
+      data = data.concat(getElementData(r));
+    });
     updateGraph(data);
     setNodes(data);
-  }, [rootFolder, previewResource]);
+  }, [rootFolder, activeResources]);
 
   useEffect(() => {
-    setNodes((nds) =>
+    setNodes(nds =>
       nds.map(nd => {
         const resource = resourceMap[nd.id];
         if (resource) {
-          nd.style = { background: resource.selected ? 'lightblue' : resource.highlight ? 'lightgreen' : 'white' };
+          nd.style = { background: resource.selected ? "lightblue" : resource.highlight ? "lightgreen" : "white" };
         }
         return nd;
-      }),
+      })
     );
   }, [resourceMap, setNodes]);
 
-  const onLoad = useCallback((instance) => {
+  const onLoad = useCallback(instance => {
     setReactFlow(instance);
   }, []);
 
@@ -138,21 +129,23 @@ const GraphView = () => {
   return (
     <Row>
       <span style={{ width: 600, height: 768 }}>
-        <div className='zoompanflow'>
+        <div className="zoompanflow">
           <ReactFlowProvider>
-            <div className='reactflow-wrapper' style={{ width: 600, height: 600 }}>
+            <div className="reactflow-wrapper" style={{ width: 600, height: 600 }}>
               <ReactFlow
                 minZoom={0.1}
-                panOnScroll={true}
+                panOnScroll
                 nodesConnectable={false}
                 onLoad={onLoad}
                 onSelectionChange={onSelectionChange}
-                elements={nodes}>
-                  <MiniMap
-                    nodeColor={(node) => {
-                          return node && node.style && node.style.background ? node.style.background.toString() : 'white';
-                    }}
-                    nodeStrokeWidth={3} />
+                elements={nodes}
+              >
+                <MiniMap
+                  nodeColor={node => {
+                    return node && node.style && node.style.background ? node.style.background.toString() : "white";
+                  }}
+                  nodeStrokeWidth={3}
+                />
               </ReactFlow>
             </div>
             <Sidebar reactFlow={reactFlow} />

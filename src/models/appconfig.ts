@@ -1,13 +1,13 @@
-import { ObjectNavigator } from './navigator';
+import {ObjectNavigator} from './navigator';
 
 interface AppConfig {
-  scanExcludes: string[],
-  fileIncludes: string[],
-  navigators: ObjectNavigator[],
+  scanExcludes: string[];
+  fileIncludes: string[];
+  navigators: ObjectNavigator[];
   settings: {
-    filterObjectsOnSelection: boolean,
-    autoZoomGraphOnSelection: boolean
-  }
+    filterObjectsOnSelection: boolean;
+    autoZoomGraphOnSelection: boolean;
+  };
 }
 
-export type { AppConfig };
+export type {AppConfig};

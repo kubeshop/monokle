@@ -1,15 +1,12 @@
-import { AppState } from '../models/appstate';
+import {AppState} from '@models/appstate';
 
 export const initialState: AppState = {
-  rootFolder: "",
-  rootEntry: {
-    name:"",
-    folder :"",
-    selected:false,
-    highlight:false,
-    expanded:false,
-    excluded:false
-  },
+  rootFolder: ''""  rootEntry: {
+    name: ''""    folder: ''""    selected: false,
+    highlight: false,
+    expanded: false,
+    excluded: false,
+ },
   appConfig: {
     settings: {
       filterObjectsOnSelection: false,
@@ -61,7 +58,7 @@ export const initialState: AppState = {
               }
             ]
           }
-        ]
+        ],
       },
       {
         name: "Ambassador",
@@ -78,7 +75,7 @@ export const initialState: AppState = {
           }
         ]
       }
-    ]
+    ],
   },
-  resourceMap: {}
-}
+  resourceMap: {},
+};

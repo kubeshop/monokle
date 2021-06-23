@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import React, {useState} from 'react';
+import {Container, Row, Col, Button} from 'react-bootstrap';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import '@styles/NavigatorPane.css';
-import { appColors as colors } from '@styles/AppColors';
-import { previewKustomization, selectK8sResource } from '@redux/reducers/main';
-import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getNamespaces, hasIncomingRefs, hasOutgoingRefs } from '@redux/utils/resource';
-import { setFilterObjects } from '@redux/reducers/appConfig';
-import { selectKustomizations, selectActiveResources } from '@redux/selectors';
-import { K8sResource } from '@models/k8sresource';
-import { NavigatorSubSection } from '@models/navigator';
+import {appColors as colors} from '@styles/AppColors';
+import {previewKustomization, selectK8sResource} from '@redux/reducers/main';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {getNamespaces, hasIncomingRefs, hasOutgoingRefs} from '@redux/utils/resource';
+import {setFilterObjects} from '@redux/reducers/appConfig';
+import {selectKustomizations, selectActiveResources} from '@redux/selectors';
+import {K8sResource} from '@models/k8sresource';
+import {NavigatorSubSection} from '@models/navigator';
 
 const ALL_NAMESPACES = '- all -';
 
@@ -31,7 +31,7 @@ const TitleRow = styled(Row)`
   width: 100%;
   margin: 0;
   padding: 0;
-`
+`;
 
 const SectionRow = styled(Row)`
   border: 1px solid blue;
@@ -40,20 +40,20 @@ const SectionRow = styled(Row)`
   width: 100%;
   margin: 0;
   padding: 0;
-`
+`;
 
 const ItemRow = styled(Row)`
-background: ${colors.appNormalBackgroound};
+  background: ${colors.appNormalBackgroound};
   width: 100%;
   margin: 0;
   padding: 0;
-`
+`;
 
 const SectionCol = styled(Col)`
   width: 100%;
   margin: 0;
   padding: 0;
-`
+`;
 
 const Title = styled.h4`
   font-size: 1.5em;
@@ -98,10 +98,12 @@ const NavigatorPane = () => {
   };
 
   function shouldBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
-    return (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selectedResource) &&
+    return (
+      (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selectedResource) &&
       item.kind === subsection.kindSelector &&
       micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
-      (namespace === ALL_NAMESPACES || item.namespace === namespace || (namespace === 'default' && !item.namespace));
+      (namespace === ALL_NAMESPACES || item.namespace === namespace || (namespace === 'default' && !item.namespace))
+    );
   }
 
   return (
@@ -109,66 +111,74 @@ const NavigatorPane = () => {
       <TitleRow>
         <Title>Navigator</Title>
         <SectionCol>
-          <input type='checkbox' onChange={onFilterChange} /> filter selected
+          <input type="checkbox" onChange={onFilterChange} /> filter selected
         </SectionCol>
       </TitleRow>
 
-      {kustomizations.length > 0 &&
-      <SectionRow>
-        <SectionCol>
-          <SectionRow>
-            <SectionCol>
-              <SectionTitle>Kustomizations</SectionTitle>
-            </SectionCol>
-          </SectionRow>
-          {kustomizations
-            .filter(k => (!appConfig.settings.filterObjectsOnSelection
-              || k.highlight || k.selected || !selectedResource || (previewResource === k.id)))
-            .map((k: K8sResource) => {
-              let className = '';
-              if (previewResource && previewResource != k.id) {
-                className = 'disabledItem';
-              } else if (k.selected || previewResource === k.id) {
-                className = 'selectedItem';
-              } else if (k.highlight) {
-                className = 'highlightItem';
-              }
+      {kustomizations.length > 0 && (
+        <SectionRow>
+          <SectionCol>
+            <SectionRow>
+              <SectionCol>
+                <SectionTitle>Kustomizations</SectionTitle>
+              </SectionCol>
+            </SectionRow>
+            {kustomizations
+              .filter(
+                k =>
+                  !appConfig.settings.filterObjectsOnSelection ||
+                  k.highlight ||
+                  k.selected ||
+                  !selectedResource ||
+                  previewResource === k.id
+              )
+              .map((k: K8sResource) => {
+                let className = '';
+                if (previewResource && previewResource !== k.id) {
+                  className = 'disabledItem';
+                } else if (k.selected || previewResource === k.id) {
+                  className = 'selectedItem';
+                } else if (k.highlight) {
+                  className = 'highlightItem';
+                }
 
-              return (
-                <ItemRow key={k.id}>
-                  <SectionCol sm={9}>
-                    <div className={className}
-                         onClick={!previewResource
-                         || previewResource === k.id ? () => selectResource(k.id) : undefined}>
-                      {hasIncomingRefs(k) ? '>> ' : ''}
-                      {k.name}
-                      {hasOutgoingRefs(k) ? ' >>' : ''}
-                    </div>
-                  </SectionCol>
-                  <SectionCol sm={3}>
-                    <Button variant='outline-dark' size='sm'
-                               onClick={() => selectPreview(k.id)}
-                               active={previewResource != undefined && previewResource === k.id}
-                               disabled={previewResource != undefined && previewResource !== k.id}>
-                                 Preview
-                    </Button>
-                  </SectionCol>
-                </ItemRow>
-              );
-            })
-          }
-        </SectionCol>
-      </SectionRow>
-      }
+                return (
+                  <ItemRow key={k.id}>
+                    <SectionCol sm={9}>
+                      <div
+                        className={className}
+                        onClick={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}
+                      >
+                        {hasIncomingRefs(k) ? '>> ' : ''}
+                        {k.name}
+                        {hasOutgoingRefs(k) ? ' >>' : ''}
+                      </div>
+                    </SectionCol>
+                    <SectionCol sm={3}>
+                      <Button
+                        variant="outline-dark"
+                        size="sm"
+                        onClick={() => selectPreview(k.id)}
+                        active={previewResource !== undefined && previewResource === k.id}
+                        disabled={previewResource !== undefined && previewResource !== k.id}
+                      >
+                        Preview
+                      </Button>
+                    </SectionCol>
+                  </ItemRow>
+                );
+              })}
+          </SectionCol>
+        </SectionRow>
+      )}
       <SectionRow>
-        Filter namespace:<select onChange={handleNamespaceChange}>
-        <option>{ALL_NAMESPACES}</option>
-        {getNamespaces(resourceMap).map(n => {
-          return (
-            <option key={n}>{n}</option>
-          );
-        })}
-      </select>
+        Filter namespace:
+        <select onChange={handleNamespaceChange}>
+          <option>{ALL_NAMESPACES}</option>
+          {getNamespaces(resourceMap).map(n => {
+            return <option key={n}>{n}</option>;
+          })}
+        </select>
       </SectionRow>
 
       <SectionRow>
@@ -184,52 +194,46 @@ const NavigatorPane = () => {
                     {navigator.sections.map(section => {
                       return (
                         <>
-                          {section.name.length > 0 &&
-                          <SectionRow>
-                            <h6>{section.name}</h6>
-                          </SectionRow>
-                          }
+                          {section.name.length > 0 && (
+                            <SectionRow>
+                              <h6>{section.name}</h6>
+                            </SectionRow>
+                          )}
                           <SectionRow key={section.name}>
                             {section.subsections.map(subsection => {
-                              const items = resources.filter(item =>
-                                shouldBeVisible(item, subsection),
-                              );
+                              const items = resources.filter(item => shouldBeVisible(item, subsection));
                               return (
                                 <SectionCol key={subsection.name}>
-                                  <h6>{subsection.name} {items.length > 0 ? '(' + items.length + ')' : ''}</h6>
-                                  {
-                                    items.map(item => {
-                                      let className = '';
-                                      if (item.highlight) {
-                                        className = 'highlightItem';
-                                      } else if (item.selected) {
-                                        className = 'selectedItem';
-                                      }
-                                      return (
-                                        <div key={item.id} className={className}
-                                             onClick={() => selectResource(item.id)}>
-                                          {hasIncomingRefs(item) ? '>> ' : ''}
-                                          {item.name}
-                                          {hasOutgoingRefs(item) ? ' >>' : ''}
-                                        </div>
-                                      );
-                                    })
-                                  }
+                                  <h6>
+                                    {subsection.name} {items.length > 0 ? `(${items.length})` : ''}
+                                  </h6>
+                                  {items.map(item => {
+                                    let className = '';
+                                    if (item.highlight) {
+                                      className = 'highlightItem';
+                                    } else if (item.selected) {
+                                      className = 'selectedItem';
+                                    }
+                                    return (
+                                      <div key={item.id} className={className} onClick={() => selectResource(item.id)}>
+                                        {hasIncomingRefs(item) ? '>> ' : ''}
+                                        {item.name}
+                                        {hasOutgoingRefs(item) ? ' >>' : ''}
+                                      </div>
+                                    );
+                                  })}
                                 </SectionCol>
                               );
-                            })
-                            }
+                            })}
                           </SectionRow>
                         </>
                       );
-                    })
-                    }
+                    })}
                   </SectionCol>
                 </SectionRow>
               </>
             );
-          })
-          }
+          })}
         </SectionCol>
       </SectionRow>
     </NavContainer>

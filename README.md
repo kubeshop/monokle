@@ -15,11 +15,13 @@ Desktop UI for managing k8s manifests.
 
 ## Dev Dependencies
 
-* https://github.com/gsoft-inc/craco for overriding CRA config for folder aliases, see https://www.npmjs.com/package/craco-alias#examples
+* https://github.com/gsoft-inc/craco for overriding CRA config for folder aliases,
+  see https://www.npmjs.com/package/craco-alias#examples
 
 ## Building
 
-This project was bootstrapped from https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, which
+This project was bootstrapped
+from https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, which
 provides
 
 * TypeScript supports for Electron main process source code

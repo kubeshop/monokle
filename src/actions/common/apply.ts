@@ -1,8 +1,8 @@
-import { K8sResource } from '../../models/k8sresource';
-import { spawn } from 'child_process';
-import { stringify } from 'yaml';
+import {K8sResource} from '@models/k8sresource';
+import {spawn} from 'child_process';
+import {stringify} from 'yaml';
 import path from 'path';
-import { isKustomizationResource } from '../../redux/utils/resource';
+import {isKustomizationResource} from '@redux/utils/resource';
 import log from 'loglevel';
 import { ResourceMapType } from '../../models/appstate';
 import { setAlert } from '../../redux/reducers/alert';
@@ -13,6 +13,10 @@ import shellPath from 'shell-path';
 
 // weird workaround to get all ENV values (accessing process.env directly only returns a subset)
 export const PROCESS_ENV = JSON.parse(JSON.stringify(process)).env;
+import {ResourceMapType} from '@models/appstate';
+import {setAlert} from '@redux/reducers/alert';
+import {AlertEnum, AlertType} from '@models/alert';
+import {AppDispatch} from '@redux/store';
 
 function applyK8sResource(resource: K8sResource) {
   const child = spawn('kubectl', ['apply', '-f', '-'], {
@@ -42,30 +46,27 @@ function applyKustomization(resource: K8sResource) {
 }
 
 export async function applyResource(resourceId: string, resourceMap: ResourceMapType, dispatch: AppDispatch) {
-
   try {
     const resource = resourceMap[resourceId];
     if (resource && resource.content) {
       const child = isKustomizationResource(resource) ? applyKustomization(resource) : applyK8sResource(resource);
 
-      child.on('exit', function(code, signal) {
-        log.info(`kubectl exited with code ${code} and signal ${signal}`);
-      });
+      child.on('exit', (code, s"exit" => log.info(`kubectl exited with code ${code} and signal ${signal}`));
 
-      child.stdout.on('data', (data) => {
+      child.stdout.on("data", data => {
         const alert: AlertType = {
           type: AlertEnum.Message,
-          title: 'Apply completed',
-          message: data.toString(),
+          title: "Apply completed",
+          message: data.toString()
         };
         dispatch(setAlert(alert));
       });
 
-      child.stderr.on('data', (data) => {
+      child.stderr.on("data", data => {
         const alert: AlertType = {
           type: AlertEnum.Error,
-          title: 'Apply failed',
-          message: data.toString(),
+          title: "Apply failed",
+          message: data.toString()
         };
         dispatch(setAlert(alert));
       });

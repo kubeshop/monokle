@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import {Col, Container, Row} from 'react-bootstrap';
 import styled from 'styled-components';
 
 import './App.css';
@@ -9,7 +9,6 @@ import NavigatorPane from '@organisms/NavigatorPane';
 import FileTreePane from '@organisms/FileTreePane';
 import Header from '@organisms/Header';
 import MessageBox from '@organisms/MessageBox';
-
 
 const ContentColumn = styled(Col)`
   border: 3px solid blue;
@@ -21,7 +20,6 @@ const ContentColumn = styled(Col)`
   overflow-y: scroll;
 `;
 
-
 const App = () => {
   return (
     <div>
@@ -31,12 +29,12 @@ const App = () => {
           <Header />
         </Row>
         <Row>
-          <ContentColumn sm={3} >
+          <ContentColumn sm={3}>
             <FileTreePane />
           </ContentColumn>
 
           <ContentColumn sm={3}>
-            <NavigatorPane/>
+            <NavigatorPane />
           </ContentColumn>
 
           <ContentColumn sm={6}>
@@ -44,7 +42,7 @@ const App = () => {
           </ContentColumn>
         </Row>
         <Row>
-          <Footer/>
+          <Footer />
         </Row>
       </Container>
     </div>

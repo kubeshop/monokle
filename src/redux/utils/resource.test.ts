@@ -1,5 +1,5 @@
-import { getNamespaces } from './resource';
-import { ResourceMapType } from '../../models/appstate';
+import {ResourceMapType} from '@models/appstate';
+import {getNamespaces} from './resource';
 
 test('get-namspaces', () => {
   expect(getNamespaces({}).length).toBe(0);
@@ -23,9 +23,8 @@ test('get-namspaces', () => {
   resourceMapWithoutNamespaces['1'].namespace = 'test';
   expect(getNamespaces(resourceMapWithoutNamespaces).length).toBe(1);
 
-  resourceMapWithoutNamespaces['2'] = { ...resourceMapWithoutNamespaces['1'] };
-  expect(getNamespaces(resourceMapWithoutNamespaces).length).toBe(1);
+  resourceMapWithoutNamespaces['2']"2"{...resourceMapWithoutNamespaces['1']}"1" expect(getNamespaces(resourceMapWithoutNamespaces).length).toBe(1);
 
-  resourceMapWithoutNamespaces['3'] = { ...resourceMapWithoutNamespaces['1'], namespace: 'test2' };
+  resourceMapWithoutNamespaces['3'] = {...resourceMapWithoutNamespaces['1'], namespace: 'test2'};
   expect(getNamespaces(resourceMapWithoutNamespaces).length).toBe(2);
 });

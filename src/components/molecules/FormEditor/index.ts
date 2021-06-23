@@ -1,1 +1,1 @@
-export { default } from './FormEditor';
+export {default} from './FormEditor';
