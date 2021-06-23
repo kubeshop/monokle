@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import {appColors as colors} from '@styles/AppColors';
 import Monaco from '@molecules/Monaco';
+import LogViewer from '@molecules/LogViewer';
 import FormEditor from '@molecules/FormEditor';
 import GraphView from '@molecules/GraphView';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -85,6 +86,9 @@ const ActionsPane = (props: {actionHeight: string}) => {
             </Tab>
             <Tab eventKey="graph" title="Graph">
               <GraphView editorHeight={actionHeight}/>
+            </Tab>
+            <Tab eventKey="logger" title="Logger">
+              <LogViewer editorHeight={actionHeight}/>
             </Tab>
           </Tabs>
         </SectionCol>
