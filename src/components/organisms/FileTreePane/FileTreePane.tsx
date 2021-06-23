@@ -74,7 +74,6 @@ const TitleRow = styled(Row)`
   border-radius: 2px;
   background: ${colors.appNormalBackgroound};
   width: 100%;
-  height: 100%;
   margin: 0;
 `;
 
