@@ -47,7 +47,7 @@ to build the Electron app package for production to the `dist` folder.
 
 See https://www.electron.build/ for more info on the electron builder
 
-## KUBECONFI for kubectl invocation
+## KUBECONFIG for kubectl invocation
 
 ManifestUI uses the KUBECONFIG env variable for kubectl commands - you'll need to set that env variable to point to your
 kubernetes config and then start ManifestUI from the command-line (to ensure it inherits the env variable) with.
