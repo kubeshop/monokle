@@ -4,6 +4,7 @@ import ReactFlow, {Edge, Node, isNode, Position, MiniMap, ReactFlowProvider} fro
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import dagre from 'dagre';
+import { useMeasure } from 'react-use';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isIncomingRef} from '@redux/utils/resource';
@@ -71,7 +72,9 @@ const getLayoutedElements = (elements: any[]): any => {
   });
 };
 
-const GraphView = () => {
+const GraphView = (props: {editorHeight: string}) => {
+  const {editorHeight} = props;
+  const graphAreaHeight = parseInt(editorHeight, 10) - 150;
   const rootFolder = useAppSelector(state => state.main.rootFolder);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const activeResources = useSelector(selectActiveResources);
@@ -80,6 +83,7 @@ const GraphView = () => {
   const dispatch = useAppDispatch();
   const [reactFlow, setReactFlow] = useState();
   const [nodes, setNodes] = useState<any[]>([]);
+  const [containerRef, { width }] = useMeasure<HTMLDivElement>();
 
   function updateGraph(data: any[]) {
     if (reactFlow) {
@@ -128,12 +132,13 @@ const GraphView = () => {
     }
   };
 
+
   return (
-    <Row>
-      <span style={{width: 600, height: 768}}>
+    <Row ref={containerRef}>
+      <span style={{width, height: editorHeight}}>
         <div className="zoompanflow">
           <ReactFlowProvider>
-            <div className="reactflow-wrapper" style={{width: 600, height: 600}}>
+            <div className="reactflow-wrapper" style={{width:600, height: graphAreaHeight}}>
               <ReactFlow
                 minZoom={0.1}
                 panOnScroll

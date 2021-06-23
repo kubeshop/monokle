@@ -3,17 +3,28 @@ import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
 import {parseAllDocuments, stringify} from 'yaml';
+import { useMeasure } from 'react-use';
+import styled from 'styled-components';
 
 import {PREVIEW_PREFIX} from '@src/constants';
 import {useAppSelector} from '@redux/hooks';
 
-const Monaco = () => {
+const MonacoContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+`;
+
+const Monaco = (props: {editorHeight: string}) => {
+  const {editorHeight} = props;
   const rootFolder = useAppSelector(state => state.main.rootFolder);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [editor, setEditor] = useState<monaco.editor.IEditor>();
   const [code, setCode] = useState('');
+  const [ref, { width }] = useMeasure<HTMLDivElement>();
 
   function editorDidMount(e: any, m: any) {
     setEditor(e);
@@ -65,17 +76,20 @@ const Monaco = () => {
     readOnly: selectedResource !== undefined && resourceMap[selectedResource].path.startsWith(PREVIEW_PREFIX),
   };
 
+  /* tslint:disable-next-line */
   return (
-    <MonacoEditor
-      width="600"
-      height="768"
-      language="yaml"
-      theme="vs-light"
-      value={code}
-      options={options}
-      onChange={onChange}
-      editorDidMount={editorDidMount}
-    />
+    <MonacoContainer ref={ref}>
+      <MonacoEditor
+        width={width}
+        height={editorHeight}
+        language="yaml"
+        theme="vs-light"
+        value={code}
+        options={options}
+        onChange={onChange}
+        editorDidMount={editorDidMount}
+      />
+    </MonacoContainer>
   );
 };
 

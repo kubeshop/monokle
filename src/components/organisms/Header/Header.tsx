@@ -36,7 +36,7 @@ const Header = () => {
     <Container fluid>
       <Row as={isInPreviewMode ? StyledRowPreviewMode : StyledRow}>
         <Col sm={6}>
-          <Title>ManifestUI / Monokle logo</Title>
+          <Title>Monokle [insert logo]</Title>
         </Col>
         <Col sm={6}>
           <EditorMode>{isInPreviewMode ? 'Preview' : ''}</EditorMode>
