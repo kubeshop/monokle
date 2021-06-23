@@ -1,6 +1,6 @@
-import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
-import { initialState } from '../initialState';
-import { AppConfig } from '../../models/appconfig';
+import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
+import {AppConfig} from '@models/appconfig';
+import {initialState} from '../initialState';
 
 export const configSlice = createSlice({
   name: 'config',
@@ -15,5 +15,5 @@ export const configSlice = createSlice({
   },
 });
 
-export const { setFilterObjects, setAutoZoom } = configSlice.actions;
+export const {setFilterObjects, setAutoZoom} = configSlice.actions;
 export default configSlice.reducer;

@@ -1,1 +1,1 @@
-export { default } from './GraphView';
+export {default} from './GraphView';

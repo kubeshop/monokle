@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import MonacoEditor, { monaco } from 'react-monaco-editor';
+import React, {useEffect, useState} from 'react';
+import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
-import { parseAllDocuments, stringify } from 'yaml';
+import {parseAllDocuments, stringify} from 'yaml';
 
-import { PREVIEW_PREFIX } from '@src/constants';
-import { useAppSelector } from '@redux/hooks';
+import {PREVIEW_PREFIX} from '@src/constants';
+import {useAppSelector} from '@redux/hooks';
 
 const Monaco = () => {
   const rootFolder = useAppSelector(state => state.main.rootFolder);
@@ -15,10 +15,8 @@ const Monaco = () => {
   const [editor, setEditor] = useState<monaco.editor.IEditor>();
   const [code, setCode] = useState('');
 
-  // eslint-disable-next-line no-unused-vars
-  function editorDidMount(editor: any, monaco: any) {
-    console.log('editorDidMount', editor);
-    setEditor(editor);
+  function editorDidMount(e: any, m: any) {
+    setEditor(e);
   }
 
   useEffect(() => {
@@ -47,9 +45,9 @@ const Monaco = () => {
           }
         }
       } else {
-        const filePath = path.join(rootFolder, selectedPath);
-        if (!fs.statSync(filePath).isDirectory()) {
-          newCode = fs.readFileSync(filePath, 'utf8');
+        const p = path.join(rootFolder, selectedPath);
+        if (!fs.statSync(p).isDirectory()) {
+          newCode = fs.readFileSync(p, 'utf8');
         }
       }
     } else if (selectedResource) {
@@ -64,15 +62,15 @@ const Monaco = () => {
 
   const options = {
     selectOnLineNumbers: true,
-    readOnly: selectedResource != undefined && resourceMap[selectedResource].path.startsWith(PREVIEW_PREFIX),
+    readOnly: selectedResource !== undefined && resourceMap[selectedResource].path.startsWith(PREVIEW_PREFIX),
   };
 
   return (
     <MonacoEditor
-      width='600'
-      height='768'
-      language='yaml'
-      theme='vs-light'
+      width="600"
+      height="768"
+      language="yaml"
+      theme="vs-light"
       value={code}
       options={options}
       onChange={onChange}

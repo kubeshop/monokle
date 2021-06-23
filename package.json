@@ -15,9 +15,6 @@
   },
   "private": true,
   "devDependencies": {
-    "@rescripts/cli": "^0.0.16",
-    "@rescripts/rescript-env": "^0.0.14",
-    "@rescripts/utilities": "^0.0.8",
     "@types/dagre": "^0.7.44",
     "@types/styled-components": "^5.1.10",
     "concurrently": "^6.2.0",
@@ -25,6 +22,14 @@
     "cross-env": "^7.0.3",
     "electron": "^13.0.1",
     "electron-builder": "^22.11.7",
+    "eslint-config-airbnb": "~18.2.1",
+    "eslint-config-prettier": "~8.3.0",
+    "eslint-plugin-import": "~2.22.1",
+    "eslint-plugin-jsx-a11y": "~6.4.1",
+    "eslint-plugin-prettier": "~3.4.0",
+    "eslint-plugin-react": "~7.22.0",
+    "eslint-plugin-react-hooks": "~4.2.0",
+    "husky": "^6.0.0",
     "prettier": "2.3.0",
     "wait-on": "^5.3.0"
   },
@@ -74,11 +79,17 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test",
+    "test": "craco test --watchAll=false",
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm run start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:build": "npm run build && tsc -p electron && electron-builder",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "npm run lint:config && npm run lint:src ",
+    "lint:config": "eslint .",
+    "lint:src": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
+    "lintfix": "eslint --fix \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
+    "precommit": "npm run lint && npm test",
+    "prepare": "husky install"
   },
   "build": {
     "appId": "io.kubeshop.manifestui",
@@ -100,6 +111,16 @@
     "directories": {
       "buildResources": "assets"
     }
+  },
+  "lint-staged": {
+    "\"{src,test}/**/*.{js,jsx,ts,tsx}\"": [
+      "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\" --fix",
+      "git add"
+    ],
+    ".": [
+      "eslint . --fix",
+      "git add"
+    ]
   },
   "eslintConfig": {
     "extends": [

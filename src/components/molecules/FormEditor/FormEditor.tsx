@@ -3,11 +3,10 @@ import Form from '@rjsf/bootstrap-4';
 import fs from 'fs';
 import log from 'loglevel';
 
-import { getStaticResourcePath } from '@redux/utils/fileEntry';
-import { useAppSelector } from '@redux/hooks';
+import {getStaticResourcePath} from '@redux/utils/fileEntry';
+import {useAppSelector} from '@redux/hooks';
 
 const FormEditor = () => {
-
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
 
@@ -31,11 +30,13 @@ const FormEditor = () => {
 
   return (
     // @ts-ignore
-    <Form schema={schema}
-          formData={data}
-          onChange={log.debug('changed')}
-          onSubmit={log.debug('submitted')}
-          onError={log.debug('errors')} />
+    <Form
+      schema={schema}
+      formData={data}
+      onChange={log.debug('changed')}
+      onSubmit={log.debug('submitted')}
+      onError={log.debug('errors')}
+    />
   );
 };
 

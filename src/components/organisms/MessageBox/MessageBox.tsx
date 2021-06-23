@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Alert } from 'react-bootstrap';
+import {Alert} from 'react-bootstrap';
 
-import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { clearAlert } from '@redux/reducers/alert';
-import { AlertEnum } from '@models/alert';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {clearAlert} from '@redux/reducers/alert';
+import {AlertEnum} from '@models/alert';
 
 const MessageBox = () => {
   const dispatch = useAppDispatch();
@@ -18,13 +18,14 @@ const MessageBox = () => {
     alertVariant = 'warning';
   }
 
-  return (<>
-      {alert &&
-      <Alert variant={alertVariant} onClose={clear} dismissible>
-        <Alert.Heading>{alert.title}</Alert.Heading>
-        <p>{alert.message}</p>
-      </Alert>
-      }
+  return (
+    <>
+      {alert && (
+        <Alert variant={alertVariant} onClose={clear} dismissible>
+          <Alert.Heading>{alert.title}</Alert.Heading>
+          <p>{alert.message}</p>
+        </Alert>
+      )}
     </>
   );
 };

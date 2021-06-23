@@ -1,10 +1,10 @@
 export enum AlertEnum {
   Message,
-  Error
+  Error,
 }
 
 export type AlertType = {
-  title: string,
-  message: string,
-  type: AlertEnum
-}
+  title: string;
+  message: string;
+  type: AlertEnum;
+};

@@ -1,7 +1,14 @@
-import { initialState } from '../initialState';
-import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
+import {exec} from 'child_process';
+import log from 'loglevel';
+// @ts-ignore
+import shellPath from 'shell-path';
+import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import { AppState, ResourceMapType } from '../../models/appstate';
+import {PREVIEW_PREFIX} from '@src/constants';
+import {AppConfig} from '@models/appconfig';
+import {AppState, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
+import {initialState} from '../initialState';
 import {
   clearFileSelections,
   clearResourceSelections,
@@ -9,29 +16,22 @@ import {
   highlightChildren,
   getKustomizationRefs,
 } from '../utils/selection';
-import { extractK8sResources, readFiles, selectResourceFileEntry } from '../utils/fileEntry';
-import { processKustomizations } from '../utils/kustomize';
-import { isKustomizationResource, processConfigMaps, processServices } from '../utils/resource';
-import { AppDispatch } from '../store';
-import { exec } from 'child_process';
-import log from 'loglevel';
-import { PREVIEW_PREFIX } from '../../constants';
-import { AppConfig } from '../../models/appconfig';
-import { FileEntry } from '../../models/fileentry';
-// @ts-ignore
-import shellPath from 'shell-path';
+import {extractK8sResources, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
+import {processKustomizations} from '../utils/kustomize';
+import {isKustomizationResource, processConfigMaps, processServices} from '../utils/resource';
+import {AppDispatch} from '../store';
 
 type SetRootFolderPayload = {
-  rootFolder: string,
-  appConfig: AppConfig,
-  rootEntry?: FileEntry,
-  resourceMap: ResourceMapType
-}
+  rootFolder: string;
+  appConfig: AppConfig;
+  rootEntry?: FileEntry;
+  resourceMap: ResourceMapType;
+};
 
 type SetPreviewDataPayload = {
-  previewResourceId?: string,
-  previewResources?: ResourceMapType
-}
+  previewResourceId?: string;
+  previewResources?: ResourceMapType;
+};
 
 export const mainSlice = createSlice({
   name: 'main',
@@ -51,13 +51,14 @@ export const mainSlice = createSlice({
       state.previewResource = action.payload.previewResourceId;
 
       // remove previous preview resources
-      Object.values(state.resourceMap).filter(r => r.path.startsWith(PREVIEW_PREFIX)).forEach(
-        r => delete state.resourceMap[r.id],
-      );
+      Object.values(state.resourceMap)
+        .filter(r => r.path.startsWith(PREVIEW_PREFIX))
+        .forEach(r => delete state.resourceMap[r.id]);
 
       if (action.payload.previewResourceId && action.payload.previewResources) {
-        Object.values(action.payload.previewResources).forEach(
-          r => state.resourceMap[r.id] = r);
+        Object.values(action.payload.previewResources).forEach(r => {
+          state.resourceMap[r.id] = r;
+        });
       }
     },
     selectK8sResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
@@ -77,9 +78,13 @@ export const mainSlice = createSlice({
           state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
 
           if (isKustomizationResource(resource)) {
-            getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => state.resourceMap[e].highlight = true);
+            getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {
+              state.resourceMap[e].highlight = true;
+            });
           } else {
-            getLinkedResources(resource).forEach(e => state.resourceMap[e].highlight = true);
+            getLinkedResources(resource).forEach(e => {
+              state.resourceMap[e].highlight = true;
+            });
           }
         }
       }
@@ -88,9 +93,8 @@ export const mainSlice = createSlice({
       if (action.payload.length > 0) {
         let parent = state.rootEntry;
         let selectedPath = '';
-        for (var c = 0; c < action.payload.length; c++) {
+        for (let c = 0; c < action.payload.length; c += 1) {
           const index = action.payload[c];
-          // @ts-ignore
           if (parent.children && index < parent.children.length) {
             parent = parent.children[index];
             selectedPath = path.join(selectedPath, parent.name);
@@ -102,7 +106,9 @@ export const mainSlice = createSlice({
         clearResourceSelections(state.resourceMap);
         clearFileSelections(state.rootEntry);
         if (parent.resourceIds && parent.resourceIds.length > 0) {
-          parent.resourceIds.forEach(e => state.resourceMap[e].highlight = true);
+          parent.resourceIds.forEach(e => {
+            state.resourceMap[e].highlight = true;
+          });
         } else if (parent.children) {
           highlightChildren(parent, state.resourceMap);
         }
@@ -140,10 +146,10 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
     processParsedResources(resourceMap);
 
     const payload: SetRootFolderPayload = {
-      rootFolder: rootFolder,
-      appConfig: appConfig,
-      rootEntry: rootEntry,
-      resourceMap: resourceMap,
+      rootFolder,
+      appConfig,
+      rootEntry,
+      resourceMap,
     };
 
     dispatch(mainSlice.actions.rootFolderSet(payload));
@@ -160,35 +166,39 @@ export function previewKustomization(id: string) {
       const resource = state.resourceMap[id];
       if (resource && resource.path) {
         const folder = resource.path.substr(0, resource.path.lastIndexOf(path.sep));
-        log.info('previewing ' + id + ' in folder ' + folder);
+        log.info(`previewing ${id} in folder ${folder}`);
 
         // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
-        exec('kubectl kustomize ./', {
-          cwd: folder, env: {
-            NODE_ENV: process.env.NODE_ENV,
-            PUBLIC_URL: process.env.PUBLIC_URL,
-            PATH: shellPath.sync(),
+        exec(
+          'kubectl kustomize ./',
+          {
+            cwd: folder,
+            env: {
+              NODE_ENV: process.env.NODE_ENV,
+              PUBLIC_URL: process.env.PUBLIC_URL,
+              PATH: shellPath.sync(),
+            },
           },
-        }, (error, stdout, stderr) => {
-          if (error) {
-            log.error(`Failed to generate kustomizations: ${error.message}`);
-            return;
-          }
-          if (stderr) {
-            log.error(`Failed to generate kustomizations: ${stderr}`);
-            return;
-          }
+          (error, stdout, stderr) => {
+            if (error) {
+              log.error(`Failed to generate kustomizations: ${error.message}`);
+              return;
+            }
+            if (stderr) {
+              log.error(`Failed to generate kustomizations: ${stderr}`);
+              return;
+            }
 
-          const resources = extractK8sResources(stdout, PREVIEW_PREFIX + resource.id);
-          processParsedResources(resources);
+            const resources = extractK8sResources(stdout, PREVIEW_PREFIX + resource.id);
+            processParsedResources(resources);
 
-          dispatch(mainSlice.actions.setPreviewData({ previewResourceId: id, previewResources: resources }));
-        });
+            dispatch(mainSlice.actions.setPreviewData({previewResourceId: id, previewResources: resources}));
+          }
+        );
       }
     }
   };
 }
 
-export const { selectK8sResource, selectFile } = mainSlice.actions;
+export const {selectK8sResource, selectFile} = mainSlice.actions;
 export default mainSlice.reducer;
-
