@@ -53,11 +53,11 @@ const App = () => {
           </ContentColumn>
 
           <ContentColumn sm={3}>
-            <NavigatorPane />
+            <NavigatorPane/>
           </ContentColumn>
 
           <ContentColumn sm={6}>
-            <ActionsPane />
+            <ActionsPane actionHeight={contentHeight}/>
           </ContentColumn>
         </ContentRow>
         <ContentRow rowHeight='20px'>

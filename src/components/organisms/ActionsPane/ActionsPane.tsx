@@ -47,7 +47,8 @@ const Title = styled.h4`
   color: tomato;
 `;
 
-const ActionsPane = () => {
+const ActionsPane = (props: {actionHeight: string}) => {
+  const {actionHeight} = props;
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const dispatch = useAppDispatch();
@@ -77,13 +78,13 @@ const ActionsPane = () => {
         <SectionCol>
           <Tabs defaultActiveKey="source" id="uncontrolled-tab-example">
             <Tab eventKey="source" title="Source">
-              <Monaco />
+              <Monaco editorHeight={actionHeight}/>
             </Tab>
             <Tab eventKey="form" title="Form">
               <FormEditor />
             </Tab>
             <Tab eventKey="graph" title="Graph">
-              <GraphView />
+              <GraphView editorHeight={actionHeight}/>
             </Tab>
           </Tabs>
         </SectionCol>
