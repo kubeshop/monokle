@@ -12,6 +12,7 @@ Desktop UI for managing k8s manifests.
 * https://github.com/rjsf-team/react-jsonschema-form for generating forms for k8s resources
 * https://github.com/wbkd/react-flow for graph diagrams
 * https://github.com/tweenjs/es6-tween for animation tweening
+* https://github.com/pengx17/monaco-yaml for yaml support in the source editor
 
 ## Dev Dependencies
 
