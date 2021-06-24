@@ -5,7 +5,7 @@ type LogsState = {
 };
 
 const initialState: LogsState = {
-  logs: ['hello', 'logs', 'how YOU doin?']
+  logs: ['']
 };
 
 export const logsSlice = createSlice({
@@ -13,7 +13,7 @@ export const logsSlice = createSlice({
   initialState,
   reducers: {
     setLogs: (state: Draft<LogsState>, action: PayloadAction<string[]>) => {
-      state.logs = action.payload;
+      state.logs = state.logs.concat(action.payload);
     },
     clearLogs: (state: Draft<LogsState>) => {
       state.logs = [];
