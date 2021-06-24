@@ -8,6 +8,7 @@ import log from 'loglevel';
 import shellPath from 'shell-path';
 import {ResourceMapType} from '@models/appstate';
 import {setAlert} from '@redux/reducers/alert';
+import {setLogs} from '@redux/reducers/logs';
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
 
@@ -56,6 +57,7 @@ export async function applyResource(resourceId: string, resourceMap: ResourceMap
           message: data.toString(),
         };
         dispatch(setAlert(alert));
+        dispatch(setLogs([alert.message]));
       });
 
       child.stderr.on('data', data => {
@@ -65,6 +67,7 @@ export async function applyResource(resourceId: string, resourceMap: ResourceMap
           message: data.toString(),
         };
         dispatch(setAlert(alert));
+        dispatch(setLogs([alert.message]));
       });
     }
   } catch (e) {

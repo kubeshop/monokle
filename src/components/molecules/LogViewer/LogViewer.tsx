@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import { useMeasure } from 'react-use';
+import {useMeasure} from 'react-use';
+import {useSelector} from 'react-redux';
 import styled from 'styled-components';
+
+import {selectLogs} from '@redux/selectors';
 
 const LogContainer = styled.div`
   width: 100%;
@@ -54,7 +57,7 @@ type EditorMinimapOptions = Readonly<Required<IEditorMinimapOptions>>
 const LogViewer = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
   const [editor, setEditor] = useState<monaco.editor.IEditor>();
-  const [code, setCode] = useState('loggyloggylog');
+  const code = useSelector(selectLogs);
   const [ref, { width }] = useMeasure<HTMLDivElement>();
 
   function editorDidMount(e: any, m: any) {
