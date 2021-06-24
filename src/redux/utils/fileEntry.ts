@@ -165,3 +165,7 @@ export function getStaticResourcePath(resourcePath: string) {
     : // @ts-ignore
       path.join(process.resourcesPath, 'resources', resourcePath);
 }
+
+export function loadResource(resourcePath: string) {
+  return fs.readFileSync(getStaticResourcePath(resourcePath), 'utf8');
+}
