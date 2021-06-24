@@ -3,11 +3,37 @@ import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
 import {parseAllDocuments, stringify} from 'yaml';
-import { useMeasure } from 'react-use';
+import {useMeasure} from 'react-use';
 import styled from 'styled-components';
 
 import {PREVIEW_PREFIX} from '@src/constants';
 import {useAppSelector} from '@redux/hooks';
+
+import 'monaco-yaml/lib/esm/monaco.contribution';
+import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
+import 'monaco-editor';
+
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
+import {loadResource} from '@redux/utils/fileEntry';
+import {isKustomizationResource} from '@redux/utils/resource';
+import {JSONPath} from 'jsonpath-plus';
+import {getResourceSchema} from '@redux/utils/schema';
+
+// @ts-ignore
+window.MonacoEnvironment = {
+  // @ts-ignore
+  getWorker(workerId, label) {
+    if (label === 'yaml') {
+      return new YamlWorker();
+    }
+    return new EditorWorker();
+  },
+};
 
 const MonacoContainer = styled.div`
   width: 100%;
@@ -16,6 +42,9 @@ const MonacoContainer = styled.div`
   margin: 0px;
 `;
 
+// @ts-ignore
+const {yaml} = languages || {};
+
 const Monaco = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
   const rootFolder = useAppSelector(state => state.main.rootFolder);
@@ -23,8 +52,8 @@ const Monaco = (props: {editorHeight: string}) => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [editor, setEditor] = useState<monaco.editor.IEditor>();
-  const [code, setCode] = useState('');
-  const [ref, { width }] = useMeasure<HTMLDivElement>();
+  const [code, setCode] = useState('p1: ');
+  const [ref, {width}] = useMeasure<HTMLDivElement>();
 
   function editorDidMount(e: any, m: any) {
     setEditor(e);
@@ -75,6 +104,30 @@ const Monaco = (props: {editorHeight: string}) => {
     selectOnLineNumbers: true,
     readOnly: selectedResource !== undefined && resourceMap[selectedResource].path.startsWith(PREVIEW_PREFIX),
   };
+
+  useEffect(() => {
+    if (selectedResource && resourceMap[selectedResource]) {
+      const resource = resourceMap[selectedResource];
+      const schema = getResourceSchema(resource);
+
+      yaml &&
+        yaml.yamlDefaults.setDiagnosticsOptions({
+          validate: true,
+          enableSchemaRequest: true,
+          hover: true,
+          completion: true,
+          isKubernetes: true,
+          format: true,
+          schemas: [
+            {
+              uri: 'http://monokle/k8s.json', // id of the first schema
+              fileMatch: ['*'], // associate with our model
+              schema,
+            },
+          ],
+        });
+    }
+  }, [selectedResource, resourceMap]);
 
   /* tslint:disable-next-line */
   return (
