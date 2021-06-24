@@ -16,6 +16,11 @@ export const selectActiveResources = createSelector(
     resources.filter(r => previewResource === undefined || r.path.startsWith(PREVIEW_PREFIX))
 );
 
-export const selectKustomizations = createSelector(selectAllResources, resources =>
-  resources.filter((r: K8sResource) => isKustomizationResource(r))
+export const selectKustomizations = createSelector(
+  selectAllResources, resources => resources.filter((r: K8sResource) => isKustomizationResource(r))
+);
+
+export const selectLogs = createSelector(
+  (state: RootState) => state.logs.logs,
+  logs => logs.join('\n')
 );
