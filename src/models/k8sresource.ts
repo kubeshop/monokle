@@ -7,10 +7,10 @@ interface K8sResource {
   namespace?: string;
   highlight: boolean;
   selected: boolean;
+  text: string; // unparsed resource
   content: any; // contains parsed yaml resource - used for filtering/etc
   refs?: ResourceRef[]; // array of refs to other resources
-  linePos: number; // line position in yaml file of this resource
-  docIndex: number; // index of this resources yaml Document
+  range?: number[]; // range of this
 }
 
 export enum ResourceRefType {

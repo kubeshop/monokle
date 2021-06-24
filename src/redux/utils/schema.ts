@@ -1,27 +1,36 @@
 import {isKustomizationResource} from '@redux/utils/resource';
 import {loadResource} from '@redux/utils/fileEntry';
 import {K8sResource} from '@models/k8sresource';
+import log from 'loglevel';
+
+const k8sSchema = JSON.parse(loadResource('schemas/k8sschemas.json'));
+const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
+
+// search for schema kinds with these prefixes
+const kindPrefixes = ['io.k8s.api.apps.v1', 'io.k8s.api.rbac.v1', 'io.k8s.api.core.v1'];
 
 export function getResourceSchema(resource: K8sResource) {
   if (isKustomizationResource(resource)) {
-    const kustomizeSchema = loadResource('schemas/kustomization.json');
-    return JSON.parse(kustomizeSchema);
-  }
-  const k8sSchemas = loadResource('schemas/k8sschemas.json');
-  const k8sSchema = JSON.parse(k8sSchemas);
-
-  // @ts-ignore
-  let kindSchema = k8sSchema['definitions'][`io.k8s.api.apps.v1.${resource.kind}`];
-  if (!kindSchema) {
-    kindSchema = k8sSchema['definitions'][`io.k8s.api.core.v1.${resource.kind}`];
+    return kustomizeSchema;
   }
 
-  if (kindSchema) {
-    Object.keys(kindSchema).forEach(key => {
-      k8sSchema[key] = kindSchema[key];
+  let prefix = kindPrefixes.find(p => k8sSchema['definitions'][`${p}.${resource.kind}`]);
+  if (prefix) {
+    const kindSchema = k8sSchema['definitions'][`${prefix}.${resource.kind}`];
+
+    Object.keys(k8sSchema).forEach(key => {
+      if (key !== 'definitions') {
+        delete k8sSchema[key];
+      }
     });
+
+    Object.keys(kindSchema).forEach(key => {
+      k8sSchema[key] = JSON.parse(JSON.stringify(kindSchema[key]));
+    });
+
     return k8sSchema;
   }
 
+  log.error(`Failed to find schema for resource of kind ${resource.kind}`);
   return undefined;
 }

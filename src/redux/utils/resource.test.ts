@@ -13,9 +13,8 @@ test('get-namspaces', () => {
     version: '1.0',
     highlight: false,
     selected: false,
-    linePos: 0,
     content: {},
-    docIndex: 0,
+    text: '',
   };
 
   expect(getNamespaces(resourceMapWithoutNamespaces).length).toBe(0);

@@ -16,7 +16,7 @@ const FormEditor = () => {
     const resource = resourceMap[selectedResource];
     if (resource) {
       data = resource.content;
-      schema = getResourceSchema(resource);
+      schema = getResourceSchema(resource) || {};
     }
   }
 

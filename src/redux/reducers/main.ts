@@ -8,6 +8,7 @@ import {PREVIEW_PREFIX} from '@src/constants';
 import {AppConfig} from '@models/appconfig';
 import {AppState, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
+import {parseDocument} from 'yaml';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -33,10 +34,22 @@ type SetPreviewDataPayload = {
   previewResources?: ResourceMapType;
 };
 
+type SetResourceContentPayload = {
+  resourceId: string;
+  content: string;
+};
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
+    setResourceContent: (state: Draft<AppState>, action: PayloadAction<SetResourceContentPayload>) => {
+      const resource = state.resourceMap[action.payload.resourceId];
+      if (resource) {
+        resource.text = action.payload.content;
+        resource.content = parseDocument(action.payload.content).toJS();
+      }
+    },
     rootFolderSet: (state: Draft<AppState>, action: PayloadAction<SetRootFolderPayload>) => {
       if (action.payload.rootEntry) {
         state.resourceMap = action.payload.resourceMap;
@@ -200,5 +213,5 @@ export function previewKustomization(id: string) {
   };
 }
 
-export const {selectK8sResource, selectFile} = mainSlice.actions;
+export const {selectK8sResource, selectFile, setResourceContent} = mainSlice.actions;
 export default mainSlice.reducer;

@@ -87,10 +87,12 @@ export function extractK8sResources(fileContent: string, filePath: string) {
             content,
             highlight: false,
             selected: false,
-            linePos: lineCounter.linePos(d.range[0]).line,
-            docIndex,
+            text: fileContent.slice(d.range[0], d.range[1]),
           };
-          docIndex += 1;
+
+          if (documents.length > 1) {
+            resource.range = d.range;
+          }
 
           if (content.metadata && content.metadata.namespace) {
             resource.namespace = content.metadata.namespace;
@@ -99,6 +101,7 @@ export function extractK8sResources(fileContent: string, filePath: string) {
           result[resource.id] = resource;
         }
       }
+      docIndex += 1;
     });
   }
   return result;
