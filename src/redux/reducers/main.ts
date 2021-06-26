@@ -20,7 +20,13 @@ import {
 } from '../utils/selection';
 import {extractK8sResources, getFileEntryForResource, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
 import {processKustomizations} from '../utils/kustomize';
-import {isKustomizationResource, processConfigMaps, processServices, saveResource} from '../utils/resource';
+import {
+  createResourceName,
+  isKustomizationResource,
+  processConfigMaps,
+  processServices,
+  saveResource,
+} from '../utils/resource';
 import {AppDispatch} from '../store';
 
 type SetRootFolderPayload = {
@@ -52,6 +58,7 @@ export const mainSlice = createSlice({
           resource.text = value;
           resource.content = parseDocument(value).toJS();
           recalculateResourceRanges(resource, state, value);
+          reprocessResources([resource.id], state.resourceMap, state.rootEntry);
         }
       } catch (e) {
         log.error(e);
@@ -140,6 +147,44 @@ export const mainSlice = createSlice({
     },
   },
 });
+
+function addChildrenToFileMap(parent: FileEntry, fileMap: Map<string, FileEntry>) {
+  parent.children?.forEach(fe => {
+    fileMap.set(path.join(fe.folder, fe.name), fe);
+    if (fe.children) {
+      addChildrenToFileMap(fe, fileMap);
+    }
+  });
+}
+
+// This needs to be more intelligent - brute force for now...
+function reprocessResources(resourceIds: string[], resourceMap: ResourceMapType, rootEntry: FileEntry) {
+  resourceIds.forEach(id => {
+    const resource = resourceMap[id];
+    if (resource) {
+      resource.name = createResourceName(resource.path, resource.content);
+      resource.kind = resource.content.kind;
+      resource.version = resource.content.apiVersion;
+    }
+  });
+
+  let hasKustomizations = false;
+  Object.values(resourceMap).forEach(r => {
+    r.refs = undefined;
+    if (isKustomizationResource(r)) {
+      hasKustomizations = true;
+    }
+  });
+
+  if (hasKustomizations) {
+    const fileMap: Map<string, FileEntry> = new Map();
+    fileMap.set(path.join(rootEntry.folder, rootEntry.name), rootEntry);
+    addChildrenToFileMap(rootEntry, fileMap);
+    processKustomizations(resourceMap, fileMap);
+  }
+
+  processParsedResources(resourceMap);
+}
 
 function processParsedResources(resourceMap: ResourceMapType) {
   processServices(resourceMap);
