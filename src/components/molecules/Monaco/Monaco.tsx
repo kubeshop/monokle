@@ -18,9 +18,8 @@ import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/utils/schema';
 import {Button} from 'react-bootstrap';
 import {logMessage} from '@redux/utils/log';
-import {setResourceContent} from '@redux/reducers/main';
-import {K8sResource} from '@models/k8sresource';
-import {AppDispatch} from '@redux/store';
+import {updateResource} from '@redux/reducers/main';
+import {parseDocument} from 'yaml';
 
 // @ts-ignore
 window.MonacoEnvironment = {
@@ -43,20 +42,6 @@ const MonacoContainer = styled.div`
 // @ts-ignore
 const {yaml} = languages || {};
 
-function updateResourceInFile(filePath: string, resource: K8sResource, value: string, dispatch: AppDispatch) {
-  if (fs.statSync(filePath).isFile()) {
-    if (resource.range) {
-      const content = fs.readFileSync(filePath, 'utf8');
-      fs.writeFileSync(filePath, content.substr(0, resource.range[0]) + value + content.substr(resource.range[1]));
-      logMessage(`Updated file ${filePath}`, dispatch);
-    } else {
-      // only document => just write to file
-      fs.writeFileSync(filePath, value);
-      logMessage(`Updated file ${filePath}`, dispatch);
-    }
-  }
-}
-
 const Monaco = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
   const rootFolder = useAppSelector(state => state.main.rootFolder);
@@ -67,8 +52,18 @@ const Monaco = (props: {editorHeight: string}) => {
   const [code, setCode] = useState('');
   const [ref, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
-  const [isInvalid, setInvalid] = useState(false);
+  const [hasWarnings, setWarnings] = useState(false);
+  const [isValid, setValid] = useState(true);
   const dispatch = useAppDispatch();
+
+  function onDidChangeMarkers(e: monaco.Uri[]) {
+    const flag = monaco.editor.getModelMarkers({}).length > 0;
+    setWarnings(flag);
+  }
+
+  function onChangeCursorSelection(e: any) {
+    // console.log(e);
+  }
 
   function editorDidMount(e: any, m: any) {
     setEditor(e);
@@ -85,38 +80,30 @@ const Monaco = (props: {editorHeight: string}) => {
   function onChange(newValue: any, e: any) {
     setDirty(true);
     setCode(newValue);
-  }
 
-  function onDidChangeMarkers(e: monaco.Uri[]) {
-    setInvalid(monaco.editor.getModelMarkers({}).length > 0);
-  }
-
-  function onChangeCursorSelection(e: any) {
-    // console.log(e);
+    // this will slow things down if document gets large - need to find a better solution...
+    setValid(parseDocument(newValue).errors.length === 0);
   }
 
   function saveContent() {
     // @ts-ignore
     const value = editor.getValue();
 
-    // is a file selected?
-    if (selectedPath) {
+    // is a file and no resource selected?
+    if (selectedPath && !selectedResource) {
       const filePath = path.join(rootFolder, selectedPath);
-      if (selectedResource && resourceMap[selectedResource]) {
-        const resource = resourceMap[selectedResource];
-        updateResourceInFile(filePath, resource, value, dispatch);
-      } else if (!fs.statSync(filePath).isDirectory()) {
+      if (!fs.statSync(filePath).isDirectory()) {
         fs.writeFileSync(filePath, value);
         logMessage(`Updated file ${filePath}`, dispatch);
+
+        // we need to reparse file at this point...
       }
     } else if (selectedResource && resourceMap[selectedResource]) {
-      const resource = resourceMap[selectedResource];
-      const filePath = path.join(rootFolder, resource.path);
-      updateResourceInFile(filePath, resource, value, dispatch);
-    }
-
-    if (selectedResource) {
-      dispatch(setResourceContent({resourceId: selectedResource, content: value}));
+      try {
+        dispatch(updateResource({resourceId: selectedResource, content: value.toString()}));
+      } catch (e) {
+        logMessage(`Failed to update resource ${e}`, dispatch);
+      }
     }
   }
 
@@ -129,9 +116,8 @@ const Monaco = (props: {editorHeight: string}) => {
       }
     } else if (selectedPath) {
       const filePath = path.join(rootFolder, selectedPath);
-      const p = path.join(rootFolder, selectedPath);
-      if (!fs.statSync(p).isDirectory()) {
-        newCode = fs.readFileSync(p, 'utf8');
+      if (!fs.statSync(filePath).isDirectory()) {
+        newCode = fs.readFileSync(filePath, 'utf8');
       }
     }
 
@@ -171,9 +157,21 @@ const Monaco = (props: {editorHeight: string}) => {
       });
   }, [selectedResource, resourceMap]);
 
+  useEffect(() => {
+    if (editor) {
+      editor.revealLineNearTop(1);
+      editor.setSelection(new monaco.Selection(0, 0, 0, 0));
+    }
+  }, [editor, code]);
+
   return (
     <>
-      <Button variant="outline-dark" size="sm" disabled={!isDirty || isInvalid} onClick={saveContent}>
+      <Button
+        variant={hasWarnings ? 'outline-danger' : 'outline-dark'}
+        size="sm"
+        disabled={!isDirty || !isValid}
+        onClick={saveContent}
+      >
         Save Changes
       </Button>
       <MonacoContainer ref={ref}>

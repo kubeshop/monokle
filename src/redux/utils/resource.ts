@@ -3,6 +3,8 @@ import path from 'path';
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
+import fs from 'fs';
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 
 /**
  * link services to target deployments via their label selector if specified
@@ -165,6 +167,35 @@ export function hasIncomingRefs(resource: K8sResource) {
 
 export function hasOutgoingRefs(resource: K8sResource) {
   return resource.refs?.find(e => isOutgoingRef(e.refType));
+}
+
+function isFileResource(resource: K8sResource) {
+  return !resource.path.startsWith(PREVIEW_PREFIX);
+}
+
+export function saveResource(resource: K8sResource, newValue: string) {
+  let valueToWrite = `${newValue.trim()}\n`;
+
+  if (isFileResource(resource)) {
+    if (resource.range) {
+      const content = fs.readFileSync(resource.path, 'utf8');
+
+      // need to make sure that document delimiter is still there if this resource was not first in the file
+      if (resource.range[0] > 0 && !valueToWrite.startsWith(YAML_DOCUMENT_DELIMITER)) {
+        valueToWrite = `${YAML_DOCUMENT_DELIMITER}${valueToWrite}`;
+      }
+
+      fs.writeFileSync(
+        resource.path,
+        content.substr(0, resource.range[0]) + valueToWrite + content.substr(resource.range[1])
+      );
+    } else {
+      // only document => just write to file
+      fs.writeFileSync(resource.path, newValue);
+    }
+  }
+
+  return valueToWrite;
 }
 
 // taken from https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid

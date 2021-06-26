@@ -1,7 +1,7 @@
 import {ResourceMapType} from '@models/appstate';
 import {getNamespaces} from './resource';
 
-test('get-namspaces', () => {
+test('get-namespaces', () => {
   expect(getNamespaces({}).length).toBe(0);
 
   const resourceMapWithoutNamespaces: ResourceMapType = {};

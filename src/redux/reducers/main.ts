@@ -2,13 +2,14 @@ import {exec} from 'child_process';
 import log from 'loglevel';
 // @ts-ignore
 import shellPath from 'shell-path';
-import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
+import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
 import {PREVIEW_PREFIX} from '@src/constants';
 import {AppConfig} from '@models/appconfig';
 import {AppState, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {parseDocument} from 'yaml';
+import {K8sResource} from '@models/k8sresource';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -17,9 +18,9 @@ import {
   highlightChildren,
   getKustomizationRefs,
 } from '../utils/selection';
-import {extractK8sResources, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
+import {extractK8sResources, getFileEntryForResource, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
 import {processKustomizations} from '../utils/kustomize';
-import {isKustomizationResource, processConfigMaps, processServices} from '../utils/resource';
+import {isKustomizationResource, processConfigMaps, processServices, saveResource} from '../utils/resource';
 import {AppDispatch} from '../store';
 
 type SetRootFolderPayload = {
@@ -34,7 +35,7 @@ type SetPreviewDataPayload = {
   previewResources?: ResourceMapType;
 };
 
-type SetResourceContentPayload = {
+export type UpdateResourcePayload = {
   resourceId: string;
   content: string;
 };
@@ -43,11 +44,18 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
-    setResourceContent: (state: Draft<AppState>, action: PayloadAction<SetResourceContentPayload>) => {
-      const resource = state.resourceMap[action.payload.resourceId];
-      if (resource) {
-        resource.text = action.payload.content;
-        resource.content = parseDocument(action.payload.content).toJS();
+    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
+      try {
+        const resource = state.resourceMap[action.payload.resourceId];
+        if (resource) {
+          const value = saveResource(resource, action.payload.content);
+          resource.text = value;
+          resource.content = parseDocument(value).toJS();
+          recalculateResourceRanges(resource, state, value);
+        }
+      } catch (e) {
+        log.error(e);
+        return original(state);
       }
     },
     rootFolderSet: (state: Draft<AppState>, action: PayloadAction<SetRootFolderPayload>) => {
@@ -213,5 +221,36 @@ export function previewKustomization(id: string) {
   };
 }
 
-export const {selectK8sResource, selectFile, setResourceContent} = mainSlice.actions;
+function recalculateResourceRanges(resource: Draft<K8sResource>, state: Draft<AppState>, value: string) {
+  // if length of value has changed we need to recalculate document ranges for
+  // subsequent resource so future saves will be at correct place in document
+  if (resource.range && resource.range[1] - resource.range[0] !== value.length) {
+    const fileEntry = getFileEntryForResource(resource, state.rootEntry);
+    if (fileEntry && fileEntry.resourceIds) {
+      let resourceIndex = fileEntry.resourceIds.indexOf(resource.id);
+      if (resourceIndex !== -1) {
+        const diff = value.length - (resource.range[1] - resource.range[0]);
+        resource.range[1] = resource.range[0] + value.length;
+
+        while (resourceIndex < fileEntry.resourceIds.length - 1) {
+          resourceIndex += 1;
+          let rid = fileEntry.resourceIds[resourceIndex];
+          const r = state.resourceMap[rid];
+          if (r && r.range) {
+            r.range[0] += diff;
+            r.range[1] += diff;
+          } else {
+            throw new Error(`Failed to find resource ${rid} in fileEntry resourceIds for ${fileEntry.name}`);
+          }
+        }
+      } else {
+        throw new Error(`Failed to find resource in list of ids of fileEntry for ${fileEntry.name}`);
+      }
+    } else {
+      throw new Error(`Failed to find fileEntry for resource with path ${resource.path}`);
+    }
+  }
+}
+
+export const {selectK8sResource, selectFile, updateResource} = mainSlice.actions;
 export default mainSlice.reducer;
