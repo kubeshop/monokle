@@ -6,9 +6,6 @@ import {FileEntry} from '@models/fileentry';
 import fs from 'fs';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 
-/**
- * link services to target deployments via their label selector if specified
- */
 export function processServices(resourceMap: ResourceMapType) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(
     d => d.content.spec?.template?.metadata?.labels
@@ -17,23 +14,31 @@ export function processServices(resourceMap: ResourceMapType) {
   getK8sResources(resourceMap, 'Service').forEach(service => {
     if (service.content?.spec?.selector) {
       Object.keys(service.content.spec.selector).forEach((e: any) => {
+        let found = false;
         deployments
           .filter(
             deployment => deployment.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]
           )
           .forEach(deployment => {
             linkResources(deployment, service, ResourceRefType.SelectedPodName, ResourceRefType.ServicePodSelector);
+            found = true;
           });
+        if (!found) {
+          service.refs = service.refs || [];
+          service.refs.push({refType: ResourceRefType.UnsatisfiedSelector, target: service.content.spec.selector[e]});
+        }
       });
     }
   });
 }
 
 export function processConfigMaps(resourceMap: ResourceMapType) {
+  console.log('hej!');
   const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
     getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
       JSONPath({path: '$..configMapRef.name', json: deployment.content}).forEach((refName: string) => {
+        let found = false;
         configMaps
           .filter(item => item.content.metadata.name === refName)
           .forEach(configMapResource => {
@@ -43,10 +48,18 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
               ResourceRefType.ConfigMapRef,
               ResourceRefType.ConfigMapConsumer
             );
+            found = true;
           });
+        if (!found) {
+          console.log('found unsatisifed ref!');
+          deployment.refs = deployment.refs || [];
+          deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
+          console.log(hasUnsatisfiedRefs(deployment));
+        }
       });
 
       JSONPath({path: '$..configMapKeyRef.name', json: deployment.content}).forEach((refName: string) => {
+        let found = false;
         configMaps
           .filter(item => item.content.metadata.name === refName)
           .forEach(configMapResource => {
@@ -56,10 +69,16 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
               ResourceRefType.ConfigMapRef,
               ResourceRefType.ConfigMapConsumer
             );
+            found = true;
           });
+        if (!found) {
+          deployment.refs = deployment.refs || [];
+          deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
+        }
       });
 
       JSONPath({path: '$..volumes[*].configMap.name', json: deployment.content}).forEach((refName: string) => {
+        let found = false;
         configMaps
           .filter(item => item.content.metadata.name === refName)
           .forEach(configMapResource => {
@@ -69,7 +88,12 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
               ResourceRefType.ConfigMapRef,
               ResourceRefType.ConfigMapConsumer
             );
+            found = true;
           });
+        if (!found) {
+          deployment.refs = deployment.refs || [];
+          deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
+        }
       });
     });
   }
@@ -86,18 +110,18 @@ export function linkResources(
   targetRefType: ResourceRefType
 ) {
   source.refs = source.refs || [];
-  if (!source.refs.some(ref => ref.refType === sourceRefType && ref.targetResourceId === target.id)) {
+  if (!source.refs.some(ref => ref.refType === sourceRefType && ref.target === target.id)) {
     source.refs.push({
       refType: sourceRefType,
-      targetResourceId: target.id,
+      target: target.id,
     });
   }
 
   target.refs = target.refs || [];
-  if (!target.refs.some(ref => ref.refType === targetRefType && ref.targetResourceId === source.id)) {
+  if (!target.refs.some(ref => ref.refType === targetRefType && ref.target === source.id)) {
     target.refs.push({
       refType: targetRefType,
-      targetResourceId: source.id,
+      target: source.id,
     });
   }
 }
@@ -153,6 +177,8 @@ const outgoingRefs = [
   ResourceRefType.ServicePodSelector,
 ];
 
+const unsatisfiedRefs = [ResourceRefType.UnsatisfiedConfigMap, ResourceRefType.UnsatisfiedSelector];
+
 export function isIncomingRef(e: ResourceRefType) {
   return incomingRefs.includes(e);
 }
@@ -161,12 +187,24 @@ export function isOutgoingRef(e: ResourceRefType) {
   return outgoingRefs.includes(e);
 }
 
+export function isUnsatisfiedRef(e: ResourceRefType) {
+  return unsatisfiedRefs.includes(e);
+}
+
 export function hasIncomingRefs(resource: K8sResource) {
-  return resource.refs?.find(e => isIncomingRef(e.refType));
+  return resource.refs?.some(e => isIncomingRef(e.refType));
 }
 
 export function hasOutgoingRefs(resource: K8sResource) {
-  return resource.refs?.find(e => isOutgoingRef(e.refType));
+  return resource.refs?.some(e => isOutgoingRef(e.refType));
+}
+
+export function hasRefs(resource: K8sResource) {
+  return resource.refs?.some(e => isOutgoingRef(e.refType));
+}
+
+export function hasUnsatisfiedRefs(resource: K8sResource) {
+  return resource.refs?.some(e => isUnsatisfiedRef(e.refType));
 }
 
 function isFileResource(resource: K8sResource) {

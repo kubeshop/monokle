@@ -20,10 +20,12 @@ export enum ResourceRefType {
   SelectedPodName,
   ConfigMapRef,
   ConfigMapConsumer,
+  UnsatisfiedSelector,
+  UnsatisfiedConfigMap,
 }
 
 interface ResourceRef {
-  targetResourceId: string;
+  target: string;
   refType: ResourceRefType;
 }
 

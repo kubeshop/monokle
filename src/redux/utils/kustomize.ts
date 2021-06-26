@@ -53,7 +53,9 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Map
         const fileEntry = fileMap.get(path.join(path.parse(kustomization.path).dir, e));
         if (fileEntry) {
           fileEntry.resourceIds?.forEach(id => {
-            resourceMap[id].name = `Patch: ${resourceMap[id].name}`;
+            if (!resourceMap[id].name.startsWith('Patch:')) {
+              resourceMap[id].name = `Patch: ${resourceMap[id].name}`;
+            }
           });
         } else {
           log.warn(`Failed to find patchesStrategicMerge ${e} in kustomization ${kustomization.path}`);
