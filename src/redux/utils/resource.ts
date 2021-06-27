@@ -33,7 +33,6 @@ export function processServices(resourceMap: ResourceMapType) {
 }
 
 export function processConfigMaps(resourceMap: ResourceMapType) {
-  console.log('hej!');
   const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
     getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
@@ -51,10 +50,8 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
             found = true;
           });
         if (!found) {
-          console.log('found unsatisifed ref!');
           deployment.refs = deployment.refs || [];
           deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
-          console.log(hasUnsatisfiedRefs(deployment));
         }
       });
 
