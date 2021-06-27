@@ -54,6 +54,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
+  const isInPreviewMode = !!useAppSelector(state => state.main.previewResource);
   const dispatch = useAppDispatch();
 
   function onDidChangeMarkers(e: monaco.Uri[]) {
@@ -127,6 +128,7 @@ const Monaco = (props: {editorHeight: string}) => {
 
   const options = {
     selectOnLineNumbers: true,
+    readOnly: isInPreviewMode,
   };
 
   useEffect(() => {
