@@ -219,13 +219,15 @@ export function saveResource(resource: K8sResource, newValue: string) {
       const content = fs.readFileSync(resource.path, 'utf8');
 
       // need to make sure that document delimiter is still there if this resource was not first in the file
-      if (resource.range[0] > 0 && !valueToWrite.startsWith(YAML_DOCUMENT_DELIMITER)) {
+      if (resource.range.start > 0 && !valueToWrite.startsWith(YAML_DOCUMENT_DELIMITER)) {
         valueToWrite = `${YAML_DOCUMENT_DELIMITER}${valueToWrite}`;
       }
 
       fs.writeFileSync(
         resource.path,
-        content.substr(0, resource.range[0]) + valueToWrite + content.substr(resource.range[1])
+        content.substr(0, resource.range.start) +
+          valueToWrite +
+          content.substr(resource.range.start + resource.range.length)
       );
     } else {
       // only document => just write to file

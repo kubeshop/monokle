@@ -269,21 +269,20 @@ export function previewKustomization(id: string) {
 function recalculateResourceRanges(resource: Draft<K8sResource>, state: Draft<AppState>, value: string) {
   // if length of value has changed we need to recalculate document ranges for
   // subsequent resource so future saves will be at correct place in document
-  if (resource.range && resource.range[1] - resource.range[0] !== value.length) {
+  if (resource.range && resource.range.length !== value.length) {
     const fileEntry = getFileEntryForResource(resource, state.rootEntry);
     if (fileEntry && fileEntry.resourceIds) {
       let resourceIndex = fileEntry.resourceIds.indexOf(resource.id);
       if (resourceIndex !== -1) {
-        const diff = value.length - (resource.range[1] - resource.range[0]);
-        resource.range[1] = resource.range[0] + value.length;
+        const diff = value.length - resource.range.length;
+        resource.range.length = value.length;
 
         while (resourceIndex < fileEntry.resourceIds.length - 1) {
           resourceIndex += 1;
           let rid = fileEntry.resourceIds[resourceIndex];
           const r = state.resourceMap[rid];
           if (r && r.range) {
-            r.range[0] += diff;
-            r.range[1] += diff;
+            r.range.start += diff;
           } else {
             throw new Error(`Failed to find resource ${rid} in fileEntry resourceIds for ${fileEntry.name}`);
           }

@@ -91,7 +91,7 @@ export function extractK8sResources(fileContent: string, filePath: string) {
           };
 
           if (documents.length > 1) {
-            resource.range = d.range;
+            resource.range = {start: d.range[0], length: d.range[1] - d.range[0]};
           }
 
           if (content.metadata && content.metadata.namespace) {

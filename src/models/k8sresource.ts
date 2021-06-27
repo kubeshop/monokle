@@ -10,7 +10,10 @@ interface K8sResource {
   text: string; // unparsed resource content (for editing)
   content: any; // contains parsed yaml resource - used for filtering/finding links/refs, etc
   refs?: ResourceRef[]; // array of refs to other resources
-  range?: number[]; // range of this resource in a multidocument file; entries are 0:start and 1:end position
+  range?: {
+    start: number;
+    length: number;
+  }; // range of this resource in a multidocument file; entries are 0:start and 1:end position
 }
 
 export enum ResourceRefType {
