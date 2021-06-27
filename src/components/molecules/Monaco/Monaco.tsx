@@ -18,8 +18,8 @@ import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/utils/schema';
 import {Button} from 'react-bootstrap';
 import {logMessage} from '@redux/utils/log';
-import {updateResource} from '@redux/reducers/main';
-import {parseDocument} from 'yaml';
+import {updateFileEntry, updateResource} from '@redux/reducers/main';
+import {parseAllDocuments} from 'yaml';
 
 // @ts-ignore
 window.MonacoEnvironment = {
@@ -83,7 +83,7 @@ const Monaco = (props: {editorHeight: string}) => {
     setCode(newValue);
 
     // this will slow things down if document gets large - need to find a better solution...
-    setValid(parseDocument(newValue).errors.length === 0);
+    setValid(!parseAllDocuments(newValue).some(d => d.errors.length > 0));
   }
 
   function saveContent() {
@@ -92,12 +92,10 @@ const Monaco = (props: {editorHeight: string}) => {
 
     // is a file and no resource selected?
     if (selectedPath && !selectedResource) {
-      const filePath = path.join(rootFolder, selectedPath);
-      if (!fs.statSync(filePath).isDirectory()) {
-        fs.writeFileSync(filePath, value);
-        logMessage(`Updated file ${filePath}`, dispatch);
-
-        // we need to reparse file at this point...
+      try {
+        dispatch(updateFileEntry({path: selectedPath, content: value}));
+      } catch (e) {
+        logMessage(`Failed to update file ${e}`, dispatch);
       }
     } else if (selectedResource && resourceMap[selectedResource]) {
       try {

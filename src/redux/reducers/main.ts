@@ -9,7 +9,7 @@ import {AppConfig} from '@models/appconfig';
 import {AppState, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {parseDocument} from 'yaml';
-import {K8sResource} from '@models/k8sresource';
+import fs from 'fs';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -18,13 +18,13 @@ import {
   highlightChildren,
   getKustomizationRefs,
 } from '../utils/selection';
-import {extractK8sResources, getFileEntryForResource, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
+import {extractK8sResources, getFileEntryForPath, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
 import {processKustomizations} from '../utils/kustomize';
 import {
-  createResourceName,
   isKustomizationResource,
-  processConfigMaps,
-  processServices,
+  processParsedResources,
+  recalculateResourceRanges,
+  reprocessResources,
   saveResource,
 } from '../utils/resource';
 import {AppDispatch} from '../store';
@@ -46,10 +46,50 @@ export type UpdateResourcePayload = {
   content: string;
 };
 
+export type UpdateFileEntryPayload = {
+  path: string;
+  content: string;
+};
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
+    updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
+      try {
+        const entry = getFileEntryForPath(action.payload.path, state.rootEntry);
+        if (entry) {
+          const filePath = path.join(state.rootFolder, action.payload.path);
+
+          if (!fs.statSync(filePath).isDirectory()) {
+            fs.writeFileSync(filePath, action.payload.content);
+
+            if (entry.resourceIds) {
+              entry.resourceIds?.forEach(id => {
+                delete state.resourceMap[id];
+              });
+
+              entry.resourceIds = undefined;
+            }
+
+            const map = extractK8sResources(action.payload.content, filePath);
+            Object.values(map).forEach(r => {
+              state.resourceMap[r.id] = r;
+
+              entry.resourceIds = entry.resourceIds || [];
+              entry.resourceIds?.push(r.id);
+            });
+
+            reprocessResources([], state.resourceMap, state.rootEntry);
+          }
+        } else {
+          log.error(`Could not find FileEntry for ${action.payload.path}`);
+        }
+      } catch (e) {
+        log.error(e);
+        return original(state);
+      }
+    },
     updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
       try {
         const resource = state.resourceMap[action.payload.resourceId];
@@ -148,49 +188,6 @@ export const mainSlice = createSlice({
   },
 });
 
-function addChildrenToFileMap(parent: FileEntry, fileMap: Map<string, FileEntry>) {
-  parent.children?.forEach(fe => {
-    fileMap.set(path.join(fe.folder, fe.name), fe);
-    if (fe.children) {
-      addChildrenToFileMap(fe, fileMap);
-    }
-  });
-}
-
-// This needs to be more intelligent - brute force for now...
-function reprocessResources(resourceIds: string[], resourceMap: ResourceMapType, rootEntry: FileEntry) {
-  resourceIds.forEach(id => {
-    const resource = resourceMap[id];
-    if (resource) {
-      resource.name = createResourceName(resource.path, resource.content);
-      resource.kind = resource.content.kind;
-      resource.version = resource.content.apiVersion;
-    }
-  });
-
-  let hasKustomizations = false;
-  Object.values(resourceMap).forEach(r => {
-    r.refs = undefined;
-    if (isKustomizationResource(r)) {
-      hasKustomizations = true;
-    }
-  });
-
-  if (hasKustomizations) {
-    const fileMap: Map<string, FileEntry> = new Map();
-    fileMap.set(path.join(rootEntry.folder, rootEntry.name), rootEntry);
-    addChildrenToFileMap(rootEntry, fileMap);
-    processKustomizations(resourceMap, fileMap);
-  }
-
-  processParsedResources(resourceMap);
-}
-
-function processParsedResources(resourceMap: ResourceMapType) {
-  processServices(resourceMap);
-  processConfigMaps(resourceMap);
-}
-
 export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
   return async (dispatch: AppDispatch) => {
     const folderPath = path.parse(rootFolder);
@@ -266,35 +263,5 @@ export function previewKustomization(id: string) {
   };
 }
 
-function recalculateResourceRanges(resource: Draft<K8sResource>, state: Draft<AppState>, value: string) {
-  // if length of value has changed we need to recalculate document ranges for
-  // subsequent resource so future saves will be at correct place in document
-  if (resource.range && resource.range.length !== value.length) {
-    const fileEntry = getFileEntryForResource(resource, state.rootEntry);
-    if (fileEntry && fileEntry.resourceIds) {
-      let resourceIndex = fileEntry.resourceIds.indexOf(resource.id);
-      if (resourceIndex !== -1) {
-        const diff = value.length - resource.range.length;
-        resource.range.length = value.length;
-
-        while (resourceIndex < fileEntry.resourceIds.length - 1) {
-          resourceIndex += 1;
-          let rid = fileEntry.resourceIds[resourceIndex];
-          const r = state.resourceMap[rid];
-          if (r && r.range) {
-            r.range.start += diff;
-          } else {
-            throw new Error(`Failed to find resource ${rid} in fileEntry resourceIds for ${fileEntry.name}`);
-          }
-        }
-      } else {
-        throw new Error(`Failed to find resource in list of ids of fileEntry for ${fileEntry.name}`);
-      }
-    } else {
-      throw new Error(`Failed to find fileEntry for resource with path ${resource.path}`);
-    }
-  }
-}
-
-export const {selectK8sResource, selectFile, updateResource} = mainSlice.actions;
+export const {selectK8sResource, selectFile, updateResource, updateFileEntry} = mainSlice.actions;
 export default mainSlice.reducer;
