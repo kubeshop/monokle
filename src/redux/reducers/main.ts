@@ -10,6 +10,7 @@ import {AppState, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
+import {K8sResource} from '@models/k8sresource';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -100,6 +101,8 @@ export const mainSlice = createSlice({
           resource.content = parseDocument(value).toJS();
           recalculateResourceRanges(resource, state, value);
           reprocessResources([resource.id], state.resourceMap, state.rootEntry);
+          resource.selected = false;
+          updateSelectionAndHighlights(state, resource);
         }
       } catch (e) {
         log.error(e);
@@ -133,29 +136,7 @@ export const mainSlice = createSlice({
     selectK8sResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const resource = state.resourceMap[action.payload];
       if (resource) {
-        clearResourceSelections(state.resourceMap, resource.id);
-        if (!state.previewResource) {
-          clearFileSelections(state.rootEntry);
-        }
-        state.selectedResource = undefined;
-
-        if (resource.selected) {
-          resource.selected = false;
-        } else {
-          resource.selected = true;
-          state.selectedResource = resource.id;
-          state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
-
-          if (isKustomizationResource(resource)) {
-            getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {
-              state.resourceMap[e].highlight = true;
-            });
-          } else {
-            getLinkedResources(resource).forEach(e => {
-              state.resourceMap[e].highlight = true;
-            });
-          }
-        }
+        updateSelectionAndHighlights(state, resource);
       }
     },
     selectFile: (state: Draft<AppState>, action: PayloadAction<number[]>) => {
@@ -262,6 +243,32 @@ export function previewKustomization(id: string) {
       }
     }
   };
+}
+
+function updateSelectionAndHighlights(state: AppState, resource: K8sResource) {
+  clearResourceSelections(state.resourceMap, resource.id);
+  if (!state.previewResource) {
+    clearFileSelections(state.rootEntry);
+  }
+  state.selectedResource = undefined;
+
+  if (resource.selected) {
+    resource.selected = false;
+  } else {
+    resource.selected = true;
+    state.selectedResource = resource.id;
+    state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
+
+    if (isKustomizationResource(resource)) {
+      getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {
+        state.resourceMap[e].highlight = true;
+      });
+    } else {
+      getLinkedResources(resource).forEach(e => {
+        state.resourceMap[e].highlight = true;
+      });
+    }
+  }
 }
 
 export const {selectK8sResource, selectFile, updateResource, updateFileEntry} = mainSlice.actions;
