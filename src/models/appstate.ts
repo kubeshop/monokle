@@ -6,9 +6,12 @@ type ResourceMapType = {
   [id: string]: K8sResource;
 };
 
+type FileMapType = {
+  [id: string]: FileEntry;
+};
+
 interface AppState {
-  rootFolder: string;
-  rootEntry: FileEntry;
+  fileMap: FileMapType;
   appConfig: AppConfig;
   resourceMap: ResourceMapType;
   selectedResource?: string;
@@ -16,4 +19,4 @@ interface AppState {
   previewResource?: string;
 }
 
-export type {AppState, ResourceMapType};
+export type {AppState, ResourceMapType, FileMapType};

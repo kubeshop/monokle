@@ -20,6 +20,7 @@ import {Button} from 'react-bootstrap';
 import {logMessage} from '@redux/utils/log';
 import {updateFileEntry, updateResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
+import {ROOT_FILE_ENTRY} from '@src/constants';
 
 // @ts-ignore
 window.MonacoEnvironment = {
@@ -44,7 +45,7 @@ const {yaml} = languages || {};
 
 const Monaco = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
-  const rootFolder = useAppSelector(state => state.main.rootFolder);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -114,7 +115,7 @@ const Monaco = (props: {editorHeight: string}) => {
         newCode = resource.text;
       }
     } else if (selectedPath) {
-      const filePath = path.join(rootFolder, selectedPath);
+      const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
       if (!fs.statSync(filePath).isDirectory()) {
         newCode = fs.readFileSync(filePath, 'utf8');
       }
@@ -122,7 +123,7 @@ const Monaco = (props: {editorHeight: string}) => {
 
     setCode(newCode);
     setDirty(false);
-  }, [rootFolder, selectedPath, selectedResource, resourceMap]);
+  }, [fileMap, selectedPath, selectedResource, resourceMap]);
 
   const options = {
     selectOnLineNumbers: true,

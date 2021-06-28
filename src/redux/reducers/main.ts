@@ -4,9 +4,9 @@ import log from 'loglevel';
 import shellPath from 'shell-path';
 import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {PREVIEW_PREFIX} from '@src/constants';
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@src/constants';
 import {AppConfig} from '@models/appconfig';
-import {AppState, ResourceMapType} from '@models/appstate';
+import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
@@ -19,7 +19,13 @@ import {
   highlightChildren,
   getKustomizationRefs,
 } from '../utils/selection';
-import {extractK8sResources, getFileEntryForPath, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
+import {
+  extractK8sResources,
+  getFileEntries,
+  getResourcesInFile,
+  readFiles,
+  selectResourceFileEntry,
+} from '../utils/fileEntry';
 import {processKustomizations} from '../utils/kustomize';
 import {
   isKustomizationResource,
@@ -31,9 +37,8 @@ import {
 import {AppDispatch} from '../store';
 
 type SetRootFolderPayload = {
-  rootFolder: string;
   appConfig: AppConfig;
-  rootEntry?: FileEntry;
+  fileMap: FileMapType;
   resourceMap: ResourceMapType;
 };
 
@@ -58,31 +63,24 @@ export const mainSlice = createSlice({
   reducers: {
     updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
       try {
-        const entry = getFileEntryForPath(action.payload.path, state.rootEntry);
+        const entry = state.fileMap[action.payload.path];
         if (entry) {
-          const filePath = path.join(state.rootFolder, action.payload.path);
+          const filePath = path.join(state.fileMap[ROOT_FILE_ENTRY].filePath, action.payload.path);
 
           if (!fs.statSync(filePath).isDirectory()) {
             fs.writeFileSync(filePath, action.payload.content);
 
-            if (entry.resourceIds) {
-              entry.resourceIds?.forEach(id => {
-                delete state.resourceMap[id];
-              });
-
-              entry.resourceIds = undefined;
-            }
+            getResourcesInFile(entry.filePath, state.resourceMap).forEach(r => {
+              delete state.resourceMap[r.id];
+            });
 
             const map = extractK8sResources(action.payload.content, filePath);
             Object.values(map).forEach(r => {
               state.resourceMap[r.id] = r;
-
-              entry.resourceIds = entry.resourceIds || [];
-              entry.resourceIds?.push(r.id);
               r.highlight = true;
             });
 
-            reprocessResources([], state.resourceMap, state.rootEntry);
+            reprocessResources([], state.resourceMap, state.fileMap);
           }
         } else {
           log.error(`Could not find FileEntry for ${action.payload.path}`);
@@ -96,11 +94,11 @@ export const mainSlice = createSlice({
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          const value = saveResource(resource, action.payload.content);
+          const value = saveResource(resource, action.payload.content, state.fileMap);
           resource.text = value;
           resource.content = parseDocument(value).toJS();
           recalculateResourceRanges(resource, state, value);
-          reprocessResources([resource.id], state.resourceMap, state.rootEntry);
+          reprocessResources([resource.id], state.resourceMap, state.fileMap);
           resource.selected = false;
           updateSelectionAndHighlights(state, resource);
         }
@@ -110,21 +108,18 @@ export const mainSlice = createSlice({
       }
     },
     rootFolderSet: (state: Draft<AppState>, action: PayloadAction<SetRootFolderPayload>) => {
-      if (action.payload.rootEntry) {
-        state.resourceMap = action.payload.resourceMap;
-        state.rootFolder = action.payload.rootFolder;
-        state.rootEntry = action.payload.rootEntry;
-        state.selectedResource = undefined;
-        state.selectedPath = undefined;
-        state.previewResource = undefined;
-      }
+      state.resourceMap = action.payload.resourceMap;
+      state.fileMap = action.payload.fileMap;
+      state.selectedResource = undefined;
+      state.selectedPath = undefined;
+      state.previewResource = undefined;
     },
     setPreviewData: (state: Draft<AppState>, action: PayloadAction<SetPreviewDataPayload>) => {
       state.previewResource = action.payload.previewResourceId;
 
       // remove previous preview resources
       Object.values(state.resourceMap)
-        .filter(r => r.path.startsWith(PREVIEW_PREFIX))
+        .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
         .forEach(r => delete state.resourceMap[r.id]);
 
       if (action.payload.previewResourceId && action.payload.previewResources) {
@@ -139,28 +134,26 @@ export const mainSlice = createSlice({
         updateSelectionAndHighlights(state, resource);
       }
     },
-    selectFile: (state: Draft<AppState>, action: PayloadAction<number[]>) => {
+    selectFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (action.payload.length > 0) {
-        let parent = state.rootEntry;
-        let selectedPath = '';
-        for (let c = 0; c < action.payload.length; c += 1) {
-          const index = action.payload[c];
-          if (parent.children && index < parent.children.length) {
-            parent = parent.children[index];
-            selectedPath = path.join(selectedPath, parent.name);
-          } else {
-            break;
-          }
-        }
+        const selectedPath = action.payload;
+        const entries = getFileEntries(action.payload, state.fileMap);
+        console.log('entries: ', entries);
 
         clearResourceSelections(state.resourceMap);
-        clearFileSelections(state.rootEntry);
-        if (parent.resourceIds && parent.resourceIds.length > 0) {
-          parent.resourceIds.forEach(e => {
-            state.resourceMap[e].highlight = true;
+        clearFileSelections(state.fileMap);
+
+        if (entries.length > 0) {
+          const parent = entries[entries.length - 1];
+
+          console.log(`looking for resources in file ${parent.filePath}`, state.resourceMap);
+          getResourcesInFile(parent.filePath, state.resourceMap).forEach(r => {
+            r.highlight = true;
           });
-        } else if (parent.children) {
-          highlightChildren(parent, state.resourceMap);
+
+          if (parent.children) {
+            highlightChildren(parent, state.resourceMap, state.fileMap);
+          }
         }
 
         state.selectedResource = undefined;
@@ -174,11 +167,11 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
   return async (dispatch: AppDispatch) => {
     const folderPath = path.parse(rootFolder);
     const resourceMap: ResourceMapType = {};
-    const fileMap: Map<string, FileEntry> = new Map();
+    const fileMap: FileMapType = {};
 
     const rootEntry: FileEntry = {
       name: folderPath.name,
-      folder: folderPath.dir,
+      filePath: rootFolder,
       highlight: false,
       selected: false,
       expanded: false,
@@ -186,18 +179,19 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
       children: [],
     };
 
-    rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap, rootEntry, rootFolder);
+    fileMap[ROOT_FILE_ENTRY] = rootEntry;
+
+    rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap);
     processKustomizations(resourceMap, fileMap);
     processParsedResources(resourceMap);
 
-    const payload: SetRootFolderPayload = {
-      rootFolder,
-      appConfig,
-      rootEntry,
-      resourceMap,
-    };
-
-    dispatch(mainSlice.actions.rootFolderSet(payload));
+    dispatch(
+      mainSlice.actions.rootFolderSet({
+        appConfig,
+        fileMap,
+        resourceMap,
+      })
+    );
   };
 }
 
@@ -209,8 +203,9 @@ export function previewKustomization(id: string) {
       dispatch(mainSlice.actions.setPreviewData({}));
     } else {
       const resource = state.resourceMap[id];
-      if (resource && resource.path) {
-        const folder = resource.path.substr(0, resource.path.lastIndexOf(path.sep));
+      if (resource && resource.filePath) {
+        const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+        const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
         log.info(`previewing ${id} in folder ${folder}`);
 
         // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
@@ -234,10 +229,14 @@ export function previewKustomization(id: string) {
               return;
             }
 
-            const resources = extractK8sResources(stdout, PREVIEW_PREFIX + resource.id);
-            processParsedResources(resources);
+            const resourceMap: ResourceMapType = {};
 
-            dispatch(mainSlice.actions.setPreviewData({previewResourceId: id, previewResources: resources}));
+            extractK8sResources(stdout, PREVIEW_PREFIX + resource.id).forEach(r => {
+              resourceMap[r.id] = r;
+            });
+            processParsedResources(resourceMap);
+
+            dispatch(mainSlice.actions.setPreviewData({previewResourceId: id, previewResources: resourceMap}));
           }
         );
       }
@@ -248,7 +247,7 @@ export function previewKustomization(id: string) {
 function updateSelectionAndHighlights(state: AppState, resource: K8sResource) {
   clearResourceSelections(state.resourceMap, resource.id);
   if (!state.previewResource) {
-    clearFileSelections(state.rootEntry);
+    clearFileSelections(state.fileMap);
   }
   state.selectedResource = undefined;
 
@@ -257,7 +256,7 @@ function updateSelectionAndHighlights(state: AppState, resource: K8sResource) {
   } else {
     resource.selected = true;
     state.selectedResource = resource.id;
-    state.selectedPath = selectResourceFileEntry(resource, state.rootEntry);
+    state.selectedPath = selectResourceFileEntry(resource, state.fileMap);
 
     if (isKustomizationResource(resource)) {
       getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {

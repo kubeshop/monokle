@@ -11,23 +11,46 @@ import {appColors as colors} from '@styles/AppColors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setRootFolder} from '@redux/reducers/main';
 import {FileEntry} from '@models/fileentry';
+import {getResourcesInFile} from '@redux/utils/fileEntry';
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {ROOT_FILE_ENTRY} from '@src/constants';
 
 interface TreeNode {
   name: string;
   checked: number;
   isOpen?: boolean;
   children: TreeNode[] | null;
+  data: string;
 }
 
-const mapTreeNodeFromFileEntry = (fileEntry: FileEntry): TreeNode => {
+const mapTreeNodeFromFileEntry = (
+  fileEntry: FileEntry,
+  fileMap: FileMapType,
+  resourceMap: ResourceMapType
+): TreeNode => {
+  const resources = getResourcesInFile(fileEntry.filePath, resourceMap);
+
   const result: TreeNode = {
-    name: fileEntry.name + (fileEntry.resourceIds ? ` [${fileEntry.resourceIds?.length}]` : ''),
+    name: fileEntry.name + (resources.length > 0 ? ` [${resources.length}]` : ''),
     checked: fileEntry.selected ? 1 : 0,
-    children: fileEntry.children ? fileEntry.children.map(child => mapTreeNodeFromFileEntry(child)) : null,
+    children: null,
+    data: fileEntry.filePath,
   };
 
   if (fileEntry.children) {
-    result.isOpen = fileEntry.expanded;
+    if (fileMap[ROOT_FILE_ENTRY] === fileEntry) {
+      result.children = fileEntry.children
+        .map(child => fileMap[path.sep + child])
+        .filter(childEntry => childEntry !== undefined)
+        .map(childEntry => mapTreeNodeFromFileEntry(childEntry, fileMap, resourceMap));
+      result.isOpen = true;
+    } else {
+      result.children = fileEntry.children
+        .map(child => fileMap[path.join(fileEntry.filePath, child)])
+        .filter(childEntry => childEntry !== undefined)
+        .map(childEntry => mapTreeNodeFromFileEntry(childEntry, fileMap, resourceMap));
+      result.isOpen = fileEntry.expanded;
+    }
   }
 
   return result;
@@ -86,10 +109,10 @@ const Title = styled.h4`
 const FileTreePane = () => {
   const dispatch = useAppDispatch();
 
-  const rootFolder = useAppSelector(state => state.main.rootFolder);
   const appConfig = useAppSelector(state => state.config);
   const previewResource = useAppSelector(state => state.main.previewResource);
-  const files = useAppSelector(state => state.main.rootEntry?.children);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);
@@ -116,19 +139,21 @@ const FileTreePane = () => {
   // eslint-disable-next-line no-unused-vars
   const onNameClick = ({defaultOnClick, nodeData}) => {
     if (previewResource === undefined) {
-      dispatch(selectFile(nodeData.path));
+      console.log('Selected ', nodeData);
+      dispatch(selectFile(nodeData.data));
     }
   };
 
-  const treeData: TreeNode = mapTreeNodeFromFileEntry({
-    name: rootFolder,
-    folder: '',
-    highlight: false,
-    selected: false,
-    expanded: true,
-    excluded: false,
-    children: files,
-  });
+  const rootEntry = fileMap[ROOT_FILE_ENTRY];
+  const treeData: TreeNode = rootEntry
+    ? mapTreeNodeFromFileEntry(rootEntry, fileMap, resourceMap)
+    : {
+        name: 'root',
+        checked: 0,
+        isOpen: false,
+        children: null,
+        data: ROOT_FILE_ENTRY,
+      };
 
   return (
     <FileTreeContainer>

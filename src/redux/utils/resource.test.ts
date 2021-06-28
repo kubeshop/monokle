@@ -7,7 +7,7 @@ test('get-namespaces', () => {
   const resourceMapWithoutNamespaces: ResourceMapType = {};
   resourceMapWithoutNamespaces['1'] = {
     id: '1',
-    path: 'folder/filename',
+    filePath: 'folder/filename',
     name: 'resource name',
     kind: 'ResourceType',
     version: '1.0',

@@ -1,22 +1,13 @@
 import {AppState} from '@models/appstate';
 
 export const initialState: AppState = {
-  rootFolder: '',
-  rootEntry: {
-    name: '',
-    folder: '',
-    selected: false,
-    highlight: false,
-    expanded: false,
-    excluded: false,
-  },
   appConfig: {
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,
     },
     scanExcludes: ['node_modules', '.git', '**/pkg/mod/**'],
-    fileIncludes: ['yaml', 'yml'],
+    fileIncludes: ['*.yaml', '*.yml'],
     navigators: [
       {
         name: 'K8s Resources',
@@ -81,4 +72,5 @@ export const initialState: AppState = {
     ],
   },
   resourceMap: {},
+  fileMap: {},
 };
