@@ -11,12 +11,12 @@ type FileMapType = {
 };
 
 interface AppState {
-  fileMap: FileMapType;
-  appConfig: AppConfig;
-  resourceMap: ResourceMapType;
-  selectedResource?: string;
-  selectedPath?: string;
-  previewResource?: string;
+  fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
+  appConfig: AppConfig; // holds current configuratio
+  resourceMap: ResourceMapType; // maps resource ids to resources
+  selectedResource?: string; // the id of the currently selected resource
+  selectedPath?: string; // the currently selected path
+  previewResource?: string; // the resource currently being previewed
 }
 
 export type {AppState, ResourceMapType, FileMapType};
