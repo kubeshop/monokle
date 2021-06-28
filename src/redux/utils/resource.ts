@@ -1,13 +1,13 @@
 import {JSONPath} from 'jsonpath-plus';
 import path from 'path';
-import {AppState, ResourceMapType} from '@models/appstate';
+import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
 import fs from 'fs';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import {processKustomizations} from '@redux/utils/kustomize';
 import {Draft} from '@reduxjs/toolkit';
-import {getFileEntryForResource} from '@redux/utils/fileEntry';
+import {getAbsoluteResourcePath, getResourcesInFile} from '@redux/utils/fileEntry';
 
 export function processServices(resourceMap: ResourceMapType) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(
@@ -35,65 +35,34 @@ export function processServices(resourceMap: ResourceMapType) {
   });
 }
 
+function linkConfigMap(configMaps: K8sResource[], refName: string, deployment: K8sResource) {
+  let found = false;
+  configMaps
+    .filter(item => item.content.metadata.name === refName)
+    .forEach(configMapResource => {
+      linkResources(configMapResource, deployment, ResourceRefType.ConfigMapRef, ResourceRefType.ConfigMapConsumer);
+      found = true;
+    });
+  if (!found) {
+    deployment.refs = deployment.refs || [];
+    deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
+  }
+}
+
 export function processConfigMaps(resourceMap: ResourceMapType) {
   const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
     getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
       JSONPath({path: '$..configMapRef.name', json: deployment.content}).forEach((refName: string) => {
-        let found = false;
-        configMaps
-          .filter(item => item.content.metadata.name === refName)
-          .forEach(configMapResource => {
-            linkResources(
-              configMapResource,
-              deployment,
-              ResourceRefType.ConfigMapRef,
-              ResourceRefType.ConfigMapConsumer
-            );
-            found = true;
-          });
-        if (!found) {
-          deployment.refs = deployment.refs || [];
-          deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
-        }
+        linkConfigMap(configMaps, refName, deployment);
       });
 
       JSONPath({path: '$..configMapKeyRef.name', json: deployment.content}).forEach((refName: string) => {
-        let found = false;
-        configMaps
-          .filter(item => item.content.metadata.name === refName)
-          .forEach(configMapResource => {
-            linkResources(
-              configMapResource,
-              deployment,
-              ResourceRefType.ConfigMapRef,
-              ResourceRefType.ConfigMapConsumer
-            );
-            found = true;
-          });
-        if (!found) {
-          deployment.refs = deployment.refs || [];
-          deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
-        }
+        linkConfigMap(configMaps, refName, deployment);
       });
 
       JSONPath({path: '$..volumes[*].configMap.name', json: deployment.content}).forEach((refName: string) => {
-        let found = false;
-        configMaps
-          .filter(item => item.content.metadata.name === refName)
-          .forEach(configMapResource => {
-            linkResources(
-              configMapResource,
-              deployment,
-              ResourceRefType.ConfigMapRef,
-              ResourceRefType.ConfigMapConsumer
-            );
-            found = true;
-          });
-        if (!found) {
-          deployment.refs = deployment.refs || [];
-          deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
-        }
+        linkConfigMap(configMaps, refName, deployment);
       });
     });
   }
@@ -144,7 +113,7 @@ export function createResourceName(filePath: string, content: any) {
       if (ix2 > 0) {
         return filePath.substr(ix2 + 1, ix - ix2 - 1);
       }
-      return filePath.substr(0, ix);
+      return filePath.substr(1, ix - 1);
     }
     return filePath;
   }
@@ -157,10 +126,10 @@ export function isKustomizationResource(r: K8sResource | undefined) {
   return r && r.kind === 'Kustomization';
 }
 
-export function isKustomizationFile(childFileEntry: FileEntry, resourceMap: ResourceMapType) {
-  if (childFileEntry.name.toLowerCase() === 'kustomization.yaml' && childFileEntry.resourceIds) {
-    const r = resourceMap[childFileEntry.resourceIds[0]];
-    return isKustomizationResource(r);
+export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
+  if (fileEntry.name.toLowerCase() === 'kustomization.yaml') {
+    const resources = getResourcesInFile(fileEntry.filePath, resourceMap);
+    return resources.length === 1 && isKustomizationResource(resources[0]);
   }
 
   return false;
@@ -208,15 +177,15 @@ export function hasUnsatisfiedRefs(resource: K8sResource) {
 }
 
 function isFileResource(resource: K8sResource) {
-  return !resource.path.startsWith(PREVIEW_PREFIX);
+  return !resource.filePath.startsWith(PREVIEW_PREFIX);
 }
 
-export function saveResource(resource: K8sResource, newValue: string) {
+export function saveResource(resource: K8sResource, newValue: string, fileMap: FileMapType) {
   let valueToWrite = `${newValue.trim()}\n`;
 
   if (isFileResource(resource)) {
     if (resource.range) {
-      const content = fs.readFileSync(resource.path, 'utf8');
+      const content = fs.readFileSync(getAbsoluteResourcePath(resource, fileMap), 'utf8');
 
       // need to make sure that document delimiter is still there if this resource was not first in the file
       if (resource.range.start > 0 && !valueToWrite.startsWith(YAML_DOCUMENT_DELIMITER)) {
@@ -224,35 +193,26 @@ export function saveResource(resource: K8sResource, newValue: string) {
       }
 
       fs.writeFileSync(
-        resource.path,
+        resource.filePath,
         content.substr(0, resource.range.start) +
           valueToWrite +
           content.substr(resource.range.start + resource.range.length)
       );
     } else {
       // only document => just write to file
-      fs.writeFileSync(resource.path, newValue);
+      fs.writeFileSync(getAbsoluteResourcePath(resource, fileMap), newValue);
     }
   }
 
   return valueToWrite;
 }
 
-function addChildrenToFileMap(parent: FileEntry, fileMap: Map<string, FileEntry>) {
-  parent.children?.forEach(fe => {
-    fileMap.set(path.join(fe.folder, fe.name), fe);
-    if (fe.children) {
-      addChildrenToFileMap(fe, fileMap);
-    }
-  });
-}
-
 // This needs to be more intelligent - brute force for now...
-export function reprocessResources(resourceIds: string[], resourceMap: ResourceMapType, rootEntry: FileEntry) {
+export function reprocessResources(resourceIds: string[], resourceMap: ResourceMapType, fileMap: FileMapType) {
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
     if (resource) {
-      resource.name = createResourceName(resource.path, resource.content);
+      resource.name = createResourceName(resource.filePath, resource.content);
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
     }
@@ -267,9 +227,6 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
   });
 
   if (hasKustomizations) {
-    const fileMap: Map<string, FileEntry> = new Map();
-    fileMap.set(path.join(rootEntry.folder, rootEntry.name), rootEntry);
-    addChildrenToFileMap(rootEntry, fileMap);
     processKustomizations(resourceMap, fileMap);
   }
 
@@ -285,16 +242,23 @@ export function recalculateResourceRanges(resource: Draft<K8sResource>, state: D
   // if length of value has changed we need to recalculate document ranges for
   // subsequent resource so future saves will be at correct place in document
   if (resource.range && resource.range.length !== value.length) {
-    const fileEntry = getFileEntryForResource(resource, state.rootEntry);
-    if (fileEntry && fileEntry.resourceIds) {
-      let resourceIndex = fileEntry.resourceIds.indexOf(resource.id);
+    const fileEntry = state.fileMap[resource.filePath];
+    if (fileEntry) {
+      // get list of resourceIds in file sorted by startPosition
+      const resourceIds = getResourcesInFile(resource.filePath, state.resourceMap)
+        .sort((a, b) => {
+          return a.range && b.range ? a.range.start - b.range.start : 0;
+        })
+        .map(r => r.id);
+
+      let resourceIndex = resourceIds.indexOf(resource.id);
       if (resourceIndex !== -1) {
         const diff = value.length - resource.range.length;
         resource.range.length = value.length;
 
-        while (resourceIndex < fileEntry.resourceIds.length - 1) {
+        while (resourceIndex < resourceIds.length - 1) {
           resourceIndex += 1;
-          let rid = fileEntry.resourceIds[resourceIndex];
+          let rid = resourceIds[resourceIndex];
           const r = state.resourceMap[rid];
           if (r && r.range) {
             r.range.start += diff;
@@ -306,7 +270,7 @@ export function recalculateResourceRanges(resource: Draft<K8sResource>, state: D
         throw new Error(`Failed to find resource in list of ids of fileEntry for ${fileEntry.name}`);
       }
     } else {
-      throw new Error(`Failed to find fileEntry for resource with path ${resource.path}`);
+      throw new Error(`Failed to find fileEntry for resource with path ${resource.filePath}`);
     }
   }
 }

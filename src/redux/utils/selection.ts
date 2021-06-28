@@ -1,7 +1,9 @@
-import {ResourceMapType} from '@models/appstate';
+import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
 import {isUnsatisfiedRef} from '@redux/utils/resource';
+import {getResourcesInFile} from '@redux/utils/fileEntry';
+import path from 'path';
 
 export function getKustomizationRefs(resourceMap: ResourceMapType, kustomizationId: string, selectParent: boolean) {
   let linkedResourceIds: string[] = [];
@@ -50,24 +52,21 @@ export function clearResourceSelections(resourceMap: ResourceMapType, itemId?: s
   });
 }
 
-export function clearFileSelections(rootEntry: FileEntry) {
-  rootEntry.selected = false;
-  rootEntry.children?.forEach(e => {
+export function clearFileSelections(fileMap: FileMapType) {
+  Object.values(fileMap).forEach(e => {
     e.selected = false;
-    if (e.children) {
-      clearFileSelections(e);
-    }
   });
 }
 
-export function highlightChildren(fileEntry: FileEntry, resourceMap: ResourceMapType) {
-  fileEntry.children?.forEach(child => {
-    if (child.resourceIds) {
-      child.resourceIds.forEach(e => {
-        resourceMap[e].highlight = true;
+export function highlightChildren(fileEntry: FileEntry, resourceMap: ResourceMapType, fileMap: FileMapType) {
+  fileEntry.children
+    ?.map(e => fileMap[path.join(fileEntry.filePath, e)])
+    .forEach(child => {
+      getResourcesInFile(child.filePath, resourceMap).forEach(e => {
+        e.highlight = true;
       });
-    } else if (child.children) {
-      highlightChildren(child, resourceMap);
-    }
-  });
+      if (child.children) {
+        highlightChildren(child, resourceMap, fileMap);
+      }
+    });
 }

@@ -5,6 +5,7 @@ import path from 'path';
 
 import packageJson from '@root/package.json';
 import {appColors as colors} from '@styles/AppColors';
+import {ROOT_FILE_ENTRY} from '@src/constants';
 
 const FooterContainer = styled.div`
   border: 1px solid blue;
@@ -23,15 +24,14 @@ const FooterContainer = styled.div`
 `;
 
 const Footer = () => {
-  const rootEntry = useAppSelector(state => state.main.rootEntry);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootEntry = fileMap[ROOT_FILE_ENTRY];
 
-  const footerText = `Monokle ${packageJson.version} - kubeshop.io 2021${rootEntry.children ? ` - ${rootEntry.folder}${path.sep}${rootEntry.name}` : ''}`;
+  const footerText = `Monokle ${packageJson.version} - kubeshop.io 2021${
+    rootEntry && rootEntry.children ? ` - ${rootEntry.filePath}${path.sep}${rootEntry.name}` : ''
+  }`;
 
-  return (
-    <FooterContainer>
-      {footerText}
-    </FooterContainer>
-  );
+  return <FooterContainer>{footerText}</FooterContainer>;
 };
 
 export default Footer;
