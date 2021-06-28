@@ -53,12 +53,13 @@ const ActionsPane = (props: {actionHeight: string}) => {
   const {actionHeight} = props;
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const dispatch = useAppDispatch();
   const [key, setKey] = useState('source');
 
   async function applySelectedResource() {
     if (selectedResource) {
-      applyResource(selectedResource, resourceMap, dispatch);
+      applyResource(selectedResource, resourceMap, fileMap, dispatch);
     }
   }
 

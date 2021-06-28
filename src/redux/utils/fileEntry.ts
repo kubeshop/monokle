@@ -3,27 +3,26 @@ import path from 'path';
 import micromatch from 'micromatch';
 import {LineCounter, parseAllDocuments} from 'yaml';
 import log from 'loglevel';
-import {ResourceMapType} from '@models/appstate';
+import {FileMapType, ResourceMapType} from '@models/appstate';
 import {AppConfig} from '@models/appconfig';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
+import {ROOT_FILE_ENTRY} from '@src/constants';
 import {createResourceName, uuidv4} from './resource';
 
-export function readFiles(
-  folder: string,
-  appConfig: AppConfig,
-  resourceMap: ResourceMapType,
-  fileMap: Map<string, FileEntry>,
-  parent: FileEntry,
-  rootFolder: string
-) {
+/**
+ * Reads the provided folder in line with the provided appConfig and populates the provides maps with found
+ * files and resources
+ */
+export function readFiles(folder: string, appConfig: AppConfig, resourceMap: ResourceMapType, fileMap: FileMapType) {
   const files = fs.readdirSync(folder);
-  const result: FileEntry[] = [];
+  const result: string[] = [];
+  const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
 
   files.forEach(file => {
     const fileEntry: FileEntry = {
       name: file,
-      folder,
+      filePath: path.join(folder, file).substr(rootFolder.length),
       highlight: false,
       selected: false,
       expanded: false,
@@ -31,43 +30,43 @@ export function readFiles(
     };
 
     const filePath = path.join(folder, file);
-    if (fs.statSync(filePath).isDirectory()) {
-      const folderPath = filePath.substr(rootFolder.length + 1);
-      if (appConfig.scanExcludes.some(e => micromatch.isMatch(folderPath, e))) {
-        fileEntry.excluded = true;
-      } else {
-        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, fileEntry, rootFolder);
-      }
-    } else if (appConfig.fileIncludes.some(e => file.toLowerCase().endsWith(e))) {
+    if (appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e))) {
+      fileEntry.excluded = true;
+    } else if (fs.statSync(filePath).isDirectory()) {
+      fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap);
+    } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
       try {
-        const resources = extractK8sResourcesFromFile(rootFolder, fileEntry);
-        if (Object.keys(resources).length > 0) {
-          fileEntry.resourceIds = fileEntry.resourceIds || [];
-          Object.keys(resources).forEach(id => {
-            fileEntry.resourceIds?.push(id);
-            resourceMap[id] = resources[id];
-          });
-        }
+        extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+          resourceMap[resource.id] = resource;
+        });
       } catch (e) {
         log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
-        if (fileEntry.resourceIds) {
-          fileEntry.resourceIds.forEach(entry => delete resourceMap[entry]);
-          fileEntry.resourceIds = undefined;
-        }
       }
     }
 
-    fileMap.set(filePath, fileEntry);
-    result.push(fileEntry);
+    fileMap[fileEntry.filePath] = fileEntry;
+    result.push(fileEntry.name);
   });
 
   return result;
 }
 
+/**
+ * Returns all resources for the specified path
+ */
+
+export function getResourcesInFile(filePath: string, resourceMap: ResourceMapType) {
+  return Object.values(resourceMap).filter(r => r.filePath === filePath);
+}
+
+/**
+ * Extracts all resources from the specified text content
+ */
+
 export function extractK8sResources(fileContent: string, filePath: string) {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllDocuments(fileContent, {lineCounter});
-  const result: ResourceMapType = {};
+  const result: K8sResource[] = [];
 
   if (documents) {
     let docIndex = 0;
@@ -80,7 +79,7 @@ export function extractK8sResources(fileContent: string, filePath: string) {
         if (content && content.apiVersion && content.kind) {
           let resource: K8sResource = {
             name: createResourceName(filePath, content),
-            path: filePath,
+            filePath,
             id: uuidv4(),
             kind: content.kind,
             version: content.apiVersion,
@@ -98,7 +97,7 @@ export function extractK8sResources(fileContent: string, filePath: string) {
             resource.namespace = content.metadata.namespace;
           }
 
-          result[resource.id] = resource;
+          result.push(resource);
         }
       }
       docIndex += 1;
@@ -107,51 +106,51 @@ export function extractK8sResources(fileContent: string, filePath: string) {
   return result;
 }
 
-function extractK8sResourcesFromFile(rootFolder: string, fileEntry: FileEntry) {
-  const filePath = path.join(fileEntry.folder, fileEntry.name);
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-  return extractK8sResources(fileContent, filePath);
+export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMapType) {
+  return path.join(
+    fileMap[ROOT_FILE_ENTRY].filePath,
+    resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep))
+  );
 }
 
-export function getFileEntryForPath(filePath: string, rootEntry: FileEntry) {
-  let current = rootEntry;
-  filePath.split(path.sep).forEach(segment => {
-    const child = current.children?.find(e => e.name === segment);
-    if (child) {
-      current = child;
-    } else {
-      return undefined;
+export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapType) {
+  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, resource.filePath);
+}
+
+/**
+ * Extracts all resources from the specified file
+ */
+
+function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapType) {
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+  const rootEntry = fileMap[ROOT_FILE_ENTRY];
+  return extractK8sResources(fileContent, rootEntry ? filePath.substr(rootEntry.filePath.length) : filePath);
+}
+
+/**
+ * Returns a list of all FileEntries "leading up" to (and including) the specified path
+ */
+
+export function getFileEntries(filePath: string, fileMap: FileMapType) {
+  let parent = fileMap[ROOT_FILE_ENTRY];
+  const result: FileEntry[] = [];
+  console.log(`getting file entries for ${filePath}`);
+  filePath.split(path.sep).forEach(pathSegment => {
+    if (parent.children?.includes(pathSegment)) {
+      const child = fileMap[path.join(parent === fileMap[ROOT_FILE_ENTRY] ? path.sep : parent.filePath, pathSegment)];
+      if (child) {
+        result.push(child);
+        parent = child;
+      }
     }
   });
-
-  return current;
-}
-
-export function getFileEntryForResource(resource: K8sResource, rootEntry: FileEntry) {
-  const entries = getFileEntries(resource, rootEntry);
-  return entries.length > 0 ? entries[entries.length - 1] : undefined;
-}
-
-function getFileEntries(resource: K8sResource, rootEntry: FileEntry) {
-  let parent = rootEntry;
-  const result: FileEntry[] = [];
-  if (resource.path) {
-    const segments = resource.path.substr(rootEntry.folder.length + 1).split(path.sep);
-    segments.forEach(pathSegment => {
-      const file = parent.children?.find(child => child.name === pathSegment);
-      if (file) {
-        result.push(file);
-        parent = file;
-      }
-    });
-  }
 
   return result;
 }
 
-export function selectResourceFileEntry(resource: K8sResource, rootEntry: FileEntry) {
+export function selectResourceFileEntry(resource: K8sResource, fileMap: FileMapType) {
   let result = '';
-  getFileEntries(resource, rootEntry).forEach(e => {
+  getFileEntries(resource.filePath, fileMap).forEach(e => {
     result = path.join(result, e.name);
     if (e.children) {
       e.expanded = true;

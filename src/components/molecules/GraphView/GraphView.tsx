@@ -75,7 +75,7 @@ const getLayoutedElements = (elements: any[]): any => {
 const GraphView = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
   const graphAreaHeight = parseInt(editorHeight, 10) - 150;
-  const rootFolder = useAppSelector(state => state.main.rootFolder);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const activeResources = useSelector(selectActiveResources);
   const previewResource = useAppSelector(state => state.main.previewResource);
@@ -109,7 +109,7 @@ const GraphView = (props: {editorHeight: string}) => {
     });
     updateGraph(data);
     setNodes(data);
-  }, [rootFolder, activeResources]);
+  }, [fileMap, activeResources]);
 
   useEffect(() => {
     setNodes(nds =>
