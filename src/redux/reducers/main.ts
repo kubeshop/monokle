@@ -78,6 +78,7 @@ export const mainSlice = createSlice({
 
               entry.resourceIds = entry.resourceIds || [];
               entry.resourceIds?.push(r.id);
+              r.highlight = true;
             });
 
             reprocessResources([], state.resourceMap, state.rootEntry);
