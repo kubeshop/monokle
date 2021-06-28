@@ -2,13 +2,9 @@ import React, {useEffect, useState} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
-import {parseAllDocuments, stringify} from 'yaml';
 import {useMeasure} from 'react-use';
 import styled from 'styled-components';
-
-import {PREVIEW_PREFIX} from '@src/constants';
-import {useAppSelector} from '@redux/hooks';
-
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import 'monaco-yaml/lib/esm/monaco.contribution';
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor';
@@ -19,10 +15,11 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
-import {loadResource} from '@redux/utils/fileEntry';
-import {isKustomizationResource} from '@redux/utils/resource';
-import {JSONPath} from 'jsonpath-plus';
 import {getResourceSchema} from '@redux/utils/schema';
+import {Button} from 'react-bootstrap';
+import {logMessage} from '@redux/utils/log';
+import {updateFileEntry, updateResource} from '@redux/reducers/main';
+import {parseAllDocuments} from 'yaml';
 
 // @ts-ignore
 window.MonacoEnvironment = {
@@ -52,12 +49,113 @@ const Monaco = (props: {editorHeight: string}) => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [editor, setEditor] = useState<monaco.editor.IEditor>();
-  const [code, setCode] = useState('p1: ');
+  const [code, setCode] = useState('');
   const [ref, {width}] = useMeasure<HTMLDivElement>();
+  const [isDirty, setDirty] = useState(false);
+  const [hasWarnings, setWarnings] = useState(false);
+  const [isValid, setValid] = useState(true);
+  const isInPreviewMode = !!useAppSelector(state => state.main.previewResource);
+  const dispatch = useAppDispatch();
+
+  function onDidChangeMarkers(e: monaco.Uri[]) {
+    const flag = monaco.editor.getModelMarkers({}).length > 0;
+    setWarnings(flag);
+  }
+
+  function onChangeCursorSelection(e: any) {
+    // console.log(e);
+  }
 
   function editorDidMount(e: any, m: any) {
     setEditor(e);
+
+    // @ts-ignore
+    monaco.editor.onDidChangeMarkers(onDidChangeMarkers);
+
+    e.updateOptions({tabSize: 2});
+    e.onDidChangeCursorSelection(onChangeCursorSelection);
+    e.revealLineNearTop(1);
+    e.setSelection(new monaco.Selection(0, 0, 0, 0));
   }
+
+  function onChange(newValue: any, e: any) {
+    setDirty(true);
+    setCode(newValue);
+
+    // this will slow things down if document gets large - need to find a better solution...
+    setValid(!parseAllDocuments(newValue).some(d => d.errors.length > 0));
+  }
+
+  function saveContent() {
+    // @ts-ignore
+    const value = editor.getValue();
+
+    // is a file and no resource selected?
+    if (selectedPath && !selectedResource) {
+      try {
+        dispatch(updateFileEntry({path: selectedPath, content: value}));
+      } catch (e) {
+        logMessage(`Failed to update file ${e}`, dispatch);
+      }
+    } else if (selectedResource && resourceMap[selectedResource]) {
+      try {
+        dispatch(updateResource({resourceId: selectedResource, content: value.toString()}));
+      } catch (e) {
+        logMessage(`Failed to update resource ${e}`, dispatch);
+      }
+    }
+  }
+
+  useEffect(() => {
+    let newCode = '';
+    if (selectedResource) {
+      const resource = resourceMap[selectedResource];
+      if (resource) {
+        newCode = resource.text;
+      }
+    } else if (selectedPath) {
+      const filePath = path.join(rootFolder, selectedPath);
+      if (!fs.statSync(filePath).isDirectory()) {
+        newCode = fs.readFileSync(filePath, 'utf8');
+      }
+    }
+
+    setCode(newCode);
+    setDirty(false);
+  }, [rootFolder, selectedPath, selectedResource, resourceMap]);
+
+  const options = {
+    selectOnLineNumbers: true,
+    readOnly: isInPreviewMode,
+  };
+
+  useEffect(() => {
+    let resourceSchema;
+
+    if (selectedResource) {
+      const resource = resourceMap[selectedResource];
+      if (resource) {
+        resourceSchema = getResourceSchema(resource);
+      }
+    }
+
+    yaml &&
+      yaml.yamlDefaults.setDiagnosticsOptions({
+        validate: true,
+        enableSchemaRequest: true,
+        hover: true,
+        completion: true,
+        isKubernetes: true,
+        format: true,
+        schemas: [
+          {
+            uri: 'http://monokle/k8s.json', // id of the first schema
+            fileMatch: ['*'], // associate with our model
+            schema: resourceSchema || {},
+          },
+        ],
+      });
+  }, [selectedResource, resourceMap]);
 
   useEffect(() => {
     if (editor) {
@@ -66,84 +164,29 @@ const Monaco = (props: {editorHeight: string}) => {
     }
   }, [editor, code]);
 
-  function onChange(newValue: any, e: any) {
-    console.log('onChange', newValue, e);
-  }
-
-  useEffect(() => {
-    let newCode = '';
-    if (selectedPath) {
-      const filePath = path.join(rootFolder, selectedPath);
-      if (selectedResource && resourceMap[selectedResource]) {
-        const resource = resourceMap[selectedResource];
-
-        if (fs.statSync(filePath).isFile()) {
-          // reparse since we can't save the parsed document object in the state (non-serializable)
-          const documents = parseAllDocuments(fs.readFileSync(filePath, 'utf8'));
-          if (documents && resource.docIndex < documents.length) {
-            newCode = documents[resource.docIndex].toString();
-          }
-        }
-      } else {
-        const p = path.join(rootFolder, selectedPath);
-        if (!fs.statSync(p).isDirectory()) {
-          newCode = fs.readFileSync(p, 'utf8');
-        }
-      }
-    } else if (selectedResource) {
-      const resource = resourceMap[selectedResource];
-      if (resource) {
-        newCode = stringify(resource.content);
-      }
-    }
-
-    setCode(newCode);
-  }, [rootFolder, selectedPath, selectedResource, resourceMap]);
-
-  const options = {
-    selectOnLineNumbers: true,
-    readOnly: selectedResource !== undefined && resourceMap[selectedResource].path.startsWith(PREVIEW_PREFIX),
-  };
-
-  useEffect(() => {
-    if (selectedResource && resourceMap[selectedResource]) {
-      const resource = resourceMap[selectedResource];
-      const schema = getResourceSchema(resource);
-
-      yaml &&
-        yaml.yamlDefaults.setDiagnosticsOptions({
-          validate: true,
-          enableSchemaRequest: true,
-          hover: true,
-          completion: true,
-          isKubernetes: true,
-          format: true,
-          schemas: [
-            {
-              uri: 'http://monokle/k8s.json', // id of the first schema
-              fileMatch: ['*'], // associate with our model
-              schema,
-            },
-          ],
-        });
-    }
-  }, [selectedResource, resourceMap]);
-
-  /* tslint:disable-next-line */
   return (
-    <MonacoContainer ref={ref}>
-      <MonacoEditor
-        width={width}
-        height={editorHeight}
-        language="yaml"
-        theme="vs-light"
-        value={code}
-        options={options}
-        onChange={onChange}
-        editorDidMount={editorDidMount}
-      />
-    </MonacoContainer>
+    <>
+      <Button
+        variant={hasWarnings ? 'outline-danger' : 'outline-dark'}
+        size="sm"
+        disabled={!isDirty || !isValid}
+        onClick={saveContent}
+      >
+        Save Changes
+      </Button>
+      <MonacoContainer ref={ref}>
+        <MonacoEditor
+          width={width}
+          height={editorHeight}
+          language="yaml"
+          theme="vs-light"
+          value={code}
+          options={options}
+          onChange={onChange}
+          editorDidMount={editorDidMount}
+        />
+      </MonacoContainer>
+    </>
   );
 };
-
 export default Monaco;

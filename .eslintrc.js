@@ -10,7 +10,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint', 'react-hooks', 'prettier'],
+  plugins: ['react', '@typescript-eslint', 'react-hooks', 'unused-imports', 'prettier'],
   rules: {
     'no-underscore-dangle': 'off',
     'react/jsx-uses-react': 'off',
@@ -28,6 +28,7 @@ module.exports = {
     'comma-dangle': 'off',
     'no-useless-escape': 'off',
     'object-curly-newline': 'off',
+    'unused-imports/no-unused-imports-ts': 'error',
     'react/jsx-max-props-per-line': [1, {maximum: 1, when: 'multiline'}],
     // Disabled old no-shadow rule as seems to be communicated by ESLint while working with TS.
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-shadow.md

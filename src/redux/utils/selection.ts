@@ -1,6 +1,7 @@
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
+import {isUnsatisfiedRef} from '@redux/utils/resource';
 
 export function getKustomizationRefs(resourceMap: ResourceMapType, kustomizationId: string, selectParent: boolean) {
   let linkedResourceIds: string[] = [];
@@ -13,12 +14,14 @@ export function getKustomizationRefs(resourceMap: ResourceMapType, kustomization
           (selectParent && r.refType === ResourceRefType.KustomizationParent)
       )
       .forEach(r => {
-        const target = resourceMap[r.targetResourceId];
-        if (target) {
-          linkedResourceIds.push(r.targetResourceId);
+        if (r.target) {
+          const target = resourceMap[r.target];
+          if (target) {
+            linkedResourceIds.push(r.target);
 
-          if (target.kind === 'Kustomization' && r.refType === ResourceRefType.KustomizationResource) {
-            linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.targetResourceId, false));
+            if (target.kind === 'Kustomization' && r.refType === ResourceRefType.KustomizationResource) {
+              linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target, false));
+            }
           }
         }
       });
@@ -29,9 +32,11 @@ export function getKustomizationRefs(resourceMap: ResourceMapType, kustomization
 
 export function getLinkedResources(resource: K8sResource) {
   const linkedResourceIds: string[] = [];
-  resource.refs?.forEach(ref => {
-    linkedResourceIds.push(ref.targetResourceId);
-  });
+  resource.refs
+    ?.filter(ref => !isUnsatisfiedRef(ref.refType))
+    .forEach(ref => {
+      linkedResourceIds.push(ref.target);
+    });
 
   return linkedResourceIds;
 }

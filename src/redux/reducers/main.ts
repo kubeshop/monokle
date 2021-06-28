@@ -2,12 +2,14 @@ import {exec} from 'child_process';
 import log from 'loglevel';
 // @ts-ignore
 import shellPath from 'shell-path';
-import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
+import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
 import {PREVIEW_PREFIX} from '@src/constants';
 import {AppConfig} from '@models/appconfig';
 import {AppState, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
+import {parseDocument} from 'yaml';
+import fs from 'fs';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -16,9 +18,15 @@ import {
   highlightChildren,
   getKustomizationRefs,
 } from '../utils/selection';
-import {extractK8sResources, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
+import {extractK8sResources, getFileEntryForPath, readFiles, selectResourceFileEntry} from '../utils/fileEntry';
 import {processKustomizations} from '../utils/kustomize';
-import {isKustomizationResource, processConfigMaps, processServices} from '../utils/resource';
+import {
+  isKustomizationResource,
+  processParsedResources,
+  recalculateResourceRanges,
+  reprocessResources,
+  saveResource,
+} from '../utils/resource';
 import {AppDispatch} from '../store';
 
 type SetRootFolderPayload = {
@@ -33,10 +41,71 @@ type SetPreviewDataPayload = {
   previewResources?: ResourceMapType;
 };
 
+export type UpdateResourcePayload = {
+  resourceId: string;
+  content: string;
+};
+
+export type UpdateFileEntryPayload = {
+  path: string;
+  content: string;
+};
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
+    updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
+      try {
+        const entry = getFileEntryForPath(action.payload.path, state.rootEntry);
+        if (entry) {
+          const filePath = path.join(state.rootFolder, action.payload.path);
+
+          if (!fs.statSync(filePath).isDirectory()) {
+            fs.writeFileSync(filePath, action.payload.content);
+
+            if (entry.resourceIds) {
+              entry.resourceIds?.forEach(id => {
+                delete state.resourceMap[id];
+              });
+
+              entry.resourceIds = undefined;
+            }
+
+            const map = extractK8sResources(action.payload.content, filePath);
+            Object.values(map).forEach(r => {
+              state.resourceMap[r.id] = r;
+
+              entry.resourceIds = entry.resourceIds || [];
+              entry.resourceIds?.push(r.id);
+              r.highlight = true;
+            });
+
+            reprocessResources([], state.resourceMap, state.rootEntry);
+          }
+        } else {
+          log.error(`Could not find FileEntry for ${action.payload.path}`);
+        }
+      } catch (e) {
+        log.error(e);
+        return original(state);
+      }
+    },
+    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
+      try {
+        const resource = state.resourceMap[action.payload.resourceId];
+        if (resource) {
+          const value = saveResource(resource, action.payload.content);
+          resource.text = value;
+          resource.content = parseDocument(value).toJS();
+          recalculateResourceRanges(resource, state, value);
+          reprocessResources([resource.id], state.resourceMap, state.rootEntry);
+        }
+      } catch (e) {
+        log.error(e);
+        return original(state);
+      }
+    },
     rootFolderSet: (state: Draft<AppState>, action: PayloadAction<SetRootFolderPayload>) => {
       if (action.payload.rootEntry) {
         state.resourceMap = action.payload.resourceMap;
@@ -120,11 +189,6 @@ export const mainSlice = createSlice({
   },
 });
 
-function processParsedResources(resourceMap: ResourceMapType) {
-  processServices(resourceMap);
-  processConfigMaps(resourceMap);
-}
-
 export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
   return async (dispatch: AppDispatch) => {
     const folderPath = path.parse(rootFolder);
@@ -200,5 +264,5 @@ export function previewKustomization(id: string) {
   };
 }
 
-export const {selectK8sResource, selectFile} = mainSlice.actions;
+export const {selectK8sResource, selectFile, updateResource, updateFileEntry} = mainSlice.actions;
 export default mainSlice.reducer;

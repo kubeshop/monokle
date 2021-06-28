@@ -9,6 +9,7 @@ import FormEditor from '@molecules/FormEditor';
 import GraphView from '@molecules/GraphView';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {applyResource} from '@actions/common/apply';
+import {useEffect, useState} from 'react';
 
 const ActionContainer = styled(Container)`
   background: ${colors.appNormalBackgroound};
@@ -53,12 +54,19 @@ const ActionsPane = (props: {actionHeight: string}) => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const dispatch = useAppDispatch();
+  const [key, setKey] = useState('source');
 
   async function applySelectedResource() {
     if (selectedResource) {
       applyResource(selectedResource, resourceMap, dispatch);
     }
   }
+
+  useEffect(() => {
+    if (key === 'form' && !selectedResource) {
+      setKey('source');
+    }
+  }, [selectedResource]);
 
   return (
     <ActionContainer>
@@ -77,18 +85,25 @@ const ActionsPane = (props: {actionHeight: string}) => {
       </SectionRow>
       <SectionRow>
         <SectionCol>
-          <Tabs defaultActiveKey="source" id="uncontrolled-tab-example">
+          <Tabs
+            defaultActiveKey="source"
+            id="uncontrolled-tab-example"
+            activeKey={key}
+            onSelect={k => {
+              if (k) setKey(k);
+            }}
+          >
             <Tab eventKey="source" title="Source">
-              <Monaco editorHeight={actionHeight}/>
+              <Monaco editorHeight={actionHeight} />
             </Tab>
-            <Tab eventKey="form" title="Form">
+            <Tab eventKey="form" title="Form" disabled={!selectedResource}>
               <FormEditor />
             </Tab>
             <Tab eventKey="graph" title="Graph">
-              <GraphView editorHeight={actionHeight}/>
+              <GraphView editorHeight={actionHeight} />
             </Tab>
             <Tab eventKey="logger" title="Logger">
-              <LogViewer editorHeight={actionHeight}/>
+              <LogViewer editorHeight={actionHeight} />
             </Tab>
           </Tabs>
         </SectionCol>

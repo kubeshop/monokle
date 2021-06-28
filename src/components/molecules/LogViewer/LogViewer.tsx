@@ -52,13 +52,13 @@ interface IEditorMinimapOptions {
    */
   scale?: number;
 }
-type EditorMinimapOptions = Readonly<Required<IEditorMinimapOptions>>
+type EditorMinimapOptions = Readonly<Required<IEditorMinimapOptions>>;
 
 const LogViewer = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
   const [editor, setEditor] = useState<monaco.editor.IEditor>();
   const code = useSelector(selectLogs);
-  const [ref, { width }] = useMeasure<HTMLDivElement>();
+  const [ref, {width}] = useMeasure<HTMLDivElement>();
 
   function editorDidMount(e: any, m: any) {
     setEditor(e);
@@ -75,13 +75,12 @@ const LogViewer = (props: {editorHeight: string}) => {
     console.log('Logger onChange >>>SHOULD NOT BE CALLED<<<', newValue, e); // should never happen
   }
 
-
   const options = {
     selectOnLineNumbers: true,
     readOnly: true,
-    lineNumbers: "off" as LineNumbersType,
+    lineNumbers: 'off' as LineNumbersType,
     minimap: {
-      enabled: false
+      enabled: false,
     } as EditorMinimapOptions,
     roundedSelection: false,
     scrollBeyondLastLine: false,
@@ -93,7 +92,7 @@ const LogViewer = (props: {editorHeight: string}) => {
       <MonacoEditor
         width={width}
         height={editorHeight}
-        language="yaml"
+        language="plaintext"
         theme="vs-light"
         value={code}
         options={options}

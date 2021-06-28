@@ -4,10 +4,10 @@ import ReactFlow, {Edge, Node, isNode, Position, MiniMap, ReactFlowProvider} fro
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import dagre from 'dagre';
-import { useMeasure } from 'react-use';
+import {useMeasure} from 'react-use';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {isIncomingRef} from '@redux/utils/resource';
+import {isIncomingRef, isUnsatisfiedRef} from '@redux/utils/resource';
 import {selectK8sResource} from '@redux/reducers/main';
 import {selectActiveResources} from '@redux/selectors';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
@@ -27,9 +27,9 @@ function mapResourceToElement(resource: K8sResource): Node {
 
 function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
   return {
-    id: `${source.id}-${ref.targetResourceId}-${ref.refType}`,
+    id: `${source.id}-${ref.target}-${ref.refType}`,
     source: source.id,
-    target: ref.targetResourceId,
+    target: ref.target,
     animated: false,
     type: 'smoothstep',
   };
@@ -83,7 +83,7 @@ const GraphView = (props: {editorHeight: string}) => {
   const dispatch = useAppDispatch();
   const [reactFlow, setReactFlow] = useState();
   const [nodes, setNodes] = useState<any[]>([]);
-  const [containerRef, { width }] = useMeasure<HTMLDivElement>();
+  const [containerRef, {width}] = useMeasure<HTMLDivElement>();
 
   function updateGraph(data: any[]) {
     if (reactFlow) {
@@ -94,7 +94,9 @@ const GraphView = (props: {editorHeight: string}) => {
   function getElementData(resource: K8sResource) {
     let data: any[] = [mapResourceToElement(resource)];
     if (resource.refs) {
-      const refs = resource.refs.map(ref => mapRefToElement(resource, ref));
+      const refs = resource.refs
+        .filter(ref => !isUnsatisfiedRef(ref.refType))
+        .map(ref => mapRefToElement(resource, ref));
       data = data.concat(refs);
     }
     return data;
@@ -132,13 +134,12 @@ const GraphView = (props: {editorHeight: string}) => {
     }
   };
 
-
   return (
     <Row ref={containerRef}>
       <span style={{width, height: editorHeight}}>
         <div className="zoompanflow">
           <ReactFlowProvider>
-            <div className="reactflow-wrapper" style={{width:600, height: graphAreaHeight}}>
+            <div className="reactflow-wrapper" style={{width: 600, height: graphAreaHeight}}>
               <ReactFlow
                 minZoom={0.1}
                 panOnScroll

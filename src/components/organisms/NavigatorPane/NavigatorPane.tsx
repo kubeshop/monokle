@@ -8,7 +8,7 @@ import '@styles/NavigatorPane.css';
 import {appColors as colors} from '@styles/AppColors';
 import {previewKustomization, selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {getNamespaces, hasIncomingRefs, hasOutgoingRefs} from '@redux/utils/resource';
+import {getNamespaces, hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resource';
 import {setFilterObjects} from '@redux/reducers/appConfig';
 import {selectKustomizations, selectActiveResources} from '@redux/selectors';
 import {K8sResource} from '@models/k8sresource';
@@ -219,6 +219,7 @@ const NavigatorPane = () => {
                                         {hasIncomingRefs(item) ? '>> ' : ''}
                                         {item.name}
                                         {hasOutgoingRefs(item) ? ' >>' : ''}
+                                        {hasUnsatisfiedRefs(item) ? ' ??' : ''}
                                       </div>
                                     );
                                   })}

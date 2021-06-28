@@ -18,6 +18,26 @@ const Sidebar = (reactFlow: any) => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const settings = useAppSelector(state => state.config.settings);
 
+  const performTransform = useCallback(
+    (transform: any) => {
+      const {
+        position: [x, y],
+        zoom,
+      } = reactFlow.reactFlow.toObject();
+
+      new Tween({x: -x + 300, y: -y + 300, zoom})
+        .to(transform, TRANSITION_TIME)
+        .easing(EASING)
+        // @ts-ignore
+        .on('update', ({x: xPos, y: yPos, zoom: zoomLevel}) =>
+          // @ts-ignore
+          zoomPanHelper.setCenter(xPos, yPos, zoomLevel)
+        )
+        .start();
+    },
+    [zoomPanHelper, reactFlow.reactFlow]
+  );
+
   const selectSelectedResource = useCallback(() => {
     if (selectedResource) {
       const {nodes} = store.getState();
@@ -36,7 +56,7 @@ const Sidebar = (reactFlow: any) => {
         }
       }
     }
-  }, [selectedResource, performTransform, store]);
+  }, [selectedResource, store, performTransform]);
 
   useEffect(() => {
     if (settings.autoZoomGraphOnSelection) {
@@ -67,25 +87,8 @@ const Sidebar = (reactFlow: any) => {
         })
         .start();
     },
-    [zoomPanHelper, store, performTransform, store]
+    [zoomPanHelper, store]
   );
-
-  function performTransform(transform: any) {
-    const {
-      position: [x, y],
-      zoom,
-    } = reactFlow.reactFlow.toObject();
-
-    new Tween({x: -x + 300, y: -y + 300, zoom})
-      .to(transform, TRANSITION_TIME)
-      .easing(EASING)
-      // @ts-ignore
-      .on('update', ({x: xPos, y: yPos, zoom: zoomLevel}) =>
-        // @ts-ignore
-        zoomPanHelper.setCenter(xPos, yPos, zoomLevel)
-      )
-      .start();
-  }
 
   return (
     <aside>
