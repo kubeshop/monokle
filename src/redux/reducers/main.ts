@@ -10,30 +10,26 @@ import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
-import {K8sResource} from '@models/k8sresource';
+import {monitorRootFolder} from '@redux/utils/fileMonitor';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
   clearResourceSelections,
-  getLinkedResources,
   highlightChildrenResources,
-  getKustomizationRefs,
+  updateSelectionAndHighlights,
 } from '../utils/selection';
 import {
+  addFile,
+  deleteFile,
   extractK8sResources,
   getAllFileEntriesForPath,
+  getFileEntryForAbsolutePath,
   getResourcesInFile,
   readFiles,
-  selectResourceFileEntry,
+  updateFile,
 } from '../utils/fileEntry';
 import {processKustomizations} from '../utils/kustomize';
-import {
-  isKustomizationResource,
-  processParsedResources,
-  recalculateResourceRanges,
-  reprocessResources,
-  saveResource,
-} from '../utils/resource';
+import {processParsedResources, recalculateResourceRanges, reprocessResources, saveResource} from '../utils/resource';
 import {AppDispatch} from '../store';
 
 type SetRootFolderPayload = {
@@ -61,6 +57,35 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
+    fileAdded: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      let filePath = action.payload;
+      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+      if (fileEntry) {
+        log.info(`added file ${filePath} already exists - updating`);
+        updateFile(filePath, fileEntry, state);
+      } else {
+        log.info(`adding file ${filePath}`);
+        addFile(filePath, state);
+      }
+    },
+    fileChanged: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      let filePath = action.payload;
+      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+      if (fileEntry) {
+        updateFile(filePath, fileEntry, state);
+      } else {
+        log.warn(`changed file ${filePath} not known - ignoring..`);
+      }
+    },
+    fileRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      let filePath = action.payload;
+      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+      if (fileEntry) {
+        deleteFile(filePath, state, fileEntry);
+      } else {
+        log.warn(`removed file ${filePath} not known - ignoring..`);
+      }
+    },
     updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
       try {
         const entry = state.fileMap[action.payload.path];
@@ -192,6 +217,8 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
     processKustomizations(resourceMap, fileMap);
     processParsedResources(resourceMap);
 
+    monitorRootFolder(rootFolder, appConfig, dispatch);
+
     dispatch(
       mainSlice.actions.rootFolderSet({
         appConfig,
@@ -255,36 +282,6 @@ export function previewKustomization(id: string) {
   };
 }
 
-/**
- * Ensures the correct resources are selected/highlighted when selecting the
- * specified resource
- */
-
-function updateSelectionAndHighlights(state: AppState, resource: K8sResource) {
-  clearResourceSelections(state.resourceMap, resource.id);
-  if (!state.previewResource) {
-    clearFileSelections(state.fileMap);
-  }
-  state.selectedResource = undefined;
-
-  if (resource.selected) {
-    resource.selected = false;
-  } else {
-    resource.selected = true;
-    state.selectedResource = resource.id;
-    state.selectedPath = selectResourceFileEntry(resource, state.fileMap);
-
-    if (isKustomizationResource(resource)) {
-      getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {
-        state.resourceMap[e].highlight = true;
-      });
-    } else {
-      getLinkedResources(resource).forEach(e => {
-        state.resourceMap[e].highlight = true;
-      });
-    }
-  }
-}
-
-export const {selectK8sResource, selectFile, updateResource, updateFileEntry} = mainSlice.actions;
+export const {selectK8sResource, selectFile, updateResource, updateFileEntry, fileAdded, fileChanged, fileRemoved} =
+  mainSlice.actions;
 export default mainSlice.reducer;

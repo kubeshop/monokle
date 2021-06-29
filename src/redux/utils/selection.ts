@@ -1,8 +1,9 @@
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
-import {getChildFilePath, getResourcesInFile} from '@redux/utils/fileEntry';
+import {getChildFilePath, getResourcesInFile, selectResourceFileEntry} from '@redux/utils/fileEntry';
 import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
+import {isKustomizationResource} from '@redux/utils/resource';
 
 /**
  * Gets all resources directly linked to by a kustomization, including transient resources
@@ -90,4 +91,35 @@ export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: Re
         highlightChildrenResources(child, resourceMap, fileMap);
       }
     });
+}
+
+/**
+ * Ensures the correct resources are selected/highlighted when selecting the
+ * specified resource
+ */
+
+export function updateSelectionAndHighlights(state: AppState, resource: K8sResource) {
+  clearResourceSelections(state.resourceMap, resource.id);
+  if (!state.previewResource) {
+    clearFileSelections(state.fileMap);
+  }
+  state.selectedResource = undefined;
+
+  if (resource.selected) {
+    resource.selected = false;
+  } else {
+    resource.selected = true;
+    state.selectedResource = resource.id;
+    state.selectedPath = selectResourceFileEntry(resource, state.fileMap);
+
+    if (isKustomizationResource(resource)) {
+      getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {
+        state.resourceMap[e].highlight = true;
+      });
+    } else {
+      getLinkedResources(resource).forEach(e => {
+        state.resourceMap[e].highlight = true;
+      });
+    }
+  }
 }
