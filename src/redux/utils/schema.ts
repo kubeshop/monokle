@@ -9,6 +9,9 @@ const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
 // search for schema kinds with these prefixes
 const kindPrefixes = ['io.k8s.api.apps.v1', 'io.k8s.api.rbac.v1', 'io.k8s.api.core.v1'];
 
+/**
+ * Returns a JSON Schema for the specified resource kind
+ */
 export function getResourceSchema(resource: K8sResource) {
   if (isKustomizationResource(resource)) {
     return kustomizeSchema;

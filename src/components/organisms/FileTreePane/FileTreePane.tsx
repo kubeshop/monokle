@@ -11,7 +11,7 @@ import {appColors as colors} from '@styles/AppColors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setRootFolder} from '@redux/reducers/main';
 import {FileEntry} from '@models/fileentry';
-import {getResourcesInFile, getChildPath} from '@redux/utils/fileEntry';
+import {getResourcesInFile, getChildFilePath} from '@redux/utils/fileEntry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 
@@ -39,7 +39,7 @@ const mapTreeNodeFromFileEntry = (
 
   if (fileEntry.children) {
     result.children = fileEntry.children
-      .map(child => fileMap[getChildPath(child, fileEntry, fileMap)])
+      .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
       .filter(childEntry => childEntry)
       .map(childEntry => mapTreeNodeFromFileEntry(childEntry, fileMap, resourceMap));
     result.isOpen = fileEntry.expanded || fileEntry === fileMap[ROOT_FILE_ENTRY];
