@@ -1,11 +1,18 @@
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
-import {isUnsatisfiedRef} from '@redux/utils/resource';
-import {getResourcesInFile} from '@redux/utils/fileEntry';
-import path from 'path';
+import {getChildFilePath, getResourcesInFile} from '@redux/utils/fileEntry';
+import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
 
-export function getKustomizationRefs(resourceMap: ResourceMapType, kustomizationId: string, selectParent: boolean) {
+/**
+ * Gets all resources directly linked to by a kustomization, including transient resources
+ */
+
+export function getKustomizationRefs(
+  resourceMap: ResourceMapType,
+  kustomizationId: string,
+  selectParent: boolean = false
+) {
   let linkedResourceIds: string[] = [];
   const kustomization = resourceMap[kustomizationId];
   if (kustomization && kustomization.refs) {
@@ -16,14 +23,12 @@ export function getKustomizationRefs(resourceMap: ResourceMapType, kustomization
           (selectParent && r.refType === ResourceRefType.KustomizationParent)
       )
       .forEach(r => {
-        if (r.target) {
-          const target = resourceMap[r.target];
-          if (target) {
-            linkedResourceIds.push(r.target);
+        const target = resourceMap[r.target];
+        if (target) {
+          linkedResourceIds.push(r.target);
 
-            if (target.kind === 'Kustomization' && r.refType === ResourceRefType.KustomizationResource) {
-              linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target, false));
-            }
+          if (target.kind === 'Kustomization' && r.refType === ResourceRefType.KustomizationResource) {
+            linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target));
           }
         }
       });
@@ -31,6 +36,10 @@ export function getKustomizationRefs(resourceMap: ResourceMapType, kustomization
 
   return linkedResourceIds;
 }
+
+/**
+ * Gets a resources linked to the specified resource
+ */
 
 export function getLinkedResources(resource: K8sResource) {
   const linkedResourceIds: string[] = [];
@@ -43,14 +52,21 @@ export function getLinkedResources(resource: K8sResource) {
   return linkedResourceIds;
 }
 
-export function clearResourceSelections(resourceMap: ResourceMapType, itemId?: string) {
+/**
+ * Clears all resource highlights and selections except selection for the specified item
+ */
+export function clearResourceSelections(resourceMap: ResourceMapType, excludeItemId?: string) {
   Object.values(resourceMap).forEach(e => {
     e.highlight = false;
-    if (!itemId || e.id !== itemId) {
+    if (!excludeItemId || e.id !== excludeItemId) {
       e.selected = false;
     }
   });
 }
+
+/**
+ * Clear all file selections
+ */
 
 export function clearFileSelections(fileMap: FileMapType) {
   Object.values(fileMap).forEach(e => {
@@ -58,15 +74,20 @@ export function clearFileSelections(fileMap: FileMapType) {
   });
 }
 
-export function highlightChildren(fileEntry: FileEntry, resourceMap: ResourceMapType, fileMap: FileMapType) {
+/**
+ * Highlight all resources in all children of the specified file
+ */
+
+export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: ResourceMapType, fileMap: FileMapType) {
   fileEntry.children
-    ?.map(e => fileMap[path.join(fileEntry.filePath, e)])
+    ?.map(e => fileMap[getChildFilePath(e, fileEntry, fileMap)])
+    .filter(child => child)
     .forEach(child => {
       getResourcesInFile(child.filePath, resourceMap).forEach(e => {
         e.highlight = true;
       });
       if (child.children) {
-        highlightChildren(child, resourceMap, fileMap);
+        highlightChildrenResources(child, resourceMap, fileMap);
       }
     });
 }

@@ -6,8 +6,12 @@ import {FileEntry} from '@models/fileentry';
 import fs from 'fs';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import {processKustomizations} from '@redux/utils/kustomize';
-import {Draft} from '@reduxjs/toolkit';
 import {getAbsoluteResourcePath, getResourcesInFile} from '@redux/utils/fileEntry';
+
+/**
+ * Processes all services in the specified resourceMap and creates
+ * applicable resourcerefs
+ */
 
 export function processServices(resourceMap: ResourceMapType) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(
@@ -27,50 +31,75 @@ export function processServices(resourceMap: ResourceMapType) {
             found = true;
           });
         if (!found) {
-          service.refs = service.refs || [];
-          service.refs.push({refType: ResourceRefType.UnsatisfiedSelector, target: service.content.spec.selector[e]});
+          createResourceRef(service, service.content.spec.selector[e], ResourceRefType.UnsatisfiedSelector);
         }
       });
     }
   });
 }
 
-function linkConfigMap(configMaps: K8sResource[], refName: string, deployment: K8sResource) {
+/**
+ * Adds configmap resourcerefs for specified configMapName to deployment
+ */
+
+function linkConfigMapToDeployment(configMaps: K8sResource[], configMapName: string, deployment: K8sResource) {
   let found = false;
   configMaps
-    .filter(item => item.content.metadata.name === refName)
+    .filter(item => item.content.metadata.name === configMapName)
     .forEach(configMapResource => {
       linkResources(configMapResource, deployment, ResourceRefType.ConfigMapRef, ResourceRefType.ConfigMapConsumer);
       found = true;
     });
   if (!found) {
-    deployment.refs = deployment.refs || [];
-    deployment.refs.push({refType: ResourceRefType.UnsatisfiedConfigMap, target: refName});
+    createResourceRef(deployment, configMapName, ResourceRefType.UnsatisfiedConfigMap);
   }
 }
+
+/**
+ * Processes all configmaps in provided resourceMap and creates
+ * applicable resourcerefs
+ */
 
 export function processConfigMaps(resourceMap: ResourceMapType) {
   const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
     getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
       JSONPath({path: '$..configMapRef.name', json: deployment.content}).forEach((refName: string) => {
-        linkConfigMap(configMaps, refName, deployment);
+        linkConfigMapToDeployment(configMaps, refName, deployment);
       });
 
       JSONPath({path: '$..configMapKeyRef.name', json: deployment.content}).forEach((refName: string) => {
-        linkConfigMap(configMaps, refName, deployment);
+        linkConfigMapToDeployment(configMaps, refName, deployment);
       });
 
       JSONPath({path: '$..volumes[*].configMap.name', json: deployment.content}).forEach((refName: string) => {
-        linkConfigMap(configMaps, refName, deployment);
+        linkConfigMapToDeployment(configMaps, refName, deployment);
       });
     });
   }
 }
 
+/**
+ * Utility function to get all resources of a specific kind
+ */
+
 export function getK8sResources(resourceMap: ResourceMapType, type: string) {
   return Object.values(resourceMap).filter(item => item.kind === type);
 }
+
+/**
+ * Adds a resource ref with the specified type/target to the specified resource
+ */
+function createResourceRef(resource: K8sResource, target: string, refType: ResourceRefType) {
+  resource.refs = resource.refs || [];
+  if (!resource.refs.some(ref => ref.refType === refType && ref.target === target)) {
+    resource.refs.push({refType, target});
+  }
+}
+
+/**
+ * Creates bidirectional resourcerefs between two resources
+ */
 
 export function linkResources(
   source: K8sResource,
@@ -78,22 +107,13 @@ export function linkResources(
   sourceRefType: ResourceRefType,
   targetRefType: ResourceRefType
 ) {
-  source.refs = source.refs || [];
-  if (!source.refs.some(ref => ref.refType === sourceRefType && ref.target === target.id)) {
-    source.refs.push({
-      refType: sourceRefType,
-      target: target.id,
-    });
-  }
-
-  target.refs = target.refs || [];
-  if (!target.refs.some(ref => ref.refType === targetRefType && ref.target === source.id)) {
-    target.refs.push({
-      refType: targetRefType,
-      target: source.id,
-    });
-  }
+  createResourceRef(source, target.id, sourceRefType);
+  createResourceRef(target, source.id, targetRefType);
 }
+
+/**
+ * Extracts all unique namespaces from resources in specified resourceMap
+ */
 
 export function getNamespaces(resourceMap: ResourceMapType) {
   const namespaces: string[] = [];
@@ -104,6 +124,10 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   });
   return namespaces;
 }
+
+/**
+ * Creates a UI friendly resource name
+ */
 
 export function createResourceName(filePath: string, content: any) {
   if (content.kind === 'Kustomization') {
@@ -122,9 +146,17 @@ export function createResourceName(filePath: string, content: any) {
   return `${name + content.kind} [${content.apiVersion}]`;
 }
 
+/**
+ * Checks if the specified resource is a kustomization resource
+ */
+
 export function isKustomizationResource(r: K8sResource | undefined) {
   return r && r.kind === 'Kustomization';
 }
+
+/**
+ * Checks if the specified fileEntry is a kustomization file
+ */
 
 export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
   if (fileEntry.name.toLowerCase() === 'kustomization.yaml') {
@@ -135,50 +167,18 @@ export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceM
   return false;
 }
 
-const incomingRefs = [
-  ResourceRefType.KustomizationParent,
-  ResourceRefType.ConfigMapRef,
-  ResourceRefType.SelectedPodName,
-];
-const outgoingRefs = [
-  ResourceRefType.KustomizationResource,
-  ResourceRefType.ConfigMapConsumer,
-  ResourceRefType.ServicePodSelector,
-];
-
-const unsatisfiedRefs = [ResourceRefType.UnsatisfiedConfigMap, ResourceRefType.UnsatisfiedSelector];
-
-export function isIncomingRef(e: ResourceRefType) {
-  return incomingRefs.includes(e);
-}
-
-export function isOutgoingRef(e: ResourceRefType) {
-  return outgoingRefs.includes(e);
-}
-
-export function isUnsatisfiedRef(e: ResourceRefType) {
-  return unsatisfiedRefs.includes(e);
-}
-
-export function hasIncomingRefs(resource: K8sResource) {
-  return resource.refs?.some(e => isIncomingRef(e.refType));
-}
-
-export function hasOutgoingRefs(resource: K8sResource) {
-  return resource.refs?.some(e => isOutgoingRef(e.refType));
-}
-
-export function hasRefs(resource: K8sResource) {
-  return resource.refs?.some(e => isOutgoingRef(e.refType));
-}
-
-export function hasUnsatisfiedRefs(resource: K8sResource) {
-  return resource.refs?.some(e => isUnsatisfiedRef(e.refType));
-}
+/**
+ * Checks if this specified resource is from a file (and not a virtual one)
+ */
 
 function isFileResource(resource: K8sResource) {
   return !resource.filePath.startsWith(PREVIEW_PREFIX);
 }
+
+/**
+ * Saves the specified value to the file of the specified resource - handles both
+ * single and multi-resource files
+ */
 
 export function saveResource(resource: K8sResource, newValue: string, fileMap: FileMapType) {
   let valueToWrite = `${newValue.trim()}\n`;
@@ -208,7 +208,12 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
   return valueToWrite;
 }
 
-// This needs to be more intelligent - brute force for now...
+/**
+ * Reprocesses the specified resourceIds in regard to refs/etc (called after updating...)
+ *
+ * This could be more intelligent - it updates everythign brute force for now...
+ */
+
 export function reprocessResources(resourceIds: string[], resourceMap: ResourceMapType, fileMap: FileMapType) {
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
@@ -234,15 +239,24 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
   processParsedResources(resourceMap);
 }
 
+/**
+ * Establishes refs for all resources in specified resourceMap
+ */
+
 export function processParsedResources(resourceMap: ResourceMapType) {
   processServices(resourceMap);
   processConfigMaps(resourceMap);
 }
 
-export function recalculateResourceRanges(resource: Draft<K8sResource>, state: Draft<AppState>, value: string) {
+/**
+ * udpates resource ranges for all resources in the same file as the specified
+ * resource
+ */
+
+export function recalculateResourceRanges(resource: K8sResource, state: AppState) {
   // if length of value has changed we need to recalculate document ranges for
   // subsequent resource so future saves will be at correct place in document
-  if (resource.range && resource.range.length !== value.length) {
+  if (resource.range && resource.range.length !== resource.text.length) {
     const fileEntry = state.fileMap[resource.filePath];
     if (fileEntry) {
       // get list of resourceIds in file sorted by startPosition
@@ -254,8 +268,8 @@ export function recalculateResourceRanges(resource: Draft<K8sResource>, state: D
 
       let resourceIndex = resourceIds.indexOf(resource.id);
       if (resourceIndex !== -1) {
-        const diff = value.length - resource.range.length;
-        resource.range.length = value.length;
+        const diff = resource.text.length - resource.range.length;
+        resource.range.length = resource.text.length;
 
         while (resourceIndex < resourceIds.length - 1) {
           resourceIndex += 1;

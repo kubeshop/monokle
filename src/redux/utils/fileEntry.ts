@@ -12,7 +12,9 @@ import {createResourceName, uuidv4} from './resource';
 
 /**
  * Reads the provided folder in line with the provided appConfig and populates the provides maps with found
- * files and resources
+ * files and resources.
+ *
+ * Returns the list of filenames (not paths) found in the specified folder
  */
 export function readFiles(folder: string, appConfig: AppConfig, resourceMap: ResourceMapType, fileMap: FileMapType) {
   const files = fs.readdirSync(folder);
@@ -52,7 +54,7 @@ export function readFiles(folder: string, appConfig: AppConfig, resourceMap: Res
 }
 
 /**
- * Returns all resources for the specified path
+ * Returns all resources associated with the specified path
  */
 
 export function getResourcesInFile(filePath: string, resourceMap: ResourceMapType) {
@@ -60,7 +62,7 @@ export function getResourcesInFile(filePath: string, resourceMap: ResourceMapTyp
 }
 
 /**
- * Extracts all resources from the specified text content
+ * Extracts all resources from the specified text content (must be yaml)
  */
 
 export function extractK8sResources(fileContent: string, relativePath: string) {
@@ -108,6 +110,11 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
   return result;
 }
 
+/**
+ * Returns the absolute path to the folder containing the file containing the
+ * specified resource
+ */
+
 export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMapType) {
   return path.join(
     fileMap[ROOT_FILE_ENTRY].filePath,
@@ -115,12 +122,16 @@ export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMa
   );
 }
 
+/**
+ * Returns the absolute path to the file that containing specified resource
+ */
+
 export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapType) {
   return path.join(fileMap[ROOT_FILE_ENTRY].filePath, resource.filePath);
 }
 
 /**
- * Extracts all resources from the specified file
+ * Extracts all resources from the file at the specified path
  */
 
 function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapType) {
@@ -133,12 +144,12 @@ function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapType) {
  * Returns a list of all FileEntries "leading up" to (and including) the specified path
  */
 
-export function getFileEntries(filePath: string, fileMap: FileMapType) {
+export function getAllFileEntriesForPath(filePath: string, fileMap: FileMapType) {
   let parent = fileMap[ROOT_FILE_ENTRY];
-  const result: FileEntry[] = [];
+  const result: FileEntry[] = [parent];
   filePath.split(path.sep).forEach(pathSegment => {
     if (parent.children?.includes(pathSegment)) {
-      const child = fileMap[getChildPath(pathSegment, parent, fileMap)];
+      const child = fileMap[getChildFilePath(pathSegment, parent, fileMap)];
       if (child) {
         result.push(child);
         parent = child;
@@ -149,9 +160,14 @@ export function getFileEntries(filePath: string, fileMap: FileMapType) {
   return result;
 }
 
+/**
+ * Marks the file entry for the specified resource as selected and ensures that all
+ * parent entries are expanded
+ */
+
 export function selectResourceFileEntry(resource: K8sResource, fileMap: FileMapType) {
   let result = '';
-  getFileEntries(resource.filePath, fileMap).forEach(e => {
+  getAllFileEntriesForPath(resource.filePath, fileMap).forEach(e => {
     result = path.join(result, e.name);
     if (e.children) {
       e.expanded = true;
@@ -162,6 +178,10 @@ export function selectResourceFileEntry(resource: K8sResource, fileMap: FileMapT
   return result;
 }
 
+/**
+ * Gets the absolute path to a statically bundled resource in the /resources folder
+ */
+
 export function getStaticResourcePath(resourcePath: string) {
   return process.env.NODE_ENV === 'development'
     ? path.join('resources', resourcePath)
@@ -169,10 +189,18 @@ export function getStaticResourcePath(resourcePath: string) {
       path.join(process.resourcesPath, 'resources', resourcePath);
 }
 
+/**
+ * Loads the static resource at the specified relative path to /resources
+ */
+
 export function loadResource(resourcePath: string) {
   return fs.readFileSync(getStaticResourcePath(resourcePath), 'utf8');
 }
 
-export function getChildPath(child: string, parentEntry: FileEntry, fileMap: FileMapType) {
+/**
+ * Gets the relative path of a child to a specified parent
+ */
+
+export function getChildFilePath(child: string, parentEntry: FileEntry, fileMap: FileMapType) {
   return parentEntry === fileMap[ROOT_FILE_ENTRY] ? path.sep + child : path.join(parentEntry.filePath, child);
 }

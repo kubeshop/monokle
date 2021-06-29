@@ -16,12 +16,12 @@ import {
   clearFileSelections,
   clearResourceSelections,
   getLinkedResources,
-  highlightChildren,
+  highlightChildrenResources,
   getKustomizationRefs,
 } from '../utils/selection';
 import {
   extractK8sResources,
-  getFileEntries,
+  getAllFileEntriesForPath,
   getResourcesInFile,
   readFiles,
   selectResourceFileEntry,
@@ -98,7 +98,7 @@ export const mainSlice = createSlice({
           const value = saveResource(resource, action.payload.content, state.fileMap);
           resource.text = value;
           resource.content = parseDocument(value).toJS();
-          recalculateResourceRanges(resource, state, value);
+          recalculateResourceRanges(resource, state);
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
           resource.selected = false;
           updateSelectionAndHighlights(state, resource);
@@ -138,20 +138,24 @@ export const mainSlice = createSlice({
     selectFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (action.payload.length > 0) {
         const selectedPath = action.payload;
-        const entries = getFileEntries(action.payload, state.fileMap);
-
+        const entries = getAllFileEntriesForPath(action.payload, state.fileMap);
         clearResourceSelections(state.resourceMap);
         clearFileSelections(state.fileMap);
 
         if (entries.length > 0) {
-          const parent = entries[entries.length - 1];
+          entries
+            .filter(e => e.children)
+            .forEach(e => {
+              e.expanded = true;
+            });
 
+          const parent = entries[entries.length - 1];
           getResourcesInFile(parent.filePath, state.resourceMap).forEach(r => {
             r.highlight = true;
           });
 
           if (parent.children) {
-            highlightChildren(parent, state.resourceMap, state.fileMap);
+            highlightChildrenResources(parent, state.resourceMap, state.fileMap);
           }
         }
 
@@ -161,6 +165,10 @@ export const mainSlice = createSlice({
     },
   },
 });
+
+/**
+ * Thunk to set the specified root folder
+ */
 
 export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
   return async (dispatch: AppDispatch) => {
@@ -193,6 +201,10 @@ export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
     );
   };
 }
+
+/**
+ * Thunk to preview a kustomization
+ */
 
 export function previewKustomization(id: string) {
   // eslint-disable-next-line no-unused-vars
@@ -242,6 +254,11 @@ export function previewKustomization(id: string) {
     }
   };
 }
+
+/**
+ * Ensures the correct resources are selected/highlighted when selecting the
+ * specified resource
+ */
 
 function updateSelectionAndHighlights(state: AppState, resource: K8sResource) {
   clearResourceSelections(state.resourceMap, resource.id);
