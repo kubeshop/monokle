@@ -1,13 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import {Col, Container, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 import styled from 'styled-components';
+import Layout from '@atoms/Layout';
+import 'antd/dist/antd.css';
 
 import './App.css';
 import Footer from '@organisms/Footer';
 import ActionsPane from '@organisms/ActionsPane';
 import NavigatorPane from '@organisms/NavigatorPane';
 import FileTreePane from '@organisms/FileTreePane';
-import Header from '@organisms/Header';
+import PageHeader from '@organisms/PageHeader';
 import MessageBox from '@organisms/MessageBox';
 import {Size} from '@models/window';
 
@@ -26,14 +28,6 @@ const ContentRow = styled(Row)`
   overflow-y: hidden;
 `;
 
-const MainContainer = styled(Container)`
-  width: 100%;
-  height: ${props => props.mainHeight || '100px'};
-  padding: 0px;
-  overflow-y: clip;
-`;
-
-
 const App = () => {
   const size: Size = useWindowSize();
 
@@ -43,10 +37,8 @@ const App = () => {
   return (
     <div>
       <MessageBox />
-      <MainContainer mainHeight={mainHeight} fluid>
-        <ContentRow rowHeight='40px'>
-          <Header />
-        </ContentRow>
+      <Layout mainheight={mainHeight} isPageContainer>
+        <PageHeader />
         <ContentRow rowHeight={contentHeight}>
           <ContentColumn sm={3}>
             <FileTreePane />
@@ -63,7 +55,7 @@ const App = () => {
         <ContentRow rowHeight='20px'>
           <Footer />
         </ContentRow>
-      </MainContainer>
+      </Layout>
     </div>
   );
 };
