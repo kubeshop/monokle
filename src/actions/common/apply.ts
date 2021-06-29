@@ -1,6 +1,5 @@
 import {K8sResource} from '@models/k8sresource';
 import {spawn} from 'child_process';
-import {stringify} from 'yaml';
 import {isKustomizationResource} from '@redux/utils/resource';
 import log from 'loglevel';
 // @ts-ignore
@@ -15,6 +14,10 @@ import {getAbsoluteResourceFolder} from '@redux/utils/fileEntry';
 // weird workaround to get all ENV values (accessing process.env directly only returns a subset)
 export const PROCESS_ENV = JSON.parse(JSON.stringify(process)).env;
 
+/**
+ * Invokes kubectl for the content of the specified resource
+ */
+
 function applyK8sResource(resource: K8sResource) {
   const child = spawn('kubectl', ['apply', '-f', '-'], {
     env: {
@@ -24,10 +27,14 @@ function applyK8sResource(resource: K8sResource) {
       KUBECONFIG: PROCESS_ENV.KUBECONFIG,
     },
   });
-  child.stdin.write(stringify(resource.content));
+  child.stdin.write(resource.text);
   child.stdin.end();
   return child;
 }
+
+/**
+ * Invokes kubectl -k for the content of the specified kustomization
+ */
 
 function applyKustomization(resource: K8sResource, fileMap: FileMapType) {
   const folder = getAbsoluteResourceFolder(resource, fileMap);
@@ -42,6 +49,10 @@ function applyKustomization(resource: K8sResource, fileMap: FileMapType) {
   return child;
 }
 
+/**
+ * applies the specified resource and creates corresponding alert
+ */
+
 export async function applyResource(
   resourceId: string,
   resourceMap: ResourceMapType,
@@ -50,7 +61,7 @@ export async function applyResource(
 ) {
   try {
     const resource = resourceMap[resourceId];
-    if (resource && resource.content) {
+    if (resource && resource.text) {
       const child = isKustomizationResource(resource)
         ? applyKustomization(resource, fileMap)
         : applyK8sResource(resource);
