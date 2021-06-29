@@ -2,7 +2,12 @@ import {createSelector} from 'reselect';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from './store';
 import {isKustomizationResource} from './utils/resource';
-import {PREVIEW_PREFIX} from '../constants';
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '../constants';
+
+export const selectRootFolder = createSelector(
+  (state: RootState) => state.main.fileMap,
+  fileMap => fileMap[ROOT_FILE_ENTRY]?.filePath
+);
 
 export const selectAllResources = createSelector(
   (state: RootState) => state.main.resourceMap,
