@@ -65,7 +65,8 @@ export const mainSlice = createSlice({
       try {
         const entry = state.fileMap[action.payload.path];
         if (entry) {
-          const filePath = path.join(state.fileMap[ROOT_FILE_ENTRY].filePath, action.payload.path);
+          let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+          const filePath = path.join(rootFolder, action.payload.path);
 
           if (!fs.statSync(filePath).isDirectory()) {
             fs.writeFileSync(filePath, action.payload.content);
@@ -74,7 +75,7 @@ export const mainSlice = createSlice({
               delete state.resourceMap[r.id];
             });
 
-            const map = extractK8sResources(action.payload.content, filePath);
+            const map = extractK8sResources(action.payload.content, filePath.substring(rootFolder.length));
             Object.values(map).forEach(r => {
               state.resourceMap[r.id] = r;
               r.highlight = true;
@@ -138,7 +139,6 @@ export const mainSlice = createSlice({
       if (action.payload.length > 0) {
         const selectedPath = action.payload;
         const entries = getFileEntries(action.payload, state.fileMap);
-        console.log('entries: ', entries);
 
         clearResourceSelections(state.resourceMap);
         clearFileSelections(state.fileMap);
@@ -146,7 +146,6 @@ export const mainSlice = createSlice({
         if (entries.length > 0) {
           const parent = entries[entries.length - 1];
 
-          console.log(`looking for resources in file ${parent.filePath}`, state.resourceMap);
           getResourcesInFile(parent.filePath, state.resourceMap).forEach(r => {
             r.highlight = true;
           });

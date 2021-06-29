@@ -11,7 +11,7 @@ import {appColors as colors} from '@styles/AppColors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setRootFolder} from '@redux/reducers/main';
 import {FileEntry} from '@models/fileentry';
-import {getResourcesInFile} from '@redux/utils/fileEntry';
+import {getResourcesInFile, getChildPath} from '@redux/utils/fileEntry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 
@@ -38,19 +38,11 @@ const mapTreeNodeFromFileEntry = (
   };
 
   if (fileEntry.children) {
-    if (fileMap[ROOT_FILE_ENTRY] === fileEntry) {
-      result.children = fileEntry.children
-        .map(child => fileMap[path.sep + child])
-        .filter(childEntry => childEntry !== undefined)
-        .map(childEntry => mapTreeNodeFromFileEntry(childEntry, fileMap, resourceMap));
-      result.isOpen = true;
-    } else {
-      result.children = fileEntry.children
-        .map(child => fileMap[path.join(fileEntry.filePath, child)])
-        .filter(childEntry => childEntry !== undefined)
-        .map(childEntry => mapTreeNodeFromFileEntry(childEntry, fileMap, resourceMap));
-      result.isOpen = fileEntry.expanded;
-    }
+    result.children = fileEntry.children
+      .map(child => fileMap[getChildPath(child, fileEntry, fileMap)])
+      .filter(childEntry => childEntry)
+      .map(childEntry => mapTreeNodeFromFileEntry(childEntry, fileMap, resourceMap));
+    result.isOpen = fileEntry.expanded || fileEntry === fileMap[ROOT_FILE_ENTRY];
   }
 
   return result;
@@ -139,7 +131,6 @@ const FileTreePane = () => {
   // eslint-disable-next-line no-unused-vars
   const onNameClick = ({defaultOnClick, nodeData}) => {
     if (previewResource === undefined) {
-      console.log('Selected ', nodeData);
       dispatch(selectFile(nodeData.data));
     }
   };

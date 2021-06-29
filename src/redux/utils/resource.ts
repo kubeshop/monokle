@@ -184,8 +184,9 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
   let valueToWrite = `${newValue.trim()}\n`;
 
   if (isFileResource(resource)) {
+    let absoluteResourcePath = getAbsoluteResourcePath(resource, fileMap);
     if (resource.range) {
-      const content = fs.readFileSync(getAbsoluteResourcePath(resource, fileMap), 'utf8');
+      const content = fs.readFileSync(absoluteResourcePath, 'utf8');
 
       // need to make sure that document delimiter is still there if this resource was not first in the file
       if (resource.range.start > 0 && !valueToWrite.startsWith(YAML_DOCUMENT_DELIMITER)) {
@@ -193,14 +194,14 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       }
 
       fs.writeFileSync(
-        resource.filePath,
+        absoluteResourcePath,
         content.substr(0, resource.range.start) +
           valueToWrite +
           content.substr(resource.range.start + resource.range.length)
       );
     } else {
       // only document => just write to file
-      fs.writeFileSync(getAbsoluteResourcePath(resource, fileMap), newValue);
+      fs.writeFileSync(absoluteResourcePath, newValue);
     }
   }
 

@@ -63,7 +63,7 @@ export function getResourcesInFile(filePath: string, resourceMap: ResourceMapTyp
  * Extracts all resources from the specified text content
  */
 
-export function extractK8sResources(fileContent: string, filePath: string) {
+export function extractK8sResources(fileContent: string, relativePath: string) {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllDocuments(fileContent, {lineCounter});
   const result: K8sResource[] = [];
@@ -72,14 +72,16 @@ export function extractK8sResources(fileContent: string, filePath: string) {
     let docIndex = 0;
     documents.forEach(d => {
       if (d.errors.length > 0) {
-        log.warn(`Ignoring document ${docIndex} in ${path.parse(filePath).name} due to ${d.errors.length} error(s)`);
+        log.warn(
+          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${d.errors.length} error(s)`
+        );
         d.errors.forEach(e => log.warn(e.message));
       } else {
         const content = d.toJS();
         if (content && content.apiVersion && content.kind) {
           let resource: K8sResource = {
-            name: createResourceName(filePath, content),
-            filePath,
+            name: createResourceName(relativePath, content),
+            filePath: relativePath,
             id: uuidv4(),
             kind: content.kind,
             version: content.apiVersion,
@@ -134,10 +136,9 @@ function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapType) {
 export function getFileEntries(filePath: string, fileMap: FileMapType) {
   let parent = fileMap[ROOT_FILE_ENTRY];
   const result: FileEntry[] = [];
-  console.log(`getting file entries for ${filePath}`);
   filePath.split(path.sep).forEach(pathSegment => {
     if (parent.children?.includes(pathSegment)) {
-      const child = fileMap[path.join(parent === fileMap[ROOT_FILE_ENTRY] ? path.sep : parent.filePath, pathSegment)];
+      const child = fileMap[getChildPath(pathSegment, parent, fileMap)];
       if (child) {
         result.push(child);
         parent = child;
@@ -170,4 +171,8 @@ export function getStaticResourcePath(resourcePath: string) {
 
 export function loadResource(resourcePath: string) {
   return fs.readFileSync(getStaticResourcePath(resourcePath), 'utf8');
+}
+
+export function getChildPath(child: string, parentEntry: FileEntry, fileMap: FileMapType) {
+  return parentEntry === fileMap[ROOT_FILE_ENTRY] ? path.sep + child : path.join(parentEntry.filePath, child);
 }
