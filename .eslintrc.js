@@ -29,6 +29,7 @@ module.exports = {
     'no-useless-escape': 'off',
     'object-curly-newline': 'off',
     'unused-imports/no-unused-imports-ts': 'error',
+    "react/jsx-props-no-spreading": 0,
     'react/jsx-max-props-per-line': [1, {maximum: 1, when: 'multiline'}],
     // Disabled old no-shadow rule as seems to be communicated by ESLint while working with TS.
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-shadow.md

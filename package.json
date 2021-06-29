@@ -30,11 +30,13 @@
     "eslint-plugin-react": "~7.22.0",
     "eslint-plugin-react-hooks": "~4.2.0",
     "eslint-plugin-unused-imports": "^1.1.1",
+    "file-loader": "^6.1.1",
     "husky": "^6.0.0",
     "prettier": "2.3.0",
     "wait-on": "^5.3.0"
   },
   "dependencies": {
+    "@ant-design/icons": "4.6.2",
     "@craco/craco": "6.1.2",
     "@reduxjs/toolkit": "^1.6.0",
     "@rjsf/bootstrap-4": "^2.5.1",
@@ -49,6 +51,7 @@
     "@types/react": "^17.0.8",
     "@types/react-dom": "^17.0.5",
     "@types/redux-logger": "^3.0.8",
+    "antd": "4.16.6",
     "dagre": "^0.8.5",
     "electron-devtools-installer": "^3.2.0",
     "electron-is-dev": "^2.0.0",
