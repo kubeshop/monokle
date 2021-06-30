@@ -3,7 +3,7 @@ import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
 import {getChildFilePath, getResourcesInFile, selectResourceFileEntry} from '@redux/utils/fileEntry';
 import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
-import {isKustomizationResource} from '@redux/utils/resource';
+import {isFileResource, isKustomizationResource} from '@redux/utils/resource';
 
 /**
  * Gets all resources directly linked to by a kustomization, including transient resources
@@ -110,7 +110,9 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
   } else {
     resource.selected = true;
     state.selectedResource = resource.id;
-    state.selectedPath = selectResourceFileEntry(resource, state.fileMap);
+    if (isFileResource(resource)) {
+      state.selectedPath = selectResourceFileEntry(resource, state.fileMap);
+    }
 
     if (isKustomizationResource(resource)) {
       getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {

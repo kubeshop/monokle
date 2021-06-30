@@ -171,7 +171,7 @@ export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceM
  * Checks if this specified resource is from a file (and not a virtual one)
  */
 
-function isFileResource(resource: K8sResource) {
+export function isFileResource(resource: K8sResource) {
   return !resource.filePath.startsWith(PREVIEW_PREFIX);
 }
 

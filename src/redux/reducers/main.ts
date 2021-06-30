@@ -4,13 +4,14 @@ import log from 'loglevel';
 import shellPath from 'shell-path';
 import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@src/constants';
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
-import {parseDocument} from 'yaml';
+import {parseDocument, stringify} from 'yaml';
 import fs from 'fs';
 import {monitorRootFolder} from '@redux/utils/fileMonitor';
+import * as k8s from '@kubernetes/client-node';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -277,6 +278,83 @@ export function previewKustomization(id: string) {
             dispatch(mainSlice.actions.setPreviewData({previewResourceId: id, previewResources: resourceMap}));
           }
         );
+      }
+    }
+  };
+}
+
+/**
+ * Thunk to preview cluster objects
+ */
+
+export function previewCluster(configPath: string) {
+  return async (dispatch: AppDispatch, getState: any) => {
+    const state: AppState = getState().main;
+    if (state.previewResource === configPath) {
+      dispatch(mainSlice.actions.setPreviewData({}));
+    } else {
+      const kc = new k8s.KubeConfig();
+      kc.loadFromFile(configPath);
+      const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+      const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+
+      let deploymentsYaml = '';
+      let configMapsYaml = '';
+      let servicesYaml = '';
+
+      let deployments = k8sAppV1Api.listDeploymentForAllNamespaces();
+      deployments.then(res => {
+        res.body.items
+          .map(item => JSON.parse(JSON.stringify(item)))
+          .map(props => ({kind: 'Deployment', apiVersion: 'apps/v1', ...props}))
+          .forEach(item => {
+            if (item.metadata.managedFields) {
+              delete item.metadata.managedFields;
+            }
+            deploymentsYaml = deploymentsYaml + YAML_DOCUMENT_DELIMITER + stringify(item);
+          });
+      });
+
+      let configMaps = k8sCoreV1Api.listConfigMapForAllNamespaces();
+      deployments.then(res => {
+        res.body.items
+          .map(item => JSON.parse(JSON.stringify(item)))
+          .map(props => ({kind: 'ConfigMap', apiVersion: 'core/v1', ...props}))
+          .forEach(item => {
+            if (item.metadata.managedFields) {
+              delete item.metadata.managedFields;
+            }
+            configMapsYaml = configMapsYaml + YAML_DOCUMENT_DELIMITER + stringify(item);
+          });
+      });
+
+      let services = k8sCoreV1Api.listServiceForAllNamespaces();
+      services.then(res => {
+        res.body.items
+          .map(item => JSON.parse(JSON.stringify(item)))
+          .map(props => ({kind: 'Service', apiVersion: 'core/v1', ...props}))
+          .forEach(item => {
+            if (item.metadata.managedFields) {
+              delete item.metadata.managedFields;
+            }
+            servicesYaml = servicesYaml + YAML_DOCUMENT_DELIMITER + stringify(item);
+          });
+      });
+
+      await Promise.all([deployments, configMaps, services]);
+
+      const allYaml = deploymentsYaml + configMapsYaml + servicesYaml;
+
+      const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
+      if (resources && resources.length > 0) {
+        console.log(`Extracted ${resources.length} objects`, resources);
+
+        const resourceMap: ResourceMapType = {};
+        resources.forEach(r => {
+          resourceMap[r.id] = r;
+        });
+        processParsedResources(resourceMap);
+        dispatch(mainSlice.actions.setPreviewData({previewResourceId: configPath, previewResources: resourceMap}));
       }
     }
   };
