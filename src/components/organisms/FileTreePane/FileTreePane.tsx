@@ -155,7 +155,12 @@ const FileTreePane = () => {
       <TitleRow>
         <Title>File Explorer</Title>
       </TitleRow>
-      <Button variant="outline-dark" size="sm" onClick={connectToCluster}>
+      <Button
+        variant={previewResource === PROCESS_ENV.KUBECONFIG ? 'secondary' : 'outline-dark'}
+        size="sm"
+        disabled={!!previewResource && previewResource !== PROCESS_ENV.KUBECONFIG}
+        onClick={connectToCluster}
+      >
         Show Cluster Objects...
       </Button>
       <input
@@ -165,6 +170,7 @@ const FileTreePane = () => {
         webkitdirectory=""
         onChange={onUploadHandler}
         ref={folderInput}
+        disabled={!!previewResource}
       />
 
       <FolderTree
