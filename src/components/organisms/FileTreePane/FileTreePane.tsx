@@ -156,7 +156,7 @@ const FileTreePane = () => {
         <Title>File Explorer</Title>
       </TitleRow>
       <Button variant="outline-dark" size="sm" onClick={connectToCluster}>
-        Get Cluster Objects...
+        Show Cluster Objects...
       </Button>
       <input
         type="file"

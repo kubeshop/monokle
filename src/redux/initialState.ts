@@ -54,21 +54,6 @@ export const initialState: AppState = {
           },
         ],
       },
-      {
-        name: 'Ambassador',
-        sections: [
-          {
-            name: 'Emissary',
-            subsections: [
-              {
-                name: 'Mappings',
-                apiVersionSelector: 'getambassador.io/*',
-                kindSelector: 'Mapping',
-              },
-            ],
-          },
-        ],
-      },
     ],
   },
   resourceMap: {},
