@@ -284,6 +284,21 @@ export function previewKustomization(id: string) {
 }
 
 /**
+ * Utility to convert list of objects returned by k8s api to a single YAML document
+ */
+
+function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: string) {
+  return items
+    .map(item => {
+      item.kind = kind;
+      item.apiVersion = apiVersion;
+      delete item.metadata?.managedFields;
+      return stringify(item);
+    })
+    .join(YAML_DOCUMENT_DELIMITER);
+}
+
+/**
  * Thunk to preview cluster objects
  */
 
@@ -298,64 +313,31 @@ export function previewCluster(configPath: string) {
       const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
       const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
-      let deploymentsYaml = '';
-      let configMapsYaml = '';
-      let servicesYaml = '';
+      Promise.all([
+        k8sAppV1Api.listDeploymentForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
+        }),
+        k8sCoreV1Api.listConfigMapForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'core/v1');
+        }),
+        k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Service', 'core/v1');
+        }),
+      ]).then(yamls => {
+        const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
+        const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
 
-      let deployments = k8sAppV1Api.listDeploymentForAllNamespaces();
-      deployments.then(res => {
-        res.body.items
-          .map(item => JSON.parse(JSON.stringify(item)))
-          .map(props => ({kind: 'Deployment', apiVersion: 'apps/v1', ...props}))
-          .forEach(item => {
-            if (item.metadata.managedFields) {
-              delete item.metadata.managedFields;
-            }
-            deploymentsYaml = deploymentsYaml + YAML_DOCUMENT_DELIMITER + stringify(item);
+        if (resources && resources.length > 0) {
+          console.log(`Extracted ${resources.length} objects`, resources);
+
+          const resourceMap: ResourceMapType = {};
+          resources.forEach(r => {
+            resourceMap[r.id] = r;
           });
+          processParsedResources(resourceMap);
+          dispatch(mainSlice.actions.setPreviewData({previewResourceId: configPath, previewResources: resourceMap}));
+        }
       });
-
-      let configMaps = k8sCoreV1Api.listConfigMapForAllNamespaces();
-      deployments.then(res => {
-        res.body.items
-          .map(item => JSON.parse(JSON.stringify(item)))
-          .map(props => ({kind: 'ConfigMap', apiVersion: 'core/v1', ...props}))
-          .forEach(item => {
-            if (item.metadata.managedFields) {
-              delete item.metadata.managedFields;
-            }
-            configMapsYaml = configMapsYaml + YAML_DOCUMENT_DELIMITER + stringify(item);
-          });
-      });
-
-      let services = k8sCoreV1Api.listServiceForAllNamespaces();
-      services.then(res => {
-        res.body.items
-          .map(item => JSON.parse(JSON.stringify(item)))
-          .map(props => ({kind: 'Service', apiVersion: 'core/v1', ...props}))
-          .forEach(item => {
-            if (item.metadata.managedFields) {
-              delete item.metadata.managedFields;
-            }
-            servicesYaml = servicesYaml + YAML_DOCUMENT_DELIMITER + stringify(item);
-          });
-      });
-
-      await Promise.all([deployments, configMaps, services]);
-
-      const allYaml = deploymentsYaml + configMapsYaml + servicesYaml;
-
-      const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
-      if (resources && resources.length > 0) {
-        console.log(`Extracted ${resources.length} objects`, resources);
-
-        const resourceMap: ResourceMapType = {};
-        resources.forEach(r => {
-          resourceMap[r.id] = r;
-        });
-        processParsedResources(resourceMap);
-        dispatch(mainSlice.actions.setPreviewData({previewResourceId: configPath, previewResources: resourceMap}));
-      }
     }
   };
 }
