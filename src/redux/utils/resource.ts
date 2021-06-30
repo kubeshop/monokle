@@ -184,6 +184,8 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
   let valueToWrite = `${newValue.trim()}\n`;
 
   if (isFileResource(resource)) {
+    const fileEntry = fileMap[resource.filePath];
+
     let absoluteResourcePath = getAbsoluteResourcePath(resource, fileMap);
     if (resource.range) {
       const content = fs.readFileSync(absoluteResourcePath, 'utf8');
@@ -203,6 +205,8 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       // only document => just write to file
       fs.writeFileSync(absoluteResourcePath, newValue);
     }
+
+    fileEntry.timestamp = fs.statSync(absoluteResourcePath).mtime.getTime();
   }
 
   return valueToWrite;

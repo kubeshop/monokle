@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {useAppSelector} from '@redux/hooks';
 import styled from 'styled-components';
-import path from 'path';
 
 import packageJson from '@root/package.json';
 import {appColors as colors} from '@styles/AppColors';
@@ -28,7 +27,7 @@ const Footer = () => {
   const rootEntry = fileMap[ROOT_FILE_ENTRY];
 
   const footerText = `Monokle ${packageJson.version} - kubeshop.io 2021${
-    rootEntry && rootEntry.children ? ` - ${rootEntry.filePath}${path.sep}${rootEntry.name}` : ''
+    rootEntry && rootEntry.children ? ` - ${rootEntry.filePath}` : ''
   }`;
 
   return <FooterContainer>{footerText}</FooterContainer>;

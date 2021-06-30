@@ -20,7 +20,7 @@ interface TreeNode {
   checked: number;
   isOpen?: boolean;
   children: TreeNode[] | null;
-  data: string;
+  data?: string;
 }
 
 const mapTreeNodeFromFileEntry = (
@@ -130,7 +130,7 @@ const FileTreePane = () => {
   // @ts-ignore
   // eslint-disable-next-line no-unused-vars
   const onNameClick = ({defaultOnClick, nodeData}) => {
-    if (previewResource === undefined) {
+    if (previewResource === undefined && nodeData.data) {
       dispatch(selectFile(nodeData.data));
     }
   };
@@ -139,11 +139,10 @@ const FileTreePane = () => {
   const treeData: TreeNode = rootEntry
     ? mapTreeNodeFromFileEntry(rootEntry, fileMap, resourceMap)
     : {
-        name: 'root',
+        name: '- no folder selected -',
         checked: 0,
         isOpen: false,
         children: null,
-        data: ROOT_FILE_ENTRY,
       };
 
   return (

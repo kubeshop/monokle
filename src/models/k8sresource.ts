@@ -1,3 +1,7 @@
+/**
+ * A k8s resource manifest, either extracted from a file or generated internaally (for example when previewing kustomizations)
+ */
+
 interface K8sResource {
   id: string; // an internally generated UUID - used for references/lookups in resourceMap
   filePath: string; // the path relative to the root folder to the file containing this resource - set to preview://<id> for internally generated resources
@@ -13,7 +17,7 @@ interface K8sResource {
   range?: {
     start: number;
     length: number;
-  }; // range of this resource in a multidocument file; entries are 0:start and 1:end position
+  }; // range of this resource in a multidocument file
 }
 
 export enum ResourceRefType {
