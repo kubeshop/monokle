@@ -87,20 +87,21 @@ export const mainSlice = createSlice({
     },
     updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
       try {
-        const entry = state.fileMap[action.payload.path];
-        if (entry) {
+        const fileEntry = state.fileMap[action.payload.path];
+        if (fileEntry) {
           let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
           const filePath = path.join(rootFolder, action.payload.path);
 
           if (!fs.statSync(filePath).isDirectory()) {
             fs.writeFileSync(filePath, action.payload.content);
+            fileEntry.timestamp = fs.statSync(filePath).mtime.getTime();
 
-            getResourcesInFile(entry.filePath, state.resourceMap).forEach(r => {
+            getResourcesInFile(fileEntry.filePath, state.resourceMap).forEach(r => {
               delete state.resourceMap[r.id];
             });
 
-            const map = extractK8sResources(action.payload.content, filePath.substring(rootFolder.length));
-            Object.values(map).forEach(r => {
+            const resources = extractK8sResources(action.payload.content, filePath.substring(rootFolder.length));
+            Object.values(resources).forEach(r => {
               state.resourceMap[r.id] = r;
               r.highlight = true;
             });
