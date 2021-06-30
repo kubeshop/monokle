@@ -34,7 +34,7 @@ const TitleRow = styled(Row)`
   padding: 0;
 `;
 
-export const SectionRow = styled(Row)`
+const SectionRow = styled(Row)`
   border: 1px solid blue;
   border-radius: 2px;
   background: ${colors.appNormalBackgroound};
