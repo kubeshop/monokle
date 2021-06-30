@@ -236,7 +236,7 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
 
 export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState) {
   if (!fileEntry.timestamp || fs.statSync(absolutePath).mtime.getTime() > fileEntry.timestamp) {
-    log.info(`updating file ${absolutePath}`);
+    log.info(`updating from file ${absolutePath}`);
 
     const resourcesInFile = getResourcesInFile(fileEntry.filePath, state.resourceMap);
     let wasSelected = false;
@@ -264,8 +264,6 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     if (resourcesInFile.length === 1 && resourcesFromFile.length === 1 && wasSelected) {
       updateSelectionAndHighlights(state, resourcesFromFile[0]);
     }
-  } else {
-    log.info(`file is old - ignoring - ${absolutePath}`);
   }
 }
 
