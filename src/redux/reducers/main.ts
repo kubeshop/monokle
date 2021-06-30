@@ -19,14 +19,14 @@ import {
   updateSelectionAndHighlights,
 } from '../utils/selection';
 import {
-  addFile,
-  deleteFile,
+  addPath,
+  removePath,
   extractK8sResources,
   getAllFileEntriesForPath,
   getFileEntryForAbsolutePath,
   getResourcesInFile,
   readFiles,
-  updateFile,
+  reloadFile,
 } from '../utils/fileEntry';
 import {processKustomizations} from '../utils/kustomize';
 import {processParsedResources, recalculateResourceRanges, reprocessResources, saveResource} from '../utils/resource';
@@ -57,31 +57,30 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
-    fileAdded: (state: Draft<AppState>, action: PayloadAction<string>) => {
+    pathAdded: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
       if (fileEntry) {
         log.info(`added file ${filePath} already exists - updating`);
-        updateFile(filePath, fileEntry, state);
+        reloadFile(filePath, fileEntry, state);
       } else {
-        log.info(`adding file ${filePath}`);
-        addFile(filePath, state);
+        addPath(filePath, state);
       }
     },
     fileChanged: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
       if (fileEntry) {
-        updateFile(filePath, fileEntry, state);
+        reloadFile(filePath, fileEntry, state);
       } else {
-        log.warn(`changed file ${filePath} not known - ignoring..`);
+        addPath(filePath, state);
       }
     },
-    fileRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
+    pathRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
       if (fileEntry) {
-        deleteFile(filePath, state, fileEntry);
+        removePath(filePath, state, fileEntry);
       } else {
         log.warn(`removed file ${filePath} not known - ignoring..`);
       }
@@ -282,6 +281,6 @@ export function previewKustomization(id: string) {
   };
 }
 
-export const {selectK8sResource, selectFile, updateResource, updateFileEntry, fileAdded, fileChanged, fileRemoved} =
+export const {selectK8sResource, selectFile, updateResource, updateFileEntry, pathAdded, fileChanged, pathRemoved} =
   mainSlice.actions;
 export default mainSlice.reducer;

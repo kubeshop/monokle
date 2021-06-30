@@ -6,6 +6,7 @@ interface FileEntry {
   expanded: boolean; // if the file should be expanded (for folders only)
   excluded: boolean; // if the file/folder is excluded from the navigator
   children?: string[]; // child file names (for folders)
+  timestamp?: number; // the timestamp of the last write - for discarding change notifications
 }
 
 export type {FileEntry};

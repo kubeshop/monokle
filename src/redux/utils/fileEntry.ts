@@ -169,7 +169,6 @@ export function getAllFileEntriesForPath(filePath: string, fileMap: FileMapType)
     }
   });
 
-  console.log(`returning entries for ${filePath}`, result);
   return result;
 }
 
@@ -188,7 +187,6 @@ export function selectResourceFileEntry(resource: K8sResource, fileMap: FileMapT
       e.selected = true;
     }
   });
-  console.log(`returning ${result} for `, resource);
 
   return result;
 }
@@ -226,74 +224,169 @@ export function getChildFilePath(child: string, parentEntry: FileEntry, fileMap:
 
 export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapType) {
   const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
+  if (filePath === rootFolder) {
+    return fileMap[ROOT_FILE_ENTRY];
+  }
   return filePath.startsWith(rootFolder) ? fileMap[filePath.substr(rootFolder.length)] : undefined;
 }
 
 /**
- * Updates the fileEntry for the specified path - and its associated resources
+ * Updates the fileEntry from the specified path - and its associated resources
  */
 
-export function updateFile(filePath: string, fileEntry: FileEntry, state: AppState) {
-  log.info(`updating file ${filePath}`);
+export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState) {
+  if (!fileEntry.timestamp || fs.statSync(absolutePath).mtime.getTime() > fileEntry.timestamp) {
+    log.info(`updating file ${absolutePath}`);
 
-  getResourcesInFile(fileEntry.filePath, state.resourceMap).forEach(resource => {
-    if (state.selectedResource === resource.id) {
-      updateSelectionAndHighlights(state, resource);
+    const resourcesInFile = getResourcesInFile(fileEntry.filePath, state.resourceMap);
+    let wasSelected = false;
+
+    resourcesInFile.forEach(resource => {
+      if (state.selectedResource === resource.id) {
+        updateSelectionAndHighlights(state, resource);
+        wasSelected = true;
+      }
+      delete state.resourceMap[resource.id];
+    });
+
+    if (state.selectedPath === fileEntry.filePath) {
+      state.selectedPath = undefined;
+      clearResourceSelections(state.resourceMap);
     }
-    delete state.resourceMap[resource.id];
-  });
 
-  if (state.selectedPath === fileEntry.filePath) {
-    state.selectedPath === undefined;
-    clearResourceSelections(state.resourceMap);
+    const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
+    resourcesFromFile.forEach(resource => {
+      state.resourceMap[resource.id] = resource;
+    });
+
+    reprocessResources([], state.resourceMap, state.fileMap);
+
+    if (resourcesInFile.length === 1 && resourcesFromFile.length === 1 && wasSelected) {
+      updateSelectionAndHighlights(state, resourcesFromFile[0]);
+    }
+  } else {
+    log.info(`file is old - ignoring - ${absolutePath}`);
   }
-
-  extractK8sResourcesFromFile(filePath, state.fileMap).forEach(resource => {
-    state.resourceMap[resource.id] = resource;
-  });
-
-  reprocessResources([], state.resourceMap, state.fileMap);
 }
 
 /**
- * Adds the file at specified path - and its contained resources
+ * Adds the file at the specified path with the specified parent
  */
 
-export function addFile(filePath: string, state: AppState) {
-  const parentEntry = getFileEntryForAbsolutePath(filePath.substr(0, filePath.lastIndexOf(path.sep)), state.fileMap);
+function addFile(absolutePath: string, state: AppState) {
+  log.info(`adding file ${absolutePath}`);
+  let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  const fileEntry = createFileEntry(absolutePath.substr(rootFolder.length));
+  extractK8sResourcesFromFile(absolutePath, state.fileMap).forEach(resource => {
+    state.resourceMap[resource.id] = resource;
+  });
+
+  return fileEntry;
+}
+
+/**
+ * Adds the folder at the specified path with the specified parent
+ */
+
+function addFolder(absolutePath: string, state: AppState) {
+  log.info(`adding folder ${absolutePath}`);
+  const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  if (absolutePath.startsWith(rootFolder)) {
+    const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
+    folderEntry.children = readFiles(absolutePath, state.appConfig, state.resourceMap, state.fileMap);
+    return folderEntry;
+  }
+
+  log.error(`added folder ${absolutePath} is not under root ${rootFolder} - ignoring...`);
+}
+
+/**
+ * Adds the file/folder at specified path - and its contained resources
+ */
+
+export function addPath(absolutePath: string, state: AppState) {
+  const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
+  const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
   if (parentEntry) {
-    const fileEntry = createFileEntry(filePath.substr(state.fileMap[ROOT_FILE_ENTRY].filePath.length));
-    extractK8sResourcesFromFile(filePath, state.fileMap).forEach(resource => {
-      state.resourceMap[resource.id] = resource;
-    });
-    state.fileMap[fileEntry.filePath] = fileEntry;
-    reprocessResources([], state.resourceMap, state.fileMap);
+    const fileEntry = fs.statSync(absolutePath).isDirectory()
+      ? addFolder(absolutePath, state)
+      : addFile(absolutePath, state);
+
+    if (fileEntry) {
+      state.fileMap[fileEntry.filePath] = fileEntry;
+
+      parentEntry.children = parentEntry.children || [];
+      parentEntry.children.push(fileEntry.name);
+
+      reprocessResources([], state.resourceMap, state.fileMap);
+    }
+
     return fileEntry;
   }
-  log.warn(`Failed to find folder entry for ${filePath}, ignoring..`);
+  log.warn(`Failed to find folder entry for ${absolutePath}, ignoring..`);
 
   return undefined;
 }
 
 /**
- * Deletes the FileEntry at the specified path - and its associated resources
+ * Removes the specified fileEntry and its resources from the provided state
  */
 
-export function deleteFile(filePath: string, state: AppState, fileEntry: FileEntry) {
-  log.info(`removing file ${filePath}`);
-  delete state.fileMap[fileEntry.filePath];
-
+function removeFile(fileEntry: FileEntry, state: AppState) {
+  log.info(`removing file ${fileEntry.filePath}`);
   getResourcesInFile(fileEntry.filePath, state.resourceMap).forEach(resource => {
     if (state.selectedResource === resource.id) {
       updateSelectionAndHighlights(state, resource);
     }
     delete state.resourceMap[resource.id];
   });
+}
 
-  if (state.selectedPath === fileEntry.filePath) {
-    state.selectedPath === undefined;
+/**
+ * Removes the specified fileEntry and its resources from the provided state
+ */
+
+function removeFolder(fileEntry: FileEntry, state: AppState) {
+  log.info(`removing folder ${fileEntry.filePath}`);
+  fileEntry.children?.forEach(child => {
+    const childEntry = state.fileMap[path.join(fileEntry.filePath, child)];
+    if (childEntry) {
+      if (childEntry.children) {
+        removeFolder(childEntry, state);
+      } else {
+        removeFile(childEntry, state);
+      }
+    }
+  });
+}
+
+/**
+ * Removes the FileEntry at the specified path - and its associated resources
+ */
+
+export function removePath(absolutePath: string, state: AppState, fileEntry: FileEntry) {
+  delete state.fileMap[fileEntry.filePath];
+
+  if (fileEntry.children) {
+    removeFolder(fileEntry, state);
+  } else {
+    removeFile(fileEntry, state);
+  }
+
+  if (state.selectedPath && !state.fileMap[state.selectedPath]) {
+    state.selectedPath = undefined;
     clearResourceSelections(state.resourceMap);
+  }
+
+  // remove from parent
+  const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
+  const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
+  if (parentEntry && parentEntry.children) {
+    const ix = parentEntry.children.indexOf(fileEntry.name);
+    if (ix >= 0) {
+      parentEntry.children.splice(ix, 1);
+    }
   }
 
   reprocessResources([], state.resourceMap, state.fileMap);
