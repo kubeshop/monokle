@@ -13,6 +13,8 @@ Desktop UI for managing k8s manifests.
 * https://github.com/wbkd/react-flow for graph diagrams
 * https://github.com/tweenjs/es6-tween for animation tweening
 * https://github.com/pengx17/monaco-yaml for yaml support in the source editor
+* https://github.com/paulmillr/chokidar for file watching
+* https://github.com/ant-design/ant-design/ for UI
 
 ## Dev Dependencies
 
