@@ -32,12 +32,12 @@ const App = () => {
   const size: Size = useWindowSize();
 
   const mainHeight = `${size.height ? size.height : 100}px`;
-  const contentHeight = `${size.height ? size.height - 60 : 40}px`;
+  const contentHeight = `${size.height ? size.height - 30 : 30}px`;
 
   return (
     <div>
       <MessageBox />
-      <Layout mainheight={mainHeight} isPageContainer>
+      <Layout className="layout" mainheight={mainHeight} isPageContainer>
         <PageHeader />
 
         <ContentRow rowHeight={contentHeight}>

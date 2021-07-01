@@ -9,9 +9,9 @@ import {ROOT_FILE_ENTRY} from '@src/constants';
 const StyledFooter = styled(Footer)`
   width: 100%;
   height: 1.5em;
-  margin: 0;
-  padding: 0;
   padding-left: 10px;
+  background: white;
+  border-top: 1px solid lightgrey;
 `;
 
 const PageFooter = () => {
@@ -22,7 +22,7 @@ const PageFooter = () => {
     rootEntry && rootEntry.children ? ` - ${rootEntry.filePath}` : ''
   }`;
 
-  return <StyledFooter>{footerText}</StyledFooter>;
+  return <StyledFooter noborder>{footerText}</StyledFooter>;
 };
 
 export default PageFooter;
