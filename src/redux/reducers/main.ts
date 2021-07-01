@@ -4,13 +4,14 @@ import log from 'loglevel';
 import shellPath from 'shell-path';
 import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@src/constants';
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
-import {parseDocument} from 'yaml';
+import {parseDocument, stringify} from 'yaml';
 import fs from 'fs';
 import {monitorRootFolder} from '@redux/utils/fileMonitor';
+import * as k8s from '@kubernetes/client-node';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -278,6 +279,65 @@ export function previewKustomization(id: string) {
           }
         );
       }
+    }
+  };
+}
+
+/**
+ * Utility to convert list of objects returned by k8s api to a single YAML document
+ */
+
+function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: string) {
+  return items
+    .map(item => {
+      item.kind = kind;
+      item.apiVersion = apiVersion;
+      delete item.metadata?.managedFields;
+      return stringify(item);
+    })
+    .join(YAML_DOCUMENT_DELIMITER);
+}
+
+/**
+ * Thunk to preview cluster objects
+ */
+
+export function previewCluster(configPath: string) {
+  return async (dispatch: AppDispatch, getState: any) => {
+    const state: AppState = getState().main;
+    if (state.previewResource === configPath) {
+      dispatch(mainSlice.actions.setPreviewData({}));
+    } else {
+      const kc = new k8s.KubeConfig();
+      kc.loadFromFile(configPath);
+      const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+      const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+
+      Promise.all([
+        k8sAppV1Api.listDeploymentForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
+        }),
+        k8sCoreV1Api.listConfigMapForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'core/v1');
+        }),
+        k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Service', 'core/v1');
+        }),
+      ]).then(yamls => {
+        const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
+        const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
+
+        if (resources && resources.length > 0) {
+          console.log(`Extracted ${resources.length} objects`, resources);
+
+          const resourceMap: ResourceMapType = {};
+          resources.forEach(r => {
+            resourceMap[r.id] = r;
+          });
+          processParsedResources(resourceMap);
+          dispatch(mainSlice.actions.setPreviewData({previewResourceId: configPath, previewResources: resourceMap}));
+        }
+      });
     }
   };
 }

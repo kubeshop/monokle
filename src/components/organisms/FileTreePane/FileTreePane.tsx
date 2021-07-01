@@ -1,6 +1,6 @@
 import * as React from 'react';
 import FolderTree from 'react-folder-tree';
-import {Row} from 'react-bootstrap';
+import {Button, Row} from 'react-bootstrap';
 import 'react-folder-tree/dist/style.css';
 import {useRef} from 'react';
 import styled from 'styled-components';
@@ -9,11 +9,12 @@ import path from 'path';
 import '@styles/FileTreePane.css';
 import {appColors as colors} from '@styles/AppColors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, setRootFolder} from '@redux/reducers/main';
+import {previewCluster, selectFile, setRootFolder} from '@redux/reducers/main';
 import {FileEntry} from '@models/fileentry';
 import {getResourcesInFile, getChildFilePath} from '@redux/utils/fileEntry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ROOT_FILE_ENTRY} from '@src/constants';
+import {PROCESS_ENV} from '@actions/common/apply';
 
 interface TreeNode {
   name: string;
@@ -145,11 +146,23 @@ const FileTreePane = () => {
         children: null,
       };
 
+  const connectToCluster = () => {
+    dispatch(previewCluster(PROCESS_ENV.KUBECONFIG));
+  };
+
   return (
     <FileTreeContainer>
       <TitleRow>
         <Title>File Explorer</Title>
       </TitleRow>
+      <Button
+        variant={previewResource === PROCESS_ENV.KUBECONFIG ? 'secondary' : 'outline-dark'}
+        size="sm"
+        disabled={!!previewResource && previewResource !== PROCESS_ENV.KUBECONFIG}
+        onClick={connectToCluster}
+      >
+        Show Cluster Objects...
+      </Button>
       <input
         type="file"
         /* @ts-expect-error */
@@ -157,7 +170,9 @@ const FileTreePane = () => {
         webkitdirectory=""
         onChange={onUploadHandler}
         ref={folderInput}
+        disabled={!!previewResource}
       />
+
       <FolderTree
         readOnly={previewResource !== undefined}
         data={treeData}

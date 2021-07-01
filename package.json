@@ -38,6 +38,7 @@
   "dependencies": {
     "@ant-design/icons": "4.6.2",
     "@craco/craco": "6.1.2",
+    "@kubernetes/client-node": "^0.15.0",
     "@reduxjs/toolkit": "^1.6.0",
     "@rjsf/bootstrap-4": "^2.5.1",
     "@rjsf/core": "^2.5.1",
