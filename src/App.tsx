@@ -5,7 +5,7 @@ import Layout from '@atoms/Layout';
 import 'antd/dist/antd.css';
 
 import './App.css';
-import Footer from '@organisms/Footer';
+import PageFooter from '@organisms/PageFooter';
 import ActionsPane from '@organisms/ActionsPane';
 import NavigatorPane from '@organisms/NavigatorPane';
 import FileTreePane from '@organisms/FileTreePane';
@@ -39,6 +39,7 @@ const App = () => {
       <MessageBox />
       <Layout mainheight={mainHeight} isPageContainer>
         <PageHeader />
+
         <ContentRow rowHeight={contentHeight}>
           <ContentColumn sm={3}>
             <FileTreePane />
@@ -52,9 +53,8 @@ const App = () => {
             <ActionsPane actionHeight={contentHeight}/>
           </ContentColumn>
         </ContentRow>
-        <ContentRow rowHeight='20px'>
-          <Footer />
-        </ContentRow>
+
+        <PageFooter />
       </Layout>
     </div>
   );
