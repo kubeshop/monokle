@@ -328,12 +328,11 @@ export function previewCluster(configPath: string) {
         const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
 
         if (resources && resources.length > 0) {
-          console.log(`Extracted ${resources.length} objects`, resources);
+          const resourceMap = resources.reduce((acc: ResourceMapType, item) => {
+            acc[item.id] = item;
+            return acc;
+          }, {});
 
-          const resourceMap: ResourceMapType = {};
-          resources.forEach(r => {
-            resourceMap[r.id] = r;
-          });
           processParsedResources(resourceMap);
           dispatch(mainSlice.actions.setPreviewData({previewResourceId: configPath, previewResources: resourceMap}));
         }
