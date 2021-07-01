@@ -290,10 +290,8 @@ export function previewKustomization(id: string) {
 function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: string) {
   return items
     .map(item => {
-      item.kind = kind;
-      item.apiVersion = apiVersion;
       delete item.metadata?.managedFields;
-      return stringify(item);
+      return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
     })
     .join(YAML_DOCUMENT_DELIMITER);
 }
@@ -318,10 +316,10 @@ export function previewCluster(configPath: string) {
           return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
         }),
         k8sCoreV1Api.listConfigMapForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'core/v1');
+          return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'v1');
         }),
         k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Service', 'core/v1');
+          return getK8sObjectsAsYaml(res.body.items, 'Service', 'v1');
         }),
       ]).then(yamls => {
         const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
