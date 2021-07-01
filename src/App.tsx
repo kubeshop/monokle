@@ -1,31 +1,36 @@
 import React, {useState, useEffect} from 'react';
-import {Col, Row} from 'react-bootstrap';
 import styled from 'styled-components';
 import 'antd/dist/antd.css';
 
-import './App.css';
 import Layout from '@atoms/Layout';
+import PageHeader from '@organisms/PageHeader';
+import Content from '@atoms/Content';
+import Col from '@atoms/Col';
+import Row from '@atoms/Row';
 import PageFooter from '@organisms/PageFooter';
 import ActionsPane from '@organisms/ActionsPane';
 import NavigatorPane from '@organisms/NavigatorPane';
 import FileTreePane from '@organisms/FileTreePane';
-import PageHeader from '@organisms/PageHeader';
 import MessageBox from '@organisms/MessageBox';
+import SettingsDrawer from '@organisms/SettingsDrawer';
 import {Size} from '@models/window';
 
-const ContentColumn = styled(Col)`
+const StyledColumn = styled(Col)`
   width: 100%;
   height: 100%;
   padding: 0px;
   overflow-y: scroll;
 `;
 
-const ContentRow = styled(Row)`
+const StyledRow = styled(Row)`
   width: 100%;
-  height: ${props => props.rowHeight || '1em'};
   padding: 0px;
   margin: 0px;
   overflow-y: hidden;
+`;
+
+const StyledContent = styled(Content)`
+  overflow-y: clip;
 `;
 
 const App = () => {
@@ -37,22 +42,25 @@ const App = () => {
   return (
     <div>
       <MessageBox />
-      <Layout className="layout" mainheight={mainHeight} isPageContainer>
+      <Layout style={{ height: mainHeight }}>
         <PageHeader />
+        <SettingsDrawer />
 
-        <ContentRow rowHeight={contentHeight}>
-          <ContentColumn sm={3}>
-            <FileTreePane />
-          </ContentColumn>
+        <StyledContent style={{ height: contentHeight }}>
+          <StyledRow style={{ height: contentHeight }}>
+            <StyledColumn sm={6}>
+              <FileTreePane />
+            </StyledColumn>
 
-          <ContentColumn sm={3}>
-            <NavigatorPane/>
-          </ContentColumn>
+            <StyledColumn sm={6}>
+              <NavigatorPane/>
+            </StyledColumn>
 
-          <ContentColumn sm={6}>
-            <ActionsPane actionHeight={contentHeight}/>
-          </ContentColumn>
-        </ContentRow>
+            <StyledColumn sm={12}>
+              <ActionsPane actionHeight={contentHeight}/>
+            </StyledColumn>
+          </StyledRow>
+        </StyledContent>
 
         <PageFooter />
       </Layout>

@@ -4,17 +4,12 @@ import AntLayout, {LayoutProps as AntLayoutProps} from 'antd/lib/layout/index';
 
 
 export type LayoutProps = AntLayoutProps & {
-  mainheight?: React.ReactNode;
-  isPageContainer?: React.ReactNode;
+  mainHeight?: React.ReactNode;
 };
 
 const Layout = styled((props: LayoutProps) => <AntLayout {...props}/>)`
   width: 100%;
-  ${props => props.mainheight && `height: ${props.mainheight}`};
-  ${props => props.isPageContainer && `
-    padding: 0px;
-    overflow-y: clip;
-  `};
+  ${props => props.mainHeight && `height: ${props.mainHeight}`};
 `;
 
 export default Layout;
