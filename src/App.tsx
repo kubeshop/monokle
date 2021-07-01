@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {Col, Row} from 'react-bootstrap';
 import styled from 'styled-components';
-import Layout from '@atoms/Layout';
 import 'antd/dist/antd.css';
 
 import './App.css';
+import Layout from '@atoms/Layout';
 import PageFooter from '@organisms/PageFooter';
 import ActionsPane from '@organisms/ActionsPane';
 import NavigatorPane from '@organisms/NavigatorPane';

@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import Layout, {LayoutProps} from 'antd/lib/layout/index';
-import 'antd/dist/antd.css';
 
 const AntFooter = Layout.Footer;
 

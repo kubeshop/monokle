@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import AntCol, {ColProps as AntColProps} from 'antd/lib/col/index';
-import 'antd/dist/antd.css';
 
 
 export type ColProps = AntColProps & {
