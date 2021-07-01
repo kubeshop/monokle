@@ -34,7 +34,7 @@ const PageHeader = () => {
   return (
     <StyledHeader noborder style={{
       zIndex: 1,
-      height: 30
+      height: '30px'
     }}>
       <Row noborder>
         <Col span={4} noborder>
