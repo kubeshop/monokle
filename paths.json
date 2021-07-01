@@ -56,11 +56,11 @@
       "@assets": [
         "src/assets/"
       ],
-      "@util/*": [
-        "src/util/*"
+      "@utils/*": [
+        "src/utils/*"
       ],
-      "@util": [
-        "src/util/"
+      "@utils": [
+        "src/utils/"
       ],
       "@src/*": [
         "src/*"
