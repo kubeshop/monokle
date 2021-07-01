@@ -17,17 +17,24 @@ const EditorMode = styled.h4`
 const MiscDiv = styled.div`
   font-size: 1em;
   text-align: right;
-  color: white;
+  color: black;
+`;
+
+const StyledHeader = styled(Header)`
+  width: 100%;
+  line-height: 30px;
+  padding-left: 10px;
+  background: white;
+  border-bottom: 1px solid lightgrey;
 `;
 
 const PageHeader = () => {
   const isInPreviewMode = !!useAppSelector(state => state.main.previewResource);
 
   return (
-    <Header noborder style={{
+    <StyledHeader noborder style={{
       zIndex: 1,
-      width: '100%',
-      height: '45px',
+      height: '30px'
     }}>
       <Row noborder>
         <Col span={4} noborder>
@@ -40,7 +47,7 @@ const PageHeader = () => {
           <MiscDiv>user / signout / settings</MiscDiv>
         </Col>
       </Row>
-    </Header>
+    </StyledHeader>
   );
 };
 

@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {Col, Row} from 'react-bootstrap';
 import styled from 'styled-components';
-import Layout from '@atoms/Layout';
 import 'antd/dist/antd.css';
 
 import './App.css';
-import Footer from '@organisms/Footer';
+import Layout from '@atoms/Layout';
+import PageFooter from '@organisms/PageFooter';
 import ActionsPane from '@organisms/ActionsPane';
 import NavigatorPane from '@organisms/NavigatorPane';
 import FileTreePane from '@organisms/FileTreePane';
@@ -32,13 +32,14 @@ const App = () => {
   const size: Size = useWindowSize();
 
   const mainHeight = `${size.height ? size.height : 100}px`;
-  const contentHeight = `${size.height ? size.height - 60 : 40}px`;
+  const contentHeight = `${size.height ? size.height - 30 : 30}px`;
 
   return (
     <div>
       <MessageBox />
-      <Layout mainheight={mainHeight} isPageContainer>
+      <Layout className="layout" mainheight={mainHeight} isPageContainer>
         <PageHeader />
+
         <ContentRow rowHeight={contentHeight}>
           <ContentColumn sm={3}>
             <FileTreePane />
@@ -52,9 +53,8 @@ const App = () => {
             <ActionsPane actionHeight={contentHeight}/>
           </ContentColumn>
         </ContentRow>
-        <ContentRow rowHeight='20px'>
-          <Footer />
-        </ContentRow>
+
+        <PageFooter />
       </Layout>
     </div>
   );

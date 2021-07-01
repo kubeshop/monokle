@@ -2,27 +2,19 @@ import * as React from 'react';
 import {useAppSelector} from '@redux/hooks';
 import styled from 'styled-components';
 
+import Footer from '@components/atoms/Footer';
 import packageJson from '@root/package.json';
-import {appColors as colors} from '@styles/AppColors';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 
-const FooterContainer = styled.div`
-  border: 1px solid blue;
-  border-radius: 2px;
-  background: ${colors.appNormalBackgroound};
+const StyledFooter = styled(Footer)`
   width: 100%;
-  height: 100%;
-  font-size: 0.9em;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #212529;
-  text-align: left;
-  margin: 0;
-  padding: 0;
+  height: 1.5em;
   padding-left: 10px;
+  background: white;
+  border-top: 1px solid lightgrey;
 `;
 
-const Footer = () => {
+const PageFooter = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const rootEntry = fileMap[ROOT_FILE_ENTRY];
 
@@ -30,7 +22,7 @@ const Footer = () => {
     rootEntry && rootEntry.children ? ` - ${rootEntry.filePath}` : ''
   }`;
 
-  return <FooterContainer>{footerText}</FooterContainer>;
+  return <StyledFooter noborder>{footerText}</StyledFooter>;
 };
 
-export default Footer;
+export default PageFooter;

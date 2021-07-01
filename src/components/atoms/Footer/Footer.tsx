@@ -2,17 +2,17 @@ import React from 'react';
 import styled from 'styled-components';
 import Layout, {LayoutProps} from 'antd/lib/layout/index';
 
-const AntHeader = Layout.Header;
+const AntFooter = Layout.Footer;
 
-export type HeaderProps = LayoutProps & {
+export type FooterProps = LayoutProps & {
   noborder?: React.ReactNode;
 };
 
-const Header = styled((props: HeaderProps) => <AntHeader {...props}/>)`
+const Footer = styled((props: FooterProps) => <AntFooter {...props}/>)`
   ${props => props.noborder && `
     padding: 0px;
     margin: 0px;
   `};
 `;
 
-export default Header;
+export default Footer;
