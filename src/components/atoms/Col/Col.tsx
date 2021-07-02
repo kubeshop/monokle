@@ -11,8 +11,8 @@ const Col = styled((props: ColProps) => <AntCol {...props}/>)`
   ${props => props.noborder && `
     padding: 1px;
     margin: 0px;
-    height: 100%;
   `};
+  height: 100%;
 `;
 
 export default Col;
