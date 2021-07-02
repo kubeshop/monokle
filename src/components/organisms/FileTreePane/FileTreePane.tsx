@@ -15,6 +15,7 @@ import {getResourcesInFile, getChildFilePath} from '@redux/utils/fileEntry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 import {PROCESS_ENV} from '@actions/common/apply';
+import fs from 'fs';
 
 interface TreeNode {
   name: string;
@@ -72,11 +73,14 @@ function findRootFolder(files: FileList) {
     }
   }
 
-  if (topIndex !== -1) {
-    return root.path.split(path.sep).slice(0, topIndex).join(path.sep);
+  let result = topIndex !== -1 ? root.path.split(path.sep).slice(0, topIndex).join(path.sep) : root.path;
+
+  // in some cases only a file is returned..
+  if (fs.statSync(result).isFile()) {
+    result = path.parse(result).dir;
   }
 
-  return root.path;
+  return result;
 }
 
 const FileTreeContainer = styled.div`

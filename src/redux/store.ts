@@ -5,6 +5,7 @@ import mainReducer from './reducers/main';
 import {configSlice} from './reducers/appConfig';
 import {alertSlice} from './reducers/alert';
 import {logsSlice} from './reducers/logs';
+import {uiSlice} from './reducers/ui';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     main: mainReducer,
     alert: alertSlice.reducer,
     logs: logsSlice.reducer,
+    ui: uiSlice.reducer,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(logger),
 });
