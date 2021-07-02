@@ -9,13 +9,14 @@ import path from 'path';
 import '@styles/FileTreePane.css';
 import {appColors as colors} from '@styles/AppColors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {previewCluster, selectFile, setRootFolder} from '@redux/reducers/main';
+import {selectFile} from '@redux/reducers/main';
 import {FileEntry} from '@models/fileentry';
 import {getResourcesInFile, getChildFilePath} from '@redux/utils/fileEntry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 import {PROCESS_ENV} from '@actions/common/apply';
 import fs from 'fs';
+import {previewCluster, setRootFolder} from '@redux/reducers/thunks';
 
 interface TreeNode {
   name: string;
@@ -105,8 +106,6 @@ const Title = styled.h4`
 
 const FileTreePane = () => {
   const dispatch = useAppDispatch();
-
-  const appConfig = useAppSelector(state => state.config);
   const previewResource = useAppSelector(state => state.main.previewResource);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -122,7 +121,7 @@ const FileTreePane = () => {
   }
 
   const setFolder = (folder: string) => {
-    dispatch(setRootFolder(folder, appConfig));
+    dispatch(setRootFolder(folder));
   };
 
   // eslint-disable-next-line no-unused-vars

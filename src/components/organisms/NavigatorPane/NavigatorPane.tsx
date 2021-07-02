@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import '@styles/NavigatorPane.css';
 import {appColors as colors} from '@styles/AppColors';
-import {previewKustomization, selectK8sResource} from '@redux/reducers/main';
+import {selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
 import {setFilterObjects} from '@redux/reducers/appConfig';
@@ -14,6 +14,7 @@ import {selectKustomizations, selectActiveResources} from '@redux/selectors';
 import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
+import {previewKustomization} from '@redux/reducers/thunks';
 
 const ALL_NAMESPACES = '- all -';
 
