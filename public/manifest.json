@@ -1,6 +1,6 @@
 {
-  "short_name": "ManifestUI",
-  "name": "ManifestUI",
+  "short_name": "Monokle",
+  "name": "Monokle",
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",

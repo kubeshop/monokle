@@ -1,4 +1,4 @@
-## ManifestUI
+## Monokle
 
 Desktop UI for managing k8s manifests.
 
@@ -58,11 +58,11 @@ See https://www.electron.build/ for more info on the electron builder
 
 ## KUBECONFIG for kubectl invocation
 
-ManifestUI uses the KUBECONFIG env variable for kubectl commands - you'll need to set that env variable to point to your
-kubernetes config and then start ManifestUI from the command-line (to ensure it inherits the env variable) with.
+Monokle uses the KUBECONFIG env variable for kubectl commands - you'll need to set that env variable to point to your
+kubernetes config and then start Monokle from the command-line (to ensure it inherits the env variable) with.
 
 On MacOS this is done with
 
 ```
-open -a "ManifestUI"
+open -a "Monokle"
 ```

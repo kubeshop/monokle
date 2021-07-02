@@ -1,5 +1,5 @@
 {
-  "name": "manifestui",
+  "name": "monokle",
   "version": "0.0.1",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
@@ -7,11 +7,12 @@
   "main": "build/electron/main.js",
   "contributors": [
     "ole@kubeshop.io",
-    "steen@kubeshop.io"
+    "steen@kubeshop.io",
+    "andrei@kubeshop.io"
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/kubeshop/manifestui.git"
+    "url": "git://github.com/kubeshop/monokle.git"
   },
   "private": true,
   "devDependencies": {
@@ -101,8 +102,8 @@
     "prepare": "husky install"
   },
   "build": {
-    "appId": "io.kubeshop.manifestui",
-    "productName": "ManifestUI",
+    "appId": "io.kubeshop.monokle",
+    "productName": "Monokle",
     "copyright": "Copyright © 2021 ${author}",
     "mac": {
       "category": "public.app-category.utilities"
