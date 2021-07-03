@@ -52,6 +52,9 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
+    /**
+     * called by the file monitor when a path is added to the file system
+     */
     pathAdded: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
@@ -62,6 +65,9 @@ export const mainSlice = createSlice({
         addPath(filePath, state);
       }
     },
+    /**
+     * called by the file monitor when a file is changed in the file system
+     */
     fileChanged: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
@@ -71,6 +77,9 @@ export const mainSlice = createSlice({
         addPath(filePath, state);
       }
     },
+    /**
+     * called by the file monitor when a path is removed from the file system
+     */
     pathRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
@@ -80,6 +89,9 @@ export const mainSlice = createSlice({
         log.warn(`removed file ${filePath} not known - ignoring..`);
       }
     },
+    /**
+     * updates the content of the specified path to the specified value
+     */
     updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
       try {
         const fileEntry = state.fileMap[action.payload.path];
@@ -111,6 +123,9 @@ export const mainSlice = createSlice({
         return original(state);
       }
     },
+    /**
+     * Updates the content of the specified resource to the specified value
+     */
     updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
       try {
         const resource = state.resourceMap[action.payload.resourceId];
@@ -128,12 +143,18 @@ export const mainSlice = createSlice({
         return original(state);
       }
     },
+    /**
+     * Marks the specified resource as selected and highlights all related resources
+     */
     selectK8sResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const resource = state.resourceMap[action.payload];
       if (resource) {
         updateSelectionAndHighlights(state, resource);
       }
     },
+    /**
+     * Marks the specified file as selected and highlights all related resources
+     */
     selectFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (action.payload.length > 0) {
         const selectedPath = action.payload;
@@ -184,6 +205,10 @@ export const mainSlice = createSlice({
       });
   },
 });
+
+/**
+ * Sets/clears preview resources
+ */
 
 function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) {
   state.previewResource = payload.previewResourceId;
