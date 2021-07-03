@@ -31,7 +31,6 @@ export type SetRootFolderPayload = {
   resourceMap: ResourceMapType;
 };
 
-
 export type UpdateResourcePayload = {
   resourceId: string;
   content: string;
@@ -46,7 +45,6 @@ export type SetPreviewDataPayload = {
   previewResourceId?: string;
   previewResources?: ResourceMapType;
 };
-
 
 export const mainSlice = createSlice({
   name: 'main',
@@ -157,7 +155,6 @@ export const mainSlice = createSlice({
      */
     selectFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (action.payload.length > 0) {
-        const selectedPath = action.payload;
         const entries = getAllFileEntriesForPath(action.payload, state.fileMap);
         clearResourceSelections(state.resourceMap);
         clearFileSelections(state.fileMap);
@@ -180,7 +177,7 @@ export const mainSlice = createSlice({
         }
 
         state.selectedResource = undefined;
-        state.selectedPath = selectedPath;
+        state.selectedPath = action.payload;
       }
     },
   },
@@ -224,8 +221,6 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
     });
   }
 }
-
-
 
 export const {selectK8sResource, selectFile, updateResource, updateFileEntry, pathAdded, fileChanged, pathRemoved} =
   mainSlice.actions;
