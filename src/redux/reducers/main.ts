@@ -1,17 +1,12 @@
-import {exec} from 'child_process';
 import log from 'loglevel';
-// @ts-ignore
-import shellPath from 'shell-path';
 import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@src/constants';
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@src/constants';
 import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-import {parseDocument, stringify} from 'yaml';
+import {parseDocument} from 'yaml';
 import fs from 'fs';
-import {monitorRootFolder} from '@redux/utils/fileMonitor';
-import * as k8s from '@kubernetes/client-node';
+import {previewCluster, previewKustomization, setRootFolder} from '@redux/reducers/thunks';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -26,22 +21,14 @@ import {
   getAllFileEntriesForPath,
   getFileEntryForAbsolutePath,
   getResourcesInFile,
-  readFiles,
   reloadFile,
 } from '../utils/fileEntry';
-import {processKustomizations} from '../utils/kustomize';
-import {processParsedResources, recalculateResourceRanges, reprocessResources, saveResource} from '../utils/resource';
-import {AppDispatch} from '../store';
+import {recalculateResourceRanges, reprocessResources, saveResource} from '../utils/resource';
 
-type SetRootFolderPayload = {
+export type SetRootFolderPayload = {
   appConfig: AppConfig;
   fileMap: FileMapType;
   resourceMap: ResourceMapType;
-};
-
-type SetPreviewDataPayload = {
-  previewResourceId?: string;
-  previewResources?: ResourceMapType;
 };
 
 export type UpdateResourcePayload = {
@@ -54,10 +41,18 @@ export type UpdateFileEntryPayload = {
   content: string;
 };
 
+export type SetPreviewDataPayload = {
+  previewResourceId?: string;
+  previewResources?: ResourceMapType;
+};
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
+    /**
+     * called by the file monitor when a path is added to the file system
+     */
     pathAdded: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
@@ -68,6 +63,9 @@ export const mainSlice = createSlice({
         addPath(filePath, state);
       }
     },
+    /**
+     * called by the file monitor when a file is changed in the file system
+     */
     fileChanged: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
@@ -77,6 +75,9 @@ export const mainSlice = createSlice({
         addPath(filePath, state);
       }
     },
+    /**
+     * called by the file monitor when a path is removed from the file system
+     */
     pathRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
@@ -86,6 +87,9 @@ export const mainSlice = createSlice({
         log.warn(`removed file ${filePath} not known - ignoring..`);
       }
     },
+    /**
+     * updates the content of the specified path to the specified value
+     */
     updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
       try {
         const fileEntry = state.fileMap[action.payload.path];
@@ -117,6 +121,9 @@ export const mainSlice = createSlice({
         return original(state);
       }
     },
+    /**
+     * Updates the content of the specified resource to the specified value
+     */
     updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
       try {
         const resource = state.resourceMap[action.payload.resourceId];
@@ -134,36 +141,20 @@ export const mainSlice = createSlice({
         return original(state);
       }
     },
-    rootFolderSet: (state: Draft<AppState>, action: PayloadAction<SetRootFolderPayload>) => {
-      state.resourceMap = action.payload.resourceMap;
-      state.fileMap = action.payload.fileMap;
-      state.selectedResource = undefined;
-      state.selectedPath = undefined;
-      state.previewResource = undefined;
-    },
-    setPreviewData: (state: Draft<AppState>, action: PayloadAction<SetPreviewDataPayload>) => {
-      state.previewResource = action.payload.previewResourceId;
-
-      // remove previous preview resources
-      Object.values(state.resourceMap)
-        .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
-        .forEach(r => delete state.resourceMap[r.id]);
-
-      if (action.payload.previewResourceId && action.payload.previewResources) {
-        Object.values(action.payload.previewResources).forEach(r => {
-          state.resourceMap[r.id] = r;
-        });
-      }
-    },
+    /**
+     * Marks the specified resource as selected and highlights all related resources
+     */
     selectK8sResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const resource = state.resourceMap[action.payload];
       if (resource) {
         updateSelectionAndHighlights(state, resource);
       }
     },
+    /**
+     * Marks the specified file as selected and highlights all related resources
+     */
     selectFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (action.payload.length > 0) {
-        const selectedPath = action.payload;
         const entries = getAllFileEntriesForPath(action.payload, state.fileMap);
         clearResourceSelections(state.resourceMap);
         clearFileSelections(state.fileMap);
@@ -186,157 +177,49 @@ export const mainSlice = createSlice({
         }
 
         state.selectedResource = undefined;
-        state.selectedPath = selectedPath;
+        state.selectedPath = action.payload;
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(
+      previewKustomization.fulfilled, (state, action) => {
+        setPreviewData(action.payload, state);
+      });
+
+    builder.addCase(
+      previewCluster.fulfilled, (state, action) => {
+        setPreviewData(action.payload, state);
+      });
+
+    builder.addCase(
+      setRootFolder.fulfilled, (state, action) => {
+        state.resourceMap = action.payload.resourceMap;
+        state.fileMap = action.payload.fileMap;
+        state.selectedResource = undefined;
+        state.selectedPath = undefined;
+        state.previewResource = undefined;
+      });
   },
 });
 
 /**
- * Thunk to set the specified root folder
+ * Sets/clears preview resources
  */
 
-export function setRootFolder(rootFolder: string, appConfig: AppConfig) {
-  return async (dispatch: AppDispatch) => {
-    const folderPath = path.parse(rootFolder);
-    const resourceMap: ResourceMapType = {};
-    const fileMap: FileMapType = {};
+function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) {
+  state.previewResource = payload.previewResourceId;
 
-    const rootEntry: FileEntry = {
-      name: folderPath.name,
-      filePath: rootFolder,
-      highlight: false,
-      selected: false,
-      expanded: false,
-      excluded: false,
-      children: [],
-    };
+  // remove previous preview resources
+  Object.values(state.resourceMap)
+    .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
+    .forEach(r => delete state.resourceMap[r.id]);
 
-    fileMap[ROOT_FILE_ENTRY] = rootEntry;
-
-    rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap);
-    processKustomizations(resourceMap, fileMap);
-    processParsedResources(resourceMap);
-
-    monitorRootFolder(rootFolder, appConfig, dispatch);
-
-    dispatch(
-      mainSlice.actions.rootFolderSet({
-        appConfig,
-        fileMap,
-        resourceMap,
-      })
-    );
-  };
-}
-
-/**
- * Thunk to preview a kustomization
- */
-
-export function previewKustomization(id: string) {
-  // eslint-disable-next-line no-unused-vars
-  return async (dispatch: AppDispatch, getState: any) => {
-    const state: AppState = getState().main;
-    if (state.previewResource === id) {
-      dispatch(mainSlice.actions.setPreviewData({}));
-    } else {
-      const resource = state.resourceMap[id];
-      if (resource && resource.filePath) {
-        const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-        const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
-        log.info(`previewing ${id} in folder ${folder}`);
-
-        // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
-        exec(
-          'kubectl kustomize ./',
-          {
-            cwd: folder,
-            env: {
-              NODE_ENV: process.env.NODE_ENV,
-              PUBLIC_URL: process.env.PUBLIC_URL,
-              PATH: shellPath.sync(),
-            },
-          },
-          (error, stdout, stderr) => {
-            if (error) {
-              log.error(`Failed to generate kustomizations: ${error.message}`);
-              return;
-            }
-            if (stderr) {
-              log.error(`Failed to generate kustomizations: ${stderr}`);
-              return;
-            }
-
-            const resourceMap: ResourceMapType = {};
-
-            extractK8sResources(stdout, PREVIEW_PREFIX + resource.id).forEach(r => {
-              resourceMap[r.id] = r;
-            });
-            processParsedResources(resourceMap);
-
-            dispatch(mainSlice.actions.setPreviewData({previewResourceId: id, previewResources: resourceMap}));
-          }
-        );
-      }
-    }
-  };
-}
-
-/**
- * Utility to convert list of objects returned by k8s api to a single YAML document
- */
-
-function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: string) {
-  return items
-    .map(item => {
-      delete item.metadata?.managedFields;
-      return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
-    })
-    .join(YAML_DOCUMENT_DELIMITER);
-}
-
-/**
- * Thunk to preview cluster objects
- */
-
-export function previewCluster(configPath: string) {
-  return async (dispatch: AppDispatch, getState: any) => {
-    const state: AppState = getState().main;
-    if (state.previewResource === configPath) {
-      dispatch(mainSlice.actions.setPreviewData({}));
-    } else {
-      const kc = new k8s.KubeConfig();
-      kc.loadFromFile(configPath);
-      const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
-      const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
-
-      Promise.all([
-        k8sAppV1Api.listDeploymentForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
-        }),
-        k8sCoreV1Api.listConfigMapForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'v1');
-        }),
-        k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Service', 'v1');
-        }),
-      ]).then(yamls => {
-        const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
-        const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
-
-        if (resources && resources.length > 0) {
-          const resourceMap = resources.reduce((acc: ResourceMapType, item) => {
-            acc[item.id] = item;
-            return acc;
-          }, {});
-
-          processParsedResources(resourceMap);
-          dispatch(mainSlice.actions.setPreviewData({previewResourceId: configPath, previewResources: resourceMap}));
-        }
-      });
-    }
-  };
+  if (payload.previewResourceId && payload.previewResources) {
+    Object.values(payload.previewResources).forEach(r => {
+      state.resourceMap[r.id] = r;
+    });
+  }
 }
 
 export const {selectK8sResource, selectFile, updateResource, updateFileEntry, pathAdded, fileChanged, pathRemoved} =
