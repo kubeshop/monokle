@@ -19,7 +19,7 @@ import {previewKustomization} from '@redux/reducers/thunks';
 const ALL_NAMESPACES = '- all -';
 
 const NavContainer = styled(Container)`
-  background: ${colors.appNormalBackgroound};
+  background: ${colors.appNormalBackground};
   width: 100%;
   height: 100%;
   margin: 0;
@@ -29,7 +29,7 @@ const NavContainer = styled(Container)`
 const TitleRow = styled(Row)`
   border: 1px solid blue;
   border-radius: 2px;
-  background: ${colors.appNormalBackgroound};
+  background: ${colors.appNormalBackground};
   width: 100%;
   margin: 0;
   padding: 0;
@@ -38,14 +38,14 @@ const TitleRow = styled(Row)`
 const SectionRow = styled(Row)`
   border: 1px solid blue;
   border-radius: 2px;
-  background: ${colors.appNormalBackgroound};
+  background: ${colors.appNormalBackground};
   width: 100%;
   margin: 0;
   padding: 0;
 `;
 
 const ItemRow = styled(Row)`
-  background: ${colors.appNormalBackgroound};
+  background: ${colors.appNormalBackground};
   width: 100%;
   margin: 0;
   padding: 0;

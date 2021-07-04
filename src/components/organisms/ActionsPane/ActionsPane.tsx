@@ -1,52 +1,46 @@
-import * as React from 'react';
-import {Button, Col, Container, Row, Tab, Tabs} from 'react-bootstrap';
+import {Tabs, Typography, Row, Col, Button} from 'antd';
 import styled from 'styled-components';
+import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
 import {appColors as colors} from '@styles/AppColors';
 import Monaco from '@molecules/Monaco';
-import LogViewer from '@molecules/LogViewer';
 import FormEditor from '@molecules/FormEditor';
 import GraphView from '@molecules/GraphView';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
+import TabHeader from "@atoms/Tabs";
 
-const ActionContainer = styled(Container)`
-  background: ${colors.appNormalBackgroound};
+const ActionContainer = styled.div`
+  background: ${colors.appNormalBackground};
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
 `;
 
-const TitleRow = styled(Row)`
-  border: 1px solid blue;
-  border-radius: 2px;
-  background: ${colors.appNormalBackgroound};
-  width: 100%;
-  margin: 0;
-  padding: 0;
+const {TabPane} = Tabs;
+const {Title} = Typography;
+
+const StyledTabs = styled(Tabs)`
+  & .ant-tabs-nav {
+    padding: 0 16px;
+  };
+  & .ant-tabs-nav::before {
+    border-bottom: 1px solid #363636;
+  };
 `;
 
-const SectionRow = styled(Row)`
-  border: 1px solid blue;
-  border-radius: 2px;
-  background: ${colors.appNormalBackgroound};
-  width: 100%;
-  margin: 0;
-  padding: 0;
+const StyledSectionTitle = styled(Title)`
+  &.ant-typography {
+    text-transform: uppercase;
+    margin-bottom: 0;
+  }
 `;
 
-const SectionCol = styled(Col)`
-  width: 100%;
-  margin: 0;
-  padding: 0;
-`;
-
-const Title = styled.h4`
-  font-size: 1.5em;
-  text-align: center;
-  color: tomato;
+const StyledSectionHeader = styled(Col)`
+  padding: 12px 16px;
+  border-bottom: 1px solid #363636;
 `;
 
 const ActionsPane = (props: {actionHeight: string}) => {
@@ -67,48 +61,43 @@ const ActionsPane = (props: {actionHeight: string}) => {
     if (key === 'form' && !selectedResource) {
       setKey('source');
     }
-  }, [selectedResource]);
+  }, [selectedResource, key]);
+
+  const OperationsSlot = {
+    right: <Button onClick={applySelectedResource} type="primary">Apply</Button>,
+  };
 
   return (
     <ActionContainer>
-      <TitleRow>
-        <Title>Editors/Actions</Title>
-      </TitleRow>
-      <SectionRow>
-        <Button
-          variant="outline-dark"
-          size="sm"
-          onClick={applySelectedResource}
-          disabled={selectedResource === undefined}
-        >
-          Apply
-        </Button>
-      </SectionRow>
-      <SectionRow>
-        <SectionCol>
-          <Tabs
+      <Row>
+        <StyledSectionHeader span={24}>
+          <StyledSectionTitle level={5}>Editor</StyledSectionTitle>
+        </StyledSectionHeader>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <StyledTabs
             defaultActiveKey="source"
-            id="uncontrolled-tab-example"
             activeKey={key}
-            onSelect={k => {
-              if (k) setKey(k);
-            }}
+            onChange={k => setKey(k)}
+            tabBarExtraContent={OperationsSlot}
           >
-            <Tab eventKey="source" title="Source">
+            <TabPane tab={<TabHeader icon={<CodeOutlined />} >Source</TabHeader>} key="source">
               <Monaco editorHeight={actionHeight} />
-            </Tab>
-            <Tab eventKey="form" title="Form" disabled={!selectedResource}>
+            </TabPane>
+            <TabPane tab={<TabHeader icon={<ContainerOutlined />} >Form</TabHeader>} disabled={!selectedResource} key="form">
               <FormEditor />
-            </Tab>
-            <Tab eventKey="graph" title="Graph">
+            </TabPane>
+            <TabPane tab={<TabHeader icon={<ClusterOutlined />} >Graph</TabHeader>} key="graph">
               <GraphView editorHeight={actionHeight} />
-            </Tab>
-            <Tab eventKey="logger" title="Logger">
+            </TabPane>
+
+            {/* <Tab eventKey="logger" title="Logger">
               <LogViewer editorHeight={actionHeight} />
-            </Tab>
-          </Tabs>
-        </SectionCol>
-      </SectionRow>
+            </Tab> */}
+          </StyledTabs>
+        </Col>
+      </Row>
     </ActionContainer>
   );
 };

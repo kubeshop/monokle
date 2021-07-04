@@ -1,3 +1,3 @@
 export const appColors = {
-  appNormalBackgroound: 'white',
+  appNormalBackground: '#000',
 };
