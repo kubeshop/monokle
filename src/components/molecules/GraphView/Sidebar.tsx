@@ -5,6 +5,7 @@ import {useStore, useZoomPanHelper} from 'react-flow-renderer';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutoZoom} from '@redux/reducers/appConfig';
+import {Button, Checkbox, Space} from 'antd';
 
 autoPlay(true);
 
@@ -20,22 +21,24 @@ const Sidebar = (reactFlow: any) => {
 
   const performTransform = useCallback(
     (transform: any) => {
-      const {
-        position: [x, y],
-        zoom,
-      } = reactFlow.reactFlow.toObject();
+      if (reactFlow.reactFlow) {
+        const {
+          position: [x, y],
+          zoom,
+        } = reactFlow.reactFlow.toObject();
 
-      new Tween({x: -x + 300, y: -y + 300, zoom})
-        .to(transform, TRANSITION_TIME)
-        .easing(EASING)
-        // @ts-ignore
-        .on('update', ({x: xPos, y: yPos, zoom: zoomLevel}) =>
+        new Tween({x: -x + 300, y: -y + 300, zoom})
+          .to(transform, TRANSITION_TIME)
+          .easing(EASING)
           // @ts-ignore
-          zoomPanHelper.setCenter(xPos, yPos, zoomLevel)
-        )
-        .start();
+          .on('update', ({x: xPos, y: yPos, zoom: zoomLevel}) =>
+            // @ts-ignore
+            zoomPanHelper.setCenter(xPos, yPos, zoomLevel),
+          )
+          .start();
+      }
     },
-    [zoomPanHelper, reactFlow.reactFlow]
+    [zoomPanHelper, reactFlow.reactFlow],
   );
 
   const selectSelectedResource = useCallback(() => {
@@ -68,7 +71,7 @@ const Sidebar = (reactFlow: any) => {
     (e: any) => {
       dispatch(setAutoZoom(e.target.checked));
     },
-    [dispatch]
+    [dispatch],
   );
 
   function fit() {
@@ -87,24 +90,26 @@ const Sidebar = (reactFlow: any) => {
         })
         .start();
     },
-    [zoomPanHelper, store]
+    [zoomPanHelper, store],
   );
 
   return (
     <aside>
-      <button type="button" onClick={fit}>
-        Fit view
-      </button>
-      <button type="button" onClick={handleZoom(1.4)}>
-        Zoom in
-      </button>
-      <button type="button" onClick={handleZoom(1 / 1.4)}>
-        Zoom out
-      </button>
-      <button type="button" onClick={selectSelectedResource} disabled={selectedResource === undefined}>
-        Zoom on selected resource
-      </button>
-      <input type="checkbox" onChange={onZoomChange} checked={settings.autoZoomGraphOnSelection === true} /> auto-zoom
+      <Space>
+        <Button type='primary' onClick={fit}>
+          Fit view
+        </Button>
+        <Button type='primary' onClick={handleZoom(1.4)}>
+          Zoom in
+        </Button>
+        <Button type='primary' onClick={handleZoom(1 / 1.4)}>
+          Zoom out
+        </Button>
+        <Button type='primary' onClick={selectSelectedResource} disabled={selectedResource === undefined}>
+          Zoom on selected resource
+        </Button>
+        <Checkbox onChange={onZoomChange} checked={settings.autoZoomGraphOnSelection === true}>auto-zoom</Checkbox>
+      </Space>
     </aside>
   );
 };
