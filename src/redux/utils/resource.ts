@@ -10,7 +10,7 @@ import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/utils/fileEnt
 import {LineCounter, parseAllDocuments} from 'yaml';
 import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
-import {uuidv4} from '@redux/utils/utils';
+import {v4 as uuidv4} from 'uuid';
 
 /**
  * Processes all services in the specified resourceMap and creates
