@@ -11,7 +11,7 @@ import {appColors as colors} from '@styles/AppColors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {FileEntry} from '@models/fileentry';
-import {getResourcesInFile, getChildFilePath} from '@redux/utils/fileEntry';
+import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 import {PROCESS_ENV} from '@actions/common/apply';
@@ -31,7 +31,7 @@ const mapTreeNodeFromFileEntry = (
   fileMap: FileMapType,
   resourceMap: ResourceMapType
 ): TreeNode => {
-  const resources = getResourcesInFile(fileEntry.filePath, resourceMap);
+  const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
   const result: TreeNode = {
     name: fileEntry.name + (resources.length > 0 ? ` [${resources.length}]` : ''),
@@ -160,8 +160,8 @@ const FileTreePane = () => {
       </TitleRow>
       <Button
         variant={previewResource === PROCESS_ENV.KUBECONFIG ? 'secondary' : 'outline-dark'}
-        size="sm"
-        disabled={!!previewResource && previewResource !== PROCESS_ENV.KUBECONFIG}
+        size='sm'
+        disabled={Boolean(previewResource) && previewResource !== PROCESS_ENV.KUBECONFIG}
         onClick={connectToCluster}
       >
         Show Cluster Objects...
@@ -173,7 +173,7 @@ const FileTreePane = () => {
         webkitdirectory=""
         onChange={onUploadHandler}
         ref={folderInput}
-        disabled={!!previewResource}
+        disabled={Boolean(previewResource)}
       />
 
       <FolderTree

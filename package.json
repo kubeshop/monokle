@@ -149,5 +149,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "@models/(.+)": "<rootDir>/src/models/$1",
+      "@redux/(.+)": "<rootDir>/src/redux/$1",
+      "@src/(.+)": "<rootDir>/src/$1"
+    }
   }
 }

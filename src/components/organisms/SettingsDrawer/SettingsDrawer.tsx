@@ -12,7 +12,7 @@ const StyledSettingsIcon = styled(SettingOutlined)`
 
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
-  const isSettingsOpened = !!useAppSelector(state => state.ui.settingsOpened);
+  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.settingsOpened));
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());

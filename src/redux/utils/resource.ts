@@ -6,7 +6,11 @@ import {FileEntry} from '@models/fileentry';
 import fs from 'fs';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import {processKustomizations} from '@redux/utils/kustomize';
-import {getAbsoluteResourcePath, getResourcesInFile} from '@redux/utils/fileEntry';
+import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/utils/fileEntry';
+import {LineCounter, parseAllDocuments} from 'yaml';
+import log from 'loglevel';
+import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
+import {uuidv4} from '@redux/utils/utils';
 
 /**
  * Processes all services in the specified resourceMap and creates
@@ -15,7 +19,7 @@ import {getAbsoluteResourcePath, getResourcesInFile} from '@redux/utils/fileEntr
 
 export function processServices(resourceMap: ResourceMapType) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(
-    d => d.content.spec?.template?.metadata?.labels
+    d => d.content.spec?.template?.metadata?.labels,
   );
 
   getK8sResources(resourceMap, 'Service').forEach(service => {
@@ -160,7 +164,7 @@ export function isKustomizationResource(r: K8sResource | undefined) {
 
 export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
   if (fileEntry.name.toLowerCase() === 'kustomization.yaml') {
-    const resources = getResourcesInFile(fileEntry.filePath, resourceMap);
+    const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
     return resources.length === 1 && isKustomizationResource(resources[0]);
   }
 
@@ -264,7 +268,7 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
     const fileEntry = state.fileMap[resource.filePath];
     if (fileEntry) {
       // get list of resourceIds in file sorted by startPosition
-      const resourceIds = getResourcesInFile(resource.filePath, state.resourceMap)
+      const resourceIds = getResourcesForPath(resource.filePath, state.resourceMap)
         .sort((a, b) => {
           return a.range && b.range ? a.range.start - b.range.start : 0;
         })
@@ -294,13 +298,66 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
   }
 }
 
-// taken from https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
-export function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    // eslint-disable-next-line no-bitwise
-    const r = (Math.random() * 16) | 0;
-    // eslint-disable-next-line no-bitwise
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+/**
+ * Extracts all resources from the specified text content (must be yaml)
+ */
+
+export function extractK8sResources(fileContent: string, relativePath: string) {
+  const lineCounter: LineCounter = new LineCounter();
+  const documents = parseAllDocuments(fileContent, {lineCounter});
+  const result: K8sResource[] = [];
+
+  if (documents) {
+    let docIndex = 0;
+    documents.forEach(d => {
+      if (d.errors.length > 0) {
+        log.warn(
+          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${d.errors.length} error(s)`,
+        );
+        d.errors.forEach(e => log.warn(e.message));
+      } else {
+        const content = d.toJS();
+        if (content && content.apiVersion && content.kind) {
+          let resource: K8sResource = {
+            name: createResourceName(relativePath, content),
+            filePath: relativePath,
+            id: uuidv4(),
+            kind: content.kind,
+            version: content.apiVersion,
+            content,
+            highlight: false,
+            selected: false,
+            text: fileContent.slice(d.range[0], d.range[1]),
+          };
+
+          if (documents.length > 1) {
+            resource.range = {start: d.range[0], length: d.range[1] - d.range[0]};
+          }
+
+          if (content.metadata && content.metadata.namespace) {
+            resource.namespace = content.metadata.namespace;
+          }
+
+          result.push(resource);
+        }
+      }
+      docIndex += 1;
+    });
+  }
+  return result;
+}
+
+/**
+ * Gets all resources linked to the specified resource
+ */
+
+export function getLinkedResources(resource: K8sResource) {
+  const linkedResourceIds: string[] = [];
+  resource.refs
+    ?.filter(ref => !isUnsatisfiedRef(ref.refType))
+    .forEach(ref => {
+      linkedResourceIds.push(ref.target);
+    });
+
+  return linkedResourceIds;
 }

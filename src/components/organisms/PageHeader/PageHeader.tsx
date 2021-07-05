@@ -34,17 +34,18 @@ const StyledSettingsIcon = styled(SettingOutlined)`
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
-  const isInPreviewMode = !!useAppSelector(state => state.main.previewResource);
+  const isInPreviewMode = Boolean(useAppSelector(state => state.main.previewResource));
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());
   };
 
   return (
-    <StyledHeader noborder style={{
-      zIndex: 1,
-      height: '30px'
-    }}>
+    <StyledHeader noborder
+                  style={{
+                    zIndex: 1,
+                    height: '30px',
+                  }}>
       <Row noborder>
         <Col span={4} noborder>
           <IconMonokle />

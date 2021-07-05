@@ -17,13 +17,12 @@ import {
 import {
   addPath,
   removePath,
-  extractK8sResources,
   getAllFileEntriesForPath,
   getFileEntryForAbsolutePath,
-  getResourcesInFile,
+  getResourcesForPath,
   reloadFile,
 } from '../utils/fileEntry';
-import {recalculateResourceRanges, reprocessResources, saveResource} from '../utils/resource';
+import {extractK8sResources, recalculateResourceRanges, reprocessResources, saveResource} from '../utils/resource';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -101,7 +100,7 @@ export const mainSlice = createSlice({
             fs.writeFileSync(filePath, action.payload.content);
             fileEntry.timestamp = fs.statSync(filePath).mtime.getTime();
 
-            getResourcesInFile(fileEntry.filePath, state.resourceMap).forEach(r => {
+            getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
               delete state.resourceMap[r.id];
             });
 
@@ -167,7 +166,7 @@ export const mainSlice = createSlice({
             });
 
           const parent = entries[entries.length - 1];
-          getResourcesInFile(parent.filePath, state.resourceMap).forEach(r => {
+          getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
             r.highlight = true;
           });
 
