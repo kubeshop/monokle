@@ -6,7 +6,7 @@ import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
-import {previewCluster, previewKustomization, setRootFolder} from '@redux/reducers/thunks';
+import {diffResource, previewCluster, previewKustomization, setRootFolder} from '@redux/reducers/thunks';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -43,6 +43,11 @@ export type UpdateFileEntryPayload = {
 export type SetPreviewDataPayload = {
   previewResourceId?: string;
   previewResources?: ResourceMapType;
+};
+
+export type SetDiffDataPayload = {
+  diffResourceId?: string;
+  diffContent?: string;
 };
 
 export const mainSlice = createSlice({
@@ -199,6 +204,13 @@ export const mainSlice = createSlice({
         state.selectedPath = undefined;
         state.previewResource = undefined;
       });
+
+    builder.addCase(
+      diffResource.fulfilled, (state, action) => {
+        state.diffResource = action.payload.diffResourceId;
+        state.diffContent = action.payload.diffContent;
+      },
+    );
   },
 });
 

@@ -14,6 +14,7 @@ import FileTreePane from '@organisms/FileTreePane';
 import MessageBox from '@organisms/MessageBox';
 import SettingsDrawer from '@organisms/SettingsDrawer';
 import {Size} from '@models/window';
+import DiffModal from '@organisms/DiffModal';
 
 const StyledColumn = styled(Col)`
   width: 100%;
@@ -64,6 +65,7 @@ const App = () => {
 
         <PageFooter />
       </Layout>
+      <DiffModal />
     </div>
   );
 };

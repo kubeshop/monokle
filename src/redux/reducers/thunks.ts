@@ -14,7 +14,10 @@ import shellPath from 'shell-path';
 import {FileEntry} from '@models/fileentry';
 import {processKustomizations} from '@redux/utils/kustomize';
 import {monitorRootFolder} from '@redux/utils/fileMonitor';
-import {SetPreviewDataPayload, SetRootFolderPayload} from '@redux/reducers/main';
+import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@redux/reducers/main';
+import {PROCESS_ENV} from '@actions/common/apply';
+import {AlertEnum, AlertType} from '@models/alert';
+import {setAlert} from '@redux/reducers/alert';
 
 /**
  * Thunk to preview a kustomization
@@ -166,4 +169,66 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
     fileMap,
     resourceMap,
   };
+});
+
+/**
+ * Thunk to diff a resource against the configured cluster
+ */
+
+export const diffResource = createAsyncThunk<SetDiffDataPayload,
+  string,
+  {
+    dispatch: AppDispatch,
+    state: RootState,
+  }>
+('main/setDiffContent', async (diffResourceId, thunkAPI) => {
+  const resourceMap = thunkAPI.getState().main.resourceMap;
+  try {
+    const resource = resourceMap[diffResourceId];
+    if (resource && resource.text) {
+      const kc = new k8s.KubeConfig();
+      kc.loadFromFile(PROCESS_ENV.KUBECONFIG);
+
+      const handleResource = (res: any) => {
+        if (res.body) {
+          delete res.body.metadata?.managedFields;
+          return {diffContent: stringify(res.body, {sortMapEntries: true}), diffResourceId};
+        }
+
+        log.error(`Failed to get ${resource.content.kind} from cluster`);
+        return {};
+      };
+
+      const handleRejection = (rej: any) => {
+        const alert: AlertType = {
+          type: AlertEnum.Error,
+          title: 'Diff failed',
+          message: `${resource.content.kind} ${resource.content.metadata.name} not found in cluster`,
+        };
+        thunkAPI.dispatch(setAlert(alert));
+        return {};
+      };
+
+      if (resource.kind === 'ConfigMap') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api.readNamespacedConfigMap(resource.content.metadata.name,
+          resource.namespace ? resource.namespace : 'default', 'true').then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Service') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api.readNamespacedService(resource.content.metadata.name,
+          resource.namespace ? resource.namespace : 'default', 'true').then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Deployment') {
+        const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+        return k8sAppV1Api.readNamespacedDeployment(resource.content.metadata.name,
+          resource.namespace ? resource.namespace : 'default', 'true').then(handleResource, handleRejection);
+      }
+    }
+  } catch (e) {
+    log.error('Failed to diff resource');
+    log.error(e);
+  }
+
+  return {};
 });

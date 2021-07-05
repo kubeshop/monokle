@@ -23,6 +23,8 @@ interface AppState {
   selectedResource?: string; // the id of the currently selected resource
   selectedPath?: string; // the currently selected path
   previewResource?: string; // the resource currently being previewed
+  diffResource?: string; // the resource currently being diffed
+  diffContent?: string; // the diff content for the resource being diffed
 }
 
 export type {AppState, ResourceMapType, FileMapType};

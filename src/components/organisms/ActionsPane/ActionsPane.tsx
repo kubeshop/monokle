@@ -1,4 +1,4 @@
-import {Tabs, Typography, Row, Col, Button} from 'antd';
+import {Tabs, Typography, Row, Col, Button, Space} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
@@ -9,7 +9,8 @@ import GraphView from '@molecules/GraphView';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
-import TabHeader from "@atoms/Tabs";
+import TabHeader from '@atoms/Tabs';
+import {diffResource} from '@redux/reducers/thunks';
 
 const ActionContainer = styled.div`
   background: ${colors.appNormalBackground};
@@ -25,10 +26,13 @@ const {Title} = Typography;
 const StyledTabs = styled(Tabs)`
   & .ant-tabs-nav {
     padding: 0 16px;
-  };
+  }
+;
+
   & .ant-tabs-nav::before {
     border-bottom: 1px solid #363636;
-  };
+  }
+;
 `;
 
 const StyledSectionTitle = styled(Title)`
@@ -57,6 +61,12 @@ const ActionsPane = (props: {actionHeight: string}) => {
     }
   }
 
+  async function diffSelectedResource() {
+    if (selectedResource) {
+      dispatch(diffResource(selectedResource));
+    }
+  }
+
   useEffect(() => {
     if (key === 'form' && !selectedResource) {
       setKey('source');
@@ -64,7 +74,10 @@ const ActionsPane = (props: {actionHeight: string}) => {
   }, [selectedResource, key]);
 
   const OperationsSlot = {
-    right: <Button onClick={applySelectedResource} type="primary">Apply</Button>,
+    right: <Space>
+      <Button onClick={applySelectedResource} disabled={!selectedResource} type='primary'>Apply</Button>
+      <Button onClick={diffSelectedResource} disabled={!selectedResource} type='primary'>Diff</Button>
+    </Space>,
   };
 
   return (
@@ -77,18 +90,20 @@ const ActionsPane = (props: {actionHeight: string}) => {
       <Row>
         <Col span={24}>
           <StyledTabs
-            defaultActiveKey="source"
+            defaultActiveKey='source'
             activeKey={key}
             onChange={k => setKey(k)}
             tabBarExtraContent={OperationsSlot}
           >
-            <TabPane tab={<TabHeader icon={<CodeOutlined />} >Source</TabHeader>} key="source">
+            <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key='source'>
               <Monaco editorHeight={actionHeight} />
             </TabPane>
-            <TabPane tab={<TabHeader icon={<ContainerOutlined />} >Form</TabHeader>} disabled={!selectedResource} key="form">
+            <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
+                     disabled={!selectedResource}
+                     key='form'>
               <FormEditor />
             </TabPane>
-            <TabPane tab={<TabHeader icon={<ClusterOutlined />} >Graph</TabHeader>} key="graph">
+            <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key='graph'>
               <GraphView editorHeight={actionHeight} />
             </TabPane>
 
