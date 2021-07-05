@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
-import 'antd/dist/antd.css';
+import 'antd/dist/antd.less';
 
 import Layout from '@atoms/Layout';
 import PageHeader from '@organisms/PageHeader';
@@ -42,22 +42,22 @@ const App = () => {
   return (
     <div>
       <MessageBox />
-      <Layout style={{ height: mainHeight }}>
+      <Layout style={{height: mainHeight}}>
         <PageHeader />
         <SettingsDrawer />
 
-        <StyledContent style={{ height: contentHeight }}>
-          <StyledRow style={{ height: contentHeight }}>
+        <StyledContent style={{height: contentHeight}}>
+          <StyledRow style={{height: contentHeight}}>
             <StyledColumn sm={6}>
               <FileTreePane />
             </StyledColumn>
 
             <StyledColumn sm={6}>
-              <NavigatorPane/>
+              <NavigatorPane />
             </StyledColumn>
 
             <StyledColumn sm={12}>
-              <ActionsPane actionHeight={contentHeight}/>
+              <ActionsPane actionHeight={contentHeight} />
             </StyledColumn>
           </StyledRow>
         </StyledContent>

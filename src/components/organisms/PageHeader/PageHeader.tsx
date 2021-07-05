@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { SettingOutlined } from '@ant-design/icons';
+import {SettingOutlined} from '@ant-design/icons';
 
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleSettings} from '@redux/reducers/ui';
@@ -42,10 +42,10 @@ const PageHeader = () => {
 
   return (
     <StyledHeader noborder
-                  style={{
-                    zIndex: 1,
-                    height: '30px',
-                  }}>
+      style={{
+        zIndex: 1,
+        height: '30px'
+      }}>
       <Row noborder>
         <Col span={4} noborder>
           <IconMonokle />
@@ -56,7 +56,7 @@ const PageHeader = () => {
         <SettingsCol span={11}>
           <StyledSettingsIcon
             onClick={toggleSettingsDrawer}
-            style={{ fontSize: '1.5em' }}
+            style={{fontSize: '1.5em'}}
           />
         </SettingsCol>
       </Row>

@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import MonacoEditor, { monaco } from 'react-monaco-editor';
+import React, {useEffect, useState} from 'react';
+import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
-import { useMeasure } from 'react-use';
+import {useMeasure} from 'react-use';
 import styled from 'styled-components';
-import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import 'monaco-yaml/lib/esm/monaco.contribution';
-import { languages } from 'monaco-editor/esm/vs/editor/editor.api';
+import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor';
+import {Button} from 'antd';
+
 
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -15,13 +17,12 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
-import { getResourceSchema } from '@redux/utils/schema';
-import { Button } from 'react-bootstrap';
-import { logMessage } from '@redux/utils/log';
-import { updateFileEntry, updateResource } from '@redux/reducers/main';
-import { parseAllDocuments } from 'yaml';
-import { ROOT_FILE_ENTRY } from '@src/constants';
-import { KUBESHOP_MONACO_THEME } from "@utils/monaco";
+import {getResourceSchema} from '@redux/utils/schema';
+import {logMessage} from '@redux/utils/log';
+import {updateFileEntry, updateResource} from '@redux/reducers/main';
+import {parseAllDocuments} from 'yaml';
+import {ROOT_FILE_ENTRY} from '@src/constants';
+import {KUBESHOP_MONACO_THEME} from "@utils/monaco";
 
 // @ts-ignore
 window.MonacoEnvironment = {
@@ -41,18 +42,22 @@ const MonacoContainer = styled.div`
   margin: 0px;
 `;
 
-// @ts-ignore
-const { yaml } = languages || {};
+const StyledSaveButton = styled(Button)`
+  margin: 0 16px 16px;
+`;
 
-const Monaco = (props: { editorHeight: string }) => {
-  const { editorHeight } = props;
+// @ts-ignore
+const {yaml} = languages || {};
+
+const Monaco = (props: {editorHeight: string}) => {
+  const {editorHeight} = props;
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [editor, setEditor] = useState<monaco.editor.IEditor>();
   const [code, setCode] = useState('');
-  const [ref, { width }] = useMeasure<HTMLDivElement>();
+  const [ref, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
@@ -74,7 +79,7 @@ const Monaco = (props: { editorHeight: string }) => {
     // @ts-ignore
     monaco.editor.onDidChangeMarkers(onDidChangeMarkers);
 
-    e.updateOptions({ tabSize: 2 });
+    e.updateOptions({tabSize: 2});
     e.onDidChangeCursorSelection(onChangeCursorSelection);
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
@@ -95,13 +100,13 @@ const Monaco = (props: { editorHeight: string }) => {
     // is a file and no resource selected?
     if (selectedPath && !selectedResource) {
       try {
-        dispatch(updateFileEntry({ path: selectedPath, content: value }));
+        dispatch(updateFileEntry({path: selectedPath, content: value}));
       } catch (e) {
         logMessage(`Failed to update file ${e}`, dispatch);
       }
     } else if (selectedResource && resourceMap[selectedResource]) {
       try {
-        dispatch(updateResource({ resourceId: selectedResource, content: value.toString() }));
+        dispatch(updateResource({resourceId: selectedResource, content: value.toString()}));
       } catch (e) {
         logMessage(`Failed to update resource ${e}`, dispatch);
       }
@@ -169,14 +174,13 @@ const Monaco = (props: { editorHeight: string }) => {
 
   return (
     <>
-      <Button
-        variant={hasWarnings ? 'outline-danger' : 'outline-dark'}
-        size="sm"
+      <StyledSaveButton
+        type={hasWarnings ? "dashed" : "primary"}
         disabled={!isDirty || !isValid}
         onClick={saveContent}
       >
         Save Changes
-      </Button>
+      </StyledSaveButton>
       <MonacoContainer ref={ref}>
         <MonacoEditor
           width={width}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { SettingOutlined } from '@ant-design/icons';
+import {SettingOutlined} from '@ant-design/icons';
 
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleSettings} from '@redux/reducers/ui';
@@ -27,7 +27,7 @@ const SettingsDrawer = () => {
       onClose={toggleSettingsDrawer}
       visible={isSettingsOpened}
     >
-      <StyledSettingsIcon style={{ fontSize: '1.5em' }}/>
+      <StyledSettingsIcon style={{fontSize: '1.5em'}} />
     </Drawer>
   );
 };

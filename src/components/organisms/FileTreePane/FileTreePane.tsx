@@ -85,7 +85,7 @@ function findRootFolder(files: FileList) {
 }
 
 const FileTreeContainer = styled.div`
-  background: ${colors.appNormalBackgroound};
+  background: ${colors.appNormalBackground};
   width: 100%;
   height: 100%;
 `;
@@ -93,7 +93,7 @@ const FileTreeContainer = styled.div`
 const TitleRow = styled(Row)`
   border: 1px solid blue;
   border-radius: 2px;
-  background: ${colors.appNormalBackgroound};
+  background: ${colors.appNormalBackground};
   width: 100%;
   margin: 0;
 `;
@@ -143,11 +143,11 @@ const FileTreePane = () => {
   const treeData: TreeNode = rootEntry
     ? mapTreeNodeFromFileEntry(rootEntry, fileMap, resourceMap)
     : {
-        name: '- no folder selected -',
-        checked: 0,
-        isOpen: false,
-        children: null,
-      };
+      name: '- no folder selected -',
+      checked: 0,
+      isOpen: false,
+      children: null,
+    };
 
   const connectToCluster = () => {
     dispatch(previewCluster(PROCESS_ENV.KUBECONFIG));
@@ -160,7 +160,7 @@ const FileTreePane = () => {
       </TitleRow>
       <Button
         variant={previewResource === PROCESS_ENV.KUBECONFIG ? 'secondary' : 'outline-dark'}
-        size='sm'
+        size="sm"
         disabled={Boolean(previewResource) && previewResource !== PROCESS_ENV.KUBECONFIG}
         onClick={connectToCluster}
       >
