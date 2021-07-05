@@ -4,9 +4,9 @@ import {PREVIEW_PREFIX, ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@src/con
 import path from 'path';
 import log from 'loglevel';
 import {exec} from 'child_process';
-import {extractK8sResources, readFiles} from '@redux/utils/fileEntry';
+import {createFileEntry, readFiles} from '@redux/utils/fileEntry';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
-import {processParsedResources} from '@redux/utils/resource';
+import {extractK8sResources, processParsedResources} from '@redux/utils/resource';
 import {stringify} from 'yaml';
 import * as k8s from '@kubernetes/client-node';
 // @ts-ignore
@@ -33,7 +33,7 @@ export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
     if (resource && resource.filePath) {
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
       const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
-      log.info(`previewing ${resourceId} in folder ${folder}`);
+      log.info(`previewing ${resource.id} in folder ${folder}`);
 
       // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
       return new Promise((resolve, reject) => {
@@ -65,7 +65,7 @@ export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
 
             processParsedResources(resourceMap);
 
-            resolve({previewResourceId: resourceId, previewResources: resourceMap});
+            resolve({previewResourceId: resource.id, previewResources: resourceMap});
           },
         );
       });
@@ -137,7 +137,6 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
   return {};
 });
 
-
 /**
  * Thunk to set the specified root folder
  */
@@ -150,19 +149,9 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
   }>
 ('main/setRootFolder', async (rootFolder, thunkAPI) => {
   const appConfig = thunkAPI.getState().config;
-  const folderPath = path.parse(rootFolder);
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
-
-  const rootEntry: FileEntry = {
-    name: folderPath.name,
-    filePath: rootFolder,
-    highlight: false,
-    selected: false,
-    expanded: false,
-    excluded: false,
-    children: [],
-  };
+  const rootEntry: FileEntry = createFileEntry(rootFolder);
 
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
   rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap);
@@ -178,6 +167,3 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
     resourceMap,
   };
 });
-
-
-

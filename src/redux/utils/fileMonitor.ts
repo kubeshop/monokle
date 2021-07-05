@@ -6,6 +6,10 @@ import {fileChanged, pathAdded, pathRemoved} from '@redux/reducers/main';
 let watcher: FSWatcher;
 let initializing = false;
 
+/**
+ * Creates a monitor for the specified folder and dispatches folder events using the specified dispatch
+ */
+
 export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch: AppDispatch) {
   if (watcher) {
     watcher.close();

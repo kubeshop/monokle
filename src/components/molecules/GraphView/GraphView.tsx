@@ -104,7 +104,7 @@ const GraphView = (props: {editorHeight: string}) => {
 
   useEffect(() => {
     let data: any[] = [];
-    activeResources.forEach(r => {
+    activeResources.filter(r => r.refs).forEach(r => {
       data = data.concat(getElementData(r));
     });
     updateGraph(data);

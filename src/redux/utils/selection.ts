@@ -1,57 +1,10 @@
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
-import {K8sResource, ResourceRefType} from '@models/k8sresource';
+import {K8sResource} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
-import {getChildFilePath, getResourcesInFile, selectResourceFileEntry} from '@redux/utils/fileEntry';
-import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
-import {isFileResource, isKustomizationResource} from '@redux/utils/resource';
-
-/**
- * Gets all resources directly linked to by a kustomization, including transient resources
- */
-
-export function getKustomizationRefs(
-  resourceMap: ResourceMapType,
-  kustomizationId: string,
-  selectParent: boolean = false
-) {
-  let linkedResourceIds: string[] = [];
-  const kustomization = resourceMap[kustomizationId];
-  if (kustomization && kustomization.refs) {
-    kustomization.refs
-      .filter(
-        r =>
-          r.refType === ResourceRefType.KustomizationResource ||
-          (selectParent && r.refType === ResourceRefType.KustomizationParent)
-      )
-      .forEach(r => {
-        const target = resourceMap[r.target];
-        if (target) {
-          linkedResourceIds.push(r.target);
-
-          if (target.kind === 'Kustomization' && r.refType === ResourceRefType.KustomizationResource) {
-            linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target));
-          }
-        }
-      });
-  }
-
-  return linkedResourceIds;
-}
-
-/**
- * Gets a resources linked to the specified resource
- */
-
-export function getLinkedResources(resource: K8sResource) {
-  const linkedResourceIds: string[] = [];
-  resource.refs
-    ?.filter(ref => !isUnsatisfiedRef(ref.refType))
-    .forEach(ref => {
-      linkedResourceIds.push(ref.target);
-    });
-
-  return linkedResourceIds;
-}
+import {getAllFileEntriesForPath, getChildFilePath, getResourcesForPath} from '@redux/utils/fileEntry';
+import {getLinkedResources, isFileResource, isKustomizationResource} from '@redux/utils/resource';
+import {getKustomizationRefs} from '@redux/utils/kustomize';
+import path from 'path';
 
 /**
  * Clears all resource highlights and selections except selection for the specified item
@@ -84,13 +37,32 @@ export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: Re
     ?.map(e => fileMap[getChildFilePath(e, fileEntry, fileMap)])
     .filter(child => child)
     .forEach(child => {
-      getResourcesInFile(child.filePath, resourceMap).forEach(e => {
+      getResourcesForPath(child.filePath, resourceMap).forEach(e => {
         e.highlight = true;
       });
       if (child.children) {
         highlightChildrenResources(child, resourceMap, fileMap);
       }
     });
+}
+
+/**
+ * Marks the file entry for the specified resource as selected and ensures that all
+ * parent entries are expanded
+ */
+
+export function selectResourceFileEntry(resource: K8sResource, fileMap: FileMapType) {
+  let result = '';
+  getAllFileEntriesForPath(resource.filePath, fileMap).forEach(e => {
+    result = path.join(result, e.name);
+    if (e.children) {
+      e.expanded = true;
+    } else {
+      e.selected = true;
+    }
+  });
+
+  return result;
 }
 
 /**

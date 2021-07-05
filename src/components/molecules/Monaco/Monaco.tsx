@@ -73,7 +73,6 @@ const Monaco = (props: {editorHeight: string}) => {
     // console.log(e);
   }
 
-
   function editorDidMount(e: any, m: any) {
     setEditor(e);
 

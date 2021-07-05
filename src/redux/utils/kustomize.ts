@@ -3,7 +3,7 @@ import log from 'loglevel';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
-import {getResourcesInFile} from '@redux/utils/fileEntry';
+import {getResourcesForPath} from '@redux/utils/fileEntry';
 import {getK8sResources, isKustomizationFile, linkResources} from './resource';
 
 /**
@@ -11,7 +11,7 @@ import {getK8sResources, isKustomizationFile, linkResources} from './resource';
  */
 
 function linkParentKustomization(fileEntry: FileEntry, kustomization: K8sResource, resourceMap: ResourceMapType) {
-  getResourcesInFile(fileEntry.filePath, resourceMap).forEach(r => {
+  getResourcesForPath(fileEntry.filePath, resourceMap).forEach(r => {
     linkResources(kustomization, r, ResourceRefType.KustomizationResource, ResourceRefType.KustomizationParent);
   });
 }
@@ -65,7 +65,7 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
       kustomization.content.patchesStrategicMerge?.forEach((e: string) => {
         const fileEntry = fileMap[path.join(path.parse(kustomization.filePath).dir, e)];
         if (fileEntry) {
-          getResourcesInFile(fileEntry.filePath, resourceMap).forEach(resource => {
+          getResourcesForPath(fileEntry.filePath, resourceMap).forEach(resource => {
             if (!resource.name.startsWith('Patch:')) {
               resource.name = `Patch: ${resource.name}`;
             }
@@ -75,4 +75,37 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
         }
       });
     });
+}
+
+/**
+ * Gets all resources directly linked to by a kustomization, including transient resources
+ */
+
+export function getKustomizationRefs(
+  resourceMap: ResourceMapType,
+  kustomizationId: string,
+  selectParent: boolean = false,
+) {
+  let linkedResourceIds: string[] = [];
+  const kustomization = resourceMap[kustomizationId];
+  if (kustomization && kustomization.refs) {
+    kustomization.refs
+      .filter(
+        r =>
+          r.refType === ResourceRefType.KustomizationResource ||
+          (selectParent && r.refType === ResourceRefType.KustomizationParent),
+      )
+      .forEach(r => {
+        const target = resourceMap[r.target];
+        if (target) {
+          linkedResourceIds.push(r.target);
+
+          if (target.kind === 'Kustomization' && r.refType === ResourceRefType.KustomizationResource) {
+            linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target));
+          }
+        }
+      });
+  }
+
+  return linkedResourceIds;
 }
