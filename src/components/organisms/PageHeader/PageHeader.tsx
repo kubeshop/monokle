@@ -2,6 +2,9 @@ import * as React from 'react';
 import styled from 'styled-components';
 import {SettingOutlined} from '@ant-design/icons';
 
+import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
+import {AppBorders} from '@styles/Borders';
+
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleSettings} from '@redux/reducers/ui';
 import IconMonokle from '@components/atoms/IconMonokle';
@@ -10,17 +13,17 @@ import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
 
 const EditorMode = styled.h4`
-  font-size: 1em;
+  font-size: 2em;
   text-align: right;
-  color: blue;
+  color: ${Colors.yellowWarning};
 `;
 
 const StyledHeader = styled(Header)`
   width: 100%;
   line-height: 30px;
   padding-left: 10px;
-  background: white;
-  border-bottom: 1px solid lightgrey;
+  background: ${BackgroundColors.darkThemeBackground};
+  border-bottom: ${AppBorders.pageDivider};
 `;
 
 const SettingsCol = styled(Col)`
@@ -30,6 +33,7 @@ const SettingsCol = styled(Col)`
 const StyledSettingsIcon = styled(SettingOutlined)`
   float: right;
   padding: 4px;
+  color: ${FontColors.darkThemeMainFont};
 `;
 
 const PageHeader = () => {
@@ -48,7 +52,7 @@ const PageHeader = () => {
       }}>
       <Row noborder>
         <Col span={4} noborder>
-          <IconMonokle />
+          <IconMonokle useDarkTheme/>
         </Col>
         <Col span={4} offset={5}>
           <EditorMode>{isInPreviewMode ? 'Preview' : ''}</EditorMode>

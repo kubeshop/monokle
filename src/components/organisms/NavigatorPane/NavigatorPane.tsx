@@ -5,7 +5,7 @@ import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
 import '@styles/NavigatorPane.css';
-import {appColors as colors} from '@styles/AppColors';
+import {BackgroundColors} from '@styles/Colors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
@@ -16,10 +16,13 @@ import {NavigatorSubSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
 import {previewKustomization} from '@redux/reducers/thunks';
 
+import MonoSectionTitle from '@atoms/MonoSectionTitle';
+import MonoSectionHeader from '@atoms/MonoSectionHeader';
+
 const ALL_NAMESPACES = '- all -';
 
 const NavContainer = styled(Container)`
-  background: ${colors.appNormalBackground};
+  background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   height: 100%;
   margin: 0;
@@ -27,25 +30,19 @@ const NavContainer = styled(Container)`
 `;
 
 const TitleRow = styled(Row)`
-  border: 1px solid blue;
-  border-radius: 2px;
-  background: ${colors.appNormalBackground};
   width: 100%;
   margin: 0;
   padding: 0;
 `;
 
 const SectionRow = styled(Row)`
-  border: 1px solid blue;
-  border-radius: 2px;
-  background: ${colors.appNormalBackground};
   width: 100%;
   margin: 0;
   padding: 0;
 `;
 
 const ItemRow = styled(Row)`
-  background: ${colors.appNormalBackground};
+  background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   margin: 0;
   padding: 0;
@@ -57,10 +54,12 @@ const SectionCol = styled(Col)`
   padding: 0;
 `;
 
-const Title = styled.h4`
-  font-size: 1.5em;
-  text-align: center;
-  color: tomato;
+const StyledCheckBox = styled.input`
+  float: right;
+`;
+
+const StyledCheckBoxText = styled.h6`
+  float: right;
 `;
 
 const SectionTitle = styled.h5`
@@ -111,10 +110,17 @@ const NavigatorPane = () => {
   return (
     <NavContainer>
       <TitleRow>
-        <Title>Navigator</Title>
-        <SectionCol>
-          <input type="checkbox" onChange={onFilterChange} /> filter selected
-        </SectionCol>
+        <MonoSectionHeader span={24}>
+          <SectionRow>
+            <SectionCol span={12}>
+              <MonoSectionTitle>Navigator</MonoSectionTitle>
+            </SectionCol>
+            <SectionCol span={12}>
+              <StyledCheckBox type="checkbox" onChange={onFilterChange} />
+              <StyledCheckBoxText>Show Relations</StyledCheckBoxText>
+            </SectionCol>
+          </SectionRow>
+        </MonoSectionHeader>
       </TitleRow>
 
       {kustomizations.length > 0 && (

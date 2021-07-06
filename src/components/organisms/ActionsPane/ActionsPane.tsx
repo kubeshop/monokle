@@ -1,19 +1,21 @@
-import {Tabs, Typography, Row, Col, Button, Space} from 'antd';
+import {Tabs, Row, Col, Button, Space} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
-import {appColors as colors} from '@styles/AppColors';
+import {BackgroundColors} from '@styles/Colors';
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
 import GraphView from '@molecules/GraphView';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
 import TabHeader from '@atoms/Tabs';
-import {diffResource} from '@redux/reducers/thunks';
+import MonoSectionTitle from '@atoms/MonoSectionTitle';
+import MonoSectionHeader from '@atoms/MonoSectionHeader';
 
 const ActionContainer = styled.div`
-  background: ${colors.appNormalBackground};
+  background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   height: 100%;
   margin: 0;
@@ -21,7 +23,6 @@ const ActionContainer = styled.div`
 `;
 
 const {TabPane} = Tabs;
-const {Title} = Typography;
 
 const StyledTabs = styled(Tabs)`
   & .ant-tabs-nav {
@@ -33,18 +34,6 @@ const StyledTabs = styled(Tabs)`
     border-bottom: 1px solid #363636;
   }
 ;
-`;
-
-const StyledSectionTitle = styled(Title)`
-  &.ant-typography {
-    text-transform: uppercase;
-    margin-bottom: 0;
-  }
-`;
-
-const StyledSectionHeader = styled(Col)`
-  padding: 12px 16px;
-  border-bottom: 1px solid #363636;
 `;
 
 const ActionsPane = (props: {actionHeight: string}) => {
@@ -83,9 +72,9 @@ const ActionsPane = (props: {actionHeight: string}) => {
   return (
     <ActionContainer>
       <Row>
-        <StyledSectionHeader span={24}>
-          <StyledSectionTitle level={5}>Editor</StyledSectionTitle>
-        </StyledSectionHeader>
+        <MonoSectionHeader>
+          <MonoSectionTitle>Editor</MonoSectionTitle>
+        </MonoSectionHeader>
       </Row>
       <Row>
         <Col span={24}>
