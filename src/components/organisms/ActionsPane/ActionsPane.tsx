@@ -2,7 +2,6 @@ import {Tabs, Space, Col, Row} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
-import {BackgroundColors} from '@styles/Colors';
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
 import GraphView from '@molecules/GraphView';
@@ -11,15 +10,7 @@ import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
 import TabHeader from '@atoms/TabHeader';
-import {MonoButton, MonoSectionHeaderCol, MonoSectionTitle} from '@atoms';
-
-const ActionContainer = styled.div`
-  background: ${BackgroundColors.darkThemeBackground};
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-`;
+import {MonoButton, MonoSectionHeaderCol, MonoSectionTitle, PaneContainer} from '@atoms';
 
 const {TabPane} = Tabs;
 
@@ -69,7 +60,7 @@ const ActionsPane = (props: {actionHeight: string}) => {
   };
 
   return (
-    <ActionContainer>
+    <PaneContainer>
       <Row>
         <MonoSectionHeaderCol>
           <MonoSectionTitle>Editor</MonoSectionTitle>
@@ -101,7 +92,7 @@ const ActionsPane = (props: {actionHeight: string}) => {
           </StyledTabs>
         </Col>
       </Row>
-    </ActionContainer>
+    </PaneContainer>
   );
 };
 

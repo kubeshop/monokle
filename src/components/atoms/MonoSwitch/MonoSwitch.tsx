@@ -34,7 +34,7 @@ const MonoSwitch = (props: MonoSwitchProps) => {
   const {label} = props;
 
   return (<StyledSwitchContainer>
-  <Text style={{fontSize: '0.9em'}}>{label}</Text>
+  <Text style={{fontSize: '0.9em'}}>{label}  </Text>
   <StyledSwitch {...props}/>
 </StyledSwitchContainer>);
 };

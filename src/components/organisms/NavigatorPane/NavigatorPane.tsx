@@ -6,7 +6,7 @@ import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
 import '@styles/NavigatorPane.css';
-import {BackgroundColors, FontColors} from '@styles/Colors';
+import {FontColors} from '@styles/Colors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
@@ -16,17 +16,9 @@ import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
 import {previewKustomization} from '@redux/reducers/thunks';
-import {MonoSwitch, MonoSectionHeaderCol, MonoSectionTitle} from '@atoms';
+import {MonoSwitch, MonoSectionHeaderCol, MonoSectionTitle, PaneContainer} from '@atoms';
 
 const ALL_NAMESPACES = '- all -';
-
-const NavContainer = styled.div`
-  background: ${BackgroundColors.darkThemeBackground};
-  width: 100%;
-  height: 100%;
-  margin: 0px;
-  padding: 0px 4px 0px 4px;
-`;
 
 const TitleRow = styled(Row)`
   width: 100%;
@@ -41,7 +33,6 @@ const SectionRow = styled(Row)`
 `;
 
 const ItemRow = styled(Row)`
-  background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   margin: 0;
   padding: 0;
@@ -99,7 +90,7 @@ const NavigatorPane = () => {
   }
 
   return (
-    <NavContainer>
+    <PaneContainer>
       <TitleRow>
         <MonoSectionHeaderCol span={24}>
           <Row>
@@ -239,7 +230,7 @@ const NavigatorPane = () => {
           })}
         </SectionCol>
       </SectionRow>
-    </NavContainer>
+    </PaneContainer>
   );
 };
 
