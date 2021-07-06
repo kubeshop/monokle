@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import AntCol, {ColProps as AntColProps} from 'antd/lib/col/index';
 
-
 export type ColProps = AntColProps & {
   noborder?: React.ReactNode;
 };

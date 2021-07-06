@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import path from 'path';
 
 import '@styles/FileTreePane.css';
-import {appColors as colors} from '@styles/AppColors';
+import {BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {FileEntry} from '@models/fileentry';
@@ -85,7 +85,7 @@ function findRootFolder(files: FileList) {
 }
 
 const FileTreeContainer = styled.div`
-  background: ${colors.appNormalBackground};
+  background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   height: 100%;
 `;
@@ -93,7 +93,7 @@ const FileTreeContainer = styled.div`
 const TitleRow = styled(Row)`
   border: 1px solid blue;
   border-radius: 2px;
-  background: ${colors.appNormalBackground};
+  background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   margin: 0;
 `;

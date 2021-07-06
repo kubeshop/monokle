@@ -10,7 +10,6 @@ import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor';
 import {Button} from 'antd';
 
-
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
