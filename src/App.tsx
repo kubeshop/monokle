@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
 
+import {BackgroundColors} from '@styles/Colors';
 import Layout from '@atoms/Layout';
 import PageHeader from '@organisms/PageHeader';
 import Content from '@atoms/Content';
@@ -24,6 +25,7 @@ const StyledColumn = styled(Col)`
 `;
 
 const StyledRow = styled(Row)`
+  background-color: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   padding: 0px;
   margin: 0px;

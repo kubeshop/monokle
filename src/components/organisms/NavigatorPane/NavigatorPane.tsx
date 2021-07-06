@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import {Button} from 'react-bootstrap';
 import {Col, Row} from 'antd';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
+import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 
 import '@styles/NavigatorPane.css';
 import {FontColors} from '@styles/Colors';
@@ -135,9 +135,12 @@ const NavigatorPane = () => {
                   className = 'highlightItem';
                 }
 
+                const buttonActive = previewResource !== undefined && previewResource === k.id;
+                // const buttonDisabled = previewResource !== undefined && previewResource !== k.id;
+
                 return (
                   <ItemRow key={k.id}>
-                    <SectionCol sm={9}>
+                    <SectionCol sm={22}>
                       <div
                         className={className}
                         onClick={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}
@@ -147,16 +150,12 @@ const NavigatorPane = () => {
                         {hasOutgoingRefs(k) ? ' >>' : ''}
                       </div>
                     </SectionCol>
-                    <SectionCol sm={3}>
-                      <Button
-                        variant="outline-dark"
-                        size="sm"
-                        onClick={() => selectPreview(k.id)}
-                        active={previewResource !== undefined && previewResource === k.id}
-                        disabled={previewResource !== undefined && previewResource !== k.id}
-                      >
-                        Preview
-                      </Button>
+                    <SectionCol sm={2}>
+                      {
+                        buttonActive ?
+                        <EyeInvisibleOutlined onClick={() => selectPreview(k.id)}/>
+                        : <EyeOutlined onClick={() => selectPreview(k.id)}/>
+                      }
                     </SectionCol>
                   </ItemRow>
                 );
