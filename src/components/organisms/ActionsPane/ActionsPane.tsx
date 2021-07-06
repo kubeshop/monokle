@@ -1,4 +1,4 @@
-import {Tabs, Row, Col, Button, Space} from 'antd';
+import {Tabs, Space, Col, Row} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
@@ -10,9 +10,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
-import TabHeader from '@atoms/Tabs';
-import MonoSectionTitle from '@atoms/MonoSectionTitle';
-import MonoSectionHeader from '@atoms/MonoSectionHeader';
+import TabHeader from '@atoms/TabHeader';
+import {MonoButton, MonoSectionHeaderCol, MonoSectionTitle} from '@atoms';
 
 const ActionContainer = styled.div`
   background: ${BackgroundColors.darkThemeBackground};
@@ -64,17 +63,17 @@ const ActionsPane = (props: {actionHeight: string}) => {
 
   const OperationsSlot = {
     right: <Space>
-      <Button onClick={applySelectedResource} disabled={!selectedResource} type='primary'>Apply</Button>
-      <Button onClick={diffSelectedResource} disabled={!selectedResource} type='primary'>Diff</Button>
+      <MonoButton onClick={applySelectedResource} disabled={!selectedResource} type='primary'>Apply</MonoButton>
+      <MonoButton onClick={diffSelectedResource} disabled={!selectedResource} type='primary'>Diff</MonoButton>
     </Space>,
   };
 
   return (
     <ActionContainer>
       <Row>
-        <MonoSectionHeader>
+        <MonoSectionHeaderCol>
           <MonoSectionTitle>Editor</MonoSectionTitle>
-        </MonoSectionHeader>
+        </MonoSectionHeaderCol>
       </Row>
       <Row>
         <Col span={24}>

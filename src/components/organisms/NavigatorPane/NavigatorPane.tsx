@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
-import {Container, Row, Col, Button} from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
+import {Col, Row} from 'antd';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
 import '@styles/NavigatorPane.css';
-import {BackgroundColors} from '@styles/Colors';
+import {BackgroundColors, FontColors} from '@styles/Colors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
@@ -15,18 +16,16 @@ import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
 import {previewKustomization} from '@redux/reducers/thunks';
-
-import MonoSectionTitle from '@atoms/MonoSectionTitle';
-import MonoSectionHeader from '@atoms/MonoSectionHeader';
+import {MonoSwitch, MonoSectionHeaderCol, MonoSectionTitle} from '@atoms';
 
 const ALL_NAMESPACES = '- all -';
 
-const NavContainer = styled(Container)`
+const NavContainer = styled.div`
   background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   height: 100%;
-  margin: 0;
-  padding: 0;
+  margin: 0px;
+  padding: 0px 4px 0px 4px;
 `;
 
 const TitleRow = styled(Row)`
@@ -54,18 +53,10 @@ const SectionCol = styled(Col)`
   padding: 0;
 `;
 
-const StyledCheckBox = styled.input`
-  float: right;
-`;
-
-const StyledCheckBoxText = styled.h6`
-  float: right;
-`;
-
 const SectionTitle = styled.h5`
   font-size: 1.2em;
-  text-align: center;
-  color: tomato;
+  text-align: left;
+  color: ${FontColors.darkThemeMainFont};
 `;
 
 const NavigatorPane = () => {
@@ -83,8 +74,8 @@ const NavigatorPane = () => {
     dispatch(selectK8sResource(resourceId));
   };
 
-  const onFilterChange = (e: any) => {
-    dispatch(setFilterObjects(e.target.checked));
+  const onFilterChange = (checked: boolean) => {
+    dispatch(setFilterObjects(checked));
   };
 
   const handleNamespaceChange = (event: any) => {
@@ -110,17 +101,20 @@ const NavigatorPane = () => {
   return (
     <NavContainer>
       <TitleRow>
-        <MonoSectionHeader span={24}>
-          <SectionRow>
-            <SectionCol span={12}>
+        <MonoSectionHeaderCol span={24}>
+          <Row>
+            <Col span={12}>
               <MonoSectionTitle>Navigator</MonoSectionTitle>
-            </SectionCol>
-            <SectionCol span={12}>
-              <StyledCheckBox type="checkbox" onChange={onFilterChange} />
-              <StyledCheckBoxText>Show Relations</StyledCheckBoxText>
-            </SectionCol>
-          </SectionRow>
-        </MonoSectionHeader>
+            </Col>
+            <Col span={12}
+            >
+              <MonoSwitch
+                onClick={onFilterChange}
+                label='RELATIONS'
+              />
+            </Col>
+          </Row>
+        </MonoSectionHeaderCol>
       </TitleRow>
 
       {kustomizations.length > 0 && (

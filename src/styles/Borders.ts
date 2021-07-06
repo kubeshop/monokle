@@ -15,5 +15,6 @@ export enum BorderWidth {
 };
 
 export const AppBorders = {
-  pageDivider: `1px solid ${Colors.grey200};`,
+  pageDivider: `1px solid ${Colors.grey700};`,
+  sectionDivider: `1px solid ${Colors.grey900}`,
 };
