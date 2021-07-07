@@ -9,3 +9,7 @@
 .excludedFileItem {
   color: grey;
 }
+
+.ant-tree-iconEle .anticon {
+  vertical-align: 1px;
+}

@@ -1,6 +1,7 @@
 const CracoAlias = require('craco-alias');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CracoLessPlugin = require("craco-less");
+const {getThemeVariables} = require('antd/dist/theme');
 
 module.exports = {
   webpack: {
@@ -11,7 +12,6 @@ module.exports = {
       return webpackConfig;
     },
   },
-
   plugins: [
     {
       plugin: CracoAlias,
@@ -28,15 +28,9 @@ module.exports = {
       options: {
         lessLoaderOptions: {
           lessOptions: {
-            modifyVars: {
-              '@primary-color': '#1a9aff',
-              '@heading-color': 'fade(@white, 85%)',
-              '@body-background': '#000',
-              '@component-background': '#000',
-              '@text-color': 'fade(@white, 85%)',
-              '@disabled-color': 'fade(#fff, 25%)',
-              '@background-color-base': '#262626'
-            },
+            modifyVars: getThemeVariables({
+              'dark': true
+            }),
             javascriptEnabled: true,
           },
         },

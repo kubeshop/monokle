@@ -1,54 +1,70 @@
 import * as React from 'react';
-import FolderTree from 'react-folder-tree';
-import {Button, Row} from 'react-bootstrap';
 import 'react-folder-tree/dist/style.css';
 import {useRef} from 'react';
 import styled from 'styled-components';
 import path from 'path';
+import {Row, Button, Tree, Col, Space, Typography} from 'antd';
 
 import '@styles/FileTreePane.css';
 import {BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
-import {FileEntry} from '@models/fileentry';
-import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
-import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ROOT_FILE_ENTRY} from '@src/constants';
+import {FolderAddOutlined} from '@ant-design/icons';
 import {PROCESS_ENV} from '@actions/common/apply';
+import {FileEntry} from '@models/fileentry';
+import {FileMapType, ResourceMapType} from '@models/appstate';
 import fs from 'fs';
 import {previewCluster, setRootFolder} from '@redux/reducers/thunks';
+import {SectionHeader, SectionTitle} from '@atoms/Header';
+import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
 
 interface TreeNode {
-  name: string;
-  checked: number;
-  isOpen?: boolean;
-  children: TreeNode[] | null;
-  data?: string;
+  key: string;
+  title: React.ReactNode;
+  children: TreeNode[];
+  isLeaf?: boolean;
 }
 
-const mapTreeNodeFromFileEntry = (
+const CenteredItemsDiv = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ColumnWithPadding = styled(Col)`
+  padding: 16px 16px 0;
+`;
+
+const StyledNumberOfResources = styled(Typography.Text)`
+  margin-left: 12px;
+`;
+
+const createNode = (
   fileEntry: FileEntry,
   fileMap: FileMapType,
   resourceMap: ResourceMapType
-): TreeNode => {
+  ) => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
-  const result: TreeNode = {
-    name: fileEntry.name + (resources.length > 0 ? ` [${resources.length}]` : ''),
-    checked: fileEntry.selected ? 1 : 0,
-    children: null,
-    data: fileEntry.filePath,
+  const node: TreeNode = {
+    key: fileEntry.filePath,
+    title: <>
+      {fileEntry.name}
+      {resources.length > 0 ? <StyledNumberOfResources type="secondary">{resources.length}</StyledNumberOfResources> : ''}
+    </>,
+    children: []
   };
 
   if (fileEntry.children) {
-    result.children = fileEntry.children
-      .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
-      .filter(childEntry => childEntry)
-      .map(childEntry => mapTreeNodeFromFileEntry(childEntry, fileMap, resourceMap));
-    result.isOpen = fileEntry.expanded || fileEntry === fileMap[ROOT_FILE_ENTRY];
+    node.children = fileEntry.children
+      .map((child) => fileMap[getChildFilePath(child, fileEntry, fileMap)])
+      .filter((childEntry) => childEntry)
+      .map((childEntry) => createNode(childEntry, fileMap, resourceMap));
+  } else {
+    node.isLeaf = true;
   }
 
-  return result;
+  return node;
 };
 
 // algorithm to find common root folder for selected files - since the first entry is not
@@ -90,18 +106,13 @@ const FileTreeContainer = styled.div`
   height: 100%;
 `;
 
-const TitleRow = styled(Row)`
-  border: 1px solid blue;
-  border-radius: 2px;
-  background: ${BackgroundColors.darkThemeBackground};
-  width: 100%;
-  margin: 0;
+const FileDetailsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
-const Title = styled.h4`
-  font-size: 1.5em;
-  text-align: center;
-  color: tomato;
+const NoFilesContainer = styled(Typography.Text)`
+  margin-left: 16px;
 `;
 
 const FileTreePane = () => {
@@ -109,11 +120,12 @@ const FileTreePane = () => {
   const previewResource = useAppSelector(state => state.main.previewResource);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const [tree, setTree] = React.useState<TreeNode | null>(null);
 
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);
 
-  function onUploadHandler(e: any) {
+  function onUploadHandler(e: React.SyntheticEvent) {
     e.preventDefault();
     if (folderInput.current?.files && folderInput.current.files.length > 0) {
       setFolder(findRootFolder(folderInput.current.files));
@@ -124,48 +136,64 @@ const FileTreePane = () => {
     dispatch(setRootFolder(folder));
   };
 
-  // eslint-disable-next-line no-unused-vars
-  const onTreeStateChange = (state: any, event: any) => {
-    // console.log('onTreeStateChange', state, event);
-    // buildTreeData(state);
-  };
-
-  // custom event handler for node name click
-  // @ts-ignore
-  // eslint-disable-next-line no-unused-vars
-  const onNameClick = ({defaultOnClick, nodeData}) => {
-    if (previewResource === undefined && nodeData.data) {
-      dispatch(selectFile(nodeData.data));
-    }
-  };
-
-  const rootEntry = fileMap[ROOT_FILE_ENTRY];
-  const treeData: TreeNode = rootEntry
-    ? mapTreeNodeFromFileEntry(rootEntry, fileMap, resourceMap)
-    : {
-      name: '- no folder selected -',
-      checked: 0,
-      isOpen: false,
-      children: null,
-    };
+  React.useEffect(() => {
+    const rootEntry = fileMap[ROOT_FILE_ENTRY];
+    const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap);
+    setTree(treeData);
+  }, [fileMap, resourceMap]);
 
   const connectToCluster = () => {
     dispatch(previewCluster(PROCESS_ENV.KUBECONFIG));
   };
 
+  const startFileUploader = () => {
+    folderInput && folderInput.current?.click();
+  };
+
+  const onSelect = (selectedKeysValue: React.Key[], info: any) => {
+    if (previewResource === undefined && info.node.key) {
+      dispatch(selectFile(info.node.key));
+    }
+  };
+
+  const directoryPath = fileMap[ROOT_FILE_ENTRY] ? path.dirname(fileMap[ROOT_FILE_ENTRY].filePath) : '';
+  // not counting the root
+  const nrOfFiles = Object.keys(fileMap).length - 1;
   return (
     <FileTreeContainer>
-      <TitleRow>
-        <Title>File Explorer</Title>
-      </TitleRow>
-      <Button
-        variant={previewResource === PROCESS_ENV.KUBECONFIG ? 'secondary' : 'outline-dark'}
-        size="sm"
-        disabled={Boolean(previewResource) && previewResource !== PROCESS_ENV.KUBECONFIG}
-        onClick={connectToCluster}
-      >
-        Show Cluster Objects...
-      </Button>
+      <Row>
+        <SectionHeader>
+          <SectionTitle>File Explorer</SectionTitle>
+        </SectionHeader>
+      </Row>
+      <Row>
+        <ColumnWithPadding span={24}>
+          <Space direction="vertical">
+            <Button
+              type="primary"
+              ghost
+              disabled={Boolean(previewResource) && previewResource !== PROCESS_ENV.KUBECONFIG}
+              onClick={connectToCluster}
+            >
+              Show Cluster Objects...
+            </Button>
+            <Button
+              type="primary"
+              ghost
+              onClick={startFileUploader}
+            >
+              <CenteredItemsDiv>
+                <FolderAddOutlined style={{marginRight: '3px'}} />
+                Browse
+              </CenteredItemsDiv>
+            </Button>
+          </Space>
+          <FileDetailsContainer>
+            {directoryPath && <Typography.Text type="secondary">{directoryPath}</Typography.Text>}
+            {nrOfFiles !== -1 && <Typography.Text type="secondary">{nrOfFiles} files</Typography.Text>}
+          </FileDetailsContainer>
+        </ColumnWithPadding>
+      </Row>
       <input
         type="file"
         /* @ts-expect-error */
@@ -173,18 +201,14 @@ const FileTreePane = () => {
         webkitdirectory=""
         onChange={onUploadHandler}
         ref={folderInput}
+        style={{display: 'none'}}
         disabled={Boolean(previewResource)}
       />
-
-      <FolderTree
-        readOnly={previewResource !== undefined}
-        data={treeData}
-        onChange={onTreeStateChange}
-        onNameClick={onNameClick}
-        initCheckedStatus="custom" // default: 0 [unchecked]
-        initOpenStatus="custom" // default: 'open'
-        indentPixels={8}
-      />
+      {tree ? <Tree.DirectoryTree
+        onSelect={onSelect}
+        defaultExpandAll
+        treeData={[tree]}
+      /> : <NoFilesContainer>No folder selected.</NoFilesContainer>}
     </FileTreeContainer>
   );
 };
