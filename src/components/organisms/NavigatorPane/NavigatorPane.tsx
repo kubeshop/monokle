@@ -3,7 +3,6 @@ import {Col, Row} from 'antd';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
-import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 
 import '@styles/NavigatorPane.css';
 import {FontColors} from '@styles/Colors';
@@ -17,6 +16,7 @@ import {NavigatorSubSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
 import {previewKustomization} from '@redux/reducers/thunks';
 import {MonoSwitch, MonoSectionHeaderCol, MonoSectionTitle, PaneContainer} from '@atoms';
+import NavigatorKustomizationRow from '@molecules/NavigatorKustomizationRow';
 
 const ALL_NAMESPACES = '- all -';
 
@@ -135,29 +135,26 @@ const NavigatorPane = () => {
                   className = 'highlightItem';
                 }
 
+                const isSelected = (k.selected || previewResource === k.id);
+                const isDisabled = Boolean(previewResource && previewResource !== k.id);
+                const isHighlighted = k.highlight;
+
                 const buttonActive = previewResource !== undefined && previewResource === k.id;
                 // const buttonDisabled = previewResource !== undefined && previewResource !== k.id;
 
                 return (
-                  <ItemRow key={k.id}>
-                    <SectionCol sm={22}>
-                      <div
-                        className={className}
-                        onClick={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}
-                      >
-                        {hasIncomingRefs(k) ? '>> ' : ''}
-                        {k.name}
-                        {hasOutgoingRefs(k) ? ' >>' : ''}
-                      </div>
-                    </SectionCol>
-                    <SectionCol sm={2}>
-                      {
-                        buttonActive ?
-                        <EyeInvisibleOutlined onClick={() => selectPreview(k.id)}/>
-                        : <EyeOutlined onClick={() => selectPreview(k.id)}/>
-                      }
-                    </SectionCol>
-                  </ItemRow>
+                  <NavigatorKustomizationRow
+                    key={k.id}
+                    resource={k}
+                    isSelected={isSelected}
+                    isDisabled={isDisabled}
+                    highlighted={isHighlighted}
+                    previewButtonActive={buttonActive}
+                    hasIncomingRefs={Boolean(hasIncomingRefs(k))}
+                    hasOutgoingRefs={Boolean(hasOutgoingRefs(k))}
+                    onClickResource={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}
+                    onClickPreview={() => selectPreview(k.id)}
+                  />
                 );
               })}
           </SectionCol>
