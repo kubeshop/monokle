@@ -2,6 +2,8 @@ import * as React from 'react';
 import {useAppSelector} from '@redux/hooks';
 import styled from 'styled-components';
 
+import {BackgroundColors} from '@styles/Colors';
+import {AppBorders} from '@styles/Borders';
 import Footer from '@components/atoms/Footer';
 import packageJson from '@root/package.json';
 import {ROOT_FILE_ENTRY} from '@src/constants';
@@ -10,8 +12,8 @@ const StyledFooter = styled(Footer)`
   width: 100%;
   height: 1.5em;
   padding-left: 10px;
-  background: white;
-  border-top: 1px solid lightgrey;
+  background: ${BackgroundColors.darkThemeBackground};
+  border-top: ${AppBorders.pageDivider};
 `;
 
 const PageFooter = () => {

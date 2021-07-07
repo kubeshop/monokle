@@ -8,7 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import 'monaco-yaml/lib/esm/monaco.contribution';
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor';
-import {Button} from 'antd';
+import {MonoButton} from '@atoms';
 
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -39,10 +39,6 @@ const MonacoContainer = styled.div`
   height: 100%;
   padding: 0px;
   margin: 0px;
-`;
-
-const StyledSaveButton = styled(Button)`
-  margin: 0 16px 16px;
 `;
 
 // @ts-ignore
@@ -173,13 +169,13 @@ const Monaco = (props: {editorHeight: string}) => {
 
   return (
     <>
-      <StyledSaveButton
+      <MonoButton large
         type={hasWarnings ? "dashed" : "primary"}
         disabled={!isDirty || !isValid}
         onClick={saveContent}
       >
-        Save Changes
-      </StyledSaveButton>
+        Save
+      </MonoButton>
       <MonacoContainer ref={ref}>
         <MonacoEditor
           width={width}

@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
-import {Container, Row, Col, Button} from 'react-bootstrap';
+import {Col, Row} from 'antd';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
+import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 
 import '@styles/NavigatorPane.css';
-import {BackgroundColors} from '@styles/Colors';
+import {FontColors} from '@styles/Colors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
@@ -15,19 +16,9 @@ import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
 import {previewKustomization} from '@redux/reducers/thunks';
-
-import MonoSectionTitle from '@atoms/MonoSectionTitle';
-import MonoSectionHeader from '@atoms/MonoSectionHeader';
+import {MonoSwitch, MonoSectionHeaderCol, MonoSectionTitle, PaneContainer} from '@atoms';
 
 const ALL_NAMESPACES = '- all -';
-
-const NavContainer = styled(Container)`
-  background: ${BackgroundColors.darkThemeBackground};
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-`;
 
 const TitleRow = styled(Row)`
   width: 100%;
@@ -42,7 +33,6 @@ const SectionRow = styled(Row)`
 `;
 
 const ItemRow = styled(Row)`
-  background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   margin: 0;
   padding: 0;
@@ -54,18 +44,10 @@ const SectionCol = styled(Col)`
   padding: 0;
 `;
 
-const StyledCheckBox = styled.input`
-  float: right;
-`;
-
-const StyledCheckBoxText = styled.h6`
-  float: right;
-`;
-
 const SectionTitle = styled.h5`
   font-size: 1.2em;
-  text-align: center;
-  color: tomato;
+  text-align: left;
+  color: ${FontColors.darkThemeMainFont};
 `;
 
 const NavigatorPane = () => {
@@ -83,8 +65,8 @@ const NavigatorPane = () => {
     dispatch(selectK8sResource(resourceId));
   };
 
-  const onFilterChange = (e: any) => {
-    dispatch(setFilterObjects(e.target.checked));
+  const onFilterChange = (checked: boolean) => {
+    dispatch(setFilterObjects(checked));
   };
 
   const handleNamespaceChange = (event: any) => {
@@ -108,19 +90,22 @@ const NavigatorPane = () => {
   }
 
   return (
-    <NavContainer>
+    <PaneContainer>
       <TitleRow>
-        <MonoSectionHeader span={24}>
-          <SectionRow>
-            <SectionCol span={12}>
+        <MonoSectionHeaderCol span={24}>
+          <Row>
+            <Col span={12}>
               <MonoSectionTitle>Navigator</MonoSectionTitle>
-            </SectionCol>
-            <SectionCol span={12}>
-              <StyledCheckBox type="checkbox" onChange={onFilterChange} />
-              <StyledCheckBoxText>Show Relations</StyledCheckBoxText>
-            </SectionCol>
-          </SectionRow>
-        </MonoSectionHeader>
+            </Col>
+            <Col span={12}
+            >
+              <MonoSwitch
+                onClick={onFilterChange}
+                label='RELATIONS'
+              />
+            </Col>
+          </Row>
+        </MonoSectionHeaderCol>
       </TitleRow>
 
       {kustomizations.length > 0 && (
@@ -150,9 +135,12 @@ const NavigatorPane = () => {
                   className = 'highlightItem';
                 }
 
+                const buttonActive = previewResource !== undefined && previewResource === k.id;
+                // const buttonDisabled = previewResource !== undefined && previewResource !== k.id;
+
                 return (
                   <ItemRow key={k.id}>
-                    <SectionCol sm={9}>
+                    <SectionCol sm={22}>
                       <div
                         className={className}
                         onClick={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}
@@ -162,16 +150,12 @@ const NavigatorPane = () => {
                         {hasOutgoingRefs(k) ? ' >>' : ''}
                       </div>
                     </SectionCol>
-                    <SectionCol sm={3}>
-                      <Button
-                        variant="outline-dark"
-                        size="sm"
-                        onClick={() => selectPreview(k.id)}
-                        active={previewResource !== undefined && previewResource === k.id}
-                        disabled={previewResource !== undefined && previewResource !== k.id}
-                      >
-                        Preview
-                      </Button>
+                    <SectionCol sm={2}>
+                      {
+                        buttonActive ?
+                        <EyeInvisibleOutlined onClick={() => selectPreview(k.id)}/>
+                        : <EyeOutlined onClick={() => selectPreview(k.id)}/>
+                      }
                     </SectionCol>
                   </ItemRow>
                 );
@@ -245,7 +229,7 @@ const NavigatorPane = () => {
           })}
         </SectionCol>
       </SectionRow>
-    </NavContainer>
+    </PaneContainer>
   );
 };
 
