@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Alert} from 'react-bootstrap';
+import {Alert} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {clearAlert} from '@redux/reducers/alert';
@@ -13,7 +13,7 @@ const MessageBox = () => {
     dispatch(clearAlert());
   };
 
-  let alertVariant = 'success';
+  let alertVariant: ("success" | "info" | "warning" | "error" | undefined) = 'success';
   if (alert && alert.type === AlertEnum.Error) {
     alertVariant = 'warning';
   }
@@ -21,10 +21,13 @@ const MessageBox = () => {
   return (
     <>
       {alert && (
-        <Alert variant={alertVariant} onClose={clear} dismissible>
-          <Alert.Heading>{alert.title}</Alert.Heading>
-          <p>{alert.message}</p>
-        </Alert>
+        <Alert
+          type={alertVariant}
+          message={alert.title}
+          description={alert.message}
+          onClose={clear}
+          closable
+        />
       )}
     </>
   );

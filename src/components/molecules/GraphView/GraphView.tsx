@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Row} from 'react-bootstrap';
+import {Row} from 'antd';
 import ReactFlow, {Edge, Node, isNode, Position, MiniMap, ReactFlowProvider} from 'react-flow-renderer';
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';

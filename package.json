@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -8,7 +8,10 @@
   "contributors": [
     "ole@kubeshop.io",
     "steen@kubeshop.io",
-    "andrei@kubeshop.io"
+    "andrei@kubeshop.io",
+    "catalin@kubeshop.io",
+    "thomas@kubeshop.io",
+    "sierra@kubeshop.io"
   ],
   "repository": {
     "type": "git",
@@ -68,7 +71,6 @@
     "monaco-editor-webpack-plugin": "^4.0.0",
     "monaco-yaml": "^2.5.1",
     "react": "^17.0.2",
-    "react-bootstrap": "^1.6.0",
     "react-dom": "^17.0.2",
     "react-flow-renderer": "^9.6.0",
     "react-folder-tree": "5.0.3",
