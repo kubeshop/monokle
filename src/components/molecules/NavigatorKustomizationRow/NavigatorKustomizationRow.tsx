@@ -18,7 +18,6 @@ export type NavigatorKustomizationRowProps = {
   onClickPreview: React.MouseEventHandler<HTMLDivElement>;
 };
 
-
 const ItemRow = styled(Row)`
   width: 100%;
   margin: 0;
@@ -30,7 +29,6 @@ const SectionCol = styled(Col)`
   margin: 0;
   padding: 0;
 `;
-
 
 const RowContainer = styled.div`
   .kustomization-row {
@@ -52,7 +50,6 @@ const RowContainer = styled.div`
 const StyledDiv = styled.div`
   width: 100%;
 `;
-
 
 const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
   const {
