@@ -1,0 +1,102 @@
+# Default values for subway.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+workerReplicaCount: 0
+
+imagePullPolicy: IfNotPresent
+
+imagePullSecrets: [ ]
+nameOverride: ""
+fullnameOverride: ""
+
+podDisruptionBudget:
+  enabled: false
+
+publicSubdomain: dave
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: { }
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations:
+  "linkerd.io/inject": enabled
+  "getambassador.io/inject-traffic-agent": enabled
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+httpPort: 3000
+socketPort: 3001
+
+service:
+  type: ClusterIP
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 250m
+    memory: 300Mi
+  requests:
+    cpu: 100m
+    memory: 150Mi
+
+workerResources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 250m
+    memory: 300Mi
+  requests:
+    cpu: 100m
+    memory: 150Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector:
+  upchieve.org/purpose: apps
+
+tolerations:
+  - key: upchieve.org/purpose
+    operator: Equal
+    value: apps
+    effect: NoSchedule
+
+affinity: { }
+
+# ---------------------------------------------------------------------------------------------
+# Ambassador Labs: Do not modify the lines below this section as they are dynamically generated
+ambassador:
+  rollouts:
+    image:
+      repository: registry.gitlab.com/upchieve/subway/main
+      tag: c00984d632b4d9c8bc69a66885ad5718bb4d6efe
+    replicas: 1
+    steps:
+      - setWeight: 90
+      - pause:
+          duration: 10

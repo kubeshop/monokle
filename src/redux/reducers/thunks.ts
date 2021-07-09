@@ -18,6 +18,7 @@ import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@
 import {PROCESS_ENV} from '@actions/common/apply';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
+import {HelmChart} from '@models/helm';
 
 /**
  * Thunk to preview a kustomization
@@ -155,9 +156,10 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
   const rootEntry: FileEntry = createFileEntry(rootFolder);
+  const helmCharts: HelmChart[] = [];
 
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
-  rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap);
+  rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmCharts);
 
   processKustomizations(resourceMap, fileMap);
   processParsedResources(resourceMap);
@@ -168,6 +170,7 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
     appConfig,
     fileMap,
     resourceMap,
+    helmCharts,
   };
 });
 

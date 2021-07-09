@@ -1,3 +1,4 @@
+import {HelmChart} from '@models/helm';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
 import {AppConfig} from './appconfig';
@@ -25,6 +26,7 @@ interface AppState {
   previewResource?: string; // the resource currently being previewed
   diffResource?: string; // the resource currently being diffed
   diffContent?: string; // the diff content for the resource being diffed
+  helmCharts: HelmChart[];
 }
 
 export type {AppState, ResourceMapType, FileMapType};

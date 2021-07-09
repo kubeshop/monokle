@@ -58,4 +58,5 @@ export const initialState: AppState = {
   },
   resourceMap: {},
   fileMap: {},
+  helmCharts: [],
 };

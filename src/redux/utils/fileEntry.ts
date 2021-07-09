@@ -8,6 +8,7 @@ import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/utils/selection';
+import {HelmChart} from '@models/helm';
 import {extractK8sResources, reprocessResources} from './resource';
 
 /**
@@ -27,44 +28,86 @@ export function createFileEntry(fileEntryPath: string) {
 }
 
 /**
+ * Checks if the specified filename should be excluded per the global exclusion config
+ */
+
+function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
+  return appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
+}
+
+/**
  * Recursively reads the provided folder in line with the provided appConfig and populates the
  * provided maps with found files and resources.
  *
  * Returns the list of filenames (not paths) found in the specified folder
  */
 
-export function readFiles(folder: string, appConfig: AppConfig, resourceMap: ResourceMapType, fileMap: FileMapType) {
+export function readFiles(folder: string, appConfig: AppConfig, resourceMap: ResourceMapType, fileMap: FileMapType, charts: HelmChart[]) {
   const files = fs.readdirSync(folder);
   const result: string[] = [];
 
+  // if there is no root entry assume this is the root folder (questionable..)
   if (!fileMap[ROOT_FILE_ENTRY]) {
     fileMap[ROOT_FILE_ENTRY] = createFileEntry(folder);
   }
 
   const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
 
-  files.forEach(file => {
-    const filePath = path.join(folder, file);
-    const fileEntryPath = filePath.substr(rootFolder.length);
-    const fileEntry = createFileEntry(fileEntryPath);
+  // is this a helm chart folder?
+  if (files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1) {
+    const helmChart: HelmChart = {
+      filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
+      name: folder.substr(folder.lastIndexOf(path.sep) + 1),
+      selected: false,
+      valueFiles: [],
+    };
 
-    if (appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e))) {
-      fileEntry.excluded = true;
-    } else if (fs.statSync(filePath).isDirectory()) {
-      fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap);
-    } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
-      try {
-        extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
-          resourceMap[resource.id] = resource;
+    files.forEach(file => {
+      const filePath = path.join(folder, file);
+      const fileEntryPath = filePath.substr(rootFolder.length);
+      const fileEntry = createFileEntry(fileEntryPath);
+
+      if (fileIsExcluded(appConfig, fileEntry)) {
+        fileEntry.excluded = true;
+      } else if (fs.statSync(filePath).isDirectory()) {
+        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, charts);
+      } else if (micromatch.isMatch(file, '*values*.yaml')) {
+        helmChart.valueFiles.push({
+          filePath: fileEntryPath,
+          name: file,
+          selected: false,
         });
-      } catch (e) {
-        log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
       }
-    }
 
-    fileMap[fileEntry.filePath] = fileEntry;
-    result.push(fileEntry.name);
-  });
+      fileMap[fileEntry.filePath] = fileEntry;
+      result.push(fileEntry.name);
+    });
+
+    charts.push(helmChart);
+  } else {
+    files.forEach(file => {
+      const filePath = path.join(folder, file);
+      const fileEntryPath = filePath.substr(rootFolder.length);
+      const fileEntry = createFileEntry(fileEntryPath);
+
+      if (fileIsExcluded(appConfig, fileEntry)) {
+        fileEntry.excluded = true;
+      } else if (fs.statSync(filePath).isDirectory()) {
+        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, charts);
+      } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+        try {
+          extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+            resourceMap[resource.id] = resource;
+          });
+        } catch (e) {
+          log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
+        }
+      }
+
+      fileMap[fileEntry.filePath] = fileEntry;
+      result.push(fileEntry.name);
+    });
+  }
 
   return result;
 }
@@ -85,7 +128,7 @@ export function getResourcesForPath(filePath: string, resourceMap: ResourceMapTy
 export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMapType) {
   return path.join(
     fileMap[ROOT_FILE_ENTRY].filePath,
-    resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep))
+    resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)),
   );
 }
 
@@ -208,7 +251,7 @@ function addFolder(absolutePath: string, state: AppState) {
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
     const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
-    folderEntry.children = readFiles(absolutePath, state.appConfig, state.resourceMap, state.fileMap);
+    folderEntry.children = readFiles(absolutePath, state.appConfig, state.resourceMap, state.fileMap, state.helmCharts);
     return folderEntry;
   }
 

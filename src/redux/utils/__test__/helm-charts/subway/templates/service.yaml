@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: { { include "subway.fullname" . } }-stable
+  labels:
+    {{- include "subway.labels" . | nindent 4 }}
+spec:
+  type: { { .Values.service.type } }
+  ports:
+    - port: { { .Values.httpPort } }
+      protocol: TCP
+      name: http
+    - port: { { .Values.socketPort } }
+      protocol: TCP
+      name: socket
+  selector:
+    component: web
+    { { - include "subway.selectorLabels" . | nindent 4 } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: { { include "subway.fullname" . } }-canary
+  labels:
+    {{- include "subway.labels" . | nindent 4 }}
+spec:
+  type: { { .Values.service.type } }
+  ports:
+    - port: { { .Values.httpPort } }
+      protocol: TCP
+      name: http
+    - port: { { .Values.socketPort } }
+      protocol: TCP
+      name: socket
+  selector:
+    component: web
+    { { - include "subway.selectorLabels" . | nindent 4 } }

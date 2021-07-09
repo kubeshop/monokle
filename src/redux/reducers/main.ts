@@ -7,6 +7,7 @@ import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
 import {diffResource, previewCluster, previewKustomization, setRootFolder} from '@redux/reducers/thunks';
+import {HelmChart} from '@models/helm';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -28,6 +29,7 @@ export type SetRootFolderPayload = {
   appConfig: AppConfig;
   fileMap: FileMapType;
   resourceMap: ResourceMapType;
+  helmCharts: HelmChart[];
 };
 
 export type UpdateResourcePayload = {

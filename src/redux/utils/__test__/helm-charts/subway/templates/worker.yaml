@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: { { include "subway.fullname" . } }-worker
+  labels:
+    {{- include "subway.labels" . | nindent 4 }}
+spec:
+  replicas: { { .Values.workerReplicaCount } }
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      component: worker
+      { { - include "subway.selectorLabels" . | nindent 6 } }
+  template:
+    metadata:
+      labels:
+        component: worker
+        { { - include "subway.selectorLabels" . | nindent 8 } }
+    spec:
+      { { - with .Values.imagePullSecrets } }
+      imagePullSecrets:
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      serviceAccountName: { { include "subway.serviceAccountName" . } }
+      securityContext:
+        { { - toYaml .Values.podSecurityContext | nindent 8 } }
+      containers:
+        - name: { { .Chart.Name } }
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          securityContext:
+            { { - toYaml .Values.securityContext | nindent 12 } }
+          image: "{{ .Values.ambassador.rollouts.image.repository }}:{{ .Values.ambassador.rollouts.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: { { .Values.imagePullPolicy } }
+          command:
+            - worker
+          env:
+            - name: DOPPLER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: subway-{{ .Release.Namespace }}-doppler-token
+                  key: DOPPLER_TOKEN
+          resources:
+            { { - toYaml .Values.workerResources | nindent 12 } }
+      { { - with .Values.nodeSelector } }
+      nodeSelector:
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      { { - with .Values.affinity } }
+      affinity:
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      { { - with .Values.tolerations } }
+      tolerations:
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      volumes:
+        - name: tmp
+          emptyDir:
+            medium: "Memory"
