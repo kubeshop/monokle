@@ -172,7 +172,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
               ${node.highlighted ? ` helmvalues-row-highlighted` : ''}`;
 
             return (
-              <ItemRow key={generateId()}>
+              <ItemRow key={generateId('helmvalues-row')}>
                 <SectionCol sm={22}>
                   <div
                     className={valuesClassName}
