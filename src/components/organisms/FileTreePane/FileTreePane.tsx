@@ -6,7 +6,7 @@ import path from 'path';
 import {Row, Button, Tree, Col, Space, Typography} from 'antd';
 
 import '@styles/FileTreePane.css';
-import {BackgroundColors} from '@styles/Colors';
+import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY} from '@src/constants';
@@ -16,8 +16,11 @@ import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import fs from 'fs';
 import {previewCluster, setRootFolder} from '@redux/reducers/thunks';
-import {SectionHeader, SectionTitle} from '@atoms/Header';
 import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
+import {
+  MonoPaneTitle,
+  MonoPaneTitleCol,
+} from '@atoms';
 
 interface TreeNode {
   key: string;
@@ -104,6 +107,31 @@ const FileTreeContainer = styled.div`
   background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   height: 100%;
+  & .ant-tree {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-variant: tabular-nums;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 22px;
+    color: ${FontColors.darkThemeMainFont};
+  }
+  & .ant-tree-treenode-selected {
+    background: ${Colors.selectionGradient} !important;
+  }
+  & .ant-tree-treenode-selected::before {
+    background: ${Colors.selectionGradient}  !important;
+  }
+  & .ant-tree-treenode {
+    background: transparent;
+  }
+  & .ant-tree-treenode::selection {
+    background: ${Colors.selectionGradient}  !important;
+  }
+  .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
+    color: black !important;
+    font-weight: bold;
+  }
 `;
 
 const FileDetailsContainer = styled.div`
@@ -162,20 +190,20 @@ const FileTreePane = () => {
   return (
     <FileTreeContainer>
       <Row>
-        <SectionHeader>
-          <SectionTitle>File Explorer</SectionTitle>
-        </SectionHeader>
+        <MonoPaneTitleCol>
+          <MonoPaneTitle>File Explorer</MonoPaneTitle>
+        </MonoPaneTitleCol>
       </Row>
       <Row>
         <ColumnWithPadding span={24}>
-          <Space direction="vertical">
+          <Space direction="horizontal">
             <Button
               type="primary"
               ghost
               disabled={Boolean(previewResource) && previewResource !== PROCESS_ENV.KUBECONFIG}
               onClick={connectToCluster}
             >
-              Show Cluster Objects...
+              Cluster Objects
             </Button>
             <Button
               type="primary"

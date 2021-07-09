@@ -10,7 +10,12 @@ import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
 import TabHeader from '@atoms/TabHeader';
-import {MonoButton, MonoSectionHeaderCol, MonoSectionTitle, PaneContainer} from '@atoms';
+import {
+  MonoButton,
+  PaneContainer,
+  MonoPaneTitle,
+  MonoPaneTitleCol,
+} from '@atoms';
 
 const {TabPane} = Tabs;
 
@@ -62,9 +67,9 @@ const ActionsPane = (props: {actionHeight: string}) => {
   return (
     <PaneContainer>
       <Row>
-        <MonoSectionHeaderCol>
-          <MonoSectionTitle>Editor</MonoSectionTitle>
-        </MonoSectionHeaderCol>
+        <MonoPaneTitleCol>
+          <MonoPaneTitle>Editor</MonoPaneTitle>
+        </MonoPaneTitleCol>
       </Row>
       <Row>
         <Col span={24}>
