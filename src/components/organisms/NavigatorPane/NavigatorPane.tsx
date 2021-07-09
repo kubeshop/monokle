@@ -26,7 +26,7 @@ import {
 } from '@atoms';
 import NavigatorKustomizationRow from '@molecules/NavigatorKustomizationRow';
 import NavigatorResourceRow from '@molecules/NavigatorResourceRow';
-
+import NavigatorHelmRow from '@molecules/NavigatorHelmRow';
 
 const {Option} = Select;
 const ALL_NAMESPACES = '- all -';
@@ -62,6 +62,7 @@ const NavigatorPane = () => {
   const appConfig = useAppSelector(state => state.config);
   const kustomizations = useSelector(selectKustomizations);
   const resources = useSelector(selectActiveResources);
+  const helmCharts = useSelector(selectKustomizations);
 
   const selectResource = (resourceId: string) => {
     dispatch(selectK8sResource(resourceId));
@@ -110,6 +111,46 @@ const NavigatorPane = () => {
         </MonoPaneTitleCol>
       </TitleRow>
 
+      {helmCharts.length > 0 && (
+        <SectionRow>
+          <SectionCol>
+            <SectionRow>
+              <MonoSectionHeaderCol>
+                <MonoSectionTitle>Helm Charts</MonoSectionTitle>
+              </MonoSectionHeaderCol>
+            </SectionRow>
+            {helmCharts
+              .filter(
+                k =>
+                  !appConfig.settings.filterObjectsOnSelection ||
+                  k.highlight ||
+                  k.selected ||
+                  !selectedResource ||
+                  previewResource === k.id
+              )
+              .map((k: K8sResource) => {
+                const isSelected = (k.selected || previewResource === k.id);
+                const isDisabled = Boolean(previewResource && previewResource !== k.id);
+                const isHighlighted = k.highlight;
+                const buttonActive = previewResource !== undefined && previewResource === k.id;
+
+                return (
+                  <NavigatorHelmRow
+                    rowKey={k.id}
+                    resource={k}
+                    isSelected={isSelected}
+                    isDisabled={isDisabled}
+                    highlighted={isHighlighted}
+                    previewButtonActive={buttonActive}
+                    onClickResource={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}
+                    onClickPreview={() => selectPreview(k.id)}
+                  />
+                );
+              })}
+          </SectionCol>
+        </SectionRow>
+      )}
+
       {kustomizations.length > 0 && (
         <SectionRow>
           <SectionCol>
@@ -131,9 +172,7 @@ const NavigatorPane = () => {
                 const isSelected = (k.selected || previewResource === k.id);
                 const isDisabled = Boolean(previewResource && previewResource !== k.id);
                 const isHighlighted = k.highlight;
-
                 const buttonActive = previewResource !== undefined && previewResource === k.id;
-                // const buttonDisabled = previewResource !== undefined && previewResource !== k.id;
 
                 return (
                   <NavigatorKustomizationRow

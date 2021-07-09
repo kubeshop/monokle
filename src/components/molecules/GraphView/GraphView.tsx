@@ -107,6 +107,7 @@ const GraphView = (props: {editorHeight: string}) => {
     activeResources.filter(r => r.refs).forEach(r => {
       data = data.concat(getElementData(r));
     });
+    /* eslint-disable react-hooks/exhaustive-deps */
     updateGraph(data);
     setNodes(data);
   }, [fileMap, activeResources]);
