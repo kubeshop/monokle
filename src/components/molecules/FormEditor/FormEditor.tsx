@@ -1,9 +1,14 @@
 import * as React from 'react';
-import Form from '@rjsf/bootstrap-4';
 import log from 'loglevel';
 
 import {useAppSelector} from '@redux/hooks';
 import {getResourceSchema} from '@redux/utils/schema';
+
+import {withTheme} from '@rjsf/core';
+// @ts-ignore
+import {Theme as AntDTheme} from '@rjsf/antd';
+
+const Form = withTheme(AntDTheme);
 
 const FormEditor = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
