@@ -7,7 +7,7 @@ const PaneContainer = styled.div`
   background-color: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   margin: 0px;
-  padding: 0px 4px 0px 4px;
+  padding: 0px 2px 0px 2px;
   border-left: ${AppBorders.sectionDivider};
   border-right: ${AppBorders.sectionDivider};
 `;

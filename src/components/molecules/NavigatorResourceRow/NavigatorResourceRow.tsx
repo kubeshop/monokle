@@ -1,22 +1,18 @@
 import React from 'react';
 import {Col, Row} from 'antd';
 import styled from 'styled-components';
-import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 
 import Colors, {FontColors} from '@styles/Colors';
-import {K8sResource} from '@models/k8sresource';
 
-export type NavigatorKustomizationRowProps = {
+export type NavigatorResourceRowProps = {
   rowKey: React.Key;
-  resource: K8sResource;
+  label: string;
   isSelected: boolean;
-  isDisabled: boolean;
   highlighted: boolean;
-  previewButtonActive: boolean;
   hasIncomingRefs: boolean;
   hasOutgoingRefs: boolean;
+  hasUnsatisfiedRefs: boolean;
   onClickResource?: React.MouseEventHandler<HTMLDivElement>;
-  onClickPreview: React.MouseEventHandler<HTMLDivElement>;
 };
 
 const ItemRow = styled(Row)`
@@ -32,7 +28,7 @@ const SectionCol = styled(Col)`
 `;
 
 const RowContainer = styled.div`
-  & .kustomization-row {
+  & .resource-row {
     width: 100%;
     padding-left: 8px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -43,15 +39,15 @@ const RowContainer = styled.div`
     line-height: 22px;
     color: ${FontColors.darkThemeMainFont};
   }
-  & .kustomization-row-selected {
+  & .resource-row-selected {
     background: ${Colors.selectionGradient};
     font-weight: bold;
     color: black;
   }
-  & .kustomization-row-disabled {
+  & .resource-row-disabled {
     color: grey;
   }
-  & .kustomization-row-highlighted {
+  & .resource-row-highlighted {
     font-style: italic;
     font-weight: bold;
     background: ${Colors.highlightGradient};
@@ -63,25 +59,22 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
-const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
+const NavigatorResourceRow = (props: NavigatorResourceRowProps) => {
   const {
     rowKey,
-    resource,
+    label,
     isSelected,
-    isDisabled,
     highlighted,
-    previewButtonActive,
     hasIncomingRefs,
     hasOutgoingRefs,
+    hasUnsatisfiedRefs,
     onClickResource,
-    onClickPreview,
   } = props;
 
   // Parent needs to make sure disabled and selected arent active at the same time.
-  let classname = `kustomization-row\
-    ${isSelected ? ` kustomization-row-selected` : ''}\
-    ${isDisabled ? ` kustomization-row-disabled` : ''}\
-    ${highlighted ? ` kustomization-row-highlighted` : ''}`;
+  let classname = `resource-row\
+    ${isSelected ? ` resource-row-selected` : ''}\
+    ${highlighted ? ` resource-row-highlighted` : ''}`;
 
   return (<RowContainer>
     <StyledDiv className={classname}>
@@ -92,21 +85,14 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
             onClick={onClickResource}
           >
             {hasIncomingRefs ? '>> ' : ''}
-            {resource.name}
+            {label}
             {hasOutgoingRefs ? ' >>' : ''}
+            {hasUnsatisfiedRefs ? ' ??' : ''}
           </div>
         </SectionCol>
-        <SectionCol sm={2}>
-          {
-            previewButtonActive ?
-            <EyeInvisibleOutlined onClick={onClickPreview}/>
-            : <EyeOutlined onClick={onClickPreview}/>
-          }
-        </SectionCol>
       </ItemRow>
-
     </StyledDiv>
   </RowContainer>);
 };
 
-export default NavigatorKustomizationRow;
+export default NavigatorResourceRow;

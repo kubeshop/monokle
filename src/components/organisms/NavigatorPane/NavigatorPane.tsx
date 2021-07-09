@@ -1,11 +1,10 @@
 import React, {useState} from 'react';
-import {Col, Row} from 'antd';
+import {Col, Row, Select} from 'antd';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
-import '@styles/NavigatorPane.css';
-import {FontColors} from '@styles/Colors';
+import { FontColors } from '@styles/Colors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
@@ -15,9 +14,21 @@ import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
 import {previewKustomization} from '@redux/reducers/thunks';
-import {MonoSwitch, MonoSectionHeaderCol, MonoSectionTitle, PaneContainer} from '@atoms';
+import {
+  MonoSwitch,
+  MonoSectionHeaderCol,
+  MonoSectionTitle,
+  PaneContainer,
+  MonoPaneTitle,
+  MonoPaneTitleCol,
+  NavigatorContentTitle,
+  NavigatorContentSubTitle,
+} from '@atoms';
 import NavigatorKustomizationRow from '@molecules/NavigatorKustomizationRow';
+import NavigatorResourceRow from '@molecules/NavigatorResourceRow';
 
+
+const {Option} = Select;
 const ALL_NAMESPACES = '- all -';
 
 const TitleRow = styled(Row)`
@@ -30,24 +41,15 @@ const SectionRow = styled(Row)`
   width: 100%;
   margin: 0;
   padding: 0;
-`;
-
-const ItemRow = styled(Row)`
-  width: 100%;
-  margin: 0;
-  padding: 0;
+  & .ant-select-selection-item {
+    color: ${FontColors.elementSelectTitle};
+  }
 `;
 
 const SectionCol = styled(Col)`
   width: 100%;
   margin: 0;
   padding: 0;
-`;
-
-const SectionTitle = styled.h5`
-  font-size: 1.2em;
-  text-align: left;
-  color: ${FontColors.darkThemeMainFont};
 `;
 
 const NavigatorPane = () => {
@@ -69,8 +71,8 @@ const NavigatorPane = () => {
     dispatch(setFilterObjects(checked));
   };
 
-  const handleNamespaceChange = (event: any) => {
-    setNamespace(event.target.value);
+  const handleNamespaceChange = (value: any) => {
+    setNamespace(value);
   };
 
   const selectPreview = (id: string) => {
@@ -92,10 +94,10 @@ const NavigatorPane = () => {
   return (
     <PaneContainer>
       <TitleRow>
-        <MonoSectionHeaderCol span={24}>
+        <MonoPaneTitleCol span={24}>
           <Row>
             <Col span={12}>
-              <MonoSectionTitle>Navigator</MonoSectionTitle>
+              <MonoPaneTitle>Navigator</MonoPaneTitle>
             </Col>
             <Col span={12}
             >
@@ -105,16 +107,16 @@ const NavigatorPane = () => {
               />
             </Col>
           </Row>
-        </MonoSectionHeaderCol>
+        </MonoPaneTitleCol>
       </TitleRow>
 
       {kustomizations.length > 0 && (
         <SectionRow>
           <SectionCol>
             <SectionRow>
-              <SectionCol>
-                <SectionTitle>Kustomizations</SectionTitle>
-              </SectionCol>
+              <MonoSectionHeaderCol>
+                <MonoSectionTitle>Kustomizations</MonoSectionTitle>
+              </MonoSectionHeaderCol>
             </SectionRow>
             {kustomizations
               .filter(
@@ -126,15 +128,6 @@ const NavigatorPane = () => {
                   previewResource === k.id
               )
               .map((k: K8sResource) => {
-                let className = '';
-                if (previewResource && previewResource !== k.id) {
-                  className = 'disabledItem';
-                } else if (k.selected || previewResource === k.id) {
-                  className = 'selectedItem';
-                } else if (k.highlight) {
-                  className = 'highlightItem';
-                }
-
                 const isSelected = (k.selected || previewResource === k.id);
                 const isDisabled = Boolean(previewResource && previewResource !== k.id);
                 const isHighlighted = k.highlight;
@@ -144,7 +137,7 @@ const NavigatorPane = () => {
 
                 return (
                   <NavigatorKustomizationRow
-                    key={k.id}
+                    rowKey={k.id}
                     resource={k}
                     isSelected={isSelected}
                     isDisabled={isDisabled}
@@ -160,14 +153,22 @@ const NavigatorPane = () => {
           </SectionCol>
         </SectionRow>
       )}
-      <SectionRow>
-        Filter namespace:
-        <select onChange={handleNamespaceChange}>
-          <option>{ALL_NAMESPACES}</option>
+      <SectionRow style={{paddingLeft: 16}}>
+        Namespace:
+        <Select
+          showSearch
+          placeholder="Namespace"
+          defaultValue="ALL_NAMESPACES"
+          onChange={handleNamespaceChange}
+          size='small'
+          style={{minWidth: '50%'}}
+          bordered={false}
+        >
+          <Option value='ALL_NAMESPACES'>all</Option>
           {getNamespaces(resourceMap).map(n => {
-            return <option key={n}>{n}</option>;
+            return <Option key={n} value={n}>{n}</Option>;
           })}
-        </select>
+        </Select>
       </SectionRow>
 
       <SectionRow>
@@ -176,7 +177,9 @@ const NavigatorPane = () => {
             return (
               <>
                 <SectionRow>
-                  <SectionTitle>{navigator.name}</SectionTitle>
+                  <MonoSectionHeaderCol>
+                    <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
+                  </MonoSectionHeaderCol>
                 </SectionRow>
                 <SectionRow>
                   <SectionCol>
@@ -185,7 +188,7 @@ const NavigatorPane = () => {
                         <>
                           {section.name.length > 0 && (
                             <SectionRow>
-                              <h6>{section.name}</h6>
+                              <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
                             </SectionRow>
                           )}
                           <SectionRow key={section.name}>
@@ -193,25 +196,21 @@ const NavigatorPane = () => {
                               const items = resources.filter(item => shouldBeVisible(item, subsection));
                               return (
                                 <SectionCol key={subsection.name}>
-                                  <h6>
+                                  <NavigatorContentSubTitle>
                                     {subsection.name} {items.length > 0 ? `(${items.length})` : ''}
-                                  </h6>
-                                  {items.map(item => {
-                                    let className = '';
-                                    if (item.highlight) {
-                                      className = 'highlightItem';
-                                    } else if (item.selected) {
-                                      className = 'selectedItem';
-                                    }
-                                    return (
-                                      <div key={item.id} className={className} onClick={() => selectResource(item.id)}>
-                                        {hasIncomingRefs(item) ? '>> ' : ''}
-                                        {item.name}
-                                        {hasOutgoingRefs(item) ? ' >>' : ''}
-                                        {hasUnsatisfiedRefs(item) ? ' ??' : ''}
-                                      </div>
-                                    );
-                                  })}
+                                  </NavigatorContentSubTitle>
+                                  {items.map(item =>
+                                    <NavigatorResourceRow
+                                      rowKey={item.id}
+                                      label={item.name}
+                                      isSelected={Boolean(item.selected)}
+                                      highlighted={Boolean(item.highlight)}
+                                      hasIncomingRefs={Boolean(hasIncomingRefs(item))}
+                                      hasOutgoingRefs={Boolean(hasOutgoingRefs(item))}
+                                      hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
+                                      onClickResource={() => selectResource(item.id)}
+                                    />
+                                  )}
                                 </SectionCol>
                               );
                             })}

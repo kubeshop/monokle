@@ -4,3 +4,7 @@ export {default as MonoSwitch} from './MonoSwitch';
 export {default as MonoSectionHeaderCol} from './MonoSectionHeaderCol';
 export {default as MonoSectionTitle} from './MonoSectionTitle';
 export {default as PaneContainer} from './PaneContainer';
+export {default as MonoPaneTitleCol} from './MonoPaneTitleCol';
+export {default as MonoPaneTitle} from './MonoPaneTitle';
+export {default as NavigatorContentSubTitle} from './NavigatorContentSubTitle';
+export {default as NavigatorContentTitle} from './NavigatorContentTitle';
