@@ -1,9 +1,8 @@
 import path from "path";
 import {AppConfig} from '@models/appconfig';
 import {initialState} from '@redux/initialState';
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {getK8sResources} from '@redux/utils/resource';
-import {HelmChart} from '@models/helm';
 import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
 function createSafePath(originalPath: string) {
@@ -25,10 +24,11 @@ function readManifests(rootFolder: string) {
   const appConfig: AppConfig = initialState.appConfig;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
-  const helmCharts: HelmChart[] = [];
+  const helmChartMap: HelmChartMapType = {};
+  const helmValuesMap: HelmValuesMapType = {};
 
-  const files = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmCharts);
-  return {resourceMap, fileMap, files, helmCharts};
+  const files = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+  return {resourceMap, fileMap, files, helmChartMap, helmValuesMap};
 }
 
 test('read-files', () => {
@@ -45,13 +45,14 @@ test('read-folder-with-one-file', () => {
     resourceMap,
     fileMap,
     files,
-    helmCharts,
+    helmChartMap,
+    helmValuesMap,
   } = readManifests(createSafePath('src/redux/utils/__test__/manifests/single'));
 
   expect(files.length).toBe(1);
   expect(Object.values(fileMap).length).toBe(2);
   expect(Object.values(resourceMap).length).toBe(1);
-  expect(helmCharts.length).toBe(0);
+  expect(Object.values(helmChartMap).length).toBe(0);
 
 });
 
@@ -60,15 +61,17 @@ test('read-folder-with-helm-chart', () => {
     resourceMap,
     fileMap,
     files,
-    helmCharts,
+    helmChartMap,
+    helmValuesMap,
   } = readManifests(createSafePath('src/redux/utils/__test__/helm-charts/subway'));
 
   expect(files.length).toBe(11);
   expect(Object.values(fileMap).length).toBe(22);
   expect(Object.values(resourceMap).length).toBe(0);
+
+  let helmCharts = Object.values(helmChartMap);
   expect(helmCharts.length).toBe(1);
   expect(helmCharts[0].valueFiles.length).toBe(8);
   expect(helmCharts[0].name).toBe('subway');
   expect(fileMap[helmCharts[0].filePath].name).toBe('Chart.yaml');
-
 });

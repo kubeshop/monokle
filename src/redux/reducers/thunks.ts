@@ -5,7 +5,7 @@ import path from 'path';
 import log from 'loglevel';
 import {exec} from 'child_process';
 import {createFileEntry, readFiles} from '@redux/utils/fileEntry';
-import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
+import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {extractK8sResources, processParsedResources} from '@redux/utils/resource';
 import {stringify} from 'yaml';
 import * as k8s from '@kubernetes/client-node';
@@ -18,11 +18,6 @@ import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@
 import {PROCESS_ENV} from '@actions/common/apply';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
-import {HelmChart} from '@models/helm';
-
-/**
- * Thunk to preview a kustomization
- */
 
 export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
   string,
@@ -156,10 +151,11 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
   const rootEntry: FileEntry = createFileEntry(rootFolder);
-  const helmCharts: HelmChart[] = [];
+  const helmChartMap: HelmChartMapType = {};
+  const helmValuesMap: HelmValuesMapType = {};
 
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
-  rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmCharts);
+  rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
 
   processKustomizations(resourceMap, fileMap);
   processParsedResources(resourceMap);
@@ -170,7 +166,8 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
     appConfig,
     fileMap,
     resourceMap,
-    helmCharts,
+    helmChartMap,
+    helmValuesMap,
   };
 });
 

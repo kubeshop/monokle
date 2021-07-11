@@ -4,12 +4,13 @@ import styled from 'styled-components';
 import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 
 import Colors, {FontColors} from '@styles/Colors';
-import {K8sResource} from '@models/k8sresource';
-import {generateId} from '@utils/numberUtils';
+import {HelmChart, HelmValuesFile} from '@models/helm';
+import {useSelector} from 'react-redux';
+import {selectHelmValues} from '@redux/selectors';
 
 export type NavigatorHelmRowProps = {
   rowKey: React.Key;
-  resource: K8sResource;
+  helmChart: HelmChart;
   isSelected: boolean;
   isDisabled: boolean;
   highlighted: boolean;
@@ -113,9 +114,11 @@ const TreeContainer = styled.div`
 */
 
 const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
+  const helmValues = useSelector(selectHelmValues);
+
   const {
     rowKey,
-    resource,
+    helmChart,
     isSelected,
     isDisabled,
     highlighted,
@@ -130,24 +133,6 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
     ${isDisabled ? ` helmchart-row-disabled` : ''}\
     ${highlighted ? ` helmchart-row-highlighted` : ''}`;
 
-  const treeData = [
-    {
-      title: 'values.yaml',
-      key: '1',
-      children: [],
-    },
-    {
-      title: 'values-local.yaml',
-      key: '2',
-      children: [],
-    },
-    {
-      title: 'override.yaml',
-      key: '3',
-      children: [],
-    },
-  ];
-
   return (<RowContainer>
     <ChartContainer className={chartClassName}>
       <ItemRow key={rowKey}>
@@ -156,7 +141,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
             className={chartClassName}
             onClick={onClickResource}
           >
-            {resource.name}
+            {helmChart.name}
           </div>
         </SectionCol>
       </ItemRow>
@@ -164,21 +149,19 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
     </ChartContainer>
     <TreeContainer className={chartClassName}>
       {
-        treeData
-          .map((node: any) => {
-            const valuesClassName = `helmvalues-row\
-              ${node.isSelected ? ` helmvalues-row-selected` : ''}\
-              ${node.isDisabled ? ` helmvalues-row-disabled` : ''}\
-              ${node.highlighted ? ` helmvalues-row-highlighted` : ''}`;
+        helmChart.valueFiles
+          .map(v => helmValues[v])
+          .map((node: HelmValuesFile) => {
+            const valuesClassName = 'helmvalues-row';
 
             return (
-              <ItemRow key={generateId('helmvalues-row')}>
+              <ItemRow key={node.id}>
                 <SectionCol sm={22}>
                   <div
                     className={valuesClassName}
                     onClick={onClickResource}
                   >
-                    {node.title}
+                    {node.name}
                   </div>
                 </SectionCol>
                 <SectionCol sm={2}>

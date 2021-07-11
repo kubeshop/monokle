@@ -1,14 +1,17 @@
 interface HelmChart {
+  id: string;
   filePath: string;
   name: string;
   selected: boolean;
-  valueFiles: HelmValuesFile[];
+  valueFiles: string[];
 }
 
 interface HelmValuesFile {
+  id: string;
   filePath: string;
   name: string;
   selected: boolean;
+  helmChart: string;
 }
 
 export type {HelmChart, HelmValuesFile};

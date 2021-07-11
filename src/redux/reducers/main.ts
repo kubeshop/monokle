@@ -3,11 +3,10 @@ import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
 import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@src/constants';
 import {AppConfig} from '@models/appconfig';
-import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
+import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
 import {diffResource, previewCluster, previewKustomization, setRootFolder} from '@redux/reducers/thunks';
-import {HelmChart} from '@models/helm';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -29,7 +28,8 @@ export type SetRootFolderPayload = {
   appConfig: AppConfig;
   fileMap: FileMapType;
   resourceMap: ResourceMapType;
-  helmCharts: HelmChart[];
+  helmChartMap: HelmChartMapType;
+  helmValuesMap: HelmValuesMapType;
 };
 
 export type UpdateResourcePayload = {
@@ -202,6 +202,8 @@ export const mainSlice = createSlice({
       setRootFolder.fulfilled, (state, action) => {
         state.resourceMap = action.payload.resourceMap;
         state.fileMap = action.payload.fileMap;
+        state.helmChartMap = action.payload.helmChartMap;
+        state.helmValuesMap = action.payload.helmValuesMap;
         state.selectedResource = undefined;
         state.selectedPath = undefined;
         state.previewResource = undefined;
