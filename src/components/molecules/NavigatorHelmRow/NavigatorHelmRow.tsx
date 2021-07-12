@@ -34,9 +34,9 @@ const RowContainer = styled.div`
     padding-left: 8px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
-    font-size: 12px;
+    font-size: 15px;
     font-style: normal;
-    font-weight: normal;
+    font-weight: bold;
     line-height: 22px;
     color: ${FontColors.darkThemeMainFont};
   }
@@ -118,10 +118,12 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   }
 
   function onClickPreview(id: string) {
-    if (id !== selectedValuesFile) {
-      dispatch(selectHelmValuesFile(id));
+    if (!previewValuesFile || previewValuesFile === id) {
+      if (id !== selectedValuesFile) {
+        dispatch(selectHelmValuesFile(id));
+      }
+      dispatch(previewHelmValuesFile(id));
     }
-    dispatch(previewHelmValuesFile(id));
   }
 
   return (<RowContainer>
