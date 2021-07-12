@@ -63,15 +63,15 @@ test('read-folder-with-helm-chart', () => {
     files,
     helmChartMap,
     helmValuesMap,
-  } = readManifests(createSafePath('src/redux/utils/__test__/helm-charts/subway'));
+  } = readManifests(createSafePath('src/redux/utils/__test__/helm-charts/aks-helloworld'));
 
-  expect(files.length).toBe(11);
-  expect(Object.values(fileMap).length).toBe(22);
-  expect(Object.values(resourceMap).length).toBe(0);
+  expect(files.length).toBe(4);
+  expect(Object.values(fileMap).length).toBe(6);
+  expect(Object.values(resourceMap).length).toBe(2);
 
   let helmCharts = Object.values(helmChartMap);
   expect(helmCharts.length).toBe(1);
-  expect(helmCharts[0].valueFiles.length).toBe(8);
-  expect(helmCharts[0].name).toBe('subway');
+  expect(helmCharts[0].valueFiles.length).toBe(1);
+  expect(helmCharts[0].name).toBe('aks-helloworld');
   expect(fileMap[helmCharts[0].filePath].name).toBe('Chart.yaml');
 });
