@@ -21,7 +21,10 @@ import {logMessage} from '@redux/utils/log';
 import {updateFileEntry, updateResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@src/constants';
-import {KUBESHOP_MONACO_THEME} from "@utils/monaco";
+import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
+
+import {clearDecorations, setDecorations} from './editorHelpers';
+import codeIntel from './codeIntel';
 
 // @ts-ignore
 window.MonacoEnvironment = {
@@ -50,12 +53,17 @@ const Monaco = (props: {editorHeight: string}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const [editor, setEditor] = useState<monaco.editor.IEditor>();
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
   const [code, setCode] = useState('');
   const [ref, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
+
+  const [currentIdsOfDecorations, setCurrentIdsOfDecorations] = useState<string[]>([]);
+  const [currentHoverDisposables, setCurrentHoverDisposables] = useState<monaco.IDisposable[]>([]);
+  const [currentCommandDisposables, setCurrentCommandDisposables] = useState<monaco.IDisposable[]>([]);
+
   const isInPreviewMode = Boolean(useAppSelector(state => state.main.previewResource));
   const dispatch = useAppDispatch();
 
@@ -129,8 +137,36 @@ const Monaco = (props: {editorHeight: string}) => {
   const options = {
     selectOnLineNumbers: true,
     readOnly: isInPreviewMode,
-    fontWeight: "bold"
+    fontWeight: 'bold',
+    glyphMargin: true,
   };
+
+  const clearCodeIntel = () => {
+    if (editor) {
+      clearDecorations(editor, currentIdsOfDecorations);
+      currentHoverDisposables.forEach(hoverDisposable => hoverDisposable.dispose());
+      currentCommandDisposables.forEach(commandDisposable => commandDisposable.dispose());
+    }
+  };
+
+  const applyCodeIntel = () => {
+    if (editor && selectedResource) {
+      const {decorations, hoverDisposables, commandDisposables} = codeIntel.handleUnsatisfiedRefs(
+        editor,
+        resourceMap,
+        selectedResource
+      );
+      const idsOfDecorations = setDecorations(editor, decorations);
+      setCurrentIdsOfDecorations(idsOfDecorations);
+      setCurrentHoverDisposables(hoverDisposables);
+      setCurrentCommandDisposables(commandDisposables);
+    }
+  };
+
+  useEffect(() => {
+    clearCodeIntel();
+    applyCodeIntel();
+  }, [code]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let resourceSchema;
@@ -169,11 +205,7 @@ const Monaco = (props: {editorHeight: string}) => {
 
   return (
     <>
-      <MonoButton large
-        type={hasWarnings ? "dashed" : "primary"}
-        disabled={!isDirty || !isValid}
-        onClick={saveContent}
-      >
+      <MonoButton large type={hasWarnings ? 'dashed' : 'primary'} disabled={!isDirty || !isValid} onClick={saveContent}>
         Save
       </MonoButton>
       <MonacoContainer ref={ref}>

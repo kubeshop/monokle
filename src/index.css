@@ -9,3 +9,13 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+.monokleEditorUnsatisfiedRefGlyphClass {
+  background-color: #ad8b00;
+  border-radius: 50%;
+}
+
+.monokleEditorUnsatisfiedRefInlineClass {
+  color: #ad8b00 !important;
+  text-decoration: underline;
+}
