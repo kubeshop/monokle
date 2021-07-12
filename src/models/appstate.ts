@@ -34,8 +34,10 @@ interface AppState {
   previewResource?: string; // the resource currently being previewed
   diffResource?: string; // the resource currently being diffed
   diffContent?: string; // the diff content for the resource being diffed
-  helmChartMap: HelmChartMapType;
-  helmValuesMap: HelmValuesMapType;
+  helmChartMap: HelmChartMapType; // maps chart ids to helm charts
+  helmValuesMap: HelmValuesMapType; // maps values ids to helm values files
+  selectedValuesFile?: string; // the currently selected values file
+  previewValuesFile?: string; // the values file currently being previewed
 }
 
 export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType};

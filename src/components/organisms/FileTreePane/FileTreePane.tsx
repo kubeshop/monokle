@@ -21,6 +21,8 @@ import {
   MonoPaneTitle,
   MonoPaneTitleCol,
 } from '@atoms';
+import {useSelector} from 'react-redux';
+import {inPreviewMode} from '@redux/selectors';
 
 interface TreeNode {
   key: string;
@@ -146,6 +148,7 @@ const NoFilesContainer = styled(Typography.Text)`
 const FileTreePane = () => {
   const dispatch = useAppDispatch();
   const previewResource = useAppSelector(state => state.main.previewResource);
+  const previewMode = useSelector(inPreviewMode);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
@@ -179,7 +182,7 @@ const FileTreePane = () => {
   };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
-    if (previewResource === undefined && info.node.key) {
+    if (!previewMode && info.node.key) {
       dispatch(selectFile(info.node.key));
     }
   };
@@ -200,7 +203,7 @@ const FileTreePane = () => {
             <Button
               type="primary"
               ghost
-              disabled={Boolean(previewResource) && previewResource !== PROCESS_ENV.KUBECONFIG}
+              disabled={previewMode && previewResource !== PROCESS_ENV.KUBECONFIG}
               onClick={connectToCluster}
             >
               Cluster Objects
@@ -217,7 +220,6 @@ const FileTreePane = () => {
             </Button>
           </Space>
           <FileDetailsContainer>
-            {directoryPath && <Typography.Text type="secondary">{directoryPath}</Typography.Text>}
             {nrOfFiles !== -1 && <Typography.Text type="secondary">{nrOfFiles} files</Typography.Text>}
           </FileDetailsContainer>
         </ColumnWithPadding>
@@ -230,7 +232,7 @@ const FileTreePane = () => {
         onChange={onUploadHandler}
         ref={folderInput}
         style={{display: 'none'}}
-        disabled={Boolean(previewResource)}
+        disabled={previewMode}
       />
       {tree ? <Tree.DirectoryTree
         onSelect={onSelect}

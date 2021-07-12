@@ -35,6 +35,11 @@ export const selectHelmValues = createSelector(
   helmValuesMap => helmValuesMap,
 );
 
+export const inPreviewMode = createSelector(
+  (state: RootState) => state.main,
+  appState => Boolean(appState.previewResource) || Boolean(appState.previewValuesFile),
+);
+
 export const selectLogs = createSelector(
   (state: RootState) => state.logs.logs,
   logs => logs.join('\n'),

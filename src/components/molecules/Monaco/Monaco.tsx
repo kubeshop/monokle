@@ -115,7 +115,7 @@ const Monaco = (props: {editorHeight: string}) => {
       if (resource) {
         newCode = resource.text;
       }
-    } else if (selectedPath) {
+    } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
       const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
       if (!fs.statSync(filePath).isDirectory()) {
         newCode = fs.readFileSync(filePath, 'utf8');

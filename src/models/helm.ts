@@ -2,7 +2,6 @@ interface HelmChart {
   id: string;
   filePath: string;
   name: string;
-  selected: boolean;
   valueFiles: string[];
 }
 

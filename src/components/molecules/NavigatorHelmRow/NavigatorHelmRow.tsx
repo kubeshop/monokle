@@ -7,16 +7,13 @@ import Colors, {FontColors} from '@styles/Colors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {useSelector} from 'react-redux';
 import {selectHelmValues} from '@redux/selectors';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectHelmValuesFile} from '@redux/reducers/main';
+import {previewHelmValuesFile} from '@redux/reducers/thunks';
 
 export type NavigatorHelmRowProps = {
   rowKey: React.Key;
   helmChart: HelmChart;
-  isSelected: boolean;
-  isDisabled: boolean;
-  highlighted: boolean;
-  previewButtonActive: boolean;
-  onClickResource?: React.MouseEventHandler<HTMLDivElement>;
-  onClickPreview: React.MouseEventHandler<HTMLDivElement>;
 };
 
 const ItemRow = styled(Row)`
@@ -43,20 +40,24 @@ const RowContainer = styled.div`
     line-height: 22px;
     color: ${FontColors.darkThemeMainFont};
   }
+
   & .helmchart-row-selected {
     background: ${Colors.selectionGradient};
     font-weight: bold;
     color: black;
   }
+
   & .helmchart-row-disabled {
     color: grey;
   }
+
   & .helmchart-row-highlighted {
     font-style: italic;
     font-weight: bold;
     background: ${Colors.highlightGradient};
     color: ${FontColors.resourceRowHighlight};
   }
+
   & .helmvalues-row {
     width: 100%;
     padding-left: 24px;
@@ -68,14 +69,17 @@ const RowContainer = styled.div`
     line-height: 22px;
     color: ${FontColors.darkThemeMainFont};
   }
+
   & .helmvalues-row-selected {
     background: ${Colors.selectionGradient};
     font-weight: bold;
     color: black;
   }
+
   & .helmvalues-row-disabled {
     color: grey;
   }
+
   & .helmvalues-row-highlighted {
     font-style: italic;
     font-weight: bold;
@@ -93,45 +97,32 @@ const TreeContainer = styled.div`
   padding-left: 16px;
 `;
 
-/*
-
-[
-  helmObject1: {
-    helmChart: {
-      fileName: ...,
-      ...helmChartProperties,
-      isSelected: false,
-    },
-    valueFilesMatchedWithChart: [
-      {
-        fileName: ...,
-        isSelected: false,
-        ...
-      }
-    ],
-  }
-]
-*/
-
 const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   const helmValues = useSelector(selectHelmValues);
+  const previewValuesFile = useAppSelector(state => state.main.previewValuesFile);
+  const selectedValuesFile = useAppSelector(state => state.main.selectedValuesFile);
+  const dispatch = useAppDispatch();
 
   const {
     rowKey,
     helmChart,
-    isSelected,
-    isDisabled,
-    highlighted,
-    previewButtonActive,
-    onClickResource,
-    onClickPreview,
   } = props;
 
   // Parent needs to make sure disabled and selected arent active at the same time.
-  let chartClassName = `helmchart-row\
-    ${isSelected ? ` helmchart-row-selected` : ''}\
-    ${isDisabled ? ` helmchart-row-disabled` : ''}\
-    ${highlighted ? ` helmchart-row-highlighted` : ''}`;
+  let chartClassName = `helmchart-row`;
+
+  function onSelectValuesFile(id: string) {
+    if (!previewValuesFile) {
+      dispatch(selectHelmValuesFile(id));
+    }
+  }
+
+  function onClickPreview(id: string) {
+    if (id !== selectedValuesFile) {
+      dispatch(selectHelmValuesFile(id));
+    }
+    dispatch(previewHelmValuesFile(id));
+  }
 
   return (<RowContainer>
     <ChartContainer className={chartClassName}>
@@ -139,7 +130,6 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
         <SectionCol sm={22}>
           <div
             className={chartClassName}
-            onClick={onClickResource}
           >
             {helmChart.name}
           </div>
@@ -151,24 +141,29 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
       {
         helmChart.valueFiles
           .map(v => helmValues[v])
-          .map((node: HelmValuesFile) => {
-            const valuesClassName = 'helmvalues-row';
+          .map((valuesFile: HelmValuesFile) => {
+            const previewButtonActive = previewValuesFile !== undefined && previewValuesFile === valuesFile.id;
+            const isDisabled = Boolean(previewValuesFile && previewValuesFile !== valuesFile.id);
+
+            let valuesClassName = `helmvalues-row\
+              ${valuesFile.selected ? ` helmvalues-row-selected` : ''}\
+              ${isDisabled ? ` helmvalues-row-disabled` : ''}`;
 
             return (
-              <ItemRow key={node.id}>
+              <ItemRow key={valuesFile.id}>
                 <SectionCol sm={22}>
                   <div
                     className={valuesClassName}
-                    onClick={onClickResource}
+                    onClick={() => onSelectValuesFile(valuesFile.id)}
                   >
-                    {node.name}
+                    {valuesFile.name}
                   </div>
                 </SectionCol>
                 <SectionCol sm={2}>
                   {
                     previewButtonActive ?
-                    <EyeInvisibleOutlined onClick={onClickPreview}/>
-                    : <EyeOutlined onClick={onClickPreview}/>
+                      <EyeInvisibleOutlined onClick={() => onClickPreview(valuesFile.id)} />
+                      : <EyeOutlined onClick={() => onClickPreview(valuesFile.id)} />
                   }
                 </SectionCol>
               </ItemRow>

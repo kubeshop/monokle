@@ -122,19 +122,10 @@ const NavigatorPane = () => {
             </SectionRow>
             {Object.values(helmCharts)
               .map((chart: HelmChart) => {
-                const buttonActive = false;
-
                 return (
                   <NavigatorHelmRow
                     rowKey={chart.id}
                     helmChart={chart}
-                    isSelected={false}
-                    isDisabled={false}
-                    highlighted={false}
-                    previewButtonActive={buttonActive}
-                    onClickResource={undefined}
-                    onClickPreview={() => {
-                    }}
                   />
                 );
               })}
@@ -175,7 +166,7 @@ const NavigatorPane = () => {
                     previewButtonActive={buttonActive}
                     hasIncomingRefs={Boolean(hasIncomingRefs(k))}
                     hasOutgoingRefs={Boolean(hasOutgoingRefs(k))}
-                    onClickResource={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}
+                    onClickResource={!previewResource ? () => selectResource(k.id) : undefined}
                     onClickPreview={() => selectPreview(k.id)}
                   />
                 );

@@ -61,7 +61,6 @@ export function readFiles(folder: string, appConfig: AppConfig, resourceMap: Res
       id: uuidv4(),
       filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
       name: folder.substr(folder.lastIndexOf(path.sep) + 1),
-      selected: false,
       valueFiles: [],
     };
 

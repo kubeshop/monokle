@@ -6,7 +6,13 @@ import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
-import {diffResource, previewCluster, previewKustomization, setRootFolder} from '@redux/reducers/thunks';
+import {
+  diffResource,
+  previewCluster,
+  previewHelmValuesFile,
+  previewKustomization,
+  setRootFolder,
+} from '@redux/reducers/thunks';
 import {initialState} from '../initialState';
 import {
   clearFileSelections,
@@ -63,8 +69,10 @@ export const mainSlice = createSlice({
       let filePath = action.payload;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
       if (fileEntry) {
-        log.info(`added file ${filePath} already exists - updating`);
-        reloadFile(filePath, fileEntry, state);
+        if (!fs.statSync(filePath).isDirectory()) {
+          log.info(`added file ${filePath} already exists - updating`);
+          reloadFile(filePath, fileEntry, state);
+        }
       } else {
         addPath(filePath, state);
       }
@@ -157,33 +165,23 @@ export const mainSlice = createSlice({
       }
     },
     /**
+     * Marks the specified values as selected
+     */
+    selectHelmValuesFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      let payload = action.payload;
+      Object.values(state.helmValuesMap).forEach(values => {
+        values.selected = values.id === payload ? !values.selected : false;
+      });
+
+      state.selectedValuesFile = state.helmValuesMap[payload].selected ? payload : undefined;
+      selectFilePath(state.helmValuesMap[payload].filePath, state);
+    },
+    /**
      * Marks the specified file as selected and highlights all related resources
      */
     selectFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       if (action.payload.length > 0) {
-        const entries = getAllFileEntriesForPath(action.payload, state.fileMap);
-        clearResourceSelections(state.resourceMap);
-        clearFileSelections(state.fileMap);
-
-        if (entries.length > 0) {
-          entries
-            .filter(e => e.children)
-            .forEach(e => {
-              e.expanded = true;
-            });
-
-          const parent = entries[entries.length - 1];
-          getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
-            r.highlight = true;
-          });
-
-          if (parent.children) {
-            highlightChildrenResources(parent, state.resourceMap, state.fileMap);
-          }
-        }
-
-        state.selectedResource = undefined;
-        state.selectedPath = action.payload;
+        selectFilePath(action.payload, state);
       }
     },
   },
@@ -191,6 +189,16 @@ export const mainSlice = createSlice({
     builder.addCase(
       previewKustomization.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
+      });
+
+    builder.addCase(
+      previewHelmValuesFile.fulfilled, (state, action) => {
+        setPreviewData(action.payload, state);
+      });
+
+    builder.addCase(
+      previewHelmValuesFile.rejected, (state, action) => {
+        log.error(action.error.message);
       });
 
     builder.addCase(
@@ -223,7 +231,18 @@ export const mainSlice = createSlice({
  */
 
 function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) {
-  state.previewResource = payload.previewResourceId;
+  state.previewResource = undefined;
+  state.previewValuesFile = undefined;
+
+  if (payload.previewResourceId) {
+    if (state.helmValuesMap[payload.previewResourceId]) {
+      state.previewValuesFile = payload.previewResourceId;
+    } else if (state.resourceMap[payload.previewResourceId]) {
+      state.previewResource = payload.previewResourceId;
+    } else {
+      log.error(`Unknown preview id: ${payload.previewResourceId}`);
+    }
+  }
 
   // remove previous preview resources
   Object.values(state.resourceMap)
@@ -237,6 +256,39 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
   }
 }
 
-export const {selectK8sResource, selectFile, updateResource, updateFileEntry, pathAdded, fileChanged, pathRemoved} =
+/**
+ * Selects the specified filePath - used by several reducers
+ */
+
+function selectFilePath(filePath: string, state: AppState) {
+  const entries = getAllFileEntriesForPath(filePath, state.fileMap);
+  clearResourceSelections(state.resourceMap);
+  clearFileSelections(state.fileMap);
+
+  if (entries.length > 0) {
+    entries
+      .filter(e => e.children)
+      .forEach(e => {
+        e.expanded = true;
+      });
+
+    const parent = entries[entries.length - 1];
+    getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
+      r.highlight = true;
+    });
+
+    if (parent.children) {
+      highlightChildrenResources(parent, state.resourceMap, state.fileMap);
+    }
+  }
+
+  state.selectedResource = undefined;
+  state.selectedPath = filePath;
+}
+
+export const {
+  selectK8sResource, selectFile, updateResource, updateFileEntry,
+  pathAdded, fileChanged, pathRemoved, selectHelmValuesFile,
+} =
   mainSlice.actions;
 export default mainSlice.reducer;

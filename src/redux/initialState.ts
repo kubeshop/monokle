@@ -5,8 +5,9 @@ export const initialState: AppState = {
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,
+      helmPreviewMode: 'template',
     },
-    scanExcludes: ['node_modules', '.git', '**/pkg/mod/**'],
+    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube'],
     fileIncludes: ['*.yaml', '*.yml'],
     navigators: [
       {

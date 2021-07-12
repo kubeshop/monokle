@@ -52,6 +52,7 @@ export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
               return;
             }
             if (stderr) {
+              dispatchError('Kustomize preview failed', stderr, thunkAPI);
               reject(new Error(`Failed to generate kustomization: ${stderr}`));
               return;
             }
@@ -171,6 +172,15 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
   };
 });
 
+function dispatchError(title: string, message: string, thunkAPI: any) {
+  const alert: AlertType = {
+    type: AlertEnum.Error,
+    title,
+    message,
+  };
+  thunkAPI.dispatch(setAlert(alert));
+}
+
 /**
  * Thunk to diff a resource against the configured cluster
  */
@@ -200,12 +210,9 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
       };
 
       const handleRejection = (rej: any) => {
-        const alert: AlertType = {
-          type: AlertEnum.Error,
-          title: 'Diff failed',
-          message: `${resource.content.kind} ${resource.content.metadata.name} not found in cluster`,
-        };
-        thunkAPI.dispatch(setAlert(alert));
+        let message = `${resource.content.kind} ${resource.content.metadata.name} not found in cluster`;
+        let title = 'Diff failed';
+        dispatchError(title, message, thunkAPI);
         return {};
       };
 
@@ -228,6 +235,71 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
   } catch (e) {
     log.error('Failed to diff resource');
     log.error(e);
+  }
+
+  return {};
+});
+
+export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
+  string,
+  {
+    dispatch: AppDispatch,
+    state: RootState,
+  }>
+('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
+  const state = thunkAPI.getState().main;
+  if (state.previewValuesFile !== valuesFileId) {
+    const valuesFile = state.helmValuesMap[valuesFileId];
+    if (valuesFile && valuesFile.filePath) {
+      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+      const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
+      const chart = state.helmChartMap[valuesFile.helmChart];
+
+      log.info(`previewing ${valuesFile.id} in folder ${folder}`);
+
+      // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
+      return new Promise((resolve, reject) => {
+
+        const helmCommand = state.appConfig.settings.helmPreviewMode === 'template' ?
+          `helm template -f ${valuesFile.name} ${chart.name} .` :
+          `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`;
+
+        exec(
+          helmCommand,
+          {
+            cwd: folder,
+            env: {
+              NODE_ENV: process.env.NODE_ENV,
+              PUBLIC_URL: process.env.PUBLIC_URL,
+              PATH: shellPath.sync(),
+              KUBECONFIG: PROCESS_ENV.KUBECONFIG,
+            },
+          },
+          (error, stdout, stderr) => {
+            if (error) {
+              dispatchError('Helm preview failed', error.message, thunkAPI);
+              reject(error);
+              return;
+            }
+            if (stderr) {
+              dispatchError('Helm preview failed', stderr, thunkAPI);
+              reject(new Error(`Failed to generate helm preview: ${stderr}`));
+              return;
+            }
+
+            const resources = extractK8sResources(stdout, PREVIEW_PREFIX + valuesFile.id);
+            const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
+              rm[r.id] = r;
+              return rm;
+            }, {});
+
+            processParsedResources(resourceMap);
+
+            resolve({previewResourceId: valuesFile.id, previewResources: resourceMap});
+          },
+        );
+      });
+    }
   }
 
   return {};
