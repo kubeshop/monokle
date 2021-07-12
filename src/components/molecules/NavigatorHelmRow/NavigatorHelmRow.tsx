@@ -150,12 +150,9 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
               ${isDisabled ? ` helmvalues-row-disabled` : ''}`;
 
             return (
-              <ItemRow key={valuesFile.id}>
+              <ItemRow key={valuesFile.id} className={valuesClassName}>
                 <SectionCol sm={22}>
-                  <div
-                    className={valuesClassName}
-                    onClick={() => onSelectValuesFile(valuesFile.id)}
-                  >
+                  <div onClick={() => onSelectValuesFile(valuesFile.id)}>
                     {valuesFile.name}
                   </div>
                 </SectionCol>
