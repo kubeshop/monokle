@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
+import NavigatorRowRefsPopover, {RefsPopoverType} from '@molecules/NavigatorRowRefsPopover';
+
 export type NavigatorResourceRowProps = {
   rowKey: React.Key;
   label: string;
@@ -31,7 +33,8 @@ const RowContainer = styled.div`
   & .resource-row {
     width: 100%;
     padding-left: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
     font-size: 12px;
     font-style: normal;
@@ -76,23 +79,21 @@ const NavigatorResourceRow = (props: NavigatorResourceRowProps) => {
     ${isSelected ? ` resource-row-selected` : ''}\
     ${highlighted ? ` resource-row-highlighted` : ''}`;
 
-  return (<RowContainer>
-    <StyledDiv className={classname}>
-      <ItemRow key={rowKey}>
-        <SectionCol sm={22}>
-          <div
-            className={classname}
-            onClick={onClickResource}
-          >
-            {hasIncomingRefs ? '>> ' : ''}
-            {label}
-            {hasOutgoingRefs ? ' >>' : ''}
-            {hasUnsatisfiedRefs ? ' ??' : ''}
-          </div>
-        </SectionCol>
-      </ItemRow>
-    </StyledDiv>
-  </RowContainer>);
+  return (
+    <RowContainer>
+      <StyledDiv className={classname}>
+        <ItemRow key={rowKey}>
+          <SectionCol sm={22}>
+            <div className={classname} onClick={onClickResource}>
+              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Incoming} />
+              <span style={!hasIncomingRefs ? {marginLeft: 19} : {}}>{label}</span>
+              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Outgoing} />
+            </div>
+          </SectionCol>
+        </ItemRow>
+      </StyledDiv>
+    </RowContainer>
+  );
 };
 
 export default NavigatorResourceRow;
