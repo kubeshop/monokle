@@ -6,7 +6,7 @@ import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 import Colors, {FontColors} from '@styles/Colors';
 import {K8sResource} from '@models/k8sresource';
 
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+import NavigatorRowRefsPopover, {RefsPopoverType} from '@molecules/NavigatorRowRefsPopover';
 
 export type NavigatorKustomizationRowProps = {
   rowKey: React.Key;
@@ -92,9 +92,9 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
         <ItemRow key={rowKey}>
           <SectionCol sm={22}>
             <div className={classname} onClick={onClickResource}>
-              {hasIncomingRefs && <MonoIcon type={MonoIconTypes.IncomingRefs} marginRight={5} />}
-              {resource.name}
-              {hasOutgoingRefs && <MonoIcon type={MonoIconTypes.OutoingRefs} marginLeft={5} />}
+              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Incoming} />
+              <span style={!hasIncomingRefs ? {marginLeft: 19} : {}}>{resource.name}</span>
+              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Outgoing} />
             </div>
           </SectionCol>
           <SectionCol sm={2}>

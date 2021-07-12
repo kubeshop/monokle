@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+import NavigatorRowRefsPopover, {RefsPopoverType} from '@molecules/NavigatorRowRefsPopover';
 
 export type NavigatorResourceRowProps = {
   rowKey: React.Key;
@@ -85,10 +85,9 @@ const NavigatorResourceRow = (props: NavigatorResourceRowProps) => {
         <ItemRow key={rowKey}>
           <SectionCol sm={22}>
             <div className={classname} onClick={onClickResource}>
-              {hasIncomingRefs && <MonoIcon type={MonoIconTypes.IncomingRefs} marginRight={5} />}
-              <span>{label}</span>
-              {hasOutgoingRefs && <MonoIcon type={MonoIconTypes.OutoingRefs} marginLeft={5} />}
-              {hasUnsatisfiedRefs && <MonoIcon type={MonoIconTypes.Warning} marginLeft={5} />}
+              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Incoming} />
+              <span style={!hasIncomingRefs ? {marginLeft: 19} : {}}>{label}</span>
+              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Outgoing} />
             </div>
           </SectionCol>
         </ItemRow>

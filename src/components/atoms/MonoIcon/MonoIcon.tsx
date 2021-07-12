@@ -6,7 +6,7 @@ import MonokleWarning from '@assets/MonokleWarning.svg';
 
 export enum MonoIconTypes {
   IncomingRefs,
-  OutoingRefs,
+  OutgoingRefs,
   Warning,
 }
 
@@ -17,6 +17,7 @@ export type MonoIconProps = {
 };
 
 const StyledImage = styled.img`
+  display: inline-block;
   height: 12px;
 `;
 
@@ -25,7 +26,7 @@ const getIconSvg = (type: MonoIconTypes) => {
     case MonoIconTypes.IncomingRefs:
       return MonokleIncomingRefs;
 
-    case MonoIconTypes.OutoingRefs:
+    case MonoIconTypes.OutgoingRefs:
       return MonokleOutgoingRefs;
 
     case MonoIconTypes.Warning:
