@@ -11,8 +11,10 @@ code {
 }
 
 .monokleEditorUnsatisfiedRefGlyphClass {
-  background-color: #ad8b00;
-  border-radius: 50%;
+  background-image: url("./assets/MonokleWarning.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  max-height: 15px;
 }
 
 .monokleEditorUnsatisfiedRefInlineClass {
