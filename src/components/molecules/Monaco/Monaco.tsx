@@ -151,15 +151,15 @@ const Monaco = (props: {editorHeight: string}) => {
 
   const applyCodeIntel = () => {
     if (editor && selectedResource) {
-      const {decorations, hoverDisposables, commandDisposables} = codeIntel.handleUnsatisfiedRefs(
+      const {newDecorations, newHoverDisposables, newCommandDisposables} = codeIntel.handleUnsatisfiedRefs(
         editor,
         resourceMap,
         selectedResource
       );
-      const idsOfDecorations = setDecorations(editor, decorations);
-      setCurrentIdsOfDecorations(idsOfDecorations);
-      setCurrentHoverDisposables(hoverDisposables);
-      setCurrentCommandDisposables(commandDisposables);
+      const idsOfNewDecorations = setDecorations(editor, newDecorations);
+      setCurrentIdsOfDecorations(idsOfNewDecorations);
+      setCurrentHoverDisposables(newHoverDisposables);
+      setCurrentCommandDisposables(newCommandDisposables);
     }
   };
 

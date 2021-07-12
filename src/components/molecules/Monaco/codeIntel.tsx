@@ -2,11 +2,15 @@ import {monaco} from 'react-monaco-editor';
 import {ResourceMapType} from '@models/appstate';
 import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
 
+import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
+
 import {
+  createCommandMarkdownLink,
   createGlyphDecoration,
   createInlineDecoration,
-  createInlineHoverPopup,
-  getInlineRangeForTarget,
+  createHoverProvider,
+  createMarkdownString,
+  getRangeForTarget,
   getLine,
 } from './editorHelpers';
 
@@ -18,13 +22,13 @@ export function handleUnsatisfiedRefs(
   const resource = resourceMap[selectedResourceId];
   const unsatisfiedRefs = resource.refs?.filter(r => isUnsatisfiedRef(r.refType));
 
-  const hoverDisposables: monaco.IDisposable[] = [];
-  const commandDisposables: monaco.IDisposable[] = [];
+  const newHoverDisposables: monaco.IDisposable[] = [];
+  const newCommandDisposables: monaco.IDisposable[] = [];
 
-  const decorations: monaco.editor.IModelDeltaDecoration[] = [];
+  const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
 
   if (!unsatisfiedRefs || unsatisfiedRefs.length === 0) {
-    return {decorations, hoverDisposables, commandDisposables};
+    return {newDecorations, newHoverDisposables, newCommandDisposables};
   }
 
   for (let i = 0; i < unsatisfiedRefs?.length; i += 1) {
@@ -33,22 +37,29 @@ export function handleUnsatisfiedRefs(
     const line = getLine(editor, unsatisfiedRef.target);
 
     if (line) {
-      const glyphDecoration = createGlyphDecoration(line.index);
-      decorations.push(glyphDecoration);
+      const glyphDecoration = createGlyphDecoration(line.index, GlyphDecorationTypes.UnsatisfiedRef);
+      newDecorations.push(glyphDecoration);
 
-      const inlineRange = getInlineRangeForTarget(line, unsatisfiedRef.target);
+      const inlineRange = getRangeForTarget(line, unsatisfiedRef.target);
       if (inlineRange) {
-        const inlineDecoration = createInlineDecoration(inlineRange);
-        decorations.push(inlineDecoration);
+        const inlineDecoration = createInlineDecoration(inlineRange, InlineDecorationTypes.UnsatisfiedRef);
+        newDecorations.push(inlineDecoration);
 
-        const {hoverDisposable, commandDisposable} = createInlineHoverPopup(inlineRange);
-        hoverDisposables.push(hoverDisposable);
-        commandDisposables.push(commandDisposable);
+        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink('Some link', () => {
+          alert('Clicked on link!');
+        });
+
+        const hoverDisposable = createHoverProvider(inlineRange, [
+          createMarkdownString('Some title'),
+          commandMarkdownLink,
+        ]);
+        newHoverDisposables.push(hoverDisposable);
+        newCommandDisposables.push(commandDisposable);
       }
     }
   }
 
-  return {decorations, hoverDisposables, commandDisposables};
+  return {newDecorations, newHoverDisposables, newCommandDisposables};
 }
 
 export default {

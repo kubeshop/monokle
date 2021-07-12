@@ -4,7 +4,14 @@ import {v4 as uuidv4} from 'uuid';
 // @ts-ignore
 import {CommandsRegistry} from 'monaco-editor/esm/vs/platform/commands/common/commands';
 
-type ILine = {
+import {
+  GlyphDecorationTypes,
+  InlineDecorationTypes,
+  getGlyphDecorationOptions,
+  getInlineDecorationOptions,
+} from './editorConstants';
+
+type Line = {
   content: string;
   index: number;
 };
@@ -21,49 +28,55 @@ export function setDecorations(
   return decorationIds;
 }
 
-export function createGlyphDecoration(lineIndex: number) {
+export function createGlyphDecoration(lineIndex: number, glyphDecorationType: GlyphDecorationTypes) {
   const glyphDecoration: monaco.editor.IModelDeltaDecoration = {
     range: new monaco.Range(lineIndex, 1, lineIndex, 1),
-    options: {
-      glyphMarginClassName: 'monokleEditorUnsatisfiedRefGlyphClass',
-      glyphMarginHoverMessage: {value: 'Unsatisfied link'},
-    },
+    options: getGlyphDecorationOptions(glyphDecorationType),
   };
   return glyphDecoration;
 }
 
-export function createInlineDecoration(range: monaco.IRange) {
+export function createInlineDecoration(range: monaco.IRange, inlineDecorationType: InlineDecorationTypes) {
   const inlineDecoration: monaco.editor.IModelDeltaDecoration = {
     range,
-    options: {
-      inlineClassName: 'monokleEditorUnsatisfiedRefInlineClass',
-    },
+    options: getInlineDecorationOptions(inlineDecorationType),
   };
   return inlineDecoration;
 }
 
-export function createInlineHoverPopup(inlineRange: monaco.IRange) {
-  const commandId = `cmd_${uuidv4()}`;
-  const commandDisposable: monaco.IDisposable = CommandsRegistry.registerCommand(commandId, () => {
-    alert('Clicked on the link!');
-  });
+export function createMarkdownString(text: string): monaco.IMarkdownString {
+  return {isTrusted: true, value: text};
+}
 
-  const hoverDisposable = monaco.languages.registerHoverProvider('yaml', {
+export function createCommandMarkdownLink(
+  text: string,
+  handler: monaco.editor.ICommandHandler
+): {commandMarkdownLink: monaco.IMarkdownString; commandDisposable: monaco.IDisposable} {
+  const commandId = `cmd_${uuidv4()}`;
+  const commandDisposable: monaco.IDisposable = CommandsRegistry.registerCommand(commandId, handler);
+
+  return {
+    commandMarkdownLink: {
+      isTrusted: true,
+      value: `[${text}](command:${commandId})`,
+    },
+    commandDisposable,
+  };
+}
+
+export function createHoverProvider(range: monaco.IRange, contents: monaco.IMarkdownString[]) {
+  const hoverDisposable: monaco.IDisposable = monaco.languages.registerHoverProvider('yaml', {
     provideHover: () => {
       return {
-        range: inlineRange,
-        contents: [
-          {isTrusted: true, value: `**Test Hover with links**`},
-          {isTrusted: true, value: `[Some link](command:${commandId})`},
-        ],
+        range,
+        contents,
       };
     },
   });
-
-  return {commandDisposable, hoverDisposable};
+  return hoverDisposable;
 }
 
-export function getLine(editor: monaco.editor.IStandaloneCodeEditor, target: string): ILine | null {
+export function getLine(editor: monaco.editor.IStandaloneCodeEditor, target: string): Line | null {
   const model = editor.getModel();
   if (!model) {
     return null;
@@ -77,7 +90,7 @@ export function getLine(editor: monaco.editor.IStandaloneCodeEditor, target: str
   return null;
 }
 
-export function getInlineRangeForTarget(line: ILine, target: string) {
+export function getRangeForTarget(line: Line, target: string) {
   let columnStart = line.content.indexOf(target);
   if (columnStart === -1) {
     return null;
