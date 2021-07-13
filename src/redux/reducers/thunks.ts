@@ -18,6 +18,7 @@ import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@
 import {PROCESS_ENV} from '@actions/common/apply';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
+import * as fs from 'fs';
 
 export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
   string,
@@ -255,50 +256,53 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
       const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
       const chart = state.helmChartMap[valuesFile.helmChart];
 
-      log.info(`previewing ${valuesFile.id} in folder ${folder}`);
+      // sanity check
+      if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
+        log.info(`previewing ${valuesFile.name} in folder ${folder}`);
 
-      // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
-      return new Promise((resolve, reject) => {
+        // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
+        return new Promise((resolve, reject) => {
+          const helmCommand = state.appConfig.settings.helmPreviewMode === 'template' ?
+            `helm template -f ${valuesFile.name} ${chart.name} .` :
+            `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`;
 
-        const helmCommand = state.appConfig.settings.helmPreviewMode === 'template' ?
-          `helm template -f ${valuesFile.name} ${chart.name} .` :
-          `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`;
-
-        exec(
-          helmCommand,
-          {
-            cwd: folder,
-            env: {
-              NODE_ENV: process.env.NODE_ENV,
-              PUBLIC_URL: process.env.PUBLIC_URL,
-              PATH: shellPath.sync(),
-              KUBECONFIG: PROCESS_ENV.KUBECONFIG,
+          exec(
+            helmCommand,
+            {
+              cwd: folder,
+              env: {
+                NODE_ENV: process.env.NODE_ENV,
+                PUBLIC_URL: process.env.PUBLIC_URL,
+                PATH: shellPath.sync(),
+                KUBECONFIG: PROCESS_ENV.KUBECONFIG,
+              },
             },
-          },
-          (error, stdout, stderr) => {
-            if (error) {
-              dispatchError('Helm preview failed', error.message, thunkAPI);
-              reject(error);
-              return;
-            }
-            if (stderr) {
-              dispatchError('Helm preview failed', stderr, thunkAPI);
-              reject(new Error(`Failed to generate helm preview: ${stderr}`));
-              return;
-            }
+            (error, stdout, stderr) => {
+              if (error) {
+                dispatchError('Helm preview failed', error.message, thunkAPI);
+                reject(error);
+                return;
+              }
+              if (stderr) {
+                dispatchError('Helm preview failed', stderr, thunkAPI);
+                reject(new Error(`Failed to generate helm preview: ${stderr}`));
+                return;
+              }
 
-            const resources = extractK8sResources(stdout, PREVIEW_PREFIX + valuesFile.id);
-            const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
-              rm[r.id] = r;
-              return rm;
-            }, {});
+              const resources = extractK8sResources(stdout, PREVIEW_PREFIX + valuesFile.id);
+              const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
+                rm[r.id] = r;
+                return rm;
+              }, {});
 
-            processParsedResources(resourceMap);
+              processParsedResources(resourceMap);
 
-            resolve({previewResourceId: valuesFile.id, previewResources: resourceMap});
-          },
-        );
-      });
+              resolve({previewResourceId: valuesFile.id, previewResources: resourceMap});
+            },
+          );
+        });
+      }
+      log.error(`Can't run helm for ${valuesFile.name} in folder ${folder}`);
     }
   }
 
