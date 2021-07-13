@@ -67,12 +67,26 @@ function linkConfigMapToDeployment(configMaps: K8sResource[], deployment: K8sRes
 }
 
 /**
+ * Parse documents lazily...
+ */
+
+function getParsedDoc(resource: K8sResource) {
+  if (!resource.parsedDoc) {
+    const lineCounter = new LineCounter();
+    resource.parsedDoc = parseDocument(resource.text, {lineCounter});
+    resource.lineCounter = lineCounter;
+  }
+
+  return resource.parsedDoc;
+}
+
+/**
  * Returns the Scalar at the specified path
  */
 
 export function getScalarNode(resource: K8sResource, nodePath: string) {
   if (resource.parsedDoc) {
-    let parent: any = resource.parsedDoc;
+    let parent: any = getParsedDoc(resource);
 
     const names = parseNodePath(nodePath);
     for (let ix = 0; ix < names.length; ix += 1) {
@@ -108,7 +122,7 @@ export function parseNodePath(nodePath: string) {
 
 export function getScalarNodes(resource: K8sResource, nodePath: string) {
   if (resource.parsedDoc) {
-    let parent: any = resource.parsedDoc;
+    let parent: any = getParsedDoc(resource);
 
     const names = parseNodePath(nodePath);
     for (let ix = 0; ix < names.length; ix += 1) {
@@ -140,21 +154,19 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
   const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
     getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
-      if (deployment.parsedDoc) {
-        visit(deployment.parsedDoc, {
-          Pair(key, node) {
+      visit(getParsedDoc(deployment), {
+        Pair(key, node) {
+          // @ts-ignore
+          const keyValue = node.key.value;
+          if (keyValue === 'configMap' || keyValue === 'configMapRef' || keyValue === 'configMapKeyRef') {
             // @ts-ignore
-            const keyValue = node.key.value;
-            if (keyValue === 'configMap' || keyValue === 'configMapRef' || keyValue === 'configMapKeyRef') {
-              // @ts-ignore
-              const nameNode: Scalar<string> = node.value.get('name', true);
-              if (nameNode) {
-                linkConfigMapToDeployment(configMaps, deployment, new NodeWrapper(nameNode, deployment.lineCounter));
-              }
+            const nameNode: Scalar<string> = node.value.get('name', true);
+            if (nameNode) {
+              linkConfigMapToDeployment(configMaps, deployment, new NodeWrapper(nameNode, deployment.lineCounter));
             }
-          },
-        });
-      }
+          }
+        },
+      });
     });
   }
 }
@@ -349,9 +361,6 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
     if (isKustomizationResource(resource)) {
       hasKustomizations = true;
     }
-    const lineCounter = new LineCounter();
-    resource.parsedDoc = parseDocument(resource.text, {lineCounter});
-    resource.lineCounter = lineCounter;
   });
 
   if (hasKustomizations) {
@@ -445,18 +454,9 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             version: content.apiVersion,
             content,
             text,
-            parsedDoc: doc,
-            lineCounter,
+            ...(documents.length === 1 ? {parsedDoc: doc, lineCounter} :
+              {range: {start: doc.range[0], length: doc.range[1] - doc.range[0]}}),
           };
-
-          if (documents.length > 1) {
-            resource.range = {start: doc.range[0], length: doc.range[1] - doc.range[0]};
-
-            // need to reparse since offsets are to full document
-            const lc = new LineCounter();
-            resource.parsedDoc = parseDocument(resource.text, {lineCounter: lc});
-            resource.lineCounter = lc;
-          }
 
           if (content.metadata && content.metadata.namespace) {
             resource.namespace = content.metadata.namespace;
