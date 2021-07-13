@@ -2,7 +2,9 @@ import React, {useState, useEffect} from 'react';
 import {Popover, Typography, Divider} from 'antd';
 import styled from 'styled-components';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+
+import {selectK8sResource} from '@redux/reducers/main';
 
 import {ResourceRef} from '@models/k8sresource';
 
@@ -36,35 +38,45 @@ const StyledUnsatisfiedRefText = styled(Text)`
   color: ${FontColors.warning};
 `;
 
-const StyledRefText = styled(Text)``;
+const StyledRefText = styled(Text)`
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 
-const OutgoingRefLink = (props: {text: string}) => {
-  const {text} = props;
+type RefLinkProps = {
+  text: string;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+};
+
+const OutgoingRefLink = (props: RefLinkProps) => {
+  const {text, onClick} = props;
   return (
-    <>
+    <div onClick={onClick}>
       <MonoIcon type={MonoIconTypes.OutgoingRefs} marginRight={5} />
       <StyledRefText>{text}</StyledRefText>
-    </>
+    </div>
   );
 };
 
-const IncomingRefLink = (props: {text: string}) => {
-  const {text} = props;
+const IncomingRefLink = (props: RefLinkProps) => {
+  const {text, onClick} = props;
   return (
-    <>
+    <div onClick={onClick}>
       <MonoIcon type={MonoIconTypes.IncomingRefs} marginRight={5} />
       <StyledRefText>{text}</StyledRefText>
-    </>
+    </div>
   );
 };
 
 const UnsatisfiedRefLink = (props: {text: string}) => {
   const {text} = props;
   return (
-    <>
+    <div>
       <MonoIcon type={MonoIconTypes.Warning} marginRight={5} />
       <StyledUnsatisfiedRefText>{text}</StyledUnsatisfiedRefText>
-    </>
+    </div>
   );
 };
 
@@ -76,9 +88,14 @@ type NavigatorRowRefsPopoverProps = {
 const NavigatorRowRefsPopover = (props: NavigatorRowRefsPopoverProps) => {
   const {resourceId, type} = props;
 
+  const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [currentRefs, setCurrentRefs] = useState<ResourceRef[]>();
   const [hasUnsatisfiedRefs, setHasUnsatisfiedRefs] = useState<Boolean>(false);
+
+  const selectResource = (resId: string) => {
+    dispatch(selectK8sResource(resId));
+  };
 
   useEffect(() => {
     const filteredRefs = [];
@@ -108,12 +125,16 @@ const NavigatorRowRefsPopover = (props: NavigatorRowRefsPopoverProps) => {
   const getLinkByRef = (ref: ResourceRef) => {
     const targetName = resourceMap[ref.target]?.name;
 
+    const onLinkClick = () => {
+      selectResource(ref.target);
+    };
+
     if (isOutgoingRef(ref.refType)) {
-      return <OutgoingRefLink text={targetName} />;
+      return <OutgoingRefLink onClick={onLinkClick} text={targetName} />;
     }
 
     if (isIncomingRef(ref.refType)) {
-      return <IncomingRefLink text={targetName} />;
+      return <IncomingRefLink onClick={onLinkClick} text={targetName} />;
     }
 
     if (isUnsatisfiedRef(ref.refType)) {
