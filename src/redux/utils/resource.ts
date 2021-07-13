@@ -85,27 +85,25 @@ function getParsedDoc(resource: K8sResource) {
  */
 
 export function getScalarNode(resource: K8sResource, nodePath: string) {
-  if (resource.parsedDoc) {
-    let parent: any = getParsedDoc(resource);
+  let parent: any = getParsedDoc(resource);
 
-    const names = parseNodePath(nodePath);
-    for (let ix = 0; ix < names.length; ix += 1) {
-      const child = parent.get(names[ix], true);
-      if (child) {
-        // @ts-ignore
-        parent = child;
-      } else {
-        log.warn(`${nodePath} not found in resource`);
-        return undefined;
-      }
+  const names = parseNodePath(nodePath);
+  for (let ix = 0; ix < names.length; ix += 1) {
+    const child = parent.get(names[ix], true);
+    if (child) {
+      // @ts-ignore
+      parent = child;
+    } else {
+      log.warn(`${nodePath} not found in resource`);
+      return undefined;
     }
-
-    if (parent instanceof Scalar) {
-      return new NodeWrapper(parent, resource.lineCounter);
-    }
-
-    log.warn(`node at ${nodePath} is not a Scalar`);
   }
+
+  if (parent instanceof Scalar) {
+    return new NodeWrapper(parent, resource.lineCounter);
+  }
+
+  log.warn(`node at ${nodePath} is not a Scalar`);
 }
 
 /**
@@ -121,27 +119,25 @@ export function parseNodePath(nodePath: string) {
  */
 
 export function getScalarNodes(resource: K8sResource, nodePath: string) {
-  if (resource.parsedDoc) {
-    let parent: any = getParsedDoc(resource);
+  let parent: any = getParsedDoc(resource);
 
-    const names = parseNodePath(nodePath);
-    for (let ix = 0; ix < names.length; ix += 1) {
-      const child = parent.get(names[ix], true);
-      if (child) {
-        // @ts-ignore
-        parent = child;
-      } else {
-        log.warn(`${nodePath} not found in resource`);
-        return [];
-      }
+  const names = parseNodePath(nodePath);
+  for (let ix = 0; ix < names.length; ix += 1) {
+    const child = parent.get(names[ix], true);
+    if (child) {
+      // @ts-ignore
+      parent = child;
+    } else {
+      log.warn(`${nodePath} not found in resource`);
+      return [];
     }
-
-    if (parent instanceof YAMLSeq) {
-      return parent.items.map(node => new NodeWrapper(node, resource.lineCounter));
-    }
-
-    log.warn(`node at ${nodePath} is not a YAMLSeq`);
   }
+
+  if (parent instanceof YAMLSeq) {
+    return parent.items.map(node => new NodeWrapper(node, resource.lineCounter));
+  }
+
+  log.warn(`node at ${nodePath} is not a YAMLSeq`);
   return [];
 }
 
