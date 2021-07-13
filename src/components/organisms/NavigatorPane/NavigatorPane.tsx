@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
-import { FontColors } from '@styles/Colors';
+import {FontColors} from '@styles/Colors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
@@ -101,12 +101,8 @@ const NavigatorPane = () => {
             <Col span={12}>
               <MonoPaneTitle>Navigator</MonoPaneTitle>
             </Col>
-            <Col span={12}
-            >
-              <MonoSwitch
-                onClick={onFilterChange}
-                label='RELATIONS'
-              />
+            <Col span={12}>
+              <MonoSwitch onClick={onFilterChange} label="RELATIONS" />
             </Col>
           </Row>
         </MonoPaneTitleCol>
@@ -151,7 +147,7 @@ const NavigatorPane = () => {
                   previewResource === k.id
               )
               .map((k: K8sResource) => {
-                const isSelected = (k.selected || previewResource === k.id);
+                const isSelected = k.selected || previewResource === k.id;
                 const isDisabled = Boolean(previewResource && previewResource !== k.id);
                 const isHighlighted = k.highlight;
                 const buttonActive = previewResource !== undefined && previewResource === k.id;
@@ -181,13 +177,17 @@ const NavigatorPane = () => {
           placeholder="Namespace"
           defaultValue="ALL_NAMESPACES"
           onChange={handleNamespaceChange}
-          size='small'
+          size="small"
           style={{minWidth: '50%'}}
           bordered={false}
         >
-          <Option value='ALL_NAMESPACES'>all</Option>
+          <Option value="ALL_NAMESPACES">all</Option>
           {getNamespaces(resourceMap).map(n => {
-            return <Option key={n} value={n}>{n}</Option>;
+            return (
+              <Option key={n} value={n}>
+                {n}
+              </Option>
+            );
           })}
         </Select>
       </SectionRow>
@@ -220,7 +220,7 @@ const NavigatorPane = () => {
                                   <NavigatorContentSubTitle>
                                     {subsection.name} {items.length > 0 ? `(${items.length})` : ''}
                                   </NavigatorContentSubTitle>
-                                  {items.map(item =>
+                                  {items.map(item => (
                                     <NavigatorResourceRow
                                       rowKey={item.id}
                                       label={item.name}
@@ -231,7 +231,7 @@ const NavigatorPane = () => {
                                       hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
                                       onClickResource={() => selectResource(item.id)}
                                     />
-                                  )}
+                                  ))}
                                 </SectionCol>
                               );
                             })}

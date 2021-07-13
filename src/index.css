@@ -9,3 +9,15 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+.monokleEditorUnsatisfiedRefGlyphClass {
+  background-image: url("./assets/MonokleWarning.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  max-height: 15px;
+}
+
+.monokleEditorUnsatisfiedRefInlineClass {
+  color: #ad8b00 !important;
+  text-decoration: underline;
+}

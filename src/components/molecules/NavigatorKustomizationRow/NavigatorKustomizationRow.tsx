@@ -6,6 +6,8 @@ import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 import Colors, {FontColors} from '@styles/Colors';
 import {K8sResource} from '@models/k8sresource';
 
+import NavigatorRowRefsPopover, {RefsPopoverType} from '@molecules/NavigatorRowRefsPopover';
+
 export type NavigatorKustomizationRowProps = {
   rowKey: React.Key;
   resource: K8sResource;
@@ -35,7 +37,8 @@ const RowContainer = styled.div`
   & .kustomization-row {
     width: 100%;
     padding-left: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
     font-size: 12px;
     font-style: normal;
@@ -63,6 +66,10 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
+const StyledSpan = styled.span`
+  cursor: pointer;
+`;
+
 const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
   const {
     rowKey,
@@ -83,30 +90,30 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
     ${isDisabled ? ` kustomization-row-disabled` : ''}\
     ${highlighted ? ` kustomization-row-highlighted` : ''}`;
 
-  return (<RowContainer>
-    <StyledDiv className={classname}>
-      <ItemRow key={rowKey}>
-        <SectionCol sm={22}>
-          <div
-            className={classname}
-            onClick={onClickResource}
-          >
-            {hasIncomingRefs ? '>> ' : ''}
-            {resource.name}
-            {hasOutgoingRefs ? ' >>' : ''}
-          </div>
-        </SectionCol>
-        <SectionCol sm={2}>
-          {
-            previewButtonActive ?
-            <EyeInvisibleOutlined onClick={onClickPreview}/>
-            : <EyeOutlined onClick={onClickPreview}/>
-          }
-        </SectionCol>
-      </ItemRow>
-
-    </StyledDiv>
-  </RowContainer>);
+  return (
+    <RowContainer>
+      <StyledDiv className={classname}>
+        <ItemRow key={rowKey}>
+          <SectionCol sm={22}>
+            <div className={classname}>
+              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Incoming} />
+              <StyledSpan onClick={onClickResource} style={!hasIncomingRefs ? {marginLeft: 19} : {}}>
+                {resource.name}
+              </StyledSpan>
+              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Outgoing} />
+            </div>
+          </SectionCol>
+          <SectionCol sm={2}>
+            {previewButtonActive ? (
+              <EyeInvisibleOutlined onClick={onClickPreview} />
+            ) : (
+              <EyeOutlined onClick={onClickPreview} />
+            )}
+          </SectionCol>
+        </ItemRow>
+      </StyledDiv>
+    </RowContainer>
+  );
 };
 
 export default NavigatorKustomizationRow;
