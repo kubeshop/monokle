@@ -167,7 +167,11 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
   }
 }
 
-export class NodeWrapper {
+/**
+ * Utility class used when parsing and creating refs
+ */
+
+class NodeWrapper {
   node: any;
   lineCounter?: LineCounter;
 
