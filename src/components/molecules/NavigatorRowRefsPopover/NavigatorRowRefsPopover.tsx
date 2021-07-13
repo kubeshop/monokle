@@ -106,7 +106,7 @@ const NavigatorRowRefsPopover = (props: NavigatorRowRefsPopoverProps) => {
   }, [resourceId, resourceMap, type]);
 
   const getLinkByRef = (ref: ResourceRef) => {
-    const targetName = resourceMap[ref.target]?.name;
+    const targetName = ref.targetResource ? resourceMap[ref.targetResource]?.name : '';
 
     if (isOutgoingRef(ref.refType)) {
       return <OutgoingRefLink text={targetName} />;
@@ -117,7 +117,7 @@ const NavigatorRowRefsPopover = (props: NavigatorRowRefsPopoverProps) => {
     }
 
     if (isUnsatisfiedRef(ref.refType)) {
-      return <UnsatisfiedRefLink text={ref.target} />;
+      return <UnsatisfiedRefLink text={ref.refName} />;
     }
 
     return null;

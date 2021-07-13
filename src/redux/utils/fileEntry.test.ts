@@ -5,7 +5,7 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {getK8sResources} from '@redux/utils/resource';
 import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
-function createSafePath(originalPath: string) {
+export function createSafePath(originalPath: string) {
   return originalPath.replaceAll('/', path.sep);
 }
 

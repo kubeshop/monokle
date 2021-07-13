@@ -1,6 +1,7 @@
 /**
  * A k8s resource manifest, either extracted from a file or generated internaally (for example when previewing kustomizations)
  */
+import {Document, LineCounter, ParsedNode} from 'yaml';
 
 interface K8sResource {
   id: string; // an internally generated UUID - used for references/lookups in resourceMap
@@ -14,10 +15,13 @@ interface K8sResource {
   text: string; // unparsed resource content (for editing)
   content: any; // contains parsed yaml resource - used for filtering/finding links/refs, etc
   refs?: ResourceRef[]; // array of refs to other resources
-  range?: {
+  range?: { // range of this resource in a multidocument file
     start: number;
     length: number;
-  }; // range of this resource in a multidocument file
+  };
+
+  parsedDoc?: Document.Parsed<ParsedNode>; // temporary object used for parsing refs
+  lineCounter?: LineCounter; // temporary object used for ref positioning
 }
 
 export enum ResourceRefType {
@@ -32,8 +36,16 @@ export enum ResourceRefType {
 }
 
 interface ResourceRef {
-  target: string;
-  refType: ResourceRefType;
+  refType: ResourceRefType; // the type of ref (see enum)
+  refName: string;          // the ref value - for example the name of a configmap
+  targetResource?: string;  // the resource this is referring to (empty for unsatisfied refs)
+  refPos?: RefPosition      // the position in the document of the refName (undefined for incoming file refs)
 }
 
-export type {K8sResource, ResourceRef};
+interface RefPosition {
+  line: number;
+  column: number;
+  length: number;
+}
+
+export type {K8sResource, ResourceRef, RefPosition};

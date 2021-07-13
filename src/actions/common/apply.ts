@@ -1,6 +1,5 @@
 import {K8sResource} from '@models/k8sresource';
 import {spawn} from 'child_process';
-import {isKustomizationResource} from '@redux/utils/resource';
 import log from 'loglevel';
 // @ts-ignore
 import shellPath from 'shell-path';
@@ -10,6 +9,7 @@ import {setLogs} from '@redux/reducers/logs';
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
 import {getAbsoluteResourceFolder} from '@redux/utils/fileEntry';
+import {isKustomizationResource} from '@redux/utils/kustomize';
 
 // weird workaround to get all ENV values (accessing process.env directly only returns a subset)
 export const PROCESS_ENV = JSON.parse(JSON.stringify(process)).env;

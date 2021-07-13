@@ -1,21 +1,14 @@
-import {JSONPath} from 'jsonpath-plus';
 import path from 'path';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
-import {K8sResource, ResourceRefType} from '@models/k8sresource';
-import {FileEntry} from '@models/fileentry';
+import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import fs from 'fs';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
-import {processKustomizations} from '@redux/utils/kustomize';
+import {isKustomizationResource, processKustomizations} from '@redux/utils/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/utils/fileEntry';
-import {LineCounter, parseAllDocuments} from 'yaml';
+import {LineCounter, parseAllDocuments, parseDocument, Scalar, visit, YAMLSeq} from 'yaml';
 import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
 import {v4 as uuidv4} from 'uuid';
-
-/**
- * Processes all services in the specified resourceMap and creates
- * applicable resourcerefs
- */
 
 export function processServices(resourceMap: ResourceMapType) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(
@@ -28,14 +21,22 @@ export function processServices(resourceMap: ResourceMapType) {
         let found = false;
         deployments
           .filter(
-            deployment => deployment.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]
+            deployment => deployment.content.spec.template.metadata.labels[e] === service.content.spec.selector[e],
           )
           .forEach(deployment => {
-            linkResources(deployment, service, ResourceRefType.SelectedPodName, ResourceRefType.ServicePodSelector);
+            const sourceNode = getScalarNode(service, `spec:selector:${e}`);
+            const targetNode = getScalarNode(deployment, `spec:template:metadata:labels:${e}`);
+            if (sourceNode && targetNode) {
+              linkResources(deployment, service, ResourceRefType.SelectedPodName, ResourceRefType.ServicePodSelector, targetNode, sourceNode);
+            }
             found = true;
           });
+
         if (!found) {
-          createResourceRef(service, service.content.spec.selector[e], ResourceRefType.UnsatisfiedSelector);
+          const sourceNode = getScalarNode(service, `spec:selector:${e}`);
+          if (sourceNode) {
+            createResourceRef(service, ResourceRefType.UnsatisfiedSelector, sourceNode);
+          }
         }
       });
     }
@@ -46,17 +47,88 @@ export function processServices(resourceMap: ResourceMapType) {
  * Adds configmap resourcerefs for specified configMapName to deployment
  */
 
-function linkConfigMapToDeployment(configMaps: K8sResource[], configMapName: string, deployment: K8sResource) {
+function linkConfigMapToDeployment(configMaps: K8sResource[], deployment: K8sResource, refNode: NodeWrapper) {
   let found = false;
   configMaps
-    .filter(item => item.content.metadata.name === configMapName)
+    .filter(item => item.content.metadata.name === refNode.node.value)
     .forEach(configMapResource => {
-      linkResources(configMapResource, deployment, ResourceRefType.ConfigMapRef, ResourceRefType.ConfigMapConsumer);
+      const targetNode = getScalarNode(configMapResource, 'metadata:name');
+      if (targetNode) {
+        linkResources(configMapResource, deployment,
+          ResourceRefType.ConfigMapRef, ResourceRefType.ConfigMapConsumer, targetNode, refNode,
+        );
+      }
       found = true;
     });
+
   if (!found) {
-    createResourceRef(deployment, configMapName, ResourceRefType.UnsatisfiedConfigMap);
+    createResourceRef(deployment, ResourceRefType.UnsatisfiedConfigMap, refNode);
   }
+}
+
+/**
+ * Returns the Scalar at the specified path
+ */
+
+export function getScalarNode(resource: K8sResource, nodePath: string) {
+  if (resource.parsedDoc) {
+    let parent: any = resource.parsedDoc;
+
+    const names = parseNodePath(nodePath);
+    for (let ix = 0; ix < names.length; ix += 1) {
+      const child = parent.get(names[ix], true);
+      if (child) {
+        // @ts-ignore
+        parent = child;
+      } else {
+        log.warn(`${nodePath} not found in resource`);
+        return undefined;
+      }
+    }
+
+    if (parent instanceof Scalar) {
+      return new NodeWrapper(parent, resource.lineCounter);
+    }
+
+    log.warn(`node at ${nodePath} is not a Scalar`);
+  }
+}
+
+/**
+ * Parses a nodePath into segments - simple split for now
+ */
+
+export function parseNodePath(nodePath: string) {
+  return nodePath.split(':');
+}
+
+/**
+ * Returns the Scalar at the specified path
+ */
+
+export function getScalarNodes(resource: K8sResource, nodePath: string) {
+  if (resource.parsedDoc) {
+    let parent: any = resource.parsedDoc;
+
+    const names = parseNodePath(nodePath);
+    for (let ix = 0; ix < names.length; ix += 1) {
+      const child = parent.get(names[ix], true);
+      if (child) {
+        // @ts-ignore
+        parent = child;
+      } else {
+        log.warn(`${nodePath} not found in resource`);
+        return [];
+      }
+    }
+
+    if (parent instanceof YAMLSeq) {
+      return parent.items.map(node => new NodeWrapper(node, resource.lineCounter));
+    }
+
+    log.warn(`node at ${nodePath} is not a YAMLSeq`);
+  }
+  return [];
 }
 
 /**
@@ -68,18 +140,49 @@ export function processConfigMaps(resourceMap: ResourceMapType) {
   const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
   if (configMaps) {
     getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
-      JSONPath({path: '$..configMapRef.name', json: deployment.content}).forEach((refName: string) => {
-        linkConfigMapToDeployment(configMaps, refName, deployment);
-      });
-
-      JSONPath({path: '$..configMapKeyRef.name', json: deployment.content}).forEach((refName: string) => {
-        linkConfigMapToDeployment(configMaps, refName, deployment);
-      });
-
-      JSONPath({path: '$..volumes[*].configMap.name', json: deployment.content}).forEach((refName: string) => {
-        linkConfigMapToDeployment(configMaps, refName, deployment);
-      });
+      if (deployment.parsedDoc) {
+        visit(deployment.parsedDoc, {
+          Pair(key, node) {
+            // @ts-ignore
+            const keyValue = node.key.value;
+            if (keyValue === 'configMap' || keyValue === 'configMapRef' || keyValue === 'configMapKeyRef') {
+              // @ts-ignore
+              const nameNode: Scalar<string> = node.value.get('name', true);
+              if (nameNode) {
+                linkConfigMapToDeployment(configMaps, deployment, new NodeWrapper(nameNode, deployment.lineCounter));
+              }
+            }
+          },
+        });
+      }
     });
+  }
+}
+
+export class NodeWrapper {
+  node: any;
+  lineCounter?: LineCounter;
+
+  constructor(node: any, lineCounter?: LineCounter) {
+    this.node = node;
+    this.lineCounter = lineCounter;
+  }
+
+  nodeValue(): string {
+    return this.node.value;
+  }
+
+  getNodePosition(): RefPosition {
+    if (this.lineCounter && this.node.range) {
+      const linePos = this.lineCounter.linePos(this.node.range[0]);
+      return {
+        line: linePos.line,
+        column: linePos.col,
+        length: this.node.range[1] - this.node.range[0],
+      };
+    }
+
+    return {line: 0, column: 0, length: 0};
   }
 }
 
@@ -94,10 +197,24 @@ export function getK8sResources(resourceMap: ResourceMapType, type: string) {
 /**
  * Adds a resource ref with the specified type/target to the specified resource
  */
-function createResourceRef(resource: K8sResource, target: string, refType: ResourceRefType) {
-  resource.refs = resource.refs || [];
-  if (!resource.refs.some(ref => ref.refType === refType && ref.target === target)) {
-    resource.refs.push({refType, target});
+function createResourceRef(resource: K8sResource, refType: ResourceRefType, refNode?: NodeWrapper, targetResource?: string) {
+  if (refNode || targetResource) {
+    resource.refs = resource.refs || [];
+    const refName = (refNode ? refNode.nodeValue() : targetResource) || '<missing>';
+
+    // make sure we don't duplicate
+    if (!resource.refs.some(ref => ref.refType === refType && ref.refName === refName && ref.targetResource === targetResource)) {
+      resource.refs.push(
+        {
+          refType,
+          refName,
+          refPos: refNode?.getNodePosition(),
+          targetResource,
+        },
+      );
+    }
+  } else {
+    log.warn(`missing both refNode and targetResource for refType ${refType} on resource ${resource.filePath}`);
   }
 }
 
@@ -109,10 +226,12 @@ export function linkResources(
   source: K8sResource,
   target: K8sResource,
   sourceRefType: ResourceRefType,
-  targetRefType: ResourceRefType
+  targetRefType: ResourceRefType,
+  sourceRef: NodeWrapper,
+  targetRef?: NodeWrapper,
 ) {
-  createResourceRef(source, target.id, sourceRefType);
-  createResourceRef(target, source.id, targetRefType);
+  createResourceRef(source, sourceRefType, sourceRef, target.id);
+  createResourceRef(target, targetRefType, targetRef, source.id);
 }
 
 /**
@@ -151,27 +270,6 @@ export function createResourceName(filePath: string, content: any) {
 }
 
 /**
- * Checks if the specified resource is a kustomization resource
- */
-
-export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === 'Kustomization';
-}
-
-/**
- * Checks if the specified fileEntry is a kustomization file
- */
-
-export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
-  if (fileEntry.name.toLowerCase() === 'kustomization.yaml') {
-    const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
-    return resources.length === 1 && isKustomizationResource(resources[0]);
-  }
-
-  return false;
-}
-
-/**
  * Checks if this specified resource is from a file (and not a virtual one)
  */
 
@@ -202,8 +300,8 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       fs.writeFileSync(
         absoluteResourcePath,
         content.substr(0, resource.range.start) +
-          valueToWrite +
-          content.substr(resource.range.start + resource.range.length)
+        valueToWrite +
+        content.substr(resource.range.start + resource.range.length),
       );
     } else {
       // only document => just write to file
@@ -217,9 +315,22 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
 }
 
 /**
+ * This needs to be called to remove temporary objects used during processing which are not serializable
+ */
+
+export function clearParsedDocs(resourceMap: ResourceMapType) {
+  Object.values(resourceMap).forEach(r => {
+    r.parsedDoc = undefined;
+    r.lineCounter = undefined;
+  });
+
+  return resourceMap;
+}
+
+/**
  * Reprocesses the specified resourceIds in regard to refs/etc (called after updating...)
  *
- * This could be more intelligent - it updates everythign brute force for now...
+ * This could be more intelligent - it updates everything brute force for now...
  */
 
 export function reprocessResources(resourceIds: string[], resourceMap: ResourceMapType, fileMap: FileMapType) {
@@ -233,11 +344,14 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
   });
 
   let hasKustomizations = false;
-  Object.values(resourceMap).forEach(r => {
-    r.refs = undefined;
-    if (isKustomizationResource(r)) {
+  Object.values(resourceMap).forEach(resource => {
+    resource.refs = undefined;
+    if (isKustomizationResource(resource)) {
       hasKustomizations = true;
     }
+    const lineCounter = new LineCounter();
+    resource.parsedDoc = parseDocument(resource.text, {lineCounter});
+    resource.lineCounter = lineCounter;
   });
 
   if (hasKustomizations) {
@@ -245,6 +359,7 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
   }
 
   processParsedResources(resourceMap);
+  clearParsedDocs(resourceMap);
 }
 
 /**
@@ -309,29 +424,38 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
   if (documents) {
     let docIndex = 0;
-    documents.forEach(d => {
-      if (d.errors.length > 0) {
+    documents.forEach(doc => {
+      if (doc.errors.length > 0) {
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${d.errors.length} error(s)`,
+          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
         );
-        d.errors.forEach(e => log.warn(e.message));
+        doc.errors.forEach(e => log.warn(e.message));
       } else {
-        const content = d.toJS();
+        const content = doc.toJS();
         if (content && content.apiVersion && content.kind) {
+          const text = fileContent.slice(doc.range[0], doc.range[1]);
+
           let resource: K8sResource = {
             name: createResourceName(relativePath, content),
             filePath: relativePath,
             id: uuidv4(),
+            highlight: false,
+            selected: false,
             kind: content.kind,
             version: content.apiVersion,
             content,
-            highlight: false,
-            selected: false,
-            text: fileContent.slice(d.range[0], d.range[1]),
+            text,
+            parsedDoc: doc,
+            lineCounter,
           };
 
           if (documents.length > 1) {
-            resource.range = {start: d.range[0], length: d.range[1] - d.range[0]};
+            resource.range = {start: doc.range[0], length: doc.range[1] - doc.range[0]};
+
+            // need to reparse since offsets are to full document
+            const lc = new LineCounter();
+            resource.parsedDoc = parseDocument(resource.text, {lineCounter: lc});
+            resource.lineCounter = lc;
           }
 
           if (content.metadata && content.metadata.namespace) {
@@ -356,7 +480,9 @@ export function getLinkedResources(resource: K8sResource) {
   resource.refs
     ?.filter(ref => !isUnsatisfiedRef(ref.refType))
     .forEach(ref => {
-      linkedResourceIds.push(ref.target);
+      if (ref.targetResource) {
+        linkedResourceIds.push(ref.targetResource);
+      }
     });
 
   return linkedResourceIds;
