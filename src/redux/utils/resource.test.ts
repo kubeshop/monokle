@@ -1,6 +1,5 @@
 import {ResourceMapType} from '@models/appstate';
-import fs from 'fs';
-import {createSafePath} from '@redux/utils/fileEntry.test';
+import {loadTestResource} from '@redux/utils/__test__/utils';
 import {extractK8sResources, getNamespaces, getScalarNode, getScalarNodes} from './resource';
 
 test('get-namespaces', () => {
@@ -32,7 +31,7 @@ test('get-namespaces', () => {
 });
 
 test('get-scalar-node', () => {
-  const fileContent = fs.readFileSync(createSafePath('src/redux/utils/__test__/manifests/core-dns-deployment.yaml'), 'utf8');
+  const fileContent = loadTestResource('manifests/core-dns-deployment.yaml');
   const resources = extractK8sResources(fileContent, 'manifests/core-dns-deployment.yaml');
 
   expect(resources.length).toBe(1);
@@ -43,7 +42,7 @@ test('get-scalar-node', () => {
 });
 
 test('get-scalar-nodes', () => {
-  const fileContent = fs.readFileSync(createSafePath('src/redux/utils/__test__/manifests/argo-rollouts/base/kustomization.yaml'), 'utf8');
+  const fileContent = loadTestResource('manifests/argo-rollouts/base/kustomization.yaml');
   const resources = extractK8sResources(fileContent, 'manifests/core-dns-deployment.yaml');
 
   expect(resources.length).toBe(1);
