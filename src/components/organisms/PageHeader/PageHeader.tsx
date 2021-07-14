@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import {SettingOutlined} from '@ant-design/icons';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
@@ -24,16 +23,19 @@ const StyledHeader = styled(Header)`
   padding-left: 10px;
   background: ${BackgroundColors.darkThemeBackground};
   border-bottom: ${AppBorders.pageDivider};
+  min-height: 50px;
 `;
 
 const SettingsCol = styled(Col)`
   width: 100%;
 `;
 
-const StyledSettingsIcon = styled(SettingOutlined)`
+const StyledSettingsSpan = styled.span`
   float: right;
-  padding: 4px;
-  color: ${FontColors.darkThemeMainFont};
+  color: ${FontColors.elementSelectTitle};
+  margin-right: 8px;
+  padding: 10px 10px;
+  cursor: pointer;
 `;
 
 const PageHeader = () => {
@@ -45,23 +47,22 @@ const PageHeader = () => {
   };
 
   return (
-    <StyledHeader noborder
+    <StyledHeader
+      noborder
       style={{
         zIndex: 1,
-        height: '30px'
-      }}>
+        height: '30px',
+      }}
+    >
       <Row noborder>
         <Col span={4} noborder>
-          <IconMonokle useDarkTheme/>
+          <IconMonokle useDarkTheme />
         </Col>
         <Col span={4} offset={5}>
           <EditorMode>{isInPreviewMode ? 'Preview' : ''}</EditorMode>
         </Col>
         <SettingsCol span={11}>
-          <StyledSettingsIcon
-            onClick={toggleSettingsDrawer}
-            style={{fontSize: '1.5em'}}
-          />
+          <StyledSettingsSpan onClick={toggleSettingsDrawer}>Settings</StyledSettingsSpan>
         </SettingsCol>
       </Row>
     </StyledHeader>
