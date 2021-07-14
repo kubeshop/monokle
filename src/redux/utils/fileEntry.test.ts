@@ -1,7 +1,7 @@
 import path from "path";
 import {AppConfig} from '@models/appconfig';
 import {initialState} from '@redux/initialState';
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {getK8sResources} from '@redux/utils/resource';
 import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
@@ -24,9 +24,11 @@ function readManifests(rootFolder: string) {
   const appConfig: AppConfig = initialState.appConfig;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
+  const helmChartMap: HelmChartMapType = {};
+  const helmValuesMap: HelmValuesMapType = {};
 
-  const files = readFiles(rootFolder, appConfig, resourceMap, fileMap);
-  return {resourceMap, fileMap, files};
+  const files = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+  return {resourceMap, fileMap, files, helmChartMap, helmValuesMap};
 }
 
 test('read-files', () => {
@@ -39,9 +41,37 @@ test('read-files', () => {
 });
 
 test('read-folder-with-one-file', () => {
-  const {resourceMap, fileMap, files} = readManifests(createSafePath('src/redux/utils/__test__/manifests/single'));
+  const {
+    resourceMap,
+    fileMap,
+    files,
+    helmChartMap,
+    helmValuesMap,
+  } = readManifests(createSafePath('src/redux/utils/__test__/manifests/single'));
 
   expect(files.length).toBe(1);
   expect(Object.values(fileMap).length).toBe(2);
   expect(Object.values(resourceMap).length).toBe(1);
+  expect(Object.values(helmChartMap).length).toBe(0);
+
+});
+
+test('read-folder-with-helm-chart', () => {
+  const {
+    resourceMap,
+    fileMap,
+    files,
+    helmChartMap,
+    helmValuesMap,
+  } = readManifests(createSafePath('src/redux/utils/__test__/helm-charts/aks-helloworld'));
+
+  expect(files.length).toBe(4);
+  expect(Object.values(fileMap).length).toBe(6);
+  expect(Object.values(resourceMap).length).toBe(2);
+
+  let helmCharts = Object.values(helmChartMap);
+  expect(helmCharts.length).toBe(1);
+  expect(helmCharts[0].valueFiles.length).toBe(1);
+  expect(helmCharts[0].name).toBe('aks-helloworld');
+  expect(fileMap[helmCharts[0].filePath].name).toBe('Chart.yaml');
 });

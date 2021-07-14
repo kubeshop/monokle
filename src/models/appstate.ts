@@ -1,3 +1,4 @@
+import {HelmChart, HelmValuesFile} from '@models/helm';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
 import {AppConfig} from './appconfig';
@@ -16,6 +17,14 @@ type FileMapType = {
   [id: string]: FileEntry;
 };
 
+type HelmChartMapType = {
+  [id: string]: HelmChart;
+}
+
+type HelmValuesMapType = {
+  [id: string]: HelmValuesFile;
+}
+
 interface AppState {
   fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
   appConfig: AppConfig; // holds current configuration
@@ -25,6 +34,10 @@ interface AppState {
   previewResource?: string; // the resource currently being previewed
   diffResource?: string; // the resource currently being diffed
   diffContent?: string; // the diff content for the resource being diffed
+  helmChartMap: HelmChartMapType; // maps chart ids to helm charts
+  helmValuesMap: HelmValuesMapType; // maps values ids to helm values files
+  selectedValuesFile?: string; // the currently selected values file
+  previewValuesFile?: string; // the values file currently being previewed
 }
 
-export type {AppState, ResourceMapType, FileMapType};
+export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType};

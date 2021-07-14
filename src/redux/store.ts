@@ -1,7 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 
-import mainReducer from './reducers/main';
+import {mainSlice} from './reducers/main';
 import {configSlice} from './reducers/appConfig';
 import {alertSlice} from './reducers/alert';
 import {logsSlice} from './reducers/logs';
@@ -10,7 +10,7 @@ import {uiSlice} from './reducers/ui';
 const store = configureStore({
   reducer: {
     config: configSlice.reducer,
-    main: mainReducer,
+    main: mainSlice.reducer,
     alert: alertSlice.reducer,
     logs: logsSlice.reducer,
     ui: uiSlice.reducer,

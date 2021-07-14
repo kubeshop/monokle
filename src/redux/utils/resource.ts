@@ -314,7 +314,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         log.warn(
           `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${d.errors.length} error(s)`,
         );
-        d.errors.forEach(e => log.warn(e.message));
+       // d.errors.forEach(e => log.warn(e.message));
       } else {
         const content = d.toJS();
         if (content && content.apiVersion && content.kind) {
