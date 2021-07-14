@@ -1,11 +1,9 @@
 import * as React from 'react';
-import 'react-folder-tree/dist/style.css';
 import {useRef} from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import {Row, Button, Tree, Col, Space, Typography} from 'antd';
 
-import '@styles/FileTreePane.css';
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
