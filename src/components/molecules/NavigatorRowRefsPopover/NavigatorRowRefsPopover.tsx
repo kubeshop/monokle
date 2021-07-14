@@ -126,7 +126,9 @@ const NavigatorRowRefsPopover = (props: NavigatorRowRefsPopoverProps) => {
     const targetName = ref.targetResource ? resourceMap[ref.targetResource]?.name : '';
 
     const onLinkClick = () => {
-      selectResource(ref.target);
+      if (ref.targetResource) {
+        selectResource(ref.targetResource);
+      }
     };
 
     if (isOutgoingRef(ref.refType)) {
