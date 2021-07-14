@@ -1,10 +1,15 @@
 import {AppState} from '@models/appstate';
+import {Themes, TextSizes, Languages} from "@models/appconfig";
 
 export const initialState: AppState = {
   appConfig: {
+    kubeconfig: "",
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,
+      theme: Themes.Dark,
+      textSize: TextSizes.Medium,
+      language: Languages.English,
     },
     scanExcludes: ['node_modules', '.git', '**/pkg/mod/**'],
     fileIncludes: ['*.yaml', '*.yml'],
