@@ -33,5 +33,5 @@ export const configSlice = createSlice({
   },
 });
 
-export const {setFilterObjects, setAutoZoom, setTheme, setTextSize, setLanguage, setScanExcludes, setFileIncludes} = configSlice.actions;
+export const {setFilterObjects, setAutoZoom, setTheme, setTextSize, setLanguage, setScanExcludes, setFileIncludes, setKubeconfig} = configSlice.actions;
 export default configSlice.reducer;
