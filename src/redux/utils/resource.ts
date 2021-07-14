@@ -10,6 +10,10 @@ import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
 import {v4 as uuidv4} from 'uuid';
 
+/**
+ * process service selectors and create corresponding refs
+ */
+
 export function processServices(resourceMap: ResourceMapType) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(
     d => d.content.spec?.template?.metadata?.labels,
@@ -209,6 +213,7 @@ export function getK8sResources(resourceMap: ResourceMapType, type: string) {
 /**
  * Adds a resource ref with the specified type/target to the specified resource
  */
+
 function createResourceRef(resource: K8sResource, refType: ResourceRefType, refNode?: NodeWrapper, targetResource?: string) {
   if (refNode || targetResource) {
     resource.refs = resource.refs || [];
@@ -438,7 +443,6 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         log.warn(
           `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
         );
-        doc.errors.forEach(e => log.warn(e.message));
       } else {
         const content = doc.toJS();
         if (content && content.apiVersion && content.kind) {
@@ -454,11 +458,20 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             version: content.apiVersion,
             content,
             text,
-            ...(documents.length === 1 ? {parsedDoc: doc, lineCounter} :
-              {range: {start: doc.range[0], length: doc.range[1] - doc.range[0]}}),
           };
 
-          if (content.metadata && content.metadata.namespace) {
+          // if this is a single-resource file we can save the parsedDoc and lineCounter
+          if (documents.length === 1) {
+            resource.parsedDoc = doc;
+            resource.lineCounter = lineCounter;
+          } else {
+            // for multi-resource files we just save the range - the parsedDoc and lineCounter will
+            // be created on demand (since they are incorrect in this context)
+            resource.range = {start: doc.range[0], length: doc.range[1] - doc.range[0]};
+          }
+
+          // set the namespace if available
+          if (content.metadata?.namespace) {
             resource.namespace = content.metadata.namespace;
           }
 

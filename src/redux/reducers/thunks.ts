@@ -297,7 +297,7 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
 
               processParsedResources(resourceMap);
 
-              resolve({previewResourceId: valuesFile.id, previewResources: resourceMap});
+              resolve({previewResourceId: valuesFile.id, previewResources: clearParsedDocs(resourceMap)});
             },
           );
         });
