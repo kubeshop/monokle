@@ -15,7 +15,7 @@ import {FileEntry} from '@models/fileentry';
 import {processKustomizations} from '@redux/utils/kustomize';
 import {monitorRootFolder} from '@redux/utils/fileMonitor';
 import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@redux/reducers/main';
-import {PROCESS_ENV} from '@actions/common/apply';
+import {PROCESS_ENV} from '@utils/env';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 

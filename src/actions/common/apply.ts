@@ -11,8 +11,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
 import {getAbsoluteResourceFolder} from '@redux/utils/fileEntry';
 
-// weird workaround to get all ENV values (accessing process.env directly only returns a subset)
-export const PROCESS_ENV = JSON.parse(JSON.stringify(process)).env;
+import {PROCESS_ENV} from "@utils/env";
 
 /**
  * Invokes kubectl for the content of the specified resource

@@ -11,7 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 import {FolderAddOutlined} from '@ant-design/icons';
-import {PROCESS_ENV} from '@actions/common/apply';
+import {PROCESS_ENV} from '@utils/env';
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import fs from 'fs';
