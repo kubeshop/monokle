@@ -6,7 +6,7 @@ import log from 'loglevel';
 import {exec} from 'child_process';
 import {createFileEntry, readFiles} from '@redux/utils/fileEntry';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
-import {extractK8sResources, processParsedResources} from '@redux/utils/resource';
+import {clearParsedDocs, extractK8sResources, processParsedResources} from '@redux/utils/resource';
 import {stringify} from 'yaml';
 import * as k8s from '@kubernetes/client-node';
 // @ts-ignore
@@ -66,7 +66,7 @@ export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
 
             processParsedResources(resourceMap);
 
-            resolve({previewResourceId: resource.id, previewResources: resourceMap});
+            resolve({previewResourceId: resource.id, previewResources: clearParsedDocs(resourceMap)});
           },
         );
       });
@@ -128,7 +128,7 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
         }, {});
 
         processParsedResources(resourceMap);
-        return {previewResourceId: configPath, previewResources: resourceMap};
+        return {previewResourceId: configPath, previewResources: clearParsedDocs(resourceMap)};
       }
 
       return {};
@@ -167,7 +167,7 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
   return {
     appConfig,
     fileMap,
-    resourceMap,
+    resourceMap: clearParsedDocs(resourceMap),
     helmChartMap,
     helmValuesMap,
   };
@@ -297,7 +297,7 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
 
               processParsedResources(resourceMap);
 
-              resolve({previewResourceId: valuesFile.id, previewResources: resourceMap});
+              resolve({previewResourceId: valuesFile.id, previewResources: clearParsedDocs(resourceMap)});
             },
           );
         });

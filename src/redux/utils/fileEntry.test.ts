@@ -1,13 +1,9 @@
-import path from "path";
 import {AppConfig} from '@models/appconfig';
 import {initialState} from '@redux/initialState';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {getK8sResources} from '@redux/utils/resource';
+import {createSafePath, getTestResourcePath} from '@redux/utils/__test__/utils';
 import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
-
-function createSafePath(originalPath: string) {
-  return originalPath.replaceAll('/', path.sep);
-}
 
 test('create-file-entry', () => {
   let e = createFileEntry(createSafePath('/a/very/long/path'));
@@ -32,7 +28,7 @@ function readManifests(rootFolder: string) {
 }
 
 test('read-files', () => {
-  const {resourceMap, fileMap, files} = readManifests(createSafePath('src/redux/utils/__test__/manifests/argo-rollouts'));
+  const {resourceMap, fileMap, files} = readManifests(getTestResourcePath('manifests/argo-rollouts'));
 
   expect(files.length).toBe(7);
   expect(Object.values(fileMap).length).toBe(27);
@@ -47,7 +43,7 @@ test('read-folder-with-one-file', () => {
     files,
     helmChartMap,
     helmValuesMap,
-  } = readManifests(createSafePath('src/redux/utils/__test__/manifests/single'));
+  } = readManifests(getTestResourcePath('manifests/single'));
 
   expect(files.length).toBe(1);
   expect(Object.values(fileMap).length).toBe(2);

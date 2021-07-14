@@ -29,6 +29,7 @@ module.exports = {
     'no-multiple-empty-lines': 1,
     'no-useless-escape': 'off',
     'object-curly-newline': 'off',
+    'lines-between-class-members': 'off',
     'unused-imports/no-unused-imports-ts': 'error',
     'react/jsx-props-no-spreading': 0,
     'react/jsx-max-props-per-line': [1, {maximum: 1, when: 'multiline'}],
