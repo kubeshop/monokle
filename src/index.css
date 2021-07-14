@@ -21,3 +21,13 @@ code {
   color: #ad8b00 !important;
   text-decoration: underline;
 }
+
+.monokleEditorSatisfiedRefGlyphClass {
+  background-color: #1890FF;
+  border-radius: 50%;
+}
+
+.monokleEditorSatisfiedRefInlineClass {
+  color: #1890FF !important;
+  text-decoration: underline;
+}
