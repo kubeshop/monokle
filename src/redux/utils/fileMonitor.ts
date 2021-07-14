@@ -19,6 +19,8 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
   watcher = chokidar.watch(folder, {
     ignored: appConfig.scanExcludes,
     persistent: true,
+    usePolling: true,
+    interval: 2000,
   });
 
   watcher
