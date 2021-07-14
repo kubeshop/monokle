@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: acs-helloworld-{{.Release.Name}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: acs-helloworld-{{.Release.Name}}
+  template:
+    metadata:
+      labels:
+        app: acs-helloworld-{{.Release.Name}}
+    spec:
+      containers:
+        - name: acs-helloworld-{{.Release.Name}}
+          image: neilpeterson/aks-helloworld:v1
+          ports:
+            - containerPort: 80
+          env:
+            - name: TITLE
+              value: { { .Values.title } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: { { .Values.serviceName } }
+spec:
+  type: { { .Values.serviceType } }
+  ports:
+    - port: 80
+  selector:
+    app: acs-helloworld-{{.Release.Name}}

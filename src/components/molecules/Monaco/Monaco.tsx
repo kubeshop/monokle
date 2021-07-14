@@ -123,7 +123,7 @@ const Monaco = (props: {editorHeight: string}) => {
       if (resource) {
         newCode = resource.text;
       }
-    } else if (selectedPath) {
+    } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
       const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
       if (!fs.statSync(filePath).isDirectory()) {
         newCode = fs.readFileSync(filePath, 'utf8');
@@ -150,11 +150,11 @@ const Monaco = (props: {editorHeight: string}) => {
   };
 
   const applyCodeIntel = () => {
-    if (editor && selectedResource) {
+    if (editor && selectedResource && resourceMap[selectedResource]) {
       const {newDecorations, newHoverDisposables, newCommandDisposables} = codeIntel.handleUnsatisfiedRefs(
         editor,
         resourceMap,
-        selectedResource
+        selectedResource,
       );
       const idsOfNewDecorations = setDecorations(editor, newDecorations);
       setCurrentIdsOfDecorations(idsOfNewDecorations);

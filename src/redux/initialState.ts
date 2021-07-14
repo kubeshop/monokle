@@ -9,11 +9,12 @@ export const initialState: AppState = {
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,
+      helmPreviewMode: 'template',
       theme: Themes.Dark,
       textSize: TextSizes.Medium,
       language: Languages.English,
     },
-    scanExcludes: ['node_modules', '.git', '**/pkg/mod/**'],
+    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube'],
     fileIncludes: ['*.yaml', '*.yml'],
     navigators: [
       {
@@ -65,4 +66,6 @@ export const initialState: AppState = {
   },
   resourceMap: {},
   fileMap: {},
+  helmChartMap: {},
+  helmValuesMap: {},
 };

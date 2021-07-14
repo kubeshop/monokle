@@ -1,0 +1,6 @@
+# UI controll
+title: "Welcome to Azure Kubernetes Service (AKS)"
+
+# Service controlls
+serviceName: aks-helloworld
+serviceType: ClusterIP

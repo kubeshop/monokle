@@ -26,7 +26,9 @@ interface AppConfig {
     language: Languages;
     filterObjectsOnSelection: boolean;
     autoZoomGraphOnSelection: boolean;
+    helmPreviewMode: string; // either "template" or "dry-run"
   };
+
 }
 
 export type {AppConfig};

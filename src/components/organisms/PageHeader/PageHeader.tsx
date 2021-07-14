@@ -4,12 +4,14 @@ import styled from 'styled-components';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
 import {toggleSettings} from '@redux/reducers/ui';
 import IconMonokle from '@components/atoms/IconMonokle';
 import Row from '@components/atoms/Row';
 import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
+import {inPreviewMode} from '@redux/selectors';
+import {useSelector} from 'react-redux';
 
 const EditorMode = styled.h4`
   font-size: 2em;
@@ -40,7 +42,7 @@ const StyledSettingsSpan = styled.span`
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
-  const isInPreviewMode = Boolean(useAppSelector(state => state.main.previewResource));
+  const isInPreviewMode = useSelector(inPreviewMode);
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());

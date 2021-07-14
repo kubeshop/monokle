@@ -1,6 +1,5 @@
 import {K8sResource} from '@models/k8sresource';
 import {spawn} from 'child_process';
-import {isKustomizationResource} from '@redux/utils/resource';
 import log from 'loglevel';
 // @ts-ignore
 import shellPath from 'shell-path';
@@ -10,6 +9,7 @@ import {setLogs} from '@redux/reducers/logs';
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
 import {getAbsoluteResourceFolder} from '@redux/utils/fileEntry';
+import {isKustomizationResource} from '@redux/utils/kustomize';
 
 import {PROCESS_ENV} from "@utils/env";
 

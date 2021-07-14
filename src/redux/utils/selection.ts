@@ -2,8 +2,8 @@ import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
 import {getAllFileEntriesForPath, getChildFilePath, getResourcesForPath} from '@redux/utils/fileEntry';
-import {getLinkedResources, isFileResource, isKustomizationResource} from '@redux/utils/resource';
-import {getKustomizationRefs} from '@redux/utils/kustomize';
+import {getLinkedResources, isFileResource} from '@redux/utils/resource';
+import {getKustomizationRefs, isKustomizationResource} from '@redux/utils/kustomize';
 import path from 'path';
 
 /**

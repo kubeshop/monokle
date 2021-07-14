@@ -1,7 +1,7 @@
-import {isKustomizationResource} from '@redux/utils/resource';
 import {K8sResource} from '@models/k8sresource';
 import log from 'loglevel';
 import {loadResource} from '@redux/utils';
+import {isKustomizationResource} from '@redux/utils/kustomize';
 
 const k8sSchema = JSON.parse(loadResource('schemas/k8sschemas.json'));
 const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));

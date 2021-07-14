@@ -34,13 +34,13 @@ export function handleUnsatisfiedRefs(
   for (let i = 0; i < unsatisfiedRefs?.length; i += 1) {
     const unsatisfiedRef = unsatisfiedRefs[i];
 
-    const line = getLine(editor, unsatisfiedRef.target);
+    const line = getLine(editor, unsatisfiedRef.refName);
 
     if (line) {
       const glyphDecoration = createGlyphDecoration(line.index, GlyphDecorationTypes.UnsatisfiedRef);
       newDecorations.push(glyphDecoration);
 
-      const inlineRange = getRangeForTarget(line, unsatisfiedRef.target);
+      const inlineRange = getRangeForTarget(line, unsatisfiedRef.refName);
       if (inlineRange) {
         const inlineDecoration = createInlineDecoration(inlineRange, InlineDecorationTypes.UnsatisfiedRef);
         newDecorations.push(inlineDecoration);
