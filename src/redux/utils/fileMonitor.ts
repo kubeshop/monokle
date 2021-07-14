@@ -1,4 +1,4 @@
-import chokidar, {FSWatcher} from 'chokidar';
+import {watch, FSWatcher} from 'chokidar';
 import {AppConfig} from '@models/appconfig';
 import {AppDispatch} from '@redux/store';
 import {fileChanged, pathAdded, pathRemoved} from '@redux/reducers/main';
@@ -16,9 +16,11 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
   }
 
   initializing = true;
-  watcher = chokidar.watch(folder, {
+  watcher = watch(folder, {
     ignored: appConfig.scanExcludes,
     persistent: true,
+    usePolling: true,
+    interval: 2000,
   });
 
   watcher

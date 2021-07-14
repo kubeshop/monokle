@@ -66,6 +66,10 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
+const StyledSpan = styled.span`
+  cursor: pointer;
+`;
+
 const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
   const {
     rowKey,
@@ -91,9 +95,11 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
       <StyledDiv className={classname}>
         <ItemRow key={rowKey}>
           <SectionCol sm={22}>
-            <div className={classname} onClick={onClickResource}>
+            <div className={classname}>
               <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Incoming} />
-              <span style={!hasIncomingRefs ? {marginLeft: 19} : {}}>{resource.name}</span>
+              <StyledSpan onClick={onClickResource} style={!hasIncomingRefs ? {marginLeft: 19} : {}}>
+                {resource.name}
+              </StyledSpan>
               <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Outgoing} />
             </div>
           </SectionCol>

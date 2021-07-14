@@ -18,14 +18,29 @@ export const selectActiveResources = createSelector(
   selectAllResources,
   (state: RootState) => state.main.previewResource,
   (resources, previewResource) =>
-    resources.filter(r => previewResource === undefined || r.filePath.startsWith(PREVIEW_PREFIX))
+    resources.filter(r => previewResource === undefined || r.filePath.startsWith(PREVIEW_PREFIX)),
 );
 
 export const selectKustomizations = createSelector(selectAllResources, resources =>
-  resources.filter((r: K8sResource) => isKustomizationResource(r))
+  resources.filter((r: K8sResource) => isKustomizationResource(r)),
+);
+
+export const selectHelmCharts = createSelector(
+  (state: RootState) => state.main.helmChartMap,
+  helmCharts => helmCharts,
+);
+
+export const selectHelmValues = createSelector(
+  (state: RootState) => state.main.helmValuesMap,
+  helmValuesMap => helmValuesMap,
+);
+
+export const inPreviewMode = createSelector(
+  (state: RootState) => state.main,
+  appState => Boolean(appState.previewResource) || Boolean(appState.previewValuesFile),
 );
 
 export const selectLogs = createSelector(
   (state: RootState) => state.logs.logs,
-  logs => logs.join('\n')
+  logs => logs.join('\n'),
 );
