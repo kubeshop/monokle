@@ -1,9 +1,11 @@
 import {AppState} from '@models/appstate';
 import {Themes, TextSizes, Languages} from "@models/appconfig";
 
+import {PROCESS_ENV} from "@utils/env";
+
 export const initialState: AppState = {
   appConfig: {
-    kubeconfig: "",
+    kubeconfig: PROCESS_ENV.KUBECONFIG,
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,
