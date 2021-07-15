@@ -12,6 +12,7 @@ import {
   createInlineDecoration,
   createHoverProvider,
   createMarkdownString,
+  createLinkProvider,
 } from './editorHelpers';
 
 function areRefPosEqual(a: RefPosition, b: RefPosition) {
@@ -27,9 +28,10 @@ export function applyForResource(
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   const newHoverDisposables: monaco.IDisposable[] = [];
   const newCommandDisposables: monaco.IDisposable[] = [];
+  const newLinkDisposables: monaco.IDisposable[] = [];
 
   if (!refs || refs.length === 0) {
-    return {newDecorations, newHoverDisposables, newCommandDisposables};
+    return {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables};
   }
 
   const unsatisfiedRefs = refs?.filter(r => isUnsatisfiedRef(r.refType));
@@ -101,9 +103,19 @@ export function applyForResource(
       ]);
       newHoverDisposables.push(hoverDisposable);
     }
+
+    if (outgoingRefs.length === 1) {
+      const outgoingRef = outgoingRefs[0];
+      const linkDisposable = createLinkProvider(inlineRange, () => {
+        if (outgoingRef.targetResource) {
+          selectResource(outgoingRef.targetResource);
+        }
+      });
+      newLinkDisposables.push(linkDisposable);
+    }
   });
 
-  return {newDecorations, newHoverDisposables, newCommandDisposables};
+  return {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables};
 }
 
 export default {

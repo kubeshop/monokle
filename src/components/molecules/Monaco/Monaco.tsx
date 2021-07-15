@@ -63,6 +63,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const [currentIdsOfDecorations, setCurrentIdsOfDecorations] = useState<string[]>([]);
   const [currentHoverDisposables, setCurrentHoverDisposables] = useState<monaco.IDisposable[]>([]);
   const [currentCommandDisposables, setCurrentCommandDisposables] = useState<monaco.IDisposable[]>([]);
+  const [currentLinkDisposables, setCurrentLinkDisposables] = useState<monaco.IDisposable[]>([]);
 
   const isInPreviewMode = Boolean(useAppSelector(state => state.main.previewResource));
   const dispatch = useAppDispatch();
@@ -150,21 +151,20 @@ const Monaco = (props: {editorHeight: string}) => {
       clearDecorations(editor, currentIdsOfDecorations);
       currentHoverDisposables.forEach(hoverDisposable => hoverDisposable.dispose());
       currentCommandDisposables.forEach(commandDisposable => commandDisposable.dispose());
+      currentLinkDisposables.forEach(linkDisposable => linkDisposable.dispose());
     }
   };
 
   const applyCodeIntel = () => {
     if (editor && selectedResource && resourceMap[selectedResource]) {
       const resource = resourceMap[selectedResource];
-      const {newDecorations, newHoverDisposables, newCommandDisposables} = codeIntel.applyForResource(
-        resource,
-        selectResource,
-        resourceMap
-      );
+      const {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables} =
+        codeIntel.applyForResource(resource, selectResource, resourceMap);
       const idsOfNewDecorations = setDecorations(editor, newDecorations);
       setCurrentIdsOfDecorations(idsOfNewDecorations);
       setCurrentHoverDisposables(newHoverDisposables);
       setCurrentCommandDisposables(newCommandDisposables);
+      setCurrentLinkDisposables(newLinkDisposables);
     }
   };
 

@@ -78,3 +78,22 @@ export function createHoverProvider(range: monaco.IRange, contents: monaco.IMark
   });
   return hoverDisposable;
 }
+
+export function createLinkProvider(range: monaco.IRange, handler: () => void) {
+  const linkDisposable: monaco.IDisposable = monaco.languages.registerLinkProvider('yaml', {
+    provideLinks: () => {
+      return {
+        links: [
+          {
+            range,
+          },
+        ],
+      };
+    },
+    resolveLink: (link: monaco.languages.ILink) => {
+      handler();
+      return {range: link.range};
+    },
+  });
+  return linkDisposable;
+}
