@@ -8,17 +8,16 @@ import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY} from '@src/constants';
-import {FolderAddOutlined} from '@ant-design/icons';
+
+import {FolderAddOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 import {PROCESS_ENV} from '@utils/env';
+
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import fs from 'fs';
 import {previewCluster, setRootFolder} from '@redux/reducers/thunks';
 import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
-import {
-  MonoPaneTitle,
-  MonoPaneTitleCol,
-} from '@atoms';
+import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 
@@ -26,6 +25,7 @@ interface TreeNode {
   key: string;
   title: React.ReactNode;
   children: TreeNode[];
+  highlight: boolean;
   isLeaf?: boolean;
 }
 
@@ -42,27 +42,48 @@ const StyledNumberOfResources = styled(Typography.Text)`
   margin-left: 12px;
 `;
 
-const createNode = (
-  fileEntry: FileEntry,
-  fileMap: FileMapType,
-  resourceMap: ResourceMapType
-  ) => {
+const NodeContainer = styled.div`
+  position: relative;
+`;
+const NodeTitleContainer = styled.div`
+  padding-right: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+const NodeActionsContainer = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+`;
+
+const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
   const node: TreeNode = {
     key: fileEntry.filePath,
-    title: <>
-      {fileEntry.name}
-      {resources.length > 0 ? <StyledNumberOfResources type="secondary">{resources.length}</StyledNumberOfResources> : ''}
-    </>,
-    children: []
+    title: (
+      <NodeContainer>
+        <NodeTitleContainer>
+          {fileEntry.name}
+          {resources.length > 0 ? (
+            <StyledNumberOfResources type="secondary">{resources.length}</StyledNumberOfResources>
+          ) : (
+            ''
+          )}
+        </NodeTitleContainer>
+        <NodeActionsContainer>{fileEntry.excluded && <EyeInvisibleOutlined />}</NodeActionsContainer>
+      </NodeContainer>
+    ),
+    children: [],
+    highlight: fileEntry.highlight,
   };
 
   if (fileEntry.children) {
     node.children = fileEntry.children
-      .map((child) => fileMap[getChildFilePath(child, fileEntry, fileMap)])
-      .filter((childEntry) => childEntry)
-      .map((childEntry) => createNode(childEntry, fileMap, resourceMap));
+      .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
+      .filter(childEntry => childEntry)
+      .map(childEntry => createNode(childEntry, fileMap, resourceMap));
   } else {
     node.isLeaf = true;
   }
@@ -108,7 +129,8 @@ const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
   & .ant-tree {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
     font-size: 12px;
     font-style: normal;
@@ -120,17 +142,38 @@ const FileTreeContainer = styled.div`
     background: ${Colors.selectionGradient} !important;
   }
   & .ant-tree-treenode-selected::before {
-    background: ${Colors.selectionGradient}  !important;
+    background: ${Colors.selectionGradient} !important;
   }
   & .ant-tree-treenode {
     background: transparent;
   }
   & .ant-tree-treenode::selection {
-    background: ${Colors.selectionGradient}  !important;
+    background: ${Colors.selectionGradient} !important;
+  }
+  & .filter-node {
+    font-style: italic;
+    font-weight: bold;
+    background: ${Colors.highlightGradient};
+    color: ${FontColors.resourceRowHighlight};
   }
   .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
     color: black !important;
     font-weight: bold;
+  }
+  & .ant-tree-iconEle {
+    flex-shrink: 0;
+  }
+  & .ant-tree-iconEle .anticon {
+    vertical-align: -2px;
+  }
+  & .ant-tree-node-content-wrapper {
+    display: flex;
+    overflow: hidden;
+  }
+
+  & .ant-tree-node-content-wrapper .ant-tree-title {
+    overflow: hidden;
+    flex-grow: 1;
   }
 `;
 
@@ -148,6 +191,7 @@ const FileTreePane = () => {
   const previewResource = useAppSelector(state => state.main.previewResource);
   const previewMode = useSelector(inPreviewMode);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
 
@@ -206,11 +250,7 @@ const FileTreePane = () => {
             >
               Cluster Objects
             </Button>
-            <Button
-              type="primary"
-              ghost
-              onClick={startFileUploader}
-            >
+            <Button type="primary" ghost onClick={startFileUploader}>
               <CenteredItemsDiv>
                 <FolderAddOutlined style={{marginRight: '3px'}} />
                 Browse
@@ -232,11 +272,20 @@ const FileTreePane = () => {
         style={{display: 'none'}}
         disabled={previewMode}
       />
-      {tree ? <Tree.DirectoryTree
-        onSelect={onSelect}
-        defaultExpandAll
-        treeData={[tree]}
-      /> : <NoFilesContainer>No folder selected.</NoFilesContainer>}
+      {tree ? (
+        <Tree.DirectoryTree
+          onSelect={onSelect}
+          defaultExpandAll
+          treeData={[tree]}
+          selectedKeys={[selectedPath || '-']}
+          filterTreeNode={node => {
+            // @ts-ignore
+            return node.highlight;
+          }}
+        />
+      ) : (
+        <NoFilesContainer>No folder selected.</NoFilesContainer>
+      )}
     </FileTreeContainer>
   );
 };
