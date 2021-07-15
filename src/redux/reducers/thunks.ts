@@ -15,7 +15,6 @@ import {FileEntry} from '@models/fileentry';
 import {processKustomizations} from '@redux/utils/kustomize';
 import {monitorRootFolder} from '@redux/utils/fileMonitor';
 import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@redux/reducers/main';
-import {PROCESS_ENV} from '@utils/env';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import * as fs from 'fs';
@@ -194,11 +193,12 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
   }>
 ('main/setDiffContent', async (diffResourceId, thunkAPI) => {
   const resourceMap = thunkAPI.getState().main.resourceMap;
+  const kubeconfig = thunkAPI.getState().config.kubeconfig;
   try {
     const resource = resourceMap[diffResourceId];
     if (resource && resource.text) {
       const kc = new k8s.KubeConfig();
-      kc.loadFromFile(PROCESS_ENV.KUBECONFIG);
+      kc.loadFromFile(kubeconfig);
 
       const handleResource = (res: any) => {
         if (res.body) {
@@ -249,6 +249,7 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
   }>
 ('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   const state = thunkAPI.getState().main;
+  const kubeconfig = thunkAPI.getState().config.kubeconfig;
   if (state.previewValuesFile !== valuesFileId) {
     const valuesFile = state.helmValuesMap[valuesFileId];
     if (valuesFile && valuesFile.filePath) {
@@ -274,7 +275,7 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
                 NODE_ENV: process.env.NODE_ENV,
                 PUBLIC_URL: process.env.PUBLIC_URL,
                 PATH: shellPath.sync(),
-                KUBECONFIG: PROCESS_ENV.KUBECONFIG,
+                KUBECONFIG: kubeconfig,
               },
             },
             (error, stdout, stderr) => {

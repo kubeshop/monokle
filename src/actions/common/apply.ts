@@ -11,19 +11,17 @@ import {AppDispatch} from '@redux/store';
 import {getAbsoluteResourceFolder} from '@redux/utils/fileEntry';
 import {isKustomizationResource} from '@redux/utils/kustomize';
 
-import {PROCESS_ENV} from "@utils/env";
-
 /**
  * Invokes kubectl for the content of the specified resource
  */
 
-function applyK8sResource(resource: K8sResource) {
+function applyK8sResource(resource: K8sResource, kubeconfig: string) {
   const child = spawn('kubectl', ['apply', '-f', '-'], {
     env: {
       NODE_ENV: process.env.NODE_ENV,
       PUBLIC_URL: process.env.PUBLIC_URL,
       PATH: shellPath.sync(),
-      KUBECONFIG: PROCESS_ENV.KUBECONFIG,
+      KUBECONFIG: kubeconfig,
     },
   });
   child.stdin.write(resource.text);
@@ -35,14 +33,14 @@ function applyK8sResource(resource: K8sResource) {
  * Invokes kubectl -k for the content of the specified kustomization
  */
 
-function applyKustomization(resource: K8sResource, fileMap: FileMapType) {
+function applyKustomization(resource: K8sResource, fileMap: FileMapType, kubeconfig: string) {
   const folder = getAbsoluteResourceFolder(resource, fileMap);
   const child = spawn('kubectl', ['apply', '-k', folder], {
     env: {
       NODE_ENV: process.env.NODE_ENV,
       PUBLIC_URL: process.env.PUBLIC_URL,
       PATH: shellPath.sync(),
-      KUBECONFIG: PROCESS_ENV.KUBECONFIG,
+      KUBECONFIG: kubeconfig,
     },
   });
   return child;
@@ -56,14 +54,15 @@ export async function applyResource(
   resourceId: string,
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
-  dispatch: AppDispatch
+  dispatch: AppDispatch,
+  kubeconfig: string
 ) {
   try {
     const resource = resourceMap[resourceId];
     if (resource && resource.text) {
       const child = isKustomizationResource(resource)
-        ? applyKustomization(resource, fileMap)
-        : applyK8sResource(resource);
+        ? applyKustomization(resource, fileMap, kubeconfig)
+        : applyK8sResource(resource, kubeconfig);
 
       child.on('exit', (code, signal) => log.info(`kubectl exited with code ${code} and signal ${signal}`));
 

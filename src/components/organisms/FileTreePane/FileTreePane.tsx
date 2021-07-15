@@ -10,7 +10,6 @@ import {selectFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 
 import {FolderAddOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
-import {PROCESS_ENV} from '@utils/env';
 
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
@@ -193,6 +192,7 @@ const FileTreePane = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const kubeconfig = useAppSelector(state => state.config.kubeconfig);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
 
   // eslint-disable-next-line no-undef
@@ -216,7 +216,7 @@ const FileTreePane = () => {
   }, [fileMap, resourceMap]);
 
   const connectToCluster = () => {
-    dispatch(previewCluster(PROCESS_ENV.KUBECONFIG));
+    dispatch(previewCluster(kubeconfig));
   };
 
   const startFileUploader = () => {
@@ -245,7 +245,7 @@ const FileTreePane = () => {
             <Button
               type="primary"
               ghost
-              disabled={previewMode && previewResource !== PROCESS_ENV.KUBECONFIG}
+              disabled={previewMode && previewResource !== kubeconfig}
               onClick={connectToCluster}
             >
               Cluster Objects
