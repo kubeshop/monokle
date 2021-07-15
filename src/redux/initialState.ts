@@ -1,21 +1,20 @@
 import {AppState} from '@models/appstate';
-import {Themes, TextSizes, Languages} from "@models/appconfig";
 
-import {PROCESS_ENV} from "@utils/env";
+import electronStore from '@utils/electronStore';
 
 export const initialState: AppState = {
   appConfig: {
-    kubeconfig: PROCESS_ENV.KUBECONFIG,
+    kubeconfig: electronStore.get('appConfig.kubeconfig'),
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,
       helmPreviewMode: 'template',
-      theme: Themes.Dark,
-      textSize: TextSizes.Medium,
-      language: Languages.English,
+      theme: electronStore.get('appConfig.settings.theme'),
+      textSize: electronStore.get('appConfig.settings.textSize'),
+      language: electronStore.get('appConfig.settings.language'),
     },
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube'],
-    fileIncludes: ['*.yaml', '*.yml'],
+    scanExcludes: electronStore.get('appConfig.scanExcludes'),
+    fileIncludes: electronStore.get('appConfig.fileIncludes'),
     navigators: [
       {
         name: 'K8s Resources',
