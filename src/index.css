@@ -14,10 +14,27 @@ code {
   background-image: url("./assets/MonokleWarning.svg");
   background-repeat: no-repeat;
   background-size: cover;
-  max-height: 15px;
+  max-height: 12px;
+  max-width: 14px;
+  margin-top: 2.5px;
+  margin-left: 12.5px;
 }
 
 .monokleEditorUnsatisfiedRefInlineClass {
   color: #ad8b00 !important;
+  text-decoration: underline;
+}
+
+.monokleEditorSatisfiedRefGlyphClass {
+  background-color: #3C8618;
+  border-radius: 50%;
+  max-height: 10px;
+  max-width: 10px;
+  margin-top: 5px;
+  margin-left: 15px;
+}
+
+.monokleEditorSatisfiedRefInlineClass {
+  color: #1890FF !important;
   text-decoration: underline;
 }
