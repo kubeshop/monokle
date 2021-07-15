@@ -66,21 +66,30 @@ export function selectResourceFileEntry(resource: K8sResource, fileMap: FileMapT
 }
 
 /**
+ * Updates highlighted file, based on the selected resource
+ */
+const updateFileHighlight = (fileMap: FileMapType, selectedResource: K8sResource) => {
+  Object.entries(fileMap).forEach(([filePath, file]) => {
+    file.highlight = filePath === selectedResource.filePath;
+  });
+};
+
+/**
  * Ensures the correct resources are selected/highlighted when selecting the
  * specified resource
  */
-
 export function updateSelectionAndHighlights(state: AppState, resource: K8sResource) {
   clearResourceSelections(state.resourceMap, resource.id);
   if (!state.previewResource) {
     clearFileSelections(state.fileMap);
   }
   state.selectedResource = undefined;
-
   if (resource.selected) {
     resource.selected = false;
   } else {
     resource.selected = true;
+    updateFileHighlight(state.fileMap, resource);
+
     state.selectedResource = resource.id;
     if (isFileResource(resource)) {
       state.selectedPath = selectResourceFileEntry(resource, state.fileMap);
