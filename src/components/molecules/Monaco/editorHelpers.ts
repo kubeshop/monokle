@@ -11,11 +11,6 @@ import {
   getInlineDecorationOptions,
 } from './editorConstants';
 
-type Line = {
-  content: string;
-  index: number;
-};
-
 export function clearDecorations(editor: monaco.editor.IStandaloneCodeEditor, idsOfDecorations: string[]) {
   editor.deltaDecorations(idsOfDecorations, []);
 }
@@ -66,35 +61,39 @@ export function createCommandMarkdownLink(
 
 export function createHoverProvider(range: monaco.IRange, contents: monaco.IMarkdownString[]) {
   const hoverDisposable: monaco.IDisposable = monaco.languages.registerHoverProvider('yaml', {
-    provideHover: () => {
-      return {
-        range,
-        contents,
-      };
+    provideHover: (model: monaco.editor.ITextModel, position: monaco.Position) => {
+      if (
+        position.lineNumber >= range.startLineNumber &&
+        position.lineNumber <= range.endLineNumber &&
+        position.column >= range.startColumn &&
+        position.column <= range.endColumn
+      ) {
+        return {
+          range,
+          contents,
+        };
+      }
+      return null;
     },
   });
   return hoverDisposable;
 }
 
-export function getLine(editor: monaco.editor.IStandaloneCodeEditor, target: string): Line | null {
-  const model = editor.getModel();
-  if (!model) {
-    return null;
-  }
-  for (let index = 1; index <= model.getLineCount(); index += 1) {
-    const content = model.getLineContent(index);
-    if (content.includes(target)) {
-      return {index, content};
-    }
-  }
-  return null;
-}
-
-export function getRangeForTarget(line: Line, target: string) {
-  let columnStart = line.content.indexOf(target);
-  if (columnStart === -1) {
-    return null;
-  }
-  columnStart += 1; // ranges use 1-based indexing
-  return new monaco.Range(line.index, columnStart, line.index, columnStart + target.length);
+export function createLinkProvider(range: monaco.IRange, handler: () => void) {
+  const linkDisposable: monaco.IDisposable = monaco.languages.registerLinkProvider('yaml', {
+    provideLinks: () => {
+      return {
+        links: [
+          {
+            range,
+          },
+        ],
+      };
+    },
+    resolveLink: (link: monaco.languages.ILink) => {
+      handler();
+      return {range: link.range};
+    },
+  });
+  return linkDisposable;
 }
