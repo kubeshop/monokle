@@ -8,17 +8,20 @@ export type IconMonokleProps = {
 };
 
 const StyledImage = styled.img`
-  height: 20px;
-  padding: 0px;
+  height: 40px;
+  padding: 5px;
   margin: 0px;
+  margin-top: 2px;
 `;
 
 const IconMonokle = (props: IconMonokleProps) => {
   const {useDarkTheme} = props;
 
-  return (<>
-    <StyledImage src={useDarkTheme ? MonokleLogoDark : MonokleLogoLight} alt="Monokle" />
-  </>);
+  return (
+    <>
+      <StyledImage src={useDarkTheme ? MonokleLogoDark : MonokleLogoLight} alt="Monokle" />
+    </>
+  );
 };
 
 export default IconMonokle;

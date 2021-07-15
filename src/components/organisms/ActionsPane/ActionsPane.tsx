@@ -10,12 +10,7 @@ import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
 import TabHeader from '@atoms/TabHeader';
-import {
-  MonoButton,
-  PaneContainer,
-  MonoPaneTitle,
-  MonoPaneTitleCol,
-} from '@atoms';
+import {MonoButton, PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 
 const {TabPane} = Tabs;
 
@@ -23,12 +18,9 @@ const StyledTabs = styled(Tabs)`
   & .ant-tabs-nav {
     padding: 0 16px;
   }
-;
-
   & .ant-tabs-nav::before {
     border-bottom: 1px solid #363636;
   }
-;
 `;
 
 const ActionsPane = (props: {actionHeight: string}) => {
@@ -37,11 +29,12 @@ const ActionsPane = (props: {actionHeight: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const dispatch = useAppDispatch();
+  const kubeconfig = useAppSelector(state => state.config.kubeconfig);
   const [key, setKey] = useState('source');
 
   async function applySelectedResource() {
     if (selectedResource) {
-      applyResource(selectedResource, resourceMap, fileMap, dispatch);
+      applyResource(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
     }
   }
 
@@ -58,10 +51,16 @@ const ActionsPane = (props: {actionHeight: string}) => {
   }, [selectedResource, key]);
 
   const OperationsSlot = {
-    right: <Space>
-      <MonoButton onClick={applySelectedResource} disabled={!selectedResource} type='primary'>Apply</MonoButton>
-      <MonoButton onClick={diffSelectedResource} disabled={!selectedResource} type='primary'>Diff</MonoButton>
-    </Space>,
+    right: (
+      <Space>
+        <MonoButton onClick={applySelectedResource} disabled={!selectedResource} type="primary">
+          Apply
+        </MonoButton>
+        <MonoButton onClick={diffSelectedResource} disabled={!selectedResource} type="primary">
+          Diff
+        </MonoButton>
+      </Space>
+    ),
   };
 
   return (
@@ -74,20 +73,22 @@ const ActionsPane = (props: {actionHeight: string}) => {
       <Row>
         <Col span={24}>
           <StyledTabs
-            defaultActiveKey='source'
+            defaultActiveKey="source"
             activeKey={key}
             onChange={k => setKey(k)}
             tabBarExtraContent={OperationsSlot}
           >
-            <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key='source'>
+            <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
               <Monaco editorHeight={actionHeight} />
             </TabPane>
-            <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
-                     disabled={!selectedResource}
-                     key='form'>
+            <TabPane
+              tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
+              disabled={!selectedResource}
+              key="form"
+            >
               <FormEditor />
             </TabPane>
-            <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key='graph'>
+            <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key="graph">
               <GraphView editorHeight={actionHeight} />
             </TabPane>
 
