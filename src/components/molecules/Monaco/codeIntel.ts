@@ -8,12 +8,108 @@ import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
 
 import {
   createCommandMarkdownLink,
+  createCompletionProvider,
   createGlyphDecoration,
   createInlineDecoration,
   createHoverProvider,
   createMarkdownString,
   createLinkProvider,
+  getSymbolsBeforePosition,
 } from './editorHelpers';
+
+type SymbolsToResourceKindMatcher = {
+  resourceKind: string;
+  symbolsCount: number; // the number of symbols required by isMatch (from the end of symbols array)
+  isMatch(symbols: monaco.languages.DocumentSymbol[]): boolean;
+};
+
+const SymbolsToResourceKindMatchers: SymbolsToResourceKindMatcher[] = [
+  {
+    resourceKind: 'ConfigMap',
+    symbolsCount: 2,
+    isMatch(symbols) {
+      return ['configMap', 'configMapRef', 'configMapKeyRef'].includes(symbols[0].name) && symbols[1].name === 'name';
+    },
+  },
+  {
+    resourceKind: 'Secret',
+    symbolsCount: 2,
+    isMatch(symbols) {
+      if (symbols[1].name === 'imagePullSecrets') {
+        return true;
+      }
+      if (symbols[0].name === 'secretKeyRef' && symbols[1].name === 'name') {
+        return true;
+      }
+      if (symbols[0].name === 'secret' && symbols[1].name === 'secretName') {
+        return true;
+      }
+      return false;
+    },
+  },
+  {
+    resourceKind: 'ServiceAccount',
+    symbolsCount: 1,
+    isMatch(symbols) {
+      return symbols[0].name === 'serviceAccountName';
+    },
+  },
+];
+
+const getResourceKindFromSymbols = (symbols: monaco.languages.DocumentSymbol[]) => {
+  for (let i = 0; i < SymbolsToResourceKindMatchers.length; i += 1) {
+    const matcher = SymbolsToResourceKindMatchers[i];
+    if (matcher.symbolsCount > 0 && symbols.length >= matcher.symbolsCount) {
+      const requiredSymbols = symbols.slice(-matcher.symbolsCount);
+      if (matcher.isMatch(requiredSymbols)) {
+        return matcher.resourceKind;
+      }
+    }
+  }
+  return null;
+};
+
+function createSuggestionsForResourceKind(
+  resourceMap: ResourceMapType,
+  resourceKind: string,
+  range: monaco.IRange,
+  triggerCharacter: string | undefined
+) {
+  const suggestions: monaco.languages.CompletionItem[] = [];
+  Object.values(resourceMap).forEach((resource: K8sResource) => {
+    if (resource.kind === resourceKind) {
+      suggestions.push({
+        label: resource.name,
+        kind: monaco.languages.CompletionItemKind.Reference,
+        insertText: triggerCharacter === ' ' ? resource.name : ` ${resource.name}`,
+        range,
+      });
+    }
+  });
+  return suggestions;
+}
+
+export function applyAutocomplete(resourceMap: ResourceMapType) {
+  const newCompletionDisposable = createCompletionProvider({
+    triggerCharacters: [':', '-', ' '],
+    provideCompletionItems: async (model, position, context) => {
+      const symbols = await getSymbolsBeforePosition(model, position);
+      const resourceKind = getResourceKindFromSymbols(symbols);
+      if (resourceKind) {
+        return {
+          suggestions: createSuggestionsForResourceKind(
+            resourceMap,
+            resourceKind,
+            new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
+            context.triggerCharacter
+          ),
+        };
+      }
+      return null;
+    },
+  });
+  return newCompletionDisposable;
+}
 
 function areRefPosEqual(a: RefPosition, b: RefPosition) {
   return a.line === b.line && a.column === b.column && a.length === b.length;
@@ -120,4 +216,5 @@ export function applyForResource(
 
 export default {
   applyForResource,
+  applyAutocomplete,
 };

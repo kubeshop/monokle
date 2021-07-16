@@ -4,6 +4,9 @@ import {v4 as uuidv4} from 'uuid';
 // @ts-ignore
 import {CommandsRegistry} from 'monaco-editor/esm/vs/platform/commands/common/commands';
 
+// @ts-ignore
+import {getDocumentSymbols} from 'monaco-editor/esm/vs/editor/contrib/documentSymbols/documentSymbols';
+
 import {
   GlyphDecorationTypes,
   InlineDecorationTypes,
@@ -96,4 +99,41 @@ export function createLinkProvider(range: monaco.IRange, handler: () => void) {
     },
   });
   return linkDisposable;
+}
+
+const flattenSymbols = (symbols: monaco.languages.DocumentSymbol[]) => {
+  const result: monaco.languages.DocumentSymbol[] = [];
+  symbols.forEach(currentSymbol => {
+    result.push(currentSymbol);
+    if (currentSymbol.children && currentSymbol.children.length > 0) {
+      const flatChildrenSymbols = flattenSymbols(currentSymbol.children);
+      result.push(...flatChildrenSymbols);
+    }
+  });
+  return result;
+};
+
+const isPositionAfterRange = (position: monaco.IPosition, range: monaco.IRange) => {
+  return position.column > range.startColumn && position.lineNumber >= range.startLineNumber;
+};
+
+const getSymbols = async (model: monaco.editor.IModel) => {
+  const symbols = await getDocumentSymbols(model, false, {
+    isCancellationRequested: false,
+    onCancellationRequested: () => {
+      return {
+        dispose() {},
+      };
+    },
+  });
+  return symbols;
+};
+
+export const getSymbolsBeforePosition = async (model: monaco.editor.IModel, position: monaco.IPosition) => {
+  const symbols = await getSymbols(model);
+  return flattenSymbols(symbols).filter(symbol => isPositionAfterRange(position, symbol.range));
+};
+
+export function createCompletionProvider(provider: monaco.languages.CompletionItemProvider) {
+  return monaco.languages.registerCompletionItemProvider('yaml', provider);
 }

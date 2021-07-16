@@ -64,6 +64,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const [currentHoverDisposables, setCurrentHoverDisposables] = useState<monaco.IDisposable[]>([]);
   const [currentCommandDisposables, setCurrentCommandDisposables] = useState<monaco.IDisposable[]>([]);
   const [currentLinkDisposables, setCurrentLinkDisposables] = useState<monaco.IDisposable[]>([]);
+  const [currentCompletionDisposable, setCurrentCompletionDisposable] = useState<monaco.IDisposable>();
 
   const isInPreviewMode = Boolean(useAppSelector(state => state.main.previewResource));
   const dispatch = useAppDispatch();
@@ -199,7 +200,14 @@ const Monaco = (props: {editorHeight: string}) => {
           },
         ],
       });
-  }, [selectedResource, resourceMap]);
+    if (currentCompletionDisposable) {
+      currentCompletionDisposable.dispose();
+    }
+    if (editor) {
+      const newCompletionDisposable = codeIntel.applyAutocomplete(resourceMap);
+      setCurrentCompletionDisposable(newCompletionDisposable);
+    }
+  }, [selectedResource, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (editor) {
