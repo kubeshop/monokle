@@ -1,10 +1,9 @@
 import {Tabs, Space, Col, Row} from 'antd';
 import styled from 'styled-components';
-import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
+import {CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
-import GraphView from '@molecules/GraphView';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
@@ -64,6 +63,8 @@ const ActionsPane = (props: {actionHeight: string}) => {
     </Space>,
   };
 
+  const resource = selectedResource && resourceMap ? resourceMap[selectedResource] : undefined;
+
   return (
     <PaneContainer>
       <Row>
@@ -82,16 +83,19 @@ const ActionsPane = (props: {actionHeight: string}) => {
             <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key='source'>
               <Monaco editorHeight={actionHeight} />
             </TabPane>
+
+            {resource?.kind === 'ConfigMap' &&
             <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
                      disabled={!selectedResource}
                      key='form'>
               <FormEditor />
             </TabPane>
-            <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key='graph'>
+            }
+            {/* <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph (alpha)</TabHeader>} key='graph'>
               <GraphView editorHeight={actionHeight} />
             </TabPane>
 
-            {/* <Tab eventKey="logger" title="Logger">
+             <Tab eventKey="logger" title="Logger">
               <LogViewer editorHeight={actionHeight} />
             </Tab> */}
           </StyledTabs>
