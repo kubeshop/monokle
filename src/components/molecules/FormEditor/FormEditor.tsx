@@ -10,6 +10,7 @@ import {logMessage} from '@redux/utils/log';
 import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
 import log from 'loglevel';
+import styled from 'styled-components';
 
 const Form = withTheme(AntDTheme);
 
@@ -20,6 +21,14 @@ function getFormSchema(kind: string) {
 function getUiSchema(kind: string) {
   return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`));
 }
+
+const FormContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  margin: 0px;
+  margin-bottom: 20px;
+`;
 
 const FormEditor = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -48,6 +57,9 @@ const FormEditor = () => {
     let formString = stringify(data.formData);
     try {
       if (resource) {
+        log.info(resource.text);
+        log.info(formString);
+
         const content = mergeManifests(resource.text, formString);
         dispatch(updateResource({resourceId: selectedResource, content}));
       }
@@ -68,13 +80,15 @@ const FormEditor = () => {
 
   return (
     // @ts-ignore
-    <Form
-      schema={schema}
-      uiSchema={uiSchema}
-      formData={formData}
-      onChange={onFormUpdate}
-      onSubmit={onFormSubmit}
-    />
+    <FormContainer>
+      <Form
+        schema={schema}
+        uiSchema={uiSchema}
+        formData={formData}
+        onChange={onFormUpdate}
+        onSubmit={onFormSubmit}
+      />
+    </FormContainer>
   );
 };
 

@@ -1,4 +1,4 @@
-import {Document, isPair, isSeq, ParsedNode, parseDocument, visit} from 'yaml';
+import {Document, isMap, isPair, isSeq, ParsedNode, parseDocument, visit} from 'yaml';
 
 /**
  * Function to merge the values of one yaml file into an existing one - maintaining
@@ -37,6 +37,17 @@ export function mergeManifests(template: string, values: string) {
 
   pathsToRemove.forEach(path => {
     templateDoc.deleteIn(path);
+
+    // delete any empty maps left by the deleted node
+    while (path.length > 0) {
+      path = path.slice(0, path.length - 1);
+      let node = templateDoc.getIn(path);
+      if (isMap(node) && node.items.length === 0) {
+        templateDoc.deleteIn(path);
+      } else {
+        break;
+      }
+    }
   });
 
   // now add missing values to template doc

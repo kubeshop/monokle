@@ -131,3 +131,31 @@ data:
   const result = mergeManifests(orgYaml, newYaml);
   expect(result).toBe(expectedYaml);
 });
+
+test('manifest-merge-value-removed2', () => {
+  const orgYaml = `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentcom-config
+  labels:
+    newKey: New Value
+immutable: true`;
+
+  const newYaml = `binaryData: {}
+metadata:
+  annotations: {}
+  labels: {}
+  name: agentcom-config
+apiVersion: v1
+kind: ConfigMap
+immutable: true`;
+
+  const expectedYaml = `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentcom-config
+immutable: true`;
+
+  const result = mergeManifests(orgYaml, newYaml);
+  expect(result).toBe(expectedYaml);
+});
