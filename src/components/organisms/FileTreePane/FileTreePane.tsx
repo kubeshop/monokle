@@ -8,17 +8,15 @@ import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY} from '@src/constants';
+
 import {FolderAddOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
-import {PROCESS_ENV} from '@actions/common/apply';
+
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import fs from 'fs';
 import {previewCluster, setRootFolder} from '@redux/reducers/thunks';
 import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
-import {
-  MonoPaneTitle,
-  MonoPaneTitleCol,
-} from '@atoms';
+import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 
@@ -58,33 +56,33 @@ const NodeActionsContainer = styled.div`
   top: 0;
 `;
 
-const createNode = (
-  fileEntry: FileEntry,
-  fileMap: FileMapType,
-  resourceMap: ResourceMapType
-  ) => {
+const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
   const node: TreeNode = {
     key: fileEntry.filePath,
-    title: <NodeContainer>
-      <NodeTitleContainer>
-        {fileEntry.name}
-        {resources.length > 0 ? <StyledNumberOfResources type="secondary">{resources.length}</StyledNumberOfResources> : ''}
-      </NodeTitleContainer>
-      <NodeActionsContainer>
-        {fileEntry.excluded && <EyeInvisibleOutlined />}
-      </NodeActionsContainer>
-    </NodeContainer>,
+    title: (
+      <NodeContainer>
+        <NodeTitleContainer>
+          {fileEntry.name}
+          {resources.length > 0 ? (
+            <StyledNumberOfResources type='secondary'>{resources.length}</StyledNumberOfResources>
+          ) : (
+            ''
+          )}
+        </NodeTitleContainer>
+        <NodeActionsContainer>{fileEntry.excluded && <EyeInvisibleOutlined />}</NodeActionsContainer>
+      </NodeContainer>
+    ),
     children: [],
-    highlight: fileEntry.highlight
+    highlight: fileEntry.highlight,
   };
 
   if (fileEntry.children) {
     node.children = fileEntry.children
-      .map((child) => fileMap[getChildFilePath(child, fileEntry, fileMap)])
-      .filter((childEntry) => childEntry)
-      .map((childEntry) => createNode(childEntry, fileMap, resourceMap));
+      .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
+      .filter(childEntry => childEntry)
+      .map(childEntry => createNode(childEntry, fileMap, resourceMap));
   } else {
     node.isLeaf = true;
   }
@@ -130,7 +128,8 @@ const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
   & .ant-tree {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
     font-size: 12px;
     font-style: normal;
@@ -142,13 +141,13 @@ const FileTreeContainer = styled.div`
     background: ${Colors.selectionGradient} !important;
   }
   & .ant-tree-treenode-selected::before {
-    background: ${Colors.selectionGradient}  !important;
+    background: ${Colors.selectionGradient} !important;
   }
   & .ant-tree-treenode {
     background: transparent;
   }
   & .ant-tree-treenode::selection {
-    background: ${Colors.selectionGradient}  !important;
+    background: ${Colors.selectionGradient} !important;
   }
   & .filter-node {
     font-style: italic;
@@ -193,6 +192,7 @@ const FileTreePane = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const kubeconfig = useAppSelector(state => state.config.kubeconfig);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
 
   // eslint-disable-next-line no-undef
@@ -216,7 +216,7 @@ const FileTreePane = () => {
   }, [fileMap, resourceMap]);
 
   const connectToCluster = () => {
-    dispatch(previewCluster(PROCESS_ENV.KUBECONFIG));
+    dispatch(previewCluster(kubeconfig));
   };
 
   const startFileUploader = () => {
@@ -243,18 +243,14 @@ const FileTreePane = () => {
         <ColumnWithPadding span={24}>
           <Space direction="horizontal">
             <Button
-              type="primary"
+              type='primary'
               ghost
-              disabled={previewMode && previewResource !== PROCESS_ENV.KUBECONFIG}
+              disabled={previewMode && previewResource !== kubeconfig}
               onClick={connectToCluster}
             >
               Cluster Objects
             </Button>
-            <Button
-              type="primary"
-              ghost
-              onClick={startFileUploader}
-            >
+            <Button type='primary' ghost onClick={startFileUploader}>
               <CenteredItemsDiv>
                 <FolderAddOutlined style={{marginRight: '3px'}} />
                 Browse
@@ -267,25 +263,29 @@ const FileTreePane = () => {
         </ColumnWithPadding>
       </Row>
       <input
-        type="file"
+        type='file'
         /* @ts-expect-error */
-        directory=""
-        webkitdirectory=""
+        directory=''
+        webkitdirectory=''
         onChange={onUploadHandler}
         ref={folderInput}
         style={{display: 'none'}}
         disabled={previewMode}
       />
-      {tree ? <Tree.DirectoryTree
-        onSelect={onSelect}
-        defaultExpandAll
-        treeData={[tree]}
-        selectedKeys={[selectedPath || '-']}
-        filterTreeNode={(node) => {
-          // @ts-ignore
-          return node.highlight;
-        }}
-      /> : <NoFilesContainer>No folder selected.</NoFilesContainer>}
+      {tree ? (
+        <Tree.DirectoryTree
+          onSelect={onSelect}
+          defaultExpandAll
+          treeData={[tree]}
+          selectedKeys={[selectedPath || '-']}
+          filterTreeNode={node => {
+            // @ts-ignore
+            return node.highlight;
+          }}
+        />
+      ) : (
+        <NoFilesContainer>No folder selected.</NoFilesContainer>
+      )}
     </FileTreeContainer>
   );
 };

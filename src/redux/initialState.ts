@@ -1,14 +1,20 @@
 import {AppState} from '@models/appstate';
 
+import electronStore from '@utils/electronStore';
+
 export const initialState: AppState = {
   appConfig: {
+    kubeconfig: electronStore.get('appConfig.kubeconfig'),
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,
       helmPreviewMode: 'template',
+      theme: electronStore.get('appConfig.settings.theme'),
+      textSize: electronStore.get('appConfig.settings.textSize'),
+      language: electronStore.get('appConfig.settings.language'),
     },
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube'],
-    fileIncludes: ['*.yaml', '*.yml'],
+    scanExcludes: electronStore.get('appConfig.scanExcludes'),
+    fileIncludes: electronStore.get('appConfig.fileIncludes'),
     navigators: [
       {
         name: 'K8s Resources',

@@ -18,7 +18,7 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/utils/schema';
 import {logMessage} from '@redux/utils/log';
-import {updateFileEntry, updateResource} from '@redux/reducers/main';
+import {updateFileEntry, updateResource, selectK8sResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
@@ -63,9 +63,15 @@ const Monaco = (props: {editorHeight: string}) => {
   const [currentIdsOfDecorations, setCurrentIdsOfDecorations] = useState<string[]>([]);
   const [currentHoverDisposables, setCurrentHoverDisposables] = useState<monaco.IDisposable[]>([]);
   const [currentCommandDisposables, setCurrentCommandDisposables] = useState<monaco.IDisposable[]>([]);
+  const [currentLinkDisposables, setCurrentLinkDisposables] = useState<monaco.IDisposable[]>([]);
+  const [currentCompletionDisposable, setCurrentCompletionDisposable] = useState<monaco.IDisposable>();
 
   const isInPreviewMode = Boolean(useAppSelector(state => state.main.previewResource));
   const dispatch = useAppDispatch();
+
+  const selectResource = (resourceId: string) => {
+    dispatch(selectK8sResource(resourceId));
+  };
 
   function onDidChangeMarkers(e: monaco.Uri[]) {
     const flag = monaco.editor.getModelMarkers({}).length > 0;
@@ -146,20 +152,20 @@ const Monaco = (props: {editorHeight: string}) => {
       clearDecorations(editor, currentIdsOfDecorations);
       currentHoverDisposables.forEach(hoverDisposable => hoverDisposable.dispose());
       currentCommandDisposables.forEach(commandDisposable => commandDisposable.dispose());
+      currentLinkDisposables.forEach(linkDisposable => linkDisposable.dispose());
     }
   };
 
   const applyCodeIntel = () => {
     if (editor && selectedResource && resourceMap[selectedResource]) {
-      const {newDecorations, newHoverDisposables, newCommandDisposables} = codeIntel.handleUnsatisfiedRefs(
-        editor,
-        resourceMap,
-        selectedResource,
-      );
+      const resource = resourceMap[selectedResource];
+      const {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables} =
+        codeIntel.applyForResource(resource, selectResource, resourceMap);
       const idsOfNewDecorations = setDecorations(editor, newDecorations);
       setCurrentIdsOfDecorations(idsOfNewDecorations);
       setCurrentHoverDisposables(newHoverDisposables);
       setCurrentCommandDisposables(newCommandDisposables);
+      setCurrentLinkDisposables(newLinkDisposables);
     }
   };
 
@@ -194,7 +200,14 @@ const Monaco = (props: {editorHeight: string}) => {
           },
         ],
       });
-  }, [selectedResource, resourceMap]);
+    if (currentCompletionDisposable) {
+      currentCompletionDisposable.dispose();
+    }
+    if (editor) {
+      const newCompletionDisposable = codeIntel.applyAutocomplete(resourceMap);
+      setCurrentCompletionDisposable(newCompletionDisposable);
+    }
+  }, [selectedResource, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (editor) {

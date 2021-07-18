@@ -35,14 +35,13 @@ const FormEditor = () => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const [formData, setFormData] = React.useState(null);
   const dispatch = useAppDispatch();
-
   const resource = resourceMap && selectedResource ? resourceMap[selectedResource] : undefined;
 
   useEffect(() => {
     if (resource) {
       setFormData(parse(resource.text));
     }
-  }, [resourceMap, selectedResource]);
+  }, [resource]);
 
   if (!selectedResource) {
     return (<div>Nothing selected...</div>);

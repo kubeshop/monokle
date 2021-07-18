@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 
+const ElectronStore = require('electron-store');
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
@@ -63,6 +65,7 @@ app.whenReady().then(() => {
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
+      ElectronStore.initRenderer();
       createWindow();
     }
   });
