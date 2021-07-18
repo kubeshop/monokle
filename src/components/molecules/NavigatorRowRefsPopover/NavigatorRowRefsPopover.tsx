@@ -162,7 +162,7 @@ const NavigatorRowRefsPopover = (props: NavigatorRowRefsPopoverProps) => {
       </PopoverTitle>
       <StyledDivider />
       {currentRefs?.map(ref => (
-        <StyledRefDiv>{getLinkByRef(ref)}</StyledRefDiv>
+        <StyledRefDiv key={ref.refName}>{getLinkByRef(ref)}</StyledRefDiv>
       ))}
     </>
   );
