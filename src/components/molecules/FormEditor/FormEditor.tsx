@@ -48,7 +48,6 @@ const FormEditor = () => {
   }
 
   const onFormUpdate = (e: any) => {
-    // console.log( e.formData );
     setFormData(e.formData);
   };
 
@@ -56,9 +55,6 @@ const FormEditor = () => {
     let formString = stringify(data.formData);
     try {
       if (resource) {
-        log.info(resource.text);
-        log.info(formString);
-
         const content = mergeManifests(resource.text, formString);
         dispatch(updateResource({resourceId: selectedResource, content}));
       }
