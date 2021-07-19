@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-import NavigatorRowRefsPopover, {RefsPopoverType} from '@molecules/NavigatorRowRefsPopover';
+import NavigatorRowLabel from '@molecules/NavigatorRowLabel';
 
 export type NavigatorResourceRowProps = {
   rowKey: React.Key;
@@ -62,10 +62,6 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
-const StyledSpan = styled.span`
-  cursor: pointer;
-`;
-
 const NavigatorResourceRow = (props: NavigatorResourceRowProps) => {
   const {
     rowKey,
@@ -89,11 +85,14 @@ const NavigatorResourceRow = (props: NavigatorResourceRowProps) => {
         <ItemRow key={rowKey}>
           <SectionCol sm={22}>
             <div className={classname}>
-              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Incoming} />
-              <StyledSpan onClick={onClickResource} style={!hasIncomingRefs ? {marginLeft: 19} : {}}>
-                {label}
-              </StyledSpan>
-              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Outgoing} />
+              <NavigatorRowLabel
+                label={label}
+                resourceId={rowKey.toString()}
+                hasIncomingRefs={hasIncomingRefs}
+                hasOutgoingRefs={hasOutgoingRefs}
+                hasUnsatisfiedRefs={hasUnsatisfiedRefs}
+                onClickLabel={onClickResource}
+              />
             </div>
           </SectionCol>
         </ItemRow>
