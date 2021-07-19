@@ -184,12 +184,17 @@ export const mainSlice = createSlice({
         selectFilePath(action.payload, state);
       }
     },
+    clearPreview: (state: Draft<AppState>) => {
+      setPreviewData({}, state);
+      state.previewType = undefined;
+    },
   },
   extraReducers: builder => {
     builder
       .addCase(previewKustomization.pending, (state, action) => {
         state.previewLoader.isLoading = true;
         state.previewLoader.targetResourceId = action.meta.arg;
+        state.previewType = 'kustomization';
       })
       .addCase(previewKustomization.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
@@ -205,6 +210,7 @@ export const mainSlice = createSlice({
       .addCase(previewHelmValuesFile.pending, (state, action) => {
         state.previewLoader.isLoading = true;
         state.previewLoader.targetResourceId = action.meta.arg;
+        state.previewType = 'helm';
       })
       .addCase(previewHelmValuesFile.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
@@ -221,6 +227,7 @@ export const mainSlice = createSlice({
       .addCase(previewCluster.pending, (state, action) => {
         state.previewLoader.isLoading = true;
         state.previewLoader.targetResourceId = action.meta.arg;
+        state.previewType = 'cluster';
       })
       .addCase(previewCluster.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
@@ -258,12 +265,22 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
   state.previewValuesFile = undefined;
 
   if (payload.previewResourceId) {
-    if (state.helmValuesMap[payload.previewResourceId]) {
-      state.previewValuesFile = payload.previewResourceId;
-    } else if (state.resourceMap[payload.previewResourceId]) {
+    if (state.previewType === 'kustomization') {
+      if (state.resourceMap[payload.previewResourceId]) {
+        state.previewResource = payload.previewResourceId;
+      } else {
+        log.error(`Unknown preview id: ${payload.previewResourceId}`);
+      }
+    }
+    if (state.previewType === 'helm') {
+      if (state.helmValuesMap[payload.previewResourceId]) {
+        state.previewValuesFile = payload.previewResourceId;
+      } else {
+        log.error(`Unknown preview id: ${payload.previewResourceId}`);
+      }
+    }
+    if (state.previewType === 'cluster') {
       state.previewResource = payload.previewResourceId;
-    } else {
-      log.error(`Unknown preview id: ${payload.previewResourceId}`);
     }
   }
 
@@ -318,5 +335,6 @@ export const {
   fileChanged,
   pathRemoved,
   selectHelmValuesFile,
+  clearPreview,
 } = mainSlice.actions;
 export default mainSlice.reducer;

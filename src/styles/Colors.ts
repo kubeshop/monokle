@@ -21,17 +21,22 @@ enum Colors {
   whitePure = '#ffffff',
   blackPure = '#000000',
 
+  cyan = '#58D1C9',
+  volcano = '#F3956A',
+
   monoBlue = '#1890FF', // Daybreak Blue / blue-6
   highlightGreen = '#33BCB7',
 
   selectionGradient = 'linear-gradient(90deg, #3C9AE8 0%, #84E2D8 100%)',
   highlightGradient = 'linear-gradient(90deg, #113536 0%, #000000 100%)',
-};
+}
 
 export enum BackgroundColors {
   lightThemeBackground = Colors.whitePure,
   darkThemeBackground = Colors.blackPure,
-};
+  previewModeBackground = Colors.cyan,
+  clusterModeBackground = Colors.volcano,
+}
 
 export enum FontColors {
   lightThemeMainFont = Colors.blackPure,
@@ -42,6 +47,6 @@ export enum FontColors {
   error = Colors.redError,
   afford = Colors.greenOkay,
   warning = Colors.yellowWarning,
-};
+}
 
 export default Colors;

@@ -5,7 +5,7 @@ import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
 import {FontColors} from '@styles/Colors';
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectK8sResource, clearPreview} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
 import {setFilterObjects} from '@redux/reducers/appConfig';
@@ -82,7 +82,11 @@ const NavigatorPane = () => {
     if (id !== selectedResource) {
       dispatch(selectK8sResource(id));
     }
-    dispatch(previewKustomization(id));
+    if (id !== previewResource) {
+      dispatch(previewKustomization(id));
+    } else {
+      dispatch(clearPreview());
+    }
   };
 
   function shouldBeVisible(item: K8sResource, subsection: NavigatorSubSection) {

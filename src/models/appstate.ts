@@ -31,6 +31,7 @@ interface AppState {
   resourceMap: ResourceMapType; // maps resource ids to resources
   selectedResource?: string; // the id of the currently selected resource
   selectedPath?: string; // the currently selected path
+  previewType?: 'kustomization' | 'cluster' | 'helm';
   previewResource?: string; // the resource currently being previewed
   previewLoader: {
     isLoading: boolean;
