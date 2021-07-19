@@ -185,44 +185,67 @@ export const mainSlice = createSlice({
       }
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(
-      previewKustomization.fulfilled, (state, action) => {
+  extraReducers: builder => {
+    builder
+      .addCase(previewKustomization.pending, (state, action) => {
+        state.previewLoader.isLoading = true;
+        state.previewLoader.targetResourceId = action.meta.arg;
+      })
+      .addCase(previewKustomization.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
+      })
+      .addCase(previewKustomization.rejected, state => {
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
       });
 
-    builder.addCase(
-      previewHelmValuesFile.fulfilled, (state, action) => {
+    builder
+      .addCase(previewHelmValuesFile.pending, (state, action) => {
+        state.previewLoader.isLoading = true;
+        state.previewLoader.targetResourceId = action.meta.arg;
+      })
+      .addCase(previewHelmValuesFile.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
-      });
-
-    builder.addCase(
-      previewHelmValuesFile.rejected, (state, action) => {
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
+      })
+      .addCase(previewHelmValuesFile.rejected, (state, action) => {
         log.error(action.error.message);
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
       });
 
-    builder.addCase(
-      previewCluster.fulfilled, (state, action) => {
+    builder
+      .addCase(previewCluster.pending, (state, action) => {
+        state.previewLoader.isLoading = true;
+        state.previewLoader.targetResourceId = action.meta.arg;
+      })
+      .addCase(previewCluster.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
+      })
+      .addCase(previewCluster.rejected, state => {
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
       });
 
-    builder.addCase(
-      setRootFolder.fulfilled, (state, action) => {
-        state.resourceMap = action.payload.resourceMap;
-        state.fileMap = action.payload.fileMap;
-        state.helmChartMap = action.payload.helmChartMap;
-        state.helmValuesMap = action.payload.helmValuesMap;
-        state.selectedResource = undefined;
-        state.selectedPath = undefined;
-        state.previewResource = undefined;
-      });
+    builder.addCase(setRootFolder.fulfilled, (state, action) => {
+      state.resourceMap = action.payload.resourceMap;
+      state.fileMap = action.payload.fileMap;
+      state.helmChartMap = action.payload.helmChartMap;
+      state.helmValuesMap = action.payload.helmValuesMap;
+      state.selectedResource = undefined;
+      state.selectedPath = undefined;
+      state.previewResource = undefined;
+    });
 
-    builder.addCase(
-      diffResource.fulfilled, (state, action) => {
-        state.diffResource = action.payload.diffResourceId;
-        state.diffContent = action.payload.diffContent;
-      },
-    );
+    builder.addCase(diffResource.fulfilled, (state, action) => {
+      state.diffResource = action.payload.diffResourceId;
+      state.diffContent = action.payload.diffContent;
+    });
   },
 });
 
@@ -287,8 +310,13 @@ function selectFilePath(filePath: string, state: AppState) {
 }
 
 export const {
-  selectK8sResource, selectFile, updateResource, updateFileEntry,
-  pathAdded, fileChanged, pathRemoved, selectHelmValuesFile,
-} =
-  mainSlice.actions;
+  selectK8sResource,
+  selectFile,
+  updateResource,
+  updateFileEntry,
+  pathAdded,
+  fileChanged,
+  pathRemoved,
+  selectHelmValuesFile,
+} = mainSlice.actions;
 export default mainSlice.reducer;

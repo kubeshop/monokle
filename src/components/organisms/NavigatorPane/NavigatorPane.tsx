@@ -60,6 +60,7 @@ const NavigatorPane = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const previewResource = useAppSelector(state => state.main.previewResource);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
   const appConfig = useAppSelector(state => state.config);
   const kustomizations = useSelector(selectKustomizations);
   const resources = useSelector(selectActiveResources);
@@ -116,15 +117,9 @@ const NavigatorPane = () => {
                 <MonoSectionTitle>Helm Charts</MonoSectionTitle>
               </MonoSectionHeaderCol>
             </SectionRow>
-            {Object.values(helmCharts)
-              .map((chart: HelmChart) => {
-                return (
-                  <NavigatorHelmRow
-                    rowKey={chart.id}
-                    helmChart={chart}
-                  />
-                );
-              })}
+            {Object.values(helmCharts).map((chart: HelmChart) => {
+              return <NavigatorHelmRow rowKey={chart.id} helmChart={chart} />;
+            })}
           </SectionCol>
         </SectionRow>
       )}
@@ -164,6 +159,7 @@ const NavigatorPane = () => {
                     hasOutgoingRefs={Boolean(hasOutgoingRefs(k))}
                     onClickResource={!previewResource ? () => selectResource(k.id) : undefined}
                     onClickPreview={() => selectPreview(k.id)}
+                    isPreviewLoading={previewLoader.isLoading && k.id === previewLoader.targetResourceId}
                   />
                 );
               })}

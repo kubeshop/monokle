@@ -67,4 +67,7 @@ export const initialState: AppState = {
   fileMap: {},
   helmChartMap: {},
   helmValuesMap: {},
+  previewLoader: {
+    isLoading: false,
+  },
 };

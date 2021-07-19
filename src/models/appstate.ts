@@ -19,11 +19,11 @@ type FileMapType = {
 
 type HelmChartMapType = {
   [id: string]: HelmChart;
-}
+};
 
 type HelmValuesMapType = {
   [id: string]: HelmValuesFile;
-}
+};
 
 interface AppState {
   fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
@@ -32,6 +32,10 @@ interface AppState {
   selectedResource?: string; // the id of the currently selected resource
   selectedPath?: string; // the currently selected path
   previewResource?: string; // the resource currently being previewed
+  previewLoader: {
+    isLoading: boolean;
+    targetResourceId?: string;
+  };
   diffResource?: string; // the resource currently being diffed
   diffContent?: string; // the diff content for the resource being diffed
   helmChartMap: HelmChartMapType; // maps chart ids to helm charts
