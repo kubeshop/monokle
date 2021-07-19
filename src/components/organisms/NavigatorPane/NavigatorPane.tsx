@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Col, Row, Select} from 'antd';
+import {Col, Row, Select, Skeleton} from 'antd';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
@@ -51,6 +51,11 @@ const SectionCol = styled(Col)`
   width: 100%;
   margin: 0;
   padding: 0;
+`;
+
+const StyledSkeleton = styled(Skeleton)`
+  margin: 20px;
+  width: 90%;
 `;
 
 const NavigatorPane = () => {
@@ -192,60 +197,64 @@ const NavigatorPane = () => {
         </Select>
       </SectionRow>
 
-      <SectionRow>
-        <SectionCol>
-          {appConfig.navigators.map(navigator => {
-            return (
-              <>
-                <SectionRow>
-                  <MonoSectionHeaderCol>
-                    <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
-                  </MonoSectionHeaderCol>
-                </SectionRow>
-                <SectionRow>
-                  <SectionCol>
-                    {navigator.sections.map(section => {
-                      return (
-                        <>
-                          {section.name.length > 0 && (
-                            <SectionRow>
-                              <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
+      {previewLoader.isLoading ? (
+        <StyledSkeleton />
+      ) : (
+        <SectionRow>
+          <SectionCol>
+            {appConfig.navigators.map(navigator => {
+              return (
+                <>
+                  <SectionRow>
+                    <MonoSectionHeaderCol>
+                      <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
+                    </MonoSectionHeaderCol>
+                  </SectionRow>
+                  <SectionRow>
+                    <SectionCol>
+                      {navigator.sections.map(section => {
+                        return (
+                          <>
+                            {section.name.length > 0 && (
+                              <SectionRow>
+                                <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
+                              </SectionRow>
+                            )}
+                            <SectionRow key={section.name}>
+                              {section.subsections.map(subsection => {
+                                const items = resources.filter(item => shouldBeVisible(item, subsection));
+                                return (
+                                  <SectionCol key={subsection.name}>
+                                    <NavigatorContentSubTitle>
+                                      {subsection.name} {items.length > 0 ? `(${items.length})` : ''}
+                                    </NavigatorContentSubTitle>
+                                    {items.map(item => (
+                                      <NavigatorResourceRow
+                                        rowKey={item.id}
+                                        label={item.name}
+                                        isSelected={Boolean(item.selected)}
+                                        highlighted={Boolean(item.highlight)}
+                                        hasIncomingRefs={Boolean(hasIncomingRefs(item))}
+                                        hasOutgoingRefs={Boolean(hasOutgoingRefs(item))}
+                                        hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
+                                        onClickResource={() => selectResource(item.id)}
+                                      />
+                                    ))}
+                                  </SectionCol>
+                                );
+                              })}
                             </SectionRow>
-                          )}
-                          <SectionRow key={section.name}>
-                            {section.subsections.map(subsection => {
-                              const items = resources.filter(item => shouldBeVisible(item, subsection));
-                              return (
-                                <SectionCol key={subsection.name}>
-                                  <NavigatorContentSubTitle>
-                                    {subsection.name} {items.length > 0 ? `(${items.length})` : ''}
-                                  </NavigatorContentSubTitle>
-                                  {items.map(item => (
-                                    <NavigatorResourceRow
-                                      rowKey={item.id}
-                                      label={item.name}
-                                      isSelected={Boolean(item.selected)}
-                                      highlighted={Boolean(item.highlight)}
-                                      hasIncomingRefs={Boolean(hasIncomingRefs(item))}
-                                      hasOutgoingRefs={Boolean(hasOutgoingRefs(item))}
-                                      hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
-                                      onClickResource={() => selectResource(item.id)}
-                                    />
-                                  ))}
-                                </SectionCol>
-                              );
-                            })}
-                          </SectionRow>
-                        </>
-                      );
-                    })}
-                  </SectionCol>
-                </SectionRow>
-              </>
-            );
-          })}
-        </SectionCol>
-      </SectionRow>
+                          </>
+                        );
+                      })}
+                    </SectionCol>
+                  </SectionRow>
+                </>
+              );
+            })}
+          </SectionCol>
+        </SectionRow>
+      )}
     </PaneContainer>
   );
 };
