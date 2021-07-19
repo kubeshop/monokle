@@ -6,7 +6,7 @@ import {EyeOutlined, EyeInvisibleOutlined, LoadingOutlined} from '@ant-design/ic
 import Colors, {FontColors} from '@styles/Colors';
 import {K8sResource} from '@models/k8sresource';
 
-import NavigatorRowRefsPopover, {RefsPopoverType} from '@molecules/NavigatorRowRefsPopover';
+import NavigatorRowLabel from '@molecules/NavigatorRowLabel';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 
@@ -69,10 +69,6 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
-const StyledSpan = styled.span`
-  cursor: pointer;
-`;
-
 const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
   const {
     rowKey,
@@ -100,11 +96,13 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
         <ItemRow key={rowKey}>
           <SectionCol sm={22}>
             <div className={classname}>
-              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Incoming} />
-              <StyledSpan onClick={onClickResource} style={!hasIncomingRefs ? {marginLeft: 19} : {}}>
-                {resource.name}
-              </StyledSpan>
-              <NavigatorRowRefsPopover resourceId={rowKey.toString()} type={RefsPopoverType.Outgoing} />
+              <NavigatorRowLabel
+                label={resource.name}
+                resourceId={rowKey.toString()}
+                hasIncomingRefs={hasIncomingRefs}
+                hasOutgoingRefs={hasOutgoingRefs}
+                onClickLabel={onClickResource}
+              />
             </div>
           </SectionCol>
           <SectionCol sm={2}>
