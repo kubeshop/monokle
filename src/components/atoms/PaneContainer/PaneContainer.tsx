@@ -11,6 +11,11 @@ const PaneContainer = styled.div`
   padding: 0px 2px 0px 2px;
   border-left: ${AppBorders.sectionDivider};
   border-right: ${AppBorders.sectionDivider};
+  overflow-y: scroll;
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
 `;
 
 export default PaneContainer;

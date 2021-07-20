@@ -23,8 +23,13 @@ const StyledTabs = styled(Tabs)`
   }
 `;
 
-const ActionsPane = (props: {actionHeight: string}) => {
-  const {actionHeight} = props;
+const ActionsPaneContainer = styled(PaneContainer)`
+  height: 100%;
+  overflow-y: hidden;
+`;
+
+const ActionsPane = (props: {contentHeight: string}) => {
+  const {contentHeight} = props;
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -64,41 +69,39 @@ const ActionsPane = (props: {actionHeight: string}) => {
   };
 
   return (
-    <PaneContainer>
+    <>
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>Editor</MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
-      <Row>
-        <Col span={24}>
-          <StyledTabs
-            defaultActiveKey="source"
-            activeKey={key}
-            onChange={k => setKey(k)}
-            tabBarExtraContent={OperationsSlot}
-          >
-            <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
-              <Monaco editorHeight={actionHeight} />
-            </TabPane>
-            <TabPane
-              tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
-              disabled={!selectedResource}
-              key="form"
+      <ActionsPaneContainer>
+        <Row>
+          <Col span={24}>
+            <StyledTabs
+              defaultActiveKey="source"
+              activeKey={key}
+              onChange={k => setKey(k)}
+              tabBarExtraContent={OperationsSlot}
             >
-              <FormEditor />
-            </TabPane>
-            <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key="graph">
-              <GraphView editorHeight={actionHeight} />
-            </TabPane>
-
-            {/* <Tab eventKey="logger" title="Logger">
-              <LogViewer editorHeight={actionHeight} />
-            </Tab> */}
-          </StyledTabs>
-        </Col>
-      </Row>
-    </PaneContainer>
+              <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
+                <Monaco editorHeight={contentHeight} />
+              </TabPane>
+              <TabPane
+                tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
+                disabled={!selectedResource}
+                key="form"
+              >
+                <FormEditor />
+              </TabPane>
+              <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key="graph">
+                <GraphView editorHeight={contentHeight} />
+              </TabPane>
+            </StyledTabs>
+          </Col>
+        </Row>
+      </ActionsPaneContainer>
+    </>
   );
 };
 

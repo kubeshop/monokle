@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
 
@@ -16,12 +16,13 @@ import MessageBox from '@organisms/MessageBox';
 import SettingsDrawer from '@organisms/SettingsDrawer';
 import {Size} from '@models/window';
 import DiffModal from '@organisms/DiffModal';
+import {useWindowSize} from '@utils/hooks';
 
 const StyledColumn = styled(Col)`
   width: 100%;
   height: 100%;
   padding: 0px;
-  overflow-y: scroll;
+  overflow-y: hidden;
 `;
 
 const StyledRow = styled(Row)`
@@ -40,7 +41,7 @@ const App = () => {
   const size: Size = useWindowSize();
 
   const mainHeight = `${size.height ? size.height : 100}px`;
-  const contentHeight = `${size.height ? size.height - 30 : 30}px`;
+  const contentHeight = `${size.height ? size.height - 75 : 75}px`;
 
   return (
     <div>
@@ -52,7 +53,7 @@ const App = () => {
         <StyledContent style={{height: contentHeight}}>
           <StyledRow style={{height: contentHeight}}>
             <StyledColumn sm={6}>
-              <FileTreePane />
+              <FileTreePane windowHeight={size.height} />
             </StyledColumn>
 
             <StyledColumn sm={6}>
@@ -60,7 +61,7 @@ const App = () => {
             </StyledColumn>
 
             <StyledColumn sm={12}>
-              <ActionsPane actionHeight={contentHeight} />
+              <ActionsPane contentHeight={contentHeight} />
             </StyledColumn>
           </StyledRow>
         </StyledContent>
@@ -73,25 +74,3 @@ const App = () => {
 };
 
 export default App;
-
-function useWindowSize(): Size {
-  const [windowSize, setWindowSize] = useState<Size>({
-    width: undefined,
-    height: undefined,
-  });
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    }
-
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    // Remove event listener on cleanup
-    return () => window.removeEventListener("resize", handleResize);
-  }, []); // Empty array ensures that effect is only run on mount
-  return windowSize;
-}

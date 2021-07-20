@@ -10,6 +10,7 @@ const MonoPaneTitleCol = styled((props: MonoPaneTitleColProps) => <AntCol {...pr
   margin: 0;
   padding: '12px 16px 12px 16px';
   border-bottom: ${AppBorders.sectionDivider};
+  border-right: ${AppBorders.sectionDivider};
   line-height: 20px;
 `;
 
