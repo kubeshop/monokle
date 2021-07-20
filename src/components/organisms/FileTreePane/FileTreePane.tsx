@@ -191,6 +191,8 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const dispatch = useAppDispatch();
   const previewResource = useAppSelector(state => state.main.previewResource);
   const previewMode = useSelector(inPreviewMode);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -248,6 +250,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
               type="primary"
               ghost
               disabled={previewMode && previewResource !== kubeconfig}
+              loading={previewType === 'cluster' && previewLoader.isLoading}
               onClick={connectToCluster}
             >
               Cluster Objects
@@ -286,6 +289,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
             // @ts-ignore
             return node.highlight;
           }}
+          disabled={previewLoader.isLoading}
         />
       ) : (
         <NoFilesContainer>No folder selected.</NoFilesContainer>

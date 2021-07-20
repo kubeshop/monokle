@@ -1,20 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import {Popover, Typography, Divider} from 'antd';
 import styled from 'styled-components';
+import {FontColors} from '@styles/Colors';
+import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-
 import {selectK8sResource} from '@redux/reducers/main';
-
 import {ResourceRef, K8sResource} from '@models/k8sresource';
-
 import {ResourceMapType} from '@models/appstate';
-
 import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/utils/resourceRefs';
-
-import {FontColors} from '@styles/Colors';
-
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
 
 const {Text} = Typography;
 

@@ -1,4 +1,4 @@
-import {Tabs, Space, Col, Row, Button} from 'antd';
+import {Tabs, Space, Col, Row, Button, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
@@ -35,11 +35,18 @@ const StyledButton = styled(Button)`
 
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
+
+  const StyledSkeleton = styled(Skeleton)`
+    margin: 20px;
+    width: 95%;
+  `;
+
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const dispatch = useAppDispatch();
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
   const [key, setKey] = useState('source');
 
   async function applySelectedResource() {
@@ -90,17 +97,17 @@ const ActionsPane = (props: {contentHeight: string}) => {
               tabBarExtraContent={OperationsSlot}
             >
               <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
-                <Monaco editorHeight={contentHeight} />
+                {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={actionHeight} />}
               </TabPane>
               <TabPane
                 tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
                 disabled={!selectedResource}
                 key="form"
               >
-                <FormEditor />
+                {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor />}
               </TabPane>
               <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key="graph">
-                <GraphView editorHeight={contentHeight} />
+                {previewLoader.isLoading ? <StyledSkeleton /> : <GraphView editorHeight={actionHeight} />}
               </TabPane>
             </StyledTabs>
           </Col>
