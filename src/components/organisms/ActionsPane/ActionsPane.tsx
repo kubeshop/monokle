@@ -1,4 +1,4 @@
-import {Tabs, Space, Col, Row} from 'antd';
+import {Tabs, Space, Col, Row, Button} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
@@ -10,7 +10,7 @@ import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
 import TabHeader from '@atoms/TabHeader';
-import {MonoButton, PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 
 const {TabPane} = Tabs;
 
@@ -26,6 +26,11 @@ const StyledTabs = styled(Tabs)`
 const ActionsPaneContainer = styled(PaneContainer)`
   height: 100%;
   overflow-y: hidden;
+`;
+
+const StyledButton = styled(Button)`
+  padding: 0px 10px;
+  height: 30px;
 `;
 
 const ActionsPane = (props: {contentHeight: string}) => {
@@ -58,12 +63,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const OperationsSlot = {
     right: (
       <Space>
-        <MonoButton onClick={applySelectedResource} disabled={!selectedResource} type="primary">
+        <StyledButton type="primary" ghost onClick={applySelectedResource} disabled={!selectedResource}>
           Apply
-        </MonoButton>
-        <MonoButton onClick={diffSelectedResource} disabled={!selectedResource} type="primary">
+        </StyledButton>
+        <StyledButton type="primary" ghost onClick={diffSelectedResource} disabled={!selectedResource}>
           Diff
-        </MonoButton>
+        </StyledButton>
       </Space>
     ),
   };
