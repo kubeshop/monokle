@@ -2,20 +2,21 @@ import React from 'react';
 import styled from 'styled-components';
 import {Typography} from 'antd';
 
-import { FontColors } from '@styles/Colors';
+import {FontColors} from '@styles/Colors';
 
 const {Text} = Typography;
 
-export type NavigatorContentTitleProps =  {};
+export type NavigatorContentTitleProps = {};
 
-const NavigatorContentTitle = styled((props: NavigatorContentTitleProps) => <Text {...props}/>)`
+const NavigatorContentTitle = styled((props: NavigatorContentTitleProps) => <Text {...props} />)`
   &.ant-typography {
     margin-bottom: 0;
     padding: 8px;
     padding-left: 16px;
     text-transform: uppercase;
     font-size: 17px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
     font-style: normal;
     font-weight: 600;

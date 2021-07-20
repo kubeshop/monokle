@@ -23,20 +23,23 @@ const StyledSwitchContainer = styled.div`
   }
 `;
 
-const StyledSwitch = styled((props: MonoSwitchProps) => <Switch
-  {...props}
-  checkedChildren={props.checkedInnerText ? <Text italic>{props.checkedInnerText}</Text> : undefined}
-  unCheckedChildren={props.unCheckedInnerText ? <Text code>{props.unCheckedInnerText}</Text> : undefined}
-/>)`
-`;
+const StyledSwitch = styled((props: MonoSwitchProps) => (
+  <Switch
+    {...props}
+    checkedChildren={props.checkedInnerText ? <Text italic>{props.checkedInnerText}</Text> : undefined}
+    unCheckedChildren={props.unCheckedInnerText ? <Text code>{props.unCheckedInnerText}</Text> : undefined}
+  />
+))``;
 
 const MonoSwitch = (props: MonoSwitchProps) => {
   const {label} = props;
 
-  return (<StyledSwitchContainer>
-  <Text style={{fontSize: '0.9em'}}>{label}  </Text>
-  <StyledSwitch {...props}/>
-</StyledSwitchContainer>);
+  return (
+    <StyledSwitchContainer>
+      <Text style={{fontSize: '0.9em'}}>{label} </Text>
+      <StyledSwitch {...props} />
+    </StyledSwitchContainer>
+  );
 };
 
 export default MonoSwitch;

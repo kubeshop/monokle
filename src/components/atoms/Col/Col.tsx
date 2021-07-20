@@ -6,8 +6,10 @@ export type ColProps = AntColProps & {
   noborder?: React.ReactNode;
 };
 
-const Col = styled((props: ColProps) => <AntCol {...props}/>)`
-  ${props => props.noborder && `
+const Col = styled((props: ColProps) => <AntCol {...props} />)`
+  ${props =>
+    props.noborder &&
+    `
     padding: 1px;
     margin: 0px;
   `};

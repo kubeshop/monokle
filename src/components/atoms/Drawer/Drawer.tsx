@@ -7,8 +7,10 @@ export type DrawerProps = AntDrawerProps & {
   children?: React.ReactNode;
 };
 
-const Drawer = styled((props: DrawerProps) => <AntDrawer {...props}/>)`
-  ${props => props.noborder && `
+const Drawer = styled((props: DrawerProps) => <AntDrawer {...props} />)`
+  ${props =>
+    props.noborder &&
+    `
     padding: 1px;
     margin: 0px;
   `};

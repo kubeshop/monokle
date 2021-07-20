@@ -8,8 +8,10 @@ export type FooterProps = LayoutProps & {
   noborder?: React.ReactNode;
 };
 
-const Footer = styled((props: FooterProps) => <AntFooter {...props}/>)`
-  ${props => props.noborder && `
+const Footer = styled((props: FooterProps) => <AntFooter {...props} />)`
+  ${props =>
+    props.noborder &&
+    `
     padding: 0px;
     margin: 0px;
   `};

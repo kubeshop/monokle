@@ -8,8 +8,10 @@ export type HeaderProps = LayoutProps & {
   noborder?: React.ReactNode;
 };
 
-const Header = styled((props: HeaderProps) => <AntHeader {...props}/>)`
-  ${props => props.noborder && `
+const Header = styled((props: HeaderProps) => <AntHeader {...props} />)`
+  ${props =>
+    props.noborder &&
+    `
     padding: 0px;
     margin: 0px;
   `};

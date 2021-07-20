@@ -5,7 +5,7 @@ import {AppBorders} from '@styles/Borders';
 
 const PaneContainer = styled.div`
   background-color: ${BackgroundColors.darkThemeBackground};
-  height 100%;
+  height: 100%;
   width: 100%;
   margin: 0px;
   padding: 0px 2px 0px 2px;
