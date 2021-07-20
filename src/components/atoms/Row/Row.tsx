@@ -7,8 +7,10 @@ export type RowProps = AntRowProps & {
   elementheight?: React.ReactNode;
 };
 
-const Row = styled((props: RowProps) => <AntRow {...props}/>)`
-  ${props => props.noborder && `
+const Row = styled((props: RowProps) => <AntRow {...props} />)`
+  ${props =>
+    props.noborder &&
+    `
     padding: 1px;
     margin: 0px;
   `};

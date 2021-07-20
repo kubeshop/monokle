@@ -5,7 +5,7 @@ type UiState = {
 };
 
 const initialState: UiState = {
-  settingsOpened: false
+  settingsOpened: false,
 };
 
 export const uiSlice = createSlice({

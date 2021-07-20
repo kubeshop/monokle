@@ -5,7 +5,7 @@ type LogsState = {
 };
 
 const initialState: LogsState = {
-  logs: ['']
+  logs: [''],
 };
 
 export const logsSlice = createSlice({

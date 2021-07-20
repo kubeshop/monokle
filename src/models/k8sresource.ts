@@ -15,7 +15,8 @@ interface K8sResource {
   text: string; // unparsed resource content (for editing)
   content: any; // contains parsed yaml resource - used for filtering/finding links/refs, etc
   refs?: ResourceRef[]; // array of refs to other resources
-  range?: { // range of this resource in a multidocument file
+  range?: {
+    // range of this resource in a multidocument file
     start: number;
     length: number;
   };
@@ -37,9 +38,9 @@ export enum ResourceRefType {
 
 interface ResourceRef {
   refType: ResourceRefType; // the type of ref (see enum)
-  refName: string;          // the ref value - for example the name of a configmap
-  targetResource?: string;  // the resource this is referring to (empty for unsatisfied refs)
-  refPos?: RefPosition      // the position in the document of the refName (undefined for incoming file refs)
+  refName: string; // the ref value - for example the name of a configmap
+  targetResource?: string; // the resource this is referring to (empty for unsatisfied refs)
+  refPos?: RefPosition; // the position in the document of the refName (undefined for incoming file refs)
 }
 
 interface RefPosition {

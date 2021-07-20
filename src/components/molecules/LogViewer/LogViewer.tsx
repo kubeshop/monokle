@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import MonacoEditor, { monaco } from 'react-monaco-editor';
-import { useMeasure } from 'react-use';
-import { useSelector } from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import MonacoEditor, {monaco} from 'react-monaco-editor';
+import {useMeasure} from 'react-use';
+import {useSelector} from 'react-redux';
 import styled from 'styled-components';
 
-import { selectLogs } from '@redux/selectors';
-import { KUBESHOP_MONACO_THEME } from '@utils/monaco';
+import {selectLogs} from '@redux/selectors';
+import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 const LogContainer = styled.div`
   width: 100%;
@@ -55,11 +55,11 @@ interface IEditorMinimapOptions {
 }
 type EditorMinimapOptions = Readonly<Required<IEditorMinimapOptions>>;
 
-const LogViewer = (props: { editorHeight: string }) => {
-  const { editorHeight } = props;
+const LogViewer = (props: {editorHeight: string}) => {
+  const {editorHeight} = props;
   const [editor, setEditor] = useState<monaco.editor.IEditor>();
   const code = useSelector(selectLogs);
-  const [ref, { width }] = useMeasure<HTMLDivElement>();
+  const [ref, {width}] = useMeasure<HTMLDivElement>();
 
   function editorDidMount(e: any, m: any) {
     setEditor(e);

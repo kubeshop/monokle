@@ -37,29 +37,20 @@ test('read-files', () => {
 });
 
 test('read-folder-with-one-file', () => {
-  const {
-    resourceMap,
-    fileMap,
-    files,
-    helmChartMap,
-    helmValuesMap,
-  } = readManifests(getTestResourcePath('manifests/single'));
+  const {resourceMap, fileMap, files, helmChartMap, helmValuesMap} = readManifests(
+    getTestResourcePath('manifests/single')
+  );
 
   expect(files.length).toBe(1);
   expect(Object.values(fileMap).length).toBe(2);
   expect(Object.values(resourceMap).length).toBe(1);
   expect(Object.values(helmChartMap).length).toBe(0);
-
 });
 
 test('read-folder-with-helm-chart', () => {
-  const {
-    resourceMap,
-    fileMap,
-    files,
-    helmChartMap,
-    helmValuesMap,
-  } = readManifests(createSafePath('src/redux/utils/__test__/helm-charts/aks-helloworld'));
+  const {resourceMap, fileMap, files, helmChartMap, helmValuesMap} = readManifests(
+    createSafePath('src/redux/utils/__test__/helm-charts/aks-helloworld')
+  );
 
   expect(files.length).toBe(4);
   expect(Object.values(fileMap).length).toBe(6);

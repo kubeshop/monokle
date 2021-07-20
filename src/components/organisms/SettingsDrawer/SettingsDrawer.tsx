@@ -74,10 +74,10 @@ const SettingsDrawer = () => {
 
   return (
     <Drawer
-      width='400'
+      width="400"
       noborder
-      title='Settings'
-      placement='right'
+      title="Settings"
+      placement="right"
       closable={false}
       onClose={toggleSettingsDrawer}
       visible={isSettingsOpened}
@@ -86,7 +86,7 @@ const SettingsDrawer = () => {
         <StyledSpan>KUBECONFIG</StyledSpan>
         <Input value={appConfig.kubeconfig} />
         <StyledButton onClick={openFileSelect}>Browse</StyledButton>
-        <HiddenInput type='file' onChange={onSelectFile} ref={fileInput} />
+        <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Files: Include</StyledSpan>
@@ -98,14 +98,14 @@ const SettingsDrawer = () => {
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
-        <Radio.Group size='large' value={appConfig.settings.theme} onChange={onChangeTheme}>
+        <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>
           <Radio.Button value={Themes.Dark}>Dark</Radio.Button>
           <Radio.Button value={Themes.Light}>Light</Radio.Button>
         </Radio.Group>
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Text Size</StyledSpan>
-        <Radio.Group size='large' value={appConfig.settings.textSize}>
+        <Radio.Group size="large" value={appConfig.settings.textSize}>
           <Radio.Button value={TextSizes.Large}>Large</Radio.Button>
           <Radio.Button value={TextSizes.Medium}>Medium</Radio.Button>
           <Radio.Button value={TextSizes.Small}>Small</Radio.Button>
@@ -113,8 +113,8 @@ const SettingsDrawer = () => {
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Language</StyledSpan>
-        <Radio.Group size='large' value={appConfig.settings.language}>
-          <Space direction='vertical'>
+        <Radio.Group size="large" value={appConfig.settings.language}>
+          <Space direction="vertical">
             <Radio value={Languages.English}>English</Radio>
           </Space>
         </Radio.Group>

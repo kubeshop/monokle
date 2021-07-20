@@ -16,7 +16,7 @@ import {v4 as uuidv4} from 'uuid';
 
 export function processServices(resourceMap: ResourceMapType) {
   const deployments = getK8sResources(resourceMap, 'Deployment').filter(
-    d => d.content.spec?.template?.metadata?.labels,
+    d => d.content.spec?.template?.metadata?.labels
   );
 
   getK8sResources(resourceMap, 'Service').forEach(service => {
@@ -25,13 +25,20 @@ export function processServices(resourceMap: ResourceMapType) {
         let found = false;
         deployments
           .filter(
-            deployment => deployment.content.spec.template.metadata.labels[e] === service.content.spec.selector[e],
+            deployment => deployment.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]
           )
           .forEach(deployment => {
             const sourceNode = getScalarNode(service, `spec:selector:${e}`);
             const targetNode = getScalarNode(deployment, `spec:template:metadata:labels:${e}`);
             if (sourceNode && targetNode) {
-              linkResources(deployment, service, ResourceRefType.SelectedPodName, ResourceRefType.ServicePodSelector, targetNode, sourceNode);
+              linkResources(
+                deployment,
+                service,
+                ResourceRefType.SelectedPodName,
+                ResourceRefType.ServicePodSelector,
+                targetNode,
+                sourceNode
+              );
             }
             found = true;
           });
@@ -58,8 +65,13 @@ function linkConfigMapToDeployment(configMaps: K8sResource[], deployment: K8sRes
     .forEach(configMapResource => {
       const targetNode = getScalarNode(configMapResource, 'metadata:name');
       if (targetNode) {
-        linkResources(configMapResource, deployment,
-          ResourceRefType.ConfigMapRef, ResourceRefType.ConfigMapConsumer, targetNode, refNode,
+        linkResources(
+          configMapResource,
+          deployment,
+          ResourceRefType.ConfigMapRef,
+          ResourceRefType.ConfigMapConsumer,
+          targetNode,
+          refNode
         );
       }
       found = true;
@@ -214,21 +226,28 @@ export function getK8sResources(resourceMap: ResourceMapType, type: string) {
  * Adds a resource ref with the specified type/target to the specified resource
  */
 
-function createResourceRef(resource: K8sResource, refType: ResourceRefType, refNode?: NodeWrapper, targetResource?: string) {
+function createResourceRef(
+  resource: K8sResource,
+  refType: ResourceRefType,
+  refNode?: NodeWrapper,
+  targetResource?: string
+) {
   if (refNode || targetResource) {
     resource.refs = resource.refs || [];
     const refName = (refNode ? refNode.nodeValue() : targetResource) || '<missing>';
 
     // make sure we don't duplicate
-    if (!resource.refs.some(ref => ref.refType === refType && ref.refName === refName && ref.targetResource === targetResource)) {
-      resource.refs.push(
-        {
-          refType,
-          refName,
-          refPos: refNode?.getNodePosition(),
-          targetResource,
-        },
-      );
+    if (
+      !resource.refs.some(
+        ref => ref.refType === refType && ref.refName === refName && ref.targetResource === targetResource
+      )
+    ) {
+      resource.refs.push({
+        refType,
+        refName,
+        refPos: refNode?.getNodePosition(),
+        targetResource,
+      });
     }
   } else {
     log.warn(`missing both refNode and targetResource for refType ${refType} on resource ${resource.filePath}`);
@@ -245,7 +264,7 @@ export function linkResources(
   sourceRefType: ResourceRefType,
   targetRefType: ResourceRefType,
   sourceRef: NodeWrapper,
-  targetRef?: NodeWrapper,
+  targetRef?: NodeWrapper
 ) {
   createResourceRef(source, sourceRefType, sourceRef, target.id);
   createResourceRef(target, targetRefType, targetRef, source.id);
@@ -317,8 +336,8 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       fs.writeFileSync(
         absoluteResourcePath,
         content.substr(0, resource.range.start) +
-        valueToWrite +
-        content.substr(resource.range.start + resource.range.length),
+          valueToWrite +
+          content.substr(resource.range.start + resource.range.length)
       );
     } else {
       // only document => just write to file
@@ -442,7 +461,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
+          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`
         );
       } else {
         const content = doc.toJS();

@@ -7,9 +7,9 @@ import {useEffect, useState} from 'react';
 import {stringify} from 'yaml';
 import {diffResource} from '@redux/reducers/thunks';
 
-import { KUBESHOP_MONACO_DIFF_THEME } from "@utils/monaco";
+import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
 
-import Colors from "@styles/Colors";
+import Colors from '@styles/Colors';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close {
@@ -39,7 +39,8 @@ const DiffModal = () => {
 
   const [isVisible, setVisible] = useState(false);
 
-  const resourceContent = diffResourceId && resourceMap ? stringify(resourceMap[diffResourceId].content, {sortMapEntries: true}) : '';
+  const resourceContent =
+    diffResourceId && resourceMap ? stringify(resourceMap[diffResourceId].content, {sortMapEntries: true}) : '';
   const options = {
     renderSideBySide: true,
   };
@@ -54,24 +55,29 @@ const DiffModal = () => {
   };
 
   return (
-    <StyledModal title='Resource Diff'
-           visible={isVisible}
-           centered
-           width={1000}
-           onCancel={handleOk}
-           footer={[
-             <Button key='submit' type='primary' onClick={handleOk}>Close</Button>,
-           ]}>
+    <StyledModal
+      title="Resource Diff"
+      visible={isVisible}
+      centered
+      width={1000}
+      onCancel={handleOk}
+      footer={[
+        <Button key="submit" type="primary" onClick={handleOk}>
+          Close
+        </Button>,
+      ]}
+    >
       <MonacoDiffEditor
-        width='1000'
-        height='600'
-        language='yaml'
+        width="1000"
+        height="600"
+        language="yaml"
         original={resourceContent}
         value={diffContent}
         options={options}
         theme={KUBESHOP_MONACO_DIFF_THEME}
       />
-    </StyledModal>);
+    </StyledModal>
+  );
 };
 
 export default DiffModal;

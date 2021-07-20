@@ -10,10 +10,21 @@ import {getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './res
  * Creates kustomization refs between a kustomization and its resources
  */
 
-function linkParentKustomization(fileEntry: FileEntry, kustomization: K8sResource, resourceMap: ResourceMapType, refNode: NodeWrapper) {
+function linkParentKustomization(
+  fileEntry: FileEntry,
+  kustomization: K8sResource,
+  resourceMap: ResourceMapType,
+  refNode: NodeWrapper
+) {
   getResourcesForPath(fileEntry.filePath, resourceMap).forEach(r => {
     // since the target is a file there is no target refNode
-    linkResources(kustomization, r, ResourceRefType.KustomizationResource, ResourceRefType.KustomizationParent, refNode);
+    linkResources(
+      kustomization,
+      r,
+      ResourceRefType.KustomizationResource,
+      ResourceRefType.KustomizationParent,
+      refNode
+    );
   });
 }
 
@@ -46,7 +57,7 @@ function processKustomizationResource(
   kustomization: K8sResource,
   refNode: NodeWrapper,
   resourceMap: ResourceMapType,
-  fileMap: FileMapType,
+  fileMap: FileMapType
 ) {
   let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
   const fileEntry = fileMap[kpath];
@@ -106,7 +117,7 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
 export function getKustomizationRefs(
   resourceMap: ResourceMapType,
   kustomizationId: string,
-  selectParent: boolean = false,
+  selectParent: boolean = false
 ) {
   let linkedResourceIds: string[] = [];
   const kustomization = resourceMap[kustomizationId];
@@ -115,7 +126,7 @@ export function getKustomizationRefs(
       .filter(
         r =>
           r.refType === ResourceRefType.KustomizationResource ||
-          (selectParent && r.refType === ResourceRefType.KustomizationParent),
+          (selectParent && r.refType === ResourceRefType.KustomizationParent)
       )
       .forEach(r => {
         if (r.targetResource) {

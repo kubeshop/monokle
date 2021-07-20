@@ -43,8 +43,14 @@ function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
  * Returns the list of filenames (not paths) found in the specified folder
  */
 
-export function readFiles(folder: string, appConfig: AppConfig, resourceMap: ResourceMapType,
-                          fileMap: FileMapType, helmChartMap: HelmChartMapType, helmValuesMap: HelmValuesMapType) {
+export function readFiles(
+  folder: string,
+  appConfig: AppConfig,
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType,
+  helmChartMap: HelmChartMapType,
+  helmValuesMap: HelmValuesMapType
+) {
   const files = fs.readdirSync(folder);
   const result: string[] = [];
 
@@ -135,7 +141,7 @@ export function getResourcesForPath(filePath: string, resourceMap: ResourceMapTy
 export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMapType) {
   return path.join(
     fileMap[ROOT_FILE_ENTRY].filePath,
-    resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)),
+    resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep))
   );
 }
 
@@ -258,7 +264,14 @@ function addFolder(absolutePath: string, state: AppState) {
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
     const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
-    folderEntry.children = readFiles(absolutePath, state.appConfig, state.resourceMap, state.fileMap, state.helmChartMap, state.helmValuesMap);
+    folderEntry.children = readFiles(
+      absolutePath,
+      state.appConfig,
+      state.resourceMap,
+      state.fileMap,
+      state.helmChartMap,
+      state.helmValuesMap
+    );
     return folderEntry;
   }
 
