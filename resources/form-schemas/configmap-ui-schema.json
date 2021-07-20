@@ -1,0 +1,19 @@
+{
+  "data": {
+    "ui:description": "Data contains the configuration data"
+  },
+  "binaryData": {
+    "ui:description": "Data contains the configuration data"
+  },
+  "metadata": {
+    "labels": {
+      "ui:description": "Map of string keys and values that can be used to organize and categorize (scope and select) objects"
+    },
+    "annotations": {
+      "ui:description": "Arbitrary metadata."
+    },
+    "finalizers": {
+      "ui:description": "Must be empty before the object is deleted from the registry."
+    }
+  }
+}

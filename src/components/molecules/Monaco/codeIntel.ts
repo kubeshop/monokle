@@ -73,7 +73,7 @@ function createSuggestionsForResourceKind(
   resourceMap: ResourceMapType,
   resourceKind: string,
   range: monaco.IRange,
-  triggerCharacter: string | undefined
+  triggerCharacter: string | undefined,
 ) {
   const suggestions: monaco.languages.CompletionItem[] = [];
   Object.values(resourceMap).forEach((resource: K8sResource) => {
@@ -101,7 +101,7 @@ export function applyAutocomplete(resourceMap: ResourceMapType) {
             resourceMap,
             resourceKind,
             new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
-            context.triggerCharacter
+            context.triggerCharacter,
           ),
         };
       }
@@ -118,7 +118,7 @@ function areRefPosEqual(a: RefPosition, b: RefPosition) {
 export function applyForResource(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
-  resourceMap: ResourceMapType
+  resourceMap: ResourceMapType,
 ) {
   const refs = resource.refs;
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
@@ -165,7 +165,7 @@ export function applyForResource(
       position.line,
       position.column,
       position.line,
-      position.column + position.length
+      position.column + position.length,
     );
 
     const glyphDecoration = createGlyphDecoration(position.line, GlyphDecorationTypes.SatisfiedRef);

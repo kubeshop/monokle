@@ -55,7 +55,7 @@ export async function applyResource(
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   dispatch: AppDispatch,
-  kubeconfig: string
+  kubeconfig: string,
 ) {
   try {
     const resource = resourceMap[resourceId];

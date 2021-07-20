@@ -1,1 +1,1 @@
-export {default} from "./FilePatternList";
+export {default} from './FilePatternList';

@@ -357,6 +357,7 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
       resource.name = createResourceName(resource.filePath, resource.content);
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
+      resource.namespace = resource.content.metadata?.namespace;
     }
   });
 

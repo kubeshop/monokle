@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Col, Row, Select, Skeleton} from 'antd';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
@@ -62,6 +62,7 @@ const StyledSkeleton = styled(Skeleton)`
 const NavigatorPane = () => {
   const dispatch = useAppDispatch();
   const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
+  const [namespaces, setNamespaces] = useState<string[]>([ALL_NAMESPACES]);
 
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
@@ -94,6 +95,14 @@ const NavigatorPane = () => {
       dispatch(clearPreview());
     }
   };
+
+  useEffect(() => {
+    let ns = getNamespaces(resourceMap);
+    setNamespaces(ns.concat([ALL_NAMESPACES]));
+    if (namespace && ns.indexOf(namespace) === -1) {
+      setNamespace(ALL_NAMESPACES);
+    }
+  }, [resourceMap, previewResource]);
 
   function shouldBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
     return (
@@ -168,14 +177,13 @@ const NavigatorPane = () => {
         <Select
           showSearch
           placeholder="Namespace"
-          defaultValue="ALL_NAMESPACES"
           onChange={handleNamespaceChange}
           size="small"
           style={{minWidth: '50%'}}
           bordered={false}
+          value={namespace}
         >
-          <Option value="ALL_NAMESPACES">all</Option>
-          {getNamespaces(resourceMap).map(n => {
+          {namespaces.map(n => {
             return (
               <Option key={n} value={n}>
                 {n}

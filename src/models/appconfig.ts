@@ -1,18 +1,18 @@
 import {ObjectNavigator} from './navigator';
 
 export enum Themes {
-  Dark = "dark",
-  Light = "light"
+  Dark = 'dark',
+  Light = 'light'
 }
 
 export enum TextSizes {
-  Large = "large",
-  Medium = "medium",
-  Small = "small"
+  Large = 'large',
+  Medium = 'medium',
+  Small = 'small'
 }
 
 export enum Languages {
-  English = "en"
+  English = 'en'
 }
 
 interface AppConfig {

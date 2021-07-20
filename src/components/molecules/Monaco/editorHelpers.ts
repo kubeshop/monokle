@@ -20,7 +20,7 @@ export function clearDecorations(editor: monaco.editor.IStandaloneCodeEditor, id
 
 export function setDecorations(
   editor: monaco.editor.IStandaloneCodeEditor,
-  decorations: monaco.editor.IModelDeltaDecoration[]
+  decorations: monaco.editor.IModelDeltaDecoration[],
 ) {
   const decorationIds = editor.deltaDecorations([], decorations);
   return decorationIds;
@@ -48,7 +48,7 @@ export function createMarkdownString(text: string): monaco.IMarkdownString {
 
 export function createCommandMarkdownLink(
   text: string,
-  handler: monaco.editor.ICommandHandler
+  handler: monaco.editor.ICommandHandler,
 ): {commandMarkdownLink: monaco.IMarkdownString; commandDisposable: monaco.IDisposable} {
   const commandId = `cmd_${uuidv4()}`;
   const commandDisposable: monaco.IDisposable = CommandsRegistry.registerCommand(commandId, handler);
@@ -122,7 +122,8 @@ const getSymbols = async (model: monaco.editor.IModel) => {
     isCancellationRequested: false,
     onCancellationRequested: () => {
       return {
-        dispose() {},
+        dispose() {
+        },
       };
     },
   });

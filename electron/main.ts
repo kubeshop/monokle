@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 
-const ElectronStore = require("electron-store");
+const ElectronStore = require('electron-store');
 
 function createWindow() {
   const win = new BrowserWindow({

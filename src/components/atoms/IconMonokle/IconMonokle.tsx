@@ -19,7 +19,7 @@ const IconMonokle = (props: IconMonokleProps) => {
 
   return (
     <>
-      <StyledImage src={useDarkTheme ? MonokleLogoDark : MonokleLogoLight} alt="Monokle" />
+      <StyledImage src={useDarkTheme ? MonokleLogoDark : MonokleLogoLight} alt='Monokle' />
     </>
   );
 };
