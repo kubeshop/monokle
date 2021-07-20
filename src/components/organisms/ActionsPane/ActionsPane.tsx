@@ -1,4 +1,4 @@
-import {Tabs, Space, Col, Row, Skeleton} from 'antd';
+import {Tabs, Space, Col, Row, Button, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
@@ -10,7 +10,7 @@ import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import {useEffect, useState} from 'react';
 import TabHeader from '@atoms/TabHeader';
-import {MonoButton, PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 
 const {TabPane} = Tabs;
 
@@ -23,13 +23,24 @@ const StyledTabs = styled(Tabs)`
   }
 `;
 
-const StyledSkeleton = styled(Skeleton)`
-  margin: 20px;
-  width: 95%;
+const ActionsPaneContainer = styled(PaneContainer)`
+  height: 100%;
+  overflow-y: hidden;
 `;
 
-const ActionsPane = (props: {actionHeight: string}) => {
-  const {actionHeight} = props;
+const StyledButton = styled(Button)`
+  padding: 0px 10px;
+  height: 30px;
+`;
+
+const ActionsPane = (props: {contentHeight: string}) => {
+  const {contentHeight} = props;
+
+  const StyledSkeleton = styled(Skeleton)`
+    margin: 20px;
+    width: 95%;
+  `;
+
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -59,52 +70,50 @@ const ActionsPane = (props: {actionHeight: string}) => {
   const OperationsSlot = {
     right: (
       <Space>
-        <MonoButton onClick={applySelectedResource} disabled={!selectedResource} type="primary">
+        <StyledButton type="primary" ghost onClick={applySelectedResource} disabled={!selectedResource}>
           Apply
-        </MonoButton>
-        <MonoButton onClick={diffSelectedResource} disabled={!selectedResource} type="primary">
+        </StyledButton>
+        <StyledButton type="primary" ghost onClick={diffSelectedResource} disabled={!selectedResource}>
           Diff
-        </MonoButton>
+        </StyledButton>
       </Space>
     ),
   };
 
   return (
-    <PaneContainer>
+    <>
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>Editor</MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
-      <Row>
-        <Col span={24}>
-          <StyledTabs
-            defaultActiveKey="source"
-            activeKey={key}
-            onChange={k => setKey(k)}
-            tabBarExtraContent={OperationsSlot}
-          >
-            <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
-              {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={actionHeight} />}
-            </TabPane>
-            <TabPane
-              tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
-              disabled={!selectedResource}
-              key="form"
+      <ActionsPaneContainer>
+        <Row>
+          <Col span={24}>
+            <StyledTabs
+              defaultActiveKey="source"
+              activeKey={key}
+              onChange={k => setKey(k)}
+              tabBarExtraContent={OperationsSlot}
             >
-              {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor />}
-            </TabPane>
-            <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key="graph">
-              {previewLoader.isLoading ? <StyledSkeleton /> : <GraphView editorHeight={actionHeight} />}
-            </TabPane>
-
-            {/* <Tab eventKey="logger" title="Logger">
-              <LogViewer editorHeight={actionHeight} />
-            </Tab> */}
-          </StyledTabs>
-        </Col>
-      </Row>
-    </PaneContainer>
+              <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
+                {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={contentHeight} />}
+              </TabPane>
+              <TabPane
+                tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
+                disabled={!selectedResource}
+                key="form"
+              >
+                {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor />}
+              </TabPane>
+              <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key="graph">
+                {previewLoader.isLoading ? <StyledSkeleton /> : <GraphView editorHeight={contentHeight} />}
+              </TabPane>
+            </StyledTabs>
+          </Col>
+        </Row>
+      </ActionsPaneContainer>
+    </>
   );
 };
 

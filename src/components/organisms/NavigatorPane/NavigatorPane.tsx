@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
-import {FontColors} from '@styles/Colors';
+import {FontColors, BackgroundColors} from '@styles/Colors';
 import {selectK8sResource, clearPreview} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
@@ -36,6 +36,7 @@ const TitleRow = styled(Row)`
   width: 100%;
   margin: 0;
   padding: 0;
+  background: ${BackgroundColors.darkThemeBackground};
 `;
 
 const SectionRow = styled(Row)`
@@ -103,21 +104,8 @@ const NavigatorPane = () => {
     );
   }
 
-  return (
+  const NavigatorsContent = () => (
     <PaneContainer>
-      <TitleRow>
-        <MonoPaneTitleCol span={24}>
-          <Row>
-            <Col span={12}>
-              <MonoPaneTitle>Navigator</MonoPaneTitle>
-            </Col>
-            <Col span={12}>
-              <MonoSwitch onClick={onFilterChange} label="RELATIONS" />
-            </Col>
-          </Row>
-        </MonoPaneTitleCol>
-      </TitleRow>
-
       {Object.values(helmCharts).length > 0 && (
         <SectionRow>
           <SectionCol>
@@ -256,6 +244,23 @@ const NavigatorPane = () => {
         </SectionRow>
       )}
     </PaneContainer>
+  );
+  return (
+    <>
+      <TitleRow>
+        <MonoPaneTitleCol span={24}>
+          <Row>
+            <Col span={12}>
+              <MonoPaneTitle>Navigator</MonoPaneTitle>
+            </Col>
+            <Col span={12}>
+              <MonoSwitch onClick={onFilterChange} label="RELATIONS" />
+            </Col>
+          </Row>
+        </MonoPaneTitleCol>
+      </TitleRow>
+      <NavigatorsContent />
+    </>
   );
 };
 

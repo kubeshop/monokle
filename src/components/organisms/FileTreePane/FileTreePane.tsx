@@ -127,6 +127,7 @@ const FileTreeContainer = styled.div`
   background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   height: 100%;
+
   & .ant-tree {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -185,7 +186,8 @@ const NoFilesContainer = styled(Typography.Text)`
   margin-left: 16px;
 `;
 
-const FileTreePane = () => {
+const FileTreePane = (props: {windowHeight: number | undefined}) => {
+  const {windowHeight} = props;
   const dispatch = useAppDispatch();
   const previewResource = useAppSelector(state => state.main.previewResource);
   const previewMode = useSelector(inPreviewMode);
@@ -277,6 +279,8 @@ const FileTreePane = () => {
       />
       {tree ? (
         <Tree.DirectoryTree
+          // height is needed to enable Tree's virtual scroll
+          height={windowHeight && windowHeight > 180 ? windowHeight - 180 : 0}
           onSelect={onSelect}
           defaultExpandAll
           treeData={[tree]}

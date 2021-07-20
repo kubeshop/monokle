@@ -8,8 +8,10 @@ export type ContentProps = LayoutProps & {
   noborder?: React.ReactNode;
 };
 
-const Content = styled((props: ContentProps) => <AntContent {...props}/>)`
-  ${props => props.noborder && `
+const Content = styled((props: ContentProps) => <AntContent {...props} />)`
+  ${props =>
+    props.noborder &&
+    `
     padding: 0px;
     margin: 0px;
   `};
