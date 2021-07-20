@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Popover, Typography, Divider} from 'antd';
 import styled from 'styled-components';
-import {FontColors} from '@styles/Colors';
+import Colors, {FontColors} from '@styles/Colors';
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -56,12 +56,12 @@ const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
   cursor: pointer;
   ${props => {
     if (props.isSelected) {
-      return 'color: #141414';
+      return `color: ${Colors.blackPure}`;
     }
     if (props.isHighlighted) {
-      return 'color: #33BCB7';
+      return `color: ${Colors.cyan7}`;
     }
-    return 'color: #b7e3fa;';
+    return `color: ${Colors.blue10}`;
   }}
 `;
 
