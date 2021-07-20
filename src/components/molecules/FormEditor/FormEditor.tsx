@@ -44,7 +44,7 @@ const FormEditor = () => {
   }, [resource]);
 
   if (!selectedResource) {
-    return (<div>Nothing selected...</div>);
+    return <div>Nothing selected...</div>;
   }
 
   const onFormUpdate = (e: any) => {
@@ -67,7 +67,7 @@ const FormEditor = () => {
   };
 
   if (resource?.kind !== 'ConfigMap') {
-    return (<div>Form editor only for ConfigMap resources...</div>);
+    return <div>Form editor only for ConfigMap resources...</div>;
   }
 
   let schema = getFormSchema(resource.kind);
@@ -76,13 +76,7 @@ const FormEditor = () => {
   return (
     // @ts-ignore
     <FormContainer>
-      <Form
-        schema={schema}
-        uiSchema={uiSchema}
-        formData={formData}
-        onChange={onFormUpdate}
-        onSubmit={onFormSubmit}
-      />
+      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} onSubmit={onFormSubmit} />
     </FormContainer>
   );
 };

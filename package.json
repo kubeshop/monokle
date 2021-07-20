@@ -105,6 +105,7 @@
     "lint:src": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "lintfix": "eslint --fix \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "precommit": "npm run lint && npm test",
+    "format:all": "prettier --write \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "prepare": "husky install"
   },
   "build": {

@@ -32,7 +32,8 @@ const RowContainer = styled.div`
   & .helmchart-row {
     width: 100%;
     padding-left: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
     font-size: 15px;
     font-style: normal;
@@ -61,7 +62,8 @@ const RowContainer = styled.div`
   & .helmvalues-row {
     width: 100%;
     padding-left: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
     font-size: 12px;
     font-style: normal;
@@ -103,10 +105,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   const selectedValuesFile = useAppSelector(state => state.main.selectedValuesFile);
   const dispatch = useAppDispatch();
 
-  const {
-    rowKey,
-    helmChart,
-  } = props;
+  const {rowKey, helmChart} = props;
 
   // Parent needs to make sure disabled and selected arent active at the same time.
   let chartClassName = `helmchart-row`;
@@ -126,22 +125,17 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
     }
   }
 
-  return (<RowContainer>
-    <ChartContainer className={chartClassName}>
-      <ItemRow key={rowKey}>
-        <SectionCol sm={22}>
-          <div
-            className={chartClassName}
-          >
-            {helmChart.name}
-          </div>
-        </SectionCol>
-      </ItemRow>
-
-    </ChartContainer>
-    <TreeContainer className={chartClassName}>
-      {
-        helmChart.valueFiles
+  return (
+    <RowContainer>
+      <ChartContainer className={chartClassName}>
+        <ItemRow key={rowKey}>
+          <SectionCol sm={22}>
+            <div className={chartClassName}>{helmChart.name}</div>
+          </SectionCol>
+        </ItemRow>
+      </ChartContainer>
+      <TreeContainer className={chartClassName}>
+        {helmChart.valueFiles
           .map(v => helmValues[v])
           .map((valuesFile: HelmValuesFile) => {
             const previewButtonActive = previewValuesFile !== undefined && previewValuesFile === valuesFile.id;
@@ -154,24 +148,21 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
             return (
               <ItemRow key={valuesFile.id} className={valuesClassName}>
                 <SectionCol sm={22}>
-                  <div onClick={() => onSelectValuesFile(valuesFile.id)}>
-                    {valuesFile.name}
-                  </div>
+                  <div onClick={() => onSelectValuesFile(valuesFile.id)}>{valuesFile.name}</div>
                 </SectionCol>
                 <SectionCol sm={2}>
-                  {
-                    previewButtonActive ?
-                      <EyeInvisibleOutlined onClick={() => onClickPreview(valuesFile.id)} />
-                      : <EyeOutlined onClick={() => onClickPreview(valuesFile.id)} />
-                  }
+                  {previewButtonActive ? (
+                    <EyeInvisibleOutlined onClick={() => onClickPreview(valuesFile.id)} />
+                  ) : (
+                    <EyeOutlined onClick={() => onClickPreview(valuesFile.id)} />
+                  )}
                 </SectionCol>
               </ItemRow>
             );
-          }
-        )
-      }
-    </TreeContainer>
-  </RowContainer>);
+          })}
+      </TreeContainer>
+    </RowContainer>
+  );
 };
 
 export default NavigatorHelmRow;

@@ -66,7 +66,7 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
         <NodeTitleContainer>
           {fileEntry.name}
           {resources.length > 0 ? (
-            <StyledNumberOfResources type='secondary'>{resources.length}</StyledNumberOfResources>
+            <StyledNumberOfResources type="secondary">{resources.length}</StyledNumberOfResources>
           ) : (
             ''
           )}
@@ -247,7 +247,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
         <ColumnWithPadding span={24}>
           <Space direction="horizontal">
             <Button
-              type='primary'
+              type="primary"
               ghost
               disabled={previewMode && previewResource !== kubeconfig}
               loading={previewType === 'cluster' && previewLoader.isLoading}
@@ -255,7 +255,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
             >
               Cluster Objects
             </Button>
-            <Button type='primary' ghost onClick={startFileUploader}>
+            <Button type="primary" ghost onClick={startFileUploader}>
               <CenteredItemsDiv>
                 <FolderAddOutlined style={{marginRight: '3px'}} />
                 Browse
@@ -268,10 +268,10 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
         </ColumnWithPadding>
       </Row>
       <input
-        type='file'
+        type="file"
         /* @ts-expect-error */
-        directory=''
-        webkitdirectory=''
+        directory=""
+        webkitdirectory=""
         onChange={onUploadHandler}
         ref={folderInput}
         style={{display: 'none'}}

@@ -104,9 +104,11 @@ const GraphView = (props: {editorHeight: string}) => {
 
   useEffect(() => {
     let data: any[] = [];
-    activeResources.filter(r => r.refs).forEach(r => {
-      data = data.concat(getElementData(r));
-    });
+    activeResources
+      .filter(r => r.refs)
+      .forEach(r => {
+        data = data.concat(getElementData(r));
+      });
     /* eslint-disable react-hooks/exhaustive-deps */
     updateGraph(data);
     setNodes(data);

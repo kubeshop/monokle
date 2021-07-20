@@ -51,7 +51,7 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
     });
 
   watcher
-  /* eslint-disable no-console */
+    /* eslint-disable no-console */
     .on('error', error => console.log(`Watcher error: ${error}`))
     .on('ready', () => {
       initializing = false;

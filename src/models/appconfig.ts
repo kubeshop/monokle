@@ -2,24 +2,24 @@ import {ObjectNavigator} from './navigator';
 
 export enum Themes {
   Dark = 'dark',
-  Light = 'light'
+  Light = 'light',
 }
 
 export enum TextSizes {
   Large = 'large',
   Medium = 'medium',
-  Small = 'small'
+  Small = 'small',
 }
 
 export enum Languages {
-  English = 'en'
+  English = 'en',
 }
 
 interface AppConfig {
   scanExcludes: string[]; // a list of patterns to exclude when scanning the file system for resources
   fileIncludes: string[]; // a list of patterns to match to against files for including
   navigators: ObjectNavigator[]; // the currrent navigator configuration
-  kubeconfig: string,
+  kubeconfig: string;
   settings: {
     theme: Themes;
     textSize: TextSizes;
@@ -28,7 +28,6 @@ interface AppConfig {
     autoZoomGraphOnSelection: boolean;
     helmPreviewMode: string; // either "template" or "dry-run"
   };
-
 }
 
 export type {AppConfig};

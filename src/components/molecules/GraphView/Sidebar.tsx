@@ -33,12 +33,12 @@ const Sidebar = (reactFlow: any) => {
           // @ts-ignore
           .on('update', ({x: xPos, y: yPos, zoom: zoomLevel}) =>
             // @ts-ignore
-            zoomPanHelper.setCenter(xPos, yPos, zoomLevel),
+            zoomPanHelper.setCenter(xPos, yPos, zoomLevel)
           )
           .start();
       }
     },
-    [zoomPanHelper, reactFlow.reactFlow],
+    [zoomPanHelper, reactFlow.reactFlow]
   );
 
   const selectSelectedResource = useCallback(() => {
@@ -71,7 +71,7 @@ const Sidebar = (reactFlow: any) => {
     (e: any) => {
       dispatch(setAutoZoom(e.target.checked));
     },
-    [dispatch],
+    [dispatch]
   );
 
   function fit() {
@@ -90,25 +90,27 @@ const Sidebar = (reactFlow: any) => {
         })
         .start();
     },
-    [zoomPanHelper, store],
+    [zoomPanHelper, store]
   );
 
   return (
     <aside>
       <Space>
-        <Button type='primary' onClick={fit}>
+        <Button type="primary" onClick={fit}>
           Fit view
         </Button>
-        <Button type='primary' onClick={handleZoom(1.4)}>
+        <Button type="primary" onClick={handleZoom(1.4)}>
           Zoom in
         </Button>
-        <Button type='primary' onClick={handleZoom(1 / 1.4)}>
+        <Button type="primary" onClick={handleZoom(1 / 1.4)}>
           Zoom out
         </Button>
-        <Button type='primary' onClick={selectSelectedResource} disabled={selectedResource === undefined}>
+        <Button type="primary" onClick={selectSelectedResource} disabled={selectedResource === undefined}>
           Zoom on selected resource
         </Button>
-        <Checkbox onChange={onZoomChange} checked={settings.autoZoomGraphOnSelection === true}>auto-zoom</Checkbox>
+        <Checkbox onChange={onZoomChange} checked={settings.autoZoomGraphOnSelection === true}>
+          auto-zoom
+        </Checkbox>
       </Space>
     </aside>
   );

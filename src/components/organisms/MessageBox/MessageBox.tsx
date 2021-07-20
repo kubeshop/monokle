@@ -13,7 +13,7 @@ const MessageBox = () => {
     dispatch(clearAlert());
   };
 
-  let alertVariant: ("success" | "info" | "warning" | "error" | undefined) = 'success';
+  let alertVariant: 'success' | 'info' | 'warning' | 'error' | undefined = 'success';
   if (alert && alert.type === AlertEnum.Error) {
     alertVariant = 'warning';
   }
@@ -21,13 +21,7 @@ const MessageBox = () => {
   return (
     <>
       {alert && (
-        <Alert
-          type={alertVariant}
-          message={alert.title}
-          description={alert.message}
-          onClose={clear}
-          closable
-        />
+        <Alert type={alertVariant} message={alert.title} description={alert.message} onClose={clear} closable />
       )}
     </>
   );

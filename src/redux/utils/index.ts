@@ -9,7 +9,7 @@ export function getStaticResourcePath(resourcePath: string) {
   return process.env.NODE_ENV === 'development'
     ? path.join('resources', resourcePath)
     : // @ts-ignore
-    path.join(process.resourcesPath, 'resources', resourcePath);
+      path.join(process.resourcesPath, 'resources', resourcePath);
 }
 
 /**

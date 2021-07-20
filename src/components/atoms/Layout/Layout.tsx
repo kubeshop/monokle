@@ -6,7 +6,7 @@ export type LayoutProps = AntLayoutProps & {
   mainHeight?: React.ReactNode;
 };
 
-const Layout = styled((props: LayoutProps) => <AntLayout {...props}/>)`
+const Layout = styled((props: LayoutProps) => <AntLayout {...props} />)`
   width: 100%;
   ${props => props.mainHeight && `height: ${props.mainHeight}`};
 `;
