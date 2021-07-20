@@ -97,7 +97,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
               tabBarExtraContent={OperationsSlot}
             >
               <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
-                {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={actionHeight} />}
+                {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={contentHeight} />}
               </TabPane>
               <TabPane
                 tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
@@ -107,7 +107,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor />}
               </TabPane>
               <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key="graph">
-                {previewLoader.isLoading ? <StyledSkeleton /> : <GraphView editorHeight={actionHeight} />}
+                {previewLoader.isLoading ? <StyledSkeleton /> : <GraphView editorHeight={contentHeight} />}
               </TabPane>
             </StyledTabs>
           </Col>
