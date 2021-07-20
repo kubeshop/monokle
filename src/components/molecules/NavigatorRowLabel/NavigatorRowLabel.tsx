@@ -20,6 +20,8 @@ type RefLinkProps = {
 type NavigatorRowLabelProps = {
   label: string;
   resourceId: string;
+  isSelected: boolean;
+  isHighlighted: boolean;
   hasIncomingRefs: boolean;
   hasOutgoingRefs: boolean;
   hasUnsatisfiedRefs?: boolean;
@@ -50,8 +52,17 @@ const StyledRefText = styled(Text)`
   }
 `;
 
-const StyledSpan = styled.span`
+const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
   cursor: pointer;
+  ${props => {
+    if (props.isSelected) {
+      return 'color: #141414';
+    }
+    if (props.isHighlighted) {
+      return 'color: #33BCB7';
+    }
+    return 'color: #b7e3fa;';
+  }}
 `;
 
 const OutgoingRefLink = (props: RefLinkProps) => {
@@ -133,7 +144,16 @@ const PopoverContent = (props: {
 };
 
 const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
-  const {label, resourceId, hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs, onClickLabel} = props;
+  const {
+    label,
+    isSelected,
+    isHighlighted,
+    resourceId,
+    hasIncomingRefs,
+    hasOutgoingRefs,
+    hasUnsatisfiedRefs,
+    onClickLabel,
+  } = props;
 
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -167,7 +187,12 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
           </span>
         </Popover>
       )}
-      <StyledSpan onClick={onClickLabel} style={!hasIncomingRefs ? {marginLeft: 19} : {}}>
+      <StyledSpan
+        isSelected={isSelected}
+        isHighlighted={isHighlighted}
+        onClick={onClickLabel}
+        style={!hasIncomingRefs ? {marginLeft: 19} : {}}
+      >
         {label}
       </StyledSpan>
       {resource && resource.refs && (hasOutgoingRefs || hasUnsatisfiedRefs) && (

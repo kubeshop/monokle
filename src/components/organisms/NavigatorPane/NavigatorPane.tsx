@@ -1,17 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {Col, Row, Select, Skeleton} from 'antd';
+import {Col, Row, Select, Skeleton, Collapse} from 'antd';
+import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
-import {FontColors, BackgroundColors} from '@styles/Colors';
+import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {selectK8sResource, clearPreview} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
 import {setFilterObjects} from '@redux/reducers/appConfig';
 import {selectKustomizations, selectActiveResources, selectHelmCharts} from '@redux/selectors';
 import {K8sResource} from '@models/k8sresource';
-import {NavigatorSubSection} from '@models/navigator';
+import {NavigatorSubSection, NavigatorSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
 import {previewKustomization} from '@redux/reducers/thunks';
 import {
@@ -59,6 +60,174 @@ const StyledSkeleton = styled(Skeleton)`
   width: 90%;
 `;
 
+const StyledCollapse = styled(Collapse)`
+  width: 100%;
+  .ant-collapse-header {
+    padding: 0 !important;
+    cursor: default !important;
+  }
+  .ant-collapse-header:hover {
+    background: #111d2c;
+  }
+`;
+
+const StyledCollapsePanel = styled(Collapse.Panel)`
+  width: 100%;
+  .ant-collapse-content-box {
+    padding: 0 !important;
+  }
+`;
+
+const SubsectionName = styled.span<{isSelected: boolean}>`
+  ${props => {
+    if (props.isSelected) {
+      return `color: ${Colors.blackPure} !important`;
+    }
+  }}
+`;
+
+const StyledResourcesLength = styled.span<{isSelected: boolean}>`
+  margin-left: 10px;
+  ${props => {
+    if (props.isSelected) {
+      return `color: ${Colors.blackPure} !important`;
+    }
+    return `color: ${FontColors.grey} !important;`;
+  }}
+`;
+
+const IconContainer = styled.span<{isSelected: boolean}>`
+  cursor: pointer;
+  float: right;
+  margin-right: 5px;
+  ${props => {
+    if (props.isSelected) {
+      return `color: ${Colors.blackPure}`;
+    }
+    return `color: ${Colors.whitePure}`;
+  }}
+`;
+
+const SubsectionContainer = styled.span<{isHighlighted: boolean; isSelected: boolean}>`
+  width: 100%;
+  display: block;
+  ${props => {
+    if (props.isHighlighted) {
+      return `background: ${Colors.highlightGradient};`;
+    }
+    if (props.isSelected) {
+      return `
+        background: ${Colors.selectionGradient};
+      `;
+    }
+  }}
+`;
+
+const SubsectionHeader = (props: {
+  isExpanded: boolean;
+  isHighlighted: boolean;
+  isSelected: boolean;
+  subsection: NavigatorSubSection;
+  items: K8sResource[];
+  onExpand: () => void;
+  onCollapse: () => void;
+}) => {
+  const {subsection, items, isExpanded, isHighlighted, isSelected, onExpand, onCollapse} = props;
+  const [isHovered, setIsHovered] = useState<Boolean>(false);
+
+  return (
+    <SubsectionContainer
+      isHighlighted={isHighlighted}
+      isSelected={isSelected}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <NavigatorContentSubTitle>
+        <SubsectionName isSelected={isSelected}>{subsection.name}</SubsectionName>
+        <StyledResourcesLength isSelected={isSelected}>
+          {items.length > 0 ? `${items.length}` : ''}
+        </StyledResourcesLength>
+      </NavigatorContentSubTitle>
+      {isHovered && isExpanded && (
+        <IconContainer isSelected={isSelected} onClick={onCollapse}>
+          <MinusSquareOutlined />
+        </IconContainer>
+      )}
+      {!isExpanded && (
+        <IconContainer isSelected={isSelected} onClick={onExpand}>
+          <PlusSquareOutlined />
+        </IconContainer>
+      )}
+    </SubsectionContainer>
+  );
+};
+
+const Section = (props: {
+  expandedSubsections: string[];
+  onSubsectionExpand: (sectionName: string, subsectionName: string) => void;
+  onSubsectionCollapse: (sectionName: string, subsectionName: string) => void;
+  section: NavigatorSection;
+  resources: K8sResource[];
+  shouldBeVisible: (item: K8sResource, subsection: NavigatorSubSection) => boolean;
+  selectResource: (resourceId: string) => void;
+}) => {
+  const {
+    expandedSubsections,
+    onSubsectionExpand,
+    onSubsectionCollapse,
+    section,
+    resources,
+    shouldBeVisible,
+    selectResource,
+  } = props;
+
+  const isSubsectionExpanded = (subsectionName: string) => {
+    return expandedSubsections.indexOf(subsectionName) !== -1;
+  };
+
+  return (
+    <SectionRow key={section.name}>
+      <StyledCollapse collapsible="disabled" ghost activeKey={expandedSubsections}>
+        {section.subsections.map(subsection => {
+          const items = resources.filter(item => shouldBeVisible(item, subsection));
+          return (
+            <StyledCollapsePanel
+              key={subsection.name}
+              showArrow={false}
+              header={
+                <SubsectionHeader
+                  isExpanded={isSubsectionExpanded(subsection.name)}
+                  isHighlighted={!isSubsectionExpanded(subsection.name) && items.some(i => i.highlight)}
+                  isSelected={!isSubsectionExpanded(subsection.name) && items.some(i => i.selected)}
+                  onExpand={() => onSubsectionExpand(section.name, subsection.name)}
+                  onCollapse={() => onSubsectionCollapse(section.name, subsection.name)}
+                  items={items}
+                  subsection={subsection}
+                />
+              }
+            >
+              <SectionCol key={subsection.name}>
+                {items.map(item => (
+                  <NavigatorResourceRow
+                    rowKey={item.id}
+                    label={item.name}
+                    isSelected={Boolean(item.selected)}
+                    highlighted={Boolean(item.highlight)}
+                    hasIncomingRefs={Boolean(hasIncomingRefs(item))}
+                    hasOutgoingRefs={Boolean(hasOutgoingRefs(item))}
+                    hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
+                    onClickResource={() => selectResource(item.id)}
+                  />
+                ))}
+              </SectionCol>
+            </StyledCollapsePanel>
+          );
+        })}
+      </StyledCollapse>
+    </SectionRow>
+  );
+};
+
 const NavigatorPane = () => {
   const dispatch = useAppDispatch();
   const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
@@ -72,6 +241,16 @@ const NavigatorPane = () => {
   const kustomizations = useSelector(selectKustomizations);
   const resources = useSelector(selectActiveResources);
   const helmCharts = useSelector(selectHelmCharts);
+
+  const [expandedSubsectionsBySection, setExpandedSubsectionsBySection] = useState<Record<string, string[]>>(
+    // set all subsections of each section as expanded by default
+    Object.fromEntries(
+      appConfig.navigators
+        .map(navigator => navigator.sections)
+        .flat()
+        .map(section => [section.name, section.subsections.map(subsection => subsection.name)])
+    )
+  );
 
   const selectResource = (resourceId: string) => {
     dispatch(selectK8sResource(resourceId));
@@ -103,6 +282,20 @@ const NavigatorPane = () => {
       setNamespace(ALL_NAMESPACES);
     }
   }, [resourceMap, previewResource]);
+
+  const handleSubsectionExpand = (sectionName: string, subsectionName: string) => {
+    setExpandedSubsectionsBySection({
+      ...expandedSubsectionsBySection,
+      [sectionName]: [...(expandedSubsectionsBySection[sectionName] || []), subsectionName],
+    });
+  };
+
+  const handleSubsectionCollapse = (sectionName: string, subsectionName: string) => {
+    setExpandedSubsectionsBySection({
+      ...expandedSubsectionsBySection,
+      [sectionName]: expandedSubsectionsBySection[sectionName].filter(s => s !== subsectionName),
+    });
+  };
 
   function shouldBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
     return (
@@ -216,30 +409,15 @@ const NavigatorPane = () => {
                                 <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
                               </SectionRow>
                             )}
-                            <SectionRow key={section.name}>
-                              {section.subsections.map(subsection => {
-                                const items = resources.filter(item => shouldBeVisible(item, subsection));
-                                return (
-                                  <SectionCol key={subsection.name}>
-                                    <NavigatorContentSubTitle>
-                                      {subsection.name} {items.length > 0 ? `(${items.length})` : ''}
-                                    </NavigatorContentSubTitle>
-                                    {items.map(item => (
-                                      <NavigatorResourceRow
-                                        rowKey={item.id}
-                                        label={item.name}
-                                        isSelected={Boolean(item.selected)}
-                                        highlighted={Boolean(item.highlight)}
-                                        hasIncomingRefs={Boolean(hasIncomingRefs(item))}
-                                        hasOutgoingRefs={Boolean(hasOutgoingRefs(item))}
-                                        hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
-                                        onClickResource={() => selectResource(item.id)}
-                                      />
-                                    ))}
-                                  </SectionCol>
-                                );
-                              })}
-                            </SectionRow>
+                            <Section
+                              expandedSubsections={expandedSubsectionsBySection[section.name]}
+                              onSubsectionExpand={handleSubsectionExpand}
+                              onSubsectionCollapse={handleSubsectionCollapse}
+                              section={section}
+                              shouldBeVisible={shouldBeVisible}
+                              resources={resources}
+                              selectResource={selectResource}
+                            />
                           </>
                         );
                       })}

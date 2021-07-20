@@ -13,8 +13,7 @@ const MonoSectionTitle = styled((props: MonoSectionTitleProps) => <Text {...prop
     margin-bottom: 0;
     padding: 12px;
     padding-left: 16px;
-    text-transform: uppercase;
-    font-size: 20px;
+    font-size: 24px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;
