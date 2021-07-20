@@ -127,6 +127,7 @@ const FileTreeContainer = styled.div`
   background: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   height: 100%;
+
   & .ant-tree {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -185,10 +186,13 @@ const NoFilesContainer = styled(Typography.Text)`
   margin-left: 16px;
 `;
 
-const FileTreePane = () => {
+const FileTreePane = (props: {windowHeight: number | undefined}) => {
+  const {windowHeight} = props;
   const dispatch = useAppDispatch();
   const previewResource = useAppSelector(state => state.main.previewResource);
   const previewMode = useSelector(inPreviewMode);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -246,6 +250,7 @@ const FileTreePane = () => {
               type='primary'
               ghost
               disabled={previewMode && previewResource !== kubeconfig}
+              loading={previewType === 'cluster' && previewLoader.isLoading}
               onClick={connectToCluster}
             >
               Cluster Objects
@@ -274,6 +279,8 @@ const FileTreePane = () => {
       />
       {tree ? (
         <Tree.DirectoryTree
+          // height is needed to enable Tree's virtual scroll
+          height={windowHeight && windowHeight > 180 ? windowHeight - 180 : 0}
           onSelect={onSelect}
           defaultExpandAll
           treeData={[tree]}
@@ -282,6 +289,7 @@ const FileTreePane = () => {
             // @ts-ignore
             return node.highlight;
           }}
+          disabled={previewLoader.isLoading}
         />
       ) : (
         <NoFilesContainer>No folder selected.</NoFilesContainer>

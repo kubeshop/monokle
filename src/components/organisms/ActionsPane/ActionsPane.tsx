@@ -1,4 +1,5 @@
-import {Tabs, Space, Col, Row} from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Tabs, Space, Col, Row, Button, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
@@ -7,9 +8,9 @@ import FormEditor from '@molecules/FormEditor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
-import {useEffect, useState} from 'react';
 import TabHeader from '@atoms/TabHeader';
-import {MonoButton, PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {K8sResource} from '@models/k8sresource';
 
 const {TabPane} = Tabs;
 
@@ -22,85 +23,104 @@ const StyledTabs = styled(Tabs)`
   }
 `;
 
-const ActionsPane = (props: {actionHeight: string}) => {
-  const {actionHeight} = props;
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+const ActionsPaneContainer = styled(PaneContainer)`
+  height: 100%;
+  overflow-y: hidden;
+`;
+
+const StyledButton = styled(Button)`
+  padding: 0px 10px;
+  height: 30px;
+`;
+
+const ActionsPane = (props: {contentHeight: string}) => {
+  const {contentHeight} = props;
+
+  const StyledSkeleton = styled(Skeleton)`
+    margin: 20px;
+    width: 95%;
+  `;
+
+  const selectedResourceId = useAppSelector(state => state.main.selectedResource);
+  const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const dispatch = useAppDispatch();
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
   const [key, setKey] = useState('source');
 
   async function applySelectedResource() {
-    if (selectedResource) {
-      applyResource(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
+    if (selectedResourceId) {
+      applyResource(selectedResourceId, resourceMap, fileMap, dispatch, kubeconfig);
     }
   }
 
   async function diffSelectedResource() {
-    if (selectedResource) {
-      dispatch(diffResource(selectedResource));
+    if (selectedResourceId) {
+      dispatch(diffResource(selectedResourceId));
     }
   }
 
   useEffect(() => {
-    if (key === 'form' && !selectedResource) {
+    if (selectedResourceId && resourceMap) {
+      setSelectedResource(resourceMap[selectedResourceId]);
+    }
+  }, [selectedResourceId, resourceMap]);
+
+  useEffect(() => {
+    if (key === 'form' && !selectedResourceId) {
       setKey('source');
     }
-  }, [selectedResource, key]);
+  }, [selectedResourceId, key]);
 
   const OperationsSlot = {
     right: (
       <Space>
-        <MonoButton onClick={applySelectedResource} disabled={!selectedResource} type='primary'>
+        <StyledButton type="primary" ghost onClick={applySelectedResource} disabled={!selectedResource}>
           Apply
-        </MonoButton>
-        <MonoButton onClick={diffSelectedResource} disabled={!selectedResource} type='primary'>
+        </StyledButton>
+        <StyledButton type="primary" ghost onClick={diffSelectedResource} disabled={!selectedResource}>
           Diff
-        </MonoButton>
+        </StyledButton>
       </Space>
     ),
   };
 
-  const resource = selectedResource && resourceMap ? resourceMap[selectedResource] : undefined;
-
   return (
-    <PaneContainer>
+    <>
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>Editor</MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
-      <Row>
-        <Col span={24}>
-          <StyledTabs
-            defaultActiveKey='source'
-            activeKey={key}
-            onChange={k => setKey(k)}
-            tabBarExtraContent={OperationsSlot}
-          >
-            <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key='source'>
-              <Monaco editorHeight={actionHeight} />
-            </TabPane>
 
-            {resource?.kind === 'ConfigMap' &&
-            <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
-                     disabled={!selectedResource}
-                     key='form'>
-              <FormEditor />
-            </TabPane>
-            }
-            {/* <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph (alpha)</TabHeader>} key='graph'>
-              <GraphView editorHeight={actionHeight} />
-            </TabPane>
-
-             <Tab eventKey="logger" title="Logger">
-              <LogViewer editorHeight={actionHeight} />
-            </Tab> */}
-          </StyledTabs>
-        </Col>
-      </Row>
-    </PaneContainer>
+      <ActionsPaneContainer>
+        <Row>
+          <Col span={24}>
+            <StyledTabs
+              defaultActiveKey="source"
+              activeKey={key}
+              onChange={k => setKey(k)}
+              tabBarExtraContent={OperationsSlot}
+            >
+              <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
+                {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={contentHeight} />}
+              </TabPane>
+              {selectedResource && selectedResource?.kind === 'ConfigMap' && (
+                <TabPane
+                  tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
+                  disabled={!selectedResourceId}
+                  key="form"
+                >
+                  {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor />}
+                </TabPane>
+              )}
+            </StyledTabs>
+          </Col>
+        </Row>
+      </ActionsPaneContainer>
+    </>
   );
 };
 
