@@ -1,4 +1,4 @@
-import {Tabs, Space, Col, Row} from 'antd';
+import {Tabs, Space, Col, Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ClusterOutlined} from '@ant-design/icons';
 
@@ -23,6 +23,11 @@ const StyledTabs = styled(Tabs)`
   }
 `;
 
+const StyledSkeleton = styled(Skeleton)`
+  margin: 20px;
+  width: 95%;
+`;
+
 const ActionsPane = (props: {actionHeight: string}) => {
   const {actionHeight} = props;
   const selectedResource = useAppSelector(state => state.main.selectedResource);
@@ -30,6 +35,7 @@ const ActionsPane = (props: {actionHeight: string}) => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const dispatch = useAppDispatch();
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
   const [key, setKey] = useState('source');
 
   async function applySelectedResource() {
@@ -79,17 +85,17 @@ const ActionsPane = (props: {actionHeight: string}) => {
             tabBarExtraContent={OperationsSlot}
           >
             <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
-              <Monaco editorHeight={actionHeight} />
+              {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={actionHeight} />}
             </TabPane>
             <TabPane
               tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
               disabled={!selectedResource}
               key="form"
             >
-              <FormEditor />
+              {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor />}
             </TabPane>
             <TabPane tab={<TabHeader icon={<ClusterOutlined />}>Graph</TabHeader>} key="graph">
-              <GraphView editorHeight={actionHeight} />
+              {previewLoader.isLoading ? <StyledSkeleton /> : <GraphView editorHeight={actionHeight} />}
             </TabPane>
 
             {/* <Tab eventKey="logger" title="Logger">

@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
-import {Col, Row, Select} from 'antd';
+import {Col, Row, Select, Skeleton} from 'antd';
 import styled from 'styled-components';
 import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
 import {FontColors} from '@styles/Colors';
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectK8sResource, clearPreview} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
 import {setFilterObjects} from '@redux/reducers/appConfig';
@@ -53,6 +53,11 @@ const SectionCol = styled(Col)`
   padding: 0;
 `;
 
+const StyledSkeleton = styled(Skeleton)`
+  margin: 20px;
+  width: 90%;
+`;
+
 const NavigatorPane = () => {
   const dispatch = useAppDispatch();
   const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
@@ -60,6 +65,7 @@ const NavigatorPane = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const previewResource = useAppSelector(state => state.main.previewResource);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
   const appConfig = useAppSelector(state => state.config);
   const kustomizations = useSelector(selectKustomizations);
   const resources = useSelector(selectActiveResources);
@@ -81,7 +87,11 @@ const NavigatorPane = () => {
     if (id !== selectedResource) {
       dispatch(selectK8sResource(id));
     }
-    dispatch(previewKustomization(id));
+    if (id !== previewResource) {
+      dispatch(previewKustomization(id));
+    } else {
+      dispatch(clearPreview());
+    }
   };
 
   function shouldBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
@@ -116,15 +126,9 @@ const NavigatorPane = () => {
                 <MonoSectionTitle>Helm Charts</MonoSectionTitle>
               </MonoSectionHeaderCol>
             </SectionRow>
-            {Object.values(helmCharts)
-              .map((chart: HelmChart) => {
-                return (
-                  <NavigatorHelmRow
-                    rowKey={chart.id}
-                    helmChart={chart}
-                  />
-                );
-              })}
+            {Object.values(helmCharts).map((chart: HelmChart) => {
+              return <NavigatorHelmRow rowKey={chart.id} helmChart={chart} />;
+            })}
           </SectionCol>
         </SectionRow>
       )}
@@ -164,6 +168,7 @@ const NavigatorPane = () => {
                     hasOutgoingRefs={Boolean(hasOutgoingRefs(k))}
                     onClickResource={!previewResource ? () => selectResource(k.id) : undefined}
                     onClickPreview={() => selectPreview(k.id)}
+                    isPreviewLoading={previewLoader.isLoading && k.id === previewLoader.targetResourceId}
                   />
                 );
               })}
@@ -192,60 +197,64 @@ const NavigatorPane = () => {
         </Select>
       </SectionRow>
 
-      <SectionRow>
-        <SectionCol>
-          {appConfig.navigators.map(navigator => {
-            return (
-              <>
-                <SectionRow>
-                  <MonoSectionHeaderCol>
-                    <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
-                  </MonoSectionHeaderCol>
-                </SectionRow>
-                <SectionRow>
-                  <SectionCol>
-                    {navigator.sections.map(section => {
-                      return (
-                        <>
-                          {section.name.length > 0 && (
-                            <SectionRow>
-                              <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
+      {previewLoader.isLoading ? (
+        <StyledSkeleton />
+      ) : (
+        <SectionRow>
+          <SectionCol>
+            {appConfig.navigators.map(navigator => {
+              return (
+                <>
+                  <SectionRow>
+                    <MonoSectionHeaderCol>
+                      <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
+                    </MonoSectionHeaderCol>
+                  </SectionRow>
+                  <SectionRow>
+                    <SectionCol>
+                      {navigator.sections.map(section => {
+                        return (
+                          <>
+                            {section.name.length > 0 && (
+                              <SectionRow>
+                                <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
+                              </SectionRow>
+                            )}
+                            <SectionRow key={section.name}>
+                              {section.subsections.map(subsection => {
+                                const items = resources.filter(item => shouldBeVisible(item, subsection));
+                                return (
+                                  <SectionCol key={subsection.name}>
+                                    <NavigatorContentSubTitle>
+                                      {subsection.name} {items.length > 0 ? `(${items.length})` : ''}
+                                    </NavigatorContentSubTitle>
+                                    {items.map(item => (
+                                      <NavigatorResourceRow
+                                        rowKey={item.id}
+                                        label={item.name}
+                                        isSelected={Boolean(item.selected)}
+                                        highlighted={Boolean(item.highlight)}
+                                        hasIncomingRefs={Boolean(hasIncomingRefs(item))}
+                                        hasOutgoingRefs={Boolean(hasOutgoingRefs(item))}
+                                        hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
+                                        onClickResource={() => selectResource(item.id)}
+                                      />
+                                    ))}
+                                  </SectionCol>
+                                );
+                              })}
                             </SectionRow>
-                          )}
-                          <SectionRow key={section.name}>
-                            {section.subsections.map(subsection => {
-                              const items = resources.filter(item => shouldBeVisible(item, subsection));
-                              return (
-                                <SectionCol key={subsection.name}>
-                                  <NavigatorContentSubTitle>
-                                    {subsection.name} {items.length > 0 ? `(${items.length})` : ''}
-                                  </NavigatorContentSubTitle>
-                                  {items.map(item => (
-                                    <NavigatorResourceRow
-                                      rowKey={item.id}
-                                      label={item.name}
-                                      isSelected={Boolean(item.selected)}
-                                      highlighted={Boolean(item.highlight)}
-                                      hasIncomingRefs={Boolean(hasIncomingRefs(item))}
-                                      hasOutgoingRefs={Boolean(hasOutgoingRefs(item))}
-                                      hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
-                                      onClickResource={() => selectResource(item.id)}
-                                    />
-                                  ))}
-                                </SectionCol>
-                              );
-                            })}
-                          </SectionRow>
-                        </>
-                      );
-                    })}
-                  </SectionCol>
-                </SectionRow>
-              </>
-            );
-          })}
-        </SectionCol>
-      </SectionRow>
+                          </>
+                        );
+                      })}
+                    </SectionCol>
+                  </SectionRow>
+                </>
+              );
+            })}
+          </SectionCol>
+        </SectionRow>
+      )}
     </PaneContainer>
   );
 };
