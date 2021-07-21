@@ -13,8 +13,7 @@ const NavigatorContentTitle = styled((props: NavigatorContentTitleProps) => <Tex
     margin-bottom: 0;
     padding: 8px;
     padding-left: 16px;
-    text-transform: uppercase;
-    font-size: 17px;
+    font-size: 20px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;

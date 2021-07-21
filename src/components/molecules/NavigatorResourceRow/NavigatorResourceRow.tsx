@@ -87,6 +87,8 @@ const NavigatorResourceRow = (props: NavigatorResourceRowProps) => {
             <div className={classname}>
               <NavigatorRowLabel
                 label={label}
+                isSelected={isSelected}
+                isHighlighted={highlighted}
                 resourceId={rowKey.toString()}
                 hasIncomingRefs={hasIncomingRefs}
                 hasOutgoingRefs={hasOutgoingRefs}

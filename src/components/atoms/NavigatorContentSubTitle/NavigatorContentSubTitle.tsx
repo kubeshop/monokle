@@ -12,8 +12,7 @@ const NavigatorContentSubTitle = styled((props: NavigatorContentSubTitleProps) =
   &.ant-typography {
     margin-bottom: 0;
     padding-left: 16px;
-    text-transform: uppercase;
-    font-size: 16px;
+    font-size: 14px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-variant: tabular-nums;

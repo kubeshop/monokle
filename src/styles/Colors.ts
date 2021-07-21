@@ -22,9 +22,12 @@ enum Colors {
   blackPure = '#000000',
 
   cyan = '#58D1C9',
+  cyan7 = '#33BCB7',
   volcano = '#F3956A',
 
-  monoBlue = '#1890FF', // Daybreak Blue / blue-6
+  blue6 = '#1890FF', // Daybreak Blue
+  blue10 = '#B7E3FA',
+
   highlightGreen = '#33BCB7',
 
   selectionGradient = 'linear-gradient(90deg, #3C9AE8 0%, #84E2D8 100%)',
@@ -41,7 +44,7 @@ export enum BackgroundColors {
 export enum FontColors {
   lightThemeMainFont = Colors.blackPure,
   darkThemeMainFont = Colors.grey450,
-  elementSelectTitle = Colors.monoBlue,
+  elementSelectTitle = Colors.blue6,
   resourceRowHighlight = Colors.highlightGreen,
   grey = Colors.grey700,
   error = Colors.redError,

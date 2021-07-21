@@ -97,6 +97,8 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
           <SectionCol sm={22}>
             <div className={classname}>
               <NavigatorRowLabel
+                isSelected={isSelected}
+                isHighlighted={highlighted}
                 label={resource.name}
                 resourceId={rowKey.toString()}
                 hasIncomingRefs={hasIncomingRefs}
