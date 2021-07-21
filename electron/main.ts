@@ -61,11 +61,11 @@ app.whenReady().then(() => {
       .catch(err => console.log('An error occurred: ', err));
   }
 
+  ElectronStore.initRenderer();
   createWindow();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      ElectronStore.initRenderer();
       createWindow();
     }
   });
