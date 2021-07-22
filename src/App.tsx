@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
+import SplitPane from 'react-split-pane';
 
 import {BackgroundColors} from '@styles/Colors';
 import Layout from '@atoms/Layout';
 import PageHeader from '@organisms/PageHeader';
 import Content from '@atoms/Content';
-import Col from '@atoms/Col';
 import Row from '@atoms/Row';
 import PageFooter from '@organisms/PageFooter';
 import ActionsPane from '@organisms/ActionsPane';
@@ -18,11 +18,10 @@ import {Size} from '@models/window';
 import DiffModal from '@organisms/DiffModal';
 import {useWindowSize} from '@utils/hooks';
 
-const StyledColumn = styled(Col)`
-  width: 100%;
+const Pane = styled.div`
+  overflow-x: hidden;
   height: 100%;
-  padding: 0px;
-  overflow-y: hidden;
+  border-right: 1px solid #fff;
 `;
 
 const StyledRow = styled(Row)`
@@ -52,17 +51,17 @@ const App = () => {
 
         <StyledContent style={{height: contentHeight}}>
           <StyledRow style={{height: contentHeight}}>
-            <StyledColumn sm={6}>
-              <FileTreePane windowHeight={size.height} />
-            </StyledColumn>
-
-            <StyledColumn sm={6}>
-              <NavigatorPane />
-            </StyledColumn>
-
-            <StyledColumn sm={12}>
-              <ActionsPane contentHeight={contentHeight} />
-            </StyledColumn>
+            <SplitPane defaultSize="50%" split="vertical">
+              <Pane>
+                <FileTreePane windowHeight={size.height} />
+              </Pane>
+              <Pane>
+                <NavigatorPane />
+              </Pane>
+              <Pane>
+                <ActionsPane contentHeight={contentHeight} />
+              </Pane>
+            </SplitPane>
           </StyledRow>
         </StyledContent>
 
