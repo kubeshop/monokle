@@ -19,9 +19,10 @@ import DiffModal from '@organisms/DiffModal';
 import {useWindowSize} from '@utils/hooks';
 
 const Pane = styled.div`
-  overflow-x: hidden;
   height: 100%;
   border-right: 1px solid #fff;
+  overflow-x: hidden;
+  overflow-y: hidden;
 `;
 
 const StyledRow = styled(Row)`

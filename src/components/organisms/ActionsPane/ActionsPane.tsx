@@ -113,7 +113,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   disabled={!selectedResourceId}
                   key="form"
                 >
-                  {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor />}
+                  {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor contentHeight={contentHeight} />}
                 </TabPane>
               )}
             </StyledTabs>
