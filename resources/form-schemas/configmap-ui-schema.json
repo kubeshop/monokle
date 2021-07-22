@@ -1,19 +1,38 @@
 {
   "data": {
-    "ui:description": "Data contains the configuration data"
+    "ui:description": " "
   },
   "binaryData": {
-    "ui:description": "Data contains the configuration data"
+    "ui:description": " "
+  },
+  "immutable": {
+    "ui:description": " "
   },
   "metadata": {
+    "ui:description": " ",
+    "name": {
+      "ui:description": " "
+    },
+    "namespace": {
+      "ui:description": " "
+    },
+    "clusterName": {
+      "ui:description": " "
+    },
+    "generation": {
+      "ui:description": " "
+    },
+    "generateName": {
+      "ui:description": " "
+    },
     "labels": {
-      "ui:description": "Map of string keys and values that can be used to organize and categorize (scope and select) objects"
+      "ui:description": " "
     },
     "annotations": {
-      "ui:description": "Arbitrary metadata."
+      "ui:description": " "
     },
     "finalizers": {
-      "ui:description": "Must be empty before the object is deleted from the registry."
+      "ui:description": " "
     }
   }
 }

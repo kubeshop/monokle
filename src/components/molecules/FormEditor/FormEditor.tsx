@@ -1,8 +1,6 @@
 import * as React from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {withTheme} from '@rjsf/core';
-// @ts-ignore
-import {Theme as AntDTheme} from '@rjsf/antd';
+import Form from '@rjsf/core';
 import {loadResource} from '@redux/utils';
 import {useEffect} from 'react';
 import {updateResource} from '@redux/reducers/main';
@@ -11,8 +9,6 @@ import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
 import log from 'loglevel';
 import styled from 'styled-components';
-
-const Form = withTheme(AntDTheme);
 
 function getFormSchema(kind: string) {
   return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`));
@@ -63,6 +59,10 @@ const FormEditor = (props: {contentHeight: string}) => {
     try {
       if (resource) {
         const content = mergeManifests(resource.text, formString);
+        log.debug(resource.text);
+        log.debug(formString);
+        log.debug(content);
+
         dispatch(updateResource({resourceId: selectedResource, content}));
       }
     } catch (err) {
