@@ -22,15 +22,22 @@ function getUiSchema(kind: string) {
   return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`));
 }
 
-const FormContainer = styled.div`
+const FormContainer = styled.div<{contentHeight: string}>`
   width: 100%;
-  height: 100%;
   padding: 20px;
   margin: 0px;
   margin-bottom: 20px;
+  overflow-y: scroll;
+  height: ${props => props.contentHeight};
+  padding-bottom: 100px;
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
 `;
 
-const FormEditor = () => {
+const FormEditor = (props: {contentHeight: string}) => {
+  const {contentHeight} = props;
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const [formData, setFormData] = React.useState(null);
@@ -75,7 +82,7 @@ const FormEditor = () => {
 
   return (
     // @ts-ignore
-    <FormContainer>
+    <FormContainer contentHeight={contentHeight}>
       <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} onSubmit={onFormSubmit} />
     </FormContainer>
   );
