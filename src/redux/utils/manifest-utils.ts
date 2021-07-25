@@ -1,5 +1,13 @@
 import {Document, isMap, isPair, isSeq, ParsedNode, parseDocument, visit} from 'yaml';
 
+function copyValueIfMissing(templateDoc: Document.Parsed<ParsedNode>, path: readonly (any)[]) {
+  const templateNode = findValueNode(templateDoc, path);
+  if (!templateNode) {
+    const nodePath = createNodePath(path);
+    templateDoc.addIn(nodePath.slice(0, nodePath.length - 1), path[path.length - 1]);
+  }
+}
+
 /**
  * Function to merge the values of one yaml file into an existing one - maintaining
  * node order as much as possible
@@ -54,12 +62,12 @@ export function mergeManifests(template: string, values: string) {
   visit(valuesDoc, {
     Scalar(key, node, path) {
       if (key === 'value') {
-        const templateNode = findValueNode(templateDoc, path);
-        if (!templateNode) {
-          const nodePath = createNodePath(path);
-          templateDoc.addIn(nodePath.slice(0, nodePath.length - 1), path[path.length - 1]);
-        }
+        copyValueIfMissing(templateDoc, path);
       }
+    },
+    // sequences
+    Seq(key, node, path) {
+      copyValueIfMissing(templateDoc, path);
     },
   });
 
