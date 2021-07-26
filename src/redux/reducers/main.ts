@@ -188,6 +188,9 @@ export const mainSlice = createSlice({
       setPreviewData({}, state);
       state.previewType = undefined;
     },
+    setShouldRefreshFileMap: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.shouldRefreshFileMap = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -247,6 +250,7 @@ export const mainSlice = createSlice({
       state.selectedResource = undefined;
       state.selectedPath = undefined;
       state.previewResource = undefined;
+      state.shouldRefreshFileMap = false;
     });
 
     builder.addCase(diffResource.fulfilled, (state, action) => {
@@ -336,5 +340,6 @@ export const {
   pathRemoved,
   selectHelmValuesFile,
   clearPreview,
+  setShouldRefreshFileMap,
 } = mainSlice.actions;
 export default mainSlice.reducer;

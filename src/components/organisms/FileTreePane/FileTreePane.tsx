@@ -197,6 +197,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
+  const shouldRefreshFileMap = useAppSelector(state => state.main.shouldRefreshFileMap);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
 
   // eslint-disable-next-line no-undef
@@ -211,6 +212,10 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
 
   const setFolder = (folder: string) => {
     dispatch(setRootFolder(folder));
+  };
+
+  const refreshFolder = () => {
+    setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
   };
 
   React.useEffect(() => {
@@ -262,11 +267,21 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
               </CenteredItemsDiv>
             </Button>
           </Space>
+        </ColumnWithPadding>
+        {shouldRefreshFileMap && fileMap[ROOT_FILE_ENTRY] && (
+          <ColumnWithPadding span={24}>
+            <Button type="primary" ghost onClick={refreshFolder}>
+              Refresh Folder
+            </Button>
+          </ColumnWithPadding>
+        )}
+        <ColumnWithPadding span={24}>
           <FileDetailsContainer>
             {nrOfFiles !== -1 && <Typography.Text type="secondary">{nrOfFiles} files</Typography.Text>}
           </FileDetailsContainer>
         </ColumnWithPadding>
       </Row>
+
       <input
         type="file"
         /* @ts-expect-error */
