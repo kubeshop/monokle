@@ -27,6 +27,7 @@ type HelmValuesMapType = {
 
 interface AppState {
   fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
+  shouldRefreshFileMap?: boolean;
   appConfig: AppConfig; // holds current configuration
   resourceMap: ResourceMapType; // maps resource ids to resources
   selectedResource?: string; // the id of the currently selected resource

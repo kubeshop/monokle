@@ -9,7 +9,7 @@ import FilePatternList from '@molecules/FilePatternList';
 
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleSettings} from '@redux/reducers/ui';
-import {setTheme, setScanExcludes, setFileIncludes, setKubeconfig} from '@redux/reducers/appConfig';
+import {updateTheme, updateScanExcludes, updateFileIncludes, updateKubeconfig} from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
 
 const StyledDiv = styled.div`
@@ -44,16 +44,16 @@ const SettingsDrawer = () => {
   };
 
   const onChangeFileIncludes = (patterns: string[]) => {
-    dispatch(setFileIncludes(patterns));
+    dispatch(updateFileIncludes(patterns));
   };
 
   const onChangeScanExcludes = (patterns: string[]) => {
-    dispatch(setScanExcludes(patterns));
+    dispatch(updateScanExcludes(patterns));
   };
 
   const onChangeTheme = (e: RadioChangeEvent) => {
     if (e.target.value) {
-      dispatch(setTheme(e.target.value));
+      dispatch(updateTheme(e.target.value));
     }
   };
 
@@ -67,7 +67,7 @@ const SettingsDrawer = () => {
       const file: any = fileInput.current.files[0];
       if (file.path) {
         const path = file.path;
-        dispatch(setKubeconfig(path));
+        dispatch(updateKubeconfig(path));
       }
     }
   };
