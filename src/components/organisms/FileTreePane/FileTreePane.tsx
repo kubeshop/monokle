@@ -6,7 +6,7 @@ import {Row, Button, Tree, Col, Space, Typography} from 'antd';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile} from '@redux/reducers/main';
+import {selectFile, clearPreview} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 
 import {FolderAddOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
@@ -220,6 +220,9 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
   }, [fileMap, resourceMap]);
 
   const connectToCluster = () => {
+    if (previewMode && previewResource !== kubeconfig) {
+      dispatch(clearPreview());
+    }
     dispatch(previewCluster(kubeconfig));
   };
 
@@ -228,7 +231,10 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
   };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
-    if (!previewMode && info.node.key) {
+    if (info.node.key) {
+      if (previewMode) {
+        dispatch(clearPreview());
+      }
       dispatch(selectFile(info.node.key));
     }
   };
@@ -249,7 +255,6 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
             <Button
               type="primary"
               ghost
-              disabled={previewMode && previewResource !== kubeconfig}
               loading={previewType === 'cluster' && previewLoader.isLoading}
               onClick={connectToCluster}
             >
@@ -275,7 +280,6 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
         onChange={onUploadHandler}
         ref={folderInput}
         style={{display: 'none'}}
-        disabled={previewMode}
       />
       {tree ? (
         <Tree.DirectoryTree
