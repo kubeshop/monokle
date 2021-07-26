@@ -33,13 +33,13 @@ const StyledButton = styled(Button)`
   height: 30px;
 `;
 
+const StyledSkeleton = styled(Skeleton)`
+  margin: 20px;
+  width: 95%;
+`;
+
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
-
-  const StyledSkeleton = styled(Skeleton)`
-    margin: 20px;
-    width: 95%;
-  `;
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResource);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
