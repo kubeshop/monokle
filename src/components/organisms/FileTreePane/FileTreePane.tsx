@@ -193,6 +193,10 @@ const FileTreeContainer = styled.div`
   & .ant-tree-switcher {
     background: transparent;
   }
+
+  & .ant-tree-treenode-disabled .file-entry-name {
+    color: ${Colors.grey800} !important;
+  }
 `;
 
 const FileDetailsContainer = styled.div`
