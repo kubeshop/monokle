@@ -34,7 +34,8 @@ provides
 Build with
 
 ```
-npm install
+nvm install
+npm install --force
 ```
 
 run with
