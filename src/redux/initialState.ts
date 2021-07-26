@@ -8,7 +8,7 @@ export const initialState: AppState = {
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,
-      helmPreviewMode: 'template',
+      helmPreviewMode: electronStore.get('appConfig.settings.helmPreviewMode') || 'template',
       theme: electronStore.get('appConfig.settings.theme'),
       textSize: electronStore.get('appConfig.settings.textSize'),
       language: electronStore.get('appConfig.settings.language'),
