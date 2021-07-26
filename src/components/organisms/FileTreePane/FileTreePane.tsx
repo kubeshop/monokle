@@ -49,6 +49,7 @@ const NodeTitleContainer = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: ${Colors.blue10};
 `;
 const NodeActionsContainer = styled.div`
   position: absolute;
@@ -64,9 +65,11 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
     title: (
       <NodeContainer>
         <NodeTitleContainer>
-          {fileEntry.name}
+          <span className="file-entry-name">{fileEntry.name}</span>
           {resources.length > 0 ? (
-            <StyledNumberOfResources type="secondary">{resources.length}</StyledNumberOfResources>
+            <StyledNumberOfResources className="file-entry-nr-of-resources" type="secondary">
+              {resources.length}
+            </StyledNumberOfResources>
           ) : (
             ''
           )}
@@ -144,6 +147,15 @@ const FileTreeContainer = styled.div`
   & .ant-tree-treenode-selected::before {
     background: ${Colors.selectionGradient} !important;
   }
+  & .ant-tree-treenode-selected .file-entry-name {
+    color: ${Colors.blackPure} !important;
+  }
+  & .ant-tree-treenode-selected .ant-tree-switcher {
+    color: ${Colors.blackPure} !important;
+  }
+  & .ant-tree-treenode-selected .file-entry-nr-of-resources {
+    color: ${Colors.blackPure} !important;
+  }
   & .ant-tree-treenode {
     background: transparent;
   }
@@ -154,10 +166,12 @@ const FileTreeContainer = styled.div`
     font-style: italic;
     font-weight: bold;
     background: ${Colors.highlightGradient};
-    color: ${FontColors.resourceRowHighlight};
+  }
+  & .filter-node .file-entry-name {
+    color: ${FontColors.resourceRowHighlight} !important;
   }
   .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
-    color: black !important;
+    color: ${Colors.blackPure} !important;
     font-weight: bold;
   }
   & .ant-tree-iconEle {
@@ -174,6 +188,10 @@ const FileTreeContainer = styled.div`
   & .ant-tree-node-content-wrapper .ant-tree-title {
     overflow: hidden;
     flex-grow: 1;
+  }
+
+  & .ant-tree-switcher {
+    background: transparent;
   }
 `;
 
@@ -315,6 +333,8 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
             return node.highlight;
           }}
           disabled={previewMode || previewLoader.isLoading}
+          showLine
+          showIcon={false}
         />
       ) : (
         <NoFilesContainer>No folder selected.</NoFilesContainer>
