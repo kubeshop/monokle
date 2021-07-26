@@ -1,37 +1,49 @@
 {
   "data": {
+    "ui:title": "Data",
     "ui:description": " "
   },
   "binaryData": {
+    "ui:title": "Binary Data",
     "ui:description": " "
   },
   "immutable": {
-    "ui:description": " "
+    "ui:title": "Immutable",
+    "ui:description": "test"
   },
   "metadata": {
+    "ui:title": "Metadata",
     "ui:description": " ",
     "name": {
+      "ui:title": "Name",
       "ui:description": " "
     },
     "namespace": {
+      "ui:title": "Namespace",
       "ui:description": " "
     },
     "clusterName": {
+      "ui:title": "Cluster Name",
       "ui:description": " "
     },
     "generation": {
+      "ui:title": "Generation",
       "ui:description": " "
     },
     "generateName": {
+      "ui:title": "Generate Name",
       "ui:description": " "
     },
     "labels": {
+      "ui:title": "Labels",
       "ui:description": " "
     },
     "annotations": {
+      "ui:title": "Annotations",
       "ui:description": " "
     },
     "finalizers": {
+      "ui:title": "Finalizers",
       "ui:description": " "
     }
   }

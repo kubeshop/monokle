@@ -7,7 +7,6 @@ import {updateResource} from '@redux/reducers/main';
 import {logMessage} from '@redux/utils/log';
 import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
-import log from 'loglevel';
 import styled from 'styled-components';
 
 function getFormSchema(kind: string) {
@@ -59,16 +58,14 @@ const FormEditor = (props: {contentHeight: string}) => {
     try {
       if (resource) {
         const content = mergeManifests(resource.text, formString);
+/*
         log.debug(resource.text);
         log.debug(formString);
         log.debug(content);
-
+*/
         dispatch(updateResource({resourceId: selectedResource, content}));
       }
     } catch (err) {
-      log.error(err);
-      log.error(formString);
-      log.error(resource?.text);
       logMessage(`Failed to update resource ${err}`, dispatch);
     }
   };
