@@ -6,7 +6,7 @@ import {Row, Button, Tree, Col, Space, Typography} from 'antd';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, clearPreview} from '@redux/reducers/main';
+import {selectFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 
 import {FolderAddOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
@@ -14,7 +14,8 @@ import {FolderAddOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import fs from 'fs';
-import {previewCluster, setRootFolder} from '@redux/reducers/thunks';
+import {setRootFolder} from '@redux/reducers/thunks';
+import {startPreview, stopPreview} from '@redux/utils/preview';
 import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
@@ -254,9 +255,9 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
 
   const connectToCluster = () => {
     if (previewMode && previewResource !== kubeconfig) {
-      dispatch(clearPreview());
+      stopPreview(dispatch);
     }
-    dispatch(previewCluster(kubeconfig));
+    startPreview(kubeconfig, 'cluster', dispatch);
   };
 
   const startFileUploader = () => {
@@ -266,7 +267,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
     if (info.node.key) {
       if (previewMode) {
-        dispatch(clearPreview());
+        stopPreview(dispatch);
       }
       dispatch(selectFile(info.node.key));
     }

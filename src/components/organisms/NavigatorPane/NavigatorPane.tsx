@@ -6,7 +6,7 @@ import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
-import {selectK8sResource, clearPreview} from '@redux/reducers/main';
+import {selectK8sResource} from '@redux/reducers/main';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/utils/resource';
 import {setFilterObjects} from '@redux/reducers/appConfig';
@@ -14,7 +14,7 @@ import {selectKustomizations, selectActiveResources, selectHelmCharts} from '@re
 import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection, NavigatorSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
-import {previewKustomization} from '@redux/reducers/thunks';
+import {startPreview, stopPreview} from '@redux/utils/preview';
 import {
   MonoSwitch,
   MonoSectionHeaderCol,
@@ -269,9 +269,9 @@ const NavigatorPane = () => {
       dispatch(selectK8sResource(id));
     }
     if (id !== previewResource) {
-      dispatch(previewKustomization(id));
+      startPreview(id, 'kustomization', dispatch);
     } else {
-      dispatch(clearPreview());
+      stopPreview(dispatch);
     }
   };
 

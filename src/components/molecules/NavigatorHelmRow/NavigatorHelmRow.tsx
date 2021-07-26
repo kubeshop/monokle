@@ -9,7 +9,7 @@ import {useSelector} from 'react-redux';
 import {selectHelmValues} from '@redux/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
-import {previewHelmValuesFile} from '@redux/reducers/thunks';
+import {startPreview} from '@redux/utils/preview';
 
 export type NavigatorHelmRowProps = {
   rowKey: React.Key;
@@ -121,7 +121,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
       if (id !== selectedValuesFile) {
         dispatch(selectHelmValuesFile(id));
       }
-      dispatch(previewHelmValuesFile(id));
+      startPreview(id, 'helm', dispatch);
     }
   }
 
