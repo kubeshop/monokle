@@ -6,6 +6,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useEffect, useState} from 'react';
 import {stringify} from 'yaml';
 import {diffResource} from '@redux/reducers/thunks';
+import {applyResource} from '@actions/common/apply';
 
 import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
 
@@ -30,12 +31,18 @@ const StyledModal = styled(Modal)`
   }
 `;
 
+const ButtonApply = styled(Button)`
+  float: left;
+`;
+
 const DiffModal = () => {
   const dispatch = useAppDispatch();
 
   const diffContent = useAppSelector(state => state.main.diffContent);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const diffResourceId = useAppSelector(state => state.main.diffResource);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const kubeconfig = useAppSelector(state => state.config.kubeconfig);
 
   const [isVisible, setVisible] = useState(false);
 
@@ -50,6 +57,18 @@ const DiffModal = () => {
     setVisible(Boolean(diffResource) && Boolean(resourceMap) && Boolean(diffContent));
   }, [diffContent]);
 
+  const handleApply = () => {
+    if (diffResourceId) {
+      applyResource(diffResourceId, resourceMap, fileMap, dispatch, kubeconfig);
+    }
+  };
+
+  const handleRefresh = () => {
+    if (diffResourceId) {
+      dispatch(diffResource(diffResourceId));
+    }
+  };
+
   const handleOk = () => {
     dispatch(diffResource(''));
   };
@@ -61,11 +80,19 @@ const DiffModal = () => {
       centered
       width={1000}
       onCancel={handleOk}
-      footer={[
-        <Button key="submit" type="primary" onClick={handleOk}>
-          Close
-        </Button>,
-      ]}
+      footer={
+        <>
+          <ButtonApply type="primary" onClick={handleApply}>
+            Apply
+          </ButtonApply>
+          <Button type="primary" onClick={handleRefresh}>
+            Refresh
+          </Button>
+          <Button type="primary" ghost onClick={handleOk}>
+            Close
+          </Button>
+        </>
+      }
     >
       <MonacoDiffEditor
         width="1000"
