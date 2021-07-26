@@ -1,15 +1,20 @@
 import React, {useRef} from 'react';
 import styled from 'styled-components';
 
-import {Radio, Button, Input, Space, RadioChangeEvent} from 'antd';
+import {Button, Input, Select} from 'antd';
 
-import {Themes, TextSizes, Languages} from '@models/appconfig';
+// import {Themes, TextSizes, Languages} from '@models/appconfig';
 
 import FilePatternList from '@molecules/FilePatternList';
 
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleSettings} from '@redux/reducers/ui';
-import {updateTheme, updateScanExcludes, updateFileIncludes, updateKubeconfig} from '@redux/reducers/appConfig';
+import {
+  updateScanExcludes,
+  updateFileIncludes,
+  updateKubeconfig,
+  updateHelmPreviewMode,
+} from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
 
 const StyledDiv = styled.div`
@@ -29,6 +34,10 @@ const StyledButton = styled(Button)`
 
 const HiddenInput = styled.input`
   display: none;
+`;
+
+const StyledSelect = styled(Select)`
+  width: 100%;
 `;
 
 const SettingsDrawer = () => {
@@ -51,9 +60,15 @@ const SettingsDrawer = () => {
     dispatch(updateScanExcludes(patterns));
   };
 
-  const onChangeTheme = (e: RadioChangeEvent) => {
-    if (e.target.value) {
-      dispatch(updateTheme(e.target.value));
+  // const onChangeTheme = (e: RadioChangeEvent) => {
+  //   if (e.target.value) {
+  //     dispatch(updateTheme(e.target.value));
+  //   }
+  // };
+
+  const onChangeHelmPreviewMode = (selectedHelmPreviewMode: any) => {
+    if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
+      dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
     }
   };
 
@@ -97,6 +112,13 @@ const SettingsDrawer = () => {
         <FilePatternList value={appConfig.scanExcludes} onChange={onChangeScanExcludes} />
       </StyledDiv>
       <StyledDiv>
+        <StyledSpan>Helm Preview Mode</StyledSpan>
+        <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
+          <Select.Option value="template">Template</Select.Option>
+          <Select.Option value="install">Install</Select.Option>
+        </StyledSelect>
+      </StyledDiv>
+      {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
         <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>
           <Radio.Button value={Themes.Dark}>Dark</Radio.Button>
@@ -118,7 +140,7 @@ const SettingsDrawer = () => {
             <Radio value={Languages.English}>English</Radio>
           </Space>
         </Radio.Group>
-      </StyledDiv>
+      </StyledDiv> */}
     </Drawer>
   );
 };

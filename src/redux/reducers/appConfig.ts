@@ -4,24 +4,38 @@ import electronStore from '@utils/electronStore';
 import {setShouldRefreshFileMap} from '@redux/reducers/main';
 import {initialState} from '../initialState';
 
-export const updateKubeconfig = createAsyncThunk('config/setKubeconfig', async (kubeconfig: string, thunkAPI) => {
+export const updateKubeconfig = createAsyncThunk('config/updateKubeconfig', async (kubeconfig: string, thunkAPI) => {
   electronStore.set('appConfig.kubeconfig', kubeconfig);
   thunkAPI.dispatch(configSlice.actions.setKubeconfig(kubeconfig));
 });
 
-export const updateScanExcludes = createAsyncThunk('config/setKubeconfig', async (scanExcludes: string[], thunkAPI) => {
-  electronStore.set('appConfig.scanExcludes', scanExcludes);
-  thunkAPI.dispatch(configSlice.actions.setScanExcludes(scanExcludes));
-  thunkAPI.dispatch(setShouldRefreshFileMap(true));
-});
+export const updateScanExcludes = createAsyncThunk(
+  'config/updateScanExcludes',
+  async (scanExcludes: string[], thunkAPI) => {
+    electronStore.set('appConfig.scanExcludes', scanExcludes);
+    thunkAPI.dispatch(configSlice.actions.setScanExcludes(scanExcludes));
+    thunkAPI.dispatch(setShouldRefreshFileMap(true));
+  }
+);
 
-export const updateFileIncludes = createAsyncThunk('config/setKubeconfig', async (fileIncludes: string[], thunkAPI) => {
-  electronStore.set('appConfig.fileIncludes', fileIncludes);
-  thunkAPI.dispatch(configSlice.actions.setFileIncludes(fileIncludes));
-  thunkAPI.dispatch(setShouldRefreshFileMap(true));
-});
+export const updateFileIncludes = createAsyncThunk(
+  'config/updateFileIncludes',
+  async (fileIncludes: string[], thunkAPI) => {
+    electronStore.set('appConfig.fileIncludes', fileIncludes);
+    thunkAPI.dispatch(configSlice.actions.setFileIncludes(fileIncludes));
+    thunkAPI.dispatch(setShouldRefreshFileMap(true));
+  }
+);
 
-export const updateTheme = createAsyncThunk('config/setKubeconfig', async (theme: Themes, thunkAPI) => {
+export const updateHelmPreviewMode = createAsyncThunk(
+  'config/updateHelmPreviewMode',
+  async (helmPreviewMode: 'template' | 'install', thunkAPI) => {
+    electronStore.set('appConfig.settings.helmPreviewMode', helmPreviewMode);
+    thunkAPI.dispatch(configSlice.actions.setHelmPreviewMode(helmPreviewMode));
+  }
+);
+
+export const updateTheme = createAsyncThunk('config/updateTheme', async (theme: Themes, thunkAPI) => {
   electronStore.set('appConfig.settings.theme', theme);
   thunkAPI.dispatch(configSlice.actions.setTheme(theme));
 });
@@ -63,6 +77,9 @@ export const configSlice = createSlice({
     },
     setLanguage: (state: Draft<AppConfig>, action: PayloadAction<Languages>) => {
       state.settings.language = action.payload;
+    },
+    setHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
+      state.settings.helmPreviewMode = action.payload;
     },
   },
 });

@@ -33,6 +33,9 @@ const schema = {
           language: {
             type: 'string',
           },
+          helmPreviewMode: {
+            type: 'string',
+          },
         },
       },
     },
@@ -48,6 +51,7 @@ const defaults = {
       theme: 'dark',
       textSize: 'medium',
       language: 'en',
+      helmPreviewMode: 'template',
     },
   },
 };
