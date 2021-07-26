@@ -186,6 +186,12 @@ const NoFilesContainer = styled(Typography.Text)`
   margin-left: 16px;
 `;
 
+const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
+  .ant-tree-switcher svg {
+    color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
+  }
+`;
+
 const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const {windowHeight} = props;
   const dispatch = useAppDispatch();
@@ -297,7 +303,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
         style={{display: 'none'}}
       />
       {tree ? (
-        <Tree.DirectoryTree
+        <StyledTreeDirectoryTree
           // height is needed to enable Tree's virtual scroll
           height={windowHeight && windowHeight > 180 ? windowHeight - 180 : 0}
           onSelect={onSelect}
@@ -308,7 +314,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
             // @ts-ignore
             return node.highlight;
           }}
-          disabled={previewLoader.isLoading}
+          disabled={previewMode || previewLoader.isLoading}
         />
       ) : (
         <NoFilesContainer>No folder selected.</NoFilesContainer>
