@@ -226,7 +226,9 @@ const Monaco = (props: {editorHeight: string}) => {
   return (
     <>
       <MonacoButtons>
-        <MonoButton large type={hasWarnings ? 'dashed' : 'primary'} disabled={!isDirty || !isValid}
+        <MonoButton large
+                    type={hasWarnings ? 'dashed' : 'primary'}
+                    disabled={!isDirty || !isValid}
                     onClick={saveContent}>
           Save
         </MonoButton>

@@ -14,6 +14,10 @@ import {Button, notification} from 'antd';
 
 const Form = withTheme(AntDTheme);
 
+/**
+ * Load schemas every time for now - should be cached in the future...
+ */
+
 function getFormSchema(kind: string) {
   return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`));
 }
