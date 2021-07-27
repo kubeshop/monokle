@@ -25,6 +25,11 @@ type HelmValuesMapType = {
   [id: string]: HelmValuesFile;
 };
 
+type PreviewLoaderType = {
+  isLoading: boolean;
+  targetResourceId?: string;
+};
+
 interface AppState {
   fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
   shouldRefreshFileMap?: boolean;
@@ -34,10 +39,7 @@ interface AppState {
   selectedPath?: string; // the currently selected path
   previewType?: 'kustomization' | 'cluster' | 'helm';
   previewResource?: string; // the resource currently being previewed
-  previewLoader: {
-    isLoading: boolean;
-    targetResourceId?: string;
-  };
+  previewLoader: PreviewLoaderType;
   diffResource?: string; // the resource currently being diffed
   diffContent?: string; // the diff content for the resource being diffed
   helmChartMap: HelmChartMapType; // maps chart ids to helm charts
@@ -46,4 +48,4 @@ interface AppState {
   previewValuesFile?: string; // the values file currently being previewed
 }
 
-export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType};
+export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType, PreviewLoaderType};
