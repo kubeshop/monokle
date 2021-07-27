@@ -5,7 +5,6 @@ import {getAllFileEntriesForPath, getChildFilePath, getResourcesForPath} from '@
 import {getLinkedResources, isFileResource} from '@redux/utils/resource';
 import {getKustomizationRefs, isKustomizationResource} from '@redux/utils/kustomize';
 import path from 'path';
-
 /**
  * Clears all resource highlights and selections except selection for the specified item
  */
@@ -25,6 +24,7 @@ export function clearResourceSelections(resourceMap: ResourceMapType, excludeIte
 export function clearFileSelections(fileMap: FileMapType) {
   Object.values(fileMap).forEach(e => {
     e.selected = false;
+    e.highlight = false;
   });
 }
 
