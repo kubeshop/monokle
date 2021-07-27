@@ -1,16 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {Tabs, Space, Col, Row, Button, Skeleton} from 'antd';
 import styled from 'styled-components';
-import {CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+import {CodeOutlined, ContainerOutlined, ApartmentOutlined} from '@ant-design/icons';
 
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
+import GraphView from '@molecules/GraphView';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import TabHeader from '@atoms/TabHeader';
 import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
+import featureJson from '@src/feature-flags.json';
 
 const {TabPane} = Tabs;
 
@@ -114,6 +116,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   key="form"
                 >
                   {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor contentHeight={contentHeight} />}
+                </TabPane>
+              )}
+              {featureJson.ShowGraphView && (
+                <TabPane
+                  tab={<TabHeader icon={<ApartmentOutlined />}>Graph</TabHeader>}
+                  disabled={!selectedResourceId}
+                  key="graph"
+                >
+                  {previewLoader.isLoading ? <StyledSkeleton /> : <GraphView editorHeight={contentHeight} />}
                 </TabPane>
               )}
             </StyledTabs>
