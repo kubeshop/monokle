@@ -58,6 +58,11 @@ export type SetDiffDataPayload = {
   diffContent?: string;
 };
 
+export type StartPreviewLoaderPayload = {
+  targetResourceId: string;
+  previewType: 'kustomization' | 'helm' | 'cluster';
+};
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState,
@@ -191,14 +196,18 @@ export const mainSlice = createSlice({
     setShouldRefreshFileMap: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.shouldRefreshFileMap = action.payload;
     },
+    startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
+      state.previewLoader.isLoading = true;
+      state.previewLoader.targetResourceId = action.payload.targetResourceId;
+      state.previewType = action.payload.previewType;
+    },
+    stopPreviewLoader: (state: Draft<AppState>) => {
+      state.previewLoader.isLoading = false;
+      state.previewLoader.targetResourceId = undefined;
+    },
   },
   extraReducers: builder => {
     builder
-      .addCase(previewKustomization.pending, (state, action) => {
-        state.previewLoader.isLoading = true;
-        state.previewLoader.targetResourceId = action.meta.arg;
-        state.previewType = 'kustomization';
-      })
       .addCase(previewKustomization.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
@@ -210,11 +219,6 @@ export const mainSlice = createSlice({
       });
 
     builder
-      .addCase(previewHelmValuesFile.pending, (state, action) => {
-        state.previewLoader.isLoading = true;
-        state.previewLoader.targetResourceId = action.meta.arg;
-        state.previewType = 'helm';
-      })
       .addCase(previewHelmValuesFile.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
@@ -227,11 +231,6 @@ export const mainSlice = createSlice({
       });
 
     builder
-      .addCase(previewCluster.pending, (state, action) => {
-        state.previewLoader.isLoading = true;
-        state.previewLoader.targetResourceId = action.meta.arg;
-        state.previewType = 'cluster';
-      })
       .addCase(previewCluster.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
@@ -341,5 +340,7 @@ export const {
   selectHelmValuesFile,
   clearPreview,
   setShouldRefreshFileMap,
+  startPreviewLoader,
+  stopPreviewLoader,
 } = mainSlice.actions;
 export default mainSlice.reducer;

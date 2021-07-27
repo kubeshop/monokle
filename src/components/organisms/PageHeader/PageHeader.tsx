@@ -13,7 +13,7 @@ import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
 import {inPreviewMode} from '@redux/selectors';
 import {useSelector} from 'react-redux';
-import {clearPreview} from '@redux/reducers/main';
+import {stopPreview} from '@redux/utils/preview';
 
 import {K8sResource} from '@models/k8sresource';
 
@@ -116,7 +116,7 @@ const PageHeader = () => {
   };
 
   const onClickExit = () => {
-    dispatch(clearPreview());
+    stopPreview(dispatch);
   };
 
   return (
