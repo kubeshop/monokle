@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import micromatch from 'micromatch';
 
 import {useSelector} from 'react-redux';
@@ -9,26 +9,40 @@ import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import {selectActiveResources} from '@redux/selectors';
 import {selectK8sResource} from '@redux/reducers/main';
+import {getNamespaces} from '@redux/utils/resource';
 
 import NavigatorContentTitle from './NavigatorContentTitle';
 
+import NamespacesSection from './NamespacesSection';
 import SectionRow from './SectionRow';
 import SectionCol from './SectionCol';
 import Section from './Section';
 
 import {ALL_NAMESPACES} from '../constants';
 
-type ResourcesSectionType = {
-  namespace: string;
-};
-
-const ResourcesSection = (props: ResourcesSectionType) => {
+const ResourcesSection = () => {
   const dispatch = useAppDispatch();
-  const {namespace} = props;
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const appConfig = useAppSelector(state => state.config);
-
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const previewResource = useAppSelector(state => state.main.previewResource);
   const resources = useSelector(selectActiveResources);
+
+  const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
+  const [namespaces, setNamespaces] = useState<string[]>([ALL_NAMESPACES]);
+
+  useEffect(() => {
+    let ns = getNamespaces(resourceMap);
+    setNamespaces(ns.concat([ALL_NAMESPACES]));
+    if (namespace && ns.indexOf(namespace) === -1) {
+      setNamespace(ALL_NAMESPACES);
+    }
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [resourceMap, previewResource]); // es-lint-disable
+
+  const handleNamespaceChange = (value: any) => {
+    setNamespace(value);
+  };
 
   const selectResource = (resourceId: string) => {
     dispatch(selectK8sResource(resourceId));
@@ -77,6 +91,10 @@ const ResourcesSection = (props: ResourcesSectionType) => {
                 <MonoSectionHeaderCol>
                   <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
                 </MonoSectionHeaderCol>
+
+                {navigator.name === 'K8s Resources' && (
+                  <NamespacesSection namespace={namespace} namespaces={namespaces} onSelect={handleNamespaceChange} />
+                )}
               </SectionRow>
               <SectionRow>
                 <SectionCol>

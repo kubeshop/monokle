@@ -1,15 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {Col, Row} from 'antd';
+import React from 'react';
+import {Col, Row, Skeleton} from 'antd';
 import styled from 'styled-components';
+import {useSelector} from 'react-redux';
+import {selectHelmCharts, selectKustomizations} from '@redux/selectors';
 
 import {BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {getNamespaces} from '@redux/utils/resource';
 import {setFilterObjects} from '@redux/reducers/appConfig';
-import {MonoSwitch, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {MonoSwitch, MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
 
-import NavigatorContent from './components/NavigatorContent';
-import {ALL_NAMESPACES} from './constants';
+import HelmChartsSection from './components/HelmChartsSection';
+import KustomizationsSection from './components/KustomizationsSection';
+import ResourcesSection from './components/ResourcesSection';
+
+const StyledSkeleton = styled(Skeleton)`
+  margin: 20px;
+  width: 90%;
+`;
 
 const TitleRow = styled(Row)`
   width: 100%;
@@ -20,24 +27,14 @@ const TitleRow = styled(Row)`
 
 const NavigatorPane = () => {
   const dispatch = useAppDispatch();
-  const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
-  const [namespaces, setNamespaces] = useState<string[]>([ALL_NAMESPACES]);
 
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const previewResource = useAppSelector(state => state.main.previewResource);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const helmCharts = useSelector(selectHelmCharts);
+  const kustomizations = useSelector(selectKustomizations);
 
   const onFilterChange = (checked: boolean) => {
     dispatch(setFilterObjects(checked));
   };
-
-  useEffect(() => {
-    let ns = getNamespaces(resourceMap);
-    setNamespaces(ns.concat([ALL_NAMESPACES]));
-    if (namespace && ns.indexOf(namespace) === -1) {
-      setNamespace(ALL_NAMESPACES);
-    }
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [resourceMap, previewResource]); // es-lint-disable
 
   return (
     <>
@@ -53,7 +50,13 @@ const NavigatorPane = () => {
           </Row>
         </MonoPaneTitleCol>
       </TitleRow>
-      <NavigatorContent namespace={namespace} namespaces={namespaces} setNamespace={setNamespace} />
+      <PaneContainer>
+        {Object.values(helmCharts).length > 0 && <HelmChartsSection helmCharts={helmCharts} />}
+
+        {kustomizations.length > 0 && <KustomizationsSection kustomizations={kustomizations} />}
+
+        {previewLoader.isLoading ? <StyledSkeleton /> : <ResourcesSection />}
+      </PaneContainer>
     </>
   );
 };
