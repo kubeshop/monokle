@@ -10,6 +10,7 @@ import {logMessage} from '@redux/utils/log';
 import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
 import styled from 'styled-components';
+import {Button, notification} from 'antd';
 
 const Form = withTheme(AntDTheme);
 
@@ -23,7 +24,8 @@ function getUiSchema(kind: string) {
 
 const FormContainer = styled.div<{contentHeight: string}>`
   width: 100%;
-  padding: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   margin: 0px;
   margin-bottom: 20px;
   overflow-y: scroll;
@@ -37,6 +39,14 @@ const FormContainer = styled.div<{contentHeight: string}>`
 
   .ant-form-item-label {
     font-weight: bold;
+    padding-top: 10px;
+    padding-bottom: 0px;
+  }
+
+  .ant-form-item-explain {
+    color: lightgrey;
+    font-size: 12px;
+    margin-top: 5px;
   }
 `;
 
@@ -73,10 +83,21 @@ const FormEditor = (props: {contentHeight: string}) => {
         log.debug(content);
 */
         dispatch(updateResource({resourceId: selectedResource, content}));
+        openNotification();
       }
     } catch (err) {
       logMessage(`Failed to update resource ${err}`, dispatch);
     }
+  };
+
+  const openNotification = () => {
+    notification['success']({
+      message: 'ConfigMap Saved...',
+      duration: 3,
+      onClick: () => {
+        console.log('Notification Clicked!');
+      },
+    });
   };
 
   if (resource?.kind !== 'ConfigMap') {
@@ -89,7 +110,13 @@ const FormEditor = (props: {contentHeight: string}) => {
   return (
     // @ts-ignore
     <FormContainer contentHeight={contentHeight}>
-      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} onSubmit={onFormSubmit} />
+      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} onSubmit={onFormSubmit}>
+        <div>
+          <Button type='primary' htmlType='submit'>
+            Save
+          </Button>
+        </div>
+      </Form>
     </FormContainer>
   );
 };

@@ -17,7 +17,9 @@ const {TabPane} = Tabs;
 const StyledTabs = styled(Tabs)`
   & .ant-tabs-nav {
     padding: 0 16px;
+    margin-bottom: 10px;
   }
+
   & .ant-tabs-nav::before {
     border-bottom: 1px solid #363636;
   }

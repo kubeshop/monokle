@@ -1,50 +1,46 @@
 {
   "data": {
-    "ui:title": "Data",
-    "ui:description": " "
+    "ui:title": "Configuration Data",
+    "ui:description": "Text configuration data"
   },
   "binaryData": {
-    "ui:title": "Binary Data",
-    "ui:description": " "
+    "ui:title": "Binary Configuration Data",
+    "ui:description": "Binary configuration data"
   },
   "immutable": {
     "ui:title": "Immutable",
-    "ui:description": "test"
+    "ui:help": "(ensures that data stored in the ConfigMap cannot be updated)"
   },
   "metadata": {
-    "ui:title": "Metadata",
-    "ui:description": "Metadata description",
+    "ui:title": "Object Metadata",
     "name": {
       "ui:title": "Name",
-      "ui:description": "name"
+      "ui:help": "(the name of this ConfigMap, must be unique within a namespace)"
     },
     "namespace": {
       "ui:title": "Namespace",
-      "ui:description": "namespace"
-    },
-    "clusterName": {
-      "ui:title": "Cluster Name",
-      "ui:description": "clustername"
-    },
-    "generation": {
-      "ui:title": "Generation",
-      "ui:description": " "
-    },
-    "generateName": {
-      "ui:title": "Generate Name",
-      "ui:description": " "
+      "ui:help": "(defines the namespace in within this ConfigMap must be unique, empty = default)"
     },
     "labels": {
       "ui:title": "Labels",
-      "ui:description": " "
+      "ui:description": "Key/value pairs that can be used for organization and categorization"
     },
     "annotations": {
       "ui:title": "Annotations",
-      "ui:description": " "
+      "ui:description": "Arbitrary metadata set/used by external tools"
+    },
+    "clusterName": {
+      "ui:title": "Cluster Name",
+      "ui:description": "clustername",
+      "ui:help": "(optional name of the cluster which the object belongs to)"
+    },
+    "generateName": {
+      "ui:title": "Generate Name",
+      "ui:help": "(an optional prefix used by the server to generate a unique name ONLY IF the Name field has not been provided)"
     },
     "finalizers": {
       "ui:title": "Finalizers",
-      "ui:description": " "
+      "ui:description": "Must be empty before the object is deleted from the registry"
     }
   }
 }

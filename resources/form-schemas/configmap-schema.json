@@ -39,17 +39,14 @@
         "clusterName": {
           "type": "string"
         },
+        "generateName": {
+          "type": "string"
+        },
         "finalizers": {
           "items": {
             "type": "string"
           },
           "type": "array"
-        },
-        "generateName": {
-          "type": "string"
-        },
-        "generation": {
-          "type": "integer"
         }
       },
       "type": "object"
