@@ -13,18 +13,18 @@
   },
   "metadata": {
     "ui:title": "Metadata",
-    "ui:description": " ",
+    "ui:description": "Metadata description",
     "name": {
       "ui:title": "Name",
-      "ui:description": " "
+      "ui:description": "name"
     },
     "namespace": {
       "ui:title": "Namespace",
-      "ui:description": " "
+      "ui:description": "namespace"
     },
     "clusterName": {
       "ui:title": "Cluster Name",
-      "ui:description": " "
+      "ui:description": "clustername"
     },
     "generation": {
       "ui:title": "Generation",

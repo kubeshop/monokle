@@ -1,6 +1,8 @@
 import * as React from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import Form from '@rjsf/core';
+import {withTheme} from '@rjsf/core';
+// @ts-ignore
+import {Theme as AntDTheme} from '@rjsf/antd';
 import {loadResource} from '@redux/utils';
 import {useEffect} from 'react';
 import {updateResource} from '@redux/reducers/main';
@@ -8,6 +10,8 @@ import {logMessage} from '@redux/utils/log';
 import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
 import styled from 'styled-components';
+
+const Form = withTheme(AntDTheme);
 
 function getFormSchema(kind: string) {
   return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`));
@@ -25,9 +29,14 @@ const FormContainer = styled.div<{contentHeight: string}>`
   overflow-y: scroll;
   height: ${props => props.contentHeight};
   padding-bottom: 100px;
+
   ::-webkit-scrollbar {
     width: 0;
     background: transparent;
+  }
+
+  .ant-form-item-label {
+    font-weight: bold;
   }
 `;
 
