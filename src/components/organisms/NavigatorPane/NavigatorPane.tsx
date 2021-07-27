@@ -209,6 +209,7 @@ const Section = (props: {
               <SectionCol key={subsection.name}>
                 {items.map(item => (
                   <NavigatorResourceRow
+                    key={item.id}
                     rowKey={item.id}
                     label={item.name}
                     isSelected={Boolean(item.selected)}
@@ -317,7 +318,7 @@ const NavigatorPane = () => {
               </MonoSectionHeaderCol>
             </SectionRow>
             {Object.values(helmCharts).map((chart: HelmChart) => {
-              return <NavigatorHelmRow rowKey={chart.id} helmChart={chart} />;
+              return <NavigatorHelmRow key={chart.id} rowKey={chart.id} helmChart={chart} />;
             })}
           </SectionCol>
         </SectionRow>
@@ -348,6 +349,7 @@ const NavigatorPane = () => {
 
                 return (
                   <NavigatorKustomizationRow
+                    key={k.id}
                     rowKey={k.id}
                     resource={k}
                     isSelected={isSelected}
@@ -393,7 +395,7 @@ const NavigatorPane = () => {
           <SectionCol>
             {appConfig.navigators.map(navigator => {
               return (
-                <>
+                <div key={navigator.name}>
                   <SectionRow>
                     <MonoSectionHeaderCol>
                       <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
@@ -403,7 +405,7 @@ const NavigatorPane = () => {
                     <SectionCol>
                       {navigator.sections.map(section => {
                         return (
-                          <>
+                          <div key={section.name}>
                             {section.name.length > 0 && (
                               <SectionRow>
                                 <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
@@ -418,12 +420,12 @@ const NavigatorPane = () => {
                               resources={resources}
                               selectResource={selectResource}
                             />
-                          </>
+                          </div>
                         );
                       })}
                     </SectionCol>
                   </SectionRow>
-                </>
+                </div>
               );
             })}
           </SectionCol>
