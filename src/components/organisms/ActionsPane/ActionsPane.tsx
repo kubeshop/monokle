@@ -71,10 +71,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (key === 'form' && !selectedResourceId) {
+    if (key === 'form' && (!selectedResourceId || selectedResource?.kind !== 'ConfigMap')) {
       setKey('source');
     }
-  }, [selectedResourceId, key]);
+  }, [selectedResourceId, selectedResource, key]);
 
   const OperationsSlot = {
     right: (
