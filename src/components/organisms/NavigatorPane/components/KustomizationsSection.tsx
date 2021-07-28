@@ -48,14 +48,7 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
           </MonoSectionHeaderCol>
         </SectionRow>
         {kustomizations
-          .filter(
-            k =>
-              !appConfig.settings.filterObjectsOnSelection ||
-              k.highlight ||
-              k.selected ||
-              !selectedResource ||
-              previewResource === k.id
-          )
+          .filter(k => k.highlight || k.selected || !selectedResource || previewResource === k.id)
           .map((k: K8sResource) => {
             const isSelected = k.selected || previewResource === k.id;
             const isDisabled = Boolean(previewResource && previewResource !== k.id);
