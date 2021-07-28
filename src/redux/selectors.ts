@@ -17,8 +17,9 @@ export const selectAllResources = createSelector(
 export const selectActiveResources = createSelector(
   selectAllResources,
   (state: RootState) => state.main.previewResource,
-  (resources, previewResource) =>
-    resources.filter(r => previewResource === undefined || r.filePath.startsWith(PREVIEW_PREFIX))
+  (state: RootState) => state.main.previewValuesFile,
+  (resources, previewResource, previewValuesFile) =>
+    resources.filter(r => (previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)),
 );
 
 export const selectKustomizations = createSelector(selectAllResources, resources =>
