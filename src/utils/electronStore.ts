@@ -1,5 +1,3 @@
-import {PROCESS_ENV} from '@utils/env';
-
 const ElectronStore = require('electron-store');
 
 const schema = {
@@ -44,7 +42,6 @@ const schema = {
 
 const defaults = {
   appConfig: {
-    kubeconfig: PROCESS_ENV.KUBECONFIG,
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {

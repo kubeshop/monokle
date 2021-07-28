@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
 import SplitPane from 'react-split-pane';
@@ -17,6 +17,8 @@ import SettingsDrawer from '@organisms/SettingsDrawer';
 import {Size} from '@models/window';
 import DiffModal from '@organisms/DiffModal';
 import {useWindowSize} from '@utils/hooks';
+import {useAppDispatch} from '@redux/hooks';
+import {initKubeconfig} from '@redux/reducers/appConfig';
 
 const Pane = styled.div`
   height: 100%;
@@ -38,10 +40,15 @@ const StyledContent = styled(Content)`
 `;
 
 const App = () => {
+  const dispatch = useAppDispatch();
   const size: Size = useWindowSize();
 
   const mainHeight = `${size.height ? size.height : 100}px`;
   const contentHeight = `${size.height ? size.height - 75 : 75}px`;
+
+  useEffect(() => {
+    dispatch(initKubeconfig());
+  }, []);
 
   return (
     <div>
