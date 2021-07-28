@@ -289,6 +289,7 @@ export function getNamespaces(resourceMap: ResourceMapType) {
  */
 
 export function createResourceName(filePath: string, content: any) {
+  // for Kustomizations we return the name of the containing folder ('base', 'staging', etc)
   if (content.kind === 'Kustomization') {
     const ix = filePath.lastIndexOf(path.sep);
     if (ix > 0) {
@@ -301,8 +302,18 @@ export function createResourceName(filePath: string, content: any) {
     return filePath;
   }
 
-  let name = content.metadata?.name ? `${content.metadata.name} ` : '';
-  return `${name + content.kind} [${content.apiVersion}]`;
+  // use metadata name if available
+  if (content.metadata?.name) {
+    return content.metadata.name;
+  }
+
+  // use filename as last resort
+  const ix = filePath.lastIndexOf(path.sep);
+  if (ix > 0) {
+    return filePath.substr(ix + 1);
+  }
+
+  return filePath;
 }
 
 /**
