@@ -21,9 +21,9 @@ interface AppConfig {
   navigators: ObjectNavigator[]; // the currrent navigator configuration
   kubeconfig: string;
   settings: {
-    theme: Themes;
-    textSize: TextSizes;
-    language: Languages;
+    theme: Themes; // not used for now
+    textSize: TextSizes; // not used for now
+    language: Languages; // not used for now
     filterObjectsOnSelection: boolean;
     autoZoomGraphOnSelection: boolean;
     helmPreviewMode: 'template' | 'install';

@@ -45,7 +45,7 @@ const schema = {
 const defaults = {
   appConfig: {
     kubeconfig: PROCESS_ENV.KUBECONFIG,
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube'],
+    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
       theme: 'dark',
