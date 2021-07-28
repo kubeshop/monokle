@@ -2,6 +2,7 @@ import {notification} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {clearAlert} from '@redux/reducers/alert';
+import {AlertEnum} from '@models/alert';
 
 const MessageBox = () => {
   const dispatch = useAppDispatch();
@@ -12,8 +13,11 @@ const MessageBox = () => {
   };
 
   if (alert) {
-    let type: 'success' | 'info' | 'warning' | 'error' | undefined = 'success';
+    let type: any = alert.type === AlertEnum.Error ? 'error' :
+      alert.type === AlertEnum.Warning ? 'warning' :
+        alert.type === AlertEnum.Success ? 'success' : 'info';
 
+    // @ts-ignore
     notification[type]({
       message: alert.title,
       description: alert.message,
@@ -23,10 +27,11 @@ const MessageBox = () => {
       onClose: () => {
         clear();
       },
+      duration: type === 'error' ? 0 : 4,
     });
   }
 
-  return (<span />);
+  return (null);
 };
 
 export default MessageBox;
