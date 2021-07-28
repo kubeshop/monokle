@@ -7,7 +7,7 @@ import {selectHelmCharts, selectKustomizations} from '@redux/selectors';
 import {BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setFilterObjects} from '@redux/reducers/appConfig';
-import {MonoSwitch, MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
+import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
 
 import HelmChartsSection from './components/HelmChartsSection';
 import KustomizationsSection from './components/KustomizationsSection';
@@ -43,9 +43,6 @@ const NavigatorPane = () => {
           <Row>
             <Col span={12}>
               <MonoPaneTitle>Navigator</MonoPaneTitle>
-            </Col>
-            <Col span={12}>
-              <MonoSwitch onClick={onFilterChange} label="RELATIONS" />
             </Col>
           </Row>
         </MonoPaneTitleCol>
