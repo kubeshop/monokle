@@ -1,5 +1,7 @@
 export enum AlertEnum {
-  Message,
+  Success,
+  Info,
+  Warning,
   Error,
 }
 

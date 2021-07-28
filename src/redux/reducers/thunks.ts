@@ -15,9 +15,8 @@ import {FileEntry} from '@models/fileentry';
 import {processKustomizations} from '@redux/utils/kustomize';
 import {monitorRootFolder} from '@redux/utils/fileMonitor';
 import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@redux/reducers/main';
-import {AlertEnum, AlertType} from '@models/alert';
-import {setAlert} from '@redux/reducers/alert';
 import * as fs from 'fs';
+import {AlertEnum} from '@models/alert';
 
 export const previewKustomization = createAsyncThunk<
   SetPreviewDataPayload,
@@ -49,12 +48,11 @@ export const previewKustomization = createAsyncThunk<
           },
           (error, stdout, stderr) => {
             if (error) {
-              reject(error);
+              reject(createPreviewRejection(thunkAPI, 'Kustomize Error', error.message));
               return;
             }
             if (stderr) {
-              dispatchError('Kustomize preview failed', stderr, thunkAPI);
-              reject(new Error(`Failed to generate kustomization: ${stderr}`));
+              reject(createPreviewRejection(thunkAPI, 'Kustomize Error', `Failed to generate kustomization: ${stderr}`));
               return;
             }
 
@@ -65,7 +63,6 @@ export const previewKustomization = createAsyncThunk<
             }, {});
 
             processParsedResources(resourceMap);
-
             resolve({previewResourceId: resource.id, previewResources: clearParsedDocs(resourceMap)});
           }
         );
@@ -132,7 +129,9 @@ export const previewCluster = createAsyncThunk<
         return {previewResourceId: configPath, previewResources: clearParsedDocs(resourceMap)};
       }
 
-      return {};
+      return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', 'Failed to get resources from cluster');
+    }, (reason) => {
+      return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
     });
   }
 
@@ -175,15 +174,6 @@ export const setRootFolder = createAsyncThunk<
   };
 });
 
-function dispatchError(title: string, message: string, thunkAPI: any) {
-  const alert: AlertType = {
-    type: AlertEnum.Error,
-    title,
-    message,
-  };
-  thunkAPI.dispatch(setAlert(alert));
-}
-
 /**
  * Thunk to diff a resource against the configured cluster
  */
@@ -210,15 +200,14 @@ export const diffResource = createAsyncThunk<
           return {diffContent: stringify(res.body, {sortMapEntries: true}), diffResourceId};
         }
 
-        log.error(`Failed to get ${resource.content.kind} from cluster`);
-        return {};
+        return createPreviewRejection(thunkAPI, 'Diff Resources', `Failed to get ${resource.content.kind} from cluster`);
       };
 
       const handleRejection = (rej: any) => {
         let message = `${resource.content.kind} ${resource.content.metadata.name} not found in cluster`;
         let title = 'Diff failed';
-        dispatchError(title, message, thunkAPI);
-        return {};
+
+        return createPreviewRejection(thunkAPI, title, message);
       };
 
       if (resource.kind === 'ConfigMap') {
@@ -253,7 +242,7 @@ export const diffResource = createAsyncThunk<
       }
     }
   } catch (e) {
-    log.error('Failed to diff resource');
+    createPreviewRejection(thunkAPI, 'Diff Resource', `Failed to diff resources; ${e.message}`);
     log.error(e);
   }
 
@@ -268,6 +257,7 @@ export const previewHelmValuesFile = createAsyncThunk<
     state: RootState;
   }
 >('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
+  const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = thunkAPI.getState().config.kubeconfig;
   if (state.previewValuesFile !== valuesFileId) {
@@ -279,12 +269,12 @@ export const previewHelmValuesFile = createAsyncThunk<
 
       // sanity check
       if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
-        log.info(`previewing ${valuesFile.name} in folder ${folder}`);
+        log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
         // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
         return new Promise((resolve, reject) => {
           const helmCommand =
-            state.appConfig.settings.helmPreviewMode === 'template'
+            configState.settings.helmPreviewMode === 'template'
               ? `helm template -f ${valuesFile.name} ${chart.name} .`
               : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`;
 
@@ -301,13 +291,11 @@ export const previewHelmValuesFile = createAsyncThunk<
             },
             (error, stdout, stderr) => {
               if (error) {
-                dispatchError('Helm preview failed', error.message, thunkAPI);
-                reject(error);
+                reject(createPreviewRejection(thunkAPI, 'Helm Error', error.message));
                 return;
               }
               if (stderr) {
-                dispatchError('Helm preview failed', stderr, thunkAPI);
-                reject(new Error(`Failed to generate helm preview: ${stderr}`));
+                reject(createPreviewRejection(thunkAPI, 'Helm Error', `Failed to generate helm preview: ${stderr}`));
                 return;
               }
 
@@ -318,7 +306,6 @@ export const previewHelmValuesFile = createAsyncThunk<
               }, {});
 
               processParsedResources(resourceMap);
-
               resolve({previewResourceId: valuesFile.id, previewResources: clearParsedDocs(resourceMap)});
             }
           );
@@ -330,3 +317,11 @@ export const previewHelmValuesFile = createAsyncThunk<
 
   return {};
 });
+
+function createPreviewRejection(thunkAPI: any, title: string, message: string) {
+  return thunkAPI.rejectWithValue({
+    alert: {
+      title, message, type: AlertEnum.Error,
+    },
+  });
+}

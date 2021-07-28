@@ -18,6 +18,13 @@ export const alertSlice = createSlice({
       state.alert = undefined;
     },
   },
+  extraReducers: (builder => {
+    builder.addMatcher(action => true, (state, action) => {
+      if (action.payload?.alert) {
+        state.alert = action.payload.alert;
+      }
+    });
+  }),
 });
 
 export const {setAlert, clearAlert} = alertSlice.actions;
