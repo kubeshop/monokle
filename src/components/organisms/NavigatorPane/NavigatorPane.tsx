@@ -5,8 +5,7 @@ import {useSelector} from 'react-redux';
 import {selectHelmCharts, selectKustomizations} from '@redux/selectors';
 
 import {BackgroundColors} from '@styles/Colors';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setFilterObjects} from '@redux/reducers/appConfig';
+import {useAppSelector} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
 
 import HelmChartsSection from './components/HelmChartsSection';
@@ -26,15 +25,9 @@ const TitleRow = styled(Row)`
 `;
 
 const NavigatorPane = () => {
-  const dispatch = useAppDispatch();
-
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const helmCharts = useSelector(selectHelmCharts);
   const kustomizations = useSelector(selectKustomizations);
-
-  const onFilterChange = (checked: boolean) => {
-    dispatch(setFilterObjects(checked));
-  };
 
   return (
     <>
