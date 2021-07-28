@@ -102,5 +102,9 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
         state.resourceMap[e].highlight = true;
       });
     }
+
+    Object.values(state.helmValuesMap).forEach(valuesFile => {
+      valuesFile.selected = false;
+    });
   }
 }
