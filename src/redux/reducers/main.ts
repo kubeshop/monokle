@@ -328,6 +328,10 @@ function selectFilePath(filePath: string, state: AppState) {
     if (parent.children) {
       highlightChildrenResources(parent, state.resourceMap, state.fileMap);
     }
+
+    Object.values(state.helmValuesMap).forEach(valuesFile => {
+      valuesFile.selected = valuesFile.filePath === filePath;
+    });
   }
 
   state.selectedResource = undefined;
