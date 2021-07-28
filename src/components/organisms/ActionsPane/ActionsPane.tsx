@@ -19,7 +19,9 @@ const {TabPane} = Tabs;
 const StyledTabs = styled(Tabs)`
   & .ant-tabs-nav {
     padding: 0 16px;
+    margin-bottom: 10px;
   }
+
   & .ant-tabs-nav::before {
     border-bottom: 1px solid #363636;
   }
@@ -71,10 +73,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (key === 'form' && !selectedResourceId) {
+    if (key === 'form' && (!selectedResourceId || selectedResource?.kind !== 'ConfigMap')) {
       setKey('source');
     }
-  }, [selectedResourceId, key]);
+  }, [selectedResourceId, selectedResource, key]);
 
   const OperationsSlot = {
     right: (

@@ -37,11 +37,18 @@ window.MonacoEnvironment = {
   },
 };
 
+const MonacoButtons = styled.div`
+  padding-left: 15px;
+  padding-bottom: 10px;
+`;
+
 const MonacoContainer = styled.div`
   width: 100%;
   height: 100%;
-  padding: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
   margin: 0px;
+  margin-bottom: 20px;
 `;
 
 // @ts-ignore
@@ -185,21 +192,21 @@ const Monaco = (props: {editorHeight: string}) => {
     }
 
     yaml &&
-      yaml.yamlDefaults.setDiagnosticsOptions({
-        validate: true,
-        enableSchemaRequest: true,
-        hover: true,
-        completion: true,
-        isKubernetes: true,
-        format: true,
-        schemas: [
-          {
-            uri: 'http://monokle/k8s.json', // id of the first schema
-            fileMatch: ['*'], // associate with our model
-            schema: resourceSchema || {},
-          },
-        ],
-      });
+    yaml.yamlDefaults.setDiagnosticsOptions({
+      validate: true,
+      enableSchemaRequest: true,
+      hover: true,
+      completion: true,
+      isKubernetes: true,
+      format: true,
+      schemas: [
+        {
+          uri: 'http://monokle/k8s.json', // id of the first schema
+          fileMatch: ['*'], // associate with our model
+          schema: resourceSchema || {},
+        },
+      ],
+    });
     if (currentCompletionDisposable) {
       currentCompletionDisposable.dispose();
     }
@@ -218,14 +225,19 @@ const Monaco = (props: {editorHeight: string}) => {
 
   return (
     <>
-      <MonoButton large type={hasWarnings ? 'dashed' : 'primary'} disabled={!isDirty || !isValid} onClick={saveContent}>
-        Save
-      </MonoButton>
+      <MonacoButtons>
+        <MonoButton large
+                    type={hasWarnings ? 'dashed' : 'primary'}
+                    disabled={!isDirty || !isValid}
+                    onClick={saveContent}>
+          Save
+        </MonoButton>
+      </MonacoButtons>
       <MonacoContainer ref={ref}>
         <MonacoEditor
           width={width}
           height={editorHeight}
-          language="yaml"
+          language='yaml'
           theme={KUBESHOP_MONACO_THEME}
           value={code}
           options={options}

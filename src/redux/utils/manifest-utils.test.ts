@@ -111,6 +111,8 @@ metadata:
   annotations: {}
   labels:
     newKey: New Value
+  finalizers:
+    - test
   name: agentcom-config
   namespace: test
 apiVersion: v1
@@ -123,6 +125,8 @@ metadata:
   namespace: test
   labels:
     newKey: New Value
+  finalizers:
+    - test
 data:
   POSTGRES_DB: ""
   REDIS_HOST: ""
