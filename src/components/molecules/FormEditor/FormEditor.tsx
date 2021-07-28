@@ -96,11 +96,8 @@ const FormEditor = (props: {contentHeight: string}) => {
 
   const openNotification = () => {
     notification['success']({
-      message: 'ConfigMap Saved...',
+      message: 'ConfigMap Saved.',
       duration: 3,
-      onClick: () => {
-        console.log('Notification Clicked!');
-      },
     });
   };
 
