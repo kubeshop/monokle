@@ -73,7 +73,7 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
                 previewButtonActive={buttonActive}
                 hasIncomingRefs={Boolean(hasIncomingRefs(k))}
                 hasOutgoingRefs={Boolean(hasOutgoingRefs(k))}
-                onClickResource={!previewResource ? () => selectResource(k.id) : undefined}
+                onClickResource={(!previewResource || previewResource === k.id) ? () => selectResource(k.id) : undefined}
                 onClickPreview={() => selectPreview(k.id)}
                 isPreviewLoading={previewLoader.isLoading && k.id === previewLoader.targetResourceId}
               />

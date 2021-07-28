@@ -111,7 +111,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   let chartClassName = `helmchart-row`;
 
   function onSelectValuesFile(id: string) {
-    if (!previewValuesFile) {
+    if (!previewValuesFile || previewValuesFile === id) {
       dispatch(selectHelmValuesFile(id));
     }
   }

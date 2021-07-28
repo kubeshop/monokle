@@ -84,9 +84,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
     clearFileSelections(state.fileMap);
   }
   state.selectedResource = undefined;
-  if (resource.selected) {
-    resource.selected = false;
-  } else {
+  if (resource) {
     resource.selected = true;
     updateFileHighlight(state.fileMap, resource);
 
