@@ -175,7 +175,7 @@ export const mainSlice = createSlice({
     selectHelmValuesFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let payload = action.payload;
       Object.values(state.helmValuesMap).forEach(values => {
-        values.selected = values.id === payload ? !values.selected : false;
+        values.selected = values.id === payload;
       });
 
       state.selectedValuesFile = state.helmValuesMap[payload].selected ? payload : undefined;
