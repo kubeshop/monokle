@@ -171,7 +171,8 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     <>
       {resource && resource.refs && hasIncomingRefs && (
         <Popover
-          placement="rightTop"
+          mouseEnterDelay={0.5}
+          placement='rightTop'
           content={
             <PopoverContent
               resourceRefs={resource.refs.filter(r => isIncomingRef(r.refType))}
@@ -197,7 +198,8 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
       </StyledSpan>
       {resource && resource.refs && (hasOutgoingRefs || hasUnsatisfiedRefs) && (
         <Popover
-          placement="rightTop"
+          placement='rightTop'
+          mouseEnterDelay={0.5}
           content={
             <PopoverContent
               resourceRefs={resource.refs.filter(r => isOutgoingRef(r.refType) || isUnsatisfiedRef(r.refType))}

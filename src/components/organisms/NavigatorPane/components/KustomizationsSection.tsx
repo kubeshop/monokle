@@ -2,7 +2,7 @@ import React from 'react';
 
 import {K8sResource} from '@models/k8sresource';
 import NavigatorKustomizationRow from '@molecules/NavigatorKustomizationRow';
-import {MonoSectionHeaderCol, MonoSectionTitle} from '@atoms';
+import {MonoSectionTitle} from '@atoms';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {hasIncomingRefs, hasOutgoingRefs} from '@redux/utils/resourceRefs';
 import {startPreview, stopPreview} from '@redux/utils/preview';
@@ -43,9 +43,7 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
     <SectionRow>
       <SectionCol>
         <SectionRow>
-          <MonoSectionHeaderCol>
-            <MonoSectionTitle>Kustomizations</MonoSectionTitle>
-          </MonoSectionHeaderCol>
+          <MonoSectionTitle>Kustomizations</MonoSectionTitle>
         </SectionRow>
         {kustomizations
           .filter(

@@ -2,7 +2,7 @@ import React from 'react';
 
 import NavigatorHelmRow from '@molecules/NavigatorHelmRow';
 import {HelmChart} from '@models/helm';
-import {MonoSectionHeaderCol, MonoSectionTitle} from '@atoms';
+import {MonoSectionTitle} from '@atoms';
 import {HelmChartMapType} from '@models/appstate';
 
 import SectionRow from './SectionRow';
@@ -19,9 +19,7 @@ const HelmChartsSection = (props: HelmChartsSectionProps) => {
     <SectionRow>
       <SectionCol>
         <SectionRow>
-          <MonoSectionHeaderCol>
             <MonoSectionTitle>Helm Charts</MonoSectionTitle>
-          </MonoSectionHeaderCol>
         </SectionRow>
         {Object.values(helmCharts).map((chart: HelmChart) => {
           return <NavigatorHelmRow key={chart.id} rowKey={chart.id} helmChart={chart} />;
