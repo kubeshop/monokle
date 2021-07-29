@@ -74,7 +74,6 @@ const ResourcesSection = () => {
 
   function shouldSectionBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
     return (
-      (!appConfig.settings.filterObjectsOnSelection || item.highlight || item.selected || !selectedResource) &&
       item.kind === subsection.kindSelector &&
       micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
       (namespace === ALL_NAMESPACES || item.namespace === namespace || (namespace === 'default' && !item.namespace))
