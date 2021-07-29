@@ -5,8 +5,10 @@ import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-
 
 const ElectronStore = require('electron-store');
 
+const userHomeDir = app.getPath('home');
+
 ipcMain.on('get-user-home-dir', event => {
-  event.returnValue = app.getPath('home');
+  event.returnValue = userHomeDir;
 });
 
 function createWindow() {
