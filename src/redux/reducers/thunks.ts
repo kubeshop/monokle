@@ -143,19 +143,7 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
     ]).then(results => {
       // @ts-ignore
       const allYaml = results.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
-      const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
-
-      if (resources && resources.length > 0) {
-        const resourceMap = resources.reduce((acc: ResourceMapType, item) => {
-          acc[item.id] = item;
-          return acc;
-        }, {});
-
-        processParsedResources(resourceMap);
-        return {previewResourceId: configPath, previewResources: clearParsedDocs(resourceMap)};
-      }
-
-      return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', 'Failed to get resources from cluster');
+      return createPreviewResult(allYaml, configPath);
     }, (reason) => {
       return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
     });
