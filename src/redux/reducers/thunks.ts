@@ -15,9 +15,7 @@ import {monitorRootFolder} from '@redux/utils/fileMonitor';
 import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@redux/reducers/main';
 import * as fs from 'fs';
 import {AlertEnum} from '@models/alert';
-import {getShellPath} from '@utils/shell';
-
-const {ipcRenderer} = require('electron');
+import {ipcRenderer} from 'electron';
 
 /**
  * Thunk to preview kustomizations
