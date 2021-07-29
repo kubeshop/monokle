@@ -5,7 +5,7 @@ import fs from 'fs';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/utils/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/utils/fileEntry';
-import {LineCounter, parseAllDocuments, parseDocument, Scalar, visit, YAMLSeq} from 'yaml';
+import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
 import log from 'loglevel';
 import {isUnsatisfiedRef, RefMappersByResourceKind} from '@redux/utils/resourceRefs';
 import {v4 as uuidv4} from 'uuid';
@@ -53,34 +53,6 @@ export function processServices(resourceMap: ResourceMapType) {
       });
     }
   });
-}
-
-/**
- * Adds configmap resourcerefs for specified configMapName to deployment
- */
-
-function linkConfigMapToDeployment(configMaps: K8sResource[], deployment: K8sResource, refNode: NodeWrapper) {
-  let found = false;
-  configMaps
-    .filter(item => item.content.metadata.name === refNode.node.value)
-    .forEach(configMapResource => {
-      const targetNode = getScalarNode(configMapResource, 'metadata:name');
-      if (targetNode) {
-        linkResources(
-          configMapResource,
-          deployment,
-          ResourceRefType.ConfigMapRef,
-          ResourceRefType.ConfigMapConsumer,
-          targetNode,
-          refNode
-        );
-      }
-      found = true;
-    });
-
-  if (!found) {
-    createResourceRef(deployment, ResourceRefType.UnsatisfiedConfigMap, refNode);
-  }
 }
 
 /**
@@ -156,32 +128,6 @@ export function getScalarNodes(resource: K8sResource, nodePath: string) {
 
   log.warn(`node at ${nodePath} is not a YAMLSeq`);
   return [];
-}
-
-/**
- * Processes all configmaps in provided resourceMap and creates
- * applicable resourcerefs
- */
-
-export function processConfigMaps(resourceMap: ResourceMapType) {
-  const configMaps = getK8sResources(resourceMap, 'ConfigMap').filter(e => e.content?.metadata?.name);
-  if (configMaps) {
-    getK8sResources(resourceMap, 'Deployment').forEach(deployment => {
-      visit(getParsedDoc(deployment), {
-        Pair(key, node) {
-          // @ts-ignore
-          const keyValue = node.key.value;
-          if (keyValue === 'configMap' || keyValue === 'configMapRef' || keyValue === 'configMapKeyRef') {
-            // @ts-ignore
-            const nameNode: Scalar<string> = node.value.get('name', true);
-            if (nameNode) {
-              linkConfigMapToDeployment(configMaps, deployment, new NodeWrapper(nameNode, deployment.lineCounter));
-            }
-          }
-        },
-      });
-    });
-  }
 }
 
 /**
@@ -375,6 +321,7 @@ export function clearParsedDocs(resourceMap: ResourceMapType) {
   Object.values(resourceMap).forEach(r => {
     r.parsedDoc = undefined;
     r.lineCounter = undefined;
+    r.refNodeByPath = undefined;
   });
 
   return resourceMap;
@@ -419,7 +366,7 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
 
 export function processParsedResources(resourceMap: ResourceMapType) {
   processServices(resourceMap);
-  processConfigMaps(resourceMap);
+  processRefs(resourceMap);
 }
 
 /**
@@ -555,6 +502,44 @@ export function processResourceRefNodes(resource: K8sResource) {
       if (keyPath.endsWith(refMapper.source.path)) {
         resource.refNodeByPath[refMapper.source.path] = scalar;
       }
+    });
+  });
+}
+
+function processRefs(resourceMap: ResourceMapType) {
+  Object.values(resourceMap).forEach(resource => {
+    const refMappers = RefMappersByResourceKind[resource.kind];
+    if (!refMappers || refMappers.length === 0) {
+      return;
+    }
+    processResourceRefNodes(resource);
+    refMappers.forEach(refMapper => {
+      if (!resource.refNodeByPath) {
+        return;
+      }
+      const targetResources = Object.values(resourceMap).filter(
+        targetResource => targetResource.kind === refMapper.target.kind
+      );
+      targetResources.forEach(targetResource => {
+        const refNode = resource.refNodeByPath ? resource.refNodeByPath[refMapper.source.path] : undefined;
+        const targetNode = targetResource.refNodeByPath
+          ? targetResource.refNodeByPath[refMapper.target.path]
+          : undefined;
+        if (refNode) {
+          if (targetNode && refNode.value === targetNode.value) {
+            linkResources(
+              targetResource,
+              resource,
+              refMapper.target.refType,
+              refMapper.source.refType,
+              new NodeWrapper(targetNode, targetResource.lineCounter),
+              new NodeWrapper(refNode, resource.lineCounter)
+            );
+          } else {
+            createResourceRef(resource, refMapper.unsatisfiedRefType, new NodeWrapper(refNode, resource.lineCounter));
+          }
+        }
+      });
     });
   });
 }
