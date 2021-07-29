@@ -111,8 +111,8 @@ export const previewCluster = createAsyncThunk<
       k8sAppV1Api.listDaemonSetForAllNamespaces().then(res => {
         return getK8sObjectsAsYaml(res.body.items, 'DaemonSet', 'apps/v1');
       }),
-      k8sAppV1Api.listStatefulSetForAllNamespaces().then(res => {
-        return getK8sObjectsAsYaml(res.body.items, 'StatefuleSet', 'apps/v1');
+      k8sAppV1Api.listDeploymentForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
       }),
       k8sAppV1Api.listStatefulSetForAllNamespaces().then(res => {
         return getK8sObjectsAsYaml(res.body.items, 'StatefuleSet', 'apps/v1');
@@ -277,7 +277,86 @@ export const diffResource = createAsyncThunk<
           .readNamespacedService(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true'
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ServiceAccount') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedServiceAccount(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'PersistentVolume') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readPersistentVolume(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'PersistentVolumeClaim') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedPersistentVolumeClaim(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Pod') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedPod(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Endpoints') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedEndpoints(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Secret') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedSecret(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ReplicationController') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedReplicationController(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'DaemonSet') {
+        const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+        return k8sAppV1Api
+          .readNamespacedDaemonSet(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
           )
           .then(handleResource, handleRejection);
       }
@@ -287,7 +366,83 @@ export const diffResource = createAsyncThunk<
           .readNamespacedDeployment(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true'
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'StatefuleSet') {
+        const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+        return k8sAppV1Api
+          .readNamespacedStatefulSet(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ReplicaSet') {
+        const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+        return k8sAppV1Api
+          .readNamespacedReplicaSet(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Job') {
+        const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
+        return k8sBatchV1Api
+          .readNamespacedJob(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'CronJob') {
+        const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
+        return k8sBatchV1Api
+          .readNamespacedCronJob(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ClusterRole') {
+        const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+        return k8sRbacV1Api
+          .readClusterRole(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ClusterRoleBinding') {
+        const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+        return k8sRbacV1Api
+          .readClusterRoleBinding(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Role') {
+        const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+        return k8sRbacV1Api
+          .readNamespacedRole(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'RoleBinding') {
+        const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+        return k8sRbacV1Api
+          .readNamespacedRoleBinding(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
           )
           .then(handleResource, handleRejection);
       }
