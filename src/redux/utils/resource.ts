@@ -304,6 +304,11 @@ export function createResourceName(filePath: string, content: any) {
 
   // use metadata name if available
   if (content.metadata?.name) {
+    // name could be an object if it's a helm template value...
+    if (typeof content.metadata.name !== 'string') {
+      return JSON.stringify(content.metadata.name).trim();
+    }
+
     return content.metadata.name;
   }
 

@@ -175,7 +175,7 @@ export const mainSlice = createSlice({
     selectHelmValuesFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let payload = action.payload;
       Object.values(state.helmValuesMap).forEach(values => {
-        values.selected = values.id === payload ? !values.selected : false;
+        values.selected = values.id === payload;
       });
 
       state.selectedValuesFile = state.helmValuesMap[payload].selected ? payload : undefined;
@@ -216,6 +216,7 @@ export const mainSlice = createSlice({
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        state.previewType = undefined;
       });
 
     builder
@@ -225,9 +226,9 @@ export const mainSlice = createSlice({
         state.previewLoader.targetResourceId = undefined;
       })
       .addCase(previewHelmValuesFile.rejected, (state, action) => {
-        log.error(action.error.message);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        state.previewType = undefined;
       });
 
     builder
@@ -239,6 +240,7 @@ export const mainSlice = createSlice({
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        state.previewType = undefined;
       });
 
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -246,9 +248,12 @@ export const mainSlice = createSlice({
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
+      state.previewLoader.isLoading = false;
+      state.previewLoader.targetResourceId = undefined;
       state.selectedResource = undefined;
       state.selectedPath = undefined;
       state.previewResource = undefined;
+      state.previewType = undefined;
       state.shouldRefreshFileMap = false;
     });
 
@@ -323,6 +328,10 @@ function selectFilePath(filePath: string, state: AppState) {
     if (parent.children) {
       highlightChildrenResources(parent, state.resourceMap, state.fileMap);
     }
+
+    Object.values(state.helmValuesMap).forEach(valuesFile => {
+      valuesFile.selected = valuesFile.filePath === filePath;
+    });
   }
 
   state.selectedResource = undefined;

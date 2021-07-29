@@ -20,6 +20,7 @@ import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
+import {uniqueArr} from '@utils/index';
 
 interface TreeNode {
   key: string;
@@ -58,7 +59,22 @@ const NodeActionsContainer = styled.div`
   top: 0;
 `;
 
-const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) => {
+/**
+ *
+ * @param fileEntry
+ * @param fileMap
+ * @param resourceMap
+ * @param keysWithChildren Output parameter contains all keys with children used for expanding nodes.
+ * @param highlightKeys Output parameter contains all highlighted keys, used for setting scroll position
+ * @returns
+ */
+const createNode = (
+  fileEntry: FileEntry,
+  fileMap: FileMapType,
+  resourceMap: ResourceMapType,
+  keysWithChildren: Set<React.Key>,
+  highlightKeys: Array<string>
+) => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
   const node: TreeNode = {
@@ -81,12 +97,20 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
     children: [],
     highlight: fileEntry.highlight,
   };
-
+  if (fileEntry.highlight) {
+    highlightKeys.push(fileEntry.filePath);
+  }
   if (fileEntry.children) {
     node.children = fileEntry.children
       .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
       .filter(childEntry => childEntry)
-      .map(childEntry => createNode(childEntry, fileMap, resourceMap));
+      .map(childEntry => {
+        const childNode = createNode(childEntry, fileMap, resourceMap, keysWithChildren, highlightKeys);
+        if (childNode.highlight) {
+          keysWithChildren.add(node.key);
+        }
+        return childNode;
+      });
   } else {
     node.isLeaf = true;
   }
@@ -228,6 +252,10 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
   const shouldRefreshFileMap = useAppSelector(state => state.main.shouldRefreshFileMap);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
+  const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
+  const [autoExpandParent, setAutoExpandParent] = React.useState(true);
+  const shouldExpandAllNodes = React.useRef(false);
+  const treeRef = React.useRef<any>();
 
   // eslint-disable-next-line no-undef
   const folderInput = useRef<HTMLInputElement>(null);
@@ -237,6 +265,8 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
     if (folderInput.current?.files && folderInput.current.files.length > 0) {
       setFolder(findRootFolder(folderInput.current.files));
     }
+    shouldExpandAllNodes.current = true;
+    setAutoExpandParent(true);
   }
 
   const setFolder = (folder: string) => {
@@ -249,8 +279,17 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
 
   React.useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
-    const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap);
+    const autoExpandedKeys = new Set<React.Key>();
+    const highlightedKeys: Array<string> = [];
+    const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap, autoExpandedKeys, highlightedKeys);
     setTree(treeData);
+    if (shouldExpandAllNodes.current) {
+      setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
+      shouldExpandAllNodes.current = false;
+    } else {
+      setExpandedKeys(prevExpandedKeys => uniqueArr([...prevExpandedKeys, ...Array.from(autoExpandedKeys)]));
+      treeRef?.current?.scrollTo({key: highlightedKeys[0]});
+    }
   }, [fileMap, resourceMap]);
 
   const connectToCluster = () => {
@@ -271,6 +310,11 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
       }
       dispatch(selectFile(info.node.key));
     }
+  };
+
+  const onExpand = (expandedKeysValue: React.Key[]) => {
+    setExpandedKeys(expandedKeysValue);
+    setAutoExpandParent(false);
   };
 
   const directoryPath = fileMap[ROOT_FILE_ENTRY] ? path.dirname(fileMap[ROOT_FILE_ENTRY].filePath) : '';
@@ -330,8 +374,11 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
           // height is needed to enable Tree's virtual scroll
           height={windowHeight && windowHeight > 180 ? windowHeight - 180 : 0}
           onSelect={onSelect}
-          defaultExpandAll
           treeData={[tree]}
+          ref={treeRef}
+          expandedKeys={expandedKeys}
+          onExpand={onExpand}
+          autoExpandParent={autoExpandParent}
           selectedKeys={[selectedPath || '-']}
           filterTreeNode={node => {
             // @ts-ignore

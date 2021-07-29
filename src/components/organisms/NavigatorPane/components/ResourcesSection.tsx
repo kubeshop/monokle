@@ -4,7 +4,7 @@ import micromatch from 'micromatch';
 import {useSelector} from 'react-redux';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {MonoSectionTitle, MonoSectionHeaderCol} from '@components/atoms';
+import {MonoSectionTitle} from '@components/atoms';
 import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import {selectActiveResources} from '@redux/selectors';
@@ -87,9 +87,7 @@ const ResourcesSection = () => {
           return (
             <div key={navigator.name}>
               <SectionRow>
-                <MonoSectionHeaderCol>
                   <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
-                </MonoSectionHeaderCol>
 
                 {navigator.name === 'K8s Resources' && (
                   <NamespacesSection namespace={namespace} namespaces={namespaces} onSelect={handleNamespaceChange} />

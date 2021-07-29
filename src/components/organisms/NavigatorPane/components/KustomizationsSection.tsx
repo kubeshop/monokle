@@ -2,7 +2,7 @@ import React from 'react';
 
 import {K8sResource} from '@models/k8sresource';
 import NavigatorKustomizationRow from '@molecules/NavigatorKustomizationRow';
-import {MonoSectionHeaderCol, MonoSectionTitle} from '@atoms';
+import {MonoSectionTitle} from '@atoms';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {hasIncomingRefs, hasOutgoingRefs} from '@redux/utils/resourceRefs';
 import {startPreview, stopPreview} from '@redux/utils/preview';
@@ -43,9 +43,7 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
     <SectionRow>
       <SectionCol>
         <SectionRow>
-          <MonoSectionHeaderCol>
-            <MonoSectionTitle>Kustomizations</MonoSectionTitle>
-          </MonoSectionHeaderCol>
+          <MonoSectionTitle>Kustomizations</MonoSectionTitle>
         </SectionRow>
         {kustomizations.map((k: K8sResource) => {
           const isSelected = k.selected || previewResource === k.id;
@@ -53,23 +51,23 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
           const isHighlighted = k.highlight;
           const buttonActive = previewResource !== undefined && previewResource === k.id;
 
-          return (
-            <NavigatorKustomizationRow
-              key={k.id}
-              rowKey={k.id}
-              resource={k}
-              isSelected={isSelected}
-              isDisabled={isDisabled}
-              highlighted={isHighlighted}
-              previewButtonActive={buttonActive}
-              hasIncomingRefs={Boolean(hasIncomingRefs(k))}
-              hasOutgoingRefs={Boolean(hasOutgoingRefs(k))}
-              onClickResource={!previewResource ? () => selectResource(k.id) : undefined}
-              onClickPreview={() => selectPreview(k.id)}
-              isPreviewLoading={previewLoader.isLoading && k.id === previewLoader.targetResourceId}
-            />
-          );
-        })}
+            return (
+              <NavigatorKustomizationRow
+                key={k.id}
+                rowKey={k.id}
+                resource={k}
+                isSelected={isSelected}
+                isDisabled={isDisabled}
+                highlighted={isHighlighted}
+                previewButtonActive={buttonActive}
+                hasIncomingRefs={Boolean(hasIncomingRefs(k))}
+                hasOutgoingRefs={Boolean(hasOutgoingRefs(k))}
+                onClickResource={(!previewResource || previewResource === k.id) ? () => selectResource(k.id) : undefined}
+                onClickPreview={() => selectPreview(k.id)}
+                isPreviewLoading={previewLoader.isLoading && k.id === previewLoader.targetResourceId}
+              />
+            );
+          })}
       </SectionCol>
     </SectionRow>
   );

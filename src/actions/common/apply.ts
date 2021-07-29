@@ -68,7 +68,7 @@ export async function applyResource(
 
       child.stdout.on('data', data => {
         const alert: AlertType = {
-          type: AlertEnum.Message,
+          type: AlertEnum.Success,
           title: 'Apply completed',
           message: data.toString(),
         };
