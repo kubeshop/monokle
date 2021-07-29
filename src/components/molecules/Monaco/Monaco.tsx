@@ -23,6 +23,8 @@ import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
+import {useSelector} from 'react-redux';
+import {inPreviewMode} from '@redux/selectors';
 import {clearDecorations, setDecorations} from './editorHelpers';
 import codeIntel from './codeIntel';
 
@@ -73,7 +75,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const [currentLinkDisposables, setCurrentLinkDisposables] = useState<monaco.IDisposable[]>([]);
   const [currentCompletionDisposable, setCurrentCompletionDisposable] = useState<monaco.IDisposable>();
 
-  const isInPreviewMode = Boolean(useAppSelector(state => state.main.previewResource));
+  const isInPreviewMode = useSelector(inPreviewMode);
   const dispatch = useAppDispatch();
 
   const selectResource = (resourceId: string) => {
