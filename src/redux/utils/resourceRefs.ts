@@ -4,15 +4,24 @@ const incomingRefs = [
   ResourceRefType.KustomizationParent,
   ResourceRefType.ConfigMapRef,
   ResourceRefType.SelectedPodName,
+  ResourceRefType.SecretRef,
+  ResourceRefType.ServiceAccountRef,
 ];
 
 const outgoingRefs = [
   ResourceRefType.KustomizationResource,
   ResourceRefType.ConfigMapConsumer,
   ResourceRefType.ServicePodSelector,
+  ResourceRefType.SecretConsumer,
+  ResourceRefType.ServiceAccountConsumer,
 ];
 
-const unsatisfiedRefs = [ResourceRefType.UnsatisfiedConfigMap, ResourceRefType.UnsatisfiedSelector];
+const unsatisfiedRefs = [
+  ResourceRefType.UnsatisfiedConfigMap,
+  ResourceRefType.UnsatisfiedSelector,
+  ResourceRefType.UnsatisfiedSecret,
+  ResourceRefType.UnsatisfiedServiceAccount,
+];
 
 export function isIncomingRef(e: ResourceRefType) {
   return incomingRefs.includes(e);
