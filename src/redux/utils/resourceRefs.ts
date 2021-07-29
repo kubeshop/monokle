@@ -46,11 +46,41 @@ export type RefMapper = {
   source: {
     kind: string;
     path: string;
+    refType: ResourceRefType;
   };
   target: {
     kind: string;
     path: string;
+    refType: ResourceRefType;
   };
+  unsatisfiedRefType: ResourceRefType;
+};
+
+const ConfigMapTarget = {
+  target: {
+    kind: 'ConfigMap',
+    path: 'metadata.name',
+    refType: ResourceRefType.ConfigMapRef,
+  },
+  unsatisfiedRefType: ResourceRefType.UnsatisfiedConfigMap,
+};
+
+const SecretTarget = {
+  target: {
+    kind: 'Secret',
+    path: 'metadata.name',
+    refType: ResourceRefType.ConfigMapRef,
+  },
+  unsatisfiedRefType: ResourceRefType.UnsatisfiedSecret,
+};
+
+const ServiceAccountTarget = {
+  target: {
+    kind: 'ServiceAccount',
+    path: 'metadata.name',
+    refType: ResourceRefType.ServiceAccountRef,
+  },
+  unsatisfiedRefType: ResourceRefType.UnsatisfiedServiceAccount,
 };
 
 const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
@@ -59,82 +89,62 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
       source: {
         kind: sourceKind,
         path: 'configMapRef.name',
+        refType: ResourceRefType.ConfigMapConsumer,
       },
-      target: {
-        kind: 'ConfigMap',
-        path: 'metadata.name',
-      },
+      ...ConfigMapTarget,
     },
     {
       source: {
         kind: sourceKind,
         path: 'configMapKeyRef.name',
+        refType: ResourceRefType.ConfigMapConsumer,
       },
-      target: {
-        kind: 'ConfigMap',
-        path: 'metadata.name',
-      },
+      ...ConfigMapTarget,
     },
     {
       source: {
         kind: sourceKind,
         path: 'volumes.configMap.name',
+        refType: ResourceRefType.ConfigMapConsumer,
       },
-      target: {
-        kind: 'ConfigMap',
-        path: 'metadata.name',
-      },
+      ...ConfigMapTarget,
     },
     {
       source: {
         kind: sourceKind,
         path: 'volumes.secret.secretName',
+        refType: ResourceRefType.SecretConsumer,
       },
-      target: {
-        kind: 'Secret',
-        path: 'metadata.name',
-      },
+      ...SecretTarget,
     },
     {
       source: {
         kind: sourceKind,
         path: 'secretKeyRef.name',
+        refType: ResourceRefType.SecretConsumer,
       },
-      target: {
-        kind: 'Secret',
-        path: 'metadata.name',
-      },
+      ...SecretTarget,
     },
     {
       source: {
         kind: sourceKind,
         path: 'imagePullSecrets',
+        refType: ResourceRefType.SecretConsumer,
       },
-      target: {
-        kind: 'Secret',
-        path: 'metadata.name',
-      },
+      ...SecretTarget,
     },
     {
       source: {
         kind: sourceKind,
         path: 'serviceAccountName',
+        refType: ResourceRefType.ServiceAccountConsumer,
       },
-      target: {
-        kind: 'ServiceAccount',
-        path: 'metadata.name',
-      },
+      ...ServiceAccountTarget,
     },
   ];
 };
 
 export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
-  Service: [
-    {
-      source: {kind: 'Service', path: 'content.spec.selector'},
-      target: {kind: 'Deployment', path: 'spec.template.metadata.labels'},
-    },
-  ],
   Deployment: createCommonRefMappers('Deployment'),
   Pod: createCommonRefMappers('Pod'),
   DaemonSet: createCommonRefMappers('DaemonSet'),
@@ -145,8 +155,9 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
   ReplicationController: createCommonRefMappers('ReplicationController'),
   ServiceAccount: [
     {
-      source: {kind: 'ServiceAccount', path: 'secrets'},
-      target: {kind: 'Secret', path: 'metadata.name'},
+      source: {kind: 'ServiceAccount', path: 'secrets', refType: ResourceRefType.SecretConsumer},
+      target: {kind: 'Secret', path: 'metadata.name', refType: ResourceRefType.SecretRef},
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedSecret,
     },
   ],
 };
