@@ -1,10 +1,9 @@
 import {AppState} from '@models/appstate';
-
 import electronStore from '@utils/electronStore';
 
 export const initialState: AppState = {
   appConfig: {
-    kubeconfig: electronStore.get('appConfig.kubeconfig'),
+    kubeconfig: '',
     settings: {
       filterObjectsOnSelection: false,
       autoZoomGraphOnSelection: true,

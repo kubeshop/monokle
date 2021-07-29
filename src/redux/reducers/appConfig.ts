@@ -1,8 +1,44 @@
+import path from 'path';
+import {ipcRenderer} from 'electron';
 import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {AppConfig, Themes, TextSizes, Languages} from '@models/appconfig';
 import electronStore from '@utils/electronStore';
 import {setShouldRefreshFileMap} from '@redux/reducers/main';
+import {PROCESS_ENV} from '@utils/env';
+import {AlertEnum, AlertType} from '@models/alert';
 import {initialState} from '../initialState';
+
+export const initKubeconfig = createAsyncThunk<{alert?: AlertType; kubeconfig: string}>(
+  'config/initKubeconfig',
+  async () => {
+    if (PROCESS_ENV.KUBECONFIG) {
+      const envKubeconfigParts = PROCESS_ENV.KUBECONFIG.split(path.delimiter);
+      if (envKubeconfigParts.length > 1) {
+        return {
+          alert: {
+            title: 'KUBECONFIG warning',
+            message: 'Found multiple configs, selected the first one.',
+            type: AlertEnum.Warning,
+          },
+          kubeconfig: envKubeconfigParts[0],
+        };
+      }
+      return {
+        kubeconfig: PROCESS_ENV.KUBECONFIG,
+      };
+    }
+    const storedKubeconfig = electronStore.get('appConfig.kubeconfig');
+    if (storedKubeconfig) {
+      return {
+        kubeconfig: electronStore.get('appConfig.kubeconfig'),
+      };
+    }
+    const userHome = ipcRenderer.sendSync('get-user-home-dir');
+    return {
+      kubeconfig: path.join(userHome, `${path.sep}.kube${path.sep}config`),
+    };
+  }
+);
 
 export const updateKubeconfig = createAsyncThunk('config/updateKubeconfig', async (kubeconfig: string, thunkAPI) => {
   electronStore.set('appConfig.kubeconfig', kubeconfig);
@@ -81,6 +117,11 @@ export const configSlice = createSlice({
     setHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
       state.settings.helmPreviewMode = action.payload;
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(initKubeconfig.fulfilled, (state, action) => {
+      state.kubeconfig = action.payload.kubeconfig;
+    });
   },
 });
 
