@@ -42,7 +42,18 @@ export function hasUnsatisfiedRefs(resource: K8sResource) {
   return resource.refs?.some(e => isUnsatisfiedRef(e.refType));
 }
 
-const createCommonRefMappers = (sourceKind: string) => {
+export type RefMapper = {
+  source: {
+    kind: string;
+    path: string;
+  };
+  target: {
+    kind: string;
+    path: string;
+  };
+};
+
+const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
   return [
     {
       source: {
@@ -107,7 +118,7 @@ const createCommonRefMappers = (sourceKind: string) => {
     {
       source: {
         kind: sourceKind,
-        path: ['serviceAccountName'],
+        path: 'serviceAccountName',
       },
       target: {
         kind: 'ServiceAccount',
@@ -117,7 +128,7 @@ const createCommonRefMappers = (sourceKind: string) => {
   ];
 };
 
-export const RefMappersByResourceKind = {
+export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
   Service: [
     {
       source: {kind: 'Service', path: 'content.spec.selector'},
