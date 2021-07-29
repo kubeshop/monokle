@@ -3,71 +3,47 @@ import {AppDispatch, RootState} from '@redux/store';
 import {PREVIEW_PREFIX, ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import path from 'path';
 import log from 'loglevel';
-import {exec} from 'child_process';
 import {createFileEntry, readFiles} from '@redux/utils/fileEntry';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {clearParsedDocs, extractK8sResources, processParsedResources} from '@redux/utils/resource';
 import {stringify} from 'yaml';
 import * as k8s from '@kubernetes/client-node';
+// @ts-ignore
 import {FileEntry} from '@models/fileentry';
 import {processKustomizations} from '@redux/utils/kustomize';
 import {monitorRootFolder} from '@redux/utils/fileMonitor';
 import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@redux/reducers/main';
 import * as fs from 'fs';
 import {AlertEnum} from '@models/alert';
-import {getShellPath} from '@utils/shell';
+import {ipcRenderer} from 'electron';
 
-export const previewKustomization = createAsyncThunk<
-  SetPreviewDataPayload,
+/**
+ * Thunk to preview kustomizations
+ */
+
+export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }
->('main/previewKustomization', async (resourceId, thunkAPI) => {
+  }>('main/previewKustomization', async (resourceId, thunkAPI) => {
   const state = thunkAPI.getState().main;
   if (state.previewResource !== resourceId) {
     const resource = state.resourceMap[resourceId];
     if (resource && resource.filePath) {
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
       const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
+
       log.info(`previewing ${resource.id} in folder ${folder}`);
+      const result = await runKustomize(folder);
 
-      // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
-      return new Promise((resolve, reject) => {
-        exec(
-          'kubectl kustomize ./',
-          {
-            cwd: folder,
-            env: {
-              NODE_ENV: process.env.NODE_ENV,
-              PUBLIC_URL: process.env.PUBLIC_URL,
-              PATH: getShellPath(),
-            },
-          },
-          (error, stdout, stderr) => {
-            log.info('got result');
+      if (result.error) {
+        return createPreviewRejection(thunkAPI, 'Kustomize Error', result.error);
+      }
 
-            if (error) {
-              reject(createPreviewRejection(thunkAPI, 'Kustomize Error', error.message));
-              return;
-            }
-            if (stderr) {
-              reject(createPreviewRejection(thunkAPI, 'Kustomize Error', `Failed to generate kustomization: ${stderr}`));
-              return;
-            }
-
-            const resources = extractK8sResources(stdout, PREVIEW_PREFIX + resource.id);
-            const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
-              rm[r.id] = r;
-              return rm;
-            }, {});
-
-            processParsedResources(resourceMap);
-            resolve({previewResourceId: resource.id, previewResources: clearParsedDocs(resourceMap)});
-          }
-        );
-      });
+      if (result.stdout) {
+        return createPreviewResult(result.stdout, resource.id);
+      }
     }
   }
 
@@ -91,14 +67,12 @@ function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: string) {
  * Thunk to preview cluster objects
  */
 
-export const previewCluster = createAsyncThunk<
-  SetPreviewDataPayload,
+export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }
->('main/previewCluster', async (configPath, thunkAPI) => {
+  }>('main/previewCluster', async (configPath, thunkAPI) => {
   const state: AppState = thunkAPI.getState().main;
   if (state.previewResource !== configPath) {
     const kc = new k8s.KubeConfig();
@@ -118,19 +92,7 @@ export const previewCluster = createAsyncThunk<
       }),
     ]).then(yamls => {
       const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
-      const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
-
-      if (resources && resources.length > 0) {
-        const resourceMap = resources.reduce((acc: ResourceMapType, item) => {
-          acc[item.id] = item;
-          return acc;
-        }, {});
-
-        processParsedResources(resourceMap);
-        return {previewResourceId: configPath, previewResources: clearParsedDocs(resourceMap)};
-      }
-
-      return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', 'Failed to get resources from cluster');
+      return createPreviewResult(allYaml, configPath);
     }, (reason) => {
       return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
     });
@@ -143,14 +105,12 @@ export const previewCluster = createAsyncThunk<
  * Thunk to set the specified root folder
  */
 
-export const setRootFolder = createAsyncThunk<
-  SetRootFolderPayload,
+export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }
->('main/setRootFolder', async (rootFolder, thunkAPI) => {
+  }>('main/setRootFolder', async (rootFolder, thunkAPI) => {
   const appConfig = thunkAPI.getState().config;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
@@ -179,14 +139,12 @@ export const setRootFolder = createAsyncThunk<
  * Thunk to diff a resource against the configured cluster
  */
 
-export const diffResource = createAsyncThunk<
-  SetDiffDataPayload,
+export const diffResource = createAsyncThunk<SetDiffDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }
->('main/setDiffContent', async (diffResourceId, thunkAPI) => {
+  }>('main/setDiffContent', async (diffResourceId, thunkAPI) => {
   const resourceMap = thunkAPI.getState().main.resourceMap;
   const kubeconfig = thunkAPI.getState().config.kubeconfig;
   try {
@@ -217,7 +175,7 @@ export const diffResource = createAsyncThunk<
           .readNamespacedConfigMap(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true'
+            'true',
           )
           .then(handleResource, handleRejection);
       }
@@ -227,7 +185,7 @@ export const diffResource = createAsyncThunk<
           .readNamespacedService(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true'
+            'true',
           )
           .then(handleResource, handleRejection);
       }
@@ -237,7 +195,7 @@ export const diffResource = createAsyncThunk<
           .readNamespacedDeployment(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true'
+            'true',
           )
           .then(handleResource, handleRejection);
       }
@@ -250,14 +208,16 @@ export const diffResource = createAsyncThunk<
   return {};
 });
 
-export const previewHelmValuesFile = createAsyncThunk<
-  SetPreviewDataPayload,
+/**
+ * Thunk to preview a Helm Chart
+ */
+
+export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }
->('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
+  }>('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = thunkAPI.getState().config.kubeconfig;
@@ -272,52 +232,76 @@ export const previewHelmValuesFile = createAsyncThunk<
       if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
         log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
-        // need to run kubectl for this since the kubernetes client doesn't support kustomization commands
-        return new Promise((resolve, reject) => {
-          const helmCommand =
-            configState.settings.helmPreviewMode === 'template'
-              ? `helm template -f ${valuesFile.name} ${chart.name} .`
-              : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`;
+        const args = {
+          helmCommand: configState.settings.helmPreviewMode === 'template'
+            ? `helm template -f ${valuesFile.name} ${chart.name} .`
+            : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`,
+          cwd: folder,
+          kubeconfig,
+        };
 
-          exec(
-            helmCommand,
-            {
-              cwd: folder,
-              env: {
-                NODE_ENV: process.env.NODE_ENV,
-                PUBLIC_URL: process.env.PUBLIC_URL,
-                PATH: getShellPath(),
-                KUBECONFIG: kubeconfig,
-              },
-            },
-            (error, stdout, stderr) => {
-              if (error) {
-                reject(createPreviewRejection(thunkAPI, 'Helm Error', error.message));
-                return;
-              }
-              if (stderr) {
-                reject(createPreviewRejection(thunkAPI, 'Helm Error', `Failed to generate helm preview: ${stderr}`));
-                return;
-              }
+        const result = await runHelm(args);
 
-              const resources = extractK8sResources(stdout, PREVIEW_PREFIX + valuesFile.id);
-              const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
-                rm[r.id] = r;
-                return rm;
-              }, {});
+        if (result.error) {
+          return createPreviewRejection(thunkAPI, 'Helm Error', result.error);
+        }
 
-              processParsedResources(resourceMap);
-              resolve({previewResourceId: valuesFile.id, previewResources: clearParsedDocs(resourceMap)});
-            }
-          );
-        });
+        if (result.stdout) {
+          return createPreviewResult(result.stdout, valuesFile.id);
+        }
       }
-      log.error(`Can't run helm for ${valuesFile.name} in folder ${folder}`);
+
+      return createPreviewRejection(thunkAPI, 'Helm Error', `Unabled to run Helm for ${valuesFile.name} in folder ${folder}`);
     }
   }
 
   return {};
 });
+
+/**
+ * Invokes kustomize in main thread
+ */
+
+function runKustomize(cmd: any): any {
+  return new Promise((resolve) => {
+    ipcRenderer.once('kustomize-result', (event, arg) => {
+      resolve(arg);
+    });
+    ipcRenderer.send('run-kustomize', cmd);
+  });
+}
+
+/**
+ * Invokes Helm in main thread
+ */
+
+function runHelm(cmd: any): any {
+  return new Promise((resolve) => {
+    ipcRenderer.once('helm-result', (event, arg) => {
+      resolve(arg);
+    });
+    ipcRenderer.send('run-helm', cmd);
+  });
+}
+
+/**
+ * Creates a preview result from a YAML string containing resources
+ */
+
+function createPreviewResult(resourcesYaml: string, previewResourceId: string) {
+  const resources = extractK8sResources(resourcesYaml, PREVIEW_PREFIX + previewResourceId);
+  const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
+    rm[r.id] = r;
+    return rm;
+  }, {});
+
+  processParsedResources(resourceMap);
+  return ({previewResourceId, previewResources: clearParsedDocs(resourceMap)});
+}
+
+/**
+ * Creates a preview rejection that displays an error alert
+ */
 
 function createPreviewRejection(thunkAPI: any, title: string, message: string) {
   return thunkAPI.rejectWithValue({
