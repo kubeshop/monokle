@@ -1,8 +1,6 @@
 import {K8sResource} from '@models/k8sresource';
 import {spawn} from 'child_process';
 import log from 'loglevel';
-// @ts-ignore
-import shellPath from 'shell-path';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {setAlert} from '@redux/reducers/alert';
 import {setLogs} from '@redux/reducers/logs';
@@ -10,6 +8,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
 import {getAbsoluteResourceFolder} from '@redux/utils/fileEntry';
 import {isKustomizationResource} from '@redux/utils/kustomize';
+import {getShellPath} from '@utils/shell';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -20,7 +19,7 @@ function applyK8sResource(resource: K8sResource, kubeconfig: string) {
     env: {
       NODE_ENV: process.env.NODE_ENV,
       PUBLIC_URL: process.env.PUBLIC_URL,
-      PATH: shellPath.sync(),
+      PATH: getShellPath(),
       KUBECONFIG: kubeconfig,
     },
   });
@@ -39,7 +38,7 @@ function applyKustomization(resource: K8sResource, fileMap: FileMapType, kubecon
     env: {
       NODE_ENV: process.env.NODE_ENV,
       PUBLIC_URL: process.env.PUBLIC_URL,
-      PATH: shellPath.sync(),
+      PATH: getShellPath(),
       KUBECONFIG: kubeconfig,
     },
   });
