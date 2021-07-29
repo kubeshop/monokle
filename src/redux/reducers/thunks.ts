@@ -104,10 +104,21 @@ export const previewCluster = createAsyncThunk<
     kc.loadFromFile(configPath);
     const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
     const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+    const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
+    const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
 
-    return Promise.all([
-      k8sAppV1Api.listDeploymentForAllNamespaces().then(res => {
-        return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
+    return Promise.allSettled([
+      k8sAppV1Api.listDaemonSetForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'DaemonSet', 'apps/v1');
+      }),
+      k8sAppV1Api.listStatefulSetForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'StatefuleSet', 'apps/v1');
+      }),
+      k8sAppV1Api.listStatefulSetForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'StatefuleSet', 'apps/v1');
+      }),
+      k8sAppV1Api.listReplicaSetForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'ReplicaSet', 'apps/v1');
       }),
       k8sCoreV1Api.listConfigMapForAllNamespaces().then(res => {
         return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'v1');
@@ -115,8 +126,48 @@ export const previewCluster = createAsyncThunk<
       k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
         return getK8sObjectsAsYaml(res.body.items, 'Service', 'v1');
       }),
-    ]).then(yamls => {
-      const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
+      k8sCoreV1Api.listServiceAccountForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'ServiceAccount', 'v1');
+      }),
+      k8sCoreV1Api.listPersistentVolume().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'PersistentVolume', 'v1');
+      }),
+      k8sCoreV1Api.listPersistentVolumeClaimForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'PersistentVolumeClaim', 'v1');
+      }),
+      k8sCoreV1Api.listPodForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'Pod', 'v1');
+      }),
+      k8sCoreV1Api.listEndpointsForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'Endpoints', 'v1');
+      }),
+      k8sCoreV1Api.listSecretForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'Secret', 'v1');
+      }),
+      k8sCoreV1Api.listReplicationControllerForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'ReplicationController', 'v1');
+      }),
+      k8sBatchV1Api.listJobForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'Job', 'batch/v1');
+      }),
+      k8sBatchV1Api.listCronJobForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'CronJob', 'batch/v1');
+      }),
+      k8sRbacV1Api.listClusterRole().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'ClusterRole', 'rbac.authorization.k8s.io/v1');
+      }),
+      k8sRbacV1Api.listClusterRoleBinding().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'ClusterRoleBinding', 'rbac.authorization.k8s.io/v1');
+      }),
+      k8sRbacV1Api.listRoleForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'Role', 'rbac.authorization.k8s.io/v1');
+      }),
+      k8sRbacV1Api.listRoleBindingForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'RoleBinding', 'rbac.authorization.k8s.io/v1');
+      }),
+    ]).then(results => {
+      // @ts-ignore
+      const allYaml = results.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
       const resources = extractK8sResources(allYaml, PREVIEW_PREFIX + configPath);
 
       if (resources && resources.length > 0) {

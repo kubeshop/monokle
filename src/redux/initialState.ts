@@ -22,14 +22,14 @@ export const initialState: AppState = {
             name: 'Workloads',
             subsections: [
               {
-                name: 'Deployments',
-                apiVersionSelector: '**',
-                kindSelector: 'Deployment',
-              },
-              {
                 name: 'Pods',
                 apiVersionSelector: '**',
                 kindSelector: 'Pod',
+              },
+              {
+                name: 'Deployments',
+                apiVersionSelector: '**',
+                kindSelector: 'Deployment',
               },
               {
                 name: 'DaemonSets',
@@ -40,6 +40,11 @@ export const initialState: AppState = {
                 name: 'StatefulSets',
                 apiVersionSelector: '**',
                 kindSelector: 'StatefulSet',
+              },
+              {
+                name: 'ReplicaSets',
+                apiVersionSelector: '**',
+                kindSelector: 'ReplicaSet',
               },
               {
                 name: 'Jobs',
@@ -81,20 +86,55 @@ export const initialState: AppState = {
                 apiVersionSelector: '**',
                 kindSelector: 'Service',
               },
+              {
+                name: 'Endpoints',
+                apiVersionSelector: '**',
+                kindSelector: 'Endpoints',
+              },
+            ],
+          },
+          {
+            name: 'Storage',
+            subsections: [
+              {
+                name: 'Persistent Volume Claims',
+                apiVersionSelector: '**',
+                kindSelector: 'PersistentVolumeClaim',
+              },
+              {
+                name: 'Persistent Volumes',
+                apiVersionSelector: '**',
+                kindSelector: 'PersistentVolume',
+              },
             ],
           },
           {
             name: 'Access Control',
             subsections: [
               {
+                name: 'Service Accounts',
+                apiVersionSelector: '**',
+                kindSelector: 'ServiceAccount',
+              },
+              {
                 name: 'ClusterRoles',
                 apiVersionSelector: '**',
                 kindSelector: 'ClusterRole',
               },
               {
-                name: 'Service Accounts',
+                name: 'Roles',
                 apiVersionSelector: '**',
-                kindSelector: 'ServiceAccount',
+                kindSelector: 'Role',
+              },
+              {
+                name: 'ClusterRoleBindings',
+                apiVersionSelector: '**',
+                kindSelector: 'ClusterRoleBinding',
+              },
+              {
+                name: 'RoleBindings',
+                apiVersionSelector: '**',
+                kindSelector: 'RoleBinding',
               },
             ],
           },
