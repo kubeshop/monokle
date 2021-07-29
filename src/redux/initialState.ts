@@ -91,6 +91,16 @@ export const initialState: AppState = {
                 apiVersionSelector: '**',
                 kindSelector: 'Endpoints',
               },
+              {
+                name: 'Ingresses',
+                apiVersionSelector: '**',
+                kindSelector: 'Ingress',
+              },
+              {
+                name: 'NetworkPolicies',
+                apiVersionSelector: '**',
+                kindSelector: 'NetworkPolicy',
+              },
             ],
           },
           {

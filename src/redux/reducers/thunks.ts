@@ -81,6 +81,7 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
     const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
     const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
     const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+    const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
 
     return Promise.allSettled([
       k8sAppV1Api.listDaemonSetForAllNamespaces().then(res => {
@@ -139,6 +140,12 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
       }),
       k8sRbacV1Api.listRoleBindingForAllNamespaces().then(res => {
         return getK8sObjectsAsYaml(res.body.items, 'RoleBinding', 'rbac.authorization.k8s.io/v1');
+      }),
+      k8sNetworkingV1Api.listIngressForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'Ingress', 'networking.k8s.io/v1');
+      }),
+      k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'NetworkPolicy', 'networking.k8s.io/v1');
       }),
     ]).then(results => {
       // @ts-ignore
@@ -400,6 +407,24 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
         const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
         return k8sRbacV1Api
           .readNamespacedRoleBinding(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Ingress') {
+        const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
+        return k8sNetworkingV1Api
+          .readNamespacedIngress(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'NetworkPolicy') {
+        const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
+        return k8sNetworkingV1Api
+          .readNamespacedNetworkPolicy(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
           )
