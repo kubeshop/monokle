@@ -11,6 +11,8 @@ import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
 import styled from 'styled-components';
 import {Button, notification} from 'antd';
+import {useSelector} from 'react-redux';
+import {inPreviewMode} from '@redux/selectors';
 
 const Form = withTheme(AntDTheme);
 
@@ -41,6 +43,14 @@ const FormContainer = styled.div<{contentHeight: string}>`
     background: transparent;
   }
 
+  .ant-input[disabled] {
+    color: grey;
+  }
+
+  .ant-checkbox-disabled + span {
+    color: grey;
+  }
+
   .ant-form-item-label {
     font-weight: bold;
     padding-top: 10px;
@@ -61,6 +71,7 @@ const FormEditor = (props: {contentHeight: string}) => {
   const [formData, setFormData] = React.useState(null);
   const dispatch = useAppDispatch();
   const resource = resourceMap && selectedResource ? resourceMap[selectedResource] : undefined;
+  const isInPreviewMode = useSelector(inPreviewMode);
 
   useEffect(() => {
     if (resource) {
@@ -111,7 +122,8 @@ const FormEditor = (props: {contentHeight: string}) => {
   return (
     // @ts-ignore
     <FormContainer contentHeight={contentHeight}>
-      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} onSubmit={onFormSubmit}>
+      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} onSubmit={onFormSubmit}
+            disabled={isInPreviewMode}>
         <div>
           <Button type='primary' htmlType='submit'>
             Save

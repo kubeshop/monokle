@@ -9,14 +9,13 @@ import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapT
 import {clearParsedDocs, extractK8sResources, processParsedResources} from '@redux/utils/resource';
 import {stringify} from 'yaml';
 import * as k8s from '@kubernetes/client-node';
-// @ts-ignore
-import shellPath from 'shell-path';
 import {FileEntry} from '@models/fileentry';
 import {processKustomizations} from '@redux/utils/kustomize';
 import {monitorRootFolder} from '@redux/utils/fileMonitor';
 import {SetDiffDataPayload, SetPreviewDataPayload, SetRootFolderPayload} from '@redux/reducers/main';
 import * as fs from 'fs';
 import {AlertEnum} from '@models/alert';
+import {getShellPath} from '@utils/shell';
 
 export const previewKustomization = createAsyncThunk<
   SetPreviewDataPayload,
@@ -43,10 +42,12 @@ export const previewKustomization = createAsyncThunk<
             env: {
               NODE_ENV: process.env.NODE_ENV,
               PUBLIC_URL: process.env.PUBLIC_URL,
-              PATH: shellPath.sync(),
+              PATH: getShellPath(),
             },
           },
           (error, stdout, stderr) => {
+            log.info('got result');
+
             if (error) {
               reject(createPreviewRejection(thunkAPI, 'Kustomize Error', error.message));
               return;
@@ -285,7 +286,7 @@ export const previewHelmValuesFile = createAsyncThunk<
               env: {
                 NODE_ENV: process.env.NODE_ENV,
                 PUBLIC_URL: process.env.PUBLIC_URL,
-                PATH: shellPath.sync(),
+                PATH: getShellPath(),
                 KUBECONFIG: kubeconfig,
               },
             },
