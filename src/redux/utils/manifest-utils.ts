@@ -114,26 +114,37 @@ function convertPathToString(path: any[]) {
   return pathString.slice(0, -1);
 }
 
-export function traverseDocument(doc: Document, callback: (key: string, value: Scalar, path: string) => void) {
+function getKeyPathFromScalarKey(scalarKey: Scalar, parentPathString: string) {
+  if (parentPathString.trim().length > 0) {
+    return `${parentPathString}.${scalarKey.value as string}`;
+  }
+  return scalarKey.value as string;
+}
+
+export function traverseDocument(doc: Document, callback: (keyPath: string, scalar: Scalar) => void) {
   visit(doc, {
-    Pair(_, pair, path) {
-      const pathString = convertPathToString(path as any);
+    Pair(_, pair, parentPath) {
+      const parentPathString = convertPathToString(parentPath as any);
 
       if (isScalar(pair.key) && isScalar(pair.value)) {
         const scalarKey = pair.key as Scalar;
+        const keyPath = getKeyPathFromScalarKey(scalarKey, parentPathString);
+
         const scalarValue = pair.value as Scalar;
-        callback(scalarKey.value as string, scalarValue, pathString);
+
+        callback(keyPath, scalarValue);
       }
     },
     Seq(_, node, path) {
       const seqPair = path.slice(-1)[0];
-      const pathString = convertPathToString(path.slice(0, -1) as any);
+      const parentPathString = convertPathToString(path.slice(0, -1) as any);
 
       if (isPair(seqPair)) {
         node.items.forEach(item => {
           if (isScalar(item)) {
             const scalarSeqKey = seqPair.key as Scalar;
-            callback(scalarSeqKey.value as string, item as Scalar, pathString);
+            const keyPath = getKeyPathFromScalarKey(scalarSeqKey, parentPathString);
+            callback(keyPath, item as Scalar);
           }
         });
       }

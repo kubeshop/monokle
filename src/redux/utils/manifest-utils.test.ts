@@ -185,25 +185,26 @@ test('traverse-document', () => {
     REDIS_HOST: ""
     newKey: New Value
 `;
+
   const expectedResult = [
-    ['apiVersion', 'v1', ''],
-    ['kind', 'ConfigMap', ''],
-    ['name', 'agentcom-config', 'metadata'],
-    ['namespace', 'test', 'metadata'],
-    ['newKey', 'New Value', 'metadata.labels'],
-    ['finalizers', 'test', 'metadata'],
-    ['finalizers', 'test2', 'metadata'],
-    ['test3', 'value', 'metadata.finalizers'],
-    ['test5', 'value', 'metadata.finalizers.test4'],
-    ['POSTGRES_DB', '', 'data'],
-    ['REDIS_HOST', '', 'data'],
-    ['newKey', 'New Value', 'data'],
+    ['apiVersion', 'v1'],
+    ['kind', 'ConfigMap'],
+    ['metadata.name', 'agentcom-config'],
+    ['metadata.namespace', 'test'],
+    ['metadata.labels.newKey', 'New Value'],
+    ['metadata.finalizers', 'test'],
+    ['metadata.finalizers', 'test2'],
+    ['metadata.finalizers.test3', 'value'],
+    ['metadata.finalizers.test4.test5', 'value'],
+    ['data.POSTGRES_DB', ''],
+    ['data.REDIS_HOST', ''],
+    ['data.newKey', 'New Value'],
   ];
 
-  const result: [string, string | null, string | null][] = [];
+  const result: [string, string][] = [];
   const document = parseDocument(inputYaml);
-  traverseDocument(document, (key, scalarValue, parentKey) => {
-    result.push([key, scalarValue.value as string, parentKey]);
+  traverseDocument(document, (keyPath, scalar) => {
+    result.push([keyPath, scalar.value as string]);
   });
   expect(result).toEqual(expectedResult);
 });
