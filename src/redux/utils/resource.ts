@@ -7,8 +7,9 @@ import {isKustomizationResource, processKustomizations} from '@redux/utils/kusto
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/utils/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, visit, YAMLSeq} from 'yaml';
 import log from 'loglevel';
-import {isUnsatisfiedRef} from '@redux/utils/resourceRefs';
+import {isUnsatisfiedRef, RefMappersByResourceKind} from '@redux/utils/resourceRefs';
 import {v4 as uuidv4} from 'uuid';
+import {traverseDocument} from './manifest-utils';
 
 /**
  * process service selectors and create corresponding refs
@@ -535,4 +536,25 @@ export function getLinkedResources(resource: K8sResource) {
     });
 
   return linkedResourceIds;
+}
+
+export function processResourceRefNodes(resource: K8sResource) {
+  const parsedDoc = getParsedDoc(resource);
+
+  const refMappers = RefMappersByResourceKind[resource.kind];
+
+  if (!refMappers || refMappers.length === 0) {
+    return;
+  }
+
+  traverseDocument(parsedDoc, (keyPath, scalar) => {
+    refMappers.forEach(refMapper => {
+      if (!resource.refNodeByPath) {
+        resource.refNodeByPath = {};
+      }
+      if (keyPath.endsWith(refMapper.source.path)) {
+        resource.refNodeByPath[refMapper.source.path] = scalar;
+      }
+    });
+  });
 }

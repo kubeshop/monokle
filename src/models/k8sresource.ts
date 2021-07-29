@@ -1,7 +1,7 @@
 /**
  * A k8s resource manifest, either extracted from a file or generated internaally (for example when previewing kustomizations)
  */
-import {Document, LineCounter, ParsedNode} from 'yaml';
+import {Document, LineCounter, ParsedNode, Scalar} from 'yaml';
 
 interface K8sResource {
   id: string; // an internally generated UUID - used for references/lookups in resourceMap
@@ -23,6 +23,7 @@ interface K8sResource {
 
   parsedDoc?: Document.Parsed<ParsedNode>; // temporary object used for parsing refs
   lineCounter?: LineCounter; // temporary object used for ref positioning
+  refNodeByPath?: Record<string, Scalar>;
 }
 
 export enum ResourceRefType {
