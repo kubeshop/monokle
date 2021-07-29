@@ -165,7 +165,7 @@ immutable: true`;
   expect(result).toBe(expectedYaml);
 });
 
-test.only('traverse-document', () => {
+test('traverse-document', () => {
   const inputYaml = `
   apiVersion: v1
   kind: ConfigMap
@@ -202,8 +202,8 @@ test.only('traverse-document', () => {
 
   const result: [string, string | null, string | null][] = [];
   const document = parseDocument(inputYaml);
-  traverseDocument(document, (key, value, parentKey) => {
-    result.push([key, value, parentKey]);
+  traverseDocument(document, (key, scalarValue, parentKey) => {
+    result.push([key, scalarValue.value as string, parentKey]);
   });
   expect(result).toEqual(expectedResult);
 });

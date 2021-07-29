@@ -114,7 +114,7 @@ function convertPathToString(path: any[]) {
   return pathString.slice(0, -1);
 }
 
-export function traverseDocument(doc: Document, callback: (key: string, node: string, path: string) => void) {
+export function traverseDocument(doc: Document, callback: (key: string, value: Scalar, path: string) => void) {
   visit(doc, {
     Pair(_, pair, path) {
       const pathString = convertPathToString(path as any);
@@ -122,7 +122,7 @@ export function traverseDocument(doc: Document, callback: (key: string, node: st
       if (isScalar(pair.key) && isScalar(pair.value)) {
         const scalarKey = pair.key as Scalar;
         const scalarValue = pair.value as Scalar;
-        callback(scalarKey.value as string, scalarValue.value as string, pathString);
+        callback(scalarKey.value as string, scalarValue, pathString);
       }
     },
     Seq(_, node, path) {
@@ -133,7 +133,7 @@ export function traverseDocument(doc: Document, callback: (key: string, node: st
         node.items.forEach(item => {
           if (isScalar(item)) {
             const scalarSeqKey = seqPair.key as Scalar;
-            callback(scalarSeqKey.value as string, item.value as string, pathString);
+            callback(scalarSeqKey.value as string, item as Scalar, pathString);
           }
         });
       }
