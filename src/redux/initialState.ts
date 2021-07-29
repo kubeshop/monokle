@@ -26,6 +26,36 @@ export const initialState: AppState = {
                 apiVersionSelector: '**',
                 kindSelector: 'Deployment',
               },
+              {
+                name: 'Pods',
+                apiVersionSelector: '**',
+                kindSelector: 'Pod',
+              },
+              {
+                name: 'DaemonSets',
+                apiVersionSelector: '**',
+                kindSelector: 'DaemonSet',
+              },
+              {
+                name: 'StatefulSets',
+                apiVersionSelector: '**',
+                kindSelector: 'StatefulSet',
+              },
+              {
+                name: 'Jobs',
+                apiVersionSelector: '**',
+                kindSelector: 'Job',
+              },
+              {
+                name: 'CronJobs',
+                apiVersionSelector: '**',
+                kindSelector: 'CronJob',
+              },
+              {
+                name: 'ReplicationControllers',
+                apiVersionSelector: '**',
+                kindSelector: 'ReplicationController',
+              },
             ],
           },
           {
@@ -35,6 +65,11 @@ export const initialState: AppState = {
                 name: 'ConfigMaps',
                 apiVersionSelector: '**',
                 kindSelector: 'ConfigMap',
+              },
+              {
+                name: 'Secrets',
+                apiVersionSelector: '**',
+                kindSelector: 'Secret',
               },
             ],
           },
@@ -49,12 +84,17 @@ export const initialState: AppState = {
             ],
           },
           {
-            name: 'Security',
+            name: 'Access Control',
             subsections: [
               {
                 name: 'ClusterRoles',
                 apiVersionSelector: '**',
                 kindSelector: 'ClusterRole',
+              },
+              {
+                name: 'Service Accounts',
+                apiVersionSelector: '**',
+                kindSelector: 'ServiceAccount',
               },
             ],
           },
