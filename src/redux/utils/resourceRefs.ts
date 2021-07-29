@@ -41,3 +41,101 @@ export function hasRefs(resource: K8sResource) {
 export function hasUnsatisfiedRefs(resource: K8sResource) {
   return resource.refs?.some(e => isUnsatisfiedRef(e.refType));
 }
+
+const createCommonRefMappers = (sourceKind: string) => {
+  return [
+    {
+      source: {
+        kind: sourceKind,
+        path: 'configMapRef.name',
+      },
+      target: {
+        kind: 'ConfigMap',
+        path: 'metadata.name',
+      },
+    },
+    {
+      source: {
+        kind: sourceKind,
+        path: 'configMapKeyRef.name',
+      },
+      target: {
+        kind: 'ConfigMap',
+        path: 'metadata.name',
+      },
+    },
+    {
+      source: {
+        kind: sourceKind,
+        path: 'volumes.configMap.name',
+      },
+      target: {
+        kind: 'ConfigMap',
+        path: 'metadata.name',
+      },
+    },
+    {
+      source: {
+        kind: sourceKind,
+        path: 'volumes.secret.secretName',
+      },
+      target: {
+        kind: 'Secret',
+        path: 'metadata.name',
+      },
+    },
+    {
+      source: {
+        kind: sourceKind,
+        path: 'secretKeyRef.name',
+      },
+      target: {
+        kind: 'Secret',
+        path: 'metadata.name',
+      },
+    },
+    {
+      source: {
+        kind: sourceKind,
+        path: 'imagePullSecrets',
+      },
+      target: {
+        kind: 'Secret',
+        path: 'metadata.name',
+      },
+    },
+    {
+      source: {
+        kind: sourceKind,
+        path: ['serviceAccountName'],
+      },
+      target: {
+        kind: 'ServiceAccount',
+        path: 'metadata.name',
+      },
+    },
+  ];
+};
+
+export const RefMappersByResourceKind = {
+  Service: [
+    {
+      source: {kind: 'Service', path: 'content.spec.selector'},
+      target: {kind: 'Deployment', path: 'spec.template.metadata.labels'},
+    },
+  ],
+  Deployment: createCommonRefMappers('Deployment'),
+  Pod: createCommonRefMappers('Pod'),
+  DaemonSet: createCommonRefMappers('DaemonSet'),
+  Job: createCommonRefMappers('Job'),
+  StatefulSet: createCommonRefMappers('StatefulSet'),
+  ReplicaSet: createCommonRefMappers('ReplicaSet'),
+  CronJob: createCommonRefMappers('CronJob'),
+  ReplicationController: createCommonRefMappers('ReplicationController'),
+  ServiceAccount: [
+    {
+      source: {kind: 'ServiceAccount', path: 'secrets'},
+      target: {kind: 'Secret', path: 'metadata.name'},
+    },
+  ],
+};
