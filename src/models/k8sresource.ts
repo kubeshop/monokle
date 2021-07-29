@@ -33,8 +33,14 @@ export enum ResourceRefType {
   SelectedPodName,
   ConfigMapRef,
   ConfigMapConsumer,
+  SecretRef,
+  SecretConsumer,
+  ServiceAccountRef,
+  ServiceAccountConsumer,
   UnsatisfiedSelector,
   UnsatisfiedConfigMap,
+  UnsatisfiedSecret,
+  UnsatisfiedServiceAccount,
 }
 
 interface ResourceRef {
