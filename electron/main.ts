@@ -18,15 +18,13 @@ ipcMain.on('get-user-home-dir', event => {
 
 ipcMain.on('run-kustomize', (event, folder: string) => {
   try {
-    let stdout = execSync('kubectl kustomize ./',
-      {
-        cwd: folder,
-        env:
-          {
-            NODE_ENV: process.env.NODE_ENV,
-            PUBLIC_URL: process.env.PUBLIC_URL,
-          },
-      });
+    let stdout = execSync('kubectl kustomize ./', {
+      cwd: folder,
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        PUBLIC_URL: process.env.PUBLIC_URL,
+      },
+    });
 
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
   } catch (e) {
@@ -40,16 +38,14 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
 
 ipcMain.on('run-helm', (event, args: any) => {
   try {
-    let stdout = execSync(args.helmCommand,
-      {
-        cwd: args.cwd,
-        env:
-          {
-            NODE_ENV: process.env.NODE_ENV,
-            PUBLIC_URL: process.env.PUBLIC_URL,
-            KUBECONFIG: args.kubeconfig,
-          },
-      });
+    let stdout = execSync(args.helmCommand, {
+      cwd: args.cwd,
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        PUBLIC_URL: process.env.PUBLIC_URL,
+        KUBECONFIG: args.kubeconfig,
+      },
+    });
 
     event.sender.send('helm-result', {stdout: stdout.toString()});
   } catch (e) {
@@ -61,7 +57,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 500,
+    minWidth: 800,
     minHeight: 300,
     webPreferences: {
       webSecurity: false,
@@ -89,7 +85,7 @@ function createWindow() {
         '..',
         'node_modules',
         '.bin',
-        `electron${process.platform === 'win32' ? '.cmd' : ''}`,
+        `electron${process.platform === 'win32' ? '.cmd' : ''}`
       ),
       forceHardReset: true,
       hardResetMethod: 'exit',
