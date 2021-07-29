@@ -2,6 +2,7 @@ import {app, BrowserWindow, ipcMain} from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
+import {execSync} from 'child_process';
 
 const ElectronStore = require('electron-store');
 
@@ -9,6 +10,51 @@ const userHomeDir = app.getPath('home');
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
+});
+
+/**
+ * called by thunk to preview a kustomization
+ */
+
+ipcMain.on('run-kustomize', (event, folder: string) => {
+  try {
+    let stdout = execSync('kubectl kustomize ./',
+      {
+        cwd: folder,
+        env:
+          {
+            NODE_ENV: process.env.NODE_ENV,
+            PUBLIC_URL: process.env.PUBLIC_URL,
+          },
+      });
+
+    event.sender.send('kustomize-result', {stdout: stdout.toString()});
+  } catch (e) {
+    event.sender.send('kustomize-result', {error: e.toString()});
+  }
+});
+
+/**
+ * called by thunk to preview a helm chart with values file
+ */
+
+ipcMain.on('run-helm', (event, args: any) => {
+  try {
+    let stdout = execSync(args.helmCommand,
+      {
+        cwd: args.cwd,
+        env:
+          {
+            NODE_ENV: process.env.NODE_ENV,
+            PUBLIC_URL: process.env.PUBLIC_URL,
+            KUBECONFIG: args.kubeconfig,
+          },
+      });
+
+    event.sender.send('helm-result', {stdout: stdout.toString()});
+  } catch (e) {
+    event.sender.send('helm-result', {error: e.toString()});
+  }
 });
 
 function createWindow() {
@@ -43,7 +89,7 @@ function createWindow() {
         '..',
         'node_modules',
         '.bin',
-        `electron${process.platform === 'win32' ? '.cmd' : ''}`
+        `electron${process.platform === 'win32' ? '.cmd' : ''}`,
       ),
       forceHardReset: true,
       hardResetMethod: 'exit',
