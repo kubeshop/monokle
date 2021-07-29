@@ -1,4 +1,5 @@
-import {mergeManifests} from '@redux/utils/manifest-utils';
+import {parseDocument} from 'yaml';
+import {mergeManifests, traverseDocument} from '@redux/utils/manifest-utils';
 
 test('manifest-merge-all-match', () => {
   const orgYaml = `apiVersion: v1
@@ -162,4 +163,47 @@ immutable: true`;
 
   const result = mergeManifests(orgYaml, newYaml);
   expect(result).toBe(expectedYaml);
+});
+
+test.only('traverse-document', () => {
+  const inputYaml = `
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: agentcom-config
+    namespace: test
+    labels:
+      newKey: New Value
+    finalizers:
+      - test
+      - test2
+      - test3: value
+      - test4:
+        - test5: value
+  data:
+    POSTGRES_DB: ""
+    REDIS_HOST: ""
+    newKey: New Value
+`;
+  const expectedResult = [
+    ['apiVersion', 'v1', ''],
+    ['kind', 'ConfigMap', ''],
+    ['name', 'agentcom-config', 'metadata'],
+    ['namespace', 'test', 'metadata'],
+    ['newKey', 'New Value', 'metadata.labels'],
+    ['finalizers', 'test', 'metadata'],
+    ['finalizers', 'test2', 'metadata'],
+    ['test3', 'value', 'metadata.finalizers'],
+    ['test5', 'value', 'metadata.finalizers.test4'],
+    ['POSTGRES_DB', '', 'data'],
+    ['REDIS_HOST', '', 'data'],
+    ['newKey', 'New Value', 'data'],
+  ];
+
+  const result: [string, string | null, string | null][] = [];
+  const document = parseDocument(inputYaml);
+  traverseDocument(document, (key, value, parentKey) => {
+    result.push([key, value, parentKey]);
+  });
+  expect(result).toEqual(expectedResult);
 });
