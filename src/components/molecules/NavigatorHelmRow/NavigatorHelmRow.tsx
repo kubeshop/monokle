@@ -10,6 +10,7 @@ import {selectHelmValues} from '@redux/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {startPreview} from '@redux/utils/preview';
+import ScrollIntoView from '@molecules/ScrollIntoView';
 
 export type NavigatorHelmRowProps = {
   rowKey: React.Key;
@@ -104,6 +105,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   const previewValuesFile = useAppSelector(state => state.main.previewValuesFile);
   const selectedValuesFile = useAppSelector(state => state.main.selectedValuesFile);
   const dispatch = useAppDispatch();
+  const scrollContainer = React.useRef(null);
 
   const {rowKey, helmChart} = props;
 
@@ -125,12 +127,21 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
     }
   }
 
+  React.useEffect(() => {
+    if (Object.values(helmValues).some(helm => helm.selected)) {
+      // @ts-ignore
+      scrollContainer.current?.scrollIntoView();
+    }
+  }, [helmValues]);
+
   return (
     <RowContainer>
       <ChartContainer className={chartClassName}>
         <ItemRow key={rowKey}>
           <SectionCol sm={22}>
-            <div className={chartClassName}>{helmChart.name}</div>
+            <ScrollIntoView ref={scrollContainer}>
+              <div className={chartClassName}>{helmChart.name}</div>
+            </ScrollIntoView>
           </SectionCol>
         </ItemRow>
       </ChartContainer>
