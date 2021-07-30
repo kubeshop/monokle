@@ -25,7 +25,6 @@ import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch} from '@redux/hooks';
 import {initKubeconfig} from '@redux/reducers/appConfig';
 import featureJson from '@src/feature-flags.json';
-import {APP_MIN_WIDTH} from '@src/constants';
 import ClustersPane from '@organisms/ClustersPane';
 
 const StyledReflexContainer = styled(ReflexContainer)`
@@ -121,9 +120,9 @@ const iconMenuWidth = 45;
 const App = () => {
   const dispatch = useAppDispatch();
   const size: Size = useWindowSize();
-  const contentWidth = size.width ? size.width - 2 * iconMenuWidth : APP_MIN_WIDTH;
-  const mainHeight = `${size.height ? size.height : 100}px`;
-  const contentHeight = `${size.height ? size.height - 75 : 75}px`;
+  const contentWidth = size.width - 2 * iconMenuWidth;
+  const mainHeight = `${size.height}px`;
+  const contentHeight = `${size.height - 75}px`;
 
   const [leftMenuSelection, setLeftMenuSelection] = useState('');
   const [rightMenuSelection, setRightMenuSelection] = useState('');
@@ -131,6 +130,22 @@ const App = () => {
   const [navPaneWidth, setNavPaneWidth] = useState(contentWidth * 0.5);
   const [editPaneWidth, setEditPaneWidth] = useState(contentWidth * 0.5);
   const [leftPaneWidth, setLeftPaneWidth] = useState(contentWidth * 0);
+  const [appWidth, setAppWidth] = useState(size.width);
+
+  console.log(
+    'app.tsx render:',
+    'app width',
+    size.width,
+    'left',
+    leftMenuSelection,
+    leftPaneWidth,
+    'nav',
+    navPaneWidth,
+    'edit',
+    editPaneWidth,
+    'right',
+    rightPaneWidth
+  );
 
   useEffect(() => {
     dispatch(initKubeconfig());
@@ -174,7 +189,10 @@ const App = () => {
     setNavPaneWidth(navEditSizes);
     setEditPaneWidth(navEditSizes);
     setRightPaneWidth(rightSize);
+    setAppWidth(size.width);
   };
+
+  if (appWidth !== size.width) setAspectRatios('', '');
 
   return (
     <div>
