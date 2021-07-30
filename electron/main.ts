@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import {execSync} from 'child_process';
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants';
 
 const ElectronStore = require('electron-store');
 
@@ -57,8 +58,8 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 800,
-    minHeight: 300,
+    minWidth: APP_MIN_WIDTH,
+    minHeight: APP_MIN_HEIGHT,
     webPreferences: {
       webSecurity: false,
       contextIsolation: false,

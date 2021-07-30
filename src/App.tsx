@@ -25,6 +25,7 @@ import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch} from '@redux/hooks';
 import {initKubeconfig} from '@redux/reducers/appConfig';
 import featureJson from '@src/feature-flags.json';
+import {APP_MIN_WIDTH} from '@src/constants';
 
 const StyledReflexContainer = styled(ReflexContainer)`
   &.reflex-container {
@@ -114,32 +115,64 @@ const iconStyle = {
   fontSize: 25,
 };
 
+const iconMenuWidth = 45;
+
 const App = () => {
   const dispatch = useAppDispatch();
   const size: Size = useWindowSize();
+  const contentWidth = size.width ? size.width - 2 * iconMenuWidth : APP_MIN_WIDTH;
+  const mainHeight = `${size.height ? size.height : 100}px`;
+  const contentHeight = `${size.height ? size.height - 75 : 75}px`;
 
   const [leftMenuSelection, setLeftMenuSelection] = useState('');
   const [rightMenuSelection, setRightMenuSelection] = useState('');
-  const [rightPaneWidth, setRightPaneWidth] = useState('0%');
-  const [navPaneWidth, setNavPaneWidth] = useState('50%');
-  const [editPaneWidth, setEditPaneWidth] = useState('50%');
-  const [leftPaneWidth, setLeftPaneWidth] = useState('0%');
-
-  const mainHeight = `${size.height ? size.height : 100}px`;
-  const contentHeight = `${size.height ? size.height - 75 : 75}px`;
+  const [rightPaneWidth, setRightPaneWidth] = useState(contentWidth * 0);
+  const [navPaneWidth, setNavPaneWidth] = useState(contentWidth * 0.5);
+  const [editPaneWidth, setEditPaneWidth] = useState(contentWidth * 0.5);
+  const [leftPaneWidth, setLeftPaneWidth] = useState(contentWidth * 0);
 
   useEffect(() => {
     dispatch(initKubeconfig());
   }, []);
 
-  const setAspectRatios = () => {
+  const setAspectRatios = (side: string, buttonName: string) => {
+    let left;
+    let right;
+    if (side === 'left') {
+      left = leftMenuSelection === buttonName ? '' : buttonName;
+      setLeftMenuSelection(left);
+    } else left = leftMenuSelection;
+
+    if (side === 'right') {
+      right = rightMenuSelection === buttonName ? '' : buttonName;
+      setRightMenuSelection(right);
+    } else right = rightMenuSelection;
+
     /*
       Possible configurations (left, right) -> left: 25%, nav: 25%, edit:25%, right:25%
-      closed, closed -> left: 0%, nav: 50%, edit:50%, right:0% (default)
-      open, closed -> left: 33%, nav: 33%, edit:33%, right:0%
-      closed, open -> left: 0%, nav: 33%, edit:33%, right:33%
-      open, open -> left: 25%, nav: 25%, edit:25%, right:25%
+      cc: closed, closed -> left: 0%, nav: 50%, edit:50%, right:0% (default)
+      oc: open, closed -> left: 33%, nav: 33%, edit:33%, right:0%
+      co: closed, open -> left: 0%, nav: 33%, edit:33%, right:33%
+      oo: open, open -> left: 25%, nav: 25%, edit:25%, right:25%
     */
+    const cfg =
+      left === '' && right === ''
+        ? 'cc'
+        : left !== '' && right === ''
+        ? 'oc'
+        : left === '' && right !== ''
+        ? 'co'
+        : 'oo';
+
+    const leftSize = cfg === 'oc' ? contentWidth * 0.33 : cfg === 'oo' ? contentWidth * 0.25 : 0;
+    const rightSize = cfg === 'co' ? contentWidth * 0.33 : cfg === 'oo' ? contentWidth * 0.25 : 0;
+    const navEditSizes =
+      cfg === 'oc' || cfg === 'co' ? contentWidth * 0.33 : cfg === 'oo' ? contentWidth * 0.25 : contentWidth * 0.5;
+
+    setLeftPaneWidth(leftSize);
+    setNavPaneWidth(navEditSizes);
+    setEditPaneWidth(navEditSizes);
+    setRightPaneWidth(rightSize);
   };
 
   return (
@@ -156,7 +189,7 @@ const App = () => {
                 <Space direction="vertical">
                   <Button
                     size="large"
-                    onClick={() => setLeftMenuSelection(leftMenuSelection === 'file-explorer' ? '' : 'file-explorer')}
+                    onClick={() => setAspectRatios('left', 'file-explorer')}
                     icon={
                       <FolderOpenOutlined
                         style={{
@@ -169,9 +202,7 @@ const App = () => {
                   {featureJson.ShowGraphView && (
                     <Button
                       size="large"
-                      onClick={() =>
-                        setLeftMenuSelection(leftMenuSelection === 'cluster-explorer' ? '' : 'cluster-explorer')
-                      }
+                      onClick={() => setAspectRatios('left', 'cluster-explorer')}
                       icon={
                         <ClusterOutlined
                           style={{
@@ -184,48 +215,44 @@ const App = () => {
                   )}
                 </Space>
               </StyledMenuLeftReflexElement>
-              <StyledReflexElement
-                minSize={leftMenuSelection !== '' ? 400 : 0}
-                maxSize={leftMenuSelection !== '' ? 1000 : 0}
-                size={leftMenuSelection === '' ? 0 : 600}
-              >
-                {leftMenuSelection === 'file-explorer' ? <FileTreePane windowHeight={size.height} /> : undefined}
-                {featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? (
-                  <div>cluster buster</div>
-                ) : undefined}
-              </StyledReflexElement>
+              {leftPaneWidth && (
+                <StyledReflexElement size={leftPaneWidth}>
+                  {leftMenuSelection === 'file-explorer' ? <FileTreePane windowHeight={size.height} /> : undefined}
+                  {featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? (
+                    <div>cluster buster</div>
+                  ) : undefined}
+                </StyledReflexElement>
+              )}
 
-              <ReflexSplitter />
+              {leftPaneWidth && <ReflexSplitter />}
 
-              <StyledReflexElement minSize={200} maxSize={1000}>
+              <StyledReflexElement size={navPaneWidth}>
                 <NavigatorPane />
               </StyledReflexElement>
 
               <ReflexSplitter />
 
-              <StyledReflexElement minSize={200} maxSize={1000}>
+              <StyledReflexElement size={editPaneWidth}>
                 <ActionsPane contentHeight={contentHeight} />
               </StyledReflexElement>
 
-              <ReflexSplitter />
+              {rightPaneWidth && <ReflexSplitter />}
 
-              <StyledReflexElement
-                minSize={rightMenuSelection !== '' ? 200 : 0}
-                maxSize={rightMenuSelection !== '' ? 1000 : 0}
-                size={rightMenuSelection === '' ? 0 : 600}
-              >
-                {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                  <GraphView editorHeight={contentHeight} />
-                ) : undefined}
-                {rightMenuSelection === 'logs' ? <LogViewer editorHeight={contentHeight} /> : undefined}
-              </StyledReflexElement>
+              {rightPaneWidth && (
+                <StyledReflexElement size={rightPaneWidth}>
+                  {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
+                    <GraphView editorHeight={contentHeight} />
+                  ) : undefined}
+                  {rightMenuSelection === 'logs' ? <LogViewer editorHeight={contentHeight} /> : undefined}
+                </StyledReflexElement>
+              )}
 
               <StyledMenuRightReflexElement size={43}>
                 <Space direction="vertical">
                   {featureJson.ShowGraphView && (
                     <Button
                       size="large"
-                      onClick={() => setRightMenuSelection(rightMenuSelection === 'graph' ? '' : 'graph')}
+                      onClick={() => setAspectRatios('right', 'graph')}
                       icon={
                         <ApartmentOutlined
                           style={{
@@ -239,7 +266,7 @@ const App = () => {
 
                   <Button
                     size="large"
-                    onClick={() => setRightMenuSelection(rightMenuSelection === 'logs' ? '' : 'logs')}
+                    onClick={() => setAspectRatios('right', 'logs')}
                     icon={
                       <CodeOutlined
                         style={{...iconStyle, color: rightMenuSelection === 'logs' ? Colors.whitePure : Colors.grey7}}
