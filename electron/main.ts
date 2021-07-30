@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import {execSync} from 'child_process';
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants';
 
 const ElectronStore = require('electron-store');
 
@@ -18,15 +19,13 @@ ipcMain.on('get-user-home-dir', event => {
 
 ipcMain.on('run-kustomize', (event, folder: string) => {
   try {
-    let stdout = execSync('kubectl kustomize ./',
-      {
-        cwd: folder,
-        env:
-          {
-            NODE_ENV: process.env.NODE_ENV,
-            PUBLIC_URL: process.env.PUBLIC_URL,
-          },
-      });
+    let stdout = execSync('kubectl kustomize ./', {
+      cwd: folder,
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        PUBLIC_URL: process.env.PUBLIC_URL,
+      },
+    });
 
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
   } catch (e) {
@@ -40,16 +39,14 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
 
 ipcMain.on('run-helm', (event, args: any) => {
   try {
-    let stdout = execSync(args.helmCommand,
-      {
-        cwd: args.cwd,
-        env:
-          {
-            NODE_ENV: process.env.NODE_ENV,
-            PUBLIC_URL: process.env.PUBLIC_URL,
-            KUBECONFIG: args.kubeconfig,
-          },
-      });
+    let stdout = execSync(args.helmCommand, {
+      cwd: args.cwd,
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        PUBLIC_URL: process.env.PUBLIC_URL,
+        KUBECONFIG: args.kubeconfig,
+      },
+    });
 
     event.sender.send('helm-result', {stdout: stdout.toString()});
   } catch (e) {
@@ -61,8 +58,8 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 500,
-    minHeight: 300,
+    minWidth: APP_MIN_WIDTH,
+    minHeight: APP_MIN_HEIGHT,
     webPreferences: {
       webSecurity: false,
       contextIsolation: false,
@@ -89,7 +86,7 @@ function createWindow() {
         '..',
         'node_modules',
         '.bin',
-        `electron${process.platform === 'win32' ? '.cmd' : ''}`,
+        `electron${process.platform === 'win32' ? '.cmd' : ''}`
       ),
       forceHardReset: true,
       hardResetMethod: 'exit',
