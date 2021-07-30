@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Size} from '@models/window';
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '@src/constants';
 
 export function useFocus<T>(): [React.RefObject<T>, () => void] {
   const htmlElRef = useRef<T>(null);
@@ -14,9 +13,10 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
 }
 
 export function useWindowSize(): Size {
+  const {innerWidth, innerHeight} = window;
   const [windowSize, setWindowSize] = useState<Size>({
-    width: APP_MIN_WIDTH,
-    height: APP_MIN_HEIGHT,
+    width: innerWidth,
+    height: innerHeight,
   });
 
   useEffect(() => {
