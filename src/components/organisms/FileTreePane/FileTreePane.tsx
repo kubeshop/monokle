@@ -15,7 +15,7 @@ import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import fs from 'fs';
 import {setRootFolder} from '@redux/reducers/thunks';
-import {startPreview, stopPreview} from '@redux/utils/preview';
+import {stopPreview} from '@redux/utils/preview';
 import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
@@ -242,14 +242,11 @@ const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
 const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const {windowHeight} = props;
   const dispatch = useAppDispatch();
-  const previewResource = useAppSelector(state => state.main.previewResource);
   const previewMode = useSelector(inPreviewMode);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const kubeconfig = useAppSelector(state => state.config.kubeconfig);
   const shouldRefreshFileMap = useAppSelector(state => state.main.shouldRefreshFileMap);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
@@ -292,13 +289,6 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
     }
   }, [fileMap, resourceMap]);
 
-  const connectToCluster = () => {
-    if (previewMode && previewResource !== kubeconfig) {
-      stopPreview(dispatch);
-    }
-    startPreview(kubeconfig, 'cluster', dispatch);
-  };
-
   const startFileUploader = () => {
     folderInput && folderInput.current?.click();
   };
@@ -330,14 +320,6 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
       <Row>
         <ColumnWithPadding span={24}>
           <Space direction="horizontal">
-            <Button
-              type="primary"
-              ghost
-              loading={previewType === 'cluster' && previewLoader.isLoading}
-              onClick={connectToCluster}
-            >
-              Cluster Objects
-            </Button>
             <Button type="primary" ghost onClick={startFileUploader}>
               <CenteredItemsDiv>
                 <FolderAddOutlined style={{marginRight: '3px'}} />

@@ -26,6 +26,7 @@ import {useAppDispatch} from '@redux/hooks';
 import {initKubeconfig} from '@redux/reducers/appConfig';
 import featureJson from '@src/feature-flags.json';
 import {APP_MIN_WIDTH} from '@src/constants';
+import ClustersPane from '@organisms/ClustersPane';
 
 const StyledReflexContainer = styled(ReflexContainer)`
   &.reflex-container {
@@ -219,7 +220,7 @@ const App = () => {
                 <StyledReflexElement size={leftPaneWidth}>
                   {leftMenuSelection === 'file-explorer' ? <FileTreePane windowHeight={size.height} /> : undefined}
                   {featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? (
-                    <div>cluster buster</div>
+                    <ClustersPane />
                   ) : undefined}
                 </StyledReflexElement>
               )}
