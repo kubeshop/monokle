@@ -148,6 +148,16 @@ export const initialState: AppState = {
               },
             ],
           },
+          {
+            name: 'Custom Resources',
+            subsections: [
+              {
+                name: 'Definitions',
+                apiVersionSelector: '**',
+                kindSelector: 'CustomResourceDefinition',
+              },
+            ],
+          },
         ],
       },
     ],

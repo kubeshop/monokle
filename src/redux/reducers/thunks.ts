@@ -82,6 +82,7 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
     const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
     const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
     const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
+    const k8sExtensionsV1Api = kc.makeApiClient(k8s.ApiextensionsV1Api);
 
     return Promise.allSettled([
       k8sAppV1Api.listDaemonSetForAllNamespaces().then(res => {
@@ -146,6 +147,9 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
       }),
       k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces().then(res => {
         return getK8sObjectsAsYaml(res.body.items, 'NetworkPolicy', 'networking.k8s.io/v1');
+      }),
+      k8sExtensionsV1Api.listCustomResourceDefinition().then(res => {
+        return getK8sObjectsAsYaml(res.body.items, 'CustomResourceDefinition', 'apiextensions.k8s.io/v1');
       }),
     ]).then(results => {
       // @ts-ignore
@@ -425,6 +429,15 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
         const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
         return k8sNetworkingV1Api
           .readNamespacedNetworkPolicy(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'CustomResourceDefinition') {
+        const k8sExtensionV1Api = kc.makeApiClient(k8s.ApiextensionsV1Api);
+        return k8sExtensionV1Api
+          .readCustomResourceDefinition(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
           )
