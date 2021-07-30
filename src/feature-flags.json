@@ -1,3 +1,4 @@
 {
-  "ShowGraphView": false
+  "ShowGraphView": true,
+  "ShowClusterView": true
 }

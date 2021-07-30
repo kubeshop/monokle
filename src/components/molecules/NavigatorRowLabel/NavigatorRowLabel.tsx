@@ -9,6 +9,7 @@ import {selectK8sResource} from '@redux/reducers/main';
 import {ResourceRef, K8sResource} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
 import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/utils/resourceRefs';
+import ScrollIntoView from '@molecules/ScrollIntoView';
 
 const {Text} = Typography;
 
@@ -158,10 +159,18 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [resource, setResource] = useState<K8sResource>();
+  const scrollContainer = React.useRef(null);
 
   useEffect(() => {
     setResource(resourceMap[resourceId]);
   }, [resourceId, resourceMap]);
+
+  useEffect(() => {
+    if (isHighlighted) {
+      // @ts-ignore
+      scrollContainer.current?.scrollIntoView();
+    }
+  }, [isHighlighted]);
 
   const selectResource = (resId: string) => {
     dispatch(selectK8sResource(resId));
@@ -172,7 +181,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
       {resource && resource.refs && hasIncomingRefs && (
         <Popover
           mouseEnterDelay={0.5}
-          placement='rightTop'
+          placement="rightTop"
           content={
             <PopoverContent
               resourceRefs={resource.refs.filter(r => isIncomingRef(r.refType))}
@@ -194,11 +203,11 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
         onClick={onClickLabel}
         style={!hasIncomingRefs ? {marginLeft: 19} : {}}
       >
-        {label}
+        <ScrollIntoView ref={scrollContainer}>{label}</ScrollIntoView>
       </StyledSpan>
       {resource && resource.refs && (hasOutgoingRefs || hasUnsatisfiedRefs) && (
         <Popover
-          placement='rightTop'
+          placement="rightTop"
           mouseEnterDelay={0.5}
           content={
             <PopoverContent

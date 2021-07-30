@@ -13,9 +13,10 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
 }
 
 export function useWindowSize(): Size {
+  const {innerWidth, innerHeight} = window;
   const [windowSize, setWindowSize] = useState<Size>({
-    width: undefined,
-    height: undefined,
+    width: innerWidth,
+    height: innerHeight,
   });
 
   useEffect(() => {
