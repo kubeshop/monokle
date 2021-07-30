@@ -26,11 +26,14 @@ import {useAppDispatch} from '@redux/hooks';
 import {initKubeconfig} from '@redux/reducers/appConfig';
 import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
+import {useSelector} from 'react-redux';
+import {inPreviewMode} from '@redux/selectors';
 
 const StyledReflexContainer = styled(ReflexContainer)`
   &.reflex-container {
     margin-top: 0px;
   }
+
   .ant-btn {
     line-height: 1.5715;
     position: relative;
@@ -55,6 +58,7 @@ const StyledReflexContainer = styled(ReflexContainer)`
     color: rgba(255, 255, 255, 0.85);
     background: transparent;
   }
+
   .ant-btn:hover,
   .ant-btn:focus {
     color: #165996;
@@ -75,6 +79,7 @@ const StyledMenuLeftReflexElement = styled(ReflexElement)`
   &.reflex-element {
     margin: 3px;
   }
+
   height: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -84,6 +89,7 @@ const StyledMenuRightReflexElement = styled(ReflexElement)`
   &.reflex-element {
     margin: 3px;
   }
+
   height: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -98,10 +104,12 @@ const StyledRow = styled(Row)`
 
 const StyledContent = styled(Content)`
   overflow-y: clip;
+
   .reflex-container > .reflex-splitter {
     background-color: ${Colors.grey3};
     z-index: 100;
   }
+
   .reflex-container.vertical > .reflex-splitter {
     border-right: 1px solid ${Colors.grey3};
     border-left: 1px solid ${Colors.grey3};
@@ -124,6 +132,8 @@ const App = () => {
   const mainHeight = `${size.height}px`;
   const contentHeight = `${size.height - 75}px`;
 
+  const previewMode = useSelector(inPreviewMode);
+
   const [leftMenuSelection, setLeftMenuSelection] = useState('');
   const [rightMenuSelection, setRightMenuSelection] = useState('');
   const [rightPaneWidth, setRightPaneWidth] = useState(contentWidth * 0);
@@ -144,7 +154,7 @@ const App = () => {
     'edit',
     editPaneWidth,
     'right',
-    rightPaneWidth
+    rightPaneWidth,
   );
 
   useEffect(() => {
@@ -175,10 +185,10 @@ const App = () => {
       left === '' && right === ''
         ? 'cc'
         : left !== '' && right === ''
-        ? 'oc'
-        : left === '' && right !== ''
-        ? 'co'
-        : 'oo';
+          ? 'oc'
+          : left === '' && right !== ''
+            ? 'co'
+            : 'oo';
 
     const leftSize = cfg === 'oc' ? contentWidth * 0.33 : cfg === 'oo' ? contentWidth * 0.25 : 0;
     const rightSize = cfg === 'co' ? contentWidth * 0.33 : cfg === 'oo' ? contentWidth * 0.25 : 0;
@@ -203,11 +213,12 @@ const App = () => {
 
         <StyledContent style={{height: contentHeight}}>
           <StyledRow style={{height: contentHeight + 4}}>
-            <StyledReflexContainer orientation="vertical" windowResizeAware>
+            <StyledReflexContainer orientation='vertical' windowResizeAware>
               <StyledMenuLeftReflexElement size={43}>
-                <Space direction="vertical">
+                <Space direction='vertical'>
                   <Button
-                    size="large"
+                    size='large'
+                    disabled={previewMode}
                     onClick={() => setAspectRatios('left', 'file-explorer')}
                     icon={
                       <FolderOpenOutlined
@@ -218,20 +229,19 @@ const App = () => {
                       />
                     }
                   />
-                  {featureJson.ShowGraphView && (
-                    <Button
-                      size="large"
-                      onClick={() => setAspectRatios('left', 'cluster-explorer')}
-                      icon={
-                        <ClusterOutlined
-                          style={{
-                            ...iconStyle,
-                            color: leftMenuSelection === 'cluster-explorer' ? Colors.whitePure : Colors.grey7,
-                          }}
-                        />
-                      }
-                    />
-                  )}
+                  <Button
+                    disabled={previewMode}
+                    size='large'
+                    onClick={() => setAspectRatios('left', 'cluster-explorer')}
+                    icon={
+                      <ClusterOutlined
+                        style={{
+                          ...iconStyle,
+                          color: leftMenuSelection === 'cluster-explorer' ? Colors.whitePure : Colors.grey7,
+                        }}
+                      />
+                    }
+                  />
                 </Space>
               </StyledMenuLeftReflexElement>
               {leftPaneWidth && (
@@ -267,10 +277,10 @@ const App = () => {
               )}
 
               <StyledMenuRightReflexElement size={43}>
-                <Space direction="vertical">
+                <Space direction='vertical'>
                   {featureJson.ShowGraphView && (
                     <Button
-                      size="large"
+                      size='large'
                       onClick={() => setAspectRatios('right', 'graph')}
                       icon={
                         <ApartmentOutlined
@@ -284,7 +294,7 @@ const App = () => {
                   )}
 
                   <Button
-                    size="large"
+                    size='large'
                     onClick={() => setAspectRatios('right', 'logs')}
                     icon={
                       <CodeOutlined
