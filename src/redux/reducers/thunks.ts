@@ -152,9 +152,36 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
         return getK8sObjectsAsYaml(res.body.items, 'CustomResourceDefinition', 'apiextensions.k8s.io/v1');
       }),
     ]).then(results => {
+      const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+
+      if (fulfilledResults.length === 0) {
+        // @ts-ignore
+        return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]));
+      }
+
       // @ts-ignore
-      const allYaml = results.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
-      return createPreviewResult(allYaml, configPath);
+      const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
+      const previewResult = createPreviewResult(allYaml, configPath);
+
+      if (fulfilledResults.length < results.length) {
+        const rejectedResult = results.find(r => r.status === 'rejected');
+        if (rejectedResult) {
+          // @ts-ignore
+          const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
+
+          return {
+            alert: {
+              title: 'Get Cluster Resources',
+              message: `Failed to get all cluster resources: ${reason}`,
+              type: AlertEnum.Warning,
+            },
+            ...previewResult,
+          };
+        }
+      }
+
+      return previewResult;
+
     }, (reason) => {
       return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
     });
