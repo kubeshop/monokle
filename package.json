@@ -26,7 +26,7 @@
     "craco-alias": "^3.0.1",
     "cross-env": "^7.0.3",
     "electron": "^13.1.6",
-    "electron-builder": "^22.11.7",
+    "electron-builder": "^22.11.11",
     "eslint-config-airbnb": "~18.2.1",
     "eslint-config-prettier": "~8.3.0",
     "eslint-plugin-import": "~2.22.1",
@@ -118,7 +118,20 @@
     },
     "extends": null,
     "files": [
-      "build/**/*"
+      "build/**/*",
+      "!**/node_modules/eslint*/**/*",
+      "!**/node_modules/@testing-library/**/*",
+      "!**/node_modules/@typescript-eslint/**/*",
+      "!**/node_modules/typescript/**/*",
+      "!**/node_modules/*webpack*/**/*",
+      "!**/node_modules/less/**/*",
+      "!**/node_modules/babel-runtime/**/*",
+      "!**/node_modules/yaml-language-server/lib/umd/**/*",
+      "!**/node_modules/antd/es/**/*",
+      "!**/node_modules/@babel/**/*",
+      "!**/node_modules/@jest/**/*",
+      "!**/node_modules/monaco-editor/min/**/*",
+      "!**/node_modules/monaco-editor/min-maps/**/*"
     ],
     "extraResources": [
       {
