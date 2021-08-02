@@ -12,6 +12,8 @@ import TabHeader from '@atoms/TabHeader';
 import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
 import {isKustomizationResource} from '@redux/utils/kustomize';
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {ThunkDispatch} from 'redux-thunk';
 
 const {TabPane} = Tabs;
 
@@ -41,6 +43,25 @@ const StyledSkeleton = styled(Skeleton)`
   width: 95%;
 `;
 
+export function applyWithConfirm(selectedResource: K8sResource, resourceMap: ResourceMapType, fileMap: FileMapType, dispatch: ThunkDispatch<any, any, any>, kubeconfig: string) {
+  const title = isKustomizationResource(selectedResource) ?
+    `Apply ${selectedResource.name} kustomization your cluster?`
+    : `Apply ${selectedResource.name} to your cluster?`;
+
+  Modal.confirm({
+    title,
+    icon: <ExclamationCircleOutlined />,
+    onOk() {
+      return new Promise((resolve) => {
+        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig);
+        resolve({});
+      });
+    },
+    onCancel() {
+    },
+  });
+}
+
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
 
@@ -55,22 +76,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   async function applySelectedResource() {
     if (selectedResource) {
-      const title = isKustomizationResource(selectedResource) ?
-        `Apply ${selectedResource.name} kustomization your cluster?`
-        : `Apply ${selectedResource.name} to your cluster?`;
-
-      Modal.confirm({
-        title,
-        icon: <ExclamationCircleOutlined />,
-        onOk() {
-          return new Promise((resolve) => {
-            applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig);
-            resolve({});
-          });
-        },
-        onCancel() {
-        },
-      });
+      applyWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
     }
   }
 
