@@ -36,7 +36,6 @@
     "electron": "^13.1.6",
     "electron-builder": "^22.11.11",
     "electron-reload": "^1.5.0",
-    "es6-tween": "^5.5.11",
     "eslint-config-airbnb": "~18.2.1",
     "eslint-config-prettier": "~8.3.0",
     "eslint-plugin-import": "~2.22.1",
@@ -71,6 +70,7 @@
     "electron-devtools-installer": "^3.2.0",
     "electron-is-dev": "^2.0.0",
     "electron-store": "^8.0.0",
+    "es6-tween": "^5.5.11",
     "jsonpath-plus": "^5.0.7",
     "loglevel": "^1.7.1",
     "micromatch": "^4.0.4",
@@ -172,14 +172,10 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "last 1 chrome version"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 chrome version"
     ]
   },
   "jest": {
