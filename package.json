@@ -99,7 +99,7 @@
     "test": "craco test --watchAll=false",
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm run start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "electron:build": "npm run build && tsc -p electron && electron-builder && ls -al dist",
+    "electron:build": "npm run build && tsc -p electron && electron-builder && (ls -alh dist | grep Monokle && du -sh dist/mac || true)",
     "eject": "react-scripts eject",
     "lint": "npm run lint:config && npm run lint:src ",
     "lint:config": "eslint .",
