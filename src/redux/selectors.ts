@@ -19,7 +19,9 @@ export const selectActiveResources = createSelector(
   (state: RootState) => state.main.previewResource,
   (state: RootState) => state.main.previewValuesFile,
   (resources, previewResource, previewValuesFile) =>
-    resources.filter(r => (previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)),
+    resources.filter(
+      r => (previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)
+    )
 );
 
 export const selectKustomizations = createSelector(selectAllResources, resources =>
@@ -39,6 +41,11 @@ export const selectHelmValues = createSelector(
 export const inPreviewMode = createSelector(
   (state: RootState) => state.main,
   appState => Boolean(appState.previewResource) || Boolean(appState.previewValuesFile)
+);
+
+export const inClusterMode = createSelector(
+  (state: RootState) => state,
+  appState => appState.main.previewResource && appState.main.previewResource.endsWith(appState.config.kubeconfig)
 );
 
 export const selectLogs = createSelector(
