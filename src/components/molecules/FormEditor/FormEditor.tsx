@@ -69,6 +69,36 @@ const FormContainer = styled.div<{contentHeight: string}>`
     font-size: 12px;
     margin-top: 5px;
   }
+
+  .object-property-expand {
+    background: black;
+    color: #177ddc;
+  }
+
+  .array-item-add {
+    background: black;
+    color: #177ddc;
+  }
+
+  .array-item-remove {
+    background: black;
+    color: #177ddc;
+  }
+
+  .array-item-move-up {
+    background: black;
+    color: #177ddc;
+  }
+
+  .array-item-move-down {
+    background: black;
+    color: #177ddc;
+  }
+
+  .ant-btn-dangerous {
+    background: black;
+    color: #177ddc;
+  }
 `;
 
 const FormEditor = (props: {contentHeight: string}) => {

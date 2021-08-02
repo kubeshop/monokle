@@ -85,12 +85,8 @@ const DiffModal = () => {
       onCancel={handleOk}
       footer={
         <>
-          <ButtonApply type="primary" onClick={handleApply}>
-            Apply
-          </ButtonApply>
-          <Button type="primary" onClick={handleRefresh}>
-            Refresh
-          </Button>
+          <ButtonApply onClick={handleApply}>Apply</ButtonApply>
+          <Button onClick={handleRefresh}>Refresh</Button>
           <Button type="primary" ghost onClick={handleOk}>
             Close
           </Button>
