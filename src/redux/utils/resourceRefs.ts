@@ -161,8 +161,53 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
 
 export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
   CronJob: createCommonRefMappers('CronJob'),
+  ClusterRoleBinding: [
+    {
+      source: {
+        kind: 'ClusterRoleBinding',
+        path: 'roleRef.name',
+        refType: ResourceRefType.ClusterRoleConsumer,
+      },
+      target: {
+        kind: 'ClusterRole',
+        path: 'metadata.name',
+        refType: ResourceRefType.ClusterRoleRef,
+      },
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedClusterRole,
+    },
+  ],
   DaemonSet: createCommonRefMappers('DaemonSet'),
   Deployment: createCommonRefMappers('Deployment'),
+  Endpoint: [
+    {
+      source: {
+        kind: 'Endpoint',
+        path: 'metadata.name',
+        refType: ResourceRefType.ServiceConsumer,
+      },
+      target: {
+        kind: 'Service',
+        path: 'metadata.name',
+        refType: ResourceRefType.ServiceRef,
+      },
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedService,
+    },
+  ],
+  Ingress: [
+    {
+      source: {
+        kind: 'Ingress',
+        path: 'backend.service.name',
+        refType: ResourceRefType.ServiceConsumer,
+      },
+      target: {
+        kind: 'Service',
+        path: 'metadata.name',
+        refType: ResourceRefType.ServiceRef,
+      },
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedService,
+    },
+  ],
   Job: createCommonRefMappers('Job'),
   PersistentVolume: [
     {
@@ -193,6 +238,34 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
   Pod: createCommonRefMappers('Pod'),
   ReplicationController: createCommonRefMappers('ReplicationController'),
   ReplicaSet: createCommonRefMappers('ReplicaSet'),
+  RoleBinding: [
+    {
+      source: {
+        kind: 'RoleBinding',
+        path: 'roleRef.name',
+        refType: ResourceRefType.ClusterRoleBindingConsumer,
+      },
+      target: {
+        kind: 'ClusterRoleBinding',
+        path: 'metadata.name',
+        refType: ResourceRefType.ClusterRoleBindingRef,
+      },
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedClusterRoleBinding,
+    },
+    {
+      source: {
+        kind: 'RoleBinding',
+        path: 'roleRef.name',
+        refType: ResourceRefType.RoleConsumer,
+      },
+      target: {
+        kind: 'Role',
+        path: 'metadata.name',
+        refType: ResourceRefType.RoleRef,
+      },
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedRole,
+    },
+  ],
   Secret: [
     {
       source: {
