@@ -1,4 +1,5 @@
 {
   "ShowGraphView": true,
-  "ShowClusterView": true
+  "ShowClusterView": true,
+  "ShowRightMenu": false
 }
