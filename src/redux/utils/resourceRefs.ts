@@ -8,6 +8,10 @@ const incomingRefs = [
   ResourceRefType.ServiceAccountRef,
   ResourceRefType.PersistentVolumeRef,
   ResourceRefType.PersistentVolumeClaimRef,
+  ResourceRefType.ClusterRoleRef,
+  ResourceRefType.ClusterRoleBindingRef,
+  ResourceRefType.RoleRef,
+  ResourceRefType.ServiceRef,
 ];
 
 const outgoingRefs = [
@@ -18,12 +22,20 @@ const outgoingRefs = [
   ResourceRefType.ServiceAccountConsumer,
   ResourceRefType.PersistentVolumeConsumer,
   ResourceRefType.PersistentVolumeClaimConsumer,
+  ResourceRefType.ClusterRoleConsumer,
+  ResourceRefType.ClusterRoleBindingConsumer,
+  ResourceRefType.RoleConsumer,
+  ResourceRefType.ServiceConsumer,
 ];
 
 const unsatisfiedRefs = [
   ResourceRefType.UnsatisfiedConfigMap,
+  ResourceRefType.UnsatisfiedClusterRole,
+  ResourceRefType.UnsatisfiedClusterRoleBinding,
+  ResourceRefType.UnsatisfiedRole,
   ResourceRefType.UnsatisfiedSelector,
   ResourceRefType.UnsatisfiedSecret,
+  ResourceRefType.UnsatisfiedService,
   ResourceRefType.UnsatisfiedServiceAccount,
   ResourceRefType.UnsatisfiedPersistentVolume,
   ResourceRefType.UnsatisfiedPersistentVolumeClaim,
