@@ -21,12 +21,14 @@ import {ipcRenderer} from 'electron';
  * Thunk to preview kustomizations
  */
 
-export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
+export const previewKustomization = createAsyncThunk<
+  SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/previewKustomization', async (resourceId, thunkAPI) => {
+  }
+>('main/previewKustomization', async (resourceId, thunkAPI) => {
   const state = thunkAPI.getState().main;
   if (state.previewResource !== resourceId) {
     const resource = state.resourceMap[resourceId];
@@ -67,15 +69,16 @@ function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: string) {
  * Thunk to preview cluster objects
  */
 
-export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
+export const previewCluster = createAsyncThunk<
+  SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/previewCluster', async (configPath, thunkAPI) => {
+  }
+>('main/previewCluster', async (configPath, thunkAPI) => {
   const state: AppState = thunkAPI.getState().main;
   if (state.previewResource !== configPath) {
-
     try {
       const kc = new k8s.KubeConfig();
       kc.loadFromFile(configPath);
@@ -153,39 +156,46 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
         k8sExtensionsV1Api.listCustomResourceDefinition().then(res => {
           return getK8sObjectsAsYaml(res.body.items, 'CustomResourceDefinition', 'apiextensions.k8s.io/v1');
         }),
-      ]).then(results => {
-        const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+      ]).then(
+        results => {
+          const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
-        if (fulfilledResults.length === 0) {
-          // @ts-ignore
-          return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]));
-        }
-
-        // @ts-ignore
-        const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
-        const previewResult = createPreviewResult(allYaml, configPath);
-
-        if (fulfilledResults.length < results.length) {
-          const rejectedResult = results.find(r => r.status === 'rejected');
-          if (rejectedResult) {
-            // @ts-ignore
-            const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
-
-            return {
-              alert: {
-                title: 'Get Cluster Resources',
-                message: `Failed to get all cluster resources: ${reason}`,
-                type: AlertEnum.Warning,
-              },
-              ...previewResult,
-            };
+          if (fulfilledResults.length === 0) {
+            return createPreviewRejection(
+              thunkAPI,
+              'Cluster Resources Failed',
+              // @ts-ignore
+              results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
+            );
           }
-        }
 
-        return previewResult;
-      }, (reason) => {
-        return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
-      });
+          // @ts-ignore
+          const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
+          const previewResult = createPreviewResult(allYaml, configPath);
+
+          if (fulfilledResults.length < results.length) {
+            const rejectedResult = results.find(r => r.status === 'rejected');
+            if (rejectedResult) {
+              // @ts-ignore
+              const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
+
+              return {
+                alert: {
+                  title: 'Get Cluster Resources',
+                  message: `Failed to get all cluster resources: ${reason}`,
+                  type: AlertEnum.Warning,
+                },
+                ...previewResult,
+              };
+            }
+          }
+
+          return previewResult;
+        },
+        reason => {
+          return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
+        }
+      );
     } catch (e) {
       return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', e.message);
     }
@@ -198,12 +208,14 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
  * Thunk to set the specified root folder
  */
 
-export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
+export const setRootFolder = createAsyncThunk<
+  SetRootFolderPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/setRootFolder', async (rootFolder, thunkAPI) => {
+  }
+>('main/setRootFolder', async (rootFolder, thunkAPI) => {
   const appConfig = thunkAPI.getState().config;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
@@ -232,12 +244,14 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
  * Thunk to diff a resource against the configured cluster
  */
 
-export const diffResource = createAsyncThunk<SetDiffDataPayload,
+export const diffResource = createAsyncThunk<
+  SetDiffDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/setDiffContent', async (diffResourceId, thunkAPI) => {
+  }
+>('main/setDiffContent', async (diffResourceId, thunkAPI) => {
   const resourceMap = thunkAPI.getState().main.resourceMap;
   const kubeconfig = thunkAPI.getState().config.kubeconfig;
   try {
@@ -252,7 +266,11 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           return {diffContent: stringify(res.body, {sortMapEntries: true}), diffResourceId};
         }
 
-        return createPreviewRejection(thunkAPI, 'Diff Resources', `Failed to get ${resource.content.kind} from cluster`);
+        return createPreviewRejection(
+          thunkAPI,
+          'Diff Resources',
+          `Failed to get ${resource.content.kind} from cluster`
+        );
       };
 
       const handleRejection = (rej: any) => {
@@ -268,7 +286,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedConfigMap(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -278,7 +296,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedService(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -288,17 +306,14 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedServiceAccount(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
       if (resource.kind === 'PersistentVolume') {
         const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
         return k8sCoreV1Api
-          .readPersistentVolume(
-            resource.content.metadata.name,
-            resource.namespace ? resource.namespace : 'default',
-          )
+          .readPersistentVolume(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
           .then(handleResource, handleRejection);
       }
       if (resource.kind === 'PersistentVolumeClaim') {
@@ -307,7 +322,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedPersistentVolumeClaim(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -317,7 +332,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedPod(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -327,7 +342,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedEndpoints(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -337,7 +352,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedSecret(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -347,7 +362,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedReplicationController(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -357,7 +372,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedDaemonSet(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -367,7 +382,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedDeployment(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -377,7 +392,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedStatefulSet(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -387,7 +402,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedReplicaSet(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -397,7 +412,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedJob(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -407,35 +422,26 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedCronJob(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
       if (resource.kind === 'ClusterRole') {
         const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
         return k8sRbacV1Api
-          .readClusterRole(
-            resource.content.metadata.name,
-            resource.namespace ? resource.namespace : 'default',
-          )
+          .readClusterRole(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
           .then(handleResource, handleRejection);
       }
       if (resource.kind === 'ClusterRoleBinding') {
         const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
         return k8sRbacV1Api
-          .readClusterRoleBinding(
-            resource.content.metadata.name,
-            resource.namespace ? resource.namespace : 'default',
-          )
+          .readClusterRoleBinding(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
           .then(handleResource, handleRejection);
       }
       if (resource.kind === 'Role') {
         const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
         return k8sRbacV1Api
-          .readNamespacedRole(
-            resource.content.metadata.name,
-            resource.namespace ? resource.namespace : 'default',
-          )
+          .readNamespacedRole(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
           .then(handleResource, handleRejection);
       }
       if (resource.kind === 'RoleBinding') {
@@ -443,17 +449,14 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
         return k8sRbacV1Api
           .readNamespacedRoleBinding(
             resource.content.metadata.name,
-            resource.namespace ? resource.namespace : 'default',
+            resource.namespace ? resource.namespace : 'default'
           )
           .then(handleResource, handleRejection);
       }
       if (resource.kind === 'Ingress') {
         const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
         return k8sNetworkingV1Api
-          .readNamespacedIngress(
-            resource.content.metadata.name,
-            resource.namespace ? resource.namespace : 'default',
-          )
+          .readNamespacedIngress(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
           .then(handleResource, handleRejection);
       }
       if (resource.kind === 'NetworkPolicy') {
@@ -461,7 +464,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
         return k8sNetworkingV1Api
           .readNamespacedNetworkPolicy(
             resource.content.metadata.name,
-            resource.namespace ? resource.namespace : 'default',
+            resource.namespace ? resource.namespace : 'default'
           )
           .then(handleResource, handleRejection);
       }
@@ -470,7 +473,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
         return k8sExtensionV1Api
           .readCustomResourceDefinition(
             resource.content.metadata.name,
-            resource.namespace ? resource.namespace : 'default',
+            resource.namespace ? resource.namespace : 'default'
           )
           .then(handleResource, handleRejection);
       }
@@ -487,12 +490,14 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
  * Thunk to preview a Helm Chart
  */
 
-export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
+export const previewHelmValuesFile = createAsyncThunk<
+  SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
+  }
+>('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = thunkAPI.getState().config.kubeconfig;
@@ -505,12 +510,15 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
 
       // sanity check
       if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
-        log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
+        log.info(
+          `previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`
+        );
 
         const args = {
-          helmCommand: configState.settings.helmPreviewMode === 'template'
-            ? `helm template -f ${valuesFile.name} ${chart.name} .`
-            : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`,
+          helmCommand:
+            configState.settings.helmPreviewMode === 'template'
+              ? `helm template -f ${valuesFile.name} ${chart.name} .`
+              : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`,
           cwd: folder,
           kubeconfig,
         };
@@ -526,7 +534,11 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
         }
       }
 
-      return createPreviewRejection(thunkAPI, 'Helm Error', `Unabled to run Helm for ${valuesFile.name} in folder ${folder}`);
+      return createPreviewRejection(
+        thunkAPI,
+        'Helm Error',
+        `Unabled to run Helm for ${valuesFile.name} in folder ${folder}`
+      );
     }
   }
 
@@ -538,7 +550,7 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
  */
 
 function runKustomize(cmd: any): any {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     ipcRenderer.once('kustomize-result', (event, arg) => {
       resolve(arg);
     });
@@ -551,7 +563,7 @@ function runKustomize(cmd: any): any {
  */
 
 function runHelm(cmd: any): any {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     ipcRenderer.once('helm-result', (event, arg) => {
       resolve(arg);
     });
@@ -571,7 +583,7 @@ function createPreviewResult(resourcesYaml: string, previewResourceId: string) {
   }, {});
 
   processParsedResources(resourceMap);
-  return ({previewResourceId, previewResources: clearParsedDocs(resourceMap)});
+  return {previewResourceId, previewResources: clearParsedDocs(resourceMap)};
 }
 
 /**
@@ -581,7 +593,9 @@ function createPreviewResult(resourcesYaml: string, previewResourceId: string) {
 function createPreviewRejection(thunkAPI: any, title: string, message: string) {
   return thunkAPI.rejectWithValue({
     alert: {
-      title, message, type: AlertEnum.Error,
+      title,
+      message,
+      type: AlertEnum.Error,
     },
   });
 }
