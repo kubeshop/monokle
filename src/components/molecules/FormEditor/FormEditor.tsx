@@ -10,10 +10,11 @@ import {logMessage} from '@redux/utils/log';
 import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
 import styled from 'styled-components';
-import {Button, notification} from 'antd';
+import {notification} from 'antd';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 import {MonoButton} from '@atoms';
+import {K8sResource} from '@models/k8sresource';
 
 const Form = withTheme(AntDTheme);
 
@@ -28,6 +29,11 @@ function getFormSchema(kind: string) {
 function getUiSchema(kind: string) {
   return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`));
 }
+
+const FormButtons = styled.div`
+  padding-left: 15px;
+  padding-bottom: 10px;
+`;
 
 const FormContainer = styled.div<{contentHeight: string}>`
   width: 100%;
@@ -71,8 +77,12 @@ const FormEditor = (props: {contentHeight: string}) => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const [formData, setFormData] = useState(null);
   const dispatch = useAppDispatch();
-  const resource = resourceMap && selectedResource ? resourceMap[selectedResource] : undefined;
+  const [resource, setResource] = useState<K8sResource>();
   const isInPreviewMode = useSelector(inPreviewMode);
+
+  useEffect(() => {
+    setResource(resourceMap && selectedResource ? resourceMap[selectedResource] : undefined);
+  }, [selectedResource, resourceMap, setResource]);
 
   useEffect(() => {
     if (resource) {
@@ -89,11 +99,11 @@ const FormEditor = (props: {contentHeight: string}) => {
     try {
       if (resource) {
         const content = mergeManifests(resource.text, formString);
-/*
-        log.debug(resource.text);
-        log.debug(formString);
-        log.debug(content);
-*/
+        /*
+                log.debug(resource.text);
+                log.debug(formString);
+                log.debug(content);
+        */
         dispatch(updateResource({resourceId: resource.id, content}));
         openNotification();
       }
@@ -128,23 +138,25 @@ const FormEditor = (props: {contentHeight: string}) => {
 
   return (
     // @ts-ignore
-    <FormContainer contentHeight={contentHeight}>
-      <MonoButton large type='primary' onClick={submitForm} disabled={isInPreviewMode}>
-        Save
-      </MonoButton>
-      <Form schema={schema}
-            uiSchema={uiSchema}
-            formData={formData}
-            onChange={onFormUpdate}
-            onSubmit={onFormSubmit}
-            disabled={isInPreviewMode}>
-        <div>
-          <Button type='primary' htmlType='submit'>
-            Save
-          </Button>
-        </div>
-      </Form>
-    </FormContainer>
+    <>
+      <FormButtons>
+        <MonoButton large type="primary" onClick={submitForm} disabled={isInPreviewMode}>
+          Save
+        </MonoButton>
+      </FormButtons>
+      <FormContainer contentHeight={contentHeight}>
+        <Form
+          schema={schema}
+          uiSchema={uiSchema}
+          formData={formData}
+          onChange={onFormUpdate}
+          onSubmit={onFormSubmit}
+          disabled={isInPreviewMode}
+        >
+          <div />
+        </Form>
+      </FormContainer>
+    </>
   );
 };
 
