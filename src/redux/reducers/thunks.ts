@@ -128,7 +128,16 @@ export const setRootFolder = createAsyncThunk<
   const helmValuesMap: HelmValuesMapType = {};
 
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
-  rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+
+  // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
+  const readFilesPromise = new Promise<string[]>(resolve => {
+    process.nextTick(() => {
+      resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
+    });
+  });
+  const files = await readFilesPromise;
+
+  rootEntry.children = files;
 
   processKustomizations(resourceMap, fileMap);
   processParsedResources(resourceMap);
