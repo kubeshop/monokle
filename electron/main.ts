@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain} from 'electron';
+import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
@@ -55,11 +55,14 @@ ipcMain.on('run-helm', (event, args: any) => {
 });
 
 function createWindow() {
+  const image = nativeImage.createFromPath(app.getAppPath() + '/public/icon-large-256.png');
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: APP_MIN_WIDTH,
     minHeight: APP_MIN_HEIGHT,
+    title: 'Monokle',
+    icon: image,
     webPreferences: {
       webSecurity: false,
       contextIsolation: false,
@@ -96,6 +99,8 @@ function createWindow() {
   if (isDev) {
     win.webContents.openDevTools();
   }
+
+  return win;
 }
 
 app.whenReady().then(() => {
@@ -112,6 +117,11 @@ app.whenReady().then(() => {
 
   ElectronStore.initRenderer();
   createWindow();
+
+  const image = nativeImage.createFromPath(app.getAppPath() + '/public/icon-large-256.png');
+  app.dock.setIcon(image);
+
+  console.info('info', app.getName(), app.getVersion(), app.getLocale());
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
