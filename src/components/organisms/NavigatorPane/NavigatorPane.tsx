@@ -2,7 +2,7 @@ import React from 'react';
 import {Col, Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {selectHelmCharts, selectKustomizations} from '@redux/selectors';
+import {inClusterMode, selectHelmCharts, selectKustomizations} from '@redux/selectors';
 
 import {BackgroundColors} from '@styles/Colors';
 import {useAppSelector} from '@redux/hooks';
@@ -29,6 +29,7 @@ const NavigatorPane = () => {
   const uiState = useAppSelector(state => state.ui);
   const helmCharts = useSelector(selectHelmCharts);
   const kustomizations = useSelector(selectKustomizations);
+  const clusterMode = useSelector(inClusterMode);
 
   return (
     <>
@@ -45,13 +46,13 @@ const NavigatorPane = () => {
         {uiState.isFolderLoading ? (
           <StyledSkeleton />
         ) : (
-          Object.values(helmCharts).length > 0 && <HelmChartsSection helmCharts={helmCharts} />
+          !clusterMode && Object.values(helmCharts).length > 0 && <HelmChartsSection helmCharts={helmCharts} />
         )}
 
         {uiState.isFolderLoading ? (
           <StyledSkeleton />
         ) : (
-          kustomizations.length > 0 && <KustomizationsSection kustomizations={kustomizations} />
+          !clusterMode && kustomizations.length > 0 && <KustomizationsSection kustomizations={kustomizations} />
         )}
 
         {uiState.isFolderLoading || previewLoader.isLoading ? <StyledSkeleton /> : <ResourcesSection />}
