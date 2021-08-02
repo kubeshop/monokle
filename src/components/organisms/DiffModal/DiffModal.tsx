@@ -6,11 +6,11 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useEffect, useState} from 'react';
 import {stringify} from 'yaml';
 import {diffResource} from '@redux/reducers/thunks';
-import {applyResource} from '@actions/common/apply';
 
 import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
 
 import Colors from '@styles/Colors';
+import {applyWithConfirm} from '@organisms/ActionsPane/ActionsPane';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close {
@@ -59,7 +59,10 @@ const DiffModal = () => {
 
   const handleApply = () => {
     if (diffResourceId) {
-      applyResource(diffResourceId, resourceMap, fileMap, dispatch, kubeconfig);
+      const resource = resourceMap[diffResourceId];
+      if (resource) {
+        applyWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig);
+      }
     }
   };
 

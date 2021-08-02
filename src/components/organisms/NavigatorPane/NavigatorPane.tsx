@@ -26,6 +26,7 @@ const TitleRow = styled(Row)`
 
 const NavigatorPane = () => {
   const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const uiState = useAppSelector(state => state.ui);
   const helmCharts = useSelector(selectHelmCharts);
   const kustomizations = useSelector(selectKustomizations);
 
@@ -41,11 +42,19 @@ const NavigatorPane = () => {
         </MonoPaneTitleCol>
       </TitleRow>
       <PaneContainer>
-        {Object.values(helmCharts).length > 0 && <HelmChartsSection helmCharts={helmCharts} />}
+        {uiState.isFolderLoading ? (
+          <StyledSkeleton />
+        ) : (
+          Object.values(helmCharts).length > 0 && <HelmChartsSection helmCharts={helmCharts} />
+        )}
 
-        {kustomizations.length > 0 && <KustomizationsSection kustomizations={kustomizations} />}
+        {uiState.isFolderLoading ? (
+          <StyledSkeleton />
+        ) : (
+          kustomizations.length > 0 && <KustomizationsSection kustomizations={kustomizations} />
+        )}
 
-        {previewLoader.isLoading ? <StyledSkeleton /> : <ResourcesSection />}
+        {uiState.isFolderLoading || previewLoader.isLoading ? <StyledSkeleton /> : <ResourcesSection />}
       </PaneContainer>
     </>
   );

@@ -4,15 +4,17 @@ import {withTheme} from '@rjsf/core';
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {loadResource} from '@redux/utils';
-import {useEffect} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {updateResource} from '@redux/reducers/main';
 import {logMessage} from '@redux/utils/log';
 import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
 import styled from 'styled-components';
-import {Button, notification} from 'antd';
+import {notification} from 'antd';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
+import {MonoButton} from '@atoms';
+import {K8sResource} from '@models/k8sresource';
 
 const Form = withTheme(AntDTheme);
 
@@ -28,9 +30,14 @@ function getUiSchema(kind: string) {
   return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`));
 }
 
+const FormButtons = styled.div`
+  padding-left: 15px;
+  padding-bottom: 10px;
+`;
+
 const FormContainer = styled.div<{contentHeight: string}>`
   width: 100%;
-  padding-left: 20px;
+  padding-left: 15px;
   padding-right: 20px;
   margin: 0px;
   margin-bottom: 20px;
@@ -68,20 +75,20 @@ const FormEditor = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
-  const [formData, setFormData] = React.useState(null);
+  const [formData, setFormData] = useState(null);
   const dispatch = useAppDispatch();
-  const resource = resourceMap && selectedResource ? resourceMap[selectedResource] : undefined;
+  const [resource, setResource] = useState<K8sResource>();
   const isInPreviewMode = useSelector(inPreviewMode);
+
+  useEffect(() => {
+    setResource(resourceMap && selectedResource ? resourceMap[selectedResource] : undefined);
+  }, [selectedResource, resourceMap, setResource]);
 
   useEffect(() => {
     if (resource) {
       setFormData(parse(resource.text));
     }
   }, [resource]);
-
-  if (!selectedResource) {
-    return <div>Nothing selected...</div>;
-  }
 
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
@@ -92,12 +99,12 @@ const FormEditor = (props: {contentHeight: string}) => {
     try {
       if (resource) {
         const content = mergeManifests(resource.text, formString);
-/*
-        log.debug(resource.text);
-        log.debug(formString);
-        log.debug(content);
-*/
-        dispatch(updateResource({resourceId: selectedResource, content}));
+        /*
+                log.debug(resource.text);
+                log.debug(formString);
+                log.debug(content);
+        */
+        dispatch(updateResource({resourceId: resource.id, content}));
         openNotification();
       }
     } catch (err) {
@@ -112,6 +119,16 @@ const FormEditor = (props: {contentHeight: string}) => {
     });
   };
 
+  const submitForm = useCallback(() => {
+    if (formData) {
+      onFormSubmit({formData}, null);
+    }
+  }, [formData]);
+
+  if (!selectedResource) {
+    return <div>Nothing selected...</div>;
+  }
+
   if (resource?.kind !== 'ConfigMap') {
     return <div>Form editor only for ConfigMap resources...</div>;
   }
@@ -121,16 +138,25 @@ const FormEditor = (props: {contentHeight: string}) => {
 
   return (
     // @ts-ignore
-    <FormContainer contentHeight={contentHeight}>
-      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} onSubmit={onFormSubmit}
-            disabled={isInPreviewMode}>
-        <div>
-          <Button type='primary' htmlType='submit'>
-            Save
-          </Button>
-        </div>
-      </Form>
-    </FormContainer>
+    <>
+      <FormButtons>
+        <MonoButton large type="primary" onClick={submitForm} disabled={isInPreviewMode}>
+          Save
+        </MonoButton>
+      </FormButtons>
+      <FormContainer contentHeight={contentHeight}>
+        <Form
+          schema={schema}
+          uiSchema={uiSchema}
+          formData={formData}
+          onChange={onFormUpdate}
+          onSubmit={onFormSubmit}
+          disabled={isInPreviewMode}
+        >
+          <div />
+        </Form>
+      </FormContainer>
+    </>
   );
 };
 

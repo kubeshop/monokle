@@ -1,11 +1,14 @@
 import {createSlice, Draft} from '@reduxjs/toolkit';
+import {setRootFolder} from '@redux/reducers/thunks';
 
 type UiState = {
   settingsOpened: boolean;
+  isFolderLoading: boolean;
 };
 
 const initialState: UiState = {
   settingsOpened: false,
+  isFolderLoading: false,
 };
 
 export const uiSlice = createSlice({
@@ -15,6 +18,18 @@ export const uiSlice = createSlice({
     toggleSettings: (state: Draft<UiState>) => {
       state.settingsOpened = !state.settingsOpened;
     },
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(setRootFolder.pending, state => {
+        state.isFolderLoading = true;
+      })
+      .addCase(setRootFolder.fulfilled, state => {
+        state.isFolderLoading = false;
+      })
+      .addCase(setRootFolder.rejected, state => {
+        state.isFolderLoading = false;
+      });
   },
 });
 

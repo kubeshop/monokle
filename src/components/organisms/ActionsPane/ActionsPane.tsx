@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {Tabs, Space, Col, Row, Button, Skeleton} from 'antd';
+import {Tabs, Space, Col, Row, Button, Skeleton, Modal} from 'antd';
 import styled from 'styled-components';
-import {CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+import {CodeOutlined, ContainerOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
@@ -11,6 +11,9 @@ import {applyResource} from '@actions/common/apply';
 import TabHeader from '@atoms/TabHeader';
 import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
+import {isKustomizationResource} from '@redux/utils/kustomize';
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {ThunkDispatch} from 'redux-thunk';
 
 const {TabPane} = Tabs;
 
@@ -40,6 +43,30 @@ const StyledSkeleton = styled(Skeleton)`
   width: 95%;
 `;
 
+export function applyWithConfirm(
+  selectedResource: K8sResource,
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType,
+  dispatch: ThunkDispatch<any, any, any>,
+  kubeconfig: string
+) {
+  const title = isKustomizationResource(selectedResource)
+    ? `Apply ${selectedResource.name} kustomization your cluster?`
+    : `Apply ${selectedResource.name} to your cluster?`;
+
+  Modal.confirm({
+    title,
+    icon: <ExclamationCircleOutlined />,
+    onOk() {
+      return new Promise(resolve => {
+        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig);
+        resolve({});
+      });
+    },
+    onCancel() {},
+  });
+}
+
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
 
@@ -50,11 +77,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const dispatch = useAppDispatch();
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const uiState = useAppSelector(state => state.ui);
   const [key, setKey] = useState('source');
 
   async function applySelectedResource() {
-    if (selectedResourceId) {
-      applyResource(selectedResourceId, resourceMap, fileMap, dispatch, kubeconfig);
+    if (selectedResource) {
+      applyWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
     }
   }
 
@@ -107,7 +135,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
               tabBarExtraContent={OperationsSlot}
             >
               <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
-                {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={contentHeight} />}
+                {uiState.isFolderLoading || previewLoader.isLoading ? (
+                  <StyledSkeleton />
+                ) : (
+                  <Monaco editorHeight={contentHeight} />
+                )}
               </TabPane>
               {selectedResource && selectedResource?.kind === 'ConfigMap' && (
                 <TabPane
@@ -115,7 +147,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   disabled={!selectedResourceId}
                   key="form"
                 >
-                  {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor contentHeight={contentHeight} />}
+                  {uiState.isFolderLoading || previewLoader.isLoading ? (
+                    <StyledSkeleton />
+                  ) : (
+                    <FormEditor contentHeight={contentHeight} />
+                  )}
                 </TabPane>
               )}
             </StyledTabs>
