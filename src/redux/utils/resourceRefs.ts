@@ -6,6 +6,8 @@ const incomingRefs = [
   ResourceRefType.SelectedPodName,
   ResourceRefType.SecretRef,
   ResourceRefType.ServiceAccountRef,
+  ResourceRefType.PersistentVolumeRef,
+  ResourceRefType.PersistentVolumeClaimRef,
 ];
 
 const outgoingRefs = [
@@ -14,6 +16,8 @@ const outgoingRefs = [
   ResourceRefType.ServicePodSelector,
   ResourceRefType.SecretConsumer,
   ResourceRefType.ServiceAccountConsumer,
+  ResourceRefType.PersistentVolumeConsumer,
+  ResourceRefType.PersistentVolumeClaimConsumer,
 ];
 
 const unsatisfiedRefs = [
@@ -21,6 +25,8 @@ const unsatisfiedRefs = [
   ResourceRefType.UnsatisfiedSelector,
   ResourceRefType.UnsatisfiedSecret,
   ResourceRefType.UnsatisfiedServiceAccount,
+  ResourceRefType.UnsatisfiedPersistentVolume,
+  ResourceRefType.UnsatisfiedPersistentVolumeClaim,
 ];
 
 export function isIncomingRef(e: ResourceRefType) {
@@ -154,14 +160,50 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
 };
 
 export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
-  Deployment: createCommonRefMappers('Deployment'),
-  Pod: createCommonRefMappers('Pod'),
-  DaemonSet: createCommonRefMappers('DaemonSet'),
-  Job: createCommonRefMappers('Job'),
-  StatefulSet: createCommonRefMappers('StatefulSet'),
-  ReplicaSet: createCommonRefMappers('ReplicaSet'),
   CronJob: createCommonRefMappers('CronJob'),
+  DaemonSet: createCommonRefMappers('DaemonSet'),
+  Deployment: createCommonRefMappers('Deployment'),
+  Job: createCommonRefMappers('Job'),
+  PersistentVolume: [
+    {
+      source: {
+        kind: 'PersistentVolume',
+        path: 'spec.claimRef.name',
+        refType: ResourceRefType.PersistentVolumeClaimConsumer,
+      },
+      target: {kind: 'PersistentVolumeClaim', path: 'metadata.name', refType: ResourceRefType.PersistentVolumeClaimRef},
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedPersistentVolumeClaim,
+    },
+  ],
+  PersistentVolumeClaim: [
+    {
+      source: {
+        kind: 'PersistentVolumeClaim',
+        path: 'spec.volumeName',
+        refType: ResourceRefType.PersistentVolumeConsumer,
+      },
+      target: {
+        kind: 'PersistentVolume',
+        path: 'metadata.name',
+        refType: ResourceRefType.PersistentVolumeRef,
+      },
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedPersistentVolume,
+    },
+  ],
+  Pod: createCommonRefMappers('Pod'),
   ReplicationController: createCommonRefMappers('ReplicationController'),
+  ReplicaSet: createCommonRefMappers('ReplicaSet'),
+  Secret: [
+    {
+      source: {
+        kind: 'Secret',
+        path: 'metadata.annotations.kubernetes.io/service-account.name',
+        refType: ResourceRefType.ServiceAccountConsumer,
+      },
+      target: {kind: 'ServiceAccount', path: 'metadata.name', refType: ResourceRefType.ServiceAccountRef},
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedServiceAccount,
+    },
+  ],
   ServiceAccount: [
     {
       source: {kind: 'ServiceAccount', path: 'secrets', refType: ResourceRefType.SecretConsumer},
@@ -169,4 +211,5 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       unsatisfiedRefType: ResourceRefType.UnsatisfiedSecret,
     },
   ],
+  StatefulSet: createCommonRefMappers('StatefulSet'),
 };
