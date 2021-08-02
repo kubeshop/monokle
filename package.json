@@ -115,7 +115,7 @@
     "copyright": "Copyright © 2021 ${author}",
     "mac": {
       "category": "public.app-category.utilities",
-      "icon": "build/MonokleAppIconPlaceHolder.png"
+      "icon": "build/icon.png"
     },
     "extends": null,
     "files": [
@@ -155,7 +155,7 @@
       "buildResources": "assets"
     },
     "dmg": {
-      "icon": "build/MonokleAppIconPlaceHolder.png"
+      "icon": "build/icon.png"
     }
   },
   "lint-staged": {
