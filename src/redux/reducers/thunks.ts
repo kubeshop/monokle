@@ -3,7 +3,7 @@ import {AppDispatch, RootState} from '@redux/store';
 import {PREVIEW_PREFIX, ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import path from 'path';
 import log from 'loglevel';
-import {createFileEntry, readFiles} from '@redux/utils/fileEntry';
+import {createFileEntry, readFilesAsync} from '@redux/utils/fileEntry';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {clearParsedDocs, extractK8sResources, processParsedResources} from '@redux/utils/resource';
 import {stringify} from 'yaml';
@@ -224,7 +224,7 @@ export const setRootFolder = createAsyncThunk<
   const helmValuesMap: HelmValuesMapType = {};
 
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
-  rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+  rootEntry.children = await readFilesAsync(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
 
   processKustomizations(resourceMap, fileMap);
   processParsedResources(resourceMap);
