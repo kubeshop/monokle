@@ -125,6 +125,117 @@ export function readFiles(
   return result;
 }
 
+async function readDirectoryAsync(directory: string) {
+  return new Promise<string[]>((resolve, reject) => {
+    fs.readdir(directory, (err, files) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(files);
+    });
+  });
+}
+
+export async function readFilesAsync(
+  folder: string,
+  appConfig: AppConfig,
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType,
+  helmChartMap: HelmChartMapType,
+  helmValuesMap: HelmValuesMapType
+) {
+  /* eslint-disable no-await-in-loop */
+  const files = await readDirectoryAsync(folder);
+  const result: string[] = [];
+
+  // if there is no root entry assume this is the root folder (questionable..)
+  if (!fileMap[ROOT_FILE_ENTRY]) {
+    fileMap[ROOT_FILE_ENTRY] = createFileEntry(folder);
+  }
+
+  const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
+
+  // is this a helm chart folder?
+  if (files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1) {
+    const helmChart: HelmChart = {
+      id: uuidv4(),
+      filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
+      name: folder.substr(folder.lastIndexOf(path.sep) + 1),
+      valueFiles: [],
+    };
+
+    for (let i = 0; i < files.length; i += 1) {
+      const file = files[i];
+      const filePath = path.join(folder, file);
+      const fileEntryPath = filePath.substr(rootFolder.length);
+      const fileEntry = createFileEntry(fileEntryPath);
+
+      if (fileIsExcluded(appConfig, fileEntry)) {
+        fileEntry.excluded = true;
+      } else if (fs.statSync(filePath).isDirectory()) {
+        fileEntry.children = await readFilesAsync(
+          filePath,
+          appConfig,
+          resourceMap,
+          fileMap,
+          helmChartMap,
+          helmValuesMap
+        );
+      } else if (micromatch.isMatch(file, '*values*.yaml')) {
+        const helmValues: HelmValuesFile = {
+          id: uuidv4(),
+          filePath: fileEntryPath,
+          name: file,
+          selected: false,
+          helmChart: helmChart.id,
+        };
+
+        helmValuesMap[helmValues.id] = helmValues;
+        helmChart.valueFiles.push(helmValues.id);
+      }
+
+      fileMap[fileEntry.filePath] = fileEntry;
+      result.push(fileEntry.name);
+    }
+
+    helmChartMap[helmChart.id] = helmChart;
+  } else {
+    for (let i = 0; i < files.length; i += 1) {
+      const file = files[i];
+      const filePath = path.join(folder, file);
+      const fileEntryPath = filePath.substr(rootFolder.length);
+      const fileEntry = createFileEntry(fileEntryPath);
+
+      if (fileIsExcluded(appConfig, fileEntry)) {
+        fileEntry.excluded = true;
+      } else if (fs.statSync(filePath).isDirectory()) {
+        fileEntry.children = await readFilesAsync(
+          filePath,
+          appConfig,
+          resourceMap,
+          fileMap,
+          helmChartMap,
+          helmValuesMap
+        );
+      } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+        try {
+          extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+            resourceMap[resource.id] = resource;
+          });
+        } catch (e) {
+          log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
+        }
+      }
+
+      fileMap[fileEntry.filePath] = fileEntry;
+      result.push(fileEntry.name);
+    }
+  }
+
+  return result;
+}
+
 /**
  * Returns all resources associated with the specified path
  */
