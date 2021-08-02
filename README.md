@@ -1,37 +1,21 @@
 ## Monokle
 
-Desktop UI for managing k8s manifests.
+Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
-## Components used
+## Getting Started
 
-* https://github.com/eemeli/yaml for yaml parsing
-* https://github.com/react-monaco-editor/react-monaco-editor for source editing
-* https://github.com/shunjizhan/react-folder-tree for file/folder tree
-* https://github.com/micromatch/micromatch for dynamic filtering in navigator and file exclusion matching
-* https://github.com/JSONPath-Plus/JSONPath for finding refs/selectors in resources
-* https://github.com/rjsf-team/react-jsonschema-form for generating forms for k8s resources
-* https://github.com/wbkd/react-flow for graph diagrams
-* https://github.com/tweenjs/es6-tween for animation tweening
-* https://github.com/pengx17/monaco-yaml for yaml support in the source editor
-* https://github.com/paulmillr/chokidar for file watching
-* https://github.com/ant-design/ant-design/ for UI
+Either download an installer from [releases](https://github.com/kubeshop/monokle/releases) or clone/build as described
+below!
 
-## Dev Dependencies
+Check out the [monokle.io website](https://monokle.io) for introductory material and videos.
 
-* https://github.com/gsoft-inc/craco for overriding CRA config for folder aliases,
-  see https://www.npmjs.com/package/craco-alias#examples
+Read the [introductory blog-post](https://medium.com/@kubeshop/introducing-monokle) to get a quick intro and overview
+
+[Hello Monokle Video]
 
 ## Building
 
-This project was bootstrapped
-from https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, which
-provides
-
-* TypeScript supports for Electron main process source code
-* Hot-relaod support for Electron app
-* Electron Bulder support
-
-Build with
+Clone this repo and build with
 
 ```
 nvm install
@@ -55,15 +39,31 @@ npm run electron:build
 
 to build the Electron app package for production to the `dist` folder.
 
+This project was bootstrapped
+from https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, which
+provides
+
+* TypeScript supports for Electron main process source code
+* Hot-relaod support for Electron app
+* Electron Builder support
+
 See https://www.electron.build/ for more info on the electron builder
 
-## KUBECONFIG for kubectl invocation
+## Components used
 
-Monokle uses the KUBECONFIG env variable for kubectl commands - you'll need to set that env variable to point to your
-kubernetes config and then start Monokle from the command-line (to ensure it inherits the env variable) with.
+* https://github.com/eemeli/yaml for yaml parsing
+* https://github.com/react-monaco-editor/react-monaco-editor for source editing
+* https://github.com/micromatch/micromatch for dynamic filtering in navigator and file exclusion matching
+* https://github.com/JSONPath-Plus/JSONPath for finding refs/selectors in resources
+* https://github.com/rjsf-team/react-jsonschema-form for generating forms for k8s resources
+* https://github.com/wbkd/react-flow for graph diagrams
+* https://github.com/tweenjs/es6-tween for animation tweening
+* https://github.com/pengx17/monaco-yaml for yaml support in the source editor
+* https://github.com/paulmillr/chokidar for file watching
+* https://github.com/ant-design/ant-design/ for UI
+* https://github.com/styled-components/styled-components for custom styling
 
-On MacOS this is done with
+## Dev Dependencies
 
-```
-open -a "Monokle"
-```
+* https://github.com/gsoft-inc/craco for overriding CRA config for folder aliases,
+  see https://www.npmjs.com/package/craco-alias#examples
