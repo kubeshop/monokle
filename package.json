@@ -117,6 +117,18 @@
       "category": "public.app-category.utilities",
       "icon": "build/icon.png"
     },
+    "dmg": {
+      "icon": "build/icon.png"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": true,
+      "installerIcon": "build/icon.png",
+      "uninstallerIcon": "build/icon.png",
+      "installerHeaderIcon": "build/icon.png"
+    },
     "extends": null,
     "files": [
       "build/**/*",
@@ -153,9 +165,6 @@
     ],
     "directories": {
       "buildResources": "assets"
-    },
-    "dmg": {
-      "icon": "build/icon.png"
     }
   },
   "lint-staged": {
