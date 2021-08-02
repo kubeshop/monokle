@@ -103,7 +103,7 @@ const iconMenuWidth = 45;
 const App = () => {
   const dispatch = useAppDispatch();
   const size: Size = useWindowSize();
-  const contentWidth = size.width - 2 * iconMenuWidth;
+  const contentWidth = size.width - (featureJson.ShowRightMenu ? 2 : 1) * iconMenuWidth;
   const mainHeight = `${size.height}px`;
   const contentHeight = `${size.height - 75}px`;
 
@@ -242,9 +242,9 @@ const App = () => {
                 <ActionsPane contentHeight={contentHeight} />
               </StyledReflexElement>
 
-              {rightPaneWidth && <ReflexSplitter />}
+              {featureJson.ShowRightMenu && rightPaneWidth && <ReflexSplitter />}
 
-              {rightPaneWidth && (
+              {featureJson.ShowRightMenu && rightPaneWidth && (
                 <StyledReflexElement size={rightPaneWidth}>
                   {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
                     <GraphView editorHeight={contentHeight} />
@@ -253,36 +253,38 @@ const App = () => {
                 </StyledReflexElement>
               )}
 
-              <StyledMenuRightReflexElement size={43}>
-                <Space direction="vertical">
-                  {featureJson.ShowGraphView && (
+              {featureJson.ShowRightMenu && (
+                <StyledMenuRightReflexElement size={43}>
+                  <Space direction="vertical">
+                    {featureJson.ShowGraphView && (
+                      <Button
+                        size="large"
+                        type="text"
+                        onClick={() => setAspectRatios('right', 'graph')}
+                        icon={
+                          <ApartmentOutlined
+                            style={{
+                              ...iconStyle,
+                              color: rightMenuSelection === 'graph' ? Colors.whitePure : Colors.grey7,
+                            }}
+                          />
+                        }
+                      />
+                    )}
+
                     <Button
                       size="large"
                       type="text"
-                      onClick={() => setAspectRatios('right', 'graph')}
+                      onClick={() => setAspectRatios('right', 'logs')}
                       icon={
-                        <ApartmentOutlined
-                          style={{
-                            ...iconStyle,
-                            color: rightMenuSelection === 'graph' ? Colors.whitePure : Colors.grey7,
-                          }}
+                        <CodeOutlined
+                          style={{...iconStyle, color: rightMenuSelection === 'logs' ? Colors.whitePure : Colors.grey7}}
                         />
                       }
                     />
-                  )}
-
-                  <Button
-                    size="large"
-                    type="text"
-                    onClick={() => setAspectRatios('right', 'logs')}
-                    icon={
-                      <CodeOutlined
-                        style={{...iconStyle, color: rightMenuSelection === 'logs' ? Colors.whitePure : Colors.grey7}}
-                      />
-                    }
-                  />
-                </Space>
-              </StyledMenuRightReflexElement>
+                  </Space>
+                </StyledMenuRightReflexElement>
+              )}
             </StyledReflexContainer>
           </StyledRow>
         </StyledContent>
