@@ -82,10 +82,11 @@ const ClustersPane = () => {
           <StyledDiv>KUBECONFIG</StyledDiv>
           <Input value={kubeconfig} />
           <StyledButton onClick={openFileSelect}>Browse</StyledButton>
-          <HiddenInput type='file' onChange={onSelectFile} ref={fileInput} />
+          <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
           <StyledDiv>Select to retrieve resources from configured kubeconfig</StyledDiv>
 
           <Button
+            type="primary"
             ghost
             loading={previewType === 'cluster' && previewLoader.isLoading}
             onClick={connectToCluster}
