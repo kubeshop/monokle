@@ -21,12 +21,14 @@ import {ipcRenderer} from 'electron';
  * Thunk to preview kustomizations
  */
 
-export const previewKustomization = createAsyncThunk<SetPreviewDataPayload,
+export const previewKustomization = createAsyncThunk<
+  SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/previewKustomization', async (resourceId, thunkAPI) => {
+  }
+>('main/previewKustomization', async (resourceId, thunkAPI) => {
   const state = thunkAPI.getState().main;
   if (state.previewResource !== resourceId) {
     const resource = state.resourceMap[resourceId];
@@ -67,12 +69,14 @@ function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: string) {
  * Thunk to preview cluster objects
  */
 
-export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
+export const previewCluster = createAsyncThunk<
+  SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/previewCluster', async (configPath, thunkAPI) => {
+  }
+>('main/previewCluster', async (configPath, thunkAPI) => {
   const state: AppState = thunkAPI.getState().main;
   if (state.previewResource !== configPath) {
     const kc = new k8s.KubeConfig();
@@ -90,12 +94,15 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
       k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
         return getK8sObjectsAsYaml(res.body.items, 'Service', 'v1');
       }),
-    ]).then(yamls => {
-      const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
-      return createPreviewResult(allYaml, configPath);
-    }, (reason) => {
-      return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
-    });
+    ]).then(
+      yamls => {
+        const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
+        return createPreviewResult(allYaml, configPath);
+      },
+      reason => {
+        return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
+      }
+    );
   }
 
   return {};
@@ -105,12 +112,14 @@ export const previewCluster = createAsyncThunk<SetPreviewDataPayload,
  * Thunk to set the specified root folder
  */
 
-export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
+export const setRootFolder = createAsyncThunk<
+  SetRootFolderPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/setRootFolder', async (rootFolder, thunkAPI) => {
+  }
+>('main/setRootFolder', async (rootFolder, thunkAPI) => {
   const appConfig = thunkAPI.getState().config;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
@@ -119,7 +128,16 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
   const helmValuesMap: HelmValuesMapType = {};
 
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
-  rootEntry.children = readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+
+  // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
+  const readFilesPromise = new Promise<string[]>(resolve => {
+    process.nextTick(() => {
+      resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
+    });
+  });
+  const files = await readFilesPromise;
+
+  rootEntry.children = files;
 
   processKustomizations(resourceMap, fileMap);
   processParsedResources(resourceMap);
@@ -139,12 +157,14 @@ export const setRootFolder = createAsyncThunk<SetRootFolderPayload,
  * Thunk to diff a resource against the configured cluster
  */
 
-export const diffResource = createAsyncThunk<SetDiffDataPayload,
+export const diffResource = createAsyncThunk<
+  SetDiffDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/setDiffContent', async (diffResourceId, thunkAPI) => {
+  }
+>('main/setDiffContent', async (diffResourceId, thunkAPI) => {
   const resourceMap = thunkAPI.getState().main.resourceMap;
   const kubeconfig = thunkAPI.getState().config.kubeconfig;
   try {
@@ -159,7 +179,11 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           return {diffContent: stringify(res.body, {sortMapEntries: true}), diffResourceId};
         }
 
-        return createPreviewRejection(thunkAPI, 'Diff Resources', `Failed to get ${resource.content.kind} from cluster`);
+        return createPreviewRejection(
+          thunkAPI,
+          'Diff Resources',
+          `Failed to get ${resource.content.kind} from cluster`
+        );
       };
 
       const handleRejection = (rej: any) => {
@@ -175,7 +199,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedConfigMap(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -185,7 +209,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedService(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -195,7 +219,7 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
           .readNamespacedDeployment(
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
-            'true',
+            'true'
           )
           .then(handleResource, handleRejection);
       }
@@ -212,12 +236,14 @@ export const diffResource = createAsyncThunk<SetDiffDataPayload,
  * Thunk to preview a Helm Chart
  */
 
-export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
+export const previewHelmValuesFile = createAsyncThunk<
+  SetPreviewDataPayload,
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
-  }>('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
+  }
+>('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = thunkAPI.getState().config.kubeconfig;
@@ -230,12 +256,15 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
 
       // sanity check
       if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
-        log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
+        log.info(
+          `previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`
+        );
 
         const args = {
-          helmCommand: configState.settings.helmPreviewMode === 'template'
-            ? `helm template -f ${valuesFile.name} ${chart.name} .`
-            : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`,
+          helmCommand:
+            configState.settings.helmPreviewMode === 'template'
+              ? `helm template -f ${valuesFile.name} ${chart.name} .`
+              : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`,
           cwd: folder,
           kubeconfig,
         };
@@ -251,7 +280,11 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
         }
       }
 
-      return createPreviewRejection(thunkAPI, 'Helm Error', `Unabled to run Helm for ${valuesFile.name} in folder ${folder}`);
+      return createPreviewRejection(
+        thunkAPI,
+        'Helm Error',
+        `Unabled to run Helm for ${valuesFile.name} in folder ${folder}`
+      );
     }
   }
 
@@ -263,7 +296,7 @@ export const previewHelmValuesFile = createAsyncThunk<SetPreviewDataPayload,
  */
 
 function runKustomize(cmd: any): any {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     ipcRenderer.once('kustomize-result', (event, arg) => {
       resolve(arg);
     });
@@ -276,7 +309,7 @@ function runKustomize(cmd: any): any {
  */
 
 function runHelm(cmd: any): any {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     ipcRenderer.once('helm-result', (event, arg) => {
       resolve(arg);
     });
@@ -296,7 +329,7 @@ function createPreviewResult(resourcesYaml: string, previewResourceId: string) {
   }, {});
 
   processParsedResources(resourceMap);
-  return ({previewResourceId, previewResources: clearParsedDocs(resourceMap)});
+  return {previewResourceId, previewResources: clearParsedDocs(resourceMap)};
 }
 
 /**
@@ -306,7 +339,9 @@ function createPreviewResult(resourcesYaml: string, previewResourceId: string) {
 function createPreviewRejection(thunkAPI: any, title: string, message: string) {
   return thunkAPI.rejectWithValue({
     alert: {
-      title, message, type: AlertEnum.Error,
+      title,
+      message,
+      type: AlertEnum.Error,
     },
   });
 }

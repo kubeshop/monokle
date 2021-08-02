@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useRef} from 'react';
 import styled from 'styled-components';
 import path from 'path';
-import {Row, Button, Tree, Col, Space, Typography} from 'antd';
+import {Row, Button, Tree, Col, Space, Typography, Skeleton} from 'antd';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -239,11 +239,17 @@ const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
   }
 `;
 
+const StyledSkeleton = styled(Skeleton)`
+  margin: 20px;
+  width: 90%;
+`;
+
 const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const {windowHeight} = props;
   const dispatch = useAppDispatch();
   const previewMode = useSelector(inPreviewMode);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const uiState = useAppSelector(state => state.ui);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -351,7 +357,9 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
         ref={folderInput}
         style={{display: 'none'}}
       />
-      {tree ? (
+      {uiState.isFolderLoading ? (
+        <StyledSkeleton />
+      ) : tree ? (
         <StyledTreeDirectoryTree
           // height is needed to enable Tree's virtual scroll
           height={windowHeight && windowHeight > 180 ? windowHeight - 180 : 0}

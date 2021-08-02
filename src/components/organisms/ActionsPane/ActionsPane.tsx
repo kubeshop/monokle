@@ -43,22 +43,27 @@ const StyledSkeleton = styled(Skeleton)`
   width: 95%;
 `;
 
-export function applyWithConfirm(selectedResource: K8sResource, resourceMap: ResourceMapType, fileMap: FileMapType, dispatch: ThunkDispatch<any, any, any>, kubeconfig: string) {
-  const title = isKustomizationResource(selectedResource) ?
-    `Apply ${selectedResource.name} kustomization your cluster?`
+export function applyWithConfirm(
+  selectedResource: K8sResource,
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType,
+  dispatch: ThunkDispatch<any, any, any>,
+  kubeconfig: string
+) {
+  const title = isKustomizationResource(selectedResource)
+    ? `Apply ${selectedResource.name} kustomization your cluster?`
     : `Apply ${selectedResource.name} to your cluster?`;
 
   Modal.confirm({
     title,
     icon: <ExclamationCircleOutlined />,
     onOk() {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig);
         resolve({});
       });
     },
-    onCancel() {
-    },
+    onCancel() {},
   });
 }
 
@@ -72,6 +77,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const dispatch = useAppDispatch();
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const uiState = useAppSelector(state => state.ui);
   const [key, setKey] = useState('source');
 
   async function applySelectedResource() {
@@ -129,7 +135,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
               tabBarExtraContent={OperationsSlot}
             >
               <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
-                {previewLoader.isLoading ? <StyledSkeleton /> : <Monaco editorHeight={contentHeight} />}
+                {uiState.isFolderLoading || previewLoader.isLoading ? (
+                  <StyledSkeleton />
+                ) : (
+                  <Monaco editorHeight={contentHeight} />
+                )}
               </TabPane>
               {selectedResource && selectedResource?.kind === 'ConfigMap' && (
                 <TabPane
@@ -137,7 +147,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   disabled={!selectedResourceId}
                   key="form"
                 >
-                  {previewLoader.isLoading ? <StyledSkeleton /> : <FormEditor contentHeight={contentHeight} />}
+                  {uiState.isFolderLoading || previewLoader.isLoading ? (
+                    <StyledSkeleton />
+                  ) : (
+                    <FormEditor contentHeight={contentHeight} />
+                  )}
                 </TabPane>
               )}
             </StyledTabs>
