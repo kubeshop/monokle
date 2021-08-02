@@ -22,7 +22,6 @@ import {ALL_NAMESPACES} from '../constants';
 
 const ResourcesSection = () => {
   const dispatch = useAppDispatch();
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
   const appConfig = useAppSelector(state => state.config);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewResource = useAppSelector(state => state.main.previewResource);
@@ -72,11 +71,19 @@ const ResourcesSection = () => {
     });
   };
 
-  function shouldSectionBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
+  function shouldResourceBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
     return (
       item.kind === subsection.kindSelector &&
       micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
-      (namespace === ALL_NAMESPACES || item.namespace === namespace || (namespace === 'default' && !item.namespace))
+      (namespace === ALL_NAMESPACES || item.namespace === namespace || (namespace === 'default' && !item.namespace)) &&
+      Object.values(resourceMap).length > 0
+    );
+  }
+
+  function shouldSubsectionBeVisible(subsection: NavigatorSubSection) {
+    return (
+      resources.length === 0 ||
+      (resources.length > 0 && resources.some(resource => resource.kind === subsection.kindSelector))
     );
   }
 
@@ -87,7 +94,7 @@ const ResourcesSection = () => {
           return (
             <div key={navigator.name}>
               <SectionRow>
-                  <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
+                <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
 
                 {navigator.name === 'K8s Resources' && (
                   <NamespacesSection namespace={namespace} namespaces={namespaces} onSelect={handleNamespaceChange} />
@@ -108,7 +115,8 @@ const ResourcesSection = () => {
                           onSubsectionExpand={handleSubsectionExpand}
                           onSubsectionCollapse={handleSubsectionCollapse}
                           section={section}
-                          shouldBeVisible={shouldSectionBeVisible}
+                          shouldResourceBeVisible={shouldResourceBeVisible}
+                          shouldSubsectionBeVisible={shouldSubsectionBeVisible}
                           resources={resources}
                           selectResource={selectResource}
                         />

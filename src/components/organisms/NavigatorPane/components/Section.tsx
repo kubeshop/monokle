@@ -37,7 +37,8 @@ const Section = (props: {
   onSubsectionCollapse: (sectionName: string, subsectionName: string) => void;
   section: NavigatorSection;
   resources: K8sResource[];
-  shouldBeVisible: (item: K8sResource, subsection: NavigatorSubSection) => boolean;
+  shouldResourceBeVisible: (resource: K8sResource, subsection: NavigatorSubSection) => boolean;
+  shouldSubsectionBeVisible: (subsection: NavigatorSubSection) => boolean;
   selectResource: (resourceId: string) => void;
 }) => {
   const {
@@ -46,7 +47,8 @@ const Section = (props: {
     onSubsectionCollapse,
     section,
     resources,
-    shouldBeVisible,
+    shouldResourceBeVisible,
+    shouldSubsectionBeVisible,
     selectResource,
   } = props;
 
@@ -57,42 +59,44 @@ const Section = (props: {
   return (
     <SectionRow key={section.name}>
       <StyledCollapse collapsible="disabled" ghost activeKey={expandedSubsections}>
-        {section.subsections.map(subsection => {
-          const items = resources.filter(item => shouldBeVisible(item, subsection));
-          return (
-            <StyledCollapsePanel
-              key={subsection.name}
-              showArrow={false}
-              header={
-                <SubsectionHeader
-                  isExpanded={isSubsectionExpanded(subsection.name)}
-                  isHighlighted={!isSubsectionExpanded(subsection.name) && items.some(i => i.highlight)}
-                  isSelected={!isSubsectionExpanded(subsection.name) && items.some(i => i.selected)}
-                  onExpand={() => onSubsectionExpand(section.name, subsection.name)}
-                  onCollapse={() => onSubsectionCollapse(section.name, subsection.name)}
-                  items={items}
-                  subsection={subsection}
-                />
-              }
-            >
-              <SectionCol key={subsection.name}>
-                {items.map(item => (
-                  <NavigatorResourceRow
-                    key={item.id}
-                    rowKey={item.id}
-                    label={item.name}
-                    isSelected={Boolean(item.selected)}
-                    highlighted={Boolean(item.highlight)}
-                    hasIncomingRefs={Boolean(hasIncomingRefs(item))}
-                    hasOutgoingRefs={Boolean(hasOutgoingRefs(item))}
-                    hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(item))}
-                    onClickResource={() => selectResource(item.id)}
+        {section.subsections
+          .filter(subsection => shouldSubsectionBeVisible(subsection))
+          .map(subsection => {
+            const visibleResources = resources.filter(item => shouldResourceBeVisible(item, subsection));
+            return (
+              <StyledCollapsePanel
+                key={subsection.name}
+                showArrow={false}
+                header={
+                  <SubsectionHeader
+                    isExpanded={isSubsectionExpanded(subsection.name)}
+                    isHighlighted={!isSubsectionExpanded(subsection.name) && visibleResources.some(r => r.highlight)}
+                    isSelected={!isSubsectionExpanded(subsection.name) && visibleResources.some(r => r.selected)}
+                    onExpand={() => onSubsectionExpand(section.name, subsection.name)}
+                    onCollapse={() => onSubsectionCollapse(section.name, subsection.name)}
+                    resourcesCount={visibleResources.length}
+                    subsection={subsection}
                   />
-                ))}
-              </SectionCol>
-            </StyledCollapsePanel>
-          );
-        })}
+                }
+              >
+                <SectionCol key={subsection.name}>
+                  {visibleResources.map(resource => (
+                    <NavigatorResourceRow
+                      key={resource.id}
+                      rowKey={resource.id}
+                      label={resource.name}
+                      isSelected={Boolean(resource.selected)}
+                      highlighted={Boolean(resource.highlight)}
+                      hasIncomingRefs={Boolean(hasIncomingRefs(resource))}
+                      hasOutgoingRefs={Boolean(hasOutgoingRefs(resource))}
+                      hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(resource))}
+                      onClickResource={() => selectResource(resource.id)}
+                    />
+                  ))}
+                </SectionCol>
+              </StyledCollapsePanel>
+            );
+          })}
       </StyledCollapse>
     </SectionRow>
   );
