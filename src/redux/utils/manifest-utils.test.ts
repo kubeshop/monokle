@@ -165,15 +165,18 @@ immutable: true`;
   expect(result).toBe(expectedYaml);
 });
 
-test('traverse-document', () => {
+test.only('traverse-document', () => {
   const inputYaml = `
   apiVersion: v1
-  kind: ConfigMap
+  kind: SomeResource
   metadata:
     name: agentcom-config
     namespace: test
     labels:
       newKey: New Value
+      app.kubernetes.io/component: test
+      app.kubernetes.io/name: test
+      app.kubernetes.io/part-of: test
     finalizers:
       - test
       - test2
@@ -184,27 +187,36 @@ test('traverse-document', () => {
     POSTGRES_DB: ""
     REDIS_HOST: ""
     newKey: New Value
+  spec:
+    matchLabels:
+      app.kubernetes.io/name: test
+      app.kubernetes.io/part-of: test
 `;
 
   const expectedResult = [
-    ['apiVersion', 'v1'],
-    ['kind', 'ConfigMap'],
-    ['metadata.name', 'agentcom-config'],
-    ['metadata.namespace', 'test'],
-    ['metadata.labels.newKey', 'New Value'],
-    ['metadata.finalizers', 'test'],
-    ['metadata.finalizers', 'test2'],
-    ['metadata.finalizers.test3', 'value'],
-    ['metadata.finalizers.test4.test5', 'value'],
-    ['data.POSTGRES_DB', ''],
-    ['data.REDIS_HOST', ''],
-    ['data.newKey', 'New Value'],
+    ['apiVersion', 'v1', 'apiVersion', ''],
+    ['kind', 'SomeResource', 'kind', ''],
+    ['metadata.name', 'agentcom-config', 'name', 'metadata'],
+    ['metadata.namespace', 'test', 'namespace', 'metadata'],
+    ['metadata.labels.newKey', 'New Value', 'newKey', 'metadata.labels'],
+    ['metadata.labels.app.kubernetes.io/component', 'test', 'app.kubernetes.io/component', 'metadata.labels'],
+    ['metadata.labels.app.kubernetes.io/name', 'test', 'app.kubernetes.io/name', 'metadata.labels'],
+    ['metadata.labels.app.kubernetes.io/part-of', 'test', 'app.kubernetes.io/part-of', 'metadata.labels'],
+    ['metadata.finalizers', 'test', 'finalizers', 'metadata'],
+    ['metadata.finalizers', 'test2', 'finalizers', 'metadata'],
+    ['metadata.finalizers.test3', 'value', 'test3', 'metadata.finalizers'],
+    ['metadata.finalizers.test4.test5', 'value', 'test5', 'metadata.finalizers.test4'],
+    ['data.POSTGRES_DB', '', 'POSTGRES_DB', 'data'],
+    ['data.REDIS_HOST', '', 'REDIS_HOST', 'data'],
+    ['data.newKey', 'New Value', 'newKey', 'data'],
+    ['spec.matchLabels.app.kubernetes.io/name', 'test', 'app.kubernetes.io/name', 'spec.matchLabels'],
+    ['spec.matchLabels.app.kubernetes.io/part-of', 'test', 'app.kubernetes.io/part-of', 'spec.matchLabels'],
   ];
 
-  const result: [string, string][] = [];
+  const result: [string, string, string, string][] = [];
   const document = parseDocument(inputYaml);
-  traverseDocument(document, (keyPath, scalar) => {
-    result.push([keyPath, scalar.value as string]);
+  traverseDocument(document, (keyPath, scalar, key, parentKeyPath) => {
+    result.push([keyPath, scalar.value as string, key, parentKeyPath]);
   });
   expect(result).toEqual(expectedResult);
 });
