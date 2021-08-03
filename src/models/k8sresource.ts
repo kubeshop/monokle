@@ -3,6 +3,8 @@
  */
 import {Document, LineCounter, ParsedNode, Scalar} from 'yaml';
 
+export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
+
 interface K8sResource {
   id: string; // an internally generated UUID - used for references/lookups in resourceMap
   filePath: string; // the path relative to the root folder to the file containing this resource - set to preview://<id> for internally generated resources
@@ -23,7 +25,7 @@ interface K8sResource {
 
   parsedDoc?: Document.Parsed<ParsedNode>; // temporary object used for parsing refs
   lineCounter?: LineCounter; // temporary object used for ref positioning
-  refNodeByPath?: Record<string, Scalar>;
+  refNodeByPath?: Record<string, RefNode>;
 }
 
 export enum ResourceRefType {
