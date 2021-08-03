@@ -200,9 +200,9 @@ const FileDetailsContainer = styled.div`
   flex-direction: column;
 `;
 
-const NoFilesContainer = styled(Typography.Text)`
-  margin-left: 10px;
-  margin-top: 20px;
+const NoFilesContainer = styled.div`
+  margin-left: 16px;
+  margin-top: 10px;
 `;
 
 const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
@@ -269,6 +269,11 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
       shouldExpandAllNodes.current = false;
     }
   }, [fileMap]);
+
+  /**
+   * This useEffect ensures that the right treeNodes are expanded and highlighted
+   * when a resource is selected
+   */
 
   useEffect(() => {
     if (selectedResource && tree) {
@@ -392,7 +397,9 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
           showIcon={false}
         />
       ) : (
-        <NoFilesContainer>No folder selected.</NoFilesContainer>
+        <NoFilesContainer>
+          Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
+        </NoFilesContainer>
       )}
     </FileTreeContainer>
   );
