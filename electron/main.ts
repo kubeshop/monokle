@@ -55,7 +55,7 @@ ipcMain.on('run-helm', (event, args: any) => {
 });
 
 function createWindow() {
-  const image = nativeImage.createFromPath(app.getAppPath() + '/public/icon-large-256.png');
+  const image = nativeImage.createFromPath(app.getAppPath() + '/public/large-icon-256.png');
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -118,7 +118,7 @@ app.whenReady().then(() => {
   ElectronStore.initRenderer();
   createWindow();
 
-  const image = nativeImage.createFromPath(app.getAppPath() + '/public/icon-large-256.png');
+  const image = nativeImage.createFromPath(app.getAppPath() + '/public/large-icon-256.png');
   app.dock.setIcon(image);
 
   console.info('info', app.getName(), app.getVersion(), app.getLocale());
