@@ -1,6 +1,6 @@
 import path from 'path';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
-import {K8sResource, RefPosition, ResourceRefType, RefNode} from '@models/k8sresource';
+import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
 import fs from 'fs';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/utils/kustomize';
@@ -579,6 +579,7 @@ function processRefs(resourceMap: ResourceMapType) {
                   resource,
                   refMapper.target.refType,
                   refMapper.source.refType,
+                  new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
                   new NodeWrapper(refNode.scalar, resource.lineCounter)
                 );
               }
@@ -633,12 +634,31 @@ function processRefs(resourceMap: ResourceMapType) {
 
   // clean up the refs
   Object.values(resourceMap).forEach(resource => {
-    resource.refs = resource.refs?.filter(ref => {
+    const cleanRefs: ResourceRef[] = [];
+
+    const findSatisfiedRefOnPosition = (refPos: RefPosition) => {
+      return resource.refs?.find(
+        ref => !isUnsatisfiedRef(ref.refType) && ref.refPos?.column === refPos.column && ref.refPos.line === refPos.line
+      );
+    };
+
+    resource.refs?.forEach(ref => {
+      let shouldPush = true;
+
       if (isUnsatisfiedRef(ref.refType)) {
-        if (resource.refs?.find(r => r.refPos?.column === ref.refPos?.column && r.refPos?.line === ref.refPos?.line))
-          return false;
+        if (ref.refPos) {
+          const foundSatisfiedRefOnSamePosition = findSatisfiedRefOnPosition(ref.refPos);
+          if (foundSatisfiedRefOnSamePosition) {
+            shouldPush = false;
+          }
+        }
       }
-      return true;
+
+      if (shouldPush) {
+        cleanRefs.push(ref);
+      }
     });
+
+    resource.refs = cleanRefs.length > 0 ? cleanRefs : undefined;
   });
 }
