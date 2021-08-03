@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';
 
-import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import NavigatorContentSubTitle from './NavigatorContentSubTitle';
 
@@ -58,11 +57,11 @@ const SubsectionHeader = (props: {
   isHighlighted: boolean;
   isSelected: boolean;
   subsection: NavigatorSubSection;
-  items: K8sResource[];
+  resourcesCount: number;
   onExpand: () => void;
   onCollapse: () => void;
 }) => {
-  const {subsection, items, isExpanded, isHighlighted, isSelected, onExpand, onCollapse} = props;
+  const {subsection, resourcesCount, isExpanded, isHighlighted, isSelected, onExpand, onCollapse} = props;
   const [isHovered, setIsHovered] = useState<Boolean>(false);
 
   return (
@@ -75,7 +74,7 @@ const SubsectionHeader = (props: {
       <NavigatorContentSubTitle>
         <SubsectionName isSelected={isSelected}>{subsection.name}</SubsectionName>
         <StyledResourcesLength isSelected={isSelected}>
-          {items.length > 0 ? `${items.length}` : ''}
+          {resourcesCount > 0 ? `${resourcesCount}` : ''}
         </StyledResourcesLength>
       </NavigatorContentSubTitle>
       {isHovered && isExpanded && (
