@@ -80,6 +80,7 @@ export type RefMapper = {
     path: string;
     refType: ResourceRefType;
   };
+  matchPairs?: boolean;
   unsatisfiedRefType: ResourceRefType;
 };
 
@@ -189,7 +190,23 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
     },
   ],
   DaemonSet: createCommonRefMappers('DaemonSet'),
-  Deployment: createCommonRefMappers('Deployment'),
+  Deployment: [
+    ...createCommonRefMappers('Deployment'),
+    {
+      source: {
+        kind: 'Deployment',
+        path: 'spec.template.metadata.labels',
+        refType: ResourceRefType.SelectedPodName,
+      },
+      target: {
+        kind: 'Service',
+        path: 'spec.selector',
+        refType: ResourceRefType.ServicePodSelector,
+      },
+      matchPairs: true,
+      unsatisfiedRefType: ResourceRefType.UnsatisfiedSelector,
+    },
+  ],
   Endpoint: [
     {
       source: {
