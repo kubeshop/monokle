@@ -20,9 +20,6 @@ export function createFileEntry(fileEntryPath: string) {
   const fileEntry: FileEntry = {
     name: fileEntryPath.substr(fileEntryPath.lastIndexOf(path.sep) + 1),
     filePath: fileEntryPath,
-    highlight: false,
-    selected: false,
-    expanded: false,
     excluded: false,
   };
   return fileEntry;

@@ -104,6 +104,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   const helmValues = useSelector(selectHelmValues);
   const previewValuesFile = useAppSelector(state => state.main.previewValuesFile);
   const selectedValuesFile = useAppSelector(state => state.main.selectedValuesFile);
+  const selectedPath = useAppSelector( state => state.main.selectedPath);
   const dispatch = useAppDispatch();
   const scrollContainer = React.useRef(null);
 
@@ -128,11 +129,11 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   }
 
   React.useEffect(() => {
-    if (Object.values(helmValues).some(helm => helm.selected)) {
+    if (selectedPath && Object.values(helmValues).some(helm => helm.selected)) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [helmValues]);
+  }, [helmValues,selectedPath]);
 
   return (
     <RowContainer>

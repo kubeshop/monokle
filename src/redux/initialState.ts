@@ -69,4 +69,6 @@ export const initialState: AppState = {
   previewLoader: {
     isLoading: false,
   },
+  isSelectingFile: false,
+  isSelectingResource: false,
 };

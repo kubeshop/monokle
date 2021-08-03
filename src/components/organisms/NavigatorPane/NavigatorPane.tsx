@@ -44,13 +44,13 @@ const NavigatorPane = () => {
       </TitleRow>
       <PaneContainer>
         {uiState.isFolderLoading ? (
-          <StyledSkeleton />
+          <StyledSkeleton active />
         ) : (
           !clusterMode && Object.values(helmCharts).length > 0 && <HelmChartsSection helmCharts={helmCharts} />
         )}
 
         {uiState.isFolderLoading ? (
-          <StyledSkeleton />
+          <StyledSkeleton active />
         ) : (
           !clusterMode && kustomizations.length > 0 && <KustomizationsSection kustomizations={kustomizations} />
         )}

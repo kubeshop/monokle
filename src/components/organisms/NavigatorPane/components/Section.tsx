@@ -2,6 +2,7 @@ import React from 'react';
 import {Collapse} from 'antd';
 
 import styled from 'styled-components';
+import {useAppSelector} from '@redux/hooks';
 
 import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection, NavigatorSection} from '@models/navigator';
@@ -52,6 +53,8 @@ const Section = (props: {
     selectResource,
   } = props;
 
+  const isSelecting = useAppSelector(state => state.main.isSelectingFile);
+
   const isSubsectionExpanded = (subsectionName: string) => {
     return expandedSubsections.indexOf(subsectionName) !== -1;
   };
@@ -63,6 +66,13 @@ const Section = (props: {
           .filter(subsection => shouldSubsectionBeVisible(subsection))
           .map(subsection => {
             const visibleResources = resources.filter(item => shouldResourceBeVisible(item, subsection));
+
+            // ensure that section containing highlighted resources is expanded by default
+            const hasHighlight = visibleResources.some(item => item.highlight);
+            if (isSelecting && hasHighlight && !isSubsectionExpanded(subsection.name)) {
+              onSubsectionExpand(section.name, subsection.name);
+            }
+
             return (
               <StyledCollapsePanel
                 key={subsection.name}
