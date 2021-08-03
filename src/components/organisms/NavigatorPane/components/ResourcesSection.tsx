@@ -57,10 +57,6 @@ const ResourcesSection = () => {
     )
   );
 
-  useEffect( () => {
-
-  }, []);
-
   const handleSubsectionExpand = (sectionName: string, subsectionName: string) => {
     setExpandedSubsectionsBySection({
       ...expandedSubsectionsBySection,
