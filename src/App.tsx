@@ -46,8 +46,8 @@ const StyledReflexElement = styled(ReflexElement)`
   height: 100%;
   border-left: ${AppBorders.pageDivider};
   border-right: ${AppBorders.pageDivider};
-  overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
 `;
 
 const StyledMenuLeftReflexElement = styled(ReflexElement)`
