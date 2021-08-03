@@ -275,39 +275,45 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
    * when a resource is selected
    */
 
+  function highlightFilePath(filePath: string) {
+    const paths = filePath.split(path.sep);
+    const keys: Array<React.Key> = [];
+
+    for (let c = 1; c < paths.length; c += 1) {
+      keys.push(paths.slice(0, c + 1).join(path.sep));
+    }
+
+    let node: TreeNode | undefined = tree || undefined;
+    for (let c = 0; c < keys.length && node; c += 1) {
+      node = node.children.find(i => i.key === keys[c]);
+    }
+
+    if (node) {
+      node.highlight = true;
+      treeRef?.current?.scrollTo({key: node.key});
+
+      if (highlightNode) {
+        highlightNode.highlight = false;
+      }
+    }
+
+    setHighlightNode(node);
+    setExpandedKeys(prevExpandedKeys => uniqueArr([...prevExpandedKeys, ...Array.from(keys)]));
+  }
+
   useEffect(() => {
     if (selectedResource && tree) {
       const resource = resourceMap[selectedResource];
       if (resource) {
-        const paths = resource.filePath.split(path.sep);
-        const keys: Array<React.Key> = [];
-
-        for (let c = 1; c < paths.length; c += 1) {
-          keys.push(paths.slice(0, c + 1).join(path.sep));
-        }
-
-        let node: TreeNode | undefined = tree;
-        for (let c = 0; c < keys.length && node; c += 1) {
-          node = node.children.find(i => i.key === keys[c]);
-        }
-
-        if (node) {
-          node.highlight = true;
-          treeRef?.current?.scrollTo({key: node.key});
-
-          if (highlightNode) {
-            highlightNode.highlight = false;
-          }
-        }
-
-        setHighlightNode(node);
-        setExpandedKeys(prevExpandedKeys => uniqueArr([...prevExpandedKeys, ...Array.from(keys)]));
+        const filePath = resource.filePath;
+        highlightFilePath(filePath);
       }
     }
   }, [selectedResource]);
 
   useEffect(() => {
-    if (highlightNode) {
+    // removes any highlight when a file is selected
+    if (selectedPath && highlightNode) {
       highlightNode.highlight = false;
     }
   }, [selectedPath]);
@@ -336,8 +342,6 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
     setExpandedKeys(expandedKeysValue);
     setAutoExpandParent(false);
   };
-
-  console.log(`selected key: ${selectedPath}`);
 
   return (
     <FileTreeContainer>
