@@ -201,6 +201,7 @@ const App = () => {
                         style={{
                           ...iconStyle,
                           color: leftMenuSelection === 'file-explorer' ? Colors.whitePure : Colors.grey7,
+                          marginLeft: 4,
                         }}
                       />
                     }

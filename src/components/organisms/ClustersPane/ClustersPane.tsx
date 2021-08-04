@@ -31,7 +31,7 @@ const TitleRow = styled(Row)`
 `;
 
 const ClustersContainer = styled.div`
-  margin: 10px;
+  margin: 16px;
 `;
 
 const ClustersPane = () => {
