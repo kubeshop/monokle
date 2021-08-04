@@ -18,16 +18,13 @@ import {stopPreview} from '@redux/utils/preview';
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 
-const EditorMode = styled.h4`
-  font-size: 2em;
-  text-align: right;
-  color: ${Colors.yellowWarning};
+const LogoCol = styled(Col)`
+  padding-left: 4px;
 `;
 
 const StyledHeader = styled(Header)`
   width: 100%;
   line-height: 30px;
-  padding-left: 10px;
   background: ${BackgroundColors.darkThemeBackground};
   border-bottom: ${AppBorders.pageDivider};
   min-height: 50px;
@@ -125,7 +122,6 @@ const PageHeader = () => {
       setPreviewValuesFile(undefined);
       setHelmChart(undefined);
     }
-
   }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmValuesMap]);
 
   const toggleSettingsDrawer = () => {
@@ -138,36 +134,44 @@ const PageHeader = () => {
 
   return (
     <>
-      {(isInPreviewMode && previewType === 'kustomization') && (
+      {isInPreviewMode && previewType === 'kustomization' && (
         <PreviewRow noborder>
           <StyledModeSpan>PREVIEW MODE</StyledModeSpan>
-          {previewResource && <StyledResourceSpan>Previewing [{previewResource.name}] kustomization
-            - {activeResources.length} resources</StyledResourceSpan>}
+          {previewResource && (
+            <StyledResourceSpan>
+              Previewing [{previewResource.name}] kustomization - {activeResources.length} resources
+            </StyledResourceSpan>
+          )}
           <ExitButton onClick={onClickExit} />
         </PreviewRow>
       )}
       {isInPreviewMode && previewType === 'cluster' && (
         <ClusterRow>
           <StyledModeSpan>CLUSTER MODE</StyledModeSpan>
-          {previewResourceId && <StyledResourceSpan>Previewing {previewResourceId} cluster
-            - {activeResources.length} resources</StyledResourceSpan>}
+          {previewResourceId && (
+            <StyledResourceSpan>
+              Previewing {previewResourceId} cluster - {activeResources.length} resources
+            </StyledResourceSpan>
+          )}
           <ExitButton onClick={onClickExit} />
         </ClusterRow>
       )}
       {isInPreviewMode && previewType === 'helm' && (
         <PreviewRow noborder>
           <StyledModeSpan>HELM MODE</StyledModeSpan>
-          {previewValuesFileId &&
-          <StyledResourceSpan>Previewing {previewValuesFile?.name} for {helmChart?.name} Helm chart
-            - {activeResources.length} resources</StyledResourceSpan>}
+          {previewValuesFileId && (
+            <StyledResourceSpan>
+              Previewing {previewValuesFile?.name} for {helmChart?.name} Helm chart - {activeResources.length} resources
+            </StyledResourceSpan>
+          )}
           <ExitButton onClick={onClickExit} />
         </PreviewRow>
       )}
       <StyledHeader noborder>
         <Row noborder>
-          <Col span={12} noborder>
+          <LogoCol span={12} noborder>
             <IconMonokle useDarkTheme />
-          </Col>
+          </LogoCol>
           <SettingsCol span={12}>
             <StyledSettingsSpan onClick={toggleSettingsDrawer}>Settings</StyledSettingsSpan>
           </SettingsCol>
