@@ -79,30 +79,126 @@ export const previewCluster = createAsyncThunk<
 >('main/previewCluster', async (configPath, thunkAPI) => {
   const state: AppState = thunkAPI.getState().main;
   if (state.previewResource !== configPath) {
-    const kc = new k8s.KubeConfig();
-    kc.loadFromFile(configPath);
-    const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
-    const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+    try {
+      const kc = new k8s.KubeConfig();
+      kc.loadFromFile(configPath);
+      const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+      const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+      const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
+      const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+      const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
+      const k8sExtensionsV1Api = kc.makeApiClient(k8s.ApiextensionsV1Api);
 
-    return Promise.all([
-      k8sAppV1Api.listDeploymentForAllNamespaces().then(res => {
-        return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
-      }),
-      k8sCoreV1Api.listConfigMapForAllNamespaces().then(res => {
-        return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'v1');
-      }),
-      k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
-        return getK8sObjectsAsYaml(res.body.items, 'Service', 'v1');
-      }),
-    ]).then(
-      yamls => {
-        const allYaml = yamls.join(YAML_DOCUMENT_DELIMITER);
-        return createPreviewResult(allYaml, configPath);
-      },
-      reason => {
-        return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
-      }
-    );
+      return Promise.allSettled([
+        k8sAppV1Api.listDaemonSetForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'DaemonSet', 'apps/v1');
+        }),
+        k8sAppV1Api.listDeploymentForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
+        }),
+        k8sAppV1Api.listStatefulSetForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'StatefuleSet', 'apps/v1');
+        }),
+        k8sAppV1Api.listReplicaSetForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'ReplicaSet', 'apps/v1');
+        }),
+        k8sCoreV1Api.listConfigMapForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'v1');
+        }),
+        k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Service', 'v1');
+        }),
+        k8sCoreV1Api.listServiceAccountForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'ServiceAccount', 'v1');
+        }),
+        k8sCoreV1Api.listPersistentVolume().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'PersistentVolume', 'v1');
+        }),
+        k8sCoreV1Api.listPersistentVolumeClaimForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'PersistentVolumeClaim', 'v1');
+        }),
+        k8sCoreV1Api.listPodForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Pod', 'v1');
+        }),
+        k8sCoreV1Api.listEndpointsForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Endpoints', 'v1');
+        }),
+        k8sCoreV1Api.listSecretForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Secret', 'v1');
+        }),
+        k8sCoreV1Api.listReplicationControllerForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'ReplicationController', 'v1');
+        }),
+        k8sBatchV1Api.listJobForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Job', 'batch/v1');
+        }),
+        k8sBatchV1Api.listCronJobForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'CronJob', 'batch/v1');
+        }),
+        k8sRbacV1Api.listClusterRole().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'ClusterRole', 'rbac.authorization.k8s.io/v1');
+        }),
+        k8sRbacV1Api.listClusterRoleBinding().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'ClusterRoleBinding', 'rbac.authorization.k8s.io/v1');
+        }),
+        k8sRbacV1Api.listRoleForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Role', 'rbac.authorization.k8s.io/v1');
+        }),
+        k8sRbacV1Api.listRoleBindingForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'RoleBinding', 'rbac.authorization.k8s.io/v1');
+        }),
+        k8sNetworkingV1Api.listIngressForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'Ingress', 'networking.k8s.io/v1');
+        }),
+        k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'NetworkPolicy', 'networking.k8s.io/v1');
+        }),
+        k8sExtensionsV1Api.listCustomResourceDefinition().then(res => {
+          return getK8sObjectsAsYaml(res.body.items, 'CustomResourceDefinition', 'apiextensions.k8s.io/v1');
+        }),
+      ]).then(
+        results => {
+          const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+
+          if (fulfilledResults.length === 0) {
+            return createPreviewRejection(
+              thunkAPI,
+              'Cluster Resources Failed',
+              // @ts-ignore
+              results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
+            );
+          }
+
+          // @ts-ignore
+          const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
+          const previewResult = createPreviewResult(allYaml, configPath);
+
+          if (fulfilledResults.length < results.length) {
+            const rejectedResult = results.find(r => r.status === 'rejected');
+            if (rejectedResult) {
+              // @ts-ignore
+              const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
+
+              return {
+                alert: {
+                  title: 'Get Cluster Resources',
+                  message: `Failed to get all cluster resources: ${reason}`,
+                  type: AlertEnum.Warning,
+                },
+                ...previewResult,
+              };
+            }
+          }
+
+          return previewResult;
+        },
+        reason => {
+          return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
+        }
+      );
+    } catch (e) {
+      return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', e.message);
+    }
   }
 
   return {};
@@ -213,6 +309,82 @@ export const diffResource = createAsyncThunk<
           )
           .then(handleResource, handleRejection);
       }
+      if (resource.kind === 'ServiceAccount') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedServiceAccount(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'PersistentVolume') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readPersistentVolume(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'PersistentVolumeClaim') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedPersistentVolumeClaim(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Pod') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedPod(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Endpoints') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedEndpoints(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Secret') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedSecret(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ReplicationController') {
+        const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+        return k8sCoreV1Api
+          .readNamespacedReplicationController(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'DaemonSet') {
+        const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+        return k8sAppV1Api
+          .readNamespacedDaemonSet(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
       if (resource.kind === 'Deployment') {
         const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
         return k8sAppV1Api
@@ -220,6 +392,97 @@ export const diffResource = createAsyncThunk<
             resource.content.metadata.name,
             resource.namespace ? resource.namespace : 'default',
             'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'StatefuleSet') {
+        const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+        return k8sAppV1Api
+          .readNamespacedStatefulSet(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ReplicaSet') {
+        const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
+        return k8sAppV1Api
+          .readNamespacedReplicaSet(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Job') {
+        const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
+        return k8sBatchV1Api
+          .readNamespacedJob(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'CronJob') {
+        const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
+        return k8sBatchV1Api
+          .readNamespacedCronJob(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default',
+            'true'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ClusterRole') {
+        const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+        return k8sRbacV1Api
+          .readClusterRole(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'ClusterRoleBinding') {
+        const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+        return k8sRbacV1Api
+          .readClusterRoleBinding(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Role') {
+        const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+        return k8sRbacV1Api
+          .readNamespacedRole(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'RoleBinding') {
+        const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+        return k8sRbacV1Api
+          .readNamespacedRoleBinding(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'Ingress') {
+        const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
+        return k8sNetworkingV1Api
+          .readNamespacedIngress(resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'NetworkPolicy') {
+        const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
+        return k8sNetworkingV1Api
+          .readNamespacedNetworkPolicy(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default'
+          )
+          .then(handleResource, handleRejection);
+      }
+      if (resource.kind === 'CustomResourceDefinition') {
+        const k8sExtensionV1Api = kc.makeApiClient(k8s.ApiextensionsV1Api);
+        return k8sExtensionV1Api
+          .readCustomResourceDefinition(
+            resource.content.metadata.name,
+            resource.namespace ? resource.namespace : 'default'
           )
           .then(handleResource, handleRejection);
       }

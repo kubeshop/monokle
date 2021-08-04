@@ -1,7 +1,9 @@
 /**
  * A k8s resource manifest, either extracted from a file or generated internaally (for example when previewing kustomizations)
  */
-import {Document, LineCounter, ParsedNode} from 'yaml';
+import {Document, LineCounter, ParsedNode, Scalar} from 'yaml';
+
+export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 
 interface K8sResource {
   id: string; // an internally generated UUID - used for references/lookups in resourceMap
@@ -23,17 +25,42 @@ interface K8sResource {
 
   parsedDoc?: Document.Parsed<ParsedNode>; // temporary object used for parsing refs
   lineCounter?: LineCounter; // temporary object used for ref positioning
+  refNodeByPath?: Record<string, RefNode>;
 }
 
 export enum ResourceRefType {
-  KustomizationResource,
-  KustomizationParent,
-  ServicePodSelector,
-  SelectedPodName,
   ConfigMapRef,
   ConfigMapConsumer,
-  UnsatisfiedSelector,
+  ClusterRoleConsumer,
+  ClusterRoleRef,
+  ClusterRoleBindingConsumer,
+  ClusterRoleBindingRef,
+  KustomizationResource,
+  KustomizationParent,
+  PersistentVolumeConsumer,
+  PersistentVolumeRef,
+  PersistentVolumeClaimConsumer,
+  PersistentVolumeClaimRef,
+  RoleConsumer,
+  RoleRef,
+  SecretRef,
+  SecretConsumer,
+  ServiceConsumer,
+  ServiceRef,
+  ServiceAccountRef,
+  ServiceAccountConsumer,
+  ServicePodSelector,
+  SelectedPodName,
   UnsatisfiedConfigMap,
+  UnsatisfiedClusterRole,
+  UnsatisfiedClusterRoleBinding,
+  UnsatisfiedPersistentVolumeClaim,
+  UnsatisfiedPersistentVolume,
+  UnsatisfiedRole,
+  UnsatisfiedSelector,
+  UnsatisfiedSecret,
+  UnsatisfiedService,
+  UnsatisfiedServiceAccount,
 }
 
 interface ResourceRef {

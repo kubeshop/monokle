@@ -22,9 +22,44 @@ export const initialState: AppState = {
             name: 'Workloads',
             subsections: [
               {
+                name: 'Pods',
+                apiVersionSelector: '**',
+                kindSelector: 'Pod',
+              },
+              {
                 name: 'Deployments',
                 apiVersionSelector: '**',
                 kindSelector: 'Deployment',
+              },
+              {
+                name: 'DaemonSets',
+                apiVersionSelector: '**',
+                kindSelector: 'DaemonSet',
+              },
+              {
+                name: 'StatefulSets',
+                apiVersionSelector: '**',
+                kindSelector: 'StatefulSet',
+              },
+              {
+                name: 'ReplicaSets',
+                apiVersionSelector: '**',
+                kindSelector: 'ReplicaSet',
+              },
+              {
+                name: 'Jobs',
+                apiVersionSelector: '**',
+                kindSelector: 'Job',
+              },
+              {
+                name: 'CronJobs',
+                apiVersionSelector: '**',
+                kindSelector: 'CronJob',
+              },
+              {
+                name: 'ReplicationControllers',
+                apiVersionSelector: '**',
+                kindSelector: 'ReplicationController',
               },
             ],
           },
@@ -36,6 +71,11 @@ export const initialState: AppState = {
                 apiVersionSelector: '**',
                 kindSelector: 'ConfigMap',
               },
+              {
+                name: 'Secrets',
+                apiVersionSelector: '**',
+                kindSelector: 'Secret',
+              },
             ],
           },
           {
@@ -46,15 +86,75 @@ export const initialState: AppState = {
                 apiVersionSelector: '**',
                 kindSelector: 'Service',
               },
+              {
+                name: 'Endpoints',
+                apiVersionSelector: '**',
+                kindSelector: 'Endpoints',
+              },
+              {
+                name: 'Ingresses',
+                apiVersionSelector: '**',
+                kindSelector: 'Ingress',
+              },
+              {
+                name: 'NetworkPolicies',
+                apiVersionSelector: '**',
+                kindSelector: 'NetworkPolicy',
+              },
             ],
           },
           {
-            name: 'Security',
+            name: 'Storage',
             subsections: [
+              {
+                name: 'Persistent Volume Claims',
+                apiVersionSelector: '**',
+                kindSelector: 'PersistentVolumeClaim',
+              },
+              {
+                name: 'Persistent Volumes',
+                apiVersionSelector: '**',
+                kindSelector: 'PersistentVolume',
+              },
+            ],
+          },
+          {
+            name: 'Access Control',
+            subsections: [
+              {
+                name: 'Service Accounts',
+                apiVersionSelector: '**',
+                kindSelector: 'ServiceAccount',
+              },
               {
                 name: 'ClusterRoles',
                 apiVersionSelector: '**',
                 kindSelector: 'ClusterRole',
+              },
+              {
+                name: 'Roles',
+                apiVersionSelector: '**',
+                kindSelector: 'Role',
+              },
+              {
+                name: 'ClusterRoleBindings',
+                apiVersionSelector: '**',
+                kindSelector: 'ClusterRoleBinding',
+              },
+              {
+                name: 'RoleBindings',
+                apiVersionSelector: '**',
+                kindSelector: 'RoleBinding',
+              },
+            ],
+          },
+          {
+            name: 'Custom Resources',
+            subsections: [
+              {
+                name: 'Definitions',
+                apiVersionSelector: '**',
+                kindSelector: 'CustomResourceDefinition',
               },
             ],
           },
