@@ -85,13 +85,14 @@ const RowContainer = styled.div`
     font-style: normal;
     font-weight: normal;
     line-height: 22px;
-    color: ${FontColors.darkThemeMainFont};
+    color: ${Colors.blue10};
+    cursor: pointer;
   }
 
   & .helmvalues-row-selected {
     background: ${Colors.selectionGradient};
     font-weight: bold;
-    color: black;
+    color: ${Colors.blackPure};
   }
 
   & .helmvalues-row-disabled {
