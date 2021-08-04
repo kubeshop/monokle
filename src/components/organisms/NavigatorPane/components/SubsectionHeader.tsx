@@ -41,7 +41,7 @@ const SubsectionContainer = styled.span<{isHighlighted: boolean; isSelected: boo
   width: 100%;
   display: block;
   ${props => {
-    if (props.isHighlighted) {
+    if (!props.isSelected && props.isHighlighted) {
       return `background: ${Colors.highlightGradient};`;
     }
     if (props.isSelected) {

@@ -1,7 +1,7 @@
-import React from 'react';
-import {Col, Row} from 'antd';
+import React, {useState} from 'react';
+import {Col, Row, Spin} from 'antd';
 import styled from 'styled-components';
-import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
+import {LoadingOutlined} from '@ant-design/icons';
 
 import Colors, {FontColors} from '@styles/Colors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
@@ -12,9 +12,12 @@ import {selectHelmValuesFile} from '@redux/reducers/main';
 import {startPreview} from '@redux/utils/preview';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 
+const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
+
 export type NavigatorHelmRowProps = {
   rowKey: React.Key;
   helmChart: HelmChart;
+  isPreviewLoading: boolean;
 };
 
 const ItemRow = styled(Row)`
@@ -27,6 +30,18 @@ const SectionCol = styled(Col)`
   width: 100%;
   margin: 0;
   padding: 0;
+`;
+
+const PreviewContainer = styled.span`
+  float: right;
+  margin-left: 15px;
+  margin-right: 15px;
+`;
+
+const PreviewSpan = styled.span<{isSelected: boolean}>`
+  font-weight: 500;
+  cursor: pointer;
+  color: ${props => (props.isSelected ? Colors.blackPure : Colors.blue6)};
 `;
 
 const RowContainer = styled.div`
@@ -70,13 +85,14 @@ const RowContainer = styled.div`
     font-style: normal;
     font-weight: normal;
     line-height: 22px;
-    color: ${FontColors.darkThemeMainFont};
+    color: ${Colors.blue10};
+    cursor: pointer;
   }
 
   & .helmvalues-row-selected {
     background: ${Colors.selectionGradient};
     font-weight: bold;
-    color: black;
+    color: ${Colors.blackPure};
   }
 
   & .helmvalues-row-disabled {
@@ -108,7 +124,9 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   const dispatch = useAppDispatch();
   const scrollContainer = React.useRef(null);
 
-  const {rowKey, helmChart} = props;
+  const {rowKey, helmChart, isPreviewLoading} = props;
+
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   // Parent needs to make sure disabled and selected arent active at the same time.
   let chartClassName = `helmchart-row`;
@@ -158,16 +176,25 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
               ${isDisabled ? ` helmvalues-row-disabled` : ''}`;
 
             return (
-              <ItemRow key={valuesFile.id} className={valuesClassName}>
+              <ItemRow
+                key={valuesFile.id}
+                className={valuesClassName}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
                 <SectionCol sm={22}>
                   <div onClick={() => onSelectValuesFile(valuesFile.id)}>{valuesFile.name}</div>
                 </SectionCol>
                 <SectionCol sm={2}>
-                  {previewButtonActive ? (
-                    <EyeInvisibleOutlined onClick={() => onClickPreview(valuesFile.id)} />
-                  ) : (
-                    <EyeOutlined onClick={() => onClickPreview(valuesFile.id)} />
-                  )}
+                  <PreviewContainer style={{float: 'right'}}>
+                    {isPreviewLoading ? (
+                      <Spin indicator={PreviewLoadingIcon} />
+                    ) : isHovered ? (
+                      <PreviewSpan isSelected={valuesFile.selected} onClick={() => onClickPreview(valuesFile.id)}>
+                        {previewButtonActive ? 'Exit' : 'Preview'}
+                      </PreviewSpan>
+                    ) : null}
+                  </PreviewContainer>
                 </SectionCol>
               </ItemRow>
             );
