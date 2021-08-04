@@ -6,7 +6,6 @@ metadata:
     app.kubernetes.io/component: rollouts-controlleras
     app.kubernetes.io/name: argo-rollouts
     app.kubernetes.io/part-of: argo-rollouts
-    test: oleasdalkjasd
 spec:
   selector:
     matchLabels:

@@ -1,9 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
+import {Tooltip} from 'antd';
 
 interface TabHeaderProps {
   icon: React.ReactNode;
   children: React.ReactNode;
+  tooltip: string;
 }
 
 const StyledWrapper = styled.div`
@@ -11,12 +13,14 @@ const StyledWrapper = styled.div`
   align-items: center;
 `;
 
-const TabHeader = ({children, icon}: TabHeaderProps): JSX.Element => {
+const TabHeader = ({children, icon, tooltip}: TabHeaderProps): JSX.Element => {
   return (
-    <StyledWrapper>
-      {icon}
-      {children}
-    </StyledWrapper>
+    <Tooltip title={tooltip}>
+      <StyledWrapper>
+        {icon}
+        {children}
+      </StyledWrapper>
+    </Tooltip>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Col, Row, Spin} from 'antd';
+import {Col, Row, Spin, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {LoadingOutlined} from '@ant-design/icons';
 
@@ -11,6 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {startPreview} from '@redux/utils/preview';
 import ScrollIntoView from '@molecules/ScrollIntoView';
+import {ExitHelmPreviewTooltip, HelmPreviewTooltip} from '@src/tooltips';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 
@@ -120,7 +121,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   const helmValues = useSelector(selectHelmValues);
   const previewValuesFile = useAppSelector(state => state.main.previewValuesFile);
   const selectedValuesFile = useAppSelector(state => state.main.selectedValuesFile);
-  const selectedPath = useAppSelector( state => state.main.selectedPath);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const dispatch = useAppDispatch();
   const scrollContainer = React.useRef(null);
 
@@ -151,7 +152,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [helmValues,selectedPath]);
+  }, [helmValues, selectedPath]);
 
   return (
     <RowContainer>
@@ -190,9 +191,11 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
                     {isPreviewLoading ? (
                       <Spin indicator={PreviewLoadingIcon} />
                     ) : isHovered ? (
-                      <PreviewSpan isSelected={valuesFile.selected} onClick={() => onClickPreview(valuesFile.id)}>
-                        {previewButtonActive ? 'Exit' : 'Preview'}
-                      </PreviewSpan>
+                      <Tooltip title={previewButtonActive ? ExitHelmPreviewTooltip : HelmPreviewTooltip}>
+                        <PreviewSpan isSelected={valuesFile.selected} onClick={() => onClickPreview(valuesFile.id)}>
+                          {previewButtonActive ? 'Exit' : 'Preview'}
+                        </PreviewSpan>
+                      </Tooltip>
                     ) : null}
                   </PreviewContainer>
                 </SectionCol>

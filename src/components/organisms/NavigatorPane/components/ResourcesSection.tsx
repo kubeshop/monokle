@@ -87,6 +87,7 @@ const ResourcesSection = () => {
     );
   }
 
+  // ensure that subsections containing highlighted sections are expanded
   useEffect(() => {
     appConfig.navigators
       .map(navigator => navigator.sections)
@@ -116,7 +117,6 @@ const ResourcesSection = () => {
             <div key={navigator.name}>
               <SectionRow>
                 <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
-
                 {navigator.name === 'K8s Resources' && (
                   <NamespacesSection namespace={namespace} namespaces={namespaces} onSelect={handleNamespaceChange} />
                 )}

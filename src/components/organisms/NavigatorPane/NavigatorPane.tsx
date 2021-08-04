@@ -68,6 +68,10 @@ const SectionTitleSpan = styled.span<{isSelected: boolean}>`
   }}
 `;
 
+const NavigatorPaneContainer = styled(PaneContainer)`
+  white-space: nowrap;
+`;
+
 const SectionHeader = (props: {
   title: string;
   isExpanded: boolean;
@@ -139,12 +143,12 @@ const NavigatorPane = () => {
           </Row>
         </MonoPaneTitleCol>
       </TitleRow>
-      <PaneContainer>
+      <NavigatorPaneContainer>
         {uiState.isFolderLoading ? (
           <StyledSkeleton active />
         ) : (
           <StyledCollapse collapsible="disabled" ghost activeKey={expandedSections}>
-            {!clusterMode && Object.values(helmCharts).length > 0 && (
+            {!clusterMode && !previewLoader.isLoading && Object.values(helmCharts).length > 0 && (
               <StyledCollapsePanel
                 key="helmcharts"
                 showArrow={false}
@@ -166,7 +170,7 @@ const NavigatorPane = () => {
                 <HelmChartsSection helmCharts={helmCharts} />
               </StyledCollapsePanel>
             )}
-            {!clusterMode && kustomizations.length > 0 && (
+            {!clusterMode && !previewLoader.isLoading && kustomizations.length > 0 && (
               <StyledCollapsePanel
                 key="kustomizations"
                 showArrow={false}
@@ -188,7 +192,7 @@ const NavigatorPane = () => {
         )}
 
         {uiState.isFolderLoading || previewLoader.isLoading ? <StyledSkeleton /> : <ResourcesSection />}
-      </PaneContainer>
+      </NavigatorPaneContainer>
     </>
   );
 };

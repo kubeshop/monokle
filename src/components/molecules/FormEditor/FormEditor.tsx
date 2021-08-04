@@ -10,11 +10,12 @@ import {logMessage} from '@redux/utils/log';
 import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/utils/manifest-utils';
 import styled from 'styled-components';
-import {notification} from 'antd';
+import {notification, Tooltip} from 'antd';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 import {MonoButton} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
+import {SaveFormTooltip} from '@src/tooltips';
 
 const Form = withTheme(AntDTheme);
 
@@ -170,9 +171,11 @@ const FormEditor = (props: {contentHeight: string}) => {
     // @ts-ignore
     <>
       <FormButtons>
-        <MonoButton large type="primary" onClick={submitForm} disabled={isInPreviewMode}>
-          Save
-        </MonoButton>
+        <Tooltip title={SaveFormTooltip}>
+          <MonoButton large type="primary" onClick={submitForm} disabled={isInPreviewMode}>
+            Save
+          </MonoButton>
+        </Tooltip>
       </FormButtons>
       <FormContainer contentHeight={contentHeight}>
         <Form

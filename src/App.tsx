@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
-import {Button, Space} from 'antd';
+import {Button, Space, Tooltip} from 'antd';
 import {ClusterOutlined, FolderOpenOutlined, ApartmentOutlined, CodeOutlined} from '@ant-design/icons';
 import 'react-reflex/styles.css';
 import {ReflexContainer, ReflexSplitter, ReflexElement} from 'react-reflex';
@@ -29,6 +29,7 @@ import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
+import {ClusterExplorerTooltip, FileExplorerTooltip} from '@src/tooltips';
 
 const StyledReflexContainer = styled(ReflexContainer)`
   &.reflex-container {
@@ -192,35 +193,39 @@ const App = () => {
             <StyledReflexContainer orientation="vertical" windowResizeAware>
               <StyledMenuLeftReflexElement size={43}>
                 <Space direction="vertical">
-                  <Button
-                    size="large"
-                    type="text"
-                    disabled={previewMode}
-                    onClick={() => setAspectRatios('left', 'file-explorer')}
-                    icon={
-                      <FolderOpenOutlined
-                        style={{
-                          ...iconStyle,
-                          color: leftMenuSelection === 'file-explorer' ? Colors.whitePure : Colors.grey7,
-                          marginLeft: 4,
-                        }}
-                      />
-                    }
-                  />
-                  <Button
-                    disabled={previewMode}
-                    size="large"
-                    type="text"
-                    onClick={() => setAspectRatios('left', 'cluster-explorer')}
-                    icon={
-                      <ClusterOutlined
-                        style={{
-                          ...iconStyle,
-                          color: leftMenuSelection === 'cluster-explorer' ? Colors.whitePure : Colors.grey7,
-                        }}
-                      />
-                    }
-                  />
+                  <Tooltip title={FileExplorerTooltip} placement="right">
+                    <Button
+                      size="large"
+                      type="text"
+                      disabled={previewMode}
+                      onClick={() => setAspectRatios('left', 'file-explorer')}
+                      icon={
+                        <FolderOpenOutlined
+                          style={{
+                            ...iconStyle,
+                            color: leftMenuSelection === 'file-explorer' ? Colors.whitePure : Colors.grey7,
+                            marginLeft: 4,
+                          }}
+                        />
+                      }
+                    />
+                  </Tooltip>
+                  <Tooltip title={ClusterExplorerTooltip} placement="right">
+                    <Button
+                      disabled={previewMode}
+                      size="large"
+                      type="text"
+                      onClick={() => setAspectRatios('left', 'cluster-explorer')}
+                      icon={
+                        <ClusterOutlined
+                          style={{
+                            ...iconStyle,
+                            color: leftMenuSelection === 'cluster-explorer' ? Colors.whitePure : Colors.grey7,
+                          }}
+                        />
+                      }
+                    />
+                  </Tooltip>
                 </Space>
               </StyledMenuLeftReflexElement>
 
