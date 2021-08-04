@@ -26,10 +26,10 @@ export type DividerProps = {
   hide: boolean;
 };
 const StyledDivider = styled.div`
-  width: 1px;
+  width: 0px;
   height: 100%;
   margin: 1px;
-  border: 1px solid #808080;
+  border-left: 1px solid #808080;
 `;
 const StyledDividerHitBox = styled.div.attrs((props: DividerProps) => props)`
   cursor: col-resize;
