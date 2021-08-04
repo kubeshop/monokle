@@ -2,7 +2,6 @@ import React from 'react';
 import {Collapse} from 'antd';
 
 import styled from 'styled-components';
-import {useAppSelector} from '@redux/hooks';
 
 import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection, NavigatorSection} from '@models/navigator';
@@ -54,8 +53,6 @@ const Section = (props: {
     shouldSubsectionBeVisible,
     selectResource,
   } = props;
-
-  const isSelecting = useAppSelector(state => state.main.isSelectingFile);
 
   const isSubsectionExpanded = (subsectionName: string) => {
     return expandedSubsections.indexOf(subsectionName) !== -1;
