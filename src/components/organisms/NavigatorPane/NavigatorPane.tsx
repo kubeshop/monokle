@@ -99,7 +99,7 @@ const NavigatorPane = () => {
       </TitleRow>
       <PaneContainer>
         {uiState.isFolderLoading ? (
-          <StyledSkeleton />
+          <StyledSkeleton active />
         ) : (
           <StyledCollapse collapsible="disabled" ghost activeKey={expandedSections}>
             {!clusterMode && Object.values(helmCharts).length > 0 && (

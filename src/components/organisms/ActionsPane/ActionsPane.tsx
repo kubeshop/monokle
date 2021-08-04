@@ -136,7 +136,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
             >
               <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
-                  <StyledSkeleton />
+                  <StyledSkeleton active />
                 ) : (
                   <Monaco editorHeight={contentHeight} />
                 )}
@@ -148,7 +148,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   key="form"
                 >
                   {uiState.isFolderLoading || previewLoader.isLoading ? (
-                    <StyledSkeleton />
+                    <StyledSkeleton active />
                   ) : (
                     <FormEditor contentHeight={contentHeight} />
                   )}

@@ -9,7 +9,7 @@ const ScrollIntoView = React.forwardRef(({children}: ScrollIntoViewProps, ref) =
   React.useImperativeHandle(ref, () => {
     return {
       scrollIntoView: () => {
-        containerRef.current?.scrollIntoView();
+        containerRef.current?.scrollIntoView({behavior: 'smooth', block: 'end', inline: 'nearest'});
       },
     };
   });
