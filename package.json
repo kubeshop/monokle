@@ -80,7 +80,6 @@
     "react-flow-renderer": "^9.6.0",
     "react-monaco-editor": "0.43.0",
     "react-redux": "^7.2.4",
-    "react-reflex": "^4.0.2",
     "react-use": "17.2.4",
     "redux": "^4.1.0",
     "redux-logger": "^3.0.6",
