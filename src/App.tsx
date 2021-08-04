@@ -18,6 +18,7 @@ import {
   MessageBox,
   SettingsDrawer,
   DiffModal,
+  StartupModal,
 } from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import {Size} from '@models/window';
@@ -299,6 +300,7 @@ const App = () => {
         <PageFooter />
       </Layout>
       <DiffModal />
+      <StartupModal />
     </div>
   );
 };
