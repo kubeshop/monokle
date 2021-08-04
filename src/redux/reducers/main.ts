@@ -14,12 +14,7 @@ import {
   setRootFolder,
 } from '@redux/reducers/thunks';
 import {initialState} from '../initialState';
-import {
-  clearFileSelections,
-  clearResourceSelections,
-  highlightChildrenResources,
-  updateSelectionAndHighlights,
-} from '../utils/selection';
+import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../utils/selection';
 import {
   addPath,
   removePath,
@@ -189,6 +184,12 @@ export const mainSlice = createSlice({
         selectFilePath(action.payload, state);
       }
     },
+    setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.isSelectingFile = action.payload;
+    },
+    setSelectingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.isSelectingResource = action.payload;
+    },
     clearPreview: (state: Draft<AppState>) => {
       setPreviewData({}, state);
       state.previewType = undefined;
@@ -311,15 +312,8 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
 function selectFilePath(filePath: string, state: AppState) {
   const entries = getAllFileEntriesForPath(filePath, state.fileMap);
   clearResourceSelections(state.resourceMap);
-  clearFileSelections(state.fileMap);
 
   if (entries.length > 0) {
-    entries
-      .filter(e => e.children)
-      .forEach(e => {
-        e.expanded = true;
-      });
-
     const parent = entries[entries.length - 1];
     getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
       r.highlight = true;
@@ -341,6 +335,8 @@ function selectFilePath(filePath: string, state: AppState) {
 export const {
   selectK8sResource,
   selectFile,
+  setSelectingFile,
+  setSelectingResource,
   updateResource,
   updateFileEntry,
   pathAdded,

@@ -1,15 +1,15 @@
 import * as React from 'react';
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import {Row, Button, Tree, Col, Space, Typography, Skeleton} from 'antd';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile} from '@redux/reducers/main';
+import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 
-import {FolderAddOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
+import {FolderAddOutlined} from '@ant-design/icons';
 
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
@@ -53,28 +53,8 @@ const NodeTitleContainer = styled.div`
   text-overflow: ellipsis;
   color: ${Colors.blue10};
 `;
-const NodeActionsContainer = styled.div`
-  position: absolute;
-  right: 0;
-  top: 0;
-`;
 
-/**
- *
- * @param fileEntry
- * @param fileMap
- * @param resourceMap
- * @param keysWithChildren Output parameter contains all keys with children used for expanding nodes.
- * @param highlightKeys Output parameter contains all highlighted keys, used for setting scroll position
- * @returns
- */
-const createNode = (
-  fileEntry: FileEntry,
-  fileMap: FileMapType,
-  resourceMap: ResourceMapType,
-  keysWithChildren: Set<React.Key>,
-  highlightKeys: Array<string>
-) => {
+const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
   const node: TreeNode = {
@@ -82,7 +62,7 @@ const createNode = (
     title: (
       <NodeContainer>
         <NodeTitleContainer>
-          <span className="file-entry-name">{fileEntry.name}</span>
+          <span className={fileEntry.excluded ? 'excluded-file-entry-name' : 'file-entry-name'}>{fileEntry.name}</span>
           {resources.length > 0 ? (
             <StyledNumberOfResources className="file-entry-nr-of-resources" type="secondary">
               {resources.length}
@@ -91,26 +71,17 @@ const createNode = (
             ''
           )}
         </NodeTitleContainer>
-        <NodeActionsContainer>{fileEntry.excluded && <EyeInvisibleOutlined />}</NodeActionsContainer>
       </NodeContainer>
     ),
     children: [],
-    highlight: fileEntry.highlight,
+    highlight: false,
   };
-  if (fileEntry.highlight) {
-    highlightKeys.push(fileEntry.filePath);
-  }
+
   if (fileEntry.children) {
     node.children = fileEntry.children
       .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
       .filter(childEntry => childEntry)
-      .map(childEntry => {
-        const childNode = createNode(childEntry, fileMap, resourceMap, keysWithChildren, highlightKeys);
-        if (childNode.highlight) {
-          keysWithChildren.add(node.key);
-        }
-        return childNode;
-      });
+      .map(childEntry => createNode(childEntry, fileMap, resourceMap));
   } else {
     node.isLeaf = true;
   }
@@ -219,8 +190,8 @@ const FileTreeContainer = styled.div`
     background: transparent;
   }
 
-  & .ant-tree-treenode-disabled .file-entry-name {
-    color: ${Colors.grey800} !important;
+  & .excluded-file-entry-name {
+    color: ${Colors.grey800};
   }
 `;
 
@@ -229,11 +200,15 @@ const FileDetailsContainer = styled.div`
   flex-direction: column;
 `;
 
-const NoFilesContainer = styled(Typography.Text)`
+const NoFilesContainer = styled.div`
   margin-left: 16px;
+  margin-top: 10px;
 `;
 
 const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
+  margin-left: 10px;
+  margin-top: 10px;
+
   .ant-tree-switcher svg {
     color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
   }
@@ -251,11 +226,14 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const shouldRefreshFileMap = useAppSelector(state => state.main.shouldRefreshFileMap);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
+  const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
   const [autoExpandParent, setAutoExpandParent] = React.useState(true);
   const shouldExpandAllNodes = React.useRef(false);
   const treeRef = React.useRef<any>();
@@ -280,20 +258,65 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
     setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
-    const autoExpandedKeys = new Set<React.Key>();
-    const highlightedKeys: Array<string> = [];
-    const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap, autoExpandedKeys, highlightedKeys);
+    const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap);
+
     setTree(treeData);
+
     if (shouldExpandAllNodes.current) {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
       shouldExpandAllNodes.current = false;
-    } else {
-      setExpandedKeys(prevExpandedKeys => uniqueArr([...prevExpandedKeys, ...Array.from(autoExpandedKeys)]));
-      treeRef?.current?.scrollTo({key: highlightedKeys[0]});
     }
-  }, [fileMap, resourceMap]);
+  }, [fileMap]);
+
+  /**
+   * This useEffect ensures that the right treeNodes are expanded and highlighted
+   * when a resource is selected
+   */
+
+  function highlightFilePath(filePath: string) {
+    const paths = filePath.split(path.sep);
+    const keys: Array<React.Key> = [];
+
+    for (let c = 1; c < paths.length; c += 1) {
+      keys.push(paths.slice(0, c + 1).join(path.sep));
+    }
+
+    let node: TreeNode | undefined = tree || undefined;
+    for (let c = 0; c < keys.length && node; c += 1) {
+      node = node.children.find(i => i.key === keys[c]);
+    }
+
+    if (node) {
+      node.highlight = true;
+      treeRef?.current?.scrollTo({key: node.key});
+
+      if (highlightNode) {
+        highlightNode.highlight = false;
+      }
+    }
+
+    setHighlightNode(node);
+    setExpandedKeys(prevExpandedKeys => uniqueArr([...prevExpandedKeys, ...Array.from(keys)]));
+  }
+
+  useEffect(() => {
+    if (selectedResource && tree) {
+      const resource = resourceMap[selectedResource];
+      if (resource) {
+        const filePath = resource.filePath;
+        highlightFilePath(filePath);
+      }
+    }
+  }, [selectedResource]);
+
+  useEffect(() => {
+    // removes any highlight when a file is selected
+    if (selectedPath && highlightNode) {
+      highlightNode.highlight = false;
+    }
+  }, [selectedPath]);
 
   const startFileUploader = () => {
     folderInput && folderInput.current?.click();
@@ -304,18 +327,22 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
       if (previewMode) {
         stopPreview(dispatch);
       }
+      dispatch(setSelectingFile(true));
       dispatch(selectFile(info.node.key));
     }
   };
+
+  useEffect(() => {
+    if (isSelectingFile) {
+      dispatch(setSelectingFile(false));
+    }
+  }, [isSelectingFile]);
 
   const onExpand = (expandedKeysValue: React.Key[]) => {
     setExpandedKeys(expandedKeysValue);
     setAutoExpandParent(false);
   };
 
-  const directoryPath = fileMap[ROOT_FILE_ENTRY] ? path.dirname(fileMap[ROOT_FILE_ENTRY].filePath) : '';
-  // not counting the root
-  const nrOfFiles = Object.keys(fileMap).length - 1;
   return (
     <FileTreeContainer>
       <Row>
@@ -341,11 +368,6 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
             </Button>
           </ColumnWithPadding>
         )}
-        <ColumnWithPadding span={24}>
-          <FileDetailsContainer>
-            {nrOfFiles !== -1 && <Typography.Text type="secondary">{nrOfFiles} files</Typography.Text>}
-          </FileDetailsContainer>
-        </ColumnWithPadding>
       </Row>
 
       <input
@@ -358,7 +380,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
         style={{display: 'none'}}
       />
       {uiState.isFolderLoading ? (
-        <StyledSkeleton />
+        <StyledSkeleton active />
       ) : tree ? (
         <StyledTreeDirectoryTree
           // height is needed to enable Tree's virtual scroll
@@ -379,7 +401,9 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
           showIcon={false}
         />
       ) : (
-        <NoFilesContainer>No folder selected.</NoFilesContainer>
+        <NoFilesContainer>
+          Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
+        </NoFilesContainer>
       )}
     </FileTreeContainer>
   );

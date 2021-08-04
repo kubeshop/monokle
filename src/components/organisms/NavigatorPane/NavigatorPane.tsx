@@ -2,8 +2,9 @@ import React, {useState} from 'react';
 import {Col, Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {inClusterMode, selectHelmCharts, selectKustomizations} from '@redux/selectors';
+import {inClusterMode, selectHelmCharts, selectHelmValues, selectKustomizations} from '@redux/selectors';
 
+import {HelmValuesFile} from '@models/helm';
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {useAppSelector} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer, MonoSectionTitle} from '@atoms';
@@ -42,28 +43,64 @@ const IconContainer = styled.span<{isSelected: boolean}>`
   }}
 `;
 
-const SectionHeader = (props: {title: string; isExpanded: boolean; onCollapse: () => void; onExpand: () => void}) => {
-  const {title, isExpanded, onCollapse, onExpand} = props;
+const SectionContainer = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
+  width: 100%;
+  display: block;
+  ${props => {
+    if (!props.isSelected && props.isHighlighted) {
+      return `background: ${Colors.highlightGradient};`;
+    }
+    if (props.isSelected) {
+      return `
+        background: ${Colors.selectionGradient};
+      `;
+    }
+  }}
+`;
+
+const SectionTitleSpan = styled.span<{isSelected: boolean}>`
+  ${props => {
+    if (props.isSelected) {
+      return `
+      color: ${Colors.blackPure} !important;
+    `;
+    }
+  }}
+`;
+
+const SectionHeader = (props: {
+  title: string;
+  isExpanded: boolean;
+  onCollapse: () => void;
+  onExpand: () => void;
+  isHighlighted?: boolean;
+  isSelected?: boolean;
+}) => {
+  const {title, isExpanded, onCollapse, onExpand, isHighlighted, isSelected} = props;
 
   const [isHovered, setIsHovered] = useState<Boolean>(false);
-  const [isSelected, setIsSelected] = useState<boolean>(false);
 
   return (
-    <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+    <SectionContainer
+      isSelected={Boolean(isSelected)}
+      isHighlighted={Boolean(isHighlighted)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <MonoSectionTitle>
-        {title}
+        <SectionTitleSpan isSelected={Boolean(isSelected)}>{title}</SectionTitleSpan>
         {isHovered && isExpanded && (
-          <IconContainer isSelected={isSelected} onClick={onCollapse}>
+          <IconContainer isSelected={Boolean(isSelected)} onClick={onCollapse}>
             <MinusSquareOutlined />
           </IconContainer>
         )}
         {!isExpanded && (
-          <IconContainer isSelected={isSelected} onClick={onExpand}>
+          <IconContainer isSelected={Boolean(isSelected)} onClick={onExpand}>
             <PlusSquareOutlined />
           </IconContainer>
         )}
       </MonoSectionTitle>
-    </div>
+    </SectionContainer>
   );
 };
 
@@ -71,6 +108,7 @@ const NavigatorPane = () => {
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const helmCharts = useSelector(selectHelmCharts);
+  const helmValues = useSelector(selectHelmValues);
   const kustomizations = useSelector(selectKustomizations);
   const clusterMode = useSelector(inClusterMode);
 
@@ -86,6 +124,10 @@ const NavigatorPane = () => {
     setExpandedSections(expandedSections.filter(s => s !== sectionName));
   };
 
+  const isSectionExpanded = (sectionName: string) => {
+    return expandedSections.indexOf(sectionName) !== -1;
+  };
+
   return (
     <>
       <TitleRow>
@@ -99,7 +141,7 @@ const NavigatorPane = () => {
       </TitleRow>
       <PaneContainer>
         {uiState.isFolderLoading ? (
-          <StyledSkeleton />
+          <StyledSkeleton active />
         ) : (
           <StyledCollapse collapsible="disabled" ghost activeKey={expandedSections}>
             {!clusterMode && Object.values(helmCharts).length > 0 && (
@@ -112,6 +154,12 @@ const NavigatorPane = () => {
                     isExpanded={expandedSections.indexOf('helmcharts') !== -1}
                     onExpand={() => expandSection('helmcharts')}
                     onCollapse={() => collapseSection('helmcharts')}
+                    isSelected={
+                      !isSectionExpanded('helmcharts') &&
+                      Object.values(helmCharts).some(h =>
+                        h.valueFiles.map(v => helmValues[v]).some((valuesFile: HelmValuesFile) => valuesFile.selected)
+                      )
+                    }
                   />
                 }
               >
@@ -128,6 +176,8 @@ const NavigatorPane = () => {
                     isExpanded={expandedSections.indexOf('kustomizations') !== -1}
                     onExpand={() => expandSection('kustomizations')}
                     onCollapse={() => collapseSection('kustomizations')}
+                    isSelected={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.selected)}
+                    isHighlighted={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.highlight)}
                   />
                 }
               >
