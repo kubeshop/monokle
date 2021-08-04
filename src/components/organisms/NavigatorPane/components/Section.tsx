@@ -7,6 +7,8 @@ import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection, NavigatorSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
 
+import Colors from '@styles/Colors';
+
 import NavigatorResourceRow from '@molecules/NavigatorResourceRow';
 import SubsectionHeader from './SubsectionHeader';
 
@@ -20,7 +22,7 @@ const StyledCollapse = styled(Collapse)`
     cursor: default !important;
   }
   .ant-collapse-header:hover {
-    background: #111d2c;
+    background: ${Colors.blackPearl};
   }
 `;
 

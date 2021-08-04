@@ -46,6 +46,8 @@ interface AppState {
   helmValuesMap: HelmValuesMapType; // maps values ids to helm values files
   selectedValuesFile?: string; // the currently selected values file
   previewValuesFile?: string; // the values file currently being previewed
+  isSelectingFile: boolean; // if we are currently in the process of selecting a file - used for one-time UI updates
+  isSelectingResource: boolean; // if we are currently in the process of selecting a resource - used for one-time UI updates
 }
 
 export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType, PreviewLoaderType};

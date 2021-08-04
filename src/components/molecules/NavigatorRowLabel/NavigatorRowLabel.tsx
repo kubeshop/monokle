@@ -158,6 +158,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
 
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [resource, setResource] = useState<K8sResource>();
   const scrollContainer = React.useRef(null);
 
@@ -166,11 +167,11 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
   }, [resourceId, resourceMap]);
 
   useEffect(() => {
-    if (isHighlighted) {
+    if (isHighlighted && selectedPath) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [isHighlighted]);
+  }, [isHighlighted, selectedPath]);
 
   const selectResource = (resId: string) => {
     dispatch(selectK8sResource(resId));

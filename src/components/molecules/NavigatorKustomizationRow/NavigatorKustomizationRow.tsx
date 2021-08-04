@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Col, Row, Spin} from 'antd';
 import styled from 'styled-components';
-import {EyeOutlined, EyeInvisibleOutlined, LoadingOutlined} from '@ant-design/icons';
+import {LoadingOutlined} from '@ant-design/icons';
 
 import Colors, {FontColors} from '@styles/Colors';
 import {K8sResource} from '@models/k8sresource';
@@ -34,6 +34,18 @@ const SectionCol = styled(Col)`
   width: 100%;
   margin: 0;
   padding: 0;
+`;
+
+const PreviewContainer = styled.span`
+  float: right;
+  margin-left: 15px;
+  margin-right: 15px;
+`;
+
+const PreviewSpan = styled.span<{isSelected: boolean}>`
+  font-weight: 500;
+  cursor: pointer;
+  color: ${props => (props.isSelected ? Colors.blackPure : Colors.blue6)};
 `;
 
 const RowContainer = styled.div`
@@ -84,6 +96,8 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
     isPreviewLoading,
   } = props;
 
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
   // Parent needs to make sure disabled and selected arent active at the same time.
   let classname = `kustomization-row\
     ${isSelected ? ` kustomization-row-selected` : ''}\
@@ -93,7 +107,7 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
   return (
     <RowContainer>
       <StyledDiv className={classname}>
-        <ItemRow key={rowKey}>
+        <ItemRow key={rowKey} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
           <SectionCol sm={22}>
             <div className={classname}>
               <NavigatorRowLabel
@@ -108,13 +122,15 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
             </div>
           </SectionCol>
           <SectionCol sm={2}>
-            {isPreviewLoading ? (
-              <Spin indicator={PreviewLoadingIcon} />
-            ) : previewButtonActive ? (
-              <EyeInvisibleOutlined onClick={onClickPreview} />
-            ) : (
-              <EyeOutlined onClick={onClickPreview} />
-            )}
+            <PreviewContainer style={{float: 'right'}}>
+              {isPreviewLoading ? (
+                <Spin indicator={PreviewLoadingIcon} />
+              ) : isHovered ? (
+                <PreviewSpan isSelected={isSelected} onClick={onClickPreview}>
+                  {previewButtonActive ? 'Exit' : 'Preview'}
+                </PreviewSpan>
+              ) : null}
+            </PreviewContainer>
           </SectionCol>
         </ItemRow>
       </StyledDiv>

@@ -87,6 +87,27 @@ const ResourcesSection = () => {
     );
   }
 
+  useEffect(() => {
+    appConfig.navigators
+      .map(navigator => navigator.sections)
+      .flat()
+      .forEach(section => {
+        section.subsections
+          .filter(subsection => shouldSubsectionBeExpanded(subsection))
+          .forEach(subsection => {
+            handleSubsectionExpand(section.name, subsection.name);
+          });
+      });
+  }, [resources]);
+
+  function shouldSubsectionBeExpanded(subsection: NavigatorSubSection) {
+    return (
+      resources.length === 0 ||
+      (resources.length > 0 &&
+        resources.some(resource => resource.kind === subsection.kindSelector && resource.highlight))
+    );
+  }
+
   return (
     <SectionRow>
       <SectionCol>

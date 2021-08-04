@@ -46,8 +46,8 @@ const StyledReflexElement = styled(ReflexElement)`
   height: 100%;
   border-left: ${AppBorders.pageDivider};
   border-right: ${AppBorders.pageDivider};
-  overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
 `;
 
 const StyledMenuLeftReflexElement = styled(ReflexElement)`
@@ -221,16 +221,22 @@ const App = () => {
                   />
                 </Space>
               </StyledMenuLeftReflexElement>
-              {leftPaneWidth && (
-                <StyledReflexElement size={leftPaneWidth}>
-                  {leftMenuSelection === 'file-explorer' ? <FileTreePane windowHeight={size.height} /> : undefined}
-                  {featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? (
-                    <ClustersPane />
-                  ) : undefined}
-                </StyledReflexElement>
-              )}
 
-              {leftPaneWidth && <ReflexSplitter />}
+              <StyledReflexElement size={leftPaneWidth} style={{display: leftPaneWidth ? 'inline' : 'none'}}>
+                <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
+                  <FileTreePane windowHeight={size.height} />
+                </div>
+                <div
+                  style={{
+                    display:
+                      featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
+                  }}
+                >
+                  <ClustersPane />
+                </div>
+              </StyledReflexElement>
+
+              <ReflexSplitter style={{display: leftPaneWidth ? 'inline' : 'none'}} />
 
               <StyledReflexElement size={navPaneWidth}>
                 <NavigatorPane />
@@ -242,49 +248,49 @@ const App = () => {
                 <ActionsPane contentHeight={contentHeight} />
               </StyledReflexElement>
 
-              {featureJson.ShowRightMenu && rightPaneWidth && <ReflexSplitter />}
+              <ReflexSplitter style={{display: featureJson.ShowRightMenu && rightPaneWidth ? 'inline' : 'none'}} />
 
-              {featureJson.ShowRightMenu && rightPaneWidth && (
-                <StyledReflexElement size={rightPaneWidth}>
-                  {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                    <GraphView editorHeight={contentHeight} />
-                  ) : undefined}
-                  {rightMenuSelection === 'logs' ? <LogViewer editorHeight={contentHeight} /> : undefined}
-                </StyledReflexElement>
-              )}
+              <StyledReflexElement
+                size={rightPaneWidth}
+                style={{display: featureJson.ShowRightMenu && rightPaneWidth ? 'inline' : 'none'}}
+              >
+                <div style={{display: featureJson.ShowGraphView && rightMenuSelection === 'graph' ? 'inline' : 'none'}}>
+                  <GraphView editorHeight={contentHeight} />
+                </div>
+                <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
+                  <LogViewer editorHeight={contentHeight} />
+                </div>
+              </StyledReflexElement>
 
-              {featureJson.ShowRightMenu && (
-                <StyledMenuRightReflexElement size={43}>
-                  <Space direction="vertical">
-                    {featureJson.ShowGraphView && (
-                      <Button
-                        size="large"
-                        type="text"
-                        onClick={() => setAspectRatios('right', 'graph')}
-                        icon={
-                          <ApartmentOutlined
-                            style={{
-                              ...iconStyle,
-                              color: rightMenuSelection === 'graph' ? Colors.whitePure : Colors.grey7,
-                            }}
-                          />
-                        }
+              <StyledMenuRightReflexElement size={43} style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
+                <Space direction="vertical">
+                  <Button
+                    size="large"
+                    type="text"
+                    onClick={() => setAspectRatios('right', 'graph')}
+                    icon={
+                      <ApartmentOutlined
+                        style={{
+                          ...iconStyle,
+                          color: rightMenuSelection === 'graph' ? Colors.whitePure : Colors.grey7,
+                        }}
                       />
-                    )}
+                    }
+                    style={{display: featureJson.ShowGraphView ? 'inline' : 'none'}}
+                  />
 
-                    <Button
-                      size="large"
-                      type="text"
-                      onClick={() => setAspectRatios('right', 'logs')}
-                      icon={
-                        <CodeOutlined
-                          style={{...iconStyle, color: rightMenuSelection === 'logs' ? Colors.whitePure : Colors.grey7}}
-                        />
-                      }
-                    />
-                  </Space>
-                </StyledMenuRightReflexElement>
-              )}
+                  <Button
+                    size="large"
+                    type="text"
+                    onClick={() => setAspectRatios('right', 'logs')}
+                    icon={
+                      <CodeOutlined
+                        style={{...iconStyle, color: rightMenuSelection === 'logs' ? Colors.whitePure : Colors.grey7}}
+                      />
+                    }
+                  />
+                </Space>
+              </StyledMenuRightReflexElement>
             </StyledReflexContainer>
           </StyledRow>
         </StyledContent>
