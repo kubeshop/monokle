@@ -95,7 +95,11 @@ const StartupModal = () => {
       width={800}
       onCancel={handleClose}
       footer={
-        <Button style={{zIndex: 100}} type="primary" onClick={handleClose}>
+        <Button
+          style={{zIndex: 100, marginBottom: 24, marginRight: 24, display: 'inline-block'}}
+          type="primary"
+          onClick={handleClose}
+        >
           Get Started!
         </Button>
       }
