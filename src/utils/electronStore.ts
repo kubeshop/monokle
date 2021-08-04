@@ -4,6 +4,9 @@ const schema = {
   appConfig: {
     type: 'object',
     properties: {
+      startupModalVisible: {
+        type: 'boolean',
+      },
       kubeconfig: {
         type: 'string',
       },
@@ -42,6 +45,7 @@ const schema = {
 
 const defaults = {
   appConfig: {
+    startupModalVisible: true,
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {

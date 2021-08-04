@@ -3,6 +3,7 @@ import electronStore from '@utils/electronStore';
 
 export const initialState: AppState = {
   appConfig: {
+    startupModalVisible: electronStore.get('appConfig.startupModalVisible'),
     kubeconfig: '',
     settings: {
       filterObjectsOnSelection: false,

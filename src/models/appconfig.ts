@@ -20,6 +20,7 @@ interface AppConfig {
   fileIncludes: string[]; // a list of patterns to match to against files for including
   navigators: ObjectNavigator[]; // the currrent navigator configuration
   kubeconfig: string;
+  startupModalVisible: boolean;
   settings: {
     theme: Themes; // not used for now
     textSize: TextSizes; // not used for now

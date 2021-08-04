@@ -40,6 +40,14 @@ export const initKubeconfig = createAsyncThunk<{alert?: AlertType; kubeconfig: s
   }
 );
 
+export const updateStartupModalVisible = createAsyncThunk(
+  'config/updateStartupModalVisible',
+  async (startupModalVisible: boolean, thunkAPI) => {
+    electronStore.set('appConfig.startupModalVisible', startupModalVisible);
+    thunkAPI.dispatch(configSlice.actions.setStartupModalVisible(startupModalVisible));
+  }
+);
+
 export const updateKubeconfig = createAsyncThunk('config/updateKubeconfig', async (kubeconfig: string, thunkAPI) => {
   electronStore.set('appConfig.kubeconfig', kubeconfig);
   thunkAPI.dispatch(configSlice.actions.setKubeconfig(kubeconfig));
@@ -98,6 +106,9 @@ export const configSlice = createSlice({
     },
     setKubeconfig: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       state.kubeconfig = action.payload;
+    },
+    setStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.startupModalVisible = action.payload;
     },
     setScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       state.scanExcludes = action.payload;

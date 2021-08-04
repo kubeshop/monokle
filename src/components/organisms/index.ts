@@ -1,5 +1,6 @@
 export {default as ActionsPane} from './ActionsPane';
 export {default as DiffModal} from './DiffModal';
+export {default as StartupModal} from './StartupModal';
 export {default as FileTreePane} from './FileTreePane';
 export {default as MessageBox} from './MessageBox';
 export {default as NavigatorPane} from './NavigatorPane';
