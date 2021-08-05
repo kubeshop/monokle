@@ -25,6 +25,8 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
+import {Tooltip} from 'antd';
+import {SaveSourceTooltip} from '@src/tooltips';
 import {clearDecorations, setDecorations} from './editorHelpers';
 import codeIntel from './codeIntel';
 
@@ -228,14 +230,16 @@ const Monaco = (props: {editorHeight: string}) => {
   return (
     <>
       <MonacoButtons>
-        <MonoButton
-          large="true"
-          type={hasWarnings ? 'dashed' : 'primary'}
-          disabled={!isDirty || !isValid}
-          onClick={saveContent}
-        >
-          Save
-        </MonoButton>
+        <Tooltip title={SaveSourceTooltip}>
+          <MonoButton
+            large="true"
+            type={hasWarnings ? 'dashed' : 'primary'}
+            disabled={!isDirty || !isValid}
+            onClick={saveContent}
+          >
+            Save
+          </MonoButton>
+        </Tooltip>
       </MonacoButtons>
       <MonacoContainer ref={ref}>
         <MonacoEditor

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
-import {Button, Space} from 'antd';
+import {Button, Space, Tooltip} from 'antd';
 import {ClusterOutlined, FolderOpenOutlined, ApartmentOutlined, CodeOutlined} from '@ant-design/icons';
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
@@ -26,6 +26,7 @@ import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
+import {ClusterExplorerTooltip, FileExplorerTooltip} from '@src/tooltips';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -127,35 +128,39 @@ const App = () => {
           <StyledRow style={{height: contentHeight + 4}}>
             <StyledColumnLeft>
               <Space direction="vertical" style={{width: 43}}>
-                <Button
-                  size="large"
-                  type="text"
-                  disabled={previewMode}
-                  onClick={() => setActivePanes('left', 'file-explorer')}
-                  icon={
-                    <FolderOpenOutlined
-                      style={{
-                        ...iconStyle,
-                        color: leftMenuSelection === 'file-explorer' ? Colors.whitePure : Colors.grey7,
-                        marginLeft: 4,
-                      }}
-                    />
-                  }
-                />
-                <Button
-                  disabled={previewMode}
-                  size="large"
-                  type="text"
-                  onClick={() => setActivePanes('left', 'cluster-explorer')}
-                  icon={
-                    <ClusterOutlined
-                      style={{
-                        ...iconStyle,
-                        color: leftMenuSelection === 'cluster-explorer' ? Colors.whitePure : Colors.grey7,
-                      }}
-                    />
-                  }
-                />
+                <Tooltip title={FileExplorerTooltip}>
+                  <Button
+                    size="large"
+                    type="text"
+                    disabled={previewMode}
+                    onClick={() => setActivePanes('left', 'file-explorer')}
+                    icon={
+                      <FolderOpenOutlined
+                        style={{
+                          ...iconStyle,
+                          color: leftMenuSelection === 'file-explorer' ? Colors.whitePure : Colors.grey7,
+                          marginLeft: 4,
+                        }}
+                      />
+                    }
+                  />
+                </Tooltip>
+                <Tooltip title={ClusterExplorerTooltip}>
+                  <Button
+                    disabled={previewMode}
+                    size="large"
+                    type="text"
+                    onClick={() => setActivePanes('left', 'cluster-explorer')}
+                    icon={
+                      <ClusterOutlined
+                        style={{
+                          ...iconStyle,
+                          color: leftMenuSelection === 'cluster-explorer' ? Colors.whitePure : Colors.grey7,
+                        }}
+                      />
+                    }
+                  />
+                </Tooltip>
               </Space>
             </StyledColumnLeft>
             <StyledColumnNavEdit style={{width: contentWidth}}>

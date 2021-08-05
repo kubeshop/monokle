@@ -1,14 +1,15 @@
 import React, {useRef} from 'react';
-import {Button, Col, Input, Row} from 'antd';
+import {Button, Col, Input, Row, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {inPreviewMode} from '@redux/selectors';
+import {inPreviewMode, inClusterMode} from '@redux/selectors';
 
 import {BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
 import {startPreview, stopPreview} from '@redux/utils/preview';
 import {updateKubeconfig} from '@redux/reducers/appConfig';
+import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@src/tooltips';
 
 const StyledDiv = styled.div`
   margin-bottom: 10px;
@@ -38,6 +39,7 @@ const ClustersPane = () => {
   const dispatch = useAppDispatch();
   const previewResource = useAppSelector(state => state.main.previewResource);
   const previewMode = useSelector(inPreviewMode);
+  const clusterMode = useSelector(inClusterMode);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
@@ -81,18 +83,23 @@ const ClustersPane = () => {
         <ClustersContainer>
           <StyledDiv>KUBECONFIG</StyledDiv>
           <Input value={kubeconfig} />
-          <StyledButton onClick={openFileSelect}>Browse</StyledButton>
+          <Tooltip title={BrowseKubeconfigTooltip}>
+            <StyledButton onClick={openFileSelect}>Browse</StyledButton>
+          </Tooltip>
           <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
           <StyledDiv>Select to retrieve resources from configured kubeconfig</StyledDiv>
 
-          <Button
-            type="primary"
-            ghost
-            loading={previewType === 'cluster' && previewLoader.isLoading}
-            onClick={connectToCluster}
-          >
-            Show Cluster Objects
-          </Button>
+          <Tooltip title={ClusterModeTooltip}>
+            <Button
+              type="primary"
+              ghost
+              loading={previewType === 'cluster' && previewLoader.isLoading}
+              onClick={connectToCluster}
+              disabled={Boolean(clusterMode)}
+            >
+              Show Cluster Objects
+            </Button>
+          </Tooltip>
         </ClustersContainer>
       </PaneContainer>
     </>

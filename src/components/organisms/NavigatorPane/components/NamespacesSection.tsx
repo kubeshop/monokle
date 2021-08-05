@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import {Select} from 'antd';
+import {Select, Tooltip} from 'antd';
+import {NamespacesFilterTooltip} from '@src/tooltips';
 
 const {Option} = Select;
 
@@ -29,23 +30,25 @@ const NamespacesSection = (props: NamespacesSectionType) => {
     <StyledDiv>
       <StyledSpan>Namespace:</StyledSpan>
       <SelectContainer>
-        <Select
-          showSearch
-          placeholder="Namespace"
-          onChange={onSelect}
-          size="small"
-          style={{width: '100%'}}
-          bordered={false}
-          value={namespace}
-        >
-          {namespaces.map(n => {
-            return (
-              <Option key={n} value={n}>
-                {n}
-              </Option>
-            );
-          })}
-        </Select>
+        <Tooltip title={NamespacesFilterTooltip}>
+          <Select
+            showSearch
+            placeholder="Namespace"
+            onChange={onSelect}
+            size="small"
+            style={{width: '100%'}}
+            bordered={false}
+            value={namespace}
+          >
+            {namespaces.map(n => {
+              return (
+                <Option key={n} value={n}>
+                  {n}
+                </Option>
+              );
+            })}
+          </Select>
+        </Tooltip>
       </SelectContainer>
     </StyledDiv>
   );

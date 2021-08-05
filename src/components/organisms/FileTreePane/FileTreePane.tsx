@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import path from 'path';
-import {Row, Button, Tree, Col, Space, Typography, Skeleton} from 'antd';
+import {Row, Button, Tree, Col, Space, Typography, Skeleton, Tooltip} from 'antd';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -21,6 +21,7 @@ import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
+import {BrowseFolderTooltip} from '@src/tooltips';
 
 interface TreeNode {
   key: string;
@@ -212,6 +213,12 @@ const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
   .ant-tree-switcher svg {
     color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
   }
+
+  opacity: ${props => (props.disabled ? '70%' : '100%')};
+`;
+
+const DisabledDirectoryTree = styled(StyledTreeDirectoryTree)`
+  opacity: 80%;
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -353,12 +360,14 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
       <Row>
         <ColumnWithPadding span={24}>
           <Space direction="horizontal">
-            <Button type="primary" ghost onClick={startFileUploader}>
-              <CenteredItemsDiv>
-                <FolderAddOutlined style={{marginRight: '3px'}} />
-                Browse
-              </CenteredItemsDiv>
-            </Button>
+            <Tooltip title={BrowseFolderTooltip}>
+              <Button type="primary" ghost onClick={startFileUploader}>
+                <CenteredItemsDiv>
+                  <FolderAddOutlined style={{marginRight: '3px'}} />
+                  Browse
+                </CenteredItemsDiv>
+              </Button>
+            </Tooltip>
           </Space>
         </ColumnWithPadding>
         {shouldRefreshFileMap && fileMap[ROOT_FILE_ENTRY] && (

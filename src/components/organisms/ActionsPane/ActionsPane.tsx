@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Tabs, Space, Col, Row, Button, Skeleton, Modal} from 'antd';
+import {Tabs, Space, Col, Row, Button, Skeleton, Modal, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -14,6 +14,7 @@ import {K8sResource} from '@models/k8sresource';
 import {isKustomizationResource} from '@redux/utils/kustomize';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
+import {ApplyTooltip, DiffTooltip, FormEditorTooltip, SourceEditorTooltip} from '@src/tooltips';
 
 const {TabPane} = Tabs;
 
@@ -107,12 +108,16 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const OperationsSlot = {
     right: (
       <Space>
-        <StyledButton type="primary" ghost onClick={applySelectedResource} disabled={!selectedResource}>
-          Apply
-        </StyledButton>
-        <StyledButton type="primary" ghost onClick={diffSelectedResource} disabled={!selectedResource}>
-          Diff
-        </StyledButton>
+        <Tooltip title={ApplyTooltip}>
+          <StyledButton type="primary" ghost onClick={applySelectedResource} disabled={!selectedResource}>
+            Apply
+          </StyledButton>
+        </Tooltip>
+        <Tooltip title={DiffTooltip}>
+          <StyledButton type="primary" ghost onClick={diffSelectedResource} disabled={!selectedResource}>
+            Diff
+          </StyledButton>
+        </Tooltip>
       </Space>
     ),
   };
@@ -134,7 +139,14 @@ const ActionsPane = (props: {contentHeight: string}) => {
               onChange={k => setKey(k)}
               tabBarExtraContent={OperationsSlot}
             >
-              <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
+              <TabPane
+                tab={
+                  <TabHeader icon={<CodeOutlined />} tooltip={SourceEditorTooltip}>
+                    Source
+                  </TabHeader>
+                }
+                key="source"
+              >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />
                 ) : (
@@ -143,7 +155,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
               </TabPane>
               {selectedResource && selectedResource?.kind === 'ConfigMap' && (
                 <TabPane
-                  tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
+                  tab={
+                    <TabHeader icon={<ContainerOutlined />} tooltip={FormEditorTooltip}>
+                      Form
+                    </TabHeader>
+                  }
                   disabled={!selectedResourceId}
                   key="form"
                 >

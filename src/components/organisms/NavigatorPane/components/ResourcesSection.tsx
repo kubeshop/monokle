@@ -87,6 +87,7 @@ const ResourcesSection = () => {
     );
   }
 
+  // ensure that subsections containing highlighted sections are expanded
   useEffect(() => {
     appConfig.navigators
       .map(navigator => navigator.sections)

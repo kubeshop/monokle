@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Col, Row, Spin} from 'antd';
+import {Col, Row, Spin, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {LoadingOutlined} from '@ant-design/icons';
 
@@ -7,6 +7,7 @@ import Colors, {FontColors} from '@styles/Colors';
 import {K8sResource} from '@models/k8sresource';
 
 import NavigatorRowLabel from '@molecules/NavigatorRowLabel';
+import {ExitKustomizationPreviewTooltip, KustomizationPreviewTooltip} from '@src/tooltips';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 
@@ -126,9 +127,11 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
               {isPreviewLoading ? (
                 <Spin indicator={PreviewLoadingIcon} />
               ) : isHovered ? (
-                <PreviewSpan isSelected={isSelected} onClick={onClickPreview}>
-                  {previewButtonActive ? 'Exit' : 'Preview'}
-                </PreviewSpan>
+                <Tooltip title={previewButtonActive ? ExitKustomizationPreviewTooltip : KustomizationPreviewTooltip}>
+                  <PreviewSpan isSelected={isSelected} onClick={onClickPreview}>
+                    {previewButtonActive ? 'Exit' : 'Preview'}
+                  </PreviewSpan>
+                </Tooltip>
               ) : null}
             </PreviewContainer>
           </SectionCol>
