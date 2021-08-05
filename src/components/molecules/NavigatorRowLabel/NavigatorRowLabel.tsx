@@ -104,11 +104,18 @@ const RefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType;
       ? resourceMap[resourceRef.targetResource].name
       : resourceRef.refName;
 
+  let linkText = targetName;
+
+  if (resourceRef.targetResource) {
+    const resourceKind = resourceMap[resourceRef.targetResource].kind;
+    linkText = `${resourceKind}: ${targetName}`;
+  }
+
   if (isOutgoingRef(resourceRef.refType)) {
-    return <OutgoingRefLink onClick={onClick} text={targetName} />;
+    return <OutgoingRefLink onClick={onClick} text={linkText} />;
   }
   if (isIncomingRef(resourceRef.refType)) {
-    return <IncomingRefLink onClick={onClick} text={targetName} />;
+    return <IncomingRefLink onClick={onClick} text={linkText} />;
   }
   if (isUnsatisfiedRef(resourceRef.refType)) {
     return <UnsatisfiedRefLink text={targetName} />;
@@ -135,11 +142,20 @@ const PopoverContent = (props: {
     <>
       <PopoverTitle>{children}</PopoverTitle>
       <StyledDivider />
-      {resourceRefs.map(resourceRef => (
-        <StyledRefDiv key={resourceRef.targetResource || resourceRef.refName}>
-          <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
-        </StyledRefDiv>
-      ))}
+      {resourceRefs
+        .sort((a, b) => {
+          if (a.targetResource && b.targetResource) {
+            const resourceA = resourceMap[a.targetResource];
+            const resourceB = resourceMap[b.targetResource];
+            return resourceA.kind.localeCompare(resourceB.kind);
+          }
+          return 0;
+        })
+        .map(resourceRef => (
+          <StyledRefDiv key={resourceRef.targetResource || resourceRef.refName}>
+            <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
+          </StyledRefDiv>
+        ))}
     </>
   );
 };
