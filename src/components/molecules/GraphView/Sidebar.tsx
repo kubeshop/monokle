@@ -38,7 +38,7 @@ const Sidebar = (reactFlow: any) => {
           .start();
       }
     },
-    [zoomPanHelper, reactFlow.reactFlow]
+    [zoomPanHelper]
   );
 
   const selectSelectedResource = useCallback(() => {
