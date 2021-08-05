@@ -26,17 +26,17 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
   watcher
     .on('add', path => {
       if (!initializing) {
-        dispatch(pathAdded(path));
+        dispatch(pathAdded({path, appConfig}));
       }
     })
     .on('addDir', path => {
       if (!initializing) {
-        dispatch(pathAdded(path));
+        dispatch(pathAdded({path, appConfig}));
       }
     })
     .on('change', path => {
       if (!initializing) {
-        dispatch(fileChanged(path));
+        dispatch(fileChanged({path, appConfig}));
       }
     })
     .on('unlink', path => {

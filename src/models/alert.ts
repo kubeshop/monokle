@@ -5,6 +5,10 @@ export enum AlertEnum {
   Error,
 }
 
+export type AlertState = {
+  alert?: AlertType;
+};
+
 export type AlertType = {
   title: string;
   message: string;

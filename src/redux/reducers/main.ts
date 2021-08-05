@@ -11,7 +11,7 @@ import {previewCluster} from '@redux/thunks/previewCluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {diffResource} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
-import {initialState} from '../initialState';
+import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
   addPath,
@@ -58,13 +58,14 @@ export type StartPreviewLoaderPayload = {
 
 export const mainSlice = createSlice({
   name: 'main',
-  initialState,
+  initialState: initialState.main,
   reducers: {
     /**
      * called by the file monitor when a path is added to the file system
      */
-    pathAdded: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      let filePath = action.payload;
+    pathAdded: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
+      let filePath = action.payload.path;
+      const appConfig = action.payload.appConfig;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
       if (fileEntry) {
         if (!fs.statSync(filePath).isDirectory()) {
@@ -72,19 +73,20 @@ export const mainSlice = createSlice({
           reloadFile(filePath, fileEntry, state);
         }
       } else {
-        addPath(filePath, state);
+        addPath(filePath, state, appConfig);
       }
     },
     /**
      * called by the file monitor when a file is changed in the file system
      */
-    fileChanged: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      let filePath = action.payload;
+    fileChanged: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
+      let filePath = action.payload.path;
+      const appConfig = action.payload.appConfig;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
       if (fileEntry) {
         reloadFile(filePath, fileEntry, state);
       } else {
-        addPath(filePath, state);
+        addPath(filePath, state, appConfig);
       }
     },
     /**

@@ -1,16 +1,10 @@
 import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
-
-type LogsState = {
-  logs: string[];
-};
-
-const initialState: LogsState = {
-  logs: [''],
-};
+import {LogsState} from '@models/logs';
+import initialState from '@redux/initialState';
 
 export const logsSlice = createSlice({
   name: 'logs',
-  initialState,
+  initialState: initialState.logs,
   reducers: {
     setLogs: (state: Draft<LogsState>, action: PayloadAction<string[]>) => {
       state.logs = state.logs.concat(action.payload);

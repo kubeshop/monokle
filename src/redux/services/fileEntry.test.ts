@@ -1,5 +1,5 @@
 import {AppConfig} from '@models/appconfig';
-import {initialState} from '@redux/initialState';
+import initialState from '@redux/initialState';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {getK8sResources} from '@redux/services/resource';
 import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
@@ -7,9 +7,6 @@ import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
 test('create-file-entry', () => {
   let e = createFileEntry(createSafePath('/a/very/long/path'));
-  expect(e.highlight).toBeFalsy();
-  expect(e.selected).toBeFalsy();
-  expect(e.expanded).toBeFalsy();
   expect(e.excluded).toBeFalsy();
   expect(e.name).toBe('path');
   expect(e.filePath).toBe(createSafePath('/a/very/long/path'));
@@ -17,7 +14,7 @@ test('create-file-entry', () => {
 });
 
 function readManifests(rootFolder: string) {
-  const appConfig: AppConfig = initialState.appConfig;
+  const appConfig: AppConfig = initialState.config;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};

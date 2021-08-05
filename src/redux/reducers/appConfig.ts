@@ -6,7 +6,7 @@ import electronStore from '@utils/electronStore';
 import {setShouldRefreshFileMap} from '@redux/reducers/main';
 import {PROCESS_ENV} from '@utils/env';
 import {AlertEnum, AlertType} from '@models/alert';
-import {initialState} from '../initialState';
+import initialState from '../initialState';
 
 export const initKubeconfig = createAsyncThunk<{alert?: AlertType; kubeconfig: string}>(
   'config/initKubeconfig',
@@ -96,7 +96,7 @@ export const updateLanguage = createAsyncThunk('config/updateLanguage', async (l
 
 export const configSlice = createSlice({
   name: 'config',
-  initialState: initialState.appConfig,
+  initialState: initialState.config,
   reducers: {
     setFilterObjects: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.filterObjectsOnSelection = action.payload;
