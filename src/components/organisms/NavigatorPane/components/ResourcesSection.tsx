@@ -116,7 +116,8 @@ const ResourcesSection = () => {
             <div key={navigator.name}>
               <SectionRow>
                 <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
-
+              </SectionRow>
+              <SectionRow>
                 {navigator.name === 'K8s Resources' && (
                   <NamespacesSection namespace={namespace} namespaces={namespaces} onSelect={handleNamespaceChange} />
                 )}

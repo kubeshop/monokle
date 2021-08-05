@@ -6,5 +6,7 @@ export {default as PaneContainer} from './PaneContainer';
 export {default as MonoPaneTitleCol} from './MonoPaneTitleCol';
 export {default as MonoPaneTitle} from './MonoPaneTitle';
 export {default as Row} from './Row';
+export {default as Col} from './Col';
 export {default as Layout} from './Layout';
 export {default as Content} from './Content';
+export {default as SplitView} from './SplitView';
