@@ -208,11 +208,14 @@ export function applyForResource(
       if (!outgoingRefResource) {
         return;
       }
-      const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(outgoingRefResource.name, () => {
-        if (outgoingRef.targetResource) {
-          selectResource(outgoingRef.targetResource);
+      const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+        `${outgoingRefResource.kind}: ${outgoingRefResource.name}`,
+        () => {
+          if (outgoingRef.targetResource) {
+            selectResource(outgoingRef.targetResource);
+          }
         }
-      });
+      );
       commandMarkdownLinkList.push(commandMarkdownLink);
       newCommandDisposables.push(commandDisposable);
     });
