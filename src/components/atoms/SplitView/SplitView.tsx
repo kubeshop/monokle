@@ -1,5 +1,6 @@
 import React, {useState, useLayoutEffect, MouseEvent, TouchEvent, ReactElement, FunctionComponent} from 'react';
 import styled from 'styled-components';
+import {AppBorders} from '@styles/Borders';
 
 const MIN_WIDTH = 150;
 const SEPARATOR_WIDTH = 5; // width including hitbox
@@ -29,7 +30,7 @@ const StyledDivider = styled.div`
   width: 0px;
   height: 100%;
   margin: 1px;
-  border-left: 1px solid #808080;
+  border-left: ${AppBorders.pageDivider};
 `;
 const StyledDividerHitBox = styled.div.attrs((props: DividerProps) => props)`
   cursor: col-resize;
