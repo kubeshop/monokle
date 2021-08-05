@@ -6,7 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import log from 'loglevel';
 import {ipcRenderer} from 'electron';
-import {createPreviewRejection, createPreviewResult} from '@redux/reducers/thunks/utils';
+import {createPreviewRejection, createPreviewResult} from '@redux/thunks/utils';
 
 /**
  * Thunk to preview a Helm Chart

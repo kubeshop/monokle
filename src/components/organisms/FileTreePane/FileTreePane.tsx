@@ -21,7 +21,7 @@ import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
 import {BrowseFolderTooltip} from '@src/tooltips';
-import {setRootFolder} from '@redux/reducers/thunks/setRootFolder';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 interface TreeNode {
   key: string;

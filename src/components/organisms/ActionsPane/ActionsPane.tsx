@@ -14,7 +14,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
 import {ApplyTooltip, DiffTooltip, FormEditorTooltip, SourceEditorTooltip} from '@src/tooltips';
-import {diffResource} from '@redux/reducers/thunks/diffResource';
+import {diffResource} from '@redux/thunks/diffResource';
 
 const {TabPane} = Tabs;
 

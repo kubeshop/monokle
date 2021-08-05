@@ -5,7 +5,7 @@ import {AppState} from '@models/appstate';
 import * as k8s from '@kubernetes/client-node';
 import {YAML_DOCUMENT_DELIMITER} from '@src/constants';
 import {AlertEnum} from '@models/alert';
-import {createPreviewRejection, createPreviewResult, getK8sObjectsAsYaml} from '@redux/reducers/thunks/utils';
+import {createPreviewRejection, createPreviewResult, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 /**
  * Thunk to preview cluster objects

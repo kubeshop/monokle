@@ -4,7 +4,7 @@ import {AppDispatch, RootState} from '@redux/store';
 import * as k8s from '@kubernetes/client-node';
 import {stringify} from 'yaml';
 import log from 'loglevel';
-import {createPreviewRejection} from '@redux/reducers/thunks/utils';
+import {createPreviewRejection} from '@redux/thunks/utils';
 
 /**
  * Thunk to diff a resource against the configured cluster

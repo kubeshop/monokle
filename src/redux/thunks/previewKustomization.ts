@@ -5,7 +5,7 @@ import {AppDispatch, RootState} from '@redux/store';
 import {ROOT_FILE_ENTRY} from '@src/constants';
 import path from 'path';
 import log from 'loglevel';
-import {createPreviewRejection, createPreviewResult} from '@redux/reducers/thunks/utils';
+import {createPreviewRejection, createPreviewResult} from '@redux/thunks/utils';
 
 /**
  * Thunk to preview kustomizations

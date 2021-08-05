@@ -6,11 +6,11 @@ import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
-import {previewKustomization} from '@redux/reducers/thunks/previewKustomization';
-import {previewCluster} from '@redux/reducers/thunks/previewCluster';
-import {setRootFolder} from '@redux/reducers/thunks/setRootFolder';
-import {diffResource} from '@redux/reducers/thunks/diffResource';
-import {previewHelmValuesFile} from '@redux/reducers/thunks/previewHelmValuesFile';
+import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {previewCluster} from '@redux/thunks/previewCluster';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {diffResource} from '@redux/thunks/diffResource';
+import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {initialState} from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {

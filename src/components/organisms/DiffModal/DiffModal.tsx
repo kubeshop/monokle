@@ -10,7 +10,7 @@ import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
 
 import Colors from '@styles/Colors';
 import {applyWithConfirm} from '@organisms/ActionsPane/ActionsPane';
-import {diffResource} from '@redux/reducers/thunks/diffResource';
+import {diffResource} from '@redux/thunks/diffResource';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close {
