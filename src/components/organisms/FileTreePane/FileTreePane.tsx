@@ -47,6 +47,7 @@ const StyledNumberOfResources = styled(Typography.Text)`
 const NodeContainer = styled.div`
   position: relative;
 `;
+
 const NodeTitleContainer = styled.div`
   padding-right: 14px;
   white-space: nowrap;
@@ -175,7 +176,7 @@ const FileTreeContainer = styled.div`
     flex-shrink: 0;
   }
   & .ant-tree-iconEle .anticon {
-    vertical-align: -2px;
+    vertical-align: text-bottom;
   }
   & .ant-tree-node-content-wrapper {
     display: flex;
@@ -207,7 +208,7 @@ const NoFilesContainer = styled.div`
 `;
 
 const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
-  margin-left: 10px;
+  margin-left: 2px;
   margin-top: 10px;
 
   .ant-tree-switcher svg {
