@@ -171,5 +171,5 @@ export const initialState: AppState = {
     isLoading: false,
   },
   isSelectingFile: false,
-  isSelectingResource: false,
+  isApplyingResource: false,
 };

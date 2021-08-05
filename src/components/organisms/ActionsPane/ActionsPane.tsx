@@ -6,7 +6,7 @@ import {CodeOutlined, ContainerOutlined, ExclamationCircleOutlined} from '@ant-d
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {applyResource} from '@actions/common/apply';
+import {applyResource} from '@redux/thunks/applyResource';
 import TabHeader from '@atoms/TabHeader';
 import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
@@ -72,6 +72,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResource);
+  const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -109,7 +110,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     right: (
       <Space>
         <Tooltip title={ApplyTooltip}>
-          <StyledButton type="primary" ghost onClick={applySelectedResource} disabled={!selectedResource}>
+          <StyledButton
+            loading={Boolean(applyingResource)}
+            type="primary"
+            ghost
+            onClick={applySelectedResource}
+            disabled={!selectedResource}
+          >
             Apply
           </StyledButton>
         </Tooltip>
