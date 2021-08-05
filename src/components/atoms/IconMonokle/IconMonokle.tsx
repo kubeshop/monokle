@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import MonokleLogoLight from '@assets/MonokleLogoLight.svg';
 import MonokleLogoDark from '@assets/MonokleLogoDark.svg';
+import {updateStartupModalVisible} from '@redux/reducers/appConfig';
+import {useAppDispatch} from '@redux/hooks';
 
 export type IconMonokleProps = {
   useDarkTheme?: React.ReactNode;
@@ -16,10 +18,15 @@ const StyledImage = styled.img`
 
 const IconMonokle = (props: IconMonokleProps) => {
   const {useDarkTheme} = props;
+  const dispatch = useAppDispatch();
+
+  const showStartupModal = () => {
+    dispatch(updateStartupModalVisible(true));
+  };
 
   return (
     <>
-      <StyledImage src={useDarkTheme ? MonokleLogoDark : MonokleLogoLight} alt="Monokle" />
+      <StyledImage onClick={showStartupModal} src={useDarkTheme ? MonokleLogoDark : MonokleLogoLight} alt="Monokle" />
     </>
   );
 };

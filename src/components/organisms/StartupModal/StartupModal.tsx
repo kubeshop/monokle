@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import {shell} from 'electron';
 import {Button, Modal} from 'antd';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
@@ -76,7 +77,7 @@ const StyledContentDiv = styled.div`
 
 const HeightFillDiv = styled.div`
   display: block;
-  height: 400px;
+  height: 425px;
 `;
 
 const StartupModal = () => {
@@ -87,6 +88,10 @@ const StartupModal = () => {
   const handleClose = () => {
     dispatch(updateStartupModalVisible(false));
   };
+
+  function openGitHub() {
+    shell.openExternal('https://github.com/kubeshop/monokle');
+  }
 
   return (
     <StyledModal
@@ -111,14 +116,18 @@ const StartupModal = () => {
       <StyledContentContainerDiv>
         <StyledContentDiv>
           <h1>Welcome 🎉</h1>
-          <p>Monokle is your K8s best friend that helps you:</p>
+          <p>Monokle is your K8s best friend!</p>
           <ul>
-            <li>Read your manifests</li>
-            <li>Understand links and relationships</li>
-            <li>Debug Kustomizations and Helm charts</li>
-            <li>Diff and apply changes to your clusters</li>
-            <li>And many more!</li>
+            <li>Read your manifest folders and files</li>
+            <li>See resources and understand links between them</li>
+            <li>Edit manifests without having to learn all yaml syntax</li>
+            <li>Preview and debug kustomizations and Helm charts</li>
+            <li>Diff and apply resource changes to your clusters</li>
+            <li>And much more!</li>
           </ul>
+          <p>
+            Suggestions? Complaints? Head over to our <a onClick={openGitHub}>GitHub repo</a> and get involved!
+          </p>
         </StyledContentDiv>
       </StyledContentContainerDiv>
     </StyledModal>
