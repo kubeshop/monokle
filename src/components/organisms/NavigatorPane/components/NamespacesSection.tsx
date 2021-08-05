@@ -17,9 +17,10 @@ const StyledDiv = styled.div`
 `;
 
 const SelectContainer = styled.div`
-  min-width: 50%;
-  display: inline;
-  float: right;
+  flex: 1;
+`;
+const StyledSpan = styled.span`
+  flex: 1;
 `;
 
 const NamespacesSection = (props: NamespacesSectionType) => {
@@ -27,7 +28,7 @@ const NamespacesSection = (props: NamespacesSectionType) => {
 
   return (
     <StyledDiv>
-      <span>Namespace:</span>
+      <StyledSpan>Namespace:</StyledSpan>
       <SelectContainer>
         <Tooltip title={NamespacesFilterTooltip}>
           <Select

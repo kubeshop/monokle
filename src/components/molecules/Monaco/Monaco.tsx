@@ -153,7 +153,7 @@ const Monaco = (props: {editorHeight: string}) => {
 
   const options = {
     selectOnLineNumbers: true,
-    readOnly: isInPreviewMode,
+    readOnly: isInPreviewMode || (!selectedPath && !selectedResource),
     fontWeight: 'bold',
     glyphMargin: true,
   };
@@ -232,7 +232,7 @@ const Monaco = (props: {editorHeight: string}) => {
       <MonacoButtons>
         <Tooltip title={SaveSourceTooltip}>
           <MonoButton
-            large
+            large="true"
             type={hasWarnings ? 'dashed' : 'primary'}
             disabled={!isDirty || !isValid}
             onClick={saveContent}
