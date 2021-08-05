@@ -19,49 +19,74 @@ import {
 
 type SymbolsToResourceKindMatcher = {
   resourceKind: string;
-  symbolsCount: number; // the number of symbols required by isMatch (from the end of symbols array)
-  isMatch(symbols: monaco.languages.DocumentSymbol[]): boolean;
+  symbolsPaths?: string[][];
+  isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
 };
 
 const SymbolsToResourceKindMatchers: SymbolsToResourceKindMatcher[] = [
   {
     resourceKind: 'ConfigMap',
-    symbolsCount: 2,
-    isMatch(symbols) {
-      return ['configMap', 'configMapRef', 'configMapKeyRef'].includes(symbols[0].name) && symbols[1].name === 'name';
-    },
+    symbolsPaths: [
+      ['volumes', 'configMap', 'name'],
+      ['configMap', 'name'],
+      ['configMapRef', 'name'],
+      ['configMapKeyRef', 'name'],
+    ],
   },
   {
     resourceKind: 'Secret',
-    symbolsCount: 2,
-    isMatch(symbols) {
-      if (symbols[1].name === 'imagePullSecrets') {
-        return true;
-      }
-      if (symbols[0].name === 'secretKeyRef' && symbols[1].name === 'name') {
-        return true;
-      }
-      if (symbols[0].name === 'secret' && symbols[1].name === 'secretName') {
-        return true;
-      }
-      return false;
-    },
+    symbolsPaths: [['imagePullSecrets'], ['secrets'], ['secretKeyRef', 'name'], ['volumes', 'secret', 'secretName']],
   },
   {
     resourceKind: 'ServiceAccount',
-    symbolsCount: 1,
-    isMatch(symbols) {
-      return symbols[0].name === 'serviceAccountName';
-    },
+    symbolsPaths: [['serviceAccountName'], ['metadata', 'annotations', 'kubernetes.io/service-account.name']],
+  },
+  {
+    resourceKind: 'ClusterRole',
+    symbolsPaths: [['roleRef', 'name']],
+  },
+  {
+    resourceKind: 'Service',
+    symbolsPaths: [['backend', 'service', 'name']],
+  },
+  {
+    resourceKind: 'PersistentVolumeClaim',
+    symbolsPaths: [['spec', 'claimRef', 'name']],
+  },
+  {
+    resourceKind: 'PersistentVolume',
+    symbolsPaths: [['spec', 'volumeName']],
+  },
+  {
+    resourceKind: 'ClusterRoleBinding',
+    symbolsPaths: [['roleRef', 'name']],
   },
 ];
 
 const getResourceKindFromSymbols = (symbols: monaco.languages.DocumentSymbol[]) => {
   for (let i = 0; i < SymbolsToResourceKindMatchers.length; i += 1) {
     const matcher = SymbolsToResourceKindMatchers[i];
-    if (matcher.symbolsCount > 0 && symbols.length >= matcher.symbolsCount) {
-      const requiredSymbols = symbols.slice(-matcher.symbolsCount);
-      if (matcher.isMatch(requiredSymbols)) {
+    if (matcher.symbolsPaths && matcher.symbolsPaths.length > 0) {
+      const isMatch = matcher.symbolsPaths.some(symbolsPath => {
+        const sliceIndex = matcher.symbolsPaths ? -symbolsPath.length : 0;
+        const slicedSymbols = symbols.slice(sliceIndex);
+        if (symbolsPath.length === slicedSymbols.length) {
+          let areEqual = true;
+          symbolsPath.forEach((symbol, index) => {
+            if (symbol !== slicedSymbols[index].name) {
+              areEqual = false;
+            }
+          });
+          return areEqual;
+        }
+        return false;
+      });
+      if (isMatch) {
+        return matcher.resourceKind;
+      }
+    }
+    if (matcher.isMatch) {
+      if (matcher.isMatch(symbols)) {
         return matcher.resourceKind;
       }
     }
