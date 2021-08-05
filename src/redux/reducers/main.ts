@@ -185,8 +185,8 @@ export const mainSlice = createSlice({
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
     },
-    setSelectingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      state.isSelectingResource = action.payload;
+    setApplyingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.isApplyingResource = action.payload;
     },
     clearPreview: (state: Draft<AppState>) => {
       setPreviewData({}, state);
@@ -334,7 +334,7 @@ export const {
   selectK8sResource,
   selectFile,
   setSelectingFile,
-  setSelectingResource,
+  setApplyingResource,
   updateResource,
   updateFileEntry,
   pathAdded,

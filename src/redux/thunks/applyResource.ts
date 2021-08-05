@@ -3,12 +3,12 @@ import {spawn} from 'child_process';
 import log from 'loglevel';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {setAlert} from '@redux/reducers/alert';
-import {setLogs} from '@redux/reducers/logs';
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getShellPath} from '@utils/shell';
+import {setApplyingResource} from '@redux/reducers/main';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -47,6 +47,8 @@ function applyKustomization(resource: K8sResource, fileMap: FileMapType, kubecon
 
 /**
  * applies the specified resource and creates corresponding alert
+ *
+ * this isn't actually a Thunk - but should be in the future!
  */
 
 export async function applyResource(
@@ -59,31 +61,41 @@ export async function applyResource(
   try {
     const resource = resourceMap[resourceId];
     if (resource && resource.text) {
-      const child = isKustomizationResource(resource)
-        ? applyKustomization(resource, fileMap, kubeconfig)
-        : applyK8sResource(resource, kubeconfig);
+      dispatch(setApplyingResource(true));
 
-      child.on('exit', (code, signal) => log.info(`kubectl exited with code ${code} and signal ${signal}`));
+      try {
+        const child = isKustomizationResource(resource)
+          ? applyKustomization(resource, fileMap, kubeconfig)
+          : applyK8sResource(resource, kubeconfig);
 
-      child.stdout.on('data', data => {
-        const alert: AlertType = {
-          type: AlertEnum.Success,
-          title: 'Apply completed',
-          message: data.toString(),
-        };
-        dispatch(setAlert(alert));
-        dispatch(setLogs([alert.message]));
-      });
+        child.on('exit', (code, signal) => {
+          log.info(`kubectl exited with code ${code} and signal ${signal}`);
+          dispatch(setApplyingResource(false));
+        });
 
-      child.stderr.on('data', data => {
-        const alert: AlertType = {
-          type: AlertEnum.Error,
-          title: 'Apply failed',
-          message: data.toString(),
-        };
-        dispatch(setAlert(alert));
-        dispatch(setLogs([alert.message]));
-      });
+        child.stdout.on('data', data => {
+          const alert: AlertType = {
+            type: AlertEnum.Success,
+            title: 'Apply completed',
+            message: data.toString(),
+          };
+          dispatch(setAlert(alert));
+          dispatch(setApplyingResource(false));
+        });
+
+        child.stderr.on('data', data => {
+          const alert: AlertType = {
+            type: AlertEnum.Error,
+            title: 'Apply failed',
+            message: data.toString(),
+          };
+          dispatch(setAlert(alert));
+          dispatch(setApplyingResource(false));
+        });
+      } catch (e) {
+        log.error(e.message);
+        dispatch(setApplyingResource(true));
+      }
     }
   } catch (e) {
     log.error('Failed to apply resource');

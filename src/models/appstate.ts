@@ -47,7 +47,7 @@ interface AppState {
   selectedValuesFile?: string; // the currently selected values file
   previewValuesFile?: string; // the values file currently being previewed
   isSelectingFile: boolean; // if we are currently in the process of selecting a file - used for one-time UI updates
-  isSelectingResource: boolean; // if we are currently in the process of selecting a resource - used for one-time UI updates
+  isApplyingResource: boolean; // id of resource currently being applied
 }
 
 export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType, PreviewLoaderType};
