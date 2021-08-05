@@ -7,7 +7,16 @@ root = true
 charset = utf-8
 insert_final_newline = true
 trim_trailing_whitespace = true
-
-[*.{ts, tsx, js, json, css, html, md}]
-indent_style = space
+end_of_line = lf
+max_line_length = 120
 indent_size = 2
+
+[*.{ts, tsx, js, json, css, html}]
+indent_style = space
+
+[*.md]
+max_line_length = 0
+trim_trailing_whitespace = false
+
+[COMMIT_EDITMSG]
+max_line_length = 0
