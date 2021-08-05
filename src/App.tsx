@@ -132,7 +132,6 @@ const App = () => {
                   <Button
                     size="large"
                     type="text"
-                    disabled={previewMode}
                     onClick={() => setActivePanes('left', 'file-explorer')}
                     icon={
                       <FolderOpenOutlined
@@ -147,7 +146,6 @@ const App = () => {
                 </Tooltip>
                 <Tooltip title={ClusterExplorerTooltip}>
                   <Button
-                    disabled={previewMode}
                     size="large"
                     type="text"
                     onClick={() => setActivePanes('left', 'cluster-explorer')}

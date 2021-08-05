@@ -16,8 +16,8 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
-import {getResourceSchema} from '@redux/utils/schema';
-import {logMessage} from '@redux/utils/log';
+import {getResourceSchema} from '@redux/services/schema';
+import {logMessage} from '@redux/services/log';
 import {updateFileEntry, updateResource, selectK8sResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@src/constants';

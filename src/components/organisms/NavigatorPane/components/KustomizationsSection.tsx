@@ -3,8 +3,8 @@ import React from 'react';
 import {K8sResource} from '@models/k8sresource';
 import NavigatorKustomizationRow from '@molecules/NavigatorKustomizationRow';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {hasIncomingRefs, hasOutgoingRefs} from '@redux/utils/resourceRefs';
-import {startPreview, stopPreview} from '@redux/utils/preview';
+import {hasIncomingRefs, hasOutgoingRefs} from '@redux/services/resourceRefs';
+import {startPreview, stopPreview} from '@redux/services/preview';
 import {selectK8sResource} from '@redux/reducers/main';
 
 type KustomizationsSectionProps = {

@@ -7,7 +7,7 @@ import {inPreviewMode, inClusterMode} from '@redux/selectors';
 import {BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
-import {startPreview, stopPreview} from '@redux/utils/preview';
+import {startPreview, stopPreview} from '@redux/services/preview';
 import {updateKubeconfig} from '@redux/reducers/appConfig';
 import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@src/tooltips';
 

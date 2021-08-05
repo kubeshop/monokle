@@ -1,8 +1,8 @@
 import {AppConfig} from '@models/appconfig';
 import {initialState} from '@redux/initialState';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
-import {getK8sResources} from '@redux/utils/resource';
-import {createSafePath, getTestResourcePath} from '@redux/utils/__test__/utils';
+import {getK8sResources} from '@redux/services/resource';
+import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
 import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
 test('create-file-entry', () => {
@@ -49,7 +49,7 @@ test('read-folder-with-one-file', () => {
 
 test('read-folder-with-helm-chart', () => {
   const {resourceMap, fileMap, files, helmChartMap, helmValuesMap} = readManifests(
-    createSafePath('src/redux/utils/__test__/helm-charts/aks-helloworld')
+    createSafePath('src/redux/services/__test__/helm-charts/aks-helloworld')
   );
 
   expect(files.length).toBe(4);

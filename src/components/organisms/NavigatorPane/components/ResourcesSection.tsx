@@ -9,7 +9,7 @@ import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection} from '@models/navigator';
 import {selectActiveResources} from '@redux/selectors';
 import {selectK8sResource} from '@redux/reducers/main';
-import {getNamespaces} from '@redux/utils/resource';
+import {getNamespaces} from '@redux/services/resource';
 
 import NavigatorContentTitle from './NavigatorContentTitle';
 

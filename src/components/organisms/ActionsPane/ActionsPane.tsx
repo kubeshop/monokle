@@ -6,15 +6,15 @@ import {CodeOutlined, ContainerOutlined, ExclamationCircleOutlined} from '@ant-d
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {diffResource} from '@redux/reducers/thunks';
 import {applyResource} from '@actions/common/apply';
 import TabHeader from '@atoms/TabHeader';
 import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
-import {isKustomizationResource} from '@redux/utils/kustomize';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
 import {ApplyTooltip, DiffTooltip, FormEditorTooltip, SourceEditorTooltip} from '@src/tooltips';
+import {diffResource} from '@redux/reducers/thunks/diffResource';
 
 const {TabPane} = Tabs;
 

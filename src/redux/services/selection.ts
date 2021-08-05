@@ -1,9 +1,9 @@
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
-import {getChildFilePath, getResourcesForPath} from '@redux/utils/fileEntry';
-import {getLinkedResources} from '@redux/utils/resource';
-import {getKustomizationRefs, isKustomizationResource} from '@redux/utils/kustomize';
+import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {getLinkedResources} from '@redux/services/resource';
+import {getKustomizationRefs, isKustomizationResource} from '@redux/services/kustomize';
 
 /**
  * Clears all resource highlights and selections except selection for the specified item

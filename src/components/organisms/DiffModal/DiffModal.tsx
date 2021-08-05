@@ -5,12 +5,12 @@ import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useEffect, useState} from 'react';
 import {stringify} from 'yaml';
-import {diffResource} from '@redux/reducers/thunks';
 
 import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
 
 import Colors from '@styles/Colors';
 import {applyWithConfirm} from '@organisms/ActionsPane/ActionsPane';
+import {diffResource} from '@redux/reducers/thunks/diffResource';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close {

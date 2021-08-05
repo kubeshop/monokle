@@ -6,7 +6,7 @@ export function loadTestResource(resourcePath: string) {
 }
 
 export function getTestResourcePath(resourcePath: string) {
-  return createSafePath(path.join('src/redux/utils/__test__', resourcePath));
+  return createSafePath(path.join('src/redux/services/__test__', resourcePath));
 }
 
 export function createSafePath(originalPath: string) {

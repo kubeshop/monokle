@@ -1,5 +1,5 @@
 import {parseDocument} from 'yaml';
-import {mergeManifests, traverseDocument} from '@redux/utils/manifest-utils';
+import {mergeManifests, traverseDocument} from '@redux/services/manifest-utils';
 
 test('manifest-merge-all-match', () => {
   const orgYaml = `apiVersion: v1

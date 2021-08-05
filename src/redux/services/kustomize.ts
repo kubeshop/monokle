@@ -3,7 +3,7 @@ import log from 'loglevel';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
-import {getResourcesForPath} from '@redux/utils/fileEntry';
+import {getResourcesForPath} from '@redux/services/fileEntry';
 import {getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
 
 /**

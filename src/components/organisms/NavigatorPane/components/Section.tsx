@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import {K8sResource} from '@models/k8sresource';
 import {NavigatorSubSection, NavigatorSection} from '@models/navigator';
-import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/utils/resourceRefs';
+import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/services/resourceRefs';
 
 import Colors from '@styles/Colors';
 
