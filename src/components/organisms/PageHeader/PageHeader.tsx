@@ -135,7 +135,7 @@ const PageHeader = () => {
   return (
     <>
       {isInPreviewMode && previewType === 'kustomization' && (
-        <PreviewRow noborder>
+        <PreviewRow noborder="true">
           <StyledModeSpan>PREVIEW MODE</StyledModeSpan>
           {previewResource && (
             <StyledResourceSpan>
@@ -157,7 +157,7 @@ const PageHeader = () => {
         </ClusterRow>
       )}
       {isInPreviewMode && previewType === 'helm' && (
-        <PreviewRow noborder>
+        <PreviewRow noborder="true">
           <StyledModeSpan>HELM MODE</StyledModeSpan>
           {previewValuesFileId && (
             <StyledResourceSpan>
@@ -167,9 +167,9 @@ const PageHeader = () => {
           <ExitButton onClick={onClickExit} />
         </PreviewRow>
       )}
-      <StyledHeader noborder>
-        <Row noborder>
-          <LogoCol span={12} noborder>
+      <StyledHeader noborder="true">
+        <Row noborder="true">
+          <LogoCol span={12} noborder="true">
             <IconMonokle useDarkTheme />
           </LogoCol>
           <SettingsCol span={12}>

@@ -27,7 +27,7 @@ const PageFooter = () => {
     rootEntry && rootEntry.children ? ` - ${rootEntry.filePath} - ${nrOfFiles} files` : ''
   }`;
 
-  return <StyledFooter noborder>{footerText}</StyledFooter>;
+  return <StyledFooter noborder="true">{footerText}</StyledFooter>;
 };
 
 export default PageFooter;

@@ -151,7 +151,7 @@ const Monaco = (props: {editorHeight: string}) => {
 
   const options = {
     selectOnLineNumbers: true,
-    readOnly: isInPreviewMode,
+    readOnly: isInPreviewMode || (!selectedPath && !selectedResource),
     fontWeight: 'bold',
     glyphMargin: true,
   };
@@ -194,21 +194,21 @@ const Monaco = (props: {editorHeight: string}) => {
     }
 
     yaml &&
-    yaml.yamlDefaults.setDiagnosticsOptions({
-      validate: true,
-      enableSchemaRequest: true,
-      hover: true,
-      completion: true,
-      isKubernetes: true,
-      format: true,
-      schemas: [
-        {
-          uri: 'http://monokle/k8s.json', // id of the first schema
-          fileMatch: ['*'], // associate with our model
-          schema: resourceSchema || {},
-        },
-      ],
-    });
+      yaml.yamlDefaults.setDiagnosticsOptions({
+        validate: true,
+        enableSchemaRequest: true,
+        hover: true,
+        completion: true,
+        isKubernetes: true,
+        format: true,
+        schemas: [
+          {
+            uri: 'http://monokle/k8s.json', // id of the first schema
+            fileMatch: ['*'], // associate with our model
+            schema: resourceSchema || {},
+          },
+        ],
+      });
     if (currentCompletionDisposable) {
       currentCompletionDisposable.dispose();
     }
@@ -228,10 +228,12 @@ const Monaco = (props: {editorHeight: string}) => {
   return (
     <>
       <MonacoButtons>
-        <MonoButton large
-                    type={hasWarnings ? 'dashed' : 'primary'}
-                    disabled={!isDirty || !isValid}
-                    onClick={saveContent}>
+        <MonoButton
+          large="true"
+          type={hasWarnings ? 'dashed' : 'primary'}
+          disabled={!isDirty || !isValid}
+          onClick={saveContent}
+        >
           Save
         </MonoButton>
       </MonacoButtons>
@@ -239,7 +241,7 @@ const Monaco = (props: {editorHeight: string}) => {
         <MonacoEditor
           width={width}
           height={editorHeight}
-          language='yaml'
+          language="yaml"
           theme={KUBESHOP_MONACO_THEME}
           value={code}
           options={options}
