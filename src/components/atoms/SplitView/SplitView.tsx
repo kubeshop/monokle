@@ -40,15 +40,14 @@ const StyledDividerHitBox = styled.div.attrs((props: DividerProps) => props)`
 `;
 
 const StyledPaneDiv = styled.div`
-  overflow-x: hidden !important;
-  overflow-y: hidden !important;
+  height: 100%;
 `;
 
 const Pane: FunctionComponent<{
   width: number;
   hide: boolean;
 }> = ({children, width, hide}) => {
-  return <StyledPaneDiv style={{display: hide ? 'none' : 'inline', width}}>{children}</StyledPaneDiv>;
+  return <StyledPaneDiv style={{display: hide ? 'none' : 'inline-block', width}}>{children}</StyledPaneDiv>;
 };
 
 const SplitView: FunctionComponent<SplitViewProps> = ({
