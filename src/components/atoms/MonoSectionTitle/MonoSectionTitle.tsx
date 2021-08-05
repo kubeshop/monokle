@@ -11,7 +11,7 @@ export type MonoSectionTitleProps = {};
 const MonoSectionTitle = styled((props: MonoSectionTitleProps) => <Text {...props} />)`
   &.ant-typography {
     display: block;
-    margin-bottom: 0;
+    margin-bottom: 0px;
     padding: 12px;
     padding-left: 16px;
     font-size: 24px;

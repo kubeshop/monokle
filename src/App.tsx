@@ -62,13 +62,6 @@ const StyledColumnRight = styled(Col)`
 
 const StyledContent = styled(Content)`
   overflow-y: clip;
-
-  .ant-btn:hover,
-  .ant-btn:focus {
-    color: #165996;
-    background: transparent;
-    border-color: #165996;
-  }
 `;
 
 const iconStyle = {
@@ -142,7 +135,7 @@ const App = () => {
           <StyledRow style={{height: contentHeight + 4}}>
             <StyledColumnLeft>
               <Space direction="vertical" style={{width: 43}}>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip}>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
                   <Button
                     size="large"
                     type="text"
@@ -158,7 +151,7 @@ const App = () => {
                     }
                   />
                 </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterExplorerTooltip}>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterExplorerTooltip} placement="right">
                   <Button
                     size="large"
                     type="text"

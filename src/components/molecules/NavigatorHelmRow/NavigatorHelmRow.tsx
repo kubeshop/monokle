@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Col, Row, Spin, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {LoadingOutlined} from '@ant-design/icons';
@@ -9,7 +9,7 @@ import {useSelector} from 'react-redux';
 import {selectHelmValues} from '@redux/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
-import {startPreview} from '@redux/services/preview';
+import {startPreview, stopPreview} from '@redux/services/preview';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 import {ExitHelmPreviewTooltip, HelmPreviewTooltip} from '@src/tooltips';
 import {TOOLTIP_DELAY} from '@src/constants';
@@ -125,9 +125,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const dispatch = useAppDispatch();
   const scrollContainer = React.useRef(null);
-
   const {rowKey, helmChart, isPreviewLoading} = props;
-
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   // Parent needs to make sure disabled and selected arent active at the same time.
@@ -139,14 +137,16 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
     }
   }
 
-  function onClickPreview(id: string) {
-    if (!previewValuesFile || previewValuesFile === id) {
-      if (id !== selectedValuesFile) {
-        dispatch(selectHelmValuesFile(id));
+  const onClickPreview = useCallback(
+    (id: string) => {
+      if (id !== previewValuesFile) {
+        startPreview(id, 'helm', dispatch);
+      } else {
+        stopPreview(dispatch);
       }
-      startPreview(id, 'helm', dispatch);
-    }
-  }
+    },
+    [previewValuesFile]
+  );
 
   React.useEffect(() => {
     if (selectedPath && Object.values(helmValues).some(helm => helm.selected)) {

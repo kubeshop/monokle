@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useAppSelector} from '@redux/hooks';
 import styled from 'styled-components';
 
-import {BackgroundColors} from '@styles/Colors';
+import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import Footer from '@components/atoms/Footer';
 import packageJson from '@root/package.json';
@@ -14,6 +14,7 @@ const StyledFooter = styled(Footer)`
   padding-left: 10px;
   background: ${BackgroundColors.darkThemeBackground};
   border-top: ${AppBorders.pageDivider};
+  color: ${Colors.grey7};
 `;
 
 const PageFooter = () => {
