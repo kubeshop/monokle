@@ -3,3 +3,4 @@ export const YAML_DOCUMENT_DELIMITER = '---\n';
 export const ROOT_FILE_ENTRY = '<root>';
 export const APP_MIN_WIDTH = 800;
 export const APP_MIN_HEIGHT = 600;
+export const TOOLTIP_DELAY = 1.0;

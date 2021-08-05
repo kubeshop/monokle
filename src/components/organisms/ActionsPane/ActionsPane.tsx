@@ -15,6 +15,7 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
 import {ApplyTooltip, DiffTooltip, FormEditorTooltip, SourceEditorTooltip} from '@src/tooltips';
 import {diffResource} from '@redux/thunks/diffResource';
+import {TOOLTIP_DELAY} from '@src/constants';
 
 const {TabPane} = Tabs;
 
@@ -109,7 +110,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const OperationsSlot = {
     right: (
       <Space>
-        <Tooltip title={ApplyTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip}>
           <StyledButton
             loading={Boolean(applyingResource)}
             type="primary"
@@ -120,7 +121,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
             Apply
           </StyledButton>
         </Tooltip>
-        <Tooltip title={DiffTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip}>
           <StyledButton type="primary" ghost onClick={diffSelectedResource} disabled={!selectedResource}>
             Diff
           </StyledButton>

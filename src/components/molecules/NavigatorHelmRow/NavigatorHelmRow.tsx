@@ -12,6 +12,7 @@ import {selectHelmValuesFile} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 import {ExitHelmPreviewTooltip, HelmPreviewTooltip} from '@src/tooltips';
+import {TOOLTIP_DELAY} from '@src/constants';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 
@@ -191,7 +192,10 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
                     {isPreviewLoading ? (
                       <Spin indicator={PreviewLoadingIcon} />
                     ) : isHovered ? (
-                      <Tooltip title={previewButtonActive ? ExitHelmPreviewTooltip : HelmPreviewTooltip}>
+                      <Tooltip
+                        mouseEnterDelay={TOOLTIP_DELAY}
+                        title={previewButtonActive ? ExitHelmPreviewTooltip : HelmPreviewTooltip}
+                      >
                         <PreviewSpan isSelected={valuesFile.selected} onClick={() => onClickPreview(valuesFile.id)}>
                           {previewButtonActive ? 'Exit' : 'Preview'}
                         </PreviewSpan>

@@ -7,7 +7,7 @@ import {Row, Button, Tree, Col, Space, Typography, Skeleton, Tooltip} from 'antd
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {ROOT_FILE_ENTRY} from '@src/constants';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@src/constants';
 
 import {FolderAddOutlined} from '@ant-design/icons';
 
@@ -360,7 +360,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
       <Row>
         <ColumnWithPadding span={24}>
           <Space direction="horizontal">
-            <Tooltip title={BrowseFolderTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
               <Button type="primary" ghost onClick={startFileUploader}>
                 <CenteredItemsDiv>
                   <FolderAddOutlined style={{marginRight: '3px'}} />
