@@ -10,7 +10,7 @@ export type NavigatorContentTitleProps = {};
 
 const NavigatorContentTitle = styled((props: NavigatorContentTitleProps) => <Text {...props} />)`
   &.ant-typography {
-    margin-bottom: 0;
+    margin-top: 16px;
     padding: 8px;
     padding-left: 16px;
     font-size: 20px;

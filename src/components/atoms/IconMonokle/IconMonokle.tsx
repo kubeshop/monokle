@@ -10,10 +10,9 @@ export type IconMonokleProps = {
 };
 
 const StyledImage = styled.img`
-  height: 40px;
-  padding: 5px;
-  margin: 0px;
-  margin-top: 2px;
+  height: 24px;
+  margin: 4px;
+  margin-top: 11px;
 `;
 
 const IconMonokle = (props: IconMonokleProps) => {

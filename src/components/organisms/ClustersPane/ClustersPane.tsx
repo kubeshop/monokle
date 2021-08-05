@@ -84,13 +84,15 @@ const ClustersPane = () => {
         <ClustersContainer>
           <StyledDiv>KUBECONFIG</StyledDiv>
           <Input value={kubeconfig} />
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip}>
-            <StyledButton onClick={openFileSelect}>Browse</StyledButton>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
+            <StyledButton ghost type="primary" onClick={openFileSelect}>
+              Browse
+            </StyledButton>
           </Tooltip>
           <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
           <StyledDiv>Select to retrieve resources from configured kubeconfig</StyledDiv>
 
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip}>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
             <Button
               type="primary"
               ghost
