@@ -26,6 +26,7 @@ import {initKubeconfig} from '@redux/reducers/appConfig';
 import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
 import {ClusterExplorerTooltip, FileExplorerTooltip} from '@src/tooltips';
+import {TOOLTIP_DELAY} from '@src/constants';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -67,10 +68,6 @@ const StyledContent = styled(Content)`
     color: #165996;
     background: transparent;
     border-color: #165996;
-  }
-  .ant-row {
-    display: flex;
-    flex-flow: row nowrap;
   }
 `;
 
@@ -145,7 +142,7 @@ const App = () => {
           <StyledRow style={{height: contentHeight + 4}}>
             <StyledColumnLeft>
               <Space direction="vertical" style={{width: 43}}>
-                <Tooltip title={FileExplorerTooltip}>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip}>
                   <Button
                     size="large"
                     type="text"
@@ -161,7 +158,7 @@ const App = () => {
                     }
                   />
                 </Tooltip>
-                <Tooltip title={ClusterExplorerTooltip}>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterExplorerTooltip}>
                   <Button
                     size="large"
                     type="text"

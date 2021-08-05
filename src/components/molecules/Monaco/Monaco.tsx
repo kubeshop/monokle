@@ -20,7 +20,7 @@ import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
 import {updateFileEntry, updateResource, selectK8sResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
-import {ROOT_FILE_ENTRY} from '@src/constants';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@src/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {useSelector} from 'react-redux';
@@ -230,7 +230,7 @@ const Monaco = (props: {editorHeight: string}) => {
   return (
     <>
       <MonacoButtons>
-        <Tooltip title={SaveSourceTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveSourceTooltip}>
           <MonoButton
             large="true"
             type={hasWarnings ? 'dashed' : 'primary'}
