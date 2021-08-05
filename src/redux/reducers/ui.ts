@@ -1,19 +1,11 @@
 import {createSlice, Draft} from '@reduxjs/toolkit';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-
-type UiState = {
-  settingsOpened: boolean;
-  isFolderLoading: boolean;
-};
-
-const initialState: UiState = {
-  settingsOpened: false,
-  isFolderLoading: false,
-};
+import {UiState} from '@models/ui';
+import initialState from '@redux/initialState';
 
 export const uiSlice = createSlice({
   name: 'ui',
-  initialState,
+  initialState: initialState.ui,
   reducers: {
     toggleSettings: (state: Draft<UiState>) => {
       state.settingsOpened = !state.settingsOpened;

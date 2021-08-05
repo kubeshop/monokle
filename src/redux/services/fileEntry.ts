@@ -256,14 +256,14 @@ function addFile(absolutePath: string, state: AppState) {
  * Adds the folder at the specified path with the specified parent
  */
 
-function addFolder(absolutePath: string, state: AppState) {
+function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) {
   log.info(`adding folder ${absolutePath}`);
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
     const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
     folderEntry.children = readFiles(
       absolutePath,
-      state.appConfig,
+      appConfig,
       state.resourceMap,
       state.fileMap,
       state.helmChartMap,
@@ -279,13 +279,13 @@ function addFolder(absolutePath: string, state: AppState) {
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState) {
+export function addPath(absolutePath: string, state: AppState, appConfig: AppConfig) {
   const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
   if (parentEntry) {
     const fileEntry = fs.statSync(absolutePath).isDirectory()
-      ? addFolder(absolutePath, state)
+      ? addFolder(absolutePath, state, appConfig)
       : addFile(absolutePath, state);
 
     if (fileEntry) {
