@@ -1,7 +1,7 @@
 import React, {useState, useLayoutEffect, MouseEvent, TouchEvent, ReactElement, FunctionComponent} from 'react';
 import styled from 'styled-components';
 
-const MIN_WIDTH = 25;
+const MIN_WIDTH = 150;
 const SEPARATOR_WIDTH = 5; // width including hitbox
 
 export type SplitViewProps = {
