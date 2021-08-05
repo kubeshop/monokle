@@ -1,5 +1,5 @@
 import {createSlice, Draft} from '@reduxjs/toolkit';
-import {setRootFolder} from '@redux/reducers/thunks';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 type UiState = {
   settingsOpened: boolean;

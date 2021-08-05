@@ -3,11 +3,11 @@ import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
 import fs from 'fs';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
-import {isKustomizationResource, processKustomizations} from '@redux/utils/kustomize';
-import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/utils/fileEntry';
+import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
 import log from 'loglevel';
-import {isUnsatisfiedRef, RefMappersByResourceKind, RefMapper} from '@redux/utils/resourceRefs';
+import {isUnsatisfiedRef, RefMappersByResourceKind, RefMapper} from '@redux/services/resourceRefs';
 import {v4 as uuidv4} from 'uuid';
 import {traverseDocument} from './manifest-utils';
 

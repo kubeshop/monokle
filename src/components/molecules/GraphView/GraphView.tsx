@@ -7,7 +7,7 @@ import dagre from 'dagre';
 import {useMeasure} from 'react-use';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {isIncomingRef, isUnsatisfiedRef} from '@redux/utils/resourceRefs';
+import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {selectK8sResource} from '@redux/reducers/main';
 import {selectActiveResources} from '@redux/selectors';
 import {K8sResource, ResourceRef} from '@models/k8sresource';

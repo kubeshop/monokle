@@ -1,6 +1,6 @@
 import {createSelector} from 'reselect';
 import {K8sResource} from '@models/k8sresource';
-import {isKustomizationResource} from '@redux/utils/kustomize';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {RootState} from './store';
 import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '../constants';
 

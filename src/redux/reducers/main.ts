@@ -6,15 +6,13 @@ import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
-import {
-  diffResource,
-  previewCluster,
-  previewHelmValuesFile,
-  previewKustomization,
-  setRootFolder,
-} from '@redux/reducers/thunks';
+import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {previewCluster} from '@redux/thunks/previewCluster';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {diffResource} from '@redux/thunks/diffResource';
+import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {initialState} from '../initialState';
-import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../utils/selection';
+import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
   addPath,
   removePath,
@@ -22,8 +20,8 @@ import {
   getFileEntryForAbsolutePath,
   getResourcesForPath,
   reloadFile,
-} from '../utils/fileEntry';
-import {extractK8sResources, recalculateResourceRanges, reprocessResources, saveResource} from '../utils/resource';
+} from '../services/fileEntry';
+import {extractK8sResources, recalculateResourceRanges, reprocessResources, saveResource} from '../services/resource';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;

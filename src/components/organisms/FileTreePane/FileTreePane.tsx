@@ -14,14 +14,14 @@ import {FolderAddOutlined} from '@ant-design/icons';
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import fs from 'fs';
-import {setRootFolder} from '@redux/reducers/thunks';
-import {stopPreview} from '@redux/utils/preview';
-import {getResourcesForPath, getChildFilePath} from '@redux/utils/fileEntry';
+import {stopPreview} from '@redux/services/preview';
+import {getResourcesForPath, getChildFilePath} from '@redux/services/fileEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
 import {BrowseFolderTooltip} from '@src/tooltips';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 interface TreeNode {
   key: string;

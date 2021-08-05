@@ -8,7 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {ResourceRef, K8sResource} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
-import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/utils/resourceRefs';
+import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 
 const {Text} = Typography;

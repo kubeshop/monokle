@@ -3,12 +3,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {withTheme} from '@rjsf/core';
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
-import {loadResource} from '@redux/utils';
+import {loadResource} from '@redux/services';
 import {useCallback, useEffect, useState} from 'react';
 import {updateResource} from '@redux/reducers/main';
-import {logMessage} from '@redux/utils/log';
+import {logMessage} from '@redux/services/log';
 import {parse, stringify} from 'yaml';
-import {mergeManifests} from '@redux/utils/manifest-utils';
+import {mergeManifests} from '@redux/services/manifest-utils';
 import styled from 'styled-components';
 import {notification, Tooltip} from 'antd';
 import {useSelector} from 'react-redux';

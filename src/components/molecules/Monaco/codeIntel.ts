@@ -1,5 +1,5 @@
 import {monaco} from 'react-monaco-editor';
-import {isUnsatisfiedRef, isOutgoingRef} from '@redux/utils/resourceRefs';
+import {isUnsatisfiedRef, isOutgoingRef} from '@redux/services/resourceRefs';
 import {K8sResource, ResourceRef, RefPosition} from '@models/k8sresource';
 
 import {ResourceMapType} from '@models/appstate';

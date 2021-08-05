@@ -13,7 +13,7 @@ import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
 import {inPreviewMode, selectActiveResources} from '@redux/selectors';
 import {useSelector} from 'react-redux';
-import {stopPreview} from '@redux/utils/preview';
+import {stopPreview} from '@redux/services/preview';
 
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';

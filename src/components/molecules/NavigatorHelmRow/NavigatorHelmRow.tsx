@@ -9,7 +9,7 @@ import {useSelector} from 'react-redux';
 import {selectHelmValues} from '@redux/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
-import {startPreview} from '@redux/utils/preview';
+import {startPreview} from '@redux/services/preview';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 import {ExitHelmPreviewTooltip, HelmPreviewTooltip} from '@src/tooltips';
 

@@ -6,8 +6,8 @@ import {setAlert} from '@redux/reducers/alert';
 import {setLogs} from '@redux/reducers/logs';
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
-import {getAbsoluteResourceFolder} from '@redux/utils/fileEntry';
-import {isKustomizationResource} from '@redux/utils/kustomize';
+import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {getShellPath} from '@utils/shell';
 
 /**
