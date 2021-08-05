@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import {Select, Tooltip} from 'antd';
 import {NamespacesFilterTooltip} from '@src/tooltips';
+import {TOOLTIP_DELAY} from '@src/constants';
 
 const {Option} = Select;
 
@@ -30,7 +31,7 @@ const NamespacesSection = (props: NamespacesSectionType) => {
     <StyledDiv>
       <StyledSpan>Namespace:</StyledSpan>
       <SelectContainer>
-        <Tooltip title={NamespacesFilterTooltip}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NamespacesFilterTooltip}>
           <Select
             showSearch
             placeholder="Namespace"

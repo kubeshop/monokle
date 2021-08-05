@@ -16,6 +16,7 @@ import {inPreviewMode} from '@redux/selectors';
 import {MonoButton} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
 import {SaveFormTooltip} from '@src/tooltips';
+import {TOOLTIP_DELAY} from '@src/constants';
 
 const Form = withTheme(AntDTheme);
 
@@ -74,31 +75,42 @@ const FormContainer = styled.div<{contentHeight: string}>`
   .object-property-expand {
     background: black;
     color: #177ddc;
+    width: 120px;
+    margin-left: 50px;
   }
 
   .array-item-add {
     background: black;
     color: #177ddc;
+    width: 120px;
+    margin-left: 50px;
   }
 
   .array-item-remove {
     background: black;
     color: #177ddc;
+    width: 120px;
+    margin-left: 50px;
   }
 
   .array-item-move-up {
     background: black;
     color: #177ddc;
+    width: 120px;
+    margin-left: 50px;
   }
 
   .array-item-move-down {
     background: black;
     color: #177ddc;
+    width: 120px;
+    margin-left: 50px;
   }
 
   .ant-btn-dangerous {
     background: black;
     color: #177ddc;
+    margin-left: 50px;
   }
 `;
 
@@ -171,8 +183,8 @@ const FormEditor = (props: {contentHeight: string}) => {
     // @ts-ignore
     <>
       <FormButtons>
-        <Tooltip title={SaveFormTooltip}>
-          <MonoButton large type="primary" onClick={submitForm} disabled={isInPreviewMode}>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveFormTooltip}>
+          <MonoButton large="true" type="primary" onClick={submitForm} disabled={isInPreviewMode}>
             Save
           </MonoButton>
         </Tooltip>

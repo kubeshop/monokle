@@ -10,6 +10,7 @@ import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {updateKubeconfig} from '@redux/reducers/appConfig';
 import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@src/tooltips';
+import {TOOLTIP_DELAY} from '@src/constants';
 
 const StyledDiv = styled.div`
   margin-bottom: 10px;
@@ -83,13 +84,13 @@ const ClustersPane = () => {
         <ClustersContainer>
           <StyledDiv>KUBECONFIG</StyledDiv>
           <Input value={kubeconfig} />
-          <Tooltip title={BrowseKubeconfigTooltip}>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip}>
             <StyledButton onClick={openFileSelect}>Browse</StyledButton>
           </Tooltip>
           <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
           <StyledDiv>Select to retrieve resources from configured kubeconfig</StyledDiv>
 
-          <Tooltip title={ClusterModeTooltip}>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip}>
             <Button
               type="primary"
               ghost

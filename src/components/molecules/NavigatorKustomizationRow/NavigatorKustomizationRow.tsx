@@ -8,6 +8,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import NavigatorRowLabel from '@molecules/NavigatorRowLabel';
 import {ExitKustomizationPreviewTooltip, KustomizationPreviewTooltip} from '@src/tooltips';
+import {TOOLTIP_DELAY} from '@src/constants';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 
@@ -127,7 +128,10 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
               {isPreviewLoading ? (
                 <Spin indicator={PreviewLoadingIcon} />
               ) : isHovered ? (
-                <Tooltip title={previewButtonActive ? ExitKustomizationPreviewTooltip : KustomizationPreviewTooltip}>
+                <Tooltip
+                  mouseEnterDelay={TOOLTIP_DELAY}
+                  title={previewButtonActive ? ExitKustomizationPreviewTooltip : KustomizationPreviewTooltip}
+                >
                   <PreviewSpan isSelected={isSelected} onClick={onClickPreview}>
                     {previewButtonActive ? 'Exit' : 'Preview'}
                   </PreviewSpan>

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import {Tooltip} from 'antd';
+import {TOOLTIP_DELAY} from '@src/constants';
 
 interface TabHeaderProps {
   icon: React.ReactNode;
@@ -15,7 +16,7 @@ const StyledWrapper = styled.div`
 
 const TabHeader = ({children, icon, tooltip}: TabHeaderProps): JSX.Element => {
   return (
-    <Tooltip title={tooltip}>
+    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
       <StyledWrapper>
         {icon}
         {children}
