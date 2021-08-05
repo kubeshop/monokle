@@ -93,8 +93,6 @@ const App = () => {
   const [rightMenuSelection, setRightMenuSelection] = useState('');
   const [appWidth, setAppWidth] = useState(size.width);
 
-  console.log('app.tsx render:', 'app width', size.width, 'left', leftMenuSelection, 'right', rightMenuSelection);
-
   useEffect(() => {
     dispatch(initKubeconfig());
   }, []);

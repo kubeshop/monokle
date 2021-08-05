@@ -114,16 +114,6 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   const [draggingNavEdit, setDraggingNavEdit] = useState(false);
   const [draggingEditRight, setDraggingEditRight] = useState(false);
 
-  console.log(
-    'SplitView Render:',
-    'splitPaneWidth',
-    splitPaneWidth,
-    'leftHidden',
-    leftHidden,
-    'rightHidden',
-    rightHidden
-  );
-
   const onMouseDownLeftNav = (evt: MouseEvent<HTMLElement>): any => {
     setSeparatorLeftNavXPosition(evt.clientX);
     setDraggingLeftNav(true);
@@ -214,29 +204,10 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setWidthA: Function,
     setWidthB: Function
   ): void => {
-    console.log(
-      'calcPaneWidth:',
-      'paneWidthA',
-      paneWidthA,
-      'paneWidthB',
-      paneWidthB,
-      'clientX',
-      clientX,
-      'separatorX',
-      separatorX
-    );
     const combinedPixelWidth = Math.floor(paneWidthA * viewWidth + paneWidthB * viewWidth);
     const newPixelWidthA = Math.floor(paneWidthA * viewWidth + clientX - separatorX);
     const newPixelWidthB = Math.floor(combinedPixelWidth - newPixelWidthA);
-    console.log(
-      'calcPaneWidth:',
-      'combinedPixelWidth',
-      combinedPixelWidth,
-      'newPixelWidthA',
-      newPixelWidthA,
-      'newPixelWidthB',
-      newPixelWidthB
-    );
+
     setSepX(clientX);
 
     // if trying to resize under minimum size
