@@ -87,7 +87,7 @@ const App = () => {
 
   const previewMode = useSelector(inPreviewMode);
 
-  const [leftMenuSelection, setLeftMenuSelection] = useState('');
+  const [leftMenuSelection, setLeftMenuSelection] = useState('file-explorer');
   const [rightMenuSelection, setRightMenuSelection] = useState('');
   const [appWidth, setAppWidth] = useState(size.width);
 

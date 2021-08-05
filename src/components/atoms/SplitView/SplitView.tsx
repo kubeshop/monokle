@@ -73,9 +73,9 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   const splitPaneWidth = viewWidth - numSeparatorsActive * SEPARATOR_WIDTH;
 
   // pane widths
-  const [leftWidth, setLeftWidth] = useState<number>(0);
-  const [navWidth, setNavWidth] = useState<number>(0.5);
-  const [editWidth, setEditWidth] = useState<number>(0.5);
+  const [leftWidth, setLeftWidth] = useState<number>(0.3333);
+  const [navWidth, setNavWidth] = useState<number>(0.3333);
+  const [editWidth, setEditWidth] = useState<number>(0.3333);
   const [rightWidth, setRightWidth] = useState<number>(0);
 
   // detect pane changes
