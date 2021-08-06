@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
@@ -41,6 +41,16 @@ window.MonacoEnvironment = {
   },
 };
 
+const HiddenInputContainer = styled.div`
+  width: 0;
+  height: 0;
+  overflow: hidden;
+`;
+
+const HiddenInput = styled.input`
+  opacity: 0;
+`;
+
 const MonacoButtons = styled.div`
   padding-left: 15px;
   padding-bottom: 10px;
@@ -66,7 +76,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
   const [code, setCode] = useState('');
-  const [ref, {width}] = useMeasure<HTMLDivElement>();
+  const [containerRef, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
@@ -77,6 +87,8 @@ const Monaco = (props: {editorHeight: string}) => {
   const [currentLinkDisposables, setCurrentLinkDisposables] = useState<monaco.IDisposable[]>([]);
   const [currentCompletionDisposable, setCurrentCompletionDisposable] = useState<monaco.IDisposable>();
   const [actionSaveDisposable, setActionSaveDisposable] = useState<monaco.IDisposable>();
+
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
 
   const isInPreviewMode = useSelector(inPreviewMode);
   const dispatch = useAppDispatch();
@@ -95,6 +107,17 @@ const Monaco = (props: {editorHeight: string}) => {
   };
 
   const editorDidMount = (e: any, m: any) => {
+    // register action to exit editor focus
+    e.addAction({
+      id: 'monokle-exit-editor-focus',
+      label: 'Exit Editor Focus',
+      /* eslint-disable no-bitwise */
+      keybindings: [monaco.KeyCode.Escape],
+      run: () => {
+        hiddenInputRef.current?.focus();
+      },
+    });
+
     setEditor(e);
 
     // @ts-ignore
@@ -252,6 +275,9 @@ const Monaco = (props: {editorHeight: string}) => {
   return (
     <>
       <MonacoButtons>
+        <HiddenInputContainer>
+          <HiddenInput ref={hiddenInputRef} type="text" />
+        </HiddenInputContainer>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveSourceTooltip}>
           <MonoButton
             large="true"
@@ -263,7 +289,7 @@ const Monaco = (props: {editorHeight: string}) => {
           </MonoButton>
         </Tooltip>
       </MonacoButtons>
-      <MonacoContainer ref={ref}>
+      <MonacoContainer ref={containerRef}>
         <MonacoEditor
           width={width}
           height={editorHeight}
