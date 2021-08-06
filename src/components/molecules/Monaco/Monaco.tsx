@@ -76,6 +76,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const [currentCommandDisposables, setCurrentCommandDisposables] = useState<monaco.IDisposable[]>([]);
   const [currentLinkDisposables, setCurrentLinkDisposables] = useState<monaco.IDisposable[]>([]);
   const [currentCompletionDisposable, setCurrentCompletionDisposable] = useState<monaco.IDisposable>();
+  const [actionSaveDisposable, setActionSaveDisposable] = useState<monaco.IDisposable>();
 
   const isInPreviewMode = useSelector(inPreviewMode);
   const dispatch = useAppDispatch();
@@ -84,16 +85,16 @@ const Monaco = (props: {editorHeight: string}) => {
     dispatch(selectK8sResource(resourceId));
   };
 
-  function onDidChangeMarkers(e: monaco.Uri[]) {
+  const onDidChangeMarkers = (e: monaco.Uri[]) => {
     const flag = monaco.editor.getModelMarkers({}).length > 0;
     setWarnings(flag);
-  }
+  };
 
-  function onChangeCursorSelection(e: any) {
+  const onChangeCursorSelection = (e: any) => {
     // console.log(e);
-  }
+  };
 
-  function editorDidMount(e: any, m: any) {
+  const editorDidMount = (e: any, m: any) => {
     setEditor(e);
 
     // @ts-ignore
@@ -103,20 +104,25 @@ const Monaco = (props: {editorHeight: string}) => {
     e.onDidChangeCursorSelection(onChangeCursorSelection);
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
-  }
+  };
 
-  function onChange(newValue: any, e: any) {
+  const onChange = (newValue: any, e: any) => {
     setDirty(true);
     setCode(newValue);
 
     // this will slow things down if document gets large - need to find a better solution...
     setValid(!parseAllDocuments(newValue).some(d => d.errors.length > 0));
-  }
+  };
 
-  function saveContent() {
-    // @ts-ignore
-    const value = editor.getValue();
-
+  const saveContent = (providedEditor?: monaco.editor.IStandaloneCodeEditor) => {
+    let value = null;
+    if (providedEditor) {
+      value = providedEditor.getValue();
+    } else if (editor) {
+      value = editor.getValue();
+    } else {
+      return;
+    }
     // is a file and no resource selected?
     if (selectedPath && !selectedResource) {
       try {
@@ -131,7 +137,23 @@ const Monaco = (props: {editorHeight: string}) => {
         logMessage(`Failed to update resource ${e}`, dispatch);
       }
     }
-  }
+  };
+
+  useEffect(() => {
+    if (editor) {
+      actionSaveDisposable?.dispose();
+      const newActionSaveDisposable = editor.addAction({
+        id: 'monokle-save-content',
+        label: 'Save Content',
+        /* eslint-disable no-bitwise */
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
+        run: currentEditor => {
+          saveContent(currentEditor as monaco.editor.IStandaloneCodeEditor);
+        },
+      });
+      setActionSaveDisposable(newActionSaveDisposable);
+    }
+  }, [editor, selectedPath, selectedResource]);
 
   useEffect(() => {
     let newCode = '';
@@ -235,7 +257,7 @@ const Monaco = (props: {editorHeight: string}) => {
             large="true"
             type={hasWarnings ? 'dashed' : 'primary'}
             disabled={!isDirty || !isValid}
-            onClick={saveContent}
+            onClick={() => saveContent()}
           >
             Save
           </MonoButton>
