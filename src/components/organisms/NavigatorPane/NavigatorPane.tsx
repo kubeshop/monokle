@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Col, Row, Skeleton} from 'antd';
+import {Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
 import {inClusterMode, selectHelmCharts, selectHelmValues, selectKustomizations} from '@redux/selectors';
@@ -66,6 +66,12 @@ const SectionTitleSpan = styled.span<{isSelected: boolean}>`
     `;
     }
   }}
+`;
+
+const TitleBarContainer = styled.div`
+  display: flex;
+  height: 24px;
+  justify-content: space-between;
 `;
 
 const NavigatorPaneContainer = styled(PaneContainer)`
@@ -136,11 +142,11 @@ const NavigatorPane = () => {
     <>
       <TitleRow>
         <MonoPaneTitleCol span={24}>
-          <Row>
-            <Col span={12}>
-              <MonoPaneTitle>Navigator</MonoPaneTitle>
-            </Col>
-          </Row>
+          <MonoPaneTitle>
+            <TitleBarContainer>
+              <span>Navigator</span>
+            </TitleBarContainer>
+          </MonoPaneTitle>
         </MonoPaneTitleCol>
       </TitleRow>
       <NavigatorPaneContainer>

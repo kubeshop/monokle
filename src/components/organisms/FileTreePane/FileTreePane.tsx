@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import path from 'path';
-import {Row, Button, Tree, Col, Typography, Skeleton, Tooltip} from 'antd';
+import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -30,15 +30,6 @@ interface TreeNode {
   highlight: boolean;
   isLeaf?: boolean;
 }
-
-const CenteredItemsDiv = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const ColumnWithPadding = styled(Col)`
-  padding: 16px 16px 0;
-`;
 
 const StyledNumberOfResources = styled(Typography.Text)`
   margin-left: 12px;
@@ -218,16 +209,14 @@ const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
   opacity: ${props => (props.disabled ? '70%' : '100%')};
 `;
 
-const LeftTitle = styled.div`
-  float: left;
+const TitleBarContainer = styled.div`
+  display: flex;
+  height: 24px;
+  justify-content: space-between;
 `;
 
 const RightButtons = styled.div`
-  float: right;
-
-  & .ant-tooltip-disabled-compatible-wrapper {
-    display: inline;
-  }
+  display: flex;
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -237,10 +226,6 @@ const StyledSkeleton = styled(Skeleton)`
 
 const ReloadButton = styled(Button)`
   margin-left: 8px;
-  margin-bottom: 8px;
-  margin-right: 3px;
-  margin-top: 0px;
-  vertical-align: top;
 `;
 
 const FileTreePane = (props: {windowHeight: number | undefined}) => {
@@ -371,27 +356,26 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>
-            <LeftTitle>File Explorer</LeftTitle>
-            <RightButtons>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
-                <Button size="small" type="primary" ghost onClick={startFileUploader}>
-                  <CenteredItemsDiv>
-                    <FolderAddOutlined style={{marginRight: '3px'}} />
+            <TitleBarContainer>
+              <span>File Explorer</span>
+              <RightButtons>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
+                  <Button icon={<FolderAddOutlined />} size="small" type="primary" ghost onClick={startFileUploader}>
                     Browse
-                  </CenteredItemsDiv>
-                </Button>
-              </Tooltip>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                <ReloadButton
-                  size="small"
-                  onClick={refreshFolder}
-                  icon={<ReloadOutlined />}
-                  type="primary"
-                  ghost
-                  disabled={!fileMap[ROOT_FILE_ENTRY]}
-                />
-              </Tooltip>
-            </RightButtons>
+                  </Button>
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                  <ReloadButton
+                    size="small"
+                    onClick={refreshFolder}
+                    icon={<ReloadOutlined />}
+                    type="primary"
+                    ghost
+                    disabled={!fileMap[ROOT_FILE_ENTRY]}
+                  />
+                </Tooltip>
+              </RightButtons>
+            </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
         <input

@@ -35,18 +35,19 @@ const ActionsPaneContainer = styled(PaneContainer)`
   overflow-y: hidden;
 `;
 
-const LeftTitle = styled.div`
-  float: left;
+const TitleBarContainer = styled.div`
+  display: flex;
+  height: 24px;
+  justify-content: space-between;
 `;
 
 const RightButtons = styled.div`
   float: right;
+  display: flex;
 `;
 
 const DiffButton = styled(Button)`
   margin-left: 8px;
-  margin-bottom: 8px;
-  margin-right: 8px;
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -121,32 +122,34 @@ const ActionsPane = (props: {contentHeight: string}) => {
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>
-            <LeftTitle>Editor</LeftTitle>
-            <RightButtons>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip}>
-                <Button
-                  loading={Boolean(applyingResource)}
-                  type="primary"
-                  size="small"
-                  ghost
-                  onClick={applySelectedResource}
-                  disabled={!selectedResourceId}
-                >
-                  Apply
-                </Button>
-              </Tooltip>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip}>
-                <DiffButton
-                  size="small"
-                  type="primary"
-                  ghost
-                  onClick={diffSelectedResource}
-                  disabled={!selectedResourceId}
-                >
-                  Diff
-                </DiffButton>
-              </Tooltip>
-            </RightButtons>
+            <TitleBarContainer>
+              <span>Editor</span>
+              <RightButtons>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip}>
+                  <Button
+                    loading={Boolean(applyingResource)}
+                    type="primary"
+                    size="small"
+                    ghost
+                    onClick={applySelectedResource}
+                    disabled={!selectedResourceId}
+                  >
+                    Apply
+                  </Button>
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip}>
+                  <DiffButton
+                    size="small"
+                    type="primary"
+                    ghost
+                    onClick={diffSelectedResource}
+                    disabled={!selectedResourceId}
+                  >
+                    Diff
+                  </DiffButton>
+                </Tooltip>
+              </RightButtons>
+            </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
