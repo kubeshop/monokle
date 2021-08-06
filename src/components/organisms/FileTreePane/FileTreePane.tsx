@@ -224,6 +224,10 @@ const LeftTitle = styled.div`
 
 const RightButtons = styled.div`
   float: right;
+
+  & .ant-tooltip-disabled-compatible-wrapper {
+    display: inline;
+  }
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -382,6 +386,8 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
                   size="small"
                   onClick={refreshFolder}
                   icon={<ReloadOutlined />}
+                  type="primary"
+                  ghost
                   disabled={!fileMap[ROOT_FILE_ENTRY]}
                 />
               </Tooltip>
