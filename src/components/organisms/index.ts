@@ -7,3 +7,4 @@ export {default as NavigatorPane} from './NavigatorPane';
 export {default as PageFooter} from './PageFooter';
 export {default as PageHeader} from './PageHeader';
 export {default as SettingsDrawer} from './SettingsDrawer';
+export {default as HotKeysHandler} from './HotKeysHandler';
