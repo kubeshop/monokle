@@ -31,33 +31,53 @@ const HotKeysHandler = (props: {onToggleLeftMenu: () => void; onToggleRightMenu:
     startFileUploader();
   });
 
-  useHotkeys(hotkeys.REFRESH_FOLDER, () => {
-    if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].filePath) {
-      dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
-    }
-  });
+  useHotkeys(
+    hotkeys.REFRESH_FOLDER,
+    () => {
+      if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].filePath) {
+        dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
+      }
+    },
+    [mainState]
+  );
 
   useHotkeys(hotkeys.TOGGLE_SETTINGS, () => {
     dispatch(toggleSettings());
   });
 
-  useHotkeys(hotkeys.PREVIEW_CLUSTER, () => {
-    startPreview(configState.kubeconfig, 'cluster', dispatch);
-  });
+  useHotkeys(
+    hotkeys.PREVIEW_CLUSTER,
+    () => {
+      startPreview(configState.kubeconfig, 'cluster', dispatch);
+    },
+    [configState]
+  );
 
-  useHotkeys(hotkeys.EXIT_PREVIEW_MODE, () => {
-    if (isInPreviewMode) {
-      stopPreview(dispatch);
-    }
-  });
+  useHotkeys(
+    hotkeys.EXIT_PREVIEW_MODE,
+    () => {
+      if (isInPreviewMode) {
+        stopPreview(dispatch);
+      }
+    },
+    [isInPreviewMode]
+  );
 
-  useHotkeys(hotkeys.TOGGLE_LEFT_PANE, () => {
-    onToggleLeftMenu();
-  });
+  useHotkeys(
+    hotkeys.TOGGLE_LEFT_PANE,
+    () => {
+      onToggleLeftMenu();
+    },
+    [onToggleLeftMenu]
+  );
 
-  useHotkeys(hotkeys.TOGGLE_RIGHT_PANE, () => {
-    onToggleRightMenu();
-  });
+  useHotkeys(
+    hotkeys.TOGGLE_RIGHT_PANE,
+    () => {
+      onToggleRightMenu();
+    },
+    [onToggleRightMenu]
+  );
 
   return (
     <>
