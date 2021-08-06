@@ -80,19 +80,24 @@ const App = () => {
   const [leftMenuSelection, setLeftMenuSelection] = useState('file-explorer');
   const [rightMenuSelection, setRightMenuSelection] = useState('');
   const [appWidth, setAppWidth] = useState(size.width);
-  const [leftActive, setLeftActive] = useState<boolean>(false);
+  const [leftActiveStore, setLeftActive] = useState<boolean>(true);
   const [rightActive, setRightActive] = useState<boolean>(false);
+  let leftActive = leftActiveStore;
 
   useEffect(() => {
     dispatch(initKubeconfig());
   }, []);
 
   const toggleLeftMenu = () => {
+    console.log('toggleLeftMenu 1:', leftActive);
     if (leftActive) {
+      leftActive = false;
       setLeftActive(false);
     } else {
+      leftActive = true;
       setLeftActive(true);
     }
+    console.log('toggleLeftMenu 2:', leftActive);
   };
 
   const toggleRightMenu = () => {
@@ -173,15 +178,13 @@ const App = () => {
                 contentWidth={contentWidth}
                 left={
                   <>
-                    <div style={{display: leftActive && leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
+                    <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
                       <FileTreePane windowHeight={size.height} />
                     </div>
                     <div
                       style={{
                         display:
-                          leftActive && featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer'
-                            ? 'inline'
-                            : 'none',
+                          featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
                       }}
                     >
                       <ClustersPane />
@@ -195,15 +198,12 @@ const App = () => {
                   <>
                     <div
                       style={{
-                        display:
-                          rightActive && featureJson.ShowGraphView && rightMenuSelection === 'graph'
-                            ? 'inline'
-                            : 'none',
+                        display: featureJson.ShowGraphView && rightMenuSelection === 'graph' ? 'inline' : 'none',
                       }}
                     >
                       <GraphView editorHeight={contentHeight} />
                     </div>
-                    <div style={{display: rightActive && rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
+                    <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
                       <LogViewer editorHeight={contentHeight} />
                     </div>
                   </>
