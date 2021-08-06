@@ -80,27 +80,22 @@ const App = () => {
   const [leftMenuSelection, setLeftMenuSelection] = useState('file-explorer');
   const [rightMenuSelection, setRightMenuSelection] = useState('');
   const [appWidth, setAppWidth] = useState(size.width);
-  const [leftActiveStore, setLeftActiveStore] = useState<boolean>(true);
-  const [rightActiveStore, setRightActiveStore] = useState<boolean>(false);
-
-  let leftActive = leftActiveStore;
-  let rightActive = rightActiveStore;
+  const [leftActive, setLeftActive] = useState<boolean>(true);
+  const [rightActive, setRightActive] = useState<boolean>(false);
 
   useEffect(() => {
     dispatch(initKubeconfig());
   }, []);
 
   const toggleLeftMenu = () => {
-    leftActive = !leftActive;
-    setLeftActiveStore(!leftActive);
+    setLeftActive(!leftActive);
   };
 
   const toggleRightMenu = () => {
     if (!featureJson.ShowRightMenu) {
       return;
     }
-    rightActive = !rightActive;
-    setRightActiveStore(!rightActive);
+    setRightActive(!rightActive);
   };
 
   const setActivePanes = (side: string, selectedMenu: string) => {
@@ -110,7 +105,7 @@ const App = () => {
       } else {
         setLeftMenuSelection(selectedMenu);
         if (!leftActive) {
-          setLeftActiveStore(true);
+          setLeftActive(true);
         }
       }
     }
@@ -121,7 +116,7 @@ const App = () => {
       } else {
         setRightMenuSelection(selectedMenu);
         if (!rightActive) {
-          setRightActiveStore(true);
+          setRightActive(true);
         }
       }
     }
