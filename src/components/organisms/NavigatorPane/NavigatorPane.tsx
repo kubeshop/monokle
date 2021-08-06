@@ -23,6 +23,7 @@ const StyledSkeleton = styled(Skeleton)`
 
 const TitleRow = styled(Row)`
   width: 100%;
+  height: 40px;
   margin: 0;
   padding: 0;
   background: ${BackgroundColors.darkThemeBackground};
