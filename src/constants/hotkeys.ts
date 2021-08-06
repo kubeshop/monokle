@@ -3,6 +3,7 @@ const hotkeys = {
   TOGGLE_SETTINGS: 'ctrl+p,command+p',
   EXIT_PREVIEW_MODE: 'esc',
   SELECT_FOLDER: 'ctrl+o,command+o',
+  REFRESH_FOLDER: 'ctrl+f5,command+f5',
   TOGGLE_LEFT_PANE: 'ctrl+b,command+b',
   TOGGLE_RIGHT_PANE: 'ctrl+alt+b,command+alt+b',
   SAVE: 'ctrl+s,command+s',

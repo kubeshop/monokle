@@ -80,28 +80,27 @@ const App = () => {
   const [leftMenuSelection, setLeftMenuSelection] = useState('file-explorer');
   const [rightMenuSelection, setRightMenuSelection] = useState('');
   const [appWidth, setAppWidth] = useState(size.width);
-  const [leftActiveStore, setLeftActive] = useState<boolean>(true);
-  const [rightActive, setRightActive] = useState<boolean>(false);
+  const [leftActiveStore, setLeftActiveStore] = useState<boolean>(true);
+  const [rightActiveStore, setRightActiveStore] = useState<boolean>(false);
+
   let leftActive = leftActiveStore;
+  let rightActive = rightActiveStore;
 
   useEffect(() => {
     dispatch(initKubeconfig());
   }, []);
 
   const toggleLeftMenu = () => {
-    console.log('toggleLeftMenu 1:', leftActive);
-    if (leftActive) {
-      leftActive = false;
-      setLeftActive(false);
-    } else {
-      leftActive = true;
-      setLeftActive(true);
-    }
-    console.log('toggleLeftMenu 2:', leftActive);
+    leftActive = !leftActive;
+    setLeftActiveStore(!leftActive);
   };
 
   const toggleRightMenu = () => {
-    setRightActive(!rightActive);
+    if (!featureJson.ShowRightMenu) {
+      return;
+    }
+    rightActive = !rightActive;
+    setRightActiveStore(!rightActive);
   };
 
   const setActivePanes = (side: string, selectedMenu: string) => {
@@ -111,18 +110,18 @@ const App = () => {
       } else {
         setLeftMenuSelection(selectedMenu);
         if (!leftActive) {
-          setLeftActive(true);
+          setLeftActiveStore(true);
         }
       }
     }
 
-    if (side === 'right') {
+    if (side === 'right' && featureJson.ShowRightMenu) {
       if (rightMenuSelection === selectedMenu) {
         toggleRightMenu();
       } else {
         setRightMenuSelection(selectedMenu);
         if (!rightActive) {
-          setRightActive(true);
+          setRightActiveStore(true);
         }
       }
     }
@@ -247,7 +246,7 @@ const App = () => {
       </Layout>
       <DiffModal />
       <StartupModal />
-      <HotKeysHandler onToggleLeftMenu={() => toggleLeftMenu()} />
+      <HotKeysHandler onToggleLeftMenu={() => toggleLeftMenu()} onToggleRightMenu={() => toggleRightMenu()} />
     </div>
   );
 };
