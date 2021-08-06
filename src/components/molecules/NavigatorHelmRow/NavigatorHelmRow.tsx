@@ -71,7 +71,6 @@ const RowContainer = styled.div`
   }
 
   & .helmchart-row-highlighted {
-    font-style: italic;
     font-weight: bold;
     background: ${Colors.highlightGradient};
     color: ${FontColors.resourceRowHighlight};
@@ -102,7 +101,6 @@ const RowContainer = styled.div`
   }
 
   & .helmvalues-row-highlighted {
-    font-style: italic;
     font-weight: bold;
     background: ${Colors.highlightGradient};
     color: ${FontColors.resourceRowHighlight};
