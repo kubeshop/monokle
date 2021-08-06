@@ -51,7 +51,6 @@ const RowContainer = styled.div`
     color: grey;
   }
   & .resource-row-highlighted {
-    font-style: italic;
     font-weight: bold;
     background: ${Colors.highlightGradient};
     color: ${FontColors.resourceRowHighlight};

@@ -16,6 +16,7 @@ import {
   SettingsDrawer,
   DiffModal,
   StartupModal,
+  HotKeysHandler,
 } from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import {Size} from '@models/window';
@@ -24,8 +25,6 @@ import {useAppDispatch} from '@redux/hooks';
 import {initKubeconfig} from '@redux/reducers/appConfig';
 import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
-import {useSelector} from 'react-redux';
-import {inPreviewMode} from '@redux/selectors';
 import {ClusterExplorerTooltip, FileExplorerTooltip} from '@src/tooltips';
 import {TOOLTIP_DELAY} from '@src/constants';
 
@@ -78,34 +77,51 @@ const App = () => {
   const mainHeight = `${size.height}px`;
   const contentHeight = `${size.height - 75}px`;
 
-  const previewMode = useSelector(inPreviewMode);
-
   const [leftMenuSelection, setLeftMenuSelection] = useState('file-explorer');
   const [rightMenuSelection, setRightMenuSelection] = useState('');
   const [appWidth, setAppWidth] = useState(size.width);
+  const [leftActive, setLeftActive] = useState<boolean>(true);
+  const [rightActive, setRightActive] = useState<boolean>(false);
 
   useEffect(() => {
     dispatch(initKubeconfig());
   }, []);
 
-  const setActivePanes = (side: string, buttonName: string) => {
-    let left;
-    let right;
-    if (side === 'left') {
-      left = leftMenuSelection === buttonName ? '' : buttonName;
-      setLeftMenuSelection(left);
-    }
-
-    if (side === 'right') {
-      right = rightMenuSelection === buttonName ? '' : buttonName;
-      setRightMenuSelection(right);
-    }
+  const toggleLeftMenu = () => {
+    setLeftActive(!leftActive);
   };
 
-  if (appWidth !== size.width) setAppWidth(size.width);
+  const toggleRightMenu = () => {
+    if (!featureJson.ShowRightMenu) {
+      return;
+    }
+    setRightActive(!rightActive);
+  };
 
-  const leftActive = leftMenuSelection !== '';
-  const rightActive = featureJson.ShowRightMenu && rightMenuSelection !== '';
+  const setActivePanes = (side: string, selectedMenu: string) => {
+    if (side === 'left') {
+      if (leftMenuSelection === selectedMenu) {
+        toggleLeftMenu();
+      } else {
+        setLeftMenuSelection(selectedMenu);
+        if (!leftActive) {
+          setLeftActive(true);
+        }
+      }
+    }
+
+    if (side === 'right' && featureJson.ShowRightMenu) {
+      if (rightMenuSelection === selectedMenu) {
+        toggleRightMenu();
+      } else {
+        setRightMenuSelection(selectedMenu);
+        if (!rightActive) {
+          setRightActive(true);
+        }
+      }
+    }
+  };
+  if (appWidth !== size.width) setAppWidth(size.width);
 
   return (
     <div>
@@ -175,7 +191,9 @@ const App = () => {
                 right={
                   <>
                     <div
-                      style={{display: featureJson.ShowGraphView && rightMenuSelection === 'graph' ? 'inline' : 'none'}}
+                      style={{
+                        display: featureJson.ShowGraphView && rightMenuSelection === 'graph' ? 'inline' : 'none',
+                      }}
                     >
                       <GraphView editorHeight={contentHeight} />
                     </div>
@@ -223,6 +241,7 @@ const App = () => {
       </Layout>
       <DiffModal />
       <StartupModal />
+      <HotKeysHandler onToggleLeftMenu={() => toggleLeftMenu()} onToggleRightMenu={() => toggleRightMenu()} />
     </div>
   );
 };

@@ -139,58 +139,50 @@ const FileTreeContainer = styled.div`
     line-height: 22px;
     color: ${FontColors.darkThemeMainFont};
   }
-
+  & .ant-tree-treenode {
+    margin-left: 8px;
+    background: transparent;
+  }
   & .ant-tree-treenode-selected {
+    vertical-align: center;
+    margin-left: 0px !important;
+    border-left: 8px hidden transparent;
+    padding-left: 8px;
+    padding-bottom: 2px;
     background: ${Colors.selectionGradient} !important;
   }
-
   & .ant-tree-treenode-selected::before {
     background: ${Colors.selectionGradient} !important;
   }
-
   & .ant-tree-treenode-selected .file-entry-name {
     color: ${Colors.blackPure} !important;
   }
-
   & .ant-tree-treenode-selected .ant-tree-switcher {
     color: ${Colors.blackPure} !important;
   }
-
   & .ant-tree-treenode-selected .file-entry-nr-of-resources {
     color: ${Colors.blackPure} !important;
   }
-
-  & .ant-tree-treenode {
-    background: transparent;
-  }
-
   & .ant-tree-treenode::selection {
     background: ${Colors.selectionGradient} !important;
   }
-
   & .filter-node {
-    font-style: italic;
     font-weight: bold;
     background: ${Colors.highlightGradient};
   }
-
   & .filter-node .file-entry-name {
     color: ${FontColors.resourceRowHighlight} !important;
   }
-
   .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
     color: ${Colors.blackPure} !important;
     font-weight: bold;
   }
-
   & .ant-tree-iconEle {
     flex-shrink: 0;
   }
-
   & .ant-tree-iconEle .anticon {
     vertical-align: text-bottom;
   }
-
   & .ant-tree-node-content-wrapper {
     display: flex;
     overflow: hidden;
