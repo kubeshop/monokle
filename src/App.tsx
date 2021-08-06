@@ -37,22 +37,22 @@ const StyledRow = styled(Row)`
   flex-direction: row;
   align-items: flex-start;
 `;
-const StyledColumnLeft = styled(Col)`
+const StyledColumnLeftMenu = styled(Col)`
   background-color: ${BackgroundColors.darkThemeBackground};
   height: 100%;
   padding: 0px;
   margin: 0px;
   border-right: ${AppBorders.pageDivider};
 `;
-const StyledColumnNavEdit = styled(Col)`
+const StyledColumnPanes = styled(Col)`
   background-color: ${BackgroundColors.darkThemeBackground};
   height: 100%;
   padding: 0px;
   margin: 0px;
-  overflow-x: hidden !important;
-  overflow-y: hidden !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 `;
-const StyledColumnRight = styled(Col)`
+const StyledColumnRightMenu = styled(Col)`
   background-color: ${BackgroundColors.darkThemeBackground};
   height: 100%;
   padding: 0px;
@@ -132,7 +132,7 @@ const App = () => {
 
         <StyledContent style={{height: contentHeight}}>
           <StyledRow style={{height: contentHeight + 4}}>
-            <StyledColumnLeft>
+            <StyledColumnLeftMenu>
               <Space direction="vertical" style={{width: 43}}>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
                   <Button
@@ -166,8 +166,8 @@ const App = () => {
                   />
                 </Tooltip>
               </Space>
-            </StyledColumnLeft>
-            <StyledColumnNavEdit style={{width: contentWidth}}>
+            </StyledColumnLeftMenu>
+            <StyledColumnPanes style={{width: contentWidth}}>
               <SplitView
                 contentWidth={contentWidth}
                 left={
@@ -204,8 +204,8 @@ const App = () => {
                 }
                 hideRight={!rightActive}
               />
-            </StyledColumnNavEdit>
-            <StyledColumnRight style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
+            </StyledColumnPanes>
+            <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
               <Space direction="vertical" style={{width: 43}}>
                 <Button
                   size="large"
@@ -233,7 +233,7 @@ const App = () => {
                   }
                 />
               </Space>
-            </StyledColumnRight>
+            </StyledColumnRightMenu>
           </StyledRow>
         </StyledContent>
 
