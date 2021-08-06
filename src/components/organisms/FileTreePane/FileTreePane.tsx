@@ -139,7 +139,16 @@ const FileTreeContainer = styled.div`
     line-height: 22px;
     color: ${FontColors.darkThemeMainFont};
   }
+  & .ant-tree-treenode {
+    margin-left: 8px;
+    background: transparent;
+  }
   & .ant-tree-treenode-selected {
+    vertical-align: center;
+    margin-left: 0px !important;
+    border-left: 8px hidden transparent;
+    padding-left: 8px;
+    padding-bottom: 2px;
     background: ${Colors.selectionGradient} !important;
   }
   & .ant-tree-treenode-selected::before {
@@ -154,14 +163,10 @@ const FileTreeContainer = styled.div`
   & .ant-tree-treenode-selected .file-entry-nr-of-resources {
     color: ${Colors.blackPure} !important;
   }
-  & .ant-tree-treenode {
-    background: transparent;
-  }
   & .ant-tree-treenode::selection {
     background: ${Colors.selectionGradient} !important;
   }
   & .filter-node {
-    font-style: italic;
     font-weight: bold;
     background: ${Colors.highlightGradient};
   }
