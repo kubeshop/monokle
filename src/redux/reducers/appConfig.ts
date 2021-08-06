@@ -3,7 +3,6 @@ import {ipcRenderer} from 'electron';
 import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {AppConfig, Themes, TextSizes, Languages} from '@models/appconfig';
 import electronStore from '@utils/electronStore';
-import {setShouldRefreshFileMap} from '@redux/reducers/main';
 import {PROCESS_ENV} from '@utils/env';
 import {AlertEnum, AlertType} from '@models/alert';
 import initialState from '../initialState';
@@ -58,7 +57,6 @@ export const updateScanExcludes = createAsyncThunk(
   async (scanExcludes: string[], thunkAPI) => {
     electronStore.set('appConfig.scanExcludes', scanExcludes);
     thunkAPI.dispatch(configSlice.actions.setScanExcludes(scanExcludes));
-    thunkAPI.dispatch(setShouldRefreshFileMap(true));
   }
 );
 
@@ -67,7 +65,6 @@ export const updateFileIncludes = createAsyncThunk(
   async (fileIncludes: string[], thunkAPI) => {
     electronStore.set('appConfig.fileIncludes', fileIncludes);
     thunkAPI.dispatch(configSlice.actions.setFileIncludes(fileIncludes));
-    thunkAPI.dispatch(setShouldRefreshFileMap(true));
   }
 );
 

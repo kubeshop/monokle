@@ -1,4 +1,5 @@
 export const BrowseFolderTooltip = 'Browse for folder containing manifests, kustomizations or Helm charts';
+export const ReloadFolderTooltip = 'Reload manifests from the currently selected folder';
 export const FileExplorerTooltip = 'Show/hide File Exlorer';
 export const ClusterExplorerTooltip = 'Show/hide Cluster Preview';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';

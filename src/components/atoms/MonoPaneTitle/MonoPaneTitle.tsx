@@ -14,6 +14,7 @@ const MonoPaneTitle = styled((props: MonoSectionPaneProps) => <Text {...props} /
     margin-bottom: 0;
     padding-top: 8px;
     padding-bottom: 8px;
+    padding-right: 4px;
     padding-left: 16px;
     text-transform: uppercase;
     font-size: 14px;

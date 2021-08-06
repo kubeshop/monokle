@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Tabs, Space, Col, Row, Button, Skeleton, Modal, Tooltip} from 'antd';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Tabs, Col, Row, Button, Skeleton, Modal, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {CodeOutlined, ContainerOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -14,7 +14,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
 import {ApplyTooltip, DiffTooltip, FormEditorTooltip, SourceEditorTooltip} from '@src/tooltips';
-import {diffResource} from '@redux/thunks/diffResource';
+import {performResourceDiff} from '@redux/thunks/diffResource';
 import {TOOLTIP_DELAY} from '@src/constants';
 
 const {TabPane} = Tabs;
@@ -22,7 +22,7 @@ const {TabPane} = Tabs;
 const StyledTabs = styled(Tabs)`
   & .ant-tabs-nav {
     padding: 0 16px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
   }
 
   & .ant-tabs-nav::before {
@@ -35,9 +35,18 @@ const ActionsPaneContainer = styled(PaneContainer)`
   overflow-y: hidden;
 `;
 
-const StyledButton = styled(Button)`
-  padding: 0px 10px;
-  height: 30px;
+const LeftTitle = styled.div`
+  float: left;
+`;
+
+const RightButtons = styled.div`
+  float: right;
+`;
+
+const DiffButton = styled(Button)`
+  margin-left: 8px;
+  margin-bottom: 8px;
+  margin-right: 8px;
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -83,17 +92,17 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const uiState = useAppSelector(state => state.ui);
   const [key, setKey] = useState('source');
 
-  async function applySelectedResource() {
+  const applySelectedResource = useCallback(() => {
     if (selectedResource) {
       applyWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
     }
-  }
+  }, [selectedResource, resourceMap, fileMap, kubeconfig]);
 
-  async function diffSelectedResource() {
+  const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
-      dispatch(diffResource(selectedResourceId));
+      dispatch(performResourceDiff(selectedResourceId));
     }
-  }
+  }, [selectedResourceId]);
 
   useEffect(() => {
     if (selectedResourceId && resourceMap) {
@@ -107,46 +116,45 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   }, [selectedResourceId, selectedResource, key]);
 
-  const OperationsSlot = {
-    right: (
-      <Space>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip}>
-          <StyledButton
-            loading={Boolean(applyingResource)}
-            type="primary"
-            ghost
-            onClick={applySelectedResource}
-            disabled={!selectedResource}
-          >
-            Apply
-          </StyledButton>
-        </Tooltip>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip}>
-          <StyledButton type="primary" ghost onClick={diffSelectedResource} disabled={!selectedResource}>
-            Diff
-          </StyledButton>
-        </Tooltip>
-      </Space>
-    ),
-  };
-
   return (
     <>
       <Row>
         <MonoPaneTitleCol>
-          <MonoPaneTitle>Editor</MonoPaneTitle>
+          <MonoPaneTitle>
+            <LeftTitle>Editor</LeftTitle>
+            <RightButtons>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip}>
+                <Button
+                  loading={Boolean(applyingResource)}
+                  type="primary"
+                  size="small"
+                  ghost
+                  onClick={applySelectedResource}
+                  disabled={!selectedResourceId}
+                >
+                  Apply
+                </Button>
+              </Tooltip>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip}>
+                <DiffButton
+                  size="small"
+                  type="primary"
+                  ghost
+                  onClick={diffSelectedResource}
+                  disabled={!selectedResourceId}
+                >
+                  Diff
+                </DiffButton>
+              </Tooltip>
+            </RightButtons>
+          </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
 
       <ActionsPaneContainer>
         <Row>
           <Col span={24}>
-            <StyledTabs
-              defaultActiveKey="source"
-              activeKey={key}
-              onChange={k => setKey(k)}
-              tabBarExtraContent={OperationsSlot}
-            >
+            <StyledTabs defaultActiveKey="source" activeKey={key} onChange={k => setKey(k)}>
               <TabPane
                 tab={
                   <TabHeader icon={<CodeOutlined />} tooltip={SourceEditorTooltip}>

@@ -90,7 +90,7 @@ const SettingsDrawer = () => {
   return (
     <Drawer
       width="400"
-      noborder
+      noborder="true"
       title="Settings"
       placement="right"
       closable={false}

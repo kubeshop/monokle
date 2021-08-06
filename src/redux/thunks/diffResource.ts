@@ -10,7 +10,7 @@ import {createPreviewRejection} from '@redux/thunks/utils';
  * Thunk to diff a resource against the configured cluster
  */
 
-export const diffResource = createAsyncThunk<
+export const performResourceDiff = createAsyncThunk<
   SetDiffDataPayload,
   string,
   {

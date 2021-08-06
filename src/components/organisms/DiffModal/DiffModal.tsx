@@ -10,7 +10,8 @@ import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
 
 import Colors from '@styles/Colors';
 import {applyWithConfirm} from '@organisms/ActionsPane/ActionsPane';
-import {diffResource} from '@redux/thunks/diffResource';
+import {performResourceDiff} from '@redux/thunks/diffResource';
+import {K8sResource} from '@models/k8sresource';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close {
@@ -31,7 +32,7 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-const ButtonApply = styled(Button)`
+const LeftButton = styled(Button)`
   float: left;
 `;
 
@@ -41,20 +42,29 @@ const DiffModal = () => {
   const diffContent = useAppSelector(state => state.main.diffContent);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const diffResourceId = useAppSelector(state => state.main.diffResource);
+  const [diffResource, setDiffResource] = useState<K8sResource>();
+  const [resourceContent, setResourceContent] = useState<string>();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfig);
-
   const [isVisible, setVisible] = useState(false);
 
-  const resourceContent =
-    diffResourceId && resourceMap ? stringify(resourceMap[diffResourceId].content, {sortMapEntries: true}) : '';
   const options = {
     renderSideBySide: true,
+    minimap: {
+      enabled: false,
+    },
   };
 
   useEffect(() => {
-    /* eslint-disable react-hooks/exhaustive-deps */
-    setVisible(Boolean(diffResource) && Boolean(resourceMap) && Boolean(diffContent));
+    if (resourceMap && diffResourceId) {
+      const resource = resourceMap[diffResourceId];
+      if (resource) {
+        setDiffResource(resource);
+        setResourceContent(stringify(resource.content, {sortMapEntries: true}));
+      }
+    }
+
+    setVisible(Boolean(performResourceDiff) && Boolean(resourceMap) && Boolean(diffContent));
   }, [diffContent]);
 
   const handleApply = () => {
@@ -68,27 +78,27 @@ const DiffModal = () => {
 
   const handleRefresh = () => {
     if (diffResourceId) {
-      dispatch(diffResource(diffResourceId));
+      dispatch(performResourceDiff(diffResourceId));
     }
   };
 
   const handleOk = () => {
-    dispatch(diffResource(''));
+    dispatch(performResourceDiff(''));
   };
 
   return (
     <StyledModal
-      title="Resource Diff"
+      title={`Resource Diff on ${diffResource ? diffResource.name : ''}`}
       visible={isVisible}
       centered
       width={1000}
       onCancel={handleOk}
       footer={
         <>
-          <ButtonApply onClick={handleApply}>Apply</ButtonApply>
-          <Button onClick={handleRefresh}>Refresh</Button>
-          <Button type="primary" ghost onClick={handleOk}>
-            Close
+          <LeftButton onClick={handleOk}>Close</LeftButton>
+          <LeftButton onClick={handleRefresh}>Refresh</LeftButton>
+          <Button type="primary" ghost onClick={handleApply}>
+            Apply
           </Button>
         </>
       }

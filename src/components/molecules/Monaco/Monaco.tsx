@@ -42,8 +42,9 @@ window.MonacoEnvironment = {
 };
 
 const MonacoButtons = styled.div`
-  padding-left: 15px;
-  padding-bottom: 10px;
+  padding: 8px;
+  padding-right: 12px;
+  height: 40px;
 `;
 
 const MonacoContainer = styled.div`
@@ -53,6 +54,10 @@ const MonacoContainer = styled.div`
   padding-right: 0px;
   margin: 0px;
   margin-bottom: 20px;
+`;
+
+const RightMonoButton = styled(MonoButton)`
+  float: right;
 `;
 
 // @ts-ignore
@@ -66,6 +71,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
   const [code, setCode] = useState('');
+  const [orgCode, setOrgCode] = useState<string>();
   const [ref, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
@@ -106,7 +112,7 @@ const Monaco = (props: {editorHeight: string}) => {
   }
 
   function onChange(newValue: any, e: any) {
-    setDirty(true);
+    setDirty(orgCode !== newValue);
     setCode(newValue);
 
     // this will slow things down if document gets large - need to find a better solution...
@@ -121,12 +127,14 @@ const Monaco = (props: {editorHeight: string}) => {
     if (selectedPath && !selectedResource) {
       try {
         dispatch(updateFileEntry({path: selectedPath, content: value}));
+        setOrgCode(value);
       } catch (e) {
         logMessage(`Failed to update file ${e}`, dispatch);
       }
     } else if (selectedResource && resourceMap[selectedResource]) {
       try {
         dispatch(updateResource({resourceId: selectedResource, content: value.toString()}));
+        setOrgCode(value);
       } catch (e) {
         logMessage(`Failed to update resource ${e}`, dispatch);
       }
@@ -148,6 +156,7 @@ const Monaco = (props: {editorHeight: string}) => {
     }
 
     setCode(newCode);
+    setOrgCode(newCode);
     setDirty(false);
   }, [fileMap, selectedPath, selectedResource, resourceMap]);
 
@@ -156,6 +165,9 @@ const Monaco = (props: {editorHeight: string}) => {
     readOnly: isInPreviewMode || (!selectedPath && !selectedResource),
     fontWeight: 'bold',
     glyphMargin: true,
+    minimap: {
+      enabled: false,
+    },
   };
 
   const clearCodeIntel = () => {
@@ -231,14 +243,14 @@ const Monaco = (props: {editorHeight: string}) => {
     <>
       <MonacoButtons>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveSourceTooltip}>
-          <MonoButton
+          <RightMonoButton
             large="true"
             type={hasWarnings ? 'dashed' : 'primary'}
             disabled={!isDirty || !isValid}
             onClick={saveContent}
           >
             Save
-          </MonoButton>
+          </RightMonoButton>
         </Tooltip>
       </MonacoButtons>
       <MonacoContainer ref={ref}>
