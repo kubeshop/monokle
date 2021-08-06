@@ -226,6 +226,11 @@ const StyledSkeleton = styled(Skeleton)`
 
 const ReloadButton = styled(Button)`
   margin-left: 8px;
+  margin-top: ${props => (props.disabled ? '0px' : '1px')};
+`;
+
+const BrowseButton = styled(Button)`
+  margin-top: 1px;
 `;
 
 const FileTreePane = (props: {windowHeight: number | undefined}) => {
@@ -360,9 +365,15 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
               <span>File Explorer</span>
               <RightButtons>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
-                  <Button icon={<FolderAddOutlined />} size="small" type="primary" ghost onClick={startFileUploader}>
+                  <BrowseButton
+                    icon={<FolderAddOutlined />}
+                    size="small"
+                    type="primary"
+                    ghost
+                    onClick={startFileUploader}
+                  >
                     Browse
-                  </Button>
+                  </BrowseButton>
                 </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
                   <ReloadButton

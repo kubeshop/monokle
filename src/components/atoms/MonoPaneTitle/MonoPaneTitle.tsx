@@ -12,7 +12,7 @@ const MonoPaneTitle = styled((props: MonoSectionPaneProps) => <Text {...props} /
   &.ant-typography {
     display: block;
     margin-bottom: 0;
-    padding-top: 8px;
+    padding-top: 7px;
     padding-bottom: 8px;
     padding-right: 4px;
     padding-left: 16px;
