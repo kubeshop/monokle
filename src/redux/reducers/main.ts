@@ -11,6 +11,7 @@ import {previewCluster} from '@redux/thunks/previewCluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {AlertType} from '@models/alert';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
@@ -29,6 +30,7 @@ export type SetRootFolderPayload = {
   resourceMap: ResourceMapType;
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
+  alert?: AlertType;
 };
 
 export type UpdateResourcePayload = {
@@ -44,6 +46,7 @@ export type UpdateFileEntryPayload = {
 export type SetPreviewDataPayload = {
   previewResourceId?: string;
   previewResources?: ResourceMapType;
+  alert?: AlertType;
 };
 
 export type SetDiffDataPayload = {

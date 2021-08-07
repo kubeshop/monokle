@@ -113,7 +113,7 @@ export const previewCluster = createAsyncThunk<
 
           // @ts-ignore
           const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
-          const previewResult = createPreviewResult(allYaml, configPath);
+          const previewResult = createPreviewResult(allYaml, configPath, 'Get Cluster Resources');
 
           if (fulfilledResults.length < results.length) {
             const rejectedResult = results.find(r => r.status === 'rejected');
@@ -121,14 +121,13 @@ export const previewCluster = createAsyncThunk<
               // @ts-ignore
               const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
 
-              return {
-                alert: {
-                  title: 'Get Cluster Resources',
-                  message: `Failed to get all cluster resources: ${reason}`,
-                  type: AlertEnum.Warning,
-                },
-                ...previewResult,
+              previewResult.alert = {
+                title: 'Get Cluster Resources',
+                message: `Failed to get all cluster resources: ${reason}`,
+                type: AlertEnum.Warning,
               };
+
+              return previewResult;
             }
           }
 
