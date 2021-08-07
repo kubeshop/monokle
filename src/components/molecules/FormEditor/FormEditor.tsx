@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {withTheme} from '@rjsf/core';
+
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {loadResource} from '@redux/services';
@@ -17,6 +18,7 @@ import {MonoButton} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
 import {SaveFormTooltip} from '@src/tooltips';
 import {TOOLTIP_DELAY} from '@src/constants';
+import equal from 'fast-deep-equal/es6/react';
 
 const Form = withTheme(AntDTheme);
 
@@ -33,8 +35,13 @@ function getUiSchema(kind: string) {
 }
 
 const FormButtons = styled.div`
-  padding-left: 15px;
-  padding-bottom: 10px;
+  padding: 8px;
+  padding-right: 12px;
+  height: 40px;
+`;
+
+const RightMonoButton = styled(MonoButton)`
+  float: right;
 `;
 
 const FormContainer = styled.div<{contentHeight: string}>`
@@ -91,6 +98,7 @@ const FormContainer = styled.div<{contentHeight: string}>`
     color: #177ddc;
     width: 120px;
     margin-left: 50px;
+    margin-top: 42px;
   }
 
   .array-item-move-up {
@@ -112,6 +120,13 @@ const FormContainer = styled.div<{contentHeight: string}>`
     color: #177ddc;
     margin-left: 50px;
   }
+
+  .field-object {
+    margin-top: -10px;
+  }
+  .field-string {
+    margin-bottom: -10px;
+  }
 `;
 
 const FormEditor = (props: {contentHeight: string}) => {
@@ -119,41 +134,58 @@ const FormEditor = (props: {contentHeight: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const [formData, setFormData] = useState(null);
+  const [hasChanged, setHasChanged] = useState<boolean>(false);
+  const [parsedResourceText, setParsedResourceText] = useState<any>(undefined);
   const dispatch = useAppDispatch();
   const [resource, setResource] = useState<K8sResource>();
   const isInPreviewMode = useSelector(inPreviewMode);
 
   useEffect(() => {
-    setResource(resourceMap && selectedResource ? resourceMap[selectedResource] : undefined);
+    if (resourceMap && selectedResource) {
+      const r = resourceMap[selectedResource];
+      setResource(r);
+      setFormData(parse(r.text));
+    }
   }, [selectedResource, resourceMap, setResource]);
 
-  useEffect(() => {
-    if (resource) {
-      setFormData(parse(resource.text));
-    }
-  }, [resource]);
+  const onFormUpdate = useCallback(
+    (e: any) => {
+      if (formData) {
+        if (!parsedResourceText) {
+          setParsedResourceText(e.formData);
+          setHasChanged(false);
+        } else if (resource) {
+          setHasChanged(!equal(e.formData, parsedResourceText));
+        }
+      }
 
-  const onFormUpdate = (e: any) => {
-    setFormData(e.formData);
-  };
+      setFormData(e.formData);
+    },
+    [parsedResourceText, resource, formData]
+  );
 
-  const onFormSubmit = (data: any, e: any) => {
-    let formString = stringify(data.formData);
-    try {
-      if (resource) {
-        const content = mergeManifests(resource.text, formString);
-        /*
+  const onFormSubmit = useCallback(
+    (data: any, e: any) => {
+      try {
+        if (resource) {
+          let formString = stringify(data.formData);
+          const content = mergeManifests(resource.text, formString);
+          /*
                 log.debug(resource.text);
                 log.debug(formString);
                 log.debug(content);
         */
-        dispatch(updateResource({resourceId: resource.id, content}));
-        openNotification();
+          dispatch(updateResource({resourceId: resource.id, content}));
+          setParsedResourceText(data.formData);
+          setHasChanged(false);
+          openNotification();
+        }
+      } catch (err) {
+        logMessage(`Failed to update resource ${err}`, dispatch);
       }
-    } catch (err) {
-      logMessage(`Failed to update resource ${err}`, dispatch);
-    }
-  };
+    },
+    [resource]
+  );
 
   const openNotification = () => {
     notification['success']({
@@ -184,9 +216,9 @@ const FormEditor = (props: {contentHeight: string}) => {
     <>
       <FormButtons>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveFormTooltip}>
-          <MonoButton large="true" type="primary" onClick={submitForm} disabled={isInPreviewMode}>
+          <RightMonoButton large="true" type="primary" onClick={submitForm} disabled={isInPreviewMode || !hasChanged}>
             Save
-          </MonoButton>
+          </RightMonoButton>
         </Tooltip>
       </FormButtons>
       <FormContainer contentHeight={contentHeight}>

@@ -9,7 +9,7 @@ import fs from 'fs';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {previewCluster} from '@redux/thunks/previewCluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {diffResource} from '@redux/thunks/diffResource';
+import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -194,9 +194,6 @@ export const mainSlice = createSlice({
       setPreviewData({}, state);
       state.previewType = undefined;
     },
-    setShouldRefreshFileMap: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      state.shouldRefreshFileMap = action.payload;
-    },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
       state.previewLoader.targetResourceId = action.payload.targetResourceId;
@@ -255,10 +252,9 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.previewResource = undefined;
       state.previewType = undefined;
-      state.shouldRefreshFileMap = false;
     });
 
-    builder.addCase(diffResource.fulfilled, (state, action) => {
+    builder.addCase(performResourceDiff.fulfilled, (state, action) => {
       state.diffResource = action.payload.diffResourceId;
       state.diffContent = action.payload.diffContent;
     });
@@ -344,7 +340,6 @@ export const {
   pathRemoved,
   selectHelmValuesFile,
   clearPreview,
-  setShouldRefreshFileMap,
   startPreviewLoader,
   stopPreviewLoader,
 } = mainSlice.actions;

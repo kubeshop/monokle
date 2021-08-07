@@ -2,14 +2,14 @@ import * as React from 'react';
 import {useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import path from 'path';
-import {Row, Button, Tree, Col, Space, Typography, Skeleton, Tooltip} from 'antd';
+import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@src/constants';
 
-import {FolderAddOutlined} from '@ant-design/icons';
+import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
@@ -20,7 +20,7 @@ import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
-import {BrowseFolderTooltip} from '@src/tooltips';
+import {BrowseFolderTooltip, ReloadFolderTooltip} from '@src/tooltips';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 interface TreeNode {
@@ -30,15 +30,6 @@ interface TreeNode {
   highlight: boolean;
   isLeaf?: boolean;
 }
-
-const CenteredItemsDiv = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const ColumnWithPadding = styled(Col)`
-  padding: 16px 16px 0;
-`;
 
 const StyledNumberOfResources = styled(Typography.Text)`
   margin-left: 12px;
@@ -202,11 +193,6 @@ const FileTreeContainer = styled.div`
   }
 `;
 
-const FileDetailsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 const NoFilesContainer = styled.div`
   margin-left: 16px;
   margin-top: 10px;
@@ -223,13 +209,28 @@ const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
   opacity: ${props => (props.disabled ? '70%' : '100%')};
 `;
 
-const DisabledDirectoryTree = styled(StyledTreeDirectoryTree)`
-  opacity: 80%;
+const TitleBarContainer = styled.div`
+  display: flex;
+  height: 24px;
+  justify-content: space-between;
+`;
+
+const RightButtons = styled.div`
+  display: flex;
 `;
 
 const StyledSkeleton = styled(Skeleton)`
   margin: 20px;
   width: 90%;
+`;
+
+const ReloadButton = styled(Button)`
+  margin-left: 8px;
+  margin-top: ${props => (props.disabled ? '0px' : '1px')};
+`;
+
+const BrowseButton = styled(Button)`
+  margin-top: 1px;
 `;
 
 const FileTreePane = (props: {windowHeight: number | undefined}) => {
@@ -243,7 +244,6 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
-  const shouldRefreshFileMap = useAppSelector(state => state.main.shouldRefreshFileMap);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
@@ -360,40 +360,46 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
     <FileTreeContainer>
       <Row>
         <MonoPaneTitleCol>
-          <MonoPaneTitle>File Explorer</MonoPaneTitle>
+          <MonoPaneTitle>
+            <TitleBarContainer>
+              <span>File Explorer</span>
+              <RightButtons>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
+                  <BrowseButton
+                    icon={<FolderAddOutlined />}
+                    size="small"
+                    type="primary"
+                    ghost
+                    onClick={startFileUploader}
+                  >
+                    Browse
+                  </BrowseButton>
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                  <ReloadButton
+                    size="small"
+                    onClick={refreshFolder}
+                    icon={<ReloadOutlined />}
+                    type="primary"
+                    ghost
+                    disabled={!fileMap[ROOT_FILE_ENTRY]}
+                  />
+                </Tooltip>
+              </RightButtons>
+            </TitleBarContainer>
+          </MonoPaneTitle>
         </MonoPaneTitleCol>
-      </Row>
-      <Row>
-        <ColumnWithPadding span={24}>
-          <Space direction="horizontal">
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
-              <Button type="primary" ghost onClick={startFileUploader}>
-                <CenteredItemsDiv>
-                  <FolderAddOutlined style={{marginRight: '3px'}} />
-                  Browse
-                </CenteredItemsDiv>
-              </Button>
-            </Tooltip>
-          </Space>
-        </ColumnWithPadding>
-        {shouldRefreshFileMap && fileMap[ROOT_FILE_ENTRY] && (
-          <ColumnWithPadding span={24}>
-            <Button type="primary" ghost onClick={refreshFolder}>
-              Refresh Folder
-            </Button>
-          </ColumnWithPadding>
-        )}
+        <input
+          type="file"
+          /* @ts-expect-error */
+          directory=""
+          webkitdirectory=""
+          onChange={onUploadHandler}
+          ref={folderInput}
+          style={{display: 'none'}}
+        />
       </Row>
 
-      <input
-        type="file"
-        /* @ts-expect-error */
-        directory=""
-        webkitdirectory=""
-        onChange={onUploadHandler}
-        ref={folderInput}
-        style={{display: 'none'}}
-      />
       {uiState.isFolderLoading ? (
         <StyledSkeleton active />
       ) : tree ? (
