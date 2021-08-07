@@ -2,16 +2,16 @@
 
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
+[Hello Monokle Video]
+
 ## Getting Started
 
-Either download an installer from [releases](https://github.com/kubeshop/monokle/releases) or clone/build as described
+Either download an (as of yet unsigned) installer from [releases](https://github.com/kubeshop/monokle/releases) or clone/build as described
 below!
 
-Check out the [monokle.io website](https://monokle.io) for introductory material and videos.
-
-Read the [introductory blog-post](https://medium.com/@kubeshop/introducing-monokle) to get a quick intro and overview
-
-[Hello Monokle Video]
+- Check out the [monokle.io website](https://monokle.io) for introductory material and videos.
+- Read the [introductory blog-post](https://medium.com/@kubeshop/introducing-monokle) to get a quick intro and overview
+- Ask question, report bugs, suggest features, join our discussions [here on GitHub](https://github.com/kubeshop/monokle/discussions)
 
 ## Building
 
