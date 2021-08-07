@@ -22,7 +22,7 @@ const MessageBox = () => {
     notification[type]({
       message: alert.title,
       description: alert.message,
-      duration: type === 'error' ? 0 : 3,
+      duration: type === 'error' ? 0 : 2.5,
     });
 
     dispatch(clearAlert());

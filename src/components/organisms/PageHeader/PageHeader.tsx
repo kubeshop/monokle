@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-import {CloseCircleOutlined} from '@ant-design/icons';
+import {CloseCircleOutlined, GithubOutlined} from '@ant-design/icons';
 import {AppBorders} from '@styles/Borders';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -17,6 +17,7 @@ import {stopPreview} from '@redux/services/preview';
 
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
+import {openGitHub} from '@utils/shell';
 
 const LogoCol = styled(Col)`
   padding-left: 4px;
@@ -34,13 +35,23 @@ const StyledHeader = styled(Header)`
 
 const SettingsCol = styled(Col)`
   width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
 `;
 
 const StyledSettingsSpan = styled.span`
-  float: right;
   color: ${FontColors.elementSelectTitle};
   margin-right: 8px;
   padding: 10px 10px;
+  cursor: pointer;
+`;
+
+const GitHubIconSpan = styled.span`
+  color: ${FontColors.elementSelectTitle};
+  margin-right: 8px;
+  padding-top: 10px;
+  padding-right: 2px;
+  font-size: 24px;
   cursor: pointer;
 `;
 
@@ -173,6 +184,9 @@ const PageHeader = () => {
             <IconMonokle useDarkTheme />
           </LogoCol>
           <SettingsCol span={12}>
+            <GitHubIconSpan>
+              <GithubOutlined size={24} onClick={openGitHub} />
+            </GitHubIconSpan>
             <StyledSettingsSpan onClick={toggleSettingsDrawer}>Settings</StyledSettingsSpan>
           </SettingsCol>
         </Row>
