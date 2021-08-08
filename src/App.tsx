@@ -190,13 +190,9 @@ const App = () => {
                 editor={<ActionsPane contentHeight={contentHeight} />}
                 right={
                   <>
-                    <div
-                      style={{
-                        display: featureJson.ShowGraphView && rightMenuSelection === 'graph' ? 'inline' : 'none',
-                      }}
-                    >
+                    {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
                       <GraphView editorHeight={contentHeight} />
-                    </div>
+                    ) : undefined}
                     <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
                       <LogViewer editorHeight={contentHeight} />
                     </div>
