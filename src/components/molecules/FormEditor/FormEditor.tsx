@@ -11,13 +11,10 @@ import {logMessage} from '@redux/services/log';
 import {parse, stringify} from 'yaml';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import styled from 'styled-components';
-import {notification, Tooltip} from 'antd';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 import {MonoButton} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
-import {SaveFormTooltip} from '@src/tooltips';
-import {TOOLTIP_DELAY} from '@src/constants';
 import equal from 'fast-deep-equal/es6/react';
 
 const Form = withTheme(AntDTheme);
@@ -135,35 +132,46 @@ const FormEditor = (props: {contentHeight: string}) => {
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const [formData, setFormData] = useState(null);
   const [hasChanged, setHasChanged] = useState<boolean>(false);
-  const [parsedResourceText, setParsedResourceText] = useState<any>(undefined);
+  const [orgFormData, setOrgFormData] = useState<any>(undefined);
+  const [initialized, setInitialized] = useState<boolean>(false);
+  const [updatingResource, setUpdatingResource] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const [resource, setResource] = useState<K8sResource>();
   const isInPreviewMode = useSelector(inPreviewMode);
 
   useEffect(() => {
     if (resourceMap && selectedResource) {
-      const r = resourceMap[selectedResource];
-      if (r) {
-        setResource(r);
-        setFormData(parse(r.text));
+      setResource(resourceMap[selectedResource]);
+    }
+  }, [selectedResource, resourceMap]);
+
+  useEffect(() => {
+    if (resource) {
+      console.log('updating form resource', initialized, updatingResource);
+      if (!updatingResource) {
+        setInitialized(false);
+        setFormData(parse(resource.text));
+      } else {
+        setUpdatingResource(false);
       }
     }
-  }, [selectedResource, resourceMap, setResource]);
+  }, [resource]);
 
   const onFormUpdate = useCallback(
     (e: any) => {
-      if (formData) {
-        if (!parsedResourceText) {
-          setParsedResourceText(e.formData);
-          setHasChanged(false);
-        } else if (resource) {
-          setHasChanged(!equal(e.formData, parsedResourceText));
-        }
+      console.log('form update ', initialized, formData, orgFormData, e.formData, resource);
+
+      if (initialized) {
+        setHasChanged(!equal(e.formData, orgFormData));
+      } else {
+        setOrgFormData(e.formData);
+        setHasChanged(false);
+        setInitialized(true);
       }
 
       setFormData(e.formData);
     },
-    [parsedResourceText, resource, formData]
+    [orgFormData, initialized]
   );
 
   const onFormSubmit = useCallback(
@@ -172,15 +180,15 @@ const FormEditor = (props: {contentHeight: string}) => {
         if (resource) {
           let formString = stringify(data.formData);
           const content = mergeManifests(resource.text, formString);
-          /*
-                log.debug(resource.text);
-                log.debug(formString);
-                log.debug(content);
-        */
+
+          /* log.debug(resource.text);
+          log.debug(formString);
+          log.debug(content); */
+
+          setUpdatingResource(true);
           dispatch(updateResource({resourceId: resource.id, content}));
-          setParsedResourceText(data.formData);
           setHasChanged(false);
-          openNotification();
+          setOrgFormData(data.formData);
         }
       } catch (err) {
         logMessage(`Failed to update resource ${err}`, dispatch);
@@ -188,13 +196,6 @@ const FormEditor = (props: {contentHeight: string}) => {
     },
     [resource]
   );
-
-  const openNotification = () => {
-    notification['success']({
-      message: 'ConfigMap Saved.',
-      duration: 3,
-    });
-  };
 
   const submitForm = useCallback(() => {
     if (formData) {
@@ -217,11 +218,9 @@ const FormEditor = (props: {contentHeight: string}) => {
     // @ts-ignore
     <>
       <FormButtons>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveFormTooltip}>
-          <RightMonoButton large="true" type="primary" onClick={submitForm} disabled={isInPreviewMode || !hasChanged}>
-            Save
-          </RightMonoButton>
-        </Tooltip>
+        <RightMonoButton large="true" type="primary" onClick={submitForm} disabled={isInPreviewMode || !hasChanged}>
+          Save
+        </RightMonoButton>
       </FormButtons>
       <FormContainer contentHeight={contentHeight}>
         <Form

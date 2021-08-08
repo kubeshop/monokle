@@ -24,7 +24,7 @@ data:
   My: valuechanged`;
 
   const result = mergeManifests(orgYaml, newYaml);
-  expect(result).toBe(expectedYaml);
+  expect(result).toEqual(expectedYaml);
 });
 
 test('manifest-merge-remove', () => {
@@ -61,7 +61,7 @@ array:
   - 3`;
 
   const result = mergeManifests(orgYaml, newYaml);
-  expect(result).toBe(expectedYaml);
+  expect(result).toEqual(expectedYaml);
 });
 
 test('manifest-merge-value-added', () => {
@@ -89,7 +89,40 @@ data:
   My2: valueadded`;
 
   const result = mergeManifests(orgYaml, newYaml);
-  expect(result).toBe(expectedYaml);
+  expect(result).toEqual(expectedYaml);
+});
+
+test('manifest-array-removed', () => {
+  const orgYaml = `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argo-rollouts-notification-configmap
+  namespace: test
+  finalizers:
+    - test
+immutable: false`;
+
+  const newYaml = `data: {}
+binaryData: {}
+metadata:
+  annotations: {}
+  labels: {}
+  finalizers: []
+  name: argo-rollouts-notification-configmap
+  namespace: test
+apiVersion: v1
+kind: ConfigMap
+immutable: false`;
+
+  const expectedYaml = `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argo-rollouts-notification-configmap
+  namespace: test
+immutable: false`;
+
+  const result = mergeManifests(orgYaml, newYaml);
+  expect(result).toEqual(expectedYaml);
 });
 
 test('manifest-merge-value-added2', () => {
@@ -134,7 +167,7 @@ data:
   newKey: New Value`;
 
   const result = mergeManifests(orgYaml, newYaml);
-  expect(result).toBe(expectedYaml);
+  expect(result).toEqual(expectedYaml);
 });
 
 test('manifest-merge-value-removed2', () => {
@@ -162,10 +195,10 @@ metadata:
 immutable: true`;
 
   const result = mergeManifests(orgYaml, newYaml);
-  expect(result).toBe(expectedYaml);
+  expect(result).toEqual(expectedYaml);
 });
 
-test.only('traverse-document', () => {
+test('traverse-document', () => {
   const inputYaml = `
   apiVersion: v1
   kind: SomeResource
