@@ -53,6 +53,7 @@ const DiffButton = styled(Button)`
 
 const StyledSkeleton = styled(Skeleton)`
   margin: 20px;
+  padding: 8px;
   width: 95%;
 `;
 
