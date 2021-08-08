@@ -17,3 +17,7 @@ export const SaveFormTooltip = 'Save changes to this resource';
 export const NamespacesFilterTooltip = 'Filter visible resources on selected namespace';
 export const SourceEditorTooltip = 'Activate source editor for selected resource';
 export const FormEditorTooltip = 'Active form editor for selected resource';
+export const KubeconfigPathTooltip = 'The path to the kubeconfig to use for cluster/kubectl commands';
+export const AddInclusionPatternTooltip = 'Add pattern for files that contain resource manifests';
+export const AddExclusionPatternTooltip = 'Add pattern for files/folders to exclude when scanning for resources';
+export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';

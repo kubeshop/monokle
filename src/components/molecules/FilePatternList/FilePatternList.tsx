@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
-import {Button, Input} from 'antd';
+import {Button, Input, Tooltip} from 'antd';
 
 import {useFocus} from '@utils/hooks';
 
@@ -10,6 +10,7 @@ import FilePatternListItem from './FilePatternListItem';
 type FilePatternListProps = {
   value: string[];
   onChange: (patterns: string[]) => void;
+  tooltip: string;
 };
 
 const StyledUl = styled.ul`
@@ -23,11 +24,9 @@ const StyledButton = styled(Button)`
 `;
 
 const FilePatternList = (props: FilePatternListProps) => {
-  const {value, onChange} = props;
-
+  const {value, onChange, tooltip} = props;
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
-
   const [inputRef, focusInput] = useFocus<Input>();
 
   const isPatternUnique = (patternStr: string) => {
@@ -91,7 +90,9 @@ const FilePatternList = (props: FilePatternListProps) => {
           <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
         </>
       ) : (
-        <Button onClick={() => setIsAddingPattern(true)}>Add Pattern</Button>
+        <Tooltip title={tooltip}>
+          <Button onClick={() => setIsAddingPattern(true)}>Add Pattern</Button>
+        </Tooltip>
       )}
     </div>
   );
