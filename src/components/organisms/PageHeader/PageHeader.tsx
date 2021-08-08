@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-import {CloseCircleOutlined, GithubOutlined} from '@ant-design/icons';
+import {CloseCircleOutlined, GithubOutlined, SettingOutlined} from '@ant-design/icons';
 import {AppBorders} from '@styles/Borders';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -42,15 +42,15 @@ const SettingsCol = styled(Col)`
 const StyledSettingsSpan = styled.span`
   color: ${FontColors.elementSelectTitle};
   margin-right: 8px;
-  padding: 10px 10px;
+  padding-top: 10px;
+  font-size: 24px;
   cursor: pointer;
 `;
 
 const GitHubIconSpan = styled.span`
   color: ${FontColors.elementSelectTitle};
-  margin-right: 8px;
   padding-top: 10px;
-  padding-right: 2px;
+  padding-right: 10px;
   font-size: 24px;
   cursor: pointer;
 `;
@@ -187,7 +187,9 @@ const PageHeader = () => {
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>
-            <StyledSettingsSpan onClick={toggleSettingsDrawer}>Settings</StyledSettingsSpan>
+            <StyledSettingsSpan onClick={toggleSettingsDrawer}>
+              <SettingOutlined />
+            </StyledSettingsSpan>
           </SettingsCol>
         </Row>
       </StyledHeader>

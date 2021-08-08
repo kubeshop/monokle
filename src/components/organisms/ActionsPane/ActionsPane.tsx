@@ -48,6 +48,7 @@ const RightButtons = styled.div`
 
 const DiffButton = styled(Button)`
   margin-left: 8px;
+  margin-right: 4px;
 `;
 
 const StyledSkeleton = styled(Skeleton)`

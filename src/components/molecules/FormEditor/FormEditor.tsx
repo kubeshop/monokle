@@ -36,7 +36,7 @@ function getUiSchema(kind: string) {
 
 const FormButtons = styled.div`
   padding: 8px;
-  padding-right: 12px;
+  padding-right: 8px;
   height: 40px;
 `;
 
@@ -47,7 +47,7 @@ const RightMonoButton = styled(MonoButton)`
 const FormContainer = styled.div<{contentHeight: string}>`
   width: 100%;
   padding-left: 15px;
-  padding-right: 20px;
+  padding-right: 8px;
   margin: 0px;
   margin-bottom: 20px;
   overflow-y: scroll;
@@ -143,8 +143,10 @@ const FormEditor = (props: {contentHeight: string}) => {
   useEffect(() => {
     if (resourceMap && selectedResource) {
       const r = resourceMap[selectedResource];
-      setResource(r);
-      setFormData(parse(r.text));
+      if (r) {
+        setResource(r);
+        setFormData(parse(r.text));
+      }
     }
   }, [selectedResource, resourceMap, setResource]);
 

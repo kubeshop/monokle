@@ -53,7 +53,7 @@ const HiddenInput = styled.input`
 
 const MonacoButtons = styled.div`
   padding: 8px;
-  padding-right: 12px;
+  padding-right: 8px;
   height: 40px;
 `;
 
@@ -61,7 +61,7 @@ const MonacoContainer = styled.div`
   width: 100%;
   height: 100%;
   padding-left: 0px;
-  padding-right: 0px;
+  padding-right: 8px;
   margin: 0px;
   margin-bottom: 20px;
 `;
