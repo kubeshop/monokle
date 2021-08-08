@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import MonacoEditor, {monaco} from 'react-monaco-editor';
+import {monaco} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 import {useSelector} from 'react-redux';
 import styled from 'styled-components';
 
 import {selectLogs} from '@redux/selectors';
-import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 const LogContainer = styled.div`
   width: 100%;
@@ -90,7 +89,7 @@ const LogViewer = (props: {editorHeight: string}) => {
   /* tslint:disable-next-line */
   return (
     <LogContainer ref={ref}>
-      <MonacoEditor
+      {/* <MonacoEditor
         width={width}
         height={editorHeight}
         language="plaintext"
@@ -99,7 +98,7 @@ const LogViewer = (props: {editorHeight: string}) => {
         options={options}
         onChange={onChange}
         editorDidMount={editorDidMount}
-      />
+      /> */}
     </LogContainer>
   );
 };
