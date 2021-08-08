@@ -147,7 +147,7 @@ const FormEditor = (props: {contentHeight: string}) => {
 
   useEffect(() => {
     if (resource) {
-      console.log('updating form resource', initialized, updatingResource);
+    //  console.log('updating form resource', initialized, updatingResource);
       if (!updatingResource) {
         setInitialized(false);
         setFormData(parse(resource.text));
@@ -159,8 +159,7 @@ const FormEditor = (props: {contentHeight: string}) => {
 
   const onFormUpdate = useCallback(
     (e: any) => {
-      console.log('form update ', initialized, formData, orgFormData, e.formData, resource);
-
+//      console.log('form update ', initialized, formData, orgFormData, e.formData, resource);
       if (initialized) {
         setHasChanged(!equal(e.formData, orgFormData));
       } else {
