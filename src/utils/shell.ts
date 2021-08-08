@@ -1,3 +1,4 @@
+import {shell} from 'electron';
 // @ts-ignore
 import shellPath from 'shell-path';
 
@@ -9,4 +10,8 @@ export function getShellPath() {
   }
 
   return cachedShellPath;
+}
+
+export function openGitHub() {
+  shell.openExternal('https://github.com/kubeshop/monokle');
 }

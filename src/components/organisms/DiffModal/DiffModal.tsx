@@ -23,17 +23,21 @@ const StyledModal = styled(Modal)`
   }
   .ant-modal-body {
     background-color: ${Colors.grey1000};
-    padding-right: 0;
-    padding-left: 0;
+    padding: 0px;
   }
   .ant-modal-footer {
     background-color: ${Colors.grey1000};
     border-top: 1px solid ${Colors.grey900};
+    padding: 8px;
   }
 `;
 
 const LeftButton = styled(Button)`
   float: left;
+`;
+
+const MonacoDiffContainer = styled.div`
+  padding: 8px;
 `;
 
 const DiffModal = () => {
@@ -103,15 +107,17 @@ const DiffModal = () => {
         </>
       }
     >
-      <MonacoDiffEditor
-        width="1000"
-        height="600"
-        language="yaml"
-        original={resourceContent}
-        value={diffContent}
-        options={options}
-        theme={KUBESHOP_MONACO_DIFF_THEME}
-      />
+      <MonacoDiffContainer>
+        <MonacoDiffEditor
+          width="980"
+          height="600"
+          language="yaml"
+          original={resourceContent}
+          value={diffContent}
+          options={options}
+          theme={KUBESHOP_MONACO_DIFF_THEME}
+        />
+      </MonacoDiffContainer>
     </StyledModal>
   );
 };

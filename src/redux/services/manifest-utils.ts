@@ -38,6 +38,9 @@ export function mergeManifests(template: string, values: string) {
       if (isSeq(valueNode)) {
         // brute-force replace sequences for now - need to revisit...
         node.items = valueNode.items;
+        if (node.items.length === 0) {
+          pathsToRemove.push(createNodePath(path));
+        }
         return visit.SKIP;
       }
     },
@@ -46,11 +49,11 @@ export function mergeManifests(template: string, values: string) {
   pathsToRemove.forEach(path => {
     templateDoc.deleteIn(path);
 
-    // delete any empty maps left by the deleted node
+    // delete any empty maps/sequences left by the deleted node
     while (path.length > 0) {
       path = path.slice(0, path.length - 1);
       let node = templateDoc.getIn(path);
-      if (isMap(node) && node.items.length === 0) {
+      if ((isMap(node) || isSeq(node)) && node.items.length === 0) {
         templateDoc.deleteIn(path);
       } else {
         break;
@@ -67,7 +70,9 @@ export function mergeManifests(template: string, values: string) {
     },
     // sequences
     Seq(key, node, path) {
-      copyValueIfMissing(templateDoc, path);
+      if (key !== 'value' || node.items.length > 0) {
+        copyValueIfMissing(templateDoc, path);
+      }
     },
   });
 

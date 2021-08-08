@@ -8,6 +8,7 @@ import {ROOT_FILE_ENTRY} from '@src/constants';
 import {processKustomizations} from '@redux/services/kustomize';
 import {clearParsedDocs, processParsedResources} from '@redux/services/resource';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
+import {AlertEnum} from '@models/alert';
 
 /**
  * Thunk to set the specified root folder
@@ -51,5 +52,10 @@ export const setRootFolder = createAsyncThunk<
     resourceMap: clearParsedDocs(resourceMap),
     helmChartMap,
     helmValuesMap,
+    alert: {
+      title: 'Folder Import',
+      message: `${Object.values(resourceMap).length} resources found in ${Object.values(fileMap).length} files`,
+      type: AlertEnum.Success,
+    },
   };
 });

@@ -20,13 +20,11 @@ import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
 import {updateFileEntry, updateResource, selectK8sResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@src/constants';
+import {ROOT_FILE_ENTRY} from '@src/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
-import {Tooltip} from 'antd';
-import {SaveSourceTooltip} from '@src/tooltips';
 import {clearDecorations, setDecorations} from './editorHelpers';
 import codeIntel from './codeIntel';
 
@@ -53,7 +51,7 @@ const HiddenInput = styled.input`
 
 const MonacoButtons = styled.div`
   padding: 8px;
-  padding-right: 12px;
+  padding-right: 8px;
   height: 40px;
 `;
 
@@ -61,7 +59,7 @@ const MonacoContainer = styled.div`
   width: 100%;
   height: 100%;
   padding-left: 0px;
-  padding-right: 0px;
+  padding-right: 8px;
   margin: 0px;
   margin-bottom: 20px;
 `;
@@ -290,16 +288,14 @@ const Monaco = (props: {editorHeight: string}) => {
         <HiddenInputContainer>
           <HiddenInput ref={hiddenInputRef} type="text" />
         </HiddenInputContainer>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveSourceTooltip}>
-          <RightMonoButton
-            large="true"
-            type={hasWarnings ? 'dashed' : 'primary'}
-            disabled={!isDirty || !isValid}
-            onClick={() => saveContent()}
-          >
-            Save
-          </RightMonoButton>
-        </Tooltip>
+        <RightMonoButton
+          large="true"
+          type={hasWarnings ? 'dashed' : 'primary'}
+          disabled={!isDirty || !isValid}
+          onClick={() => saveContent()}
+        >
+          Save
+        </RightMonoButton>
       </MonacoButtons>
       <MonacoContainer ref={containerRef}>
         <MonacoEditor

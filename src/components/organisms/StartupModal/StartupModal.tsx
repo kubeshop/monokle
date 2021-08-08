@@ -1,12 +1,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import {shell} from 'electron';
 import {Button, Modal} from 'antd';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import MonokleStartupBackground from '@assets/MonokleStartupBackground.svg';
 
 import Colors from '@styles/Colors';
+import {openGitHub} from '@utils/shell';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close-icon {
@@ -82,16 +82,11 @@ const HeightFillDiv = styled.div`
 
 const StartupModal = () => {
   const dispatch = useAppDispatch();
-
   const startupModalVisible = useAppSelector(state => state.config.startupModalVisible);
 
   const handleClose = () => {
     dispatch(updateStartupModalVisible(false));
   };
-
-  function openGitHub() {
-    shell.openExternal('https://github.com/kubeshop/monokle');
-  }
 
   return (
     <StyledModal

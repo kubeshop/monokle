@@ -1,7 +1,7 @@
 import React, {useRef} from 'react';
 import styled from 'styled-components';
 
-import {Button, Input, Select} from 'antd';
+import {Button, Input, Select, Tooltip} from 'antd';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
 
@@ -16,6 +16,12 @@ import {
   updateHelmPreviewMode,
 } from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
+import {
+  AddExclusionPatternTooltip,
+  AddInclusionPatternTooltip,
+  HelmPreviewModeTooltip,
+  KubeconfigPathTooltip,
+} from '@src/tooltips';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -99,24 +105,36 @@ const SettingsDrawer = () => {
     >
       <StyledDiv>
         <StyledSpan>KUBECONFIG</StyledSpan>
-        <Input value={appConfig.kubeconfig} />
+        <Tooltip title={KubeconfigPathTooltip}>
+          <Input value={appConfig.kubeconfig} />
+        </Tooltip>
         <StyledButton onClick={openFileSelect}>Browse</StyledButton>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Files: Include</StyledSpan>
-        <FilePatternList value={appConfig.fileIncludes} onChange={onChangeFileIncludes} />
+        <FilePatternList
+          value={appConfig.fileIncludes}
+          onChange={onChangeFileIncludes}
+          tooltip={AddInclusionPatternTooltip}
+        />
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Files: Exclude</StyledSpan>
-        <FilePatternList value={appConfig.scanExcludes} onChange={onChangeScanExcludes} />
+        <FilePatternList
+          value={appConfig.scanExcludes}
+          onChange={onChangeScanExcludes}
+          tooltip={AddExclusionPatternTooltip}
+        />
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Helm Preview Mode</StyledSpan>
-        <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
-          <Select.Option value="template">Template</Select.Option>
-          <Select.Option value="install">Install</Select.Option>
-        </StyledSelect>
+        <Tooltip title={HelmPreviewModeTooltip}>
+          <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
+            <Select.Option value="template">Template</Select.Option>
+            <Select.Option value="install">Install</Select.Option>
+          </StyledSelect>
+        </Tooltip>
       </StyledDiv>
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
