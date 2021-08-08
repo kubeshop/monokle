@@ -169,7 +169,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />
                 ) : (
-                  <Monaco editorHeight={contentHeight} />
+                  <Monaco editorHeight={`${parseInt(contentHeight, 10) - 120}`} />
                 )}
               </TabPane>
               {selectedResource && selectedResource?.kind === 'ConfigMap' && (

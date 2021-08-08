@@ -404,8 +404,8 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
         <StyledSkeleton active />
       ) : tree ? (
         <StyledTreeDirectoryTree
-          // height is needed to enable Tree's virtual scroll
-          height={windowHeight && windowHeight > 180 ? windowHeight - 180 : 0}
+          // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
+          height={windowHeight && windowHeight > 122 ? windowHeight - 122 : 0}
           onSelect={onSelect}
           treeData={[tree]}
           ref={treeRef}
