@@ -100,7 +100,8 @@
     "test": "craco test --watchAll=false",
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm run start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "electron:build": "npm run build && tsc -p electron && electron-builder && (ls -alh dist | grep Monokle && du -sh dist/mac || true)",
+    "electron:build": "npm run build && tsc -p electron && electron-builder",
+    "electron:build:mac": "npm run build && tsc -p electron && electron-builder && (ls -alh dist | grep Monokle && du -sh dist/mac || true)",
     "eject": "react-scripts eject",
     "lint": "npm run lint:config && npm run lint:src ",
     "lint:config": "eslint .",
@@ -126,9 +127,9 @@
     },
     "nsis": {
       "oneClick": true,
-      "installerIcon": "build/icon.png",
-      "uninstallerIcon": "build/icon.png",
-      "installerHeaderIcon": "build/icon.png"
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico"
     },
     "extends": null,
     "files": [
