@@ -14,9 +14,10 @@ Either download an (as of yet unsigned) installer from [releases](https://github
 clone/build as described below!
 
 - Check out the [monokle.io website](https://monokle.io) for introductory material and videos.
-- Read the [introductory blog-post](https://medium.com/@kubeshop/introducing-monokle) to get a quick intro and overview
+- Read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle) to get a quick intro and overview
 - Ask question, report bugs, suggest features, join our discussions
   [here on GitHub](https://github.com/kubeshop/monokle/discussions)
+- See "Getting Involved" below on how to get started with contributions
 
 ## Building
 
@@ -44,30 +45,14 @@ npm run electron:build
 
 to build the Electron app package for production to the `dist` folder.
 
-This project was bootstrapped from
-https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, which provides
+## Getting involved
 
-- TypeScript supports for Electron main process source code
-- Hot-relaod support for Electron app
-- Electron Builder support
+Awesome - you want to join the fun! 
 
-See https://www.electron.build/ for more info on the electron builder
-
-## Components used
-
-- https://github.com/eemeli/yaml for yaml parsing
-- https://github.com/react-monaco-editor/react-monaco-editor for source editing
-- https://github.com/micromatch/micromatch for dynamic filtering in navigator and file exclusion matching
-- https://github.com/JSONPath-Plus/JSONPath for finding refs/selectors in resources
-- https://github.com/rjsf-team/react-jsonschema-form for generating forms for k8s resources
-- https://github.com/wbkd/react-flow for graph diagrams
-- https://github.com/tweenjs/es6-tween for animation tweening
-- https://github.com/pengx17/monaco-yaml for yaml support in the source editor
-- https://github.com/paulmillr/chokidar for file watching
-- https://github.com/ant-design/ant-design/ for UI
-- https://github.com/styled-components/styled-components for custom styling
-
-## Dev Dependencies
-
-- https://github.com/gsoft-inc/craco for overriding CRA config for folder aliases, see
-  https://www.npmjs.com/package/craco-alias#examples
+- Fork/Clone the repo and make sure you can run it as shown above
+- Check out the [architecture.md](docs/architecture.md) document to get a high-level understanding of 
+  how monokle works
+- Check out open [issues](https://github.com/kubeshop/monokle/issues) and get in touch with the team 
+  by starting a [discussion]() on what you want to help with - or open an issue of your own that you would
+  like to contribute to the project.
+- Fly like the wind!
