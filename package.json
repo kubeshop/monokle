@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -158,7 +158,8 @@
       "!**/node_modules/@babel/**/*",
       "!**/node_modules/@jest/**/*",
       "!**/node_modules/monaco-editor/min/**/*",
-      "!**/node_modules/monaco-editor/min-maps/**/*"
+      "!**/node_modules/monaco-editor/min-maps/**/*",
+      "!**/docs/**/*"
     ],
     "extraResources": [
       {
