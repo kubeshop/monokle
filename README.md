@@ -22,6 +22,10 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
 <img src="./docs/img/find-file-and-dead-links.gif" alt="Locate source file quickly, and see if links are dead-ends" width="800" height="500" />
 
+### Browse your clusters objects
+
+<img src="./docs/img/cluster-objects.gif" alt="Browse your clusters objects" width="800" height="500" />
+
 ## Getting Started
 
 Either download an (as of yet unsigned) installer from [releases](https://github.com/kubeshop/monokle/releases) or
