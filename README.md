@@ -8,15 +8,19 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
 ### Navigate k8s objects easily
 
-<img src="./docs/img/navigator.gif" alt="navigate objects" width="300" height="300" />
+<img src="./docs/img/navigator.gif" alt="Navigate k8s objects easily" width="300" height="300" />
 
 ### Follow links up or downstream through your manifests
 
-<img src="./docs/img/upstream-downstream.gif" alt="follow links" width="600" height="300" />
+<img src="./docs/img/upstream-downstream.gif" alt="Follow links up or downstream through your manifests" width="600" height="300" />
 
 ### Preview the resources created by customizations
 
-<img src="./docs/img/kustomization.gif" alt="preview kustomization resources" width="800" height="500" />
+<img src="./docs/img/kustomization.gif" alt="Preview the resources created by customizations" width="800" height="500" />
+
+### Locate source file quickly, and see if links are dead-ends
+
+<img src="./docs/img/find-file-and-dead-links.gif" alt="Locate source file quickly, and see if links are dead-ends" width="800" height="500" />
 
 ## Getting Started
 
