@@ -13,14 +13,14 @@ type ResourceMapType = {
  * Maps relative paths to FileEntries. The root folder FileEntry is mapped to "<root>"
  */
 type FileMapType = {
-  [path: string]: FileEntry;
+  [id: string]: FileEntry;
 };
 
 /**
  * Maps ids to Helm charts
  */
 type HelmChartMapType = {
-  [path: string]: HelmChart;
+  [id: string]: HelmChart;
 };
 
 /**
