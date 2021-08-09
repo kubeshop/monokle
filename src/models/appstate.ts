@@ -13,13 +13,19 @@ type ResourceMapType = {
  * Maps relative paths to FileEntries. The root folder FileEntry is mapped to "<root>"
  */
 type FileMapType = {
-  [id: string]: FileEntry;
+  [path: string]: FileEntry;
 };
 
+/**
+ * Maps ids to Helm charts
+ */
 type HelmChartMapType = {
-  [id: string]: HelmChart;
+  [path: string]: HelmChart;
 };
 
+/**
+ * Maps ids to Helm values files
+ */
 type HelmValuesMapType = {
   [id: string]: HelmValuesFile;
 };
@@ -44,7 +50,7 @@ interface AppState {
   selectedValuesFile?: string; // the currently selected values file
   previewValuesFile?: string; // the values file currently being previewed
   isSelectingFile: boolean; // if we are currently in the process of selecting a file - used for one-time UI updates
-  isApplyingResource: boolean; // id of resource currently being applied
+  isApplyingResource: boolean; // if we are currently applying a resource - room for improvement...
 }
 
 export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType, PreviewLoaderType};

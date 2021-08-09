@@ -2,7 +2,7 @@ import {ipcRenderer} from 'electron';
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
-import {ROOT_FILE_ENTRY} from '@src/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 import path from 'path';
 import log from 'loglevel';
 import {createPreviewRejection, createPreviewResult} from '@redux/thunks/utils';

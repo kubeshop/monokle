@@ -7,7 +7,7 @@ import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@src/constants';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
 import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -20,7 +20,7 @@ import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {inPreviewMode} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
-import {BrowseFolderTooltip, ReloadFolderTooltip} from '@src/tooltips';
+import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 interface TreeNode {

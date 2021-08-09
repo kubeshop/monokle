@@ -3,7 +3,7 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import hotkeys from '@constants/hotkeys';
 import {useSelector} from 'react-redux';
 
-import {ROOT_FILE_ENTRY} from '@src/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 

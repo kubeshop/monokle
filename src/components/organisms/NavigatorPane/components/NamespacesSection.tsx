@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import {Select, Tooltip} from 'antd';
-import {NamespacesFilterTooltip} from '@src/tooltips';
-import {TOOLTIP_DELAY} from '@src/constants';
+import {NamespacesFilterTooltip} from '@constants/tooltips';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 const {Option} = Select;
 

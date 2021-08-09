@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import {execSync} from 'child_process';
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants';
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 
 const ElectronStore = require('electron-store');
 

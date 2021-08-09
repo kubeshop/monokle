@@ -13,9 +13,9 @@ import {K8sResource} from '@models/k8sresource';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
-import {ApplyTooltip, DiffTooltip} from '@src/tooltips';
+import {ApplyTooltip, DiffTooltip} from '@constants/tooltips';
 import {performResourceDiff} from '@redux/thunks/diffResource';
-import {TOOLTIP_DELAY} from '@src/constants';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 const {TabPane} = Tabs;
 

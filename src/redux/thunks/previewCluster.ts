@@ -3,7 +3,7 @@ import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
 import {AppState} from '@models/appstate';
 import * as k8s from '@kubernetes/client-node';
-import {YAML_DOCUMENT_DELIMITER} from '@src/constants';
+import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {AlertEnum} from '@models/alert';
 import {createPreviewRejection, createPreviewResult, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
