@@ -10,9 +10,9 @@ providing plentiful manifests for us to run Monokle against.
 <img src="./img/navigator.gif" alt="Navigate k8s objects easily" width="300" height="300" />
 
 Monokle compiles a list of all the objects in your repo (from files you didnt want ignored), to give you a handy
-overview of all your resources. When you select a resource, Monokle will show you which file it was defined in.
+overview of all your resources.
 
-## Follow links up or downstream through your manifests
+## Follow links up- or downstream through your manifests
 
 <img src="./img/upstream-downstream.gif" alt="Follow links up or downstream through your manifests" width="600" height="300" />
 
@@ -30,8 +30,8 @@ the cluster, if you are satisfied.
 
 <img src="./img/find-file-and-dead-links.gif" alt="Locate source file quickly, and see if links are dead-ends" width="800" height="500" />
 
-You can quickly find the file, a resource belongs to. Also, if you mistype a referenced resource, Monokle will quickly
-show you, that you have a dead link with a warning triangle.
+When you select a resource, Monokle will show you which file it was defined in. Also, if you mistype a referenced
+resource, Monokle will quickly show you, that you have a dead link with a warning triangle.
 
 ## Browse your clusters objects
 
