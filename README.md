@@ -14,9 +14,9 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
 <img src="./docs/img/upstream-downstream.gif" alt="Follow links up or downstream through your manifests" width="600" height="300" />
 
-### Preview the resources created by customizations
+### Preview the resources created by kustomizations
 
-<img src="./docs/img/kustomization.gif" alt="Preview the resources created by customizations" width="800" height="500" />
+<img src="./docs/img/kustomization.gif" alt="Preview the resources created by kustomizations" width="800" height="500" />
 
 ### Locate source file quickly, and see if links are dead-ends
 
