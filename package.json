@@ -156,7 +156,8 @@
       "!**/node_modules/@babel/**/*",
       "!**/node_modules/@jest/**/*",
       "!**/node_modules/monaco-editor/min/**/*",
-      "!**/node_modules/monaco-editor/min-maps/**/*"
+      "!**/node_modules/monaco-editor/min-maps/**/*",
+      "!**/docs/**/*"
     ],
     "extraResources": [
       {
