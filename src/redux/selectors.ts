@@ -24,6 +24,12 @@ export const selectActiveResources = createSelector(
     )
 );
 
+export const selectSelectedResource = createSelector(
+  (state: RootState) => state.main.resourceMap,
+  (state: RootState) => state.main.selectedResource,
+  (resourceMap, selectedResourceId) => (selectedResourceId ? resourceMap[selectedResourceId] : undefined)
+);
+
 export const selectKustomizations = createSelector(selectAllResources, resources =>
   resources.filter((r: K8sResource) => isKustomizationResource(r))
 );

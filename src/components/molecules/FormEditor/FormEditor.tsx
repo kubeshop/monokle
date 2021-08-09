@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
 import {withTheme} from '@rjsf/core';
 
 // @ts-ignore
@@ -8,13 +8,12 @@ import {loadResource} from '@redux/services';
 import {useCallback, useEffect, useState} from 'react';
 import {updateResource} from '@redux/reducers/main';
 import {logMessage} from '@redux/services/log';
-import {parse, stringify} from 'yaml';
+import {stringify} from 'yaml';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {inPreviewMode} from '@redux/selectors';
+import {inPreviewMode, selectSelectedResource} from '@redux/selectors';
 import {MonoButton} from '@atoms';
-import {K8sResource} from '@models/k8sresource';
 import equal from 'fast-deep-equal/es6/react';
 
 const Form = withTheme(AntDTheme);
@@ -23,12 +22,23 @@ const Form = withTheme(AntDTheme);
  * Load schemas every time for now - should be cached in the future...
  */
 
+const formSchemaCache = new Map<string, any>();
+const uiformSchemaCache = new Map<string, any>();
+
 function getFormSchema(kind: string) {
-  return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`));
+  if (!formSchemaCache.has(kind)) {
+    formSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`)));
+  }
+
+  return formSchemaCache.get(kind);
 }
 
 function getUiSchema(kind: string) {
-  return JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`));
+  if (!uiformSchemaCache.has(kind)) {
+    uiformSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`)));
+  }
+
+  return uiformSchemaCache.get(kind);
 }
 
 const FormButtons = styled.div`
@@ -128,90 +138,69 @@ const FormContainer = styled.div<{contentHeight: string}>`
 
 const FormEditor = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
-  const [formData, setFormData] = useState(null);
+  const selectedResource = useSelector(selectSelectedResource);
+  const [formData, setFormData] = useState<any>({formData: undefined, orgFormData: undefined});
   const [hasChanged, setHasChanged] = useState<boolean>(false);
-  const [orgFormData, setOrgFormData] = useState<any>(undefined);
-  const [initialized, setInitialized] = useState<boolean>(false);
-  const [updatingResource, setUpdatingResource] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const [resource, setResource] = useState<K8sResource>();
   const isInPreviewMode = useSelector(inPreviewMode);
-
-  useEffect(() => {
-    if (resourceMap && selectedResource) {
-      setResource(resourceMap[selectedResource]);
-    }
-  }, [selectedResource, resourceMap]);
-
-  useEffect(() => {
-    if (resource) {
-      //  console.log('updating form resource', initialized, updatingResource);
-      if (!updatingResource) {
-        setInitialized(false);
-        setFormData(parse(resource.text));
-      } else {
-        setUpdatingResource(false);
-      }
-    }
-  }, [resource]);
 
   const onFormUpdate = useCallback(
     (e: any) => {
-      //      console.log('form update ', initialized, formData, orgFormData, e.formData, resource);
-      if (initialized) {
-        setHasChanged(!equal(e.formData, orgFormData));
+      if (formData.orgFormData) {
+        setFormData({formData: e.formData, orgFormData: formData.orgFormData});
+        setHasChanged(!equal(e.formData, formData.orgFormData));
       } else {
-        setOrgFormData(e.formData);
+        setFormData({formData: e.formData, orgFormData: e.formData});
         setHasChanged(false);
-        setInitialized(true);
       }
-
-      setFormData(e.formData);
     },
-    [orgFormData, initialized]
+    [formData]
   );
 
   const onFormSubmit = useCallback(
     (data: any, e: any) => {
       try {
-        if (resource) {
-          let formString = stringify(data.formData);
-          const content = mergeManifests(resource.text, formString);
+        if (selectedResource) {
+          let formString = stringify(data);
+          const content = mergeManifests(selectedResource.text, formString);
 
           /* log.debug(resource.text);
           log.debug(formString);
           log.debug(content); */
 
-          setUpdatingResource(true);
-          dispatch(updateResource({resourceId: resource.id, content}));
+          setFormData({formData: formData.formData, orgFormData: data});
           setHasChanged(false);
-          setOrgFormData(data.formData);
+          dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
       } catch (err) {
         logMessage(`Failed to update resource ${err}`, dispatch);
       }
     },
-    [resource]
+    [selectedResource]
   );
 
   const submitForm = useCallback(() => {
     if (formData) {
-      onFormSubmit({formData}, null);
+      onFormSubmit(formData.formData, null);
     }
   }, [formData]);
+
+  useEffect(() => {
+    if (selectedResource) {
+      setFormData({formData: selectedResource.content, orgFormData: undefined});
+    }
+  }, [selectedResource]);
 
   if (!selectedResource) {
     return <div>Nothing selected...</div>;
   }
 
-  if (resource?.kind !== 'ConfigMap') {
+  if (selectedResource?.kind !== 'ConfigMap') {
     return <div>Form editor only for ConfigMap resources...</div>;
   }
 
-  let schema = getFormSchema(resource.kind);
-  let uiSchema = getUiSchema(resource.kind);
+  let schema = getFormSchema(selectedResource.kind);
+  let uiSchema = getUiSchema(selectedResource.kind);
 
   return (
     // @ts-ignore
@@ -225,7 +214,7 @@ const FormEditor = (props: {contentHeight: string}) => {
         <Form
           schema={schema}
           uiSchema={uiSchema}
-          formData={formData}
+          formData={formData.formData}
           onChange={onFormUpdate}
           onSubmit={onFormSubmit}
           disabled={isInPreviewMode}
