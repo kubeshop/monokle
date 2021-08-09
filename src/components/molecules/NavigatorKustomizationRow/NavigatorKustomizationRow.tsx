@@ -7,8 +7,8 @@ import Colors, {FontColors} from '@styles/Colors';
 import {K8sResource} from '@models/k8sresource';
 
 import NavigatorRowLabel from '@molecules/NavigatorRowLabel';
-import {ExitKustomizationPreviewTooltip, KustomizationPreviewTooltip} from '@src/tooltips';
-import {TOOLTIP_DELAY} from '@src/constants';
+import {ExitKustomizationPreviewTooltip, KustomizationPreviewTooltip} from '@constants/tooltips';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 

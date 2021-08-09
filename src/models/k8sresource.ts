@@ -1,5 +1,5 @@
 /**
- * A k8s resource manifest, either extracted from a file or generated internaally (for example when previewing kustomizations)
+ * A k8s resource manifest, either extracted from a file or generated internally (for example when previewing kustomizations or helm charts)
  */
 import {Document, LineCounter, ParsedNode, Scalar} from 'yaml';
 

@@ -21,7 +21,7 @@ import {
   AddInclusionPatternTooltip,
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
-} from '@src/tooltips';
+} from '@constants/tooltips';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;

@@ -6,7 +6,7 @@ import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapT
 import {AppConfig} from '@models/appconfig';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
-import {ROOT_FILE_ENTRY} from '@src/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/services/selection';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {v4 as uuidv4} from 'uuid';

@@ -2,7 +2,7 @@ import path from 'path';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
 import fs from 'fs';
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
@@ -240,10 +240,6 @@ export function createResourceName(filePath: string, content: any) {
   if (content.kind === 'Kustomization') {
     const ix = filePath.lastIndexOf(path.sep);
     if (ix > 0) {
-      const ix2 = filePath.lastIndexOf(path.sep, ix - 1);
-      if (ix2 > 0) {
-        return filePath.substr(ix2 + 1, ix - ix2 - 1);
-      }
       return filePath.substr(1, ix - 1);
     }
     return filePath;

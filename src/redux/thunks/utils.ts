@@ -1,4 +1,4 @@
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@src/constants';
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {ResourceMapType} from '@models/appstate';
 import {clearParsedDocs, extractK8sResources, processParsedResources} from '@redux/services/resource';
 import {stringify} from 'yaml';

@@ -11,8 +11,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import ScrollIntoView from '@molecules/ScrollIntoView';
-import {ExitHelmPreviewTooltip, HelmPreviewTooltip} from '@src/tooltips';
-import {TOOLTIP_DELAY} from '@src/constants';
+import {ExitHelmPreviewTooltip, HelmPreviewTooltip} from '@constants/tooltips';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 

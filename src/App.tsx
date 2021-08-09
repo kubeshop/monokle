@@ -25,8 +25,8 @@ import {useAppDispatch} from '@redux/hooks';
 import {initKubeconfig} from '@redux/reducers/appConfig';
 import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
-import {ClusterExplorerTooltip, FileExplorerTooltip} from '@src/tooltips';
-import {TOOLTIP_DELAY} from '@src/constants';
+import {ClusterExplorerTooltip, FileExplorerTooltip} from '@constants/tooltips';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};

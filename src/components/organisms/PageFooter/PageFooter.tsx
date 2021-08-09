@@ -6,7 +6,7 @@ import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import Footer from '@components/atoms/Footer';
 import packageJson from '@root/package.json';
-import {ROOT_FILE_ENTRY} from '@src/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 const StyledFooter = styled(Footer)`
   width: 100%;

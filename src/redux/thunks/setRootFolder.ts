@@ -4,7 +4,7 @@ import {AppDispatch, RootState} from '@redux/store';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {createFileEntry, readFiles} from '@redux/services/fileEntry';
-import {ROOT_FILE_ENTRY} from '@src/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {processKustomizations} from '@redux/services/kustomize';
 import {clearParsedDocs, processParsedResources} from '@redux/services/resource';
 import {monitorRootFolder} from '@redux/services/fileMonitor';

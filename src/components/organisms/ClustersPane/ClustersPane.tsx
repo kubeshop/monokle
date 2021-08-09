@@ -9,8 +9,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {updateKubeconfig} from '@redux/reducers/appConfig';
-import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@src/tooltips';
-import {TOOLTIP_DELAY} from '@src/constants';
+import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 const StyledDiv = styled.div`
   margin-bottom: 10px;
