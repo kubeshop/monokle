@@ -48,6 +48,8 @@ jobs:
           tree node_modules -L 1
 
       - name: Build
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export NVM_DIR="$HOME/.nvm"
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
@@ -55,8 +57,6 @@ jobs:
           export CI=false
           echo $GITHUB_TOKEN
           npm run electron:build:mac
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Check Binary Size
       - name: Build Succeeded
