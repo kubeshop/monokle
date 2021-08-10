@@ -41,8 +41,8 @@ jobs:
           system_profiler | grep Processor
           vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
           env
-          npm --version
-          node --version
+          echo "npm: $(npm --version)"
+          echo "node: $(node --version)"
           ls -la
           tree
 
@@ -55,7 +55,7 @@ jobs:
         run: |
           npm run electron:build:mac
 
-      - name: Build Failed: Output Build Logs
+      - name: Build Failed - Output Build Logs
         run: |
           cat /Users/runner/.npm/_logs/*-debug.log
         if: ${{ failure() || cancelled() }}
