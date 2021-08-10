@@ -53,7 +53,10 @@ jobs:
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
           nvm install
           export CI=false
+          echo $GITHUB_TOKEN
           npm run electron:build:mac
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Check Binary Size
       - name: Build Succeeded
