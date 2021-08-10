@@ -1,11 +1,11 @@
-name: monokle-build-mac
+name: monokle-build-mac-nightly
 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [steen/housekeeping/build-binaries-windows]
-    tags:
-      - '*' # Should only grab tags without /
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '0 2 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          brew install nvm tree
+          brew install nvm tree jq sponge
           mkdir ~/.nvm || true
           export NVM_DIR="$HOME/.nvm"
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
@@ -47,13 +47,21 @@ jobs:
           ls -la
           tree node_modules -L 1
 
+      - name: Generate and apply tag
+        run: |
+          t=$(git describe --tags `git rev-list --tags --max-count=1`)/`date +%Y%m%d`
+          echo $t
+          jq --arg h "${t}" '.version=$h' package.json | sponge package.json
+          git tag "${t}"
+          git push origin "${t}"
+
       - name: Build
         run: |
           export NVM_DIR="$HOME/.nvm"
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
           nvm install
           npm run electron:build:ci
-          electron-builder --publish "onTag"
+          electron-builder --publish "never"
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
