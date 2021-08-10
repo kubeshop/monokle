@@ -1,0 +1,75 @@
+name: monokle-build-mac
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  release:
+    types: # This configuration does not affect the page_build event above
+      - prereleased
+      - released
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # This workflow contains a single job called "build"
+  build-mac:
+    runs-on: macOS-latest
+
+    steps:
+      # Make sure build is clean and no files from a previous run are re-used.
+      - name: Cleanup files before run
+        run: |
+          rm -rf *
+          rm /Users/runner/.npm/_logs/*.log || true
+        if: ${{ always() }}
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      # Check memory and cpu
+      - name: Verify Runner Resources
+        run: |
+          sysctl -n machdep.cpu.brand_string
+          vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
+
+      - name: Install Dependencies
+        run: |
+          brew install nvm tree
+          mkdir ~/.nvm || true
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+          nvm install
+          env
+          echo "npm: $(npm --version)"
+          echo "node: $(node --version)"
+          npm install --force
+          ls -la
+          tree node_modules -L 1
+
+      - name: Build
+        run: |
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+          nvm install
+          export CI=false
+          export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          npm run electron:build:mac
+
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          ls -alh dist | grep Monokle && du -sh dist/mac || true
+        if: ${{ success() }}
+
+      - name: Build Failed - Output Build Logs
+        run: |
+          cat /Users/runner/.npm/_logs/*-debug.log || true
+        if: ${{ failure() || cancelled() }}
+
+      # Make sure no secrets or certs are left on the runner
+      - name: Cleanup files after run
+        run: |
+          rm -rf *
+          ls -la
+        if: ${{ always() }}
