@@ -20,9 +20,10 @@ export function clearDecorations(editor: monaco.editor.IStandaloneCodeEditor, id
 
 export function setDecorations(
   editor: monaco.editor.IStandaloneCodeEditor,
-  decorations: monaco.editor.IModelDeltaDecoration[]
+  newDecorations: monaco.editor.IModelDeltaDecoration[],
+  idsOfOldDecorations: string[] = []
 ) {
-  const decorationIds = editor.deltaDecorations([], decorations);
+  const decorationIds = editor.deltaDecorations(idsOfOldDecorations, newDecorations);
   return decorationIds;
 }
 
