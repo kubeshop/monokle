@@ -11,7 +11,7 @@ Check out our [Features Document](./docs/features.md) or watch our demo video.
 Either download an (as of yet unsigned) installer from [releases](https://github.com/kubeshop/monokle/releases) or
 clone/build as described below!
 
-- Read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle) to get a quick intro and overview
+- Read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview
 - Ask questions, report bugs, suggest features, join our discussions
   [here on GitHub](https://github.com/kubeshop/monokle/discussions)
 - See "Getting Involved" below on how to get involved!
