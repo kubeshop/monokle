@@ -77,7 +77,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [code, setCode] = useState('');
   const [orgCode, setOrgCode] = useState<string>();
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
@@ -85,12 +85,14 @@ const Monaco = (props: {editorHeight: string}) => {
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
 
-  const [currentIdsOfDecorations, setCurrentIdsOfDecorations] = useState<string[]>([]);
-  const [currentHoverDisposables, setCurrentHoverDisposables] = useState<monaco.IDisposable[]>([]);
-  const [currentCommandDisposables, setCurrentCommandDisposables] = useState<monaco.IDisposable[]>([]);
-  const [currentLinkDisposables, setCurrentLinkDisposables] = useState<monaco.IDisposable[]>([]);
-  const [currentCompletionDisposable, setCurrentCompletionDisposable] = useState<monaco.IDisposable>();
-  const [actionSaveDisposable, setActionSaveDisposable] = useState<monaco.IDisposable>();
+  const idsOfDecorationsRef = useRef<string[]>([]);
+  const hoverDisposablesRef = useRef<monaco.IDisposable[]>([]);
+  const commandDisposablesRef = useRef<monaco.IDisposable[]>([]);
+  const linkDisposablesRef = useRef<monaco.IDisposable[]>([]);
+  const completionDisposableRef = useRef<monaco.IDisposable | null>(null);
+  const actionSaveDisposableRef = useRef<monaco.IDisposable | null>(null);
+
+  const editor = editorRef.current;
 
   const hiddenInputRef = useRef<HTMLInputElement>(null);
 
@@ -122,7 +124,7 @@ const Monaco = (props: {editorHeight: string}) => {
       },
     });
 
-    setEditor(e);
+    editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
 
     // @ts-ignore
     monaco.editor.onDidChangeMarkers(onDidChangeMarkers);
@@ -170,7 +172,9 @@ const Monaco = (props: {editorHeight: string}) => {
 
   useEffect(() => {
     if (editor) {
-      actionSaveDisposable?.dispose();
+      if (actionSaveDisposableRef.current && actionSaveDisposableRef.current.dispose) {
+        actionSaveDisposableRef.current.dispose();
+      }
       const newActionSaveDisposable = editor.addAction({
         id: 'monokle-save-content',
         label: 'Save Content',
@@ -180,7 +184,7 @@ const Monaco = (props: {editorHeight: string}) => {
           saveContent(currentEditor as monaco.editor.IStandaloneCodeEditor);
         },
       });
-      setActionSaveDisposable(newActionSaveDisposable);
+      actionSaveDisposableRef.current = newActionSaveDisposable;
     }
   }, [editor, selectedPath, selectedResource]);
 
@@ -215,11 +219,11 @@ const Monaco = (props: {editorHeight: string}) => {
 
   const clearCodeIntel = () => {
     if (editor) {
-      clearDecorations(editor, currentIdsOfDecorations);
-      currentHoverDisposables.forEach(hoverDisposable => hoverDisposable.dispose());
-      currentCommandDisposables.forEach(commandDisposable => commandDisposable.dispose());
-      currentLinkDisposables.forEach(linkDisposable => linkDisposable.dispose());
+      clearDecorations(editor, idsOfDecorationsRef.current);
     }
+    hoverDisposablesRef.current.forEach(hoverDisposable => hoverDisposable.dispose());
+    commandDisposablesRef.current.forEach(commandDisposable => commandDisposable.dispose());
+    linkDisposablesRef.current.forEach(linkDisposable => linkDisposable.dispose());
   };
 
   const applyCodeIntel = () => {
@@ -227,18 +231,21 @@ const Monaco = (props: {editorHeight: string}) => {
       const resource = resourceMap[selectedResource];
       const {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables} =
         codeIntel.applyForResource(resource, selectResource, resourceMap);
-      const idsOfNewDecorations = setDecorations(editor, newDecorations);
-      setCurrentIdsOfDecorations(idsOfNewDecorations);
-      setCurrentHoverDisposables(newHoverDisposables);
-      setCurrentCommandDisposables(newCommandDisposables);
-      setCurrentLinkDisposables(newLinkDisposables);
+      const idsOfNewDecorations = setDecorations(editor, newDecorations, idsOfDecorationsRef.current);
+      idsOfDecorationsRef.current = idsOfNewDecorations;
+      hoverDisposablesRef.current = newHoverDisposables;
+      commandDisposablesRef.current = newCommandDisposables;
+      linkDisposablesRef.current = newLinkDisposables;
     }
   };
 
   useEffect(() => {
     clearCodeIntel();
     applyCodeIntel();
-  }, [code]); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => {
+      clearCodeIntel();
+    };
+  }, [code, selectedResource, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let resourceSchema;
@@ -266,12 +273,12 @@ const Monaco = (props: {editorHeight: string}) => {
           },
         ],
       });
-    if (currentCompletionDisposable) {
-      currentCompletionDisposable.dispose();
+    if (completionDisposableRef.current && completionDisposableRef.current.dispose) {
+      completionDisposableRef.current.dispose();
     }
     if (editor) {
       const newCompletionDisposable = codeIntel.applyAutocomplete(resourceMap);
-      setCurrentCompletionDisposable(newCompletionDisposable);
+      completionDisposableRef.current = newCompletionDisposable;
     }
   }, [selectedResource, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
 

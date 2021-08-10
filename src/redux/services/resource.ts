@@ -12,50 +12,6 @@ import {v4 as uuidv4} from 'uuid';
 import {traverseDocument} from './manifest-utils';
 
 /**
- * process service selectors and create corresponding refs
- */
-
-export function processServices(resourceMap: ResourceMapType) {
-  const deployments = getK8sResources(resourceMap, 'Deployment').filter(
-    d => d.content.spec?.template?.metadata?.labels
-  );
-
-  getK8sResources(resourceMap, 'Service').forEach(service => {
-    if (service.content?.spec?.selector) {
-      Object.keys(service.content.spec.selector).forEach((e: any) => {
-        let found = false;
-        deployments
-          .filter(
-            deployment => deployment.content.spec.template.metadata.labels[e] === service.content.spec.selector[e]
-          )
-          .forEach(deployment => {
-            const sourceNode = getScalarNode(service, `spec:selector:${e}`);
-            const targetNode = getScalarNode(deployment, `spec:template:metadata:labels:${e}`);
-            if (sourceNode && targetNode) {
-              linkResources(
-                deployment,
-                service,
-                ResourceRefType.SelectedPodName,
-                ResourceRefType.ServicePodSelector,
-                targetNode,
-                sourceNode
-              );
-            }
-            found = true;
-          });
-
-        if (!found) {
-          const sourceNode = getScalarNode(service, `spec:selector:${e}`);
-          if (sourceNode) {
-            createResourceRef(service, ResourceRefType.UnsatisfiedSelector, sourceNode);
-          }
-        }
-      });
-    }
-  });
-}
-
-/**
  * Parse documents lazily...
  */
 
@@ -361,7 +317,6 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
  */
 
 export function processParsedResources(resourceMap: ResourceMapType) {
-  // processServices(resourceMap);
   processRefs(resourceMap);
 }
 
