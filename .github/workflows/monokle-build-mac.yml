@@ -20,7 +20,7 @@ jobs:
       - name: Cleanup files before run
         run: |
           rm -rf *
-          rm /Users/runner/.npm/_logs/*.log
+          rm /Users/runner/.npm/_logs/*.log || true
         if: ${{ always() }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
