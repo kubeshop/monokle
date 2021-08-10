@@ -16,6 +16,11 @@ clone/build as described below!
   [here on GitHub](https://github.com/kubeshop/monokle/discussions)
 - See "Getting Involved" below on how to get involved!
 
+Note: If you download the unsigned binary, MacOs will complain a bit. You need to go to Preferences > Security &
+Privacy > General. Text will appear saying "Monokle was blocked from use because it is not from an identified developer.
+Click the "Open Anyway" button. A new pop-up will say "macOs cannot verify the developer of Monokle. Are you sure you
+want to open it?", simply click "Move to Bin". No wait, did you? You should have clicked "Open", silly.
+
 ## Building / running
 
 ### Mac
