@@ -49,7 +49,7 @@ jobs:
 
       - name: Generate and apply tag
         run: |
-          t=$(git describe --tags `git rev-list --tags --max-count=1`)/`date +%Y%m%d`
+          t=$(jq -r '.version' package.json)/`date +%Y%m%d`
           echo $t
           jq --arg h "${t}" '.version=$h' package.json | sponge package.json
           git tag "${t}"
@@ -61,7 +61,7 @@ jobs:
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
           nvm install
           npm run electron:build:ci
-          electron-builder --publish "never"
+          electron-builder --publish "always"
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
