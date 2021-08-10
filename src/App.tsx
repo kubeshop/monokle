@@ -197,7 +197,7 @@ const App = () => {
                   </>
                 }
                 hideLeft={!leftActive}
-                nav={<NavigatorPane />}
+                nav={<NavigatorPane windowHeight={size.height} />}
                 editor={<ActionsPane contentHeight={contentHeight} />}
                 right={
                   <>

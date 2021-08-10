@@ -115,7 +115,10 @@ const SectionHeader = (props: {
   );
 };
 
-const NavigatorPane = () => {
+const NAVIGATOR_HEIGHT_OFFSET = 112;
+
+const NavigatorPane = (props: {windowHeight: number}) => {
+  const {windowHeight} = props;
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const helmCharts = useSelector(selectHelmCharts);
@@ -150,7 +153,12 @@ const NavigatorPane = () => {
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </TitleRow>
-      <NavigatorPaneContainer>
+      <NavigatorPaneContainer
+        style={{
+          height:
+            windowHeight && windowHeight > NAVIGATOR_HEIGHT_OFFSET ? windowHeight - NAVIGATOR_HEIGHT_OFFSET : '100%',
+        }}
+      >
         {uiState.isFolderLoading ? (
           <StyledSkeleton active />
         ) : (

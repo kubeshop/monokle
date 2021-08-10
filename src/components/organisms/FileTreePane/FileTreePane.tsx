@@ -233,6 +233,8 @@ const BrowseButton = styled(Button)`
   margin-top: 1px;
 `;
 
+const FILE_TREE_HEIGHT_OFFSET = 122;
+
 const FileTreePane = (props: {windowHeight: number | undefined}) => {
   const {windowHeight} = props;
   const dispatch = useAppDispatch();
@@ -405,7 +407,7 @@ const FileTreePane = (props: {windowHeight: number | undefined}) => {
       ) : tree ? (
         <StyledTreeDirectoryTree
           // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
-          height={windowHeight && windowHeight > 122 ? windowHeight - 122 : 0}
+          height={windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET ? windowHeight - FILE_TREE_HEIGHT_OFFSET : 0}
           onSelect={onSelect}
           treeData={[tree]}
           ref={treeRef}
