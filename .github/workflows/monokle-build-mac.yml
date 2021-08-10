@@ -20,6 +20,7 @@ jobs:
       - name: Cleanup files before run
         run: |
           rm -rf *
+          rm /Users/runner/.npm/_logs/*.log
         if: ${{ always() }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
@@ -36,6 +37,9 @@ jobs:
 
       - name: Verify Build Environment
         run: |
+          sysctl -n machdep.cpu.brand_string
+          system_profiler | grep Processor
+          vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
           env
           npm --version
           node --version
@@ -50,6 +54,11 @@ jobs:
       - name: Build app
         run: |
           npm run electron:build:mac
+
+      - name: Build Failed: Output Build Logs
+        run: |
+          cat /Users/runner/.npm/_logs/*-debug.log
+        if: ${{ failure() || cancelled() }}
 
       # Make sure no secrets or certs are left on the runner
       - name: Cleanup files after run
