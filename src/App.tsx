@@ -64,17 +64,23 @@ const StyledContent = styled(Content)`
   overflow-y: clip;
 `;
 
-const MenuIcon = (props: {icon: React.ElementType; active: boolean; isSelected: boolean}) => {
-  const {icon: IconComponent, active, isSelected} = props;
+const MenuIcon = (props: {
+  icon: React.ElementType;
+  active: boolean;
+  isSelected: boolean;
+  style?: React.CSSProperties;
+}) => {
+  const {icon: IconComponent, active, isSelected, style: customStyle = {}} = props;
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const style = {
+    ...customStyle,
     fontSize: 25,
     color: Colors.grey7,
   };
 
   if (isHovered || (active && isSelected)) {
-    style.color = Colors.whitePure;
+    style.color = Colors.grey400;
   }
 
   return (
@@ -155,6 +161,7 @@ const App = () => {
                     onClick={() => setActivePanes('left', 'file-explorer')}
                     icon={
                       <MenuIcon
+                        style={{marginLeft: 4}}
                         icon={FolderOpenOutlined}
                         active={leftActive}
                         isSelected={leftMenuSelection === 'file-explorer'}
