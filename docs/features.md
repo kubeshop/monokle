@@ -19,7 +19,7 @@ overview of all your resources.
 Surf up- or downstream through your resources! Monokle highlights other resources, that your selection has direct
 relations to and even provides you with the links to go to them quickly.
 
-## Preview the resources created by kustomizations
+## Preview the resources created by kustomize and Helm
 
 <img src="./img/kustomization.gif" alt="Preview the resources created by kustomizations" width="800" height="500" />
 
