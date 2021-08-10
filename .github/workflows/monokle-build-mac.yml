@@ -56,8 +56,8 @@ jobs:
           nvm install
           export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           npm run electron:build:mac
-          env:
-            CI: false
+        env:
+          CI: false
 
       # Check Binary Size
       - name: Build Succeeded
