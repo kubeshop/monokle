@@ -4,7 +4,7 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
 Check out our [Features Document](./docs/features.md) or watch our demo video.
 
-[Hello Monokle Video]
+[Hello Monokle Video](https://drive.google.com/file/d/1E6MkT0WVwEoV5YYq-_yrpPhk5uMgsPDS/view)
 
 ## Getting Started
 
