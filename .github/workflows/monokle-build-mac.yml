@@ -53,14 +53,13 @@ jobs:
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
           nvm install
           export CI=false
-          npm run build
-          tsc -p electron
-          electron-builder
+          npm run electron:build:mac
 
       # Check Binary Size
       - name: Build Succeeded
         run: |
           ls -alh dist | grep Monokle && du -sh dist/mac || true
+        if: ${{ success() }}
 
       - name: Build Failed - Output Build Logs
         run: |
