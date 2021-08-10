@@ -223,9 +223,7 @@ const Monaco = (props: {editorHeight: string}) => {
     }
     hoverDisposablesRef.current.forEach(hoverDisposable => hoverDisposable.dispose());
     commandDisposablesRef.current.forEach(commandDisposable => commandDisposable.dispose());
-    linkDisposablesRef.current.forEach(linkDisposable =>
-      linkDisposable.dispose()
-    );
+    linkDisposablesRef.current.forEach(linkDisposable => linkDisposable.dispose());
   };
 
   const applyCodeIntel = () => {
@@ -247,7 +245,7 @@ const Monaco = (props: {editorHeight: string}) => {
     return () => {
       clearCodeIntel();
     };
-  }, [code]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [code, selectedResource, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let resourceSchema;
