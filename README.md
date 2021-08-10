@@ -2,22 +2,19 @@
 
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
+Check out our [Features Document](./docs/features.md) or watch our demo video.
+
 [Hello Monokle Video]
-
-## Features
-
-Check out our feature list under docs. [Features](./docs/features.md)
 
 ## Getting Started
 
 Either download an (as of yet unsigned) installer from [releases](https://github.com/kubeshop/monokle/releases) or
 clone/build as described below!
 
-- Check out the [monokle.io website](https://monokle.io) for introductory material and videos.
 - Read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle) to get a quick intro and overview
-- Ask question, report bugs, suggest features, join our discussions
+- Ask questions, report bugs, suggest features, join our discussions
   [here on GitHub](https://github.com/kubeshop/monokle/discussions)
-- See "Getting Involved" below on how to get started with contributions
+- See "Getting Involved" below on how to get involved!
 
 ## Building
 
@@ -49,9 +46,11 @@ to build the Electron app package for production to the `dist` folder.
 
 Awesome - you want to join the fun! 
 
+- Check out our [Contributor Guide](https://github.com/kubeshop/.github/blob/main/CONTRIBUTING.md) and
+  [Code of Conduct](https://github.com/kubeshop/.github/blob/main/CODE_OF_CONDUCT.md)
 - Fork/Clone the repo and make sure you can run it as shown above
 - Check out the [architecture.md](docs/architecture.md) document to get a high-level understanding of 
-  how monokle works
+  how Monokle works
 - Check out open [issues](https://github.com/kubeshop/monokle/issues) and get in touch with the team 
   by starting a [discussion]() on what you want to help with - or open an issue of your own that you would
   like to contribute to the project.
