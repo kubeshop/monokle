@@ -33,7 +33,7 @@ jobs:
           sysctl -n machdep.cpu.brand_string
           vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
 
-      - name: Install & Build
+      - name: Install Dependencies
         run: |
           brew install nvm tree
           mkdir ~/.nvm || true
@@ -44,7 +44,22 @@ jobs:
           echo "npm: $(npm --version)"
           echo "node: $(node --version)"
           npm install --force
-          npm run electron:build:mac
+          ls -la
+          tree node_modules
+
+      - name: Build
+        run: |
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+          nvm install
+          npm run build
+          tsc -p electron
+          electron-builder
+
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          ls -alh dist | grep Monokle && du -sh dist/mac || true
 
       - name: Build Failed - Output Build Logs
         run: |
