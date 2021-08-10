@@ -1,0 +1,59 @@
+name: monokle-build-mac
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [master, steen/housekeeping/build-binaries]
+  pull_request:
+    branches: [master]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # This workflow contains a single job called "build"
+  build-mac:
+    runs-on: macOS-latest
+
+    steps:
+      # Make sure build is clean and no files from a previous run are re-used.
+      - name: Cleanup files before run
+        run: |
+          rm -rf *
+        if: ${{ always() }}
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      - name: Install Build Environment
+        run: |
+          brew install nvm tree
+          mkdir ~/.nvm || true
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+          nvm install
+
+      - name: Verify Build Environment
+        run: |
+          env
+          npm --version
+          node --version
+          ls -la
+          tree
+
+      - name: Install App Dependencies
+        run: |
+          npm install --force
+          tree node_modules
+
+      - name: Build app
+        run: |
+          npm run electron:build:mac
+
+      # Make sure no secrets or certs are left on the runner
+      - name: Cleanup files after run
+        run: |
+          rm -rf *
+          ls -la
+        if: ${{ always() }}
