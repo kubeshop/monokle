@@ -2,6 +2,8 @@ name: monokle-build-mac
 
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [steen/housekeeping/build-binaries-windows]
   release:
     types: # This configuration does not affect the page_build event above
       - prereleased
@@ -52,9 +54,10 @@ jobs:
           export NVM_DIR="$HOME/.nvm"
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
           nvm install
-          export CI=false
           export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           npm run electron:build:mac
+          env:
+            CI: false
 
       # Check Binary Size
       - name: Build Succeeded
@@ -62,9 +65,23 @@ jobs:
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
 
+      - name: Archive Binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
+        if: ${{ success() }}
+
       - name: Build Failed - Output Build Logs
         run: |
           cat /Users/runner/.npm/_logs/*-debug.log || true
+        if: ${{ failure() || cancelled() }}
+
+      - name: Build Failed - Archive Build Logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: /Users/runner/.npm/_logs
         if: ${{ failure() || cancelled() }}
 
       # Make sure no secrets or certs are left on the runner
