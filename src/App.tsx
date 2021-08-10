@@ -64,8 +64,28 @@ const StyledContent = styled(Content)`
   overflow-y: clip;
 `;
 
-const iconStyle = {
-  fontSize: 25,
+const MenuIcon = (props: {
+  icon: React.ElementType;
+  active: boolean;
+  isSelected: boolean;
+  style?: React.CSSProperties;
+}) => {
+  const {icon: IconComponent, active, isSelected, style: customStyle = {}} = props;
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  const style = {
+    ...customStyle,
+    fontSize: 25,
+    color: Colors.grey7,
+  };
+
+  if (isHovered || (active && isSelected)) {
+    style.color = Colors.grey400;
+  }
+
+  return (
+    <IconComponent style={style} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} />
+  );
 };
 
 const iconMenuWidth = 45;
@@ -140,12 +160,11 @@ const App = () => {
                     type="text"
                     onClick={() => setActivePanes('left', 'file-explorer')}
                     icon={
-                      <FolderOpenOutlined
-                        style={{
-                          ...iconStyle,
-                          color: leftMenuSelection === 'file-explorer' ? Colors.whitePure : Colors.grey7,
-                          marginLeft: 4,
-                        }}
+                      <MenuIcon
+                        style={{marginLeft: 4}}
+                        icon={FolderOpenOutlined}
+                        active={leftActive}
+                        isSelected={leftMenuSelection === 'file-explorer'}
                       />
                     }
                   />
@@ -156,11 +175,10 @@ const App = () => {
                     type="text"
                     onClick={() => setActivePanes('left', 'cluster-explorer')}
                     icon={
-                      <ClusterOutlined
-                        style={{
-                          ...iconStyle,
-                          color: leftMenuSelection === 'cluster-explorer' ? Colors.whitePure : Colors.grey7,
-                        }}
+                      <MenuIcon
+                        icon={ClusterOutlined}
+                        active={leftActive}
+                        isSelected={leftMenuSelection === 'cluster-explorer'}
                       />
                     }
                   />
@@ -186,7 +204,7 @@ const App = () => {
                   </>
                 }
                 hideLeft={!leftActive}
-                nav={<NavigatorPane />}
+                nav={<NavigatorPane windowHeight={size.height} />}
                 editor={<ActionsPane contentHeight={contentHeight} />}
                 right={
                   <>
@@ -208,11 +226,10 @@ const App = () => {
                   type="text"
                   onClick={() => setActivePanes('right', 'graph')}
                   icon={
-                    <ApartmentOutlined
-                      style={{
-                        ...iconStyle,
-                        color: rightMenuSelection === 'graph' ? Colors.whitePure : Colors.grey7,
-                      }}
+                    <MenuIcon
+                      icon={ApartmentOutlined}
+                      active={rightActive}
+                      isSelected={rightMenuSelection === 'graph'}
                     />
                   }
                   style={{display: featureJson.ShowGraphView ? 'inline' : 'none'}}
@@ -223,9 +240,7 @@ const App = () => {
                   type="text"
                   onClick={() => setActivePanes('right', 'logs')}
                   icon={
-                    <CodeOutlined
-                      style={{...iconStyle, color: rightMenuSelection === 'logs' ? Colors.whitePure : Colors.grey7}}
-                    />
+                    <MenuIcon icon={CodeOutlined} active={rightActive} isSelected={rightMenuSelection === 'logs'} />
                   }
                 />
               </Space>
