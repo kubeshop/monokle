@@ -45,13 +45,14 @@ jobs:
           echo "node: $(node --version)"
           npm install --force
           ls -la
-          tree node_modules
+          tree node_modules -L 1
 
       - name: Build
         run: |
           export NVM_DIR="$HOME/.nvm"
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
           nvm install
+          export CI=false
           npm run build
           tsc -p electron
           electron-builder
