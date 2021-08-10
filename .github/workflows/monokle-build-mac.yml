@@ -27,31 +27,23 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
-      - name: Install Build Environment
+      # Check memory and cpu
+      - name: Verify Runner Resources
+        run: |
+          sysctl -n machdep.cpu.brand_string
+          vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
+
+      - name: Install & Build
         run: |
           brew install nvm tree
           mkdir ~/.nvm || true
           export NVM_DIR="$HOME/.nvm"
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
           nvm install
-
-      - name: Verify Build Environment
-        run: |
-          sysctl -n machdep.cpu.brand_string
-          vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
           env
           echo "npm: $(npm --version)"
           echo "node: $(node --version)"
-          ls -la
-          tree
-
-      - name: Install App Dependencies
-        run: |
           npm install --force
-          tree node_modules
-
-      - name: Build app
-        run: |
           npm run electron:build:mac
 
       - name: Build Failed - Output Build Logs
