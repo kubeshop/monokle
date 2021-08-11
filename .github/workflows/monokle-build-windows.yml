@@ -14,34 +14,28 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       # Make sure build is clean and no files from a previous run are re-used.
       - name: Cleanup files before run
         run: |
-          dir
+          ls -la
+          cmd /r dir
         if: ${{ always() }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
         uses: actions/checkout@v2
 
-      # Install dependencies
-      - name: Cleanup files before run
+      # Install Dependencies
+      - name: Install Dependencies
         run: |
           $env:NVS_HOME="$env:LOCALAPPDATA\nvs"
           git clone https://github.com/jasongin/nvs "$env:NVS_HOME"
           . "$env:NVS_HOME\nvs.ps1" install
-
           nvs --version
-
-          refreshenv
-
-          nvs --version
-
-          nvs add auto
           nvs use auto
-          nvs link auto
-
-          refreshenv
-
           node --version
