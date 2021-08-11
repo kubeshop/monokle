@@ -29,7 +29,7 @@ jobs:
       - name: Install Dependencies
         run: |
           Set-PSDebug -Trace 1
-          $uri = "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi"
+          $uri = "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x86.msi"
           $msifile = "D:\a\monokle\monokle\nodejs.msi"
           Invoke-WebRequest -Uri $uri -OutFile $msifile
           cmd /r dir
