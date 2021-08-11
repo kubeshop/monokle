@@ -35,7 +35,7 @@ jobs:
               "/qn"
               "/norestart"
               "/L*v"
-              msilog.txt
+              "msilog.log"
           )
           Start-Process msiexec.exe -Wait -NoNewWindow -ArgumentList '/I .\nodejs.msi /quiet'
           cmd /r dir
