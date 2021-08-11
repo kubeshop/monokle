@@ -19,7 +19,6 @@ jobs:
       - name: Cleanup files before run
         run: |
           cmd /r dir
-          dir
         if: ${{ always() }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
@@ -29,8 +28,9 @@ jobs:
       # Install Dependencies
       - name: Install Dependencies
         run: |
-          Invoke-WebRequest -Uri "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi" -OutFile ".\\nodejs.msi"
-          msiexec.exe /I .\nodejs.msi
+          Invoke-WebRequest -Uri "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi" -OutFile "nodejs.msi"
+          msiexec.exe /I nodejs.msi
+          cmd /r dir
           node --version
 
       - name: Check Dependencies
