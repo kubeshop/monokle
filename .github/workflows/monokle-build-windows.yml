@@ -29,10 +29,25 @@ jobs:
       - name: Install Dependencies
         run: |
           Invoke-WebRequest -Uri "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi" -OutFile "nodejs.msi"
-          Start-Process msiexec.exe -ArgumentList '/I .\nodejs.msi'
+          $MSIArguments = @(
+              "/i"
+              .\nodejs.msi
+              "/qn"
+              "/norestart"
+              "/L*v"
+              msilog.txt
+          )
+          Start-Process msiexec.exe -Wait -NoNewWindow -ArgumentList '/I .\nodejs.msi /quiet'
           cmd /r dir
           node --version
 
       - name: Check Dependencies
         run: |
           node --version
+
+      - name: Build Failed - Archive Build Logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: .\msilog.txt
+        if: ${{ failure() || cancelled() }}
