@@ -50,7 +50,7 @@ jobs:
       - name: Generate and apply tag
         run: |
           npm --no-git-tag-version version patch
-          t=$(jq -r '.version' package.json)/`date +%Y%m%d`
+          t=$(jq -r '.version' package.json)-`date +%Y%m%d`
           echo $t
           jq --arg h "${t}" '.version=$h' package.json | sponge package.json
           git tag "${t}" || true

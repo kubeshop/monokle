@@ -19,6 +19,7 @@ jobs:
       - name: Cleanup files before run
         run: |
           cmd /r dir
+          dir
         if: ${{ always() }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
@@ -33,4 +34,12 @@ jobs:
           . "$env:NVS_HOME\nvs.ps1" install
           nvs --version
           nvs use auto
+          node --version
+          nvs auto on
+          cd ..
+          cd D:\a\monokle\monokle
+          node --version
+
+      - name: Install Dependencies
+        run: |
           node --version
