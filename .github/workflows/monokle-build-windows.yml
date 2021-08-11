@@ -29,15 +29,10 @@ jobs:
       # Install Dependencies
       - name: Install Dependencies
         run: |
-          $env:NVS_HOME="$env:LOCALAPPDATA\nvs"
-          git clone https://github.com/jasongin/nvs "$env:NVS_HOME"
-          . "$env:NVS_HOME\nvs.ps1" install
-          nvs --version
-          nvs auto
-          nvs link
-          nvs which default
+          wget "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi" -outfile "nodejs.msi"
+          msiexec.exe /I .\nodejs.msi
           node --version
 
-      - name: Install Dependencies
+      - name: Check Dependencies
         run: |
           node --version
