@@ -29,7 +29,7 @@ jobs:
       - name: Install Dependencies
         run: |
           Invoke-WebRequest -Uri "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi" -OutFile "nodejs.msi"
-          Start-Process msiexec.exe -Wait -ArgumentList '/I .\nodejs.msi'
+          Start-Process msiexec.exe -ArgumentList '/I .\nodejs.msi'
           cmd /r dir
           node --version
 
