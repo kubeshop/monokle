@@ -2,7 +2,6 @@ name: monokle-build-mac-nightly
 
 on:
   push:
-    branches: [steen/housekeeping/build-binaries-windows]
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron: '0 2 * * *'

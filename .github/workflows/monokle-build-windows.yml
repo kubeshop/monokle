@@ -33,11 +33,9 @@ jobs:
           git clone https://github.com/jasongin/nvs "$env:NVS_HOME"
           . "$env:NVS_HOME\nvs.ps1" install
           nvs --version
-          nvs use auto
-          node --version
-          nvs auto on
-          cd ..
-          cd D:\a\monokle\monokle
+          nvs auto
+          nvs link
+          nvs which default
           node --version
 
       - name: Install Dependencies
