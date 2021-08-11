@@ -53,8 +53,8 @@ jobs:
           t=$(jq -r '.version' package.json)/`date +%Y%m%d`
           echo $t
           jq --arg h "${t}" '.version=$h' package.json | sponge package.json
-          git tag "${t}"
-          git push origin "${t}"
+          git tag "${t}" || true
+          git push origin "${t}" || true
 
       - name: Build
         run: |

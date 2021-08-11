@@ -14,15 +14,10 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
-    defaults:
-      run:
-        shell: bash
-
     steps:
       # Make sure build is clean and no files from a previous run are re-used.
       - name: Cleanup files before run
         run: |
-          ls -la
           cmd /r dir
         if: ${{ always() }}
 
