@@ -27,6 +27,7 @@ import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
 import {ClusterExplorerTooltip, FileExplorerTooltip} from '@constants/tooltips';
 import {TOOLTIP_DELAY} from '@constants/constants';
+import AppContext from './AppContext';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -144,7 +145,7 @@ const App = () => {
   if (appWidth !== size.width) setAppWidth(size.width);
 
   return (
-    <div>
+    <AppContext.Provider value={{windowSize: size}}>
       <MessageBox />
       <Layout style={{height: mainHeight}}>
         <PageHeader />
@@ -191,7 +192,7 @@ const App = () => {
                 left={
                   <>
                     <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
-                      <FileTreePane windowHeight={size.height} />
+                      <FileTreePane />
                     </div>
                     <div
                       style={{
@@ -204,7 +205,7 @@ const App = () => {
                   </>
                 }
                 hideLeft={!leftActive}
-                nav={<NavigatorPane windowHeight={size.height} />}
+                nav={<NavigatorPane />}
                 editor={<ActionsPane contentHeight={contentHeight} />}
                 right={
                   <>
@@ -253,7 +254,7 @@ const App = () => {
       <DiffModal />
       <StartupModal />
       <HotKeysHandler onToggleLeftMenu={() => toggleLeftMenu()} onToggleRightMenu={() => toggleRightMenu()} />
-    </div>
+    </AppContext.Provider>
   );
 };
 

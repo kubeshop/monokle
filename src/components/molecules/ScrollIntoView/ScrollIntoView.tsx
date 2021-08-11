@@ -5,7 +5,7 @@ interface ScrollIntoViewProps {
 }
 
 const ScrollIntoView = React.forwardRef(({children}: ScrollIntoViewProps, ref) => {
-  const containerRef = React.useRef<any>(null);
+  const containerRef = React.useRef<HTMLSpanElement>(null);
   React.useImperativeHandle(ref, () => {
     return {
       scrollIntoView: () => {

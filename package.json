@@ -52,6 +52,7 @@
     "prettier": "2.3.2",
     "react-scripts": "4.0.3",
     "redux-devtools-extension": "^2.13.9",
+    "standard-version": "^9.3.1",
     "typescript": "^4.3.5",
     "wait-on": "^6.0.0"
   },
@@ -111,7 +112,10 @@
     "lintfix": "eslint --fix \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "precommit": "npm run lint && npm test",
     "format:all": "prettier --write \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release:patch": "standard-version --release-as patch",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major"
   },
   "build": {
     "appId": "io.kubeshop.monokle",

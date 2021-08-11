@@ -23,8 +23,8 @@ relations to and even provides you with the links to go to them quickly.
 
 <img src="./img/kustomization.gif" alt="Preview the resources created by kustomizations" width="800" height="500" />
 
-Do a quick dry-run, enabling you to navigate the resources, that will be created by your Kustomizations. Apply them to
-the cluster, if you are satisfied.
+Do a quick dry-run, enabling you to navigate and debug the resources created by Kustomize or Helm. Apply them to
+the cluster if you are satisfied.
 
 ## Locate source file quickly, and see if links are dead-ends
 

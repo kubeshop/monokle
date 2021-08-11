@@ -2,7 +2,14 @@
 
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
-Check out our [Features Document](./docs/features.md) or watch our demo video!
+- Quickly get a high-level view of your manifests, their contained resources and relationships
+- Easily edit resources without having to learn or look up yaml syntax
+- Refactor resources with maintained integrity of names and references
+- Preview and debug resources generated with kustomize or helm
+  diff resources against your cluster and apply changes immediately
+- And much more!
+
+Check out the [Features Document](./docs/features.md) or watch the short demo video below:
 
 [![Monokle Demo](docs/img/monokle-welcome.png)](https://drive.google.com/file/d/1E6MkT0WVwEoV5YYq-_yrpPhk5uMgsPDS/view)
 

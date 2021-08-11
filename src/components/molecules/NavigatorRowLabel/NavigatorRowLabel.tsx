@@ -1,8 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext, useCallback} from 'react';
 import {Popover, Typography, Divider} from 'antd';
 import styled from 'styled-components';
 import Colors, {FontColors} from '@styles/Colors';
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+
+import AppContext from '@src/AppContext';
+import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
@@ -174,20 +177,44 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
 
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedResource = useAppSelector(state => state.main.selectedResource);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [resource, setResource] = useState<K8sResource>();
   const scrollContainer = React.useRef(null);
+  const labelRef = React.useRef<HTMLSpanElement>(null);
+
+  const {windowSize} = useContext(AppContext);
+  const navigatorHeight = windowSize.height - NAVIGATOR_HEIGHT_OFFSET;
+
+  const isScrolledIntoView = useCallback(() => {
+    const boundingClientRect = labelRef.current?.getBoundingClientRect();
+    if (!boundingClientRect) {
+      return false;
+    }
+    const elementTop = boundingClientRect.top;
+    const elementBottom = boundingClientRect.bottom;
+    return elementTop < navigatorHeight && elementBottom >= 0;
+  }, [navigatorHeight]);
 
   useEffect(() => {
     setResource(resourceMap[resourceId]);
   }, [resourceId, resourceMap]);
 
   useEffect(() => {
-    if (isHighlighted && selectedPath) {
+    const isVisible = isScrolledIntoView();
+    if (isHighlighted && selectedPath && !isVisible) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
   }, [isHighlighted, selectedPath]);
+
+  useEffect(() => {
+    const isVisible = isScrolledIntoView();
+    if (isSelected && selectedResource && !isVisible) {
+      // @ts-ignore
+      scrollContainer.current?.scrollIntoView();
+    }
+  }, [isSelected, selectedResource]);
 
   const selectResource = (resId: string) => {
     dispatch(selectK8sResource(resId));
@@ -220,7 +247,9 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
         onClick={onClickLabel}
         style={!hasIncomingRefs ? {marginLeft: 19} : {}}
       >
-        <ScrollIntoView ref={scrollContainer}>{label}</ScrollIntoView>
+        <ScrollIntoView ref={scrollContainer}>
+          <span ref={labelRef}>{label}</span>
+        </ScrollIntoView>
       </StyledSpan>
       {resource && resource.refs && (hasOutgoingRefs || hasUnsatisfiedRefs) && (
         <Popover
