@@ -3,7 +3,6 @@ name: monokle-build-mac
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [steen/housekeeping/build-binaries-windows]
     tags:
       - '*' # Should only grab tags without /
 

@@ -30,8 +30,12 @@ jobs:
         run: |
           choco install nvs
 
+          refreshenv
+
           nvs add auto
           nvs use auto
           nvs link auto
+
+          refreshenv
 
           node --version
