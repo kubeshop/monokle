@@ -36,9 +36,9 @@ jobs:
           $DataStamp = get-date -Format yyyyMMddTHHmmss
           $logFile = '{0}-{1}.log' -f $file.fullname,$DataStamp
           $MSIArguments = @(
-              "/i"
+              "/I"
               ('"{0}"' -f $msifile)
-              "/qn"
+              "/quiet"
               "/norestart"
               "/L*v"
               $logFile
