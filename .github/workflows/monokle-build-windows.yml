@@ -33,7 +33,17 @@ jobs:
           $msifile = "D:\a\monokle\monokle\nodejs.msi"
           Invoke-WebRequest -Uri $uri -OutFile $msifile
           cmd /r dir
-          Start-Process "msiexec.exe" -Wait -NoNewWindow -ArgumentList '/I $msifile /quiet /passive'
+          $DataStamp = get-date -Format yyyyMMddTHHmmss
+          $logFile = '{0}-{1}.log' -f $file.fullname,$DataStamp
+          $MSIArguments = @(
+              "/i"
+              ('"{0}"' -f $msifile)
+              "/qn"
+              "/norestart"
+              "/L*v"
+              $logFile
+          )
+          Start-Process "msiexec.exe" -Wait -NoNewWindow -ArgumentList $MSIArguments
           node --version
 
       - name: Check Dependencies
