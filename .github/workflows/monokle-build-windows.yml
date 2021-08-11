@@ -24,3 +24,14 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
         uses: actions/checkout@v2
+
+      # Install dependencies
+      - name: Cleanup files before run
+        run: |
+          choco install nvs
+
+          nvs add auto
+          nvs use auto
+          nvs link auto
+
+          node --version
