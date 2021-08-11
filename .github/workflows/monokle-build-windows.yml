@@ -29,7 +29,7 @@ jobs:
       # Install Dependencies
       - name: Install Dependencies
         run: |
-          wget "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi" -outfile "nodejs.msi"
+          Invoke-WebRequest -Uri "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi" -OutFile ".\\nodejs.msi"
           msiexec.exe /I .\nodejs.msi
           node --version
 
