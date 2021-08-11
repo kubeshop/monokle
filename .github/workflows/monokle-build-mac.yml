@@ -52,7 +52,7 @@ jobs:
           [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
           nvm install
           npm run electron:build:ci
-          electron-builder --publish "onTag"
+          npm exec -c "electron-builder --publish \"onTag\""
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
