@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {MonoSectionTitle} from '@components/atoms';
 import {K8sResource} from '@models/k8sresource';
-import {NavigatorSubSection} from '@models/navigator';
+import {NavigatorSection, NavigatorSubSection} from '@models/navigator';
 import {selectActiveResources} from '@redux/selectors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {getNamespaces} from '@redux/services/resource';
@@ -80,6 +80,13 @@ const ResourcesSection = () => {
     );
   }
 
+  function shouldSectionBeVisible(section: NavigatorSection) {
+    return (
+      resources.length === 0 ||
+      (resources.length > 0 && section.subsections.some(subsection => shouldSubsectionBeVisible(subsection)))
+    );
+  }
+
   function shouldSubsectionBeVisible(subsection: NavigatorSubSection) {
     return (
       resources.length === 0 ||
@@ -125,27 +132,29 @@ const ResourcesSection = () => {
               </SectionRow>
               <SectionRow>
                 <SectionCol>
-                  {navigator.sections.map(section => {
-                    return (
-                      <div key={section.name}>
-                        {section.name.length > 0 && (
-                          <SectionRow>
-                            <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
-                          </SectionRow>
-                        )}
-                        <Section
-                          expandedSubsections={expandedSubsectionsBySection[section.name]}
-                          onSubsectionExpand={handleSubsectionExpand}
-                          onSubsectionCollapse={handleSubsectionCollapse}
-                          section={section}
-                          shouldResourceBeVisible={shouldResourceBeVisible}
-                          shouldSubsectionBeVisible={shouldSubsectionBeVisible}
-                          resources={resources}
-                          selectResource={selectResource}
-                        />
-                      </div>
-                    );
-                  })}
+                  {navigator.sections
+                    .filter(section => shouldSectionBeVisible(section))
+                    .map(section => {
+                      return (
+                        <div key={section.name}>
+                          {section.name.length > 0 && (
+                            <SectionRow>
+                              <NavigatorContentTitle>{section.name}</NavigatorContentTitle>
+                            </SectionRow>
+                          )}
+                          <Section
+                            expandedSubsections={expandedSubsectionsBySection[section.name]}
+                            onSubsectionExpand={handleSubsectionExpand}
+                            onSubsectionCollapse={handleSubsectionCollapse}
+                            section={section}
+                            shouldResourceBeVisible={shouldResourceBeVisible}
+                            shouldSubsectionBeVisible={shouldSubsectionBeVisible}
+                            resources={resources}
+                            selectResource={selectResource}
+                          />
+                        </div>
+                      );
+                    })}
                 </SectionCol>
               </SectionRow>
             </div>
