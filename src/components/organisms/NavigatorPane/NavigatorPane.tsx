@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
@@ -9,6 +9,10 @@ import Colors, {BackgroundColors} from '@styles/Colors';
 import {useAppSelector} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer, MonoSectionTitle} from '@atoms';
 import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
+
+import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+
+import AppContext from '@src/AppContext';
 
 import HelmChartsSection from './components/HelmChartsSection';
 import KustomizationsSection from './components/KustomizationsSection';
@@ -115,10 +119,10 @@ const SectionHeader = (props: {
   );
 };
 
-const NAVIGATOR_HEIGHT_OFFSET = 112;
-
-const NavigatorPane = (props: {windowHeight: number}) => {
-  const {windowHeight} = props;
+const NavigatorPane = () => {
+  const {windowSize} = useContext(AppContext);
+  const windowHeight = windowSize.height;
+  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const helmCharts = useSelector(selectHelmCharts);
@@ -155,8 +159,7 @@ const NavigatorPane = (props: {windowHeight: number}) => {
       </TitleRow>
       <NavigatorPaneContainer
         style={{
-          height:
-            windowHeight && windowHeight > NAVIGATOR_HEIGHT_OFFSET ? windowHeight - NAVIGATOR_HEIGHT_OFFSET : '100%',
+          height: windowHeight && windowHeight > NAVIGATOR_HEIGHT_OFFSET ? navigatorHeight : '100%',
         }}
       >
         {uiState.isFolderLoading ? (

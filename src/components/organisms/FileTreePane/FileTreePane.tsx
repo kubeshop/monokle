@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useContext} from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
@@ -7,8 +7,9 @@ import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY, FILE_TREE_HEIGHT_OFFSET} from '@constants/constants';
 
+import AppContext from '@src/AppContext';
 import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {FileEntry} from '@models/fileentry';
@@ -233,10 +234,9 @@ const BrowseButton = styled(Button)`
   margin-top: 1px;
 `;
 
-const FILE_TREE_HEIGHT_OFFSET = 122;
-
-const FileTreePane = (props: {windowHeight: number | undefined}) => {
-  const {windowHeight} = props;
+const FileTreePane = () => {
+  const {windowSize} = useContext(AppContext);
+  const windowHeight = windowSize.height;
   const dispatch = useAppDispatch();
   const previewMode = useSelector(inPreviewMode);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
