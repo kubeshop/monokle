@@ -28,16 +28,9 @@ jobs:
       # Install Dependencies
       - name: Install Dependencies
         run: |
+          Set-PSDebug -Trace 1
           Invoke-WebRequest -Uri "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x64.msi" -OutFile "nodejs.msi"
-          $MSIArguments = @(
-              "/i"
-              .\nodejs.msi
-              "/qn"
-              "/norestart"
-              "/L*v"
-              "msilog.log"
-          )
-          Start-Process msiexec.exe -Wait -NoNewWindow -ArgumentList '/I .\nodejs.msi /quiet'
+          Start-Process .\nodejs.msi -Wait -NoNewWindow -ArgumentList '/quiet /passive'
           cmd /r dir
           node --version
 
