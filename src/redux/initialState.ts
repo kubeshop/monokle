@@ -188,6 +188,13 @@ const initialLogsState: LogsState = {
 const initialUiState: UiState = {
   settingsOpened: false,
   isFolderLoading: false,
+  leftMenu: {
+    selection: 'file-explorer',
+    isActive: true,
+  },
+  rightMenu: {
+    isActive: false,
+  },
 };
 
 export default {
