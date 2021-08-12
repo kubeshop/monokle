@@ -43,7 +43,7 @@ interface AppState {
   previewType?: 'kustomization' | 'cluster' | 'helm';
   previewResourceId?: string; // the resource currently being previewed
   previewLoader: PreviewLoaderType;
-  diffResource?: string; // the resource currently being diffed
+  diffResourceId?: string; // the resource currently being diffed
   diffContent?: string; // the diff content for the resource being diffed
   helmChartMap: HelmChartMapType; // maps chart ids to helm charts
   helmValuesMap: HelmValuesMapType; // maps values ids to helm values files
