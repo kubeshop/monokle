@@ -119,7 +119,6 @@ const TreeContainer = styled.div`
 const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   const helmValues = useSelector(selectHelmValues);
   const previewValuesFile = useAppSelector(state => state.main.previewValuesFile);
-  const selectedValuesFile = useAppSelector(state => state.main.selectedValuesFile);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const dispatch = useAppDispatch();
   const scrollContainer = React.useRef(null);

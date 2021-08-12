@@ -176,7 +176,7 @@ export const mainSlice = createSlice({
         values.selected = values.id === payload;
       });
 
-      state.selectedValuesFile = state.helmValuesMap[payload].selected ? payload : undefined;
+      state.selectedValuesFileId = state.helmValuesMap[payload].selected ? payload : undefined;
       selectFilePath(state.helmValuesMap[payload].filePath, state);
     },
     /**
@@ -253,12 +253,12 @@ export const mainSlice = createSlice({
       state.previewLoader.targetResourceId = undefined;
       state.selectedResourceId = undefined;
       state.selectedPath = undefined;
-      state.previewResource = undefined;
+      state.previewResourceId = undefined;
       state.previewType = undefined;
     });
 
     builder.addCase(performResourceDiff.fulfilled, (state, action) => {
-      state.diffResource = action.payload.diffResourceId;
+      state.diffResourceId = action.payload.diffResourceId;
       state.diffContent = action.payload.diffContent;
     });
   },
