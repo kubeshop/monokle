@@ -7,7 +7,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {inPreviewMode} from '@redux/selectors';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {toggleSettings, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -18,7 +18,7 @@ const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
   const configState = useAppSelector(state => state.config);
-  const isInPreviewMode = useSelector(inPreviewMode);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const folderInputRef = useRef<HTMLInputElement>(null);
   const startFileUploader = () => {

@@ -24,7 +24,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {useSelector} from 'react-redux';
-import {inPreviewMode} from '@redux/selectors';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {clearDecorations, setDecorations} from './editorHelpers';
 import codeIntel from './codeIntel';
 
@@ -96,7 +96,7 @@ const Monaco = (props: {editorHeight: string}) => {
 
   const hiddenInputRef = useRef<HTMLInputElement>(null);
 
-  const isInPreviewMode = useSelector(inPreviewMode);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const dispatch = useAppDispatch();
 
   const selectResource = (resourceId: string) => {

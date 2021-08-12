@@ -2,7 +2,7 @@ import React, {useState, useContext, useEffect} from 'react';
 import {Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {inClusterMode, selectHelmCharts, selectHelmValues, selectKustomizations} from '@redux/selectors';
+import {isInClusterModeSelector, helmChartsSelector, helmValuesSelector, kustomizationsSelector} from '@redux/selectors';
 
 import {HelmValuesFile} from '@models/helm';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -126,10 +126,10 @@ const NavigatorPane = () => {
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const helmCharts = useSelector(selectHelmCharts);
-  const helmValues = useSelector(selectHelmValues);
-  const kustomizations = useSelector(selectKustomizations);
-  const clusterMode = useSelector(inClusterMode);
+  const helmCharts = useSelector(helmChartsSelector);
+  const helmValues = useSelector(helmValuesSelector);
+  const kustomizations = useSelector(kustomizationsSelector);
+  const isInClusterMode = useSelector(isInClusterModeSelector);
 
   const [expandedSections, setExpandedSections] = useState<string[]>(['kustomizations', 'helmcharts']);
 
@@ -173,7 +173,7 @@ const NavigatorPane = () => {
           <StyledSkeleton active />
         ) : (
           <StyledCollapse collapsible="disabled" ghost activeKey={expandedSections}>
-            {!clusterMode && !previewLoader.isLoading && Object.values(helmCharts).length > 0 && (
+            {!isInClusterMode && !previewLoader.isLoading && Object.values(helmCharts).length > 0 && (
               <StyledCollapsePanel
                 key="helmcharts"
                 showArrow={false}
@@ -195,7 +195,7 @@ const NavigatorPane = () => {
                 <HelmChartsSection helmCharts={helmCharts} />
               </StyledCollapsePanel>
             )}
-            {!clusterMode && !previewLoader.isLoading && kustomizations.length > 0 && (
+            {!isInClusterMode && !previewLoader.isLoading && kustomizations.length > 0 && (
               <StyledCollapsePanel
                 key="kustomizations"
                 showArrow={false}

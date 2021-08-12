@@ -9,7 +9,7 @@ import {useMeasure} from 'react-use';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {selectK8sResource} from '@redux/reducers/main';
-import {selectActiveResources} from '@redux/selectors';
+import {activeResourcesSelector} from '@redux/selectors';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 import Sidebar from './Sidebar';
 
@@ -77,7 +77,7 @@ const GraphView = (props: {editorHeight: string}) => {
   const graphAreaHeight = parseInt(editorHeight, 10) - 150;
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const activeResources = useSelector(selectActiveResources);
+  const activeResources = useSelector(activeResourcesSelector);
   const previewResource = useAppSelector(state => state.main.previewResourceId);
 
   const dispatch = useAppDispatch();

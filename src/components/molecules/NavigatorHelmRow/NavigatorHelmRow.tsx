@@ -6,7 +6,7 @@ import {LoadingOutlined} from '@ant-design/icons';
 import Colors, {FontColors} from '@styles/Colors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {useSelector} from 'react-redux';
-import {selectHelmValues} from '@redux/selectors';
+import {helmValuesSelector} from '@redux/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -117,7 +117,7 @@ const TreeContainer = styled.div`
 `;
 
 const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
-  const helmValues = useSelector(selectHelmValues);
+  const helmValues = useSelector(helmValuesSelector);
   const previewValuesFile = useAppSelector(state => state.main.previewValuesFileId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const dispatch = useAppDispatch();

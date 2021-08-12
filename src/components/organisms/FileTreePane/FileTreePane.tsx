@@ -19,7 +19,7 @@ import {stopPreview} from '@redux/services/preview';
 import {getResourcesForPath, getChildFilePath} from '@redux/services/fileEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
-import {inPreviewMode} from '@redux/selectors';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -238,7 +238,7 @@ const FileTreePane = () => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const dispatch = useAppDispatch();
-  const previewMode = useSelector(inPreviewMode);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -339,7 +339,7 @@ const FileTreePane = () => {
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
     if (info.node.key) {
-      if (previewMode) {
+      if (isInPreviewMode) {
         stopPreview(dispatch);
       }
       dispatch(setSelectingFile(true));
@@ -419,7 +419,7 @@ const FileTreePane = () => {
             // @ts-ignore
             return node.highlight;
           }}
-          disabled={previewMode || previewLoader.isLoading}
+          disabled={isInPreviewMode || previewLoader.isLoading}
           showLine
           showIcon={false}
         />

@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {Button, Col, Input, Row, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {inPreviewMode, inClusterMode} from '@redux/selectors';
+import {isInPreviewModeSelector, isInClusterModeSelector} from '@redux/selectors';
 
 import {BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -39,8 +39,8 @@ const ClustersContainer = styled.div`
 const ClustersPane = () => {
   const dispatch = useAppDispatch();
   const previewResource = useAppSelector(state => state.main.previewResourceId);
-  const previewMode = useSelector(inPreviewMode);
-  const clusterMode = useSelector(inClusterMode);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInClusterMode = useSelector(isInClusterModeSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
@@ -63,7 +63,7 @@ const ClustersPane = () => {
   };
 
   const connectToCluster = () => {
-    if (previewMode && previewResource !== kubeconfig) {
+    if (isInPreviewMode && previewResource !== kubeconfig) {
       stopPreview(dispatch);
     }
     startPreview(kubeconfig, 'cluster', dispatch);
@@ -98,7 +98,7 @@ const ClustersPane = () => {
               ghost
               loading={previewType === 'cluster' && previewLoader.isLoading}
               onClick={connectToCluster}
-              disabled={Boolean(clusterMode)}
+              disabled={Boolean(isInClusterMode)}
             >
               Show Cluster Objects
             </Button>

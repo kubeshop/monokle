@@ -11,7 +11,7 @@ import IconMonokle from '@components/atoms/IconMonokle';
 import Row from '@components/atoms/Row';
 import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
-import {inPreviewMode, selectActiveResources} from '@redux/selectors';
+import {isInPreviewModeSelector, activeResourcesSelector} from '@redux/selectors';
 import {useSelector} from 'react-redux';
 import {stopPreview} from '@redux/services/preview';
 
@@ -108,7 +108,7 @@ const PageHeader = () => {
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const activeResources = useSelector(selectActiveResources);
+  const activeResources = useSelector(activeResourcesSelector);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewType = useAppSelector(state => state.main.previewType);
@@ -116,7 +116,7 @@ const PageHeader = () => {
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
   const [helmChart, setHelmChart] = useState<HelmChart>();
   const dispatch = useAppDispatch();
-  const isInPreviewMode = useSelector(inPreviewMode);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   useEffect(() => {
     if (previewResourceId) {

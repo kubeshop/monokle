@@ -12,7 +12,7 @@ import {stringify} from 'yaml';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {inPreviewMode, selectSelectedResource} from '@redux/selectors';
+import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
 import {MonoButton} from '@atoms';
 import equal from 'fast-deep-equal/es6/react';
 
@@ -138,11 +138,11 @@ const FormContainer = styled.div<{contentHeight: string}>`
 
 const FormEditor = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
-  const selectedResource = useSelector(selectSelectedResource);
+  const selectedResource = useSelector(selectedResourceSelector);
   const [formData, setFormData] = useState<any>({formData: undefined, orgFormData: undefined});
   const [hasChanged, setHasChanged] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const isInPreviewMode = useSelector(inPreviewMode);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const onFormUpdate = useCallback(
     (e: any) => {
