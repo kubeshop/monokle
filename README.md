@@ -20,6 +20,7 @@ Note: If you download the unsigned binary, MacOs will complain a bit. You need t
 Privacy > General. Text will appear saying "Monokle was blocked from use because it is not from an identified developer.
 Click the "Open Anyway" button. A new pop-up will say "macOs cannot verify the developer of Monokle. Are you sure you
 want to open it?", simply click "Move to Bin". No wait, did you? You should have clicked "Open", silly.
+[Apple Support](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac)
 
 ## Building / running
 
