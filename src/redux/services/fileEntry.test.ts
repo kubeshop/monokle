@@ -7,7 +7,7 @@ import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
 test('create-file-entry', () => {
   let e = createFileEntry(createSafePath('/a/very/long/path'));
-  expect(e.excluded).toBeFalsy();
+  expect(e.isExcluded).toBeFalsy();
   expect(e.name).toBe('path');
   expect(e.filePath).toBe(createSafePath('/a/very/long/path'));
   expect(e.children).toBeUndefined();

@@ -20,7 +20,7 @@ export function createFileEntry(fileEntryPath: string) {
   const fileEntry: FileEntry = {
     name: fileEntryPath.substr(fileEntryPath.lastIndexOf(path.sep) + 1),
     filePath: fileEntryPath,
-    excluded: false,
+    isExcluded: false,
   };
   return fileEntry;
 }
@@ -73,7 +73,7 @@ export function readFiles(
       const fileEntry = createFileEntry(fileEntryPath);
 
       if (fileIsExcluded(appConfig, fileEntry)) {
-        fileEntry.excluded = true;
+        fileEntry.isExcluded = true;
       } else if (fs.statSync(filePath).isDirectory()) {
         fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
       } else if (micromatch.isMatch(file, '*values*.yaml')) {
@@ -101,7 +101,7 @@ export function readFiles(
       const fileEntry = createFileEntry(fileEntryPath);
 
       if (fileIsExcluded(appConfig, fileEntry)) {
-        fileEntry.excluded = true;
+        fileEntry.isExcluded = true;
       } else if (fs.statSync(filePath).isDirectory()) {
         fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
