@@ -155,12 +155,12 @@ export function applyForResource(
     return {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables};
   }
 
-  const unsatisfiedRefs = refs?.filter(r => isUnsatisfiedRef(r.refType));
+  const unsatisfiedRefs = refs?.filter(r => isUnsatisfiedRef(r.type));
   const listOfOutgoingRefsByEqualPos: {position: RefPosition; outgoingRefs: ResourceRef[]}[] = [];
 
   refs.forEach(ref => {
     const refPos = ref.refPos;
-    if (refPos && isOutgoingRef(ref.refType)) {
+    if (refPos && isOutgoingRef(ref.type)) {
       const refsByEqualPosIndex = listOfOutgoingRefsByEqualPos.findIndex(e => areRefPosEqual(e.position, refPos));
       if (refsByEqualPosIndex === -1) {
         listOfOutgoingRefsByEqualPos.push({

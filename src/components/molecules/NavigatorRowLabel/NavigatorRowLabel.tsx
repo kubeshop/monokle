@@ -114,13 +114,13 @@ const RefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType;
     linkText = `${resourceKind}: ${targetName}`;
   }
 
-  if (isOutgoingRef(resourceRef.refType)) {
+  if (isOutgoingRef(resourceRef.type)) {
     return <OutgoingRefLink onClick={onClick} text={linkText} />;
   }
-  if (isIncomingRef(resourceRef.refType)) {
+  if (isIncomingRef(resourceRef.type)) {
     return <IncomingRefLink onClick={onClick} text={linkText} />;
   }
-  if (isUnsatisfiedRef(resourceRef.refType)) {
+  if (isUnsatisfiedRef(resourceRef.type)) {
     return <UnsatisfiedRefLink text={targetName} />;
   }
 
@@ -237,7 +237,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
           placement="rightTop"
           content={
             <PopoverContent
-              resourceRefs={resource.refs.filter(r => isIncomingRef(r.refType))}
+              resourceRefs={resource.refs.filter(r => isIncomingRef(r.type))}
               resourceMap={resourceMap}
               selectResource={selectResource}
             >
@@ -266,7 +266,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
           mouseEnterDelay={0.5}
           content={
             <PopoverContent
-              resourceRefs={resource.refs.filter(r => isOutgoingRef(r.refType) || isUnsatisfiedRef(r.refType))}
+              resourceRefs={resource.refs.filter(r => isOutgoingRef(r.type) || isUnsatisfiedRef(r.type))}
               resourceMap={resourceMap}
               selectResource={selectResource}
             >

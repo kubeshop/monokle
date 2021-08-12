@@ -125,8 +125,8 @@ export function getKustomizationRefs(
     kustomization.refs
       .filter(
         r =>
-          r.refType === ResourceRefType.KustomizationResource ||
-          (selectParent && r.refType === ResourceRefType.KustomizationParent)
+          r.type === ResourceRefType.KustomizationResource ||
+          (selectParent && r.type === ResourceRefType.KustomizationParent)
       )
       .forEach(r => {
         if (r.targetResource) {
@@ -134,7 +134,7 @@ export function getKustomizationRefs(
           if (target) {
             linkedResourceIds.push(r.targetResource);
 
-            if (target.kind === 'Kustomization' && r.refType === ResourceRefType.KustomizationResource) {
+            if (target.kind === 'Kustomization' && r.type === ResourceRefType.KustomizationResource) {
               linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.targetResource));
             }
           }

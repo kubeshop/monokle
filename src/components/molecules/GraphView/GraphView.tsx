@@ -27,7 +27,7 @@ function mapResourceToElement(resource: K8sResource): Node {
 
 function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
   return {
-    id: `${source.id}-${ref.targetResource}-${ref.refType}`,
+    id: `${source.id}-${ref.targetResource}-${ref.type}`,
     source: source.id,
     target: ref.targetResource || ref.refName,
     animated: false,
@@ -95,7 +95,7 @@ const GraphView = (props: {editorHeight: string}) => {
     let data: any[] = [mapResourceToElement(resource)];
     if (resource.refs) {
       const refs = resource.refs
-        .filter(ref => !isUnsatisfiedRef(ref.refType))
+        .filter(ref => !isUnsatisfiedRef(ref.type))
         .map(ref => mapRefToElement(resource, ref));
       data = data.concat(refs);
     }

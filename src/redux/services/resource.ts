@@ -142,11 +142,11 @@ function createResourceRef(
     // make sure we don't duplicate
     if (
       !resource.refs.some(
-        ref => ref.refType === refType && ref.refName === refName && ref.targetResource === targetResource
+        ref => ref.type === refType && ref.refName === refName && ref.targetResource === targetResource
       )
     ) {
       resource.refs.push({
-        refType,
+        type: refType,
         refName,
         refPos: refNode?.getNodePosition(),
         targetResource,
@@ -596,7 +596,7 @@ function processRefs(resourceMap: ResourceMapType) {
     resource.refs?.forEach(ref => {
       let shouldPush = true;
 
-      if (isUnsatisfiedRef(ref.refType)) {
+      if (isUnsatisfiedRef(ref.type)) {
         if (ref.refPos) {
           const foundSatisfiedRefOnSamePosition = findSatisfiedRefOnPosition(ref.refPos);
           if (foundSatisfiedRefOnSamePosition) {
