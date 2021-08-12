@@ -3,7 +3,6 @@ name: monokle-build-mac
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [steen/housekeeping/build-binaries-windows]
     tags:
       - '*' # Should only grab tags without /
 
@@ -35,9 +34,8 @@ jobs:
 
       - name: Install Tools
         run: |
-          brew install nvm tree
+          brew install tree
 
-      # Get Node Version
       - name: Get Node Version
         run: |
           cat .nvmrc
@@ -69,11 +67,10 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Publish
+      - name: Package and Publish
         run: |
           npm exec -c "electron-builder --publish \"onTag\""
         env:
-          # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
       # Check Binary Size

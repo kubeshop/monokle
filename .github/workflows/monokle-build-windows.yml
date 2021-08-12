@@ -25,7 +25,6 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
-      # Get Node Version
       - name: Get Node Version
         run: |
           Set-PSDebug -Trace 1
@@ -57,11 +56,21 @@ jobs:
       - name: Build
         run: |
           npm run electron:build:ci
-          npm exec -c "electron-builder --publish \"onTag\""
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+
+      - name: Package and Publish
+        run: |
+          npm exec -c "electron-builder --publish \"always\""
+        env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          cmd /r dir .\dist
+        if: ${{ success() }}
 
       - name: Build Failed - Archive Build Logs
         uses: actions/upload-artifact@v2

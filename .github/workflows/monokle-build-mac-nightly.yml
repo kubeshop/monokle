@@ -1,6 +1,8 @@
 name: monokle-build-mac-nightly
 
 on:
+  push:
+    branches: [steen/housekeeping/build-binaries-windows]
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron: '0 2 * * *'
@@ -31,17 +33,31 @@ jobs:
           sysctl -n machdep.cpu.brand_string
           vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
 
+      - name: Install Tools
+        run: |
+          brew install tree jq sponge
+
+      - name: Get Node Version
+        run: |
+          cat .nvmrc
+          echo "::set-output name=nodeversion::$(cat .nvmrc)"
+        id: get-node-version
+
+      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.get-node-version.outputs.nodeversion }}
+          cache: 'npm'
+
       - name: Install Dependencies
         run: |
-          brew install nvm tree jq sponge
-          mkdir ~/.nvm || true
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-          nvm install
           env
           echo "npm: $(npm --version)"
           echo "node: $(node --version)"
           npm install --force
+
+      - name: Verify Dependencies
+        run: |
           ls -la
           tree node_modules -L 1
 
@@ -56,14 +72,15 @@ jobs:
 
       - name: Build
         run: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-          nvm install
           npm run electron:build:ci
-          npm exec -c "electron-builder --publish \"always\""
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+
+      - name: Package and Publish
+        run: |
+          npm exec -c "electron-builder --publish \"always\""
+        env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
       # Check Binary Size
