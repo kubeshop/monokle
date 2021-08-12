@@ -426,10 +426,10 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 export function getLinkedResources(resource: K8sResource) {
   const linkedResourceIds: string[] = [];
   resource.refs
-    ?.filter(ref => !isUnsatisfiedRef(ref.refType))
+    ?.filter(ref => !isUnsatisfiedRef(ref.type))
     .forEach(ref => {
-      if (ref.targetResource) {
-        linkedResourceIds.push(ref.targetResource);
+      if (ref.targetResourceId) {
+        linkedResourceIds.push(ref.targetResourceId);
       }
     });
 
@@ -589,7 +589,8 @@ function processRefs(resourceMap: ResourceMapType) {
 
     const findSatisfiedRefOnPosition = (refPos: RefPosition) => {
       return resource.refs?.find(
-        ref => !isUnsatisfiedRef(ref.refType) && ref.refPos?.column === refPos.column && ref.refPos.line === refPos.line
+        ref =>
+          !isUnsatisfiedRef(ref.type) && ref.position?.column === refPos.column && ref.position.line === refPos.line
       );
     };
 
