@@ -63,9 +63,10 @@ jobs:
 
           echo $p.version
 
-          # $tag=$(jq -r '.version' package.json)
-          # git tag $tag
-          # git push origin $tag
+          git tag $p.version
+          git push origin $tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
 
       - name: Build
         run: |
