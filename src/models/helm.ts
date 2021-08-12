@@ -18,7 +18,7 @@ interface HelmValuesFile {
   filePath: string;
   name: string;
   selected: boolean;
-  helmChart: string; // the id of the containing helm chart
+  helmChartId: string; // the id of the containing helm chart
 }
 
 export type {HelmChart, HelmValuesFile};

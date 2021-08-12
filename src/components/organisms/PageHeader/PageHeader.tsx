@@ -128,7 +128,7 @@ const PageHeader = () => {
     if (previewValuesFileId && helmValuesMap[previewValuesFileId]) {
       const valuesFile = helmValuesMap[previewValuesFileId];
       setPreviewValuesFile(valuesFile);
-      setHelmChart(helmChartMap[valuesFile.helmChart]);
+      setHelmChart(helmChartMap[valuesFile.helmChartId]);
     } else {
       setPreviewValuesFile(undefined);
       setHelmChart(undefined);

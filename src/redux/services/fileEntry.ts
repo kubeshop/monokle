@@ -82,7 +82,7 @@ export function readFiles(
           filePath: fileEntryPath,
           name: file,
           selected: false,
-          helmChart: helmChart.id,
+          helmChartId: helmChart.id,
         };
 
         helmValuesMap[helmValues.id] = helmValues;
