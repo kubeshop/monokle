@@ -6,7 +6,7 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 - Easily edit resources without having to learn or look up yaml syntax
 - Refactor resources with maintained integrity of names and references
 - Preview and debug resources generated with kustomize or helm
-  diff resources against your cluster and apply changes immediately
+- Diff resources against your cluster and apply changes immediately
 - And much more!
 
 Check out the [Features Document](./docs/features.md) or watch the short demo video below:
@@ -23,11 +23,23 @@ clone/build as described below!
   [here on GitHub](https://github.com/kubeshop/monokle/discussions)
 - See "Getting Involved" below on how to get involved!
 
-Note: If you download the unsigned binary, MacOs will complain a bit. You need to go to Preferences > Security &
-Privacy > General. Text will appear saying "Monokle was blocked from use because it is not from an identified developer.
-Click the "Open Anyway" button. A new pop-up will say "macOs cannot verify the developer of Monokle. Are you sure you
-want to open it?", simply click "Move to Bin". No wait, did you? You should have clicked "Open", silly.
+<details>
+<summary>
+Note: If you download the unsigned binary, MacOs will complain a bit. Check how to fix it.  
+</summary>  
+
+You need to go to Preferences > Security & Privacy > General.  
+
+Text will appear saying: `Monokle was blocked from use because it is not from an identified developer.`  
+
+Click the `Open Anyway` button. A new pop-up will say:  
+
+`macOs cannot verify the developer of Monokle.Are you sure you want to open it?`,  
+
+simply click `Move to Bin`. No wait, did you? You should have clicked `Open`, silly.  
+
 [Apple Support](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac)
+</details>
 
 ## Building / running
 
