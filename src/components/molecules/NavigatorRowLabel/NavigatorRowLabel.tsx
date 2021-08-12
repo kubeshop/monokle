@@ -103,14 +103,14 @@ const RefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType;
   const {resourceRef, resourceMap, onClick} = props;
 
   const targetName =
-    resourceRef.targetResource && resourceMap[resourceRef.targetResource]
-      ? resourceMap[resourceRef.targetResource].name
+    resourceRef.targetResourceId && resourceMap[resourceRef.targetResourceId]
+      ? resourceMap[resourceRef.targetResourceId].name
       : resourceRef.name;
 
   let linkText = targetName;
 
-  if (resourceRef.targetResource) {
-    const resourceKind = resourceMap[resourceRef.targetResource].kind;
+  if (resourceRef.targetResourceId) {
+    const resourceKind = resourceMap[resourceRef.targetResourceId].kind;
     linkText = `${resourceKind}: ${targetName}`;
   }
 
@@ -136,8 +136,8 @@ const PopoverContent = (props: {
   const {children, resourceRefs, resourceMap, selectResource} = props;
 
   const onLinkClick = (ref: ResourceRef) => {
-    if (ref.targetResource) {
-      selectResource(ref.targetResource);
+    if (ref.targetResourceId) {
+      selectResource(ref.targetResourceId);
     }
   };
 
@@ -147,15 +147,15 @@ const PopoverContent = (props: {
       <StyledDivider />
       {resourceRefs
         .sort((a, b) => {
-          if (a.targetResource && b.targetResource) {
-            const resourceA = resourceMap[a.targetResource];
-            const resourceB = resourceMap[b.targetResource];
+          if (a.targetResourceId && b.targetResourceId) {
+            const resourceA = resourceMap[a.targetResourceId];
+            const resourceB = resourceMap[b.targetResourceId];
             return resourceA.kind.localeCompare(resourceB.kind);
           }
           return 0;
         })
         .map(resourceRef => (
-          <StyledRefDiv key={resourceRef.targetResource || resourceRef.name}>
+          <StyledRefDiv key={resourceRef.targetResourceId || resourceRef.name}>
             <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
           </StyledRefDiv>
         ))}

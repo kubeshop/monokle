@@ -66,7 +66,7 @@ export enum ResourceRefType {
 interface ResourceRef {
   type: ResourceRefType; // the type of ref (see enum)
   name: string; // the ref value - for example the name of a configmap
-  targetResource?: string; // the resource this is referring to (empty for unsatisfied refs)
+  targetResourceId?: string; // the resource this is referring to (empty for unsatisfied refs)
   position?: RefPosition; // the position in the document of the refName (undefined for incoming file refs)
 }
 

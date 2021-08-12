@@ -201,18 +201,18 @@ export function applyForResource(
 
     const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
     outgoingRefs.forEach(outgoingRef => {
-      if (!outgoingRef.targetResource) {
+      if (!outgoingRef.targetResourceId) {
         return;
       }
-      const outgoingRefResource = resourceMap[outgoingRef.targetResource];
+      const outgoingRefResource = resourceMap[outgoingRef.targetResourceId];
       if (!outgoingRefResource) {
         return;
       }
       const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
         `${outgoingRefResource.kind}: ${outgoingRefResource.name}`,
         () => {
-          if (outgoingRef.targetResource) {
-            selectResource(outgoingRef.targetResource);
+          if (outgoingRef.targetResourceId) {
+            selectResource(outgoingRef.targetResourceId);
           }
         }
       );
@@ -231,8 +231,8 @@ export function applyForResource(
     if (outgoingRefs.length === 1) {
       const outgoingRef = outgoingRefs[0];
       const linkDisposable = createLinkProvider(inlineRange, () => {
-        if (outgoingRef.targetResource) {
-          selectResource(outgoingRef.targetResource);
+        if (outgoingRef.targetResourceId) {
+          selectResource(outgoingRef.targetResourceId);
         }
       });
       newLinkDisposables.push(linkDisposable);

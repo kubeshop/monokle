@@ -27,9 +27,9 @@ function mapResourceToElement(resource: K8sResource): Node {
 
 function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
   return {
-    id: `${source.id}-${ref.targetResource}-${ref.type}`,
+    id: `${source.id}-${ref.targetResourceId}-${ref.type}`,
     source: source.id,
-    target: ref.targetResource || ref.name,
+    target: ref.targetResourceId || ref.name,
     animated: false,
     type: 'smoothstep',
   };
