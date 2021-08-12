@@ -132,7 +132,7 @@ const ResourcesSection = () => {
       (resources.length > 0 &&
         resources.some(
           resource =>
-            resource.kind === subsection.kindSelector && (resource.highlight || selectedResource === resource.id)
+            resource.kind === subsection.kindSelector && (resource.isHighlighted || selectedResource === resource.id)
         ))
     );
   }

@@ -72,7 +72,7 @@ const Section = (props: {
                 header={
                   <SubsectionHeader
                     isExpanded={isSubsectionExpanded(subsection.name)}
-                    isHighlighted={!isSubsectionExpanded(subsection.name) && visibleResources.some(r => r.highlight)}
+                    isHighlighted={!isSubsectionExpanded(subsection.name) && visibleResources.some(r => r.isHighlighted)}
                     isSelected={!isSubsectionExpanded(subsection.name) && visibleResources.some(r => r.selected)}
                     onExpand={() => onSubsectionExpand(section.name, subsection.name)}
                     onCollapse={() => onSubsectionCollapse(section.name, subsection.name)}
@@ -88,7 +88,7 @@ const Section = (props: {
                       rowKey={resource.id}
                       label={resource.name}
                       isSelected={Boolean(resource.selected)}
-                      highlighted={Boolean(resource.highlight)}
+                      highlighted={Boolean(resource.isHighlighted)}
                       hasIncomingRefs={Boolean(hasIncomingRefs(resource))}
                       hasOutgoingRefs={Boolean(hasOutgoingRefs(resource))}
                       hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(resource))}

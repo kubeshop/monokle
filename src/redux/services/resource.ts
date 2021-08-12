@@ -387,7 +387,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             name: createResourceName(relativePath, content),
             filePath: relativePath,
             id: uuidv4(),
-            highlight: false,
+            isHighlighted: false,
             selected: false,
             kind: content.kind,
             version: content.apiVersion,

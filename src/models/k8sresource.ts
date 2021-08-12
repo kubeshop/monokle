@@ -12,7 +12,7 @@ interface K8sResource {
   kind: string; // k8s resource kind
   version: string; // k8s resource version
   namespace?: string; // k8s namespace is specified (for filtering)
-  highlight: boolean; // if highlighted in UI (should probalby move to UI state object)
+  isHighlighted: boolean; // if highlighted in UI (should probalby move to UI state object)
   selected: boolean; // if selected in UI (should probably move to UI state object)
   text: string; // unparsed resource content (for editing)
   content: any; // contains parsed yaml resource - used for filtering/finding links/refs, etc

@@ -39,7 +39,7 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
       {kustomizations.map((k: K8sResource) => {
         const isSelected = k.selected || previewResource === k.id;
         const isDisabled = Boolean(previewResource && previewResource !== k.id);
-        const isHighlighted = k.highlight;
+        const isHighlighted = k.isHighlighted;
         const buttonActive = previewResource !== undefined && previewResource === k.id;
 
         return (

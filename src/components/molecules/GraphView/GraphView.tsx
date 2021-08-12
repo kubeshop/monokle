@@ -21,7 +21,7 @@ function mapResourceToElement(resource: K8sResource): Node {
       wasSelectedInGraphView: false,
     },
     position: {x: 0, y: 0},
-    style: {background: resource.selected ? 'lighblue' : resource.highlight ? 'lightgreen' : 'white'},
+    style: {background: resource.selected ? 'lighblue' : resource.isHighlighted ? 'lightgreen' : 'white'},
   };
 }
 
@@ -119,7 +119,7 @@ const GraphView = (props: {editorHeight: string}) => {
       nds.map(nd => {
         const resource = resourceMap[nd.id];
         if (resource) {
-          nd.style = {background: resource.selected ? 'lightblue' : resource.highlight ? 'lightgreen' : 'white'};
+          nd.style = {background: resource.selected ? 'lightblue' : resource.isHighlighted ? 'lightgreen' : 'white'};
         }
         return nd;
       })

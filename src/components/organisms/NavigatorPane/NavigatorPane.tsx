@@ -206,7 +206,7 @@ const NavigatorPane = () => {
                     onExpand={() => expandSection('kustomizations')}
                     onCollapse={() => collapseSection('kustomizations')}
                     isSelected={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.selected)}
-                    isHighlighted={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.highlight)}
+                    isHighlighted={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.isHighlighted)}
                   />
                 }
               >

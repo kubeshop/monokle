@@ -315,7 +315,7 @@ function selectFilePath(filePath: string, state: AppState) {
   if (entries.length > 0) {
     const parent = entries[entries.length - 1];
     getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
-      r.highlight = true;
+      r.isHighlighted = true;
     });
 
     if (parent.children) {

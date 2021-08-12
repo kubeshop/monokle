@@ -12,7 +12,7 @@ test('get-namespaces', () => {
     name: 'resource name',
     kind: 'ResourceType',
     version: '1.0',
-    highlight: false,
+    isHighlighted: false,
     selected: false,
     content: {},
     text: '',
