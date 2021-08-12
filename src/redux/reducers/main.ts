@@ -173,10 +173,10 @@ export const mainSlice = createSlice({
     selectHelmValuesFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let payload = action.payload;
       Object.values(state.helmValuesMap).forEach(values => {
-        values.selected = values.id === payload;
+        values.isSelected = values.id === payload;
       });
 
-      state.selectedValuesFileId = state.helmValuesMap[payload].selected ? payload : undefined;
+      state.selectedValuesFileId = state.helmValuesMap[payload].isSelected ? payload : undefined;
       selectFilePath(state.helmValuesMap[payload].filePath, state);
     },
     /**
@@ -323,7 +323,7 @@ function selectFilePath(filePath: string, state: AppState) {
     }
 
     Object.values(state.helmValuesMap).forEach(valuesFile => {
-      valuesFile.selected = valuesFile.filePath === filePath;
+      valuesFile.isSelected = valuesFile.filePath === filePath;
     });
   }
 

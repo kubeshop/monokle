@@ -146,7 +146,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   );
 
   React.useEffect(() => {
-    if (selectedPath && Object.values(helmValues).some(helm => helm.selected)) {
+    if (selectedPath && Object.values(helmValues).some(helm => helm.isSelected)) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
@@ -171,7 +171,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
             const isDisabled = Boolean(previewValuesFile && previewValuesFile !== valuesFile.id);
 
             let valuesClassName = `helmvalues-row\
-              ${valuesFile.selected ? ` helmvalues-row-selected` : ''}\
+              ${valuesFile.isSelected ? ` helmvalues-row-selected` : ''}\
               ${isDisabled ? ` helmvalues-row-disabled` : ''}`;
 
             return (
@@ -193,7 +193,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
                         mouseEnterDelay={TOOLTIP_DELAY}
                         title={previewButtonActive ? ExitHelmPreviewTooltip : HelmPreviewTooltip}
                       >
-                        <PreviewSpan isSelected={valuesFile.selected} onClick={() => onClickPreview(valuesFile.id)}>
+                        <PreviewSpan isSelected={valuesFile.isSelected} onClick={() => onClickPreview(valuesFile.id)}>
                           {previewButtonActive ? 'Exit' : 'Preview'}
                         </PreviewSpan>
                       </Tooltip>

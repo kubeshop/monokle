@@ -186,7 +186,7 @@ const NavigatorPane = () => {
                     isSelected={
                       !isSectionExpanded('helmcharts') &&
                       Object.values(helmCharts).some(h =>
-                        h.valueFiles.map(v => helmValues[v]).some((valuesFile: HelmValuesFile) => valuesFile.selected)
+                        h.valueFiles.map(v => helmValues[v]).some((valuesFile: HelmValuesFile) => valuesFile.isSelected)
                       )
                     }
                   />

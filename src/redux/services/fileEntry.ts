@@ -81,7 +81,7 @@ export function readFiles(
           id: uuidv4(),
           filePath: fileEntryPath,
           name: file,
-          selected: false,
+          isSelected: false,
           helmChartId: helmChart.id,
         };
 

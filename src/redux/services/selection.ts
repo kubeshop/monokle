@@ -61,7 +61,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
     }
 
     Object.values(state.helmValuesMap).forEach(valuesFile => {
-      valuesFile.selected = false;
+      valuesFile.isSelected = false;
     });
   }
 }

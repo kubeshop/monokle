@@ -17,7 +17,7 @@ interface HelmValuesFile {
   id: string;
   filePath: string;
   name: string;
-  selected: boolean;
+  isSelected: boolean;
   helmChartId: string; // the id of the containing helm chart
 }
 
