@@ -49,9 +49,19 @@ jobs:
           npm --version
           npm install --force
 
-      - name: Check Dependencies
+      - name: Verify Dependencies
         run: |
-          node --version
+          cmd /r dir
+          cmd /r dir .\node_modules
+
+      - name: Build
+        run: |
+          npm run electron:build:ci
+          npm exec -c "electron-builder --publish \"onTag\""
+        env:
+          # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
+          CI: false
+          GITHUB_TOKEN: ${{ secrets.github_token }}
 
       - name: Build Failed - Archive Build Logs
         uses: actions/upload-artifact@v2
