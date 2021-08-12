@@ -16,7 +16,7 @@ export const selectAllResources = createSelector(
 
 export const selectActiveResources = createSelector(
   selectAllResources,
-  (state: RootState) => state.main.previewResource,
+  (state: RootState) => state.main.previewResourceId,
   (state: RootState) => state.main.previewValuesFile,
   (resources, previewResource, previewValuesFile) =>
     resources.filter(
@@ -46,12 +46,12 @@ export const selectHelmValues = createSelector(
 
 export const inPreviewMode = createSelector(
   (state: RootState) => state.main,
-  appState => Boolean(appState.previewResource) || Boolean(appState.previewValuesFile)
+  appState => Boolean(appState.previewResourceId) || Boolean(appState.previewValuesFile)
 );
 
 export const inClusterMode = createSelector(
   (state: RootState) => state,
-  appState => appState.main.previewResource && appState.main.previewResource.endsWith(appState.config.kubeconfig)
+  appState => appState.main.previewResourceId && appState.main.previewResourceId.endsWith(appState.config.kubeconfig)
 );
 
 export const selectLogs = createSelector(

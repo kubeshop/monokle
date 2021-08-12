@@ -24,7 +24,7 @@ const ResourcesSection = () => {
   const dispatch = useAppDispatch();
   const appConfig = useAppSelector(state => state.config);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const previewResource = useAppSelector(state => state.main.previewResource);
+  const previewResource = useAppSelector(state => state.main.previewResourceId);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const resources = useSelector(selectActiveResources);
 

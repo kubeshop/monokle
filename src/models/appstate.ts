@@ -41,7 +41,7 @@ interface AppState {
   selectedResourceId?: string; // the id of the currently selected resource
   selectedPath?: string; // the currently selected path
   previewType?: 'kustomization' | 'cluster' | 'helm';
-  previewResource?: string; // the resource currently being previewed
+  previewResourceId?: string; // the resource currently being previewed
   previewLoader: PreviewLoaderType;
   diffResource?: string; // the resource currently being diffed
   diffContent?: string; // the diff content for the resource being diffed

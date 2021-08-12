@@ -105,7 +105,7 @@ const ExitButton = (props: {onClick: () => void}) => {
 };
 
 const PageHeader = () => {
-  const previewResourceId = useAppSelector(state => state.main.previewResource);
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFile);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const activeResources = useSelector(selectActiveResources);

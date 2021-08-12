@@ -16,7 +16,7 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
   const dispatch = useAppDispatch();
 
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const previewResource = useAppSelector(state => state.main.previewResource);
+  const previewResource = useAppSelector(state => state.main.previewResourceId);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
   const selectResource = (resourceId: string) => {

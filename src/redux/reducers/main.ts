@@ -269,13 +269,13 @@ export const mainSlice = createSlice({
  */
 
 function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) {
-  state.previewResource = undefined;
+  state.previewResourceId = undefined;
   state.previewValuesFile = undefined;
 
   if (payload.previewResourceId) {
     if (state.previewType === 'kustomization') {
       if (state.resourceMap[payload.previewResourceId]) {
-        state.previewResource = payload.previewResourceId;
+        state.previewResourceId = payload.previewResourceId;
       } else {
         log.error(`Unknown preview id: ${payload.previewResourceId}`);
       }
@@ -288,7 +288,7 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
       }
     }
     if (state.previewType === 'cluster') {
-      state.previewResource = payload.previewResourceId;
+      state.previewResourceId = payload.previewResourceId;
     }
   }
 

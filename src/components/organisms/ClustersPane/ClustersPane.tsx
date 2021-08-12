@@ -38,7 +38,7 @@ const ClustersContainer = styled.div`
 
 const ClustersPane = () => {
   const dispatch = useAppDispatch();
-  const previewResource = useAppSelector(state => state.main.previewResource);
+  const previewResource = useAppSelector(state => state.main.previewResourceId);
   const previewMode = useSelector(inPreviewMode);
   const clusterMode = useSelector(inClusterMode);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
