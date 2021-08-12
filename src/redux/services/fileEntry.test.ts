@@ -55,7 +55,7 @@ test('read-folder-with-helm-chart', () => {
 
   let helmCharts = Object.values(helmChartMap);
   expect(helmCharts.length).toBe(1);
-  expect(helmCharts[0].valueFiles.length).toBe(1);
+  expect(helmCharts[0].valueFileIds.length).toBe(1);
   expect(helmCharts[0].name).toBe('aks-helloworld');
   expect(fileMap[helmCharts[0].filePath].name).toBe('Chart.yaml');
 });

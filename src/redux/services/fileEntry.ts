@@ -64,7 +64,7 @@ export function readFiles(
       id: uuidv4(),
       filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
       name: folder.substr(folder.lastIndexOf(path.sep) + 1),
-      valueFiles: [],
+      valueFileIds: [],
     };
 
     files.forEach(file => {
@@ -86,7 +86,7 @@ export function readFiles(
         };
 
         helmValuesMap[helmValues.id] = helmValues;
-        helmChart.valueFiles.push(helmValues.id);
+        helmChart.valueFileIds.push(helmValues.id);
       }
 
       fileMap[fileEntry.filePath] = fileEntry;

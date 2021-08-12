@@ -164,7 +164,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
         </ItemRow>
       </ChartContainer>
       <TreeContainer className={chartClassName}>
-        {helmChart.valueFiles
+        {helmChart.valueFileIds
           .map(v => helmValues[v])
           .map((valuesFile: HelmValuesFile) => {
             const previewButtonActive = previewValuesFile !== undefined && previewValuesFile === valuesFile.id;
