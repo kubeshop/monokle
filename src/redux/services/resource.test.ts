@@ -13,7 +13,7 @@ test('get-namespaces', () => {
     kind: 'ResourceType',
     version: '1.0',
     isHighlighted: false,
-    selected: false,
+    isSelected: false,
     content: {},
     text: '',
   };

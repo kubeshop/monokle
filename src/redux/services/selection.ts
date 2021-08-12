@@ -13,7 +13,7 @@ export function clearResourceSelections(resourceMap: ResourceMapType, excludeIte
   Object.values(resourceMap).forEach(e => {
     e.isHighlighted = false;
     if (!excludeItemId || e.id !== excludeItemId) {
-      e.selected = false;
+      e.isSelected = false;
     }
   });
 }
@@ -47,7 +47,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
   state.selectedResource = undefined;
 
   if (resource) {
-    resource.selected = true;
+    resource.isSelected = true;
     state.selectedResource = resource.id;
 
     if (isKustomizationResource(resource)) {

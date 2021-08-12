@@ -150,7 +150,7 @@ export const mainSlice = createSlice({
           resource.content = parseDocument(value).toJS();
           recalculateResourceRanges(resource, state);
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
-          resource.selected = false;
+          resource.isSelected = false;
           updateSelectionAndHighlights(state, resource);
         }
       } catch (e) {
