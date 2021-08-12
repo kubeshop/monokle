@@ -62,7 +62,7 @@ jobs:
 
       - name: Package and Publish
         run: |
-          npm exec -c "electron-builder --publish \"always\""
+          npm exec -c 'electron-builder --publish "onTag"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
