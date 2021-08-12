@@ -105,7 +105,7 @@ export const configSlice = createSlice({
       state.kubeconfigPath = action.payload;
     },
     setStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      state.startupModalVisible = action.payload;
+      state.isStartupModalVisible = action.payload;
     },
     setScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       state.scanExcludes = action.payload;

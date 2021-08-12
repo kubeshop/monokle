@@ -18,7 +18,7 @@ const initialAppState: AppState = {
 };
 
 const initialAppConfigState: AppConfig = {
-  startupModalVisible: electronStore.get('appConfig.startupModalVisible'),
+  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
   kubeconfigPath: '',
   settings: {
     filterObjectsOnSelection: false,
