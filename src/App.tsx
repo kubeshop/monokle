@@ -29,18 +29,18 @@ const App = () => {
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
-      <MessageBox />
-      <Layout style={{height: mainHeight}}>
-        <PageHeader />
-        <SettingsDrawer />
-
-        <PaneManager />
-
-        <PageFooter />
-      </Layout>
-      <DiffModal />
-      <StartupModal />
-      <HotKeysHandler />
+      <div style={{overflowY: 'hidden'}}>
+        <MessageBox />
+        <Layout style={{height: mainHeight}}>
+          <PageHeader />
+          <SettingsDrawer />
+          <PaneManager />
+          <PageFooter />
+        </Layout>
+        <DiffModal />
+        <StartupModal />
+        <HotKeysHandler />
+      </div>
     </AppContext.Provider>
   );
 };
