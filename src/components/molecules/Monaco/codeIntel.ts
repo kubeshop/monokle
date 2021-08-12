@@ -159,7 +159,7 @@ export function applyForResource(
   const listOfOutgoingRefsByEqualPos: {position: RefPosition; outgoingRefs: ResourceRef[]}[] = [];
 
   refs.forEach(ref => {
-    const refPos = ref.refPos;
+    const refPos = ref.position;
     if (refPos && isOutgoingRef(ref.type)) {
       const refsByEqualPosIndex = listOfOutgoingRefsByEqualPos.findIndex(e => areRefPosEqual(e.position, refPos));
       if (refsByEqualPosIndex === -1) {
@@ -174,7 +174,7 @@ export function applyForResource(
   });
 
   unsatisfiedRefs.forEach(ref => {
-    const refPos = ref.refPos;
+    const refPos = ref.position;
     if (refPos) {
       const inlineRange = new monaco.Range(refPos.line, refPos.column, refPos.line, refPos.column + refPos.length);
       const glyphDecoration = createGlyphDecoration(refPos.line, GlyphDecorationTypes.UnsatisfiedRef);

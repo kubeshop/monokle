@@ -148,7 +148,7 @@ function createResourceRef(
       resource.refs.push({
         type: refType,
         name: refName,
-        refPos: refNode?.getNodePosition(),
+        position: refNode?.getNodePosition(),
         targetResource,
       });
     }
@@ -597,8 +597,8 @@ function processRefs(resourceMap: ResourceMapType) {
       let shouldPush = true;
 
       if (isUnsatisfiedRef(ref.type)) {
-        if (ref.refPos) {
-          const foundSatisfiedRefOnSamePosition = findSatisfiedRefOnPosition(ref.refPos);
+        if (ref.position) {
+          const foundSatisfiedRefOnSamePosition = findSatisfiedRefOnPosition(ref.position);
           if (foundSatisfiedRefOnSamePosition) {
             shouldPush = false;
           }
