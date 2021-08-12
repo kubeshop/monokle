@@ -84,7 +84,7 @@ export function applyWithConfirm(
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
 
-  const selectedResourceId = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);

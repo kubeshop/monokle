@@ -177,7 +177,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
 
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [resource, setResource] = useState<K8sResource>();
   const scrollContainer = React.useRef(null);
@@ -211,7 +211,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
   // on mount, if this resource is selected, scroll to it (the subsection expanded and rendered this)
   useEffect(() => {
     const isVisible = isScrolledIntoView();
-    if (isSelected && selectedResource && !isVisible) {
+    if (isSelected && selectedResourceId && !isVisible) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
@@ -219,11 +219,11 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
 
   useEffect(() => {
     const isVisible = isScrolledIntoView();
-    if (isSelected && selectedResource && !isVisible) {
+    if (isSelected && selectedResourceId && !isVisible) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [isSelected, selectedResource]);
+  }, [isSelected, selectedResourceId]);
 
   const selectResource = (resId: string) => {
     dispatch(selectK8sResource(resId));

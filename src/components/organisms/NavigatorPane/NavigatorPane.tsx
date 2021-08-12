@@ -125,7 +125,7 @@ const NavigatorPane = () => {
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const helmCharts = useSelector(selectHelmCharts);
   const helmValues = useSelector(selectHelmValues);
   const kustomizations = useSelector(selectKustomizations);
@@ -148,10 +148,10 @@ const NavigatorPane = () => {
   };
 
   useEffect(() => {
-    if (kustomizations.some(kustomization => kustomization.id === selectedResource)) {
+    if (kustomizations.some(kustomization => kustomization.id === selectedResourceId)) {
       expandSection('kustomizations');
     }
-  }, [selectedResource]);
+  }, [selectedResourceId]);
 
   return (
     <>

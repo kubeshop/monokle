@@ -243,7 +243,7 @@ const FileTreePane = () => {
   const uiState = useAppSelector(state => state.ui);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
@@ -317,14 +317,14 @@ const FileTreePane = () => {
   }
 
   useEffect(() => {
-    if (selectedResource && tree) {
-      const resource = resourceMap[selectedResource];
+    if (selectedResourceId && tree) {
+      const resource = resourceMap[selectedResourceId];
       if (resource) {
         const filePath = resource.filePath;
         highlightFilePath(filePath);
       }
     }
-  }, [selectedResource]);
+  }, [selectedResourceId]);
 
   useEffect(() => {
     // removes any highlight when a file is selected

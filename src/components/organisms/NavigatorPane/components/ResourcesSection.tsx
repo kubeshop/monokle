@@ -25,7 +25,7 @@ const ResourcesSection = () => {
   const appConfig = useAppSelector(state => state.config);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewResource = useAppSelector(state => state.main.previewResource);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const resources = useSelector(selectActiveResources);
 
   const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
@@ -124,7 +124,7 @@ const ResourcesSection = () => {
       })
     );
     setExpandedSubsectionsBySection(updatedExpandedSubsectionsBySection);
-  }, [resourceMap, selectedResource]);
+  }, [resourceMap, selectedResourceId]);
 
   function shouldSubsectionBeExpanded(subsection: NavigatorSubSection) {
     return (
@@ -132,7 +132,7 @@ const ResourcesSection = () => {
       (resources.length > 0 &&
         resources.some(
           resource =>
-            resource.kind === subsection.kindSelector && (resource.isHighlighted || selectedResource === resource.id)
+            resource.kind === subsection.kindSelector && (resource.isHighlighted || selectedResourceId === resource.id)
         ))
     );
   }

@@ -17,14 +17,14 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
 
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewResource = useAppSelector(state => state.main.previewResource);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
   const selectResource = (resourceId: string) => {
     dispatch(selectK8sResource(resourceId));
   };
 
   const selectPreview = (id: string) => {
-    if (id !== selectedResource) {
+    if (id !== selectedResourceId) {
       dispatch(selectK8sResource(id));
     }
     if (id !== previewResource) {

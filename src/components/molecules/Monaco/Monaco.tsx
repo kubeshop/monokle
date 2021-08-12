@@ -75,7 +75,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [code, setCode] = useState('');
@@ -153,16 +153,16 @@ const Monaco = (props: {editorHeight: string}) => {
       return;
     }
     // is a file and no resource selected?
-    if (selectedPath && !selectedResource) {
+    if (selectedPath && !selectedResourceId) {
       try {
         dispatch(updateFileEntry({path: selectedPath, content: value}));
         setOrgCode(value);
       } catch (e) {
         logMessage(`Failed to update file ${e}`, dispatch);
       }
-    } else if (selectedResource && resourceMap[selectedResource]) {
+    } else if (selectedResourceId && resourceMap[selectedResourceId]) {
       try {
-        dispatch(updateResource({resourceId: selectedResource, content: value.toString()}));
+        dispatch(updateResource({resourceId: selectedResourceId, content: value.toString()}));
         setOrgCode(value);
       } catch (e) {
         logMessage(`Failed to update resource ${e}`, dispatch);
@@ -186,12 +186,12 @@ const Monaco = (props: {editorHeight: string}) => {
       });
       actionSaveDisposableRef.current = newActionSaveDisposable;
     }
-  }, [editor, selectedPath, selectedResource]);
+  }, [editor, selectedPath, selectedResourceId]);
 
   useEffect(() => {
     let newCode = '';
-    if (selectedResource) {
-      const resource = resourceMap[selectedResource];
+    if (selectedResourceId) {
+      const resource = resourceMap[selectedResourceId];
       if (resource) {
         newCode = resource.text;
       }
@@ -205,11 +205,11 @@ const Monaco = (props: {editorHeight: string}) => {
     setCode(newCode);
     setOrgCode(newCode);
     setDirty(false);
-  }, [fileMap, selectedPath, selectedResource, resourceMap]);
+  }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
 
   const options = {
     selectOnLineNumbers: true,
-    readOnly: isInPreviewMode || (!selectedPath && !selectedResource),
+    readOnly: isInPreviewMode || (!selectedPath && !selectedResourceId),
     fontWeight: 'bold',
     glyphMargin: true,
     minimap: {
@@ -227,8 +227,8 @@ const Monaco = (props: {editorHeight: string}) => {
   };
 
   const applyCodeIntel = () => {
-    if (editor && selectedResource && resourceMap[selectedResource]) {
-      const resource = resourceMap[selectedResource];
+    if (editor && selectedResourceId && resourceMap[selectedResourceId]) {
+      const resource = resourceMap[selectedResourceId];
       const {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables} =
         codeIntel.applyForResource(resource, selectResource, resourceMap);
       const idsOfNewDecorations = setDecorations(editor, newDecorations, idsOfDecorationsRef.current);
@@ -245,13 +245,13 @@ const Monaco = (props: {editorHeight: string}) => {
     return () => {
       clearCodeIntel();
     };
-  }, [code, selectedResource, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [code, selectedResourceId, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let resourceSchema;
 
-    if (selectedResource) {
-      const resource = resourceMap[selectedResource];
+    if (selectedResourceId) {
+      const resource = resourceMap[selectedResourceId];
       if (resource) {
         resourceSchema = getResourceSchema(resource);
       }
@@ -280,7 +280,7 @@ const Monaco = (props: {editorHeight: string}) => {
       const newCompletionDisposable = codeIntel.applyAutocomplete(resourceMap);
       completionDisposableRef.current = newCompletionDisposable;
     }
-  }, [selectedResource, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedResourceId, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (editor) {

@@ -212,7 +212,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     let wasSelected = false;
 
     resourcesInFile.forEach(resource => {
-      if (state.selectedResource === resource.id) {
+      if (state.selectedResourceId === resource.id) {
         updateSelectionAndHighlights(state, resource);
         wasSelected = true;
       }
@@ -311,7 +311,7 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
 function removeFile(fileEntry: FileEntry, state: AppState) {
   log.info(`removing file ${fileEntry.filePath}`);
   getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(resource => {
-    if (state.selectedResource === resource.id) {
+    if (state.selectedResourceId === resource.id) {
       updateSelectionAndHighlights(state, resource);
     }
     delete state.resourceMap[resource.id];

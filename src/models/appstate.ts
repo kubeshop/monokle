@@ -38,7 +38,7 @@ type PreviewLoaderType = {
 interface AppState {
   fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
   resourceMap: ResourceMapType; // maps resource ids to resources
-  selectedResource?: string; // the id of the currently selected resource
+  selectedResourceId?: string; // the id of the currently selected resource
   selectedPath?: string; // the currently selected path
   previewType?: 'kustomization' | 'cluster' | 'helm';
   previewResource?: string; // the resource currently being previewed

@@ -125,7 +125,7 @@ export const mainSlice = createSlice({
             const resources = extractK8sResources(action.payload.content, filePath.substring(rootFolder.length));
             Object.values(resources).forEach(r => {
               state.resourceMap[r.id] = r;
-              r.highlight = true;
+              r.isHighlighted = true;
             });
 
             reprocessResources([], state.resourceMap, state.fileMap);
@@ -251,7 +251,7 @@ export const mainSlice = createSlice({
       state.helmValuesMap = action.payload.helmValuesMap;
       state.previewLoader.isLoading = false;
       state.previewLoader.targetResourceId = undefined;
-      state.selectedResource = undefined;
+      state.selectedResourceId = undefined;
       state.selectedPath = undefined;
       state.previewResource = undefined;
       state.previewType = undefined;
@@ -327,7 +327,7 @@ function selectFilePath(filePath: string, state: AppState) {
     });
   }
 
-  state.selectedResource = undefined;
+  state.selectedResourceId = undefined;
   state.selectedPath = filePath;
 }
 

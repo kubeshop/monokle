@@ -26,7 +26,7 @@ export const selectActiveResources = createSelector(
 
 export const selectSelectedResource = createSelector(
   (state: RootState) => state.main.resourceMap,
-  (state: RootState) => state.main.selectedResource,
+  (state: RootState) => state.main.selectedResourceId,
   (resourceMap, selectedResourceId) => (selectedResourceId ? resourceMap[selectedResourceId] : undefined)
 );
 

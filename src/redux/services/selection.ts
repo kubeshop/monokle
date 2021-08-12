@@ -44,11 +44,11 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
   clearResourceSelections(state.resourceMap, resource.id);
 
   state.selectedPath = undefined;
-  state.selectedResource = undefined;
+  state.selectedResourceId = undefined;
 
   if (resource) {
     resource.isSelected = true;
-    state.selectedResource = resource.id;
+    state.selectedResourceId = resource.id;
 
     if (isKustomizationResource(resource)) {
       getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {

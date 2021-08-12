@@ -16,7 +16,7 @@ const Sidebar = (reactFlow: any) => {
   const store = useStore();
   const dispatch = useAppDispatch();
   const zoomPanHelper = useZoomPanHelper();
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const settings = useAppSelector(state => state.config.settings);
 
   const performTransform = useCallback(
@@ -42,11 +42,11 @@ const Sidebar = (reactFlow: any) => {
   );
 
   const selectSelectedResource = useCallback(() => {
-    if (selectedResource) {
+    if (selectedResourceId) {
       const {nodes} = store.getState();
 
       if (nodes.length) {
-        const node = nodes.find(n => n.id === selectedResource);
+        const node = nodes.find(n => n.id === selectedResourceId);
         if (node) {
           if (node.data.wasSelectedInGraphView === true) {
             node.data.wasSelectedInGraphView = false;
@@ -59,13 +59,13 @@ const Sidebar = (reactFlow: any) => {
         }
       }
     }
-  }, [selectedResource, store, performTransform]);
+  }, [selectedResourceId, store, performTransform]);
 
   useEffect(() => {
     if (settings.autoZoomGraphOnSelection) {
       selectSelectedResource();
     }
-  }, [selectedResource, settings.autoZoomGraphOnSelection, selectSelectedResource]);
+  }, [selectedResourceId, settings.autoZoomGraphOnSelection, selectSelectedResource]);
 
   const onZoomChange = useCallback(
     (e: any) => {
@@ -105,7 +105,7 @@ const Sidebar = (reactFlow: any) => {
         <Button type="primary" onClick={handleZoom(1 / 1.4)}>
           Zoom out
         </Button>
-        <Button type="primary" onClick={selectSelectedResource} disabled={selectedResource === undefined}>
+        <Button type="primary" onClick={selectSelectedResource} disabled={selectedResourceId === undefined}>
           Zoom on selected resource
         </Button>
         <Checkbox onChange={onZoomChange} checked={settings.autoZoomGraphOnSelection === true}>
