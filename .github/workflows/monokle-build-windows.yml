@@ -25,26 +25,28 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
+      # Get Node Version
+      - name: Get_Node_Version
+        run: |
+          Set-PSDebug -Trace 1
+          $filePath = D:\a\monokle\monokle\.npmrc
+          $content = Get-Content $filePath -Raw
+          echo "::set-output nodeversion=string::$content"
+
+      - name: Use Node.js ${{ steps.Get_Node_Version.outputs.nodeversion }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.Get_Node_Version.outputs.nodeversion }}
+          cache: 'npm'
+
       # Install Dependencies
       - name: Install Dependencies
         run: |
           Set-PSDebug -Trace 1
-          $uri = "https://nodejs.org/dist/v16.6.1/node-v16.6.1-x86.msi"
-          $msifile = "D:\a\monokle\monokle\nodejs.msi"
-          Invoke-WebRequest -Uri $uri -OutFile $msifile
-          cmd /r dir
-          $DataStamp = get-date -Format yyyyMMddTHHmmss
-          $logFile = '{0}-{1}.log' -f $file.fullname,$DataStamp
-          $MSIArguments = @(
-              "/I"
-              ('"{0}"' -f $msifile)
-              "/quiet"
-              "/norestart"
-              "/L*v"
-              $logFile
-          )
-          Start-Process "msiexec.exe" -Wait -NoNewWindow -ArgumentList $MSIArguments
+          $content = [IO.File]::ReadAllText(".\test.txt")
           node --version
+          npm --version
+          npm install --force
 
       - name: Check Dependencies
         run: |
