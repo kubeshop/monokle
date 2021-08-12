@@ -1,8 +1,6 @@
 name: monokle-build-windows
 
 on:
-  push:
-    branches: [steen/housekeeping/build-binaries-windows]
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron: '0 2 * * *'
@@ -55,6 +53,7 @@ jobs:
 
       - name: Generate and apply tag
         run: |
+          Set-PSDebug -Trace 1
           $datetoday = Get-Date -Format "yyyyMMdd"
           echo $datetoday
           npm --no-git-tag-version --preid=$datetoday version prerelease
@@ -63,6 +62,7 @@ jobs:
 
           echo $p.version
 
+          $ErrorActionPreference = 'SilentlyContinue'
           git tag $p.version
           git push origin $tag
         env:
