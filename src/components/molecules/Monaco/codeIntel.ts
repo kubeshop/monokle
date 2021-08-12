@@ -17,7 +17,7 @@ import {
   getSymbolsBeforePosition,
 } from './editorHelpers';
 
-type SymbolsToResourceKindMatcher = {
+export type SymbolsToResourceKindMatcher = {
   resourceKind: string;
   symbolsPaths?: string[][];
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
