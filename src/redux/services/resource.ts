@@ -142,12 +142,12 @@ function createResourceRef(
     // make sure we don't duplicate
     if (
       !resource.refs.some(
-        ref => ref.type === refType && ref.refName === refName && ref.targetResource === targetResource
+        ref => ref.type === refType && ref.name === refName && ref.targetResource === targetResource
       )
     ) {
       resource.refs.push({
         type: refType,
-        refName,
+        name: refName,
         refPos: refNode?.getNodePosition(),
         targetResource,
       });

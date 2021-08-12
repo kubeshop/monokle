@@ -105,7 +105,7 @@ const RefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType;
   const targetName =
     resourceRef.targetResource && resourceMap[resourceRef.targetResource]
       ? resourceMap[resourceRef.targetResource].name
-      : resourceRef.refName;
+      : resourceRef.name;
 
   let linkText = targetName;
 
@@ -155,7 +155,7 @@ const PopoverContent = (props: {
           return 0;
         })
         .map(resourceRef => (
-          <StyledRefDiv key={resourceRef.targetResource || resourceRef.refName}>
+          <StyledRefDiv key={resourceRef.targetResource || resourceRef.name}>
             <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
           </StyledRefDiv>
         ))}
