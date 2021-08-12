@@ -26,19 +26,19 @@ jobs:
         uses: actions/checkout@v2
 
       # Get Node Version
-      - name: Get_Node_Version
+      - name: Get Node Version
         run: |
           Set-PSDebug -Trace 1
           $filePath = "D:\a\monokle\monokle\.nvmrc"
           Get-Content $filePath -Raw
           $content = Get-Content $filePath -Raw
           echo "::set-output name=nodeversion::$content"
-          echo "$content"
+        id: get-node-version
 
-      - name: Use Node.js ${{ steps.Get_Node_Version.outputs.nodeversion }}
+      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ steps.Get_Node_Version.outputs.nodeversion }}
+          node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
 
       # Install Dependencies
