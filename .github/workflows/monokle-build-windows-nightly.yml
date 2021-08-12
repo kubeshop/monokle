@@ -3,8 +3,9 @@ name: monokle-build-windows
 on:
   push:
     branches: [steen/housekeeping/build-binaries-windows]
-  # * is a special character in YAML so you have to quote this string
-  - cron: '0 2 * * *'
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '0 2 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
