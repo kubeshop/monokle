@@ -8,14 +8,13 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {inPreviewMode} from '@redux/selectors';
-import {toggleSettings} from '@redux/reducers/ui';
+import {toggleSettings, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {makeOnUploadHandler} from '@utils/fileUpload';
 
-const HotKeysHandler = (props: {onToggleLeftMenu: () => void; onToggleRightMenu: () => void}) => {
-  const {onToggleLeftMenu, onToggleRightMenu} = props;
+const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
   const configState = useAppSelector(state => state.config);
@@ -63,21 +62,13 @@ const HotKeysHandler = (props: {onToggleLeftMenu: () => void; onToggleRightMenu:
     [isInPreviewMode]
   );
 
-  useHotkeys(
-    hotkeys.TOGGLE_LEFT_PANE,
-    () => {
-      onToggleLeftMenu();
-    },
-    [onToggleLeftMenu]
-  );
+  useHotkeys(hotkeys.TOGGLE_LEFT_PANE, () => {
+    dispatch(toggleLeftMenu());
+  });
 
-  useHotkeys(
-    hotkeys.TOGGLE_RIGHT_PANE,
-    () => {
-      onToggleRightMenu();
-    },
-    [onToggleRightMenu]
-  );
+  useHotkeys(hotkeys.TOGGLE_RIGHT_PANE, () => {
+    dispatch(toggleRightMenu());
+  });
 
   return (
     <>
