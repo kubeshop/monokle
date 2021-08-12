@@ -17,7 +17,7 @@ export const selectAllResources = createSelector(
 export const selectActiveResources = createSelector(
   selectAllResources,
   (state: RootState) => state.main.previewResourceId,
-  (state: RootState) => state.main.previewValuesFile,
+  (state: RootState) => state.main.previewValuesFileId,
   (resources, previewResource, previewValuesFile) =>
     resources.filter(
       r => (previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)
@@ -46,7 +46,7 @@ export const selectHelmValues = createSelector(
 
 export const inPreviewMode = createSelector(
   (state: RootState) => state.main,
-  appState => Boolean(appState.previewResourceId) || Boolean(appState.previewValuesFile)
+  appState => Boolean(appState.previewResourceId) || Boolean(appState.previewValuesFileId)
 );
 
 export const inClusterMode = createSelector(

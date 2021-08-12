@@ -270,7 +270,7 @@ export const mainSlice = createSlice({
 
 function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) {
   state.previewResourceId = undefined;
-  state.previewValuesFile = undefined;
+  state.previewValuesFileId = undefined;
 
   if (payload.previewResourceId) {
     if (state.previewType === 'kustomization') {
@@ -282,7 +282,7 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
     }
     if (state.previewType === 'helm') {
       if (state.helmValuesMap[payload.previewResourceId]) {
-        state.previewValuesFile = payload.previewResourceId;
+        state.previewValuesFileId = payload.previewResourceId;
       } else {
         log.error(`Unknown preview id: ${payload.previewResourceId}`);
       }

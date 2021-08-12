@@ -23,7 +23,7 @@ export const previewHelmValuesFile = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = thunkAPI.getState().config.kubeconfig;
-  if (state.previewValuesFile !== valuesFileId) {
+  if (state.previewValuesFileId !== valuesFileId) {
     const valuesFile = state.helmValuesMap[valuesFileId];
     if (valuesFile && valuesFile.filePath) {
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
