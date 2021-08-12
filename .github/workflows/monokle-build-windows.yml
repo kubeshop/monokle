@@ -31,7 +31,7 @@ jobs:
           Set-PSDebug -Trace 1
           $filePath = "D:\a\monokle\monokle\.nvmrc"
           $content = Get-Content $filePath -Raw
-          echo "::set-output nodeversion=string::$content"
+          echo "::set-output name=nodeversion::$content"
 
       - name: Use Node.js ${{ steps.Get_Node_Version.outputs.nodeversion }}
         uses: actions/setup-node@v2
