@@ -1,5 +1,5 @@
 export type UiState = {
-  settingsOpened: boolean;
+  isSettingsOpen: boolean;
   isFolderLoading: boolean;
   leftMenu: {
     selection: string;

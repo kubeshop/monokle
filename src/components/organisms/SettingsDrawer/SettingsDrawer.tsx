@@ -48,7 +48,7 @@ const StyledSelect = styled(Select)`
 
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
-  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.settingsOpened));
+  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const appConfig = useAppSelector(state => state.config);
 

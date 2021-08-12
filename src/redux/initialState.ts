@@ -186,7 +186,7 @@ const initialLogsState: LogsState = {
 };
 
 const initialUiState: UiState = {
-  settingsOpened: false,
+  isSettingsOpen: false,
   isFolderLoading: false,
   leftMenu: {
     selection: 'file-explorer',
