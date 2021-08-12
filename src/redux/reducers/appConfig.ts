@@ -128,7 +128,7 @@ export const configSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(initKubeconfig.fulfilled, (state, action) => {
-      state.kubeconfig = action.payload.kubeconfig;
+      state.kubeconfigPath = action.payload.kubeconfig;
     });
   },
 });
