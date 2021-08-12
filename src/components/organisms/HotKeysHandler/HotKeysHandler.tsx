@@ -47,7 +47,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.PREVIEW_CLUSTER,
     () => {
-      startPreview(configState.kubeconfig, 'cluster', dispatch);
+      startPreview(configState.kubeconfigPath, 'cluster', dispatch);
     },
     [configState]
   );

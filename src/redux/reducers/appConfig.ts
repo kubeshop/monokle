@@ -102,7 +102,7 @@ export const configSlice = createSlice({
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
     setKubeconfig: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      state.kubeconfig = action.payload;
+      state.kubeconfigPath = action.payload;
     },
     setStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.startupModalVisible = action.payload;

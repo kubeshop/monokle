@@ -106,7 +106,7 @@ const SettingsDrawer = () => {
       <StyledDiv>
         <StyledSpan>KUBECONFIG</StyledSpan>
         <Tooltip title={KubeconfigPathTooltip}>
-          <Input value={appConfig.kubeconfig} />
+          <Input value={appConfig.kubeconfigPath} />
         </Tooltip>
         <StyledButton onClick={openFileSelect}>Browse</StyledButton>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />

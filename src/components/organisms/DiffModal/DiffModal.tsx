@@ -49,7 +49,7 @@ const DiffModal = () => {
   const [diffResource, setDiffResource] = useState<K8sResource>();
   const [resourceContent, setResourceContent] = useState<string>();
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const kubeconfig = useAppSelector(state => state.config.kubeconfig);
+  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const [isVisible, setVisible] = useState(false);
 
   const options = {

@@ -43,7 +43,7 @@ const ClustersPane = () => {
   const clusterMode = useSelector(inClusterMode);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
-  const kubeconfig = useAppSelector(state => state.config.kubeconfig);
+  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
 
   const fileInput = useRef<HTMLInputElement>(null);
 
