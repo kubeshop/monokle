@@ -25,6 +25,7 @@ const ResourcesSection = () => {
   const appConfig = useAppSelector(state => state.config);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewResource = useAppSelector(state => state.main.previewResource);
+  const selectedResource = useAppSelector(state => state.main.selectedResource);
   const resources = useSelector(selectActiveResources);
 
   const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
@@ -58,10 +59,12 @@ const ResourcesSection = () => {
   );
 
   const handleSubsectionExpand = (sectionName: string, subsectionName: string) => {
-    setExpandedSubsectionsBySection({
+    const currentExpandedSubsections = [...(expandedSubsectionsBySection[sectionName] || [])];
+    const updatedSubsectionsBySection = {
       ...expandedSubsectionsBySection,
-      [sectionName]: [...(expandedSubsectionsBySection[sectionName] || []), subsectionName],
-    });
+      [sectionName]: [...new Set([...currentExpandedSubsections, subsectionName])],
+    };
+    setExpandedSubsectionsBySection(updatedSubsectionsBySection);
   };
 
   const handleSubsectionCollapse = (sectionName: string, subsectionName: string) => {
@@ -94,8 +97,9 @@ const ResourcesSection = () => {
     );
   }
 
-  // ensure that subsections containing highlighted sections are expanded
+  // ensure that subsections containing selected or highlighted sections are expanded
   useEffect(() => {
+    const subsectionsToExpandBySection: Record<string, string[]> = {};
     appConfig.navigators
       .map(navigator => navigator.sections)
       .flat()
@@ -103,16 +107,33 @@ const ResourcesSection = () => {
         section.subsections
           .filter(subsection => shouldSubsectionBeExpanded(subsection))
           .forEach(subsection => {
-            handleSubsectionExpand(section.name, subsection.name);
+            if (!subsectionsToExpandBySection[section.name]) {
+              subsectionsToExpandBySection[section.name] = [subsection.name];
+            } else {
+              subsectionsToExpandBySection[section.name] = [
+                ...subsectionsToExpandBySection[section.name],
+                subsection.name,
+              ];
+            }
           });
       });
-  }, [resources]);
+    const updatedExpandedSubsectionsBySection: Record<string, string[]> = Object.fromEntries(
+      Object.entries(expandedSubsectionsBySection).map(([sectionName, expandedSubsections]) => {
+        const subsectionsToExpand = [...(subsectionsToExpandBySection[sectionName] || [])];
+        return [sectionName, [...new Set([...expandedSubsections, ...subsectionsToExpand])]];
+      })
+    );
+    setExpandedSubsectionsBySection(updatedExpandedSubsectionsBySection);
+  }, [resourceMap, selectedResource]);
 
   function shouldSubsectionBeExpanded(subsection: NavigatorSubSection) {
     return (
       resources.length === 0 ||
       (resources.length > 0 &&
-        resources.some(resource => resource.kind === subsection.kindSelector && resource.highlight))
+        resources.some(
+          resource =>
+            resource.kind === subsection.kindSelector && (resource.highlight || selectedResource === resource.id)
+        ))
     );
   }
 

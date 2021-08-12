@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
@@ -125,6 +125,7 @@ const NavigatorPane = () => {
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
+  const selectedResource = useAppSelector(state => state.main.selectedResource);
   const helmCharts = useSelector(selectHelmCharts);
   const helmValues = useSelector(selectHelmValues);
   const kustomizations = useSelector(selectKustomizations);
@@ -145,6 +146,12 @@ const NavigatorPane = () => {
   const isSectionExpanded = (sectionName: string) => {
     return expandedSections.indexOf(sectionName) !== -1;
   };
+
+  useEffect(() => {
+    if (kustomizations.some(kustomization => kustomization.id === selectedResource)) {
+      expandSection('kustomizations');
+    }
+  }, [selectedResource]);
 
   return (
     <>

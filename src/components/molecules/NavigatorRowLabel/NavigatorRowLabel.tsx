@@ -208,6 +208,15 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     }
   }, [isHighlighted, selectedPath]);
 
+  // on mount, if this resource is selected, scroll to it (the subsection expanded and rendered this)
+  useEffect(() => {
+    const isVisible = isScrolledIntoView();
+    if (isSelected && selectedResource && !isVisible) {
+      // @ts-ignore
+      scrollContainer.current?.scrollIntoView();
+    }
+  }, []);
+
   useEffect(() => {
     const isVisible = isScrolledIntoView();
     if (isSelected && selectedResource && !isVisible) {
