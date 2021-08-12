@@ -70,10 +70,3 @@ jobs:
         run: |
           cmd /r dir .\dist
         if: ${{ success() }}
-
-      - name: Build Failed - Archive Build Logs
-        uses: actions/upload-artifact@v2
-        with:
-          name: logs
-          path: .\msilog.txt
-        if: ${{ failure() || cancelled() }}
