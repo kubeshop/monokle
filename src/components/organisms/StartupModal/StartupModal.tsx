@@ -82,7 +82,7 @@ const HeightFillDiv = styled.div`
 
 const StartupModal = () => {
   const dispatch = useAppDispatch();
-  const startupModalVisible = useAppSelector(state => state.config.startupModalVisible);
+  const startupModalVisible = useAppSelector(state => state.config.isStartupModalVisible);
 
   const handleClose = () => {
     dispatch(updateStartupModalVisible(false));

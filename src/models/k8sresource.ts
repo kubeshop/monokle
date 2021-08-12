@@ -12,8 +12,8 @@ interface K8sResource {
   kind: string; // k8s resource kind
   version: string; // k8s resource version
   namespace?: string; // k8s namespace is specified (for filtering)
-  highlight: boolean; // if highlighted in UI (should probalby move to UI state object)
-  selected: boolean; // if selected in UI (should probably move to UI state object)
+  isHighlighted: boolean; // if highlighted in UI (should probalby move to UI state object)
+  isSelected: boolean; // if selected in UI (should probably move to UI state object)
   text: string; // unparsed resource content (for editing)
   content: any; // contains parsed yaml resource - used for filtering/finding links/refs, etc
   refs?: ResourceRef[]; // array of refs to other resources
@@ -64,10 +64,10 @@ export enum ResourceRefType {
 }
 
 interface ResourceRef {
-  refType: ResourceRefType; // the type of ref (see enum)
-  refName: string; // the ref value - for example the name of a configmap
-  targetResource?: string; // the resource this is referring to (empty for unsatisfied refs)
-  refPos?: RefPosition; // the position in the document of the refName (undefined for incoming file refs)
+  type: ResourceRefType; // the type of ref (see enum)
+  name: string; // the ref value - for example the name of a configmap
+  targetResourceId?: string; // the resource this is referring to (empty for unsatisfied refs)
+  position?: RefPosition; // the position in the document of the refName (undefined for incoming file refs)
 }
 
 interface RefPosition {

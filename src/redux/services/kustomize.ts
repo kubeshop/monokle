@@ -125,17 +125,17 @@ export function getKustomizationRefs(
     kustomization.refs
       .filter(
         r =>
-          r.refType === ResourceRefType.KustomizationResource ||
-          (selectParent && r.refType === ResourceRefType.KustomizationParent)
+          r.type === ResourceRefType.KustomizationResource ||
+          (selectParent && r.type === ResourceRefType.KustomizationParent)
       )
       .forEach(r => {
-        if (r.targetResource) {
-          const target = resourceMap[r.targetResource];
+        if (r.targetResourceId) {
+          const target = resourceMap[r.targetResourceId];
           if (target) {
-            linkedResourceIds.push(r.targetResource);
+            linkedResourceIds.push(r.targetResourceId);
 
-            if (target.kind === 'Kustomization' && r.refType === ResourceRefType.KustomizationResource) {
-              linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.targetResource));
+            if (target.kind === 'Kustomization' && r.type === ResourceRefType.KustomizationResource) {
+              linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.targetResourceId));
             }
           }
         }

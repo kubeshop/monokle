@@ -18,8 +18,8 @@ const initialAppState: AppState = {
 };
 
 const initialAppConfigState: AppConfig = {
-  startupModalVisible: electronStore.get('appConfig.startupModalVisible'),
-  kubeconfig: '',
+  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
+  kubeconfigPath: '',
   settings: {
     filterObjectsOnSelection: false,
     autoZoomGraphOnSelection: true,
@@ -186,7 +186,7 @@ const initialLogsState: LogsState = {
 };
 
 const initialUiState: UiState = {
-  settingsOpened: false,
+  isSettingsOpen: false,
   isFolderLoading: false,
   leftMenu: {
     selection: 'file-explorer',

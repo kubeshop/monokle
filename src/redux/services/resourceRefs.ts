@@ -54,19 +54,19 @@ export function isUnsatisfiedRef(e: ResourceRefType) {
 }
 
 export function hasIncomingRefs(resource: K8sResource) {
-  return resource.refs?.some(e => isIncomingRef(e.refType));
+  return resource.refs?.some(e => isIncomingRef(e.type));
 }
 
 export function hasOutgoingRefs(resource: K8sResource) {
-  return resource.refs?.some(e => isOutgoingRef(e.refType));
+  return resource.refs?.some(e => isOutgoingRef(e.type));
 }
 
 export function hasRefs(resource: K8sResource) {
-  return resource.refs?.some(e => isOutgoingRef(e.refType));
+  return resource.refs?.some(e => isOutgoingRef(e.type));
 }
 
 export function hasUnsatisfiedRefs(resource: K8sResource) {
-  return resource.refs?.some(e => isUnsatisfiedRef(e.refType));
+  return resource.refs?.some(e => isUnsatisfiedRef(e.type));
 }
 
 export type RefMapper = {

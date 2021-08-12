@@ -2,7 +2,7 @@ import React, {useState, useContext, useEffect} from 'react';
 import {Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {inClusterMode, selectHelmCharts, selectHelmValues, selectKustomizations} from '@redux/selectors';
+import {isInClusterModeSelector, helmChartsSelector, helmValuesSelector, kustomizationsSelector} from '@redux/selectors';
 
 import {HelmValuesFile} from '@models/helm';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -125,11 +125,11 @@ const NavigatorPane = () => {
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
-  const helmCharts = useSelector(selectHelmCharts);
-  const helmValues = useSelector(selectHelmValues);
-  const kustomizations = useSelector(selectKustomizations);
-  const clusterMode = useSelector(inClusterMode);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const helmCharts = useSelector(helmChartsSelector);
+  const helmValues = useSelector(helmValuesSelector);
+  const kustomizations = useSelector(kustomizationsSelector);
+  const isInClusterMode = useSelector(isInClusterModeSelector);
 
   const [expandedSections, setExpandedSections] = useState<string[]>(['kustomizations', 'helmcharts']);
 
@@ -148,10 +148,10 @@ const NavigatorPane = () => {
   };
 
   useEffect(() => {
-    if (kustomizations.some(kustomization => kustomization.id === selectedResource)) {
+    if (kustomizations.some(kustomization => kustomization.id === selectedResourceId)) {
       expandSection('kustomizations');
     }
-  }, [selectedResource]);
+  }, [selectedResourceId]);
 
   return (
     <>
@@ -173,7 +173,7 @@ const NavigatorPane = () => {
           <StyledSkeleton active />
         ) : (
           <StyledCollapse collapsible="disabled" ghost activeKey={expandedSections}>
-            {!clusterMode && !previewLoader.isLoading && Object.values(helmCharts).length > 0 && (
+            {!isInClusterMode && !previewLoader.isLoading && Object.values(helmCharts).length > 0 && (
               <StyledCollapsePanel
                 key="helmcharts"
                 showArrow={false}
@@ -186,7 +186,7 @@ const NavigatorPane = () => {
                     isSelected={
                       !isSectionExpanded('helmcharts') &&
                       Object.values(helmCharts).some(h =>
-                        h.valueFiles.map(v => helmValues[v]).some((valuesFile: HelmValuesFile) => valuesFile.selected)
+                        h.valueFileIds.map(v => helmValues[v]).some((valuesFile: HelmValuesFile) => valuesFile.isSelected)
                       )
                     }
                   />
@@ -195,7 +195,7 @@ const NavigatorPane = () => {
                 <HelmChartsSection helmCharts={helmCharts} />
               </StyledCollapsePanel>
             )}
-            {!clusterMode && !previewLoader.isLoading && kustomizations.length > 0 && (
+            {!isInClusterMode && !previewLoader.isLoading && kustomizations.length > 0 && (
               <StyledCollapsePanel
                 key="kustomizations"
                 showArrow={false}
@@ -205,8 +205,8 @@ const NavigatorPane = () => {
                     isExpanded={expandedSections.indexOf('kustomizations') !== -1}
                     onExpand={() => expandSection('kustomizations')}
                     onCollapse={() => collapseSection('kustomizations')}
-                    isSelected={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.selected)}
-                    isHighlighted={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.highlight)}
+                    isSelected={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.isSelected)}
+                    isHighlighted={!isSectionExpanded('kustomizations') && kustomizations.some(k => k.isHighlighted)}
                   />
                 }
               >

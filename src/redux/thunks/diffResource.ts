@@ -19,7 +19,7 @@ export const performResourceDiff = createAsyncThunk<
   }
 >('main/setDiffContent', async (diffResourceId, thunkAPI) => {
   const resourceMap = thunkAPI.getState().main.resourceMap;
-  const kubeconfig = thunkAPI.getState().config.kubeconfig;
+  const kubeconfig = thunkAPI.getState().config.kubeconfigPath;
   try {
     const resource = resourceMap[diffResourceId];
     if (resource && resource.text) {

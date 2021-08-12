@@ -38,17 +38,17 @@ type PreviewLoaderType = {
 interface AppState {
   fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
   resourceMap: ResourceMapType; // maps resource ids to resources
-  selectedResource?: string; // the id of the currently selected resource
+  selectedResourceId?: string; // the id of the currently selected resource
   selectedPath?: string; // the currently selected path
   previewType?: 'kustomization' | 'cluster' | 'helm';
-  previewResource?: string; // the resource currently being previewed
+  previewResourceId?: string; // the resource currently being previewed
   previewLoader: PreviewLoaderType;
-  diffResource?: string; // the resource currently being diffed
+  diffResourceId?: string; // the resource currently being diffed
   diffContent?: string; // the diff content for the resource being diffed
   helmChartMap: HelmChartMapType; // maps chart ids to helm charts
   helmValuesMap: HelmValuesMapType; // maps values ids to helm values files
-  selectedValuesFile?: string; // the currently selected values file
-  previewValuesFile?: string; // the values file currently being previewed
+  selectedValuesFileId?: string; // the currently selected values file
+  previewValuesFileId?: string; // the values file currently being previewed
   isSelectingFile: boolean; // if we are currently in the process of selecting a file - used for one-time UI updates
   isApplyingResource: boolean; // if we are currently applying a resource - room for improvement...
 }

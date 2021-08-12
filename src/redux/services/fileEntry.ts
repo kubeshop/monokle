@@ -20,7 +20,7 @@ export function createFileEntry(fileEntryPath: string) {
   const fileEntry: FileEntry = {
     name: fileEntryPath.substr(fileEntryPath.lastIndexOf(path.sep) + 1),
     filePath: fileEntryPath,
-    excluded: false,
+    isExcluded: false,
   };
   return fileEntry;
 }
@@ -64,7 +64,7 @@ export function readFiles(
       id: uuidv4(),
       filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
       name: folder.substr(folder.lastIndexOf(path.sep) + 1),
-      valueFiles: [],
+      valueFileIds: [],
     };
 
     files.forEach(file => {
@@ -73,7 +73,7 @@ export function readFiles(
       const fileEntry = createFileEntry(fileEntryPath);
 
       if (fileIsExcluded(appConfig, fileEntry)) {
-        fileEntry.excluded = true;
+        fileEntry.isExcluded = true;
       } else if (fs.statSync(filePath).isDirectory()) {
         fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
       } else if (micromatch.isMatch(file, '*values*.yaml')) {
@@ -81,12 +81,12 @@ export function readFiles(
           id: uuidv4(),
           filePath: fileEntryPath,
           name: file,
-          selected: false,
-          helmChart: helmChart.id,
+          isSelected: false,
+          helmChartId: helmChart.id,
         };
 
         helmValuesMap[helmValues.id] = helmValues;
-        helmChart.valueFiles.push(helmValues.id);
+        helmChart.valueFileIds.push(helmValues.id);
       }
 
       fileMap[fileEntry.filePath] = fileEntry;
@@ -101,7 +101,7 @@ export function readFiles(
       const fileEntry = createFileEntry(fileEntryPath);
 
       if (fileIsExcluded(appConfig, fileEntry)) {
-        fileEntry.excluded = true;
+        fileEntry.isExcluded = true;
       } else if (fs.statSync(filePath).isDirectory()) {
         fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
@@ -212,7 +212,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     let wasSelected = false;
 
     resourcesInFile.forEach(resource => {
-      if (state.selectedResource === resource.id) {
+      if (state.selectedResourceId === resource.id) {
         updateSelectionAndHighlights(state, resource);
         wasSelected = true;
       }
@@ -311,7 +311,7 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
 function removeFile(fileEntry: FileEntry, state: AppState) {
   log.info(`removing file ${fileEntry.filePath}`);
   getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(resource => {
-    if (state.selectedResource === resource.id) {
+    if (state.selectedResourceId === resource.id) {
       updateSelectionAndHighlights(state, resource);
     }
     delete state.resourceMap[resource.id];

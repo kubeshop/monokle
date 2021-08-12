@@ -19,8 +19,8 @@ interface AppConfig {
   scanExcludes: string[]; // a list of patterns to exclude when scanning the file system for resources
   fileIncludes: string[]; // a list of patterns to match to against files for including
   navigators: ObjectNavigator[]; // the currrent navigator configuration
-  kubeconfig: string;
-  startupModalVisible: boolean;
+  kubeconfigPath: string;
+  isStartupModalVisible: boolean;
   settings: {
     theme: Themes; // not used for now
     textSize: TextSizes; // not used for now
