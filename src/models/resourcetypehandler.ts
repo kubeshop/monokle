@@ -1,8 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 import {monaco} from 'react-monaco-editor';
 
-interface SymbolPathMatcher {
-  path?: string[];
+interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
 }
 
@@ -58,7 +57,7 @@ interface ResourceTypeHandler {
    * The desired navigator section and subsection for this resource type
    */
 
-  navigatorPath: [sectionName: string, subsectionName: string];
+  navigatorPath: [navigatorName: string, sectionName: string, subsectionName: string];
 
   /**
    * optional JSON Schema and symbol-matchers to pass to the source editor
@@ -66,7 +65,7 @@ interface ResourceTypeHandler {
 
   sourceEditorOptions?: {
     editorSchema?: any;
-    symbolPathMatchers?: SymbolPathMatcher[];
+    symbolMatchers?: SymbolMatcher[];
   };
 
   /**
