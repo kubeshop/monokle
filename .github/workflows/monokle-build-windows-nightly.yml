@@ -1,10 +1,9 @@
 name: monokle-build-windows
 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-    tags:
-      - '*'
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '0 2 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -52,6 +51,23 @@ jobs:
           cmd /r dir
           cmd /r dir .\node_modules
 
+      - name: Generate and apply tag
+        run: |
+          Set-PSDebug -Trace 1
+          $datetoday = Get-Date -Format "yyyyMMdd"
+          echo $datetoday
+          npm --no-git-tag-version --preid=$datetoday version prerelease
+          npm version
+          $p = get-content package.json | ConvertFrom-Json
+
+          echo $p.version
+
+          $ErrorActionPreference = 'SilentlyContinue'
+          git tag $p.version
+          git push origin $tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
       - name: Build
         run: |
           npm run electron:build:ci
@@ -61,7 +77,7 @@ jobs:
 
       - name: Package and Publish
         run: |
-          npm exec -c 'electron-builder --publish "onTag"'
+          npm exec -c 'electron-builder --publish "always"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
@@ -70,3 +86,10 @@ jobs:
         run: |
           cmd /r dir .\dist
         if: ${{ success() }}
+
+      - name: Build Failed - Archive Build Logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: .\msilog.txt
+        if: ${{ failure() || cancelled() }}

@@ -1,10 +1,7 @@
-name: monokle-build-mac
+name: monokle-lint
 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    tags:
-      - '*' # Should only grab tags without /
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -60,47 +57,6 @@ jobs:
           ls -la
           tree node_modules -L 1
 
-      - name: Build
+      - name: Lint
         run: |
-          npm run electron:build:ci
-        env:
-          # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
-          CI: false
-
-      - name: Package and Publish
-        run: |
-          npm exec -c "electron-builder --publish \"onTag\""
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-
-      # Check Binary Size
-      - name: Build Succeeded
-        run: |
-          ls -alh dist | grep Monokle && du -sh dist/mac || true
-        if: ${{ success() }}
-
-      - name: Archive Binary
-        uses: actions/upload-artifact@v2
-        with:
-          name: dist
-          path: dist
-        if: ${{ success() }}
-
-      - name: Build Failed - Output Build Logs
-        run: |
-          cat /Users/runner/.npm/_logs/*-debug.log || true
-        if: ${{ failure() || cancelled() }}
-
-      - name: Build Failed - Archive Build Logs
-        uses: actions/upload-artifact@v2
-        with:
-          name: logs
-          path: /Users/runner/.npm/_logs
-        if: ${{ failure() || cancelled() }}
-
-      # Make sure no secrets or certs are left on the runner
-      - name: Cleanup files after run
-        run: |
-          rm -rf *
-          ls -la
-        if: ${{ always() }}
+          npm run lint

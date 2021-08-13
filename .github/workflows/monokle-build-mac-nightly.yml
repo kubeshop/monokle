@@ -1,10 +1,9 @@
-name: monokle-build-mac
+name: monokle-build-mac-nightly
 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-    tags:
-      - '*' # Should only grab tags without /
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '0 2 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -34,7 +33,7 @@ jobs:
 
       - name: Install Tools
         run: |
-          brew install tree
+          brew install tree jq
 
       - name: Get Node Version
         run: |
@@ -60,6 +59,16 @@ jobs:
           ls -la
           tree node_modules -L 1
 
+      - name: Generate and apply tag
+        run: |
+          npm --no-git-tag-version --preid="$(date +%Y%m%d)" version prerelease
+          npm version
+          t=$(jq -r '.version' package.json)
+          git tag "${t}" || true
+          git push origin "${t}" || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
       - name: Build
         run: |
           npm run electron:build:ci
@@ -69,7 +78,7 @@ jobs:
 
       - name: Package and Publish
         run: |
-          npm exec -c "electron-builder --publish \"onTag\""
+          npm exec -c "electron-builder --publish \"always\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
