@@ -108,51 +108,44 @@ function createNodePath(path: readonly any[]) {
   return result;
 }
 
-function convertPathToString(path: any[]) {
-  let pathString = '';
-  path.forEach((item: any) => {
+function getPathParts(pathArray: any[]) {
+  const pathParts: string[] = [];
+  pathArray.forEach((item: any) => {
     if (isPair(item)) {
       const itemKeyScalar = item.key as Scalar;
-      pathString += `${itemKeyScalar.value as string}.`;
+      pathParts.push(itemKeyScalar.value as string);
     }
   });
-  return pathString.slice(0, -1);
-}
-
-function getKeyPathFromScalarKey(scalarKey: Scalar, parentPathString: string) {
-  if (parentPathString.trim().length > 0) {
-    return `${parentPathString}.${scalarKey.value as string}`;
-  }
-  return scalarKey.value as string;
+  return pathParts;
 }
 
 export function traverseDocument(
   doc: Document,
-  callback: (keyPath: string, scalar: Scalar, key: string, parentKeyPath: string) => void
+  callback: (parentKeyPathParts: string[], keyPathParts: string[], key: string, scalar: Scalar) => void
 ) {
   visit(doc, {
     Pair(_, pair, parentPath) {
-      const parentPathString = convertPathToString(parentPath as any);
+      const parentKeyPathParts = getPathParts(parentPath as any);
 
       if (isScalar(pair.key) && isScalar(pair.value)) {
         const scalarKey = pair.key as Scalar;
-        const keyPath = getKeyPathFromScalarKey(scalarKey, parentPathString);
+        const keyPathParts = [...parentKeyPathParts, scalarKey.value as string];
 
         const scalarValue = pair.value as Scalar;
 
-        callback(keyPath, scalarValue, scalarKey.value as string, parentPathString);
+        callback(parentKeyPathParts, keyPathParts, scalarKey.value as string, scalarValue);
       }
     },
     Seq(_, node, path) {
       const seqPair = path.slice(-1)[0];
-      const parentPathString = convertPathToString(path.slice(0, -1) as any);
+      const parentKeyPathParts = getPathParts(path.slice(0, -1) as any);
 
       if (isPair(seqPair)) {
         node.items.forEach(item => {
           if (isScalar(item)) {
             const scalarSeqKey = seqPair.key as Scalar;
-            const keyPath = getKeyPathFromScalarKey(scalarSeqKey, parentPathString);
-            callback(keyPath, item as Scalar, scalarSeqKey.value as string, parentPathString);
+            const keyPathParts = [...parentKeyPathParts, scalarSeqKey.value as string];
+            callback(parentKeyPathParts, keyPathParts, scalarSeqKey.value as string, item as Scalar);
           }
         });
       }

@@ -2,13 +2,14 @@ import path from 'path';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
 import fs from 'fs';
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER, REF_PATH_SEPARATOR} from '@constants/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
 import log from 'loglevel';
-import {isUnsatisfiedRef, RefMappersByResourceKind, RefMapper} from '@redux/services/resourceRefs';
+import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {v4 as uuidv4} from 'uuid';
+import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 import {traverseDocument} from './manifest-utils';
 
 /**
@@ -434,47 +435,54 @@ export function getLinkedResources(resource: K8sResource) {
   return linkedResourceIds;
 }
 
+const joinPathParts = (pathParts: string[]) => {
+  return pathParts.join(REF_PATH_SEPARATOR);
+};
+
 export function processResourceRefNodes(resource: K8sResource) {
   const parsedDoc = getParsedDoc(resource);
 
-  const refMappers: RefMapper[] = [];
+  const resourceKindHandler = getResourceKindHandler(resource.kind);
+  if (!resourceKindHandler) {
+    return;
+  }
+  const outgoingRefMappers = resourceKindHandler?.outgoingRefMappers || [];
+  const incomingRefMappers = ResourceKindHandlers.map(
+    otherKindHandler =>
+      otherKindHandler.outgoingRefMappers?.filter(
+        outgoingRefMapper => outgoingRefMapper.target.kind === resource.kind
+      ) || []
+  ).flat();
 
-  Object.values(RefMappersByResourceKind)
-    .flat()
-    .forEach(currentRefMapper => {
-      if (currentRefMapper.source.kind === resource.kind) {
-        if (!refMappers.some(rm => rm.source.path === currentRefMapper.source.path)) {
-          refMappers.push(currentRefMapper);
-        }
-      }
-      if (currentRefMapper.target.kind === resource.kind) {
-        if (!refMappers.some(rm => rm.target.path === currentRefMapper.target.path)) {
-          refMappers.push(currentRefMapper);
-        }
-      }
-    });
+  const refMappers = [...incomingRefMappers, ...outgoingRefMappers];
 
   if (!refMappers || refMappers.length === 0) {
     return;
   }
 
-  traverseDocument(parsedDoc, (keyPath, scalar, key, parentKeyPath) => {
+  traverseDocument(parsedDoc, (parentKeyPathParts, keyPathParts, key, scalar) => {
     refMappers.forEach(refMapper => {
       if (!resource.refNodeByPath) {
         resource.refNodeByPath = {};
       }
 
+      const keyPath = joinPathParts(keyPathParts);
+      const parentKeyPath = joinPathParts(parentKeyPathParts);
+
       if (refMapper.matchPairs) {
-        if (refMapper.source.path === parentKeyPath || refMapper.target.path === parentKeyPath) {
+        if (
+          joinPathParts(refMapper.source.pathParts) === parentKeyPath ||
+          joinPathParts(refMapper.target.pathParts) === parentKeyPath
+        ) {
           resource.refNodeByPath[keyPath] = {scalar, key, parentKeyPath};
         }
       } else {
-        if (keyPath.endsWith(refMapper.source.path)) {
-          resource.refNodeByPath[refMapper.source.path] = {scalar, key, parentKeyPath};
+        if (keyPath.endsWith(joinPathParts(refMapper.source.pathParts))) {
+          resource.refNodeByPath[joinPathParts(refMapper.source.pathParts)] = {scalar, key, parentKeyPath};
         }
 
-        if (keyPath.endsWith(refMapper.target.path)) {
-          resource.refNodeByPath[refMapper.target.path] = {scalar, key, parentKeyPath};
+        if (keyPath.endsWith(joinPathParts(refMapper.target.pathParts))) {
+          resource.refNodeByPath[joinPathParts(refMapper.target.pathParts)] = {scalar, key, parentKeyPath};
         }
       }
     });
@@ -485,23 +493,27 @@ function processRefs(resourceMap: ResourceMapType) {
   Object.values(resourceMap).forEach(resource => processResourceRefNodes(resource));
 
   Object.values(resourceMap).forEach(resource => {
-    const refMappers = RefMappersByResourceKind[resource.kind];
-    if (!refMappers || refMappers.length === 0) {
+    const resourceKindHandler = getResourceKindHandler(resource.kind);
+    if (
+      !resourceKindHandler ||
+      !resourceKindHandler.outgoingRefMappers ||
+      resourceKindHandler.outgoingRefMappers.length === 0
+    ) {
       return;
     }
-    refMappers.forEach(refMapper => {
+    resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
       if (!resource.refNodeByPath) {
         return;
       }
 
       const targetResources = Object.values(resourceMap).filter(
-        targetResource => targetResource.kind === refMapper.target.kind
+        targetResource => targetResource.kind === outgoingRefMapper.target.kind
       );
 
-      if (refMapper.matchPairs) {
+      if (outgoingRefMapper.matchPairs) {
         const refNodes: RefNode[] = [];
         Object.values(resource.refNodeByPath).forEach(({scalar, key, parentKeyPath}) => {
-          if (refMapper.source.path === parentKeyPath) {
+          if (joinPathParts(outgoingRefMapper.source.pathParts) === parentKeyPath) {
             refNodes.push({scalar, key, parentKeyPath});
           }
         });
@@ -512,7 +524,7 @@ function processRefs(resourceMap: ResourceMapType) {
             return;
           }
           Object.values(targetResource.refNodeByPath).forEach(({scalar, key, parentKeyPath}) => {
-            if (refMapper.target.path === parentKeyPath) {
+            if (joinPathParts(outgoingRefMapper.target.pathParts) === parentKeyPath) {
               targetNodes.push({scalar, key, parentKeyPath});
             }
           });
@@ -549,11 +561,13 @@ function processRefs(resourceMap: ResourceMapType) {
           });
         });
       } else {
-        const refNode = resource.refNodeByPath ? resource.refNodeByPath[refMapper.source.path] : undefined;
+        const refNode = resource.refNodeByPath
+          ? resource.refNodeByPath[joinPathParts(outgoingRefMapper.source.pathParts)]
+          : undefined;
 
         targetResources.forEach(targetResource => {
           const targetNode = targetResource.refNodeByPath
-            ? targetResource.refNodeByPath[refMapper.target.path]
+            ? targetResource.refNodeByPath[joinPathParts(outgoingRefMapper.target.pathParts)]
             : undefined;
 
           if (refNode) {
