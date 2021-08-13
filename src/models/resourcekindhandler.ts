@@ -7,11 +7,11 @@ interface SymbolMatcher {
 
 interface OutgoingRefMapper {
   source: {
-    path: string;
+    path: string[];
   };
   target: {
     kind: string;
-    path: string;
+    path: string[];
   };
   matchPairs?: boolean;
 }

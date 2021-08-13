@@ -16,11 +16,11 @@ const DeploymentHandler: ResourceKindHandler = {
     ...PodOutgoingRefMappers,
     {
       source: {
-        path: 'spec.template.metadata.labels',
+        path: ['spec', 'template', 'metadata', 'labels'],
       },
       target: {
         kind: 'Service',
-        path: 'spec.selector',
+        path: ['spec', 'selector'],
       },
       matchPairs: true,
     },

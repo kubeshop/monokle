@@ -14,11 +14,11 @@ const PersistentVolumeClaimHandler: ResourceKindHandler = {
   outgoingRefMappers: [
     {
       source: {
-        path: 'spec.volumeName',
+        path: ['spec', 'volumeName'],
       },
       target: {
         kind: 'PersistentVolume',
-        path: 'metadata.name',
+        path: ['metadata', 'name'],
       },
     },
   ],

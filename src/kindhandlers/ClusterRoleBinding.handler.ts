@@ -14,11 +14,11 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
   outgoingRefMappers: [
     {
       source: {
-        path: 'roleRef.name',
+        path: ['roleRef', 'name'],
       },
       target: {
         kind: 'ClusterRole',
-        path: 'metadata.name',
+        path: ['metadata', 'name'],
       },
     },
   ],

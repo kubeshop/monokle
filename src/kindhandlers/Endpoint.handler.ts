@@ -14,11 +14,11 @@ const EndpointHandler: ResourceKindHandler = {
   outgoingRefMappers: [
     {
       source: {
-        path: 'metadata.name',
+        path: ['metadata', 'name'],
       },
       target: {
         kind: 'Service',
-        path: 'metadata.name',
+        path: ['metadata', 'name'],
       },
     },
   ],
