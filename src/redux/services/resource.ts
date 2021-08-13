@@ -164,13 +164,11 @@ function createResourceRef(
 export function linkResources(
   source: K8sResource,
   target: K8sResource,
-  sourceRefType: ResourceRefType,
-  targetRefType: ResourceRefType,
   sourceRef: NodeWrapper,
   targetRef?: NodeWrapper
 ) {
-  createResourceRef(source, sourceRefType, sourceRef, target.id);
-  createResourceRef(target, targetRefType, targetRef, source.id);
+  createResourceRef(source, ResourceRefType.Outgoing, sourceRef, target.id);
+  createResourceRef(target, ResourceRefType.Incoming, targetRef, source.id);
 }
 
 /**
@@ -528,8 +526,6 @@ function processRefs(resourceMap: ResourceMapType) {
                 linkResources(
                   targetResource,
                   resource,
-                  refMapper.target.refType,
-                  refMapper.source.refType,
                   new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
                   new NodeWrapper(refNode.scalar, resource.lineCounter)
                 );
@@ -546,7 +542,7 @@ function processRefs(resourceMap: ResourceMapType) {
 
               createResourceRef(
                 targetResource,
-                refMapper.unsatisfiedRefType,
+                ResourceRefType.Unsatisfied,
                 new NodeWrapper(targetNode.scalar, targetResource.lineCounter)
               );
             }
@@ -565,15 +561,13 @@ function processRefs(resourceMap: ResourceMapType) {
               linkResources(
                 targetResource,
                 resource,
-                refMapper.target.refType,
-                refMapper.source.refType,
                 new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
                 new NodeWrapper(refNode.scalar, resource.lineCounter)
               );
             } else {
               createResourceRef(
                 resource,
-                refMapper.unsatisfiedRefType,
+                ResourceRefType.Unsatisfied,
                 new NodeWrapper(refNode.scalar, resource.lineCounter)
               );
             }

@@ -18,13 +18,7 @@ function linkParentKustomization(
 ) {
   getResourcesForPath(fileEntry.filePath, resourceMap).forEach(r => {
     // since the target is a file there is no target refNode
-    linkResources(
-      kustomization,
-      r,
-      ResourceRefType.KustomizationResource,
-      ResourceRefType.KustomizationParent,
-      refNode
-    );
+    linkResources(kustomization, r, refNode);
   });
 }
 
@@ -123,18 +117,14 @@ export function getKustomizationRefs(
   const kustomization = resourceMap[kustomizationId];
   if (kustomization && kustomization.refs) {
     kustomization.refs
-      .filter(
-        r =>
-          r.type === ResourceRefType.KustomizationResource ||
-          (selectParent && r.type === ResourceRefType.KustomizationParent)
-      )
+      .filter(r => r.type === ResourceRefType.Outgoing || (selectParent && r.type === ResourceRefType.Incoming))
       .forEach(r => {
         if (r.targetResourceId) {
           const target = resourceMap[r.targetResourceId];
           if (target) {
             linkedResourceIds.push(r.targetResourceId);
 
-            if (target.kind === 'Kustomization' && r.type === ResourceRefType.KustomizationResource) {
+            if (target.kind === 'Kustomization' && r.type === ResourceRefType.Outgoing) {
               linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.targetResourceId));
             }
           }

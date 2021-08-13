@@ -1,56 +1,15 @@
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 
-const incomingRefs = [
-  ResourceRefType.KustomizationParent,
-  ResourceRefType.ConfigMapRef,
-  ResourceRefType.SelectedPodName,
-  ResourceRefType.SecretRef,
-  ResourceRefType.ServiceAccountRef,
-  ResourceRefType.PersistentVolumeRef,
-  ResourceRefType.PersistentVolumeClaimRef,
-  ResourceRefType.ClusterRoleRef,
-  ResourceRefType.ClusterRoleBindingRef,
-  ResourceRefType.RoleRef,
-  ResourceRefType.ServiceRef,
-];
-
-const outgoingRefs = [
-  ResourceRefType.KustomizationResource,
-  ResourceRefType.ConfigMapConsumer,
-  ResourceRefType.ServicePodSelector,
-  ResourceRefType.SecretConsumer,
-  ResourceRefType.ServiceAccountConsumer,
-  ResourceRefType.PersistentVolumeConsumer,
-  ResourceRefType.PersistentVolumeClaimConsumer,
-  ResourceRefType.ClusterRoleConsumer,
-  ResourceRefType.ClusterRoleBindingConsumer,
-  ResourceRefType.RoleConsumer,
-  ResourceRefType.ServiceConsumer,
-];
-
-const unsatisfiedRefs = [
-  ResourceRefType.UnsatisfiedConfigMap,
-  ResourceRefType.UnsatisfiedClusterRole,
-  ResourceRefType.UnsatisfiedClusterRoleBinding,
-  ResourceRefType.UnsatisfiedRole,
-  ResourceRefType.UnsatisfiedSelector,
-  ResourceRefType.UnsatisfiedSecret,
-  ResourceRefType.UnsatisfiedService,
-  ResourceRefType.UnsatisfiedServiceAccount,
-  ResourceRefType.UnsatisfiedPersistentVolume,
-  ResourceRefType.UnsatisfiedPersistentVolumeClaim,
-];
-
-export function isIncomingRef(e: ResourceRefType) {
-  return incomingRefs.includes(e);
+export function isIncomingRef(refType: ResourceRefType) {
+  return refType === ResourceRefType.Incoming;
 }
 
-export function isOutgoingRef(e: ResourceRefType) {
-  return outgoingRefs.includes(e);
+export function isOutgoingRef(refType: ResourceRefType) {
+  return refType === ResourceRefType.Outgoing;
 }
 
-export function isUnsatisfiedRef(e: ResourceRefType) {
-  return unsatisfiedRefs.includes(e);
+export function isUnsatisfiedRef(refType: ResourceRefType) {
+  return refType === ResourceRefType.Unsatisfied;
 }
 
 export function hasIncomingRefs(resource: K8sResource) {
@@ -73,42 +32,33 @@ export type RefMapper = {
   source: {
     kind: string;
     path: string;
-    refType: ResourceRefType;
   };
   target: {
     kind: string;
     path: string;
-    refType: ResourceRefType;
   };
   matchPairs?: boolean;
-  unsatisfiedRefType: ResourceRefType;
 };
 
 const ConfigMapTarget = {
   target: {
     kind: 'ConfigMap',
     path: 'metadata.name',
-    refType: ResourceRefType.ConfigMapRef,
   },
-  unsatisfiedRefType: ResourceRefType.UnsatisfiedConfigMap,
 };
 
 const SecretTarget = {
   target: {
     kind: 'Secret',
     path: 'metadata.name',
-    refType: ResourceRefType.ConfigMapRef,
   },
-  unsatisfiedRefType: ResourceRefType.UnsatisfiedSecret,
 };
 
 const ServiceAccountTarget = {
   target: {
     kind: 'ServiceAccount',
     path: 'metadata.name',
-    refType: ResourceRefType.ServiceAccountRef,
   },
-  unsatisfiedRefType: ResourceRefType.UnsatisfiedServiceAccount,
 };
 
 const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
@@ -117,7 +67,6 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
       source: {
         kind: sourceKind,
         path: 'configMapRef.name',
-        refType: ResourceRefType.ConfigMapConsumer,
       },
       ...ConfigMapTarget,
     },
@@ -125,7 +74,6 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
       source: {
         kind: sourceKind,
         path: 'configMapKeyRef.name',
-        refType: ResourceRefType.ConfigMapConsumer,
       },
       ...ConfigMapTarget,
     },
@@ -133,7 +81,6 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
       source: {
         kind: sourceKind,
         path: 'volumes.configMap.name',
-        refType: ResourceRefType.ConfigMapConsumer,
       },
       ...ConfigMapTarget,
     },
@@ -141,7 +88,6 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
       source: {
         kind: sourceKind,
         path: 'volumes.secret.secretName',
-        refType: ResourceRefType.SecretConsumer,
       },
       ...SecretTarget,
     },
@@ -149,7 +95,6 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
       source: {
         kind: sourceKind,
         path: 'secretKeyRef.name',
-        refType: ResourceRefType.SecretConsumer,
       },
       ...SecretTarget,
     },
@@ -157,7 +102,6 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
       source: {
         kind: sourceKind,
         path: 'imagePullSecrets',
-        refType: ResourceRefType.SecretConsumer,
       },
       ...SecretTarget,
     },
@@ -165,7 +109,6 @@ const createCommonRefMappers = (sourceKind: string): RefMapper[] => {
       source: {
         kind: sourceKind,
         path: 'serviceAccountName',
-        refType: ResourceRefType.ServiceAccountConsumer,
       },
       ...ServiceAccountTarget,
     },
@@ -179,14 +122,11 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       source: {
         kind: 'ClusterRoleBinding',
         path: 'roleRef.name',
-        refType: ResourceRefType.ClusterRoleConsumer,
       },
       target: {
         kind: 'ClusterRole',
         path: 'metadata.name',
-        refType: ResourceRefType.ClusterRoleRef,
       },
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedClusterRole,
     },
   ],
   DaemonSet: createCommonRefMappers('DaemonSet'),
@@ -196,15 +136,12 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       source: {
         kind: 'Deployment',
         path: 'spec.template.metadata.labels',
-        refType: ResourceRefType.SelectedPodName,
       },
       target: {
         kind: 'Service',
         path: 'spec.selector',
-        refType: ResourceRefType.ServicePodSelector,
       },
       matchPairs: true,
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedSelector,
     },
   ],
   Endpoint: [
@@ -212,14 +149,11 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       source: {
         kind: 'Endpoint',
         path: 'metadata.name',
-        refType: ResourceRefType.ServiceConsumer,
       },
       target: {
         kind: 'Service',
         path: 'metadata.name',
-        refType: ResourceRefType.ServiceRef,
       },
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedService,
     },
   ],
   Ingress: [
@@ -227,14 +161,11 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       source: {
         kind: 'Ingress',
         path: 'backend.service.name',
-        refType: ResourceRefType.ServiceConsumer,
       },
       target: {
         kind: 'Service',
         path: 'metadata.name',
-        refType: ResourceRefType.ServiceRef,
       },
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedService,
     },
   ],
   Job: createCommonRefMappers('Job'),
@@ -243,10 +174,8 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       source: {
         kind: 'PersistentVolume',
         path: 'spec.claimRef.name',
-        refType: ResourceRefType.PersistentVolumeClaimConsumer,
       },
-      target: {kind: 'PersistentVolumeClaim', path: 'metadata.name', refType: ResourceRefType.PersistentVolumeClaimRef},
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedPersistentVolumeClaim,
+      target: {kind: 'PersistentVolumeClaim', path: 'metadata.name'},
     },
   ],
   PersistentVolumeClaim: [
@@ -254,14 +183,11 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       source: {
         kind: 'PersistentVolumeClaim',
         path: 'spec.volumeName',
-        refType: ResourceRefType.PersistentVolumeConsumer,
       },
       target: {
         kind: 'PersistentVolume',
         path: 'metadata.name',
-        refType: ResourceRefType.PersistentVolumeRef,
       },
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedPersistentVolume,
     },
   ],
   Pod: createCommonRefMappers('Pod'),
@@ -272,27 +198,21 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       source: {
         kind: 'RoleBinding',
         path: 'roleRef.name',
-        refType: ResourceRefType.ClusterRoleBindingConsumer,
       },
       target: {
         kind: 'ClusterRoleBinding',
         path: 'metadata.name',
-        refType: ResourceRefType.ClusterRoleBindingRef,
       },
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedClusterRoleBinding,
     },
     {
       source: {
         kind: 'RoleBinding',
         path: 'roleRef.name',
-        refType: ResourceRefType.RoleConsumer,
       },
       target: {
         kind: 'Role',
         path: 'metadata.name',
-        refType: ResourceRefType.RoleRef,
       },
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedRole,
     },
   ],
   Secret: [
@@ -300,17 +220,14 @@ export const RefMappersByResourceKind: Record<string, RefMapper[]> = {
       source: {
         kind: 'Secret',
         path: 'metadata.annotations.kubernetes.io/service-account.name',
-        refType: ResourceRefType.ServiceAccountConsumer,
       },
-      target: {kind: 'ServiceAccount', path: 'metadata.name', refType: ResourceRefType.ServiceAccountRef},
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedServiceAccount,
+      target: {kind: 'ServiceAccount', path: 'metadata.name'},
     },
   ],
   ServiceAccount: [
     {
-      source: {kind: 'ServiceAccount', path: 'secrets', refType: ResourceRefType.SecretConsumer},
-      target: {kind: 'Secret', path: 'metadata.name', refType: ResourceRefType.SecretRef},
-      unsatisfiedRefType: ResourceRefType.UnsatisfiedSecret,
+      source: {kind: 'ServiceAccount', path: 'secrets'},
+      target: {kind: 'Secret', path: 'metadata.name'},
     },
   ],
   StatefulSet: createCommonRefMappers('StatefulSet'),
