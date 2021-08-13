@@ -11,9 +11,9 @@ import {getKustomizationRefs, isKustomizationResource} from '@redux/services/kus
 
 export function clearResourceSelections(resourceMap: ResourceMapType, excludeItemId?: string) {
   Object.values(resourceMap).forEach(e => {
-    e.highlight = false;
+    e.isHighlighted = false;
     if (!excludeItemId || e.id !== excludeItemId) {
-      e.selected = false;
+      e.isSelected = false;
     }
   });
 }
@@ -28,7 +28,7 @@ export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: Re
     .filter(child => child)
     .forEach(child => {
       getResourcesForPath(child.filePath, resourceMap).forEach(e => {
-        e.highlight = true;
+        e.isHighlighted = true;
       });
       if (child.children) {
         highlightChildrenResources(child, resourceMap, fileMap);
@@ -44,24 +44,24 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
   clearResourceSelections(state.resourceMap, resource.id);
 
   state.selectedPath = undefined;
-  state.selectedResource = undefined;
+  state.selectedResourceId = undefined;
 
   if (resource) {
-    resource.selected = true;
-    state.selectedResource = resource.id;
+    resource.isSelected = true;
+    state.selectedResourceId = resource.id;
 
     if (isKustomizationResource(resource)) {
       getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {
-        state.resourceMap[e].highlight = true;
+        state.resourceMap[e].isHighlighted = true;
       });
     } else {
       getLinkedResources(resource).forEach(e => {
-        state.resourceMap[e].highlight = true;
+        state.resourceMap[e].isHighlighted = true;
       });
     }
 
     Object.values(state.helmValuesMap).forEach(valuesFile => {
-      valuesFile.selected = false;
+      valuesFile.isSelected = false;
     });
   }
 }

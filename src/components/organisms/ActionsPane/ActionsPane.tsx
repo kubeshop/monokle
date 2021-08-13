@@ -84,13 +84,13 @@ export function applyWithConfirm(
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
 
-  const selectedResourceId = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const dispatch = useAppDispatch();
-  const kubeconfig = useAppSelector(state => state.config.kubeconfig);
+  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const [key, setKey] = useState('source');

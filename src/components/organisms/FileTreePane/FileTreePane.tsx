@@ -19,7 +19,7 @@ import {stopPreview} from '@redux/services/preview';
 import {getResourcesForPath, getChildFilePath} from '@redux/services/fileEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
-import {inPreviewMode} from '@redux/selectors';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -56,7 +56,7 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
     title: (
       <NodeContainer>
         <NodeTitleContainer>
-          <span className={fileEntry.excluded ? 'excluded-file-entry-name' : 'file-entry-name'}>{fileEntry.name}</span>
+          <span className={fileEntry.isExcluded ? 'excluded-file-entry-name' : 'file-entry-name'}>{fileEntry.name}</span>
           {resources.length > 0 ? (
             <StyledNumberOfResources className="file-entry-nr-of-resources" type="secondary">
               {resources.length}
@@ -238,12 +238,12 @@ const FileTreePane = () => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const dispatch = useAppDispatch();
-  const previewMode = useSelector(inPreviewMode);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
@@ -317,14 +317,14 @@ const FileTreePane = () => {
   }
 
   useEffect(() => {
-    if (selectedResource && tree) {
-      const resource = resourceMap[selectedResource];
+    if (selectedResourceId && tree) {
+      const resource = resourceMap[selectedResourceId];
       if (resource) {
         const filePath = resource.filePath;
         highlightFilePath(filePath);
       }
     }
-  }, [selectedResource]);
+  }, [selectedResourceId]);
 
   useEffect(() => {
     // removes any highlight when a file is selected
@@ -339,7 +339,7 @@ const FileTreePane = () => {
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
     if (info.node.key) {
-      if (previewMode) {
+      if (isInPreviewMode) {
         stopPreview(dispatch);
       }
       dispatch(setSelectingFile(true));
@@ -419,7 +419,7 @@ const FileTreePane = () => {
             // @ts-ignore
             return node.highlight;
           }}
-          disabled={previewMode || previewLoader.isLoading}
+          disabled={isInPreviewMode || previewLoader.isLoading}
           showLine
           showIcon={false}
         />

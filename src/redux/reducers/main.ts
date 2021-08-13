@@ -125,7 +125,7 @@ export const mainSlice = createSlice({
             const resources = extractK8sResources(action.payload.content, filePath.substring(rootFolder.length));
             Object.values(resources).forEach(r => {
               state.resourceMap[r.id] = r;
-              r.highlight = true;
+              r.isHighlighted = true;
             });
 
             reprocessResources([], state.resourceMap, state.fileMap);
@@ -150,7 +150,7 @@ export const mainSlice = createSlice({
           resource.content = parseDocument(value).toJS();
           recalculateResourceRanges(resource, state);
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
-          resource.selected = false;
+          resource.isSelected = false;
           updateSelectionAndHighlights(state, resource);
         }
       } catch (e) {
@@ -173,10 +173,10 @@ export const mainSlice = createSlice({
     selectHelmValuesFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let payload = action.payload;
       Object.values(state.helmValuesMap).forEach(values => {
-        values.selected = values.id === payload;
+        values.isSelected = values.id === payload;
       });
 
-      state.selectedValuesFile = state.helmValuesMap[payload].selected ? payload : undefined;
+      state.selectedValuesFileId = state.helmValuesMap[payload].isSelected ? payload : undefined;
       selectFilePath(state.helmValuesMap[payload].filePath, state);
     },
     /**
@@ -251,14 +251,14 @@ export const mainSlice = createSlice({
       state.helmValuesMap = action.payload.helmValuesMap;
       state.previewLoader.isLoading = false;
       state.previewLoader.targetResourceId = undefined;
-      state.selectedResource = undefined;
+      state.selectedResourceId = undefined;
       state.selectedPath = undefined;
-      state.previewResource = undefined;
+      state.previewResourceId = undefined;
       state.previewType = undefined;
     });
 
     builder.addCase(performResourceDiff.fulfilled, (state, action) => {
-      state.diffResource = action.payload.diffResourceId;
+      state.diffResourceId = action.payload.diffResourceId;
       state.diffContent = action.payload.diffContent;
     });
   },
@@ -269,26 +269,26 @@ export const mainSlice = createSlice({
  */
 
 function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) {
-  state.previewResource = undefined;
-  state.previewValuesFile = undefined;
+  state.previewResourceId = undefined;
+  state.previewValuesFileId = undefined;
 
   if (payload.previewResourceId) {
     if (state.previewType === 'kustomization') {
       if (state.resourceMap[payload.previewResourceId]) {
-        state.previewResource = payload.previewResourceId;
+        state.previewResourceId = payload.previewResourceId;
       } else {
         log.error(`Unknown preview id: ${payload.previewResourceId}`);
       }
     }
     if (state.previewType === 'helm') {
       if (state.helmValuesMap[payload.previewResourceId]) {
-        state.previewValuesFile = payload.previewResourceId;
+        state.previewValuesFileId = payload.previewResourceId;
       } else {
         log.error(`Unknown preview id: ${payload.previewResourceId}`);
       }
     }
     if (state.previewType === 'cluster') {
-      state.previewResource = payload.previewResourceId;
+      state.previewResourceId = payload.previewResourceId;
     }
   }
 
@@ -315,7 +315,7 @@ function selectFilePath(filePath: string, state: AppState) {
   if (entries.length > 0) {
     const parent = entries[entries.length - 1];
     getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
-      r.highlight = true;
+      r.isHighlighted = true;
     });
 
     if (parent.children) {
@@ -323,11 +323,11 @@ function selectFilePath(filePath: string, state: AppState) {
     }
 
     Object.values(state.helmValuesMap).forEach(valuesFile => {
-      valuesFile.selected = valuesFile.filePath === filePath;
+      valuesFile.isSelected = valuesFile.filePath === filePath;
     });
   }
 
-  state.selectedResource = undefined;
+  state.selectedResourceId = undefined;
   state.selectedPath = filePath;
 }
 

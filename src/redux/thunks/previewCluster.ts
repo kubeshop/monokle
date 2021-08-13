@@ -20,7 +20,7 @@ export const previewCluster = createAsyncThunk<
   }
 >('main/previewCluster', async (configPath, thunkAPI) => {
   const state: AppState = thunkAPI.getState().main;
-  if (state.previewResource !== configPath) {
+  if (state.previewResourceId !== configPath) {
     try {
       const kc = new k8s.KubeConfig();
       kc.loadFromFile(configPath);

@@ -7,7 +7,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {MonoSectionTitle} from '@components/atoms';
 import {K8sResource} from '@models/k8sresource';
 import {NavigatorSection, NavigatorSubSection} from '@models/navigator';
-import {selectActiveResources} from '@redux/selectors';
+import {activeResourcesSelector} from '@redux/selectors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {getNamespaces} from '@redux/services/resource';
 
@@ -24,9 +24,9 @@ const ResourcesSection = () => {
   const dispatch = useAppDispatch();
   const appConfig = useAppSelector(state => state.config);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const previewResource = useAppSelector(state => state.main.previewResource);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
-  const resources = useSelector(selectActiveResources);
+  const previewResource = useAppSelector(state => state.main.previewResourceId);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const activeResources = useSelector(activeResourcesSelector);
 
   const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
   const [namespaces, setNamespaces] = useState<string[]>([ALL_NAMESPACES]);
@@ -85,15 +85,15 @@ const ResourcesSection = () => {
 
   function shouldSectionBeVisible(section: NavigatorSection) {
     return (
-      resources.length === 0 ||
-      (resources.length > 0 && section.subsections.some(subsection => shouldSubsectionBeVisible(subsection)))
+      activeResources.length === 0 ||
+      (activeResources.length > 0 && section.subsections.some(subsection => shouldSubsectionBeVisible(subsection)))
     );
   }
 
   function shouldSubsectionBeVisible(subsection: NavigatorSubSection) {
     return (
-      resources.length === 0 ||
-      (resources.length > 0 && resources.some(resource => resource.kind === subsection.kindSelector))
+      activeResources.length === 0 ||
+      (activeResources.length > 0 && activeResources.some(resource => resource.kind === subsection.kindSelector))
     );
   }
 
@@ -124,15 +124,15 @@ const ResourcesSection = () => {
       })
     );
     setExpandedSubsectionsBySection(updatedExpandedSubsectionsBySection);
-  }, [resourceMap, selectedResource]);
+  }, [resourceMap, selectedResourceId]);
 
   function shouldSubsectionBeExpanded(subsection: NavigatorSubSection) {
     return (
-      resources.length === 0 ||
-      (resources.length > 0 &&
-        resources.some(
+      activeResources.length === 0 ||
+      (activeResources.length > 0 &&
+        activeResources.some(
           resource =>
-            resource.kind === subsection.kindSelector && (resource.highlight || selectedResource === resource.id)
+            resource.kind === subsection.kindSelector && (resource.isHighlighted || selectedResourceId === resource.id)
         ))
     );
   }
@@ -170,7 +170,7 @@ const ResourcesSection = () => {
                             section={section}
                             shouldResourceBeVisible={shouldResourceBeVisible}
                             shouldSubsectionBeVisible={shouldSubsectionBeVisible}
-                            resources={resources}
+                            resources={activeResources}
                             selectResource={selectResource}
                           />
                         </div>

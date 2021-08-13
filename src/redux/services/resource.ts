@@ -142,14 +142,14 @@ function createResourceRef(
     // make sure we don't duplicate
     if (
       !resource.refs.some(
-        ref => ref.refType === refType && ref.refName === refName && ref.targetResource === targetResource
+        ref => ref.type === refType && ref.name === refName && ref.targetResourceId === targetResource
       )
     ) {
       resource.refs.push({
-        refType,
-        refName,
-        refPos: refNode?.getNodePosition(),
-        targetResource,
+        type: refType,
+        name: refName,
+        position: refNode?.getNodePosition(),
+        targetResourceId: targetResource,
       });
     }
   } else {
@@ -387,8 +387,8 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             name: createResourceName(relativePath, content),
             filePath: relativePath,
             id: uuidv4(),
-            highlight: false,
-            selected: false,
+            isHighlighted: false,
+            isSelected: false,
             kind: content.kind,
             version: content.apiVersion,
             content,
@@ -426,10 +426,10 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 export function getLinkedResources(resource: K8sResource) {
   const linkedResourceIds: string[] = [];
   resource.refs
-    ?.filter(ref => !isUnsatisfiedRef(ref.refType))
+    ?.filter(ref => !isUnsatisfiedRef(ref.type))
     .forEach(ref => {
-      if (ref.targetResource) {
-        linkedResourceIds.push(ref.targetResource);
+      if (ref.targetResourceId) {
+        linkedResourceIds.push(ref.targetResourceId);
       }
     });
 
@@ -589,16 +589,17 @@ function processRefs(resourceMap: ResourceMapType) {
 
     const findSatisfiedRefOnPosition = (refPos: RefPosition) => {
       return resource.refs?.find(
-        ref => !isUnsatisfiedRef(ref.refType) && ref.refPos?.column === refPos.column && ref.refPos.line === refPos.line
+        ref =>
+          !isUnsatisfiedRef(ref.type) && ref.position?.column === refPos.column && ref.position.line === refPos.line
       );
     };
 
     resource.refs?.forEach(ref => {
       let shouldPush = true;
 
-      if (isUnsatisfiedRef(ref.refType)) {
-        if (ref.refPos) {
-          const foundSatisfiedRefOnSamePosition = findSatisfiedRefOnPosition(ref.refPos);
+      if (isUnsatisfiedRef(ref.type)) {
+        if (ref.position) {
+          const foundSatisfiedRefOnSamePosition = findSatisfiedRefOnPosition(ref.position);
           if (foundSatisfiedRefOnSamePosition) {
             shouldPush = false;
           }

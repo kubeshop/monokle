@@ -16,15 +16,15 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
   const dispatch = useAppDispatch();
 
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const previewResource = useAppSelector(state => state.main.previewResource);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const previewResource = useAppSelector(state => state.main.previewResourceId);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
   const selectResource = (resourceId: string) => {
     dispatch(selectK8sResource(resourceId));
   };
 
   const selectPreview = (id: string) => {
-    if (id !== selectedResource) {
+    if (id !== selectedResourceId) {
       dispatch(selectK8sResource(id));
     }
     if (id !== previewResource) {
@@ -37,9 +37,9 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
   return (
     <>
       {kustomizations.map((k: K8sResource) => {
-        const isSelected = k.selected || previewResource === k.id;
+        const isSelected = k.isSelected || previewResource === k.id;
         const isDisabled = Boolean(previewResource && previewResource !== k.id);
-        const isHighlighted = k.highlight;
+        const isHighlighted = k.isHighlighted;
         const buttonActive = previewResource !== undefined && previewResource === k.id;
 
         return (

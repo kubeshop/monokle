@@ -6,7 +6,7 @@ import {LoadingOutlined} from '@ant-design/icons';
 import Colors, {FontColors} from '@styles/Colors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {useSelector} from 'react-redux';
-import {selectHelmValues} from '@redux/selectors';
+import {helmValuesSelector} from '@redux/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -117,9 +117,8 @@ const TreeContainer = styled.div`
 `;
 
 const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
-  const helmValues = useSelector(selectHelmValues);
-  const previewValuesFile = useAppSelector(state => state.main.previewValuesFile);
-  const selectedValuesFile = useAppSelector(state => state.main.selectedValuesFile);
+  const helmValues = useSelector(helmValuesSelector);
+  const previewValuesFile = useAppSelector(state => state.main.previewValuesFileId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const dispatch = useAppDispatch();
   const scrollContainer = React.useRef(null);
@@ -147,7 +146,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
   );
 
   React.useEffect(() => {
-    if (selectedPath && Object.values(helmValues).some(helm => helm.selected)) {
+    if (selectedPath && Object.values(helmValues).some(helm => helm.isSelected)) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
@@ -165,14 +164,14 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
         </ItemRow>
       </ChartContainer>
       <TreeContainer className={chartClassName}>
-        {helmChart.valueFiles
+        {helmChart.valueFileIds
           .map(v => helmValues[v])
           .map((valuesFile: HelmValuesFile) => {
             const previewButtonActive = previewValuesFile !== undefined && previewValuesFile === valuesFile.id;
             const isDisabled = Boolean(previewValuesFile && previewValuesFile !== valuesFile.id);
 
             let valuesClassName = `helmvalues-row\
-              ${valuesFile.selected ? ` helmvalues-row-selected` : ''}\
+              ${valuesFile.isSelected ? ` helmvalues-row-selected` : ''}\
               ${isDisabled ? ` helmvalues-row-disabled` : ''}`;
 
             return (
@@ -194,7 +193,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
                         mouseEnterDelay={TOOLTIP_DELAY}
                         title={previewButtonActive ? ExitHelmPreviewTooltip : HelmPreviewTooltip}
                       >
-                        <PreviewSpan isSelected={valuesFile.selected} onClick={() => onClickPreview(valuesFile.id)}>
+                        <PreviewSpan isSelected={valuesFile.isSelected} onClick={() => onClickPreview(valuesFile.id)}>
                           {previewButtonActive ? 'Exit' : 'Preview'}
                         </PreviewSpan>
                       </Tooltip>

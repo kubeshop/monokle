@@ -22,13 +22,13 @@ export const previewHelmValuesFile = createAsyncThunk<
 >('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
-  const kubeconfig = thunkAPI.getState().config.kubeconfig;
-  if (state.previewValuesFile !== valuesFileId) {
+  const kubeconfig = thunkAPI.getState().config.kubeconfigPath;
+  if (state.previewValuesFileId !== valuesFileId) {
     const valuesFile = state.helmValuesMap[valuesFileId];
     if (valuesFile && valuesFile.filePath) {
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
       const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
-      const chart = state.helmChartMap[valuesFile.helmChart];
+      const chart = state.helmChartMap[valuesFile.helmChartId];
 
       // sanity check
       if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {

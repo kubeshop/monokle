@@ -155,12 +155,12 @@ export function applyForResource(
     return {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables};
   }
 
-  const unsatisfiedRefs = refs?.filter(r => isUnsatisfiedRef(r.refType));
+  const unsatisfiedRefs = refs?.filter(r => isUnsatisfiedRef(r.type));
   const listOfOutgoingRefsByEqualPos: {position: RefPosition; outgoingRefs: ResourceRef[]}[] = [];
 
   refs.forEach(ref => {
-    const refPos = ref.refPos;
-    if (refPos && isOutgoingRef(ref.refType)) {
+    const refPos = ref.position;
+    if (refPos && isOutgoingRef(ref.type)) {
       const refsByEqualPosIndex = listOfOutgoingRefsByEqualPos.findIndex(e => areRefPosEqual(e.position, refPos));
       if (refsByEqualPosIndex === -1) {
         listOfOutgoingRefsByEqualPos.push({
@@ -174,7 +174,7 @@ export function applyForResource(
   });
 
   unsatisfiedRefs.forEach(ref => {
-    const refPos = ref.refPos;
+    const refPos = ref.position;
     if (refPos) {
       const inlineRange = new monaco.Range(refPos.line, refPos.column, refPos.line, refPos.column + refPos.length);
       const glyphDecoration = createGlyphDecoration(refPos.line, GlyphDecorationTypes.UnsatisfiedRef);
@@ -201,18 +201,18 @@ export function applyForResource(
 
     const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
     outgoingRefs.forEach(outgoingRef => {
-      if (!outgoingRef.targetResource) {
+      if (!outgoingRef.targetResourceId) {
         return;
       }
-      const outgoingRefResource = resourceMap[outgoingRef.targetResource];
+      const outgoingRefResource = resourceMap[outgoingRef.targetResourceId];
       if (!outgoingRefResource) {
         return;
       }
       const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
         `${outgoingRefResource.kind}: ${outgoingRefResource.name}`,
         () => {
-          if (outgoingRef.targetResource) {
-            selectResource(outgoingRef.targetResource);
+          if (outgoingRef.targetResourceId) {
+            selectResource(outgoingRef.targetResourceId);
           }
         }
       );
@@ -231,8 +231,8 @@ export function applyForResource(
     if (outgoingRefs.length === 1) {
       const outgoingRef = outgoingRefs[0];
       const linkDisposable = createLinkProvider(inlineRange, () => {
-        if (outgoingRef.targetResource) {
-          selectResource(outgoingRef.targetResource);
+        if (outgoingRef.targetResourceId) {
+          selectResource(outgoingRef.targetResourceId);
         }
       });
       newLinkDisposables.push(linkDisposable);

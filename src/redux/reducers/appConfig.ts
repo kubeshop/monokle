@@ -102,10 +102,10 @@ export const configSlice = createSlice({
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
     setKubeconfig: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      state.kubeconfig = action.payload;
+      state.kubeconfigPath = action.payload;
     },
     setStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      state.startupModalVisible = action.payload;
+      state.isStartupModalVisible = action.payload;
     },
     setScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       state.scanExcludes = action.payload;
@@ -128,7 +128,7 @@ export const configSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(initKubeconfig.fulfilled, (state, action) => {
-      state.kubeconfig = action.payload.kubeconfig;
+      state.kubeconfigPath = action.payload.kubeconfig;
     });
   },
 });

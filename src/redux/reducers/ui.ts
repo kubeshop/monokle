@@ -8,7 +8,7 @@ export const uiSlice = createSlice({
   initialState: initialState.ui,
   reducers: {
     toggleSettings: (state: Draft<UiState>) => {
-      state.settingsOpened = !state.settingsOpened;
+      state.isSettingsOpen = !state.isSettingsOpen;
     },
     toggleLeftMenu: (state: Draft<UiState>) => {
       state.leftMenu.isActive = !state.leftMenu.isActive;

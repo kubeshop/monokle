@@ -6,7 +6,7 @@ interface HelmChart {
   id: string;
   filePath: string;
   name: string;
-  valueFiles: string[]; // ids of contained Helm value files
+  valueFileIds: string[]; // ids of contained Helm value files
 }
 
 /**
@@ -17,8 +17,8 @@ interface HelmValuesFile {
   id: string;
   filePath: string;
   name: string;
-  selected: boolean;
-  helmChart: string; // the id of the containing helm chart
+  isSelected: boolean;
+  helmChartId: string; // the id of the containing helm chart
 }
 
 export type {HelmChart, HelmValuesFile};

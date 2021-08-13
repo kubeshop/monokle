@@ -48,7 +48,7 @@ const StyledSelect = styled(Select)`
 
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
-  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.settingsOpened));
+  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const appConfig = useAppSelector(state => state.config);
 
@@ -106,7 +106,7 @@ const SettingsDrawer = () => {
       <StyledDiv>
         <StyledSpan>KUBECONFIG</StyledSpan>
         <Tooltip title={KubeconfigPathTooltip}>
-          <Input value={appConfig.kubeconfig} />
+          <Input value={appConfig.kubeconfigPath} />
         </Tooltip>
         <StyledButton onClick={openFileSelect}>Browse</StyledButton>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />

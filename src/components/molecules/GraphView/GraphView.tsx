@@ -9,7 +9,7 @@ import {useMeasure} from 'react-use';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {selectK8sResource} from '@redux/reducers/main';
-import {selectActiveResources} from '@redux/selectors';
+import {activeResourcesSelector} from '@redux/selectors';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 import Sidebar from './Sidebar';
 
@@ -21,15 +21,15 @@ function mapResourceToElement(resource: K8sResource): Node {
       wasSelectedInGraphView: false,
     },
     position: {x: 0, y: 0},
-    style: {background: resource.selected ? 'lighblue' : resource.highlight ? 'lightgreen' : 'white'},
+    style: {background: resource.isSelected ? 'lighblue' : resource.isHighlighted ? 'lightgreen' : 'white'},
   };
 }
 
 function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
   return {
-    id: `${source.id}-${ref.targetResource}-${ref.refType}`,
+    id: `${source.id}-${ref.targetResourceId}-${ref.type}`,
     source: source.id,
-    target: ref.targetResource || ref.refName,
+    target: ref.targetResourceId || ref.name,
     animated: false,
     type: 'smoothstep',
   };
@@ -77,8 +77,8 @@ const GraphView = (props: {editorHeight: string}) => {
   const graphAreaHeight = parseInt(editorHeight, 10) - 150;
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const activeResources = useSelector(selectActiveResources);
-  const previewResource = useAppSelector(state => state.main.previewResource);
+  const activeResources = useSelector(activeResourcesSelector);
+  const previewResource = useAppSelector(state => state.main.previewResourceId);
 
   const dispatch = useAppDispatch();
   const [reactFlow, setReactFlow] = useState();
@@ -95,7 +95,7 @@ const GraphView = (props: {editorHeight: string}) => {
     let data: any[] = [mapResourceToElement(resource)];
     if (resource.refs) {
       const refs = resource.refs
-        .filter(ref => !isUnsatisfiedRef(ref.refType))
+        .filter(ref => !isUnsatisfiedRef(ref.type))
         .map(ref => mapRefToElement(resource, ref));
       data = data.concat(refs);
     }
@@ -119,7 +119,7 @@ const GraphView = (props: {editorHeight: string}) => {
       nds.map(nd => {
         const resource = resourceMap[nd.id];
         if (resource) {
-          nd.style = {background: resource.selected ? 'lightblue' : resource.highlight ? 'lightgreen' : 'white'};
+          nd.style = {background: resource.isSelected ? 'lightblue' : resource.isHighlighted ? 'lightgreen' : 'white'};
         }
         return nd;
       })

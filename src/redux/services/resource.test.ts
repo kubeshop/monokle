@@ -12,8 +12,8 @@ test('get-namespaces', () => {
     name: 'resource name',
     kind: 'ResourceType',
     version: '1.0',
-    highlight: false,
-    selected: false,
+    isHighlighted: false,
+    isSelected: false,
     content: {},
     text: '',
   };

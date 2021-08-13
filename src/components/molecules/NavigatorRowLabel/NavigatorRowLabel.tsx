@@ -103,24 +103,24 @@ const RefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType;
   const {resourceRef, resourceMap, onClick} = props;
 
   const targetName =
-    resourceRef.targetResource && resourceMap[resourceRef.targetResource]
-      ? resourceMap[resourceRef.targetResource].name
-      : resourceRef.refName;
+    resourceRef.targetResourceId && resourceMap[resourceRef.targetResourceId]
+      ? resourceMap[resourceRef.targetResourceId].name
+      : resourceRef.name;
 
   let linkText = targetName;
 
-  if (resourceRef.targetResource) {
-    const resourceKind = resourceMap[resourceRef.targetResource].kind;
+  if (resourceRef.targetResourceId) {
+    const resourceKind = resourceMap[resourceRef.targetResourceId].kind;
     linkText = `${resourceKind}: ${targetName}`;
   }
 
-  if (isOutgoingRef(resourceRef.refType)) {
+  if (isOutgoingRef(resourceRef.type)) {
     return <OutgoingRefLink onClick={onClick} text={linkText} />;
   }
-  if (isIncomingRef(resourceRef.refType)) {
+  if (isIncomingRef(resourceRef.type)) {
     return <IncomingRefLink onClick={onClick} text={linkText} />;
   }
-  if (isUnsatisfiedRef(resourceRef.refType)) {
+  if (isUnsatisfiedRef(resourceRef.type)) {
     return <UnsatisfiedRefLink text={targetName} />;
   }
 
@@ -136,8 +136,8 @@ const PopoverContent = (props: {
   const {children, resourceRefs, resourceMap, selectResource} = props;
 
   const onLinkClick = (ref: ResourceRef) => {
-    if (ref.targetResource) {
-      selectResource(ref.targetResource);
+    if (ref.targetResourceId) {
+      selectResource(ref.targetResourceId);
     }
   };
 
@@ -147,15 +147,15 @@ const PopoverContent = (props: {
       <StyledDivider />
       {resourceRefs
         .sort((a, b) => {
-          if (a.targetResource && b.targetResource) {
-            const resourceA = resourceMap[a.targetResource];
-            const resourceB = resourceMap[b.targetResource];
+          if (a.targetResourceId && b.targetResourceId) {
+            const resourceA = resourceMap[a.targetResourceId];
+            const resourceB = resourceMap[b.targetResourceId];
             return resourceA.kind.localeCompare(resourceB.kind);
           }
           return 0;
         })
         .map(resourceRef => (
-          <StyledRefDiv key={resourceRef.targetResource || resourceRef.refName}>
+          <StyledRefDiv key={resourceRef.targetResourceId || resourceRef.name}>
             <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
           </StyledRefDiv>
         ))}
@@ -177,7 +177,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
 
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResource = useAppSelector(state => state.main.selectedResource);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [resource, setResource] = useState<K8sResource>();
   const scrollContainer = React.useRef(null);
@@ -211,7 +211,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
   // on mount, if this resource is selected, scroll to it (the subsection expanded and rendered this)
   useEffect(() => {
     const isVisible = isScrolledIntoView();
-    if (isSelected && selectedResource && !isVisible) {
+    if (isSelected && selectedResourceId && !isVisible) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
@@ -219,11 +219,11 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
 
   useEffect(() => {
     const isVisible = isScrolledIntoView();
-    if (isSelected && selectedResource && !isVisible) {
+    if (isSelected && selectedResourceId && !isVisible) {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [isSelected, selectedResource]);
+  }, [isSelected, selectedResourceId]);
 
   const selectResource = (resId: string) => {
     dispatch(selectK8sResource(resId));
@@ -237,7 +237,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
           placement="rightTop"
           content={
             <PopoverContent
-              resourceRefs={resource.refs.filter(r => isIncomingRef(r.refType))}
+              resourceRefs={resource.refs.filter(r => isIncomingRef(r.type))}
               resourceMap={resourceMap}
               selectResource={selectResource}
             >
@@ -266,7 +266,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
           mouseEnterDelay={0.5}
           content={
             <PopoverContent
-              resourceRefs={resource.refs.filter(r => isOutgoingRef(r.refType) || isUnsatisfiedRef(r.refType))}
+              resourceRefs={resource.refs.filter(r => isOutgoingRef(r.type) || isUnsatisfiedRef(r.type))}
               resourceMap={resourceMap}
               selectResource={selectResource}
             >
