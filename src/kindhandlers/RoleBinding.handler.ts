@@ -5,8 +5,9 @@ const RoleBindingHandler: ResourceKindHandler = {
   kind: 'RoleBinding',
   apiVersionMatcher: '*',
   description: '',
-  getResourceFromCluster(name: string, namespace: string, kubeconfig: k8s.KubeConfig): Promise<any> {
-    return Promise.resolve();
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
+    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
+    return k8sCoreV1Api.readNamespacedRoleBinding(name, namespace);
   },
   listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]> {
     return Promise.resolve([]);

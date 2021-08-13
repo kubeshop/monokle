@@ -5,8 +5,9 @@ const PersistentVolumeHandler: ResourceKindHandler = {
   kind: 'PersistentVolume',
   apiVersionMatcher: '*',
   description: '',
-  getResourceFromCluster(name: string, namespace: string, kubeconfig: k8s.KubeConfig): Promise<any> {
-    return Promise.resolve();
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string): Promise<any> {
+    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    return k8sCoreV1Api.readPersistentVolume(name);
   },
   listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]> {
     return Promise.resolve([]);

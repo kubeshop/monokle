@@ -39,7 +39,7 @@ interface ResourceKindHandler {
    * Retrieve the specified resource of this type using the provided kubeconfig
    */
 
-  getResourceFromCluster(name: string, namespace: string, kubeconfig: k8s.KubeConfig): Promise<any>;
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any>;
 
   /**
    * Get all resources of this type using the provided kubeconfig
