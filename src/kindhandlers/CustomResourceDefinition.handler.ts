@@ -9,8 +9,10 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
     return k8sCoreV1Api.readCustomResourceDefinition(name);
   },
-  listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]> {
-    return Promise.resolve([]);
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+    const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
+    const response = await k8sExtensionsV1Api.listCustomResourceDefinition();
+    return response.body.items;
   },
 };
 

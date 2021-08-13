@@ -9,8 +9,10 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
     return k8sCoreV1Api.readClusterRoleBinding(name);
   },
-  listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]> {
-    return Promise.resolve([]);
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+    const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
+    const response = await k8sRbacV1Api.listClusterRoleBinding();
+    return response.body.items;
   },
   outgoingRefMappers: [
     {

@@ -10,8 +10,10 @@ const ReplicaSetHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
     return k8sCoreV1Api.readNamespacedReplicaSet(name, namespace, 'true');
   },
-  listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]> {
-    return Promise.resolve([]);
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+    const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    const response = await k8sAppV1Api.listReplicaSetForAllNamespaces();
+    return response.body.items;
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
 };

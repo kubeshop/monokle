@@ -9,8 +9,10 @@ const NetworkPolicyHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     return k8sCoreV1Api.readNamespacedNetworkPolicy(name, namespace);
   },
-  listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]> {
-    return Promise.resolve([]);
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+    const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+    const response = await k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces();
+    return response.body.items;
   },
 };
 

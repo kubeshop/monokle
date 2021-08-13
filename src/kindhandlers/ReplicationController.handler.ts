@@ -10,8 +10,10 @@ const ReplicationControllerHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespacedReplicationController(name, namespace, 'true');
   },
-  listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]> {
-    return Promise.resolve([]);
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    const response = await k8sCoreV1Api.listReplicationControllerForAllNamespaces();
+    return response.body.items;
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
 };
