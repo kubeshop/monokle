@@ -1,6 +1,6 @@
 # Getting Started with Monokle
 
-Monokle is a standalong desktop application, you can either download an (as of yet unsigned) installer 
+Monokle is a standalone desktop application, you can either download an (as of yet unsigned) installer 
 from [releases](https://github.com/kubeshop/monokle/releases) or clone our repo and run as described below!
 
 Note: If you download the unsigned binary, your OS might complain - here's how to fix it on MacOS
