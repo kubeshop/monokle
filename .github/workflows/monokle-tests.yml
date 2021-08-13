@@ -103,6 +103,6 @@ jobs:
           cmd /r dir
           cmd /r dir .\node_modules
 
-      - name: Build
+      - name: Test
         run: |
           npm run test
