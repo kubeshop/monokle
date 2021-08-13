@@ -16,7 +16,7 @@ interface OutgoingRefMapper {
   matchPairs?: boolean;
 }
 
-interface ResourceTypeHandler {
+interface ResourceKindHandler {
   /**
    * The kubernetes kind of this resource
    */
@@ -98,4 +98,4 @@ interface ResourceTypeHandler {
   }[];
 }
 
-export type {ResourceTypeHandler};
+export type {ResourceKindHandler};
