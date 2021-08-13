@@ -18,9 +18,9 @@ const SecretHandler: ResourceKindHandler = {
   outgoingRefMappers: [
     {
       source: {
-        path: ['metadata', 'annotations', 'kubernetes.io/service-account.name'],
+        pathParts: ['metadata', 'annotations', 'kubernetes.io/service-account.name'],
       },
-      target: {kind: 'ServiceAccount', path: ['metadata', 'name']},
+      target: {kind: 'ServiceAccount', pathParts: ['metadata', 'name']},
     },
   ],
 };

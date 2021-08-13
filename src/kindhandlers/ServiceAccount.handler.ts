@@ -17,8 +17,8 @@ const ServiceAccountHandler: ResourceKindHandler = {
   },
   outgoingRefMappers: [
     {
-      source: {path: ['secrets']},
-      target: {kind: 'Secret', path: ['metadata', 'name']},
+      source: {pathParts: ['secrets']},
+      target: {kind: 'Secret', pathParts: ['metadata', 'name']},
     },
   ],
 };

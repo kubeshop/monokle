@@ -18,11 +18,11 @@ const IngressHandler: ResourceKindHandler = {
   outgoingRefMappers: [
     {
       source: {
-        path: ['backend', 'service', 'name'],
+        pathParts: ['backend', 'service', 'name'],
       },
       target: {
         kind: 'Service',
-        path: ['metadata', 'name'],
+        pathParts: ['metadata', 'name'],
       },
     },
   ],

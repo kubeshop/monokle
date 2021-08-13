@@ -18,9 +18,9 @@ const PersistentVolumeHandler: ResourceKindHandler = {
   outgoingRefMappers: [
     {
       source: {
-        path: ['spec', 'claimRef', 'name'],
+        pathParts: ['spec', 'claimRef', 'name'],
       },
-      target: {kind: 'PersistentVolumeClaim', path: ['metadata', 'name']},
+      target: {kind: 'PersistentVolumeClaim', pathParts: ['metadata', 'name']},
     },
   ],
 };

@@ -3,64 +3,64 @@ import {OutgoingRefMapper} from '@models/resourcekindhandler';
 const ConfigMapTarget = {
   target: {
     kind: 'ConfigMap',
-    path: ['metadata', 'name'],
+    pathParts: ['metadata', 'name'],
   },
 };
 
 const SecretTarget = {
   target: {
     kind: 'Secret',
-    path: ['metadata', 'name'],
+    pathParts: ['metadata', 'name'],
   },
 };
 
 const ServiceAccountTarget = {
   target: {
     kind: 'ServiceAccount',
-    path: ['metadata', 'name'],
+    pathParts: ['metadata', 'name'],
   },
 };
 
 export const PodOutgoingRefMappers: OutgoingRefMapper[] = [
   {
     source: {
-      path: ['configMapRef', 'name'],
+      pathParts: ['configMapRef', 'name'],
     },
     ...ConfigMapTarget,
   },
   {
     source: {
-      path: ['configMapKeyRef', 'name'],
+      pathParts: ['configMapKeyRef', 'name'],
     },
     ...ConfigMapTarget,
   },
   {
     source: {
-      path: ['volumes', 'configMap', 'name'],
+      pathParts: ['volumes', 'configMap', 'name'],
     },
     ...ConfigMapTarget,
   },
   {
     source: {
-      path: ['volumes', 'secret', 'secretName'],
+      pathParts: ['volumes', 'secret', 'secretName'],
     },
     ...SecretTarget,
   },
   {
     source: {
-      path: ['secretKeyRef', 'name'],
+      pathParts: ['secretKeyRef', 'name'],
     },
     ...SecretTarget,
   },
   {
     source: {
-      path: ['imagePullSecrets'],
+      pathParts: ['imagePullSecrets'],
     },
     ...SecretTarget,
   },
   {
     source: {
-      path: ['serviceAccountName'],
+      pathParts: ['serviceAccountName'],
     },
     ...ServiceAccountTarget,
   },
