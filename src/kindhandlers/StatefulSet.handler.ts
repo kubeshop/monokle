@@ -5,6 +5,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const StatefulSetHandler: ResourceKindHandler = {
   kind: 'StatefulSet',
   apiVersionMatcher: '*',
+  clusterApiVersion: 'apps/v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);

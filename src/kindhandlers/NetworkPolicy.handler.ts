@@ -4,6 +4,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const NetworkPolicyHandler: ResourceKindHandler = {
   kind: 'NetworkPolicy',
   apiVersionMatcher: '*',
+  clusterApiVersion: 'networking.k8s.io/v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);

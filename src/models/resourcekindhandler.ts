@@ -30,6 +30,12 @@ interface ResourceKindHandler {
   apiVersionMatcher: string;
 
   /**
+   * API version used by cluster preview
+   */
+
+  clusterApiVersion: string;
+
+  /**
    * A user friendly description of this resource type
    */
 

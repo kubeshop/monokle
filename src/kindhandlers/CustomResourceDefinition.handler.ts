@@ -4,6 +4,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const CustomResourceDefinitionHandler: ResourceKindHandler = {
   kind: 'CustomResourceDefinition',
   apiVersionMatcher: '*',
+  clusterApiVersion: 'apiextensions.k8s.io/v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);

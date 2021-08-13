@@ -5,6 +5,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const ReplicationControllerHandler: ResourceKindHandler = {
   kind: 'ReplicationController',
   apiVersionMatcher: '*',
+  clusterApiVersion: 'v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);

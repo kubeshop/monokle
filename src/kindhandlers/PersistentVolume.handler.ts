@@ -4,6 +4,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const PersistentVolumeHandler: ResourceKindHandler = {
   kind: 'PersistentVolume',
   apiVersionMatcher: '*',
+  clusterApiVersion: 'v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);

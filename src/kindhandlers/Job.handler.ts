@@ -5,6 +5,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const JobHandler: ResourceKindHandler = {
   kind: 'Job',
   apiVersionMatcher: '*',
+  clusterApiVersion: 'batch/v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
