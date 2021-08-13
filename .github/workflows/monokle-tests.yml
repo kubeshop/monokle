@@ -1,0 +1,63 @@
+name: monokle-tests
+
+on:
+  push:
+    branches: [steen/housekeeping/build-binaries-windows]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # This workflow contains a single job called "build"
+  build-mac:
+    runs-on: macOS-latest
+
+    steps:
+      # Make sure build is clean and no files from a previous run are re-used.
+      - name: Cleanup files before run
+        run: |
+          rm -rf *
+          rm /Users/runner/.npm/_logs/*.log || true
+        if: ${{ always() }}
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      # Check memory and cpu
+      - name: Verify Runner Resources
+        run: |
+          sysctl -n machdep.cpu.brand_string
+          vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
+
+      - name: Install Tools
+        run: |
+          brew install tree
+
+      - name: Get Node Version
+        run: |
+          cat .nvmrc
+          echo "::set-output name=nodeversion::$(cat .nvmrc)"
+        id: get-node-version
+
+      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.get-node-version.outputs.nodeversion }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          env
+          echo "npm: $(npm --version)"
+          echo "node: $(node --version)"
+          npm install --force
+
+      - name: Verify Dependencies
+        run: |
+          ls -la
+          tree node_modules -L 1
+
+      - name: Build
+        run: |
+          npm run test
