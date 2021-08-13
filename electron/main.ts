@@ -3,8 +3,10 @@ import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import {execSync} from 'child_process';
+
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 
+const {autoUpdater} = require('electron-updater'); // Hacky way to fix for `Conflicting definitions for 'node'` error
 const ElectronStore = require('electron-store');
 
 const userHomeDir = app.getPath('home');
@@ -54,6 +56,14 @@ ipcMain.on('run-helm', (event, args: any) => {
   }
 });
 
+ipcMain.on('app_version', event => {
+  event.sender.send('app_version', {version: app.getVersion()});
+});
+
+// ipcMain.on('restart_app', () => {
+//   autoUpdater.quitAndInstall();
+// });
+
 function createWindow() {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
   const win = new BrowserWindow({
@@ -99,6 +109,18 @@ function createWindow() {
   if (isDev) {
     win.webContents.openDevTools();
   }
+
+  win.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
+
+  autoUpdater.on('update-available', () => {
+    win.webContents.send('update_available');
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    win.webContents.send('update_downloaded');
+  });
 
   return win;
 }
