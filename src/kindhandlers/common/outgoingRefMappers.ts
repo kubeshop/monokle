@@ -1,4 +1,4 @@
-import {OutgoingRefMapper} from '@models/resourcekindhandler';
+import {RefMapper} from '@models/resourcekindhandler';
 
 const ConfigMapTarget = {
   target: {
@@ -21,7 +21,7 @@ const ServiceAccountTarget = {
   },
 };
 
-export const PodOutgoingRefMappers: OutgoingRefMapper[] = [
+export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['configMapRef', 'name'],

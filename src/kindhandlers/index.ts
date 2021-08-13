@@ -1,4 +1,4 @@
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {ResourceKindHandler, RefMapper} from '@models/resourcekindhandler';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -54,4 +54,13 @@ const HandlerByResourceKind = Object.fromEntries(
 
 export const getResourceKindHandler = (resourceKind: string): ResourceKindHandler | undefined => {
   return HandlerByResourceKind[resourceKind];
+};
+
+export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
+  return ResourceKindHandlers.map(
+    resourceKindHandler =>
+      resourceKindHandler.outgoingRefMappers?.filter(
+        outgoingRefMapper => outgoingRefMapper.target.kind === resourceKind
+      ) || []
+  ).flat();
 };

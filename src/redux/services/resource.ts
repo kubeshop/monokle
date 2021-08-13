@@ -9,7 +9,7 @@ import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'ya
 import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {v4 as uuidv4} from 'uuid';
-import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
+import {getResourceKindHandler, getIncomingRefMappers} from '@src/kindhandlers';
 import {traverseDocument} from './manifest-utils';
 
 /**
@@ -447,12 +447,7 @@ export function processResourceRefNodes(resource: K8sResource) {
     return;
   }
   const outgoingRefMappers = resourceKindHandler?.outgoingRefMappers || [];
-  const incomingRefMappers = ResourceKindHandlers.map(
-    otherKindHandler =>
-      otherKindHandler.outgoingRefMappers?.filter(
-        outgoingRefMapper => outgoingRefMapper.target.kind === resource.kind
-      ) || []
-  ).flat();
+  const incomingRefMappers = getIncomingRefMappers(resource.kind);
 
   const refMappers = [...incomingRefMappers, ...outgoingRefMappers];
 

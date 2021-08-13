@@ -5,7 +5,7 @@ interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
 }
 
-interface OutgoingRefMapper {
+interface RefMapper {
   source: {
     pathParts: string[];
   };
@@ -57,7 +57,7 @@ interface ResourceKindHandler {
    * optional outgoing RefMappers to use for resolving refs in resources of this type
    */
 
-  outgoingRefMappers?: OutgoingRefMapper[];
+  outgoingRefMappers?: RefMapper[];
 
   /**
    * The desired navigator section and subsection for this resource type,
@@ -106,4 +106,4 @@ interface ResourceKindHandler {
   }[];
 }
 
-export type {ResourceKindHandler, OutgoingRefMapper, SymbolMatcher};
+export type {ResourceKindHandler, RefMapper, SymbolMatcher};
