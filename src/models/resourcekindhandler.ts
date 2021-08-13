@@ -10,7 +10,7 @@ interface OutgoingRefMapper {
     path: string;
   };
   target: {
-    resourceKind: string;
+    kind: string;
     path: string;
   };
   matchPairs?: boolean;
@@ -51,13 +51,15 @@ interface ResourceKindHandler {
    * optional outgoing RefMappers to use for resolving refs in resources of this type
    */
 
-  outgoingRefMapper?: OutgoingRefMapper[];
+  outgoingRefMappers?: OutgoingRefMapper[];
 
   /**
-   * The desired navigator section and subsection for this resource type
+   * The desired navigator section and subsection for this resource type,
+   * if not specified, the resource will appear in an existing subsection
+   * which has the kindSelector equal to the resource kind
    */
 
-  navigatorPath: [navigatorName: string, sectionName: string, subsectionName: string];
+  navigatorPath?: [navigatorName: string, sectionName: string, subsectionName: string];
 
   /**
    * optional JSON Schema and symbol-matchers to pass to the source editor
@@ -98,4 +100,4 @@ interface ResourceKindHandler {
   }[];
 }
 
-export type {ResourceKindHandler};
+export type {ResourceKindHandler, OutgoingRefMapper, SymbolMatcher};
