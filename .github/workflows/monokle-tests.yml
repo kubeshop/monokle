@@ -60,3 +60,49 @@ jobs:
       - name: Test
         run: |
           npm run test
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      # Make sure build is clean and no files from a previous run are re-used.
+      - name: Cleanup files before run
+        run: |
+          cmd /r dir
+        if: ${{ always() }}
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      - name: Get Node Version
+        run: |
+          Set-PSDebug -Trace 1
+          $filePath = "D:\a\monokle\monokle\.nvmrc"
+          Get-Content $filePath -Raw
+          $content = Get-Content $filePath -Raw
+          echo "::set-output name=nodeversion::$content"
+        id: get-node-version
+
+      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.get-node-version.outputs.nodeversion }}
+          cache: 'npm'
+
+      # Install Dependencies
+      - name: Install Dependencies
+        run: |
+          Set-PSDebug -Trace 1
+          node --version
+          npm --version
+          npm install --force
+
+      - name: Verify Dependencies
+        run: |
+          cmd /r dir
+          cmd /r dir .\node_modules
+
+      - name: Build
+        run: |
+          npm run test
