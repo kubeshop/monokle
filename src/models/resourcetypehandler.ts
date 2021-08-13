@@ -1,7 +1,21 @@
 import * as k8s from '@kubernetes/client-node';
-import {ObjectNavigator} from '@models/navigator';
-import {RefMapper} from '@redux/services/resourceRefs';
-import {SymbolsToResourceKindMatcher} from '@molecules/Monaco/codeIntel';
+import {monaco} from 'react-monaco-editor';
+
+interface SymbolPathMatcher {
+  path?: string[];
+  isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
+}
+
+interface OutgoingRefMapper {
+  source: {
+    path: string;
+  };
+  target: {
+    resourceKind: string;
+    path: string;
+  };
+  matchPairs?: boolean;
+}
 
 interface ResourceTypeHandler {
   /**
@@ -35,25 +49,24 @@ interface ResourceTypeHandler {
   listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]>;
 
   /**
-   * optional RefMappers to use for resolving refs in resources of this type
+   * optional outgoing RefMappers to use for resolving refs in resources of this type
    */
 
-  refMappers?: RefMapper[];
+  outgoingRefMapper?: OutgoingRefMapper[];
 
   /**
-   * The desired navigator section/subsection for this resource type, must contain
-   * only one section with only one subsection
+   * The desired navigator section and subsection for this resource type
    */
 
-  navigator: ObjectNavigator;
+  navigatorPath: [sectionName: string, subsectionName: string];
 
   /**
    * optional JSON Schema and symbol-matchers to pass to the source editor
    */
 
-  sourceEditorOptions: {
+  sourceEditorOptions?: {
     editorSchema?: any;
-    symbolToResourceKindMatchers?: SymbolsToResourceKindMatcher[];
+    symbolPathMatchers?: SymbolPathMatcher[];
   };
 
   /**
