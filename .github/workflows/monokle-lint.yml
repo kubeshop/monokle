@@ -1,4 +1,4 @@
-name: monokle-tests
+name: monokle-lint
 
 on:
   push:
