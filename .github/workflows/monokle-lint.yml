@@ -2,6 +2,7 @@ name: monokle-tests
 
 on:
   push:
+    branches: [steen/housekeeping/build-binaries-windows]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -57,6 +58,6 @@ jobs:
           ls -la
           tree node_modules -L 1
 
-      - name: Test
+      - name: Lint
         run: |
-          npm run test
+          npm run lint
