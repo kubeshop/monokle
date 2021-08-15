@@ -12,7 +12,7 @@ const {autoUpdater} = require('electron-updater'); // Hacky way to fix for `Conf
 
 Object.assign(console, electronLog.functions);
 console.log = electronLog.log;
-autoUpdater.logger = electronLog;
+autoUpdater.logger = console;
 
 const userHomeDir = app.getPath('home');
 
@@ -62,8 +62,6 @@ ipcMain.on('run-helm', (event, args: any) => {
 });
 
 ipcMain.on('app-version', (event, args) => {
-  electronLog.info('app-version-ipcMain');
-  console.log('app-version-ipcMain', event, args);
   event.sender.send('app-version', {version: app.getVersion()});
 });
 
@@ -123,19 +121,16 @@ function createWindow() {
   });
 
   autoUpdater.on('update-available', (info: any) => {
-    autoUpdater.logger.info(`update-available-autoUpdater ${info}`);
-    electronLog.info(`update-available-autoUpdater ${info}`);
+    console.log(`update-available-autoUpdater ${JSON.stringify(info)}`);
     win.webContents.send('update-available');
   });
 
   autoUpdater.on('download-progress', (progressObj: any) => {
-    autoUpdater.logger.info(`download-progress-autoUpdater ${JSON.stringify(progressObj)}`);
-    electronLog.info(`download-progress-autoUpdater ${JSON.stringify(progressObj)}`);
+    console.info(`download-progress-autoUpdater ${JSON.stringify(progressObj)}`);
   });
 
   autoUpdater.on('update-downloaded', (info: any) => {
-    autoUpdater.logger.info(`update-available-autoUpdater ${info}`);
-    electronLog.info(`update-available-autoUpdater ${info}`);
+    console.info(`update-available-autoUpdater ${JSON.stringify(info)}`);
     win.webContents.send('update-downloaded');
   });
 
