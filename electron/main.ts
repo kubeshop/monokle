@@ -6,8 +6,13 @@ import {execSync} from 'child_process';
 
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 
-const {autoUpdater} = require('electron-updater'); // Hacky way to fix for `Conflicting definitions for 'node'` error
+const electronLog = require('electron-log');
 const ElectronStore = require('electron-store');
+const {autoUpdater} = require('electron-updater'); // Hacky way to fix for `Conflicting definitions for 'node'` error
+
+Object.assign(console, electronLog.functions);
+console.log = electronLog.log;
+autoUpdater.logger = electronLog;
 
 const userHomeDir = app.getPath('home');
 
@@ -56,13 +61,16 @@ ipcMain.on('run-helm', (event, args: any) => {
   }
 });
 
-ipcMain.on('app_version', event => {
-  event.sender.send('app_version', {version: app.getVersion()});
+ipcMain.on('app-version', (event, args) => {
+  electronLog.info('app-version-ipcMain');
+  console.log('app-version-ipcMain', event, args);
+  event.sender.send('app-version', {version: app.getVersion()});
 });
 
-// ipcMain.on('restart_app', () => {
-//   autoUpdater.quitAndInstall();
-// });
+ipcMain.on('quit-and-install', (event, args) => {
+  electronLog.info('quit-and-install-ipcMain');
+  // autoUpdater.quitAndInstall();
+});
 
 function createWindow() {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
@@ -114,12 +122,21 @@ function createWindow() {
     autoUpdater.checkForUpdatesAndNotify();
   });
 
-  autoUpdater.on('update-available', () => {
-    win.webContents.send('update_available');
+  autoUpdater.on('update-available', (info: any) => {
+    autoUpdater.logger.info(`update-available-autoUpdater ${info}`);
+    electronLog.info(`update-available-autoUpdater ${info}`);
+    win.webContents.send('update-available');
   });
 
-  autoUpdater.on('update-downloaded', () => {
-    win.webContents.send('update_downloaded');
+  autoUpdater.on('download-progress', (progressObj: any) => {
+    autoUpdater.logger.info(`download-progress-autoUpdater ${JSON.stringify(progressObj)}`);
+    electronLog.info(`download-progress-autoUpdater ${JSON.stringify(progressObj)}`);
+  });
+
+  autoUpdater.on('update-downloaded', (info: any) => {
+    autoUpdater.logger.info(`update-available-autoUpdater ${info}`);
+    electronLog.info(`update-available-autoUpdater ${info}`);
+    win.webContents.send('update-downloaded');
   });
 
   return win;

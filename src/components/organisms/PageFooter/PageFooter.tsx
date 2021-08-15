@@ -20,16 +20,32 @@ const StyledFooter = styled(Footer)`
 const PageFooter = () => {
   const [appVersion, setAppVersion] = useState('');
   const [footerText, setFooterText] = useState('');
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateDownloaded, setUpdateDownloaded] = useState(false);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const rootEntry = fileMap[ROOT_FILE_ENTRY];
 
   // not counting the root
   const nrOfFiles = Object.keys(fileMap).length - 1;
 
-  ipcRenderer.send('app_version');
-  ipcRenderer.on('app_version', (event, {version}) => {
-    ipcRenderer.removeAllListeners('app_version');
+  ipcRenderer.send('app-version');
+  ipcRenderer.once('app-version', (_, {version}) => {
+    console.log('app-version');
     setAppVersion(version);
+  });
+
+  ipcRenderer.once('update-available', () => {
+    console.log('update-available');
+    if (!updateAvailable) {
+      setUpdateAvailable(true);
+    }
+  });
+
+  ipcRenderer.once('update-downloaded', () => {
+    console.log('update-downloaded');
+    if (!updateDownloaded) {
+      setUpdateDownloaded(true);
+    }
   });
 
   useEffect(() => {
@@ -40,6 +56,13 @@ const PageFooter = () => {
       }`
     );
   }, [appVersion]);
+
+  useEffect(() => {
+    if (updateAvailable && updateDownloaded) {
+      console.log('updateAvailable && updateDownloaded');
+      ipcRenderer.send('quit-and-install');
+    }
+  }, [updateAvailable, updateDownloaded]);
 
   return <StyledFooter noborder="true">{footerText}</StyledFooter>;
 };
