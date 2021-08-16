@@ -5,7 +5,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const DeploymentHandler: ResourceKindHandler = {
   kind: 'Deployment',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_WORKLOADS, 'Deployments'],
   clusterApiVersion: 'apps/v1',
   description: '',

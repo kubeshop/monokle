@@ -5,7 +5,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const StatefulSetHandler: ResourceKindHandler = {
   kind: 'StatefulSet',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_WORKLOADS, 'StatefulSets'],
   clusterApiVersion: 'apps/v1',
   description: '',

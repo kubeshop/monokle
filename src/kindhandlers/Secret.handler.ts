@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_CONFIGURATION} from '@constants/navigator';
 
 const SecretHandler: ResourceKindHandler = {
   kind: 'Secret',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_CONFIGURATION, 'Secrets'],
   clusterApiVersion: 'v1',
   description: '',

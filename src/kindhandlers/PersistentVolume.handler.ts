@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_STORAGE} from '@constants/navigator';
 
 const PersistentVolumeHandler: ResourceKindHandler = {
   kind: 'PersistentVolume',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_STORAGE, 'PersistentVolumes'],
   clusterApiVersion: 'v1',
   description: '',

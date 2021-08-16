@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_ACCESS_CONTROL} from '@constants/navigator';
 
 const ClusterRoleHandler: ResourceKindHandler = {
   kind: 'ClusterRole',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_ACCESS_CONTROL, 'ClusterRoles'],
   clusterApiVersion: 'rbac.authorization.k8s.io/v1',
   description: '',
