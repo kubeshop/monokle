@@ -5,7 +5,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const JobHandler: ResourceKindHandler = {
   kind: 'Job',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_WORKLOADS, 'Jobs'],
   clusterApiVersion: 'batch/v1',
   description: '',

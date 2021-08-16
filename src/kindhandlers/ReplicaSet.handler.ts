@@ -5,7 +5,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const ReplicaSetHandler: ResourceKindHandler = {
   kind: 'ReplicaSet',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_WORKLOADS, 'ReplicaSets'],
   clusterApiVersion: 'apps/v1',
   description: '',
