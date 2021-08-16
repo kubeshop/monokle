@@ -1,0 +1,1 @@
+# Applying and Diffing Resources

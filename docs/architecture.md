@@ -28,25 +28,26 @@ See https://www.electron.build/ for more info on electron builder
   
 ## Core objects
 
-- Most logic revolves around [K8sResource](../src/models/k8sresource.ts) objects which "encapsulate" all 
+- Most logic revolves around [K8sResource](https://github.com/kubeshop/monokle/tree/main/src/models/k8sresource.ts) objects which "encapsulate" all 
 data associated with a parsed resource.
-- [FileEntry](../src/models/fileentry.ts) objects correspond to a parsed file - which can contain 0..n K8sResource objects
-- The [AppState](../src/models/appstate.ts) holds the main state of the application (see inline comments), state
-  changes are handled by the [main reducer](../src/redux/reducers/main.ts) and corresponding [thunks](../src/redux/thunks)
+- [FileEntry](https://github.com/kubeshop/monokle/tree/main/src/models/fileentry.ts) objects correspond to a parsed file - which can contain 0..n K8sResource objects
+- The [AppState](https://github.com/kubeshop/monokle/tree/main/src/models/appstate.ts) holds the main state of the application (see inline comments), state
+  changes are handled by the [main reducer](https://github.com/kubeshop/monokle/tree/main/src/redux/reducers/main.ts) 
+  and corresponding [thunks](https://github.com/kubeshop/monokle/tree/main/src/redux/thunks)
 
 ## Main UI Components
 
-The content of most high level [organisms](../src/components/organisms) and 
-[molecules](../src/components/molecules) should be fairly self-explanatory. A few highlights:
+The content of most high level [organisms](https://github.com/kubeshop/monokle/tree/main/src/components/organisms) and 
+[molecules](https://github.com/kubeshop/monokle/tree/main/src/components/molecules) should be fairly self-explanatory. A few highlights:
 
-- the [FileTreePane](../src/components/organisms/FileTreePane/FileTreePane.tsx) renders the selected folder
-- the [NavigatorPane](../src/components/organisms/NavigatorPane/NavigatorPane.tsx) renders the main resource 
+- the [FileTreePane](https://github.com/kubeshop/monokle/tree/main/src/components/organisms/FileTreePane/FileTreePane.tsx) renders the selected folder
+- the [NavigatorPane](https://github.com/kubeshop/monokle/tree/main/src/components/organisms/NavigatorPane/NavigatorPane.tsx) renders the main resource 
   navigator, including sections for Helm Charts and Kustomizations
-- the [Monaco](../src/components/molecules/Monaco/Monaco.tsx) component renders the source editor using the
+- the [Monaco](https://github.com/kubeshop/monokle/tree/main/src/components/molecules/Monaco/Monaco.tsx) component renders the source editor using the
   Monaco editor (same as used by VS Code)
-- the [FormEditor](../src/components/molecules/FormEditor/FormEditor.tsx) component renders nice forms for 
+- the [FormEditor](https://github.com/kubeshop/monokle/tree/main/src/components/molecules/FormEditor/FormEditor.tsx) component renders nice forms for 
   K8sResources using the react-jsonschema-form component (see below), corresponding schames/uiSchemas are 
-  in the [resources/form-schemas](../resources/form-schemas) folder.
+  in the [resources/form-schemas](https://github.com/kubeshop/monokle/tree/main/resources/form-schemas) folder.
 
 ## 3rd party components used
 
