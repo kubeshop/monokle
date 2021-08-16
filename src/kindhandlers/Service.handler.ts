@@ -1,9 +1,11 @@
 import * as k8s from '@kubernetes/client-node';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {NAV_K8S_RESOURCES, SECTION_NETWORK} from '@constants/navigator';
 
 const ServiceHandler: ResourceKindHandler = {
   kind: 'Service',
   apiVersionMatcher: '*',
+  navigatorPath: [NAV_K8S_RESOURCES, SECTION_NETWORK, 'Services'],
   clusterApiVersion: 'v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {

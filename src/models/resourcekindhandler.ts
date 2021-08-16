@@ -65,7 +65,7 @@ interface ResourceKindHandler {
    * which has the kindSelector equal to the resource kind
    */
 
-  navigatorPath?: [navigatorName: string, sectionName: string, subsectionName: string];
+  navigatorPath: [navigatorName: string, sectionName: string, subsectionName: string];
 
   /**
    * optional JSON Schema and symbol-matchers to pass to the source editor
