@@ -21,6 +21,7 @@ export function createFileEntry(fileEntryPath: string) {
     name: fileEntryPath.substr(fileEntryPath.lastIndexOf(path.sep) + 1),
     filePath: fileEntryPath,
     isExcluded: false,
+    isDirty: false,
   };
   return fileEntry;
 }
