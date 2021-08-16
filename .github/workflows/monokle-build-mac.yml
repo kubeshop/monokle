@@ -1,10 +1,14 @@
 name: monokle-build-mac
 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
+    branches:
+      - main
     tags:
-      - '*' # Should only grab tags without /
+      - 'v[0-9].[0-9]+.[0-9]+' # Should only grab tags without /
+  release:
+    types:
+      - prereleased
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -69,7 +73,7 @@ jobs:
 
       - name: Package and Publish
         run: |
-          npm exec -c "electron-builder --publish \"onTag\""
+          npm exec -c "electron-builder --publish \"always\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
