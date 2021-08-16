@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_ACCESS_CONTROL} from '@constants/navigator';
 
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_ACCESS_CONTROL, 'Service Accounts'],
   clusterApiVersion: 'v1',
   description: '',

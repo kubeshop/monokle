@@ -5,7 +5,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const PodHandler: ResourceKindHandler = {
   kind: 'Pod',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_WORKLOADS, 'Pods'],
   clusterApiVersion: 'v1',
   description: '',

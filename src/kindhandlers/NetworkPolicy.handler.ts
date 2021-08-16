@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_NETWORK} from '@constants/navigator';
 
 const NetworkPolicyHandler: ResourceKindHandler = {
   kind: 'NetworkPolicy',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_NETWORK, 'NetworkPolicies'],
   clusterApiVersion: 'networking.k8s.io/v1',
   description: '',

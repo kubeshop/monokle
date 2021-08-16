@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_CUSTOM_RESOURCES} from '@constants/navigator'
 
 const CustomResourceDefinitionHandler: ResourceKindHandler = {
   kind: 'CustomResourceDefinition',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_CUSTOM_RESOURCES, 'Custom Resources'],
   clusterApiVersion: 'apiextensions.k8s.io/v1',
   description: '',

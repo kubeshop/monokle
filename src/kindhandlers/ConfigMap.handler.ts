@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_CONFIGURATION} from '@constants/navigator';
 
 const ConfigMapHandler: ResourceKindHandler = {
   kind: 'ConfigMap',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_CONFIGURATION, 'ConfigMaps'],
   clusterApiVersion: 'v1',
   description: '',

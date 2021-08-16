@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_NETWORK} from '@constants/navigator';
 
 const ServiceHandler: ResourceKindHandler = {
   kind: 'Service',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_NETWORK, 'Services'],
   clusterApiVersion: 'v1',
   description: '',
