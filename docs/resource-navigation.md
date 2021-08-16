@@ -1,1 +1,66 @@
 # Resource Navigation
+
+Resources can be loaded either from the file system or a configured cluster. 
+- Selecting the "Browse" button in the File Explorer prompts for a folder containing resource manifests
+- Selecting "Show Cluster Objects" in the Cluster Explorer loads available resources using the configured kubeconfig  
+  variable, see [Cluster Preview](cluster-preview.md) for more details
+
+Once selecting a folder the File Explorer and Navigators will be populated accordingly: 
+
+
+## File Explorer
+
+- The File Explorer now shows all files parsed in the specified folder
+  - excluded files are greyed out
+  - files containing resource manifests have a number displayed after them, showing the number of 
+    resources found in that file
+
+Selecting a file will highlight contained resources in the Navigator and attempt to scroll them into view. The contents of the 
+file will be shown in the source editor to the right - allowing for direct editing of the file.
+
+## Navigator
+
+The Navigator shows all resources found recursively in the selected folder. Resources are grouped into sections/subsections based
+on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
+any other resourced linked to the selected one:
+
+
+
+
+
+
+## Resource Links
+
+Links between resources are indicated by link icons to the left and right each resource name:
+- Links to the left indicate there are incoming link to the resource, for example a ConfigMap might
+  have an incoming link from a Deployment
+- Links to the right indicate there are outgoing links from the resource, for example a Service might have a
+  selector that selects a Deployment
+
+Hovering over a link icon will show a popup with all links (either incoming or outgoing) allowing you to click on 
+a link to take you to that resource in the navigator:
+
+
+
+## Supported Resource links
+
+Monokle currently finds and visualizes the following links between kubernetes resources - please let us know if
+we missed something or got it wrong!
+
+| Resource Type | Outgoing Link(s) identified |
+|:-------------|:---------------------------|
+| Secret | `metadata.annotations.kubernetes.io/service-account.name` => ServiceAccount `metadata.name` (optional)
+| Service |  `content.spec.selector` =>  Deployment `spec.template.metadata.labels``
+| PodSpec in Deployment / Pod / DaemonSet / Job / StatefulSet / ReplicaSet / CronJob / ReplicationController |  `..configMapRef.name` => ConfigMap `metadata.name`, `..configMapKeyRef.name` => ConfigMap `metadata.name`, `..volumes[*].configMap.name` => ConfigMap `metadata.name`, `..volumes[*].secret.secretMame` => Secret `metadata.name`, `..secretKeyRef.name` => Secret `metadata.name`, `..imagePullSecrets` => Secret `metadata.name`, `..serviceAccountName` => ServiceAccount `metadata.name` 
+| ServiceAccount | `..secrets` => Secret `metadata.name` 
+| PersistentVolume | `spec.claimRef.name` => PersistentVolumeClaim `metadata.name`
+| PersistentVolumeClaim| `spec.volumeName` => PersistentVolume `metadata.name`
+| Endpoints| `metadata.name`  => Service `metadata.name`
+| ClusterRoleBinding| `roleRef.name` => ClusterRole `metadata.name`
+| RoleBinding| `roleRef.name` => ClusterRoleBinding or Role `metadata.name`
+| Ingress| `..backend.service.name` => Service `metadata.name`, `..resource.*` => any object in same namespace
+
+
+
+
+
