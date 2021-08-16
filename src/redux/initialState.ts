@@ -6,6 +6,7 @@ import {UiState} from '@models/ui';
 import electronStore from '@utils/electronStore';
 import {ObjectNavigator, NavigatorSection, NavigatorSubSection} from '@models/navigator';
 import {ResourceKindHandlers} from '@src/kindhandlers';
+import {NAV_K8S_RESOURCES_SECTIONS_ORDER} from '@constants/navigator';
 
 const initialAppState: AppState = {
   resourceMap: {},
@@ -46,23 +47,41 @@ const initialAppConfigState: AppConfig = {
         apiVersionSelector: kindHandler.apiVersionMatcher,
       };
 
-      let currentSection: NavigatorSection | undefined = currentNavigator.sections.find(s => s.name === sectionName);
-      let foundSection = currentSection !== undefined;
-
+      const currentSection: NavigatorSection | undefined = currentNavigator.sections.find(s => s.name === sectionName);
       if (currentSection) {
         currentSection.subsections = [...currentSection.subsections, newSubsection];
-      } else {
-        currentSection = {
+      }
+
+      let newNavigatorSections = currentNavigator.sections;
+
+      if (!currentSection) {
+        const newSection = {
           name: sectionName,
           subsections: [newSubsection],
         };
+
+        const newSectionIndex = newNavigatorSections.findIndex(section => {
+          if (
+            NAV_K8S_RESOURCES_SECTIONS_ORDER.indexOf(section.name) >
+            NAV_K8S_RESOURCES_SECTIONS_ORDER.indexOf(newSection.name)
+          ) {
+            return true;
+          }
+          return false;
+        });
+
+        if (newSectionIndex === -1) {
+          newNavigatorSections.push(newSection);
+        } else {
+          newNavigatorSections.splice(newSectionIndex, 0, newSection);
+        }
       }
 
       return {
         ...navigatorsByName,
         [navigatorName]: {
           ...currentNavigator,
-          sections: foundSection ? currentNavigator.sections : [...currentNavigator.sections, currentSection],
+          sections: newNavigatorSections,
         },
       };
     }, {})
