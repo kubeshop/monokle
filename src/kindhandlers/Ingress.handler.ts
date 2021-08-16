@@ -4,7 +4,7 @@ import {NAV_K8S_RESOURCES, SECTION_NETWORK} from '@constants/navigator';
 
 const IngressHandler: ResourceKindHandler = {
   kind: 'Ingress',
-  apiVersionMatcher: '*',
+  apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_NETWORK, 'Ingresses'],
   clusterApiVersion: 'networking.k8s.io/v1',
   description: '',
