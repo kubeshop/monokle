@@ -4,6 +4,7 @@ site_author: 'Kubeshop Monokle Team'
 docs_dir: docs/
 repo_name: 'kubeshop/monokle'
 repo_url: 'https://github.com/kubeshop/monokle'
+edit_uri: blob/main/docs/
 
 theme:
   name: material
