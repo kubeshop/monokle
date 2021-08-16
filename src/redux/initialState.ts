@@ -4,6 +4,8 @@ import {AlertState} from '@models/alert';
 import {LogsState} from '@models/logs';
 import {UiState} from '@models/ui';
 import electronStore from '@utils/electronStore';
+import {ObjectNavigator, NavigatorSection, NavigatorSubSection} from '@models/navigator';
+import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const initialAppState: AppState = {
   resourceMap: {},
@@ -30,153 +32,41 @@ const initialAppConfigState: AppConfig = {
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes'),
   fileIncludes: electronStore.get('appConfig.fileIncludes'),
-  navigators: [
-    {
-      name: 'K8s Resources',
-      sections: [
-        {
-          name: 'Workloads',
-          subsections: [
-            {
-              name: 'Pods',
-              apiVersionSelector: '**',
-              kindSelector: 'Pod',
-            },
-            {
-              name: 'Deployments',
-              apiVersionSelector: '**',
-              kindSelector: 'Deployment',
-            },
-            {
-              name: 'DaemonSets',
-              apiVersionSelector: '**',
-              kindSelector: 'DaemonSet',
-            },
-            {
-              name: 'StatefulSets',
-              apiVersionSelector: '**',
-              kindSelector: 'StatefulSet',
-            },
-            {
-              name: 'ReplicaSets',
-              apiVersionSelector: '**',
-              kindSelector: 'ReplicaSet',
-            },
-            {
-              name: 'Jobs',
-              apiVersionSelector: '**',
-              kindSelector: 'Job',
-            },
-            {
-              name: 'CronJobs',
-              apiVersionSelector: '**',
-              kindSelector: 'CronJob',
-            },
-            {
-              name: 'ReplicationControllers',
-              apiVersionSelector: '**',
-              kindSelector: 'ReplicationController',
-            },
-          ],
+  navigators: Object.values(
+    ResourceKindHandlers.reduce<Record<string, ObjectNavigator>>((navigatorsByName, kindHandler) => {
+      const [navigatorName, sectionName, subsectionName] = kindHandler.navigatorPath;
+      const currentNavigator: ObjectNavigator = navigatorsByName[navigatorName] || {
+        name: navigatorName,
+        sections: [],
+      };
+
+      const newSubsection: NavigatorSubSection = {
+        name: subsectionName,
+        kindSelector: kindHandler.kind,
+        apiVersionSelector: kindHandler.apiVersionMatcher,
+      };
+
+      let currentSection: NavigatorSection | undefined = currentNavigator.sections.find(s => s.name === sectionName);
+      let foundSection = currentSection !== undefined;
+
+      if (currentSection) {
+        currentSection.subsections = [...currentSection.subsections, newSubsection];
+      } else {
+        currentSection = {
+          name: sectionName,
+          subsections: [newSubsection],
+        };
+      }
+
+      return {
+        ...navigatorsByName,
+        [navigatorName]: {
+          ...currentNavigator,
+          sections: foundSection ? currentNavigator.sections : [...currentNavigator.sections, currentSection],
         },
-        {
-          name: 'Configuration',
-          subsections: [
-            {
-              name: 'ConfigMaps',
-              apiVersionSelector: '**',
-              kindSelector: 'ConfigMap',
-            },
-            {
-              name: 'Secrets',
-              apiVersionSelector: '**',
-              kindSelector: 'Secret',
-            },
-          ],
-        },
-        {
-          name: 'Network',
-          subsections: [
-            {
-              name: 'Services',
-              apiVersionSelector: '**',
-              kindSelector: 'Service',
-            },
-            {
-              name: 'Endpoints',
-              apiVersionSelector: '**',
-              kindSelector: 'Endpoints',
-            },
-            {
-              name: 'Ingresses',
-              apiVersionSelector: '**',
-              kindSelector: 'Ingress',
-            },
-            {
-              name: 'NetworkPolicies',
-              apiVersionSelector: '**',
-              kindSelector: 'NetworkPolicy',
-            },
-          ],
-        },
-        {
-          name: 'Storage',
-          subsections: [
-            {
-              name: 'Persistent Volume Claims',
-              apiVersionSelector: '**',
-              kindSelector: 'PersistentVolumeClaim',
-            },
-            {
-              name: 'Persistent Volumes',
-              apiVersionSelector: '**',
-              kindSelector: 'PersistentVolume',
-            },
-          ],
-        },
-        {
-          name: 'Access Control',
-          subsections: [
-            {
-              name: 'Service Accounts',
-              apiVersionSelector: '**',
-              kindSelector: 'ServiceAccount',
-            },
-            {
-              name: 'ClusterRoles',
-              apiVersionSelector: '**',
-              kindSelector: 'ClusterRole',
-            },
-            {
-              name: 'Roles',
-              apiVersionSelector: '**',
-              kindSelector: 'Role',
-            },
-            {
-              name: 'ClusterRoleBindings',
-              apiVersionSelector: '**',
-              kindSelector: 'ClusterRoleBinding',
-            },
-            {
-              name: 'RoleBindings',
-              apiVersionSelector: '**',
-              kindSelector: 'RoleBinding',
-            },
-          ],
-        },
-        {
-          name: 'Custom Resources',
-          subsections: [
-            {
-              name: 'Definitions',
-              apiVersionSelector: '**',
-              kindSelector: 'CustomResourceDefinition',
-            },
-          ],
-        },
-      ],
-    },
-  ],
+      };
+    }, {})
+  ),
 };
 
 const initialAlertState: AlertState = {};
