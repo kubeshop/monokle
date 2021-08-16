@@ -392,6 +392,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             version: content.apiVersion,
             content,
             text,
+            isDirty: false,
           };
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
