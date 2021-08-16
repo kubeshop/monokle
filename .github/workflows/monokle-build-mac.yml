@@ -73,7 +73,7 @@ jobs:
 
       - name: Package and Publish
         run: |
-          npm exec -c "electron-builder --publish \"always\""
+          EP_DRAFT=true EP_PRE_RELEASE=true npm exec -c "electron-builder --publish \"always\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
