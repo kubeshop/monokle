@@ -1,4 +1,4 @@
-name: monokle-build-mac
+name: monokle-publish
 
 on:
   push:
