@@ -2,8 +2,8 @@ import {monaco} from 'react-monaco-editor';
 import {isUnsatisfiedRef, isOutgoingRef} from '@redux/services/resourceRefs';
 import {K8sResource, ResourceRef, RefPosition} from '@models/k8sresource';
 
+import {ResourceKindHandlers, getIncomingRefMappers} from '@src/kindhandlers';
 import {ResourceMapType} from '@models/appstate';
-
 import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
 
 import {
@@ -17,51 +17,30 @@ import {
   getSymbolsBeforePosition,
 } from './editorHelpers';
 
-type SymbolsToResourceKindMatcher = {
+export type SymbolsToResourceKindMatcher = {
   resourceKind: string;
   symbolsPaths?: string[][];
-  isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
 };
 
-const SymbolsToResourceKindMatchers: SymbolsToResourceKindMatcher[] = [
-  {
-    resourceKind: 'ConfigMap',
-    symbolsPaths: [
-      ['volumes', 'configMap', 'name'],
-      ['configMap', 'name'],
-      ['configMapRef', 'name'],
-      ['configMapKeyRef', 'name'],
-    ],
-  },
-  {
-    resourceKind: 'Secret',
-    symbolsPaths: [['imagePullSecrets'], ['secrets'], ['secretKeyRef', 'name'], ['volumes', 'secret', 'secretName']],
-  },
-  {
-    resourceKind: 'ServiceAccount',
-    symbolsPaths: [['serviceAccountName'], ['metadata', 'annotations', 'kubernetes.io/service-account.name']],
-  },
-  {
-    resourceKind: 'ClusterRole',
-    symbolsPaths: [['roleRef', 'name']],
-  },
-  {
-    resourceKind: 'Service',
-    symbolsPaths: [['backend', 'service', 'name']],
-  },
-  {
-    resourceKind: 'PersistentVolumeClaim',
-    symbolsPaths: [['spec', 'claimRef', 'name']],
-  },
-  {
-    resourceKind: 'PersistentVolume',
-    symbolsPaths: [['spec', 'volumeName']],
-  },
-  {
-    resourceKind: 'ClusterRoleBinding',
-    symbolsPaths: [['roleRef', 'name']],
-  },
-];
+const SymbolsToResourceKindMatchers = ResourceKindHandlers.map(resourceKindHandler => {
+  return {
+    resourceKind: resourceKindHandler.kind,
+    symbolsPaths: getIncomingRefMappers(resourceKindHandler.kind)
+      .map(incomingRefMapper => incomingRefMapper.source.pathParts)
+      .reduce<string[][]>((previousValue, currentValue) => {
+        if (
+          previousValue.some(
+            symbolsPath =>
+              symbolsPath.length === currentValue.length &&
+              symbolsPath.every((symbol, index) => symbol === currentValue[index])
+          )
+        ) {
+          return previousValue;
+        }
+        return [...previousValue, currentValue];
+      }, []),
+  };
+}).flat();
 
 const getResourceKindFromSymbols = (symbols: monaco.languages.DocumentSymbol[]) => {
   for (let i = 0; i < SymbolsToResourceKindMatchers.length; i += 1) {
@@ -82,11 +61,6 @@ const getResourceKindFromSymbols = (symbols: monaco.languages.DocumentSymbol[]) 
         return false;
       });
       if (isMatch) {
-        return matcher.resourceKind;
-      }
-    }
-    if (matcher.isMatch) {
-      if (matcher.isMatch(symbols)) {
         return matcher.resourceKind;
       }
     }

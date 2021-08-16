@@ -227,29 +227,39 @@ test('traverse-document', () => {
 `;
 
   const expectedResult = [
-    ['apiVersion', 'v1', 'apiVersion', ''],
-    ['kind', 'SomeResource', 'kind', ''],
-    ['metadata.name', 'agentcom-config', 'name', 'metadata'],
-    ['metadata.namespace', 'test', 'namespace', 'metadata'],
-    ['metadata.labels.newKey', 'New Value', 'newKey', 'metadata.labels'],
-    ['metadata.labels.app.kubernetes.io/component', 'test', 'app.kubernetes.io/component', 'metadata.labels'],
-    ['metadata.labels.app.kubernetes.io/name', 'test', 'app.kubernetes.io/name', 'metadata.labels'],
-    ['metadata.labels.app.kubernetes.io/part-of', 'test', 'app.kubernetes.io/part-of', 'metadata.labels'],
-    ['metadata.finalizers', 'test', 'finalizers', 'metadata'],
-    ['metadata.finalizers', 'test2', 'finalizers', 'metadata'],
-    ['metadata.finalizers.test3', 'value', 'test3', 'metadata.finalizers'],
-    ['metadata.finalizers.test4.test5', 'value', 'test5', 'metadata.finalizers.test4'],
-    ['data.POSTGRES_DB', '', 'POSTGRES_DB', 'data'],
-    ['data.REDIS_HOST', '', 'REDIS_HOST', 'data'],
-    ['data.newKey', 'New Value', 'newKey', 'data'],
-    ['spec.matchLabels.app.kubernetes.io/name', 'test', 'app.kubernetes.io/name', 'spec.matchLabels'],
-    ['spec.matchLabels.app.kubernetes.io/part-of', 'test', 'app.kubernetes.io/part-of', 'spec.matchLabels'],
+    [[], ['apiVersion'], 'apiVersion', 'v1'],
+    [[], ['kind'], 'kind', 'SomeResource'],
+    [['metadata'], ['metadata', 'name'], 'name', 'agentcom-config'],
+    [['metadata'], ['metadata', 'namespace'], 'namespace', 'test'],
+    [['metadata', 'labels'], ['metadata', 'labels', 'newKey'], 'newKey', 'New Value'],
+    [
+      ['metadata', 'labels'],
+      ['metadata', 'labels', 'app.kubernetes.io/component'],
+      'app.kubernetes.io/component',
+      'test',
+    ],
+    [['metadata', 'labels'], ['metadata', 'labels', 'app.kubernetes.io/name'], 'app.kubernetes.io/name', 'test'],
+    [['metadata', 'labels'], ['metadata', 'labels', 'app.kubernetes.io/part-of'], 'app.kubernetes.io/part-of', 'test'],
+    [['metadata'], ['metadata', 'finalizers'], 'finalizers', 'test'],
+    [['metadata'], ['metadata', 'finalizers'], 'finalizers', 'test2'],
+    [['metadata', 'finalizers'], ['metadata', 'finalizers', 'test3'], 'test3', 'value'],
+    [['metadata', 'finalizers', 'test4'], ['metadata', 'finalizers', 'test4', 'test5'], 'test5', 'value'],
+    [['data'], ['data', 'POSTGRES_DB'], 'POSTGRES_DB', ''],
+    [['data'], ['data', 'REDIS_HOST'], 'REDIS_HOST', ''],
+    [['data'], ['data', 'newKey'], 'newKey', 'New Value'],
+    [['spec', 'matchLabels'], ['spec', 'matchLabels', 'app.kubernetes.io/name'], 'app.kubernetes.io/name', 'test'],
+    [
+      ['spec', 'matchLabels'],
+      ['spec', 'matchLabels', 'app.kubernetes.io/part-of'],
+      'app.kubernetes.io/part-of',
+      'test',
+    ],
   ];
 
-  const result: [string, string, string, string][] = [];
+  const result: [string[], string[], string, string][] = [];
   const document = parseDocument(inputYaml);
-  traverseDocument(document, (keyPath, scalar, key, parentKeyPath) => {
-    result.push([keyPath, scalar.value as string, key, parentKeyPath]);
+  traverseDocument(document, (parentKeyPathParts, keyPathParts, key, scalar) => {
+    result.push([parentKeyPathParts, keyPathParts, key, scalar.value as string]);
   });
   expect(result).toEqual(expectedResult);
 });

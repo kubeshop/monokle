@@ -7,6 +7,8 @@ import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {AlertEnum} from '@models/alert';
 import {createPreviewRejection, createPreviewResult, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
+import {ResourceKindHandlers} from '@src/kindhandlers';
+
 /**
  * Thunk to preview cluster objects
  */
@@ -24,81 +26,14 @@ export const previewCluster = createAsyncThunk<
     try {
       const kc = new k8s.KubeConfig();
       kc.loadFromFile(configPath);
-      const k8sAppV1Api = kc.makeApiClient(k8s.AppsV1Api);
-      const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
-      const k8sBatchV1Api = kc.makeApiClient(k8s.BatchV1Api);
-      const k8sRbacV1Api = kc.makeApiClient(k8s.RbacAuthorizationV1Api);
-      const k8sNetworkingV1Api = kc.makeApiClient(k8s.NetworkingV1Api);
-      const k8sExtensionsV1Api = kc.makeApiClient(k8s.ApiextensionsV1Api);
 
-      return Promise.allSettled([
-        k8sAppV1Api.listDaemonSetForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'DaemonSet', 'apps/v1');
-        }),
-        k8sAppV1Api.listDeploymentForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Deployment', 'apps/v1');
-        }),
-        k8sAppV1Api.listStatefulSetForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'StatefuleSet', 'apps/v1');
-        }),
-        k8sAppV1Api.listReplicaSetForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'ReplicaSet', 'apps/v1');
-        }),
-        k8sCoreV1Api.listConfigMapForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'ConfigMap', 'v1');
-        }),
-        k8sCoreV1Api.listServiceForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Service', 'v1');
-        }),
-        k8sCoreV1Api.listServiceAccountForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'ServiceAccount', 'v1');
-        }),
-        k8sCoreV1Api.listPersistentVolume().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'PersistentVolume', 'v1');
-        }),
-        k8sCoreV1Api.listPersistentVolumeClaimForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'PersistentVolumeClaim', 'v1');
-        }),
-        k8sCoreV1Api.listPodForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Pod', 'v1');
-        }),
-        k8sCoreV1Api.listEndpointsForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Endpoints', 'v1');
-        }),
-        k8sCoreV1Api.listSecretForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Secret', 'v1');
-        }),
-        k8sCoreV1Api.listReplicationControllerForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'ReplicationController', 'v1');
-        }),
-        k8sBatchV1Api.listJobForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Job', 'batch/v1');
-        }),
-        k8sBatchV1Api.listCronJobForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'CronJob', 'batch/v1');
-        }),
-        k8sRbacV1Api.listClusterRole().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'ClusterRole', 'rbac.authorization.k8s.io/v1');
-        }),
-        k8sRbacV1Api.listClusterRoleBinding().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'ClusterRoleBinding', 'rbac.authorization.k8s.io/v1');
-        }),
-        k8sRbacV1Api.listRoleForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Role', 'rbac.authorization.k8s.io/v1');
-        }),
-        k8sRbacV1Api.listRoleBindingForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'RoleBinding', 'rbac.authorization.k8s.io/v1');
-        }),
-        k8sNetworkingV1Api.listIngressForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'Ingress', 'networking.k8s.io/v1');
-        }),
-        k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'NetworkPolicy', 'networking.k8s.io/v1');
-        }),
-        k8sExtensionsV1Api.listCustomResourceDefinition().then(res => {
-          return getK8sObjectsAsYaml(res.body.items, 'CustomResourceDefinition', 'apiextensions.k8s.io/v1');
-        }),
-      ]).then(
+      return Promise.allSettled(
+        ResourceKindHandlers.map(resourceKindHandler =>
+          resourceKindHandler
+            .listResourcesInCluster(kc)
+            .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
+        )
+      ).then(
         results => {
           const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
