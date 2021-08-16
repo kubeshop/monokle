@@ -232,8 +232,8 @@ export function isFileResource(resource: K8sResource) {
  * single and multi-resource files
  */
 
-export function saveResource(resource: K8sResource, newValue: string, fileMap: FileMapType) {
-  let valueToWrite = `${newValue.trim()}\n`;
+export function saveResourceFile(resource: K8sResource, newValue: string, fileMap: FileMapType) {
+  let newFileContent = `${newValue.trim()}\n`;
 
   if (isFileResource(resource)) {
     const fileEntry = fileMap[resource.filePath];
@@ -243,14 +243,14 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       const content = fs.readFileSync(absoluteResourcePath, 'utf8');
 
       // need to make sure that document delimiter is still there if this resource was not first in the file
-      if (resource.range.start > 0 && !valueToWrite.startsWith(YAML_DOCUMENT_DELIMITER)) {
-        valueToWrite = `${YAML_DOCUMENT_DELIMITER}${valueToWrite}`;
+      if (resource.range.start > 0 && !newFileContent.startsWith(YAML_DOCUMENT_DELIMITER)) {
+        newFileContent = `${YAML_DOCUMENT_DELIMITER}${newFileContent}`;
       }
 
       fs.writeFileSync(
         absoluteResourcePath,
         content.substr(0, resource.range.start) +
-          valueToWrite +
+          newFileContent +
           content.substr(resource.range.start + resource.range.length)
       );
     } else {
@@ -261,7 +261,7 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
     fileEntry.timestamp = fs.statSync(absoluteResourcePath).mtime.getTime();
   }
 
-  return valueToWrite;
+  return newFileContent;
 }
 
 /**

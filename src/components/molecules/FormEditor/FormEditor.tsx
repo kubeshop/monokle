@@ -6,7 +6,7 @@ import {withTheme} from '@rjsf/core';
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {loadResource} from '@redux/services';
 import {useCallback, useEffect, useState} from 'react';
-import {updateResource} from '@redux/reducers/main';
+import {saveResource} from '@redux/reducers/main';
 import {logMessage} from '@redux/services/log';
 import {stringify} from 'yaml';
 import {mergeManifests} from '@redux/services/manifest-utils';
@@ -170,7 +170,7 @@ const FormEditor = (props: {contentHeight: string}) => {
 
           setFormData({formData: formData.formData, orgFormData: data});
           setHasChanged(false);
-          dispatch(updateResource({resourceId: selectedResource.id, content}));
+          dispatch(saveResource({resourceId: selectedResource.id, content}));
         }
       } catch (err) {
         logMessage(`Failed to update resource ${err}`, dispatch);

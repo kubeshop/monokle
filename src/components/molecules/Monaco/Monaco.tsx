@@ -18,7 +18,7 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
-import {updateFileEntry, updateResource, selectK8sResource} from '@redux/reducers/main';
+import {updateFileEntry, saveResource, selectK8sResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
@@ -79,7 +79,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [code, setCode] = useState('');
-  const [orgCode, setOrgCode] = useState<string>();
+  const [originalCode, setOriginalCode] = useState<string>();
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
@@ -136,7 +136,7 @@ const Monaco = (props: {editorHeight: string}) => {
   };
 
   function onChange(newValue: any, e: any) {
-    setDirty(orgCode !== newValue);
+    setDirty(originalCode !== newValue);
     setCode(newValue);
 
     // this will slow things down if document gets large - need to find a better solution...
@@ -156,14 +156,14 @@ const Monaco = (props: {editorHeight: string}) => {
     if (selectedPath && !selectedResourceId) {
       try {
         dispatch(updateFileEntry({path: selectedPath, content: value}));
-        setOrgCode(value);
+        setOriginalCode(value);
       } catch (e) {
         logMessage(`Failed to update file ${e}`, dispatch);
       }
     } else if (selectedResourceId && resourceMap[selectedResourceId]) {
       try {
-        dispatch(updateResource({resourceId: selectedResourceId, content: value.toString()}));
-        setOrgCode(value);
+        dispatch(saveResource({resourceId: selectedResourceId, content: value.toString()}));
+        setOriginalCode(value);
       } catch (e) {
         logMessage(`Failed to update resource ${e}`, dispatch);
       }
@@ -203,7 +203,7 @@ const Monaco = (props: {editorHeight: string}) => {
     }
 
     setCode(newCode);
-    setOrgCode(newCode);
+    setOriginalCode(newCode);
     setDirty(false);
   }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
 

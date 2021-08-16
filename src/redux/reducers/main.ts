@@ -22,7 +22,12 @@ import {
   getResourcesForPath,
   reloadFile,
 } from '../services/fileEntry';
-import {extractK8sResources, recalculateResourceRanges, reprocessResources, saveResource} from '../services/resource';
+import {
+  extractK8sResources,
+  recalculateResourceRanges,
+  reprocessResources,
+  saveResourceFile,
+} from '../services/resource';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -33,7 +38,7 @@ export type SetRootFolderPayload = {
   alert?: AlertType;
 };
 
-export type UpdateResourcePayload = {
+export type SaveResourcePayload = {
   resourceId: string;
   content: string;
 };
@@ -139,18 +144,19 @@ export const mainSlice = createSlice({
       }
     },
     /**
-     * Updates the content of the specified resource to the specified value
+     * Saves the content of the specified resource to the specified value
      */
-    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
+    saveResource: (state: Draft<AppState>, action: PayloadAction<SaveResourcePayload>) => {
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          const value = saveResource(resource, action.payload.content, state.fileMap);
-          resource.text = value;
-          resource.content = parseDocument(value).toJS();
+          const newResourceFileContent = saveResourceFile(resource, action.payload.content, state.fileMap);
+          resource.text = newResourceFileContent;
+          resource.content = parseDocument(newResourceFileContent).toJS();
           recalculateResourceRanges(resource, state);
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
           resource.isSelected = false;
+          resource.isDirty = false;
           updateSelectionAndHighlights(state, resource);
         }
       } catch (e) {
@@ -336,7 +342,7 @@ export const {
   selectFile,
   setSelectingFile,
   setApplyingResource,
-  updateResource,
+  saveResource,
   updateFileEntry,
   pathAdded,
   fileChanged,
