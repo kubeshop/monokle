@@ -320,7 +320,7 @@ const FileTreePane = () => {
     if (selectedResourceId && tree) {
       const resource = resourceMap[selectedResourceId];
       if (resource) {
-        const filePath = resource.filePath;
+        const filePath = resource.fileRelativePath;
         highlightFilePath(filePath);
       }
     }

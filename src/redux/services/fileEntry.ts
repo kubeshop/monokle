@@ -142,7 +142,7 @@ export function readFiles(
  */
 
 export function getResourcesForPath(filePath: string, resourceMap: ResourceMapType) {
-  return Object.values(resourceMap).filter(r => r.filePath === filePath);
+  return Object.values(resourceMap).filter(r => r.fileRelativePath === filePath);
 }
 
 /**
@@ -153,7 +153,7 @@ export function getResourcesForPath(filePath: string, resourceMap: ResourceMapTy
 export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMapType) {
   return path.join(
     fileMap[ROOT_FILE_ENTRY].relativePath,
-    resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep))
+    resource.fileRelativePath.substr(0, resource.fileRelativePath.lastIndexOf(path.sep))
   );
 }
 
@@ -162,7 +162,7 @@ export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMa
  */
 
 export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapType) {
-  return path.join(fileMap[ROOT_FILE_ENTRY].relativePath, resource.filePath);
+  return path.join(fileMap[ROOT_FILE_ENTRY].relativePath, resource.fileRelativePath);
 }
 
 /**

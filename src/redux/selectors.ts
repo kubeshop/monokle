@@ -20,7 +20,7 @@ export const activeResourcesSelector = createSelector(
   (state: RootState) => state.main.previewValuesFileId,
   (resources, previewResource, previewValuesFile) =>
     resources.filter(
-      r => (previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)
+      r => (previewResource === undefined && previewValuesFile === undefined) || r.fileRelativePath.startsWith(PREVIEW_PREFIX)
     )
 );
 

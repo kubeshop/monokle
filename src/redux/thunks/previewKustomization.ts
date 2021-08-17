@@ -22,9 +22,9 @@ export const previewKustomization = createAsyncThunk<
   const state = thunkAPI.getState().main;
   if (state.previewResourceId !== resourceId) {
     const resource = state.resourceMap[resourceId];
-    if (resource && resource.filePath) {
+    if (resource && resource.fileRelativePath) {
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].relativePath;
-      const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
+      const folder = path.join(rootFolder, resource.fileRelativePath.substr(0, resource.fileRelativePath.lastIndexOf(path.sep)));
 
       log.info(`previewing ${resource.id} in folder ${folder}`);
       const result = await runKustomize(folder);

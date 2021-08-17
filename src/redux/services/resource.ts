@@ -154,7 +154,7 @@ function createResourceRef(
       });
     }
   } else {
-    log.warn(`missing both refNode and targetResource for refType ${refType} on resource ${resource.filePath}`);
+    log.warn(`missing both refNode and targetResource for refType ${refType} on resource ${resource.fileRelativePath}`);
   }
 }
 
@@ -224,7 +224,7 @@ export function createResourceName(filePath: string, content: any) {
  */
 
 export function isFileResource(resource: K8sResource) {
-  return !resource.filePath.startsWith(PREVIEW_PREFIX);
+  return !resource.fileRelativePath.startsWith(PREVIEW_PREFIX);
 }
 
 /**
@@ -236,7 +236,7 @@ export function saveResourceFile(resource: K8sResource, fileMap: FileMapType) {
   let newFileContent = `${resource.text.trim()}\n`;
 
   if (isFileResource(resource)) {
-    const fileEntry = fileMap[resource.filePath];
+    const fileEntry = fileMap[resource.fileRelativePath];
 
     let absoluteResourcePath = getAbsoluteResourcePath(resource, fileMap);
     if (resource.range) {
@@ -288,7 +288,7 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
     if (resource) {
-      resource.name = createResourceName(resource.filePath, resource.content);
+      resource.name = createResourceName(resource.fileRelativePath, resource.content);
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
       resource.namespace = resource.content.metadata?.namespace;
@@ -328,10 +328,10 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
   // if length of value has changed we need to recalculate document ranges for
   // subsequent resource so future saves will be at correct place in document
   if (resource.range && resource.range.length !== resource.text.length) {
-    const fileEntry = state.fileMap[resource.filePath];
+    const fileEntry = state.fileMap[resource.fileRelativePath];
     if (fileEntry) {
       // get list of resourceIds in file sorted by startPosition
-      const resourceIds = getResourcesForPath(resource.filePath, state.resourceMap)
+      const resourceIds = getResourcesForPath(resource.fileRelativePath, state.resourceMap)
         .sort((a, b) => {
           return a.range && b.range ? a.range.start - b.range.start : 0;
         })
@@ -356,7 +356,7 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
         throw new Error(`Failed to find resource in list of ids of fileEntry for ${fileEntry.name}`);
       }
     } else {
-      throw new Error(`Failed to find fileEntry for resource with path ${resource.filePath}`);
+      throw new Error(`Failed to find fileEntry for resource with path ${resource.fileRelativePath}`);
     }
   }
 }
@@ -384,7 +384,7 @@ export function extractK8sResources(fileText: string, fileRelativePath: string) 
 
           let resource: K8sResource = {
             name: createResourceName(fileRelativePath, content),
-            filePath: fileRelativePath,
+            fileRelativePath,
             id: uuidv4(),
             isHighlighted: false,
             isSelected: false,

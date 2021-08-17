@@ -53,7 +53,7 @@ function processKustomizationResource(
   resourceMap: ResourceMapType,
   fileMap: FileMapType
 ) {
-  let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
+  let kpath = path.join(path.parse(kustomization.fileRelativePath).dir, refNode.nodeValue());
   const fileEntry = fileMap[kpath];
   if (fileEntry) {
     if (fileEntry.children) {
@@ -90,7 +90,7 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
       });
 
       kustomization.content.patchesStrategicMerge?.forEach((e: string) => {
-        const fileEntry = fileMap[path.join(path.parse(kustomization.filePath).dir, e)];
+        const fileEntry = fileMap[path.join(path.parse(kustomization.fileRelativePath).dir, e)];
         if (fileEntry) {
           getResourcesForPath(fileEntry.relativePath, resourceMap).forEach(resource => {
             if (!resource.name.startsWith('Patch:')) {
@@ -98,7 +98,7 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
             }
           });
         } else {
-          log.warn(`Failed to find patchesStrategicMerge ${e} in kustomization ${kustomization.filePath}`);
+          log.warn(`Failed to find patchesStrategicMerge ${e} in kustomization ${kustomization.fileRelativePath}`);
         }
       });
     });

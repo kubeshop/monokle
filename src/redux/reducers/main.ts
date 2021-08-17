@@ -320,7 +320,7 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
 
   // remove previous preview resources
   Object.values(state.resourceMap)
-    .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
+    .filter(r => r.fileRelativePath.startsWith(PREVIEW_PREFIX))
     .forEach(r => delete state.resourceMap[r.id]);
 
   if (payload.previewResourceId && payload.previewResources) {
