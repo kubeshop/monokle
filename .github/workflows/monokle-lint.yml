@@ -45,7 +45,7 @@ jobs:
           env
           echo "npm: $(npm --version)"
           echo "node: $(node --version)"
-          npm install --only=dev
+          npm install --production=false
 
       - name: Verify Dependencies
         run: |
