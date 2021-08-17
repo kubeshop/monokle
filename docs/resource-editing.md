@@ -46,5 +46,6 @@ To start with Monokle only shows a Form Editor for ConfigMap resources:
 ![Form Editor](img/form-editor.png)
 
 The editor provides form fields for key ConfigMap properties, allowing you to edit/discover all available properties without 
-having to learn or lookup the corresponding resource documentation. Any changes made and saved (with the Save button on the top right)
+having to learn or lookup the corresponding yaml/resource documentation. Any changes made and saved (with the Save button on the top right)
 are written back to the underlying yaml.
+

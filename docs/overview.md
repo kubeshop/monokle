@@ -29,3 +29,16 @@ Clicking the Settings icon on the top right opens the settings:
 - **Helm Preview Mode**: which Helm command to use for generating previews:
   - Template: uses [Helm Template](https://helm.sh/docs/helm/helm_template/)
   - Install: uses [Helm Install](https://helm.sh/docs/helm/helm_install/)
+
+## Keyboard Shortcuts
+
+Monokle current supports the following keyboard shortcuts:
+
+- Cluster Preview: Ctrl/Cmd I
+- Settings: Ctrl/Cmd P
+- Exit Preview: ESC
+- Browse Folder: Ctrl/Cmd O
+- Refresh Folder: Ctrl/Cmd F5
+- Toggle Left Pane: Ctrl/Cmd B
+- Toggle Right Pane: Ctrl/Cmd ALT B
+- Save (in editors): Ctrl/Cmd S
