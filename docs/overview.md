@@ -26,9 +26,9 @@ Clicking the Settings icon on the top right opens the settings:
 - **Kubeconfig**: sets which kubeconfig Monokle should use for all cluster interactions
 - **Files: Include**: which files to parse for kubernetes resources when scanning folders
 - **Files: Exclude**: which files/folders to exclude when scanning folders for resources
-- **Helm Preview Mode**: which Helm command to use for generating previews:
-  - Template: uses [Helm Template](https://helm.sh/docs/helm/helm_template/)
-  - Install: uses [Helm Install](https://helm.sh/docs/helm/helm_install/)
+- **Helm Preview Mode**: which Helm command to use for generating previews (see [Working with Helm Charts](helm.md))
+    - Template: uses [Helm Template](https://helm.sh/docs/helm/helm_template/)
+    - Install: uses [Helm Install](https://helm.sh/docs/helm/helm_install/)
 
 ## Keyboard Shortcuts
 

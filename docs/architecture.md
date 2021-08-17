@@ -18,13 +18,13 @@ See https://www.electron.build/ for more info on electron builder
 
 - /electron : electron main thread, contains startup code and some ipc handlers invoked from the UI
 - /src : root for monokle UI application, contains App.tsx, Index.tsx, etc.
-  - /components : UI components - coarse to fine grained; organisms -> molecules -> atoms
-  - /constants : constants..
-  - /models : type definitions for core objects (see below) and states
-  - /redux : redux-related code (selectors, hooks, store, reducers, thunks, services)
-  - /styles : styles..
-  - /utils : common utility functions
-  - /assets : icons/images/etc
+    - /components : UI components - coarse to fine grained; organisms -> molecules -> atoms
+    - /constants : constants..
+    - /models : type definitions for core objects (see below) and states
+    - /redux : redux-related code (selectors, hooks, store, reducers, thunks, services)
+    - /styles : styles..
+    - /utils : common utility functions
+    - /assets : icons/images/etc
   
 ## Core objects
 
