@@ -3,7 +3,7 @@ import {SetRootFolderPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
-import {createFileEntry, readFiles} from '@redux/services/fileEntry';
+import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {processKustomizations} from '@redux/services/kustomize';
 import {clearParsedDocs, processParsedResources} from '@redux/services/resource';
@@ -25,7 +25,7 @@ export const setRootFolder = createAsyncThunk<
   const appConfig = thunkAPI.getState().config;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
-  const rootEntry: FileEntry = createFileEntry(rootFolder);
+  const rootEntry: FileEntry = createRootFileEntry(rootFolder);
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
 

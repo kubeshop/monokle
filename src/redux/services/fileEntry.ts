@@ -16,10 +16,23 @@ import {extractK8sResources, reprocessResources} from './resource';
  * Creates a FileEntry for the specified relative path
  */
 
-export function createFileEntry(fileEntryPath: string) {
+export function createFileEntry(rootFolderPath: string, fileRelativePath: string) {
+  const fileAbsolutePath = path.join(rootFolderPath, fileRelativePath);
+  const text = !fs.statSync(fileAbsolutePath).isDirectory() ? fs.readFileSync(fileAbsolutePath, 'utf8') : undefined;
   const fileEntry: FileEntry = {
-    name: fileEntryPath.substr(fileEntryPath.lastIndexOf(path.sep) + 1),
-    filePath: fileEntryPath,
+    name: fileRelativePath.substr(fileRelativePath.lastIndexOf(path.sep) + 1),
+    filePath: fileRelativePath,
+    isExcluded: false,
+    isDirty: false,
+    text,
+  };
+  return fileEntry;
+}
+
+export function createRootFileEntry(rootFolderPath: string) {
+  const fileEntry: FileEntry = {
+    name: rootFolderPath.substr(rootFolderPath.lastIndexOf(path.sep) + 1),
+    filePath: rootFolderPath,
     isExcluded: false,
     isDirty: false,
   };
@@ -54,33 +67,34 @@ export function readFiles(
 
   // if there is no root entry assume this is the root folder (questionable..)
   if (!fileMap[ROOT_FILE_ENTRY]) {
-    fileMap[ROOT_FILE_ENTRY] = createFileEntry(folder);
+    fileMap[ROOT_FILE_ENTRY] = createRootFileEntry(folder);
   }
 
-  const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
+  const rootFileEntry = fileMap[ROOT_FILE_ENTRY];
+  const rootFolderPath = rootFileEntry.filePath;
 
   // is this a helm chart folder?
   if (files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1) {
     const helmChart: HelmChart = {
       id: uuidv4(),
-      filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
+      filePath: path.join(folder, 'Chart.yaml').substr(rootFolderPath.length),
       name: folder.substr(folder.lastIndexOf(path.sep) + 1),
       valueFileIds: [],
     };
 
     files.forEach(file => {
-      const filePath = path.join(folder, file);
-      const fileEntryPath = filePath.substr(rootFolder.length);
-      const fileEntry = createFileEntry(fileEntryPath);
+      const fileAbsolutePath = path.join(folder, file);
+      const fileRelativePath = fileAbsolutePath.substr(rootFolderPath.length);
+      const fileEntry = createFileEntry(rootFolderPath, fileRelativePath);
 
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
-      } else if (fs.statSync(filePath).isDirectory()) {
-        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+      } else if (fs.statSync(fileAbsolutePath).isDirectory()) {
+        fileEntry.children = readFiles(fileAbsolutePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
       } else if (micromatch.isMatch(file, '*values*.yaml')) {
         const helmValues: HelmValuesFile = {
           id: uuidv4(),
-          filePath: fileEntryPath,
+          filePath: fileRelativePath,
           name: file,
           isSelected: false,
           helmChartId: helmChart.id,
@@ -97,17 +111,17 @@ export function readFiles(
     helmChartMap[helmChart.id] = helmChart;
   } else {
     files.forEach(file => {
-      const filePath = path.join(folder, file);
-      const fileEntryPath = filePath.substr(rootFolder.length);
-      const fileEntry = createFileEntry(fileEntryPath);
+      const fileAbsolutePath = path.join(folder, file);
+      const fileRelativePath = fileAbsolutePath.substr(rootFolderPath.length);
+      const fileEntry = createFileEntry(rootFolderPath, fileRelativePath);
 
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
-      } else if (fs.statSync(filePath).isDirectory()) {
-        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+      } else if (fs.statSync(fileAbsolutePath).isDirectory()) {
+        fileEntry.children = readFiles(fileAbsolutePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
-          extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+          extractK8sResourcesFromFileEntry(fileEntry).forEach(resource => {
             resourceMap[resource.id] = resource;
           });
         } catch (e) {
@@ -155,10 +169,11 @@ export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapT
  * Extracts all resources from the file at the specified path
  */
 
-export function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapType) {
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-  const rootEntry = fileMap[ROOT_FILE_ENTRY];
-  return extractK8sResources(fileContent, rootEntry ? filePath.substr(rootEntry.filePath.length) : filePath);
+export function extractK8sResourcesFromFileEntry(fileEntry: FileEntry) {
+  if (!fileEntry.text) {
+    return [];
+  }
+  return extractK8sResources(fileEntry.text, fileEntry.filePath);
 }
 
 /**
@@ -214,7 +229,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
     resourcesInFile.forEach(resource => {
       if (state.selectedResourceId === resource.id) {
-        updateSelectionAndHighlights(state, resource);
+        updateSelectionAndHighlights(state, resource); // TODO: is this needed here?
         wasSelected = true;
       }
       delete state.resourceMap[resource.id];
@@ -225,7 +240,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
       clearResourceSelections(state.resourceMap);
     }
 
-    const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
+    const resourcesFromFile = extractK8sResourcesFromFileEntry(fileEntry);
     resourcesFromFile.forEach(resource => {
       state.resourceMap[resource.id] = resource;
     });
@@ -244,9 +259,9 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
 function addFile(absolutePath: string, state: AppState) {
   log.info(`adding file ${absolutePath}`);
-  let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-  const fileEntry = createFileEntry(absolutePath.substr(rootFolder.length));
-  extractK8sResourcesFromFile(absolutePath, state.fileMap).forEach(resource => {
+  let rootFolderPath = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  const fileEntry = createFileEntry(rootFolderPath, absolutePath.substr(rootFolderPath.length));
+  extractK8sResourcesFromFileEntry(fileEntry).forEach(resource => {
     state.resourceMap[resource.id] = resource;
   });
 
@@ -259,9 +274,9 @@ function addFile(absolutePath: string, state: AppState) {
 
 function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) {
   log.info(`adding folder ${absolutePath}`);
-  const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-  if (absolutePath.startsWith(rootFolder)) {
-    const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
+  const rootFolderPath = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  if (absolutePath.startsWith(rootFolderPath)) {
+    const folderEntry = createFileEntry(rootFolderPath, absolutePath.substr(rootFolderPath.length));
     folderEntry.children = readFiles(
       absolutePath,
       appConfig,
@@ -273,7 +288,7 @@ function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) 
     return folderEntry;
   }
 
-  log.error(`added folder ${absolutePath} is not under root ${rootFolder} - ignoring...`);
+  log.error(`added folder ${absolutePath} is not under root ${rootFolderPath} - ignoring...`);
 }
 
 /**

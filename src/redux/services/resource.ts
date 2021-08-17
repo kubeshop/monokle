@@ -232,8 +232,8 @@ export function isFileResource(resource: K8sResource) {
  * single and multi-resource files
  */
 
-export function saveResourceFile(resource: K8sResource, newValue: string, fileMap: FileMapType) {
-  let newFileContent = `${newValue.trim()}\n`;
+export function saveResourceFile(resource: K8sResource, fileMap: FileMapType) {
+  let newFileContent = `${resource.text.trim()}\n`;
 
   if (isFileResource(resource)) {
     const fileEntry = fileMap[resource.filePath];
@@ -255,7 +255,7 @@ export function saveResourceFile(resource: K8sResource, newValue: string, fileMa
       );
     } else {
       // only document => just write to file
-      fs.writeFileSync(absoluteResourcePath, newValue);
+      fs.writeFileSync(absoluteResourcePath, resource.text);
     }
 
     fileEntry.timestamp = fs.statSync(absoluteResourcePath).mtime.getTime();
@@ -365,9 +365,9 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
  * Extracts all resources from the specified text content (must be yaml)
  */
 
-export function extractK8sResources(fileContent: string, relativePath: string) {
+export function extractK8sResources(fileText: string, fileRelativePath: string) {
   const lineCounter: LineCounter = new LineCounter();
-  const documents = parseAllDocuments(fileContent, {lineCounter});
+  const documents = parseAllDocuments(fileText, {lineCounter});
   const result: K8sResource[] = [];
 
   if (documents) {
@@ -375,16 +375,16 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`
+          `Ignoring document ${docIndex} in ${path.parse(fileRelativePath).name} due to ${doc.errors.length} error(s)`
         );
       } else {
         const content = doc.toJS();
         if (content && content.apiVersion && content.kind) {
-          const text = fileContent.slice(doc.range[0], doc.range[1]);
+          const text = fileText.slice(doc.range[0], doc.range[1]);
 
           let resource: K8sResource = {
-            name: createResourceName(relativePath, content),
-            filePath: relativePath,
+            name: createResourceName(fileRelativePath, content),
+            filePath: fileRelativePath,
             id: uuidv4(),
             isHighlighted: false,
             isSelected: false,
