@@ -3,7 +3,7 @@
 Resources can be loaded either from the file system or a configured cluster. 
 - Selecting the "Browse" button in the File Explorer prompts for a folder containing resource manifests
 - Selecting "Show Cluster Objects" in the Cluster Explorer loads available resources using the configured kubeconfig  
-  variable, see [Cluster Preview](cluster-preview.md) for more details
+  variable, see [Cluster Preview](cluster-integration.md) for more details
 
 Once selecting a folder the File Explorer and Navigators will be populated accordingly. Monokle will attempt to synchronize 
 automatically with any external file/folder changes made in the selected folder, but the Refresh button next to the Browse button

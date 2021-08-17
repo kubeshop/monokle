@@ -1,4 +1,4 @@
-# Editing
+# Resource Editing
 
 ## Source Editor
 

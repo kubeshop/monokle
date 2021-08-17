@@ -38,4 +38,4 @@ resource, Monokle will quickly show you, that you have a dead link with a warnin
 ![Browse your clusters objects](img/cluster-objects.gif)
 
 Want to browse your cluster instead of a repo? Simply smash the "Show Cluster Objects" button to import all objects from
-the cluster into Monokle - [read more](cluster-preview.md)
+the cluster into Monokle - [read more](cluster-integration.md)

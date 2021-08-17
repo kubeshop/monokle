@@ -24,7 +24,7 @@ nav:
   - Resource Editing: resource-editing.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
-  - Cluster Preview: cluster-preview.md
+  - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
 

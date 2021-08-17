@@ -50,7 +50,7 @@ export const performResourceDiff = createAsyncThunk<
         return createPreviewRejection(thunkAPI, title, message);
       };
 
-      resourceKindHandler
+      return resourceKindHandler
         .getResourceFromCluster(kc, resource.content.metadata.name, resource.namespace ? resource.namespace : 'default')
         .then(handleResource, handleRejection);
     }
