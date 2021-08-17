@@ -18,7 +18,8 @@ Check out the [Features Document](./docs/features.md) or watch the Monokle 1.0 w
 Either download an (as of yet unsigned) installer from [releases](https://github.com/kubeshop/monokle/releases) or
 clone/build as described below!
 
-- Read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview
+- Read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and
+  overview
 - Ask questions, report bugs, suggest features, join our discussions
   [here on GitHub](https://github.com/kubeshop/monokle/discussions)
 - See "Getting Involved" below on how to get involved!
@@ -26,19 +27,20 @@ clone/build as described below!
 <details>
 <summary>
 Note: If you download the unsigned binary, MacOs will complain a bit. Check how to fix it.  
-</summary>  
+</summary>
 
-You need to go to Preferences > Security & Privacy > General.  
+You need to go to Preferences > Security & Privacy > General.
 
-Text will appear saying: `Monokle was blocked from use because it is not from an identified developer.`  
+Text will appear saying: `Monokle was blocked from use because it is not from an identified developer.`
 
-Click the `Open Anyway` button. A new pop-up will say:  
+Click the `Open Anyway` button. A new pop-up will say:
 
-`macOs cannot verify the developer of Monokle.Are you sure you want to open it?`,  
+`macOs cannot verify the developer of Monokle.Are you sure you want to open it?`,
 
-simply click `Move to Bin`. No wait, did you? You should have clicked `Open`, silly.  
+simply click `Move to Bin`. No wait, did you? You should have clicked `Open`, silly.
 
 [Apple Support](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac)
+
 </details>
 
 ## Building / running
@@ -48,8 +50,8 @@ simply click `Move to Bin`. No wait, did you? You should have clicked `Open`, si
 Clone this repo and build with
 
 ```
-nvm install
-npm install --force
+nvm install # assert nodejs version
+npm install
 ```
 
 run with

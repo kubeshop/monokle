@@ -20,6 +20,60 @@ const initialAppState: AppState = {
   isApplyingResource: false,
 };
 
+const navigators = Object.values(
+  ResourceKindHandlers.reduce<Record<string, ObjectNavigator>>((navigatorsByName, kindHandler) => {
+    const [navigatorName, sectionName, subsectionName] = kindHandler.navigatorPath;
+    const currentNavigator: ObjectNavigator = navigatorsByName[navigatorName] || {
+      name: navigatorName,
+      sections: [],
+    };
+
+    const newSubsection: NavigatorSubSection = {
+      name: subsectionName,
+      kindSelector: kindHandler.kind,
+      apiVersionSelector: kindHandler.apiVersionMatcher,
+    };
+
+    const currentSection: NavigatorSection | undefined = currentNavigator.sections.find(s => s.name === sectionName);
+    if (currentSection) {
+      currentSection.subsections = [...currentSection.subsections, newSubsection];
+    }
+
+    let newNavigatorSections = currentNavigator.sections;
+
+    if (!currentSection) {
+      const newSection = {
+        name: sectionName,
+        subsections: [newSubsection],
+      };
+
+      const newSectionIndex = newNavigatorSections.findIndex(section => {
+        if (
+          NAV_K8S_RESOURCES_SECTIONS_ORDER.indexOf(section.name) >
+          NAV_K8S_RESOURCES_SECTIONS_ORDER.indexOf(newSection.name)
+        ) {
+          return true;
+        }
+        return false;
+      });
+
+      if (newSectionIndex === -1) {
+        newNavigatorSections.push(newSection);
+      } else {
+        newNavigatorSections.splice(newSectionIndex, 0, newSection);
+      }
+    }
+
+    return {
+      ...navigatorsByName,
+      [navigatorName]: {
+        ...currentNavigator,
+        sections: newNavigatorSections,
+      },
+    };
+  }, {})
+);
+
 const initialAppConfigState: AppConfig = {
   isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
   isNewVersionAvailable: false,
@@ -35,59 +89,7 @@ const initialAppConfigState: AppConfig = {
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes'),
   fileIncludes: electronStore.get('appConfig.fileIncludes'),
-  navigators: Object.values(
-    ResourceKindHandlers.reduce<Record<string, ObjectNavigator>>((navigatorsByName, kindHandler) => {
-      const [navigatorName, sectionName, subsectionName] = kindHandler.navigatorPath;
-      const currentNavigator: ObjectNavigator = navigatorsByName[navigatorName] || {
-        name: navigatorName,
-        sections: [],
-      };
-
-      const newSubsection: NavigatorSubSection = {
-        name: subsectionName,
-        kindSelector: kindHandler.kind,
-        apiVersionSelector: kindHandler.apiVersionMatcher,
-      };
-
-      const currentSection: NavigatorSection | undefined = currentNavigator.sections.find(s => s.name === sectionName);
-      if (currentSection) {
-        currentSection.subsections = [...currentSection.subsections, newSubsection];
-      }
-
-      let newNavigatorSections = currentNavigator.sections;
-
-      if (!currentSection) {
-        const newSection = {
-          name: sectionName,
-          subsections: [newSubsection],
-        };
-
-        const newSectionIndex = newNavigatorSections.findIndex(section => {
-          if (
-            NAV_K8S_RESOURCES_SECTIONS_ORDER.indexOf(section.name) >
-            NAV_K8S_RESOURCES_SECTIONS_ORDER.indexOf(newSection.name)
-          ) {
-            return true;
-          }
-          return false;
-        });
-
-        if (newSectionIndex === -1) {
-          newNavigatorSections.push(newSection);
-        } else {
-          newNavigatorSections.splice(newSectionIndex, 0, newSection);
-        }
-      }
-
-      return {
-        ...navigatorsByName,
-        [navigatorName]: {
-          ...currentNavigator,
-          sections: newNavigatorSections,
-        },
-      };
-    }, {})
-  ),
+  navigators,
 };
 
 const initialAlertState: AlertState = {};
