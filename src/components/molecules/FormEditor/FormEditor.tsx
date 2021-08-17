@@ -170,7 +170,7 @@ const FormEditor = (props: {contentHeight: string}) => {
 
           setFormData({formData: formData.formData, orgFormData: data});
           setHasChanged(false);
-          dispatch(saveResource({resourceId: selectedResource.id, content}));
+          dispatch(saveResource({resourceId: selectedResource.id}));
         }
       } catch (err) {
         logMessage(`Failed to update resource ${err}`, dispatch);

@@ -40,10 +40,14 @@ export type SetRootFolderPayload = {
 
 export type SaveResourcePayload = {
   resourceId: string;
+};
+
+export type UpdateResourcePayload = {
+  resourceId: string;
   content: string;
 };
 
-export type UpdateFileEntryPayload = {
+export type SaveFileEntryPayload = {
   path: string;
   content: string;
 };
@@ -112,7 +116,7 @@ export const mainSlice = createSlice({
     /**
      * updates the content of the specified path to the specified value
      */
-    updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
+    saveFileEntry: (state: Draft<AppState>, action: PayloadAction<SaveFileEntryPayload>) => {
       try {
         const fileEntry = state.fileMap[action.payload.path];
         if (fileEntry) {
@@ -122,6 +126,7 @@ export const mainSlice = createSlice({
           if (!fs.statSync(filePath).isDirectory()) {
             fs.writeFileSync(filePath, action.payload.content);
             fileEntry.timestamp = fs.statSync(filePath).mtime.getTime();
+            fileEntry.isDirty = false;
 
             getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
               delete state.resourceMap[r.id];
@@ -150,13 +155,28 @@ export const mainSlice = createSlice({
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          const newResourceFileContent = saveResourceFile(resource, action.payload.content, state.fileMap);
-          resource.text = newResourceFileContent;
-          resource.content = parseDocument(newResourceFileContent).toJS();
+          saveResourceFile(resource, state.fileMap);
+          resource.isDirty = false;
+        }
+      } catch (e) {
+        log.error(e);
+        return original(state);
+      }
+    },
+    /**
+     * Saves the content of the specified resource to the specified value
+     */
+    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
+      const newResourceText = action.payload.content;
+      try {
+        const resource = state.resourceMap[action.payload.resourceId];
+        if (resource) {
+          resource.text = newResourceText;
+          resource.content = parseDocument(newResourceText).toJS();
           recalculateResourceRanges(resource, state);
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
+          resource.isDirty = true;
           resource.isSelected = false;
-          resource.isDirty = false;
           updateSelectionAndHighlights(state, resource);
         }
       } catch (e) {
@@ -343,7 +363,8 @@ export const {
   setSelectingFile,
   setApplyingResource,
   saveResource,
-  updateFileEntry,
+  updateResource,
+  saveFileEntry,
   pathAdded,
   fileChanged,
   pathRemoved,

@@ -2,7 +2,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
-import {useMeasure} from 'react-use';
+import {useMeasure, useDebounce} from 'react-use';
 import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import 'monaco-yaml/lib/esm/monaco.contribution';
@@ -18,7 +18,7 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
-import {updateFileEntry, saveResource, selectK8sResource} from '@redux/reducers/main';
+import {saveFileEntry, saveResource, updateResource, selectK8sResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
@@ -143,32 +143,38 @@ const Monaco = (props: {editorHeight: string}) => {
     setValid(!parseAllDocuments(newValue).some(d => d.errors.length > 0));
   }
 
-  const saveContent = (providedEditor?: monaco.editor.IStandaloneCodeEditor) => {
-    let value = null;
+  const saveResourceContent = (providedEditor?: monaco.editor.IStandaloneCodeEditor) => {
+    let editorValue = null;
     if (providedEditor) {
-      value = providedEditor.getValue();
+      editorValue = providedEditor.getValue();
     } else if (editor) {
-      value = editor.getValue();
+      editorValue = editor.getValue();
     } else {
       return;
     }
     // is a file and no resource selected?
     if (selectedPath && !selectedResourceId) {
       try {
-        dispatch(updateFileEntry({path: selectedPath, content: value}));
-        setOriginalCode(value);
+        dispatch(saveFileEntry({path: selectedPath, content: editorValue}));
+        setOriginalCode(editorValue);
       } catch (e) {
         logMessage(`Failed to update file ${e}`, dispatch);
       }
     } else if (selectedResourceId && resourceMap[selectedResourceId]) {
       try {
-        dispatch(saveResource({resourceId: selectedResourceId, content: value.toString()}));
-        setOriginalCode(value);
+        dispatch(saveResource({resourceId: selectedResourceId}));
+        setOriginalCode(editorValue);
       } catch (e) {
         logMessage(`Failed to update resource ${e}`, dispatch);
       }
     }
   };
+
+  const updateResourceContent = () => {
+    dispatch(updateResource({resourceId: '', content: ''}));
+  };
+
+  useDebounce(() => {}, 1000, []);
 
   useEffect(() => {
     if (editor) {
@@ -181,7 +187,7 @@ const Monaco = (props: {editorHeight: string}) => {
         /* eslint-disable no-bitwise */
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
         run: currentEditor => {
-          saveContent(currentEditor as monaco.editor.IStandaloneCodeEditor);
+          saveResourceContent(currentEditor as monaco.editor.IStandaloneCodeEditor);
         },
       });
       actionSaveDisposableRef.current = newActionSaveDisposable;
@@ -299,7 +305,7 @@ const Monaco = (props: {editorHeight: string}) => {
           large="true"
           type={hasWarnings ? 'dashed' : 'primary'}
           disabled={!isDirty || !isValid}
-          onClick={() => saveContent()}
+          onClick={() => saveResourceContent()}
         >
           Save
         </RightMonoButton>
