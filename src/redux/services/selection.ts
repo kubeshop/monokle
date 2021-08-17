@@ -27,7 +27,7 @@ export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: Re
     ?.map(e => fileMap[getChildFilePath(e, fileEntry, fileMap)])
     .filter(child => child)
     .forEach(child => {
-      getResourcesForPath(child.filePath, resourceMap).forEach(e => {
+      getResourcesForPath(child.relativePath, resourceMap).forEach(e => {
         e.isHighlighted = true;
       });
       if (child.children) {

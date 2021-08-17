@@ -16,7 +16,7 @@ function linkParentKustomization(
   resourceMap: ResourceMapType,
   refNode: NodeWrapper
 ) {
-  getResourcesForPath(fileEntry.filePath, resourceMap).forEach(r => {
+  getResourcesForPath(fileEntry.relativePath, resourceMap).forEach(r => {
     // since the target is a file there is no target refNode
     linkResources(kustomization, r, refNode);
   });
@@ -36,7 +36,7 @@ export function isKustomizationResource(r: K8sResource | undefined) {
 
 export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
   if (fileEntry.name.toLowerCase() === 'kustomization.yaml') {
-    const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
+    const resources = getResourcesForPath(fileEntry.relativePath, resourceMap);
     return resources.length === 1 && isKustomizationResource(resources[0]);
   }
 
@@ -59,7 +59,7 @@ function processKustomizationResource(
     if (fileEntry.children) {
       // resource is folder -> find contained kustomizations and link...
       fileEntry.children
-        .map(child => fileMap[path.join(fileEntry.filePath, child)])
+        .map(child => fileMap[path.join(fileEntry.relativePath, child)])
         .filter(childFileEntry => childFileEntry)
         .filter(childFileEntry => isKustomizationFile(childFileEntry, resourceMap))
         .forEach(childFileEntry => {
@@ -92,7 +92,7 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
       kustomization.content.patchesStrategicMerge?.forEach((e: string) => {
         const fileEntry = fileMap[path.join(path.parse(kustomization.filePath).dir, e)];
         if (fileEntry) {
-          getResourcesForPath(fileEntry.filePath, resourceMap).forEach(resource => {
+          getResourcesForPath(fileEntry.relativePath, resourceMap).forEach(resource => {
             if (!resource.name.startsWith('Patch:')) {
               resource.name = `Patch: ${resource.name}`;
             }

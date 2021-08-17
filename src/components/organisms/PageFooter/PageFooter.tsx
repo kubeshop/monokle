@@ -25,7 +25,7 @@ const PageFooter = () => {
   const nrOfFiles = Object.keys(fileMap).length - 1;
 
   const footerText = `Monokle ${packageJson.version} - kubeshop.io 2021${
-    rootEntry && rootEntry.children ? ` - ${rootEntry.filePath} - ${nrOfFiles} files` : ''
+    rootEntry && rootEntry.children ? ` - ${rootEntry.relativePath} - ${nrOfFiles} files` : ''
   }`;
 
   return <StyledFooter noborder="true">{footerText}</StyledFooter>;

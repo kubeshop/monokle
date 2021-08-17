@@ -6,7 +6,7 @@ import {RootState} from './store';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
-  fileMap => fileMap[ROOT_FILE_ENTRY]?.filePath
+  fileMap => fileMap[ROOT_FILE_ENTRY]?.relativePath
 );
 
 export const allResourcesSelector = createSelector(

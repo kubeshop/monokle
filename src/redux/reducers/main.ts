@@ -120,7 +120,7 @@ export const mainSlice = createSlice({
       try {
         const fileEntry = state.fileMap[action.payload.path];
         if (fileEntry) {
-          let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+          let rootFolder = state.fileMap[ROOT_FILE_ENTRY].relativePath;
           const filePath = path.join(rootFolder, action.payload.path);
 
           if (!fs.statSync(filePath).isDirectory()) {
@@ -128,7 +128,7 @@ export const mainSlice = createSlice({
             fileEntry.timestamp = fs.statSync(filePath).mtime.getTime();
             fileEntry.isDirty = false;
 
-            getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
+            getResourcesForPath(fileEntry.relativePath, state.resourceMap).forEach(r => {
               delete state.resourceMap[r.id];
             });
 
@@ -340,7 +340,7 @@ function selectFilePath(filePath: string, state: AppState) {
 
   if (entries.length > 0) {
     const parent = entries[entries.length - 1];
-    getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
+    getResourcesForPath(parent.relativePath, state.resourceMap).forEach(r => {
       r.isHighlighted = true;
     });
 

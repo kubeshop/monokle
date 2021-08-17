@@ -26,7 +26,7 @@ export const previewHelmValuesFile = createAsyncThunk<
   if (state.previewValuesFileId !== valuesFileId) {
     const valuesFile = state.helmValuesMap[valuesFileId];
     if (valuesFile && valuesFile.filePath) {
-      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].relativePath;
       const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
       const chart = state.helmChartMap[valuesFile.helmChartId];
 

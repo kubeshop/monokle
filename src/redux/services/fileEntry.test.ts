@@ -9,7 +9,7 @@ test('create-file-entry', () => {
   let e = createFileEntry(createSafePath('/a/very/long/path'));
   expect(e.isExcluded).toBeFalsy();
   expect(e.name).toBe('path');
-  expect(e.filePath).toBe(createSafePath('/a/very/long/path'));
+  expect(e.relativePath).toBe(createSafePath('/a/very/long/path'));
   expect(e.children).toBeUndefined();
 });
 

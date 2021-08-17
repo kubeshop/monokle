@@ -49,10 +49,10 @@ const NodeTitleContainer = styled.div`
 `;
 
 const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) => {
-  const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
+  const resources = getResourcesForPath(fileEntry.relativePath, resourceMap);
 
   const node: TreeNode = {
-    key: fileEntry.filePath,
+    key: fileEntry.relativePath,
     title: (
       <NodeContainer>
         <NodeTitleContainer>
@@ -270,7 +270,7 @@ const FileTreePane = () => {
   };
 
   const refreshFolder = () => {
-    setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
+    setFolder(fileMap[ROOT_FILE_ENTRY].relativePath);
   };
 
   useEffect(() => {

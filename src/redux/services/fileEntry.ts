@@ -21,7 +21,7 @@ export function createFileEntry(rootFolderPath: string, fileRelativePath: string
   const text = !fs.statSync(fileAbsolutePath).isDirectory() ? fs.readFileSync(fileAbsolutePath, 'utf8') : undefined;
   const fileEntry: FileEntry = {
     name: fileRelativePath.substr(fileRelativePath.lastIndexOf(path.sep) + 1),
-    filePath: fileRelativePath,
+    relativePath: fileRelativePath,
     isExcluded: false,
     isDirty: false,
     text,
@@ -32,7 +32,7 @@ export function createFileEntry(rootFolderPath: string, fileRelativePath: string
 export function createRootFileEntry(rootFolderPath: string) {
   const fileEntry: FileEntry = {
     name: rootFolderPath.substr(rootFolderPath.lastIndexOf(path.sep) + 1),
-    filePath: rootFolderPath,
+    relativePath: rootFolderPath,
     isExcluded: false,
     isDirty: false,
   };
@@ -44,7 +44,7 @@ export function createRootFileEntry(rootFolderPath: string) {
  */
 
 function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
-  return appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
+  return appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.relativePath, e));
 }
 
 /**
@@ -71,7 +71,7 @@ export function readFiles(
   }
 
   const rootFileEntry = fileMap[ROOT_FILE_ENTRY];
-  const rootFolderPath = rootFileEntry.filePath;
+  const rootFolderPath = rootFileEntry.relativePath;
 
   // is this a helm chart folder?
   if (files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1) {
@@ -104,7 +104,7 @@ export function readFiles(
         helmChart.valueFileIds.push(helmValues.id);
       }
 
-      fileMap[fileEntry.filePath] = fileEntry;
+      fileMap[fileEntry.relativePath] = fileEntry;
       result.push(fileEntry.name);
     });
 
@@ -129,7 +129,7 @@ export function readFiles(
         }
       }
 
-      fileMap[fileEntry.filePath] = fileEntry;
+      fileMap[fileEntry.relativePath] = fileEntry;
       result.push(fileEntry.name);
     });
   }
@@ -152,7 +152,7 @@ export function getResourcesForPath(filePath: string, resourceMap: ResourceMapTy
 
 export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMapType) {
   return path.join(
-    fileMap[ROOT_FILE_ENTRY].filePath,
+    fileMap[ROOT_FILE_ENTRY].relativePath,
     resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep))
   );
 }
@@ -162,7 +162,7 @@ export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMa
  */
 
 export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapType) {
-  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, resource.filePath);
+  return path.join(fileMap[ROOT_FILE_ENTRY].relativePath, resource.filePath);
 }
 
 /**
@@ -173,7 +173,7 @@ export function extractK8sResourcesFromFileEntry(fileEntry: FileEntry) {
   if (!fileEntry.text) {
     return [];
   }
-  return extractK8sResources(fileEntry.text, fileEntry.filePath);
+  return extractK8sResources(fileEntry.text, fileEntry.relativePath);
 }
 
 /**
@@ -201,7 +201,7 @@ export function getAllFileEntriesForPath(filePath: string, fileMap: FileMapType)
  */
 
 export function getChildFilePath(child: string, parentEntry: FileEntry, fileMap: FileMapType) {
-  return parentEntry === fileMap[ROOT_FILE_ENTRY] ? path.sep + child : path.join(parentEntry.filePath, child);
+  return parentEntry === fileMap[ROOT_FILE_ENTRY] ? path.sep + child : path.join(parentEntry.relativePath, child);
 }
 
 /**
@@ -209,7 +209,7 @@ export function getChildFilePath(child: string, parentEntry: FileEntry, fileMap:
  */
 
 export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapType) {
-  const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
+  const rootFolder = fileMap[ROOT_FILE_ENTRY].relativePath;
   if (filePath === rootFolder) {
     return fileMap[ROOT_FILE_ENTRY];
   }
@@ -224,7 +224,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
   if (!fileEntry.timestamp || fs.statSync(absolutePath).mtime.getTime() > fileEntry.timestamp) {
     log.info(`updating from file ${absolutePath}`);
 
-    const resourcesInFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
+    const resourcesInFile = getResourcesForPath(fileEntry.relativePath, state.resourceMap);
     let wasSelected = false;
 
     resourcesInFile.forEach(resource => {
@@ -235,7 +235,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
       delete state.resourceMap[resource.id];
     });
 
-    if (state.selectedPath === fileEntry.filePath) {
+    if (state.selectedPath === fileEntry.relativePath) {
       state.selectedPath = undefined;
       clearResourceSelections(state.resourceMap);
     }
@@ -259,7 +259,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
 function addFile(absolutePath: string, state: AppState) {
   log.info(`adding file ${absolutePath}`);
-  let rootFolderPath = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  let rootFolderPath = state.fileMap[ROOT_FILE_ENTRY].relativePath;
   const fileEntry = createFileEntry(rootFolderPath, absolutePath.substr(rootFolderPath.length));
   extractK8sResourcesFromFileEntry(fileEntry).forEach(resource => {
     state.resourceMap[resource.id] = resource;
@@ -274,7 +274,7 @@ function addFile(absolutePath: string, state: AppState) {
 
 function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) {
   log.info(`adding folder ${absolutePath}`);
-  const rootFolderPath = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  const rootFolderPath = state.fileMap[ROOT_FILE_ENTRY].relativePath;
   if (absolutePath.startsWith(rootFolderPath)) {
     const folderEntry = createFileEntry(rootFolderPath, absolutePath.substr(rootFolderPath.length));
     folderEntry.children = readFiles(
@@ -305,7 +305,7 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
       : addFile(absolutePath, state);
 
     if (fileEntry) {
-      state.fileMap[fileEntry.filePath] = fileEntry;
+      state.fileMap[fileEntry.relativePath] = fileEntry;
 
       parentEntry.children = parentEntry.children || [];
       parentEntry.children.push(fileEntry.name);
@@ -325,8 +325,8 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
  */
 
 function removeFile(fileEntry: FileEntry, state: AppState) {
-  log.info(`removing file ${fileEntry.filePath}`);
-  getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(resource => {
+  log.info(`removing file ${fileEntry.relativePath}`);
+  getResourcesForPath(fileEntry.relativePath, state.resourceMap).forEach(resource => {
     if (state.selectedResourceId === resource.id) {
       updateSelectionAndHighlights(state, resource);
     }
@@ -339,9 +339,9 @@ function removeFile(fileEntry: FileEntry, state: AppState) {
  */
 
 function removeFolder(fileEntry: FileEntry, state: AppState) {
-  log.info(`removing folder ${fileEntry.filePath}`);
+  log.info(`removing folder ${fileEntry.relativePath}`);
   fileEntry.children?.forEach(child => {
-    const childEntry = state.fileMap[path.join(fileEntry.filePath, child)];
+    const childEntry = state.fileMap[path.join(fileEntry.relativePath, child)];
     if (childEntry) {
       if (childEntry.children) {
         removeFolder(childEntry, state);
@@ -357,7 +357,7 @@ function removeFolder(fileEntry: FileEntry, state: AppState) {
  */
 
 export function removePath(absolutePath: string, state: AppState, fileEntry: FileEntry) {
-  delete state.fileMap[fileEntry.filePath];
+  delete state.fileMap[fileEntry.relativePath];
 
   if (fileEntry.children) {
     removeFolder(fileEntry, state);
