@@ -1,9 +1,6 @@
 name: monokle-publish
 
 on:
-  push:
-    tags:
-      - 'v[0-9].[0-9]+.[0-9]+' # Should only grab tags without /
   release:
     types:
       - prereleased
@@ -13,7 +10,7 @@ on:
 
 jobs:
   # This workflow contains a single job called "build"
-  build-mac:
+  build-and-publish-mac:
     runs-on: macOS-latest
 
     steps:
@@ -34,10 +31,6 @@ jobs:
           sysctl -n machdep.cpu.brand_string
           vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
 
-      - name: Install Tools
-        run: |
-          brew install tree
-
       - name: Get Node Version
         run: |
           cat .nvmrc
@@ -55,12 +48,12 @@ jobs:
           env
           echo "npm: $(npm --version)"
           echo "node: $(node --version)"
-          npm install --force
+          npm install
 
       - name: Verify Dependencies
         run: |
           ls -la
-          tree node_modules -L 1
+          npm list --depth=1
 
       - name: Build
         run: |
@@ -108,7 +101,7 @@ jobs:
           ls -la
         if: ${{ always() }}
 
-  build-windows:
+  build-and-publishwindows:
     runs-on: windows-latest
 
     steps:
@@ -143,12 +136,12 @@ jobs:
           Set-PSDebug -Trace 1
           node --version
           npm --version
-          npm install --force
+          npm install
 
       - name: Verify Dependencies
         run: |
           cmd /r dir
-          cmd /r dir .\node_modules
+          npm list --depth=1
 
       - name: Build
         run: |

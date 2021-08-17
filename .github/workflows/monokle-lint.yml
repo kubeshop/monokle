@@ -7,8 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # This workflow contains a single job called "build"
-  build-mac:
+  lint-mac:
     runs-on: macOS-latest
 
     steps:
@@ -29,10 +28,6 @@ jobs:
           sysctl -n machdep.cpu.brand_string
           vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
 
-      - name: Install Tools
-        run: |
-          brew install tree
-
       - name: Get Node Version
         run: |
           cat .nvmrc
@@ -50,12 +45,12 @@ jobs:
           env
           echo "npm: $(npm --version)"
           echo "node: $(node --version)"
-          npm install --force
+          npm install --only=dev
 
       - name: Verify Dependencies
         run: |
           ls -la
-          tree node_modules -L 1
+          npm list --depth=1
 
       - name: Lint
         run: |
