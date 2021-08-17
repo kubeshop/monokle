@@ -61,13 +61,16 @@ ipcMain.on('run-helm', (event, args: any) => {
   }
 });
 
-ipcMain.on('app-version', (event, args) => {
+ipcMain.on('app-version', event => {
   event.sender.send('app-version', {version: app.getVersion()});
 });
 
-ipcMain.on('quit-and-install', (event, args) => {
-  console.info('quit-and-install-ipcMain');
-  // autoUpdater.quitAndInstall();
+ipcMain.on('check-update-available', () => {
+  autoUpdater.checkForUpdatesAndNotify();
+});
+
+ipcMain.on('quit-and-install', () => {
+  autoUpdater.quitAndInstall();
 });
 
 function createWindow() {
@@ -116,21 +119,25 @@ function createWindow() {
     win.webContents.openDevTools();
   }
 
+  // store.subscribe(() => {});
+
   win.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
   });
 
-  autoUpdater.on('update-available', (info: any) => {
-    console.log(`update-available-autoUpdater ${JSON.stringify(info)}`);
+  autoUpdater.on('update-available', () => {
     win.webContents.send('update-available');
   });
 
-  autoUpdater.on('download-progress', (progressObj: any) => {
-    console.info(`download-progress-autoUpdater ${JSON.stringify(progressObj)}`);
+  autoUpdater.on('update-not-available', () => {
+    win.webContents.send('update-not-available');
   });
 
-  autoUpdater.on('update-downloaded', (info: any) => {
-    console.info(`update-available-autoUpdater ${JSON.stringify(info)}`);
+  autoUpdater.on('download-progress', (progressObj: any) => {
+    console.info(`download-progress ${JSON.stringify(progressObj)}`);
+  });
+
+  autoUpdater.on('update-downloaded', () => {
     win.webContents.send('update-downloaded');
   });
 

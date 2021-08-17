@@ -1,7 +1,7 @@
-import React, {useRef} from 'react';
+import React, {useState, useRef} from 'react';
 import styled from 'styled-components';
 
-import {Button, Input, Select, Tooltip} from 'antd';
+import {Button, Input, Select, Tooltip, Divider} from 'antd';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
 
@@ -14,6 +14,8 @@ import {
   updateFileIncludes,
   updateKubeconfig,
   updateHelmPreviewMode,
+  updateCheckingNewVersion,
+  updateNewVersionAvailable,
 } from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
 import {
@@ -22,6 +24,7 @@ import {
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
 } from '@constants/tooltips';
+import {ipcRenderer} from 'electron';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -49,6 +52,9 @@ const StyledSelect = styled(Select)`
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
+  const isNewVersionAvailable = Boolean(useAppSelector(state => state.config.isNewVersionAvailable));
+  const isCheckingNewVersion = Boolean(useAppSelector(state => state.config.isCheckingNewVersion));
+  const [isUpdateDownloaded, setUpdateDownloaded] = useState(false);
 
   const appConfig = useAppSelector(state => state.config);
 
@@ -93,6 +99,33 @@ const SettingsDrawer = () => {
     }
   };
 
+  const checkUpdateAvailability = () => {
+    console.log('checkUpdateAvailability');
+    dispatch(updateCheckingNewVersion(true));
+    ipcRenderer.send('check-update-available');
+  };
+
+  const updateApplication = () => {
+    ipcRenderer.send('quit-and-install');
+  };
+
+  ipcRenderer.once('update-available', () => {
+    console.log('update-available');
+    dispatch(updateNewVersionAvailable(true));
+    dispatch(updateCheckingNewVersion(false));
+  });
+
+  ipcRenderer.once('update-not-available', () => {
+    console.log('update-not-available');
+    dispatch(updateNewVersionAvailable(false));
+    dispatch(updateCheckingNewVersion(false));
+  });
+
+  ipcRenderer.once('update-downloaded', () => {
+    console.log('update-downloaded');
+    setUpdateDownloaded(true);
+  });
+
   return (
     <Drawer
       width="400"
@@ -135,6 +168,18 @@ const SettingsDrawer = () => {
             <Select.Option value="install">Install</Select.Option>
           </StyledSelect>
         </Tooltip>
+      </StyledDiv>
+      <Divider />
+      <StyledDiv>
+        {isNewVersionAvailable ? (
+          <StyledButton onClick={updateApplication} disabled={!isUpdateDownloaded}>
+            Update Monokle
+          </StyledButton>
+        ) : (
+          <StyledButton onClick={checkUpdateAvailability} loading={isCheckingNewVersion}>
+            Check New Version
+          </StyledButton>
+        )}
       </StyledDiv>
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>

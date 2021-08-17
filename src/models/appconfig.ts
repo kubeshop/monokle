@@ -21,7 +21,8 @@ interface AppConfig {
   navigators: ObjectNavigator[]; // the currrent navigator configuration
   kubeconfigPath: string;
   isStartupModalVisible: boolean;
-  isUpdateAvailable: boolean;
+  isNewVersionAvailable: boolean;
+  isCheckingNewVersion: boolean;
   settings: {
     theme: Themes; // not used for now
     textSize: TextSizes; // not used for now

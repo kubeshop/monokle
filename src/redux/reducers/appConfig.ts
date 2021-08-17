@@ -91,6 +91,22 @@ export const updateLanguage = createAsyncThunk('config/updateLanguage', async (l
   thunkAPI.dispatch(configSlice.actions.setLanguage(language));
 });
 
+export const updateNewVersionAvailable = createAsyncThunk(
+  'config/updateNewVersionAvailable',
+  async (isAvailable: boolean, thunkAPI) => {
+    electronStore.set('appConfig.isNewVersionAvailable', isAvailable);
+    thunkAPI.dispatch(configSlice.actions.setNewVersionAvailable(isAvailable));
+  }
+);
+
+export const updateCheckingNewVersion = createAsyncThunk(
+  'config/updateCheckingNewVersion',
+  async (isChecking: boolean, thunkAPI) => {
+    electronStore.set('appConfig.isCheckingNewVersion', isChecking);
+    thunkAPI.dispatch(configSlice.actions.setCheckingNewVersion(isChecking));
+  }
+);
+
 export const configSlice = createSlice({
   name: 'config',
   initialState: initialState.config,
@@ -124,6 +140,12 @@ export const configSlice = createSlice({
     },
     setHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
       state.settings.helmPreviewMode = action.payload;
+    },
+    setNewVersionAvailable: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.isNewVersionAvailable = action.payload;
+    },
+    setCheckingNewVersion: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.isCheckingNewVersion = action.payload;
     },
   },
   extraReducers: builder => {

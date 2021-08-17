@@ -22,7 +22,8 @@ const initialAppState: AppState = {
 
 const initialAppConfigState: AppConfig = {
   isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
-  isUpdateAvailable: false,
+  isNewVersionAvailable: false,
+  isCheckingNewVersion: false,
   kubeconfigPath: '',
   settings: {
     filterObjectsOnSelection: false,
