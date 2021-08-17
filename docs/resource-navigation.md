@@ -55,6 +55,14 @@ a link to take you to that resource in the navigator:
 Here the popup shows the outgoing link from the `argo-rollouts-metrics` Service to the `argo-rollouts Deployment 
 (via the selector in the Service manifest)
 
+If a link is "unfulfilled", i.e. not referring to any object currently in the navigator it is marked with a warning 
+triangle - making it easy to identify broken resource-links in your manifests:
+
+![Resource Navigator Broken Links](img/navigator-broken-links.png)
+
+In this screenshot the `argo-rollouts-role-binding` RoleBinding contains a reference to an `argo-rollouts-role` Role, which
+doesn't exist in the current manifests.
+
 ## Supported Resource links
 
 Monokle currently finds and visualizes the following links between kubernetes resources - please let us know if
