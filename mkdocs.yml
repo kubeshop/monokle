@@ -10,6 +10,8 @@ theme:
   name: material
   locale: en
   highlightjs: true
+  analytics:
+    gtag: G-ZDGQ7HPJSC
   hljs_languages:
     - yaml
 
