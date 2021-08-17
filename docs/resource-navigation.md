@@ -18,16 +18,26 @@ Once selecting a folder the File Explorer and Navigators will be populated accor
 Selecting a file will highlight contained resources in the Navigator and attempt to scroll them into view. The contents of the 
 file will be shown in the source editor to the right - allowing for direct editing of the file.
 
+![File Explorer Navigation](img/resource-navigation-2.png)
+
+In this screenshot
+- the argo-rollouts-aggregate-roles.yaml file is selected - the "3" after the filename indicates it contains 3 kubernetes resources
+- the 3 ClusterRole resources in thie file are highlighed in the Navigator in the middle
+- the contents of the file are shown in the editor to the right
+
 ## Navigator
 
 The Navigator shows all resources found recursively in the selected folder. Resources are grouped into sections/subsections based
 on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
 any other resourced linked to the selected one:
 
+![Resource Navigation](img/resource-navigation-1.png)
 
-
-
-
+In this screenshot 
+- the `argo-rollouts-metrics` service is selected
+- the associated `argo-rollouts-metrics-service.yaml` file is highlighted to the left
+- the linked `argo-rollouts` Deployment (via the selector in the Service manifest) is highlighted 
+- the Service manifest is shown in the editor to the right (with highlighting of the link to the Deployment on line 16)
 
 ## Resource Links
 
@@ -40,7 +50,10 @@ Links between resources are indicated by link icons to the left and right each r
 Hovering over a link icon will show a popup with all links (either incoming or outgoing) allowing you to click on 
 a link to take you to that resource in the navigator:
 
+![Resource Links Popup](img/resource-links-popup.png)
 
+Here the popup shows the outgoing link from the `argo-rollouts-metrics` Service to the `argo-rollouts Deployment 
+(via the selector in the Service manifest)
 
 ## Supported Resource links
 
