@@ -79,6 +79,7 @@
     "jsonpath-plus": "6.0.1",
     "loglevel": "1.7.1",
     "micromatch": "4.0.4",
+    "minimist": "^1.2.5",
     "monaco-yaml": "3.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -96,7 +97,8 @@
     "uuid": "8.3.2",
     "web-vitals": "2.1.0",
     "worker-loader": "3.0.8",
-    "yaml": "2.0.0-6"
+    "yaml": "2.0.0-6",
+    "yargs": "^17.1.1"
   },
   "scripts": {
     "start": "craco start",

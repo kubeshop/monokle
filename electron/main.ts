@@ -10,6 +10,8 @@ import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 Object.assign(console, ElectronLog.functions);
 
 const ElectronStore = require('electron-store');
+const parseArgs = require('minimist');
+import electronTerminalOpen from '../cli/terminal';
 
 const userHomeDir = app.getPath('home');
 
@@ -141,3 +143,25 @@ app.whenReady().then(() => {
     }
   });
 });
+
+const args = parseArgs(process.argv.slice(1));
+
+console.log(args);
+
+if (args.h || args.help) {
+  console.log(`help sample`);
+  process.exit(0); // eslint-disable-line
+}
+
+if (args.v || args.version) {
+  console.log(app.getName(), app.getVersion());
+  process.exit(0); // eslint-disable-line
+}
+
+electronTerminalOpen()
+  .then(() => {
+    createWindow();
+  })
+  .catch((err: any) => {
+    console.log(err);
+  });
