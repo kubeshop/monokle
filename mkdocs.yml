@@ -10,18 +10,21 @@ theme:
   name: material
   locale: en
   highlightjs: true
+  analytics:
+    gtag: G-ZDGQ7HPJSC
   hljs_languages:
     - yaml
 
 nav:
   - Welcome: index.md
   - Getting Started: getting-started.md
+  - Features: features.md
   - UI Overview: overview.md
   - Navigating Resources: resource-navigation.md
   - Resource Editing: resource-editing.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
-  - Cluster Preview: cluster-preview.md
+  - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
 
