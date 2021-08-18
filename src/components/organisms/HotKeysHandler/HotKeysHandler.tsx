@@ -3,14 +3,12 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import hotkeys from '@constants/hotkeys';
 import {useSelector} from 'react-redux';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {toggleSettings, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
 import {startPreview, stopPreview} from '@redux/services/preview';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {setRootEntry} from '@redux/thunks/setRootEntry';
 
 import {makeOnUploadHandler} from '@utils/fileUpload';
 
@@ -24,7 +22,7 @@ const HotKeysHandler = () => {
   const startFileUploader = () => {
     folderInputRef && folderInputRef.current?.click();
   };
-  const onUploadHandler = makeOnUploadHandler(folderInputRef, folder => dispatch(setRootFolder(folder)));
+  const onUploadHandler = makeOnUploadHandler(folderInputRef, folder => dispatch(setRootEntry(folder)));
 
   useHotkeys(hotkeys.SELECT_FOLDER, () => {
     startFileUploader();
@@ -33,8 +31,8 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.REFRESH_FOLDER,
     () => {
-      if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].relativePath) {
-        dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].relativePath));
+      if (mainState.rootEntry) {
+        dispatch(setRootEntry(mainState.rootEntry.absPath));
       }
     },
     [mainState]

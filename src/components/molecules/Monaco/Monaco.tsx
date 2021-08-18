@@ -20,7 +20,6 @@ import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
 import {saveFileEntry, saveResource, updateResource, selectK8sResource} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {useSelector} from 'react-redux';
@@ -73,7 +72,8 @@ const {yaml} = languages || {};
 
 const Monaco = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootEntry = useAppSelector(state => state.main.rootEntry);
+  const fsEntryMap = useAppSelector(state => state.main.fsEntryMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -201,8 +201,8 @@ const Monaco = (props: {editorHeight: string}) => {
       if (resource) {
         newCode = resource.text;
       }
-    } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].relativePath) {
-      const filePath = path.join(fileMap[ROOT_FILE_ENTRY].relativePath, selectedPath);
+    } else if (rootEntry !== undefined && selectedPath && selectedPath !== rootEntry.absPath) {
+      const filePath = path.join(rootEntry.absPath, selectedPath);
       if (!fs.statSync(filePath).isDirectory()) {
         newCode = fs.readFileSync(filePath, 'utf8');
       }
@@ -211,7 +211,7 @@ const Monaco = (props: {editorHeight: string}) => {
     setCode(newCode);
     setOriginalCode(newCode);
     setDirty(false);
-  }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
+  }, [fsEntryMap, selectedPath, selectedResourceId, resourceMap]);
 
   const options = {
     selectOnLineNumbers: true,

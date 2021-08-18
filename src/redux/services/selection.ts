@@ -1,7 +1,7 @@
-import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
+import {AppState, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {FileEntry} from '@models/fileentry';
-import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {FolderEntry, FileSystemEntryMap} from '@models/filesystementry';
+import {getChildRelPath, getResourcesForPath} from '@redux/services/fileSystemEntry';
 import {getLinkedResources} from '@redux/services/resource';
 import {getKustomizationRefs, isKustomizationResource} from '@redux/services/kustomize';
 
@@ -22,16 +22,20 @@ export function clearResourceSelections(resourceMap: ResourceMapType, excludeIte
  * Highlight all resources in all children of the specified file
  */
 
-export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: ResourceMapType, fileMap: FileMapType) {
-  fileEntry.children
-    ?.map(e => fileMap[getChildFilePath(e, fileEntry, fileMap)])
+export function highlightChildrenResources(
+  folderEntry: FolderEntry,
+  resourceMap: ResourceMapType,
+  fsEntryMap: FileSystemEntryMap
+) {
+  folderEntry.childrenEntryNames
+    .map(childEntryName => fsEntryMap[getChildRelPath(childEntryName, folderEntry)])
     .filter(child => child)
     .forEach(child => {
-      getResourcesForPath(child.relativePath, resourceMap).forEach(e => {
+      getResourcesForPath(child.relPath, resourceMap).forEach(e => {
         e.isHighlighted = true;
       });
-      if (child.children) {
-        highlightChildrenResources(child, resourceMap, fileMap);
+      if (child.type === 'folder') {
+        highlightChildrenResources(child, resourceMap, fsEntryMap);
       }
     });
 }

@@ -48,7 +48,7 @@ const DiffModal = () => {
   const diffResourceId = useAppSelector(state => state.main.diffResourceId);
   const [diffResource, setDiffResource] = useState<K8sResource>();
   const [resourceContent, setResourceContent] = useState<string>();
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootEntry = useAppSelector(state => state.main.rootEntry);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const [isVisible, setVisible] = useState(false);
 
@@ -74,8 +74,8 @@ const DiffModal = () => {
   const handleApply = () => {
     if (diffResourceId) {
       const resource = resourceMap[diffResourceId];
-      if (resource) {
-        applyWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig);
+      if (resource && rootEntry) {
+        applyWithConfirm(resource, resourceMap, rootEntry, dispatch, kubeconfig);
       }
     }
   };

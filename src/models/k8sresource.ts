@@ -7,7 +7,7 @@ export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 
 interface K8sResource {
   id: string; // an internally generated UUID - used for references/lookups in resourceMap
-  fileRelativePath: string; // the path relative to the root folder to the file containing this resource - set to preview://<id> for internally generated resources
+  fileRelPath: string; // the path relative to the root folder to the file containing this resource - set to preview://<id> for internally generated resources
   name: string; // name - generated from manifest metadata
   kind: string; // k8s resource kind
   version: string; // k8s resource version

@@ -75,10 +75,9 @@ const getLayoutedElements = (elements: any[]): any => {
 const GraphView = (props: {editorHeight: string}) => {
   const {editorHeight} = props;
   const graphAreaHeight = parseInt(editorHeight, 10) - 150;
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const fsEntryMap = useAppSelector(state => state.main.fsEntryMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const activeResources = useSelector(activeResourcesSelector);
-  const previewResource = useAppSelector(state => state.main.previewResourceId);
 
   const dispatch = useAppDispatch();
   const [reactFlow, setReactFlow] = useState();
@@ -94,9 +93,7 @@ const GraphView = (props: {editorHeight: string}) => {
   function getElementData(resource: K8sResource) {
     let data: any[] = [mapResourceToElement(resource)];
     if (resource.refs) {
-      const refs = resource.refs
-        .filter(ref => !isUnsatisfiedRef(ref.type))
-        .map(ref => mapRefToElement(resource, ref));
+      const refs = resource.refs.filter(ref => !isUnsatisfiedRef(ref.type)).map(ref => mapRefToElement(resource, ref));
       data = data.concat(refs);
     }
     return data;
@@ -112,7 +109,7 @@ const GraphView = (props: {editorHeight: string}) => {
     /* eslint-disable react-hooks/exhaustive-deps */
     updateGraph(data);
     setNodes(data);
-  }, [fileMap, activeResources]);
+  }, [fsEntryMap, activeResources]);
 
   useEffect(() => {
     setNodes(nds =>

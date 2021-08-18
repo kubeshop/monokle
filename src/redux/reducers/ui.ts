@@ -1,5 +1,5 @@
 import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {setRootEntry} from '@redux/thunks/setRootEntry';
 import {UiState} from '@models/ui';
 import initialState from '@redux/initialState';
 
@@ -25,13 +25,13 @@ export const uiSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(setRootFolder.pending, state => {
+      .addCase(setRootEntry.pending, state => {
         state.isFolderLoading = true;
       })
-      .addCase(setRootFolder.fulfilled, state => {
+      .addCase(setRootEntry.fulfilled, state => {
         state.isFolderLoading = false;
       })
-      .addCase(setRootFolder.rejected, state => {
+      .addCase(setRootEntry.rejected, state => {
         state.isFolderLoading = false;
       });
   },

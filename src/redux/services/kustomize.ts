@@ -1,9 +1,9 @@
 import path from 'path';
 import log from 'loglevel';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
+import {ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
-import {getResourcesForPath} from '@redux/services/fileEntry';
+import {getResourcesForPath} from '@redux/services/fileSystemEntry';
+import {FileSystemEntryMap, FileEntry, isFileEntry} from '@models/filesystementry';
 import {getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
 
 /**
@@ -16,7 +16,7 @@ function linkParentKustomization(
   resourceMap: ResourceMapType,
   refNode: NodeWrapper
 ) {
-  getResourcesForPath(fileEntry.relativePath, resourceMap).forEach(r => {
+  getResourcesForPath(fileEntry.relPath, resourceMap).forEach(r => {
     // since the target is a file there is no target refNode
     linkResources(kustomization, r, refNode);
   });
@@ -36,10 +36,9 @@ export function isKustomizationResource(r: K8sResource | undefined) {
 
 export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
   if (fileEntry.name.toLowerCase() === 'kustomization.yaml') {
-    const resources = getResourcesForPath(fileEntry.relativePath, resourceMap);
-    return resources.length === 1 && isKustomizationResource(resources[0]);
+    const resources = getResourcesForPath(fileEntry.relPath, resourceMap);
+    return Boolean(resources.length === 1 && isKustomizationResource(resources[0]));
   }
-
   return false;
 }
 
@@ -51,23 +50,25 @@ function processKustomizationResource(
   kustomization: K8sResource,
   refNode: NodeWrapper,
   resourceMap: ResourceMapType,
-  fileMap: FileMapType
+  fsEntryMap: FileSystemEntryMap
 ) {
-  let kpath = path.join(path.parse(kustomization.fileRelativePath).dir, refNode.nodeValue());
-  const fileEntry = fileMap[kpath];
-  if (fileEntry) {
-    if (fileEntry.children) {
+  let kpath = path.join(path.parse(kustomization.fileRelPath).dir, refNode.nodeValue());
+  const fsEntry = fsEntryMap[kpath];
+  if (fsEntry) {
+    if (fsEntry.type === 'folder') {
       // resource is folder -> find contained kustomizations and link...
-      fileEntry.children
-        .map(child => fileMap[path.join(fileEntry.relativePath, child)])
-        .filter(childFileEntry => childFileEntry)
+      fsEntry.childrenEntryNames
+        .map(childEntryName => fsEntryMap[path.join(fsEntry.relPath, childEntryName)])
+        .filter(
+          (childFileEntry): childFileEntry is FileEntry => childFileEntry !== undefined && isFileEntry(childFileEntry)
+        )
         .filter(childFileEntry => isKustomizationFile(childFileEntry, resourceMap))
         .forEach(childFileEntry => {
           linkParentKustomization(childFileEntry, kustomization, resourceMap, refNode);
         });
     } else {
       // resource is file -> check for contained resources
-      linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
+      linkParentKustomization(fsEntry, kustomization, resourceMap, refNode);
     }
   }
 }
@@ -76,7 +77,7 @@ function processKustomizationResource(
  * Processes all kustomizations in resourceMap and establishes corresponding resourcerefs
  */
 
-export function processKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
+export function processKustomizations(resourceMap: ResourceMapType, fsEntryMap: FileSystemEntryMap) {
   getK8sResources(resourceMap, 'Kustomization')
     .filter(k => k.content.resources || k.content.bases || k.content.patchesStrategicMerge)
     .forEach(kustomization => {
@@ -86,19 +87,19 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
       }
 
       resources.forEach((refNode: NodeWrapper) => {
-        processKustomizationResource(kustomization, refNode, resourceMap, fileMap);
+        processKustomizationResource(kustomization, refNode, resourceMap, fsEntryMap);
       });
 
       kustomization.content.patchesStrategicMerge?.forEach((e: string) => {
-        const fileEntry = fileMap[path.join(path.parse(kustomization.fileRelativePath).dir, e)];
-        if (fileEntry) {
-          getResourcesForPath(fileEntry.relativePath, resourceMap).forEach(resource => {
+        const fsEntry = fsEntryMap[path.join(path.parse(kustomization.fileRelPath).dir, e)];
+        if (fsEntry) {
+          getResourcesForPath(fsEntry.relPath, resourceMap).forEach(resource => {
             if (!resource.name.startsWith('Patch:')) {
               resource.name = `Patch: ${resource.name}`;
             }
           });
         } else {
-          log.warn(`Failed to find patchesStrategicMerge ${e} in kustomization ${kustomization.fileRelativePath}`);
+          log.warn(`Failed to find patchesStrategicMerge ${e} in kustomization ${kustomization.fileRelPath}`);
         }
       });
     });

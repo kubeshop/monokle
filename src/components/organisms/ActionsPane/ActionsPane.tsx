@@ -11,7 +11,8 @@ import TabHeader from '@atoms/TabHeader';
 import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {ResourceMapType} from '@models/appstate';
+import {RootEntry} from '@models/filesystementry';
 import {ThunkDispatch} from 'redux-thunk';
 import {ApplyTooltip, DiffTooltip} from '@constants/tooltips';
 import {performResourceDiff} from '@redux/thunks/diffResource';
@@ -60,7 +61,7 @@ const StyledSkeleton = styled(Skeleton)`
 export function applyWithConfirm(
   selectedResource: K8sResource,
   resourceMap: ResourceMapType,
-  fileMap: FileMapType,
+  rootEntry: RootEntry,
   dispatch: ThunkDispatch<any, any, any>,
   kubeconfig: string
 ) {
@@ -73,7 +74,7 @@ export function applyWithConfirm(
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
-        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig);
+        applyResource(selectedResource.id, resourceMap, rootEntry, dispatch, kubeconfig);
         resolve({});
       });
     },
@@ -88,7 +89,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootEntry = useAppSelector(state => state.main.rootEntry);
   const dispatch = useAppDispatch();
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
@@ -96,10 +97,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const [key, setKey] = useState('source');
 
   const applySelectedResource = useCallback(() => {
-    if (selectedResource) {
-      applyWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
+    if (selectedResource && rootEntry) {
+      applyWithConfirm(selectedResource, resourceMap, rootEntry, dispatch, kubeconfig);
     }
-  }, [selectedResource, resourceMap, fileMap, kubeconfig]);
+  }, [selectedResource, resourceMap, rootEntry, kubeconfig]);
 
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {

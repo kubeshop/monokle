@@ -7,22 +7,22 @@ import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY, FILE_TREE_HEIGHT_OFFSET} from '@constants/constants';
+import {TOOLTIP_DELAY, FILE_TREE_HEIGHT_OFFSET} from '@constants/constants';
 
 import AppContext from '@src/AppContext';
 import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {FileEntry} from '@models/fileentry';
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {FileSystemEntryMap, RootOrFileSystemEntry} from '@models/filesystementry';
+import {ResourceMapType} from '@models/appstate';
 import fs from 'fs';
 import {stopPreview} from '@redux/services/preview';
-import {getResourcesForPath, getChildFilePath} from '@redux/services/fileEntry';
+import {getResourcesForPath, getChildRelPath} from '@redux/services/fileSystemEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {setRootEntry} from '@redux/thunks/setRootEntry';
 
 interface TreeNode {
   key: string;
@@ -48,15 +48,19 @@ const NodeTitleContainer = styled.div`
   color: ${Colors.blue10};
 `;
 
-const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) => {
-  const resources = getResourcesForPath(fileEntry.relativePath, resourceMap);
+const createNode = (fsEntry: RootOrFileSystemEntry, fsEntryMap: FileSystemEntryMap, resourceMap: ResourceMapType) => {
+  const resources = fsEntry.type === 'root' ? [] : getResourcesForPath(fsEntry.relPath, resourceMap);
 
   const node: TreeNode = {
-    key: fileEntry.relativePath,
+    key: fsEntry.type === 'root' ? fsEntry.absPath : fsEntry.relPath,
     title: (
       <NodeContainer>
         <NodeTitleContainer>
-          <span className={fileEntry.isExcluded ? 'excluded-file-entry-name' : 'file-entry-name'}>{fileEntry.name}</span>
+          <span
+            className={fsEntry.type !== 'root' && fsEntry.isExcluded ? 'excluded-file-entry-name' : 'file-entry-name'}
+          >
+            {fsEntry.name}
+          </span>
           {resources.length > 0 ? (
             <StyledNumberOfResources className="file-entry-nr-of-resources" type="secondary">
               {resources.length}
@@ -71,12 +75,12 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
     highlight: false,
   };
 
-  if (fileEntry.children) {
-    node.children = fileEntry.children
-      .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
-      .filter(childEntry => childEntry)
-      .map(childEntry => createNode(childEntry, fileMap, resourceMap));
-  } else {
+  if (fsEntry.type === 'root' || fsEntry.type === 'folder') {
+    node.children = fsEntry.childrenEntryNames
+      .map(childEntryName => fsEntryMap[getChildRelPath(childEntryName, fsEntry)])
+      .filter(childFsEntry => childFsEntry !== undefined)
+      .map(childFsEntry => createNode(childFsEntry, fsEntryMap, resourceMap));
+  } else if (fsEntry.type === 'file') {
     node.isLeaf = true;
   }
 
@@ -86,7 +90,7 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
 // algorithm to find common root folder for selected files - since the first entry is not
 // necessarily the selected folder
 // eslint-disable-next-line no-undef
-function findRootFolder(files: FileList) {
+function findRootFolderPath(files: FileList) {
   let root: any = files[0];
   let topIndex = -1;
 
@@ -241,7 +245,8 @@ const FileTreePane = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootEntry = useAppSelector(state => state.main.rootEntry);
+  const fsEntryMap = useAppSelector(state => state.main.fsEntryMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
@@ -259,31 +264,39 @@ const FileTreePane = () => {
   function onUploadHandler(e: React.SyntheticEvent) {
     e.preventDefault();
     if (folderInput.current?.files && folderInput.current.files.length > 0) {
-      setFolder(findRootFolder(folderInput.current.files));
+      setFolder(findRootFolderPath(folderInput.current.files));
     }
     shouldExpandAllNodes.current = true;
     setAutoExpandParent(true);
   }
 
   const setFolder = (folder: string) => {
-    dispatch(setRootFolder(folder));
+    dispatch(setRootEntry(folder));
   };
 
   const refreshFolder = () => {
-    setFolder(fileMap[ROOT_FILE_ENTRY].relativePath);
+    if (!rootEntry) {
+      return;
+    }
+    setFolder(rootEntry.absPath);
   };
 
   useEffect(() => {
-    const rootEntry = fileMap[ROOT_FILE_ENTRY];
-    const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap);
+    if (!rootEntry) {
+      return;
+    }
+    const treeData = createNode(rootEntry, fsEntryMap, resourceMap);
 
     setTree(treeData);
 
     if (shouldExpandAllNodes.current) {
-      setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
+      setExpandedKeys([
+        rootEntry.name, // TODO: is this needed?
+        ...Object.keys(fsEntryMap).filter(key => fsEntryMap[key].type === 'folder'),
+      ]);
       shouldExpandAllNodes.current = false;
     }
-  }, [fileMap]);
+  }, [rootEntry, fsEntryMap]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
@@ -320,7 +333,7 @@ const FileTreePane = () => {
     if (selectedResourceId && tree) {
       const resource = resourceMap[selectedResourceId];
       if (resource) {
-        const filePath = resource.fileRelativePath;
+        const filePath = resource.fileRelPath;
         highlightFilePath(filePath);
       }
     }
@@ -384,7 +397,7 @@ const FileTreePane = () => {
                     icon={<ReloadOutlined />}
                     type="primary"
                     ghost
-                    disabled={!fileMap[ROOT_FILE_ENTRY]}
+                    disabled={!rootEntry}
                   />
                 </Tooltip>
               </RightButtons>

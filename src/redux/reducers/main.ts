@@ -1,14 +1,15 @@
 import log from 'loglevel';
 import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {PREVIEW_PREFIX} from '@constants/constants';
 import {AppConfig} from '@models/appconfig';
-import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {RootEntry, FileSystemEntryMap} from '@models/filesystementry';
+import {AppState, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {parseDocument} from 'yaml';
 import fs from 'fs';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {previewCluster} from '@redux/thunks/previewCluster';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {setRootEntry} from '@redux/thunks/setRootEntry';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {AlertType} from '@models/alert';
@@ -17,11 +18,11 @@ import {clearResourceSelections, highlightChildrenResources, updateSelectionAndH
 import {
   addPath,
   removePath,
-  getAllFileEntriesForPath,
-  getFileEntryForAbsolutePath,
+  getAllFileSystemEntriesForPath,
+  getEntryForAbsolutePath,
   getResourcesForPath,
   reloadFile,
-} from '../services/fileEntry';
+} from '../services/fileSystemEntry';
 import {
   extractK8sResources,
   recalculateResourceRanges,
@@ -29,9 +30,10 @@ import {
   saveResourceFile,
 } from '../services/resource';
 
-export type SetRootFolderPayload = {
+export type SetRootEntryPayload = {
   appConfig: AppConfig;
-  fileMap: FileMapType;
+  rootEntry: RootEntry;
+  fsEntryMap: FileSystemEntryMap;
   resourceMap: ResourceMapType;
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
@@ -76,16 +78,20 @@ export const mainSlice = createSlice({
      * called by the file monitor when a path is added to the file system
      */
     pathAdded: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
-      let filePath = action.payload.path;
+      let fileAbsolutePath = action.payload.path;
       const appConfig = action.payload.appConfig;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        if (!fs.statSync(filePath).isDirectory()) {
-          log.info(`added file ${filePath} already exists - updating`);
-          reloadFile(filePath, fileEntry, state);
+      if (!state.rootEntry) {
+        log.error(`Could not find root folder.`);
+        return;
+      }
+      let fsEntry = getEntryForAbsolutePath(fileAbsolutePath, state.fsEntryMap, state.rootEntry);
+      if (fsEntry) {
+        if (fsEntry.type === 'file') {
+          log.info(`added file ${fileAbsolutePath} already exists - updating`);
+          reloadFile(fileAbsolutePath, fsEntry, state);
         }
       } else {
-        addPath(filePath, state, appConfig);
+        addPath(fileAbsolutePath, state, appConfig);
       }
     },
     /**
@@ -94,9 +100,13 @@ export const mainSlice = createSlice({
     fileChanged: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
       let filePath = action.payload.path;
       const appConfig = action.payload.appConfig;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        reloadFile(filePath, fileEntry, state);
+      if (!state.rootEntry) {
+        log.error(`Could not find root folder.`);
+        return;
+      }
+      let fsEntry = getEntryForAbsolutePath(filePath, state.fsEntryMap, state.rootEntry);
+      if (fsEntry && fsEntry.type === 'file') {
+        reloadFile(filePath, fsEntry, state);
       } else {
         addPath(filePath, state, appConfig);
       }
@@ -106,9 +116,13 @@ export const mainSlice = createSlice({
      */
     pathRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
       let filePath = action.payload;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        removePath(filePath, state, fileEntry);
+      if (!state.rootEntry) {
+        log.error(`Could not find root folder.`);
+        return;
+      }
+      let fsEntry = getEntryForAbsolutePath(filePath, state.fsEntryMap, state.rootEntry);
+      if (fsEntry) {
+        removePath(filePath, state, fsEntry);
       } else {
         log.warn(`removed file ${filePath} not known - ignoring..`);
       }
@@ -118,27 +132,34 @@ export const mainSlice = createSlice({
      */
     saveFileEntry: (state: Draft<AppState>, action: PayloadAction<SaveFileEntryPayload>) => {
       try {
-        const fileEntry = state.fileMap[action.payload.path];
-        if (fileEntry) {
-          let rootFolder = state.fileMap[ROOT_FILE_ENTRY].relativePath;
-          const filePath = path.join(rootFolder, action.payload.path);
+        const fsEntry = state.fsEntryMap[action.payload.path];
+        if (fsEntry) {
+          const rootEntry = state.rootEntry;
+          if (!rootEntry) {
+            log.error(`Could not find root folder`);
+            return;
+          }
+          const fileAbsPath = path.join(rootEntry.absPath, action.payload.path);
 
-          if (!fs.statSync(filePath).isDirectory()) {
-            fs.writeFileSync(filePath, action.payload.content);
-            fileEntry.timestamp = fs.statSync(filePath).mtime.getTime();
-            fileEntry.isDirty = false;
+          if (fsEntry.type === 'file' && !fs.statSync(fileAbsPath).isDirectory()) {
+            fs.writeFileSync(fileAbsPath, action.payload.content);
+            fsEntry.timestamp = fs.statSync(fileAbsPath).mtime.getTime();
+            fsEntry.isDirty = false;
 
-            getResourcesForPath(fileEntry.relativePath, state.resourceMap).forEach(r => {
+            getResourcesForPath(fsEntry.relPath, state.resourceMap).forEach(r => {
               delete state.resourceMap[r.id];
             });
 
-            const resources = extractK8sResources(action.payload.content, filePath.substring(rootFolder.length));
+            const resources = extractK8sResources(
+              action.payload.content,
+              fileAbsPath.substring(rootEntry.absPath.length)
+            );
             Object.values(resources).forEach(r => {
               state.resourceMap[r.id] = r;
               r.isHighlighted = true;
             });
 
-            reprocessResources([], state.resourceMap, state.fileMap);
+            reprocessResources([], state.resourceMap, state.fsEntryMap);
           }
         } else {
           log.error(`Could not find FileEntry for ${action.payload.path}`);
@@ -152,10 +173,14 @@ export const mainSlice = createSlice({
      * Saves the content of the specified resource to the specified value
      */
     saveResource: (state: Draft<AppState>, action: PayloadAction<SaveResourcePayload>) => {
+      if (!state.rootEntry) {
+        log.error(`Could not find root folder.`);
+        return;
+      }
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          saveResourceFile(resource, state.fileMap);
+          saveResourceFile(resource, state.fsEntryMap, state.rootEntry);
           resource.isDirty = false;
         }
       } catch (e) {
@@ -174,7 +199,7 @@ export const mainSlice = createSlice({
           resource.text = newResourceText;
           resource.content = parseDocument(newResourceText).toJS();
           recalculateResourceRanges(resource, state);
-          reprocessResources([resource.id], state.resourceMap, state.fileMap);
+          reprocessResources([resource.id], state.resourceMap, state.fsEntryMap);
           resource.isDirty = true;
           resource.isSelected = false;
           updateSelectionAndHighlights(state, resource);
@@ -270,9 +295,10 @@ export const mainSlice = createSlice({
         state.previewType = undefined;
       });
 
-    builder.addCase(setRootFolder.fulfilled, (state, action) => {
+    builder.addCase(setRootEntry.fulfilled, (state, action) => {
       state.resourceMap = action.payload.resourceMap;
-      state.fileMap = action.payload.fileMap;
+      state.rootEntry = action.payload.rootEntry;
+      state.fsEntryMap = action.payload.fsEntryMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
       state.previewLoader.isLoading = false;
@@ -320,7 +346,7 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
 
   // remove previous preview resources
   Object.values(state.resourceMap)
-    .filter(r => r.fileRelativePath.startsWith(PREVIEW_PREFIX))
+    .filter(r => r.fileRelPath.startsWith(PREVIEW_PREFIX))
     .forEach(r => delete state.resourceMap[r.id]);
 
   if (payload.previewResourceId && payload.previewResources) {
@@ -335,17 +361,20 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
  */
 
 function selectFilePath(filePath: string, state: AppState) {
-  const entries = getAllFileEntriesForPath(filePath, state.fileMap);
+  if (!state.rootEntry) {
+    return;
+  }
+  const entries = getAllFileSystemEntriesForPath(filePath, state.fsEntryMap, state.rootEntry);
   clearResourceSelections(state.resourceMap);
 
   if (entries.length > 0) {
     const parent = entries[entries.length - 1];
-    getResourcesForPath(parent.relativePath, state.resourceMap).forEach(r => {
+    getResourcesForPath(parent.relPath, state.resourceMap).forEach(r => {
       r.isHighlighted = true;
     });
 
-    if (parent.children) {
-      highlightChildrenResources(parent, state.resourceMap, state.fileMap);
+    if (parent.type !== 'file') {
+      highlightChildrenResources(parent, state.resourceMap, state.fsEntryMap);
     }
 
     Object.values(state.helmValuesMap).forEach(valuesFile => {

@@ -10,7 +10,7 @@ import {NAV_K8S_RESOURCES_SECTIONS_ORDER} from '@constants/navigator';
 
 const initialAppState: AppState = {
   resourceMap: {},
-  fileMap: {},
+  fsEntryMap: {},
   helmChartMap: {},
   helmValuesMap: {},
   previewLoader: {

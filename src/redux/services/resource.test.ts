@@ -8,7 +8,7 @@ test('get-namespaces', () => {
   const resourceMapWithoutNamespaces: ResourceMapType = {};
   resourceMapWithoutNamespaces['1'] = {
     id: '1',
-    fileRelativePath: 'folder/filename',
+    fileRelPath: 'folder/filename',
     name: 'resource name',
     kind: 'ResourceType',
     version: '1.0',
@@ -16,6 +16,7 @@ test('get-namespaces', () => {
     isSelected: false,
     content: {},
     text: '',
+    isDirty: false,
   };
 
   expect(getNamespaces(resourceMapWithoutNamespaces).length).toBe(0);

@@ -1,10 +1,11 @@
 import path from 'path';
-import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
-import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
 import fs from 'fs';
+import {AppState, ResourceMapType} from '@models/appstate';
+import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
+import {FileSystemEntryMap, RootEntry} from '@models/filesystementry';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER, REF_PATH_SEPARATOR} from '@constants/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileSystemEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
 import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
@@ -154,7 +155,7 @@ function createResourceRef(
       });
     }
   } else {
-    log.warn(`missing both refNode and targetResource for refType ${refType} on resource ${resource.fileRelativePath}`);
+    log.warn(`missing both refNode and targetResource for refType ${refType} on resource ${resource.fileRelPath}`);
   }
 }
 
@@ -224,7 +225,7 @@ export function createResourceName(filePath: string, content: any) {
  */
 
 export function isFileResource(resource: K8sResource) {
-  return !resource.fileRelativePath.startsWith(PREVIEW_PREFIX);
+  return !resource.fileRelPath.startsWith(PREVIEW_PREFIX);
 }
 
 /**
@@ -232,13 +233,22 @@ export function isFileResource(resource: K8sResource) {
  * single and multi-resource files
  */
 
-export function saveResourceFile(resource: K8sResource, fileMap: FileMapType) {
+export function saveResourceFile(
+  resource: K8sResource,
+  fsEntryMap: FileSystemEntryMap,
+  rootEntry: RootEntry
+) {
   let newFileContent = `${resource.text.trim()}\n`;
 
   if (isFileResource(resource)) {
-    const fileEntry = fileMap[resource.fileRelativePath];
+    const fileEntry = fsEntryMap[resource.fileRelPath];
 
-    let absoluteResourcePath = getAbsoluteResourcePath(resource, fileMap);
+    if (fileEntry.type !== 'file') {
+      log.error(`Could not find file entry for resource ${resource.id}`);
+      return;
+    }
+
+    let absoluteResourcePath = getAbsoluteResourcePath(resource, rootEntry);
     if (resource.range) {
       const content = fs.readFileSync(absoluteResourcePath, 'utf8');
 
@@ -284,11 +294,15 @@ export function clearParsedDocs(resourceMap: ResourceMapType) {
  * This could be more intelligent - it updates everything brute force for now...
  */
 
-export function reprocessResources(resourceIds: string[], resourceMap: ResourceMapType, fileMap: FileMapType) {
+export function reprocessResources(
+  resourceIds: string[],
+  resourceMap: ResourceMapType,
+  fsEntryMap: FileSystemEntryMap
+) {
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
     if (resource) {
-      resource.name = createResourceName(resource.fileRelativePath, resource.content);
+      resource.name = createResourceName(resource.fileRelPath, resource.content);
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
       resource.namespace = resource.content.metadata?.namespace;
@@ -304,7 +318,7 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
   });
 
   if (hasKustomizations) {
-    processKustomizations(resourceMap, fileMap);
+    processKustomizations(resourceMap, fsEntryMap);
   }
 
   processParsedResources(resourceMap);
@@ -328,10 +342,13 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
   // if length of value has changed we need to recalculate document ranges for
   // subsequent resource so future saves will be at correct place in document
   if (resource.range && resource.range.length !== resource.text.length) {
-    const fileEntry = state.fileMap[resource.fileRelativePath];
+    const fileEntry = state.fsEntryMap[resource.fileRelPath];
+    if (fileEntry.type !== 'file') {
+      log.error(`Could not find file entry for resource ${resource.id}`);
+    }
     if (fileEntry) {
       // get list of resourceIds in file sorted by startPosition
-      const resourceIds = getResourcesForPath(resource.fileRelativePath, state.resourceMap)
+      const resourceIds = getResourcesForPath(resource.fileRelPath, state.resourceMap)
         .sort((a, b) => {
           return a.range && b.range ? a.range.start - b.range.start : 0;
         })
@@ -356,7 +373,7 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
         throw new Error(`Failed to find resource in list of ids of fileEntry for ${fileEntry.name}`);
       }
     } else {
-      throw new Error(`Failed to find fileEntry for resource with path ${resource.fileRelativePath}`);
+      throw new Error(`Failed to find fileEntry for resource with path ${resource.fileRelPath}`);
     }
   }
 }
@@ -365,7 +382,7 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
  * Extracts all resources from the specified text content (must be yaml)
  */
 
-export function extractK8sResources(fileText: string, fileRelativePath: string) {
+export function extractK8sResources(fileText: string, fileRelPath: string) {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllDocuments(fileText, {lineCounter});
   const result: K8sResource[] = [];
@@ -375,7 +392,7 @@ export function extractK8sResources(fileText: string, fileRelativePath: string) 
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(fileRelativePath).name} due to ${doc.errors.length} error(s)`
+          `Ignoring document ${docIndex} in ${path.parse(fileRelPath).name} due to ${doc.errors.length} error(s)`
         );
       } else {
         const content = doc.toJS();
@@ -383,8 +400,8 @@ export function extractK8sResources(fileText: string, fileRelativePath: string) 
           const text = fileText.slice(doc.range[0], doc.range[1]);
 
           let resource: K8sResource = {
-            name: createResourceName(fileRelativePath, content),
-            fileRelativePath,
+            name: createResourceName(fileRelPath, content),
+            fileRelPath,
             id: uuidv4(),
             isHighlighted: false,
             isSelected: false,

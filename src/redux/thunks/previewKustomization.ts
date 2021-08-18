@@ -2,7 +2,6 @@ import {ipcRenderer} from 'electron';
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 import path from 'path';
 import log from 'loglevel';
 import {createPreviewRejection, createPreviewResult} from '@redux/thunks/utils';
@@ -22,9 +21,15 @@ export const previewKustomization = createAsyncThunk<
   const state = thunkAPI.getState().main;
   if (state.previewResourceId !== resourceId) {
     const resource = state.resourceMap[resourceId];
-    if (resource && resource.fileRelativePath) {
-      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].relativePath;
-      const folder = path.join(rootFolder, resource.fileRelativePath.substr(0, resource.fileRelativePath.lastIndexOf(path.sep)));
+    if (resource && resource.fileRelPath) {
+      const rootEntry = state.rootEntry;
+      if (!rootEntry) {
+        return createPreviewRejection(thunkAPI, 'Kustomize Error', 'Could not find root folder');
+      }
+      const folder = path.join(
+        rootEntry.absPath,
+        resource.fileRelPath.substr(0, resource.fileRelPath.lastIndexOf(path.sep))
+      );
 
       log.info(`previewing ${resource.id} in folder ${folder}`);
       const result = await runKustomize(folder);

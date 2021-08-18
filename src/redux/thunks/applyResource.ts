@@ -1,11 +1,12 @@
 import {K8sResource} from '@models/k8sresource';
 import {spawn} from 'child_process';
 import log from 'loglevel';
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {ResourceMapType} from '@models/appstate';
+import {RootEntry} from '@models/filesystementry';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
-import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
+import {getAbsoluteResourceFolder} from '@redux/services/fileSystemEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getShellPath} from '@utils/shell';
 import {setApplyingResource} from '@redux/reducers/main';
@@ -32,8 +33,8 @@ function applyK8sResource(resource: K8sResource, kubeconfig: string) {
  * Invokes kubectl -k for the content of the specified kustomization
  */
 
-function applyKustomization(resource: K8sResource, fileMap: FileMapType, kubeconfig: string) {
-  const folder = getAbsoluteResourceFolder(resource, fileMap);
+function applyKustomization(resource: K8sResource, rootEntry: RootEntry, kubeconfig: string) {
+  const folder = getAbsoluteResourceFolder(resource, rootEntry);
   const child = spawn('kubectl', ['apply', '-k', folder], {
     env: {
       NODE_ENV: process.env.NODE_ENV,
@@ -54,7 +55,7 @@ function applyKustomization(resource: K8sResource, fileMap: FileMapType, kubecon
 export async function applyResource(
   resourceId: string,
   resourceMap: ResourceMapType,
-  fileMap: FileMapType,
+  rootEntry: RootEntry,
   dispatch: AppDispatch,
   kubeconfig: string
 ) {
@@ -65,7 +66,7 @@ export async function applyResource(
 
       try {
         const child = isKustomizationResource(resource)
-          ? applyKustomization(resource, fileMap, kubeconfig)
+          ? applyKustomization(resource, rootEntry, kubeconfig)
           : applyK8sResource(resource, kubeconfig);
 
         child.on('exit', (code, signal) => {

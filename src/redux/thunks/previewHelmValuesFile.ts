@@ -1,7 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 import path from 'path';
 import fs from 'fs';
 import log from 'loglevel';
@@ -26,8 +25,14 @@ export const previewHelmValuesFile = createAsyncThunk<
   if (state.previewValuesFileId !== valuesFileId) {
     const valuesFile = state.helmValuesMap[valuesFileId];
     if (valuesFile && valuesFile.filePath) {
-      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].relativePath;
-      const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
+      const rootEntry = state.rootEntry;
+      if (!rootEntry) {
+        return createPreviewRejection(thunkAPI, 'Helm Error', `Could not find root folder`);
+      }
+      const folder = path.join(
+        rootEntry.absPath,
+        valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep))
+      );
       const chart = state.helmChartMap[valuesFile.helmChartId];
 
       // sanity check

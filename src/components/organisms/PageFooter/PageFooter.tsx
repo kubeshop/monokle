@@ -6,7 +6,6 @@ import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import Footer from '@components/atoms/Footer';
 import packageJson from '@root/package.json';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 const StyledFooter = styled(Footer)`
   width: 100%;
@@ -18,14 +17,13 @@ const StyledFooter = styled(Footer)`
 `;
 
 const PageFooter = () => {
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const rootEntry = fileMap[ROOT_FILE_ENTRY];
+  const rootEntry = useAppSelector(state => state.main.rootEntry);
+  const fsEntryMap = useAppSelector(state => state.main.fsEntryMap);
 
-  // not counting the root
-  const nrOfFiles = Object.keys(fileMap).length - 1;
+  const nrOfFiles = Object.keys(fsEntryMap).length;
 
   const footerText = `Monokle ${packageJson.version} - kubeshop.io 2021${
-    rootEntry && rootEntry.children ? ` - ${rootEntry.relativePath} - ${nrOfFiles} files` : ''
+    rootEntry ? ` - ${rootEntry.absPath} - ${nrOfFiles} files` : ''
   }`;
 
   return <StyledFooter noborder="true">{footerText}</StyledFooter>;
