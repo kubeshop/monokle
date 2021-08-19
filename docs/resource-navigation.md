@@ -26,7 +26,7 @@ In this screenshot
 - the 3 ClusterRole resources in thie file are highlighed in the Navigator in the middle
 - the contents of the file are shown in the editor to the right
 
-## Navigator
+## Resource Navigator
 
 The Navigator shows all resources found recursively in the selected folder. Resources are grouped into sections/subsections based
 on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
@@ -39,6 +39,11 @@ In this screenshot
 - the associated `argo-rollouts-metrics-service.yaml` file is highlighted to the left
 - the linked `argo-rollouts` Deployment (via the selector in the Service manifest) is highlighted 
 - the Service manifest is shown in the editor to the right (with highlighting of the link to the Deployment on line 16)
+
+The Namespaces filter at the top of the K8S Resources section is populated with available/defined namespaces and 
+allows you to only show objects in the selected namespace - for example when retrieving resources from your cluster:
+
+![Namespace Filter](img/namespace-filter.png)
 
 ## Resource Links
 
