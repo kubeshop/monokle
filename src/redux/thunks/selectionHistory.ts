@@ -22,17 +22,16 @@ export const selectFromHistory = createAsyncThunk<
     if (currentSelectionHistoryIndex === 0) {
       return;
     }
-    nextSelectionHistoryIndex = currentSelectionHistoryIndex
-      ? currentSelectionHistoryIndex - 1
-      : selectionHistory.length - 2;
+    nextSelectionHistoryIndex =
+      currentSelectionHistoryIndex !== undefined ? currentSelectionHistoryIndex - 1 : selectionHistory.length - 2;
   } else if (direction === 'right') {
-    if (!currentSelectionHistoryIndex || currentSelectionHistoryIndex === selectionHistory.length - 1) {
+    if (currentSelectionHistoryIndex === undefined || currentSelectionHistoryIndex === selectionHistory.length - 1) {
       return;
     }
     nextSelectionHistoryIndex = currentSelectionHistoryIndex + 1;
   }
 
-  if (!nextSelectionHistoryIndex) {
+  if (nextSelectionHistoryIndex === null) {
     return;
   }
 

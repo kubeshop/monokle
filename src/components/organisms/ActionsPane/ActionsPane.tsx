@@ -112,11 +112,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
-  const isLeftArrowEnabled = selectionHistory.length > 0 && currentSelectionHistoryIndex !== 0;
+  const isLeftArrowEnabled =
+    selectionHistory.length > 1 &&
+    (currentSelectionHistoryIndex === undefined || (currentSelectionHistoryIndex && currentSelectionHistoryIndex > 0));
   const isRightArrowEnabled =
-    selectionHistory.length > 0 &&
-    currentSelectionHistoryIndex &&
-    currentSelectionHistoryIndex < selectionHistory.length - 2;
+    selectionHistory.length > 1 &&
+    currentSelectionHistoryIndex !== undefined &&
+    currentSelectionHistoryIndex < selectionHistory.length - 1;
 
   const onClickLeftArrow = () => {
     dispatch(selectFromHistory({direction: 'left'}));

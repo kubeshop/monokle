@@ -62,7 +62,6 @@ export type StartPreviewLoaderPayload = {
 
 function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
   if (isVirtualSelection) {
-    state.currentSelectionHistoryIndex = undefined;
     return;
   }
   if (type === 'resource' && state.selectedResourceId) {
@@ -77,6 +76,7 @@ function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: b
       selectedPath: state.selectedPath,
     });
   }
+  state.currentSelectionHistoryIndex = undefined;
 }
 
 export const mainSlice = createSlice({
