@@ -1,7 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Tabs, Col, Row, Button, Skeleton, Modal, Tooltip} from 'antd';
 import styled from 'styled-components';
-import {CodeOutlined, ContainerOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
+import {
+  CodeOutlined,
+  ContainerOutlined,
+  ExclamationCircleOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+} from '@ant-design/icons';
 
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
@@ -55,6 +61,14 @@ const StyledSkeleton = styled(Skeleton)`
   margin: 20px;
   padding: 8px;
   width: 95%;
+`;
+
+const StyledLeftArrowButton = styled(Button)`
+  margin-right: 5px;
+`;
+
+const StyledRightArrowButton = styled(Button)`
+  margin-right: 10px;
 `;
 
 export function applyWithConfirm(
@@ -127,6 +141,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
             <TitleBarContainer>
               <span>Editor</span>
               <RightButtons>
+                <StyledLeftArrowButton type="link" size="small" icon={<ArrowLeftOutlined />} />
+                <StyledRightArrowButton type="link" size="small" icon={<ArrowRightOutlined />} />
+
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip} placement="bottomLeft">
                   <Button
                     loading={Boolean(applyingResource)}
