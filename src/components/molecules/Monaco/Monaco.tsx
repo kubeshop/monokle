@@ -100,7 +100,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const dispatch = useAppDispatch();
 
   const selectResource = (resourceId: string) => {
-    dispatch(selectK8sResource(resourceId));
+    dispatch(selectK8sResource({resourceId}));
   };
 
   const onDidChangeMarkers = (e: monaco.Uri[]) => {

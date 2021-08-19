@@ -94,9 +94,7 @@ const GraphView = (props: {editorHeight: string}) => {
   function getElementData(resource: K8sResource) {
     let data: any[] = [mapResourceToElement(resource)];
     if (resource.refs) {
-      const refs = resource.refs
-        .filter(ref => !isUnsatisfiedRef(ref.type))
-        .map(ref => mapRefToElement(resource, ref));
+      const refs = resource.refs.filter(ref => !isUnsatisfiedRef(ref.type)).map(ref => mapRefToElement(resource, ref));
       data = data.concat(refs);
     }
     return data;
@@ -133,7 +131,7 @@ const GraphView = (props: {editorHeight: string}) => {
   const onSelectionChange = (elements: any) => {
     if (elements && elements[0]) {
       elements[0].data.wasSelectedInGraphView = true;
-      dispatch(selectK8sResource(elements[0].id));
+      dispatch(selectK8sResource({resourceId: elements[0].id}));
     }
   };
 

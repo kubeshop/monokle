@@ -56,7 +56,9 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
     title: (
       <NodeContainer>
         <NodeTitleContainer>
-          <span className={fileEntry.isExcluded ? 'excluded-file-entry-name' : 'file-entry-name'}>{fileEntry.name}</span>
+          <span className={fileEntry.isExcluded ? 'excluded-file-entry-name' : 'file-entry-name'}>
+            {fileEntry.name}
+          </span>
           {resources.length > 0 ? (
             <StyledNumberOfResources className="file-entry-nr-of-resources" type="secondary">
               {resources.length}
@@ -343,7 +345,7 @@ const FileTreePane = () => {
         stopPreview(dispatch);
       }
       dispatch(setSelectingFile(true));
-      dispatch(selectFile(info.node.key));
+      dispatch(selectFile({filePath: info.node.key}));
     }
   };
 

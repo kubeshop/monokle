@@ -45,7 +45,7 @@ const ResourcesSection = () => {
   };
 
   const selectResource = (resourceId: string) => {
-    dispatch(selectK8sResource(resourceId));
+    dispatch(selectK8sResource({resourceId}));
   };
 
   const [expandedSubsectionsBySection, setExpandedSubsectionsBySection] = useState<Record<string, string[]>>(
