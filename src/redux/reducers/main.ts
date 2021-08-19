@@ -285,6 +285,8 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
       state.previewType = undefined;
+      state.currentSelectionHistoryIndex = undefined;
+      state.selectionHistory = [];
     });
 
     builder.addCase(performResourceDiff.fulfilled, (state, action) => {
