@@ -226,6 +226,8 @@ export const mainSlice = createSlice({
     clearPreview: (state: Draft<AppState>) => {
       setPreviewData({}, state);
       state.previewType = undefined;
+      state.currentSelectionHistoryIndex = undefined;
+      state.selectionHistory = [];
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
@@ -243,6 +245,8 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        state.currentSelectionHistoryIndex = undefined;
+        state.selectionHistory = [];
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -255,6 +259,8 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        state.currentSelectionHistoryIndex = undefined;
+        state.selectionHistory = [];
       })
       .addCase(previewHelmValuesFile.rejected, (state, action) => {
         state.previewLoader.isLoading = false;
@@ -267,6 +273,8 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        state.currentSelectionHistoryIndex = undefined;
+        state.selectionHistory = [];
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
