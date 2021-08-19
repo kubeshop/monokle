@@ -21,6 +21,7 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
 import {ApplyTooltip, DiffTooltip} from '@constants/tooltips';
 import {performResourceDiff} from '@redux/thunks/diffResource';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 const {TabPane} = Tabs;
@@ -103,11 +104,27 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const dispatch = useAppDispatch();
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
+  const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
+  const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const [key, setKey] = useState('source');
+  const dispatch = useAppDispatch();
+
+  const isLeftArrowEnabled = selectionHistory.length > 0 && currentSelectionHistoryIndex !== 0;
+  const isRightArrowEnabled =
+    selectionHistory.length > 0 &&
+    currentSelectionHistoryIndex &&
+    currentSelectionHistoryIndex < selectionHistory.length - 2;
+
+  const onClickLeftArrow = () => {
+    dispatch(selectFromHistory({direction: 'left'}));
+  };
+
+  const onClickRightArrow = () => {
+    dispatch(selectFromHistory({direction: 'right'}));
+  };
 
   const applySelectedResource = useCallback(() => {
     if (selectedResource) {
@@ -141,8 +158,20 @@ const ActionsPane = (props: {contentHeight: string}) => {
             <TitleBarContainer>
               <span>Editor</span>
               <RightButtons>
-                <StyledLeftArrowButton type="link" size="small" icon={<ArrowLeftOutlined />} />
-                <StyledRightArrowButton type="link" size="small" icon={<ArrowRightOutlined />} />
+                <StyledLeftArrowButton
+                  onClick={onClickLeftArrow}
+                  disabled={!isLeftArrowEnabled}
+                  type="link"
+                  size="small"
+                  icon={<ArrowLeftOutlined />}
+                />
+                <StyledRightArrowButton
+                  onClick={onClickRightArrow}
+                  disabled={!isRightArrowEnabled}
+                  type="link"
+                  size="small"
+                  icon={<ArrowRightOutlined />}
+                />
 
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip} placement="bottomLeft">
                   <Button
