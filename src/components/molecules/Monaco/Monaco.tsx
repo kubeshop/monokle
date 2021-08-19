@@ -287,7 +287,7 @@ const Monaco = (props: {editorHeight: string}) => {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-  }, [editor, code]);
+  }, [editor, selectedResourceId]);
 
   return (
     <>
