@@ -10,8 +10,6 @@ theme:
   name: material
   locale: en
   highlightjs: true
-  analytics:
-    gtag: G-ZDGQ7HPJSC
   hljs_languages:
     - yaml
 
@@ -27,6 +25,11 @@ nav:
   - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
+
+extra:
+  analytics:
+    provider: google
+    property: UA-204665550-5
 
 copyright: Copyright &copy; 2021 <a href="https://kubeshop.io">Kubeshop</a>
 
