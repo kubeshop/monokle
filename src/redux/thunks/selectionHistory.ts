@@ -17,6 +17,14 @@ export const selectFromHistory = createAsyncThunk<
   let currentSelectionHistoryIndex = mainState.currentSelectionHistoryIndex;
   const selectionHistory = mainState.selectionHistory;
 
+  const canNavigateLeft =
+    selectionHistory.length > 1 &&
+    (currentSelectionHistoryIndex === undefined || (currentSelectionHistoryIndex && currentSelectionHistoryIndex > 0));
+  const canNavigateRight =
+    selectionHistory.length > 1 &&
+    currentSelectionHistoryIndex !== undefined &&
+    currentSelectionHistoryIndex < selectionHistory.length - 1;
+
   let removedSelectionHistoryEntriesCount = 0;
   const newSelectionHistory = selectionHistory.filter(historyEntry => {
     if (historyEntry.type === 'resource') {
@@ -33,31 +41,39 @@ export const selectFromHistory = createAsyncThunk<
     return false;
   });
 
-  if (newSelectionHistory.length === 0) {
-    return {newSelectionHistory};
+  if (
+    currentSelectionHistoryIndex !== undefined &&
+    currentSelectionHistoryIndex - removedSelectionHistoryEntriesCount >= 0
+  ) {
+    currentSelectionHistoryIndex -= removedSelectionHistoryEntriesCount;
   }
 
-  if (currentSelectionHistoryIndex !== undefined) {
-    currentSelectionHistoryIndex -= removedSelectionHistoryEntriesCount;
+  if (
+    newSelectionHistory.length === 0 ||
+    (direction === 'left' && !canNavigateLeft) ||
+    (direction === 'right' && !canNavigateRight)
+  ) {
+    return {newSelectionHistory, nextSelectionHistoryIndex: currentSelectionHistoryIndex};
   }
 
   let nextSelectionHistoryIndex: number | null = null;
 
   if (direction === 'left') {
-    if (currentSelectionHistoryIndex === 0) {
-      return {newSelectionHistory};
+    if (
+      currentSelectionHistoryIndex === undefined ||
+      (currentSelectionHistoryIndex && currentSelectionHistoryIndex >= 0)
+    ) {
+      nextSelectionHistoryIndex =
+        currentSelectionHistoryIndex !== undefined ? currentSelectionHistoryIndex - 1 : newSelectionHistory.length - 2;
     }
-    nextSelectionHistoryIndex =
-      currentSelectionHistoryIndex !== undefined ? currentSelectionHistoryIndex - 1 : newSelectionHistory.length - 2;
   } else if (direction === 'right') {
-    if (currentSelectionHistoryIndex === undefined || currentSelectionHistoryIndex === newSelectionHistory.length - 1) {
-      return {newSelectionHistory};
+    if (currentSelectionHistoryIndex !== undefined && currentSelectionHistoryIndex <= newSelectionHistory.length - 1) {
+      nextSelectionHistoryIndex = currentSelectionHistoryIndex + 1;
     }
-    nextSelectionHistoryIndex = currentSelectionHistoryIndex + 1;
   }
 
   if (nextSelectionHistoryIndex === null) {
-    return {newSelectionHistory};
+    return {newSelectionHistory, nextSelectionHistoryIndex: currentSelectionHistoryIndex};
   }
 
   const selectionHistoryEntry = newSelectionHistory[nextSelectionHistoryIndex];
