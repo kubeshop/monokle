@@ -2,40 +2,65 @@ import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+import {SelectionHistoryEntry} from '@models/appstate';
+
 export const selectFromHistory = createAsyncThunk<
-  number | undefined,
+  {
+    newSelectionHistory: SelectionHistoryEntry[];
+    nextSelectionHistoryIndex?: number;
+  },
   {direction: 'left' | 'right'},
   {dispatch: AppDispatch; state: RootState}
 >('main/selectFromHistory', async (payload, thunkAPI) => {
   const mainState = thunkAPI.getState().main;
   const direction = payload.direction;
-  const currentSelectionHistoryIndex = mainState.currentSelectionHistoryIndex;
+  let currentSelectionHistoryIndex = mainState.currentSelectionHistoryIndex;
   const selectionHistory = mainState.selectionHistory;
 
-  if (selectionHistory.length === 0) {
-    return;
+  let removedSelectionHistoryEntriesCount = 0;
+  const newSelectionHistory = selectionHistory.filter(historyEntry => {
+    if (historyEntry.type === 'resource') {
+      if (mainState.resourceMap[historyEntry.selectedResourceId] !== undefined) {
+        return true;
+      }
+    }
+    if (historyEntry.type === 'path') {
+      if (mainState.fileMap[historyEntry.selectedPath] !== undefined) {
+        return true;
+      }
+    }
+    removedSelectionHistoryEntriesCount += 1;
+    return false;
+  });
+
+  if (newSelectionHistory.length === 0) {
+    return {newSelectionHistory};
+  }
+
+  if (currentSelectionHistoryIndex !== undefined) {
+    currentSelectionHistoryIndex -= removedSelectionHistoryEntriesCount;
   }
 
   let nextSelectionHistoryIndex: number | null = null;
 
   if (direction === 'left') {
     if (currentSelectionHistoryIndex === 0) {
-      return;
+      return {newSelectionHistory};
     }
     nextSelectionHistoryIndex =
-      currentSelectionHistoryIndex !== undefined ? currentSelectionHistoryIndex - 1 : selectionHistory.length - 2;
+      currentSelectionHistoryIndex !== undefined ? currentSelectionHistoryIndex - 1 : newSelectionHistory.length - 2;
   } else if (direction === 'right') {
-    if (currentSelectionHistoryIndex === undefined || currentSelectionHistoryIndex === selectionHistory.length - 1) {
-      return;
+    if (currentSelectionHistoryIndex === undefined || currentSelectionHistoryIndex === newSelectionHistory.length - 1) {
+      return {newSelectionHistory};
     }
     nextSelectionHistoryIndex = currentSelectionHistoryIndex + 1;
   }
 
   if (nextSelectionHistoryIndex === null) {
-    return;
+    return {newSelectionHistory};
   }
 
-  const selectionHistoryEntry = selectionHistory[nextSelectionHistoryIndex];
+  const selectionHistoryEntry = newSelectionHistory[nextSelectionHistoryIndex];
   if (selectionHistoryEntry.type === 'resource') {
     thunkAPI.dispatch(
       selectK8sResource({resourceId: selectionHistoryEntry.selectedResourceId, isVirtualSelection: true})
@@ -45,5 +70,5 @@ export const selectFromHistory = createAsyncThunk<
     thunkAPI.dispatch(selectFile({filePath: selectionHistoryEntry.selectedPath, isVirtualSelection: true}));
   }
 
-  return nextSelectionHistoryIndex;
+  return {newSelectionHistory, nextSelectionHistoryIndex};
 });

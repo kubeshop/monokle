@@ -303,7 +303,8 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(selectFromHistory.fulfilled, (state, action) => {
-      state.currentSelectionHistoryIndex = action.payload;
+      state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
+      state.selectionHistory = action.payload.newSelectionHistory;
     });
   },
 });

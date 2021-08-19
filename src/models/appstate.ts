@@ -67,4 +67,12 @@ interface AppState {
   diffContent?: string; // the diff content for the resource being diffed
 }
 
-export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType, PreviewLoaderType};
+export type {
+  AppState,
+  ResourceMapType,
+  FileMapType,
+  HelmChartMapType,
+  HelmValuesMapType,
+  PreviewLoaderType,
+  SelectionHistoryEntry,
+};
