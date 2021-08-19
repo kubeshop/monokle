@@ -35,22 +35,36 @@ type PreviewLoaderType = {
   targetResourceId?: string;
 };
 
+type ResourceSelectionHistoryEntry = {
+  type: 'resource';
+  selectedResourceId: string;
+};
+
+type PathSelectionHistoryEntry = {
+  type: 'path';
+  selectedPath: string;
+};
+
+type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry;
+
 interface AppState {
   fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
   resourceMap: ResourceMapType; // maps resource ids to resources
-  selectedResourceId?: string; // the id of the currently selected resource
-  selectedPath?: string; // the currently selected path
-  previewType?: 'kustomization' | 'cluster' | 'helm';
-  previewResourceId?: string; // the resource currently being previewed
-  previewLoader: PreviewLoaderType;
-  diffResourceId?: string; // the resource currently being diffed
-  diffContent?: string; // the diff content for the resource being diffed
   helmChartMap: HelmChartMapType; // maps chart ids to helm charts
   helmValuesMap: HelmValuesMapType; // maps values ids to helm values files
-  selectedValuesFileId?: string; // the currently selected values file
-  previewValuesFileId?: string; // the values file currently being previewed
-  isSelectingFile: boolean; // if we are currently in the process of selecting a file - used for one-time UI updates
   isApplyingResource: boolean; // if we are currently applying a resource - room for improvement...
+  isSelectingFile: boolean; // if we are currently in the process of selecting a file - used for one-time UI updates
+  currentSelectionHistoryIndex?: number; // index of current selection from the history, or undefined if last selection was not virtual
+  selectionHistory: SelectionHistoryEntry[];
+  selectedResourceId?: string; // the id of the currently selected resource
+  selectedPath?: string; // the currently selected path
+  selectedValuesFileId?: string; // the currently selected values file
+  previewType?: 'kustomization' | 'cluster' | 'helm';
+  previewLoader: PreviewLoaderType;
+  previewResourceId?: string; // the resource currently being previewed
+  previewValuesFileId?: string; // the values file currently being previewed
+  diffResourceId?: string; // the resource currently being diffed
+  diffContent?: string; // the diff content for the resource being diffed
 }
 
 export type {AppState, ResourceMapType, FileMapType, HelmChartMapType, HelmValuesMapType, PreviewLoaderType};

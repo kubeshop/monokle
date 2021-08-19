@@ -11,6 +11,7 @@ import {previewCluster} from '@redux/thunks/previewCluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {AlertType} from '@models/alert';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -58,6 +59,25 @@ export type StartPreviewLoaderPayload = {
   targetResourceId: string;
   previewType: 'kustomization' | 'helm' | 'cluster';
 };
+
+function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
+  if (isVirtualSelection) {
+    state.currentSelectionHistoryIndex = undefined;
+    return;
+  }
+  if (type === 'resource' && state.selectedResourceId) {
+    state.selectionHistory.push({
+      type,
+      selectedResourceId: state.selectedResourceId,
+    });
+  }
+  if (type === 'path' && state.selectedPath) {
+    state.selectionHistory.push({
+      type,
+      selectedPath: state.selectedPath,
+    });
+  }
+}
 
 export const mainSlice = createSlice({
   name: 'main',
@@ -161,30 +181,40 @@ export const mainSlice = createSlice({
     /**
      * Marks the specified resource as selected and highlights all related resources
      */
-    selectK8sResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      const resource = state.resourceMap[action.payload];
+    selectK8sResource: (
+      state: Draft<AppState>,
+      action: PayloadAction<{resourceId: string; isVirtualSelection?: boolean}>
+    ) => {
+      const resource = state.resourceMap[action.payload.resourceId];
       if (resource) {
         updateSelectionAndHighlights(state, resource);
+        updateSelectionHistory('resource', Boolean(action.payload.isVirtualSelection), state);
       }
     },
     /**
      * Marks the specified values as selected
      */
-    selectHelmValuesFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      let payload = action.payload;
+    selectHelmValuesFile: (
+      state: Draft<AppState>,
+      action: PayloadAction<{valuesFileId: string; isVirtualSelection?: boolean}>
+    ) => {
+      const valuesFileId = action.payload.valuesFileId;
       Object.values(state.helmValuesMap).forEach(values => {
-        values.isSelected = values.id === payload;
+        values.isSelected = values.id === valuesFileId;
       });
 
-      state.selectedValuesFileId = state.helmValuesMap[payload].isSelected ? payload : undefined;
-      selectFilePath(state.helmValuesMap[payload].filePath, state);
+      state.selectedValuesFileId = state.helmValuesMap[valuesFileId].isSelected ? valuesFileId : undefined;
+      selectFilePath(state.helmValuesMap[valuesFileId].filePath, state);
+      updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
     },
     /**
      * Marks the specified file as selected and highlights all related resources
      */
-    selectFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      if (action.payload.length > 0) {
-        selectFilePath(action.payload, state);
+    selectFile: (state: Draft<AppState>, action: PayloadAction<{filePath: string; isVirtualSelection?: boolean}>) => {
+      const filePath = action.payload.filePath;
+      if (filePath.length > 0) {
+        selectFilePath(filePath, state);
+        updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
     },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
@@ -260,6 +290,10 @@ export const mainSlice = createSlice({
     builder.addCase(performResourceDiff.fulfilled, (state, action) => {
       state.diffResourceId = action.payload.diffResourceId;
       state.diffContent = action.payload.diffContent;
+    });
+
+    builder.addCase(selectFromHistory.fulfilled, (state, action) => {
+      state.currentSelectionHistoryIndex = action.payload;
     });
   },
 });
