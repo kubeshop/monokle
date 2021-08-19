@@ -1,6 +1,6 @@
 # Monokle
 
-[![Known Vulnerabilities](https://snyk.io/test/github/kubeshop/monokle/badge.svg)]
+![Known Vulnerabilities](https://snyk.io/test/github/kubeshop/monokle/badge.svg)
 
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
