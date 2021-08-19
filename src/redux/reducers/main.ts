@@ -246,7 +246,16 @@ export const mainSlice = createSlice({
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         state.currentSelectionHistoryIndex = undefined;
-        state.selectionHistory = [];
+        if (state.previewResourceId) {
+          state.selectionHistory = [
+            {
+              type: 'resource',
+              selectedResourceId: state.previewResourceId,
+            },
+          ];
+        } else {
+          state.selectionHistory = [];
+        }
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -260,7 +269,6 @@ export const mainSlice = createSlice({
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         state.currentSelectionHistoryIndex = undefined;
-        state.selectionHistory = [];
       })
       .addCase(previewHelmValuesFile.rejected, (state, action) => {
         state.previewLoader.isLoading = false;
@@ -274,7 +282,16 @@ export const mainSlice = createSlice({
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         state.currentSelectionHistoryIndex = undefined;
-        state.selectionHistory = [];
+        if (state.previewResourceId) {
+          state.selectionHistory = [
+            {
+              type: 'resource',
+              selectedResourceId: state.previewResourceId,
+            },
+          ];
+        } else {
+          state.selectionHistory = [];
+        }
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;

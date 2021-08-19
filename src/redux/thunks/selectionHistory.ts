@@ -17,14 +17,6 @@ export const selectFromHistory = createAsyncThunk<
   let currentSelectionHistoryIndex = mainState.currentSelectionHistoryIndex;
   const selectionHistory = mainState.selectionHistory;
 
-  const canNavigateLeft =
-    selectionHistory.length > 1 &&
-    (currentSelectionHistoryIndex === undefined || (currentSelectionHistoryIndex && currentSelectionHistoryIndex > 0));
-  const canNavigateRight =
-    selectionHistory.length > 1 &&
-    currentSelectionHistoryIndex !== undefined &&
-    currentSelectionHistoryIndex < selectionHistory.length - 1;
-
   let removedSelectionHistoryEntriesCount = 0;
   const newSelectionHistory = selectionHistory.filter(historyEntry => {
     if (historyEntry.type === 'resource') {
@@ -47,6 +39,14 @@ export const selectFromHistory = createAsyncThunk<
   ) {
     currentSelectionHistoryIndex -= removedSelectionHistoryEntriesCount;
   }
+
+  const canNavigateLeft =
+    selectionHistory.length > 1 &&
+    (currentSelectionHistoryIndex === undefined || (currentSelectionHistoryIndex && currentSelectionHistoryIndex > 0));
+  const canNavigateRight =
+    selectionHistory.length > 1 &&
+    currentSelectionHistoryIndex !== undefined &&
+    currentSelectionHistoryIndex < selectionHistory.length - 1;
 
   if (
     newSelectionHistory.length === 0 ||
