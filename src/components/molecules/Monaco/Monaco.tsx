@@ -2,7 +2,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
-import {useMeasure} from 'react-use';
+import {useMeasure, useDebounce} from 'react-use';
 import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import 'monaco-yaml/lib/esm/monaco.contribution';
@@ -169,6 +169,16 @@ const Monaco = (props: {editorHeight: string}) => {
       }
     }
   };
+
+  useDebounce(
+    () => {
+      if (orgCode !== undefined && code !== undefined && orgCode !== code) {
+        saveContent();
+      }
+    },
+    250,
+    [code]
+  );
 
   useEffect(() => {
     if (editor) {
