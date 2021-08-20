@@ -1,7 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Tabs, Col, Row, Button, Skeleton, Modal, Tooltip} from 'antd';
 import styled from 'styled-components';
-import {CodeOutlined, ContainerOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
+import {
+  CodeOutlined,
+  ContainerOutlined,
+  ExclamationCircleOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+} from '@ant-design/icons';
 
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
@@ -15,6 +21,7 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
 import {ApplyTooltip, DiffTooltip} from '@constants/tooltips';
 import {performResourceDiff} from '@redux/thunks/diffResource';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 const {TabPane} = Tabs;
@@ -57,6 +64,14 @@ const StyledSkeleton = styled(Skeleton)`
   width: 95%;
 `;
 
+const StyledLeftArrowButton = styled(Button)`
+  margin-right: 5px;
+`;
+
+const StyledRightArrowButton = styled(Button)`
+  margin-right: 10px;
+`;
+
 export function applyWithConfirm(
   selectedResource: K8sResource,
   resourceMap: ResourceMapType,
@@ -89,11 +104,29 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const dispatch = useAppDispatch();
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
+  const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
+  const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const [key, setKey] = useState('source');
+  const dispatch = useAppDispatch();
+
+  const isLeftArrowEnabled =
+    selectionHistory.length > 1 &&
+    (currentSelectionHistoryIndex === undefined || (currentSelectionHistoryIndex && currentSelectionHistoryIndex > 0));
+  const isRightArrowEnabled =
+    selectionHistory.length > 1 &&
+    currentSelectionHistoryIndex !== undefined &&
+    currentSelectionHistoryIndex < selectionHistory.length - 1;
+
+  const onClickLeftArrow = () => {
+    dispatch(selectFromHistory({direction: 'left'}));
+  };
+
+  const onClickRightArrow = () => {
+    dispatch(selectFromHistory({direction: 'right'}));
+  };
 
   const applySelectedResource = useCallback(() => {
     if (selectedResource) {
@@ -127,6 +160,21 @@ const ActionsPane = (props: {contentHeight: string}) => {
             <TitleBarContainer>
               <span>Editor</span>
               <RightButtons>
+                <StyledLeftArrowButton
+                  onClick={onClickLeftArrow}
+                  disabled={!isLeftArrowEnabled}
+                  type="link"
+                  size="small"
+                  icon={<ArrowLeftOutlined />}
+                />
+                <StyledRightArrowButton
+                  onClick={onClickRightArrow}
+                  disabled={!isRightArrowEnabled}
+                  type="link"
+                  size="small"
+                  icon={<ArrowRightOutlined />}
+                />
+
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip} placement="bottomLeft">
                   <Button
                     loading={Boolean(applyingResource)}
