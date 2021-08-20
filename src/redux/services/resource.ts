@@ -307,7 +307,7 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
     processKustomizations(resourceMap, fileMap);
   }
 
-  processParsedResources(resourceMap);
+  processParsedResources(resourceMap, resourceIds);
   clearParsedDocs(resourceMap);
 }
 
@@ -315,8 +315,8 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
  * Establishes refs for all resources in specified resourceMap
  */
 
-export function processParsedResources(resourceMap: ResourceMapType) {
-  processRefs(resourceMap);
+export function processParsedResources(resourceMap: ResourceMapType, filteredResourceIds?: string[]) {
+  processRefs(resourceMap, filteredResourceIds);
 }
 
 /**
@@ -484,107 +484,111 @@ export function processResourceRefNodes(resource: K8sResource) {
   });
 }
 
-function processRefs(resourceMap: ResourceMapType) {
-  Object.values(resourceMap).forEach(resource => processResourceRefNodes(resource));
+function processRefs(resourceMap: ResourceMapType, filteredResourceIds?: string[]) {
+  Object.values(resourceMap)
+    .filter(res => (filteredResourceIds ? filteredResourceIds.includes(res.id) : true))
+    .forEach(resource => processResourceRefNodes(resource));
 
-  Object.values(resourceMap).forEach(resource => {
-    const resourceKindHandler = getResourceKindHandler(resource.kind);
-    if (
-      !resourceKindHandler ||
-      !resourceKindHandler.outgoingRefMappers ||
-      resourceKindHandler.outgoingRefMappers.length === 0
-    ) {
-      return;
-    }
-    resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-      if (!resource.refNodeByPath) {
+  Object.values(resourceMap)
+    .filter(res => (filteredResourceIds ? filteredResourceIds.includes(res.id) : true))
+    .forEach(resource => {
+      const resourceKindHandler = getResourceKindHandler(resource.kind);
+      if (
+        !resourceKindHandler ||
+        !resourceKindHandler.outgoingRefMappers ||
+        resourceKindHandler.outgoingRefMappers.length === 0
+      ) {
         return;
       }
+      resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
+        if (!resource.refNodeByPath) {
+          return;
+        }
 
-      const targetResources = Object.values(resourceMap).filter(
-        targetResource => targetResource.kind === outgoingRefMapper.target.kind
-      );
+        const targetResources = Object.values(resourceMap).filter(
+          targetResource => targetResource.kind === outgoingRefMapper.target.kind
+        );
 
-      if (outgoingRefMapper.matchPairs) {
-        const refNodes: RefNode[] = [];
-        Object.values(resource.refNodeByPath).forEach(({scalar, key, parentKeyPath}) => {
-          if (joinPathParts(outgoingRefMapper.source.pathParts) === parentKeyPath) {
-            refNodes.push({scalar, key, parentKeyPath});
-          }
-        });
-
-        targetResources.forEach(targetResource => {
-          const targetNodes: RefNode[] = [];
-          if (!targetResource.refNodeByPath) {
-            return;
-          }
-          Object.values(targetResource.refNodeByPath).forEach(({scalar, key, parentKeyPath}) => {
-            if (joinPathParts(outgoingRefMapper.target.pathParts) === parentKeyPath) {
-              targetNodes.push({scalar, key, parentKeyPath});
+        if (outgoingRefMapper.matchPairs) {
+          const refNodes: RefNode[] = [];
+          Object.values(resource.refNodeByPath).forEach(({scalar, key, parentKeyPath}) => {
+            if (joinPathParts(outgoingRefMapper.source.pathParts) === parentKeyPath) {
+              refNodes.push({scalar, key, parentKeyPath});
             }
           });
-          const foundMatchByTargetNodeKey: Record<string, boolean> = Object.fromEntries(
-            targetNodes.map(targetNode => [targetNode.key, false])
-          );
-          refNodes.forEach(refNode => {
-            targetNodes.forEach(targetNode => {
-              if (refNode.key === targetNode.key && refNode.scalar.value === targetNode.scalar.value) {
-                foundMatchByTargetNodeKey[refNode.key] = true;
+
+          targetResources.forEach(targetResource => {
+            const targetNodes: RefNode[] = [];
+            if (!targetResource.refNodeByPath) {
+              return;
+            }
+            Object.values(targetResource.refNodeByPath).forEach(({scalar, key, parentKeyPath}) => {
+              if (joinPathParts(outgoingRefMapper.target.pathParts) === parentKeyPath) {
+                targetNodes.push({scalar, key, parentKeyPath});
+              }
+            });
+            const foundMatchByTargetNodeKey: Record<string, boolean> = Object.fromEntries(
+              targetNodes.map(targetNode => [targetNode.key, false])
+            );
+            refNodes.forEach(refNode => {
+              targetNodes.forEach(targetNode => {
+                if (refNode.key === targetNode.key && refNode.scalar.value === targetNode.scalar.value) {
+                  foundMatchByTargetNodeKey[refNode.key] = true;
+                  linkResources(
+                    targetResource,
+                    resource,
+                    new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
+                    new NodeWrapper(refNode.scalar, resource.lineCounter)
+                  );
+                }
+              });
+            });
+
+            Object.entries(foundMatchByTargetNodeKey).forEach(([refNodeKey, foundMatch]) => {
+              if (!foundMatch) {
+                const targetNode = targetNodes.find(r => r.key === refNodeKey);
+                if (!targetNode) {
+                  return;
+                }
+
+                createResourceRef(
+                  targetResource,
+                  ResourceRefType.Unsatisfied,
+                  new NodeWrapper(targetNode.scalar, targetResource.lineCounter)
+                );
+              }
+            });
+          });
+        } else {
+          const refNode = resource.refNodeByPath
+            ? resource.refNodeByPath[joinPathParts(outgoingRefMapper.source.pathParts)]
+            : undefined;
+
+          targetResources.forEach(targetResource => {
+            const targetNode = targetResource.refNodeByPath
+              ? targetResource.refNodeByPath[joinPathParts(outgoingRefMapper.target.pathParts)]
+              : undefined;
+
+            if (refNode) {
+              if (targetNode && refNode.scalar.value === targetNode.scalar.value) {
                 linkResources(
                   targetResource,
                   resource,
                   new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
                   new NodeWrapper(refNode.scalar, resource.lineCounter)
                 );
+              } else {
+                createResourceRef(
+                  resource,
+                  ResourceRefType.Unsatisfied,
+                  new NodeWrapper(refNode.scalar, resource.lineCounter)
+                );
               }
-            });
-          });
-
-          Object.entries(foundMatchByTargetNodeKey).forEach(([refNodeKey, foundMatch]) => {
-            if (!foundMatch) {
-              const targetNode = targetNodes.find(r => r.key === refNodeKey);
-              if (!targetNode) {
-                return;
-              }
-
-              createResourceRef(
-                targetResource,
-                ResourceRefType.Unsatisfied,
-                new NodeWrapper(targetNode.scalar, targetResource.lineCounter)
-              );
             }
           });
-        });
-      } else {
-        const refNode = resource.refNodeByPath
-          ? resource.refNodeByPath[joinPathParts(outgoingRefMapper.source.pathParts)]
-          : undefined;
-
-        targetResources.forEach(targetResource => {
-          const targetNode = targetResource.refNodeByPath
-            ? targetResource.refNodeByPath[joinPathParts(outgoingRefMapper.target.pathParts)]
-            : undefined;
-
-          if (refNode) {
-            if (targetNode && refNode.scalar.value === targetNode.scalar.value) {
-              linkResources(
-                targetResource,
-                resource,
-                new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
-                new NodeWrapper(refNode.scalar, resource.lineCounter)
-              );
-            } else {
-              createResourceRef(
-                resource,
-                ResourceRefType.Unsatisfied,
-                new NodeWrapper(refNode.scalar, resource.lineCounter)
-              );
-            }
-          }
-        });
-      }
+        }
+      });
     });
-  });
 
   // clean up the refs
   Object.values(resourceMap).forEach(resource => {
