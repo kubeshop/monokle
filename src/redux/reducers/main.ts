@@ -246,7 +246,7 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
-        resetSelectionHistory(state, {initialResources: [state.previewResourceId]});
+        resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -273,7 +273,7 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
-        resetSelectionHistory(state, {initialResources: [state.previewResourceId]});
+        resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
