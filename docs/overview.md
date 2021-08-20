@@ -42,5 +42,5 @@ Monokle current supports the following keyboard shortcuts:
 - Toggle Left Pane: Ctrl/Cmd B
 - Toggle Right Pane: Ctrl/Cmd ALT B
 - Save (in editors): Ctrl/Cmd S
-- Navigate Back (in Selection History): ALT ArrowLeft
-- Navigate Forward (in Selection History): ALT ArrowRight
+- Navigate Back (Selection History): ALT ArrowLeft
+- Navigate Forward (Selection History): ALT ArrowRight
