@@ -3,6 +3,7 @@ import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 import {getResourceKindHandler, getIncomingRefMappers} from '@src/kindhandlers';
 import {RefMapper} from '@models/resourcekindhandler';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {traverseDocument} from './manifest-utils';
 import {NodeWrapper, getParsedDoc, createResourceRef, linkResources} from './resource';
 
@@ -234,18 +235,35 @@ function handleRefMappingByKey(
   }
 }
 
-export function processRefs(resourceMap: ResourceMapType, filter?: {resourceIds?: string[]; resourceKinds?: string[]}) {
-  Object.values(resourceMap).forEach(resource => processResourceRefNodes(resource));
+/*
+  removes all outgoing refs on the specified resource and
+  removes all incoming refs from the specified resource on all the other resources
+*/
+function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) {
+  resource.refs = resource.refs?.filter(ref => ref.type === 'incoming');
+  Object.values(resourceMap).forEach(currentResource => {
+    currentResource.refs = currentResource.refs?.filter(ref => {
+      if (ref.type === 'incoming' && ref.targetResourceId === resource.id) {
+        return false;
+      }
+      return true;
+    });
+  });
+}
 
-  const filteredResources =
+export function processRefs(resourceMap: ResourceMapType, filter?: {resourceIds?: string[]; resourceKinds?: string[]}) {
+  const resources = Object.values(resourceMap).filter(resource => !isKustomizationResource(resource));
+  resources.forEach(resource => processResourceRefNodes(resource));
+
+  let filteredResources =
     filter && filter.resourceKinds
-      ? Object.values(resourceMap).filter(resource =>
+      ? resources.filter(resource =>
           filter.resourceKinds && filter.resourceKinds.length > 0 ? filter.resourceKinds.includes(resource.kind) : true
         )
-      : Object.values(resourceMap);
+      : resources;
 
   filteredResources.forEach(sourceResource => {
-    sourceResource.refs = undefined;
+    clearResourceRefs(sourceResource, resourceMap);
 
     const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
     if (
