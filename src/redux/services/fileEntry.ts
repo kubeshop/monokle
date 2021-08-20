@@ -12,6 +12,10 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {v4 as uuidv4} from 'uuid';
 import {extractK8sResources, reprocessResources} from './resource';
 
+type PathRemovalSideEffect = {
+  removedResources: K8sResource[];
+};
+
 /**
  * Creates a FileEntry for the specified relative path
  */
@@ -154,7 +158,7 @@ export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapT
  * Extracts all resources from the file at the specified path
  */
 
-export function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapType) {
+export function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapType): K8sResource[] {
   const fileContent = fs.readFileSync(filePath, 'utf8');
   const rootEntry = fileMap[ROOT_FILE_ENTRY];
   return extractK8sResources(fileContent, rootEntry ? filePath.substr(rootEntry.filePath.length) : filePath);
@@ -229,7 +233,11 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
       state.resourceMap[resource.id] = resource;
     });
 
-    reprocessResources([], state.resourceMap, state.fileMap);
+    reprocessResources(
+      resourcesFromFile.map(r => r.id),
+      state.resourceMap,
+      state.fileMap
+    );
 
     if (resourcesInFile.length === 1 && resourcesFromFile.length === 1 && wasSelected) {
       updateSelectionAndHighlights(state, resourcesFromFile[0]);
@@ -245,10 +253,16 @@ function addFile(absolutePath: string, state: AppState) {
   log.info(`adding file ${absolutePath}`);
   let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   const fileEntry = createFileEntry(absolutePath.substr(rootFolder.length));
-  extractK8sResourcesFromFile(absolutePath, state.fileMap).forEach(resource => {
+  const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
+  resourcesFromFile.forEach(resource => {
     state.resourceMap[resource.id] = resource;
   });
 
+  reprocessResources(
+    resourcesFromFile.map(r => r.id),
+    state.resourceMap,
+    state.fileMap
+  );
   return fileEntry;
 }
 
@@ -293,8 +307,6 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
 
       parentEntry.children = parentEntry.children || [];
       parentEntry.children.push(fileEntry.name);
-
-      reprocessResources([], state.resourceMap, state.fileMap);
     }
 
     return fileEntry;
@@ -308,12 +320,13 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
  * Removes the specified fileEntry and its resources from the provided state
  */
 
-function removeFile(fileEntry: FileEntry, state: AppState) {
+function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
   log.info(`removing file ${fileEntry.filePath}`);
   getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(resource => {
     if (state.selectedResourceId === resource.id) {
       updateSelectionAndHighlights(state, resource);
     }
+    removalSideEffect.removedResources.push(resource);
     delete state.resourceMap[resource.id];
   });
 }
@@ -322,15 +335,15 @@ function removeFile(fileEntry: FileEntry, state: AppState) {
  * Removes the specified fileEntry and its resources from the provided state
  */
 
-function removeFolder(fileEntry: FileEntry, state: AppState) {
+function removeFolder(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
   log.info(`removing folder ${fileEntry.filePath}`);
   fileEntry.children?.forEach(child => {
     const childEntry = state.fileMap[path.join(fileEntry.filePath, child)];
     if (childEntry) {
       if (childEntry.children) {
-        removeFolder(childEntry, state);
+        removeFolder(childEntry, state, removalSideEffect);
       } else {
-        removeFile(childEntry, state);
+        removeFile(childEntry, state, removalSideEffect);
       }
     }
   });
@@ -343,10 +356,14 @@ function removeFolder(fileEntry: FileEntry, state: AppState) {
 export function removePath(absolutePath: string, state: AppState, fileEntry: FileEntry) {
   delete state.fileMap[fileEntry.filePath];
 
+  const removalSideEffect: PathRemovalSideEffect = {
+    removedResources: [],
+  };
+
   if (fileEntry.children) {
-    removeFolder(fileEntry, state);
+    removeFolder(fileEntry, state, removalSideEffect);
   } else {
-    removeFile(fileEntry, state);
+    removeFile(fileEntry, state, removalSideEffect);
   }
 
   if (state.selectedPath && !state.fileMap[state.selectedPath]) {
@@ -364,5 +381,7 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
     }
   }
 
-  reprocessResources([], state.resourceMap, state.fileMap);
+  reprocessResources([], state.resourceMap, state.fileMap, {
+    resourceKinds: removalSideEffect.removedResources.map(r => r.kind),
+  });
 }

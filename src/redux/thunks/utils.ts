@@ -1,6 +1,6 @@
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {ResourceMapType} from '@models/appstate';
-import {clearParsedDocs, extractK8sResources, processParsedResources} from '@redux/services/resource';
+import {extractK8sResources, processParsedResources} from '@redux/services/resource';
 import {stringify} from 'yaml';
 import {AlertEnum} from '@models/alert';
 
@@ -31,7 +31,7 @@ export function createPreviewResult(resourcesYaml: string, previewResourceId: st
   processParsedResources(resourceMap);
   return {
     previewResourceId,
-    previewResources: clearParsedDocs(resourceMap),
+    previewResources: resourceMap,
     alert: {
       title,
       message: `Previewing ${Object.keys(resourceMap).length} resources`,

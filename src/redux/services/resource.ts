@@ -1,22 +1,22 @@
 import path from 'path';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
-import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
+import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import fs from 'fs';
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER, REF_PATH_SEPARATOR} from '@constants/constants';
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
 import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {getDependentResourceKinds} from '@src/kindhandlers';
 import {v4 as uuidv4} from 'uuid';
-import {getResourceKindHandler, getIncomingRefMappers} from '@src/kindhandlers';
-import {traverseDocument} from './manifest-utils';
+import {processRefs} from './resourceRefs';
 
 /**
  * Parse documents lazily...
  */
 
-function getParsedDoc(resource: K8sResource) {
+export function getParsedDoc(resource: K8sResource) {
   if (!resource.parsedDoc) {
     const lineCounter = new LineCounter();
     resource.parsedDoc = parseDocument(resource.text, {lineCounter});
@@ -130,27 +130,27 @@ export function getK8sResources(resourceMap: ResourceMapType, type: string) {
  * Adds a resource ref with the specified type/target to the specified resource
  */
 
-function createResourceRef(
+export function createResourceRef(
   resource: K8sResource,
   refType: ResourceRefType,
   refNode?: NodeWrapper,
-  targetResource?: string
+  targetResourceId?: string
 ) {
-  if (refNode || targetResource) {
+  if (refNode || targetResourceId) {
     resource.refs = resource.refs || [];
-    const refName = (refNode ? refNode.nodeValue() : targetResource) || '<missing>';
+    const refName = (refNode ? refNode.nodeValue() : targetResourceId) || '<missing>';
 
     // make sure we don't duplicate
     if (
       !resource.refs.some(
-        ref => ref.type === refType && ref.name === refName && ref.targetResourceId === targetResource
+        ref => ref.type === refType && ref.name === refName && ref.targetResourceId === targetResourceId
       )
     ) {
       resource.refs.push({
         type: refType,
         name: refName,
         position: refNode?.getNodePosition(),
-        targetResourceId: targetResource,
+        targetResourceId,
       });
     }
   } else {
@@ -268,7 +268,7 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
  * This needs to be called to remove temporary objects used during processing which are not serializable
  */
 
-export function clearParsedDocs(resourceMap: ResourceMapType) {
+export function clearResourcesTemporaryObjects(resourceMap: ResourceMapType) {
   Object.values(resourceMap).forEach(r => {
     r.parsedDoc = undefined;
     r.lineCounter = undefined;
@@ -284,7 +284,26 @@ export function clearParsedDocs(resourceMap: ResourceMapType) {
  * This could be more intelligent - it updates everything brute force for now...
  */
 
-export function reprocessResources(resourceIds: string[], resourceMap: ResourceMapType, fileMap: FileMapType) {
+export function reprocessResources(
+  resourceIds: string[],
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType,
+  options?: {
+    resourceKinds?: string[];
+  }
+) {
+  let resourceKinds = resourceIds
+    .map(resId => resourceMap[resId])
+    .filter(res => res !== undefined)
+    .map(res => res.kind);
+
+  if (options && options.resourceKinds) {
+    resourceKinds = [...resourceKinds, ...options.resourceKinds];
+  }
+  const dependentResourceKinds = getDependentResourceKinds(resourceKinds);
+  let resourceKindsToReprocess = [...resourceKinds, ...dependentResourceKinds];
+  resourceKindsToReprocess = [...new Set(resourceKindsToReprocess)];
+
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
     if (resource) {
@@ -297,8 +316,8 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
 
   let hasKustomizations = false;
   Object.values(resourceMap).forEach(resource => {
-    resource.refs = undefined;
     if (isKustomizationResource(resource)) {
+      resource.refs = undefined;
       hasKustomizations = true;
     }
   });
@@ -307,16 +326,22 @@ export function reprocessResources(resourceIds: string[], resourceMap: ResourceM
     processKustomizations(resourceMap, fileMap);
   }
 
-  processParsedResources(resourceMap, resourceIds);
-  clearParsedDocs(resourceMap);
+  processParsedResources(resourceMap, {
+    resourceIds,
+    resourceKinds: resourceKindsToReprocess,
+  });
 }
 
 /**
  * Establishes refs for all resources in specified resourceMap
  */
 
-export function processParsedResources(resourceMap: ResourceMapType, filteredResourceIds?: string[]) {
-  processRefs(resourceMap, filteredResourceIds);
+export function processParsedResources(
+  resourceMap: ResourceMapType,
+  options?: {resourceIds?: string[]; resourceKinds?: string[]}
+) {
+  processRefs(resourceMap, options);
+  clearResourcesTemporaryObjects(resourceMap);
 }
 
 /**
@@ -433,191 +458,4 @@ export function getLinkedResources(resource: K8sResource) {
     });
 
   return linkedResourceIds;
-}
-
-const joinPathParts = (pathParts: string[]) => {
-  return pathParts.join(REF_PATH_SEPARATOR);
-};
-
-export function processResourceRefNodes(resource: K8sResource) {
-  const parsedDoc = getParsedDoc(resource);
-
-  const resourceKindHandler = getResourceKindHandler(resource.kind);
-  if (!resourceKindHandler) {
-    return;
-  }
-  const outgoingRefMappers = resourceKindHandler?.outgoingRefMappers || [];
-  const incomingRefMappers = getIncomingRefMappers(resource.kind);
-
-  const refMappers = [...incomingRefMappers, ...outgoingRefMappers];
-
-  if (!refMappers || refMappers.length === 0) {
-    return;
-  }
-
-  traverseDocument(parsedDoc, (parentKeyPathParts, keyPathParts, key, scalar) => {
-    refMappers.forEach(refMapper => {
-      if (!resource.refNodeByPath) {
-        resource.refNodeByPath = {};
-      }
-
-      const keyPath = joinPathParts(keyPathParts);
-      const parentKeyPath = joinPathParts(parentKeyPathParts);
-
-      if (refMapper.matchPairs) {
-        if (
-          joinPathParts(refMapper.source.pathParts) === parentKeyPath ||
-          joinPathParts(refMapper.target.pathParts) === parentKeyPath
-        ) {
-          resource.refNodeByPath[keyPath] = {scalar, key, parentKeyPath};
-        }
-      } else {
-        if (keyPath.endsWith(joinPathParts(refMapper.source.pathParts))) {
-          resource.refNodeByPath[joinPathParts(refMapper.source.pathParts)] = {scalar, key, parentKeyPath};
-        }
-
-        if (keyPath.endsWith(joinPathParts(refMapper.target.pathParts))) {
-          resource.refNodeByPath[joinPathParts(refMapper.target.pathParts)] = {scalar, key, parentKeyPath};
-        }
-      }
-    });
-  });
-}
-
-function processRefs(resourceMap: ResourceMapType, filteredResourceIds?: string[]) {
-  Object.values(resourceMap)
-    .filter(res => (filteredResourceIds ? filteredResourceIds.includes(res.id) : true))
-    .forEach(resource => processResourceRefNodes(resource));
-
-  Object.values(resourceMap)
-    .filter(res => (filteredResourceIds ? filteredResourceIds.includes(res.id) : true))
-    .forEach(resource => {
-      const resourceKindHandler = getResourceKindHandler(resource.kind);
-      if (
-        !resourceKindHandler ||
-        !resourceKindHandler.outgoingRefMappers ||
-        resourceKindHandler.outgoingRefMappers.length === 0
-      ) {
-        return;
-      }
-      resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-        if (!resource.refNodeByPath) {
-          return;
-        }
-
-        const targetResources = Object.values(resourceMap).filter(
-          targetResource => targetResource.kind === outgoingRefMapper.target.kind
-        );
-
-        if (outgoingRefMapper.matchPairs) {
-          const refNodes: RefNode[] = [];
-          Object.values(resource.refNodeByPath).forEach(({scalar, key, parentKeyPath}) => {
-            if (joinPathParts(outgoingRefMapper.source.pathParts) === parentKeyPath) {
-              refNodes.push({scalar, key, parentKeyPath});
-            }
-          });
-
-          targetResources.forEach(targetResource => {
-            const targetNodes: RefNode[] = [];
-            if (!targetResource.refNodeByPath) {
-              return;
-            }
-            Object.values(targetResource.refNodeByPath).forEach(({scalar, key, parentKeyPath}) => {
-              if (joinPathParts(outgoingRefMapper.target.pathParts) === parentKeyPath) {
-                targetNodes.push({scalar, key, parentKeyPath});
-              }
-            });
-            const foundMatchByTargetNodeKey: Record<string, boolean> = Object.fromEntries(
-              targetNodes.map(targetNode => [targetNode.key, false])
-            );
-            refNodes.forEach(refNode => {
-              targetNodes.forEach(targetNode => {
-                if (refNode.key === targetNode.key && refNode.scalar.value === targetNode.scalar.value) {
-                  foundMatchByTargetNodeKey[refNode.key] = true;
-                  linkResources(
-                    targetResource,
-                    resource,
-                    new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
-                    new NodeWrapper(refNode.scalar, resource.lineCounter)
-                  );
-                }
-              });
-            });
-
-            Object.entries(foundMatchByTargetNodeKey).forEach(([refNodeKey, foundMatch]) => {
-              if (!foundMatch) {
-                const targetNode = targetNodes.find(r => r.key === refNodeKey);
-                if (!targetNode) {
-                  return;
-                }
-
-                createResourceRef(
-                  targetResource,
-                  ResourceRefType.Unsatisfied,
-                  new NodeWrapper(targetNode.scalar, targetResource.lineCounter)
-                );
-              }
-            });
-          });
-        } else {
-          const refNode = resource.refNodeByPath
-            ? resource.refNodeByPath[joinPathParts(outgoingRefMapper.source.pathParts)]
-            : undefined;
-
-          targetResources.forEach(targetResource => {
-            const targetNode = targetResource.refNodeByPath
-              ? targetResource.refNodeByPath[joinPathParts(outgoingRefMapper.target.pathParts)]
-              : undefined;
-
-            if (refNode) {
-              if (targetNode && refNode.scalar.value === targetNode.scalar.value) {
-                linkResources(
-                  targetResource,
-                  resource,
-                  new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
-                  new NodeWrapper(refNode.scalar, resource.lineCounter)
-                );
-              } else {
-                createResourceRef(
-                  resource,
-                  ResourceRefType.Unsatisfied,
-                  new NodeWrapper(refNode.scalar, resource.lineCounter)
-                );
-              }
-            }
-          });
-        }
-      });
-    });
-
-  // clean up the refs
-  Object.values(resourceMap).forEach(resource => {
-    const cleanRefs: ResourceRef[] = [];
-
-    const findSatisfiedRefOnPosition = (refPos: RefPosition) => {
-      return resource.refs?.find(
-        ref =>
-          !isUnsatisfiedRef(ref.type) && ref.position?.column === refPos.column && ref.position.line === refPos.line
-      );
-    };
-
-    resource.refs?.forEach(ref => {
-      let shouldPush = true;
-
-      if (isUnsatisfiedRef(ref.type)) {
-        if (ref.position) {
-          const foundSatisfiedRefOnSamePosition = findSatisfiedRefOnPosition(ref.position);
-          if (foundSatisfiedRefOnSamePosition) {
-            shouldPush = false;
-          }
-        }
-      }
-
-      if (shouldPush) {
-        cleanRefs.push(ref);
-      }
-    });
-
-    resource.refs = cleanRefs.length > 0 ? cleanRefs : undefined;
-  });
 }

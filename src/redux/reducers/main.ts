@@ -122,13 +122,17 @@ export const mainSlice = createSlice({
               delete state.resourceMap[r.id];
             });
 
-            const resources = extractK8sResources(action.payload.content, filePath.substring(rootFolder.length));
-            Object.values(resources).forEach(r => {
+            const extractedResources = extractK8sResources(
+              action.payload.content,
+              filePath.substring(rootFolder.length)
+            );
+            Object.values(extractedResources).forEach(r => {
               state.resourceMap[r.id] = r;
               r.isHighlighted = true;
             });
-
-            reprocessResources([], state.resourceMap, state.fileMap);
+            reprocessResources([], state.resourceMap, state.fileMap, {
+              resourceKinds: extractedResources.map(r => r.kind),
+            });
           }
         } else {
           log.error(`Could not find FileEntry for ${action.payload.path}`);
