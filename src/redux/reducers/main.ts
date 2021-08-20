@@ -12,6 +12,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {AlertType} from '@models/alert';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -245,17 +246,7 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
-        state.currentSelectionHistoryIndex = undefined;
-        if (state.previewResourceId) {
-          state.selectionHistory = [
-            {
-              type: 'resource',
-              selectedResourceId: state.previewResourceId,
-            },
-          ];
-        } else {
-          state.selectionHistory = [];
-        }
+        resetSelectionHistory(state, {initialResources: [state.previewResourceId]});
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -269,6 +260,7 @@ export const mainSlice = createSlice({
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         state.currentSelectionHistoryIndex = undefined;
+        resetSelectionHistory(state);
       })
       .addCase(previewHelmValuesFile.rejected, (state, action) => {
         state.previewLoader.isLoading = false;
@@ -281,17 +273,7 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
-        state.currentSelectionHistoryIndex = undefined;
-        if (state.previewResourceId) {
-          state.selectionHistory = [
-            {
-              type: 'resource',
-              selectedResourceId: state.previewResourceId,
-            },
-          ];
-        } else {
-          state.selectionHistory = [];
-        }
+        resetSelectionHistory(state, {initialResources: [state.previewResourceId]});
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -310,8 +292,7 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
       state.previewType = undefined;
-      state.currentSelectionHistoryIndex = undefined;
-      state.selectionHistory = [];
+      resetSelectionHistory(state);
     });
 
     builder.addCase(performResourceDiff.fulfilled, (state, action) => {
