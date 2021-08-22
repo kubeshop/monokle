@@ -19,6 +19,7 @@ import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
 import {updateFileEntry, updateResource, selectK8sResource} from '@redux/reducers/main';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
@@ -100,7 +101,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const dispatch = useAppDispatch();
 
   const selectResource = (resourceId: string) => {
-    dispatch(selectK8sResource(resourceId));
+    dispatch(selectK8sResource({resourceId}));
   };
 
   const onDidChangeMarkers = (e: monaco.Uri[]) => {
@@ -121,6 +122,28 @@ const Monaco = (props: {editorHeight: string}) => {
       keybindings: [monaco.KeyCode.Escape],
       run: () => {
         hiddenInputRef.current?.focus();
+      },
+    });
+
+    // register action to navigate back in the selection history
+    e.addAction({
+      id: 'monokle-navigate-back',
+      label: 'Navigate Back',
+      /* eslint-disable no-bitwise */
+      keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.LeftArrow],
+      run: () => {
+        dispatch(selectFromHistory({direction: 'left'}));
+      },
+    });
+
+    // register action to navigate forward in the selection history
+    e.addAction({
+      id: 'monokle-navigate-forward',
+      label: 'Navigate Forward',
+      /* eslint-disable no-bitwise */
+      keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.RightArrow],
+      run: () => {
+        dispatch(selectFromHistory({direction: 'right'}));
       },
     });
 
@@ -287,7 +310,7 @@ const Monaco = (props: {editorHeight: string}) => {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-  }, [editor, code]);
+  }, [editor, selectedResourceId]);
 
   return (
     <>

@@ -7,35 +7,35 @@ providing plentiful manifests for us to run Monokle against.
 
 ## Navigate k8s objects easily
 
-<img src="./img/navigator.gif" alt="Navigate k8s objects easily" width="300" height="300" />
+![Navigate k8s objects easily](img/navigator.gif)
 
 Monokle compiles a list of all the objects in your repo (from files you didnt want ignored), to give you a handy
 overview of all your resources - [read more](resource-navigation.md)
 
 ## Follow links up- or downstream through your manifests
 
-<img src="./img/upstream-downstream.gif" alt="Follow links up or downstream through your manifests" width="600" height="300" />
+![Follow links up or downstream through your manifests](img/upstream-downstream.gif)
 
 Surf up- or downstream through your resources! Monokle highlights other resources, that your selection has direct
 relations to and even provides you with the links to go to them quickly - [read more](resource-navigation.md)
 
 ## Preview the resources created by kustomize and Helm
 
-<img src="./img/kustomization.gif" alt="Preview the resources created by kustomizations" width="800" height="500" />
+![Preview the resources created by Kustomize or Helm](img/kustomization.gif)
 
 Do a quick dry-run, enabling you to navigate and debug the resources created by Kustomize or Helm. Apply them to
 the cluster if you are satisfied - read more about [Kustomize](kustomize.md) and [Helm](helm.md)
 
 ## Locate source file quickly, and see if links are dead-ends
 
-<img src="./img/find-file-and-dead-links.gif" alt="Locate source file quickly, and see if links are dead-ends" width="800" height="500" />
+![Locate source file quickly, and see if links are dead-ends](img/find-file-and-dead-links.gif)
 
 When you select a resource, Monokle will show you which file it was defined in. Also, if you mistype a referenced
 resource, Monokle will quickly show you, that you have a dead link with a warning triangle.
 
 ## Browse your clusters objects
 
-<img src="./img/cluster-objects.gif" alt="Browse your clusters objects" width="800" height="500" />
+![Browse your clusters objects](img/cluster-objects.gif)
 
 Want to browse your cluster instead of a repo? Simply smash the "Show Cluster Objects" button to import all objects from
-the cluster into Monokle - [read more](cluster-preview.md)
+the cluster into Monokle - [read more](cluster-integration.md)

@@ -226,7 +226,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
   }, [isSelected, selectedResourceId]);
 
   const selectResource = (resId: string) => {
-    dispatch(selectK8sResource(resId));
+    dispatch(selectK8sResource({resourceId: resId}));
   };
 
   return (

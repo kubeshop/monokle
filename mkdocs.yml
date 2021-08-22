@@ -16,14 +16,28 @@ theme:
 nav:
   - Welcome: index.md
   - Getting Started: getting-started.md
+  - Features: features.md
   - UI Overview: overview.md
   - Navigating Resources: resource-navigation.md
   - Resource Editing: resource-editing.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
-  - Cluster Preview: cluster-preview.md
+  - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
+
+extra:
+  analytics:
+    provider: google
+    property: UA-204665550-5
+
+  consent:
+    title: Cookie consent
+    description: >
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
 
 copyright: Copyright &copy; 2021 <a href="https://kubeshop.io">Kubeshop</a>
 

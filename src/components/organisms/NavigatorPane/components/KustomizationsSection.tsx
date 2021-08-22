@@ -20,12 +20,12 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
   const selectResource = (resourceId: string) => {
-    dispatch(selectK8sResource(resourceId));
+    dispatch(selectK8sResource({resourceId}));
   };
 
   const selectPreview = (id: string) => {
     if (id !== selectedResourceId) {
-      dispatch(selectK8sResource(id));
+      dispatch(selectK8sResource({resourceId: id}));
     }
     if (id !== previewResource) {
       startPreview(id, 'kustomization', dispatch);
