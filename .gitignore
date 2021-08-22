@@ -31,3 +31,5 @@ k8sdumps
 
 .vscode
 /site
+
+.env

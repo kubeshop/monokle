@@ -100,7 +100,6 @@ const SettingsDrawer = () => {
   };
 
   const checkUpdateAvailability = () => {
-    console.log('checkUpdateAvailability');
     dispatch(updateCheckingNewVersion(true));
     ipcRenderer.send('check-update-available');
   };
@@ -110,19 +109,16 @@ const SettingsDrawer = () => {
   };
 
   ipcRenderer.once('update-available', () => {
-    console.log('update-available');
     dispatch(updateNewVersionAvailable(true));
     dispatch(updateCheckingNewVersion(false));
   });
 
   ipcRenderer.once('update-not-available', () => {
-    console.log('update-not-available');
     dispatch(updateNewVersionAvailable(false));
     dispatch(updateCheckingNewVersion(false));
   });
 
   ipcRenderer.once('update-downloaded', () => {
-    console.log('update-downloaded');
     setUpdateDownloaded(true);
   });
 
@@ -172,8 +168,8 @@ const SettingsDrawer = () => {
       <Divider />
       <StyledDiv>
         {isNewVersionAvailable ? (
-          <StyledButton onClick={updateApplication} disabled={!isUpdateDownloaded}>
-            Update Monokle
+          <StyledButton onClick={updateApplication} loading={!isUpdateDownloaded}>
+            {isUpdateDownloaded ? <span>Update Monokle</span> : <span>Downloading the update..</span>}
           </StyledButton>
         ) : (
           <StyledButton onClick={checkUpdateAvailability} loading={isCheckingNewVersion}>
