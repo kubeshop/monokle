@@ -77,14 +77,14 @@ const Monaco = (props: {editorHeight: string}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [code, setCode] = useState('');
-  const [orgCode, setOrgCode] = useState<string>();
+  const [orgCode, setOrgCode] = useState<string>('');
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
 
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const idsOfDecorationsRef = useRef<string[]>([]);
   const hoverDisposablesRef = useRef<monaco.IDisposable[]>([]);
   const commandDisposablesRef = useRef<monaco.IDisposable[]>([]);
@@ -135,7 +135,7 @@ const Monaco = (props: {editorHeight: string}) => {
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
   };
 
-  function onChange(newValue: any, e: any) {
+  function onChange(newValue: any, event: monaco.editor.IModelContentChangedEvent) {
     setDirty(orgCode !== newValue);
     setCode(newValue);
 
@@ -176,7 +176,7 @@ const Monaco = (props: {editorHeight: string}) => {
         saveContent();
       }
     },
-    250,
+    1000,
     [code]
   );
 
