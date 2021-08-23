@@ -6,7 +6,7 @@ import {FileEntry} from '@models/fileentry';
 import {createFileEntry, readFiles} from '@redux/services/fileEntry';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {processKustomizations} from '@redux/services/kustomize';
-import {clearParsedDocs, processParsedResources} from '@redux/services/resource';
+import {processParsedResources} from '@redux/services/resource';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {AlertEnum} from '@models/alert';
 
@@ -49,7 +49,7 @@ export const setRootFolder = createAsyncThunk<
   return {
     appConfig,
     fileMap,
-    resourceMap: clearParsedDocs(resourceMap),
+    resourceMap,
     helmChartMap,
     helmValuesMap,
     alert: {

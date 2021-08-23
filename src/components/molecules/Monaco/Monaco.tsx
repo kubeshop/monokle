@@ -2,13 +2,12 @@ import React, {useEffect, useState, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
-import {useMeasure} from 'react-use';
+import {useMeasure, useDebounce} from 'react-use';
 import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import 'monaco-yaml/lib/esm/monaco.contribution';
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor';
-import {MonoButton} from '@atoms';
 
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -53,7 +52,6 @@ const HiddenInput = styled.input`
 const MonacoButtons = styled.div`
   padding: 8px;
   padding-right: 8px;
-  height: 40px;
 `;
 
 const MonacoContainer = styled.div`
@@ -65,10 +63,6 @@ const MonacoContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const RightMonoButton = styled(MonoButton)`
-  float: right;
-`;
-
 // @ts-ignore
 const {yaml} = languages || {};
 
@@ -78,14 +72,14 @@ const Monaco = (props: {editorHeight: string}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [code, setCode] = useState('');
-  const [orgCode, setOrgCode] = useState<string>();
+  const [orgCode, setOrgCode] = useState<string>('');
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
 
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const idsOfDecorationsRef = useRef<string[]>([]);
   const hoverDisposablesRef = useRef<monaco.IDisposable[]>([]);
   const commandDisposablesRef = useRef<monaco.IDisposable[]>([]);
@@ -158,7 +152,7 @@ const Monaco = (props: {editorHeight: string}) => {
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
   };
 
-  function onChange(newValue: any, e: any) {
+  function onChange(newValue: any, event: monaco.editor.IModelContentChangedEvent) {
     setDirty(orgCode !== newValue);
     setCode(newValue);
 
@@ -192,6 +186,19 @@ const Monaco = (props: {editorHeight: string}) => {
       }
     }
   };
+
+  useDebounce(
+    () => {
+      if (!isDirty || !isValid) {
+        return;
+      }
+      if (orgCode !== undefined && code !== undefined && orgCode !== code) {
+        saveContent();
+      }
+    },
+    500,
+    [code]
+  );
 
   useEffect(() => {
     if (editor) {
@@ -318,14 +325,6 @@ const Monaco = (props: {editorHeight: string}) => {
         <HiddenInputContainer>
           <HiddenInput ref={hiddenInputRef} type="text" />
         </HiddenInputContainer>
-        <RightMonoButton
-          large="true"
-          type={hasWarnings ? 'dashed' : 'primary'}
-          disabled={!isDirty || !isValid}
-          onClick={() => saveContent()}
-        >
-          Save
-        </RightMonoButton>
       </MonacoButtons>
       <MonacoContainer ref={containerRef}>
         <MonacoEditor
