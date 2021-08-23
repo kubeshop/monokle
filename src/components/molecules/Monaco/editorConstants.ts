@@ -1,3 +1,5 @@
+import {monaco} from 'react-monaco-editor';
+
 export enum GlyphDecorationTypes {
   UnsatisfiedRef,
   SatisfiedRef,
@@ -8,7 +10,7 @@ export enum InlineDecorationTypes {
   SatisfiedRef,
 }
 
-const glyphDecorationOptionsByType = {
+const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.IModelDecorationOptions> = {
   [GlyphDecorationTypes.UnsatisfiedRef]: {
     glyphMarginClassName: 'monokleEditorUnsatisfiedRefGlyphClass',
     glyphMarginHoverMessage: {value: 'Unsatisfied link'},
