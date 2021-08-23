@@ -8,7 +8,6 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import 'monaco-yaml/lib/esm/monaco.contribution';
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor';
-import {MonoButton} from '@atoms';
 
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -52,7 +51,6 @@ const HiddenInput = styled.input`
 const MonacoButtons = styled.div`
   padding: 8px;
   padding-right: 8px;
-  height: 40px;
 `;
 
 const MonacoContainer = styled.div`
@@ -62,10 +60,6 @@ const MonacoContainer = styled.div`
   padding-right: 8px;
   margin: 0px;
   margin-bottom: 20px;
-`;
-
-const RightMonoButton = styled(MonoButton)`
-  float: right;
 `;
 
 // @ts-ignore
@@ -172,11 +166,14 @@ const Monaco = (props: {editorHeight: string}) => {
 
   useDebounce(
     () => {
+      if (!isDirty || !isValid) {
+        return;
+      }
       if (orgCode !== undefined && code !== undefined && orgCode !== code) {
         saveContent();
       }
     },
-    1000,
+    500,
     [code]
   );
 
@@ -305,14 +302,6 @@ const Monaco = (props: {editorHeight: string}) => {
         <HiddenInputContainer>
           <HiddenInput ref={hiddenInputRef} type="text" />
         </HiddenInputContainer>
-        <RightMonoButton
-          large="true"
-          type={hasWarnings ? 'dashed' : 'primary'}
-          disabled={!isDirty || !isValid}
-          onClick={() => saveContent()}
-        >
-          Save
-        </RightMonoButton>
       </MonacoButtons>
       <MonacoContainer ref={containerRef}>
         <MonacoEditor
