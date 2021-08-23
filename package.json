@@ -44,6 +44,7 @@
     "cross-env": "7.0.3",
     "electron": "13.4.0",
     "electron-builder": "22.11.11",
+    "electron-notarize": "1.1.0",
     "electron-reload": "2.0.0-alpha.1",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "8.3.0",
@@ -141,8 +142,14 @@
     "copyright": "Copyright © 2021 ${author}",
     "mac": {
       "category": "public.app-category.utilities",
-      "icon": "build/icon.png"
+      "icon": "build/icon.png",
+      "hardenedRuntime": true,
+      "entitlements": "./electron/src/entitlements.mac.inherit.plist",
+      "target": [
+        "dmg"
+      ]
     },
+    "afterSign": "./notarization/afterSignHook.js",
     "dmg": {
       "icon": "build/icon.png"
     },
@@ -182,7 +189,8 @@
       "!**/node_modules/@jest/**/*",
       "!**/node_modules/monaco-editor/min/**/*",
       "!**/node_modules/monaco-editor/min-maps/**/*",
-      "!**/docs/**/*"
+      "!**/docs/**/*",
+      "!notarization/**/*"
     ],
     "extraResources": [
       {
