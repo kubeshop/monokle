@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch} from '@redux/hooks';
 import {withTheme} from '@rjsf/core';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {loadResource} from '@redux/services';
-import {useCallback, useEffect, useState} from 'react';
+import {useDebounce} from 'react-use';
 import {updateResource} from '@redux/reducers/main';
 import {logMessage} from '@redux/services/log';
 import {stringify} from 'yaml';
@@ -137,8 +137,14 @@ const FormEditor = (props: {contentHeight: string}) => {
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
+  let schema = selectedResource ? getFormSchema(selectedResource.kind) : undefined;
+  let uiSchema = selectedResource ? getUiSchema(selectedResource.kind) : undefined;
+
   const onFormUpdate = useCallback(
     (e: any) => {
+      if (e.formData === undefined) {
+        return;
+      }
       if (formData.orgFormData) {
         setFormData({currFormData: e.formData, orgFormData: formData.orgFormData});
         setHasChanged(!isDeepEqual(e.formData, formData.orgFormData));
@@ -161,7 +167,6 @@ const FormEditor = (props: {contentHeight: string}) => {
           log.debug(formString);
           log.debug(content); */
 
-          setFormData({currFormData: formData.currFormData, orgFormData: data});
           setHasChanged(false);
           dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
@@ -169,14 +174,24 @@ const FormEditor = (props: {contentHeight: string}) => {
         logMessage(`Failed to update resource ${err}`, dispatch);
       }
     },
-    [selectedResource]
+    [selectedResource, dispatch]
   );
 
   const submitForm = useCallback(() => {
     if (formData) {
       onFormSubmit(formData.currFormData, null);
     }
-  }, [formData]);
+  }, [formData, onFormSubmit]);
+
+  useDebounce(
+    () => {
+      if (hasChanged) {
+        submitForm();
+      }
+    },
+    250,
+    [hasChanged]
+  );
 
   useEffect(() => {
     if (selectedResource) {
@@ -191,9 +206,6 @@ const FormEditor = (props: {contentHeight: string}) => {
   if (selectedResource?.kind !== 'ConfigMap') {
     return <div>Form editor only for ConfigMap resources...</div>;
   }
-
-  let schema = getFormSchema(selectedResource.kind);
-  let uiSchema = getUiSchema(selectedResource.kind);
 
   return (
     <FormContainer contentHeight={contentHeight}>
