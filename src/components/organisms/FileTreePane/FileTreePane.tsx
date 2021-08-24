@@ -23,6 +23,7 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {ipcRenderer} from 'electron';
 
 interface TreeNode {
   key: string;
@@ -359,6 +360,10 @@ const FileTreePane = () => {
     setExpandedKeys(expandedKeysValue);
     setAutoExpandParent(false);
   };
+
+  ipcRenderer.on('executed-from', (_, data) => {
+    setFolder(data.path);
+  });
 
   return (
     <FileTreeContainer>

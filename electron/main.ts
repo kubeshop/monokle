@@ -5,14 +5,17 @@ import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-
 import {execSync} from 'child_process';
 import * as ElectronLog from 'electron-log';
 import * as Splashscreen from '@trodi/electron-splashscreen';
+import yargs from 'yargs';
+import {hideBin} from 'yargs/helpers';
 
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
+import terminal from '../cli/terminal';
 
 Object.assign(console, ElectronLog.functions);
 
 const ElectronStore = require('electron-store');
-const parseArgs = require('minimist');
-import electronTerminalOpen from '../cli/terminal';
+
+const {MONOKLE_RUN_AS_NODE} = process.env;
 
 const userHomeDir = app.getPath('home');
 
@@ -124,59 +127,74 @@ function createWindow() {
   return win;
 }
 
-app.whenReady().then(() => {
-  if (isDev) {
-    // DevTools
-    installExtension(REACT_DEVELOPER_TOOLS)
-      .then(name => console.log(`Added Extension:  ${name}`))
-      .catch(err => console.log('An error occurred: ', err));
+if (MONOKLE_RUN_AS_NODE) {
+  yargs(hideBin(process.argv)).command(
+    '$0',
+    'opens current directory',
+    () => {},
+    async argv => {
+      const {executedFrom, _} = argv;
+      const [, executedPath] = _;
 
-    installExtension(REDUX_DEVTOOLS)
-      .then(name => console.log(`Added Extension:  ${name}`))
-      .catch(err => console.log('An error occurred: ', err));
-  }
+      let fullPath: any = executedFrom;
 
-  ElectronStore.initRenderer();
-  createWindow();
+      if (executedPath && (<string>executedPath).startsWith('/')) {
+        fullPath = executedPath;
+      } else {
+        fullPath = `${fullPath}/${executedPath}`;
+      }
 
-  if (app.dock) {
-    const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
-    app.dock.setIcon(image);
-  }
+      await app.whenReady();
 
-  console.info('info', app.getName(), app.getVersion(), app.getLocale());
+      ElectronStore.initRenderer();
+      const win = createWindow();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      win.webContents.on('did-finish-load', () => {
+        win.webContents.send('executed-from', {path: fullPath});
+      });
+
+      app.on('window-all-closed', () => {
+        if (process.platform !== 'darwin') {
+          app.quit();
+        }
+      });
     }
-  });
+  ).argv;
+} else {
+  app.whenReady().then(() => {
+    if (isDev) {
+      // DevTools
+      installExtension(REACT_DEVELOPER_TOOLS)
+        .then(name => console.log(`Added Extension:  ${name}`))
+        .catch(err => console.log('An error occurred: ', err));
 
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
+      installExtension(REDUX_DEVTOOLS)
+        .then(name => console.log(`Added Extension:  ${name}`))
+        .catch(err => console.log('An error occurred: ', err));
     }
-  });
-});
 
-const args = parseArgs(process.argv.slice(1));
-
-console.log(args);
-
-if (args.h || args.help) {
-  console.log(`help sample`);
-  process.exit(0); // eslint-disable-line
-}
-
-if (args.v || args.version) {
-  console.log(app.getName(), app.getVersion());
-  process.exit(0); // eslint-disable-line
-}
-
-electronTerminalOpen()
-  .then(() => {
+    ElectronStore.initRenderer();
     createWindow();
-  })
-  .catch((err: any) => {
-    console.log(err);
+
+    if (app.dock) {
+      const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
+      app.dock.setIcon(image);
+    }
+
+    console.log('info', app.getName(), app.getVersion(), app.getLocale());
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
+
+    app.on('window-all-closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit();
+      }
+    });
   });
+}
+
+terminal();

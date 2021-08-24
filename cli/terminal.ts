@@ -2,7 +2,12 @@
 const path = require('path');
 const fs = require('fs');
 
-const installCommand = (commandPath: string, commandName: string): Promise<void> => {
+const getResourcesPath = () => process.resourcesPath;
+
+export default (): Promise<void> => {
+  const commandPath = path.resolve(getResourcesPath(), `app/darwin/bin/monokle.sh`);
+  const commandName = 'monokle';
+
   return new Promise((resolve, reject) => {
     if (typeof commandPath !== 'string' || typeof commandName !== 'string') {
       reject(new TypeError('Expected a string'));
@@ -35,17 +40,4 @@ const installCommand = (commandPath: string, commandName: string): Promise<void>
       });
     });
   });
-};
-
-const getResourcesPath = () => process.resourcesPath;
-
-export default async () => {
-  const output = fs.readFileSync(path.resolve(__dirname, '../../cli/open.sh'), 'utf8');
-  const outputPath = path.resolve(getResourcesPath(), `monokle.sh`);
-  fs.writeFileSync(outputPath, output, {
-    encoding: 'utf8',
-    flag: 'a+',
-    mode: 0o755,
-  });
-  await installCommand(outputPath, 'monokle');
 };
