@@ -4,6 +4,7 @@ import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import {execSync} from 'child_process';
 import * as ElectronLog from 'electron-log';
+import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 
@@ -75,7 +76,7 @@ ipcMain.on('quit-and-install', () => {
 
 function createWindow() {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
-  const win = new BrowserWindow({
+  const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1200,
     height: 800,
     minWidth: APP_MIN_WIDTH,
@@ -89,7 +90,21 @@ function createWindow() {
       nodeIntegrationInWorker: true, // <---  for web workers
       preload: path.join(__dirname, 'preload.js'),
     },
-  });
+  };
+  const splashscreenConfig: Splashscreen.Config = {
+    windowOpts: mainBrowserWindowOptions,
+    templateUrl: isDev
+      ? path.normalize(`${__dirname}/../../public/Splashscreen.html`)
+      : path.normalize(`${__dirname}/../Splashscreen.html`),
+    delay: 0,
+    splashScreenOpts: {
+      width: 1200,
+      height: 800,
+      backgroundColor: 'black',
+    },
+  };
+
+  const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');

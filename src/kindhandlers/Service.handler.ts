@@ -17,6 +17,18 @@ const ServiceHandler: ResourceKindHandler = {
     const response = await k8sCoreV1Api.listServiceForAllNamespaces();
     return response.body.items;
   },
+  outgoingRefMappers: [
+    {
+      source: {
+        pathParts: ['spec', 'selector'],
+      },
+      target: {
+        kind: 'Deployment',
+        pathParts: ['spec', 'template', 'metadata', 'labels'],
+      },
+      matchPairs: true,
+    },
+  ],
 };
 
 export default ServiceHandler;

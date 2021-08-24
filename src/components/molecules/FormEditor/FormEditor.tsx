@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useAppDispatch} from '@redux/hooks';
 import {withTheme} from '@rjsf/core';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {loadResource} from '@redux/services';
-import {useCallback, useEffect, useState} from 'react';
+import {useDebounce} from 'react-use';
 import {updateResource} from '@redux/reducers/main';
 import {logMessage} from '@redux/services/log';
 import {stringify} from 'yaml';
@@ -13,8 +13,7 @@ import {mergeManifests} from '@redux/services/manifest-utils';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
 import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
-import {MonoButton} from '@atoms';
-import equal from 'fast-deep-equal/es6/react';
+import isDeepEqual from 'fast-deep-equal/es6/react';
 
 const Form = withTheme(AntDTheme);
 
@@ -41,21 +40,12 @@ function getUiSchema(kind: string) {
   return uiformSchemaCache.get(kind);
 }
 
-const FormButtons = styled.div`
-  padding: 8px;
-  padding-right: 8px;
-  height: 40px;
-`;
-
-const RightMonoButton = styled(MonoButton)`
-  float: right;
-`;
-
 const FormContainer = styled.div<{contentHeight: string}>`
   width: 100%;
   padding-left: 15px;
   padding-right: 8px;
   margin: 0px;
+  margin-top: 20px;
   margin-bottom: 20px;
   overflow-y: scroll;
   height: ${props => props.contentHeight};
@@ -139,18 +129,27 @@ const FormContainer = styled.div<{contentHeight: string}>`
 const FormEditor = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
   const selectedResource = useSelector(selectedResourceSelector);
-  const [formData, setFormData] = useState<any>({formData: undefined, orgFormData: undefined});
+  const [formData, setFormData] = useState<{
+    currFormData: any;
+    orgFormData: any;
+  }>({currFormData: undefined, orgFormData: undefined});
   const [hasChanged, setHasChanged] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
+  let schema = selectedResource ? getFormSchema(selectedResource.kind) : undefined;
+  let uiSchema = selectedResource ? getUiSchema(selectedResource.kind) : undefined;
+
   const onFormUpdate = useCallback(
     (e: any) => {
+      if (e.formData === undefined) {
+        return;
+      }
       if (formData.orgFormData) {
-        setFormData({formData: e.formData, orgFormData: formData.orgFormData});
-        setHasChanged(!equal(e.formData, formData.orgFormData));
+        setFormData({currFormData: e.formData, orgFormData: formData.orgFormData});
+        setHasChanged(!isDeepEqual(e.formData, formData.orgFormData));
       } else {
-        setFormData({formData: e.formData, orgFormData: e.formData});
+        setFormData({currFormData: e.formData, orgFormData: e.formData});
         setHasChanged(false);
       }
     },
@@ -168,7 +167,6 @@ const FormEditor = (props: {contentHeight: string}) => {
           log.debug(formString);
           log.debug(content); */
 
-          setFormData({formData: formData.formData, orgFormData: data});
           setHasChanged(false);
           dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
@@ -176,18 +174,28 @@ const FormEditor = (props: {contentHeight: string}) => {
         logMessage(`Failed to update resource ${err}`, dispatch);
       }
     },
-    [selectedResource]
+    [selectedResource, dispatch]
   );
 
   const submitForm = useCallback(() => {
     if (formData) {
-      onFormSubmit(formData.formData, null);
+      onFormSubmit(formData.currFormData, null);
     }
-  }, [formData]);
+  }, [formData, onFormSubmit]);
+
+  useDebounce(
+    () => {
+      if (hasChanged) {
+        submitForm();
+      }
+    },
+    250,
+    [hasChanged]
+  );
 
   useEffect(() => {
     if (selectedResource) {
-      setFormData({formData: selectedResource.content, orgFormData: undefined});
+      setFormData({currFormData: selectedResource.content, orgFormData: undefined});
     }
   }, [selectedResource]);
 
@@ -199,30 +207,19 @@ const FormEditor = (props: {contentHeight: string}) => {
     return <div>Form editor only for ConfigMap resources...</div>;
   }
 
-  let schema = getFormSchema(selectedResource.kind);
-  let uiSchema = getUiSchema(selectedResource.kind);
-
   return (
-    // @ts-ignore
-    <>
-      <FormButtons>
-        <RightMonoButton large="true" type="primary" onClick={submitForm} disabled={isInPreviewMode || !hasChanged}>
-          Save
-        </RightMonoButton>
-      </FormButtons>
-      <FormContainer contentHeight={contentHeight}>
-        <Form
-          schema={schema}
-          uiSchema={uiSchema}
-          formData={formData.formData}
-          onChange={onFormUpdate}
-          onSubmit={onFormSubmit}
-          disabled={isInPreviewMode}
-        >
-          <div />
-        </Form>
-      </FormContainer>
-    </>
+    <FormContainer contentHeight={contentHeight}>
+      <Form
+        schema={schema}
+        uiSchema={uiSchema}
+        formData={formData.currFormData}
+        onChange={onFormUpdate}
+        onSubmit={onFormSubmit}
+        disabled={isInPreviewMode}
+      >
+        <div />
+      </Form>
+    </FormContainer>
   );
 };
 

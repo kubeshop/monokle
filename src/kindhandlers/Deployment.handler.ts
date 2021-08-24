@@ -18,19 +18,7 @@ const DeploymentHandler: ResourceKindHandler = {
     const response = await k8sAppV1Api.listDeploymentForAllNamespaces();
     return response.body.items;
   },
-  outgoingRefMappers: [
-    ...PodOutgoingRefMappers,
-    {
-      source: {
-        pathParts: ['spec', 'template', 'metadata', 'labels'],
-      },
-      target: {
-        kind: 'Service',
-        pathParts: ['spec', 'selector'],
-      },
-      matchPairs: true,
-    },
-  ],
+  outgoingRefMappers: [...PodOutgoingRefMappers],
 };
 
 export default DeploymentHandler;

@@ -64,3 +64,18 @@ export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
       ) || []
   ).flat();
 };
+
+export const getDependentResourceKinds = (resourceKinds: string[]) => {
+  const dependentResourceKinds: string[] = [];
+  ResourceKindHandlers.forEach(kindHandler => {
+    if (!kindHandler.outgoingRefMappers || kindHandler.outgoingRefMappers.length === 0) {
+      return;
+    }
+    kindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
+      if (resourceKinds.includes(outgoingRefMapper.target.kind)) {
+        dependentResourceKinds.push(outgoingRefMapper.target.kind);
+      }
+    });
+  });
+  return [...new Set(dependentResourceKinds)];
+};
