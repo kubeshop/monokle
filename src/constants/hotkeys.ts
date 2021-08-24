@@ -7,6 +7,8 @@ const hotkeys = {
   TOGGLE_LEFT_PANE: 'ctrl+b,command+b',
   TOGGLE_RIGHT_PANE: 'ctrl+alt+b,command+alt+b',
   SAVE: 'ctrl+s,command+s',
+  SELECT_FROM_HISTORY_BACK: 'alt+left',
+  SELECT_FROM_HISTORY_FORWARD: 'alt+right',
 };
 
 export default hotkeys;

@@ -25,7 +25,7 @@ interface K8sResource {
 
   parsedDoc?: Document.Parsed<ParsedNode>; // temporary object used for parsing refs
   lineCounter?: LineCounter; // temporary object used for ref positioning
-  refNodeByPath?: Record<string, RefNode>;
+  refNodeByPath?: Record<string, RefNode>; // temporary object used for parsing refs
 }
 
 export enum ResourceRefType {

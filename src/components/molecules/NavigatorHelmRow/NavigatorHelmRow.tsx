@@ -130,7 +130,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
 
   function onSelectValuesFile(id: string) {
     if (!previewValuesFile || previewValuesFile === id) {
-      dispatch(selectHelmValuesFile(id));
+      dispatch(selectHelmValuesFile({valuesFileId: id}));
     }
   }
 

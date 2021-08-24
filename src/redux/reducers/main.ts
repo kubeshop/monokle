@@ -11,6 +11,8 @@ import {previewCluster} from '@redux/thunks/previewCluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {AlertType} from '@models/alert';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -58,6 +60,25 @@ export type StartPreviewLoaderPayload = {
   targetResourceId: string;
   previewType: 'kustomization' | 'helm' | 'cluster';
 };
+
+function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
+  if (isVirtualSelection) {
+    return;
+  }
+  if (type === 'resource' && state.selectedResourceId) {
+    state.selectionHistory.push({
+      type,
+      selectedResourceId: state.selectedResourceId,
+    });
+  }
+  if (type === 'path' && state.selectedPath) {
+    state.selectionHistory.push({
+      type,
+      selectedPath: state.selectedPath,
+    });
+  }
+  state.currentSelectionHistoryIndex = undefined;
+}
 
 export const mainSlice = createSlice({
   name: 'main',
@@ -122,13 +143,17 @@ export const mainSlice = createSlice({
               delete state.resourceMap[r.id];
             });
 
-            const resources = extractK8sResources(action.payload.content, filePath.substring(rootFolder.length));
-            Object.values(resources).forEach(r => {
+            const extractedResources = extractK8sResources(
+              action.payload.content,
+              filePath.substring(rootFolder.length)
+            );
+            Object.values(extractedResources).forEach(r => {
               state.resourceMap[r.id] = r;
               r.isHighlighted = true;
             });
-
-            reprocessResources([], state.resourceMap, state.fileMap);
+            reprocessResources([], state.resourceMap, state.fileMap, {
+              resourceKinds: extractedResources.map(r => r.kind),
+            });
           }
         } else {
           log.error(`Could not find FileEntry for ${action.payload.path}`);
@@ -161,30 +186,40 @@ export const mainSlice = createSlice({
     /**
      * Marks the specified resource as selected and highlights all related resources
      */
-    selectK8sResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      const resource = state.resourceMap[action.payload];
+    selectK8sResource: (
+      state: Draft<AppState>,
+      action: PayloadAction<{resourceId: string; isVirtualSelection?: boolean}>
+    ) => {
+      const resource = state.resourceMap[action.payload.resourceId];
       if (resource) {
         updateSelectionAndHighlights(state, resource);
+        updateSelectionHistory('resource', Boolean(action.payload.isVirtualSelection), state);
       }
     },
     /**
      * Marks the specified values as selected
      */
-    selectHelmValuesFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      let payload = action.payload;
+    selectHelmValuesFile: (
+      state: Draft<AppState>,
+      action: PayloadAction<{valuesFileId: string; isVirtualSelection?: boolean}>
+    ) => {
+      const valuesFileId = action.payload.valuesFileId;
       Object.values(state.helmValuesMap).forEach(values => {
-        values.isSelected = values.id === payload;
+        values.isSelected = values.id === valuesFileId;
       });
 
-      state.selectedValuesFileId = state.helmValuesMap[payload].isSelected ? payload : undefined;
-      selectFilePath(state.helmValuesMap[payload].filePath, state);
+      state.selectedValuesFileId = state.helmValuesMap[valuesFileId].isSelected ? valuesFileId : undefined;
+      selectFilePath(state.helmValuesMap[valuesFileId].filePath, state);
+      updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
     },
     /**
      * Marks the specified file as selected and highlights all related resources
      */
-    selectFile: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      if (action.payload.length > 0) {
-        selectFilePath(action.payload, state);
+    selectFile: (state: Draft<AppState>, action: PayloadAction<{filePath: string; isVirtualSelection?: boolean}>) => {
+      const filePath = action.payload.filePath;
+      if (filePath.length > 0) {
+        selectFilePath(filePath, state);
+        updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
     },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
@@ -196,6 +231,8 @@ export const mainSlice = createSlice({
     clearPreview: (state: Draft<AppState>) => {
       setPreviewData({}, state);
       state.previewType = undefined;
+      state.currentSelectionHistoryIndex = undefined;
+      state.selectionHistory = [];
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
@@ -213,6 +250,7 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -225,6 +263,8 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        state.currentSelectionHistoryIndex = undefined;
+        resetSelectionHistory(state);
       })
       .addCase(previewHelmValuesFile.rejected, (state, action) => {
         state.previewLoader.isLoading = false;
@@ -237,6 +277,7 @@ export const mainSlice = createSlice({
         setPreviewData(action.payload, state);
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
+        resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -255,11 +296,17 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
       state.previewType = undefined;
+      resetSelectionHistory(state);
     });
 
     builder.addCase(performResourceDiff.fulfilled, (state, action) => {
       state.diffResourceId = action.payload.diffResourceId;
       state.diffContent = action.payload.diffContent;
+    });
+
+    builder.addCase(selectFromHistory.fulfilled, (state, action) => {
+      state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
+      state.selectionHistory = action.payload.newSelectionHistory;
     });
   },
 });

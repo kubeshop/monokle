@@ -12,6 +12,8 @@ import {toggleSettings, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/u
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
+
 import {makeOnUploadHandler} from '@utils/fileUpload';
 
 const HotKeysHandler = () => {
@@ -68,6 +70,14 @@ const HotKeysHandler = () => {
 
   useHotkeys(hotkeys.TOGGLE_RIGHT_PANE, () => {
     dispatch(toggleRightMenu());
+  });
+
+  useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK, () => {
+    dispatch(selectFromHistory({direction: 'left'}));
+  });
+
+  useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD, () => {
+    dispatch(selectFromHistory({direction: 'right'}));
   });
 
   return (

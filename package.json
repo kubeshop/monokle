@@ -66,6 +66,7 @@
     "@kubernetes/client-node": "0.15.0",
     "@rjsf/antd": "3.1.0",
     "@rjsf/core": "3.1.0",
+    "@trodi/electron-splashscreen": "1.0.2",
     "antd": "4.16.12",
     "chokidar": "3.5.2",
     "dagre": "0.8.5",
