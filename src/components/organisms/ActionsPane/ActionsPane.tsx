@@ -19,10 +19,11 @@ import {K8sResource} from '@models/k8sresource';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
-import {ApplyTooltip, DiffTooltip} from '@constants/tooltips';
+import {ApplyFileTooltip, ApplyTooltip, DiffTooltip} from '@constants/tooltips';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {TOOLTIP_DELAY} from '@constants/constants';
+import {applyFile} from '@redux/thunks/applyFile';
 
 const {TabPane} = Tabs;
 
@@ -96,6 +97,27 @@ export function applyWithConfirm(
   });
 }
 
+function applyFileWithConfirm(
+  selectedPath: string,
+  fileMap: FileMapType,
+  dispatch: ThunkDispatch<any, any, any>,
+  kubeconfig: string
+) {
+  const title = `Apply ${fileMap[selectedPath].name} to your cluster?`;
+
+  Modal.confirm({
+    title,
+    icon: <ExclamationCircleOutlined />,
+    onOk() {
+      return new Promise(resolve => {
+        applyFile(selectedPath, fileMap, dispatch, kubeconfig);
+        resolve({});
+      });
+    },
+    onCancel() {},
+  });
+}
+
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
 
@@ -103,6 +125,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
@@ -131,6 +154,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const applySelectedResource = useCallback(() => {
     if (selectedResource) {
       applyWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
+    } else if (selectedPath) {
+      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
     }
   }, [selectedResource, resourceMap, fileMap, kubeconfig]);
 
@@ -141,8 +166,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId]);
 
   useEffect(() => {
-    if (selectedResourceId && resourceMap) {
+    if (selectedResourceId && resourceMap[selectedResourceId]) {
       setSelectedResource(resourceMap[selectedResourceId]);
+    } else {
+      setSelectedResource(undefined);
     }
   }, [selectedResourceId, resourceMap]);
 
@@ -175,14 +202,18 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   icon={<ArrowRightOutlined />}
                 />
 
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip} placement="bottomLeft">
+                <Tooltip
+                  mouseEnterDelay={TOOLTIP_DELAY}
+                  title={selectedPath ? ApplyFileTooltip : ApplyTooltip}
+                  placement="bottomLeft"
+                >
                   <Button
                     loading={Boolean(applyingResource)}
                     type="primary"
                     size="small"
                     ghost
                     onClick={applySelectedResource}
-                    disabled={!selectedResourceId}
+                    disabled={!selectedResourceId && !selectedPath}
                   >
                     Apply
                   </Button>
