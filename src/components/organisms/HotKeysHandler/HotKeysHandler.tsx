@@ -81,11 +81,15 @@ const HotKeysHandler = () => {
     dispatch(selectFromHistory({direction: 'right'}));
   });
 
-  useHotkeys(hotkeys.OPEN_NEW_RESOURCE_WIZARD, () => {
-    if (!uiState.isNewResourceWizardOpen) {
-      dispatch(openNewResourceWizard());
-    }
-  });
+  useHotkeys(
+    hotkeys.OPEN_NEW_RESOURCE_WIZARD,
+    () => {
+      if (!uiState.isNewResourceWizardOpen && mainState.fileMap[ROOT_FILE_ENTRY]) {
+        dispatch(openNewResourceWizard());
+      }
+    },
+    [mainState.fileMap[ROOT_FILE_ENTRY]]
+  );
 
   return (
     <>

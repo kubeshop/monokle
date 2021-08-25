@@ -148,7 +148,9 @@ const Monaco = (props: {editorHeight: string}) => {
       /* eslint-disable no-bitwise */
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N],
       run: () => {
-        dispatch(openNewResourceWizard());
+        if (fileMap[ROOT_FILE_ENTRY]) {
+          dispatch(openNewResourceWizard());
+        }
       },
     });
 
