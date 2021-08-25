@@ -24,7 +24,13 @@ import {
   getResourcesForPath,
   reloadFile,
 } from '../services/fileEntry';
-import {extractK8sResources, recalculateResourceRanges, reprocessResources, saveResource} from '../services/resource';
+import {
+  createUnsavedResource,
+  extractK8sResources,
+  recalculateResourceRanges,
+  reprocessResources,
+  saveResource,
+} from '../services/resource';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -61,6 +67,13 @@ export type StartPreviewLoaderPayload = {
   previewType: 'kustomization' | 'helm' | 'cluster';
 };
 
+export type NewResourcePayload = {
+  name: string;
+  kind: string;
+  apiVersion?: string;
+  namespace?: string;
+};
+
 function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
   if (isVirtualSelection) {
     return;
@@ -84,6 +97,10 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
   reducers: {
+    addNewResource: (state: Draft<AppState>, action: PayloadAction<NewResourcePayload>) => {
+      const newResource = createUnsavedResource(action.payload);
+      state.resourceMap[newResource.id] = newResource;
+    },
     /**
      * called by the file monitor when a path is added to the file system
      */
@@ -379,6 +396,7 @@ function selectFilePath(filePath: string, state: AppState) {
 }
 
 export const {
+  addNewResource,
   selectK8sResource,
   selectFile,
   setSelectingFile,

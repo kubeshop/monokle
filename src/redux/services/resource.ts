@@ -2,7 +2,7 @@ import path from 'path';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import fs from 'fs';
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {PREVIEW_PREFIX, UNSAVED_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
@@ -226,7 +226,15 @@ export function createResourceName(filePath: string, content: any) {
  */
 
 export function isFileResource(resource: K8sResource) {
-  return !resource.filePath.startsWith(PREVIEW_PREFIX);
+  return !resource.filePath.startsWith(PREVIEW_PREFIX) && !isUnsavedResource(resource);
+}
+
+/**
+ * Checks if this specified resource is unsaved
+ */
+
+export function isUnsavedResource(resource: K8sResource) {
+  return resource.filePath.startsWith(UNSAVED_PREFIX);
 }
 
 /**
@@ -460,4 +468,36 @@ export function getLinkedResources(resource: K8sResource) {
     });
 
   return linkedResourceIds;
+}
+
+function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
+  return `
+apiVersion: ${input.apiVersion ? input.apiVersion : 'apps/v1'}
+kind: ${input.kind}
+metadata:
+  name: ${input.name}
+  `.trim();
+}
+
+/**
+ * Creates an unsaved Resource which will have it's filePath set as unsaved://resourceId
+ */
+export function createUnsavedResource(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
+  // TODO: add logic to use a resource template
+  const newResourceId = uuidv4();
+  const newResourceText = createDefaultResourceText(input);
+  const newResourceContent = parseDocument(newResourceText).toJS();
+  const newResource: K8sResource = {
+    name: input.name,
+    filePath: `${UNSAVED_PREFIX}${newResourceId}`,
+    id: newResourceId,
+    isHighlighted: false,
+    isSelected: false,
+    kind: input.kind,
+    // TODO: get default apiVersion from KindHandlers
+    version: input.apiVersion ? input.apiVersion : 'apps/v1',
+    text: newResourceText,
+    content: newResourceContent,
+  };
+  return newResource;
 }

@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext, useEffect, useCallback} from 'react';
 import {Row, Skeleton, Button} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
@@ -16,7 +16,7 @@ import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer, MonoSectionTitle} from '
 import {MinusSquareOutlined, PlusSquareOutlined, PlusOutlined} from '@ant-design/icons';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import AppContext from '@src/AppContext';
 
@@ -140,12 +140,17 @@ const NavigatorPane = () => {
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const helmCharts = useSelector(helmChartsSelector);
   const helmValues = useSelector(helmValuesSelector);
   const kustomizations = useSelector(kustomizationsSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
 
   const [expandedSections, setExpandedSections] = useState<string[]>(['kustomizations', 'helmcharts']);
+
+  const doesRootFileEntryExist = useCallback(() => {
+    return Boolean(fileMap[ROOT_FILE_ENTRY]);
+  }, [fileMap]);
 
   const expandSection = (sectionName: string) => {
     if (!expandedSections.includes(sectionName)) {
@@ -179,7 +184,13 @@ const NavigatorPane = () => {
             <TitleBarContainer>
               <span>Navigator</span>
               <RightButtons>
-                <StyledPlusButton onClick={onClickNewResource} type="link" size="small" icon={<PlusOutlined />} />
+                <StyledPlusButton
+                  disabled={!doesRootFileEntryExist()}
+                  onClick={onClickNewResource}
+                  type="link"
+                  size="small"
+                  icon={<PlusOutlined />}
+                />
               </RightButtons>
             </TitleBarContainer>
           </MonoPaneTitle>
