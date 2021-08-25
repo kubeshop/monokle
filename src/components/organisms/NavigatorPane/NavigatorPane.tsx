@@ -1,14 +1,20 @@
 import React, {useState, useContext, useEffect} from 'react';
-import {Row, Skeleton} from 'antd';
+import {Row, Skeleton, Button} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {isInClusterModeSelector, helmChartsSelector, helmValuesSelector, kustomizationsSelector} from '@redux/selectors';
+import {
+  isInClusterModeSelector,
+  helmChartsSelector,
+  helmValuesSelector,
+  kustomizationsSelector,
+} from '@redux/selectors';
 
 import {HelmValuesFile} from '@models/helm';
 import Colors, {BackgroundColors} from '@styles/Colors';
-import {useAppSelector} from '@redux/hooks';
+import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer, MonoSectionTitle} from '@atoms';
-import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
+import {MinusSquareOutlined, PlusSquareOutlined, PlusOutlined} from '@ant-design/icons';
+import {openNewResourceWizard} from '@redux/reducers/ui';
 
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 
@@ -79,9 +85,16 @@ const TitleBarContainer = styled.div`
   justify-content: space-between;
 `;
 
+const RightButtons = styled.div`
+  float: right;
+  display: flex;
+`;
+
 const NavigatorPaneContainer = styled(PaneContainer)`
   white-space: nowrap;
 `;
+
+const StyledPlusButton = styled(Button)``;
 
 const SectionHeader = (props: {
   title: string;
@@ -120,6 +133,7 @@ const SectionHeader = (props: {
 };
 
 const NavigatorPane = () => {
+  const dispatch = useAppDispatch();
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
@@ -147,6 +161,10 @@ const NavigatorPane = () => {
     return expandedSections.indexOf(sectionName) !== -1;
   };
 
+  const onClickNewResource = () => {
+    dispatch(openNewResourceWizard());
+  };
+
   useEffect(() => {
     if (kustomizations.some(kustomization => kustomization.id === selectedResourceId)) {
       expandSection('kustomizations');
@@ -160,6 +178,9 @@ const NavigatorPane = () => {
           <MonoPaneTitle>
             <TitleBarContainer>
               <span>Navigator</span>
+              <RightButtons>
+                <StyledPlusButton onClick={onClickNewResource} type="link" size="small" icon={<PlusOutlined />} />
+              </RightButtons>
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
@@ -186,7 +207,9 @@ const NavigatorPane = () => {
                     isSelected={
                       !isSectionExpanded('helmcharts') &&
                       Object.values(helmCharts).some(h =>
-                        h.valueFileIds.map(v => helmValues[v]).some((valuesFile: HelmValuesFile) => valuesFile.isSelected)
+                        h.valueFileIds
+                          .map(v => helmValues[v])
+                          .some((valuesFile: HelmValuesFile) => valuesFile.isSelected)
                       )
                     }
                   />
