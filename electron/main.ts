@@ -127,7 +127,44 @@ function createWindow() {
   return win;
 }
 
-if (MONOKLE_RUN_AS_NODE) {
+const openApplication = async () => {
+  await app.whenReady();
+
+  if (isDev) {
+    // DevTools
+    installExtension(REACT_DEVELOPER_TOOLS)
+      .then(name => console.log(`Added Extension:  ${name}`))
+      .catch(err => console.log('An error occurred: ', err));
+
+    installExtension(REDUX_DEVTOOLS)
+      .then(name => console.log(`Added Extension:  ${name}`))
+      .catch(err => console.log('An error occurred: ', err));
+  }
+
+  ElectronStore.initRenderer();
+  createWindow();
+
+  if (app.dock) {
+    const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
+    app.dock.setIcon(image);
+  }
+
+  console.log('info', app.getName(), app.getVersion(), app.getLocale());
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+  });
+};
+
+const openApplicationByCLI = () => {
   yargs(hideBin(process.argv)).command(
     '$0',
     'opens current directory',
@@ -160,41 +197,12 @@ if (MONOKLE_RUN_AS_NODE) {
       });
     }
   ).argv;
-} else {
-  app.whenReady().then(() => {
-    if (isDev) {
-      // DevTools
-      installExtension(REACT_DEVELOPER_TOOLS)
-        .then(name => console.log(`Added Extension:  ${name}`))
-        .catch(err => console.log('An error occurred: ', err));
-
-      installExtension(REDUX_DEVTOOLS)
-        .then(name => console.log(`Added Extension:  ${name}`))
-        .catch(err => console.log('An error occurred: ', err));
-    }
-
-    ElectronStore.initRenderer();
-    createWindow();
-
-    if (app.dock) {
-      const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
-      app.dock.setIcon(image);
-    }
-
-    console.log('info', app.getName(), app.getVersion(), app.getLocale());
-
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-      }
-    });
-
-    app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
-        app.quit();
-      }
-    });
-  });
-}
+};
 
 terminal();
+
+if (MONOKLE_RUN_AS_NODE) {
+  openApplicationByCLI();
+} else {
+  openApplication();
+}
