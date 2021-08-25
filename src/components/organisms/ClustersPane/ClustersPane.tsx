@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useCallback} from 'react';
 import {Button, Col, Input, Row, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
@@ -76,7 +76,7 @@ const ClustersPane = () => {
     restartPreview(kubeconfig, 'cluster', dispatch);
   };
 
-  const clusterObjectsButtonTemplate = () => {
+  const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
       return <span>Reload Cluster Objects</span>;
     }
@@ -84,7 +84,7 @@ const ClustersPane = () => {
       return <span>Loading Cluster Objects</span>;
     }
     return <span>Show Cluster Objects</span>;
-  };
+  }, [previewType, previewLoader]);
 
   return (
     <>
@@ -116,7 +116,7 @@ const ClustersPane = () => {
               loading={previewType === 'cluster' && previewLoader.isLoading}
               onClick={isInClusterMode ? reconnectToCluster : connectToCluster}
             >
-              {clusterObjectsButtonTemplate()}
+              {createClusterObjectsLabel()}
             </Button>
           </Tooltip>
         </ClustersContainer>
