@@ -72,7 +72,9 @@ const Section = (props: {
                 header={
                   <SubsectionHeader
                     isExpanded={isSubsectionExpanded(subsection.name)}
-                    isHighlighted={!isSubsectionExpanded(subsection.name) && visibleResources.some(r => r.isHighlighted)}
+                    isHighlighted={
+                      !isSubsectionExpanded(subsection.name) && visibleResources.some(r => r.isHighlighted)
+                    }
                     isSelected={!isSubsectionExpanded(subsection.name) && visibleResources.some(r => r.isSelected)}
                     onExpand={() => onSubsectionExpand(section.name, subsection.name)}
                     onCollapse={() => onSubsectionCollapse(section.name, subsection.name)}

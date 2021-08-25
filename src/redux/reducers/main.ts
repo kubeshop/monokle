@@ -231,6 +231,10 @@ export const mainSlice = createSlice({
     clearPreview: (state: Draft<AppState>) => {
       setPreviewData({}, state);
       state.previewType = undefined;
+    },
+    clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+      setPreviewData({}, state);
+      state.previewType = undefined;
       state.currentSelectionHistoryIndex = undefined;
       state.selectionHistory = [];
     },
@@ -356,6 +360,7 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
  */
 
 function selectFilePath(filePath: string, state: AppState) {
+  console.log('selectFilePath', filePath, state.fileMap);
   const entries = getAllFileEntriesForPath(filePath, state.fileMap);
   clearResourceSelections(state.resourceMap);
 
@@ -390,6 +395,7 @@ export const {
   pathRemoved,
   selectHelmValuesFile,
   clearPreview,
+  clearPreviewAndSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
 } = mainSlice.actions;
