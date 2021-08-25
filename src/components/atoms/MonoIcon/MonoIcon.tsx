@@ -1,25 +1,25 @@
 import React from 'react';
-import styled from 'styled-components';
 import MonokleIncomingRefs from '@assets/MonokleIncomingRefs.svg';
 import MonokleOutgoingRefs from '@assets/MonokleOutgoingRefs.svg';
 import MonokleWarning from '@assets/MonokleWarning.svg';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 export enum MonoIconTypes {
   IncomingRefs,
   OutgoingRefs,
   Warning,
+  Error,
 }
 
 export type MonoIconProps = {
   type: MonoIconTypes;
-  marginRight?: number;
-  marginLeft?: number;
+  style?: React.CSSProperties;
 };
 
-const StyledImage = styled.img`
-  display: inline-block;
-  height: 12px;
-`;
+const defaultStyle: React.CSSProperties = {
+  display: 'inline-block',
+  height: '12px',
+};
 
 const getIconSvg = (type: MonoIconTypes) => {
   switch (type) {
@@ -33,20 +33,39 @@ const getIconSvg = (type: MonoIconTypes) => {
       return MonokleWarning;
 
     default:
-      return null;
+      return undefined;
+  }
+};
+
+const createImageComponent = (type: MonoIconTypes, style?: React.CSSProperties) => {
+  const iconSvg = getIconSvg(type);
+  if (!iconSvg) {
+    return null;
+  }
+
+  return <img src={iconSvg} style={style} />;
+};
+
+const getIconComponent = (type: MonoIconTypes, style?: React.CSSProperties) => {
+  switch (type) {
+    case MonoIconTypes.Error: {
+      return <ExclamationCircleOutlined style={style} />;
+    }
+    default:
+      return createImageComponent(type, style);
   }
 };
 
 const MonoIcon = (props: MonoIconProps) => {
-  const {type, marginRight, marginLeft} = props;
+  const {type, style} = props;
 
-  const iconSvg = getIconSvg(type);
+  const fullStyle = {
+    ...defaultStyle,
+    ...style,
+  };
 
-  if (iconSvg) {
-    return <StyledImage src={iconSvg} style={{marginRight, marginLeft}} alt={MonoIconTypes[type]} />;
-  }
-
-  return null;
+  const IconComponent = getIconComponent(type, fullStyle);
+  return IconComponent;
 };
 
 export default MonoIcon;

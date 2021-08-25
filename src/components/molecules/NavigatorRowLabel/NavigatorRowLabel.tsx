@@ -56,6 +56,16 @@ const StyledRefText = styled(Text)`
   }
 `;
 
+const StyledLabelContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledIconsContainer = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
 const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
   cursor: pointer;
   ${props => {
@@ -73,7 +83,7 @@ const OutgoingRefLink = (props: RefLinkProps) => {
   const {text, onClick} = props;
   return (
     <div onClick={onClick}>
-      <MonoIcon type={MonoIconTypes.OutgoingRefs} marginRight={5} />
+      <MonoIcon type={MonoIconTypes.OutgoingRefs} style={{marginRight: 5}} />
       <StyledRefText>{text}</StyledRefText>
     </div>
   );
@@ -83,7 +93,7 @@ const IncomingRefLink = (props: RefLinkProps) => {
   const {text, onClick} = props;
   return (
     <div onClick={onClick}>
-      <MonoIcon type={MonoIconTypes.IncomingRefs} marginRight={5} />
+      <MonoIcon type={MonoIconTypes.IncomingRefs} style={{marginRight: 5}} />
       <StyledRefText>{text}</StyledRefText>
     </div>
   );
@@ -93,7 +103,7 @@ const UnsatisfiedRefLink = (props: {text: string}) => {
   const {text} = props;
   return (
     <div>
-      <MonoIcon type={MonoIconTypes.Warning} marginRight={5} />
+      <MonoIcon type={MonoIconTypes.Warning} style={{marginRight: 5}} />
       <StyledUnsatisfiedRefText>{text}</StyledUnsatisfiedRefText>
     </div>
   );
@@ -229,8 +239,12 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     dispatch(selectK8sResource({resourceId: resId}));
   };
 
+  if (!resource) {
+    return null;
+  }
+
   return (
-    <>
+    <StyledLabelContainer>
       {resource && resource.refs && hasIncomingRefs && (
         <Popover
           mouseEnterDelay={0.5}
@@ -245,9 +259,9 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
             </PopoverContent>
           }
         >
-          <span>
-            <MonoIcon type={MonoIconTypes.IncomingRefs} marginRight={5} />
-          </span>
+          <StyledIconsContainer>
+            <MonoIcon type={MonoIconTypes.IncomingRefs} style={{marginRight: 5}} />
+          </StyledIconsContainer>
         </Popover>
       )}
       <StyledSpan
@@ -274,13 +288,16 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
             </PopoverContent>
           }
         >
-          <span>
-            <MonoIcon type={MonoIconTypes.OutgoingRefs} marginLeft={5} />
-            {hasUnsatisfiedRefs && <MonoIcon type={MonoIconTypes.Warning} marginLeft={5} />}
-          </span>
+          <StyledIconsContainer>
+            <MonoIcon type={MonoIconTypes.OutgoingRefs} style={{marginLeft: 5}} />
+            {hasUnsatisfiedRefs && <MonoIcon type={MonoIconTypes.Warning} style={{marginLeft: 5}} />}
+          </StyledIconsContainer>
         </Popover>
       )}
-    </>
+      {resource && resource.validation && !resource.validation.isValid && (
+        <MonoIcon type={MonoIconTypes.Error} style={{marginLeft: 5, color: Colors.redError}} />
+      )}
+    </StyledLabelContainer>
   );
 };
 
