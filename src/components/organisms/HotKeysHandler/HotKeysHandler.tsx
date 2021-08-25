@@ -8,7 +8,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {toggleSettings, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
+import {toggleSettings, toggleLeftMenu, toggleRightMenu, openNewResourceWizard} from '@redux/reducers/ui';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -20,6 +20,7 @@ const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
   const configState = useAppSelector(state => state.config);
+  const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const folderInputRef = useRef<HTMLInputElement>(null);
@@ -78,6 +79,12 @@ const HotKeysHandler = () => {
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD, () => {
     dispatch(selectFromHistory({direction: 'right'}));
+  });
+
+  useHotkeys(hotkeys.OPEN_NEW_RESOURCE_WIZARD, () => {
+    if (!uiState.isNewResourceWizardOpen) {
+      dispatch(openNewResourceWizard());
+    }
   });
 
   return (
