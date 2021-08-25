@@ -5,6 +5,16 @@ import {Document, LineCounter, ParsedNode, Scalar} from 'yaml';
 
 export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 
+type ResourceValidationError = {
+  property: string;
+  message: string;
+};
+
+type ResourceValidation = {
+  isValid: boolean;
+  errors: ResourceValidationError[];
+};
+
 interface K8sResource {
   id: string; // an internally generated UUID - used for references/lookups in resourceMap
   filePath: string; // the path relative to the root folder to the file containing this resource - set to preview://<id> for internally generated resources
@@ -22,7 +32,7 @@ interface K8sResource {
     start: number;
     length: number;
   };
-
+  validation?: ResourceValidation;
   parsedDoc?: Document.Parsed<ParsedNode>; // temporary object used for parsing refs
   lineCounter?: LineCounter; // temporary object used for ref positioning
   refNodeByPath?: Record<string, RefNode>; // temporary object used for parsing refs
@@ -47,4 +57,4 @@ interface RefPosition {
   length: number;
 }
 
-export type {K8sResource, ResourceRef, RefPosition};
+export type {K8sResource, ResourceRef, RefPosition, ResourceValidation, ResourceValidationError};
