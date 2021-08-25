@@ -360,7 +360,6 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
  */
 
 function selectFilePath(filePath: string, state: AppState) {
-  console.log('selectFilePath', filePath, state.fileMap);
   const entries = getAllFileEntriesForPath(filePath, state.fileMap);
   clearResourceSelections(state.resourceMap);
 
