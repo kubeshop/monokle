@@ -151,13 +151,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     dispatch(selectFromHistory({direction: 'right'}));
   };
 
-  const applySelectedResource = useCallback(() => {
+  const applySelection = useCallback(() => {
     if (selectedResource) {
       applyWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
     } else if (selectedPath) {
       applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
     }
-  }, [selectedResource, resourceMap, fileMap, kubeconfig]);
+  }, [selectedResource, resourceMap, fileMap, kubeconfig, selectedPath]);
 
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
@@ -212,7 +212,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     type="primary"
                     size="small"
                     ghost
-                    onClick={applySelectedResource}
+                    onClick={applySelection}
                     disabled={!selectedResourceId && !selectedPath}
                   >
                     Apply
