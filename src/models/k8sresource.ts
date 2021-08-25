@@ -38,6 +38,7 @@ interface ResourceRef {
   type: ResourceRefType; // the type of ref (see enum)
   name: string; // the ref value - for example the name of a configmap
   targetResourceId?: string; // the resource this is referring to (empty for unsatisfied refs)
+  targetResourceKind?: string; // the resource kind of the target resource
   position?: RefPosition; // the position in the document of the refName (undefined for incoming file refs)
 }
 

@@ -109,7 +109,9 @@ const RefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType;
 
   let linkText = targetName;
 
-  if (resourceRef.targetResourceId) {
+  if (resourceRef.targetResourceKind) {
+    linkText = `${resourceRef.targetResourceKind}: ${targetName}`;
+  } else if (resourceRef.targetResourceId) {
     const resourceKind = resourceMap[resourceRef.targetResourceId].kind;
     linkText = `${resourceKind}: ${targetName}`;
   }
@@ -121,7 +123,7 @@ const RefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType;
     return <IncomingRefLink onClick={onClick} text={linkText} />;
   }
   if (isUnsatisfiedRef(resourceRef.type)) {
-    return <UnsatisfiedRefLink text={targetName} />;
+    return <UnsatisfiedRefLink text={linkText} />;
   }
 
   return null;
@@ -147,10 +149,22 @@ const PopoverContent = (props: {
       <StyledDivider />
       {resourceRefs
         .sort((a, b) => {
-          if (a.targetResourceId && b.targetResourceId) {
-            const resourceA = resourceMap[a.targetResourceId];
-            const resourceB = resourceMap[b.targetResourceId];
-            return resourceA.kind.localeCompare(resourceB.kind);
+          let kindA;
+          let kindB;
+          if (a.targetResourceKind) {
+            kindA = a.targetResourceKind;
+          } else if (a.targetResourceId) {
+            const targetResourceA = resourceMap[a.targetResourceId];
+            kindA = targetResourceA?.kind;
+          }
+          if (b.targetResourceKind) {
+            kindB = b.targetResourceKind;
+          } else if (b.targetResourceId) {
+            const targetResourceB = resourceMap[b.targetResourceId];
+            kindB = targetResourceB?.kind;
+          }
+          if (kindA && kindB) {
+            return kindA.localeCompare(kindB);
           }
           return 0;
         })
