@@ -36,6 +36,7 @@
     "@types/redux-logger": "3.0.9",
     "@types/styled-components": "5.1.12",
     "@types/uuid": "8.3.1",
+    "@types/yargs": "^17.0.2",
     "concurrently": "6.2.1",
     "craco-alias": "3.0.1",
     "craco-less": "1.18.0",
@@ -97,7 +98,8 @@
     "uuid": "8.3.2",
     "web-vitals": "2.1.0",
     "worker-loader": "3.0.8",
-    "yaml": "2.0.0-6"
+    "yaml": "2.0.0-6",
+    "yargs": "^17.1.1"
   },
   "scripts": {
     "start": "craco start",
@@ -174,6 +176,14 @@
       {
         "from": "resources",
         "to": "resources"
+      },
+      {
+        "from": "resources/darwin",
+        "to": "app"
+      },
+      {
+        "from": "resources",
+        "to": "app"
       }
     ],
     "directories": {
