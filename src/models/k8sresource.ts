@@ -2,6 +2,16 @@ import {Document, LineCounter, ParsedNode, Scalar} from 'yaml';
 
 export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 
+type ResourceValidationError = {
+  property: string;
+  message: string;
+};
+
+type ResourceValidation = {
+  isValid: boolean;
+  errors: ResourceValidationError[];
+};
+
 /**
  * A k8s resource manifest, either extracted from a file or generated internally (for example when previewing kustomizations or helm charts)
  */
@@ -38,6 +48,8 @@ interface K8sResource {
     start: number;
     length: number;
   };
+  /** result of schema validation */
+  validation?: ResourceValidation;
 
   /** temporary object used for parsing refs */
   parsedDoc?: Document.Parsed<ParsedNode>;
@@ -72,4 +84,4 @@ interface RefPosition {
   length: number;
 }
 
-export type {K8sResource, ResourceRef, RefPosition};
+export type {K8sResource, ResourceRef, RefPosition, ResourceValidation, ResourceValidationError};
