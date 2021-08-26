@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-import {CloseCircleOutlined, GithubOutlined, SettingOutlined} from '@ant-design/icons';
+import {CloseCircleOutlined, GithubOutlined, QuestionCircleOutlined, SettingOutlined} from '@ant-design/icons';
 import {AppBorders} from '@styles/Borders';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -17,7 +17,7 @@ import {stopPreview} from '@redux/services/preview';
 
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
-import {openGitHub} from '@utils/shell';
+import {openDocumentation, openGitHub} from '@utils/shell';
 
 const LogoCol = styled(Col)`
   padding-left: 4px;
@@ -184,6 +184,9 @@ const PageHeader = () => {
             <IconMonokle useDarkTheme />
           </LogoCol>
           <SettingsCol span={12}>
+            <GitHubIconSpan>
+              <QuestionCircleOutlined size={24} onClick={openDocumentation} />
+            </GitHubIconSpan>
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>
