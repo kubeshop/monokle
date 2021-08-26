@@ -142,17 +142,20 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer((files: FileList) => {
-    if (!selectedResourceId) {
-      return;
-    }
-    dispatch(
-      saveUnsavedResource({
-        resourceId: selectedResourceId,
-        absolutePath: files[0].path,
-      })
-    );
-  });
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    (files: FileList) => {
+      if (!selectedResourceId) {
+        return;
+      }
+      dispatch(
+        saveUnsavedResource({
+          resourceId: selectedResourceId,
+          absolutePath: files[0].path,
+        })
+      );
+    },
+    {acceptedFileExtensions: ['.yaml']}
+  );
 
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&

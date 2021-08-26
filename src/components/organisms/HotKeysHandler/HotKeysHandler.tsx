@@ -24,9 +24,12 @@ const HotKeysHandler = () => {
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer((files: FileList) => {
-    dispatch(setRootFolder(findRootFolder(files)));
-  });
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    (files: FileList) => {
+      dispatch(setRootFolder(findRootFolder(files)));
+    },
+    {isDirectoryExplorer: true}
+  );
 
   useHotkeys(hotkeys.SELECT_FOLDER, () => {
     openFileExplorer();
