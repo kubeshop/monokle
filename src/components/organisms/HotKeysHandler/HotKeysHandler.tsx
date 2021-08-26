@@ -15,7 +15,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import FileExplorer, {useFileExplorer} from '@atoms/FileExplorer';
-import {findRootFolder} from '@utils/fileUpload';
+import {findRootFolder} from '@utils/files';
 
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();

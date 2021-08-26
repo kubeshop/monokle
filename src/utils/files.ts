@@ -33,3 +33,8 @@ export function findRootFolder(files: FileList) {
 
   return result;
 }
+
+export function isSubDirectory(parentDir: string, dir: string) {
+  const relative = path.relative(parentDir, dir);
+  return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+}
