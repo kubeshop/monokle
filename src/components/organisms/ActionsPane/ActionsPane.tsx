@@ -19,11 +19,13 @@ import {K8sResource} from '@models/k8sresource';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {ThunkDispatch} from 'redux-thunk';
-import {ApplyFileTooltip, ApplyTooltip, DiffTooltip} from '@constants/tooltips';
+import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {applyFile} from '@redux/thunks/applyFile';
+import {isUnsavedResource} from '@redux/services/resource';
+import FileExplorer, {useFileExplorer} from '@atoms/FileExplorer';
 
 const {TabPane} = Tabs;
 
@@ -57,6 +59,10 @@ const RightButtons = styled.div`
 const DiffButton = styled(Button)`
   margin-left: 8px;
   margin-right: 4px;
+`;
+
+const SaveButton = styled(Button)`
+  margin-right: 8px;
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -135,6 +141,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer((files: FileList) => {
+    console.log(files);
+    // TODO: save resource to selected folder/file
+  });
+
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&
     (currentSelectionHistoryIndex === undefined || (currentSelectionHistoryIndex && currentSelectionHistoryIndex > 0));
@@ -149,6 +160,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const onClickRightArrow = () => {
     dispatch(selectFromHistory({direction: 'right'}));
+  };
+
+  const onClickSaveResource = () => {
+    openFileExplorer();
   };
 
   const applySelection = useCallback(() => {
@@ -179,9 +194,17 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   }, [selectedResourceId, selectedResource, key]);
 
+  const isSelectedResourceUnsaved = useCallback(() => {
+    if (!selectedResource) {
+      return false;
+    }
+    return isUnsavedResource(selectedResource);
+  }, [selectedResource]);
+
   return (
     <>
       <Row>
+        <FileExplorer {...fileExplorerProps} />
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <TitleBarContainer>
@@ -201,6 +224,14 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   size="small"
                   icon={<ArrowRightOutlined />}
                 />
+
+                {isSelectedResourceUnsaved() && (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
+                    <SaveButton onClick={onClickSaveResource} type="primary" size="small">
+                      Save
+                    </SaveButton>
+                  </Tooltip>
+                )}
 
                 <Tooltip
                   mouseEnterDelay={TOOLTIP_DELAY}
