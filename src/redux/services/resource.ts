@@ -479,35 +479,3 @@ export function getLinkedResources(resource: K8sResource) {
 
   return linkedResourceIds;
 }
-
-function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
-  return `
-apiVersion: ${input.apiVersion ? input.apiVersion : 'apps/v1'}
-kind: ${input.kind}
-metadata:
-  name: ${input.name}
-  `.trim();
-}
-
-/**
- * Creates an unsaved Resource which will have it's filePath set as unsaved://resourceId
- */
-export function createUnsavedResource(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
-  // TODO: add logic to use a resource template
-  const newResourceId = uuidv4();
-  const newResourceText = createDefaultResourceText(input);
-  const newResourceContent = parseDocument(newResourceText).toJS();
-  const newResource: K8sResource = {
-    name: input.name,
-    filePath: `${UNSAVED_PREFIX}${newResourceId}`,
-    id: newResourceId,
-    isHighlighted: false,
-    isSelected: false,
-    kind: input.kind,
-    // TODO: get default apiVersion from KindHandlers
-    version: input.apiVersion ? input.apiVersion : 'apps/v1',
-    text: newResourceText,
-    content: newResourceContent,
-  };
-  return newResource;
-}

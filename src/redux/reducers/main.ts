@@ -14,6 +14,7 @@ import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
+import {K8sResource} from '@models/k8sresource';
 import {AlertType} from '@models/alert';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -24,9 +25,9 @@ import {
   getFileEntryForAbsolutePath,
   getResourcesForPath,
   reloadFile,
+  createFileEntry,
 } from '../services/fileEntry';
 import {
-  createUnsavedResource,
   extractK8sResources,
   isFileResource,
   recalculateResourceRanges,
@@ -69,13 +70,6 @@ export type StartPreviewLoaderPayload = {
   previewType: 'kustomization' | 'helm' | 'cluster';
 };
 
-export type NewResourcePayload = {
-  name: string;
-  kind: string;
-  apiVersion?: string;
-  namespace?: string;
-};
-
 function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: boolean, state: AppState) {
   if (isVirtualSelection) {
     return;
@@ -99,9 +93,9 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
   reducers: {
-    addNewResource: (state: Draft<AppState>, action: PayloadAction<NewResourcePayload>) => {
-      const newResource = createUnsavedResource(action.payload);
-      state.resourceMap[newResource.id] = newResource;
+    addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      const resource = action.payload;
+      state.resourceMap[resource.id] = resource;
     },
     /**
      * called by the file monitor when a path is added to the file system
@@ -332,9 +326,19 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
+      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
       const resource = state.resourceMap[action.payload.resourceId];
+      const relativeFilePath = action.payload.resourceFilePath.substr(rootFolder.length);
+      const resourceFileEntry = state.fileMap[relativeFilePath];
       if (resource) {
-        resource.filePath = action.payload.resourceFilePath;
+        resource.filePath = relativeFilePath;
+      }
+      if (resourceFileEntry) {
+        resourceFileEntry.timestamp = action.payload.fileTimestamp;
+      } else {
+        const newFileEntry = createFileEntry(relativeFilePath);
+        newFileEntry.timestamp = action.payload.fileTimestamp;
+        state.fileMap[relativeFilePath] = newFileEntry;
       }
     });
   },
@@ -408,7 +412,7 @@ function selectFilePath(filePath: string, state: AppState) {
 }
 
 export const {
-  addNewResource,
+  addResource,
   selectK8sResource,
   selectFile,
   setSelectingFile,

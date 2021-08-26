@@ -4,7 +4,7 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {useResetFormOnCloseModal} from '@utils/hooks';
-import {addNewResource} from '@redux/reducers/main';
+import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const NewResourceWizard = () => {
@@ -31,13 +31,14 @@ const NewResourceWizard = () => {
       return;
     }
 
-    dispatch(
-      addNewResource({
+    createUnsavedResource(
+      {
         name: values.name,
         kind: values.kind,
         namespace: values.namespace,
         apiVersion: values.apiVersion,
-      })
+      },
+      dispatch
     );
 
     closeWizard();

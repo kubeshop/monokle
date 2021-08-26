@@ -12,6 +12,7 @@ import {createPreviewRejection} from './utils';
 type SaveUnsavedResourcePayload = {
   resourceId: string;
   resourceFilePath: string;
+  fileTimestamp: number;
   alert: AlertType;
 };
 
@@ -61,23 +62,27 @@ export const saveUnsavedResource = createAsyncThunk<
     absoluteFilePath = path.join(absolutePath, fileName);
   }
 
-  if (path.extname(absoluteFilePath) !== 'yaml') {
+  if (path.extname(absoluteFilePath) !== '.yaml') {
     return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'The selected file does not have .yaml extension.');
   }
 
   if (fs.existsSync(absoluteFilePath)) {
     const fileContent = await readFilePromise(absoluteFilePath, 'utf-8');
-    const contentToAppend = fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)
-      ? `${resource.text}`
-      : `\n${YAML_DOCUMENT_DELIMITER}\n${resource.text}`;
+    const contentToAppend =
+      fileContent.trim().length === 0 || fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)
+        ? `${resource.text}`
+        : `\n${YAML_DOCUMENT_DELIMITER}${resource.text}`;
     await appendFilePromise(absoluteFilePath, contentToAppend);
   } else {
     await writeFilePromise(absoluteFilePath, resource.text);
   }
 
+  const fileTimestamp = fs.statSync(absolutePath).mtime.getTime();
+
   return {
     resourceId,
     resourceFilePath: absoluteFilePath,
+    fileTimestamp,
     alert: {
       title: 'Resource Saved',
       message: `Saved resource to ${absoluteFilePath}`,
