@@ -10,6 +10,7 @@ import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {getDependentResourceKinds} from '@src/kindhandlers';
 import {v4 as uuidv4} from 'uuid';
+import {validateResource} from './validation';
 import {processRefs} from './resourceRefs';
 
 /**
@@ -342,6 +343,15 @@ export function processParsedResources(
   resourceMap: ResourceMapType,
   options?: {resourceIds?: string[]; resourceKinds?: string[]}
 ) {
+  if (options && options.resourceIds && options.resourceIds.length > 0) {
+    Object.values(resourceMap)
+      .filter(r => options.resourceIds?.includes(r.id))
+      .forEach(resource => validateResource(resource));
+  } else {
+    Object.values(resourceMap).forEach(resource => {
+      validateResource(resource);
+    });
+  }
   processRefs(resourceMap, options);
   clearResourcesTemporaryObjects(resourceMap);
 }

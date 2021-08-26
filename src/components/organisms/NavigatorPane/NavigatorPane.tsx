@@ -2,7 +2,12 @@ import React, {useState, useContext, useEffect} from 'react';
 import {Row, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {isInClusterModeSelector, helmChartsSelector, helmValuesSelector, kustomizationsSelector} from '@redux/selectors';
+import {
+  isInClusterModeSelector,
+  helmChartsSelector,
+  helmValuesSelector,
+  kustomizationsSelector,
+} from '@redux/selectors';
 
 import {HelmValuesFile} from '@models/helm';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -13,6 +18,9 @@ import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 
 import AppContext from '@src/AppContext';
+
+import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
+import {ResourceValidationError} from '@models/k8sresource';
 
 import HelmChartsSection from './components/HelmChartsSection';
 import KustomizationsSection from './components/KustomizationsSection';
@@ -131,6 +139,8 @@ const NavigatorPane = () => {
   const kustomizations = useSelector(kustomizationsSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
 
+  const [isValidationsErrorsModalVisible, setValidationsErrorsVisible] = useState<boolean>(false);
+  const [currentValidationErrors, setCurrentValidationErrors] = useState<ResourceValidationError[]>([]);
   const [expandedSections, setExpandedSections] = useState<string[]>(['kustomizations', 'helmcharts']);
 
   const expandSection = (sectionName: string) => {
@@ -153,8 +163,23 @@ const NavigatorPane = () => {
     }
   }, [selectedResourceId]);
 
+  const showValidationsErrorsModal = (errors: ResourceValidationError[]) => {
+    setValidationsErrorsVisible(true);
+    setCurrentValidationErrors(errors);
+  };
+
+  const hideValidationsErrorsModal = () => {
+    setValidationsErrorsVisible(false);
+    setCurrentValidationErrors([]);
+  };
+
   return (
     <>
+      <ValidationErrorsModal
+        errors={currentValidationErrors}
+        isVisible={isValidationsErrorsModalVisible}
+        onClose={hideValidationsErrorsModal}
+      />
       <TitleRow>
         <MonoPaneTitleCol span={24}>
           <MonoPaneTitle>
@@ -186,7 +211,9 @@ const NavigatorPane = () => {
                     isSelected={
                       !isSectionExpanded('helmcharts') &&
                       Object.values(helmCharts).some(h =>
-                        h.valueFileIds.map(v => helmValues[v]).some((valuesFile: HelmValuesFile) => valuesFile.isSelected)
+                        h.valueFileIds
+                          .map(v => helmValues[v])
+                          .some((valuesFile: HelmValuesFile) => valuesFile.isSelected)
                       )
                     }
                   />
@@ -216,7 +243,11 @@ const NavigatorPane = () => {
           </StyledCollapse>
         )}
 
-        {uiState.isFolderLoading || previewLoader.isLoading ? <StyledSkeleton /> : <ResourcesSection />}
+        {uiState.isFolderLoading || previewLoader.isLoading ? (
+          <StyledSkeleton />
+        ) : (
+          <ResourcesSection showErrorsModal={showValidationsErrorsModal} />
+        )}
       </NavigatorPaneContainer>
     </>
   );
