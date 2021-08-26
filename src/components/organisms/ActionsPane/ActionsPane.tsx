@@ -24,6 +24,7 @@ import {performResourceDiff} from '@redux/thunks/diffResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {applyFile} from '@redux/thunks/applyFile';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {isUnsavedResource} from '@redux/services/resource';
 import FileExplorer, {useFileExplorer} from '@atoms/FileExplorer';
 
@@ -142,8 +143,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const dispatch = useAppDispatch();
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer((files: FileList) => {
-    console.log(files);
-    // TODO: save resource to selected folder/file
+    if (!selectedResourceId) {
+      return;
+    }
+    dispatch(
+      saveUnsavedResource({
+        resourceId: selectedResourceId,
+        absolutePath: files[0].path,
+      })
+    );
   });
 
   const isLeftArrowEnabled =
