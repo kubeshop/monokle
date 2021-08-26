@@ -139,7 +139,9 @@ function handleRefMappingByParentKey(
       createResourceRef(
         sourceResource,
         ResourceRefType.Unsatisfied,
-        new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter)
+        new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+        undefined,
+        outgoingRefMapper.target.kind
       );
     });
   } else {
@@ -177,7 +179,9 @@ function handleRefMappingByParentKey(
         createResourceRef(
           sourceResource,
           ResourceRefType.Unsatisfied,
-          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter)
+          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+          undefined,
+          outgoingRefMapper.target.kind
         );
       }
     });
@@ -203,7 +207,9 @@ function handleRefMappingByKey(
     createResourceRef(
       sourceResource,
       ResourceRefType.Unsatisfied,
-      new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter)
+      new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+      undefined,
+      outgoingRefMapper.target.kind
     );
   } else {
     let hasSatisfiedRefs = false;
@@ -229,7 +235,9 @@ function handleRefMappingByKey(
       createResourceRef(
         sourceResource,
         ResourceRefType.Unsatisfied,
-        new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter)
+        new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+        undefined,
+        outgoingRefMapper.target.kind
       );
     }
   }

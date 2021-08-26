@@ -155,6 +155,14 @@ export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapT
 }
 
 /**
+ * Returns the absolute path to the file that containing specified resource
+ */
+
+export function getAbsoluteFileEntryPath(fileEntry: FileEntry, fileMap: FileMapType) {
+  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, fileEntry.filePath);
+}
+
+/**
  * Extracts all resources from the file at the specified path
  */
 
