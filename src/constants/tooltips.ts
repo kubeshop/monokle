@@ -10,6 +10,7 @@ export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize
 export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
 export const HelmPreviewTooltip = 'Preview the Helm chart with this values file';
 export const ExitHelmPreviewTooltip = 'Exit Helm chart preview (Escape)';
+export const ApplyFileTooltip = 'Apply this file to your configured cluster';
 export const ApplyTooltip = 'Apply this resource to your configured cluster';
 export const DiffTooltip = 'Diff this resource against your configured cluster';
 export const NamespacesFilterTooltip = 'Filter visible resources on selected namespace';
