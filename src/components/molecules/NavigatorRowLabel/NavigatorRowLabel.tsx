@@ -9,7 +9,7 @@ import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
-import {ResourceRef, K8sResource} from '@models/k8sresource';
+import {ResourceRef, K8sResource, ResourceValidationError} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
 import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import ScrollIntoView from '@molecules/ScrollIntoView';
@@ -30,6 +30,7 @@ type NavigatorRowLabelProps = {
   hasOutgoingRefs: boolean;
   hasUnsatisfiedRefs?: boolean;
   onClickLabel?: React.MouseEventHandler<HTMLDivElement>;
+  showErrorsModal?: (errors: ResourceValidationError[]) => void;
 };
 
 const StyledDivider = styled(Divider)`
@@ -64,6 +65,7 @@ const StyledLabelContainer = styled.div`
 const StyledIconsContainer = styled.span`
   display: flex;
   align-items: center;
+  cursor: pointer;
 `;
 
 const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
@@ -183,6 +185,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     hasOutgoingRefs,
     hasUnsatisfiedRefs,
     onClickLabel,
+    showErrorsModal,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -205,6 +208,12 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     const elementBottom = boundingClientRect.bottom;
     return elementTop < navigatorHeight && elementBottom >= 0;
   }, [navigatorHeight]);
+
+  const onClickErrorIcon = () => {
+    if (showErrorsModal && resource?.validation?.errors && resource.validation.errors.length > 0) {
+      showErrorsModal(resource.validation.errors);
+    }
+  };
 
   useEffect(() => {
     setResource(resourceMap[resourceId]);
@@ -295,7 +304,20 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
         </Popover>
       )}
       {resource && resource.validation && !resource.validation.isValid && (
-        <MonoIcon type={MonoIconTypes.Error} style={{marginLeft: 5, color: Colors.redError}} />
+        <Popover
+          placement="right"
+          content={
+            <div>
+              <span>
+                {resource.validation.errors.length} error{resource.validation.errors.length !== 1 && 's'}
+              </span>
+            </div>
+          }
+        >
+          <StyledIconsContainer onClick={onClickErrorIcon}>
+            <MonoIcon type={MonoIconTypes.Error} style={{marginLeft: 5, color: Colors.redError}} />
+          </StyledIconsContainer>
+        </Popover>
       )}
     </StyledLabelContainer>
   );

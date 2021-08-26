@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {MonoSectionTitle} from '@components/atoms';
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource, ResourceValidationError} from '@models/k8sresource';
 import {NavigatorSection, NavigatorSubSection} from '@models/navigator';
 import {activeResourcesSelector} from '@redux/selectors';
 import {selectK8sResource} from '@redux/reducers/main';
@@ -20,7 +20,8 @@ import Section from './Section';
 
 import {ALL_NAMESPACES} from '../constants';
 
-const ResourcesSection = () => {
+const ResourcesSection = (props: {showErrorsModal: (errors: ResourceValidationError[]) => void}) => {
+  const {showErrorsModal} = props;
   const dispatch = useAppDispatch();
   const appConfig = useAppSelector(state => state.config);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -172,6 +173,7 @@ const ResourcesSection = () => {
                             shouldSubsectionBeVisible={shouldSubsectionBeVisible}
                             resources={activeResources}
                             selectResource={selectResource}
+                            showErrorsModal={showErrorsModal}
                           />
                         </div>
                       );
