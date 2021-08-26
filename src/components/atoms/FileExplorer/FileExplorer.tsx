@@ -1,12 +1,40 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useState, useCallback} from 'react';
 
-const FileExplorer = (props: {isOpen: boolean; onFileSelect: (files: FileList) => void}) => {
-  const {isOpen, onFileSelect} = props;
+export const useFileExplorer = (onFileSelect: (files: FileList) => void) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const onFileSelectHandler = useCallback(
+    (files: FileList) => {
+      onFileSelect(files);
+      setIsOpen(false);
+    },
+    [onFileSelect]
+  );
+
+  return {
+    openFileExplorer: () => {
+      setIsOpen(true);
+    },
+    fileExplorerProps: {
+      isOpen,
+      onFileSelect: onFileSelectHandler,
+      onOpen: () => {
+        setIsOpen(false);
+      },
+    },
+  };
+};
+
+type FileExplorerProps = {isOpen: boolean; onFileSelect: (files: FileList) => void; onOpen: () => void};
+
+const FileExplorer = (props: FileExplorerProps) => {
+  const {isOpen, onFileSelect, onOpen} = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       fileInputRef && fileInputRef.current?.click();
+      onOpen();
     }
   }, [isOpen]);
 

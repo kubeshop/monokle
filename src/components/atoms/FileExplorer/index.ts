@@ -1,1 +1,1 @@
-export {default} from './FileExplorer';
+export {default, useFileExplorer} from './FileExplorer';
