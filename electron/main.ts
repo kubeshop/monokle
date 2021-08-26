@@ -127,7 +127,7 @@ function createWindow() {
   return win;
 }
 
-const openApplication = async () => {
+const openApplication = async (givenPath?: string) => {
   await app.whenReady();
 
   if (isDev) {
@@ -142,7 +142,13 @@ const openApplication = async () => {
   }
 
   ElectronStore.initRenderer();
-  createWindow();
+  const win = createWindow();
+
+  if (givenPath) {
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.send('executed-from', {path: givenPath});
+    });
+  }
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
@@ -164,45 +170,18 @@ const openApplication = async () => {
   });
 };
 
-const openApplicationByCLI = () => {
+if (MONOKLE_RUN_AS_NODE) {
   yargs(hideBin(process.argv)).command(
     '$0',
     'opens current directory',
     () => {},
     async argv => {
-      const {executedFrom, _} = argv;
-      const [, executedPath] = _;
-
-      let fullPath: any = executedFrom;
-
-      if (executedPath && (<string>executedPath).startsWith('/')) {
-        fullPath = executedPath;
-      } else {
-        fullPath = `${fullPath}/${executedPath}`;
-      }
-
-      await app.whenReady();
-
-      ElectronStore.initRenderer();
-      const win = createWindow();
-
-      win.webContents.on('did-finish-load', () => {
-        win.webContents.send('executed-from', {path: fullPath});
-      });
-
-      app.on('window-all-closed', () => {
-        if (process.platform !== 'darwin') {
-          app.quit();
-        }
-      });
+      const {executedFrom} = argv;
+      openApplication(<string>executedFrom);
     }
   ).argv;
-};
-
-terminal();
-
-if (MONOKLE_RUN_AS_NODE) {
-  openApplicationByCLI();
 } else {
   openApplication();
 }
+
+terminal();

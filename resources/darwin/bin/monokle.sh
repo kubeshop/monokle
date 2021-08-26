@@ -5,22 +5,19 @@ CLI="$CONTENTS/Resources/app/cli/index.js"
 
 PASSED=$1
 
-if [[ $PASSED = /* ]]; then
-    if [[ -d "$(pwd)$PASSED" ]]; then
-        MONOKLE_RUN_AS_NODE=1 "$MONOKLE" "$CLI" --executed-from="$(pwd)" "$@" &>/dev/null &
-        disown
-        exit $?
-    else
-        echo "The requested path is not a valid directory"
-        exit 1
-    fi
+if [ -z $PASSED ]; then
+    ABSOLUTE_PATH=""
+elif [[ $PASSED = /* ]]; then
+    ABSOLUTE_PATH=$PASSED
 else
-    if [[ -d "$(pwd)/$PASSED" ]]; then
-        MONOKLE_RUN_AS_NODE=1 "$MONOKLE" "$CLI" --executed-from="$(pwd)" "$@" &>/dev/null &
-        disown
-        exit $?
-    else
-        echo "The requested path is not a valid directory"
-        exit 1
-    fi
+    ABSOLUTE_PATH="$(pwd)/$PASSED"
+fi
+
+if [[ -d "$ABSOLUTE_PATH" ]]; then
+    MONOKLE_RUN_AS_NODE=1 "$MONOKLE" "$CLI" --executed-from="$ABSOLUTE_PATH" "$@" &>/dev/null &
+    disown
+    exit $?
+else
+    echo "The requested path is not a valid directory"
+    exit 1
 fi
