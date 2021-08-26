@@ -4,7 +4,7 @@ import fs from 'fs';
 // algorithm to find common root folder for selected files - since the first entry is not
 // necessarily the selected folder
 // eslint-disable-next-line no-undef
-function findRootFolder(files: FileList) {
+export function findRootFolder(files: FileList) {
   let root: any = files[0];
   let topIndex = -1;
 
@@ -32,13 +32,4 @@ function findRootFolder(files: FileList) {
   }
 
   return result;
-}
-
-export function makeOnUploadHandler(folderInputRef: any, setFolder: (folder: any) => {}) {
-  return function onUploadHandler(e: React.SyntheticEvent) {
-    e.preventDefault();
-    if (folderInputRef.current?.files && folderInputRef.current.files.length > 0) {
-      setFolder(findRootFolder(folderInputRef.current.files));
-    }
-  };
 }

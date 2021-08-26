@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import hotkeys from '@constants/hotkeys';
 import {useSelector} from 'react-redux';
@@ -14,7 +14,8 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
-import {makeOnUploadHandler} from '@utils/fileUpload';
+import FileExplorer, {useFileExplorer} from '@atoms/FileExplorer';
+import {findRootFolder} from '@utils/fileUpload';
 
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
@@ -23,14 +24,12 @@ const HotKeysHandler = () => {
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const folderInputRef = useRef<HTMLInputElement>(null);
-  const startFileUploader = () => {
-    folderInputRef && folderInputRef.current?.click();
-  };
-  const onUploadHandler = makeOnUploadHandler(folderInputRef, folder => dispatch(setRootFolder(folder)));
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer((files: FileList) => {
+    dispatch(setRootFolder(findRootFolder(files)));
+  });
 
   useHotkeys(hotkeys.SELECT_FOLDER, () => {
-    startFileUploader();
+    openFileExplorer();
   });
 
   useHotkeys(
@@ -93,15 +92,7 @@ const HotKeysHandler = () => {
 
   return (
     <>
-      <input
-        type="file"
-        /* @ts-expect-error */
-        directory=""
-        webkitdirectory=""
-        onChange={onUploadHandler}
-        ref={folderInputRef}
-        style={{display: 'none'}}
-      />
+      <FileExplorer {...fileExplorerProps} />
     </>
   );
 };
