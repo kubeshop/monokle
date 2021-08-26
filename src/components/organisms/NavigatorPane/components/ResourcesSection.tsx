@@ -20,6 +20,12 @@ import Section from './Section';
 
 import {ALL_NAMESPACES} from '../constants';
 
+const filterByNameSpace = (resource: K8sResource, namespace: string): boolean => {
+  return (
+    namespace === ALL_NAMESPACES || resource.namespace === namespace || (namespace === 'default' && !resource.namespace)
+  );
+};
+
 const ResourcesSection = () => {
   const dispatch = useAppDispatch();
   const appConfig = useAppSelector(state => state.config);
@@ -78,7 +84,7 @@ const ResourcesSection = () => {
     return (
       item.kind === subsection.kindSelector &&
       micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
-      (namespace === ALL_NAMESPACES || item.namespace === namespace || (namespace === 'default' && !item.namespace)) &&
+      filterByNameSpace(item, namespace) &&
       Object.values(resourceMap).length > 0
     );
   }
@@ -93,7 +99,10 @@ const ResourcesSection = () => {
   function shouldSubsectionBeVisible(subsection: NavigatorSubSection) {
     return (
       activeResources.length === 0 ||
-      (activeResources.length > 0 && activeResources.some(resource => resource.kind === subsection.kindSelector))
+      (activeResources.length > 0 &&
+        activeResources.some(
+          resource => resource.kind === subsection.kindSelector && filterByNameSpace(resource, namespace)
+        ))
     );
   }
 
