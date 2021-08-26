@@ -9,11 +9,13 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {isSubDirectory} from '@utils/files';
 import {createPreviewRejection} from './utils';
 
-type SaveResourceToFilePayload = {
-  alert?: AlertType;
+type SaveUnsavedResourcePayload = {
+  resourceId: string;
+  resourceFilePath: string;
+  alert: AlertType;
 };
 
-type SaveResourceToFileArgs = {
+type SaveUnsavedResourceArgs = {
   resourceId: string;
   absolutePath: string;
 };
@@ -22,14 +24,14 @@ const readFilePromise = util.promisify(fs.readFile);
 const appendFilePromise = util.promisify(fs.appendFile);
 const writeFilePromise = util.promisify(fs.writeFile);
 
-export const saveResourceToFile = createAsyncThunk<
-  SaveResourceToFilePayload,
-  SaveResourceToFileArgs,
+export const saveUnsavedResource = createAsyncThunk<
+  SaveUnsavedResourcePayload,
+  SaveUnsavedResourceArgs,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/saveResourceToFile', async ({resourceId, absolutePath}, thunkAPI) => {
+>('main/saveUnsavedResource', async ({resourceId, absolutePath}, thunkAPI) => {
   const mainState = thunkAPI.getState().main;
   const resource = mainState.resourceMap[resourceId];
   const rootFolder = mainState.fileMap[ROOT_FILE_ENTRY];
@@ -74,6 +76,8 @@ export const saveResourceToFile = createAsyncThunk<
   }
 
   return {
+    resourceId,
+    resourceFilePath: absoluteFilePath,
     alert: {
       title: 'Resource Saved',
       message: `Saved resource to ${absoluteFilePath}`,

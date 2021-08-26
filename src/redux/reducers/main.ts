@@ -12,6 +12,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {AlertType} from '@models/alert';
 import initialState from '../initialState';
@@ -27,6 +28,7 @@ import {
 import {
   createUnsavedResource,
   extractK8sResources,
+  isFileResource,
   recalculateResourceRanges,
   reprocessResources,
   saveResource,
@@ -187,9 +189,12 @@ export const mainSlice = createSlice({
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          const value = saveResource(resource, action.payload.content, state.fileMap);
-          resource.text = value;
-          resource.content = parseDocument(value).toJS();
+          let newText = action.payload.content;
+          if (isFileResource(resource)) {
+            newText = saveResource(resource, action.payload.content, state.fileMap);
+          }
+          resource.text = newText;
+          resource.content = parseDocument(newText).toJS();
           recalculateResourceRanges(resource, state);
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
           resource.isSelected = false;
@@ -324,6 +329,13 @@ export const mainSlice = createSlice({
     builder.addCase(selectFromHistory.fulfilled, (state, action) => {
       state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
       state.selectionHistory = action.payload.newSelectionHistory;
+    });
+
+    builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
+      const resource = state.resourceMap[action.payload.resourceId];
+      if (resource) {
+        resource.filePath = action.payload.resourceFilePath;
+      }
     });
   },
 });
