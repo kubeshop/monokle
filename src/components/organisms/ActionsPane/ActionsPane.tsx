@@ -26,7 +26,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {applyFile} from '@redux/thunks/applyFile';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {isUnsavedResource} from '@redux/services/resource';
-import FileExplorer, {useFileExplorer} from '@atoms/FileExplorer';
+import {useFileExplorer} from '@hooks/useFileExplorer';
 
 const {TabPane} = Tabs;
 
@@ -142,20 +142,21 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    (files: FileList) => {
+  const {openFileExplorer, FileExplorer} = useFileExplorer({
+    type: 'single-file',
+    onSelect: ({absolutePath}) => {
       if (!selectedResourceId) {
         return;
       }
       dispatch(
         saveUnsavedResource({
           resourceId: selectedResourceId,
-          absolutePath: files[0].path,
+          absolutePath,
         })
       );
     },
-    {acceptedFileExtensions: ['.yaml']}
-  );
+    acceptedFileExtensions: ['.yaml'],
+  });
 
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&
@@ -215,7 +216,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   return (
     <>
       <Row>
-        <FileExplorer {...fileExplorerProps} />
+        <FileExplorer />
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <TitleBarContainer>

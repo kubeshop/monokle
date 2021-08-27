@@ -1,51 +1,30 @@
-import React, {useRef, useEffect, useState, useCallback} from 'react';
+import React, {useRef, useEffect} from 'react';
 
-type DirectoryOptions = {
-  isDirectoryExplorer: true;
+export type DirectoryOptions = {
+  type: 'directory';
 };
 
-type FileOptions = {
-  isDirectoryExplorer?: false;
+export type MultipleFilesOptions = {
+  type: 'multiple-files';
   acceptedFileExtensions?: string[];
 };
 
-type FileExplorerOptions = DirectoryOptions | FileOptions;
-
-export const useFileExplorer = (onFileSelect: (files: FileList) => void, options?: FileExplorerOptions) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const onFileSelectHandler = useCallback(
-    (files: FileList) => {
-      onFileSelect(files);
-      setIsOpen(false);
-    },
-    [onFileSelect]
-  );
-
-  return {
-    openFileExplorer: () => {
-      setIsOpen(true);
-    },
-    fileExplorerProps: {
-      options,
-      isOpen,
-      onFileSelect: onFileSelectHandler,
-      onOpen: () => {
-        setIsOpen(false);
-      },
-    },
-  };
+export type SingleFileOptions = {
+  type: 'single-file';
+  acceptedFileExtensions?: string[];
 };
+
+export type FileExplorerOptions = DirectoryOptions | MultipleFilesOptions | SingleFileOptions;
 
 type FileExplorerProps = {
   isOpen: boolean;
-  onFileSelect: (files: FileList) => void;
+  onSelect: (files: FileList) => void;
   onOpen: () => void;
-  options?: FileExplorerOptions;
+  options: FileExplorerOptions;
 };
 
 const FileExplorer = (props: FileExplorerProps) => {
-  const {isOpen, onFileSelect, onOpen, options} = props;
+  const {isOpen, onSelect, onOpen, options} = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -58,18 +37,18 @@ const FileExplorer = (props: FileExplorerProps) => {
   const onChange = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (fileInputRef.current?.files && fileInputRef.current.files.length > 0) {
-      onFileSelect(fileInputRef.current.files);
+      onSelect(fileInputRef.current.files);
     }
   };
 
-  const inputProps = {
+  const inputProps: React.HTMLProps<HTMLInputElement> = {
     type: 'file',
     onChange,
     ref: fileInputRef,
     style: {display: 'none'},
   };
 
-  if (options?.isDirectoryExplorer) {
+  if (options.type === 'directory') {
     return (
       <input
         multiple
@@ -81,11 +60,13 @@ const FileExplorer = (props: FileExplorerProps) => {
     );
   }
 
+  if (options.type === 'multiple-files') {
+    inputProps.multiple = true;
+  }
+
   const inputAccept = options?.acceptedFileExtensions?.length
     ? options.acceptedFileExtensions.map(ext => ext.trim()).join(',')
     : undefined;
-
-  console.log({inputAccept});
 
   return <input accept={inputAccept} {...inputProps} />;
 };

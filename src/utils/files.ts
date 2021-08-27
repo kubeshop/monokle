@@ -4,7 +4,7 @@ import fs from 'fs';
 // algorithm to find common root folder for selected files - since the first entry is not
 // necessarily the selected folder
 // eslint-disable-next-line no-undef
-export function findRootFolder(files: FileList) {
+export function findCommonRootFolder(files: FileList) {
   let root: any = files[0];
   let topIndex = -1;
 

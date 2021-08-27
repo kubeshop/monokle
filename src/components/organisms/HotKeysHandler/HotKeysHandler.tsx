@@ -2,20 +2,14 @@ import React from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import hotkeys from '@constants/hotkeys';
 import {useSelector} from 'react-redux';
-
 import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {toggleSettings, toggleLeftMenu, toggleRightMenu, openNewResourceWizard} from '@redux/reducers/ui';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
-
-import FileExplorer, {useFileExplorer} from '@atoms/FileExplorer';
-import {findRootFolder} from '@utils/files';
+import {useFileExplorer} from '@hooks/useFileExplorer';
 
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
@@ -24,12 +18,12 @@ const HotKeysHandler = () => {
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    (files: FileList) => {
-      dispatch(setRootFolder(findRootFolder(files)));
+  const {openFileExplorer, FileExplorer} = useFileExplorer({
+    type: 'directory',
+    onSelect: ({absolutePath}) => {
+      dispatch(setRootFolder(absolutePath));
     },
-    {isDirectoryExplorer: true}
-  );
+  });
 
   useHotkeys(hotkeys.SELECT_FOLDER, () => {
     openFileExplorer();
@@ -95,7 +89,7 @@ const HotKeysHandler = () => {
 
   return (
     <>
-      <FileExplorer {...fileExplorerProps} />
+      <FileExplorer />
     </>
   );
 };
