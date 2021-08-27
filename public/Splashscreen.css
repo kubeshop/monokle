@@ -1,0 +1,63 @@
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+@keyframes loading-dots-1 {
+  from {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+}
+@keyframes loading-dots-2 {
+  from {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes loading-dots-3 {
+  from {
+    opacity: 0;
+  }
+  75% {
+    opacity: 1;
+  }
+}
+.loading-dots span {
+  animation: loading-dots-1 1s infinite steps(1);
+}
+.loading-dots span:first-child + span {
+  animation-name: loading-dots-2;
+}
+.loading-dots span:first-child + span + span {
+  animation-name: loading-dots-3;
+}
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.loading-text {
+  color: white;
+  font-size: 18px;
+}
+.kubeshop-text {
+  color: white;
+  margin-right: 5px;
+  font-size: 14px;
+}
+.kubeshop-logo {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
