@@ -6,8 +6,9 @@ import {CloseCircleOutlined, GithubOutlined, QuestionCircleOutlined, SettingOutl
 import {AppBorders} from '@styles/Borders';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {toggleSettings} from '@redux/reducers/ui';
-import IconMonokle from '@components/atoms/IconMonokle';
+import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 import Row from '@components/atoms/Row';
 import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
@@ -18,6 +19,12 @@ import {stopPreview} from '@redux/services/preview';
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {openDocumentation, openGitHub} from '@utils/shell';
+
+const StyledLogo = styled.img`
+  height: 24px;
+  margin: 4px;
+  margin-top: 11px;
+`;
 
 const LogoCol = styled(Col)`
   padding-left: 4px;
@@ -139,6 +146,10 @@ const PageHeader = () => {
     dispatch(toggleSettings());
   };
 
+  const showStartupModal = () => {
+    dispatch(updateStartupModalVisible(true));
+  };
+
   const onClickExit = () => {
     stopPreview(dispatch);
   };
@@ -181,7 +192,7 @@ const PageHeader = () => {
       <StyledHeader noborder="true">
         <Row noborder="true">
           <LogoCol span={12} noborder="true">
-            <IconMonokle useDarkTheme />
+            <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
           <SettingsCol span={12}>
             <GitHubIconSpan>
