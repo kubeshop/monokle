@@ -1,26 +1,22 @@
 import React, {useRef, useEffect} from 'react';
 
 export type DirectoryOptions = {
-  type: 'directory';
+  isDirectoryExplorer: true;
 };
 
-export type MultipleFilesOptions = {
-  type: 'multiple-files';
+export type FileOptions = {
+  isDirectoryExplorer?: false;
+  allowMultiple?: boolean;
   acceptedFileExtensions?: string[];
 };
 
-export type SingleFileOptions = {
-  type: 'single-file';
-  acceptedFileExtensions?: string[];
-};
+export type FileExplorerOptions = DirectoryOptions | FileOptions;
 
-export type FileExplorerOptions = DirectoryOptions | MultipleFilesOptions | SingleFileOptions;
-
-type FileExplorerProps = {
+export type FileExplorerProps = {
   isOpen: boolean;
   onSelect: (files: FileList) => void;
   onOpen: () => void;
-  options: FileExplorerOptions;
+  options?: FileExplorerOptions;
 };
 
 const FileExplorer = (props: FileExplorerProps) => {
@@ -32,7 +28,7 @@ const FileExplorer = (props: FileExplorerProps) => {
       fileInputRef && fileInputRef.current?.click();
       onOpen();
     }
-  }, [isOpen]);
+  }, [isOpen, onOpen]);
 
   const onChange = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -48,7 +44,7 @@ const FileExplorer = (props: FileExplorerProps) => {
     style: {display: 'none'},
   };
 
-  if (options.type === 'directory') {
+  if (options?.isDirectoryExplorer) {
     return (
       <input
         multiple
@@ -60,7 +56,7 @@ const FileExplorer = (props: FileExplorerProps) => {
     );
   }
 
-  if (options.type === 'multiple-files') {
+  if (options?.allowMultiple) {
     inputProps.multiple = true;
   }
 

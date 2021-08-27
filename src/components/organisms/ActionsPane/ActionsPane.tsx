@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState, useRef} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Tabs, Col, Row, Button, Tooltip, Menu, Dropdown} from 'antd';
 import {CodeOutlined, ContainerOutlined, ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
@@ -14,7 +14,8 @@ import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {isUnsavedResource} from '@redux/services/resource';
-import {useFileExplorer, OnSelectDirectory, OnSelectSingleFile} from '@hooks/useFileExplorer';
+import {useFileExplorer} from '@hooks/useFileExplorer';
+import FileExplorer from '@components/atoms/FileExplorer';
 import {applyFileWithConfirm} from './applyFileWithConfirm';
 import {applyResourceWithConfirm} from './applyResourceWithConfirm';
 import {
@@ -45,52 +46,64 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
-  const fileExplorerTypeRef = useRef<'directory' | 'single-file'>('single-file');
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
-  const {openFileExplorer, FileExplorer} = useFileExplorer({
-    type: fileExplorerTypeRef.current,
-    onSelect: (result: OnSelectDirectory | OnSelectSingleFile) => {
+  const onSelect = useCallback(
+    (absolutePath: string) => {
       if (!selectedResourceId) {
         return;
       }
       dispatch(
         saveUnsavedResource({
           resourceId: selectedResourceId,
-          absolutePath: result.absolutePath,
+          absolutePath,
         })
       );
     },
-    acceptedFileExtensions: fileExplorerTypeRef.current === 'single-file' ? ['.yaml'] : undefined,
-  });
+    [selectedResourceId, dispatch]
+  );
 
-  const onSaveToFile = () => {
-    fileExplorerTypeRef.current = 'single-file';
-    openFileExplorer();
-  };
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({filePath}) => {
+      if (!filePath) {
+        return;
+      }
+      onSelect(filePath);
+    },
+    {
+      acceptedFileExtensions: ['.yaml'],
+    }
+  );
 
-  const onSaveToDirectory = () => {
-    fileExplorerTypeRef.current = 'directory';
-    openFileExplorer();
-  };
+  const {openFileExplorer: openDirectoryExplorer, fileExplorerProps: directoryExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (!folderPath) {
+        return;
+      }
+      onSelect(folderPath);
+    },
+    {
+      isDirectoryExplorer: true,
+    }
+  );
 
   const getSaveButtonMenu = useCallback(
     () => (
       <Menu>
         <Menu.Item key="to-existing-file">
-          <Button onClick={onSaveToFile} type="text">
+          <Button onClick={() => openFileExplorer()} type="text">
             To existing file
           </Button>
         </Menu.Item>
         <Menu.Item key="to-directory">
-          <Button onClick={onSaveToDirectory} type="text">
+          <Button onClick={() => openDirectoryExplorer()} type="text">
             To new file in directory
           </Button>
         </Menu.Item>
       </Menu>
     ),
-    [onSaveToFile, onSaveToDirectory]
+    [openFileExplorer, openDirectoryExplorer]
   );
 
   const isLeftArrowEnabled =
@@ -115,13 +128,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     } else if (selectedPath) {
       applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
     }
-  }, [selectedResource, resourceMap, fileMap, kubeconfig, selectedPath]);
+  }, [selectedResource, resourceMap, fileMap, kubeconfig, selectedPath, dispatch]);
 
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
       dispatch(performResourceDiff(selectedResourceId));
     }
-  }, [selectedResourceId]);
+  }, [selectedResourceId, dispatch]);
 
   useEffect(() => {
     if (selectedResourceId && resourceMap[selectedResourceId]) {
@@ -147,7 +160,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
   return (
     <>
       <Row>
-        <FileExplorer />
+        <FileExplorer {...fileExplorerProps} />
+        <FileExplorer {...directoryExplorerProps} />
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <TitleBarContainer>

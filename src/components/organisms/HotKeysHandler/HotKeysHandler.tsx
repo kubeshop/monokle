@@ -9,6 +9,7 @@ import {toggleSettings, toggleLeftMenu, toggleRightMenu, openNewResourceWizard} 
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 const HotKeysHandler = () => {
@@ -18,12 +19,17 @@ const HotKeysHandler = () => {
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const {openFileExplorer, FileExplorer} = useFileExplorer({
-    type: 'directory',
-    onSelect: ({absolutePath}) => {
-      dispatch(setRootFolder(absolutePath));
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (!folderPath) {
+        return;
+      }
+      dispatch(setRootFolder(folderPath));
     },
-  });
+    {
+      isDirectoryExplorer: true,
+    }
+  );
 
   useHotkeys(hotkeys.SELECT_FOLDER, () => {
     openFileExplorer();
@@ -89,7 +95,7 @@ const HotKeysHandler = () => {
 
   return (
     <>
-      <FileExplorer />
+      <FileExplorer {...fileExplorerProps} />
     </>
   );
 };
