@@ -11,6 +11,7 @@ apiVersion: ${input.apiVersion ? input.apiVersion : 'apps/v1'}
 kind: ${input.kind}
 metadata:
   name: ${input.name}
+  namespace: ${input.namespace ? input.namespace : 'default'}
   `.trim();
 }
 
@@ -18,7 +19,7 @@ metadata:
  * Creates an unsaved Resource which will have it's filePath set as unsaved://resourceId
  */
 export function createUnsavedResource(
-  input: {name: string; kind: string; apiVersion?: string; namespace?: string},
+  input: {name: string; kind: string; apiVersion: string; namespace?: string},
   dispatch: AppDispatch
 ) {
   // TODO: add logic to use a resource template
@@ -32,8 +33,8 @@ export function createUnsavedResource(
     isHighlighted: false,
     isSelected: false,
     kind: input.kind,
-    // TODO: get default apiVersion from KindHandlers
-    version: input.apiVersion ? input.apiVersion : 'apps/v1',
+    version: input.apiVersion,
+    namespace: input.namespace,
     text: newResourceText,
     content: newResourceContent,
   };
