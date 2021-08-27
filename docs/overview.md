@@ -44,3 +44,4 @@ Monokle current supports the following keyboard shortcuts:
 - Save (in editors): Ctrl/Cmd S
 - Navigate Back (Selection History): ALT ArrowLeft
 - Navigate Forward (Selection History): ALT ArrowRight
+- Open New Resource Wizard: Ctrl/Cmd N

@@ -18,6 +18,7 @@ import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
 import {updateFileEntry, updateResource, selectK8sResource} from '@redux/reducers/main';
+import {openNewResourceWizard} from '@redux/reducers/ui';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
@@ -138,6 +139,18 @@ const Monaco = (props: {editorHeight: string}) => {
       keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.RightArrow],
       run: () => {
         dispatch(selectFromHistory({direction: 'right'}));
+      },
+    });
+
+    e.addAction({
+      id: 'monokle-open-new-resource-wizard',
+      label: 'Open New Resource Wizard',
+      /* eslint-disable no-bitwise */
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N],
+      run: () => {
+        if (fileMap[ROOT_FILE_ENTRY]) {
+          dispatch(openNewResourceWizard());
+        }
       },
     });
 

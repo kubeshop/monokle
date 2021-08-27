@@ -2,7 +2,7 @@ import path from 'path';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import fs from 'fs';
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {PREVIEW_PREFIX, UNSAVED_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
@@ -227,7 +227,15 @@ export function createResourceName(filePath: string, content: any) {
  */
 
 export function isFileResource(resource: K8sResource) {
-  return !resource.filePath.startsWith(PREVIEW_PREFIX);
+  return !resource.filePath.startsWith(PREVIEW_PREFIX) && !isUnsavedResource(resource);
+}
+
+/**
+ * Checks if this specified resource is unsaved
+ */
+
+export function isUnsavedResource(resource: K8sResource) {
+  return resource.filePath.startsWith(UNSAVED_PREFIX);
 }
 
 /**

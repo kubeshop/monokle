@@ -1,5 +1,5 @@
-import React, {useState, useContext, useEffect} from 'react';
-import {Row, Skeleton} from 'antd';
+import React, {useState, useContext, useEffect, useCallback} from 'react';
+import {Row, Skeleton, Button} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
 import {
@@ -11,11 +11,12 @@ import {
 
 import {HelmValuesFile} from '@models/helm';
 import Colors, {BackgroundColors} from '@styles/Colors';
-import {useAppSelector} from '@redux/hooks';
+import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer, MonoSectionTitle} from '@atoms';
-import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
+import {MinusSquareOutlined, PlusSquareOutlined, PlusOutlined} from '@ant-design/icons';
+import {openNewResourceWizard} from '@redux/reducers/ui';
 
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import AppContext from '@src/AppContext';
 
@@ -87,9 +88,16 @@ const TitleBarContainer = styled.div`
   justify-content: space-between;
 `;
 
+const RightButtons = styled.div`
+  float: right;
+  display: flex;
+`;
+
 const NavigatorPaneContainer = styled(PaneContainer)`
   white-space: nowrap;
 `;
+
+const StyledPlusButton = styled(Button)``;
 
 const SectionHeader = (props: {
   title: string;
@@ -128,12 +136,14 @@ const SectionHeader = (props: {
 };
 
 const NavigatorPane = () => {
+  const dispatch = useAppDispatch();
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const helmCharts = useSelector(helmChartsSelector);
   const helmValues = useSelector(helmValuesSelector);
   const kustomizations = useSelector(kustomizationsSelector);
@@ -142,6 +152,10 @@ const NavigatorPane = () => {
   const [isValidationsErrorsModalVisible, setValidationsErrorsVisible] = useState<boolean>(false);
   const [currentValidationErrors, setCurrentValidationErrors] = useState<ResourceValidationError[]>([]);
   const [expandedSections, setExpandedSections] = useState<string[]>(['kustomizations', 'helmcharts']);
+
+  const doesRootFileEntryExist = useCallback(() => {
+    return Boolean(fileMap[ROOT_FILE_ENTRY]);
+  }, [fileMap]);
 
   const expandSection = (sectionName: string) => {
     if (!expandedSections.includes(sectionName)) {
@@ -155,6 +169,10 @@ const NavigatorPane = () => {
 
   const isSectionExpanded = (sectionName: string) => {
     return expandedSections.indexOf(sectionName) !== -1;
+  };
+
+  const onClickNewResource = () => {
+    dispatch(openNewResourceWizard());
   };
 
   useEffect(() => {
@@ -185,6 +203,15 @@ const NavigatorPane = () => {
           <MonoPaneTitle>
             <TitleBarContainer>
               <span>Navigator</span>
+              <RightButtons>
+                <StyledPlusButton
+                  disabled={!doesRootFileEntryExist()}
+                  onClick={onClickNewResource}
+                  type="link"
+                  size="small"
+                  icon={<PlusOutlined />}
+                />
+              </RightButtons>
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>

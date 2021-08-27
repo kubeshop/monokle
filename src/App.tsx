@@ -10,6 +10,7 @@ import {
   StartupModal,
   HotKeysHandler,
   PaneManager,
+  NewResourceWizard,
 } from '@organisms';
 import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
@@ -39,6 +40,7 @@ const App = () => {
         </Layout>
         <DiffModal />
         <StartupModal />
+        <NewResourceWizard />
         <HotKeysHandler />
       </div>
     </AppContext.Provider>
