@@ -1,129 +1,35 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Tabs, Col, Row, Button, Skeleton, Modal, Tooltip} from 'antd';
-import styled from 'styled-components';
-import {
-  CodeOutlined,
-  ContainerOutlined,
-  ExclamationCircleOutlined,
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-} from '@ant-design/icons';
+import React, {useCallback, useEffect, useState, useRef} from 'react';
+import {Tabs, Col, Row, Button, Tooltip, Menu, Dropdown} from 'antd';
+import {CodeOutlined, ContainerOutlined, ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {applyResource} from '@redux/thunks/applyResource';
 import TabHeader from '@atoms/TabHeader';
-import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
-import {isKustomizationResource} from '@redux/services/kustomize';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {ThunkDispatch} from 'redux-thunk';
 import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {applyFile} from '@redux/thunks/applyFile';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {isUnsavedResource} from '@redux/services/resource';
-import {useFileExplorer} from '@hooks/useFileExplorer';
+import {useFileExplorer, OnSelectDirectory, OnSelectSingleFile} from '@hooks/useFileExplorer';
+import {applyFileWithConfirm} from './applyFileWithConfirm';
+import {applyResourceWithConfirm} from './applyResourceWithConfirm';
+import {
+  StyledLeftArrowButton,
+  StyledRightArrowButton,
+  StyledSkeleton,
+  StyledTabs,
+  TitleBarContainer,
+  DiffButton,
+  SaveButton,
+  RightButtons,
+  ActionsPaneContainer,
+} from './ActionsPane.styled';
 
 const {TabPane} = Tabs;
-
-const StyledTabs = styled(Tabs)`
-  & .ant-tabs-nav {
-    padding: 0 16px;
-    margin-bottom: 0px;
-  }
-
-  & .ant-tabs-nav::before {
-    border-bottom: 1px solid #363636;
-  }
-`;
-
-const ActionsPaneContainer = styled(PaneContainer)`
-  height: 100%;
-  overflow-y: hidden;
-`;
-
-const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-`;
-
-const RightButtons = styled.div`
-  float: right;
-  display: flex;
-`;
-
-const DiffButton = styled(Button)`
-  margin-left: 8px;
-  margin-right: 4px;
-`;
-
-const SaveButton = styled(Button)`
-  margin-right: 8px;
-`;
-
-const StyledSkeleton = styled(Skeleton)`
-  margin: 20px;
-  padding: 8px;
-  width: 95%;
-`;
-
-const StyledLeftArrowButton = styled(Button)`
-  margin-right: 5px;
-`;
-
-const StyledRightArrowButton = styled(Button)`
-  margin-right: 10px;
-`;
-
-export function applyWithConfirm(
-  selectedResource: K8sResource,
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType,
-  dispatch: ThunkDispatch<any, any, any>,
-  kubeconfig: string
-) {
-  const title = isKustomizationResource(selectedResource)
-    ? `Apply ${selectedResource.name} kustomization your cluster?`
-    : `Apply ${selectedResource.name} to your cluster?`;
-
-  Modal.confirm({
-    title,
-    icon: <ExclamationCircleOutlined />,
-    onOk() {
-      return new Promise(resolve => {
-        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig);
-        resolve({});
-      });
-    },
-    onCancel() {},
-  });
-}
-
-function applyFileWithConfirm(
-  selectedPath: string,
-  fileMap: FileMapType,
-  dispatch: ThunkDispatch<any, any, any>,
-  kubeconfig: string
-) {
-  const title = `Apply ${fileMap[selectedPath].name} to your cluster?`;
-
-  Modal.confirm({
-    title,
-    icon: <ExclamationCircleOutlined />,
-    onOk() {
-      return new Promise(resolve => {
-        applyFile(selectedPath, fileMap, dispatch, kubeconfig);
-        resolve({});
-      });
-    },
-    onCancel() {},
-  });
-}
 
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
@@ -139,24 +45,53 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
+  const fileExplorerTypeRef = useRef<'directory' | 'single-file'>('single-file');
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
   const {openFileExplorer, FileExplorer} = useFileExplorer({
-    type: 'single-file',
-    onSelect: ({absolutePath}) => {
+    type: fileExplorerTypeRef.current,
+    onSelect: (result: OnSelectDirectory | OnSelectSingleFile) => {
       if (!selectedResourceId) {
         return;
       }
       dispatch(
         saveUnsavedResource({
           resourceId: selectedResourceId,
-          absolutePath,
+          absolutePath: result.absolutePath,
         })
       );
     },
-    acceptedFileExtensions: ['.yaml'],
+    acceptedFileExtensions: fileExplorerTypeRef.current === 'single-file' ? ['.yaml'] : undefined,
   });
+
+  const onSaveToFile = () => {
+    fileExplorerTypeRef.current = 'single-file';
+    openFileExplorer();
+  };
+
+  const onSaveToDirectory = () => {
+    fileExplorerTypeRef.current = 'directory';
+    openFileExplorer();
+  };
+
+  const getSaveButtonMenu = useCallback(
+    () => (
+      <Menu>
+        <Menu.Item key="to-existing-file">
+          <Button onClick={onSaveToFile} type="text">
+            To existing file
+          </Button>
+        </Menu.Item>
+        <Menu.Item key="to-directory">
+          <Button onClick={onSaveToDirectory} type="text">
+            To new file in directory
+          </Button>
+        </Menu.Item>
+      </Menu>
+    ),
+    [onSaveToFile, onSaveToDirectory]
+  );
 
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&
@@ -174,13 +109,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     dispatch(selectFromHistory({direction: 'right'}));
   };
 
-  const onClickSaveResource = () => {
-    openFileExplorer();
-  };
-
   const applySelection = useCallback(() => {
     if (selectedResource) {
-      applyWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
+      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
     } else if (selectedPath) {
       applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
     }
@@ -239,9 +170,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
                 {isSelectedResourceUnsaved() && (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
-                    <SaveButton onClick={onClickSaveResource} type="primary" size="small">
-                      Save
-                    </SaveButton>
+                    <Dropdown overlay={getSaveButtonMenu()}>
+                      <SaveButton type="primary" size="small">
+                        Save
+                      </SaveButton>
+                    </Dropdown>
                   </Tooltip>
                 )}
 

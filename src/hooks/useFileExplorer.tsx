@@ -2,17 +2,17 @@ import React, {useState, useCallback} from 'react';
 import FileExplorer, {DirectoryOptions, MultipleFilesOptions, SingleFileOptions} from '@atoms/FileExplorer';
 import {findCommonRootFolder} from '@utils/files';
 
-type OnSelectDirectory = {
+export type OnSelectDirectory = {
   type: 'directory';
   absolutePath: string;
 };
 
-type OnSelectMultipleFiles = {
+export type OnSelectMultipleFiles = {
   type: 'multiple-files';
   absolutePaths: string[];
 };
 
-type OnSelectSingleFile = {
+export type OnSelectSingleFile = {
   type: 'single-file';
   absolutePath: string;
 };
