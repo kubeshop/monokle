@@ -58,7 +58,7 @@ export const saveUnsavedResource = createAsyncThunk<
 
   /** if the absolute path is a directory, we will use the resource.name to create a new fileName */
   if (isDirectory) {
-    const fileName = `${resource.name}.yaml`;
+    const fileName = `${resource.name}-${resource.kind.toLowerCase()}.yaml`;
     absoluteFilePath = path.join(absolutePath, fileName);
   }
 
