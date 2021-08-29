@@ -6,7 +6,7 @@ import {
 } from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
-import {previewCluster} from '@redux/thunks/previewCluster';
+import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 
 export const startPreview = (
@@ -37,7 +37,7 @@ export const restartPreview = (
     dispatch(previewKustomization(targetResourceId));
   }
   if (type === 'cluster') {
-    dispatch(previewCluster(targetResourceId));
+    dispatch(repreviewCluster(targetResourceId));
   }
   if (type === 'helm') {
     dispatch(previewHelmValuesFile(targetResourceId));
