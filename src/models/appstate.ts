@@ -48,23 +48,43 @@ type PathSelectionHistoryEntry = {
 type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry;
 
 interface AppState {
-  fileMap: FileMapType; // maps filePath to FileEntry, filePath is relative to selected rootFolder
-  resourceMap: ResourceMapType; // maps resource ids to resources
-  helmChartMap: HelmChartMapType; // maps chart ids to helm charts
-  helmValuesMap: HelmValuesMapType; // maps values ids to helm values files
-  isApplyingResource: boolean; // if we are currently applying a resource - room for improvement...
-  isSelectingFile: boolean; // if we are currently in the process of selecting a file - used for one-time UI updates
-  currentSelectionHistoryIndex?: number; // index of current selection from the history, or undefined if last selection was not virtual
+  /** maps filePath to FileEntry
+   * - filePath is relative to selected rootFolder
+   * - fileMap[**ROOT_FILE_ENTRY**] is the FileEntry for the rootFolder and it's **filePath is absolute**
+   */
+  fileMap: FileMapType;
+  /** maps resource ids to resources */
+  resourceMap: ResourceMapType;
+  /** maps chart ids to helm charts */
+  helmChartMap: HelmChartMapType;
+  /** maps values ids to helm values files */
+  helmValuesMap: HelmValuesMapType;
+  /** if we are currently applying a resource - room for improvement... */
+  isApplyingResource: boolean;
+  /** if we are currently in the process of selecting a file - used for one-time UI updates */
+  isSelectingFile: boolean;
+  /** index of current selection from the history, or undefined if last selection was not virtual */
+  currentSelectionHistoryIndex?: number;
+  /** a list of previously selected resources of paths */
   selectionHistory: SelectionHistoryEntry[];
-  selectedResourceId?: string; // the id of the currently selected resource
-  selectedPath?: string; // the currently selected path
-  selectedValuesFileId?: string; // the currently selected values file
+  /** the id of the currently selected resource */
+  selectedResourceId?: string;
+  /** the currently selected path */
+  selectedPath?: string;
+  /** the currently selected values file */
+  selectedValuesFileId?: string;
+  /** the current type of preview */
   previewType?: 'kustomization' | 'cluster' | 'helm';
+  /** information used to load the preview */
   previewLoader: PreviewLoaderType;
-  previewResourceId?: string; // the resource currently being previewed
-  previewValuesFileId?: string; // the values file currently being previewed
-  diffResourceId?: string; // the resource currently being diffed
-  diffContent?: string; // the diff content for the resource being diffed
+  /** the resource currently being previewed */
+  previewResourceId?: string;
+  /** the values file currently being previewed */
+  previewValuesFileId?: string;
+  /** the resource currently being diffed */
+  diffResourceId?: string;
+  /** the diff content for the resource being diffed */
+  diffContent?: string;
 }
 
 export type {

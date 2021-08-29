@@ -3,7 +3,7 @@ import {Collapse} from 'antd';
 
 import styled from 'styled-components';
 
-import {K8sResource} from '@models/k8sresource';
+import {K8sResource, ResourceValidationError} from '@models/k8sresource';
 import {NavigatorSubSection, NavigatorSection} from '@models/navigator';
 import {hasIncomingRefs, hasOutgoingRefs, hasUnsatisfiedRefs} from '@redux/services/resourceRefs';
 
@@ -42,6 +42,7 @@ const Section = (props: {
   shouldResourceBeVisible: (resource: K8sResource, subsection: NavigatorSubSection) => boolean;
   shouldSubsectionBeVisible: (subsection: NavigatorSubSection) => boolean;
   selectResource: (resourceId: string) => void;
+  showErrorsModal: (errors: ResourceValidationError[]) => void;
 }) => {
   const {
     expandedSubsections,
@@ -52,6 +53,7 @@ const Section = (props: {
     shouldResourceBeVisible,
     shouldSubsectionBeVisible,
     selectResource,
+    showErrorsModal,
   } = props;
 
   const isSubsectionExpanded = (subsectionName: string) => {
@@ -95,6 +97,7 @@ const Section = (props: {
                       hasOutgoingRefs={Boolean(hasOutgoingRefs(resource))}
                       hasUnsatisfiedRefs={Boolean(hasUnsatisfiedRefs(resource))}
                       onClickResource={() => selectResource(resource.id)}
+                      showErrorsModal={showErrorsModal}
                     />
                   ))}
                 </SectionCol>

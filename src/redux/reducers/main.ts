@@ -12,7 +12,9 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
+import {K8sResource} from '@models/k8sresource';
 import {AlertType} from '@models/alert';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -23,8 +25,15 @@ import {
   getFileEntryForAbsolutePath,
   getResourcesForPath,
   reloadFile,
+  createFileEntry,
 } from '../services/fileEntry';
-import {extractK8sResources, recalculateResourceRanges, reprocessResources, saveResource} from '../services/resource';
+import {
+  extractK8sResources,
+  isFileResource,
+  recalculateResourceRanges,
+  reprocessResources,
+  saveResource,
+} from '../services/resource';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -84,6 +93,10 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
   reducers: {
+    addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      const resource = action.payload;
+      state.resourceMap[resource.id] = resource;
+    },
     /**
      * called by the file monitor when a path is added to the file system
      */
@@ -170,9 +183,12 @@ export const mainSlice = createSlice({
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          const value = saveResource(resource, action.payload.content, state.fileMap);
-          resource.text = value;
-          resource.content = parseDocument(value).toJS();
+          let newText = action.payload.content;
+          if (isFileResource(resource)) {
+            newText = saveResource(resource, action.payload.content, state.fileMap);
+          }
+          resource.text = newText;
+          resource.content = parseDocument(newText).toJS();
           recalculateResourceRanges(resource, state);
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
           resource.isSelected = false;
@@ -331,6 +347,23 @@ export const mainSlice = createSlice({
       state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
       state.selectionHistory = action.payload.newSelectionHistory;
     });
+
+    builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
+      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+      const resource = state.resourceMap[action.payload.resourceId];
+      const relativeFilePath = action.payload.resourceFilePath.substr(rootFolder.length);
+      const resourceFileEntry = state.fileMap[relativeFilePath];
+      if (resource) {
+        resource.filePath = relativeFilePath;
+      }
+      if (resourceFileEntry) {
+        resourceFileEntry.timestamp = action.payload.fileTimestamp;
+      } else {
+        const newFileEntry = createFileEntry(relativeFilePath);
+        newFileEntry.timestamp = action.payload.fileTimestamp;
+        state.fileMap[relativeFilePath] = newFileEntry;
+      }
+    });
   },
 });
 
@@ -402,6 +435,7 @@ function selectFilePath(filePath: string, state: AppState) {
 }
 
 export const {
+  addResource,
   selectK8sResource,
   selectFile,
   setSelectingFile,

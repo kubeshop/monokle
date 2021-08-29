@@ -9,6 +9,7 @@ const hotkeys = {
   SAVE: 'ctrl+s,command+s',
   SELECT_FROM_HISTORY_BACK: 'alt+left',
   SELECT_FROM_HISTORY_FORWARD: 'alt+right',
+  OPEN_NEW_RESOURCE_WIZARD: 'ctrl+n,cmd+n',
 };
 
 export default hotkeys;

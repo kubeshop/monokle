@@ -9,9 +9,10 @@ import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
-import {ResourceRef, K8sResource} from '@models/k8sresource';
+import {ResourceRef, K8sResource, ResourceValidationError} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
 import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {isUnsavedResource} from '@redux/services/resource';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 
 const {Text} = Typography;
@@ -30,6 +31,7 @@ type NavigatorRowLabelProps = {
   hasOutgoingRefs: boolean;
   hasUnsatisfiedRefs?: boolean;
   onClickLabel?: React.MouseEventHandler<HTMLDivElement>;
+  showErrorsModal?: (errors: ResourceValidationError[]) => void;
 };
 
 const StyledDivider = styled(Divider)`
@@ -56,6 +58,17 @@ const StyledRefText = styled(Text)`
   }
 `;
 
+const StyledLabelContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledIconsContainer = styled.span`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`;
+
 const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
   cursor: pointer;
   ${props => {
@@ -69,11 +82,19 @@ const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
   }}
 `;
 
+const StyledLabel = styled.span<{isSelected: boolean; isUnsaved: boolean}>`
+  ${props => {
+    if (props.isUnsaved && !props.isSelected) {
+      return `color: ${Colors.yellow7}`;
+    }
+  }}
+`;
+
 const OutgoingRefLink = (props: RefLinkProps) => {
   const {text, onClick} = props;
   return (
     <div onClick={onClick}>
-      <MonoIcon type={MonoIconTypes.OutgoingRefs} marginRight={5} />
+      <MonoIcon type={MonoIconTypes.OutgoingRefs} style={{marginRight: 5}} />
       <StyledRefText>{text}</StyledRefText>
     </div>
   );
@@ -83,7 +104,7 @@ const IncomingRefLink = (props: RefLinkProps) => {
   const {text, onClick} = props;
   return (
     <div onClick={onClick}>
-      <MonoIcon type={MonoIconTypes.IncomingRefs} marginRight={5} />
+      <MonoIcon type={MonoIconTypes.IncomingRefs} style={{marginRight: 5}} />
       <StyledRefText>{text}</StyledRefText>
     </div>
   );
@@ -93,7 +114,7 @@ const UnsatisfiedRefLink = (props: {text: string}) => {
   const {text} = props;
   return (
     <div>
-      <MonoIcon type={MonoIconTypes.Warning} marginRight={5} />
+      <MonoIcon type={MonoIconTypes.Warning} style={{marginRight: 5}} />
       <StyledUnsatisfiedRefText>{text}</StyledUnsatisfiedRefText>
     </div>
   );
@@ -187,6 +208,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     hasOutgoingRefs,
     hasUnsatisfiedRefs,
     onClickLabel,
+    showErrorsModal,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -209,6 +231,12 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     const elementBottom = boundingClientRect.bottom;
     return elementTop < navigatorHeight && elementBottom >= 0;
   }, [navigatorHeight]);
+
+  const onClickErrorIcon = () => {
+    if (showErrorsModal && resource?.validation?.errors && resource.validation.errors.length > 0) {
+      showErrorsModal(resource.validation.errors);
+    }
+  };
 
   useEffect(() => {
     setResource(resourceMap[resourceId]);
@@ -239,12 +267,20 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     }
   }, [isSelected, selectedResourceId]);
 
+  const isUnsaved = useCallback(() => {
+    return Boolean(resource && isUnsavedResource(resource));
+  }, [resource]);
+
   const selectResource = (resId: string) => {
     dispatch(selectK8sResource({resourceId: resId}));
   };
 
+  if (!resource) {
+    return null;
+  }
+
   return (
-    <>
+    <StyledLabelContainer>
       {resource && resource.refs && hasIncomingRefs && (
         <Popover
           mouseEnterDelay={0.5}
@@ -259,9 +295,9 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
             </PopoverContent>
           }
         >
-          <span>
-            <MonoIcon type={MonoIconTypes.IncomingRefs} marginRight={5} />
-          </span>
+          <StyledIconsContainer>
+            <MonoIcon type={MonoIconTypes.IncomingRefs} style={{marginRight: 5}} />
+          </StyledIconsContainer>
         </Popover>
       )}
       <StyledSpan
@@ -271,7 +307,10 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
         style={!hasIncomingRefs ? {marginLeft: 19} : {}}
       >
         <ScrollIntoView ref={scrollContainer}>
-          <span ref={labelRef}>{label}</span>
+          <StyledLabel isSelected={isSelected} isUnsaved={isUnsaved()} ref={labelRef}>
+            {label}
+            {isUnsaved() && <span>*</span>}
+          </StyledLabel>
         </ScrollIntoView>
       </StyledSpan>
       {resource && resource.refs && (hasOutgoingRefs || hasUnsatisfiedRefs) && (
@@ -288,13 +327,29 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
             </PopoverContent>
           }
         >
-          <span>
-            <MonoIcon type={MonoIconTypes.OutgoingRefs} marginLeft={5} />
-            {hasUnsatisfiedRefs && <MonoIcon type={MonoIconTypes.Warning} marginLeft={5} />}
-          </span>
+          <StyledIconsContainer>
+            <MonoIcon type={MonoIconTypes.OutgoingRefs} style={{marginLeft: 5}} />
+            {hasUnsatisfiedRefs && <MonoIcon type={MonoIconTypes.Warning} style={{marginLeft: 5}} />}
+          </StyledIconsContainer>
         </Popover>
       )}
-    </>
+      {resource && resource.validation && !resource.validation.isValid && (
+        <Popover
+          placement="right"
+          content={
+            <div>
+              <span>
+                {resource.validation.errors.length} error{resource.validation.errors.length !== 1 && 's'}
+              </span>
+            </div>
+          }
+        >
+          <StyledIconsContainer onClick={onClickErrorIcon}>
+            <MonoIcon type={MonoIconTypes.Error} style={{marginLeft: 5, color: Colors.redError}} />
+          </StyledIconsContainer>
+        </Popover>
+      )}
+    </StyledLabelContainer>
   );
 };
 

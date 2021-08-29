@@ -9,7 +9,7 @@ import {stringify} from 'yaml';
 import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
 
 import Colors from '@styles/Colors';
-import {applyWithConfirm} from '@organisms/ActionsPane/ActionsPane';
+import {applyResourceWithConfirm} from '@organisms/ActionsPane/applyResourceWithConfirm';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {K8sResource} from '@models/k8sresource';
 
@@ -75,7 +75,7 @@ const DiffModal = () => {
     if (diffResourceId) {
       const resource = resourceMap[diffResourceId];
       if (resource) {
-        applyWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig);
+        applyResourceWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig);
       }
     }
   };

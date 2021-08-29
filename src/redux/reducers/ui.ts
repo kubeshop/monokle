@@ -22,6 +22,12 @@ export const uiSlice = createSlice({
     setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.rightMenu.selection = action.payload;
     },
+    openNewResourceWizard: (state: Draft<UiState>) => {
+      state.isNewResourceWizardOpen = true;
+    },
+    closeNewResourceWizard: (state: Draft<UiState>) => {
+      state.isNewResourceWizardOpen = false;
+    },
   },
   extraReducers: builder => {
     builder
@@ -37,6 +43,13 @@ export const uiSlice = createSlice({
   },
 });
 
-export const {toggleSettings, toggleLeftMenu, toggleRightMenu, setLeftMenuSelection, setRightMenuSelection} =
-  uiSlice.actions;
+export const {
+  toggleSettings,
+  toggleLeftMenu,
+  toggleRightMenu,
+  setLeftMenuSelection,
+  setRightMenuSelection,
+  openNewResourceWizard,
+  closeNewResourceWizard,
+} = uiSlice.actions;
 export default uiSlice.reducer;

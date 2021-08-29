@@ -1,18 +1,27 @@
-import React, {useState, useContext, useEffect} from 'react';
-import {Row, Skeleton} from 'antd';
+import React, {useState, useContext, useEffect, useCallback} from 'react';
+import {Row, Skeleton, Button} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
-import {isInClusterModeSelector, helmChartsSelector, helmValuesSelector, kustomizationsSelector} from '@redux/selectors';
+import {
+  isInClusterModeSelector,
+  helmChartsSelector,
+  helmValuesSelector,
+  kustomizationsSelector,
+} from '@redux/selectors';
 
 import {HelmValuesFile} from '@models/helm';
 import Colors, {BackgroundColors} from '@styles/Colors';
-import {useAppSelector} from '@redux/hooks';
+import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer, MonoSectionTitle} from '@atoms';
-import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
+import {MinusSquareOutlined, PlusSquareOutlined, PlusOutlined} from '@ant-design/icons';
+import {openNewResourceWizard} from '@redux/reducers/ui';
 
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import AppContext from '@src/AppContext';
+
+import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
+import {ResourceValidationError} from '@models/k8sresource';
 
 import HelmChartsSection from './components/HelmChartsSection';
 import KustomizationsSection from './components/KustomizationsSection';
@@ -79,9 +88,16 @@ const TitleBarContainer = styled.div`
   justify-content: space-between;
 `;
 
+const RightButtons = styled.div`
+  float: right;
+  display: flex;
+`;
+
 const NavigatorPaneContainer = styled(PaneContainer)`
   white-space: nowrap;
 `;
+
+const StyledPlusButton = styled(Button)``;
 
 const SectionHeader = (props: {
   title: string;
@@ -120,18 +136,26 @@ const SectionHeader = (props: {
 };
 
 const NavigatorPane = () => {
+  const dispatch = useAppDispatch();
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const helmCharts = useSelector(helmChartsSelector);
   const helmValues = useSelector(helmValuesSelector);
   const kustomizations = useSelector(kustomizationsSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
 
+  const [isValidationsErrorsModalVisible, setValidationsErrorsVisible] = useState<boolean>(false);
+  const [currentValidationErrors, setCurrentValidationErrors] = useState<ResourceValidationError[]>([]);
   const [expandedSections, setExpandedSections] = useState<string[]>(['kustomizations', 'helmcharts']);
+
+  const doesRootFileEntryExist = useCallback(() => {
+    return Boolean(fileMap[ROOT_FILE_ENTRY]);
+  }, [fileMap]);
 
   const expandSection = (sectionName: string) => {
     if (!expandedSections.includes(sectionName)) {
@@ -147,19 +171,47 @@ const NavigatorPane = () => {
     return expandedSections.indexOf(sectionName) !== -1;
   };
 
+  const onClickNewResource = () => {
+    dispatch(openNewResourceWizard());
+  };
+
   useEffect(() => {
     if (kustomizations.some(kustomization => kustomization.id === selectedResourceId)) {
       expandSection('kustomizations');
     }
   }, [selectedResourceId]);
 
+  const showValidationsErrorsModal = (errors: ResourceValidationError[]) => {
+    setValidationsErrorsVisible(true);
+    setCurrentValidationErrors(errors);
+  };
+
+  const hideValidationsErrorsModal = () => {
+    setValidationsErrorsVisible(false);
+    setCurrentValidationErrors([]);
+  };
+
   return (
     <>
+      <ValidationErrorsModal
+        errors={currentValidationErrors}
+        isVisible={isValidationsErrorsModalVisible}
+        onClose={hideValidationsErrorsModal}
+      />
       <TitleRow>
         <MonoPaneTitleCol span={24}>
           <MonoPaneTitle>
             <TitleBarContainer>
               <span>Navigator</span>
+              <RightButtons>
+                <StyledPlusButton
+                  disabled={!doesRootFileEntryExist()}
+                  onClick={onClickNewResource}
+                  type="link"
+                  size="small"
+                  icon={<PlusOutlined />}
+                />
+              </RightButtons>
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
@@ -186,7 +238,9 @@ const NavigatorPane = () => {
                     isSelected={
                       !isSectionExpanded('helmcharts') &&
                       Object.values(helmCharts).some(h =>
-                        h.valueFileIds.map(v => helmValues[v]).some((valuesFile: HelmValuesFile) => valuesFile.isSelected)
+                        h.valueFileIds
+                          .map(v => helmValues[v])
+                          .some((valuesFile: HelmValuesFile) => valuesFile.isSelected)
                       )
                     }
                   />
@@ -216,7 +270,11 @@ const NavigatorPane = () => {
           </StyledCollapse>
         )}
 
-        {uiState.isFolderLoading || previewLoader.isLoading ? <StyledSkeleton /> : <ResourcesSection />}
+        {uiState.isFolderLoading || previewLoader.isLoading ? (
+          <StyledSkeleton />
+        ) : (
+          <ResourcesSection showErrorsModal={showValidationsErrorsModal} />
+        )}
       </NavigatorPaneContainer>
     </>
   );
