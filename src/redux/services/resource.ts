@@ -430,7 +430,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           let resource: K8sResource = {
             name: createResourceName(relativePath, content),
             filePath: relativePath,
-            id: uuidv4(),
+            id: (content.metadata && content.metadata.uid) || uuidv4(),
             isHighlighted: false,
             isSelected: false,
             kind: content.kind,

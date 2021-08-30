@@ -1,7 +1,12 @@
-import {startPreviewLoader, stopPreviewLoader, clearPreview} from '@redux/reducers/main';
+import {
+  startPreviewLoader,
+  stopPreviewLoader,
+  clearPreview,
+  clearPreviewAndSelectionHistory,
+} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
-import {previewCluster} from '@redux/thunks/previewCluster';
+import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 
 export const startPreview = (
@@ -9,7 +14,7 @@ export const startPreview = (
   type: 'kustomization' | 'cluster' | 'helm',
   dispatch: AppDispatch
 ) => {
-  dispatch(clearPreview());
+  dispatch(clearPreviewAndSelectionHistory());
   dispatch(startPreviewLoader({previewType: type, targetResourceId}));
   if (type === 'kustomization') {
     dispatch(previewKustomization(targetResourceId));
@@ -21,8 +26,25 @@ export const startPreview = (
     dispatch(previewHelmValuesFile(targetResourceId));
   }
 };
+export const restartPreview = (
+  targetResourceId: string,
+  type: 'kustomization' | 'cluster' | 'helm',
+  dispatch: AppDispatch
+) => {
+  dispatch(clearPreview());
+  dispatch(startPreviewLoader({previewType: type, targetResourceId}));
+  if (type === 'kustomization') {
+    dispatch(previewKustomization(targetResourceId));
+  }
+  if (type === 'cluster') {
+    dispatch(repreviewCluster(targetResourceId));
+  }
+  if (type === 'helm') {
+    dispatch(previewHelmValuesFile(targetResourceId));
+  }
+};
 
 export const stopPreview = (dispatch: AppDispatch) => {
   dispatch(stopPreviewLoader());
-  dispatch(clearPreview());
+  dispatch(clearPreviewAndSelectionHistory());
 };

@@ -7,7 +7,7 @@ import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapT
 import {parseDocument} from 'yaml';
 import fs from 'fs';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
-import {previewCluster} from '@redux/thunks/previewCluster';
+import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
@@ -247,6 +247,10 @@ export const mainSlice = createSlice({
     clearPreview: (state: Draft<AppState>) => {
       setPreviewData({}, state);
       state.previewType = undefined;
+    },
+    clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+      setPreviewData({}, state);
+      state.previewType = undefined;
       state.currentSelectionHistoryIndex = undefined;
       state.selectionHistory = [];
     },
@@ -296,6 +300,25 @@ export const mainSlice = createSlice({
         resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
       })
       .addCase(previewCluster.rejected, state => {
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
+        state.previewType = undefined;
+      });
+
+    builder
+      .addCase(repreviewCluster.fulfilled, (state, action) => {
+        setPreviewData(action.payload, state);
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
+        let resource = null;
+        if (action && action.payload && action.payload.previewResources && state && state.selectedResourceId) {
+          resource = action.payload.previewResources[state.selectedResourceId];
+        }
+        if (resource) {
+          updateSelectionAndHighlights(state, resource);
+        }
+      })
+      .addCase(repreviewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         state.previewType = undefined;
@@ -424,6 +447,7 @@ export const {
   pathRemoved,
   selectHelmValuesFile,
   clearPreview,
+  clearPreviewAndSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
 } = mainSlice.actions;

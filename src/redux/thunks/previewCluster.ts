@@ -9,18 +9,7 @@ import {createPreviewRejection, createPreviewResult, getK8sObjectsAsYaml} from '
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
-/**
- * Thunk to preview cluster objects
- */
-
-export const previewCluster = createAsyncThunk<
-  SetPreviewDataPayload,
-  string,
-  {
-    dispatch: AppDispatch;
-    state: RootState;
-  }
->('main/previewCluster', async (configPath, thunkAPI) => {
+const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
   const state: AppState = thunkAPI.getState().main;
   if (state.previewResourceId !== configPath) {
     try {
@@ -78,4 +67,26 @@ export const previewCluster = createAsyncThunk<
   }
 
   return {};
-});
+};
+
+/**
+ * Thunk to preview cluster objects
+ */
+
+export const previewCluster = createAsyncThunk<
+  SetPreviewDataPayload,
+  string,
+  {
+    dispatch: AppDispatch;
+    state: RootState;
+  }
+>('main/previewCluster', previewClusterHandler);
+
+export const repreviewCluster = createAsyncThunk<
+  SetPreviewDataPayload,
+  string,
+  {
+    dispatch: AppDispatch;
+    state: RootState;
+  }
+>('main/repreviewCluster', previewClusterHandler);

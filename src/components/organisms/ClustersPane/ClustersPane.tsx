@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useCallback} from 'react';
 import {Button, Col, Input, Row, Tooltip} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
@@ -7,7 +7,7 @@ import {isInPreviewModeSelector, isInClusterModeSelector} from '@redux/selectors
 import {BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
-import {startPreview, stopPreview} from '@redux/services/preview';
+import {startPreview, stopPreview, restartPreview} from '@redux/services/preview';
 import {updateKubeconfig} from '@redux/reducers/appConfig';
 import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
 import {TOOLTIP_DELAY} from '@constants/constants';
@@ -69,6 +69,23 @@ const ClustersPane = () => {
     startPreview(kubeconfig, 'cluster', dispatch);
   };
 
+  const reconnectToCluster = () => {
+    if (isInPreviewMode && previewResource !== kubeconfig) {
+      stopPreview(dispatch);
+    }
+    restartPreview(kubeconfig, 'cluster', dispatch);
+  };
+
+  const createClusterObjectsLabel = useCallback(() => {
+    if (isInClusterMode) {
+      return <span>Reload Cluster Objects</span>;
+    }
+    if (previewType === 'cluster' && previewLoader.isLoading) {
+      return <span>Loading Cluster Objects</span>;
+    }
+    return <span>Show Cluster Objects</span>;
+  }, [previewType, previewLoader]);
+
   return (
     <>
       <TitleRow>
@@ -97,10 +114,9 @@ const ClustersPane = () => {
               type="primary"
               ghost
               loading={previewType === 'cluster' && previewLoader.isLoading}
-              onClick={connectToCluster}
-              disabled={Boolean(isInClusterMode)}
+              onClick={isInClusterMode ? reconnectToCluster : connectToCluster}
             >
-              Show Cluster Objects
+              {createClusterObjectsLabel()}
             </Button>
           </Tooltip>
         </ClustersContainer>
