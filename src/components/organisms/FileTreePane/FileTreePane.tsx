@@ -253,7 +253,7 @@ const FileTreePane = () => {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
       shouldExpandAllNodes.current = false;
     }
-  }, [fileMap]);
+  }, [resourceMap]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
