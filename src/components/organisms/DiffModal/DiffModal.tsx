@@ -6,7 +6,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useEffect, useState} from 'react';
 import {stringify} from 'yaml';
 
-import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
+import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import Colors from '@styles/Colors';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
@@ -38,6 +38,15 @@ const LeftButton = styled(Button)`
 
 const MonacoDiffContainer = styled.div`
   padding: 8px;
+  & .monaco-editor .monaco-editor-background {
+    background-color: ${Colors.grey1000} !important;
+  }
+  & .monaco-editor .margin {
+    background-color: ${Colors.grey1000} !important;
+  }
+  & .diffOverview {
+    background-color: ${Colors.grey1000} !important;
+  }
 `;
 
 const DiffModal = () => {
@@ -120,7 +129,7 @@ const DiffModal = () => {
           original={resourceContent}
           value={diffContent}
           options={options}
-          theme={KUBESHOP_MONACO_DIFF_THEME}
+          theme={KUBESHOP_MONACO_THEME}
         />
       </MonacoDiffContainer>
     </StyledModal>
