@@ -1,100 +1,36 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Tabs, Col, Row, Button, Skeleton, Modal, Tooltip} from 'antd';
-import styled from 'styled-components';
-import {
-  CodeOutlined,
-  ContainerOutlined,
-  ExclamationCircleOutlined,
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-} from '@ant-design/icons';
+import {Tabs, Col, Row, Button, Tooltip, Menu, Dropdown} from 'antd';
+import {CodeOutlined, ContainerOutlined, ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {applyResource} from '@redux/thunks/applyResource';
 import TabHeader from '@atoms/TabHeader';
-import {PaneContainer, MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {K8sResource} from '@models/k8sresource';
-import {isKustomizationResource} from '@redux/services/kustomize';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {ThunkDispatch} from 'redux-thunk';
-import {ApplyTooltip, DiffTooltip} from '@constants/tooltips';
+import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {TOOLTIP_DELAY} from '@constants/constants';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {isUnsavedResource} from '@redux/services/resource';
+import {useFileExplorer} from '@hooks/useFileExplorer';
+import FileExplorer from '@components/atoms/FileExplorer';
+import {applyFileWithConfirm} from './applyFileWithConfirm';
+import {applyResourceWithConfirm} from './applyResourceWithConfirm';
+import {
+  StyledLeftArrowButton,
+  StyledRightArrowButton,
+  StyledSkeleton,
+  StyledTabs,
+  TitleBarContainer,
+  DiffButton,
+  SaveButton,
+  RightButtons,
+  ActionsPaneContainer,
+} from './ActionsPane.styled';
 
 const {TabPane} = Tabs;
-
-const StyledTabs = styled(Tabs)`
-  & .ant-tabs-nav {
-    padding: 0 16px;
-    margin-bottom: 0px;
-  }
-
-  & .ant-tabs-nav::before {
-    border-bottom: 1px solid #363636;
-  }
-`;
-
-const ActionsPaneContainer = styled(PaneContainer)`
-  height: 100%;
-  overflow-y: hidden;
-`;
-
-const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-`;
-
-const RightButtons = styled.div`
-  float: right;
-  display: flex;
-`;
-
-const DiffButton = styled(Button)`
-  margin-left: 8px;
-  margin-right: 4px;
-`;
-
-const StyledSkeleton = styled(Skeleton)`
-  margin: 20px;
-  padding: 8px;
-  width: 95%;
-`;
-
-const StyledLeftArrowButton = styled(Button)`
-  margin-right: 5px;
-`;
-
-const StyledRightArrowButton = styled(Button)`
-  margin-right: 10px;
-`;
-
-export function applyWithConfirm(
-  selectedResource: K8sResource,
-  resourceMap: ResourceMapType,
-  fileMap: FileMapType,
-  dispatch: ThunkDispatch<any, any, any>,
-  kubeconfig: string
-) {
-  const title = isKustomizationResource(selectedResource)
-    ? `Apply ${selectedResource.name} kustomization your cluster?`
-    : `Apply ${selectedResource.name} to your cluster?`;
-
-  Modal.confirm({
-    title,
-    icon: <ExclamationCircleOutlined />,
-    onOk() {
-      return new Promise(resolve => {
-        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig);
-        resolve({});
-      });
-    },
-    onCancel() {},
-  });
-}
 
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
@@ -103,6 +39,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
@@ -111,6 +48,63 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
+
+  const onSelect = useCallback(
+    (absolutePath: string) => {
+      if (!selectedResourceId) {
+        return;
+      }
+      dispatch(
+        saveUnsavedResource({
+          resourceId: selectedResourceId,
+          absolutePath,
+        })
+      );
+    },
+    [selectedResourceId, dispatch]
+  );
+
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({filePath}) => {
+      if (!filePath) {
+        return;
+      }
+      onSelect(filePath);
+    },
+    {
+      acceptedFileExtensions: ['.yaml'],
+    }
+  );
+
+  const {openFileExplorer: openDirectoryExplorer, fileExplorerProps: directoryExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (!folderPath) {
+        return;
+      }
+      onSelect(folderPath);
+    },
+    {
+      isDirectoryExplorer: true,
+    }
+  );
+
+  const getSaveButtonMenu = useCallback(
+    () => (
+      <Menu>
+        <Menu.Item key="to-existing-file">
+          <Button onClick={() => openFileExplorer()} type="text">
+            To existing file
+          </Button>
+        </Menu.Item>
+        <Menu.Item key="to-directory">
+          <Button onClick={() => openDirectoryExplorer()} type="text">
+            To new file in directory
+          </Button>
+        </Menu.Item>
+      </Menu>
+    ),
+    [openFileExplorer, openDirectoryExplorer]
+  );
 
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&
@@ -128,21 +122,25 @@ const ActionsPane = (props: {contentHeight: string}) => {
     dispatch(selectFromHistory({direction: 'right'}));
   };
 
-  const applySelectedResource = useCallback(() => {
+  const applySelection = useCallback(() => {
     if (selectedResource) {
-      applyWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
+      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
+    } else if (selectedPath) {
+      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
     }
-  }, [selectedResource, resourceMap, fileMap, kubeconfig]);
+  }, [selectedResource, resourceMap, fileMap, kubeconfig, selectedPath, dispatch]);
 
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
       dispatch(performResourceDiff(selectedResourceId));
     }
-  }, [selectedResourceId]);
+  }, [selectedResourceId, dispatch]);
 
   useEffect(() => {
-    if (selectedResourceId && resourceMap) {
+    if (selectedResourceId && resourceMap[selectedResourceId]) {
       setSelectedResource(resourceMap[selectedResourceId]);
+    } else {
+      setSelectedResource(undefined);
     }
   }, [selectedResourceId, resourceMap]);
 
@@ -152,9 +150,18 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   }, [selectedResourceId, selectedResource, key]);
 
+  const isSelectedResourceUnsaved = useCallback(() => {
+    if (!selectedResource) {
+      return false;
+    }
+    return isUnsavedResource(selectedResource);
+  }, [selectedResource]);
+
   return (
     <>
       <Row>
+        <FileExplorer {...fileExplorerProps} />
+        <FileExplorer {...directoryExplorerProps} />
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <TitleBarContainer>
@@ -175,14 +182,28 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   icon={<ArrowRightOutlined />}
                 />
 
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ApplyTooltip} placement="bottomLeft">
+                {isSelectedResourceUnsaved() && (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
+                    <Dropdown overlay={getSaveButtonMenu()}>
+                      <SaveButton type="primary" size="small">
+                        Save
+                      </SaveButton>
+                    </Dropdown>
+                  </Tooltip>
+                )}
+
+                <Tooltip
+                  mouseEnterDelay={TOOLTIP_DELAY}
+                  title={selectedPath ? ApplyFileTooltip : ApplyTooltip}
+                  placement="bottomLeft"
+                >
                   <Button
                     loading={Boolean(applyingResource)}
                     type="primary"
                     size="small"
                     ghost
-                    onClick={applySelectedResource}
-                    disabled={!selectedResourceId}
+                    onClick={applySelection}
+                    disabled={!selectedResourceId && !selectedPath}
                   >
                     Apply
                   </Button>

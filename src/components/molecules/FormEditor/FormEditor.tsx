@@ -137,8 +137,10 @@ const FormEditor = (props: {contentHeight: string}) => {
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  let schema = selectedResource ? getFormSchema(selectedResource.kind) : undefined;
-  let uiSchema = selectedResource ? getUiSchema(selectedResource.kind) : undefined;
+  let schema =
+    selectedResource && selectedResource.kind === 'ConfigMap' ? getFormSchema(selectedResource.kind) : undefined;
+  let uiSchema =
+    selectedResource && selectedResource.kind === 'ConfigMap' ? getUiSchema(selectedResource.kind) : undefined;
 
   const onFormUpdate = useCallback(
     (e: any) => {

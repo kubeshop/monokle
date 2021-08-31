@@ -11,7 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import ScrollIntoView from '@molecules/ScrollIntoView';
-import {ExitHelmPreviewTooltip, HelmPreviewTooltip} from '@constants/tooltips';
+import {ExitHelmPreviewTooltip, HelmPreviewTooltip, ReloadHelmPreviewTooltip} from '@constants/tooltips';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
@@ -41,6 +41,13 @@ const PreviewContainer = styled.span`
 `;
 
 const PreviewSpan = styled.span<{isSelected: boolean}>`
+  font-weight: 500;
+  cursor: pointer;
+  color: ${props => (props.isSelected ? Colors.blackPure : Colors.blue6)};
+`;
+
+const ReloadSpan = styled.span<{isSelected: boolean}>`
+  margin-left: 10px;
   font-weight: 500;
   cursor: pointer;
   color: ${props => (props.isSelected ? Colors.blackPure : Colors.blue6)};
@@ -142,8 +149,12 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
         stopPreview(dispatch);
       }
     },
-    [previewValuesFile]
+    [previewValuesFile, dispatch]
   );
+
+  const onReloadPreview = useCallback((id: string) => {
+    startPreview(id, 'helm', dispatch);
+  }, []);
 
   React.useEffect(() => {
     if (selectedPath && Object.values(helmValues).some(helm => helm.isSelected)) {
@@ -189,14 +200,27 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
                     {isPreviewLoading ? (
                       <Spin indicator={PreviewLoadingIcon} />
                     ) : isHovered ? (
-                      <Tooltip
-                        mouseEnterDelay={TOOLTIP_DELAY}
-                        title={previewButtonActive ? ExitHelmPreviewTooltip : HelmPreviewTooltip}
-                      >
-                        <PreviewSpan isSelected={valuesFile.isSelected} onClick={() => onClickPreview(valuesFile.id)}>
-                          {previewButtonActive ? 'Exit' : 'Preview'}
-                        </PreviewSpan>
-                      </Tooltip>
+                      <>
+                        <Tooltip
+                          mouseEnterDelay={TOOLTIP_DELAY}
+                          title={previewButtonActive ? ExitHelmPreviewTooltip : HelmPreviewTooltip}
+                        >
+                          <PreviewSpan isSelected={valuesFile.isSelected} onClick={() => onClickPreview(valuesFile.id)}>
+                            {previewButtonActive ? 'Exit' : 'Preview'}
+                          </PreviewSpan>
+                        </Tooltip>
+
+                        {previewButtonActive && (
+                          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadHelmPreviewTooltip}>
+                            <ReloadSpan
+                              isSelected={valuesFile.isSelected}
+                              onClick={() => onReloadPreview(valuesFile.id)}
+                            >
+                              Reload
+                            </ReloadSpan>
+                          </Tooltip>
+                        )}
+                      </>
                     ) : null}
                   </PreviewContainer>
                 </SectionCol>

@@ -1,10 +1,9 @@
 import React from 'react';
 import {Col, Row} from 'antd';
 import styled from 'styled-components';
-
 import Colors, {FontColors} from '@styles/Colors';
-
 import NavigatorRowLabel from '@molecules/NavigatorRowLabel';
+import {ResourceValidationError} from '@models/k8sresource';
 
 export type NavigatorResourceRowProps = {
   rowKey: React.Key;
@@ -15,6 +14,7 @@ export type NavigatorResourceRowProps = {
   hasOutgoingRefs: boolean;
   hasUnsatisfiedRefs: boolean;
   onClickResource?: React.MouseEventHandler<HTMLDivElement>;
+  showErrorsModal?: (errors: ResourceValidationError[]) => void;
 };
 
 const ItemRow = styled(Row)`
@@ -71,6 +71,7 @@ const NavigatorResourceRow = (props: NavigatorResourceRowProps) => {
     hasOutgoingRefs,
     hasUnsatisfiedRefs,
     onClickResource,
+    showErrorsModal,
   } = props;
 
   // Parent needs to make sure disabled and selected arent active at the same time.
@@ -93,6 +94,7 @@ const NavigatorResourceRow = (props: NavigatorResourceRowProps) => {
                 hasOutgoingRefs={hasOutgoingRefs}
                 hasUnsatisfiedRefs={hasUnsatisfiedRefs}
                 onClickLabel={onClickResource}
+                showErrorsModal={showErrorsModal}
               />
             </div>
           </SectionCol>

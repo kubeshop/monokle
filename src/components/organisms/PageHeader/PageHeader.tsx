@@ -2,13 +2,20 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-import {CloseCircleOutlined, GithubOutlined, SettingOutlined, DownloadOutlined} from '@ant-design/icons';
+import {
+  CloseCircleOutlined,
+  GithubOutlined,
+  DownloadOutlined,
+  QuestionCircleOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import {Badge} from 'antd';
 import {AppBorders} from '@styles/Borders';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {toggleSettings} from '@redux/reducers/ui';
-import IconMonokle from '@components/atoms/IconMonokle';
+import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 import Row from '@components/atoms/Row';
 import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
@@ -18,7 +25,13 @@ import {stopPreview} from '@redux/services/preview';
 
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
-import {openGitHub} from '@utils/shell';
+import {openDocumentation, openGitHub} from '@utils/shell';
+
+const StyledLogo = styled.img`
+  height: 24px;
+  margin: 4px;
+  margin-top: 11px;
+`;
 
 const LogoCol = styled(Col)`
   padding-left: 4px;
@@ -150,10 +163,14 @@ const PageHeader = () => {
       setPreviewValuesFile(undefined);
       setHelmChart(undefined);
     }
-  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmValuesMap]);
+  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap]);
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());
+  };
+
+  const showStartupModal = () => {
+    dispatch(updateStartupModalVisible(true));
   };
 
   const onClickExit = () => {
@@ -198,9 +215,12 @@ const PageHeader = () => {
       <StyledHeader noborder="true">
         <Row noborder="true">
           <LogoCol span={12} noborder="true">
-            <IconMonokle useDarkTheme />
+            <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
           <SettingsCol span={12}>
+            <GitHubIconSpan>
+              <QuestionCircleOutlined size={24} onClick={openDocumentation} />
+            </GitHubIconSpan>
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>

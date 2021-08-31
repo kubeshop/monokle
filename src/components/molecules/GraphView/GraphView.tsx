@@ -107,9 +107,9 @@ const GraphView = (props: {editorHeight: string}) => {
       .forEach(r => {
         data = data.concat(getElementData(r));
       });
-    /* eslint-disable react-hooks/exhaustive-deps */
     updateGraph(data);
     setNodes(data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileMap, activeResources]);
 
   useEffect(() => {

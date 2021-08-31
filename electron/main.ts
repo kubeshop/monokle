@@ -5,8 +5,11 @@ import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-
 import {execSync} from 'child_process';
 import * as ElectronLog from 'electron-log';
 import * as Splashscreen from '@trodi/electron-splashscreen';
+import yargs from 'yargs';
+import {hideBin} from 'yargs/helpers';
 
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
+import terminal from '../cli/terminal';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -14,6 +17,8 @@ const ElectronStore = require('electron-store');
 const {autoUpdater} = require('electron-updater'); // Hacky way to fix for `Conflicting definitions for 'node'` error
 
 autoUpdater.logger = console;
+
+const {MONOKLE_RUN_AS_NODE} = process.env;
 
 const userHomeDir = app.getPath('home');
 
@@ -159,7 +164,9 @@ function createWindow() {
   return win;
 }
 
-app.whenReady().then(() => {
+const openApplication = async (givenPath?: string) => {
+  await app.whenReady();
+
   if (isDev) {
     // DevTools
     installExtension(REACT_DEVELOPER_TOOLS)
@@ -172,14 +179,20 @@ app.whenReady().then(() => {
   }
 
   ElectronStore.initRenderer();
-  createWindow();
+  const win = createWindow();
+
+  if (givenPath) {
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.send('executed-from', {path: givenPath});
+    });
+  }
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
     app.dock.setIcon(image);
   }
 
-  console.info('info', app.getName(), app.getVersion(), app.getLocale());
+  console.log('info', app.getName(), app.getVersion(), app.getLocale());
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -192,4 +205,20 @@ app.whenReady().then(() => {
       app.quit();
     }
   });
-});
+};
+
+if (MONOKLE_RUN_AS_NODE) {
+  yargs(hideBin(process.argv)).command(
+    '$0',
+    'opens current directory',
+    () => {},
+    async argv => {
+      const {executedFrom} = argv;
+      openApplication(<string>executedFrom);
+    }
+  ).argv;
+} else {
+  openApplication();
+}
+
+terminal();

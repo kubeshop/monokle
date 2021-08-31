@@ -2,7 +2,7 @@ import path from 'path';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import fs from 'fs';
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {PREVIEW_PREFIX, UNSAVED_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
@@ -10,11 +10,18 @@ import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {getDependentResourceKinds} from '@src/kindhandlers';
 import {v4 as uuidv4} from 'uuid';
+import {validateResource} from './validation';
 import {processRefs} from './resourceRefs';
 
 /**
  * Parse documents lazily...
  */
+
+function doesTextStartWithYamlDocumentDelimiter(text: string) {
+  return ['\n', '\r\n', '\r'].some(lineEnding => {
+    return text.startsWith(`${YAML_DOCUMENT_DELIMITER}${lineEnding}`);
+  });
+}
 
 export function getParsedDoc(resource: K8sResource) {
   if (!resource.parsedDoc) {
@@ -134,7 +141,8 @@ export function createResourceRef(
   resource: K8sResource,
   refType: ResourceRefType,
   refNode?: NodeWrapper,
-  targetResourceId?: string
+  targetResourceId?: string,
+  targetResourceKind?: string
 ) {
   if (refNode || targetResourceId) {
     resource.refs = resource.refs || [];
@@ -151,6 +159,7 @@ export function createResourceRef(
         name: refName,
         position: refNode?.getNodePosition(),
         targetResourceId,
+        targetResourceKind,
       });
     }
   } else {
@@ -168,8 +177,8 @@ export function linkResources(
   sourceRef: NodeWrapper,
   targetRef?: NodeWrapper
 ) {
-  createResourceRef(source, ResourceRefType.Outgoing, sourceRef, target.id);
-  createResourceRef(target, ResourceRefType.Incoming, targetRef, source.id);
+  createResourceRef(source, ResourceRefType.Outgoing, sourceRef, target.id, target.kind);
+  createResourceRef(target, ResourceRefType.Incoming, targetRef, source.id, source.kind);
 }
 
 /**
@@ -224,7 +233,15 @@ export function createResourceName(filePath: string, content: any) {
  */
 
 export function isFileResource(resource: K8sResource) {
-  return !resource.filePath.startsWith(PREVIEW_PREFIX);
+  return !resource.filePath.startsWith(PREVIEW_PREFIX) && !isUnsavedResource(resource);
+}
+
+/**
+ * Checks if this specified resource is unsaved
+ */
+
+export function isUnsavedResource(resource: K8sResource) {
+  return resource.filePath.startsWith(UNSAVED_PREFIX);
 }
 
 /**
@@ -243,8 +260,8 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       const content = fs.readFileSync(absoluteResourcePath, 'utf8');
 
       // need to make sure that document delimiter is still there if this resource was not first in the file
-      if (resource.range.start > 0 && !valueToWrite.startsWith(YAML_DOCUMENT_DELIMITER)) {
-        valueToWrite = `${YAML_DOCUMENT_DELIMITER}${valueToWrite}`;
+      if (resource.range.start > 0 && !doesTextStartWithYamlDocumentDelimiter(valueToWrite)) {
+        valueToWrite = `${YAML_DOCUMENT_DELIMITER}\n${valueToWrite}`;
       }
 
       fs.writeFileSync(
@@ -340,6 +357,15 @@ export function processParsedResources(
   resourceMap: ResourceMapType,
   options?: {resourceIds?: string[]; resourceKinds?: string[]}
 ) {
+  if (options && options.resourceIds && options.resourceIds.length > 0) {
+    Object.values(resourceMap)
+      .filter(r => options.resourceIds?.includes(r.id))
+      .forEach(resource => validateResource(resource));
+  } else {
+    Object.values(resourceMap).forEach(resource => {
+      validateResource(resource);
+    });
+  }
   processRefs(resourceMap, options);
   clearResourcesTemporaryObjects(resourceMap);
 }
@@ -410,7 +436,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           let resource: K8sResource = {
             name: createResourceName(relativePath, content),
             filePath: relativePath,
-            id: uuidv4(),
+            id: (content.metadata && content.metadata.uid) || uuidv4(),
             isHighlighted: false,
             isSelected: false,
             kind: content.kind,

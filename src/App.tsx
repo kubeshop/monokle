@@ -10,6 +10,7 @@ import {
   StartupModal,
   HotKeysHandler,
   PaneManager,
+  NewResourceWizard,
 } from '@organisms';
 import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
@@ -25,6 +26,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(initKubeconfig());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -39,6 +41,7 @@ const App = () => {
         </Layout>
         <DiffModal />
         <StartupModal />
+        <NewResourceWizard />
         <HotKeysHandler />
       </div>
     </AppContext.Provider>

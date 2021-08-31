@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Size} from '@models/window';
+import {FormInstance} from 'antd/lib/form';
 
 export function useFocus<T>(): [React.RefObject<T>, () => void] {
   const htmlElRef = useRef<T>(null);
@@ -34,3 +35,19 @@ export function useWindowSize(): Size {
   }, []); // Empty array ensures that effect is only run on mount
   return windowSize;
 }
+
+/**  reset antd form fields when modal is closed */
+export const useResetFormOnCloseModal = ({form, visible}: {form: FormInstance; visible: boolean}) => {
+  const prevVisibleRef = useRef<boolean>();
+  useEffect(() => {
+    prevVisibleRef.current = visible;
+  }, [visible]);
+  const prevVisible = prevVisibleRef.current;
+
+  useEffect(() => {
+    if (!visible && prevVisible) {
+      form.resetFields();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+};

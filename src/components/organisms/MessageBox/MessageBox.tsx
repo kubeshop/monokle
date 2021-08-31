@@ -29,7 +29,7 @@ const MessageBox = () => {
 
       dispatch(clearAlert());
     }
-  }, [alert]);
+  }, [alert, dispatch]);
 
   return null;
 };

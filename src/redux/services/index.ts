@@ -6,10 +6,10 @@ import path from 'path';
  */
 
 export function getStaticResourcePath(resourcePath: string) {
-  return process.env.NODE_ENV === 'development'
-    ? path.join('resources', resourcePath)
-    : // @ts-ignore
-      path.join(process.resourcesPath, 'resources', resourcePath);
+  return process.env.NODE_ENV === 'production'
+    ? // @ts-ignore
+      path.join(process.resourcesPath, 'resources', resourcePath)
+    : path.join('resources', resourcePath);
 }
 
 /**

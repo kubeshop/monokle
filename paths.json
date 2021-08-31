@@ -12,6 +12,8 @@
       "@organisms": ["src/components/organisms/"],
       "@molecules/*": ["src/components/molecules/*"],
       "@molecules": ["src/components/molecules/"],
+      "@hooks/*": ["src/hooks/*"],
+      "@hooks": ["src/hooks"],
       "@models/*": ["src/models/*"],
       "@models": ["src/models/"],
       "@redux/*": ["src/redux/*"],
