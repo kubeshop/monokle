@@ -258,12 +258,28 @@ const Monaco = (props: {editorHeight: string}) => {
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
   const isReadOnlyMode = useCallback(() => {
-    return (
-      (isInPreviewMode && selectedResourceId !== previewResourceId) ||
-      selectedValuesFileId !== previewValuesFileId ||
-      (!selectedPath && !selectedResourceId)
-    );
-  }, [isInPreviewMode, selectedResourceId, previewResourceId, selectedValuesFileId, previewValuesFileId, selectedPath]);
+    if (isInPreviewMode && previewType === 'cluster') {
+      return false;
+    }
+    if (isInPreviewMode && selectedResourceId !== previewResourceId) {
+      return false;
+    }
+    if (selectedValuesFileId !== previewValuesFileId) {
+      return false;
+    }
+    if (!selectedPath && !selectedResourceId) {
+      return false;
+    }
+    return true;
+  }, [
+    isInPreviewMode,
+    selectedResourceId,
+    previewResourceId,
+    selectedValuesFileId,
+    previewValuesFileId,
+    selectedPath,
+    previewType,
+  ]);
 
   const options = {
     selectOnLineNumbers: true,
