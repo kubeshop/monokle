@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
@@ -72,6 +72,9 @@ const Monaco = (props: {editorHeight: string}) => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [code, setCode] = useState('');
   const [orgCode, setOrgCode] = useState<string>('');
@@ -251,9 +254,18 @@ const Monaco = (props: {editorHeight: string}) => {
     setDirty(false);
   }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
 
+  // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
+  const isReadOnlyMode = useCallback(() => {
+    return (
+      (isInPreviewMode && selectedResourceId !== previewResourceId) ||
+      selectedValuesFileId !== previewValuesFileId ||
+      (!selectedPath && !selectedResourceId)
+    );
+  }, [isInPreviewMode, selectedResourceId, previewResourceId, selectedValuesFileId, previewValuesFileId, selectedPath]);
+
   const options = {
     selectOnLineNumbers: true,
-    readOnly: isInPreviewMode || (!selectedPath && !selectedResourceId),
+    readOnly: isReadOnlyMode(),
     fontWeight: 'bold',
     glyphMargin: true,
     minimap: {
