@@ -79,6 +79,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
+  const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const idsOfDecorationsRef = useRef<string[]>([]);
@@ -286,6 +287,10 @@ const Monaco = (props: {editorHeight: string}) => {
   useEffect(() => {
     clearCodeIntel();
     applyCodeIntel();
+
+    if (!firstCodeLoadedOnEditor && code) {
+      setFirstCodeLoadedOnEditor(true);
+    }
     return () => {
       clearCodeIntel();
     };
@@ -329,11 +334,11 @@ const Monaco = (props: {editorHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (editor && code) {
+    if (editor) {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-  }, [editor, code]);
+  }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
 
   return (
     <>
