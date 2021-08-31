@@ -68,4 +68,11 @@ The content of most high level [organisms](https://github.com/kubeshop/monokle/t
 * https://github.com/gsoft-inc/craco for overriding CRA config for folder aliases,
   see https://www.npmjs.com/package/craco-alias#examples
 
+## K8s Schemas
 
+Monokle currently uses the latest 1.22.1 schemas for validation and editor functionality - 
+see [this issue](https://github.com/kubeshop/monokle/issues/321) for making schema version configurable. 
+
+Schemas are currently taken from 
+[https://github.com/yannh/kubernetes-json-schema](https://github.com/yannh/kubernetes-json-schema) - strict version
+is used.
