@@ -20,18 +20,19 @@ export function getResourceSchema(resource: K8sResource) {
 
   if (prefix) {
     const kindSchema = k8sSchema['definitions'][`${prefix}.${resource.kind}`];
+    if (kindSchema) {
+      Object.keys(k8sSchema).forEach(key => {
+        if (key !== 'definitions') {
+          delete k8sSchema[key];
+        }
+      });
 
-    Object.keys(k8sSchema).forEach(key => {
-      if (key !== 'definitions') {
-        delete k8sSchema[key];
-      }
-    });
+      Object.keys(kindSchema).forEach(key => {
+        k8sSchema[key] = JSON.parse(JSON.stringify(kindSchema[key]));
+      });
 
-    Object.keys(kindSchema).forEach(key => {
-      k8sSchema[key] = JSON.parse(JSON.stringify(kindSchema[key]));
-    });
-
-    return k8sSchema;
+      return k8sSchema;
+    }
   }
 
   log.error(`Failed to find schema for resource of kind ${resource.kind}`);
