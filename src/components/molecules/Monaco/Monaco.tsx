@@ -288,19 +288,16 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
   const isReadOnlyMode = useCallback(() => {
-    if (isInPreviewMode && previewType === 'cluster') {
-      return false;
-    }
-    if (isInPreviewMode && selectedResourceId !== previewResourceId) {
-      return false;
+    if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
+      return true;
     }
     if (selectedValuesFileId !== previewValuesFileId) {
-      return false;
+      return true;
     }
     if (!selectedPath && !selectedResourceId) {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }, [
     isInPreviewMode,
     selectedResourceId,
