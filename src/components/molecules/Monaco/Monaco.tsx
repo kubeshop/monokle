@@ -329,11 +329,11 @@ const Monaco = (props: {editorHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (editor) {
+    if (editor && code) {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-  }, [editor, selectedResourceId]);
+  }, [editor, code]);
 
   return (
     <>
