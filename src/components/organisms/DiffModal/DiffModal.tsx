@@ -9,7 +9,7 @@ import {stringify} from 'yaml';
 import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
 
 import Colors from '@styles/Colors';
-import {applyResourceWithConfirm} from '@organisms/ActionsPane/applyResourceWithConfirm';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {K8sResource} from '@models/k8sresource';
 

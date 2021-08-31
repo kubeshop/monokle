@@ -16,8 +16,8 @@ import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {isUnsavedResource} from '@redux/services/resource';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 import FileExplorer from '@components/atoms/FileExplorer';
-import {applyFileWithConfirm} from './applyFileWithConfirm';
-import {applyResourceWithConfirm} from './applyResourceWithConfirm';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {
   StyledLeftArrowButton,
   StyledRightArrowButton,
