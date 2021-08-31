@@ -326,9 +326,13 @@ const FileTreePane = () => {
     setAutoExpandParent(false);
   };
 
-  ipcRenderer.on('executed-from', (_, data) => {
-    setFolder(data.path);
-  });
+  useEffect(() => {
+    ipcRenderer.on('executed-from', (_, data) => {
+      setFolder(data.path);
+      shouldExpandAllNodes.current = true;
+      setAutoExpandParent(true);
+    });
+  }, []);
 
   return (
     <FileTreeContainer>

@@ -144,6 +144,19 @@ const openApplication = async (givenPath?: string) => {
   ElectronStore.initRenderer();
   const win = createWindow();
 
+  if (!givenPath) {
+    // load recent folder from here so we don't override cli argument
+    const electronStore = new ElectronStore();
+    const loadLastFolderOnStartup = electronStore.get('appConfig.settings.loadLastFolderOnStartup', true);
+
+    if (loadLastFolderOnStartup) {
+      const recentFolders: string[] = electronStore.get('appConfig.recentFolders', []);
+      if (recentFolders.length > 0) {
+        givenPath = recentFolders[0];
+      }
+    }
+  }
+
   if (givenPath) {
     win.webContents.on('did-finish-load', () => {
       win.webContents.send('executed-from', {path: givenPath});
@@ -155,7 +168,7 @@ const openApplication = async (givenPath?: string) => {
     app.dock.setIcon(image);
   }
 
-  console.log('info', app.getName(), app.getVersion(), app.getLocale());
+  console.log('info', app.getName(), app.getVersion(), app.getLocale(), givenPath);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

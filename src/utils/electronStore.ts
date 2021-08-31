@@ -37,6 +37,15 @@ const schema = {
           helmPreviewMode: {
             type: 'string',
           },
+          loadLastFolderOnStartup: {
+            type: 'boolean',
+          },
+        },
+      },
+      recentFolders: {
+        type: 'array',
+        items: {
+          type: 'string',
         },
       },
     },
@@ -53,7 +62,9 @@ const defaults = {
       textSize: 'medium',
       language: 'en',
       helmPreviewMode: 'template',
+      loadLastFolderOnStartup: 'true',
     },
+    recentFolders: [],
   },
 };
 

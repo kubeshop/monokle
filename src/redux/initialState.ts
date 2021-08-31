@@ -85,9 +85,11 @@ const initialAppConfigState: AppConfig = {
     theme: electronStore.get('appConfig.settings.theme'),
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
+    loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes'),
   fileIncludes: electronStore.get('appConfig.fileIncludes'),
+  recentFolders: electronStore.get('appConfig.recentFolders') || [],
   navigators,
 };
 

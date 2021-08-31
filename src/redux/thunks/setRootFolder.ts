@@ -9,6 +9,8 @@ import {processKustomizations} from '@redux/services/kustomize';
 import {processParsedResources} from '@redux/services/resource';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {AlertEnum} from '@models/alert';
+import {configSlice} from '@redux/reducers/appConfig';
+import electronStore from '@utils/electronStore';
 
 /**
  * Thunk to set the specified root folder
@@ -45,6 +47,7 @@ export const setRootFolder = createAsyncThunk<
   processParsedResources(resourceMap);
 
   monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
+  updateRecentFolders(thunkAPI, rootFolder);
 
   return {
     appConfig,
@@ -59,3 +62,24 @@ export const setRootFolder = createAsyncThunk<
     },
   };
 });
+
+/**
+ * Adds the specified folder to the top of the recentFolders list
+ */
+
+function updateRecentFolders(thunkAPI: any, rootFolder: string) {
+  let folders: string[] = [];
+  folders = folders.concat(thunkAPI.getState().config.recentFolders);
+
+  const ix = folders.indexOf(rootFolder);
+  if (ix !== 0) {
+    if (ix > 0) {
+      folders.splice(ix, 1);
+    }
+
+    folders.unshift(rootFolder);
+
+    electronStore.set('appConfig.recentFolders', folders);
+    thunkAPI.dispatch(configSlice.actions.setRecentFolders(folders));
+  }
+}
