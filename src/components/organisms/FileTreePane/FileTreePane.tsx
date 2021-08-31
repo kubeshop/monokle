@@ -337,7 +337,7 @@ const FileTreePane = () => {
         setAutoExpandParent(true);
       }
     });
-  }, []);
+  }, [loadLastFolderOnStartup, recentFolders]);
 
   return (
     <FileTreeContainer>
