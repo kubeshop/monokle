@@ -16,6 +16,10 @@ import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch} from '@redux/hooks';
 import {initKubeconfig} from '@redux/reducers/appConfig';
+import {ipcRenderer} from 'electron';
+import {setAlert} from '@redux/reducers/alert';
+import {AlertEnum, AlertType} from '@models/alert';
+
 import AppContext from './AppContext';
 
 const App = () => {
@@ -28,6 +32,15 @@ const App = () => {
     dispatch(initKubeconfig());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  ipcRenderer.once('missing-dependecy-result', (_, {dependencies}) => {
+    const alert: AlertType = {
+      type: AlertEnum.Warning,
+      title: 'Missing dependecy',
+      message: `${dependencies.toString()} must be installed.`,
+    };
+    dispatch(setAlert(alert));
+  });
 
   return (
     <AppContext.Provider value={{windowSize: size}}>

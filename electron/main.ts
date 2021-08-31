@@ -13,7 +13,10 @@ import terminal from '../cli/terminal';
 
 Object.assign(console, ElectronLog.functions);
 
+const {which} = require('shelljs');
 const ElectronStore = require('electron-store');
+
+const APP_DEPENDENCIES = ['kubectl', 'helm', 'erdkse'];
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
 
@@ -40,6 +43,14 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
   } catch (e) {
     event.sender.send('kustomize-result', {error: e.toString()});
+  }
+});
+
+ipcMain.on('check-missing-dependency', event => {
+  const missingDependecies = APP_DEPENDENCIES.filter(d => !which(d));
+
+  if (missingDependecies.length > 0) {
+    event.sender.send('missing-dependecy-result', {dependencies: missingDependecies});
   }
 });
 
@@ -144,6 +155,14 @@ const openApplication = async (givenPath?: string) => {
   ElectronStore.initRenderer();
   const win = createWindow();
 
+  const missingDependecies = APP_DEPENDENCIES.filter(d => !which(d));
+
+  if (missingDependecies.length > 0) {
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.send('missing-dependecy-result', {dependencies: missingDependecies});
+    });
+  }
+
   if (givenPath) {
     win.webContents.on('did-finish-load', () => {
       win.webContents.send('executed-from', {path: givenPath});
@@ -184,4 +203,6 @@ if (MONOKLE_RUN_AS_NODE) {
   openApplication();
 }
 
-terminal();
+terminal()
+  // eslint-disable-next-line no-console
+  .catch(e => console.log(e));
