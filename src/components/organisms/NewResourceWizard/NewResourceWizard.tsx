@@ -8,6 +8,7 @@ import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 import {getNamespaces} from '@redux/services/resource';
 
+const NO_NAMESPACE = '<none>';
 const NewResourceWizard = () => {
   const dispatch = useAppDispatch();
   const isNewResourceWizardOpen = useAppSelector(state => state.ui.isNewResourceWizardOpen);
@@ -15,7 +16,7 @@ const NewResourceWizard = () => {
   const [namespaces, setNamespaces] = useState<string[]>([]);
 
   useEffect(() => {
-    setNamespaces([...new Set(['default', ...getNamespaces(resourceMap)])]);
+    setNamespaces([...new Set([NO_NAMESPACE, 'default', ...getNamespaces(resourceMap)])]);
   }, [resourceMap]);
 
   const [form] = Form.useForm();
@@ -53,7 +54,7 @@ const NewResourceWizard = () => {
       {
         name: data.name,
         kind: data.kind,
-        namespace: data.namespace,
+        namespace: data.namespace === NO_NAMESPACE ? undefined : data.namespace,
         apiVersion: data.apiVersion,
       },
       dispatch
@@ -94,7 +95,7 @@ const NewResourceWizard = () => {
           name="namespace"
           label="Namespace"
           tooltip={{title: 'Select the namespace', icon: <InfoCircleOutlined />}}
-          initialValue="default"
+          initialValue={NO_NAMESPACE}
         >
           <Select>
             {namespaces.map(namespace => (
