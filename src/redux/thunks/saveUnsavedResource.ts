@@ -68,10 +68,14 @@ export const saveUnsavedResource = createAsyncThunk<
 
   if (fs.existsSync(absoluteFilePath)) {
     const fileContent = await readFilePromise(absoluteFilePath, 'utf-8');
-    const contentToAppend =
-      fileContent.trim().length === 0 || fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)
-        ? `${resource.text}`
-        : `\n${YAML_DOCUMENT_DELIMITER}${resource.text}`;
+    let contentToAppend = resource.text;
+    if (fileContent.trim().length > 0) {
+      if (fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
+        contentToAppend = `\n${resource.text}`;
+      } else {
+        contentToAppend = `\n${YAML_DOCUMENT_DELIMITER}\n${resource.text}`;
+      }
+    }
     await appendFilePromise(absoluteFilePath, contentToAppend);
   } else {
     await writeFilePromise(absoluteFilePath, resource.text);

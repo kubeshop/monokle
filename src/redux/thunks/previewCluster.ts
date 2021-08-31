@@ -3,7 +3,7 @@ import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
 import {AppState} from '@models/appstate';
 import * as k8s from '@kubernetes/client-node';
-import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 import {AlertEnum} from '@models/alert';
 import {createPreviewRejection, createPreviewResult, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
@@ -36,7 +36,7 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
           }
 
           // @ts-ignore
-          const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER);
+          const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
           const previewResult = createPreviewResult(allYaml, configPath, 'Get Cluster Resources');
 
           if (fulfilledResults.length < results.length) {
