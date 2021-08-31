@@ -48,6 +48,7 @@ const DiffModal = () => {
   const diffResourceId = useAppSelector(state => state.main.diffResourceId);
   const [diffResource, setDiffResource] = useState<K8sResource>();
   const [resourceContent, setResourceContent] = useState<string>();
+  const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const [isVisible, setVisible] = useState(false);
@@ -75,7 +76,10 @@ const DiffModal = () => {
     if (diffResourceId) {
       const resource = resourceMap[diffResourceId];
       if (resource) {
-        applyResourceWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig);
+        applyResourceWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig, {
+          isClusterPreview: previewType === 'cluster',
+          shouldPerformDiff: true,
+        });
       }
     }
   };

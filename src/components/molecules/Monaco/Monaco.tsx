@@ -73,6 +73,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const previewType = useAppSelector(state => state.main.previewType);
   const [code, setCode] = useState('');
   const [orgCode, setOrgCode] = useState<string>('');
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
@@ -252,7 +253,7 @@ const Monaco = (props: {editorHeight: string}) => {
 
   const options = {
     selectOnLineNumbers: true,
-    readOnly: isInPreviewMode || (!selectedPath && !selectedResourceId),
+    readOnly: (isInPreviewMode && previewType !== 'cluster') || (!selectedPath && !selectedResourceId),
     fontWeight: 'bold',
     glyphMargin: true,
     minimap: {
