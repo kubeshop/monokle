@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
@@ -72,6 +72,9 @@ const Monaco = (props: {editorHeight: string}) => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
   const [code, setCode] = useState('');
@@ -80,6 +83,7 @@ const Monaco = (props: {editorHeight: string}) => {
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
+  const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const idsOfDecorationsRef = useRef<string[]>([]);
@@ -230,6 +234,7 @@ const Monaco = (props: {editorHeight: string}) => {
       });
       actionSaveDisposableRef.current = newActionSaveDisposable;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, selectedPath, selectedResourceId]);
 
   useEffect(() => {
@@ -251,9 +256,18 @@ const Monaco = (props: {editorHeight: string}) => {
     setDirty(false);
   }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
 
+  // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
+  const isReadOnlyMode = useCallback(() => {
+    return (
+      (isInPreviewMode && selectedResourceId !== previewResourceId) ||
+      selectedValuesFileId !== previewValuesFileId ||
+      (!selectedPath && !selectedResourceId)
+    );
+  }, [isInPreviewMode, selectedResourceId, previewResourceId, selectedValuesFileId, previewValuesFileId, selectedPath]);
+
   const options = {
     selectOnLineNumbers: true,
-    readOnly: (isInPreviewMode && previewType !== 'cluster') || (!selectedPath && !selectedResourceId),
+    readOnly: isReadOnlyMode(),
     fontWeight: 'bold',
     glyphMargin: true,
     minimap: {
@@ -286,10 +300,15 @@ const Monaco = (props: {editorHeight: string}) => {
   useEffect(() => {
     clearCodeIntel();
     applyCodeIntel();
+
+    if (!firstCodeLoadedOnEditor && code) {
+      setFirstCodeLoadedOnEditor(true);
+    }
     return () => {
       clearCodeIntel();
     };
-  }, [code, selectedResourceId, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, selectedResourceId, resourceMap]);
 
   useEffect(() => {
     let resourceSchema;
@@ -324,14 +343,15 @@ const Monaco = (props: {editorHeight: string}) => {
       const newCompletionDisposable = codeIntel.applyAutocomplete(resourceMap);
       completionDisposableRef.current = newCompletionDisposable;
     }
-  }, [selectedResourceId, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
     if (editor) {
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-  }, [editor, selectedResourceId]);
+  }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
 
   return (
     <>

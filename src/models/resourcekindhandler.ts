@@ -104,6 +104,8 @@ interface ResourceKindHandler {
     description: string;
     content: string;
   }[];
+
+  validationSchemaPrefix?: string;
 }
 
 export type {ResourceKindHandler, RefMapper, SymbolMatcher};

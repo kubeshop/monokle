@@ -7,6 +7,7 @@ import {
   helmChartsSelector,
   helmValuesSelector,
   kustomizationsSelector,
+  isInPreviewModeSelector,
 } from '@redux/selectors';
 
 import {HelmValuesFile} from '@models/helm';
@@ -148,6 +149,7 @@ const NavigatorPane = () => {
   const helmValues = useSelector(helmValuesSelector);
   const kustomizations = useSelector(kustomizationsSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const [isValidationsErrorsModalVisible, setValidationsErrorsVisible] = useState<boolean>(false);
   const [currentValidationErrors, setCurrentValidationErrors] = useState<ResourceValidationError[]>([]);
@@ -179,7 +181,8 @@ const NavigatorPane = () => {
     if (kustomizations.some(kustomization => kustomization.id === selectedResourceId)) {
       expandSection('kustomizations');
     }
-  }, [selectedResourceId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedResourceId, kustomizations]);
 
   const showValidationsErrorsModal = (errors: ResourceValidationError[]) => {
     setValidationsErrorsVisible(true);
@@ -205,7 +208,7 @@ const NavigatorPane = () => {
               <span>Navigator</span>
               <RightButtons>
                 <StyledPlusButton
-                  disabled={!doesRootFileEntryExist()}
+                  disabled={!doesRootFileEntryExist() || isInClusterMode || isInPreviewMode}
                   onClick={onClickNewResource}
                   type="link"
                   size="small"

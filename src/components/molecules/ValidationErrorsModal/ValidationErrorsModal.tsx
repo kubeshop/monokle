@@ -38,7 +38,7 @@ const ValidationErrorsModal = (props: {errors: ResourceValidationError[]; isVisi
         <StyledErrorList>
           {errors.map(error => {
             return (
-              <li>
+              <li key={`${error.property}:${error.message}`}>
                 <StyledErrorProperty>{error.property}</StyledErrorProperty>
                 <StyledErrorMessage>{error.message}</StyledErrorMessage>
               </li>

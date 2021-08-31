@@ -34,6 +34,14 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
     }
   };
 
+  const reloadPreview = (id: string) => {
+    if (id !== selectedResourceId) {
+      dispatch(selectK8sResource({resourceId: id}));
+    }
+
+    startPreview(id, 'kustomization', dispatch);
+  };
+
   return (
     <>
       {kustomizations.map((k: K8sResource) => {
@@ -55,6 +63,7 @@ const KustomizationsSection = (props: KustomizationsSectionProps) => {
             hasOutgoingRefs={Boolean(hasOutgoingRefs(k))}
             onClickResource={!previewResource || previewResource === k.id ? () => selectResource(k.id) : undefined}
             onClickPreview={() => selectPreview(k.id)}
+            onReloadPreview={() => reloadPreview(k.id)}
             isPreviewLoading={previewLoader.isLoading && k.id === previewLoader.targetResourceId}
           />
         );

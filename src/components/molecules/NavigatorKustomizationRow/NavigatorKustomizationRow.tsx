@@ -7,7 +7,11 @@ import Colors, {FontColors} from '@styles/Colors';
 import {K8sResource} from '@models/k8sresource';
 
 import NavigatorRowLabel from '@molecules/NavigatorRowLabel';
-import {ExitKustomizationPreviewTooltip, KustomizationPreviewTooltip} from '@constants/tooltips';
+import {
+  ExitKustomizationPreviewTooltip,
+  KustomizationPreviewTooltip,
+  ReloadKustomizationPreviewTooltip,
+} from '@constants/tooltips';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
@@ -24,6 +28,7 @@ export type NavigatorKustomizationRowProps = {
   isPreviewLoading: boolean;
   onClickResource?: React.MouseEventHandler<HTMLDivElement>;
   onClickPreview: React.MouseEventHandler<HTMLDivElement>;
+  onReloadPreview: React.MouseEventHandler<HTMLDivElement>;
 };
 
 const ItemRow = styled(Row)`
@@ -45,6 +50,13 @@ const PreviewContainer = styled.span`
 `;
 
 const PreviewSpan = styled.span<{isSelected: boolean}>`
+  font-weight: 500;
+  cursor: pointer;
+  color: ${props => (props.isSelected ? Colors.blackPure : Colors.blue6)};
+`;
+
+const ReloadSpan = styled.span<{isSelected: boolean}>`
+  margin-left: 10px;
   font-weight: 500;
   cursor: pointer;
   color: ${props => (props.isSelected ? Colors.blackPure : Colors.blue6)};
@@ -94,6 +106,7 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
     hasOutgoingRefs,
     onClickResource,
     onClickPreview,
+    onReloadPreview,
     isPreviewLoading,
   } = props;
 
@@ -127,14 +140,24 @@ const NavigatorKustomizationRow = (props: NavigatorKustomizationRowProps) => {
               {isPreviewLoading ? (
                 <Spin indicator={PreviewLoadingIcon} />
               ) : isHovered ? (
-                <Tooltip
-                  mouseEnterDelay={TOOLTIP_DELAY}
-                  title={previewButtonActive ? ExitKustomizationPreviewTooltip : KustomizationPreviewTooltip}
-                >
-                  <PreviewSpan isSelected={isSelected} onClick={onClickPreview}>
-                    {previewButtonActive ? 'Exit' : 'Preview'}
-                  </PreviewSpan>
-                </Tooltip>
+                <>
+                  <Tooltip
+                    mouseEnterDelay={TOOLTIP_DELAY}
+                    title={previewButtonActive ? ExitKustomizationPreviewTooltip : KustomizationPreviewTooltip}
+                  >
+                    <PreviewSpan isSelected={isSelected} onClick={onClickPreview}>
+                      {previewButtonActive ? 'Exit' : 'Preview'}
+                    </PreviewSpan>
+                  </Tooltip>
+
+                  {previewButtonActive && (
+                    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadKustomizationPreviewTooltip}>
+                      <ReloadSpan isSelected={isSelected} onClick={onReloadPreview}>
+                        Reload
+                      </ReloadSpan>
+                    </Tooltip>
+                  )}
+                </>
               ) : null}
             </PreviewContainer>
           </SectionCol>
