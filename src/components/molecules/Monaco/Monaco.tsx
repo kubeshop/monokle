@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
@@ -254,13 +254,13 @@ const Monaco = (props: {editorHeight: string}) => {
   }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
-  function isReadOnlyMode() {
+  const isReadOnlyMode = useCallback(() => {
     return (
       (isInPreviewMode && selectedResourceId !== previewResourceId) ||
       selectedValuesFileId !== previewValuesFileId ||
       (!selectedPath && !selectedResourceId)
     );
-  }
+  }, [isInPreviewMode, selectedResourceId, previewResourceId, selectedValuesFileId, previewValuesFileId, selectedPath]);
 
   const options = {
     selectOnLineNumbers: true,
