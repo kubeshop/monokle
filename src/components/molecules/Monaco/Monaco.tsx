@@ -229,6 +229,7 @@ const Monaco = (props: {editorHeight: string}) => {
       });
       actionSaveDisposableRef.current = newActionSaveDisposable;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, selectedPath, selectedResourceId]);
 
   useEffect(() => {
@@ -288,7 +289,8 @@ const Monaco = (props: {editorHeight: string}) => {
     return () => {
       clearCodeIntel();
     };
-  }, [code, selectedResourceId, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, selectedResourceId, resourceMap]);
 
   useEffect(() => {
     let resourceSchema;
@@ -323,7 +325,8 @@ const Monaco = (props: {editorHeight: string}) => {
       const newCompletionDisposable = codeIntel.applyAutocomplete(resourceMap);
       completionDisposableRef.current = newCompletionDisposable;
     }
-  }, [selectedResourceId, resourceMap]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
     if (editor) {

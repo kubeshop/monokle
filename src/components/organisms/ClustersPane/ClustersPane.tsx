@@ -84,7 +84,7 @@ const ClustersPane = () => {
       return <span>Loading Cluster Objects</span>;
     }
     return <span>Show Cluster Objects</span>;
-  }, [previewType, previewLoader]);
+  }, [previewType, previewLoader, isInClusterMode]);
 
   return (
     <>

@@ -142,7 +142,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
         stopPreview(dispatch);
       }
     },
-    [previewValuesFile]
+    [previewValuesFile, dispatch]
   );
 
   React.useEffect(() => {

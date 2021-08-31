@@ -181,7 +181,8 @@ const NavigatorPane = () => {
     if (kustomizations.some(kustomization => kustomization.id === selectedResourceId)) {
       expandSection('kustomizations');
     }
-  }, [selectedResourceId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedResourceId, kustomizations]);
 
   const showValidationsErrorsModal = (errors: ResourceValidationError[]) => {
     setValidationsErrorsVisible(true);

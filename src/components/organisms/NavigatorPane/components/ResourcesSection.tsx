@@ -44,8 +44,8 @@ const ResourcesSection = (props: {showErrorsModal: (errors: ResourceValidationEr
     if (namespace && ns.indexOf(namespace) === -1) {
       setNamespace(ALL_NAMESPACES);
     }
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [resourceMap, previewResource]); // es-lint-disable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resourceMap, previewResource]);
 
   const handleNamespaceChange = (value: any) => {
     setNamespace(value);
@@ -134,7 +134,8 @@ const ResourcesSection = (props: {showErrorsModal: (errors: ResourceValidationEr
       })
     );
     setExpandedSubsectionsBySection(updatedExpandedSubsectionsBySection);
-  }, [resourceMap, selectedResourceId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resourceMap, selectedResourceId, appConfig.navigators]);
 
   function shouldSubsectionBeExpanded(subsection: NavigatorSubSection) {
     return (

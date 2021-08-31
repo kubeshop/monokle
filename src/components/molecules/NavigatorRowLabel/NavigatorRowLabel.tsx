@@ -248,7 +248,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [isHighlighted, selectedPath]);
+  }, [isHighlighted, selectedPath, isScrolledIntoView]);
 
   // on mount, if this resource is selected, scroll to it (the subsection expanded and rendered this)
   useEffect(() => {
@@ -257,6 +257,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -265,7 +266,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [isSelected, selectedResourceId]);
+  }, [isSelected, selectedResourceId, isScrolledIntoView]);
 
   const isUnsaved = useCallback(() => {
     return Boolean(resource && isUnsavedResource(resource));
