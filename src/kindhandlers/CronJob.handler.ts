@@ -8,6 +8,7 @@ const CronJobHandler: ResourceKindHandler = {
   apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_WORKLOADS, 'CronJobs'],
   clusterApiVersion: 'batch/v1',
+  validationSchemaPrefix: 'io.k8s.api.batch.v2alpha1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);

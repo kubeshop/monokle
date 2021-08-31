@@ -7,7 +7,7 @@ import {addResource, selectK8sResource} from '@redux/reducers/main';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `
-apiVersion: ${input.apiVersion ? input.apiVersion : 'apps/v1'}
+apiVersion: ${input.apiVersion ? input.apiVersion : 'v1'}
 kind: ${input.kind}
 metadata:
   name: ${input.name}
