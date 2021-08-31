@@ -1,5 +1,5 @@
 import * as k8s from '@kubernetes/client-node';
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 import {ResourceMapType} from '@models/appstate';
 import {extractK8sResources, processParsedResources} from '@redux/services/resource';
 import {stringify} from 'yaml';
@@ -17,7 +17,7 @@ export function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: stri
       delete item.metadata?.managedFields;
       return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
     })
-    .join(YAML_DOCUMENT_DELIMITER);
+    .join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
 }
 
 /**

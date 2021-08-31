@@ -17,6 +17,12 @@ import {processRefs} from './resourceRefs';
  * Parse documents lazily...
  */
 
+function doesTextStartWithYamlDocumentDelimiter(text: string) {
+  return ['\n', '\r\n', '\r'].some(lineEnding => {
+    return text.startsWith(`${YAML_DOCUMENT_DELIMITER}${lineEnding}`);
+  });
+}
+
 export function getParsedDoc(resource: K8sResource) {
   if (!resource.parsedDoc) {
     const lineCounter = new LineCounter();
@@ -254,8 +260,8 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       const content = fs.readFileSync(absoluteResourcePath, 'utf8');
 
       // need to make sure that document delimiter is still there if this resource was not first in the file
-      if (resource.range.start > 0 && !valueToWrite.startsWith(YAML_DOCUMENT_DELIMITER)) {
-        valueToWrite = `${YAML_DOCUMENT_DELIMITER}${valueToWrite}`;
+      if (resource.range.start > 0 && !doesTextStartWithYamlDocumentDelimiter(valueToWrite)) {
+        valueToWrite = `${YAML_DOCUMENT_DELIMITER}\n${valueToWrite}`;
       }
 
       fs.writeFileSync(
