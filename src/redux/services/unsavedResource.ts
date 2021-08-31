@@ -22,8 +22,6 @@ export function createUnsavedResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
   dispatch: AppDispatch
 ) {
-  console.log(input);
-
   // TODO: add logic to use a resource template
   const newResourceId = uuidv4();
   const newResourceText = createDefaultResourceText(input);
