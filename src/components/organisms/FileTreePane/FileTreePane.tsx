@@ -217,6 +217,8 @@ const FileTreePane = () => {
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
+  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
+  const recentFolders = useAppSelector(state => state.config.recentFolders);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
@@ -328,9 +330,12 @@ const FileTreePane = () => {
 
   useEffect(() => {
     ipcRenderer.on('executed-from', (_, data) => {
-      setFolder(data.path);
-      shouldExpandAllNodes.current = true;
-      setAutoExpandParent(true);
+      const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
+      if (folder) {
+        setFolder(folder);
+        shouldExpandAllNodes.current = true;
+        setAutoExpandParent(true);
+      }
     });
   }, []);
 

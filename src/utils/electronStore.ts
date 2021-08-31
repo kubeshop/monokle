@@ -62,7 +62,7 @@ const defaults = {
       textSize: 'medium',
       language: 'en',
       helmPreviewMode: 'template',
-      loadLastFolderOnStartup: 'true',
+      loadLastFolderOnStartup: true,
     },
     recentFolders: [],
   },
