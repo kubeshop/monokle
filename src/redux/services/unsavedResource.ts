@@ -11,7 +11,7 @@ apiVersion: ${input.apiVersion ? input.apiVersion : 'apps/v1'}
 kind: ${input.kind}
 metadata:
   name: ${input.name}
-  namespace: ${input.namespace ? input.namespace : 'default'}
+  ${input.namespace ? `namespace: ${input.namespace}` : ''}
   `.trim();
 }
 
