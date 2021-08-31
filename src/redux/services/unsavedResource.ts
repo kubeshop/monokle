@@ -11,7 +11,7 @@ apiVersion: ${input.apiVersion ? input.apiVersion : 'apps/v1'}
 kind: ${input.kind}
 metadata:
   name: ${input.name}
-  namespace: ${input.namespace ? input.namespace : 'default'}
+  ${input.namespace ? `namespace: ${input.namespace}` : ''}
   `.trim();
 }
 
@@ -22,6 +22,8 @@ export function createUnsavedResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
   dispatch: AppDispatch
 ) {
+  console.log(input);
+
   // TODO: add logic to use a resource template
   const newResourceId = uuidv4();
   const newResourceText = createDefaultResourceText(input);
