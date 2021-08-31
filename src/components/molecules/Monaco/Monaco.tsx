@@ -67,8 +67,8 @@ const MonacoContainer = styled.div`
 // @ts-ignore
 const {yaml} = languages || {};
 
-const Monaco = (props: {editorHeight: string}) => {
-  const {editorHeight} = props;
+const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; applySelection: () => void}) => {
+  const {editorHeight, diffSelectedResource, applySelection} = props;
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
@@ -92,6 +92,8 @@ const Monaco = (props: {editorHeight: string}) => {
   const linkDisposablesRef = useRef<monaco.IDisposable[]>([]);
   const completionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const actionSaveDisposableRef = useRef<monaco.IDisposable | null>(null);
+  const applySelectionDisposableRef = useRef<monaco.IDisposable | null>(null);
+  const diffSelectedResourceDisposableRef = useRef<monaco.IDisposable | null>(null);
 
   const editor = editorRef.current;
 
@@ -113,12 +115,42 @@ const Monaco = (props: {editorHeight: string}) => {
     // console.log(e);
   };
 
-  const editorDidMount = (e: any, m: any) => {
+  useEffect(() => {
+    if (editor) {
+      applySelectionDisposableRef.current?.dispose();
+      applySelectionDisposableRef.current = editor.addAction({
+        id: 'monokle-apply-selection',
+        label: 'Apply Selection',
+        // eslint-disable-next-line no-bitwise
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KEY_S],
+        run: () => {
+          applySelection();
+        },
+      });
+    }
+  }, [editor, applySelection]);
+
+  useEffect(() => {
+    if (editor) {
+      diffSelectedResourceDisposableRef.current?.dispose();
+      diffSelectedResourceDisposableRef.current = editor.addAction({
+        id: 'monokle-diff-selected-resource',
+        label: 'Diff Selected Resource',
+        // eslint-disable-next-line no-bitwise
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KEY_D],
+        run: () => {
+          diffSelectedResource();
+        },
+      });
+    }
+  }, [editor, diffSelectedResource]);
+
+  const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor, m: any) => {
     // register action to exit editor focus
     e.addAction({
       id: 'monokle-exit-editor-focus',
       label: 'Exit Editor Focus',
-      /* eslint-disable no-bitwise */
+      // eslint-disable-next-line no-bitwise
       keybindings: [monaco.KeyCode.Escape],
       run: () => {
         hiddenInputRef.current?.focus();
@@ -129,7 +161,7 @@ const Monaco = (props: {editorHeight: string}) => {
     e.addAction({
       id: 'monokle-navigate-back',
       label: 'Navigate Back',
-      /* eslint-disable no-bitwise */
+      // eslint-disable-next-line no-bitwise
       keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.LeftArrow],
       run: () => {
         dispatch(selectFromHistory({direction: 'left'}));
@@ -140,7 +172,7 @@ const Monaco = (props: {editorHeight: string}) => {
     e.addAction({
       id: 'monokle-navigate-forward',
       label: 'Navigate Forward',
-      /* eslint-disable no-bitwise */
+      // eslint-disable-next-line no-bitwise
       keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.RightArrow],
       run: () => {
         dispatch(selectFromHistory({direction: 'right'}));
@@ -150,7 +182,7 @@ const Monaco = (props: {editorHeight: string}) => {
     e.addAction({
       id: 'monokle-open-new-resource-wizard',
       label: 'Open New Resource Wizard',
-      /* eslint-disable no-bitwise */
+      // eslint-disable-next-line no-bitwise
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N],
       run: () => {
         if (fileMap[ROOT_FILE_ENTRY]) {
@@ -220,13 +252,11 @@ const Monaco = (props: {editorHeight: string}) => {
 
   useEffect(() => {
     if (editor) {
-      if (actionSaveDisposableRef.current && actionSaveDisposableRef.current.dispose) {
-        actionSaveDisposableRef.current.dispose();
-      }
+      actionSaveDisposableRef.current?.dispose();
       const newActionSaveDisposable = editor.addAction({
         id: 'monokle-save-content',
         label: 'Save Content',
-        /* eslint-disable no-bitwise */
+        // eslint-disable-next-line no-bitwise
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
         run: currentEditor => {
           saveContent(currentEditor as monaco.editor.IStandaloneCodeEditor);
