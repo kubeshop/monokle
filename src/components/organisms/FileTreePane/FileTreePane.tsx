@@ -295,7 +295,7 @@ const FileTreePane = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId]);
+  }, [selectedResourceId, tree]);
 
   useEffect(() => {
     // removes any highlight when a file is selected

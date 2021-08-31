@@ -360,16 +360,18 @@ const Monaco = (props: {editorHeight: string}) => {
         </HiddenInputContainer>
       </MonacoButtons>
       <MonacoContainer ref={containerRef}>
-        <MonacoEditor
-          width={width}
-          height={editorHeight}
-          language="yaml"
-          theme={KUBESHOP_MONACO_THEME}
-          value={code}
-          options={options}
-          onChange={onChange}
-          editorDidMount={editorDidMount}
-        />
+        {firstCodeLoadedOnEditor && (
+          <MonacoEditor
+            width={width}
+            height={editorHeight}
+            language="yaml"
+            theme={KUBESHOP_MONACO_THEME}
+            value={code}
+            options={options}
+            onChange={onChange}
+            editorDidMount={editorDidMount}
+          />
+        )}
       </MonacoContainer>
     </>
   );
