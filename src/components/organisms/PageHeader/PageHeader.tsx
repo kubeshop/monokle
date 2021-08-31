@@ -140,7 +140,7 @@ const PageHeader = () => {
       setPreviewValuesFile(undefined);
       setHelmChart(undefined);
     }
-  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmValuesMap]);
+  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap]);
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());

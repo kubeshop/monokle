@@ -72,6 +72,7 @@ const LogViewer = (props: {editorHeight: string}) => {
   }, [editor, code]);
 
   function onChange(newValue: any, e: any) {
+    // eslint-disable-next-line no-console
     console.log('Logger onChange >>>SHOULD NOT BE CALLED<<<', newValue, e); // should never happen
   }
 

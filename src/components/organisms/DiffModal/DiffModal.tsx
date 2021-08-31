@@ -69,6 +69,7 @@ const DiffModal = () => {
     }
 
     setVisible(Boolean(performResourceDiff) && Boolean(resourceMap) && Boolean(diffContent));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diffContent]);
 
   const handleApply = () => {

@@ -253,7 +253,7 @@ const FileTreePane = () => {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
       shouldExpandAllNodes.current = false;
     }
-  }, [resourceMap]);
+  }, [resourceMap, fileMap]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
@@ -294,6 +294,7 @@ const FileTreePane = () => {
         highlightFilePath(filePath);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResourceId]);
 
   useEffect(() => {
@@ -301,6 +302,7 @@ const FileTreePane = () => {
     if (selectedPath && highlightNode) {
       highlightNode.highlight = false;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPath]);
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
@@ -317,7 +319,7 @@ const FileTreePane = () => {
     if (isSelectingFile) {
       dispatch(setSelectingFile(false));
     }
-  }, [isSelectingFile]);
+  }, [isSelectingFile, dispatch]);
 
   const onExpand = (expandedKeysValue: React.Key[]) => {
     setExpandedKeys(expandedKeysValue);
