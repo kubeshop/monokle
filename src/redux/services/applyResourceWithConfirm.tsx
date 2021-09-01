@@ -11,7 +11,11 @@ export function applyResourceWithConfirm(
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   dispatch: ThunkDispatch<any, any, any>,
-  kubeconfig: string
+  kubeconfig: string,
+  options?: {
+    isClusterPreview?: boolean;
+    shouldPerformDiff?: boolean;
+  }
 ) {
   const title = isKustomizationResource(selectedResource)
     ? `Apply ${selectedResource.name} kustomization your cluster?`
@@ -22,7 +26,7 @@ export function applyResourceWithConfirm(
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
-        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig);
+        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig, options);
         resolve({});
       });
     },

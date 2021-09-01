@@ -16,8 +16,8 @@ import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {isUnsavedResource} from '@redux/services/resource';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 import FileExplorer from '@components/atoms/FileExplorer';
-import {applyFileWithConfirm} from './applyFileWithConfirm';
-import {applyResourceWithConfirm} from './applyResourceWithConfirm';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {
   StyledLeftArrowButton,
   StyledRightArrowButton,
@@ -46,6 +46,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
+  const previewType = useAppSelector(state => state.main.previewType);
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
@@ -124,11 +125,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const applySelection = useCallback(() => {
     if (selectedResource) {
-      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
+      const isClusterPreview = previewType === 'cluster';
+      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig, {isClusterPreview});
     } else if (selectedPath) {
       applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
     }
-  }, [selectedResource, resourceMap, fileMap, kubeconfig, selectedPath, dispatch]);
+  }, [selectedResource, resourceMap, fileMap, kubeconfig, selectedPath, dispatch, previewType]);
 
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
@@ -233,7 +235,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />
                 ) : (
-                  <Monaco editorHeight={`${parseInt(contentHeight, 10) - 120}`} />
+                  <Monaco
+                    editorHeight={`${parseInt(contentHeight, 10) - 120}`}
+                    applySelection={applySelection}
+                    diffSelectedResource={diffSelectedResource}
+                  />
                 )}
               </TabPane>
               {selectedResource && selectedResource?.kind === 'ConfigMap' && (
