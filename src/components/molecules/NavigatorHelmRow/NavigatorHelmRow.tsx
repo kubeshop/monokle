@@ -154,7 +154,7 @@ const NavigatorHelmRow = (props: NavigatorHelmRowProps) => {
 
   const onReloadPreview = useCallback((id: string) => {
     startPreview(id, 'helm', dispatch);
-  }, []);
+  }, [dispatch]);
 
   React.useEffect(() => {
     if (selectedPath && Object.values(helmValues).some(helm => helm.isSelected)) {
