@@ -33,7 +33,7 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  ipcRenderer.once('missing-dependency-result', (_, {dependencies}) => {
+  ipcRenderer.on('missing-dependency-result', (_, {dependencies}) => {
     const alert: AlertType = {
       type: AlertEnum.Warning,
       title: 'Missing dependecy',
