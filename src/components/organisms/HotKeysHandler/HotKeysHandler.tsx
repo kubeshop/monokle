@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import hotkeys from '@constants/hotkeys';
 import {useSelector} from 'react-redux';
@@ -11,6 +11,9 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
+import {performResourceDiff} from '@redux/thunks/diffResource';
 
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
@@ -48,6 +51,56 @@ const HotKeysHandler = () => {
   useHotkeys(hotkeys.TOGGLE_SETTINGS, () => {
     dispatch(toggleSettings());
   });
+
+  const applySelection = useCallback(() => {
+    if (!mainState.selectedResourceId) {
+      return;
+    }
+    const selectedResource = mainState.resourceMap[mainState.selectedResourceId];
+    if (selectedResource) {
+      const isClusterPreview = mainState.previewType === 'cluster';
+      applyResourceWithConfirm(
+        selectedResource,
+        mainState.resourceMap,
+        mainState.fileMap,
+        dispatch,
+        configState.kubeconfigPath,
+        {isClusterPreview}
+      );
+    } else if (mainState.selectedPath) {
+      applyFileWithConfirm(mainState.selectedPath, mainState.fileMap, dispatch, configState.kubeconfigPath);
+    }
+  }, [
+    mainState.selectedResourceId,
+    mainState.resourceMap,
+    mainState.fileMap,
+    configState.kubeconfigPath,
+    mainState.selectedPath,
+    mainState.previewType,
+    dispatch,
+  ]);
+
+  useHotkeys(
+    hotkeys.APPLY_SELECTION,
+    () => {
+      applySelection();
+    },
+    [applySelection]
+  );
+
+  const diffSelectedResource = useCallback(() => {
+    if (mainState.selectedResourceId) {
+      dispatch(performResourceDiff(mainState.selectedResourceId));
+    }
+  }, [mainState.selectedResourceId, dispatch]);
+
+  useHotkeys(
+    hotkeys.DIFF_RESOURCE,
+    () => {
+      diffSelectedResource();
+    },
+    [diffSelectedResource]
+  );
 
   useHotkeys(
     hotkeys.PREVIEW_CLUSTER,

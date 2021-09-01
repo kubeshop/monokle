@@ -183,13 +183,15 @@ export const mainSlice = createSlice({
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          let newText = action.payload.content;
           if (isFileResource(resource)) {
-            newText = saveResource(resource, action.payload.content, state.fileMap);
+            const updatedFileText = saveResource(resource, action.payload.content, state.fileMap);
+            resource.text = updatedFileText;
+            resource.content = parseDocument(updatedFileText).toJS();
+            recalculateResourceRanges(resource, state);
+          } else {
+            resource.text = action.payload.content;
+            resource.content = parseDocument(action.payload.content).toJS();
           }
-          resource.text = newText;
-          resource.content = parseDocument(newText).toJS();
-          recalculateResourceRanges(resource, state);
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
           resource.isSelected = false;
           updateSelectionAndHighlights(state, resource);

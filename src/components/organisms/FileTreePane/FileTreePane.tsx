@@ -25,6 +25,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {ipcRenderer} from 'electron';
 import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
+import fs from 'fs';
 
 interface TreeNode {
   key: string;
@@ -217,6 +218,8 @@ const FileTreePane = () => {
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
+  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
+  const recentFolders = useAppSelector(state => state.config.recentFolders);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
@@ -295,7 +298,7 @@ const FileTreePane = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId]);
+  }, [selectedResourceId, tree]);
 
   useEffect(() => {
     // removes any highlight when a file is selected
@@ -326,9 +329,16 @@ const FileTreePane = () => {
     setAutoExpandParent(false);
   };
 
-  ipcRenderer.on('executed-from', (_, data) => {
-    setFolder(data.path);
-  });
+  useEffect(() => {
+    ipcRenderer.on('executed-from', (_, data) => {
+      const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
+      if (folder && fs.statSync(folder)?.isDirectory()) {
+        setFolder(folder);
+        shouldExpandAllNodes.current = true;
+        setAutoExpandParent(true);
+      }
+    });
+  }, [loadLastFolderOnStartup, recentFolders]);
 
   return (
     <FileTreeContainer>

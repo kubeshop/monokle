@@ -1,9 +1,12 @@
+import * as k8s from '@kubernetes/client-node';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 import {ResourceMapType} from '@models/appstate';
 import {extractK8sResources, processParsedResources} from '@redux/services/resource';
 import {stringify} from 'yaml';
 import {AlertEnum} from '@models/alert';
 import {ipcRenderer} from 'electron';
+import {K8sResource} from '@models/k8sresource';
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document
@@ -54,4 +57,20 @@ export function createPreviewRejection(thunkAPI: any, title: string, message: st
       type: AlertEnum.Error,
     },
   });
+}
+
+export async function getResourceFromCluster(resource: K8sResource, kubeconfigPath: string) {
+  const resourceKindHandler = getResourceKindHandler(resource.kind);
+
+  if (resource && resource.text && resourceKindHandler) {
+    const kc = new k8s.KubeConfig();
+    kc.loadFromFile(kubeconfigPath);
+
+    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(
+      kc,
+      resource.content.metadata.name,
+      resource.namespace ? resource.namespace : 'default'
+    );
+    return resourceFromCluster;
+  }
 }

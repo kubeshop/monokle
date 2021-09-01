@@ -161,18 +161,16 @@ const openApplication = async (givenPath?: string) => {
     });
   }
 
-  if (givenPath) {
-    win.webContents.on('did-finish-load', () => {
-      win.webContents.send('executed-from', {path: givenPath});
-    });
-  }
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('executed-from', {path: givenPath});
+  });
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
     app.dock.setIcon(image);
   }
 
-  console.log('info', app.getName(), app.getVersion(), app.getLocale());
+  console.log('info', app.getName(), app.getVersion(), app.getLocale(), givenPath);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

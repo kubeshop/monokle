@@ -1,6 +1,7 @@
 import {K8sResource} from '@models/k8sresource';
 import {spawn} from 'child_process';
 import log from 'loglevel';
+import {stringify} from 'yaml';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
@@ -8,7 +9,9 @@ import {AppDispatch} from '@redux/store';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getShellPath} from '@utils/shell';
-import {setApplyingResource} from '@redux/reducers/main';
+import {setApplyingResource, updateResource} from '@redux/reducers/main';
+import {getResourceFromCluster} from '@redux/thunks/utils';
+import {performResourceDiff} from './diffResource';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -56,7 +59,11 @@ export async function applyResource(
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   dispatch: AppDispatch,
-  kubeconfig: string
+  kubeconfig: string,
+  options?: {
+    isClusterPreview?: boolean;
+    shouldPerformDiff?: boolean;
+  }
 ) {
   try {
     const resource = resourceMap[resourceId];
@@ -79,6 +86,23 @@ export async function applyResource(
             title: 'Apply completed',
             message: data.toString(),
           };
+          if (options?.isClusterPreview) {
+            getResourceFromCluster(resource, kubeconfig).then(resourceFromCluster => {
+              delete resourceFromCluster.body.metadata?.managedFields;
+              const updatedResourceText = stringify(resourceFromCluster.body, {sortMapEntries: true});
+              dispatch(
+                updateResource({
+                  resourceId: resource.id,
+                  content: updatedResourceText,
+                })
+              );
+              if (options?.shouldPerformDiff) {
+                dispatch(performResourceDiff(resource.id));
+              }
+            });
+          } else if (options?.shouldPerformDiff) {
+            dispatch(performResourceDiff(resource.id));
+          }
           dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
         });
