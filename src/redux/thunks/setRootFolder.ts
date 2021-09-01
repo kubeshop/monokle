@@ -11,6 +11,7 @@ import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {AlertEnum} from '@models/alert';
 import {configSlice} from '@redux/reducers/appConfig';
 import electronStore from '@utils/electronStore';
+import fs from 'fs';
 
 /**
  * Thunk to set the specified root folder
@@ -77,6 +78,8 @@ function updateRecentFolders(thunkAPI: any, rootFolder: string) {
       folders.splice(ix, 1);
     }
 
+    // remove entries that don't exist anymore
+    folders = folders.filter(e => fs.statSync(e) !== undefined);
     folders.unshift(rootFolder);
 
     electronStore.set('appConfig.recentFolders', folders);
