@@ -36,7 +36,7 @@ const App = () => {
   ipcRenderer.on('missing-dependency-result', (_, {dependencies}) => {
     const alert: AlertType = {
       type: AlertEnum.Warning,
-      title: 'Missing dependecy',
+      title: 'Missing dependency',
       message: `${dependencies.toString()} must be installed for all Monokle functionality to be available`,
     };
     dispatch(setAlert(alert));
