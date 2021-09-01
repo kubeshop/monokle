@@ -3,6 +3,7 @@ import {ResourceMapType} from '@models/appstate';
 import {extractK8sResources, processParsedResources} from '@redux/services/resource';
 import {stringify} from 'yaml';
 import {AlertEnum} from '@models/alert';
+import {ipcRenderer} from 'electron';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document
@@ -45,6 +46,7 @@ export function createPreviewResult(resourcesYaml: string, previewResourceId: st
  */
 
 export function createPreviewRejection(thunkAPI: any, title: string, message: string) {
+  ipcRenderer.send('check-missing-dependency');
   return thunkAPI.rejectWithValue({
     alert: {
       title,

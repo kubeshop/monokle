@@ -8,19 +8,18 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
+import {checkMissingDependencies} from '../src/utils/index';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 import terminal from '../cli/terminal';
 
 Object.assign(console, ElectronLog.functions);
 
-const {which} = require('shelljs');
 const ElectronStore = require('electron-store');
-
-const APP_DEPENDENCIES = ['kubectl', 'helm', 'erdkse'];
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
 
 const userHomeDir = app.getPath('home');
+const APP_DEPENDENCIES = ['kubectl', 'helm'];
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
@@ -47,10 +46,9 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
 });
 
 ipcMain.on('check-missing-dependency', event => {
-  const missingDependecies = APP_DEPENDENCIES.filter(d => !which(d));
-
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
   if (missingDependecies.length > 0) {
-    event.sender.send('missing-dependecy-result', {dependencies: missingDependecies});
+    event.sender.send('missing-dependency-result', {dependencies: missingDependecies});
   }
 });
 
@@ -155,11 +153,11 @@ const openApplication = async (givenPath?: string) => {
   ElectronStore.initRenderer();
   const win = createWindow();
 
-  const missingDependecies = APP_DEPENDENCIES.filter(d => !which(d));
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 
   if (missingDependecies.length > 0) {
     win.webContents.on('did-finish-load', () => {
-      win.webContents.send('missing-dependecy-result', {dependencies: missingDependecies});
+      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
     });
   }
 

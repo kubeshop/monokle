@@ -33,11 +33,11 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  ipcRenderer.once('missing-dependecy-result', (_, {dependencies}) => {
+  ipcRenderer.once('missing-dependency-result', (_, {dependencies}) => {
     const alert: AlertType = {
       type: AlertEnum.Warning,
       title: 'Missing dependecy',
-      message: `${dependencies.toString()} must be installed.`,
+      message: `${dependencies.toString()} must be installed for all Monokle functionality to be available`,
     };
     dispatch(setAlert(alert));
   });
