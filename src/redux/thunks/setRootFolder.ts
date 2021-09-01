@@ -79,7 +79,7 @@ function updateRecentFolders(thunkAPI: any, rootFolder: string) {
     }
 
     // remove entries that don't exist anymore
-    folders = folders.filter(e => fs.statSync(e) !== undefined);
+    folders = folders.filter(e => fs.statSync(e)?.isDirectory());
     folders.unshift(rootFolder);
 
     electronStore.set('appConfig.recentFolders', folders);
