@@ -1,23 +1,21 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useRef, useEffect} from 'react';
 import {useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/services/resource';
 
 export const ALL_NAMESPACES = '<all>';
 export const NO_NAMESPACE = '<none>';
 
-export function useNamespaces(options?: {extra?: ('all' | 'none' | 'default')[]}) {
+export function useNamespaces(options: {extra?: ('all' | 'none' | 'default')[]}) {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const optionsExtra = useRef<string[]>([]);
+  optionsExtra.current = options.extra || [];
 
   const [namespaces, setNamespaces] = useState<string[]>([]);
-
-  const getExtraNamespaces = useCallback(() => {
-    return options?.extra || [];
-  }, [options]);
 
   useEffect(() => {
     setNamespaces([
       ...new Set([
-        ...getExtraNamespaces().map(opt => {
+        ...optionsExtra.current.map(opt => {
           if (opt === 'all') {
             return ALL_NAMESPACES;
           }
@@ -29,7 +27,7 @@ export function useNamespaces(options?: {extra?: ('all' | 'none' | 'default')[]}
         ...getNamespaces(resourceMap),
       ]),
     ]);
-  }, [resourceMap, getExtraNamespaces]);
+  }, [resourceMap, setNamespaces]);
 
   return namespaces;
 }
