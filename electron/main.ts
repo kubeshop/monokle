@@ -8,6 +8,7 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
+import {checkMissingDependencies} from '../src/utils/index';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 import terminal from '../cli/terminal';
 
@@ -18,6 +19,7 @@ const ElectronStore = require('electron-store');
 const {MONOKLE_RUN_AS_NODE} = process.env;
 
 const userHomeDir = app.getPath('home');
+const APP_DEPENDENCIES = ['kubectl', 'helm'];
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
@@ -40,6 +42,13 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
   } catch (e) {
     event.sender.send('kustomize-result', {error: e.toString()});
+  }
+});
+
+ipcMain.on('check-missing-dependency', event => {
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
+  if (missingDependecies.length > 0) {
+    event.sender.send('missing-dependency-result', {dependencies: missingDependecies});
   }
 });
 
@@ -144,6 +153,14 @@ const openApplication = async (givenPath?: string) => {
   ElectronStore.initRenderer();
   const win = createWindow();
 
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
+
+  if (missingDependecies.length > 0) {
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
+    });
+  }
+
   win.webContents.on('did-finish-load', () => {
     win.webContents.send('executed-from', {path: givenPath});
   });
@@ -182,4 +199,6 @@ if (MONOKLE_RUN_AS_NODE) {
   openApplication();
 }
 
-terminal();
+terminal()
+  // eslint-disable-next-line no-console
+  .catch(e => console.log(e));
