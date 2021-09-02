@@ -7,7 +7,7 @@ import CronJobHandler from './CronJob.handler';
 import CustomResourceDefinitionHandler from './CustomResourceDefinition.handler';
 import DaemonSetHandler from './DaemonSet.handler';
 import DeploymentHandler from './Deployment.handler';
-import EndpointHandler from './Endpoint.handler';
+import EndpointsHandler from './Endpoints.handler';
 import IngressHandler from './Ingress.handler';
 import JobHandler from './Job.handler';
 import NetworkPolicyHandler from './NetworkPolicy.handler';
@@ -31,7 +31,7 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   CustomResourceDefinitionHandler,
   DaemonSetHandler,
   DeploymentHandler,
-  EndpointHandler,
+  EndpointsHandler,
   IngressHandler,
   JobHandler,
   NetworkPolicyHandler,
