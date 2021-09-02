@@ -68,6 +68,7 @@
     "@rjsf/antd": "3.1.0",
     "@rjsf/core": "3.1.0",
     "@trodi/electron-splashscreen": "1.0.2",
+    "ajv": "^6.12.6",
     "antd": "4.16.12",
     "chokidar": "3.5.2",
     "dagre": "0.8.5",
@@ -81,7 +82,7 @@
     "jsonpath-plus": "6.0.1",
     "loglevel": "1.7.1",
     "micromatch": "4.0.4",
-    "monaco-yaml": "3.0.0",
+    "monaco-yaml": "3.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-flow-renderer": "9.6.6",
@@ -98,7 +99,7 @@
     "uuid": "8.3.2",
     "web-vitals": "2.1.0",
     "worker-loader": "3.0.8",
-    "yaml": "2.0.0-6",
+    "yaml": "2.0.0-7",
     "yargs": "^17.1.1"
   },
   "scripts": {
