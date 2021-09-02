@@ -2,12 +2,12 @@ import * as k8s from '@kubernetes/client-node';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NAV_K8S_RESOURCES, SECTION_NETWORK} from '@constants/navigator';
 
-const EndpointHandler: ResourceKindHandler = {
-  kind: 'Endpoint',
+const EndpointsHandler: ResourceKindHandler = {
+  kind: 'Endpoints',
   apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_NETWORK, 'Endpoints'],
   clusterApiVersion: 'v1',
-  validationSchemaPrefix: 'io.k8s.api.discovery.v1',
+  validationSchemaPrefix: 'io.k8s.api.core.v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
@@ -31,4 +31,4 @@ const EndpointHandler: ResourceKindHandler = {
   ],
 };
 
-export default EndpointHandler;
+export default EndpointsHandler;
