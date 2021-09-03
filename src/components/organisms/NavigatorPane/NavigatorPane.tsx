@@ -1,5 +1,5 @@
 import React, {useState, useContext, useEffect, useCallback} from 'react';
-import {Row, Skeleton, Button} from 'antd';
+import {Row, Skeleton, Button, Popover} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
 import {
@@ -14,7 +14,7 @@ import {HelmValuesFile} from '@models/helm';
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer, MonoSectionTitle} from '@atoms';
-import {MinusSquareOutlined, PlusSquareOutlined, PlusOutlined} from '@ant-design/icons';
+import {MinusSquareOutlined, PlusSquareOutlined, PlusOutlined, FilterOutlined} from '@ant-design/icons';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
@@ -22,6 +22,7 @@ import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 import AppContext from '@src/AppContext';
 
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
+import ResourceFilter from '@components/molecules/ResourceFilter';
 import {ResourceValidationError} from '@models/k8sresource';
 
 import HelmChartsSection from './components/HelmChartsSection';
@@ -99,6 +100,8 @@ const NavigatorPaneContainer = styled(PaneContainer)`
 `;
 
 const StyledPlusButton = styled(Button)``;
+
+const StyledFilterButton = styled(Button)``;
 
 const SectionHeader = (props: {
   title: string;
@@ -214,6 +217,14 @@ const NavigatorPane = () => {
                   size="small"
                   icon={<PlusOutlined />}
                 />
+                <Popover content={<ResourceFilter onChange={() => {}} />} trigger="click">
+                  <StyledFilterButton
+                    disabled={!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode}
+                    type="link"
+                    size="small"
+                    icon={<FilterOutlined />}
+                  />
+                </Popover>
               </RightButtons>
             </TitleBarContainer>
           </MonoPaneTitle>
