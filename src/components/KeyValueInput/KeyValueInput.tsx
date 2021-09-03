@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
+import isDeepEqual from 'fast-deep-equal/es6/react';
 import {Select, Button} from 'antd';
 import {PlusOutlined, MinusOutlined} from '@ant-design/icons';
 import {v4 as uuidv4} from 'uuid';
@@ -35,6 +36,7 @@ type KeyValueInputProps = {
   label: string;
   labelStyle?: React.CSSProperties;
   data: KeyValues;
+  value: KeyValues;
   onChange: (keyValues: KeyValues) => void;
 };
 
@@ -58,18 +60,59 @@ function concatValuesOfSimilarKeys(keyValueEntries: KeyValueEntry[]): KeyValues 
 }
 
 function KeyValueInput(props: KeyValueInputProps) {
-  const {label, labelStyle, data, onChange} = props;
+  const {label, labelStyle, data, value: keyValues, onChange} = props;
   const [entries, setEntries] = useState<KeyValueEntry[]>([]);
+  const [currentKeyValues, setCurrentKeyValues] = useState<KeyValues>(keyValues);
+
+  useEffect(() => {
+    if (!isDeepEqual(keyValues, currentKeyValues)) {
+      setCurrentKeyValues(keyValues);
+      const newEntries: KeyValueEntry[] = [];
+      Object.entries(keyValues).forEach(([key, values]) => {
+        if (data[key]) {
+          if (values.length === 0) {
+            newEntries.push({
+              id: uuidv4(),
+              key,
+              value: ANY_VALUE,
+            });
+          } else {
+            newEntries.push(
+              ...values
+                .filter(value => data[key].includes(value))
+                .map(value => {
+                  return {
+                    id: uuidv4(),
+                    key,
+                    value,
+                  };
+                })
+            );
+          }
+        }
+      });
+      setEntries(newEntries);
+    }
+  }, [keyValues, currentKeyValues, data]);
+
+  const updateKeyValues = (newEntries: KeyValueEntry[]) => {
+    const newKeyValues = concatValuesOfSimilarKeys(newEntries);
+    setCurrentKeyValues(newKeyValues);
+    onChange(newKeyValues);
+  };
 
   const createEntry = () => {
     const newEntry: KeyValueEntry = {
       id: uuidv4(),
     };
-    setEntries([...entries, newEntry]);
+    const newEntries = [...entries, newEntry];
+    setEntries(newEntries);
   };
 
   const removeEntry = (entryId: string) => {
-    setEntries(entries.filter(e => e.id !== entryId));
+    const newEntries = entries.filter(e => e.id !== entryId);
+    setEntries(newEntries);
+    updateKeyValues(newEntries);
   };
 
   const updateEntryKey = (entryId: string, key: string) => {
@@ -81,7 +124,7 @@ function KeyValueInput(props: KeyValueInputProps) {
       value: ANY_VALUE,
     };
     setEntries(newEntries);
-    onChange(concatValuesOfSimilarKeys(newEntries));
+    updateKeyValues(newEntries);
   };
 
   const updateEntryValue = (entryId: string, value: string) => {
@@ -92,7 +135,7 @@ function KeyValueInput(props: KeyValueInputProps) {
       value,
     };
     setEntries(newEntries);
-    onChange(concatValuesOfSimilarKeys(newEntries));
+    updateKeyValues(newEntries);
   };
 
   return (
