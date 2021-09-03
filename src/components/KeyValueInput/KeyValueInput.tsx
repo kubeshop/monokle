@@ -7,6 +7,7 @@ import {v4 as uuidv4} from 'uuid';
 import Colors from '@styles/Colors';
 
 const Container = styled.div`
+  min-width: 600px;
   max-height: 800px;
   overflow-y: auto;
 `;
@@ -148,7 +149,12 @@ function KeyValueInput(props: KeyValueInputProps) {
       </TitleContainer>
       {entries.map(entry => (
         <KeyValueContainer key={entry.id}>
-          <Select value={entry.key} onChange={newKey => updateEntryKey(entry.id, newKey)} style={{width: '100%'}}>
+          <Select
+            value={entry.key}
+            onChange={newKey => updateEntryKey(entry.id, newKey)}
+            style={{width: '100%'}}
+            showSearch
+          >
             {Object.keys(data).map(key => (
               <Select.Option key={key} value={key}>
                 {key}
@@ -160,6 +166,7 @@ function KeyValueInput(props: KeyValueInputProps) {
               value={entry.value}
               onChange={newValue => updateEntryValue(entry.id, newValue)}
               style={{width: '100%', marginLeft: 8}}
+              showSearch
             >
               <Select.Option key={ANY_VALUE} value={ANY_VALUE}>
                 {ANY_VALUE}
