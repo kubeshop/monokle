@@ -22,7 +22,7 @@ import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 import AppContext from '@src/AppContext';
 
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
-import ResourceFilter from '@components/molecules/ResourceFilter';
+import ResourceFilter, {ResourceFilterType} from '@components/molecules/ResourceFilter';
 import {ResourceValidationError} from '@models/k8sresource';
 
 import HelmChartsSection from './components/HelmChartsSection';
@@ -158,6 +158,8 @@ const NavigatorPane = () => {
   const [currentValidationErrors, setCurrentValidationErrors] = useState<ResourceValidationError[]>([]);
   const [expandedSections, setExpandedSections] = useState<string[]>(['kustomizations', 'helmcharts']);
 
+  const [resourceFilters, setResourceFilters] = useState<ResourceFilterType>({labels: {}, annotations: {}});
+
   const doesRootFileEntryExist = useCallback(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
@@ -217,7 +219,7 @@ const NavigatorPane = () => {
                   size="small"
                   icon={<PlusOutlined />}
                 />
-                <Popover content={<ResourceFilter onChange={() => {}} />} trigger="click">
+                <Popover content={<ResourceFilter onChange={setResourceFilters} />} trigger="click">
                   <StyledFilterButton
                     disabled={!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode}
                     type="link"
@@ -287,7 +289,7 @@ const NavigatorPane = () => {
         {uiState.isFolderLoading || previewLoader.isLoading ? (
           <StyledSkeleton />
         ) : (
-          <ResourcesSection showErrorsModal={showValidationsErrorsModal} />
+          <ResourcesSection filters={resourceFilters} showErrorsModal={showValidationsErrorsModal} />
         )}
       </NavigatorPaneContainer>
     </>

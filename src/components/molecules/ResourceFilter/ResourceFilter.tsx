@@ -62,23 +62,22 @@ const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (curren
   return keyValues;
 };
 
-const ResourceFilter = (props: {
-  onChange?: (filter: {
-    name?: string;
-    kind?: string;
-    namespace?: string;
-    labels: Record<string, string[]>;
-    annotations: Record<string, string[]>;
-  }) => void;
-}) => {
+export type ResourceFilterType = {
+  name?: string;
+  kind?: string;
+  namespace?: string;
+  labels: Record<string, string | null>;
+  annotations: Record<string, string | null>;
+};
+
+const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}) => {
   const {onChange: onFilterChange} = props;
   const [name, setName] = useState<string>();
   const [kind, setKind] = useState<string>();
   const [namespace, setNamespace] = useState<string>();
-  const [labels, setLabels] = useState<Record<string, string[]>>({});
-  const [annotations, setAnnotations] = useState<Record<string, string[]>>({});
+  const [labels, setLabels] = useState<Record<string, string | null>>({});
+  const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const allNamespaces = useNamespaces({extra: ['all', 'default']});
-
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const getAllLabels = useCallback(() => {
@@ -103,6 +102,22 @@ const ResourceFilter = (props: {
     setNamespace(undefined);
     setLabels({});
     setAnnotations({});
+  };
+
+  const updateKind = (selectedKind: string) => {
+    if (selectedKind === ALL_OPTIONS) {
+      setKind(undefined);
+    } else {
+      setKind(selectedKind);
+    }
+  };
+
+  const updateNamespace = (selectedNamespace: string) => {
+    if (selectedNamespace === ALL_OPTIONS) {
+      setNamespace(undefined);
+    } else {
+      setNamespace(selectedNamespace);
+    }
   };
 
   useDebounce(
@@ -133,11 +148,11 @@ const ResourceFilter = (props: {
       </StyledTitleContainer>
       <FieldContainer>
         <FieldLabel>Name:</FieldLabel>
-        <Search placeholder="All or part of name..." value={name} onSearch={setName} />
+        <Input placeholder="All or part of name..." value={name} onChange={e => setName(e.target.value)} />
       </FieldContainer>
       <FieldContainer>
         <FieldLabel>Kind:</FieldLabel>
-        <Select showSearch defaultValue={ALL_OPTIONS} onChange={setKind} style={{width: '100%'}}>
+        <Select showSearch defaultValue={ALL_OPTIONS} onChange={updateKind} style={{width: '100%'}}>
           <Select.Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
             {ALL_OPTIONS}
           </Select.Option>
@@ -150,10 +165,7 @@ const ResourceFilter = (props: {
       </FieldContainer>
       <FieldContainer>
         <FieldLabel>Namespace:</FieldLabel>
-        <Select showSearch defaultValue={ALL_OPTIONS} onChange={setNamespace} style={{width: '100%'}}>
-          <Select.Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
-            {ALL_OPTIONS}
-          </Select.Option>
+        <Select showSearch defaultValue={ALL_OPTIONS} onChange={updateNamespace} style={{width: '100%'}}>
           {allNamespaces.map(ns => (
             <Select.Option key={ns} value={ns}>
               {ns}

@@ -31,75 +31,69 @@ const StyledRemoveButton = styled(Button)`
 `;
 
 type KeyValueEntry = {id: string; key?: string; value?: string};
-type KeyValues = Record<string, string[]>;
+type KeyValue = Record<string, string | null>;
 
 type KeyValueInputProps = {
   label: string;
   labelStyle?: React.CSSProperties;
-  data: KeyValues;
-  value: KeyValues;
-  onChange: (keyValues: KeyValues) => void;
+  data: Record<string, string[]>;
+  value: KeyValue;
+  onChange: (keyValues: KeyValue) => void;
 };
 
 export const ANY_VALUE = '<any>';
 
-function concatValuesOfSimilarKeys(keyValueEntries: KeyValueEntry[]): KeyValues {
-  const keyValues: KeyValues = {};
+function makeKeyValueFromEntries(keyValueEntries: KeyValueEntry[]): KeyValue {
+  const keyValue: KeyValue = {};
   keyValueEntries.forEach(({key, value}) => {
     if (!key || !value) {
       return;
     }
-    if (keyValues[key]) {
-      keyValues[key].push(value);
+    if (value === ANY_VALUE) {
+      keyValue[key] = null;
     } else {
-      keyValues[key] = [value];
+      keyValue[key] = value;
     }
   });
-  return Object.fromEntries(
-    Object.entries(keyValues).map(([key, values]) => [key, values.some(val => val === ANY_VALUE) ? [] : values])
-  );
+  return keyValue;
 }
 
 function KeyValueInput(props: KeyValueInputProps) {
-  const {label, labelStyle, data, value: keyValues, onChange} = props;
+  const {label, labelStyle, data, value: keyValue, onChange} = props;
   const [entries, setEntries] = useState<KeyValueEntry[]>([]);
-  const [currentKeyValues, setCurrentKeyValues] = useState<KeyValues>(keyValues);
+  const [currentKeyValue, setCurrentKeyValue] = useState<KeyValue>(keyValue);
 
   useEffect(() => {
-    if (!isDeepEqual(keyValues, currentKeyValues)) {
-      setCurrentKeyValues(keyValues);
+    if (!isDeepEqual(keyValue, currentKeyValue)) {
+      setCurrentKeyValue(keyValue);
       const newEntries: KeyValueEntry[] = [];
-      Object.entries(keyValues).forEach(([key, values]) => {
-        if (data[key]) {
-          if (values.length === 0) {
-            newEntries.push({
-              id: uuidv4(),
-              key,
-              value: ANY_VALUE,
-            });
-          } else {
-            newEntries.push(
-              ...values
-                .filter(value => data[key].includes(value))
-                .map(value => {
-                  return {
-                    id: uuidv4(),
-                    key,
-                    value,
-                  };
-                })
-            );
-          }
+      Object.entries(keyValue).forEach(([key, value]) => {
+        if (newEntries.some(e => e.key === key)) {
+          return;
+        }
+
+        if (value === null) {
+          newEntries.push({
+            id: uuidv4(),
+            key,
+            value: ANY_VALUE,
+          });
+        } else {
+          newEntries.push({
+            id: uuidv4(),
+            key,
+            value,
+          });
         }
       });
       setEntries(newEntries);
     }
-  }, [keyValues, currentKeyValues, data]);
+  }, [keyValue, currentKeyValue, data]);
 
-  const updateKeyValues = (newEntries: KeyValueEntry[]) => {
-    const newKeyValues = concatValuesOfSimilarKeys(newEntries);
-    setCurrentKeyValues(newKeyValues);
-    onChange(newKeyValues);
+  const updateKeyValue = (newEntries: KeyValueEntry[]) => {
+    const newKeyValue = makeKeyValueFromEntries(newEntries);
+    setCurrentKeyValue(newKeyValue);
+    onChange(newKeyValue);
   };
 
   const createEntry = () => {
@@ -113,7 +107,7 @@ function KeyValueInput(props: KeyValueInputProps) {
   const removeEntry = (entryId: string) => {
     const newEntries = entries.filter(e => e.id !== entryId);
     setEntries(newEntries);
-    updateKeyValues(newEntries);
+    updateKeyValue(newEntries);
   };
 
   const updateEntryKey = (entryId: string, key: string) => {
@@ -125,7 +119,7 @@ function KeyValueInput(props: KeyValueInputProps) {
       value: ANY_VALUE,
     };
     setEntries(newEntries);
-    updateKeyValues(newEntries);
+    updateKeyValue(newEntries);
   };
 
   const updateEntryValue = (entryId: string, value: string) => {
@@ -136,7 +130,7 @@ function KeyValueInput(props: KeyValueInputProps) {
       value,
     };
     setEntries(newEntries);
-    updateKeyValues(newEntries);
+    updateKeyValue(newEntries);
   };
 
   return (
@@ -155,11 +149,13 @@ function KeyValueInput(props: KeyValueInputProps) {
             style={{width: '100%'}}
             showSearch
           >
-            {Object.keys(data).map(key => (
-              <Select.Option key={key} value={key}>
-                {key}
-              </Select.Option>
-            ))}
+            {Object.keys(data)
+              .filter(key => key === entry.key || !entries.some(e => e.key === key))
+              .map(key => (
+                <Select.Option key={key} value={key}>
+                  {key}
+                </Select.Option>
+              ))}
           </Select>
           {entry.key && (
             <Select

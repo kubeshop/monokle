@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import micromatch from 'micromatch';
 
 import {useSelector} from 'react-redux';
@@ -11,8 +11,9 @@ import {activeResourcesSelector} from '@redux/selectors';
 import {selectK8sResource} from '@redux/reducers/main';
 import {getNamespaces} from '@redux/services/resource';
 
-import NavigatorContentTitle from './NavigatorContentTitle';
+import {ResourceFilterType} from '@components/molecules/ResourceFilter';
 
+import NavigatorContentTitle from './NavigatorContentTitle';
 import NamespacesSection from './NamespacesSection';
 import SectionRow from './SectionRow';
 import SectionCol from './SectionCol';
@@ -26,8 +27,56 @@ const filterByNamespace = (resource: K8sResource, namespace: string): boolean =>
   );
 };
 
-const ResourcesSection = (props: {showErrorsModal: (errors: ResourceValidationError[]) => void}) => {
-  const {showErrorsModal} = props;
+function isPassingKeyValueFilter(target: any, keyValueFilter: Record<string, string | null>) {
+  return Object.entries(keyValueFilter).every(([key, value]) => {
+    if (!target[key]) {
+      return false;
+    }
+    if (value !== null) {
+      return target[key] === value;
+    }
+    return true;
+  });
+}
+
+function isResourcePassingFilters(resource: K8sResource, filters: ResourceFilterType) {
+  if (filters.name && resource.name.toLowerCase().indexOf(filters.name.toLowerCase()) === -1) {
+    return false;
+  }
+  if (filters.kind && resource.kind !== filters.kind) {
+    return false;
+  }
+  if (filters.namespace && resource.namespace !== filters.namespace) {
+    return false;
+  }
+  if (filters.labels && Object.keys(filters.labels).length > 0) {
+    const resourceLabels = resource.content?.metadata?.labels;
+    if (!resourceLabels) {
+      return false;
+    }
+    const isPassingLabelFilter = isPassingKeyValueFilter(resourceLabels, filters.labels);
+    if (!isPassingLabelFilter) {
+      return false;
+    }
+  }
+  if (filters.annotations && Object.keys(filters.annotations).length > 0) {
+    const resourceAnnotations = resource.content?.metadata?.annotations;
+    if (!resourceAnnotations) {
+      return false;
+    }
+    const isPassingAnnotationsFilter = isPassingKeyValueFilter(resourceAnnotations, filters.annotations);
+    if (!isPassingAnnotationsFilter) {
+      return false;
+    }
+  }
+  return true;
+}
+
+const ResourcesSection = (props: {
+  filters: ResourceFilterType;
+  showErrorsModal: (errors: ResourceValidationError[]) => void;
+}) => {
+  const {filters, showErrorsModal} = props;
   const dispatch = useAppDispatch();
   const appConfig = useAppSelector(state => state.config);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -81,14 +130,18 @@ const ResourcesSection = (props: {showErrorsModal: (errors: ResourceValidationEr
     });
   };
 
-  function shouldResourceBeVisible(item: K8sResource, subsection: NavigatorSubSection) {
-    return (
-      item.kind === subsection.kindSelector &&
-      micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
-      filterByNamespace(item, namespace) &&
-      Object.values(resourceMap).length > 0
-    );
-  }
+  const shouldResourceBeVisible = useCallback(
+    (item: K8sResource, subsection: NavigatorSubSection) => {
+      return (
+        item.kind === subsection.kindSelector &&
+        micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
+        filterByNamespace(item, namespace) &&
+        Object.values(resourceMap).length > 0 &&
+        isResourcePassingFilters(item, filters)
+      );
+    },
+    [filters, namespace, resourceMap]
+  );
 
   function shouldSectionBeVisible(section: NavigatorSection) {
     return (
