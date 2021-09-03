@@ -135,7 +135,7 @@ const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}
       onFilterChange(updatedFilters);
     },
     250,
-    [name, kind, labels, annotations, onFilterChange]
+    [name, kind, namespace, labels, annotations, onFilterChange]
   );
 
   return (
