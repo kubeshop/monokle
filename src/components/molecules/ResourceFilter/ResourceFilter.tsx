@@ -98,8 +98,8 @@ const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}
 
   const resetFilters = () => {
     setName(undefined);
-    setKind(undefined);
-    setNamespace(undefined);
+    setKind(ALL_OPTIONS);
+    setNamespace(ALL_OPTIONS);
     setLabels({});
     setAnnotations({});
   };
@@ -127,8 +127,8 @@ const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}
       }
       const updatedFilters = {
         name,
-        kind,
-        namespace,
+        kind: kind === ALL_OPTIONS ? undefined : kind,
+        namespace: namespace === ALL_OPTIONS ? undefined : namespace,
         labels,
         annotations,
       };
@@ -152,7 +152,7 @@ const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}
       </FieldContainer>
       <FieldContainer>
         <FieldLabel>Kind:</FieldLabel>
-        <Select showSearch defaultValue={ALL_OPTIONS} onChange={updateKind} style={{width: '100%'}}>
+        <Select showSearch defaultValue={ALL_OPTIONS} value={kind} onChange={updateKind} style={{width: '100%'}}>
           <Select.Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
             {ALL_OPTIONS}
           </Select.Option>
@@ -165,7 +165,13 @@ const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}
       </FieldContainer>
       <FieldContainer>
         <FieldLabel>Namespace:</FieldLabel>
-        <Select showSearch defaultValue={ALL_OPTIONS} onChange={updateNamespace} style={{width: '100%'}}>
+        <Select
+          showSearch
+          defaultValue={ALL_OPTIONS}
+          value={namespace}
+          onChange={updateNamespace}
+          style={{width: '100%'}}
+        >
           {allNamespaces.map(ns => (
             <Select.Option key={ns} value={ns}>
               {ns}
