@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {Modal, Form, Input, Select} from 'antd';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
@@ -6,18 +6,12 @@ import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {useResetFormOnCloseModal} from '@utils/hooks';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
-import {getNamespaces} from '@redux/services/resource';
+import {useNamespaces, NO_NAMESPACE} from '@hooks/useNamespaces';
 
-const NO_NAMESPACE = '<none>';
 const NewResourceWizard = () => {
   const dispatch = useAppDispatch();
   const isNewResourceWizardOpen = useAppSelector(state => state.ui.isNewResourceWizardOpen);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const [namespaces, setNamespaces] = useState<string[]>([]);
-
-  useEffect(() => {
-    setNamespaces([...new Set([NO_NAMESPACE, 'default', ...getNamespaces(resourceMap)])]);
-  }, [resourceMap]);
+  const namespaces = useNamespaces({extra: ['none', 'default']});
 
   const [form] = Form.useForm();
   useResetFormOnCloseModal({form, visible: isNewResourceWizardOpen});

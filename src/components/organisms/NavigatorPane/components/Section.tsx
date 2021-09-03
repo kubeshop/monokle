@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {Collapse} from 'antd';
 
 import styled from 'styled-components';
@@ -60,13 +60,20 @@ const Section = (props: {
     return expandedSubsections.indexOf(subsectionName) !== -1;
   };
 
+  const getVisibleResources = useCallback(
+    (subsection: NavigatorSubSection) => {
+      return resources.filter(item => shouldResourceBeVisible(item, subsection));
+    },
+    [shouldResourceBeVisible, resources]
+  );
+
   return (
     <SectionRow key={section.name}>
       <StyledCollapse collapsible="disabled" ghost activeKey={expandedSubsections}>
         {section.subsections
           .filter(subsection => shouldSubsectionBeVisible(subsection))
           .map(subsection => {
-            const visibleResources = resources.filter(item => shouldResourceBeVisible(item, subsection));
+            const visibleResources = getVisibleResources(subsection);
             return (
               <StyledCollapsePanel
                 key={subsection.name}
