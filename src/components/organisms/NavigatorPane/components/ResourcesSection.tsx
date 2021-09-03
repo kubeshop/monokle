@@ -9,23 +9,13 @@ import {K8sResource, ResourceValidationError} from '@models/k8sresource';
 import {NavigatorSection, NavigatorSubSection} from '@models/navigator';
 import {activeResourcesSelector} from '@redux/selectors';
 import {selectK8sResource} from '@redux/reducers/main';
-import {getNamespaces} from '@redux/services/resource';
 
 import {ResourceFilterType} from '@components/molecules/ResourceFilter';
 
 import NavigatorContentTitle from './NavigatorContentTitle';
-import NamespacesSection from './NamespacesSection';
 import SectionRow from './SectionRow';
 import SectionCol from './SectionCol';
 import Section from './Section';
-
-import {ALL_NAMESPACES} from '../constants';
-
-const filterByNamespace = (resource: K8sResource, namespace: string): boolean => {
-  return (
-    namespace === ALL_NAMESPACES || resource.namespace === namespace || (namespace === 'default' && !resource.namespace)
-  );
-};
 
 function isPassingKeyValueFilter(target: any, keyValueFilter: Record<string, string | null>) {
   return Object.entries(keyValueFilter).every(([key, value]) => {
@@ -46,8 +36,11 @@ function isResourcePassingFilters(resource: K8sResource, filters: ResourceFilter
   if (filters.kind && resource.kind !== filters.kind) {
     return false;
   }
-  if (filters.namespace && resource.namespace !== filters.namespace) {
-    return false;
+  if (filters.namespace) {
+    if (!resource.namespace && filters.namespace !== 'default') {
+      return false;
+    }
+    return resource.namespace === filters.namespace;
   }
   if (filters.labels && Object.keys(filters.labels).length > 0) {
     const resourceLabels = resource.content?.metadata?.labels;
@@ -80,25 +73,8 @@ const ResourcesSection = (props: {
   const dispatch = useAppDispatch();
   const appConfig = useAppSelector(state => state.config);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const previewResource = useAppSelector(state => state.main.previewResourceId);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const activeResources = useSelector(activeResourcesSelector);
-
-  const [namespace, setNamespace] = useState<string>(ALL_NAMESPACES);
-  const [namespaces, setNamespaces] = useState<string[]>([ALL_NAMESPACES]);
-
-  useEffect(() => {
-    let ns = getNamespaces(resourceMap);
-    setNamespaces(ns.concat([ALL_NAMESPACES]));
-    if (namespace && ns.indexOf(namespace) === -1) {
-      setNamespace(ALL_NAMESPACES);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceMap, previewResource]);
-
-  const handleNamespaceChange = (value: any) => {
-    setNamespace(value);
-  };
 
   const selectResource = (resourceId: string) => {
     dispatch(selectK8sResource({resourceId}));
@@ -135,12 +111,11 @@ const ResourcesSection = (props: {
       return (
         item.kind === subsection.kindSelector &&
         micromatch.isMatch(item.version, subsection.apiVersionSelector) &&
-        filterByNamespace(item, namespace) &&
         Object.values(resourceMap).length > 0 &&
         isResourcePassingFilters(item, filters)
       );
     },
-    [filters, namespace, resourceMap]
+    [filters, resourceMap]
   );
 
   function shouldSectionBeVisible(section: NavigatorSection) {
@@ -153,10 +128,7 @@ const ResourcesSection = (props: {
   function shouldSubsectionBeVisible(subsection: NavigatorSubSection) {
     return (
       activeResources.length === 0 ||
-      (activeResources.length > 0 &&
-        activeResources.some(
-          resource => resource.kind === subsection.kindSelector && filterByNamespace(resource, namespace)
-        ))
+      (activeResources.length > 0 && activeResources.some(resource => shouldResourceBeVisible(resource, subsection)))
     );
   }
 
@@ -207,15 +179,9 @@ const ResourcesSection = (props: {
         {appConfig.navigators.map(navigator => {
           return (
             <div key={navigator.name}>
-              <SectionRow>
-                <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
-              </SectionRow>
-              <SectionRow>
-                {navigator.name === 'K8s Resources' && (
-                  <NamespacesSection namespace={namespace} namespaces={namespaces} onSelect={handleNamespaceChange} />
-                )}
-              </SectionRow>
-              <SectionRow>
+              <MonoSectionTitle>{navigator.name}</MonoSectionTitle>
+
+              <SectionRow style={{marginTop: -20}}>
                 <SectionCol>
                   {navigator.sections
                     .filter(section => shouldSectionBeVisible(section))
