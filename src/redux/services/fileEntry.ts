@@ -191,11 +191,27 @@ export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapT
 }
 
 /**
- * Returns the absolute path to the file that containing specified resource
+ * Returns the absolute path to the specified FileEntry
  */
 
 export function getAbsoluteFileEntryPath(fileEntry: FileEntry, fileMap: FileMapType) {
   return path.join(fileMap[ROOT_FILE_ENTRY].filePath, fileEntry.filePath);
+}
+
+/**
+ * Returns the absolute path to the specified HelmChart
+ */
+
+export function getAbsoluteHelmChartPath(helmChart: HelmChart, fileMap: FileMapType) {
+  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, helmChart.filePath);
+}
+
+/**
+ * Returns the absolute path to the specified Helm Values File
+ */
+
+export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMap: FileMapType) {
+  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, helmValuesFile.filePath);
 }
 
 /**
