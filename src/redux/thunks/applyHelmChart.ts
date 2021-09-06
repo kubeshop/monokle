@@ -88,5 +88,7 @@ export async function applyHelmChart(
   } catch (e) {
     log.error('Failed to install Helm Chart');
     log.error(e);
+
+    dispatch(setApplyingResource(false));
   }
 }
