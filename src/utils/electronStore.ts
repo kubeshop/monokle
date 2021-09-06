@@ -50,6 +50,68 @@ const schema = {
       },
     },
   },
+  ui: {
+    type: 'object',
+    properties: {
+      isSettingsOpen: {
+        type: 'boolean',
+      },
+      isNewResourceWizardOpen: {
+        type: 'boolean',
+      },
+      isFolderLoading: {
+        type: 'boolean',
+      },
+      leftMenu: {
+        type: 'object',
+        properties: {
+          selection: {
+            type: 'string',
+          },
+          isActive: {
+            type: 'boolean',
+          },
+        },
+      },
+      rightMenu: {
+        type: 'object',
+        properties: {
+          selection: {
+            type: 'string',
+          },
+          isActive: {
+            type: 'boolean',
+          },
+        },
+      },
+      paneConfiguration: {
+        type: 'object',
+        properties: {
+          leftWidth: {
+            type: 'number',
+          },
+          navWidth: {
+            type: 'number',
+          },
+          editWidth: {
+            type: 'number',
+          },
+          rightWidth: {
+            type: 'number',
+          },
+          separatorEditRightXPosition: {
+            type: 'number',
+          },
+          separatorLeftNavXPosition: {
+            type: 'number',
+          },
+          separatorNavEditXPosition: {
+            type: 'number',
+          },
+        },
+      },
+    },
+  },
 };
 
 const defaults = {
@@ -65,6 +127,27 @@ const defaults = {
       loadLastFolderOnStartup: true,
     },
     recentFolders: [],
+  },
+  ui: {
+    isSettingsOpen: false,
+    isNewResourceWizardOpen: false,
+    leftMenu: {
+      selection: 'file-explorer',
+      isActive: true,
+    },
+    rightMenu: {
+      selection: null,
+      isActive: false,
+    },
+    paneConfiguration: {
+      leftWidth: 0.3333,
+      navWidth: 0.3333,
+      editWidth: 0.3333,
+      rightWidth: 0,
+      separatorEditRightXPosition: null,
+      separatorLeftNavXPosition: null,
+      separatorNavEditXPosition: null,
+    },
   },
 };
 

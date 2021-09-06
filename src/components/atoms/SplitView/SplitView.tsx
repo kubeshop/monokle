@@ -1,6 +1,16 @@
 import React, {useState, useLayoutEffect, MouseEvent, TouchEvent, ReactElement, FunctionComponent} from 'react';
 import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
+import {useAppSelector, useAppDispatch} from '@redux/hooks';
+import {
+  updateLeftWidth,
+  updateNavWidth,
+  updateEditWidth,
+  updateRightWidth,
+  updateSeparatorLeftNavXPosition,
+  updateSeparatorNavEditXPosition,
+  updateSeparatorEditRightXPosition,
+} from '@redux/reducers/ui';
 
 const MIN_WIDTH = 150;
 const SEPARATOR_WIDTH = 5; // width including hitbox
@@ -74,10 +84,12 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   const splitPaneWidth = viewWidth - numSeparatorsActive * SEPARATOR_WIDTH;
 
   // pane widths
-  const [leftWidth, setLeftWidth] = useState<number>(0.3333);
-  const [navWidth, setNavWidth] = useState<number>(0.3333);
-  const [editWidth, setEditWidth] = useState<number>(0.3333);
-  const [rightWidth, setRightWidth] = useState<number>(0);
+  const [leftWidth, setLeftWidth] = useState<number>(useAppSelector(state => state.ui.paneConfiguration.leftWidth));
+  const [navWidth, setNavWidth] = useState<number>(useAppSelector(state => state.ui.paneConfiguration.navWidth));
+  const [editWidth, setEditWidth] = useState<number>(useAppSelector(state => state.ui.paneConfiguration.editWidth));
+  const [rightWidth, setRightWidth] = useState<number>(useAppSelector(state => state.ui.paneConfiguration.rightWidth));
+
+  const dispatch = useAppDispatch();
 
   // detect pane changes
   if (leftHidden !== hideLeft || rightHidden !== hideRight) {
@@ -107,10 +119,18 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setRightWidth(sizeRight / viewWidth);
   }
 
-  // separator positions and drag status
-  const [separatorLeftNavXPosition, setSeparatorLeftNavXPosition] = useState<number>(splitPaneWidth * 0.25);
-  const [separatorNavEditXPosition, setSeparatorNavEditXPosition] = useState<number>(splitPaneWidth * 0.5);
-  const [separatorEditRightXPosition, setSeparatorEditRightXPosition] = useState<number>(splitPaneWidth * 0.75);
+  // separator positions
+  const [separatorLeftNavXPosition, setSeparatorLeftNavXPosition] = useState<number>(
+    useAppSelector(state => state.ui.paneConfiguration.separatorLeftNavXPosition) || splitPaneWidth * 0.25
+  );
+  const [separatorNavEditXPosition, setSeparatorNavEditXPosition] = useState<number>(
+    useAppSelector(state => state.ui.paneConfiguration.separatorNavEditXPosition) || splitPaneWidth * 0.5
+  );
+  const [separatorEditRightXPosition, setSeparatorEditRightXPosition] = useState<number>(
+    useAppSelector(state => state.ui.paneConfiguration.separatorEditRightXPosition) || splitPaneWidth * 0.75
+  );
+
+  // drag statuses
   const [draggingLeftNav, setDraggingLeftNav] = useState(false);
   const [draggingNavEdit, setDraggingNavEdit] = useState(false);
   const [draggingEditRight, setDraggingEditRight] = useState(false);
@@ -158,6 +178,13 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setDraggingLeftNav(false);
     setDraggingNavEdit(false);
     setDraggingEditRight(false);
+    dispatch(updateLeftWidth(leftWidth));
+    dispatch(updateNavWidth(navWidth));
+    dispatch(updateEditWidth(editWidth));
+    dispatch(updateRightWidth(rightWidth));
+    dispatch(updateSeparatorLeftNavXPosition(separatorLeftNavXPosition));
+    dispatch(updateSeparatorNavEditXPosition(separatorNavEditXPosition));
+    dispatch(updateSeparatorEditRightXPosition(separatorEditRightXPosition));
   };
 
   const onMove = (clientX: number) => {
