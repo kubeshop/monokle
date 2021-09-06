@@ -136,7 +136,7 @@ const defaults = {
       isActive: true,
     },
     rightMenu: {
-      selection: null,
+      selection: '',
       isActive: false,
     },
     paneConfiguration: {
@@ -144,9 +144,9 @@ const defaults = {
       navWidth: 0.3333,
       editWidth: 0.3333,
       rightWidth: 0,
-      separatorEditRightXPosition: null,
-      separatorLeftNavXPosition: null,
-      separatorNavEditXPosition: null,
+      separatorEditRightXPosition: 0,
+      separatorLeftNavXPosition: 0,
+      separatorNavEditXPosition: 0,
     },
   },
 };
