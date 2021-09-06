@@ -124,5 +124,7 @@ export async function applyResource(
   } catch (e) {
     log.error('Failed to apply resource');
     log.error(e);
+
+    dispatch(setApplyingResource(false));
   }
 }
