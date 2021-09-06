@@ -100,15 +100,24 @@ const initialLogsState: LogsState = {
 };
 
 const initialUiState: UiState = {
-  isSettingsOpen: false,
+  isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
   isFolderLoading: false,
-  isNewResourceWizardOpen: false,
+  isNewResourceWizardOpen: electronStore.get('ui.isNewResourceWizardOpen'),
   leftMenu: {
-    selection: 'file-explorer',
-    isActive: true,
+    selection: electronStore.get('ui.leftMenu.selection'),
+    isActive: electronStore.get('ui.leftMenu.isActive'),
   },
   rightMenu: {
-    isActive: false,
+    isActive: electronStore.get('ui.rightMenu.isActive'),
+  },
+  paneConfiguration: {
+    leftWidth: electronStore.get('ui.paneConfiguration.leftWidth'),
+    navWidth: electronStore.get('ui.paneConfiguration.navWidth'),
+    editWidth: electronStore.get('ui.paneConfiguration.editWidth'),
+    rightWidth: electronStore.get('ui.paneConfiguration.rightWidth'),
+    separatorEditRightXPosition: electronStore.get('ui.paneConfiguration.separatorEditRightXPosition'),
+    separatorLeftNavXPosition: electronStore.get('ui.paneConfiguration.separatorLeftNavXPosition'),
+    separatorNavEditXPosition: electronStore.get('ui.paneConfiguration.separatorNavEditXPosition'),
   },
 };
 
