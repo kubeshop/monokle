@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import {ResourceKindHandlers} from '@src/kindhandlers';
 import {useNamespaces} from '@hooks/useNamespaces';
 import Colors from '@styles/Colors';
-import KeyValueInput from '@components/KeyValueInput';
+import {KeyValueInput} from '@components/atoms';
 import {useAppSelector} from '@redux/hooks';
 
 const {Search} = Input;
