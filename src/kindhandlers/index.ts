@@ -73,7 +73,7 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
     }
     kindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
       if (resourceKinds.includes(outgoingRefMapper.target.kind)) {
-        dependentResourceKinds.push(outgoingRefMapper.target.kind);
+        dependentResourceKinds.push(kindHandler.kind);
       }
     });
   });
