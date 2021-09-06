@@ -1,50 +1,14 @@
 import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {UiState} from '@models/ui';
+import {PaneConfiguration, UiState} from '@models/ui';
 import initialState from '@redux/initialState';
 import electronStore from '@utils/electronStore';
 
-export const updateLeftWidth = createAsyncThunk('ui/updateLeftWidth', async (width: number, thunkAPI) => {
-  electronStore.set('ui.paneConfiguration.leftWidth', width);
-  thunkAPI.dispatch(uiSlice.actions.setLeftWidth(width));
-});
-
-export const updateNavWidth = createAsyncThunk('ui/updateNavWidth', async (width: number, thunkAPI) => {
-  electronStore.set('ui.paneConfiguration.navWidth', width);
-  thunkAPI.dispatch(uiSlice.actions.setNavWidth(width));
-});
-
-export const updateEditWidth = createAsyncThunk('ui/updateEditWidth', async (width: number, thunkAPI) => {
-  electronStore.set('ui.paneConfiguration.editWidth', width);
-  thunkAPI.dispatch(uiSlice.actions.setEditWidth(width));
-});
-
-export const updateRightWidth = createAsyncThunk('ui/updateRightWidth', async (width: number, thunkAPI) => {
-  electronStore.set('ui.paneConfiguration.rightWidth', width);
-  thunkAPI.dispatch(uiSlice.actions.setRightWidth(width));
-});
-
-export const updateSeparatorEditRightXPosition = createAsyncThunk(
-  'ui/updateSeparatorEditRightXPosition',
-  async (position: number, thunkAPI) => {
-    electronStore.set('ui.paneConfiguration.separatorEditRightXPosition', position);
-    thunkAPI.dispatch(uiSlice.actions.setSeparatorEditRightXPosition(position));
-  }
-);
-
-export const updateSeparatorLeftNavXPosition = createAsyncThunk(
-  'ui/updateseparatorLeftNavXPosition',
-  async (position: number, thunkAPI) => {
-    electronStore.set('ui.paneConfiguration.separatorLeftNavXPosition', position);
-    thunkAPI.dispatch(uiSlice.actions.setSeparatorLeftNavXPosition(position));
-  }
-);
-
-export const updateSeparatorNavEditXPosition = createAsyncThunk(
-  'ui/updateSeparatorNavEditXPosition',
-  async (position: number, thunkAPI) => {
-    electronStore.set('ui.paneConfiguration.separatorNavEditXPosition', position);
-    thunkAPI.dispatch(uiSlice.actions.setSeparatorNavEditXPosition(position));
+export const updatePaneConfiguration = createAsyncThunk(
+  'ui/updatePaneConfiguration',
+  async (configuration: PaneConfiguration, thunkAPI) => {
+    electronStore.set('ui.paneConfiguration', configuration);
+    thunkAPI.dispatch(uiSlice.actions.setPaneConfiguration(configuration));
   }
 );
 
@@ -80,26 +44,8 @@ export const uiSlice = createSlice({
       state.isNewResourceWizardOpen = false;
       electronStore.set('ui.isNewResourceWizardOpen', state.isNewResourceWizardOpen);
     },
-    setLeftWidth(state: Draft<UiState>, action: PayloadAction<number>) {
-      state.paneConfiguration.leftWidth = action.payload;
-    },
-    setNavWidth(state: Draft<UiState>, action: PayloadAction<number>) {
-      state.paneConfiguration.navWidth = action.payload;
-    },
-    setEditWidth(state: Draft<UiState>, action: PayloadAction<number>) {
-      state.paneConfiguration.editWidth = action.payload;
-    },
-    setRightWidth(state: Draft<UiState>, action: PayloadAction<number>) {
-      state.paneConfiguration.rightWidth = action.payload;
-    },
-    setSeparatorEditRightXPosition(state: Draft<UiState>, action: PayloadAction<number>) {
-      state.paneConfiguration.separatorEditRightXPosition = action.payload;
-    },
-    setSeparatorLeftNavXPosition(state: Draft<UiState>, action: PayloadAction<number>) {
-      state.paneConfiguration.separatorLeftNavXPosition = action.payload;
-    },
-    setSeparatorNavEditXPosition(state: Draft<UiState>, action: PayloadAction<number>) {
-      state.paneConfiguration.separatorNavEditXPosition = action.payload;
+    setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<PaneConfiguration>) {
+      state.paneConfiguration = action.payload;
     },
   },
   extraReducers: builder => {

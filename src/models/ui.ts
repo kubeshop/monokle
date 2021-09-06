@@ -10,13 +10,15 @@ export type UiState = {
     selection?: string;
     isActive: boolean;
   };
-  paneConfiguration: {
-    leftWidth: number;
-    navWidth: number;
-    rightWidth: number;
-    editWidth: number;
-    separatorEditRightXPosition?: number;
-    separatorLeftNavXPosition?: number;
-    separatorNavEditXPosition?: number;
-  };
+  paneConfiguration: PaneConfiguration;
+};
+
+export type PaneConfiguration = {
+  leftWidth: number;
+  navWidth: number;
+  rightWidth: number;
+  editWidth: number;
+  separatorEditRightXPosition?: number;
+  separatorLeftNavXPosition?: number;
+  separatorNavEditXPosition?: number;
 };

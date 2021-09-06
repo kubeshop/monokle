@@ -110,15 +110,7 @@ const initialUiState: UiState = {
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),
   },
-  paneConfiguration: {
-    leftWidth: electronStore.get('ui.paneConfiguration.leftWidth'),
-    navWidth: electronStore.get('ui.paneConfiguration.navWidth'),
-    editWidth: electronStore.get('ui.paneConfiguration.editWidth'),
-    rightWidth: electronStore.get('ui.paneConfiguration.rightWidth'),
-    separatorEditRightXPosition: electronStore.get('ui.paneConfiguration.separatorEditRightXPosition'),
-    separatorLeftNavXPosition: electronStore.get('ui.paneConfiguration.separatorLeftNavXPosition'),
-    separatorNavEditXPosition: electronStore.get('ui.paneConfiguration.separatorNavEditXPosition'),
-  },
+  paneConfiguration: electronStore.get('ui.paneConfiguration'),
 };
 
 export default {

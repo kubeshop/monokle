@@ -2,15 +2,7 @@ import React, {useState, useLayoutEffect, MouseEvent, TouchEvent, ReactElement, 
 import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {
-  updateLeftWidth,
-  updateNavWidth,
-  updateEditWidth,
-  updateRightWidth,
-  updateSeparatorLeftNavXPosition,
-  updateSeparatorNavEditXPosition,
-  updateSeparatorEditRightXPosition,
-} from '@redux/reducers/ui';
+import {updatePaneConfiguration} from '@redux/reducers/ui';
 
 const MIN_WIDTH = 150;
 const SEPARATOR_WIDTH = 5; // width including hitbox
@@ -178,13 +170,17 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setDraggingLeftNav(false);
     setDraggingNavEdit(false);
     setDraggingEditRight(false);
-    dispatch(updateLeftWidth(leftWidth));
-    dispatch(updateNavWidth(navWidth));
-    dispatch(updateEditWidth(editWidth));
-    dispatch(updateRightWidth(rightWidth));
-    dispatch(updateSeparatorLeftNavXPosition(separatorLeftNavXPosition));
-    dispatch(updateSeparatorNavEditXPosition(separatorNavEditXPosition));
-    dispatch(updateSeparatorEditRightXPosition(separatorEditRightXPosition));
+    dispatch(
+      updatePaneConfiguration({
+        leftWidth,
+        navWidth,
+        editWidth,
+        rightWidth,
+        separatorEditRightXPosition,
+        separatorLeftNavXPosition,
+        separatorNavEditXPosition,
+      })
+    );
   };
 
   const onMove = (clientX: number) => {
