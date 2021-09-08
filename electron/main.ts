@@ -11,6 +11,7 @@ import {hideBin} from 'yargs/helpers';
 import {checkMissingDependencies} from '../src/utils/index';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 import terminal from '../cli/terminal';
+import {createMenu} from './menu';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -40,7 +41,7 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
     });
 
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
-  } catch (e) {
+  } catch (e: any) {
     event.sender.send('kustomize-result', {error: e.toString()});
   }
 });
@@ -68,7 +69,7 @@ ipcMain.on('run-helm', (event, args: any) => {
     });
 
     event.sender.send('helm-result', {stdout: stdout.toString()});
-  } catch (e) {
+  } catch (e: any) {
     event.sender.send('helm-result', {error: e.toString()});
   }
 });
@@ -152,6 +153,8 @@ const openApplication = async (givenPath?: string) => {
 
   ElectronStore.initRenderer();
   const win = createWindow();
+
+  createMenu(win);
 
   const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 
