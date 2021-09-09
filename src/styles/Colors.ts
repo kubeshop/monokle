@@ -15,8 +15,11 @@ enum Colors {
   // Notifications
   greenOkay = '#09b89d',
   greenOkayCompliment = '#B2DFD3',
+
   yellowWarning = '#ffe17f',
   yellowWarningCompliment = '#FFF3CA',
+  yellow7 = '#E8D639',
+
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
 

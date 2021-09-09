@@ -6,10 +6,10 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useEffect, useState} from 'react';
 import {stringify} from 'yaml';
 
-import {KUBESHOP_MONACO_DIFF_THEME} from '@utils/monaco';
+import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import Colors from '@styles/Colors';
-import {applyWithConfirm} from '@organisms/ActionsPane/ActionsPane';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {K8sResource} from '@models/k8sresource';
 
@@ -38,6 +38,15 @@ const LeftButton = styled(Button)`
 
 const MonacoDiffContainer = styled.div`
   padding: 8px;
+  & .monaco-editor .monaco-editor-background {
+    background-color: ${Colors.grey1000} !important;
+  }
+  & .monaco-editor .margin {
+    background-color: ${Colors.grey1000} !important;
+  }
+  & .diffOverview {
+    background-color: ${Colors.grey1000} !important;
+  }
 `;
 
 const DiffModal = () => {
@@ -48,6 +57,7 @@ const DiffModal = () => {
   const diffResourceId = useAppSelector(state => state.main.diffResourceId);
   const [diffResource, setDiffResource] = useState<K8sResource>();
   const [resourceContent, setResourceContent] = useState<string>();
+  const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const [isVisible, setVisible] = useState(false);
@@ -69,13 +79,17 @@ const DiffModal = () => {
     }
 
     setVisible(Boolean(performResourceDiff) && Boolean(resourceMap) && Boolean(diffContent));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diffContent]);
 
   const handleApply = () => {
     if (diffResourceId) {
       const resource = resourceMap[diffResourceId];
       if (resource) {
-        applyWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig);
+        applyResourceWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig, {
+          isClusterPreview: previewType === 'cluster',
+          shouldPerformDiff: true,
+        });
       }
     }
   };
@@ -115,7 +129,7 @@ const DiffModal = () => {
           original={resourceContent}
           value={diffContent}
           options={options}
-          theme={KUBESHOP_MONACO_DIFF_THEME}
+          theme={KUBESHOP_MONACO_THEME}
         />
       </MonacoDiffContainer>
     </StyledModal>

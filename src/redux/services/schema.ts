@@ -2,12 +2,11 @@ import {K8sResource} from '@models/k8sresource';
 import log from 'loglevel';
 import {loadResource} from '@redux/services';
 import {isKustomizationResource} from '@redux/services/kustomize';
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 const k8sSchema = JSON.parse(loadResource('schemas/k8sschemas.json'));
 const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
-
-// search for schema kinds with these prefixes
-const kindPrefixes = ['io.k8s.api.apps.v1', 'io.k8s.api.rbac.v1', 'io.k8s.api.core.v1'];
+const schemaCache = new Map<string, any>();
 
 /**
  * Returns a JSON Schema for the specified resource kind
@@ -17,23 +16,33 @@ export function getResourceSchema(resource: K8sResource) {
     return kustomizeSchema;
   }
 
-  let prefix = kindPrefixes.find(p => k8sSchema['definitions'][`${p}.${resource.kind}`]);
+  const resourceKindHandler = getResourceKindHandler(resource.kind);
+  const prefix = resourceKindHandler?.validationSchemaPrefix;
+
   if (prefix) {
-    const kindSchema = k8sSchema['definitions'][`${prefix}.${resource.kind}`];
+    const schemaKey = `${prefix}.${resource.kind}`;
+    if (!schemaCache.has(schemaKey)) {
+      const kindSchema = k8sSchema['definitions'][schemaKey];
+      if (kindSchema) {
+        Object.keys(k8sSchema).forEach(key => {
+          if (key !== 'definitions') {
+            delete k8sSchema[key];
+          }
+        });
 
-    Object.keys(k8sSchema).forEach(key => {
-      if (key !== 'definitions') {
-        delete k8sSchema[key];
+        Object.keys(kindSchema).forEach(key => {
+          k8sSchema[key] = JSON.parse(JSON.stringify(kindSchema[key]));
+        });
+
+        schemaCache.set(schemaKey, JSON.parse(JSON.stringify(k8sSchema)));
       }
-    });
+    }
 
-    Object.keys(kindSchema).forEach(key => {
-      k8sSchema[key] = JSON.parse(JSON.stringify(kindSchema[key]));
-    });
-
-    return k8sSchema;
+    if (schemaCache.has(schemaKey)) {
+      return schemaCache.get(schemaKey);
+    }
   }
 
-  log.error(`Failed to find schema for resource of kind ${resource.kind}`);
+  log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
   return undefined;
 }

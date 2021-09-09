@@ -38,6 +38,65 @@ function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
 }
 
 /**
+ * Checks if the specified files are a Helm Chart folder
+ */
+
+function isHelmChartFolder(files: string[]) {
+  return files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1;
+}
+
+/**
+ * Processes the specified folder as containing a Helm Chart
+ */
+
+function processHelmChartFolder(
+  folder: string,
+  rootFolder: string,
+  files: string[],
+  appConfig: AppConfig,
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType,
+  helmChartMap: HelmChartMapType,
+  helmValuesMap: HelmValuesMapType,
+  result: string[]
+) {
+  const helmChart: HelmChart = {
+    id: uuidv4(),
+    filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
+    name: folder.substr(folder.lastIndexOf(path.sep) + 1),
+    valueFileIds: [],
+  };
+
+  files.forEach(file => {
+    const filePath = path.join(folder, file);
+    const fileEntryPath = filePath.substr(rootFolder.length);
+    const fileEntry = createFileEntry(fileEntryPath);
+
+    if (fileIsExcluded(appConfig, fileEntry)) {
+      fileEntry.isExcluded = true;
+    } else if (fs.statSync(filePath).isDirectory()) {
+      fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+    } else if (micromatch.isMatch(file, '*values*.yaml')) {
+      const helmValues: HelmValuesFile = {
+        id: uuidv4(),
+        filePath: fileEntryPath,
+        name: file,
+        isSelected: false,
+        helmChartId: helmChart.id,
+      };
+
+      helmValuesMap[helmValues.id] = helmValues;
+      helmChart.valueFileIds.push(helmValues.id);
+    }
+
+    fileMap[fileEntry.filePath] = fileEntry;
+    result.push(fileEntry.name);
+  });
+
+  helmChartMap[helmChart.id] = helmChart;
+}
+
+/**
  * Recursively reads the provided folder in line with the provided appConfig and populates the
  * provided maps with found files and resources.
  *
@@ -63,41 +122,18 @@ export function readFiles(
   const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
 
   // is this a helm chart folder?
-  if (files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1) {
-    const helmChart: HelmChart = {
-      id: uuidv4(),
-      filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
-      name: folder.substr(folder.lastIndexOf(path.sep) + 1),
-      valueFileIds: [],
-    };
-
-    files.forEach(file => {
-      const filePath = path.join(folder, file);
-      const fileEntryPath = filePath.substr(rootFolder.length);
-      const fileEntry = createFileEntry(fileEntryPath);
-
-      if (fileIsExcluded(appConfig, fileEntry)) {
-        fileEntry.isExcluded = true;
-      } else if (fs.statSync(filePath).isDirectory()) {
-        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
-      } else if (micromatch.isMatch(file, '*values*.yaml')) {
-        const helmValues: HelmValuesFile = {
-          id: uuidv4(),
-          filePath: fileEntryPath,
-          name: file,
-          isSelected: false,
-          helmChartId: helmChart.id,
-        };
-
-        helmValuesMap[helmValues.id] = helmValues;
-        helmChart.valueFileIds.push(helmValues.id);
-      }
-
-      fileMap[fileEntry.filePath] = fileEntry;
-      result.push(fileEntry.name);
-    });
-
-    helmChartMap[helmChart.id] = helmChart;
+  if (isHelmChartFolder(files)) {
+    processHelmChartFolder(
+      folder,
+      rootFolder,
+      files,
+      appConfig,
+      resourceMap,
+      fileMap,
+      helmChartMap,
+      helmValuesMap,
+      result
+    );
   } else {
     files.forEach(file => {
       const filePath = path.join(folder, file);
@@ -155,11 +191,27 @@ export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapT
 }
 
 /**
- * Returns the absolute path to the file that containing specified resource
+ * Returns the absolute path to the specified FileEntry
  */
 
 export function getAbsoluteFileEntryPath(fileEntry: FileEntry, fileMap: FileMapType) {
   return path.join(fileMap[ROOT_FILE_ENTRY].filePath, fileEntry.filePath);
+}
+
+/**
+ * Returns the absolute path to the specified HelmChart
+ */
+
+export function getAbsoluteHelmChartPath(helmChart: HelmChart, fileMap: FileMapType) {
+  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, helmChart.filePath);
+}
+
+/**
+ * Returns the absolute path to the specified Helm Values File
+ */
+
+export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMap: FileMapType) {
+  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, helmValuesFile.filePath);
 }
 
 /**

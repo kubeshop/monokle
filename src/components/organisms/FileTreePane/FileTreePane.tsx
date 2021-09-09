@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect, useRef, useContext} from 'react';
+import {useEffect, useContext} from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
@@ -14,7 +14,6 @@ import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
-import fs from 'fs';
 import {stopPreview} from '@redux/services/preview';
 import {getResourcesForPath, getChildFilePath} from '@redux/services/fileEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
@@ -24,6 +23,9 @@ import {uniqueArr} from '@utils/index';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {ipcRenderer} from 'electron';
+import FileExplorer from '@atoms/FileExplorer';
+import {useFileExplorer} from '@hooks/useFileExplorer';
+import fs from 'fs';
 
 interface TreeNode {
   key: string;
@@ -85,39 +87,6 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
 
   return node;
 };
-
-// algorithm to find common root folder for selected files - since the first entry is not
-// necessarily the selected folder
-// eslint-disable-next-line no-undef
-function findRootFolder(files: FileList) {
-  let root: any = files[0];
-  let topIndex = -1;
-
-  for (let i = 1; i < files.length; i += 1) {
-    let rootSegments = root.path.split(path.sep);
-    // @ts-ignore
-    let fileSegments = files[i].path.split(path.sep);
-
-    let ix = 0;
-    while (ix < rootSegments.length && ix < fileSegments.length && rootSegments[ix] === fileSegments[ix]) {
-      ix += 1;
-    }
-
-    if (topIndex === -1 || ix < topIndex) {
-      topIndex = ix;
-      root = files[i];
-    }
-  }
-
-  let result = topIndex !== -1 ? root.path.split(path.sep).slice(0, topIndex).join(path.sep) : root.path;
-
-  // in some cases only a file is returned..
-  if (fs.statSync(result).isFile()) {
-    result = path.parse(result).dir;
-  }
-
-  return result;
-}
 
 const FileTreeContainer = styled.div`
   background: ${BackgroundColors.darkThemeBackground};
@@ -249,6 +218,8 @@ const FileTreePane = () => {
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
+  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
+  const recentFolders = useAppSelector(state => state.config.recentFolders);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
@@ -256,17 +227,16 @@ const FileTreePane = () => {
   const shouldExpandAllNodes = React.useRef(false);
   const treeRef = React.useRef<any>();
 
-  // eslint-disable-next-line no-undef
-  const folderInput = useRef<HTMLInputElement>(null);
-
-  function onUploadHandler(e: React.SyntheticEvent) {
-    e.preventDefault();
-    if (folderInput.current?.files && folderInput.current.files.length > 0) {
-      setFolder(findRootFolder(folderInput.current.files));
-    }
-    shouldExpandAllNodes.current = true;
-    setAutoExpandParent(true);
-  }
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (folderPath) {
+        setFolder(folderPath);
+      }
+      shouldExpandAllNodes.current = true;
+      setAutoExpandParent(true);
+    },
+    {isDirectoryExplorer: true}
+  );
 
   const setFolder = (folder: string) => {
     dispatch(setRootFolder(folder));
@@ -286,7 +256,7 @@ const FileTreePane = () => {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
       shouldExpandAllNodes.current = false;
     }
-  }, [fileMap]);
+  }, [resourceMap, fileMap]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
@@ -327,18 +297,16 @@ const FileTreePane = () => {
         highlightFilePath(filePath);
       }
     }
-  }, [selectedResourceId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedResourceId, tree]);
 
   useEffect(() => {
     // removes any highlight when a file is selected
     if (selectedPath && highlightNode) {
       highlightNode.highlight = false;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPath]);
-
-  const startFileUploader = () => {
-    folderInput && folderInput.current?.click();
-  };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
     if (info.node.key) {
@@ -354,16 +322,23 @@ const FileTreePane = () => {
     if (isSelectingFile) {
       dispatch(setSelectingFile(false));
     }
-  }, [isSelectingFile]);
+  }, [isSelectingFile, dispatch]);
 
   const onExpand = (expandedKeysValue: React.Key[]) => {
     setExpandedKeys(expandedKeysValue);
     setAutoExpandParent(false);
   };
 
-  ipcRenderer.on('executed-from', (_, data) => {
-    setFolder(data.path);
-  });
+  useEffect(() => {
+    ipcRenderer.on('executed-from', (_, data) => {
+      const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
+      if (folder && fs.statSync(folder)?.isDirectory()) {
+        setFolder(folder);
+        shouldExpandAllNodes.current = true;
+        setAutoExpandParent(true);
+      }
+    });
+  }, [loadLastFolderOnStartup, recentFolders]);
 
   return (
     <FileTreeContainer>
@@ -379,7 +354,7 @@ const FileTreePane = () => {
                     size="small"
                     type="primary"
                     ghost
-                    onClick={startFileUploader}
+                    onClick={openFileExplorer}
                   >
                     Browse
                   </BrowseButton>
@@ -398,15 +373,7 @@ const FileTreePane = () => {
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
-        <input
-          type="file"
-          /* @ts-expect-error */
-          directory=""
-          webkitdirectory=""
-          onChange={onUploadHandler}
-          ref={folderInput}
-          style={{display: 'none'}}
-        />
+        <FileExplorer {...fileExplorerProps} />
       </Row>
 
       {uiState.isFolderLoading ? (

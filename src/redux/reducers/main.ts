@@ -7,12 +7,14 @@ import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapT
 import {parseDocument} from 'yaml';
 import fs from 'fs';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
-import {previewCluster} from '@redux/thunks/previewCluster';
+import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
+import {K8sResource} from '@models/k8sresource';
 import {AlertType} from '@models/alert';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -23,8 +25,15 @@ import {
   getFileEntryForAbsolutePath,
   getResourcesForPath,
   reloadFile,
+  createFileEntry,
 } from '../services/fileEntry';
-import {extractK8sResources, recalculateResourceRanges, reprocessResources, saveResource} from '../services/resource';
+import {
+  extractK8sResources,
+  isFileResource,
+  recalculateResourceRanges,
+  reprocessResources,
+  saveResource,
+} from '../services/resource';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -84,6 +93,10 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
   reducers: {
+    addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      const resource = action.payload;
+      state.resourceMap[resource.id] = resource;
+    },
     /**
      * called by the file monitor when a path is added to the file system
      */
@@ -170,10 +183,15 @@ export const mainSlice = createSlice({
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          const value = saveResource(resource, action.payload.content, state.fileMap);
-          resource.text = value;
-          resource.content = parseDocument(value).toJS();
-          recalculateResourceRanges(resource, state);
+          if (isFileResource(resource)) {
+            const updatedFileText = saveResource(resource, action.payload.content, state.fileMap);
+            resource.text = updatedFileText;
+            resource.content = parseDocument(updatedFileText).toJS();
+            recalculateResourceRanges(resource, state);
+          } else {
+            resource.text = action.payload.content;
+            resource.content = parseDocument(action.payload.content).toJS();
+          }
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
           resource.isSelected = false;
           updateSelectionAndHighlights(state, resource);
@@ -231,6 +249,10 @@ export const mainSlice = createSlice({
     clearPreview: (state: Draft<AppState>) => {
       setPreviewData({}, state);
       state.previewType = undefined;
+    },
+    clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+      setPreviewData({}, state);
+      state.previewType = undefined;
       state.currentSelectionHistoryIndex = undefined;
       state.selectionHistory = [];
     },
@@ -285,6 +307,25 @@ export const mainSlice = createSlice({
         state.previewType = undefined;
       });
 
+    builder
+      .addCase(repreviewCluster.fulfilled, (state, action) => {
+        setPreviewData(action.payload, state);
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
+        let resource = null;
+        if (action && action.payload && action.payload.previewResources && state && state.selectedResourceId) {
+          resource = action.payload.previewResources[state.selectedResourceId];
+        }
+        if (resource) {
+          updateSelectionAndHighlights(state, resource);
+        }
+      })
+      .addCase(repreviewCluster.rejected, state => {
+        state.previewLoader.isLoading = false;
+        state.previewLoader.targetResourceId = undefined;
+        state.previewType = undefined;
+      });
+
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       state.resourceMap = action.payload.resourceMap;
       state.fileMap = action.payload.fileMap;
@@ -307,6 +348,23 @@ export const mainSlice = createSlice({
     builder.addCase(selectFromHistory.fulfilled, (state, action) => {
       state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
       state.selectionHistory = action.payload.newSelectionHistory;
+    });
+
+    builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
+      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+      const resource = state.resourceMap[action.payload.resourceId];
+      const relativeFilePath = action.payload.resourceFilePath.substr(rootFolder.length);
+      const resourceFileEntry = state.fileMap[relativeFilePath];
+      if (resource) {
+        resource.filePath = relativeFilePath;
+      }
+      if (resourceFileEntry) {
+        resourceFileEntry.timestamp = action.payload.fileTimestamp;
+      } else {
+        const newFileEntry = createFileEntry(relativeFilePath);
+        newFileEntry.timestamp = action.payload.fileTimestamp;
+        state.fileMap[relativeFilePath] = newFileEntry;
+      }
     });
   },
 });
@@ -379,6 +437,7 @@ function selectFilePath(filePath: string, state: AppState) {
 }
 
 export const {
+  addResource,
   selectK8sResource,
   selectFile,
   setSelectingFile,
@@ -390,6 +449,7 @@ export const {
   pathRemoved,
   selectHelmValuesFile,
   clearPreview,
+  clearPreviewAndSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
 } = mainSlice.actions;

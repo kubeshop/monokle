@@ -12,6 +12,7 @@ import {selectK8sResource} from '@redux/reducers/main';
 import {ResourceRef, K8sResource, ResourceValidationError} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
 import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {isUnsavedResource} from '@redux/services/resource';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 
 const {Text} = Typography;
@@ -78,6 +79,14 @@ const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
       return `color: ${Colors.cyan7}`;
     }
     return `color: ${Colors.blue10}`;
+  }}
+`;
+
+const StyledLabel = styled.span<{isSelected: boolean; isUnsaved: boolean}>`
+  ${props => {
+    if (props.isUnsaved && !props.isSelected) {
+      return `color: ${Colors.yellow7}`;
+    }
   }}
 `;
 
@@ -239,7 +248,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [isHighlighted, selectedPath]);
+  }, [isHighlighted, selectedPath, isScrolledIntoView]);
 
   // on mount, if this resource is selected, scroll to it (the subsection expanded and rendered this)
   useEffect(() => {
@@ -248,6 +257,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -256,7 +266,11 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
       // @ts-ignore
       scrollContainer.current?.scrollIntoView();
     }
-  }, [isSelected, selectedResourceId]);
+  }, [isSelected, selectedResourceId, isScrolledIntoView]);
+
+  const isUnsaved = useCallback(() => {
+    return Boolean(resource && isUnsavedResource(resource));
+  }, [resource]);
 
   const selectResource = (resId: string) => {
     dispatch(selectK8sResource({resourceId: resId}));
@@ -294,7 +308,10 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
         style={!hasIncomingRefs ? {marginLeft: 19} : {}}
       >
         <ScrollIntoView ref={scrollContainer}>
-          <span ref={labelRef}>{label}</span>
+          <StyledLabel isSelected={isSelected} isUnsaved={isUnsaved()} ref={labelRef}>
+            {label}
+            {isUnsaved() && <span>*</span>}
+          </StyledLabel>
         </ScrollIntoView>
       </StyledSpan>
       {resource && resource.refs && (hasOutgoingRefs || hasUnsatisfiedRefs) && (

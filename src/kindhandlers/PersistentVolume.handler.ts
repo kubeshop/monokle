@@ -7,6 +7,7 @@ const PersistentVolumeHandler: ResourceKindHandler = {
   apiVersionMatcher: '**',
   navigatorPath: [NAV_K8S_RESOURCES, SECTION_STORAGE, 'PersistentVolumes'],
   clusterApiVersion: 'v1',
+  validationSchemaPrefix: 'io.k8s.api.core.v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);

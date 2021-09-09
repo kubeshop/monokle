@@ -16,10 +16,15 @@ export enum Languages {
 }
 
 interface AppConfig {
-  scanExcludes: string[]; // a list of patterns to exclude when scanning the file system for resources
-  fileIncludes: string[]; // a list of patterns to match to against files for including
-  navigators: ObjectNavigator[]; // the currrent navigator configuration
+  /** a list of patterns to exclude when scanning the file system for resources */
+  scanExcludes: string[];
+  /** a list of patterns to match to against files for including */
+  fileIncludes: string[];
+  /** the currrent navigator configuration */
+  navigators: ObjectNavigator[];
+  /** absolute kubeconfig path */
   kubeconfigPath: string;
+  /** if the startup modal is visible */
   isStartupModalVisible: boolean;
   settings: {
     theme: Themes; // not used for now
@@ -28,7 +33,9 @@ interface AppConfig {
     filterObjectsOnSelection: boolean;
     autoZoomGraphOnSelection: boolean;
     helmPreviewMode: 'template' | 'install';
+    loadLastFolderOnStartup: boolean;
   };
+  recentFolders: string[];
 }
 
 export type {AppConfig};
