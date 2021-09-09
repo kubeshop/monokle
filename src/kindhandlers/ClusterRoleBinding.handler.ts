@@ -18,6 +18,10 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
     const response = await k8sRbacV1Api.listClusterRoleBinding();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string) {
+    const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
+    await k8sRbacV1Api.deleteClusterRoleBinding(name);
+  },
   outgoingRefMappers: [
     {
       source: {

@@ -380,13 +380,15 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
  * Removes the specified fileEntry and its resources from the provided state
  */
 
-function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
+export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect?: PathRemovalSideEffect) {
   log.info(`removing file ${fileEntry.filePath}`);
   getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(resource => {
     if (state.selectedResourceId === resource.id) {
       updateSelectionAndHighlights(state, resource);
     }
-    removalSideEffect.removedResources.push(resource);
+    if (removalSideEffect) {
+      removalSideEffect.removedResources.push(resource);
+    }
     delete state.resourceMap[resource.id];
   });
 }
@@ -395,7 +397,7 @@ function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect: Pa
  * Removes the specified fileEntry and its resources from the provided state
  */
 
-function removeFolder(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
+function removeFolder(fileEntry: FileEntry, state: AppState, removalSideEffect?: PathRemovalSideEffect) {
   log.info(`removing folder ${fileEntry.filePath}`);
   fileEntry.children?.forEach(child => {
     const childEntry = state.fileMap[path.join(fileEntry.filePath, child)];
