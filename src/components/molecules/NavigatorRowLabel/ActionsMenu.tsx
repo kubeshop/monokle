@@ -6,12 +6,15 @@ import {removeResource} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {isFileResource} from '@redux/services/resource';
+import {getResourcesForPath} from '@redux/services/fileEntry';
+import {PreviewType, ResourceMapType} from '@models/appstate';
 
-function deleteResourceWithConfirm(resource: K8sResource, dispatch: AppDispatch) {
+function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMapType, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;
 
   if (isFileResource(resource)) {
-    if (!resource.range) {
+    const resourcesFromPath = getResourcesForPath(resource.filePath, resourceMap);
+    if (resourcesFromPath.length === 1) {
       title = `This action will delete the ${resource.filePath} file.\n${title}`;
     }
   } else {
@@ -30,17 +33,22 @@ function deleteResourceWithConfirm(resource: K8sResource, dispatch: AppDispatch)
     onCancel() {},
   });
 }
-const ActionsMenu = (props: {resource: K8sResource}) => {
-  const {resource} = props;
+const ActionsMenu = (props: {
+  resource: K8sResource;
+  resourceMap: ResourceMapType;
+  isInPreviewMode: boolean;
+  previewType?: PreviewType;
+}) => {
+  const {resource, resourceMap, isInPreviewMode, previewType} = props;
   const dispatch = useAppDispatch();
 
   const deleteResource = () => {
-    deleteResourceWithConfirm(resource, dispatch);
+    deleteResourceWithConfirm(resource, resourceMap, dispatch);
   };
 
   return (
     <Menu>
-      <Menu.Item onClick={deleteResource} key="delete">
+      <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={deleteResource} key="delete">
         Delete
       </Menu.Item>
     </Menu>
