@@ -309,6 +309,9 @@ const FileTreePane = () => {
   }, [selectedPath]);
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
+    if (!['.yaml', '.yml'].includes(path.extname(info.node.key))) {
+      return;
+    }
     if (info.node.key) {
       if (isInPreviewMode) {
         stopPreview(dispatch);
