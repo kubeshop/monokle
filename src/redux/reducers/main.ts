@@ -5,6 +5,7 @@ import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {parseDocument} from 'yaml';
+import * as k8s from '@kubernetes/client-node';
 import fs from 'fs';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
@@ -16,6 +17,7 @@ import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {K8sResource} from '@models/k8sresource';
 import {AlertType} from '@models/alert';
+import {getResourceKindHandler} from '@src/kindhandlers';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
@@ -31,6 +33,7 @@ import {
   extractK8sResources,
   isFileResource,
   recalculateResourceRanges,
+  removeResourceFromFile,
   reprocessResources,
   saveResource,
 } from '../services/resource';
@@ -199,6 +202,31 @@ export const mainSlice = createSlice({
       } catch (e) {
         log.error(e);
         return original(state);
+      }
+    },
+    removeResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      const resourceId = action.payload;
+      const resource = state.resourceMap[resourceId];
+      if (!resource) {
+        return;
+      }
+      if (isFileResource(resource)) {
+        removeResourceFromFile(resource, state.fileMap, state.resourceMap);
+        return;
+      }
+      if (state.previewType === 'cluster' && state.previewResourceId) {
+        try {
+          const kubeConfig = new k8s.KubeConfig();
+          kubeConfig.loadFromFile(state.previewResourceId);
+          const kindHandler = getResourceKindHandler(resource.kind);
+          if (kindHandler?.deleteResourceInCluster) {
+            kindHandler.deleteResourceInCluster(kubeConfig, resource);
+            delete state.resourceMap[resource.id];
+          }
+        } catch (err) {
+          log.error(err);
+          return original(state);
+        }
       }
     },
     /**
@@ -452,5 +480,6 @@ export const {
   clearPreviewAndSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
+  removeResource,
 } = mainSlice.actions;
 export default mainSlice.reducer;

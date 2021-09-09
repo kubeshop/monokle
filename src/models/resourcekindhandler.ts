@@ -1,5 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 import {monaco} from 'react-monaco-editor';
+import {K8sResource} from './k8sresource';
 
 interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
@@ -52,6 +53,8 @@ interface ResourceKindHandler {
    */
 
   listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]>;
+
+  deleteResourceInCluster?: (kubeconfig: k8s.KubeConfig, resource: K8sResource) => Promise<any>;
 
   /**
    * optional outgoing RefMappers to use for resolving refs in resources of this type

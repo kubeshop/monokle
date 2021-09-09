@@ -1,6 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NAV_K8S_RESOURCES, SECTION_CONFIGURATION} from '@constants/navigator';
+import {K8sResource} from '@models/k8sresource';
 
 const ConfigMapHandler: ResourceKindHandler = {
   kind: 'ConfigMap',
@@ -17,6 +18,10 @@ const ConfigMapHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = await k8sCoreV1Api.listConfigMapForAllNamespaces();
     return response.body.items;
+  },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    await k8sCoreV1Api.deleteNamespacedConfigMap(resource.name, resource.namespace || 'default');
   },
 };
 
