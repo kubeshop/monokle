@@ -117,6 +117,7 @@
     "electron:build:ci": "npm run build && tsc -p electron",
     "eject": "react-scripts eject",
     "lint": "npm run lint:config && npm run lint:src ",
+    "stylelint": "stylelint  \"./src/**/*.tsx\"",
     "lint:config": "eslint .",
     "lint:src": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "lintfix": "eslint --fix \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
