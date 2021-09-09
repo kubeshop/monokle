@@ -228,6 +228,9 @@ export const mainSlice = createSlice({
           return original(state);
         }
       }
+      if (state.selectedResourceId === resourceId) {
+        clearResourceSelections(state.resourceMap);
+      }
     },
     /**
      * Marks the specified resource as selected and highlights all related resources
