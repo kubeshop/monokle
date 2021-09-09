@@ -423,17 +423,18 @@ export function removeResourceFromFile(
   }
   const absoluteFilePath = getAbsoluteResourcePath(removedResource, fileMap);
 
-  if (!removedResource.range) {
-    fs.unlinkSync(absoluteFilePath);
-    return;
-  }
-
   // get list of resourceIds in file sorted by startPosition
   const resourceIds = getResourcesForPath(removedResource.filePath, resourceMap)
     .sort((a, b) => {
       return a.range && b.range ? a.range.start - b.range.start : 0;
     })
     .map(r => r.id);
+
+  // delete the file if there's only one resource in it
+  if (!removedResource.range || resourceIds.length === 1) {
+    fs.unlinkSync(absoluteFilePath);
+    return;
+  }
 
   // recalculate ranges for resources below the removed resource
   let newRangeStart = 0;
