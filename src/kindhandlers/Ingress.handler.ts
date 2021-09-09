@@ -10,13 +10,17 @@ const IngressHandler: ResourceKindHandler = {
   validationSchemaPrefix: 'io.k8s.api.networking.v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
-    return k8sCoreV1Api.readNamespacedIngress(name, namespace);
+    const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+    return k8sNetworkingV1Api.readNamespacedIngress(name, namespace);
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     const response = await k8sNetworkingV1Api.listIngressForAllNamespaces();
     return response.body.items;
+  },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+    const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+    await k8sNetworkingV1Api.deleteNamespacedIngress(name, namespace || 'default');
   },
   outgoingRefMappers: [
     {

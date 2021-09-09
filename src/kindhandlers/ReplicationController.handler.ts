@@ -19,6 +19,10 @@ const ReplicationControllerHandler: ResourceKindHandler = {
     const response = await k8sCoreV1Api.listReplicationControllerForAllNamespaces();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    await k8sCoreV1Api.deleteNamespacedReplicationController(name, namespace || 'default');
+  },
   outgoingRefMappers: [...PodOutgoingRefMappers],
 };
 

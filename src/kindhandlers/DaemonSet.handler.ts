@@ -19,6 +19,10 @@ const DaemonSetHandler: ResourceKindHandler = {
     const response = await k8sAppV1Api.listDaemonSetForAllNamespaces();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+    const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    await k8sAppV1Api.deleteNamespacedDaemonSet(name, namespace || 'default');
+  },
   outgoingRefMappers: [...PodOutgoingRefMappers],
 };
 

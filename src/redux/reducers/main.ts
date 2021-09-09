@@ -220,7 +220,7 @@ export const mainSlice = createSlice({
           kubeConfig.loadFromFile(state.previewResourceId);
           const kindHandler = getResourceKindHandler(resource.kind);
           if (kindHandler?.deleteResourceInCluster) {
-            kindHandler.deleteResourceInCluster(kubeConfig, resource);
+            kindHandler.deleteResourceInCluster(kubeConfig, resource.name, resource.namespace);
             delete state.resourceMap[resource.id];
           }
         } catch (err) {

@@ -19,6 +19,10 @@ const StatefulSetHandler: ResourceKindHandler = {
     const response = await k8sAppV1Api.listStatefulSetForAllNamespaces();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+    const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    await k8sAppV1Api.deleteNamespacedStatefulSet(name, namespace || 'default');
+  },
   outgoingRefMappers: [...PodOutgoingRefMappers],
 };
 
