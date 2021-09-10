@@ -1,0 +1,38 @@
+{
+  "processors": ["stylelint-processor-styled-components"],
+  "extends": ["stylelint-config-standard", "stylelint-config-recommended", "stylelint-config-styled-components"],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["extends", "ignores"]
+      }
+    ],
+    "indentation": [2, {"baseIndentLevel": 2}],
+    "number-leading-zero": null,
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "no-empty-source": null,
+    "block-no-empty": null,
+    "declaration-block-no-duplicate-properties": null,
+    "color-no-invalid-hex": true,
+    "comment-no-empty": true,
+    "declaration-colon-newline-after": null,
+    "declaration-block-no-shorthand-property-overrides": true,
+    "font-family-no-duplicate-names": true,
+    "font-family-no-missing-generic-family-keyword": true,
+    "function-calc-no-unspaced-operator": true,
+    "function-linear-gradient-no-nonstandard-direction": true,
+    "keyframe-declaration-no-important": true,
+    "media-feature-name-no-unknown": true,
+    "no-duplicate-at-import-rules": true,
+    "no-extra-semicolons": true,
+    "no-invalid-double-slash-comments": true,
+    "property-no-unknown": true,
+    "selector-pseudo-class-no-unknown": true,
+    "selector-pseudo-element-no-unknown": true,
+    "selector-type-no-unknown": true,
+    "string-no-newline": true,
+    "unit-no-unknown": true
+  }
+}

@@ -8,13 +8,24 @@ import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 import {useNamespaces, NO_NAMESPACE} from '@hooks/useNamespaces';
 
+const SELECT_OPTION_NONE = '<none>';
+
 const NewResourceWizard = () => {
   const dispatch = useAppDispatch();
-  const isNewResourceWizardOpen = useAppSelector(state => state.ui.isNewResourceWizardOpen);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const namespaces = useNamespaces({extra: ['none', 'default']});
 
+  const defaultInput = newResourceWizardState.defaultInput;
+  const defaultValues = defaultInput
+    ? {
+        ...defaultInput,
+        namespace: defaultInput.namespace || SELECT_OPTION_NONE,
+        selectedResourceId: defaultInput.selectedResourceId || SELECT_OPTION_NONE,
+      }
+    : undefined;
   const [form] = Form.useForm();
-  useResetFormOnCloseModal({form, visible: isNewResourceWizardOpen});
+  useResetFormOnCloseModal({form, visible: newResourceWizardState.isOpen, defaultValues});
 
   const closeWizard = () => {
     dispatch(closeNewResourceWizard());
@@ -44,6 +55,12 @@ const NewResourceWizard = () => {
       return;
     }
 
+    const selectedResource =
+      data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE
+        ? resourceMap[data.selectedResourceId]
+        : undefined;
+    const jsonTemplate = selectedResource?.content;
+
     createUnsavedResource(
       {
         name: data.name,
@@ -51,14 +68,15 @@ const NewResourceWizard = () => {
         namespace: data.namespace === NO_NAMESPACE ? undefined : data.namespace,
         apiVersion: data.apiVersion,
       },
-      dispatch
+      dispatch,
+      jsonTemplate
     );
 
     closeWizard();
   };
 
   return (
-    <Modal title="Add New Resource" visible={isNewResourceWizardOpen} onOk={onOk} onCancel={onCancel}>
+    <Modal title="Add New Resource" visible={newResourceWizardState.isOpen} onOk={onOk} onCancel={onCancel}>
       <Form form={form} layout="vertical" onValuesChange={onFormValuesChange} onFinish={onFinish}>
         <Form.Item name="name" label="Name" required>
           <Input />
@@ -95,6 +113,22 @@ const NewResourceWizard = () => {
             {namespaces.map(namespace => (
               <Select.Option key={namespace} value={namespace}>
                 {namespace}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="selectedResourceId"
+          label="Select existing resource as template"
+          initialValue={SELECT_OPTION_NONE}
+        >
+          <Select showSearch>
+            <Select.Option key={SELECT_OPTION_NONE} value={SELECT_OPTION_NONE}>
+              {SELECT_OPTION_NONE}
+            </Select.Option>
+            {Object.values(resourceMap).map(resource => (
+              <Select.Option key={resource.id} value={resource.id}>
+                {resource.name}
               </Select.Option>
             ))}
           </Select>

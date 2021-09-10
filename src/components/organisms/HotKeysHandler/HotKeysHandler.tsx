@@ -139,7 +139,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.OPEN_NEW_RESOURCE_WIZARD,
     () => {
-      if (!uiState.isNewResourceWizardOpen && mainState.fileMap[ROOT_FILE_ENTRY]) {
+      if (!uiState.newResourceWizard.isOpen && mainState.fileMap[ROOT_FILE_ENTRY]) {
         dispatch(openNewResourceWizard());
       }
     },
