@@ -1,8 +1,10 @@
 import React, {useState, useEffect, useContext, useCallback} from 'react';
-import {Popover, Typography, Divider} from 'antd';
+import {Popover, Typography, Divider, Dropdown} from 'antd';
 import styled from 'styled-components';
+import {useSelector} from 'react-redux';
 import Colors, {FontColors} from '@styles/Colors';
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+import {MoreOutlined} from '@ant-design/icons';
 
 import AppContext from '@src/AppContext';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
@@ -14,6 +16,8 @@ import {ResourceMapType} from '@models/appstate';
 import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {isUnsavedResource} from '@redux/services/resource';
 import ScrollIntoView from '@molecules/ScrollIntoView';
+import {isInPreviewModeSelector} from '@redux/selectors';
+import ActionsMenu from './ActionsMenu';
 
 const {Text} = Typography;
 
@@ -67,6 +71,10 @@ const StyledIconsContainer = styled.span`
   display: flex;
   align-items: center;
   cursor: pointer;
+`;
+
+const StyledMenuToggle = styled.span`
+  margin-left: auto;
 `;
 
 const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
@@ -218,6 +226,9 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
   const [resource, setResource] = useState<K8sResource>();
   const scrollContainer = React.useRef(null);
   const labelRef = React.useRef<HTMLSpanElement>(null);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const previewType = useAppSelector(state => state.main.previewType);
+  const [isHovered, setHovered] = useState<boolean>(false);
 
   const {windowSize} = useContext(AppContext);
   const navigatorHeight = windowSize.height - NAVIGATOR_HEIGHT_OFFSET;
@@ -281,7 +292,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
   }
 
   return (
-    <StyledLabelContainer>
+    <StyledLabelContainer onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       {resource && resource.refs && hasIncomingRefs && (
         <Popover
           mouseEnterDelay={0.5}
@@ -349,6 +360,23 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
             <MonoIcon type={MonoIconTypes.Error} style={{marginLeft: 5, color: Colors.redError}} />
           </StyledIconsContainer>
         </Popover>
+      )}
+      {isHovered && (
+        <StyledMenuToggle>
+          <Dropdown
+            overlay={
+              <ActionsMenu
+                resource={resource}
+                resourceMap={resourceMap}
+                isInPreviewMode={isInPreviewMode}
+                previewType={previewType}
+              />
+            }
+            trigger={['click']}
+          >
+            <MoreOutlined />
+          </Dropdown>
+        </StyledMenuToggle>
       )}
     </StyledLabelContainer>
   );

@@ -18,6 +18,10 @@ const EndpointsHandler: ResourceKindHandler = {
     const response = await k8sCoreV1Api.listEndpointsForAllNamespaces();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    await k8sCoreV1Api.deleteNamespacedEndpoints(name, namespace || 'default');
+  },
   outgoingRefMappers: [
     {
       source: {

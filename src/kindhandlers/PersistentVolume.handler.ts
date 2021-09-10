@@ -18,6 +18,10 @@ const PersistentVolumeHandler: ResourceKindHandler = {
     const response = await k8sCoreV1Api.listPersistentVolume();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string) {
+    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    await k8sCoreV1Api.deletePersistentVolume(name);
+  },
   outgoingRefMappers: [
     {
       source: {

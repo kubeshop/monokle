@@ -18,6 +18,10 @@ const NetworkPolicyHandler: ResourceKindHandler = {
     const response = await k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+    const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+    await k8sNetworkingV1Api.deleteNamespacedNetworkPolicy(name, namespace || 'default');
+  },
 };
 
 export default NetworkPolicyHandler;

@@ -18,6 +18,10 @@ const PersistentVolumeClaimHandler: ResourceKindHandler = {
     const response = await k8sCoreV1Api.listPersistentVolumeClaimForAllNamespaces();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    await k8sCoreV1Api.deleteNamespacedPersistentVolumeClaim(name, namespace || 'default');
+  },
   outgoingRefMappers: [
     {
       source: {

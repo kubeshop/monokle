@@ -102,7 +102,9 @@ const initialLogsState: LogsState = {
 const initialUiState: UiState = {
   isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
   isFolderLoading: false,
-  isNewResourceWizardOpen: electronStore.get('ui.isNewResourceWizardOpen'),
+  newResourceWizard: {
+    isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
+  },
   leftMenu: {
     selection: electronStore.get('ui.leftMenu.selection'),
     isActive: electronStore.get('ui.leftMenu.isActive'),

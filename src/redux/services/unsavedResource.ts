@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import {parseDocument} from 'yaml';
+import {parseDocument, stringify} from 'yaml';
 import {UNSAVED_PREFIX} from '@constants/constants';
 import {AppDispatch} from '@redux/store';
 import {K8sResource} from '@models/k8sresource';
@@ -20,12 +20,30 @@ metadata:
  */
 export function createUnsavedResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
-  dispatch: AppDispatch
+  dispatch: AppDispatch,
+  jsonTemplate?: any
 ) {
-  // TODO: add logic to use a resource template
   const newResourceId = uuidv4();
-  const newResourceText = createDefaultResourceText(input);
-  const newResourceContent = parseDocument(newResourceText).toJS();
+  let newResourceText: string;
+  let newResourceContent: any;
+
+  if (jsonTemplate) {
+    newResourceContent = {
+      ...jsonTemplate,
+      apiVersion: input.apiVersion,
+      kind: input.kind,
+      metadata: {
+        ...(jsonTemplate.metadata || {}),
+        name: input.name,
+        namespace: input.namespace,
+      },
+    };
+    newResourceText = stringify(newResourceContent);
+  } else {
+    newResourceText = createDefaultResourceText(input);
+    newResourceContent = parseDocument(newResourceText).toJS();
+  }
+
   const newResource: K8sResource = {
     name: input.name,
     filePath: `${UNSAVED_PREFIX}${newResourceId}`,

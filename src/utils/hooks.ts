@@ -37,7 +37,15 @@ export function useWindowSize(): Size {
 }
 
 /**  reset antd form fields when modal is closed */
-export const useResetFormOnCloseModal = ({form, visible}: {form: FormInstance; visible: boolean}) => {
+export const useResetFormOnCloseModal = ({
+  form,
+  visible,
+  defaultValues,
+}: {
+  form: FormInstance;
+  visible: boolean;
+  defaultValues?: any;
+}) => {
   const prevVisibleRef = useRef<boolean>();
   useEffect(() => {
     prevVisibleRef.current = visible;
@@ -47,6 +55,9 @@ export const useResetFormOnCloseModal = ({form, visible}: {form: FormInstance; v
   useEffect(() => {
     if (!visible && prevVisible) {
       form.resetFields();
+    }
+    if (visible && !prevVisible && defaultValues) {
+      form.setFieldsValue(defaultValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);

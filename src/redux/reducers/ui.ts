@@ -1,6 +1,6 @@
 import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {PaneConfiguration, UiState} from '@models/ui';
+import {PaneConfiguration, UiState, NewResourceWizardInput} from '@models/ui';
 import initialState from '@redux/initialState';
 import electronStore from '@utils/electronStore';
 
@@ -36,16 +36,23 @@ export const uiSlice = createSlice({
       state.rightMenu.selection = action.payload;
       electronStore.set('ui.rightMenu.selection', state.rightMenu.selection);
     },
-    openNewResourceWizard: (state: Draft<UiState>) => {
-      state.isNewResourceWizardOpen = true;
-      electronStore.set('ui.isNewResourceWizardOpen', state.isNewResourceWizardOpen);
-    },
-    closeNewResourceWizard: (state: Draft<UiState>) => {
-      state.isNewResourceWizardOpen = false;
-      electronStore.set('ui.isNewResourceWizardOpen', state.isNewResourceWizardOpen);
-    },
     setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<PaneConfiguration>) {
       state.paneConfiguration = action.payload;
+    },
+    openNewResourceWizard: (
+      state: Draft<UiState>,
+      action: PayloadAction<{defaultInput?: NewResourceWizardInput} | undefined>
+    ) => {
+      state.newResourceWizard.isOpen = true;
+      electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
+      if (action.payload && action.payload.defaultInput) {
+        state.newResourceWizard.defaultInput = action.payload.defaultInput;
+      }
+    },
+    closeNewResourceWizard: (state: Draft<UiState>) => {
+      state.newResourceWizard.isOpen = false;
+      electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
+      state.newResourceWizard.defaultInput = undefined;
     },
   },
   extraReducers: builder => {

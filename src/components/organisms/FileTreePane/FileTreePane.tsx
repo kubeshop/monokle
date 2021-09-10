@@ -3,6 +3,7 @@ import {useEffect, useContext} from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
+import micromatch from 'micromatch';
 
 import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -220,6 +221,7 @@ const FileTreePane = () => {
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
   const recentFolders = useAppSelector(state => state.config.recentFolders);
+  const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
@@ -309,6 +311,9 @@ const FileTreePane = () => {
   }, [selectedPath]);
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
+    if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(info.node.key), fileInclude))) {
+      return;
+    }
     if (info.node.key) {
       if (isInPreviewMode) {
         stopPreview(dispatch);
