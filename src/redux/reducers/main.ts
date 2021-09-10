@@ -388,6 +388,7 @@ export const mainSlice = createSlice({
       const resourceFileEntry = state.fileMap[relativeFilePath];
       if (resource) {
         resource.filePath = relativeFilePath;
+        resource.range = action.payload.resourceRange;
       }
       if (resourceFileEntry) {
         resourceFileEntry.timestamp = action.payload.fileTimestamp;

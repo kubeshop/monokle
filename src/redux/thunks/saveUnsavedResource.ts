@@ -7,11 +7,14 @@ import {isUnsavedResource} from '@redux/services/resource';
 import {YAML_DOCUMENT_DELIMITER, ROOT_FILE_ENTRY} from '@constants/constants';
 import {AlertEnum, AlertType} from '@models/alert';
 import {isSubDirectory} from '@utils/files';
+import {getResourcesForPath} from '@redux/services/fileEntry';
+import {addResource} from '@redux/reducers/main';
 import {createPreviewRejection} from './utils';
 
 type SaveUnsavedResourcePayload = {
   resourceId: string;
   resourceFilePath: string;
+  resourceRange?: {start: number; length: number};
   fileTimestamp: number;
   alert: AlertType;
 };
@@ -36,6 +39,7 @@ export const saveUnsavedResource = createAsyncThunk<
   const mainState = thunkAPI.getState().main;
   const resource = mainState.resourceMap[resourceId];
   const rootFolder = mainState.fileMap[ROOT_FILE_ENTRY];
+  let resourceRange: {start: number; length: number} | undefined;
 
   if (!rootFolder) {
     return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'Could not find the root folder.');
@@ -67,7 +71,27 @@ export const saveUnsavedResource = createAsyncThunk<
   }
 
   if (fs.existsSync(absoluteFilePath)) {
+    const rootFileEntry = mainState.fileMap[ROOT_FILE_ENTRY];
+    if (!rootFileEntry) {
+      return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'Could not find the root folder.');
+    }
+
     const fileContent = await readFilePromise(absoluteFilePath, 'utf-8');
+    const relativeFilePath = absoluteFilePath.substr(mainState.fileMap[ROOT_FILE_ENTRY].filePath.length);
+    const resourcesFromFile = getResourcesForPath(relativeFilePath, mainState.resourceMap);
+
+    if (resourcesFromFile.length === 1) {
+      thunkAPI.dispatch(
+        addResource({
+          ...resourcesFromFile[0],
+          range: {
+            start: 0,
+            length: fileContent.length,
+          },
+        })
+      );
+    }
+
     let contentToAppend = resource.text;
     if (fileContent.trim().length > 0) {
       if (fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
@@ -76,6 +100,12 @@ export const saveUnsavedResource = createAsyncThunk<
         contentToAppend = `\n${YAML_DOCUMENT_DELIMITER}\n${resource.text}`;
       }
     }
+
+    resourceRange = {
+      start: fileContent.length,
+      length: contentToAppend.length,
+    };
+
     await appendFilePromise(absoluteFilePath, contentToAppend);
   } else {
     await writeFilePromise(absoluteFilePath, resource.text);
@@ -86,6 +116,7 @@ export const saveUnsavedResource = createAsyncThunk<
   return {
     resourceId,
     resourceFilePath: absoluteFilePath,
+    resourceRange,
     fileTimestamp,
     alert: {
       title: 'Resource Saved',
