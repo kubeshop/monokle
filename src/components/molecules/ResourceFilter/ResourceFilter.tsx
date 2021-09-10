@@ -8,8 +8,6 @@ import Colors from '@styles/Colors';
 import {KeyValueInput} from '@components/atoms';
 import {useAppSelector} from '@redux/hooks';
 
-const {Search} = Input;
-
 const ALL_OPTIONS = '<all>';
 
 const BaseContainer = styled.div`
@@ -148,7 +146,7 @@ const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}
       </StyledTitleContainer>
       <FieldContainer>
         <FieldLabel>Name:</FieldLabel>
-        <Input placeholder="All or part of name..." value={name} onChange={e => setName(e.target.value)} />
+        <Input autoFocus placeholder="All or part of name..." value={name} onChange={e => setName(e.target.value)} />
       </FieldContainer>
       <FieldContainer>
         <FieldLabel>Kind:</FieldLabel>

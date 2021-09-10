@@ -12,6 +12,10 @@ export type UiState = {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;
   };
+  renameResourceModal?: {
+    isOpen: boolean;
+    resourceId: string;
+  };
   isFolderLoading: boolean;
   leftMenu: {
     selection: string;
