@@ -5,7 +5,7 @@ import {useAppDispatch} from '@redux/hooks';
 import {removeResource} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
-import {isFileResource} from '@redux/services/resource';
+import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 
 function deleteResourceWithConfirm(resource: K8sResource, dispatch: AppDispatch) {
@@ -15,7 +15,7 @@ function deleteResourceWithConfirm(resource: K8sResource, dispatch: AppDispatch)
     if (!resource.range) {
       title = `This action will delete the ${resource.filePath} file.\n${title}`;
     }
-  } else {
+  } else if (!isUnsavedResource(resource)) {
     title = `This action will delete the resource from the Cluster.\n${title}`;
   }
 

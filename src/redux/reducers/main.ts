@@ -32,6 +32,7 @@ import {
 import {
   extractK8sResources,
   isFileResource,
+  isUnsavedResource,
   recalculateResourceRanges,
   removeResourceFromFile,
   reprocessResources,
@@ -210,6 +211,13 @@ export const mainSlice = createSlice({
       if (!resource) {
         return;
       }
+      if (state.selectedResourceId === resourceId) {
+        clearResourceSelections(state.resourceMap);
+      }
+      if (isUnsavedResource(resource)) {
+        delete state.resourceMap[resource.id];
+        return;
+      }
       if (isFileResource(resource)) {
         removeResourceFromFile(resource, state.fileMap, state.resourceMap);
         return;
@@ -227,9 +235,6 @@ export const mainSlice = createSlice({
           log.error(err);
           return original(state);
         }
-      }
-      if (state.selectedResourceId === resourceId) {
-        clearResourceSelections(state.resourceMap);
       }
     },
     /**
