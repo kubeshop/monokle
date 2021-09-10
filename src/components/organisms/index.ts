@@ -10,3 +10,4 @@ export {default as SettingsDrawer} from './SettingsDrawer';
 export {default as HotKeysHandler} from './HotKeysHandler';
 export {default as PaneManager} from './PaneManager';
 export {default as NewResourceWizard} from './NewResourceWizard';
+export {default as RenameResourceModal} from './RenameResourceModal';
