@@ -23,7 +23,6 @@ export const renameResource = (
     },
   };
   const newResourceText = stringify(newResourceContent);
-  dispatch(updateResource({resourceId, content: newResourceText}));
   if (shouldUpdateRefs && resource.refs) {
     resource.refs.forEach(ref => {
       if (!isIncomingRef(ref.type) || !ref.targetResourceId) {
@@ -35,7 +34,7 @@ export const renameResource = (
       }
       let newDependentResourceText = '';
       dependentResource.text.split('\n').forEach((line, lineIndex) => {
-        const refAtCurrentLine = dependentResource.refs?.find(depRef => depRef.position?.line === lineIndex);
+        const refAtCurrentLine = dependentResource.refs?.find(depRef => depRef.position?.line === lineIndex + 1);
         if (!refAtCurrentLine) {
           newDependentResourceText += `${line}\n`;
           return;
@@ -45,4 +44,5 @@ export const renameResource = (
       dispatch(updateResource({resourceId: dependentResource.id, content: newDependentResourceText}));
     });
   }
+  dispatch(updateResource({resourceId, content: newResourceText}));
 };
