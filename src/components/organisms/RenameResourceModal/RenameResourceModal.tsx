@@ -1,8 +1,13 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Modal, Input, Checkbox} from 'antd';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
 import {renameResource} from '@redux/services/renameResource';
+import styled from 'styled-components';
+
+const CheckboxContainer = styled.div`
+  margin-top: 10px;
+`;
 
 const RenameResourceModel = () => {
   const dispatch = useAppDispatch();
@@ -10,11 +15,13 @@ const RenameResourceModel = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [newResourceName, setNewResourceName] = useState<string>();
   const [shouldUpdateRefs, setShouldUpdateRefs] = useState<boolean>(false);
+  const inputNameRef = useRef<any>();
 
   useEffect(() => {
     if (uiState?.isOpen) {
       setNewResourceName(undefined);
       setShouldUpdateRefs(false);
+      inputNameRef?.current?.focus();
     }
   }, [uiState?.isOpen]);
 
@@ -48,15 +55,17 @@ const RenameResourceModel = () => {
       onCancel={handleCancel}
     >
       <label>New resource name:</label>
-      <Input value={newResourceName} onChange={e => setNewResourceName(e.target.value)} />
-      <Checkbox
-        checked={shouldUpdateRefs}
-        onChange={e => {
-          setShouldUpdateRefs(e.target.checked);
-        }}
-      >
-        Automatically update references to this resource
-      </Checkbox>
+      <Input ref={inputNameRef} value={newResourceName} onChange={e => setNewResourceName(e.target.value)} />
+      <CheckboxContainer>
+        <Checkbox
+          checked={shouldUpdateRefs}
+          onChange={e => {
+            setShouldUpdateRefs(e.target.checked);
+          }}
+        >
+          Automatically update references to this resource
+        </Checkbox>
+      </CheckboxContainer>
     </Modal>
   );
 };
