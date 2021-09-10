@@ -10,7 +10,7 @@ Monokle has built-in support for [Helm](https://helm.sh/) - a popular tool for m
 
 ## Helm Navigation
 
-When selecting a folder containing Helm charts (identified by values.yaml files), these will automatically be displayed in 
+When selecting a folder containing Helm charts (identified by Chart.yaml files), these will automatically be displayed in 
 a "Helm Charts" section on top of the Navigator:
 
 ![Helm Navigation](img/helm-navigation.png)
