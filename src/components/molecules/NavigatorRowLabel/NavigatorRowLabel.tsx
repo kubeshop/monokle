@@ -17,6 +17,7 @@ import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/services/re
 import {isUnsavedResource} from '@redux/services/resource';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import ActionsMenu from './ActionsMenu';
 
 const {Text} = Typography;
@@ -366,7 +367,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
           </StyledIconsContainer>
         </Popover>
       )}
-      {isHovered && (
+      {!isKustomizationResource(resource) && isHovered && (
         <StyledMenuToggle>
           <Dropdown
             overlay={
