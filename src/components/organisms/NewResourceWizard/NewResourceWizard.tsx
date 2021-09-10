@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Modal, Form, Input, Select} from 'antd';
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
@@ -7,6 +7,7 @@ import {useResetFormOnCloseModal} from '@utils/hooks';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 import {useNamespaces, NO_NAMESPACE} from '@hooks/useNamespaces';
+import {K8sResource} from '@models/k8sresource';
 
 const SELECT_OPTION_NONE = '<none>';
 
@@ -15,7 +16,8 @@ const NewResourceWizard = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const namespaces = useNamespaces({extra: ['none', 'default']});
-
+  const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
+  const lastKindRef = useRef<string>();
   const defaultInput = newResourceWizardState.defaultInput;
   const defaultValues = defaultInput
     ? {
@@ -25,7 +27,19 @@ const NewResourceWizard = () => {
       }
     : undefined;
   const [form] = Form.useForm();
+  lastKindRef.current = form.getFieldValue('kind');
+
   useResetFormOnCloseModal({form, visible: newResourceWizardState.isOpen, defaultValues});
+
+  useEffect(() => {
+    const currentKind = form.getFieldValue('kind');
+    if (!currentKind) {
+      setFilteredResources(Object.values(resourceMap));
+      return;
+    }
+    setFilteredResources(Object.values(resourceMap).filter(resource => resource.kind === currentKind));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resourceMap]);
 
   const closeWizard = () => {
     dispatch(closeNewResourceWizard());
@@ -40,11 +54,37 @@ const NewResourceWizard = () => {
   };
 
   const onFormValuesChange = (data: any) => {
-    if (data.kind) {
+    let shouldFilterResources = false;
+    if (data.kind && data.kind !== lastKindRef.current) {
       const kindHandler = getResourceKindHandler(data.kind);
       if (kindHandler) {
         form.setFieldsValue({
           apiVersion: kindHandler.clusterApiVersion,
+        });
+      }
+      shouldFilterResources = true;
+    }
+    if (data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE && !data.kind) {
+      const selectedResource = resourceMap[data.selectedResourceId];
+      if (selectedResource && lastKindRef.current !== selectedResource.kind) {
+        form.setFieldsValue({
+          kind: selectedResource.kind,
+        });
+      }
+      shouldFilterResources = true;
+    }
+    if (shouldFilterResources) {
+      const currentKind = form.getFieldValue('kind');
+      if (!currentKind) {
+        setFilteredResources(Object.values(resourceMap));
+        return;
+      }
+      const newFilteredResources = Object.values(resourceMap).filter(resource => resource.kind === currentKind);
+      setFilteredResources(newFilteredResources);
+      const currentSelectedResourceId = form.getFieldValue('selectedResourceId');
+      if (currentSelectedResourceId && !newFilteredResources.some(res => res.id === currentSelectedResourceId)) {
+        form.setFieldsValue({
+          selectedResourceId: SELECT_OPTION_NONE,
         });
       }
     }
@@ -126,7 +166,7 @@ const NewResourceWizard = () => {
             <Select.Option key={SELECT_OPTION_NONE} value={SELECT_OPTION_NONE}>
               {SELECT_OPTION_NONE}
             </Select.Option>
-            {Object.values(resourceMap).map(resource => (
+            {filteredResources.map(resource => (
               <Select.Option key={resource.id} value={resource.id}>
                 {resource.name}
               </Select.Option>
