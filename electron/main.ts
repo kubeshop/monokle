@@ -1,3 +1,5 @@
+import 'module-alias/register';
+
 import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
@@ -7,11 +9,14 @@ import * as ElectronLog from 'electron-log';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
+// import store from '@redux/store';
 
 import {checkMissingDependencies} from '../src/utils/index';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 import terminal from '../cli/terminal';
 import {createMenu} from './menu';
+
+// console.log(store);
 
 Object.assign(console, ElectronLog.functions);
 

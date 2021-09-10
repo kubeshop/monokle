@@ -1,4 +1,5 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions, shell} from 'electron';
+import hotkeys from '../src/constants/hotkeys';
 
 const isMac = process.platform === 'darwin';
 
@@ -90,14 +91,14 @@ const viewMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
     submenu: [
       {
         label: 'Previous Resource',
-        accelerator: 'alt+left',
+        accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
         click: () => {
           win.webContents.send('select-from-history', {direction: 'left'});
         },
       },
       {
         label: 'Next Resource',
-        accelerator: 'alt+right',
+        accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD,
         click: () => {
           win.webContents.send('select-from-history', {direction: 'right'});
         },
