@@ -68,10 +68,10 @@ const ActionsMenu = (props: {
 
   return (
     <Menu>
-      <Menu.Item onClick={onClickRename} key="rename">
+      <Menu.Item disabled={isInPreviewMode} onClick={onClickRename} key="rename">
         Rename
       </Menu.Item>
-      <Menu.Item onClick={onClickClone} key="clone">
+      <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
         Clone
       </Menu.Item>
       <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={onClickDelete} key="delete">
