@@ -4,6 +4,7 @@ import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
 import {renameResource} from '@redux/services/renameResource';
 import styled from 'styled-components';
+import {K8sResource} from '@models/k8sresource';
 
 const CheckboxContainer = styled.div`
   margin-top: 10px;
@@ -13,23 +14,31 @@ const RenameResourceModel = () => {
   const dispatch = useAppDispatch();
   const uiState = useAppSelector(state => state.ui.renameResourceModal);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const [newResourceName, setNewResourceName] = useState<string>();
   const [shouldUpdateRefs, setShouldUpdateRefs] = useState<boolean>(false);
   const inputNameRef = useRef<any>();
+  const [resource, setResource] = useState<K8sResource>();
 
   useEffect(() => {
-    if (uiState?.isOpen) {
-      setNewResourceName(undefined);
-      setShouldUpdateRefs(false);
-      inputNameRef?.current?.focus();
+    if (uiState) {
+      const newResource = resourceMap[uiState.resourceId];
+      if (newResource) {
+        setResource(newResource);
+        setNewResourceName(newResource.name);
+      }
     }
-  }, [uiState?.isOpen]);
+    if (!uiState || uiState?.isOpen === false) {
+      setResource(undefined);
+      setNewResourceName(undefined);
+    }
+    setShouldUpdateRefs(false);
+    inputNameRef?.current?.focus();
+  }, [uiState, resourceMap]);
 
   if (!uiState) {
     return null;
   }
-
-  const resource = resourceMap[uiState.resourceId];
 
   if (!resource) {
     return null;
@@ -39,7 +48,7 @@ const RenameResourceModel = () => {
     if (!newResourceName || resource.name === newResourceName) {
       return;
     }
-    renameResource(resource.id, newResourceName, shouldUpdateRefs, resourceMap, dispatch);
+    renameResource(resource.id, newResourceName, shouldUpdateRefs, resourceMap, dispatch, selectedResourceId);
     dispatch(closeRenameResourceModal());
   };
 
