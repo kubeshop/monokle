@@ -54,7 +54,7 @@ const RenameResourceModel = () => {
       onOk={handleOk}
       onCancel={handleCancel}
     >
-      <label>New resource name:</label>
+      <span>New resource name:</span>
       <Input ref={inputNameRef} value={newResourceName} onChange={e => setNewResourceName(e.target.value)} />
       <CheckboxContainer>
         <Checkbox
