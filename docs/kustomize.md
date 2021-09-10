@@ -28,7 +28,7 @@ Just as with K8s resources, hovering over the link-icon to the right of the kust
 
 ![Kustomize Outgoing Links](img/kustomize-outgoing-links.png)
 
-(here we can see the 7 resources included by the selected kustomization)
+(here we can see the 10 resources included by the selected kustomization)
 
 and hovering the link-icon to the left of the kustomization name shows its incoming links:
 
@@ -61,7 +61,7 @@ Monokle is now in "Preview Mode" (as indicated by the header at the top):
 - selecting "Preview" for a different kustomization will preview the output of kustomize for that resource instead
 - selecting "Exit" in the top right or next to the kustomization restores the previous resource navigator.
 
-In the screenshot we can see that the selected kustomization resulted in 7 resources - and that they contain references to the image
+In the screenshot we can see that the selected kustomization resulted in 10 resources - and that they contain references to the image
 specified in the kustomization configuration:
 
 ![Kustomize Preview Content](img/kustomize-preview-content.png)

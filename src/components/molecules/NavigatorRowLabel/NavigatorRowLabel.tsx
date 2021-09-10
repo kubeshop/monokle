@@ -361,9 +361,19 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
           </StyledIconsContainer>
         </Popover>
       )}
-      {isHovered && (!isInPreviewMode || (isInPreviewMode && previewType === 'cluster')) && (
+      {isHovered && (
         <StyledMenuToggle>
-          <Dropdown overlay={<ActionsMenu resource={resource} />} trigger={['click']}>
+          <Dropdown
+            overlay={
+              <ActionsMenu
+                resource={resource}
+                resourceMap={resourceMap}
+                isInPreviewMode={isInPreviewMode}
+                previewType={previewType}
+              />
+            }
+            trigger={['click']}
+          >
             <MoreOutlined />
           </Dropdown>
         </StyledMenuToggle>

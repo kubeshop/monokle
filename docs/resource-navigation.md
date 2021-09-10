@@ -40,10 +40,10 @@ In this screenshot
 - the linked `argo-rollouts` Deployment (via the selector in the Service manifest) is highlighted 
 - the Service manifest is shown in the editor to the right (with highlighting of the link to the Deployment on line 16)
 
-The Namespaces filter at the top of the K8S Resources section is populated with available/defined namespaces and 
+The Namespaces pop-up at the top of the K8S Resources section is populated with available/defined namespaces and 
 allows you to only show objects in the selected namespace - for example when retrieving resources from your cluster:
 
-![Namespace Filter](img/namespace-filter.png)
+![Namespace Filter](img/namespace-filter.gif)
 
 ## Resource Links
 
