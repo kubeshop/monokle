@@ -1,6 +1,6 @@
 import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {UiState} from '@models/ui';
+import {NewResourceWizardInput, UiState} from '@models/ui';
 import initialState from '@redux/initialState';
 
 export const uiSlice = createSlice({
@@ -22,11 +22,18 @@ export const uiSlice = createSlice({
     setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.rightMenu.selection = action.payload;
     },
-    openNewResourceWizard: (state: Draft<UiState>) => {
-      state.isNewResourceWizardOpen = true;
+    openNewResourceWizard: (
+      state: Draft<UiState>,
+      action: PayloadAction<{defaultInput?: NewResourceWizardInput} | undefined>
+    ) => {
+      state.newResourceWizard.isOpen = true;
+      if (action.payload && action.payload.defaultInput) {
+        state.newResourceWizard.defaultInput = action.payload.defaultInput;
+      }
     },
     closeNewResourceWizard: (state: Draft<UiState>) => {
-      state.isNewResourceWizardOpen = false;
+      state.newResourceWizard.isOpen = false;
+      state.newResourceWizard.defaultInput = undefined;
     },
   },
   extraReducers: builder => {
