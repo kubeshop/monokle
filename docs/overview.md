@@ -21,7 +21,7 @@ The top right contains two buttons
 
 Clicking the Settings icon on the top right opens the settings:
 
-![Monokle Settings](img/settings.png)
+![Monokle Settings](img/settings.gif)
 
 - **Kubeconfig**: sets which kubeconfig Monokle should use for all cluster interactions
 - **Files: Include**: which files to parse for kubernetes resources when scanning folders
