@@ -5,7 +5,8 @@ import {useAppDispatch} from '@redux/hooks';
 import {removeResource} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
-import {isFileResource} from '@redux/services/resource';
+import {isFileResource, isUnsavedResource} from '@redux/services/resource';
+import {openNewResourceWizard} from '@redux/reducers/ui';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {PreviewType, ResourceMapType} from '@models/appstate';
 
@@ -17,7 +18,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     if (resourcesFromPath.length === 1) {
       title = `This action will delete the ${resource.filePath} file.\n${title}`;
     }
-  } else {
+  } else if (!isUnsavedResource(resource)) {
     title = `This action will delete the resource from the Cluster.\n${title}`;
   }
 
@@ -33,6 +34,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     onCancel() {},
   });
 }
+
 const ActionsMenu = (props: {
   resource: K8sResource;
   resourceMap: ResourceMapType;
@@ -42,12 +44,29 @@ const ActionsMenu = (props: {
   const {resource, resourceMap, isInPreviewMode, previewType} = props;
   const dispatch = useAppDispatch();
 
+  const cloneResource = () => {
+    dispatch(
+      openNewResourceWizard({
+        defaultInput: {
+          name: resource.name,
+          kind: resource.kind,
+          apiVersion: resource.version,
+          namespace: resource.namespace,
+          selectedResourceId: resource.id,
+        },
+      })
+    );
+  };
+
   const deleteResource = () => {
     deleteResourceWithConfirm(resource, resourceMap, dispatch);
   };
 
   return (
     <Menu>
+      <Menu.Item onClick={cloneResource} key="clone">
+        Clone
+      </Menu.Item>
       <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={deleteResource} key="delete">
         Delete
       </Menu.Item>

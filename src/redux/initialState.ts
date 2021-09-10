@@ -102,7 +102,9 @@ const initialLogsState: LogsState = {
 const initialUiState: UiState = {
   isSettingsOpen: false,
   isFolderLoading: false,
-  isNewResourceWizardOpen: false,
+  newResourceWizard: {
+    isOpen: false,
+  },
   leftMenu: {
     selection: 'file-explorer',
     isActive: true,

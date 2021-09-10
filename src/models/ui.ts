@@ -1,6 +1,17 @@
+export type NewResourceWizardInput = {
+  name?: string;
+  kind?: string;
+  apiVersion?: string;
+  namespace?: string;
+  selectedResourceId?: string;
+};
+
 export type UiState = {
   isSettingsOpen: boolean;
-  isNewResourceWizardOpen: boolean;
+  newResourceWizard: {
+    isOpen: boolean;
+    defaultInput?: NewResourceWizardInput;
+  };
   isFolderLoading: boolean;
   leftMenu: {
     selection: string;
