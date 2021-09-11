@@ -1,18 +1,18 @@
 import {ResourceMapType} from '@models/appstate';
-import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
+import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {REF_PATH_SEPARATOR} from '@constants/constants';
-import {getResourceKindHandler, getIncomingRefMappers} from '@src/kindhandlers';
+import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
 import {RefMapper} from '@models/resourcekindhandler';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {traverseDocument} from './manifest-utils';
-import {NodeWrapper, getParsedDoc, createResourceRef, linkResources} from './resource';
+import {createResourceRef, getParsedDoc, linkResources, NodeWrapper} from './resource';
 
 export function isIncomingRef(refType: ResourceRefType) {
   return refType === ResourceRefType.Incoming;
 }
 
 export function isOutgoingRef(refType: ResourceRefType) {
-  return refType === ResourceRefType.Outgoing;
+  return refType === ResourceRefType.Outgoing || refType === ResourceRefType.File;
 }
 
 export function isUnsatisfiedRef(refType: ResourceRefType) {

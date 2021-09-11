@@ -1,10 +1,10 @@
 import path from 'path';
-import log from 'loglevel';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
+import log from 'loglevel';
+import {createFileRef, getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
 
 /**
  * Creates kustomization refs between a kustomization and its resources
@@ -16,10 +16,15 @@ function linkParentKustomization(
   resourceMap: ResourceMapType,
   refNode: NodeWrapper
 ) {
+  let result: K8sResource[] = [];
+
   getResourcesForPath(fileEntry.filePath, resourceMap).forEach(r => {
     // since the target is a file there is no target refNode
     linkResources(kustomization, r, refNode);
+    result.push(r);
   });
+
+  return result;
 }
 
 /**
@@ -89,16 +94,44 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
         processKustomizationResource(kustomization, refNode, resourceMap, fileMap);
       });
 
-      kustomization.content.patchesStrategicMerge?.forEach((e: string) => {
-        const fileEntry = fileMap[path.join(path.parse(kustomization.filePath).dir, e)];
+      let strategicMergePatches = getScalarNodes(kustomization, 'patchesStrategicMerge');
+      strategicMergePatches.forEach((refNode: NodeWrapper) => {
+        let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
+        const fileEntry = fileMap[kpath];
         if (fileEntry) {
-          getResourcesForPath(fileEntry.filePath, resourceMap).forEach(resource => {
+          let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
+          linkedResources.forEach(resource => {
             if (!resource.name.startsWith('Patch:')) {
               resource.name = `Patch: ${resource.name}`;
             }
           });
         } else {
-          log.warn(`Failed to find patchesStrategicMerge ${e} in kustomization ${kustomization.filePath}`);
+          log.warn(
+            `Failed to find patchesStrategicMerge ${refNode.nodeValue()} in kustomization ${kustomization.filePath}`
+          );
+        }
+      });
+
+      let json6902Patches = getScalarNodes(kustomization, 'patchesJson6902:path');
+      json6902Patches.forEach((refNode: NodeWrapper) => {
+        let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
+        const fileEntry = fileMap[kpath];
+        if (fileEntry) {
+          let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
+          if (linkedResources.length > 0) {
+            linkedResources.forEach(resource => {
+              if (!resource.name.startsWith('Json6902 Patch:')) {
+                resource.name = `Json6902 Patch: ${resource.name}`;
+              }
+            });
+          } else {
+            log.warn(`No resources in ${refNode.nodeValue()} - creating FileRef to ${kpath}`);
+            createFileRef(kustomization, refNode, kpath);
+          }
+        } else {
+          log.warn(
+            `Failed to find patchesJson6902.path ${refNode.nodeValue()} in kustomization ${kustomization.filePath}`
+          );
         }
       });
     });

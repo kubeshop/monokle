@@ -63,6 +63,7 @@ export enum ResourceRefType {
   Incoming = 'incoming',
   Outgoing = 'outgoing',
   Unsatisfied = 'unsatisfied-outgoing',
+  File = 'file',
 }
 
 interface ResourceRef {
@@ -70,7 +71,7 @@ interface ResourceRef {
   type: ResourceRefType;
   /** the ref value - for example the name of a configmap */
   name: string;
-  /** the resource this is referring to (empty for unsatisfied refs) */
+  /** the resource this is referring to (empty for unsatisfied refs, filePath for File refs) */
   targetResourceId?: string;
   /** the resource kind of the target resource */
   targetResourceKind?: string;
