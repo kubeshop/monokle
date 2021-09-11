@@ -9,7 +9,8 @@ export const renameResource = (
   newResourceName: string,
   shouldUpdateRefs: boolean,
   resourceMap: ResourceMapType,
-  dispatch: AppDispatch
+  dispatch: AppDispatch,
+  selectedResourceId?: string
 ) => {
   const resource = resourceMap[resourceId];
   if (!resource || !resource.content) {
@@ -41,8 +42,20 @@ export const renameResource = (
         }
         newDependentResourceText += `${line.replace(ref.name, newResourceName)}\n`;
       });
-      dispatch(updateResource({resourceId: dependentResource.id, content: newDependentResourceText}));
+      dispatch(
+        updateResource({
+          resourceId: dependentResource.id,
+          content: newDependentResourceText,
+          preventSelectionAndHighlightsUpdate: selectedResourceId !== dependentResource.id,
+        })
+      );
     });
   }
-  dispatch(updateResource({resourceId, content: newResourceText}));
+  dispatch(
+    updateResource({
+      resourceId,
+      content: newResourceText,
+      preventSelectionAndHighlightsUpdate: selectedResourceId !== resourceId,
+    })
+  );
 };
