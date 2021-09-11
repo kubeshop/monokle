@@ -78,6 +78,38 @@ function processKustomizationResource(
 }
 
 /**
+ * Extract patches at the specified nodePath and create resource or file refs
+ */
+
+function extractPatches(
+  kustomization: K8sResource,
+  fileMap: FileMapType,
+  resourceMap: ResourceMapType,
+  patchPath: string
+) {
+  let strategicMergePatches = getScalarNodes(kustomization, patchPath);
+  strategicMergePatches.forEach((refNode: NodeWrapper) => {
+    let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
+    const fileEntry = fileMap[kpath];
+    if (fileEntry) {
+      let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
+      if (linkedResources.length > 0) {
+        linkedResources.forEach(resource => {
+          if (!resource.name.startsWith('Patch:')) {
+            resource.name = `Patch: ${resource.name}`;
+          }
+        });
+      } else {
+        log.warn(`No resources in ${refNode.nodeValue()} - creating FileRef to ${kpath}`);
+        createFileRef(kustomization, refNode, kpath);
+      }
+    } else {
+      log.warn(`Failed to find ${patchPath} ${refNode.nodeValue()} in ${kustomization.filePath}`);
+    }
+  });
+}
+
+/**
  * Processes all kustomizations in resourceMap and establishes corresponding resourcerefs
  */
 
@@ -94,46 +126,8 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
         processKustomizationResource(kustomization, refNode, resourceMap, fileMap);
       });
 
-      let strategicMergePatches = getScalarNodes(kustomization, 'patchesStrategicMerge');
-      strategicMergePatches.forEach((refNode: NodeWrapper) => {
-        let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
-        const fileEntry = fileMap[kpath];
-        if (fileEntry) {
-          let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
-          linkedResources.forEach(resource => {
-            if (!resource.name.startsWith('Patch:')) {
-              resource.name = `Patch: ${resource.name}`;
-            }
-          });
-        } else {
-          log.warn(
-            `Failed to find patchesStrategicMerge ${refNode.nodeValue()} in kustomization ${kustomization.filePath}`
-          );
-        }
-      });
-
-      let json6902Patches = getScalarNodes(kustomization, 'patchesJson6902:path');
-      json6902Patches.forEach((refNode: NodeWrapper) => {
-        let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
-        const fileEntry = fileMap[kpath];
-        if (fileEntry) {
-          let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
-          if (linkedResources.length > 0) {
-            linkedResources.forEach(resource => {
-              if (!resource.name.startsWith('Json6902 Patch:')) {
-                resource.name = `Json6902 Patch: ${resource.name}`;
-              }
-            });
-          } else {
-            log.warn(`No resources in ${refNode.nodeValue()} - creating FileRef to ${kpath}`);
-            createFileRef(kustomization, refNode, kpath);
-          }
-        } else {
-          log.warn(
-            `Failed to find patchesJson6902.path ${refNode.nodeValue()} in kustomization ${kustomization.filePath}`
-          );
-        }
-      });
+      extractPatches(kustomization, fileMap, resourceMap, 'patchesStrategicMerge');
+      extractPatches(kustomization, fileMap, resourceMap, 'patchesJson6902:path');
     });
 }
 
