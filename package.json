@@ -100,7 +100,7 @@
     "redux-logger": "3.0.6",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
-    "shell-path": "2.1.0",
+    "shell-path": "3.0.0",
     "shelljs": "0.8.4",
     "styled-components": "5.3.0",
     "uuid": "8.3.2",
