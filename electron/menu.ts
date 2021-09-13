@@ -1,8 +1,9 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions, shell} from 'electron';
 import hotkeys from '@constants/hotkeys';
-
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
-// import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {AppState} from '@models/appstate';
+import {AppConfig} from '@models/appconfig';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 const isMac = process.platform === 'darwin';
 
@@ -18,7 +19,7 @@ const appMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => 
       },
       {
         label: 'Check for Update',
-        click: async () => {
+        click: () => {
           console.log('Check for update');
         },
       },
@@ -33,6 +34,8 @@ const appMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => 
 };
 
 const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+  const configState: AppConfig = store.getState().config;
+  const mainState: AppState = store.getState().main;
   return {
     label: 'File',
     submenu: [
@@ -44,16 +47,22 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       },
       {
         label: 'Refresh Folder',
+        enabled: Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
         click: async () => {
-          console.log('Refresh folder');
+          const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
+          store.dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
         },
       },
       {type: 'separator'},
       {
         label: 'Recent Folders',
-        click: async () => {
-          console.log('Refresh folder');
-        },
+        submenu: configState.recentFolders.map((folder: string) => ({
+          label: folder,
+          click: async () => {
+            const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
+            store.dispatch(setRootFolder(folder));
+          },
+        })),
       },
       {type: 'separator'},
       {
@@ -89,21 +98,30 @@ const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
 };
 
 const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+  let mainState: AppState = store.getState().main;
+  const isPreviousResourceEnabled = mainState.selectionHistory.length > 0;
+  const isNextResourceEnabled = mainState.currentSelectionHistoryIndex
+    ? mainState.currentSelectionHistoryIndex < mainState.selectionHistory.length - 1
+    : false;
   return {
     label: 'View',
     submenu: [
       {
         label: 'Previous Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
-        click: () => {
-          // store.dispatch(selectFromHistory({direction: 'left'}));
+        enabled: isPreviousResourceEnabled,
+        click: async () => {
+          const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
+          store.dispatch(selectFromHistory({direction: 'left'}));
         },
       },
       {
         label: 'Next Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD,
-        click: () => {
-          // store.dispatch(selectFromHistory({direction: 'right'}));
+        enabled: isNextResourceEnabled,
+        click: async () => {
+          const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
+          store.dispatch(selectFromHistory({direction: 'right'}));
         },
       },
       {type: 'separator'},

@@ -159,7 +159,9 @@ const openApplication = async (givenPath?: string) => {
   ElectronStore.initRenderer();
   const win = createWindow();
 
-  createMenu(win, mainStore);
+  mainStore.subscribe(() => {
+    createMenu(win, mainStore);
+  });
 
   const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 
