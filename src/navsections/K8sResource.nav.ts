@@ -12,6 +12,10 @@ const subsectionNames = navSectionNames.representation[navSectionNames.K8S_RESOU
 
 const kindHandlersBySubsectionName: Record<string, ResourceKindHandler[]> = {};
 ResourceKindHandlers.forEach(kindHandler => {
+  const navSectionName = kindHandler.navigatorPath[0];
+  if (navSectionName !== navSectionNames.K8S_RESOURCES) {
+    return;
+  }
   const subsectionName = kindHandler.navigatorPath[1];
   if (kindHandlersBySubsectionName[subsectionName]) {
     kindHandlersBySubsectionName[subsectionName].push(kindHandler);
