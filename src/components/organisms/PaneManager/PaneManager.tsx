@@ -6,7 +6,7 @@ import {ClusterOutlined, FolderOpenOutlined, ApartmentOutlined, CodeOutlined} fr
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, NavigatorPane, FileTreePane} from '@organisms';
+import {ActionsPane, FileTreePane} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
@@ -15,6 +15,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleLeftMenu, toggleRightMenu, setLeftMenuSelection, setRightMenuSelection} from '@redux/reducers/ui';
 import AppContext from '@src/AppContext';
+import NavPane from '@src/components/organisms/NewNavigatorPane';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -169,7 +170,7 @@ const PaneManager = () => {
               </>
             }
             hideLeft={!leftActive}
-            nav={<NavigatorPane />}
+            nav={<NavPane />}
             editor={<ActionsPane contentHeight={contentHeight} />}
             right={
               <>
