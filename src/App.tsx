@@ -16,10 +16,9 @@ import {
 import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch} from '@redux/hooks';
-import {initKubeconfig, updateStartupModalVisible} from '@redux/reducers/appConfig';
+import {initKubeconfig} from '@redux/reducers/appConfig';
 import {ipcRenderer} from 'electron';
 import {setAlert} from '@redux/reducers/alert';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {AlertEnum, AlertType} from '@models/alert';
 
 import AppContext from './AppContext';
@@ -42,14 +41,6 @@ const App = () => {
       message: `${dependencies.toString()} must be installed for all Monokle functionality to be available`,
     };
     dispatch(setAlert(alert));
-  });
-
-  ipcRenderer.on('show-launch-dialog', () => {
-    dispatch(updateStartupModalVisible(true));
-  });
-
-  ipcRenderer.on('select-from-history', (_, {direction}) => {
-    dispatch(selectFromHistory({direction}));
   });
 
   return (

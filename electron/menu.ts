@@ -1,16 +1,19 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions, shell} from 'electron';
 import hotkeys from '@constants/hotkeys';
 
+import {updateStartupModalVisible} from '@redux/reducers/appConfig';
+// import {selectFromHistory} from '@redux/thunks/selectionHistory';
+
 const isMac = process.platform === 'darwin';
 
-const appMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
+const appMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
   return {
     label: 'Monokle',
     submenu: [
       {
         label: 'About Monokle',
         click: async () => {
-          win.webContents.send('show-launch-dialog');
+          await store.dispatch(updateStartupModalVisible(true));
         },
       },
       {
@@ -29,7 +32,7 @@ const appMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
   };
 };
 
-const fileMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
+const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
   return {
     label: 'File',
     submenu: [
@@ -65,7 +68,7 @@ const fileMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
   };
 };
 
-const editMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
+const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
   return {
     label: 'Edit',
     submenu: [
@@ -85,7 +88,7 @@ const editMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
   };
 };
 
-const viewMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
+const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
   return {
     label: 'View',
     submenu: [
@@ -93,14 +96,14 @@ const viewMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
         label: 'Previous Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
         click: () => {
-          win.webContents.send('select-from-history', {direction: 'left'});
+          // store.dispatch(selectFromHistory({direction: 'left'}));
         },
       },
       {
         label: 'Next Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD,
         click: () => {
-          win.webContents.send('select-from-history', {direction: 'right'});
+          // store.dispatch(selectFromHistory({direction: 'right'}));
         },
       },
       {type: 'separator'},
@@ -110,7 +113,7 @@ const viewMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
   };
 };
 
-const windowMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
+const windowMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
   return {
     label: 'Window',
     submenu: [
@@ -124,7 +127,7 @@ const windowMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
   };
 };
 
-const helpMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
+const helpMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
   return {
     label: 'Help',
     submenu: [
@@ -145,11 +148,17 @@ const helpMenu = (win: BrowserWindow): MenuItemConstructorOptions => {
   };
 };
 
-export const createMenu = (win: BrowserWindow) => {
-  const template: any[] = [fileMenu(win), editMenu(win), viewMenu(win), windowMenu(win), helpMenu(win)];
+export const createMenu = (win: BrowserWindow, store: any) => {
+  const template: any[] = [
+    fileMenu(win, store),
+    editMenu(win, store),
+    viewMenu(win, store),
+    windowMenu(win, store),
+    helpMenu(win, store),
+  ];
 
   if (isMac) {
-    template.unshift(appMenu(win));
+    template.unshift(appMenu(win, store));
   }
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);

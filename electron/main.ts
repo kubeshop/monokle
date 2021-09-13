@@ -143,7 +143,7 @@ function createWindow() {
 
 const openApplication = async (givenPath?: string) => {
   await app.whenReady();
-  await import('@redux/main-store');
+  const {default: mainStore} = await import('@redux/main-store');
 
   if (isDev) {
     // DevTools
@@ -159,7 +159,7 @@ const openApplication = async (givenPath?: string) => {
   ElectronStore.initRenderer();
   const win = createWindow();
 
-  createMenu(win);
+  createMenu(win, mainStore);
 
   const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 
