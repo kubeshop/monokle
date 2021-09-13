@@ -11,6 +11,7 @@ import {
   HotKeysHandler,
   PaneManager,
   NewResourceWizard,
+  RenameResourceModal,
 } from '@organisms';
 import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
@@ -65,6 +66,7 @@ const App = () => {
         <StartupModal />
         <NewResourceWizard />
         <HotKeysHandler />
+        <RenameResourceModal />
       </div>
     </AppContext.Provider>
   );

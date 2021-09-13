@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {useSelector} from 'react-redux';
 import Colors, {FontColors} from '@styles/Colors';
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
-import {MoreOutlined} from '@ant-design/icons';
+import {FormOutlined} from '@ant-design/icons';
 
 import AppContext from '@src/AppContext';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
@@ -17,6 +17,7 @@ import {isOutgoingRef, isIncomingRef, isUnsatisfiedRef} from '@redux/services/re
 import {isUnsavedResource} from '@redux/services/resource';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import ActionsMenu from './ActionsMenu';
 
 const {Text} = Typography;
@@ -88,6 +89,11 @@ const StyledSpan = styled.span<{isSelected: boolean; isHighlighted: boolean}>`
     }
     return `color: ${Colors.blue10}`;
   }}
+`;
+
+const StyledActionsMenuIcon = styled(FormOutlined)`
+  font-size: 14px;
+  padding: 0 10px;
 `;
 
 const StyledLabel = styled.span<{isSelected: boolean; isUnsaved: boolean}>`
@@ -361,7 +367,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
           </StyledIconsContainer>
         </Popover>
       )}
-      {isHovered && (
+      {!isKustomizationResource(resource) && isHovered && (
         <StyledMenuToggle>
           <Dropdown
             overlay={
@@ -374,7 +380,7 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
             }
             trigger={['click']}
           >
-            <MoreOutlined />
+            <StyledActionsMenuIcon />
           </Dropdown>
         </StyledMenuToggle>
       )}

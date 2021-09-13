@@ -6,7 +6,7 @@ import {removeResource} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
-import {openNewResourceWizard} from '@redux/reducers/ui';
+import {openNewResourceWizard, openRenameResourceModal} from '@redux/reducers/ui';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {PreviewType, ResourceMapType} from '@models/appstate';
 
@@ -44,7 +44,11 @@ const ActionsMenu = (props: {
   const {resource, resourceMap, isInPreviewMode, previewType} = props;
   const dispatch = useAppDispatch();
 
-  const cloneResource = () => {
+  const onClickRename = () => {
+    dispatch(openRenameResourceModal(resource.id));
+  };
+
+  const onClickClone = () => {
     dispatch(
       openNewResourceWizard({
         defaultInput: {
@@ -58,16 +62,19 @@ const ActionsMenu = (props: {
     );
   };
 
-  const deleteResource = () => {
+  const onClickDelete = () => {
     deleteResourceWithConfirm(resource, resourceMap, dispatch);
   };
 
   return (
     <Menu>
-      <Menu.Item onClick={cloneResource} key="clone">
+      <Menu.Item disabled={isInPreviewMode} onClick={onClickRename} key="rename">
+        Rename
+      </Menu.Item>
+      <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
         Clone
       </Menu.Item>
-      <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={deleteResource} key="delete">
+      <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={onClickDelete} key="delete">
         Delete
       </Menu.Item>
     </Menu>

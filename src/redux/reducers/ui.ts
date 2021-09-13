@@ -35,6 +35,15 @@ export const uiSlice = createSlice({
       state.newResourceWizard.isOpen = false;
       state.newResourceWizard.defaultInput = undefined;
     },
+    openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.renameResourceModal = {
+        isOpen: true,
+        resourceId: action.payload,
+      };
+    },
+    closeRenameResourceModal: (state: Draft<UiState>) => {
+      state.renameResourceModal = undefined;
+    },
   },
   extraReducers: builder => {
     builder
@@ -58,5 +67,7 @@ export const {
   setRightMenuSelection,
   openNewResourceWizard,
   closeNewResourceWizard,
+  openRenameResourceModal,
+  closeRenameResourceModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

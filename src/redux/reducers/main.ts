@@ -51,6 +51,7 @@ export type SetRootFolderPayload = {
 export type UpdateResourcePayload = {
   resourceId: string;
   content: string;
+  preventSelectionAndHighlightsUpdate?: boolean;
 };
 
 export type UpdateFileEntryPayload = {
@@ -197,8 +198,10 @@ export const mainSlice = createSlice({
             resource.content = parseDocument(action.payload.content).toJS();
           }
           reprocessResources([resource.id], state.resourceMap, state.fileMap);
-          resource.isSelected = false;
-          updateSelectionAndHighlights(state, resource);
+          if (!action.payload.preventSelectionAndHighlightsUpdate) {
+            resource.isSelected = false;
+            updateSelectionAndHighlights(state, resource);
+          }
         }
       } catch (e) {
         log.error(e);
