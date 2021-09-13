@@ -234,11 +234,11 @@
     }
   },
   "_moduleAliases": {
-    "@constants": "src/constants",
-    "@models": "src/models",
-    "@redux": "src/redux",
-    "@utils": "src/utils",
-    "@src": "src",
-    "@root": "."
+    "@constants": "build/src/constants",
+    "@models": "build/src/models",
+    "@redux": "build/src/redux",
+    "@utils": "build/src/utils",
+    "@src": "build/src",
+    "@root": "build/"
   }
 }

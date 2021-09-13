@@ -1,5 +1,5 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions, shell} from 'electron';
-import hotkeys from '../src/constants/hotkeys';
+import hotkeys from '@constants/hotkeys';
 
 const isMac = process.platform === 'darwin';
 
