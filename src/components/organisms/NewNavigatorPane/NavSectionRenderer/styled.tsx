@@ -16,7 +16,7 @@ const BaseContainer = styled.li<BaseContainerProps>`
 
 type BaseNameProps = {isSelected: boolean; isHighlighted: boolean; level: number};
 const BaseName = styled.span<BaseNameProps>`
-  margin-left: ${props => `${props.level * 8}px`};
+  padding: 2px 12px;
   ${props => {
     if (!props.isSelected && props.isHighlighted) {
       return `color: ${Colors.cyan7};`;
@@ -30,7 +30,12 @@ const BaseName = styled.span<BaseNameProps>`
 
 export const Section = {
   Container: styled(BaseContainer)``,
-  Name: styled(BaseName)``,
+  Name: styled(BaseName)`
+    color: ${Colors.whitePure};
+    font-size: ${props => {
+      return `${24 - 4 * props.level}px`;
+    }};
+  `,
 };
 
 export const ItemContainer = styled(BaseContainer)`
@@ -40,6 +45,7 @@ export const ItemContainer = styled(BaseContainer)`
 
 export const ItemName = styled(BaseName)`
   cursor: pointer;
+  font-size: 12px;
 `;
 
 export const ItemPrefix = styled.span``;

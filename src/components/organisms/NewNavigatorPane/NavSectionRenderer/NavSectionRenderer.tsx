@@ -36,7 +36,9 @@ function NavSectionRenderer<ItemType, ScopeType>(props: {navSection: NavSection<
   return (
     <>
       <S.Section.Container isSelected={false} isHighlighted={false}>
-        {name}
+        <S.Section.Name isSelected={false} isHighlighted={false} level={level}>
+          {name}
+        </S.Section.Name>
       </S.Section.Container>
       {itemHandler &&
         items &&
@@ -54,7 +56,9 @@ function NavSectionRenderer<ItemType, ScopeType>(props: {navSection: NavSection<
         Object.entries(groupedItems).map(([groupName, groupItems]) => (
           <React.Fragment key={groupName}>
             <S.Section.Container isSelected={false} isHighlighted={false} style={{color: 'red'}}>
-              {groupName}
+              <S.Section.Name isSelected={false} isHighlighted={false} level={level + 1}>
+                {groupName}
+              </S.Section.Name>
             </S.Section.Container>
             {groupItems.map(item => (
               <NavSectionItem<ItemType, ScopeType>

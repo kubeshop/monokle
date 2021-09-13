@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const List = styled.ol<{height: number}>`
   list-style-type: none;
-  padding: 20px;
+  padding: 0;
   overflow-y: auto;
   ::-webkit-scrollbar {
     width: 0;
