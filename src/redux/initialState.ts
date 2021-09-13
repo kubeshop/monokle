@@ -6,7 +6,9 @@ import {UiState} from '@models/ui';
 import electronStore from '@utils/electronStore';
 import {ObjectNavigator, NavigatorSection, NavigatorSubSection} from '@models/navigator';
 import {ResourceKindHandlers} from '@src/kindhandlers';
-import {NAV_K8S_RESOURCES_SECTIONS_ORDER} from '@constants/navigator';
+import navSectionNames from '@constants/navSectionNames';
+
+const NAV_K8S_RESOURCES_SECTIONS_ORDER = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
 
 const initialAppState: AppState = {
   selectionHistory: [],

@@ -1,12 +1,12 @@
 import * as k8s from '@kubernetes/client-node';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {NAV_K8S_RESOURCES, SECTION_WORKLOADS} from '@constants/navigator';
+import navSectionNames from '@constants/navSectionNames';
 import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const JobHandler: ResourceKindHandler = {
   kind: 'Job',
   apiVersionMatcher: '**',
-  navigatorPath: [NAV_K8S_RESOURCES, SECTION_WORKLOADS, 'Jobs'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'Jobs'],
   clusterApiVersion: 'batch/v1',
   validationSchemaPrefix: 'io.k8s.api.batch.v1',
   description: '',
