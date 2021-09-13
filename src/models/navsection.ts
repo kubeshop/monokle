@@ -3,6 +3,7 @@ export interface NavSectionItemHandler<ItemType, ScopeType> {
   getIdentifier: <S extends ScopeType>(item: ItemType, scope: S) => string;
   isSelected?: <S extends ScopeType>(item: ItemType, scope: S) => boolean;
   isHighlighted?: <S extends ScopeType>(item: ItemType, scope: S) => boolean;
+  isVisible?: <S extends ScopeType>(item: ItemType, scope: S) => boolean;
   onClick?: <S extends ScopeType>(item: ItemType, scope: S) => void;
 }
 
