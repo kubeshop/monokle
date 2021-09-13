@@ -43,7 +43,7 @@ function makeResourceKindNavSection(
     getItems: scope => {
       return Object.values(scope.resourceMap).filter(r => r.kind === kindHandler.kind);
     },
-    itemHandlers: {
+    itemHandler: {
       getName: item => item.name,
       getIdentifier: item => item.id,
       isSelected: item => item.isSelected,

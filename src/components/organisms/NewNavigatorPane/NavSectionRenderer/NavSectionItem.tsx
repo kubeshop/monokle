@@ -1,32 +1,32 @@
 import React, {useMemo} from 'react';
-import {NavSectionItemHandlers} from '@models/navsection';
+import {NavSectionItemHandler} from '@models/navsection';
 import * as S from './styled';
 
 function NavSectionItem<ItemType, ScopeType>(props: {
   item: ItemType;
   scope: ScopeType;
-  handlers: NavSectionItemHandlers<ItemType, ScopeType>;
+  handler: NavSectionItemHandler<ItemType, ScopeType>;
   level: number;
 }) {
-  const {item, scope, handlers, level} = props;
+  const {item, scope, handler, level} = props;
 
   const name = useMemo(() => {
-    return handlers.getName(item, scope);
-  }, [handlers.getName, scope]);
+    return handler.getName(item, scope);
+  }, [handler, scope, item]);
 
   const isSelected = useMemo(() => {
-    return Boolean(handlers.isSelected && handlers.isSelected(item, scope));
-  }, [handlers.isSelected, scope]);
+    return Boolean(handler.isSelected && handler.isSelected(item, scope));
+  }, [handler, scope, item]);
 
   const isHighlighted = useMemo(() => {
-    return Boolean(handlers.isHighlighted && handlers.isHighlighted(item, scope));
-  }, [handlers.isHighlighted, scope]);
+    return Boolean(handler.isHighlighted && handler.isHighlighted(item, scope));
+  }, [handler, scope, item]);
 
   return (
     <S.ItemContainer
       isSelected={isSelected}
       isHighlighted={isHighlighted}
-      onClick={() => handlers.onClick && handlers.onClick(item, scope)}
+      onClick={() => handler.onClick && handler.onClick(item, scope)}
     >
       <S.ItemName level={level} isSelected={isSelected} isHighlighted={isHighlighted}>
         {name}

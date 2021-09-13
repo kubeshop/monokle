@@ -1,4 +1,4 @@
-export interface NavSectionItemHandlers<ItemType, ScopeType> {
+export interface NavSectionItemHandler<ItemType, ScopeType> {
   getName: <S extends ScopeType>(item: ItemType, scope: S) => string;
   getIdentifier: <S extends ScopeType>(item: ItemType, scope: S) => string;
   isSelected?: <S extends ScopeType>(item: ItemType, scope: S) => boolean;
@@ -12,5 +12,5 @@ export interface NavSection<ItemType, ScopeType = any> {
   subsections?: NavSection<ItemType, ScopeType>[];
   getItems?: <S extends ScopeType>(scope: S) => ItemType[];
   getItemsGrouped?: <S extends ScopeType>(scope: S) => Record<string, ItemType[]>;
-  itemHandlers?: NavSectionItemHandlers<ItemType, ScopeType>;
+  itemHandler?: NavSectionItemHandler<ItemType, ScopeType>;
 }

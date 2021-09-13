@@ -34,7 +34,7 @@ export const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSection
       })
     );
   },
-  itemHandlers: {
+  itemHandler: {
     getName: item => item.name,
     getIdentifier: item => item.id,
     isSelected: item => {

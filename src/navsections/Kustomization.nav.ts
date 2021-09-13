@@ -17,7 +17,7 @@ export const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSe
   getItems: scope => {
     return Object.values(scope.resourceMap).filter(i => i.kind === 'Kustomization');
   },
-  itemHandlers: {
+  itemHandler: {
     getName: item => item.name,
     getIdentifier: item => item.id,
     isSelected: item => item.isSelected,

@@ -5,7 +5,7 @@ import * as S from './styled';
 
 function NavSectionRenderer<ItemType, ScopeType>(props: {navSection: NavSection<ItemType, ScopeType>; level: number}) {
   const {navSection, level} = props;
-  const {name, getItems, getItemsGrouped, useScope, itemHandlers, subsections} = navSection;
+  const {name, getItems, getItemsGrouped, useScope, itemHandler, subsections} = navSection;
 
   const scope = useScope();
 
@@ -25,12 +25,12 @@ function NavSectionRenderer<ItemType, ScopeType>(props: {navSection: NavSection<
 
   const getItemIdentifier = useCallback(
     (item: ItemType) => {
-      if (!itemHandlers) {
+      if (!itemHandler) {
         return null;
       }
-      return itemHandlers.getIdentifier(item, scope);
+      return itemHandler.getIdentifier(item, scope);
     },
-    [scope, itemHandlers]
+    [scope, itemHandler]
   );
 
   return (
@@ -38,18 +38,18 @@ function NavSectionRenderer<ItemType, ScopeType>(props: {navSection: NavSection<
       <S.Section.Container isSelected={false} isHighlighted={false}>
         {name}
       </S.Section.Container>
-      {itemHandlers &&
+      {itemHandler &&
         items &&
         items.map(item => (
           <NavSectionItem<ItemType, ScopeType>
             key={getItemIdentifier(item)}
             item={item}
             scope={scope}
-            handlers={itemHandlers}
+            handler={itemHandler}
             level={level + 1}
           />
         ))}
-      {itemHandlers &&
+      {itemHandler &&
         groupedItems &&
         Object.entries(groupedItems).map(([groupName, groupItems]) => (
           <React.Fragment key={groupName}>
@@ -61,7 +61,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: {navSection: NavSection<
                 key={getItemIdentifier(item)}
                 item={item}
                 scope={scope}
-                handlers={itemHandlers}
+                handler={itemHandler}
                 level={level + 2}
               />
             ))}
