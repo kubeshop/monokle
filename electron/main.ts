@@ -1,4 +1,4 @@
-import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
+import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
@@ -50,6 +50,26 @@ ipcMain.on('check-missing-dependency', event => {
   if (missingDependecies.length > 0) {
     event.sender.send('missing-dependency-result', {dependencies: missingDependecies});
   }
+});
+
+ipcMain.handle('select-file', async (event, options: any) => {
+  const browserWindow = BrowserWindow.fromId(event.sender.id);
+  let dialogOptions: Electron.OpenDialogSyncOptions = {};
+  if (options.isDirectoryExplorer) {
+    dialogOptions.properties = ['openDirectory'];
+  } else {
+    if (options.allowMultiple) {
+      dialogOptions.properties = ['multiSelections'];
+    }
+    if (options.acceptedFileExtensions) {
+      dialogOptions.filters = [{name: 'Files', extensions: options.acceptedFileExtensions}];
+    }
+  }
+
+  if (browserWindow) {
+    return dialog.showOpenDialogSync(browserWindow, dialogOptions);
+  }
+  return dialog.showOpenDialogSync(dialogOptions);
 });
 
 /**
