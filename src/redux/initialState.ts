@@ -119,6 +119,7 @@ const initialUiState: UiState = {
   folderExplorer: {
     isOpen: false,
   },
+  triggerApplySelectionState: false,
 };
 
 export default {

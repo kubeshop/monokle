@@ -28,4 +28,5 @@ export type UiState = {
   folderExplorer: {
     isOpen: boolean;
   };
+  triggerApplySelectionState: boolean;
 };

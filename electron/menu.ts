@@ -6,7 +6,7 @@ import {AppConfig} from '@models/appconfig';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
-import {openFolderExplorer, openNewResourceWizard} from '@redux/reducers/ui';
+import {openFolderExplorer, openNewResourceWizard, toggleTriggerApplySelectionState} from '@redux/reducers/ui';
 
 const isMac = process.platform === 'darwin';
 
@@ -22,6 +22,7 @@ const appMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => 
       },
       {
         label: 'Check for Update',
+        enabled: false,
         click: () => {
           console.log('Check for update');
         },
@@ -91,6 +92,7 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
 };
 
 const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+  const mainState: AppState = store.getState().main;
   return {
     label: 'Edit',
     submenu: [
@@ -101,11 +103,24 @@ const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {role: 'copy'},
       {role: 'paste'},
       {type: 'separator'},
-      {label: 'Find'},
-      {label: 'Replace'},
+      {label: 'Find', enabled: Boolean(mainState.selectedResourceId)},
+      {label: 'Replace', enabled: Boolean(mainState.selectedResourceId)},
       {type: 'separator'},
-      {label: 'Apply'},
-      {label: 'Diff'},
+      {
+        label: 'Apply',
+        enabled: Boolean(mainState.selectedResourceId),
+        click: () => {
+          store.dispatch(toggleTriggerApplySelectionState());
+        },
+      },
+      {
+        label: 'Diff',
+        enabled: Boolean(mainState.selectedResourceId),
+        click: async () => {
+          const {performResourceDiff} = await import('@redux/thunks/diffResource');
+          store.dispatch(performResourceDiff(<string>mainState.selectedResourceId));
+        },
+      },
     ],
   };
 };
@@ -138,7 +153,13 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
         },
       },
       {type: 'separator'},
-      {label: 'Toggle Navigator'},
+      {
+        label: 'Toggle Navigator',
+        enabled: false,
+        click: () => {
+          console.log('Toggle navigator');
+        },
+      },
       {type: 'separator'},
     ],
   };
