@@ -27,6 +27,7 @@ import {ipcRenderer} from 'electron';
 import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 import fs from 'fs';
+import {closeFolderExplorer} from '@redux/reducers/ui';
 
 interface TreeNode {
   key: string;
@@ -328,6 +329,13 @@ const FileTreePane = () => {
       dispatch(setSelectingFile(false));
     }
   }, [isSelectingFile, dispatch]);
+
+  useEffect(() => {
+    if (uiState.leftMenu.selection === 'file-explorer' && uiState.folderExplorer.isOpen) {
+      openFileExplorer();
+      dispatch(closeFolderExplorer());
+    }
+  }, [uiState]);
 
   const onExpand = (expandedKeysValue: React.Key[]) => {
     setExpandedKeys(expandedKeysValue);

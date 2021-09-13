@@ -4,6 +4,9 @@ import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {AppState} from '@models/appstate';
 import {AppConfig} from '@models/appconfig';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
+import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
+import {openFolderExplorer, openNewResourceWizard} from '@redux/reducers/ui';
 
 const isMac = process.platform === 'darwin';
 
@@ -41,13 +44,15 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
     submenu: [
       {
         label: 'Browse Folder',
+        toolTip: BrowseFolderTooltip,
         click: async () => {
-          console.log('Browse folder');
+          store.dispatch(openFolderExplorer());
         },
       },
       {
         label: 'Refresh Folder',
         enabled: Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
+        toolTip: ReloadFolderTooltip,
         click: async () => {
           const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
           store.dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
@@ -67,12 +72,20 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {type: 'separator'},
       {
         label: 'New Resource',
+        enabled: Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
         click: async () => {
-          console.log('Refresh folder');
+          store.dispatch(openNewResourceWizard());
         },
       },
       {type: 'separator'},
-      {label: 'Exit Preview'},
+      {
+        label: 'Exit Preview',
+        enabled: Boolean(mainState.previewResourceId) || Boolean(mainState.previewValuesFileId),
+        click: () => {
+          store.dispatch(stopPreviewLoader());
+          store.dispatch(clearPreviewAndSelectionHistory());
+        },
+      },
     ],
   };
 };

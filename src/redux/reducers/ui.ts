@@ -44,6 +44,12 @@ export const uiSlice = createSlice({
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
+    openFolderExplorer: (state: Draft<UiState>) => {
+      state.folderExplorer = {isOpen: true};
+    },
+    closeFolderExplorer: (state: Draft<UiState>) => {
+      state.folderExplorer = {isOpen: false};
+    },
   },
   extraReducers: builder => {
     builder
@@ -69,5 +75,7 @@ export const {
   closeNewResourceWizard,
   openRenameResourceModal,
   closeRenameResourceModal,
+  openFolderExplorer,
+  closeFolderExplorer,
 } = uiSlice.actions;
 export default uiSlice.reducer;

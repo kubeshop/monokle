@@ -25,4 +25,7 @@ export type UiState = {
     selection?: string;
     isActive: boolean;
   };
+  folderExplorer: {
+    isOpen: boolean;
+  };
 };

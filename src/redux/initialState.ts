@@ -105,12 +105,19 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: false,
   },
+  renameResourceModal: {
+    isOpen: false,
+    resourceId: '',
+  },
   leftMenu: {
     selection: 'file-explorer',
     isActive: true,
   },
   rightMenu: {
     isActive: false,
+  },
+  folderExplorer: {
+    isOpen: false,
   },
 };
 
