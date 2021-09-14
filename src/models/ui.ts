@@ -25,4 +25,15 @@ export type UiState = {
     selection?: string;
     isActive: boolean;
   };
+  paneConfiguration: PaneConfiguration;
+};
+
+export type PaneConfiguration = {
+  leftWidth: number;
+  navWidth: number;
+  rightWidth: number;
+  editWidth: number;
+  separatorEditRightXPosition?: number;
+  separatorLeftNavXPosition?: number;
+  separatorNavEditXPosition?: number;
 };
