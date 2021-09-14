@@ -48,13 +48,16 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {
         label: 'Browse Folder',
         toolTip: BrowseFolderTooltip,
+        enabled: !(Boolean(mainState.previewResourceId) || Boolean(mainState.previewValuesFileId)),
         click: async () => {
           store.dispatch(openFolderExplorer());
         },
       },
       {
         label: 'Refresh Folder',
-        enabled: Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
+        enabled:
+          !(Boolean(mainState.previewResourceId) || Boolean(mainState.previewValuesFileId)) &&
+          Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
         toolTip: ReloadFolderTooltip,
         click: async () => {
           const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
@@ -184,6 +187,7 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {type: 'separator'},
       {
         label: 'Toggle Left Menu',
+        accelerator: hotkeys.TOGGLE_LEFT_PANE,
         click: () => {
           store.dispatch(toggleLeftMenu());
         },
@@ -217,7 +221,7 @@ const helpMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       },
       {type: 'separator'},
       {
-        label: 'Github',
+        label: 'GitHub',
         click: openGitHub,
       },
     ],

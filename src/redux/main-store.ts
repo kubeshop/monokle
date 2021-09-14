@@ -1,5 +1,4 @@
 import {configureStore} from '@reduxjs/toolkit';
-import logger from 'redux-logger';
 import {forwardToRenderer, triggerAlias, replayActionMain} from 'electron-redux';
 
 import {mainSlice} from './reducers/main';
@@ -16,7 +15,7 @@ const store = configureStore({
     logs: logsSlice.reducer,
     ui: uiSlice.reducer,
   },
-  middleware: getDefaultMiddleware => [triggerAlias, ...getDefaultMiddleware().concat(logger), forwardToRenderer],
+  middleware: getDefaultMiddleware => [triggerAlias, ...getDefaultMiddleware(), forwardToRenderer],
 });
 
 replayActionMain(store);
