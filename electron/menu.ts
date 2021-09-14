@@ -6,7 +6,7 @@ import {AppConfig} from '@models/appconfig';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
-import {openFolderExplorer, openNewResourceWizard, setMonacoEditor} from '@redux/reducers/ui';
+import {openFolderExplorer, openNewResourceWizard, setMonacoEditor, toggleLeftMenu} from '@redux/reducers/ui';
 import {UiState} from '@models/ui';
 
 const isMac = process.platform === 'darwin';
@@ -150,17 +150,22 @@ const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
 
 const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
   let mainState: AppState = store.getState().main;
-  const isPreviousResourceEnabled = mainState.selectionHistory.length > 0;
-  const isNextResourceEnabled = mainState.currentSelectionHistoryIndex
-    ? mainState.currentSelectionHistoryIndex < mainState.selectionHistory.length - 1
-    : false;
+  const isPreviousResourceEnabled =
+    mainState.selectionHistory.length > 1 &&
+    (mainState.currentSelectionHistoryIndex === undefined ||
+      (mainState.currentSelectionHistoryIndex && mainState.currentSelectionHistoryIndex > 0));
+  const isNextResourceEnabled =
+    mainState.selectionHistory.length > 1 &&
+    mainState.currentSelectionHistoryIndex !== undefined &&
+    mainState.currentSelectionHistoryIndex < mainState.selectionHistory.length - 1;
+
   return {
     label: 'View',
     submenu: [
       {
         label: 'Previous Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
-        enabled: isPreviousResourceEnabled,
+        enabled: Boolean(isPreviousResourceEnabled),
         click: async () => {
           const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
           store.dispatch(selectFromHistory({direction: 'left'}));
@@ -169,7 +174,7 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {
         label: 'Next Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD,
-        enabled: isNextResourceEnabled,
+        enabled: Boolean(isNextResourceEnabled),
         click: async () => {
           const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
           store.dispatch(selectFromHistory({direction: 'right'}));
@@ -177,10 +182,9 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       },
       {type: 'separator'},
       {
-        label: 'Toggle Navigator',
-        enabled: false,
+        label: 'Toggle Left Menu',
         click: () => {
-          console.log('Toggle navigator');
+          store.dispatch(toggleLeftMenu());
         },
       },
       {type: 'separator'},
