@@ -1,0 +1,49 @@
+import Colors from '@styles/Colors';
+import styled from 'styled-components';
+
+export const ItemContainer = styled.li<{isSelected: boolean; isHighlighted: boolean; isVisible: boolean}>`
+  display: flex;
+  align-items: center;
+  width: 100%
+    ${props => {
+      if (props.isVisible) {
+        return 'transition: opacity 500ms ease-in;';
+      }
+      return 'transition: opacity 500ms ease-out;';
+    }}
+    ${props => {
+      if (!props.isSelected && props.isHighlighted) {
+        return `background: ${Colors.highlightGradient};`;
+      }
+      if (props.isSelected) {
+        return `background: ${Colors.selectionGradient};`;
+      }
+    }};
+`;
+
+export const ItemName = styled.span<{isSelected: boolean; isHighlighted: boolean; level: number}>`
+  padding: 2px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  ${props => {
+    if (!props.isSelected && props.isHighlighted) {
+      return `color: ${Colors.cyan7};`;
+    }
+    if (props.isSelected) {
+      return `color: ${Colors.blackPure}`;
+    }
+    return `color: ${Colors.blue10}`;
+  }};
+`;
+
+export const PrefixContainer = styled.span``;
+
+export const SuffixContainer = styled.span``;
+
+export const QuickActionContainer = styled.span`
+  margin-left: auto;
+`;
+
+export const ContextMenuContainer = styled.span`
+  margin-left: auto;
+`;

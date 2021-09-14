@@ -1,7 +1,7 @@
 import {useMemo} from 'react';
 import {NavSectionItemHandler} from '@models/navsection';
 
-export function useNavSectionItem<ItemType, ScopeType>(
+export function useItemHandler<ItemType, ScopeType>(
   item: ItemType,
   scope: ScopeType,
   handler: NavSectionItemHandler<ItemType, ScopeType>

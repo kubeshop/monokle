@@ -22,7 +22,7 @@ function makeItemVisibilityMap<ItemType, ScopeType>(
 }
 
 export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemType, ScopeType>) {
-  const {name, getItems, getItemsGrouped, useScope, itemHandler, subsections} = navSection;
+  const {name, getItems, getItemsGrouped, useScope, itemHandler, itemCustomization, subsections} = navSection;
 
   const scope = useScope();
 
@@ -84,5 +84,16 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     [groupedItems, itemVisibilityMap]
   );
 
-  return {name, scope, subsections, items, groupedItems, isGroupVisible, isItemVisible, getItemIdentifier, itemHandler};
+  return {
+    name,
+    scope,
+    subsections,
+    items,
+    groupedItems,
+    isGroupVisible,
+    isItemVisible,
+    getItemIdentifier,
+    itemHandler,
+    itemCustomization,
+  };
 }

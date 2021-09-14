@@ -12,8 +12,18 @@ type NavSectionRendererProps<ItemType, ScopeType> = {
 function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<ItemType, ScopeType>) {
   const {navSection, level} = props;
 
-  const {name, scope, items, groupedItems, getItemIdentifier, isGroupVisible, isItemVisible, itemHandler, subsections} =
-    useNavSection<ItemType, ScopeType>(navSection);
+  const {
+    name,
+    scope,
+    items,
+    groupedItems,
+    getItemIdentifier,
+    isGroupVisible,
+    isItemVisible,
+    itemHandler,
+    itemCustomization,
+    subsections,
+  } = useNavSection<ItemType, ScopeType>(navSection);
 
   if (!subsections && !groupedItems && (!items || items.length === 0)) {
     return null;
@@ -21,11 +31,11 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
 
   return (
     <>
-      <S.Section.Container isVisible isSelected={false} isHighlighted={false}>
-        <S.Section.Name isSelected={false} isHighlighted={false} level={level}>
+      <S.NameContainer isSelected={false} isHighlighted={false}>
+        <S.Name isSelected={false} isHighlighted={false} level={level}>
           {name}
-        </S.Section.Name>
-      </S.Section.Container>
+        </S.Name>
+      </S.NameContainer>
       {itemHandler &&
         items &&
         items.map(item => (
@@ -34,6 +44,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
             item={item}
             scope={scope}
             handler={itemHandler}
+            customization={itemCustomization}
             level={level + 1}
             isVisible={isItemVisible(item)}
           />
@@ -44,17 +55,18 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
           ([groupName, groupItems]) =>
             isGroupVisible(groupName) && (
               <React.Fragment key={groupName}>
-                <S.Section.Container isVisible isSelected={false} isHighlighted={false} style={{color: 'red'}}>
-                  <S.Section.Name isSelected={false} isHighlighted={false} level={level + 1}>
+                <S.NameContainer isSelected={false} isHighlighted={false} style={{color: 'red'}}>
+                  <S.Name isSelected={false} isHighlighted={false} level={level + 1}>
                     {groupName}
-                  </S.Section.Name>
-                </S.Section.Container>
+                  </S.Name>
+                </S.NameContainer>
                 {groupItems.map(item => (
                   <NavSectionItem<ItemType, ScopeType>
                     key={getItemIdentifier(item)}
                     item={item}
                     scope={scope}
                     handler={itemHandler}
+                    customization={itemCustomization}
                     level={level + 2}
                     isVisible={isItemVisible(item)}
                   />

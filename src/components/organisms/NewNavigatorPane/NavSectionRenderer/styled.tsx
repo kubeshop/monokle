@@ -1,8 +1,7 @@
 import Colors from '@styles/Colors';
 import styled from 'styled-components';
 
-type BaseContainerProps = {isSelected: boolean; isHighlighted: boolean; isVisible: boolean};
-const BaseContainer = styled.li<BaseContainerProps>`
+export const NameContainer = styled.li<{isSelected: boolean; isHighlighted: boolean}>`
   width: 100%;
   ${props => {
     if (!props.isSelected && props.isHighlighted) {
@@ -14,50 +13,10 @@ const BaseContainer = styled.li<BaseContainerProps>`
   }};
 `;
 
-type BaseNameProps = {isSelected: boolean; isHighlighted: boolean; level: number};
-const BaseName = styled.span<BaseNameProps>`
+export const Name = styled.span<{isSelected: boolean; isHighlighted: boolean; level: number}>`
   padding: 2px 12px;
-  ${props => {
-    if (!props.isSelected && props.isHighlighted) {
-      return `color: ${Colors.cyan7};`;
-    }
-    if (props.isSelected) {
-      return `color: ${Colors.blackPure}`;
-    }
-    return `color: ${Colors.blue10}`;
+  color: ${Colors.whitePure};
+  font-size: ${props => {
+    return `${24 - 4 * props.level}px;`;
   }};
-`;
-
-export const Section = {
-  Container: styled(BaseContainer)``,
-  Name: styled(BaseName)`
-    color: ${Colors.whitePure};
-    font-size: ${props => {
-      return `${24 - 4 * props.level}px`;
-    }};
-  `,
-};
-
-export const ItemContainer = styled(BaseContainer)`
-  display: flex;
-  align-items: center;
-  ${props => {
-    if (props.isVisible) {
-      return 'transition: opacity 500ms ease-in;';
-    }
-    return 'transition: opacity 500ms ease-out;';
-  }}
-`;
-
-export const ItemName = styled(BaseName)`
-  cursor: pointer;
-  font-size: 12px;
-`;
-
-export const ItemPrefix = styled.span``;
-
-export const ItemSuffix = styled.span``;
-
-export const ItemContextMenu = styled.span`
-  margin-left: auto;
 `;
