@@ -37,5 +37,15 @@ export type UiState = {
     apply: boolean;
     diff: boolean;
   };
-  triggerApplySelectionState: boolean;
+  paneConfiguration: PaneConfiguration;
+};
+
+export type PaneConfiguration = {
+  leftWidth: number;
+  navWidth: number;
+  rightWidth: number;
+  editWidth: number;
+  separatorEditRightXPosition?: number;
+  separatorLeftNavXPosition?: number;
+  separatorNavEditXPosition?: number;
 };
