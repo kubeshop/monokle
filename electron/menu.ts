@@ -6,7 +6,8 @@ import {AppConfig} from '@models/appconfig';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
-import {openFolderExplorer, openNewResourceWizard, toggleTriggerApplySelectionState} from '@redux/reducers/ui';
+import {openFolderExplorer, openNewResourceWizard, setMonacoEditor} from '@redux/reducers/ui';
+import {UiState} from '@models/ui';
 
 const isMac = process.platform === 'darwin';
 
@@ -93,29 +94,51 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
 
 const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
   const mainState: AppState = store.getState().main;
+  const uiState: UiState = store.getState().ui;
   return {
     label: 'Edit',
+    enabled: Boolean(mainState.selectedResourceId) && uiState.monacoEditor.focused,
     submenu: [
-      {role: 'undo'},
-      {role: 'redo'},
+      {
+        label: 'Undo',
+        click: () => {
+          store.dispatch(setMonacoEditor({...uiState.monacoEditor, undo: true}));
+        },
+      },
+      {
+        label: 'Redo',
+        click: () => {
+          store.dispatch(setMonacoEditor({...uiState.monacoEditor, redo: true}));
+        },
+      },
       {type: 'separator'},
       {role: 'cut'},
       {role: 'copy'},
       {role: 'paste'},
       {type: 'separator'},
-      {label: 'Find', enabled: Boolean(mainState.selectedResourceId)},
-      {label: 'Replace', enabled: Boolean(mainState.selectedResourceId)},
+      {
+        label: 'Find',
+        click: () => {
+          store.dispatch(setMonacoEditor({...uiState.monacoEditor, find: true}));
+        },
+      },
+      {
+        label: 'Replace',
+        click: () => {
+          store.dispatch(setMonacoEditor({...uiState.monacoEditor, replace: true}));
+        },
+      },
       {type: 'separator'},
       {
         label: 'Apply',
-        enabled: Boolean(mainState.selectedResourceId),
+        accelerator: hotkeys.APPLY_SELECTION,
         click: () => {
-          store.dispatch(toggleTriggerApplySelectionState());
+          store.dispatch(setMonacoEditor({...uiState.monacoEditor, apply: true}));
         },
       },
       {
         label: 'Diff',
-        enabled: Boolean(mainState.selectedResourceId),
+        accelerator: hotkeys.DIFF_RESOURCE,
         click: async () => {
           const {performResourceDiff} = await import('@redux/thunks/diffResource');
           store.dispatch(performResourceDiff(<string>mainState.selectedResourceId));

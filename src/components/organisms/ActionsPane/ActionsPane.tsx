@@ -19,7 +19,7 @@ import FileExplorer from '@components/atoms/FileExplorer';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
-import {toggleTriggerApplySelectionState} from '@redux/reducers/ui';
+import {setMonacoEditor} from '@redux/reducers/ui';
 
 import {
   StyledLeftArrowButton,
@@ -53,7 +53,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const previewType = useAppSelector(state => state.main.previewType);
-  const triggerApplySelectionState = useAppSelector(state => state.ui.triggerApplySelectionState);
+  const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
@@ -162,11 +162,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
   ]);
 
   useEffect(() => {
-    if (triggerApplySelectionState) {
+    if (monacoEditor.apply) {
       applySelection();
-      dispatch(toggleTriggerApplySelectionState());
+      dispatch(setMonacoEditor({...monacoEditor, apply: false}));
     }
-  }, [triggerApplySelectionState]);
+  }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {

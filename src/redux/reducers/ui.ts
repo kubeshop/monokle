@@ -50,8 +50,8 @@ export const uiSlice = createSlice({
     closeFolderExplorer: (state: Draft<UiState>) => {
       state.folderExplorer = {isOpen: false};
     },
-    toggleTriggerApplySelectionState: (state: Draft<UiState>) => {
-      state.triggerApplySelectionState = !state.triggerApplySelectionState;
+    setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<any>) => {
+      state.monacoEditor = action.payload;
     },
   },
   extraReducers: builder => {
@@ -80,6 +80,6 @@ export const {
   closeRenameResourceModal,
   openFolderExplorer,
   closeFolderExplorer,
-  toggleTriggerApplySelectionState,
+  setMonacoEditor,
 } = uiSlice.actions;
 export default uiSlice.reducer;

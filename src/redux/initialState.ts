@@ -119,6 +119,15 @@ const initialUiState: UiState = {
   folderExplorer: {
     isOpen: false,
   },
+  monacoEditor: {
+    focused: false,
+    undo: false,
+    redo: false,
+    find: false,
+    replace: false,
+    apply: false,
+    diff: false,
+  },
   triggerApplySelectionState: false,
 };
 

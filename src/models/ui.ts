@@ -28,5 +28,14 @@ export type UiState = {
   folderExplorer: {
     isOpen: boolean;
   };
+  monacoEditor: {
+    focused: boolean;
+    undo: boolean;
+    redo: boolean;
+    find: boolean;
+    replace: boolean;
+    apply: boolean;
+    diff: boolean;
+  };
   triggerApplySelectionState: boolean;
 };
