@@ -83,6 +83,29 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
 
   const dispatch = useAppDispatch();
 
+  const normalizePaneWidths = (paneWidths: any, state: string) => {
+    let totalWidth: number = 0;
+    if (state === 'oo') {
+      totalWidth = paneWidths.left + paneWidths.nav + paneWidths.edit + paneWidths.right;
+    }
+    if (state === 'cc') {
+      totalWidth = paneWidths.nav + paneWidths.edit;
+    }
+    if (state === 'oc') {
+      totalWidth = paneWidths.left + paneWidths.nav + paneWidths.edit;
+    }
+    if (state === 'co') {
+      totalWidth = paneWidths.nav + paneWidths.edit + paneWidths.right;
+    }
+
+    return {
+      left: paneWidths.left * (1 / totalWidth),
+      nav: paneWidths.nav * (1 / totalWidth),
+      edit: paneWidths.edit * (1 / totalWidth),
+      right: paneWidths.right * (1 / totalWidth),
+    };
+  };
+
   // detect pane changes
   if (leftHidden !== hideLeft || rightHidden !== hideRight) {
     setLeftHidden(hideLeft);
@@ -97,6 +120,15 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     */
     const cfg = hideLeft && hideRight ? 'cc' : !hideLeft && hideRight ? 'oc' : hideLeft && !hideRight ? 'co' : 'oo';
 
+    let sizes = {
+      left: leftWidth,
+      nav: rightWidth,
+      edit: editWidth,
+      right: rightWidth,
+    };
+
+    sizes = normalizePaneWidths(sizes, cfg);
+
     const sizeLeft = cfg === 'oc' ? splitPaneWidth * 0.33333 : cfg === 'oo' ? splitPaneWidth * 0.25 : 0;
     const sizeRight = cfg === 'co' ? splitPaneWidth * 0.33333 : cfg === 'oo' ? splitPaneWidth * 0.25 : 0;
     const sizeNavEdit =
@@ -105,10 +137,14 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         : cfg === 'oo'
         ? splitPaneWidth * 0.25
         : splitPaneWidth * 0.5;
-    setLeftWidth(sizeLeft / viewWidth);
-    setNavWidth(sizeNavEdit / viewWidth);
-    setEditWidth(sizeNavEdit / viewWidth);
-    setRightWidth(sizeRight / viewWidth);
+    setLeftWidth(sizeLeft);
+    setNavWidth(sizeNavEdit);
+    setEditWidth(sizeNavEdit);
+    setRightWidth(sizeRight);
+    // setLeftWidth(sizes.left);
+    // setNavWidth(sizes.nav);
+    // setEditWidth(sizes.edit);
+    // setRightWidth(sizes.right);
   }
 
   // separator positions
