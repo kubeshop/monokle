@@ -1,7 +1,7 @@
 import Colors from '@styles/Colors';
 import styled from 'styled-components';
 
-type BaseContainerProps = {isSelected: boolean; isHighlighted: boolean};
+type BaseContainerProps = {isSelected: boolean; isHighlighted: boolean; isVisible: boolean};
 const BaseContainer = styled.li<BaseContainerProps>`
   width: 100%;
   ${props => {
@@ -41,6 +41,12 @@ export const Section = {
 export const ItemContainer = styled(BaseContainer)`
   display: flex;
   align-items: center;
+  ${props => {
+    if (props.isVisible) {
+      return 'transition: opacity 500ms ease-in;';
+    }
+    return 'transition: opacity 500ms ease-out;';
+  }}
 `;
 
 export const ItemName = styled(BaseName)`

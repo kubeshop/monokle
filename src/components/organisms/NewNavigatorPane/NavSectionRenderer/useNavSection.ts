@@ -1,5 +1,25 @@
 import {useMemo, useCallback} from 'react';
-import {NavSection} from '@models/navsection';
+import {NavSection, NavSectionScopedItemMethod} from '@models/navsection';
+
+function makeItemVisibilityMap<ItemType, ScopeType>(
+  items: ItemType[],
+  scope: ScopeType,
+  isVisible: boolean | NavSectionScopedItemMethod<ItemType, ScopeType, boolean>,
+  getItemIdentifier: (item: ItemType) => string | null
+): Record<string, boolean> {
+  const itemEntries: [string, boolean][] = items
+    .map(item => {
+      const itemId = getItemIdentifier(item);
+      if (!itemId) {
+        return undefined;
+      }
+      const entry: [string, boolean] =
+        typeof isVisible === 'boolean' ? [itemId, isVisible] : [itemId, isVisible(item, scope)];
+      return entry;
+    })
+    .filter((entry): entry is [string, boolean] => entry !== undefined);
+  return Object.fromEntries(itemEntries);
+}
 
 export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemType, ScopeType>) {
   const {name, getItems, getItemsGrouped, useScope, itemHandler, subsections} = navSection;
@@ -25,36 +45,44 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
       if (!itemHandler) {
         return null;
       }
-      return itemHandler.getIdentifier(item, scope);
+      return itemHandler.getIdentifier(item);
     },
-    [scope, itemHandler]
+    [itemHandler]
   );
 
-  const visibleItems = useMemo(() => {
+  const itemVisibilityMap = useMemo<Record<string, boolean>>(() => {
     if (!items) {
-      return [];
+      return {};
     }
     const isVisible = itemHandler?.isVisible;
     if (!isVisible) {
-      return items;
+      return makeItemVisibilityMap(items, scope, true, getItemIdentifier);
     }
-    return items.filter(item => isVisible(item, scope));
+    return makeItemVisibilityMap(items, scope, isVisible, getItemIdentifier);
   }, [scope, itemHandler, items]);
 
-  const groupedVisibleItems = useMemo<Record<string, ItemType[]> | undefined>(() => {
-    if (!groupedItems) {
-      return undefined;
-    }
-    const isVisible = itemHandler?.isVisible;
-    if (!isVisible) {
-      return groupedItems;
-    }
-    return Object.fromEntries(
-      Object.entries(([groupName, groupItems]: [string, ItemType[]]) => {
-        return [groupName, groupItems.filter(item => isVisible(item, scope))];
-      })
-    );
-  }, [scope, itemHandler, groupedItems]);
+  const isItemVisible = useCallback(
+    (item: ItemType) => {
+      const itemId = getItemIdentifier(item);
+      if (!itemId) {
+        return false;
+      }
+      return Boolean(itemVisibilityMap[itemId]);
+    },
+    [itemVisibilityMap]
+  );
 
-  return {name, scope, subsections, visibleItems, groupedVisibleItems, getItemIdentifier, itemHandler};
+  const isGroupVisible = useCallback(
+    (groupName: string) => {
+      if (!groupedItems || !groupedItems[groupName]) {
+        return false;
+      }
+      return groupedItems[groupName].every(item => {
+        return isItemVisible(item);
+      });
+    },
+    [groupedItems, itemVisibilityMap]
+  );
+
+  return {name, scope, subsections, items, groupedItems, isGroupVisible, isItemVisible, getItemIdentifier, itemHandler};
 }
