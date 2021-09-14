@@ -99,10 +99,10 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     }
 
     return {
-      left: paneWidths.left * (1 / totalWidth),
-      nav: paneWidths.nav * (1 / totalWidth),
-      edit: paneWidths.edit * (1 / totalWidth),
-      right: paneWidths.right * (1 / totalWidth),
+      left: splitPaneWidth * paneWidths.left * (1 / totalWidth),
+      nav: splitPaneWidth * paneWidths.nav * (1 / totalWidth),
+      edit: splitPaneWidth * paneWidths.edit * (1 / totalWidth),
+      right: splitPaneWidth * paneWidths.right * (1 / totalWidth),
     };
   };
 
@@ -129,22 +129,10 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
 
     sizes = normalizePaneWidths(sizes, cfg);
 
-    const sizeLeft = cfg === 'oc' ? splitPaneWidth * 0.33333 : cfg === 'oo' ? splitPaneWidth * 0.25 : 0;
-    const sizeRight = cfg === 'co' ? splitPaneWidth * 0.33333 : cfg === 'oo' ? splitPaneWidth * 0.25 : 0;
-    const sizeNavEdit =
-      cfg === 'oc' || cfg === 'co'
-        ? splitPaneWidth * 0.33333
-        : cfg === 'oo'
-        ? splitPaneWidth * 0.25
-        : splitPaneWidth * 0.5;
-    setLeftWidth(sizeLeft);
-    setNavWidth(sizeNavEdit);
-    setEditWidth(sizeNavEdit);
-    setRightWidth(sizeRight);
-    // setLeftWidth(sizes.left);
-    // setNavWidth(sizes.nav);
-    // setEditWidth(sizes.edit);
-    // setRightWidth(sizes.right);
+    setLeftWidth(sizes.left / viewWidth);
+    setNavWidth(sizes.nav / viewWidth);
+    setEditWidth(sizes.edit / viewWidth);
+    setRightWidth(sizes.right / viewWidth);
   }
 
   // separator positions
