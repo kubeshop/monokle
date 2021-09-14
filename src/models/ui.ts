@@ -38,6 +38,7 @@ export type UiState = {
     diff: boolean;
   };
   paneConfiguration: PaneConfiguration;
+  shouldExpandAllNodes: boolean;
 };
 
 export type PaneConfiguration = {

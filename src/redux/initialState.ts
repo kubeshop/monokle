@@ -129,6 +129,7 @@ const initialUiState: UiState = {
     diff: false,
   },
   paneConfiguration: electronStore.get('ui.paneConfiguration'),
+  shouldExpandAllNodes: false,
 };
 
 export default {

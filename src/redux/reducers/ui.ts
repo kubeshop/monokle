@@ -72,6 +72,9 @@ export const uiSlice = createSlice({
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<any>) => {
       state.monacoEditor = action.payload;
     },
+    setShouldExpandAllNodes: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.shouldExpandAllNodes = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -100,5 +103,6 @@ export const {
   openFolderExplorer,
   closeFolderExplorer,
   setMonacoEditor,
+  setShouldExpandAllNodes,
 } = uiSlice.actions;
 export default uiSlice.reducer;

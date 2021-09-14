@@ -27,7 +27,7 @@ import {ipcRenderer} from 'electron';
 import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 import fs from 'fs';
-import {closeFolderExplorer} from '@redux/reducers/ui';
+import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
 
 interface TreeNode {
   key: string;
@@ -223,11 +223,11 @@ const FileTreePane = () => {
   const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
   const recentFolders = useAppSelector(state => state.config.recentFolders);
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
+  const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
   const [tree, setTree] = React.useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
   const [autoExpandParent, setAutoExpandParent] = React.useState(true);
-  const shouldExpandAllNodes = React.useRef(false);
   const treeRef = React.useRef<any>();
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
@@ -235,7 +235,7 @@ const FileTreePane = () => {
       if (folderPath) {
         setFolder(folderPath);
       }
-      shouldExpandAllNodes.current = true;
+      dispatch(setShouldExpandAllNodes(true));
       setAutoExpandParent(true);
     },
     {isDirectoryExplorer: true}
@@ -255,11 +255,11 @@ const FileTreePane = () => {
 
     setTree(treeData);
 
-    if (shouldExpandAllNodes.current) {
+    if (shouldExpandAllNodes) {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
-      shouldExpandAllNodes.current = false;
+      dispatch(setShouldExpandAllNodes(false));
     }
-  }, [resourceMap, fileMap]);
+  }, [resourceMap, fileMap, shouldExpandAllNodes]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
@@ -347,7 +347,7 @@ const FileTreePane = () => {
       const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
       if (folder && fs.statSync(folder)?.isDirectory()) {
         setFolder(folder);
-        shouldExpandAllNodes.current = true;
+        dispatch(setShouldExpandAllNodes(true));
         setAutoExpandParent(true);
       }
     });

@@ -6,9 +6,16 @@ import {AppConfig} from '@models/appconfig';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
-import {openFolderExplorer, openNewResourceWizard, setMonacoEditor, toggleLeftMenu} from '@redux/reducers/ui';
+import {
+  openFolderExplorer,
+  openNewResourceWizard,
+  setMonacoEditor,
+  setShouldExpandAllNodes,
+  toggleLeftMenu,
+} from '@redux/reducers/ui';
 import {UiState} from '@models/ui';
 import {openGitHub, openDocumentation} from '@utils/shell';
+import {isInPreviewModeSelector} from '@redux/selectors';
 
 const isMac = process.platform === 'darwin';
 
@@ -48,16 +55,14 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {
         label: 'Browse Folder',
         toolTip: BrowseFolderTooltip,
-        enabled: !(Boolean(mainState.previewResourceId) || Boolean(mainState.previewValuesFileId)),
+        enabled: !isInPreviewModeSelector(store.getState()),
         click: async () => {
           store.dispatch(openFolderExplorer());
         },
       },
       {
         label: 'Refresh Folder',
-        enabled:
-          !(Boolean(mainState.previewResourceId) || Boolean(mainState.previewValuesFileId)) &&
-          Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
+        enabled: !isInPreviewModeSelector(store.getState()) && Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
         toolTip: ReloadFolderTooltip,
         click: async () => {
           const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
@@ -72,6 +77,7 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
           click: async () => {
             const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
             store.dispatch(setRootFolder(folder));
+            store.dispatch(setShouldExpandAllNodes(true));
           },
         })),
       },
@@ -86,7 +92,7 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {type: 'separator'},
       {
         label: 'Exit Preview',
-        enabled: Boolean(mainState.previewResourceId) || Boolean(mainState.previewValuesFileId),
+        enabled: isInPreviewModeSelector(store.getState()),
         click: () => {
           store.dispatch(stopPreviewLoader());
           store.dispatch(clearPreviewAndSelectionHistory());
