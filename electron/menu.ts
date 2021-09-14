@@ -1,4 +1,4 @@
-import {BrowserWindow, Menu, MenuItemConstructorOptions, shell} from 'electron';
+import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 import hotkeys from '@constants/hotkeys';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {AppState} from '@models/appstate';
@@ -8,6 +8,7 @@ import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
 import {openFolderExplorer, openNewResourceWizard, setMonacoEditor, toggleLeftMenu} from '@redux/reducers/ui';
 import {UiState} from '@models/ui';
+import {openGitHub, openDocumentation} from '@utils/shell';
 
 const isMac = process.platform === 'darwin';
 
@@ -212,16 +213,12 @@ const helpMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
     submenu: [
       {
         label: 'Documentation',
-        click: async () => {
-          await shell.openExternal('https://kubeshop.github.io/monokle/');
-        },
+        click: openDocumentation,
       },
       {type: 'separator'},
       {
         label: 'Github',
-        click: async () => {
-          await shell.openExternal('https://github.com/kubeshop/monokle');
-        },
+        click: openGitHub,
       },
     ],
   };
