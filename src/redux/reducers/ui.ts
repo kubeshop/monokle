@@ -54,6 +54,15 @@ export const uiSlice = createSlice({
       electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
       state.newResourceWizard.defaultInput = undefined;
     },
+    openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.renameResourceModal = {
+        isOpen: true,
+        resourceId: action.payload,
+      };
+    },
+    closeRenameResourceModal: (state: Draft<UiState>) => {
+      state.renameResourceModal = undefined;
+    },
   },
   extraReducers: builder => {
     builder
@@ -77,5 +86,7 @@ export const {
   setRightMenuSelection,
   openNewResourceWizard,
   closeNewResourceWizard,
+  openRenameResourceModal,
+  closeRenameResourceModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;
