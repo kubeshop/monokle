@@ -19,6 +19,10 @@ const ReplicaSetHandler: ResourceKindHandler = {
     const response = await k8sAppV1Api.listReplicaSetForAllNamespaces();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+    const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    await k8sAppV1Api.deleteNamespacedReplicaSet(name, namespace || 'default');
+  },
   outgoingRefMappers: [...PodOutgoingRefMappers],
 };
 

@@ -18,6 +18,10 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
     const response = await k8sExtensionsV1Api.listCustomResourceDefinition();
     return response.body.items;
   },
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string) {
+    const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
+    await k8sExtensionsV1Api.deleteCustomResourceDefinition(name);
+  },
 };
 
 export default CustomResourceDefinitionHandler;

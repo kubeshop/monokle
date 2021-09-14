@@ -53,6 +53,8 @@ interface ResourceKindHandler {
 
   listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]>;
 
+  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, name: string, namespace?: string) => Promise<void>;
+
   /**
    * optional outgoing RefMappers to use for resolving refs in resources of this type
    */

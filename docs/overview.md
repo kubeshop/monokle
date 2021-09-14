@@ -21,7 +21,7 @@ The top right contains two buttons
 
 Clicking the Settings icon on the top right opens the settings:
 
-![Monokle Settings](img/settings.png)
+![Monokle Settings](img/settings.gif)
 
 - **Kubeconfig**: sets which kubeconfig Monokle should use for all cluster interactions
 - **Files: Include**: which files to parse for kubernetes resources when scanning folders
@@ -45,3 +45,5 @@ Monokle current supports the following keyboard shortcuts:
 - Navigate Back (Selection History): ALT ArrowLeft
 - Navigate Forward (Selection History): ALT ArrowRight
 - Open New Resource Wizard: Ctrl/Cmd N
+- Apply Resource or File to cluster: Ctrl/Cmd ALT S
+- Diff Resource: Ctrl/Cmd ALT D

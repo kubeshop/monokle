@@ -1,7 +1,7 @@
 import React, {useState, useRef} from 'react';
 import styled from 'styled-components';
 
-import {Button, Input, Select, Tooltip, Divider} from 'antd';
+import {Button, Input, Select, Tooltip, Divider, Checkbox} from 'antd';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
 
@@ -16,11 +16,13 @@ import {
   updateHelmPreviewMode,
   updateCheckingNewVersion,
   updateNewVersionAvailable,
+  updateLoadLastFolderOnStartup,
 } from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
+  AutoLoadLastFolderTooltip,
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
 } from '@constants/tooltips';
@@ -82,6 +84,10 @@ const SettingsDrawer = () => {
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
       dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
     }
+  };
+
+  const onChangeLoadLastFolderOnStartup = (e: any) => {
+    dispatch(updateLoadLastFolderOnStartup(e.target.checked));
   };
 
   const openFileSelect = () => {
@@ -163,6 +169,14 @@ const SettingsDrawer = () => {
             <Select.Option value="template">Template</Select.Option>
             <Select.Option value="install">Install</Select.Option>
           </StyledSelect>
+        </Tooltip>
+      </StyledDiv>
+      <StyledDiv>
+        <StyledSpan>On Startup</StyledSpan>
+        <Tooltip title={AutoLoadLastFolderTooltip}>
+          <Checkbox checked={appConfig.settings.loadLastFolderOnStartup} onChange={onChangeLoadLastFolderOnStartup}>
+            Automatically load last folder
+          </Checkbox>
         </Tooltip>
       </StyledDiv>
       <Divider />

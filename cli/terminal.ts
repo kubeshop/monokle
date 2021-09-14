@@ -1,4 +1,3 @@
-'use strict';
 const path = require('path');
 const fs = require('fs');
 
@@ -31,9 +30,9 @@ export default (): Promise<void> => {
           reject(err);
         }
 
-        fs.symlink(commandPath, destinationPath, (err: any) => {
-          if (err) {
-            reject(err);
+        fs.symlink(commandPath, destinationPath, (e: any) => {
+          if (e) {
+            reject(e);
           }
           resolve();
         });

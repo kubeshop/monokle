@@ -16,8 +16,9 @@ import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {isUnsavedResource} from '@redux/services/resource';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 import FileExplorer from '@components/atoms/FileExplorer';
-import {applyFileWithConfirm} from './applyFileWithConfirm';
-import {applyResourceWithConfirm} from './applyResourceWithConfirm';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
 import {
   StyledLeftArrowButton,
   StyledRightArrowButton,
@@ -36,6 +37,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -46,6 +50,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
+  const previewType = useAppSelector(state => state.main.previewType);
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
@@ -123,12 +128,35 @@ const ActionsPane = (props: {contentHeight: string}) => {
   };
 
   const applySelection = useCallback(() => {
-    if (selectedResource) {
-      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig);
+    if (selectedValuesFileId && (!selectedResourceId || selectedValuesFileId === selectedResourceId)) {
+      const helmValuesFile = helmValuesMap[selectedValuesFileId];
+      if (helmValuesFile) {
+        applyHelmChartWithConfirm(
+          helmValuesFile,
+          helmChartMap[helmValuesFile.helmChartId],
+          fileMap,
+          dispatch,
+          kubeconfig
+        );
+      }
+    } else if (selectedResource) {
+      const isClusterPreview = previewType === 'cluster';
+      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig, {isClusterPreview});
     } else if (selectedPath) {
       applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
     }
-  }, [selectedResource, resourceMap, fileMap, kubeconfig, selectedPath, dispatch]);
+  }, [
+    selectedResource,
+    resourceMap,
+    fileMap,
+    kubeconfig,
+    selectedPath,
+    dispatch,
+    previewType,
+    helmChartMap,
+    helmValuesMap,
+    selectedValuesFileId,
+  ]);
 
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
@@ -233,7 +261,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />
                 ) : (
-                  <Monaco editorHeight={`${parseInt(contentHeight, 10) - 120}`} />
+                  <Monaco
+                    editorHeight={`${parseInt(contentHeight, 10) - 120}`}
+                    applySelection={applySelection}
+                    diffSelectedResource={diffSelectedResource}
+                  />
                 )}
               </TabPane>
               {selectedResource && selectedResource?.kind === 'ConfigMap' && (

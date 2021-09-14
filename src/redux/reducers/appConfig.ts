@@ -76,6 +76,14 @@ export const updateHelmPreviewMode = createAsyncThunk(
   }
 );
 
+export const updateLoadLastFolderOnStartup = createAsyncThunk(
+  'config/updateLoadLastFolderOnStartup',
+  async (autoLoad: boolean, thunkAPI) => {
+    electronStore.set('appConfig.settings.loadLastFolderOnStartup', autoLoad);
+    thunkAPI.dispatch(configSlice.actions.setLoadLastFolderOnStartup(autoLoad));
+  }
+);
+
 export const updateTheme = createAsyncThunk('config/updateTheme', async (theme: Themes, thunkAPI) => {
   electronStore.set('appConfig.settings.theme', theme);
   thunkAPI.dispatch(configSlice.actions.setTheme(theme));
@@ -146,6 +154,12 @@ export const configSlice = createSlice({
     },
     setCheckingNewVersion: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.isCheckingNewVersion = action.payload;
+    },
+    setLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.settings.loadLastFolderOnStartup = action.payload;
+    },
+    setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
+      state.recentFolders = action.payload;
     },
   },
   extraReducers: builder => {

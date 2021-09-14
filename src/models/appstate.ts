@@ -47,6 +47,8 @@ type PathSelectionHistoryEntry = {
 
 type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry;
 
+type PreviewType = 'kustomization' | 'cluster' | 'helm';
+
 interface AppState {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -74,7 +76,7 @@ interface AppState {
   /** the currently selected values file */
   selectedValuesFileId?: string;
   /** the current type of preview */
-  previewType?: 'kustomization' | 'cluster' | 'helm';
+  previewType?: PreviewType;
   /** information used to load the preview */
   previewLoader: PreviewLoaderType;
   /** the resource currently being previewed */
@@ -95,4 +97,5 @@ export type {
   HelmValuesMapType,
   PreviewLoaderType,
   SelectionHistoryEntry,
+  PreviewType,
 };

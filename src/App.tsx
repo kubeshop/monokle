@@ -11,11 +11,16 @@ import {
   HotKeysHandler,
   PaneManager,
   NewResourceWizard,
+  RenameResourceModal,
 } from '@organisms';
 import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch} from '@redux/hooks';
 import {initKubeconfig} from '@redux/reducers/appConfig';
+import {ipcRenderer} from 'electron';
+import {setAlert} from '@redux/reducers/alert';
+import {AlertEnum, AlertType} from '@models/alert';
+
 import AppContext from './AppContext';
 
 const App = () => {
@@ -28,6 +33,15 @@ const App = () => {
     dispatch(initKubeconfig());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  ipcRenderer.on('missing-dependency-result', (_, {dependencies}) => {
+    const alert: AlertType = {
+      type: AlertEnum.Warning,
+      title: 'Missing dependency',
+      message: `${dependencies.toString()} must be installed for all Monokle functionality to be available`,
+    };
+    dispatch(setAlert(alert));
+  });
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
@@ -43,6 +57,7 @@ const App = () => {
         <StartupModal />
         <NewResourceWizard />
         <HotKeysHandler />
+        <RenameResourceModal />
       </div>
     </AppContext.Provider>
   );

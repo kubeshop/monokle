@@ -1,4 +1,4 @@
-import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
+import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
@@ -8,6 +8,7 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
+import {checkMissingDependencies} from '../src/utils/index';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 import terminal from '../cli/terminal';
 
@@ -21,6 +22,7 @@ autoUpdater.logger = console;
 const {MONOKLE_RUN_AS_NODE} = process.env;
 
 const userHomeDir = app.getPath('home');
+const APP_DEPENDENCIES = ['kubectl', 'helm'];
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
@@ -44,6 +46,33 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
   } catch (e) {
     event.sender.send('kustomize-result', {error: e.toString()});
   }
+});
+
+ipcMain.on('check-missing-dependency', event => {
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
+  if (missingDependecies.length > 0) {
+    event.sender.send('missing-dependency-result', {dependencies: missingDependecies});
+  }
+});
+
+ipcMain.handle('select-file', async (event, options: any) => {
+  const browserWindow = BrowserWindow.fromId(event.sender.id);
+  let dialogOptions: Electron.OpenDialogSyncOptions = {};
+  if (options.isDirectoryExplorer) {
+    dialogOptions.properties = ['openDirectory'];
+  } else {
+    if (options.allowMultiple) {
+      dialogOptions.properties = ['multiSelections'];
+    }
+    if (options.acceptedFileExtensions) {
+      dialogOptions.filters = [{name: 'Files', extensions: options.acceptedFileExtensions}];
+    }
+  }
+
+  if (browserWindow) {
+    return dialog.showOpenDialogSync(browserWindow, dialogOptions);
+  }
+  return dialog.showOpenDialogSync(dialogOptions);
 });
 
 /**
@@ -181,18 +210,24 @@ const openApplication = async (givenPath?: string) => {
   ElectronStore.initRenderer();
   const win = createWindow();
 
-  if (givenPath) {
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
+
+  if (missingDependecies.length > 0) {
     win.webContents.on('did-finish-load', () => {
-      win.webContents.send('executed-from', {path: givenPath});
+      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
     });
   }
+
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('executed-from', {path: givenPath});
+  });
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
     app.dock.setIcon(image);
   }
 
-  console.log('info', app.getName(), app.getVersion(), app.getLocale());
+  console.log('info', app.getName(), app.getVersion(), app.getLocale(), givenPath);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -221,4 +256,6 @@ if (MONOKLE_RUN_AS_NODE) {
   openApplication();
 }
 
-terminal();
+terminal()
+  // eslint-disable-next-line no-console
+  .catch(e => console.log(e));

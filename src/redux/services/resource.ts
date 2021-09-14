@@ -412,6 +412,60 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
   }
 }
 
+export function removeResourceFromFile(
+  removedResource: K8sResource,
+  fileMap: FileMapType,
+  resourceMap: ResourceMapType
+) {
+  const fileEntry = fileMap[removedResource.filePath];
+  if (!fileEntry) {
+    throw new Error(`Failed to find fileEntry for resource with path ${removedResource.filePath}`);
+  }
+  const absoluteFilePath = getAbsoluteResourcePath(removedResource, fileMap);
+
+  // get list of resourceIds in file sorted by startPosition
+  const resourceIds = getResourcesForPath(removedResource.filePath, resourceMap)
+    .sort((a, b) => {
+      return a.range && b.range ? a.range.start - b.range.start : 0;
+    })
+    .map(r => r.id);
+
+  // delete the file if there's only one resource in it
+  if (!removedResource.range || resourceIds.length === 1) {
+    fs.unlinkSync(absoluteFilePath);
+    return;
+  }
+
+  // recalculate ranges for resources below the removed resource
+  let newRangeStart = 0;
+  let passedRemovedResource = false;
+  resourceIds.forEach(resourceId => {
+    const resource = resourceMap[resourceId];
+    if (resourceId === removedResource.id) {
+      passedRemovedResource = true;
+      newRangeStart = resource.range?.start || newRangeStart;
+      return;
+    }
+    if (!passedRemovedResource) {
+      return;
+    }
+    if (resource.range) {
+      resource.range.start = newRangeStart;
+      newRangeStart = resource.range.start + resource.range.length;
+    }
+  });
+
+  const content = fs.readFileSync(absoluteFilePath, 'utf8');
+  fs.writeFileSync(
+    absoluteFilePath,
+    content.substr(0, removedResource.range.start) +
+      content.substr(removedResource.range.start + removedResource.range.length)
+  );
+  fileEntry.timestamp = fs.statSync(absoluteFilePath).mtime.getTime();
+
+  delete resourceMap[removedResource.id];
+}
+
 /**
  * Extracts all resources from the specified text content (must be yaml)
  */

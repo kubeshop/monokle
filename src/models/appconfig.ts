@@ -35,7 +35,9 @@ interface AppConfig {
     filterObjectsOnSelection: boolean;
     autoZoomGraphOnSelection: boolean;
     helmPreviewMode: 'template' | 'install';
+    loadLastFolderOnStartup: boolean;
   };
+  recentFolders: string[];
 }
 
 export type {AppConfig};

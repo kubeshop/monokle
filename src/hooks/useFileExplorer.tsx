@@ -1,6 +1,5 @@
 import {useState, useCallback} from 'react';
 import {FileExplorerOptions, FileExplorerProps} from '@atoms/FileExplorer';
-import {findCommonRootFolder} from '@utils/files';
 
 type FileExplorerSelectResult = {
   filePath?: string;
@@ -15,22 +14,22 @@ export const useFileExplorer = (
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleOnSelect = useCallback(
-    (fileList: FileList) => {
+    (fileList: string[]) => {
       setIsOpen(false);
       if (options?.isDirectoryExplorer) {
         onSelect({
-          folderPath: findCommonRootFolder(fileList),
+          folderPath: fileList[0],
         });
         return;
       }
       if (options?.allowMultiple) {
         onSelect({
-          filePaths: Array.from(fileList).map(f => f.path),
+          filePaths: fileList,
         });
         return;
       }
       onSelect({
-        filePath: fileList[0].path,
+        filePath: fileList[0],
       });
     },
     [setIsOpen, onSelect, options]

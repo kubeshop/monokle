@@ -10,3 +10,4 @@ export {default as Col} from './Col';
 export {default as Layout} from './Layout';
 export {default as Content} from './Content';
 export {default as SplitView} from './SplitView';
+export {default as KeyValueInput} from './KeyValueInput';

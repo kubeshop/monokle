@@ -74,5 +74,7 @@ export async function applyFile(filePath: string, fileMap: FileMapType, dispatch
   } catch (e) {
     log.error('Failed to apply file');
     log.error(e);
+
+    dispatch(setApplyingResource(false));
   }
 }
