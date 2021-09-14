@@ -12,7 +12,7 @@ export function isIncomingRef(refType: ResourceRefType) {
 }
 
 export function isOutgoingRef(refType: ResourceRefType) {
-  return refType === ResourceRefType.Outgoing || refType === ResourceRefType.File;
+  return refType === ResourceRefType.Outgoing;
 }
 
 export function isUnsatisfiedRef(refType: ResourceRefType) {
@@ -21,6 +21,18 @@ export function isUnsatisfiedRef(refType: ResourceRefType) {
 
 export function hasIncomingRefs(resource: K8sResource) {
   return resource.refs?.some(e => isIncomingRef(e.type));
+}
+
+export function isFileRef(ref: ResourceRef) {
+  return ref.target?.type === 'file';
+}
+
+export function isResourceRef(ref: ResourceRef) {
+  return ref.target?.type === 'resource';
+}
+
+export function isResourceRefTo(ref: ResourceRef, resourceId: string) {
+  return ref.target?.type === 'resource' && ref.target.resourceId === resourceId;
 }
 
 export function hasOutgoingRefs(resource: K8sResource) {
@@ -251,7 +263,7 @@ function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) 
   resource.refs = resource.refs?.filter(ref => ref.type === 'incoming');
   Object.values(resourceMap).forEach(currentResource => {
     currentResource.refs = currentResource.refs?.filter(ref => {
-      if (ref.type === 'incoming' && ref.targetResourceId === resource.id) {
+      if (ref.type === 'incoming' && isResourceRefTo(ref, resource.id)) {
         return false;
       }
       return true;

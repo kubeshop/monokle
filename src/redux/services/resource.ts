@@ -167,15 +167,22 @@ export function createResourceRef(
     // make sure we don't duplicate
     if (
       !resource.refs.some(
-        ref => ref.type === refType && ref.name === refName && ref.targetResourceId === targetResourceId
+        ref =>
+          ref.type === refType &&
+          ref.name === refName &&
+          ref.target?.type === 'resource' &&
+          ref.target.resourceId === targetResourceId
       )
     ) {
       resource.refs.push({
         type: refType,
         name: refName,
         position: refNode?.getNodePosition(),
-        targetResourceId,
-        targetResourceKind,
+        target: {
+          type: 'resource',
+          resourceId: targetResourceId,
+          resourceKind: targetResourceKind,
+        },
       });
     }
   } else {
@@ -249,17 +256,25 @@ export function createResourceName(filePath: string, content: any) {
  */
 
 export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string) {
-  let refType = ResourceRefType.File;
+  let refType = ResourceRefType.Outgoing;
   resource.refs = resource.refs || [];
   const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
 
   // make sure we don't duplicate
-  if (!resource.refs.some(ref => ref.type === refType && ref.name === refName && ref.targetResourceId === filePath)) {
+  if (
+    !resource.refs.some(
+      ref =>
+        ref.type === refType && ref.name === refName && ref.target?.type === 'file' && ref.target.filePath === filePath
+    )
+  ) {
     resource.refs.push({
       type: refType,
       name: refName,
       position: refNode?.getNodePosition(),
-      targetResourceId: filePath,
+      target: {
+        type: 'file',
+        filePath,
+      },
     });
   }
 }
@@ -568,8 +583,8 @@ export function getLinkedResources(resource: K8sResource) {
   resource.refs
     ?.filter(ref => !isUnsatisfiedRef(ref.type))
     .forEach(ref => {
-      if (ref.targetResourceId) {
-        linkedResourceIds.push(ref.targetResourceId);
+      if (ref.target?.type === 'resource' && ref.target.resourceId) {
+        linkedResourceIds.push(ref.target.resourceId);
       }
     });
 

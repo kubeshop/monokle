@@ -146,13 +146,13 @@ export function getKustomizationRefs(
     kustomization.refs
       .filter(r => r.type === ResourceRefType.Outgoing || (selectParent && r.type === ResourceRefType.Incoming))
       .forEach(r => {
-        if (r.targetResourceId) {
-          const target = resourceMap[r.targetResourceId];
+        if (r.target?.type === 'resource' && r.target.resourceId) {
+          const target = resourceMap[r.target.resourceId];
           if (target) {
-            linkedResourceIds.push(r.targetResourceId);
+            linkedResourceIds.push(r.target.resourceId);
 
             if (target.kind === 'Kustomization' && r.type === ResourceRefType.Outgoing) {
-              linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.targetResourceId));
+              linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target.resourceId));
             }
           }
         }

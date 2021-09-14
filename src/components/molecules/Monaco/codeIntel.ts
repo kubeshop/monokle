@@ -3,7 +3,7 @@ import {isUnsatisfiedRef, isOutgoingRef} from '@redux/services/resourceRefs';
 import {K8sResource, ResourceRef, RefPosition} from '@models/k8sresource';
 
 import {ResourceKindHandlers, getIncomingRefMappers} from '@src/kindhandlers';
-import {ResourceMapType} from '@models/appstate';
+import {FileMapType, ResourceMapType} from '@models/appstate';
 import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
 
 import {
@@ -117,7 +117,9 @@ function areRefPosEqual(a: RefPosition, b: RefPosition) {
 export function applyForResource(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
-  resourceMap: ResourceMapType
+  selectFilePath: (filePath: string) => void,
+  resourceMap: ResourceMapType,
+  fileMap: FileMapType
 ) {
   const refs = resource.refs;
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
@@ -175,23 +177,40 @@ export function applyForResource(
 
     const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
     outgoingRefs.forEach(outgoingRef => {
-      if (!outgoingRef.targetResourceId) {
+      if (!outgoingRef.target) {
         return;
       }
-      const outgoingRefResource = resourceMap[outgoingRef.targetResourceId];
-      if (!outgoingRefResource) {
-        return;
-      }
-      const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-        `${outgoingRefResource.kind}: ${outgoingRefResource.name}`,
-        () => {
-          if (outgoingRef.targetResourceId) {
-            selectResource(outgoingRef.targetResourceId);
-          }
+
+      if (outgoingRef.target.type === 'resource' && outgoingRef.target.resourceId) {
+        const outgoingRefResource = resourceMap[outgoingRef.target.resourceId];
+        if (!outgoingRefResource) {
+          return;
         }
-      );
-      commandMarkdownLinkList.push(commandMarkdownLink);
-      newCommandDisposables.push(commandDisposable);
+        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+          `${outgoingRefResource.kind}: ${outgoingRefResource.name}`,
+          () => {
+            // @ts-ignore
+            selectResource(outgoingRef.target?.resourceId);
+          }
+        );
+        commandMarkdownLinkList.push(commandMarkdownLink);
+        newCommandDisposables.push(commandDisposable);
+      }
+      if (outgoingRef.target.type === 'file') {
+        const outgoingRefFile = fileMap[outgoingRef.target.filePath];
+        if (!outgoingRefFile) {
+          return;
+        }
+        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+          `File: ${outgoingRefFile.name}`,
+          () => {
+            // @ts-ignore
+            selectFilePath(outgoingRef.target?.filePath);
+          }
+        );
+        commandMarkdownLinkList.push(commandMarkdownLink);
+        newCommandDisposables.push(commandDisposable);
+      }
     });
 
     if (commandMarkdownLinkList.length > 0) {
@@ -205,8 +224,11 @@ export function applyForResource(
     if (outgoingRefs.length === 1) {
       const outgoingRef = outgoingRefs[0];
       const linkDisposable = createLinkProvider(inlineRange, () => {
-        if (outgoingRef.targetResourceId) {
-          selectResource(outgoingRef.targetResourceId);
+        if (outgoingRef.target?.type === 'resource' && outgoingRef.target.resourceId) {
+          selectResource(outgoingRef.target.resourceId);
+        }
+        if (outgoingRef.target?.type === 'file' && outgoingRef.target.filePath) {
+          selectFilePath(outgoingRef.target.filePath);
         }
       });
       newLinkDisposables.push(linkDisposable);

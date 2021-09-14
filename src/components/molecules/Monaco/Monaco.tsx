@@ -102,11 +102,15 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const dispatch = useAppDispatch();
 
-  const selectResourceOrFile = (selectedId: string) => {
-    if (resourceMap[selectedId]) {
-      dispatch(selectK8sResource({resourceId: selectedId}));
-    } else if (fileMap[selectedId]) {
-      dispatch(selectFile({filePath: selectedId}));
+  const selectResource = (resourceId: string) => {
+    if (resourceMap[resourceId]) {
+      dispatch(selectK8sResource({resourceId}));
+    }
+  };
+
+  const selectFilePath = (filePath: string) => {
+    if (fileMap[filePath]) {
+      dispatch(selectFile({filePath}));
     }
   };
 
@@ -335,7 +339,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     if (editor && selectedResourceId && resourceMap[selectedResourceId]) {
       const resource = resourceMap[selectedResourceId];
       const {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables} =
-        codeIntel.applyForResource(resource, selectResourceOrFile, resourceMap);
+        codeIntel.applyForResource(resource, selectResource, selectFilePath, resourceMap, fileMap);
       const idsOfNewDecorations = setDecorations(editor, newDecorations, idsOfDecorationsRef.current);
       idsOfDecorationsRef.current = idsOfNewDecorations;
       hoverDisposablesRef.current = newHoverDisposables;

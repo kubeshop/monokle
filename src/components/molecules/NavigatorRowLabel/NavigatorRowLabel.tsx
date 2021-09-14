@@ -11,13 +11,14 @@ import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
-import {K8sResource, ResourceRef, ResourceRefType, ResourceValidationError} from '@models/k8sresource';
+import {K8sResource, ResourceRef, ResourceValidationError} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {isUnsavedResource} from '@redux/services/resource';
 import ScrollIntoView from '@molecules/ScrollIntoView';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
+import path from 'path';
 import ActionsMenu from './ActionsMenu';
 
 const {Text} = Typography;
@@ -134,23 +135,48 @@ const UnsatisfiedRefLink = (props: {text: string}) => {
   );
 };
 
+const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
+  if (ref.target?.type === 'resource') {
+    if (ref.target.resourceId && resourceMap[ref.target.resourceId]) {
+      return resourceMap[ref.target.resourceId].name;
+    }
+  }
+  if (ref.target?.type === 'file') {
+    return path.parse(ref.target.filePath).name;
+  }
+  return ref.name;
+};
+
+const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
+  if (ref.target?.type === 'file') {
+    return 'File';
+  }
+
+  if (ref.target?.type === 'resource') {
+    if (ref.target.resourceKind) {
+      return ref.target.resourceKind;
+    }
+    if (ref.target.resourceId) {
+      return resourceMap[ref.target.resourceId]?.kind;
+    }
+  }
+};
+
 const RefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType; onClick?: () => void}) => {
   const {resourceRef, resourceMap, onClick} = props;
 
-  const targetName =
-    resourceRef.targetResourceId && resourceMap[resourceRef.targetResourceId]
-      ? resourceMap[resourceRef.targetResourceId].name
-      : resourceRef.name;
-
+  const targetName = getRefTargetName(resourceRef, resourceMap);
   let linkText = targetName;
 
-  if (resourceRef.type === ResourceRefType.File) {
+  if (resourceRef.target?.type === 'file') {
     linkText = `File: ${targetName}`;
-  } else if (resourceRef.targetResourceKind) {
-    linkText = `${resourceRef.targetResourceKind}: ${targetName}`;
-  } else if (resourceRef.targetResourceId) {
-    const resourceKind = resourceMap[resourceRef.targetResourceId].kind;
-    linkText = `${resourceKind}: ${targetName}`;
+  } else if (resourceRef.target?.type === 'resource') {
+    if (resourceRef.target.resourceKind) {
+      linkText = `${resourceRef.target.resourceKind}: ${targetName}`;
+    } else if (resourceRef.target.resourceId) {
+      const resourceKind = resourceMap[resourceRef.target.resourceId].kind;
+      linkText = `${resourceKind}: ${targetName}`;
+    }
   }
 
   if (isOutgoingRef(resourceRef.type)) {
@@ -170,13 +196,17 @@ const PopoverContent = (props: {
   children: React.ReactNode;
   resourceRefs: ResourceRef[];
   resourceMap: ResourceMapType;
-  selectResourceOrFile: (selectedResourceOrFile: string) => void;
+  selectResource: (resourceId: string) => void;
+  selectFilePath: (filePath: string) => void;
 }) => {
-  const {children, resourceRefs, resourceMap, selectResourceOrFile} = props;
+  const {children, resourceRefs, resourceMap, selectResource, selectFilePath} = props;
 
   const onLinkClick = (ref: ResourceRef) => {
-    if (ref.targetResourceId) {
-      selectResourceOrFile(ref.targetResourceId);
+    if (ref.target?.type === 'resource' && ref.target.resourceId) {
+      selectResource(ref.target.resourceId);
+    }
+    if (ref.target?.type === 'file') {
+      selectFilePath(ref.target.filePath);
     }
   };
 
@@ -186,27 +216,16 @@ const PopoverContent = (props: {
       <StyledDivider />
       {resourceRefs
         .sort((a, b) => {
-          let kindA;
-          let kindB;
-          if (a.targetResourceKind) {
-            kindA = a.targetResourceKind;
-          } else if (a.targetResourceId) {
-            const targetResourceA = resourceMap[a.targetResourceId];
-            kindA = targetResourceA?.kind;
-          }
-          if (b.targetResourceKind) {
-            kindB = b.targetResourceKind;
-          } else if (b.targetResourceId) {
-            const targetResourceB = resourceMap[b.targetResourceId];
-            kindB = targetResourceB?.kind;
-          }
+          let kindA = getRefKind(a, resourceMap);
+          let kindB = getRefKind(b, resourceMap);
+
           if (kindA && kindB) {
             return kindA.localeCompare(kindB);
           }
           return 0;
         })
         .map(resourceRef => (
-          <StyledRefDiv key={resourceRef.targetResourceId || resourceRef.name}>
+          <StyledRefDiv key={resourceRef.name}>
             <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
           </StyledRefDiv>
         ))}
@@ -292,11 +311,15 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
     return Boolean(resource && isUnsavedResource(resource));
   }, [resource]);
 
-  const selectResourceOrFile = (selectedId: string) => {
+  const selectResource = (selectedId: string) => {
     if (resourceMap[selectedId]) {
       dispatch(selectK8sResource({resourceId: selectedId}));
-    } else if (fileMap[selectedId]) {
-      dispatch(selectFile({filePath: selectedId}));
+    }
+  };
+
+  const selectFilePath = (filePath: string) => {
+    if (fileMap[filePath]) {
+      dispatch(selectFile({filePath}));
     }
   };
 
@@ -314,7 +337,8 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
             <PopoverContent
               resourceRefs={resource.refs.filter(r => isIncomingRef(r.type))}
               resourceMap={resourceMap}
-              selectResourceOrFile={selectResourceOrFile}
+              selectResource={selectResource}
+              selectFilePath={selectFilePath}
             >
               Incoming Links <MonoIcon type={MonoIconTypes.IncomingRefs} />
             </PopoverContent>
@@ -346,7 +370,8 @@ const NavigatorRowLabel = (props: NavigatorRowLabelProps) => {
             <PopoverContent
               resourceRefs={resource.refs.filter(r => isOutgoingRef(r.type) || isUnsatisfiedRef(r.type))}
               resourceMap={resourceMap}
-              selectResourceOrFile={selectResourceOrFile}
+              selectResource={selectResource}
+              selectFilePath={selectFilePath}
             >
               Outgoing Links <MonoIcon type={MonoIconTypes.OutgoingRefs} />
             </PopoverContent>
