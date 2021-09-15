@@ -38,6 +38,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
       </S.NameContainer>
       {itemHandler &&
         items &&
+        !groupedItems &&
         items.map(item => (
           <NavSectionItem<ItemType, ScopeType>
             key={getItemIdentifier(item)}

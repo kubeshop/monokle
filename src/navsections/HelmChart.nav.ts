@@ -23,10 +23,10 @@ export const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSection
       dispatch,
     };
   },
+  getItems: scope => {
+    return Object.values(scope.helmValuesMap);
+  },
   getItemsGrouped: scope => {
-    if (!scope || !scope.helmChartMap || !scope.helmValuesMap) {
-      return {};
-    }
     return Object.fromEntries(
       Object.values(scope.helmChartMap).map(helmChart => {
         const helmValuesFiles = helmChart.valueFileIds.map(valuesFile => scope.helmValuesMap[valuesFile]);
