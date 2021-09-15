@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2017",
     "module": "commonjs",
     "sourceMap": true,
     "strict": true,
     "outDir": "../build",
     "rootDir": "../",
+    "baseUrl": "../",
     "noEmitOnError": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ]
-  }
+    "resolveJsonModule": true
+  },
+  "extends": "../paths.json"
 }

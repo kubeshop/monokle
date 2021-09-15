@@ -63,6 +63,18 @@ export const uiSlice = createSlice({
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
+    openFolderExplorer: (state: Draft<UiState>) => {
+      state.folderExplorer = {isOpen: true};
+    },
+    closeFolderExplorer: (state: Draft<UiState>) => {
+      state.folderExplorer = {isOpen: false};
+    },
+    setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<any>) => {
+      state.monacoEditor = action.payload;
+    },
+    setShouldExpandAllNodes: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.shouldExpandAllNodes = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -88,5 +100,9 @@ export const {
   closeNewResourceWizard,
   openRenameResourceModal,
   closeRenameResourceModal,
+  openFolderExplorer,
+  closeFolderExplorer,
+  setMonacoEditor,
+  setShouldExpandAllNodes,
 } = uiSlice.actions;
 export default uiSlice.reducer;

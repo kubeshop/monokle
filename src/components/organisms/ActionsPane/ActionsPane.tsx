@@ -19,6 +19,8 @@ import FileExplorer from '@components/atoms/FileExplorer';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
+import {setMonacoEditor} from '@redux/reducers/ui';
+
 import {
   StyledLeftArrowButton,
   StyledRightArrowButton,
@@ -51,6 +53,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const previewType = useAppSelector(state => state.main.previewType);
+  const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
@@ -157,6 +160,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     helmValuesMap,
     selectedValuesFileId,
   ]);
+
+  useEffect(() => {
+    if (monacoEditor.apply) {
+      applySelection();
+      dispatch(setMonacoEditor({...monacoEditor, apply: false}));
+    }
+  }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {

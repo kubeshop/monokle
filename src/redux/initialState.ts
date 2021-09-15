@@ -105,6 +105,10 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
   },
+  renameResourceModal: {
+    isOpen: false,
+    resourceId: '',
+  },
   leftMenu: {
     selection: electronStore.get('ui.leftMenu.selection'),
     isActive: electronStore.get('ui.leftMenu.isActive'),
@@ -112,7 +116,20 @@ const initialUiState: UiState = {
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),
   },
+  folderExplorer: {
+    isOpen: false,
+  },
+  monacoEditor: {
+    focused: false,
+    undo: false,
+    redo: false,
+    find: false,
+    replace: false,
+    apply: false,
+    diff: false,
+  },
   paneConfiguration: electronStore.get('ui.paneConfiguration'),
+  shouldExpandAllNodes: false,
 };
 
 export default {

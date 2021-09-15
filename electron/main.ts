@@ -1,3 +1,5 @@
+import 'module-alias/register';
+
 import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
@@ -7,10 +9,13 @@ import * as ElectronLog from 'electron-log';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '@constants/constants';
+import {checkMissingDependencies} from '@utils/index';
 
-import {checkMissingDependencies} from '../src/utils/index';
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '../src/constants/constants';
 import terminal from '../cli/terminal';
+import {createMenu} from './menu';
+
+// console.log(store);
 
 Object.assign(console, ElectronLog.functions);
 
@@ -40,7 +45,7 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
     });
 
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
-  } catch (e) {
+  } catch (e: any) {
     event.sender.send('kustomize-result', {error: e.toString()});
   }
 });
@@ -88,7 +93,7 @@ ipcMain.on('run-helm', (event, args: any) => {
     });
 
     event.sender.send('helm-result', {stdout: stdout.toString()});
-  } catch (e) {
+  } catch (e: any) {
     event.sender.send('helm-result', {error: e.toString()});
   }
 });
@@ -158,6 +163,7 @@ function createWindow() {
 
 const openApplication = async (givenPath?: string) => {
   await app.whenReady();
+  const {default: mainStore} = await import('@redux/main-store');
 
   if (isDev) {
     // DevTools
@@ -172,6 +178,10 @@ const openApplication = async (givenPath?: string) => {
 
   ElectronStore.initRenderer();
   const win = createWindow();
+
+  mainStore.subscribe(() => {
+    createMenu(win, mainStore);
+  });
 
   const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 
