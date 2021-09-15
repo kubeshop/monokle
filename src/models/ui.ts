@@ -25,4 +25,28 @@ export type UiState = {
     selection?: string;
     isActive: boolean;
   };
+  folderExplorer: {
+    isOpen: boolean;
+  };
+  monacoEditor: {
+    focused: boolean;
+    undo: boolean;
+    redo: boolean;
+    find: boolean;
+    replace: boolean;
+    apply: boolean;
+    diff: boolean;
+  };
+  paneConfiguration: PaneConfiguration;
+  shouldExpandAllNodes: boolean;
+};
+
+export type PaneConfiguration = {
+  leftWidth: number;
+  navWidth: number;
+  rightWidth: number;
+  editWidth: number;
+  separatorEditRightXPosition?: number;
+  separatorLeftNavXPosition?: number;
+  separatorNavEditXPosition?: number;
 };

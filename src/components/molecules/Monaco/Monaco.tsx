@@ -18,7 +18,7 @@ import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
 import {updateFileEntry, updateResource, selectK8sResource, selectFile} from '@redux/reducers/main';
-import {openNewResourceWizard} from '@redux/reducers/ui';
+import {openNewResourceWizard, setMonacoEditor} from '@redux/reducers/ui';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
@@ -26,6 +26,7 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {useSelector} from 'react-redux';
 import {isInPreviewModeSelector} from '@redux/selectors';
+
 import {clearDecorations, setDecorations} from './editorHelpers';
 import codeIntel from './codeIntel';
 
@@ -77,6 +78,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
+  const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const [code, setCode] = useState('');
   const [orgCode, setOrgCode] = useState<string>('');
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
@@ -95,7 +97,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const applySelectionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const diffSelectedResourceDisposableRef = useRef<monaco.IDisposable | null>(null);
 
-  const editor = editorRef.current;
+  let editor = editorRef.current;
 
   const hiddenInputRef = useRef<HTMLInputElement>(null);
 
@@ -197,6 +199,10 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
           dispatch(openNewResourceWizard());
         }
       },
+    });
+
+    e.onDidFocusEditorText(() => {
+      dispatch(setMonacoEditor({...monacoEditor, focused: true}));
     });
 
     editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
@@ -403,6 +409,45 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
   }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
+
+  const handleClickOutside = useCallback(() => {
+    editor = editorRef.current;
+    if (editor && editor.hasTextFocus()) {
+      dispatch(setMonacoEditor({...monacoEditor, focused: true}));
+    } else {
+      dispatch(setMonacoEditor({...monacoEditor, focused: false}));
+    }
+  }, [selectedResourceId]);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!monacoEditor.focused) {
+      return;
+    }
+
+    if (editor && monacoEditor.undo) {
+      editor.trigger(null, 'undo', null);
+      dispatch(setMonacoEditor({...monacoEditor, undo: false}));
+    }
+    if (editor && monacoEditor.redo) {
+      editor.trigger(null, 'redo', null);
+      dispatch(setMonacoEditor({...monacoEditor, redo: false}));
+    }
+    if (editor && monacoEditor.find) {
+      editor.trigger(null, 'actions.find', null);
+      dispatch(setMonacoEditor({...monacoEditor, find: false}));
+    }
+    if (editor && monacoEditor.replace) {
+      editor.trigger(null, 'editor.action.startFindReplaceAction', null);
+      dispatch(setMonacoEditor({...monacoEditor, replace: false}));
+    }
+  }, [monacoEditor]);
 
   return (
     <>

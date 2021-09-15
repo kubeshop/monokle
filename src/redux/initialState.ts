@@ -100,18 +100,36 @@ const initialLogsState: LogsState = {
 };
 
 const initialUiState: UiState = {
-  isSettingsOpen: false,
+  isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
   isFolderLoading: false,
   newResourceWizard: {
+    isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
+  },
+  renameResourceModal: {
     isOpen: false,
+    resourceId: '',
   },
   leftMenu: {
-    selection: 'file-explorer',
-    isActive: true,
+    selection: electronStore.get('ui.leftMenu.selection'),
+    isActive: electronStore.get('ui.leftMenu.isActive'),
   },
   rightMenu: {
-    isActive: false,
+    isActive: electronStore.get('ui.rightMenu.isActive'),
   },
+  folderExplorer: {
+    isOpen: false,
+  },
+  monacoEditor: {
+    focused: false,
+    undo: false,
+    redo: false,
+    find: false,
+    replace: false,
+    apply: false,
+    diff: false,
+  },
+  paneConfiguration: electronStore.get('ui.paneConfiguration'),
+  shouldExpandAllNodes: false,
 };
 
 export default {
