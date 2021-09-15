@@ -3,11 +3,13 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandlers} from '@src/kindhandlers';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {ResourceFilterType, ResourceMapType} from '@models/appstate';
+import {ResourceFilterType} from '@models/appstate';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {AppDispatch} from '@redux/store';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isPassingKeyValueFilter} from '@utils/filter';
+import {activeResourcesSelector} from '@redux/selectors';
+import {useSelector} from 'react-redux';
 
 function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (
@@ -66,7 +68,7 @@ ResourceKindHandlers.forEach(kindHandler => {
 });
 
 type ResourceKindNavSectionScope = {
-  resourceMap: ResourceMapType;
+  activeResources: K8sResource[];
   resourceFilter: ResourceFilterType;
   dispatch: AppDispatch;
 };
@@ -79,12 +81,12 @@ function makeResourceKindNavSection(
     name: kindSectionName,
     useScope: () => {
       const dispatch = useAppDispatch();
-      const resourceMap = useAppSelector(state => state.main.resourceMap);
       const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-      return {resourceMap, resourceFilter, dispatch};
+      const activeResources = useSelector(activeResourcesSelector);
+      return {activeResources, resourceFilter, dispatch};
     },
     getItems: scope => {
-      return Object.values(scope.resourceMap).filter(r => r.kind === kindHandler.kind);
+      return scope.activeResources.filter(r => r.kind === kindHandler.kind);
     },
     itemHandler: {
       getName: item => item.name,
