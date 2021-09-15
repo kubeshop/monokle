@@ -4,11 +4,11 @@ const CONFIGURATION = 'Configuration';
 const NETWORK = 'Network';
 const STORAGE = 'Storage';
 const ACCESS_CONTROL = 'Access Control';
-const CUSTOM_RESOURCES = 'Custom Resources';
+const CUSTOM = 'Custom';
 
 /** stores the order of subsections for each section */
 const representation: Record<string, string[]> = {
-  [K8S_RESOURCES]: [WORKLOADS, CONFIGURATION, NETWORK, STORAGE, ACCESS_CONTROL, CUSTOM_RESOURCES],
+  [K8S_RESOURCES]: [WORKLOADS, CONFIGURATION, NETWORK, STORAGE, ACCESS_CONTROL, CUSTOM],
 };
 
 export default {
@@ -19,5 +19,5 @@ export default {
   NETWORK,
   STORAGE,
   ACCESS_CONTROL,
-  CUSTOM_RESOURCES,
+  CUSTOM,
 };

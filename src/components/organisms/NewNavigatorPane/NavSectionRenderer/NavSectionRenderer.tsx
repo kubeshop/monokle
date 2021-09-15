@@ -20,13 +20,23 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     getItemIdentifier,
     isGroupVisible,
     isItemVisible,
+    isSectionLoading,
+    isSectionVisible,
     itemHandler,
     itemCustomization,
     subsections,
   } = useNavSection<ItemType, ScopeType>(navSection);
 
-  if (!subsections && !groupedItems && (!items || items.length === 0)) {
+  if (!isSectionVisible) {
     return null;
+  }
+
+  if (!subsections && Object.keys(groupedItems).length === 0 && items.length === 0) {
+    return null;
+  }
+
+  if (isSectionLoading) {
+    return <S.Skeleton />;
   }
 
   return (
@@ -37,8 +47,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         </S.Name>
       </S.NameContainer>
       {itemHandler &&
-        items &&
-        !groupedItems &&
+        Object.keys(groupedItems).length === 0 &&
         items.map(item => (
           <NavSectionItem<ItemType, ScopeType>
             key={getItemIdentifier(item)}
@@ -51,7 +60,6 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
           />
         ))}
       {itemHandler &&
-        groupedItems &&
         Object.entries(groupedItems).map(
           ([groupName, groupItems]) =>
             isGroupVisible(groupName) && (

@@ -1,10 +1,11 @@
 import {useMemo, useCallback} from 'react';
-import {NavSection, NavSectionScopedItemMethod} from '@models/navsection';
+import {NavSection} from '@models/navsection';
+import navSectionMap from '@src/navsections/navSectionMap';
 
 function makeItemVisibilityMap<ItemType, ScopeType>(
   items: ItemType[],
   scope: ScopeType,
-  isVisible: boolean | NavSectionScopedItemMethod<ItemType, ScopeType, boolean>,
+  isVisible: boolean | ((item: ItemType, scope: ScopeType) => boolean),
   getItemIdentifier: (item: ItemType) => string | null
 ): Record<string, boolean> {
   const itemEntries: [string, boolean][] = items
@@ -22,7 +23,17 @@ function makeItemVisibilityMap<ItemType, ScopeType>(
 }
 
 export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemType, ScopeType>) {
-  const {name, getItems, getItemsGrouped, useScope, itemHandler, itemCustomization, subsections} = navSection;
+  const {
+    name,
+    getItems,
+    getItemsGrouped,
+    useScope,
+    itemHandler,
+    itemCustomization,
+    isLoading,
+    isVisible,
+    subsectionNames,
+  } = navSection;
 
   const scope = useScope();
 
@@ -30,14 +41,14 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     if (getItems) {
       return getItems(scope);
     }
-    return undefined;
+    return [];
   }, [scope, getItems]);
 
   const groupedItems = useMemo(() => {
     if (getItemsGrouped) {
       return getItemsGrouped(scope);
     }
-    return undefined;
+    return {};
   }, [scope, getItemsGrouped]);
 
   const getItemIdentifier = useCallback(
@@ -54,11 +65,11 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     if (!items) {
       return {};
     }
-    const isVisible = itemHandler?.isVisible;
-    if (!isVisible) {
+    const handleIsVisible = itemHandler?.isVisible;
+    if (!handleIsVisible) {
       return makeItemVisibilityMap(items, scope, true, getItemIdentifier);
     }
-    return makeItemVisibilityMap(items, scope, isVisible, getItemIdentifier);
+    return makeItemVisibilityMap(items, scope, handleIsVisible, getItemIdentifier);
   }, [scope, itemHandler, items]);
 
   const isItemVisible = useCallback(
@@ -84,6 +95,24 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     [groupedItems, itemVisibilityMap]
   );
 
+  const isSectionLoading = useMemo(() => {
+    if (!isLoading) {
+      return false;
+    }
+    return isLoading(scope, items);
+  }, [scope, items, isLoading]);
+
+  const isSectionVisible = useMemo(() => {
+    if (!isVisible) {
+      return true;
+    }
+    return isVisible(scope, items);
+  }, [scope, items, isVisible]);
+
+  const subsections = useMemo(() => {
+    return subsectionNames?.map(s => navSectionMap.getByName(s)) || undefined;
+  }, [navSectionMap]);
+
   return {
     name,
     scope,
@@ -93,6 +122,8 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     isGroupVisible,
     isItemVisible,
     getItemIdentifier,
+    isSectionLoading,
+    isSectionVisible,
     itemHandler,
     itemCustomization,
   };

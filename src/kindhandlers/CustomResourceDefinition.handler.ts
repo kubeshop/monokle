@@ -5,7 +5,7 @@ import navSectionNames from '@constants/navSectionNames';
 const CustomResourceDefinitionHandler: ResourceKindHandler = {
   kind: 'CustomResourceDefinition',
   apiVersionMatcher: '**',
-  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CUSTOM_RESOURCES, 'Custom Resources'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CUSTOM, 'Custom Resources'],
   clusterApiVersion: 'apiextensions.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1',
   description: '',

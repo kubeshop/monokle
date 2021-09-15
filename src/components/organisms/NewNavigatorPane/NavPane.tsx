@@ -2,7 +2,7 @@ import React, {useCallback, useContext} from 'react';
 import AppContext from '@src/AppContext';
 import {K8sResource} from '@models/k8sresource';
 import {HelmValuesFile} from '@models/helm';
-import {KustomizationNavSection, KustomizationNavSectionScope} from '@src/navsections/Kustomization.nav';
+import KustomizationNavSection, {KustomizationNavSectionScope} from '@src/navsections/KustomizationNavSection';
 import {HelmChartNavSection, HelmChartNavSectionScope} from '@src/navsections/HelmChart.nav';
 import {K8sResourceNavSection, K8sResourceNavSectionScope} from '@src/navsections/K8sResource.nav';
 import {Popover} from 'antd';

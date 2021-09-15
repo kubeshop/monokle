@@ -1,12 +1,5 @@
 import React from 'react';
 
-export type NavSectionScopedMethod<ScopeType, MethodReturnType> = <S extends ScopeType>(scope: S) => MethodReturnType;
-
-export type NavSectionScopedItemMethod<ItemType, ScopeType, MethodReturnType> = <S extends ScopeType>(
-  item: ItemType,
-  scope: S
-) => MethodReturnType;
-
 export type NavSectionItemCustomComponentProps<ItemType> = {
   item: ItemType;
   isItemHovered: boolean;
@@ -23,18 +16,20 @@ export interface NavSectionItemCustomization<ItemType> {
 export interface NavSectionItemHandler<ItemType, ScopeType> {
   getName: (item: ItemType) => string;
   getIdentifier: (item: ItemType) => string;
-  isSelected?: NavSectionScopedItemMethod<ItemType, ScopeType, boolean>;
-  isHighlighted?: NavSectionScopedItemMethod<ItemType, ScopeType, boolean>;
-  isVisible?: NavSectionScopedItemMethod<ItemType, ScopeType, boolean>;
-  onClick?: NavSectionScopedItemMethod<ItemType, ScopeType, void>;
+  isSelected?: (item: ItemType, scope: ScopeType) => boolean;
+  isHighlighted?: (item: ItemType, scope: ScopeType) => boolean;
+  isVisible?: (item: ItemType, scope: ScopeType) => boolean;
+  onClick?: (item: ItemType, scope: ScopeType) => void;
 }
 
 export interface NavSection<ItemType, ScopeType = any> {
   name: string;
   useScope: () => ScopeType;
-  subsections?: NavSection<ItemType, ScopeType>[];
-  getItems?: NavSectionScopedMethod<ScopeType, ItemType[]>;
-  getItemsGrouped?: NavSectionScopedMethod<ScopeType, Record<string, ItemType[]>>;
+  subsectionNames?: string[];
+  getItems?: (scope: ScopeType) => ItemType[];
+  getItemsGrouped?: (scope: ScopeType) => Record<string, ItemType[]>;
+  isLoading?: (scope: ScopeType, items: ItemType[]) => boolean;
+  isVisible?: (scope: ScopeType, items: ItemType[]) => boolean;
   itemHandler?: NavSectionItemHandler<ItemType, ScopeType>;
   itemCustomization?: NavSectionItemCustomization<ItemType>;
 }
