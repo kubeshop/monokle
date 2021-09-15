@@ -75,7 +75,7 @@
     "@rjsf/core": "3.1.0",
     "@trodi/electron-splashscreen": "1.0.2",
     "ajv": "^6.12.6",
-    "antd": "4.16.12",
+    "antd": "4.16.13",
     "chokidar": "3.5.2",
     "dagre": "0.8.5",
     "dayjs": "1.10.6",
