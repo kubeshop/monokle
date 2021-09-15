@@ -3,10 +3,51 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandlers} from '@src/kindhandlers';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {ResourceMapType} from '@models/appstate';
+import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {AppDispatch} from '@redux/store';
 import {selectK8sResource} from '@redux/reducers/main';
+import {isPassingKeyValueFilter} from '@utils/filter';
+
+function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
+  if (
+    filters.name &&
+    filters.name.trim() !== '' &&
+    resource.name.toLowerCase().indexOf(filters.name.toLowerCase()) === -1
+  ) {
+    return false;
+  }
+  if (filters.kind && resource.kind !== filters.kind) {
+    return false;
+  }
+  if (filters.namespace) {
+    if (!resource.namespace && filters.namespace !== 'default') {
+      return false;
+    }
+    return resource.namespace === filters.namespace;
+  }
+  if (filters.labels && Object.keys(filters.labels).length > 0) {
+    const resourceLabels = resource.content?.metadata?.labels;
+    if (!resourceLabels) {
+      return false;
+    }
+    const isPassingLabelFilter = isPassingKeyValueFilter(resourceLabels, filters.labels);
+    if (!isPassingLabelFilter) {
+      return false;
+    }
+  }
+  if (filters.annotations && Object.keys(filters.annotations).length > 0) {
+    const resourceAnnotations = resource.content?.metadata?.annotations;
+    if (!resourceAnnotations) {
+      return false;
+    }
+    const isPassingAnnotationsFilter = isPassingKeyValueFilter(resourceAnnotations, filters.annotations);
+    if (!isPassingAnnotationsFilter) {
+      return false;
+    }
+  }
+  return true;
+}
 
 const subsectionNames = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
 
@@ -26,6 +67,7 @@ ResourceKindHandlers.forEach(kindHandler => {
 
 type ResourceKindNavSectionScope = {
   resourceMap: ResourceMapType;
+  resourceFilter: ResourceFilterType;
   dispatch: AppDispatch;
 };
 
@@ -38,7 +80,8 @@ function makeResourceKindNavSection(
     useScope: () => {
       const dispatch = useAppDispatch();
       const resourceMap = useAppSelector(state => state.main.resourceMap);
-      return {resourceMap, dispatch};
+      const resourceFilter = useAppSelector(state => state.main.resourceFilter);
+      return {resourceMap, resourceFilter, dispatch};
     },
     getItems: scope => {
       return Object.values(scope.resourceMap).filter(r => r.kind === kindHandler.kind);
@@ -50,6 +93,10 @@ function makeResourceKindNavSection(
       isHighlighted: item => item.isHighlighted,
       onClick: (item, scope) => {
         scope.dispatch(selectK8sResource({resourceId: item.id}));
+      },
+      isVisible: (item, scope) => {
+        const isPassingFilter = isResourcePassingFilter(item, scope.resourceFilter);
+        return isPassingFilter;
       },
     },
   };

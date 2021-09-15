@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {NavSectionItemHandler, NavSectionItemCustomization} from '@models/navsection';
-import {useDelayedUnmount} from '@hooks/useDelayedUnmount';
 import {useItemHandler} from './useItemHandler';
 import {useItemCustomization} from './useItemCustomization';
 import * as S from './styled';
@@ -16,8 +15,6 @@ function NavSectionItem<ItemType, ScopeType>(props: {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const {item, scope, handler, customization = {}, level, isVisible} = props;
 
-  const {shouldMount} = useDelayedUnmount(isVisible, 500);
-
   const {name, isSelected, isHighlighted} = useItemHandler(item, scope, handler);
   const {Prefix, Suffix, QuickAction, customComponentProps} = useItemCustomization<ItemType>(item, customization, {
     isHovered,
@@ -25,7 +22,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
 
   return (
     <>
-      {shouldMount && (
+      {isVisible && (
         <S.ItemContainer
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
