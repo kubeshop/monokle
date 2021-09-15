@@ -47,7 +47,7 @@ const NavPane = () => {
             size="small"
             icon={<PlusOutlined />}
           />
-          <Popover content={<ResourceFilter onChange={() => {}} />} trigger="click">
+          <Popover content={<ResourceFilter />} trigger="click">
             <S.FilterButton
               disabled={!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode}
               type="link"

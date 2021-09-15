@@ -22,7 +22,7 @@ import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 import AppContext from '@src/AppContext';
 
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
-import ResourceFilter, {ResourceFilterType} from '@components/molecules/ResourceFilter';
+import ResourceFilter from '@components/molecules/ResourceFilter';
 import {ResourceValidationError} from '@models/k8sresource';
 
 import HelmChartsSection from './components/HelmChartsSection';
@@ -153,12 +153,11 @@ const NavigatorPane = () => {
   const kustomizations = useSelector(kustomizationsSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const resourceFilter = useAppSelector(state => state.main.resourceFilter);
 
   const [isValidationsErrorsModalVisible, setValidationsErrorsVisible] = useState<boolean>(false);
   const [currentValidationErrors, setCurrentValidationErrors] = useState<ResourceValidationError[]>([]);
   const [expandedSections, setExpandedSections] = useState<string[]>(['kustomizations', 'helmcharts']);
-
-  const [resourceFilters, setResourceFilters] = useState<ResourceFilterType>({labels: {}, annotations: {}});
 
   const doesRootFileEntryExist = useCallback(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
@@ -219,7 +218,7 @@ const NavigatorPane = () => {
                   size="small"
                   icon={<PlusOutlined />}
                 />
-                <Popover content={<ResourceFilter onChange={setResourceFilters} />} trigger="click">
+                <Popover content={<ResourceFilter />} trigger="click">
                   <StyledFilterButton
                     disabled={!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode}
                     type="link"
@@ -289,7 +288,7 @@ const NavigatorPane = () => {
         {uiState.isFolderLoading || previewLoader.isLoading ? (
           <StyledSkeleton />
         ) : (
-          <ResourcesSection filters={resourceFilters} showErrorsModal={showValidationsErrorsModal} />
+          <ResourcesSection filters={resourceFilter} showErrorsModal={showValidationsErrorsModal} />
         )}
       </NavigatorPaneContainer>
     </>

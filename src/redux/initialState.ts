@@ -13,6 +13,10 @@ const NAV_K8S_RESOURCES_SECTIONS_ORDER = navSectionNames.representation[navSecti
 const initialAppState: AppState = {
   selectionHistory: [],
   resourceMap: {},
+  resourceFilter: {
+    labels: {},
+    annotations: {},
+  },
   fileMap: {},
   helmChartMap: {},
   helmValuesMap: {},

@@ -10,7 +10,7 @@ import {NavigatorSection, NavigatorSubSection} from '@models/navigator';
 import {activeResourcesSelector} from '@redux/selectors';
 import {selectK8sResource} from '@redux/reducers/main';
 
-import {ResourceFilterType} from '@components/molecules/ResourceFilter';
+import {ResourceFilterType} from '@models/appstate';
 
 import NavigatorContentTitle from './NavigatorContentTitle';
 import SectionRow from './SectionRow';
