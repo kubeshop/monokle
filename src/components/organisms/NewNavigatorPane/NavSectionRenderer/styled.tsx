@@ -7,6 +7,7 @@ export const NameContainer = styled.li<{isSelected: boolean; isHighlighted: bool
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  user-select: none;
   ${props => {
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {

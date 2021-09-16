@@ -11,6 +11,7 @@ export const ItemContainer = styled.li<{
   align-items: center;
   width: 100%
   cursor: pointer;
+  user-select: none;
     ${props => {
       if (props.isVisible) {
         return 'transition: opacity 500ms ease-in;';
