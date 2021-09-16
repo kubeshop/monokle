@@ -2,10 +2,10 @@ import Colors from '@styles/Colors';
 import styled from 'styled-components';
 
 export const ItemContainer = styled.li<{
-  isHovered: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
   isVisible: boolean;
+  isHovered: boolean;
 }>`
   display: flex;
   align-items: center;

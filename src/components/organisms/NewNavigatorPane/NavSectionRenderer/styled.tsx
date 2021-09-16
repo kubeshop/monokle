@@ -2,14 +2,23 @@ import Colors from '@styles/Colors';
 import styled from 'styled-components';
 import {Skeleton as RawSkeleton} from 'antd';
 
-export const NameContainer = styled.li<{isSelected: boolean; isHighlighted: boolean}>`
+export const NameContainer = styled.li<{isSelected: boolean; isHighlighted: boolean; isHovered?: boolean}>`
   width: 100%;
   ${props => {
     if (!props.isSelected && props.isHighlighted) {
+      if (props.isHovered) {
+        return `background: ${Colors.highlightGradientHover};`;
+      }
       return `background: ${Colors.highlightGradient};`;
     }
     if (props.isSelected) {
+      if (props.isHovered) {
+        return `background: ${Colors.selectionGradientHover};`;
+      }
       return `background: ${Colors.selectionGradient};`;
+    }
+    if (props.isHovered) {
+      return `background: ${Colors.blackPearl};`;
     }
   }};
 `;

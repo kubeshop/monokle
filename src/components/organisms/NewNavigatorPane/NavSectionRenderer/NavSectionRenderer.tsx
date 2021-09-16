@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {NavSection} from '@models/navsection';
 import {useNavSection} from './useNavSection';
 import NavSectionItem from './NavSectionItem';
@@ -27,6 +27,8 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     subsections,
   } = useNavSection<ItemType, ScopeType>(navSection);
 
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
   if (!isSectionVisible) {
     return null;
   }
@@ -41,7 +43,13 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
 
   return (
     <>
-      <S.NameContainer isSelected={false} isHighlighted={false}>
+      <S.NameContainer
+        isHovered={isHovered}
+        isSelected={false}
+        isHighlighted={false}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <S.Name isSelected={false} isHighlighted={false} level={level}>
           {name}
         </S.Name>
