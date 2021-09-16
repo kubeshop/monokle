@@ -13,6 +13,8 @@ export type KustomizationNavSectionScope = {
   previewResourceId: string | undefined;
   isInClusterMode: boolean;
   isFolderLoading: boolean;
+  selectedPath: string | undefined;
+  selectedResourceId: string | undefined;
   dispatch: AppDispatch;
 };
 
@@ -24,11 +26,15 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
     const previewResourceId = useAppSelector(state => state.main.previewResourceId);
     const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
     const isInClusterMode = useSelector(isInClusterModeSelector);
+    const selectedPath = useAppSelector(state => state.main.selectedPath);
+    const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
     return {
       resourceMap,
       previewResourceId,
       isInClusterMode: Boolean(isInClusterMode),
       isFolderLoading,
+      selectedPath,
+      selectedResourceId,
       dispatch,
     };
   },
@@ -49,6 +55,15 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
     isDisabled: (item, scope) => Boolean(scope.previewResourceId && scope.previewResourceId !== item.id),
     onClick: (item, scope) => {
       scope.dispatch(selectK8sResource({resourceId: item.id}));
+    },
+    shouldScrollIntoView: (item, scope) => {
+      if (item.isHighlighted && scope.selectedPath) {
+        return true;
+      }
+      if (item.isSelected && scope.selectedResourceId) {
+        return true;
+      }
+      return false;
     },
   },
   itemCustomization: {

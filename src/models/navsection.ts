@@ -22,6 +22,7 @@ export interface NavSectionItemHandler<ItemType, ScopeType> {
   isVisible?: (item: ItemType, scope: ScopeType) => boolean;
   isDirty?: (item: ItemType, scope: ScopeType) => boolean;
   isDisabled?: (item: ItemType, scope: ScopeType) => boolean;
+  shouldScrollIntoView?: (item: ItemType, scope: ScopeType) => boolean;
   onClick?: (item: ItemType, scope: ScopeType) => void;
 }
 

@@ -26,5 +26,9 @@ export function useItemHandler<ItemType, ScopeType>(
     return Boolean(handler.isDisabled && handler.isDisabled(item, scope));
   }, [handler, scope, item]);
 
-  return {name, isSelected, isHighlighted, isDirty, isDisabled};
+  const shouldScrollIntoView = useMemo(() => {
+    return Boolean(handler.shouldScrollIntoView && handler.shouldScrollIntoView(item, scope));
+  }, [handler, scope, item]);
+
+  return {name, isSelected, isHighlighted, isDirty, isDisabled, shouldScrollIntoView};
 }

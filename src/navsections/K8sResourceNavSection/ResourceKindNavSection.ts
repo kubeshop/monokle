@@ -10,12 +10,6 @@ import {isPassingKeyValueFilter} from '@utils/filter';
 import {activeResourcesSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 
-export type ResourceKindNavSectionScope = {
-  activeResources: K8sResource[];
-  resourceFilter: ResourceFilterType;
-  dispatch: AppDispatch;
-};
-
 function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (
     filters.name &&
@@ -56,6 +50,14 @@ function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterT
   return true;
 }
 
+export type ResourceKindNavSectionScope = {
+  activeResources: K8sResource[];
+  resourceFilter: ResourceFilterType;
+  selectedResourceId: string | undefined;
+  selectedPath: string | undefined;
+  dispatch: AppDispatch;
+};
+
 export function makeResourceKindNavSection(
   kindHandler: ResourceKindHandler
 ): NavSection<K8sResource, ResourceKindNavSectionScope> {
@@ -66,7 +68,9 @@ export function makeResourceKindNavSection(
       const dispatch = useAppDispatch();
       const resourceFilter = useAppSelector(state => state.main.resourceFilter);
       const activeResources = useSelector(activeResourcesSelector);
-      return {activeResources, resourceFilter, dispatch};
+      const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+      const selectedPath = useAppSelector(state => state.main.selectedPath);
+      return {activeResources, resourceFilter, selectedResourceId, selectedPath, dispatch};
     },
     getItems: scope => {
       return scope.activeResources.filter(r => r.kind === kindHandler.kind);
@@ -83,6 +87,15 @@ export function makeResourceKindNavSection(
       isVisible: (item, scope) => {
         const isPassingFilter = isResourcePassingFilter(item, scope.resourceFilter);
         return isPassingFilter;
+      },
+      shouldScrollIntoView: (item, scope) => {
+        if (item.isHighlighted && scope.selectedPath) {
+          return true;
+        }
+        if (item.isSelected && scope.selectedResourceId) {
+          return true;
+        }
+        return false;
       },
     },
   };
