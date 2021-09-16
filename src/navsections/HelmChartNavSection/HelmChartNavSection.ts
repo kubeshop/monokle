@@ -11,7 +11,7 @@ export type HelmChartNavSectionScope = {
   dispatch: AppDispatch;
 };
 
-export const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> = {
+const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> = {
   name: 'Helm Charts',
   useScope: () => {
     const dispatch = useAppDispatch();
@@ -45,3 +45,5 @@ export const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSection
     },
   },
 };
+
+export default HelmChartNavSection;

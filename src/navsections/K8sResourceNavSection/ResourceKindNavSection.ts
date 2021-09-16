@@ -1,16 +1,19 @@
+import {useSelector} from 'react-redux';
 import {NavSection} from '@models/navsection';
-import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandlers} from '@src/kindhandlers';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {PreviewLoaderType, ResourceFilterType} from '@models/appstate';
+import {ResourceFilterType} from '@models/appstate';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {AppDispatch} from '@redux/store';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {activeResourcesSelector} from '@redux/selectors';
-import {useSelector} from 'react-redux';
-import navSectionMap from './navSectionMap';
+
+export type ResourceKindNavSectionScope = {
+  activeResources: K8sResource[];
+  resourceFilter: ResourceFilterType;
+  dispatch: AppDispatch;
+};
 
 function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (
@@ -52,29 +55,7 @@ function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterT
   return true;
 }
 
-const subsectionNames = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
-
-const kindHandlersBySubsectionName: Record<string, ResourceKindHandler[]> = {};
-ResourceKindHandlers.forEach(kindHandler => {
-  const navSectionName = kindHandler.navigatorPath[0];
-  if (navSectionName !== navSectionNames.K8S_RESOURCES) {
-    return;
-  }
-  const subsectionName = kindHandler.navigatorPath[1];
-  if (kindHandlersBySubsectionName[subsectionName]) {
-    kindHandlersBySubsectionName[subsectionName].push(kindHandler);
-  } else {
-    kindHandlersBySubsectionName[subsectionName] = [kindHandler];
-  }
-});
-
-type ResourceKindNavSectionScope = {
-  activeResources: K8sResource[];
-  resourceFilter: ResourceFilterType;
-  dispatch: AppDispatch;
-};
-
-function makeResourceKindNavSection(
+export function makeResourceKindNavSection(
   kindHandler: ResourceKindHandler
 ): NavSection<K8sResource, ResourceKindNavSectionScope> {
   const kindSectionName = kindHandler.navigatorPath[2];
@@ -105,37 +86,3 @@ function makeResourceKindNavSection(
   };
   return navSection;
 }
-
-export type K8sResourceNavSectionScope = {
-  isFolderLoading: boolean;
-  previewLoader: PreviewLoaderType;
-};
-
-const subsections = subsectionNames.map(subsectionName => {
-  const kindHandlerSections = (kindHandlersBySubsectionName[subsectionName] || []).map(kindHandler =>
-    makeResourceKindNavSection(kindHandler)
-  );
-
-  kindHandlerSections.forEach(k => navSectionMap.register(k));
-
-  return {
-    name: subsectionName,
-    useScope: () => {},
-    subsectionNames: kindHandlerSections.map(k => k.name),
-  };
-});
-
-subsections.forEach(s => navSectionMap.register(s));
-
-export const K8sResourceNavSection: NavSection<K8sResource, K8sResourceNavSectionScope> = {
-  name: navSectionNames.K8S_RESOURCES,
-  useScope: () => {
-    const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
-    const previewLoader = useAppSelector(state => state.main.previewLoader);
-    return {isFolderLoading, previewLoader};
-  },
-  isLoading: scope => {
-    return scope.isFolderLoading || scope.previewLoader.isLoading;
-  },
-  subsectionNames,
-};
