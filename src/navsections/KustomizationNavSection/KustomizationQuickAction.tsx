@@ -49,24 +49,24 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
     return null;
   }
   return (
-    <>
+    <S.Container>
       <Tooltip
         mouseEnterDelay={TOOLTIP_DELAY}
         title={isItemBeingPreviewed ? ExitKustomizationPreviewTooltip : KustomizationPreviewTooltip}
       >
-        <S.PreviewSpan isSelected={isItemSelected} onClick={selectAndPreviewKustomization}>
+        <S.PreviewSpan isItemSelected={isItemSelected} onClick={selectAndPreviewKustomization}>
           {isItemBeingPreviewed ? 'Exit' : 'Preview'}
         </S.PreviewSpan>
       </Tooltip>
 
       {isItemBeingPreviewed && (
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadKustomizationPreviewTooltip}>
-          <S.ReloadSpan isSelected={isItemSelected} onClick={reloadPreview}>
+          <S.ReloadSpan isItemSelected={isItemSelected} onClick={reloadPreview}>
             Reload
           </S.ReloadSpan>
         </Tooltip>
       )}
-    </>
+    </S.Container>
   );
 };
 

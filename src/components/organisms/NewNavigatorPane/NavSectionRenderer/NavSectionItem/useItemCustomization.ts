@@ -15,7 +15,7 @@ export function useItemCustomization<ItemType>(
       item,
       isItemHovered: itemState.isHovered,
     };
-  }, [itemState.isHovered]);
+  }, [item, itemState]);
 
   return {Prefix, Suffix, QuickAction, customComponentProps};
 }
