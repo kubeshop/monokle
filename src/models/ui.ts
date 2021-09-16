@@ -25,4 +25,7 @@ export type UiState = {
     selection?: string;
     isActive: boolean;
   };
+  navPane: {
+    collapsedNavSectionNames: string[];
+  };
 };

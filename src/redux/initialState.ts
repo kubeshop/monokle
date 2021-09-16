@@ -118,6 +118,9 @@ const initialUiState: UiState = {
   rightMenu: {
     isActive: false,
   },
+  navPane: {
+    collapsedNavSectionNames: [],
+  },
 };
 
 export default {

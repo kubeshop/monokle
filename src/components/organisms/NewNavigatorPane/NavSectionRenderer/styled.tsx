@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import {Skeleton as RawSkeleton} from 'antd';
 
 export const NameContainer = styled.li<{isSelected: boolean; isHighlighted: boolean; isHovered?: boolean}>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
   ${props => {
     if (!props.isSelected && props.isHighlighted) {
@@ -29,6 +32,11 @@ export const Name = styled.span<{isSelected: boolean; isHighlighted: boolean; le
   font-size: ${props => {
     return `${24 - 4 * props.level}px;`;
   }};
+`;
+
+export const Collapsible = styled.span`
+  margin-left: auto;
+  margin-right: 15px;
 `;
 
 export const Skeleton = styled(RawSkeleton)`

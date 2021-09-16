@@ -1,5 +1,8 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
+import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 import {NavSection} from '@models/navsection';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {collapseNavSection, expandNavSection} from '@redux/reducers/ui';
 import {useNavSection} from './useNavSection';
 import NavSectionItem from './NavSectionItem';
 import * as S from './styled';
@@ -10,8 +13,8 @@ type NavSectionRendererProps<ItemType, ScopeType> = {
 };
 
 function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<ItemType, ScopeType>) {
+  const dispatch = useAppDispatch();
   const {navSection, level} = props;
-
   const {
     name,
     scope,
@@ -28,6 +31,19 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
   } = useNavSection<ItemType, ScopeType>(navSection);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const collapsedNavSectionNames = useAppSelector(state => state.ui.navPane.collapsedNavSectionNames);
+
+  const isCollapsed = useMemo(() => {
+    return collapsedNavSectionNames.includes(name);
+  }, [collapsedNavSectionNames, name]);
+
+  const expandSection = () => {
+    dispatch(expandNavSection(name));
+  };
+
+  const collapseSection = () => {
+    dispatch(collapseNavSection(name));
+  };
 
   if (!isSectionVisible) {
     return null;
@@ -53,8 +69,18 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         <S.Name isSelected={false} isHighlighted={false} level={level}>
           {name}
         </S.Name>
+        {isHovered && (
+          <S.Collapsible>
+            {isCollapsed ? (
+              <PlusSquareOutlined onClick={expandSection} />
+            ) : (
+              <MinusSquareOutlined onClick={collapseSection} />
+            )}
+          </S.Collapsible>
+        )}
       </S.NameContainer>
-      {itemHandler &&
+      {!isCollapsed &&
+        itemHandler &&
         Object.keys(groupedItems).length === 0 &&
         items.map(item => (
           <NavSectionItem<ItemType, ScopeType>
@@ -67,7 +93,8 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
             isVisible={isItemVisible(item)}
           />
         ))}
-      {itemHandler &&
+      {!isCollapsed &&
+        itemHandler &&
         Object.entries(groupedItems).map(
           ([groupName, groupItems]) =>
             isGroupVisible(groupName) && (
@@ -91,7 +118,8 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
               </React.Fragment>
             )
         )}
-      {subsections &&
+      {!isCollapsed &&
+        subsections &&
         subsections.map(child => (
           <NavSectionRenderer<ItemType, ScopeType> key={child.name} navSection={child} level={level + 1} />
         ))}
