@@ -49,11 +49,9 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
     getIdentifier: item => item.id,
     isSelected: (item, scope) => item.isSelected || scope.previewResourceId === item.id,
     isHighlighted: item => item.isHighlighted,
+    isDisabled: (item, scope) => Boolean(scope.previewResourceId && scope.previewResourceId !== item.id),
     onClick: (item, scope) => {
-      const isSelectionDisabled = Boolean(scope.previewResourceId && scope.previewResourceId !== item.id);
-      if (!isSelectionDisabled) {
-        scope.dispatch(selectK8sResource({resourceId: item.id}));
-      }
+      scope.dispatch(selectK8sResource({resourceId: item.id}));
     },
   },
   itemCustomization: {

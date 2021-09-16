@@ -21,7 +21,13 @@ export const ItemContainer = styled.li<{isSelected: boolean; isHighlighted: bool
     }};
 `;
 
-export const ItemName = styled.span<{isSelected: boolean; isHighlighted: boolean; isDirty: boolean; level: number}>`
+export const ItemName = styled.span<{
+  isSelected: boolean;
+  isHighlighted: boolean;
+  isDirty: boolean;
+  isDisabled: boolean;
+  level: number;
+}>`
   padding: 2px 12px;
   cursor: pointer;
   font-size: 12px;
@@ -34,6 +40,9 @@ export const ItemName = styled.span<{isSelected: boolean; isHighlighted: boolean
     }
   }};
   ${props => {
+    if (props.isDisabled) {
+      return `color: ${Colors.grey7};`;
+    }
     if (!props.isSelected && props.isDirty) {
       return `color: ${Colors.yellow7};`;
     }

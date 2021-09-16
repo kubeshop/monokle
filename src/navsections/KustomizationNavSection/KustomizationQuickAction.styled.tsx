@@ -14,7 +14,6 @@ export const PreviewSpan = styled.span<{isItemSelected: boolean}>`
 
 export const ReloadSpan = styled.span<{isItemSelected: boolean}>`
   margin-right: 15px;
-  margin-left: 10px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {NavSectionItemHandler, NavSectionItemCustomization} from '@models/navsection';
 import {useItemHandler} from './useItemHandler';
 import {useItemCustomization} from './useItemCustomization';
@@ -15,10 +15,16 @@ function NavSectionItem<ItemType, ScopeType>(props: {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const {item, scope, handler, customization = {}, level, isVisible} = props;
 
-  const {name, isSelected, isHighlighted, isDirty} = useItemHandler(item, scope, handler);
+  const {name, isSelected, isHighlighted, isDirty, isDisabled} = useItemHandler(item, scope, handler);
   const {Prefix, Suffix, QuickAction, customComponentProps} = useItemCustomization<ItemType>(item, customization, {
     isHovered,
   });
+
+  const onClick = useCallback(() => {
+    if (handler.onClick && !isDisabled) {
+      handler.onClick(item, scope);
+    }
+  }, [handler]);
 
   return (
     <>
@@ -29,10 +35,16 @@ function NavSectionItem<ItemType, ScopeType>(props: {
           isSelected={isSelected}
           isHighlighted={isHighlighted}
           isVisible={isVisible}
-          onClick={() => handler.onClick && handler.onClick(item, scope)}
+          onClick={onClick}
         >
           <S.PrefixContainer>{Prefix && <Prefix {...customComponentProps} />}</S.PrefixContainer>
-          <S.ItemName level={level} isSelected={isSelected} isDirty={isDirty} isHighlighted={isHighlighted}>
+          <S.ItemName
+            level={level}
+            isSelected={isSelected}
+            isDirty={isDirty}
+            isHighlighted={isHighlighted}
+            isDisabled={isDisabled}
+          >
             {name}
             {isDirty && <span>*</span>}
           </S.ItemName>
