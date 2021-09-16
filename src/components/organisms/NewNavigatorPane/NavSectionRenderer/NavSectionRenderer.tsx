@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 import {NavSection} from '@models/navsection';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -28,22 +28,34 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     itemHandler,
     itemCustomization,
     subsections,
+    shouldSectionExpand,
   } = useNavSection<ItemType, ScopeType>(navSection);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const collapsedNavSectionNames = useAppSelector(state => state.ui.navPane.collapsedNavSectionNames);
 
   const isCollapsed = useMemo(() => {
-    return collapsedNavSectionNames.includes(name);
+    return (
+      collapsedNavSectionNames.includes(name) ||
+      (subsections && subsections.every(s => collapsedNavSectionNames.includes(s.name)))
+    );
   }, [collapsedNavSectionNames, name]);
 
   const expandSection = () => {
+    subsections && subsections.map(s => dispatch(expandNavSection(s.name)));
     dispatch(expandNavSection(name));
   };
 
   const collapseSection = () => {
+    subsections && subsections.map(s => dispatch(collapseNavSection(s.name)));
     dispatch(collapseNavSection(name));
   };
+
+  useEffect(() => {
+    if (shouldSectionExpand) {
+      dispatch(expandNavSection(name));
+    }
+  }, [shouldSectionExpand]);
 
   if (!isSectionVisible) {
     return null;
@@ -118,8 +130,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
               </React.Fragment>
             )
         )}
-      {!isCollapsed &&
-        subsections &&
+      {subsections &&
         subsections.map(child => (
           <NavSectionRenderer<ItemType, ScopeType> key={child.name} navSection={child} level={level + 1} />
         ))}

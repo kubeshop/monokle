@@ -95,6 +95,16 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     [groupedItems, itemVisibilityMap]
   );
 
+  const shouldSectionExpand = useMemo(() => {
+    const shouldScrollItemIntoView = itemHandler?.shouldScrollIntoView;
+    if (items && shouldScrollItemIntoView) {
+      if (items.some(item => isItemVisible(item) && shouldScrollItemIntoView(item, scope))) {
+        return true;
+      }
+    }
+    return false;
+  }, [scope, items, itemHandler, isItemVisible]);
+
   const isSectionLoading = useMemo(() => {
     if (!isLoading) {
       return false;
@@ -126,5 +136,6 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     isSectionVisible,
     itemHandler,
     itemCustomization,
+    shouldSectionExpand,
   };
 }
