@@ -1,10 +1,16 @@
 import Colors from '@styles/Colors';
 import styled from 'styled-components';
 
-export const ItemContainer = styled.li<{isSelected: boolean; isHighlighted: boolean; isVisible: boolean}>`
+export const ItemContainer = styled.li<{
+  isHovered: boolean;
+  isSelected: boolean;
+  isHighlighted: boolean;
+  isVisible: boolean;
+}>`
   display: flex;
   align-items: center;
   width: 100%
+  cursor: pointer;
     ${props => {
       if (props.isVisible) {
         return 'transition: opacity 500ms ease-in;';
@@ -13,10 +19,19 @@ export const ItemContainer = styled.li<{isSelected: boolean; isHighlighted: bool
     }}
     ${props => {
       if (!props.isSelected && props.isHighlighted) {
+        if (props.isHovered) {
+          return `background: ${Colors.highlightGradientHover};`;
+        }
         return `background: ${Colors.highlightGradient};`;
       }
       if (props.isSelected) {
+        if (props.isHovered) {
+          return `background: ${Colors.selectionGradientHover};`;
+        }
         return `background: ${Colors.selectionGradient};`;
+      }
+      if (props.isHovered) {
+        return `background: ${Colors.blackPearl};`;
       }
     }};
 `;

@@ -35,6 +35,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
           isSelected={isSelected}
           isHighlighted={isHighlighted}
           isVisible={isVisible}
+          isHovered={isHovered}
           onClick={onClick}
         >
           <S.PrefixContainer>{Prefix && <Prefix {...customComponentProps} />}</S.PrefixContainer>
