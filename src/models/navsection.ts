@@ -19,6 +19,7 @@ export interface NavSectionItemHandler<ItemType, ScopeType> {
   isSelected?: (item: ItemType, scope: ScopeType) => boolean;
   isHighlighted?: (item: ItemType, scope: ScopeType) => boolean;
   isVisible?: (item: ItemType, scope: ScopeType) => boolean;
+  isDirty?: (item: ItemType, scope: ScopeType) => boolean;
   onClick?: (item: ItemType, scope: ScopeType) => void;
 }
 

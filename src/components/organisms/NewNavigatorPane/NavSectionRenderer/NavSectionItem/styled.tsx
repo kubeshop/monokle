@@ -21,18 +21,29 @@ export const ItemContainer = styled.li<{isSelected: boolean; isHighlighted: bool
     }};
 `;
 
-export const ItemName = styled.span<{isSelected: boolean; isHighlighted: boolean; level: number}>`
+export const ItemName = styled.span<{isSelected: boolean; isHighlighted: boolean; isDirty: boolean; level: number}>`
   padding: 2px 12px;
   cursor: pointer;
   font-size: 12px;
   ${props => {
+    if (props.isSelected) {
+      return `font-weight: 700;`;
+    }
+    if (props.isHighlighted) {
+      return `font-weight: 500;`;
+    }
+  }};
+  ${props => {
+    if (!props.isSelected && props.isDirty) {
+      return `color: ${Colors.yellow7};`;
+    }
     if (!props.isSelected && props.isHighlighted) {
       return `color: ${Colors.cyan7};`;
     }
     if (props.isSelected) {
-      return `color: ${Colors.blackPure}`;
+      return `color: ${Colors.blackPure};`;
     }
-    return `color: ${Colors.blue10}`;
+    return `color: ${Colors.blue10};`;
   }};
 `;
 

@@ -8,6 +8,7 @@ import {AppDispatch} from '@redux/store';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {activeResourcesSelector} from '@redux/selectors';
+import {isUnsavedResource} from '@redux/services/resource';
 
 export type ResourceKindNavSectionScope = {
   activeResources: K8sResource[];
@@ -75,6 +76,7 @@ export function makeResourceKindNavSection(
       getIdentifier: item => item.id,
       isSelected: item => item.isSelected,
       isHighlighted: item => item.isHighlighted,
+      isDirty: item => isUnsavedResource(item),
       onClick: (item, scope) => {
         scope.dispatch(selectK8sResource({resourceId: item.id}));
       },

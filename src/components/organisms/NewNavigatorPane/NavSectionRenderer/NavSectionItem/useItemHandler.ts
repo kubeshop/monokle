@@ -18,5 +18,9 @@ export function useItemHandler<ItemType, ScopeType>(
     return Boolean(handler.isHighlighted && handler.isHighlighted(item, scope));
   }, [handler, scope, item]);
 
-  return {name, isSelected, isHighlighted};
+  const isDirty = useMemo(() => {
+    return Boolean(handler.isDirty && handler.isDirty(item, scope));
+  }, [handler, scope, item]);
+
+  return {name, isSelected, isHighlighted, isDirty};
 }

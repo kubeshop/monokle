@@ -15,7 +15,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const {item, scope, handler, customization = {}, level, isVisible} = props;
 
-  const {name, isSelected, isHighlighted} = useItemHandler(item, scope, handler);
+  const {name, isSelected, isHighlighted, isDirty} = useItemHandler(item, scope, handler);
   const {Prefix, Suffix, QuickAction, customComponentProps} = useItemCustomization<ItemType>(item, customization, {
     isHovered,
   });
@@ -32,8 +32,9 @@ function NavSectionItem<ItemType, ScopeType>(props: {
           onClick={() => handler.onClick && handler.onClick(item, scope)}
         >
           <S.PrefixContainer>{Prefix && <Prefix {...customComponentProps} />}</S.PrefixContainer>
-          <S.ItemName level={level} isSelected={isSelected} isHighlighted={isHighlighted}>
+          <S.ItemName level={level} isSelected={isSelected} isDirty={isDirty} isHighlighted={isHighlighted}>
             {name}
+            {isDirty && <span>*</span>}
           </S.ItemName>
           <S.SuffixContainer>{Suffix && <Suffix {...customComponentProps} />}</S.SuffixContainer>
           <S.QuickActionContainer>{QuickAction && <QuickAction {...customComponentProps} />}</S.QuickActionContainer>
