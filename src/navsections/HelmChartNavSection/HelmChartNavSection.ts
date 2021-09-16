@@ -1,13 +1,19 @@
+import {useSelector} from 'react-redux';
 import {HelmValuesFile} from '@models/helm';
 import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {NavSection} from '@models/navsection';
+import {isInClusterModeSelector} from '@redux/selectors';
+import HelmChartQuickAction from './HelmChartQuickAction';
 
 export type HelmChartNavSectionScope = {
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
+  previewValuesFileId: string | undefined;
+  isInClusterMode: boolean;
+  isFolderLoading: boolean;
   dispatch: AppDispatch;
 };
 
@@ -17,9 +23,15 @@ const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> 
     const dispatch = useAppDispatch();
     const helmChartMap = useAppSelector(state => state.main.helmChartMap);
     const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+    const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
+    const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
+    const isInClusterMode = useSelector(isInClusterModeSelector);
     return {
       helmChartMap,
       helmValuesMap,
+      previewValuesFileId,
+      isInClusterMode: Boolean(isInClusterMode),
+      isFolderLoading,
       dispatch,
     };
   },
@@ -34,15 +46,25 @@ const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> 
       })
     );
   },
+  isLoading: scope => {
+    return scope.isFolderLoading;
+  },
+  isVisible: scope => {
+    return !scope.isInClusterMode;
+  },
   itemHandler: {
     getName: item => item.name,
     getIdentifier: item => item.id,
     isSelected: item => {
       return item.isSelected;
     },
+    isDisabled: (item, scope) => Boolean(scope.previewValuesFileId && scope.previewValuesFileId !== item.id),
     onClick: (item, scope) => {
       scope.dispatch(selectHelmValuesFile({valuesFileId: item.id}));
     },
+  },
+  itemCustomization: {
+    QuickAction: HelmChartQuickAction,
   },
 };
 
