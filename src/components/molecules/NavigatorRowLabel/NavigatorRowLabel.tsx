@@ -224,11 +224,26 @@ const PopoverContent = (props: {
           }
           return 0;
         })
-        .map(resourceRef => (
-          <StyledRefDiv key={resourceRef.name}>
-            <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
-          </StyledRefDiv>
-        ))}
+        .map(resourceRef => {
+          let key = resourceRef.name;
+          if (resourceRef.target?.type === 'file') {
+            key = resourceRef.target.filePath;
+          }
+          if (resourceRef.target?.type === 'resource') {
+            if (resourceRef.target.resourceId) {
+              key = resourceRef.target.resourceId;
+            } else {
+              key = resourceRef.target.resourceKind
+                ? `${resourceRef.target.resourceKind}-${resourceRef.name}`
+                : resourceRef.name;
+            }
+          }
+          return (
+            <StyledRefDiv key={key}>
+              <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
+            </StyledRefDiv>
+          );
+        })}
     </>
   );
 };
