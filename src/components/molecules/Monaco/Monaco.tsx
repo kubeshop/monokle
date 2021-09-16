@@ -17,7 +17,7 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {getResourceSchema} from '@redux/services/schema';
 import {logMessage} from '@redux/services/log';
-import {updateFileEntry, updateResource, selectK8sResource} from '@redux/reducers/main';
+import {updateFileEntry, updateResource, selectK8sResource, selectFile} from '@redux/reducers/main';
 import {openNewResourceWizard, setMonacoEditor} from '@redux/reducers/ui';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {parseAllDocuments} from 'yaml';
@@ -105,7 +105,15 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const dispatch = useAppDispatch();
 
   const selectResource = (resourceId: string) => {
-    dispatch(selectK8sResource({resourceId}));
+    if (resourceMap[resourceId]) {
+      dispatch(selectK8sResource({resourceId}));
+    }
+  };
+
+  const selectFilePath = (filePath: string) => {
+    if (fileMap[filePath]) {
+      dispatch(selectFile({filePath}));
+    }
   };
 
   const onDidChangeMarkers = (e: monaco.Uri[]) => {
@@ -337,7 +345,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     if (editor && selectedResourceId && resourceMap[selectedResourceId]) {
       const resource = resourceMap[selectedResourceId];
       const {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables} =
-        codeIntel.applyForResource(resource, selectResource, resourceMap);
+        codeIntel.applyForResource(resource, selectResource, selectFilePath, resourceMap, fileMap);
       const idsOfNewDecorations = setDecorations(editor, newDecorations, idsOfDecorationsRef.current);
       idsOfDecorationsRef.current = idsOfNewDecorations;
       hoverDisposablesRef.current = newHoverDisposables;

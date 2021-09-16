@@ -26,10 +26,10 @@ export const renameResource = (
   const newResourceText = stringify(newResourceContent);
   if (shouldUpdateRefs && resource.refs) {
     resource.refs.forEach(ref => {
-      if (!isIncomingRef(ref.type) || !ref.targetResourceId) {
+      if (!isIncomingRef(ref.type) || !(ref.target?.type === 'resource' && ref.target.resourceId)) {
         return;
       }
-      const dependentResource = resourceMap[ref.targetResourceId];
+      const dependentResource = resourceMap[ref.target.resourceId];
       if (!dependentResource || !dependentResource.refs) {
         return;
       }
