@@ -3,6 +3,7 @@ import React from 'react';
 export type NavSectionItemCustomComponentProps<ItemType> = {
   item: ItemType;
   isItemHovered: boolean;
+  isItemSelected: boolean;
 };
 
 export type NavSectionItemCustomComponent<ItemType> = React.ComponentType<NavSectionItemCustomComponentProps<ItemType>>;

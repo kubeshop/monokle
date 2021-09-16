@@ -4,7 +4,7 @@ import {NavSectionItemCustomComponentProps, NavSectionItemCustomization} from '@
 export function useItemCustomization<ItemType>(
   item: ItemType,
   customization: NavSectionItemCustomization<ItemType> = {},
-  itemState: {isHovered: boolean}
+  itemState: {isHovered: boolean; isSelected: boolean}
 ) {
   const Prefix = useMemo(() => customization.Prefix, [customization]);
   const Suffix = useMemo(() => customization.Suffix, [customization]);
@@ -14,6 +14,7 @@ export function useItemCustomization<ItemType>(
     return {
       item,
       isItemHovered: itemState.isHovered,
+      isItemSelected: itemState.isSelected,
     };
   }, [item, itemState]);
 

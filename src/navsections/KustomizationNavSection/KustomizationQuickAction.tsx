@@ -1,5 +1,4 @@
 import React, {useCallback, useMemo} from 'react';
-import {Tooltip} from 'antd';
 import {NavSectionItemCustomComponentProps} from '@models/navsection';
 import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -10,16 +9,13 @@ import {
   KustomizationPreviewTooltip,
   ReloadKustomizationPreviewTooltip,
 } from '@constants/tooltips';
-import {TOOLTIP_DELAY} from '@constants/constants';
-import * as S from './KustomizationQuickAction.styled';
+import QuickActionPreview from '@components/molecules/QuickActionPreview';
 
 const QuickAction = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
-  const {item, isItemHovered} = props;
+  const {item, isItemSelected, isItemHovered} = props;
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
-
-  const isItemSelected = useMemo(() => item.isSelected || previewResourceId === item.id, [previewResourceId, item]);
 
   const isItemBeingPreviewed = useMemo(
     () => previewResourceId !== undefined && previewResourceId === item.id,
@@ -48,25 +44,17 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
   if (!isItemHovered) {
     return null;
   }
-  return (
-    <S.Container>
-      <Tooltip
-        mouseEnterDelay={TOOLTIP_DELAY}
-        title={isItemBeingPreviewed ? ExitKustomizationPreviewTooltip : KustomizationPreviewTooltip}
-      >
-        <S.PreviewSpan isItemSelected={isItemSelected} onClick={selectAndPreviewKustomization}>
-          {isItemBeingPreviewed ? 'Exit' : 'Preview'}
-        </S.PreviewSpan>
-      </Tooltip>
 
-      {isItemBeingPreviewed && (
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadKustomizationPreviewTooltip}>
-          <S.ReloadSpan isItemSelected={isItemSelected} onClick={reloadPreview}>
-            Reload
-          </S.ReloadSpan>
-        </Tooltip>
-      )}
-    </S.Container>
+  return (
+    <QuickActionPreview
+      isItemSelected={isItemSelected}
+      isItemBeingPreviewed={isItemBeingPreviewed}
+      previewTooltip={KustomizationPreviewTooltip}
+      reloadPreviewTooltip={ReloadKustomizationPreviewTooltip}
+      exitPreviewTooltip={ExitKustomizationPreviewTooltip}
+      selectAndPreviewOrExit={selectAndPreviewKustomization}
+      reloadPreview={reloadPreview}
+    />
   );
 };
 

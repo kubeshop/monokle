@@ -18,6 +18,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
   const {name, isSelected, isHighlighted, isDirty, isDisabled} = useItemHandler(item, scope, handler);
   const {Prefix, Suffix, QuickAction, customComponentProps} = useItemCustomization<ItemType>(item, customization, {
     isHovered,
+    isSelected,
   });
 
   const onClick = useCallback(() => {

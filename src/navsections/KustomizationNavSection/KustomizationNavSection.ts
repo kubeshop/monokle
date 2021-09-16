@@ -1,5 +1,5 @@
 import {useSelector} from 'react-redux';
-import {PreviewLoaderType, ResourceMapType} from '@models/appstate';
+import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {selectK8sResource} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
@@ -11,7 +11,6 @@ import KustomizationQuickAction from './KustomizationQuickAction';
 export type KustomizationNavSectionScope = {
   resourceMap: ResourceMapType;
   previewResourceId: string | undefined;
-  previewLoader: PreviewLoaderType;
   isInClusterMode: boolean;
   isFolderLoading: boolean;
   dispatch: AppDispatch;
@@ -23,13 +22,11 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
     const dispatch = useAppDispatch();
     const resourceMap = useAppSelector(state => state.main.resourceMap);
     const previewResourceId = useAppSelector(state => state.main.previewResourceId);
-    const previewLoader = useAppSelector(state => state.main.previewLoader);
     const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
     const isInClusterMode = useSelector(isInClusterModeSelector);
     return {
       resourceMap,
       previewResourceId,
-      previewLoader,
       isInClusterMode: Boolean(isInClusterMode),
       isFolderLoading,
       dispatch,
@@ -41,8 +38,8 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
   isLoading: scope => {
     return scope.isFolderLoading;
   },
-  isVisible: (scope, items) => {
-    return !scope.isInClusterMode && !scope.previewLoader.isLoading && items.length > 0;
+  isVisible: scope => {
+    return !scope.isInClusterMode;
   },
   itemHandler: {
     getName: item => item.name,
