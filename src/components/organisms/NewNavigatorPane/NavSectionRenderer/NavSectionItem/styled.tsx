@@ -6,6 +6,7 @@ export const ItemContainer = styled.li<{
   isHighlighted: boolean;
   isVisible: boolean;
   isHovered: boolean;
+  level: number;
 }>`
   display: flex;
   align-items: center;
@@ -35,6 +36,7 @@ export const ItemContainer = styled.li<{
         return `background: ${Colors.blackPearl};`;
       }
     }};
+  padding-left: ${props => `${props.level * 10}px;`};
 `;
 
 export const ItemName = styled.span<{
@@ -44,7 +46,7 @@ export const ItemName = styled.span<{
   isDisabled: boolean;
   level: number;
 }>`
-  padding: 2px 12px;
+  padding: 2px 0;
   cursor: pointer;
   font-size: 12px;
   ${props => {
@@ -76,7 +78,10 @@ export const PrefixContainer = styled.span`
   width: 20px;
 `;
 
-export const SuffixContainer = styled.span``;
+export const SuffixContainer = styled.span`
+  display: flex;
+  align-items: center;
+`;
 
 export const QuickActionContainer = styled.span`
   margin-left: auto;

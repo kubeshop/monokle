@@ -6,6 +6,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isIncomingRef} from '@redux/services/resourceRefs';
 import {Popover} from 'antd';
+import {useMemo} from 'react';
 import styled from 'styled-components';
 
 const StyledIconsContainer = styled.span`
@@ -19,7 +20,7 @@ const Prefix = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
-  const incomingRefs = item.refs?.filter(r => isIncomingRef(r.type));
+  const incomingRefs = useMemo(() => item.refs?.filter(r => isIncomingRef(r.type)), [item]);
 
   const selectResource = (resId: string) => {
     dispatch(selectK8sResource({resourceId: resId}));

@@ -11,6 +11,7 @@ import {activeResourcesSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindPrefix from './ResourceKindPrefix';
+import ResourceKindSuffix from './ResourceKindSuffix';
 
 function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (
@@ -102,6 +103,7 @@ export function makeResourceKindNavSection(
     },
     itemCustomization: {
       Prefix: ResourceKindPrefix,
+      Suffix: ResourceKindSuffix,
       ContextMenu: ResourceKindContextMenu,
     },
   };
