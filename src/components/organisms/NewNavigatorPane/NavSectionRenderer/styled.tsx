@@ -32,6 +32,9 @@ export const Name = styled.span<{isSelected?: boolean; isHighlighted?: boolean; 
   font-size: ${props => {
     return `${24 - 4 * props.level}px;`;
   }};
+  margin-left: ${props => {
+    return `${8 * props.level}px`;
+  }};
   ${props => {
     if (props.isSelected) {
       return `font-weight: 700;`;

@@ -44,15 +44,17 @@ export const uiSlice = createSlice({
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
-    collapseNavSection: (state: Draft<UiState>, action: PayloadAction<string>) => {
-      if (!state.navPane.collapsedNavSectionNames.includes(action.payload)) {
-        state.navPane.collapsedNavSectionNames.push(action.payload);
+    collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
+      if (expandedSections.length > 0) {
+        state.navPane.collapsedNavSectionNames.push(...expandedSections);
       }
     },
-    expandNavSection: (state: Draft<UiState>, action: PayloadAction<string>) => {
-      if (state.navPane.collapsedNavSectionNames.includes(action.payload)) {
+    expandNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const collapsedSections = action.payload.filter(s => state.navPane.collapsedNavSectionNames.includes(s));
+      if (collapsedSections.length > 0) {
         state.navPane.collapsedNavSectionNames = state.navPane.collapsedNavSectionNames.filter(
-          n => n !== action.payload
+          n => !collapsedSections.includes(n)
         );
       }
     },
@@ -81,7 +83,7 @@ export const {
   closeNewResourceWizard,
   openRenameResourceModal,
   closeRenameResourceModal,
-  collapseNavSection,
-  expandNavSection,
+  collapseNavSections,
+  expandNavSections,
 } = uiSlice.actions;
 export default uiSlice.reducer;

@@ -72,7 +72,9 @@ export const ItemName = styled.span<{
   }};
 `;
 
-export const PrefixContainer = styled.span``;
+export const PrefixContainer = styled.span`
+  width: 20px;
+`;
 
 export const SuffixContainer = styled.span``;
 

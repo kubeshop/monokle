@@ -1,8 +1,8 @@
-import React, {useMemo, useState, useEffect} from 'react';
+import React, {useMemo, useState, useEffect, useCallback} from 'react';
 import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 import {NavSection} from '@models/navsection';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {collapseNavSection, expandNavSection} from '@redux/reducers/ui';
+import {collapseNavSections, expandNavSections} from '@redux/reducers/ui';
 import {useNavSection} from './useNavSection';
 import NavSectionItem from './NavSectionItem';
 import * as S from './styled';
@@ -11,6 +11,22 @@ type NavSectionRendererProps<ItemType, ScopeType> = {
   navSection: NavSection<ItemType, ScopeType>;
   level: number;
 };
+
+function loopSubsectionNamesDeep(
+  subsections: NavSection<any, any>[] | string[],
+  callback: (subsectionName: string) => void
+) {
+  subsections.forEach(sub => {
+    if (typeof sub === 'string') {
+      callback(sub);
+      return;
+    }
+    callback(sub.name);
+    if (sub.subsectionNames) {
+      loopSubsectionNamesDeep(sub.subsectionNames, callback);
+    }
+  });
+}
 
 function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<ItemType, ScopeType>) {
   const dispatch = useAppDispatch();
@@ -36,28 +52,51 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const collapsedNavSectionNames = useAppSelector(state => state.ui.navPane.collapsedNavSectionNames);
 
-  const isCollapsed = useMemo(() => {
-    return (
-      collapsedNavSectionNames.includes(name) ||
-      (subsections && subsections.every(s => collapsedNavSectionNames.includes(s.name)))
-    );
+  const isCollapsedMode = useMemo(() => {
+    if (collapsedNavSectionNames.includes(name)) {
+      return 'collapsed';
+    }
+    if (subsections && subsections.every(s => collapsedNavSectionNames.includes(s.name))) {
+      return 'collapsed';
+    }
+    if (subsections && subsections.every(s => !collapsedNavSectionNames.includes(s.name))) {
+      return 'expanded';
+    }
+    if (!subsections || subsections.length === 0) {
+      return 'expanded';
+    }
+    return 'mixed';
   }, [collapsedNavSectionNames, name]);
 
-  const expandSection = () => {
-    subsections && subsections.map(s => dispatch(expandNavSection(s.name)));
-    dispatch(expandNavSection(name));
-  };
+  const isCollapsed = useMemo(() => {
+    return isCollapsedMode === 'collapsed';
+  }, [isCollapsedMode]);
 
-  const collapseSection = () => {
-    subsections && subsections.map(s => dispatch(collapseNavSection(s.name)));
-    dispatch(collapseNavSection(name));
-  };
+  const expandSection = useCallback(() => {
+    if (!subsections || subsections.length === 0) {
+      dispatch(expandNavSections([name]));
+    } else {
+      const allSubsectionNames: string[] = [];
+      loopSubsectionNamesDeep(subsections, subsectionName => allSubsectionNames.push(subsectionName));
+      dispatch(expandNavSections([name, ...allSubsectionNames]));
+    }
+  }, [name, subsections, dispatch, expandNavSections]);
+
+  const collapseSection = useCallback(() => {
+    if (!subsections || subsections.length === 0) {
+      dispatch(collapseNavSections([name]));
+    } else {
+      const allSubsectionNames: string[] = [];
+      loopSubsectionNamesDeep(subsections, subsectionName => allSubsectionNames.push(subsectionName));
+      dispatch(collapseNavSections([name, ...allSubsectionNames]));
+    }
+  }, [name, subsections, dispatch, collapseNavSections]);
 
   useEffect(() => {
     if (shouldSectionExpand) {
-      dispatch(expandNavSection(name));
+      expandSection();
     }
-  }, [shouldSectionExpand]);
+  }, [shouldSectionExpand, expandSection]);
 
   if (!isSectionVisible) {
     return null;
@@ -89,10 +128,11 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         </S.Name>
         {isHovered && (
           <S.Collapsible>
-            {isCollapsed ? (
+            {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
               <PlusSquareOutlined onClick={expandSection} />
-            ) : (
-              <MinusSquareOutlined onClick={collapseSection} />
+            )}
+            {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
+              <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
             )}
           </S.Collapsible>
         )}
