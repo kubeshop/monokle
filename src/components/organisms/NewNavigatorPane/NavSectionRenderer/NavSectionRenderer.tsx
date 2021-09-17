@@ -25,6 +25,8 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     isItemVisible,
     isSectionLoading,
     isSectionVisible,
+    isSectionHighlighted,
+    isSectionSelected,
     itemHandler,
     itemCustomization,
     subsections,
@@ -73,12 +75,16 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     <>
       <S.NameContainer
         isHovered={isHovered}
-        isSelected={false}
-        isHighlighted={false}
+        isSelected={isSectionSelected && isCollapsed}
+        isHighlighted={isSectionHighlighted && isCollapsed}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <S.Name isSelected={false} isHighlighted={false} level={level}>
+        <S.Name
+          isSelected={isSectionSelected && isCollapsed}
+          isHighlighted={isSectionSelected && isCollapsed}
+          level={level}
+        >
           {name}
         </S.Name>
         {isHovered && (
@@ -111,10 +117,8 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
           ([groupName, groupItems]) =>
             isGroupVisible(groupName) && (
               <React.Fragment key={groupName}>
-                <S.NameContainer isSelected={false} isHighlighted={false} style={{color: 'red'}}>
-                  <S.Name isSelected={false} isHighlighted={false} level={level + 1}>
-                    {groupName}
-                  </S.Name>
+                <S.NameContainer style={{color: 'red'}}>
+                  <S.Name level={level + 1}>{groupName}</S.Name>
                 </S.NameContainer>
                 {groupItems.map(item => (
                   <NavSectionItem<ItemType, ScopeType>

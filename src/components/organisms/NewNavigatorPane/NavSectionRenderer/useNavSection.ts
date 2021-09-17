@@ -2,10 +2,10 @@ import {useMemo, useCallback} from 'react';
 import {NavSection} from '@models/navsection';
 import navSectionMap from '@src/navsections/navSectionMap';
 
-function makeItemVisibilityMap<ItemType, ScopeType>(
+function makeItemToPassedConditionMap<ItemType, ScopeType>(
   items: ItemType[],
   scope: ScopeType,
-  isVisible: boolean | ((item: ItemType, scope: ScopeType) => boolean),
+  isPassingCondition: boolean | ((item: ItemType, scope: ScopeType) => boolean),
   getItemIdentifier: (item: ItemType) => string | null
 ): Record<string, boolean> {
   const itemEntries: [string, boolean][] = items
@@ -15,7 +15,9 @@ function makeItemVisibilityMap<ItemType, ScopeType>(
         return undefined;
       }
       const entry: [string, boolean] =
-        typeof isVisible === 'boolean' ? [itemId, isVisible] : [itemId, isVisible(item, scope)];
+        typeof isPassingCondition === 'boolean'
+          ? [itemId, isPassingCondition]
+          : [itemId, isPassingCondition(item, scope)];
       return entry;
     })
     .filter((entry): entry is [string, boolean] => entry !== undefined);
@@ -67,9 +69,9 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     }
     const handleIsVisible = itemHandler?.isVisible;
     if (!handleIsVisible) {
-      return makeItemVisibilityMap(items, scope, true, getItemIdentifier);
+      return makeItemToPassedConditionMap(items, scope, true, getItemIdentifier);
     }
-    return makeItemVisibilityMap(items, scope, handleIsVisible, getItemIdentifier);
+    return makeItemToPassedConditionMap(items, scope, handleIsVisible, getItemIdentifier);
   }, [scope, itemHandler, items]);
 
   const isItemVisible = useCallback(
@@ -82,6 +84,43 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     },
     [itemVisibilityMap]
   );
+
+  const itemSelectionMap = useMemo<Record<string, boolean>>(() => {
+    if (!items) {
+      return {};
+    }
+    const handleIsSelected = itemHandler?.isSelected;
+    if (!handleIsSelected) {
+      return makeItemToPassedConditionMap(items, scope, false, getItemIdentifier);
+    }
+    return makeItemToPassedConditionMap(items, scope, handleIsSelected, getItemIdentifier);
+  }, [scope, itemHandler, items]);
+
+  const isSectionSelected = useMemo(() => {
+    return (
+      Object.values(itemSelectionMap).length > 0 &&
+      Object.values(itemSelectionMap).some(isSelected => isSelected === true)
+    );
+  }, [itemSelectionMap]);
+
+  const itemHighlightingMap = useMemo<Record<string, boolean>>(() => {
+    if (!items) {
+      return {};
+    }
+    const handleIsHighlighted = itemHandler?.isHighlighted;
+    if (!handleIsHighlighted) {
+      return makeItemToPassedConditionMap(items, scope, false, getItemIdentifier);
+    }
+    return makeItemToPassedConditionMap(items, scope, handleIsHighlighted, getItemIdentifier);
+  }, [scope, itemHandler, items]);
+
+  const isSectionHighlighted = useMemo(() => {
+    return (
+      !isSectionSelected &&
+      Object.values(itemHighlightingMap).length > 0 &&
+      Object.values(itemHighlightingMap).some(isHighlighted => isHighlighted === true)
+    );
+  }, [itemHighlightingMap, isSectionSelected]);
 
   const isGroupVisible = useCallback(
     (groupName: string) => {
@@ -132,6 +171,8 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     isGroupVisible,
     isItemVisible,
     getItemIdentifier,
+    isSectionSelected,
+    isSectionHighlighted,
     isSectionLoading,
     isSectionVisible,
     itemHandler,
