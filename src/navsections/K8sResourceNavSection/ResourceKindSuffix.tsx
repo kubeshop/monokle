@@ -9,6 +9,7 @@ import Colors from '@styles/Colors';
 import {Popover} from 'antd';
 import {useMemo} from 'react';
 import styled from 'styled-components';
+import {showValidationErrorsModal} from '@redux/reducers/ui';
 
 const StyledIconsContainer = styled.span`
   display: flex;
@@ -28,7 +29,11 @@ const Suffix = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
     dispatch(selectK8sResource({resourceId: resId}));
   };
 
-  const onClickErrorIcon = () => {};
+  const onClickErrorIcon = () => {
+    if (item.validation) {
+      dispatch(showValidationErrorsModal(item.validation.errors));
+    }
+  };
 
   if (!outgoingRefs || outgoingRefs.length === 0) {
     return null;

@@ -200,11 +200,7 @@ const NavigatorPane = () => {
 
   return (
     <>
-      <ValidationErrorsModal
-        errors={currentValidationErrors}
-        isVisible={isValidationsErrorsModalVisible}
-        onClose={hideValidationsErrorsModal}
-      />
+      <ValidationErrorsModal />
       <TitleRow>
         <MonoPaneTitleCol span={24}>
           <MonoPaneTitle>

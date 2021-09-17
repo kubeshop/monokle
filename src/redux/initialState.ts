@@ -121,6 +121,10 @@ const initialUiState: UiState = {
   navPane: {
     collapsedNavSectionNames: [],
   },
+  validationErrorsModal: {
+    isVisible: false,
+    errors: [],
+  },
 };
 
 export default {

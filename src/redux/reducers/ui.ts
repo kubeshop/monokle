@@ -2,6 +2,7 @@ import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {NewResourceWizardInput, UiState} from '@models/ui';
 import initialState from '@redux/initialState';
+import {ResourceValidationError} from '@models/k8sresource';
 
 export const uiSlice = createSlice({
   name: 'ui',
@@ -58,6 +59,18 @@ export const uiSlice = createSlice({
         );
       }
     },
+    showValidationErrorsModal: (state: Draft<UiState>, action: PayloadAction<ResourceValidationError[]>) => {
+      state.validationErrorsModal = {
+        isVisible: true,
+        errors: action.payload,
+      };
+    },
+    hideValidationErrorsModal: (state: Draft<UiState>) => {
+      state.validationErrorsModal = {
+        isVisible: false,
+        errors: [],
+      };
+    },
   },
   extraReducers: builder => {
     builder
@@ -85,5 +98,7 @@ export const {
   closeRenameResourceModal,
   collapseNavSections,
   expandNavSections,
+  showValidationErrorsModal,
+  hideValidationErrorsModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

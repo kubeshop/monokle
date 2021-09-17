@@ -20,7 +20,7 @@ import {initKubeconfig} from '@redux/reducers/appConfig';
 import {ipcRenderer} from 'electron';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
-
+import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import AppContext from './AppContext';
 
 const App = () => {
@@ -58,6 +58,7 @@ const App = () => {
         <NewResourceWizard />
         <HotKeysHandler />
         <RenameResourceModal />
+        <ValidationErrorsModal />
       </div>
     </AppContext.Provider>
   );
