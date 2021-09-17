@@ -65,15 +65,25 @@ export enum ResourceRefType {
   Unsatisfied = 'unsatisfied-outgoing',
 }
 
+type RefTargetResource = {
+  type: 'resource';
+  resourceId?: string;
+  resourceKind?: string;
+};
+type RefTargetFile = {
+  type: 'file';
+  filePath: string;
+};
+
+type RefTarget = RefTargetResource | RefTargetFile;
+
 interface ResourceRef {
   /** the type of ref (see enum) */
   type: ResourceRefType;
   /** the ref value - for example the name of a configmap */
   name: string;
-  /** the resource this is referring to (empty for unsatisfied refs) */
-  targetResourceId?: string;
-  /** the resource kind of the target resource */
-  targetResourceKind?: string;
+  /** the target resource or file this is referring to (empty for unsatisfied refs) */
+  target?: RefTarget;
   /** the position in the document of the refName (undefined for incoming file refs) */
   position?: RefPosition;
 }

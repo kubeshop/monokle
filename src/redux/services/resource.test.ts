@@ -31,8 +31,7 @@ test('get-namespaces', () => {
 });
 
 test('get-scalar-node', () => {
-  const fileContent = loadTestResource('manifests/core-dns-deployment.yaml');
-  const resources = extractK8sResources(fileContent, 'manifests/core-dns-deployment.yaml');
+  const resources = extractTestResources('manifests/core-dns-deployment.yaml');
 
   expect(resources.length).toBe(1);
 
@@ -42,8 +41,7 @@ test('get-scalar-node', () => {
 });
 
 test('get-scalar-nodes', () => {
-  const fileContent = loadTestResource('manifests/argo-rollouts/base/kustomization.yaml');
-  const resources = extractK8sResources(fileContent, 'manifests/core-dns-deployment.yaml');
+  const resources = extractTestResources('manifests/argo-rollouts/base/kustomization.yaml');
 
   expect(resources.length).toBe(1);
 
@@ -53,3 +51,20 @@ test('get-scalar-nodes', () => {
   // @ts-ignore
   expect(nameNodes[0].nodeValue()).toBe('argo-rollouts-sa.yaml');
 });
+
+test('get-scalar-nodes-with-array', () => {
+  const resources = extractTestResources('manifests/argo-rollouts/namespace-install/kustomization.yaml');
+
+  expect(resources.length).toBe(1);
+
+  const nameNodes = getScalarNodes(resources[0], 'patchesJson6902:path');
+  expect(nameNodes).toBeDefined();
+  expect(nameNodes?.length).toBe(2);
+  // @ts-ignore
+  expect(nameNodes[1].nodeValue()).toBe('clusterrole-to-role.yaml');
+});
+
+function extractTestResources(relativePath: string) {
+  const fileContent = loadTestResource(relativePath);
+  return extractK8sResources(fileContent, relativePath);
+}

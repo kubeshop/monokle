@@ -25,14 +25,17 @@ function mapResourceToElement(resource: K8sResource): Node {
   };
 }
 
-function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge {
-  return {
-    id: `${source.id}-${ref.targetResourceId}-${ref.type}`,
-    source: source.id,
-    target: ref.targetResourceId || ref.name,
-    animated: false,
-    type: 'smoothstep',
-  };
+function mapRefToElement(source: K8sResource, ref: ResourceRef): Edge | undefined {
+  if (ref.target?.type === 'resource') {
+    return {
+      id: `${source.id}-${ref.target.resourceId}-${ref.type}`,
+      source: source.id,
+      target: ref.target.resourceId || ref.name,
+      animated: false,
+      type: 'smoothstep',
+    };
+  }
+  return undefined;
 }
 
 const dagreGraph = new dagre.graphlib.Graph();
@@ -94,7 +97,10 @@ const GraphView = (props: {editorHeight: string}) => {
   function getElementData(resource: K8sResource) {
     let data: any[] = [mapResourceToElement(resource)];
     if (resource.refs) {
-      const refs = resource.refs.filter(ref => !isUnsatisfiedRef(ref.type)).map(ref => mapRefToElement(resource, ref));
+      const refs = resource.refs
+        .filter(ref => !isUnsatisfiedRef(ref.type))
+        .map(ref => mapRefToElement(resource, ref))
+        .filter(ref => Boolean(ref));
       data = data.concat(refs);
     }
     return data;
