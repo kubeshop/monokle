@@ -12,6 +12,7 @@ export const List = styled.ol<{height: number}>`
     background: transparent;
   }
   ${props => `height: ${props.height}px;`}
+  padding-bottom: 20px;
 `;
 
 export const TitleBar = styled.div`

@@ -52,45 +52,56 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const collapsedNavSectionNames = useAppSelector(state => state.ui.navPane.collapsedNavSectionNames);
 
+  const allNestedSubsectionNames = useMemo(() => {
+    if (!subsections) {
+      return undefined;
+    }
+    const nestedSubsectionNames: string[] = [];
+    loopSubsectionNamesDeep(subsections, subsectionName => nestedSubsectionNames.push(subsectionName));
+    return nestedSubsectionNames;
+  }, [subsections]);
+
   const isCollapsedMode = useMemo(() => {
+    if (allNestedSubsectionNames) {
+      if (
+        collapsedNavSectionNames.includes(name) &&
+        allNestedSubsectionNames.every(s => collapsedNavSectionNames.includes(s))
+      ) {
+        return 'collapsed';
+      }
+      if (
+        !collapsedNavSectionNames.includes(name) &&
+        allNestedSubsectionNames.every(s => !collapsedNavSectionNames.includes(s))
+      ) {
+        return 'expanded';
+      }
+      return 'mixed';
+    }
     if (collapsedNavSectionNames.includes(name)) {
       return 'collapsed';
     }
-    if (subsections && subsections.every(s => collapsedNavSectionNames.includes(s.name))) {
-      return 'collapsed';
-    }
-    if (subsections && subsections.every(s => !collapsedNavSectionNames.includes(s.name))) {
-      return 'expanded';
-    }
-    if (!subsections || subsections.length === 0) {
-      return 'expanded';
-    }
-    return 'mixed';
-  }, [collapsedNavSectionNames, name]);
+    return 'expanded';
+  }, [collapsedNavSectionNames, name, allNestedSubsectionNames]);
 
   const isCollapsed = useMemo(() => {
     return isCollapsedMode === 'collapsed';
   }, [isCollapsedMode]);
 
   const expandSection = useCallback(() => {
-    if (!subsections || subsections.length === 0) {
+    if (!allNestedSubsectionNames || allNestedSubsectionNames.length === 0) {
       dispatch(expandNavSections([name]));
     } else {
-      const allSubsectionNames: string[] = [];
-      loopSubsectionNamesDeep(subsections, subsectionName => allSubsectionNames.push(subsectionName));
-      dispatch(expandNavSections([name, ...allSubsectionNames]));
+      dispatch(expandNavSections([name, ...allNestedSubsectionNames]));
     }
-  }, [name, subsections, dispatch, expandNavSections]);
+  }, [name, allNestedSubsectionNames, dispatch, expandNavSections]);
 
   const collapseSection = useCallback(() => {
-    if (!subsections || subsections.length === 0) {
+    if (!allNestedSubsectionNames || allNestedSubsectionNames.length === 0) {
       dispatch(collapseNavSections([name]));
     } else {
-      const allSubsectionNames: string[] = [];
-      loopSubsectionNamesDeep(subsections, subsectionName => allSubsectionNames.push(subsectionName));
-      dispatch(collapseNavSections([name, ...allSubsectionNames]));
+      dispatch(collapseNavSections([name, ...allNestedSubsectionNames]));
     }
-  }, [name, subsections, dispatch, collapseNavSections]);
+  }, [name, allNestedSubsectionNames, dispatch, collapseNavSections]);
 
   useEffect(() => {
     if (shouldSectionExpand) {

@@ -36,7 +36,7 @@ const NavPane = () => {
   };
 
   return (
-    <nav>
+    <>
       <S.TitleBar>
         <MonoPaneTitle>Navigator</MonoPaneTitle>
         <S.TitleBarRightButtons>
@@ -62,7 +62,7 @@ const NavPane = () => {
         <NavSectionRenderer<K8sResource, KustomizationNavSectionScope> navSection={KustomizationNavSection} level={0} />
         <NavSectionRenderer<K8sResource, K8sResourceNavSectionScope> navSection={K8sResourceNavSection} level={0} />
       </S.List>
-    </nav>
+    </>
   );
 };
 
