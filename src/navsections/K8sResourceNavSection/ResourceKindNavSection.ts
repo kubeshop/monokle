@@ -9,6 +9,7 @@ import {selectK8sResource} from '@redux/reducers/main';
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {activeResourcesSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
+import K8sResourceContextMenu from './K8sResourceContextMenu';
 
 function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (
@@ -97,6 +98,9 @@ export function makeResourceKindNavSection(
         }
         return false;
       },
+    },
+    itemCustomization: {
+      ContextMenu: K8sResourceContextMenu,
     },
   };
   return navSection;

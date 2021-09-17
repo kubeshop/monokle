@@ -9,6 +9,7 @@ export function useItemCustomization<ItemType>(
   const Prefix = useMemo(() => customization.Prefix, [customization]);
   const Suffix = useMemo(() => customization.Suffix, [customization]);
   const QuickAction = useMemo(() => customization.QuickAction, [customization]);
+  const ContextMenu = useMemo(() => customization.ContextMenu, [customization]);
 
   const customComponentProps = useMemo<NavSectionItemCustomComponentProps<ItemType>>(() => {
     return {
@@ -18,5 +19,5 @@ export function useItemCustomization<ItemType>(
     };
   }, [item, itemState]);
 
-  return {Prefix, Suffix, QuickAction, customComponentProps};
+  return {Prefix, Suffix, QuickAction, ContextMenu, customComponentProps};
 }

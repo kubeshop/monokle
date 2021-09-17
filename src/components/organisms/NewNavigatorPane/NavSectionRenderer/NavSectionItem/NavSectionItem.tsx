@@ -27,10 +27,14 @@ function NavSectionItem<ItemType, ScopeType>(props: {
     scope,
     handler
   );
-  const {Prefix, Suffix, QuickAction, customComponentProps} = useItemCustomization<ItemType>(item, customization, {
-    isHovered,
-    isSelected,
-  });
+  const {Prefix, Suffix, QuickAction, ContextMenu, customComponentProps} = useItemCustomization<ItemType>(
+    item,
+    customization,
+    {
+      isHovered,
+      isSelected,
+    }
+  );
 
   const scrollContainer = useRef<ScrollContainerRef>(null);
   const isScrolledIntoView = useCallback(() => {
@@ -69,7 +73,6 @@ function NavSectionItem<ItemType, ScopeType>(props: {
           isHighlighted={isHighlighted}
           isVisible={isVisible}
           isHovered={isHovered}
-          onClick={onClick}
         >
           <S.PrefixContainer>{Prefix && <Prefix {...customComponentProps} />}</S.PrefixContainer>
           <S.ItemName
@@ -78,12 +81,26 @@ function NavSectionItem<ItemType, ScopeType>(props: {
             isDirty={isDirty}
             isHighlighted={isHighlighted}
             isDisabled={isDisabled}
+            onClick={onClick}
           >
             {name}
             {isDirty && <span>*</span>}
           </S.ItemName>
-          <S.SuffixContainer>{Suffix && <Suffix {...customComponentProps} />}</S.SuffixContainer>
-          <S.QuickActionContainer>{QuickAction && <QuickAction {...customComponentProps} />}</S.QuickActionContainer>
+          {Suffix && (
+            <S.SuffixContainer>
+              <Suffix {...customComponentProps} />
+            </S.SuffixContainer>
+          )}
+          {QuickAction && (
+            <S.QuickActionContainer>
+              <QuickAction {...customComponentProps} />
+            </S.QuickActionContainer>
+          )}
+          {ContextMenu && (
+            <S.ContextMenuContainer>
+              <ContextMenu {...customComponentProps} />
+            </S.ContextMenuContainer>
+          )}
         </S.ItemContainer>
       )}
     </ScrollIntoView>

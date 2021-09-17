@@ -12,6 +12,7 @@ export interface NavSectionItemCustomization<ItemType> {
   Prefix?: NavSectionItemCustomComponent<ItemType>;
   Suffix?: NavSectionItemCustomComponent<ItemType>;
   QuickAction?: NavSectionItemCustomComponent<ItemType>;
+  ContextMenu?: NavSectionItemCustomComponent<ItemType>;
 }
 
 export interface NavSectionItemHandler<ItemType, ScopeType> {
