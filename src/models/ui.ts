@@ -39,6 +39,7 @@ export type UiState = {
   };
   paneConfiguration: PaneConfiguration;
   shouldExpandAllNodes: boolean;
+  resetLayout: boolean;
 };
 
 export type PaneConfiguration = {

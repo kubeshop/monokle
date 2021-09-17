@@ -24,6 +24,10 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = !state.leftMenu.isActive;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
+    openLeftMenu: (state: Draft<UiState>) => {
+      state.leftMenu.isActive = true;
+      electronStore.set('ui.leftMenu.isActive', true);
+    },
     setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
@@ -38,6 +42,9 @@ export const uiSlice = createSlice({
     },
     setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<PaneConfiguration>) {
       state.paneConfiguration = action.payload;
+    },
+    setResetLayout: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.resetLayout = action.payload;
     },
     openNewResourceWizard: (
       state: Draft<UiState>,
@@ -93,6 +100,7 @@ export const uiSlice = createSlice({
 export const {
   toggleSettings,
   toggleLeftMenu,
+  openLeftMenu,
   toggleRightMenu,
   setLeftMenuSelection,
   setRightMenuSelection,
@@ -104,5 +112,6 @@ export const {
   closeFolderExplorer,
   setMonacoEditor,
   setShouldExpandAllNodes,
+  setResetLayout,
 } = uiSlice.actions;
 export default uiSlice.reducer;
