@@ -1,5 +1,14 @@
 # Getting Started with Monokle
 
+## Prerequisites
+
+The prerequisite for the Monokle includes:
+
+| Tool   | Description                                   |
+|--------|-----------------------------------------------|
+| Helm   | The package manager for Kubernetes            |
+| Kubectl| kubectl controls the kubsnetes cluster manager|
+
 Monokle is a standalone desktop application, you can either download an (as of yet unsigned) installer 
 from [releases](https://github.com/kubeshop/monokle/releases) or clone our repo and run as described below!
 
