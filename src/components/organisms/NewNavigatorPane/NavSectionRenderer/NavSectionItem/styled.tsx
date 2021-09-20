@@ -7,12 +7,18 @@ export const ItemContainer = styled.li<{
   isVisible: boolean;
   isHovered: boolean;
   level: number;
+  isLastItem: boolean;
 }>`
   display: flex;
   align-items: center;
   width: 100%
   cursor: pointer;
   user-select: none;
+    ${props => {
+      if (props.isLastItem) {
+        return `margin-bottom: 12px;`;
+      }
+    }}
     ${props => {
       if (props.isVisible) {
         return 'transition: opacity 500ms ease-in;';

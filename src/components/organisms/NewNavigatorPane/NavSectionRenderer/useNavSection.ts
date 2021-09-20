@@ -151,16 +151,16 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     return isLoading(scope, items);
   }, [scope, items, isLoading]);
 
-  const isSectionVisible = useMemo(() => {
-    if (!isVisible) {
-      return true;
-    }
-    return isVisible(scope, items);
-  }, [scope, items, isVisible]);
-
   const subsections = useMemo(() => {
     return subsectionNames?.map(s => navSectionMap.getByName(s)) || undefined;
   }, [navSectionMap]);
+
+  const isSectionVisible = useMemo(() => {
+    if (!isVisible) {
+      return (subsections && subsections.length > 0) || Object.keys(groupedItems).length > 0 || items.length > 0;
+    }
+    return isVisible(scope, items);
+  }, [scope, items, groupedItems, isVisible]);
 
   return {
     name,

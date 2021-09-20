@@ -2,12 +2,24 @@ import Colors from '@styles/Colors';
 import styled from 'styled-components';
 import {Skeleton as RawSkeleton} from 'antd';
 
-export const NameContainer = styled.li<{isSelected?: boolean; isHighlighted?: boolean; isHovered?: boolean}>`
+export const NameContainer = styled.li<{
+  isSelected?: boolean;
+  isHighlighted?: boolean;
+  isHovered?: boolean;
+  isLastSection?: boolean;
+  isCollapsed?: boolean;
+  hasSubsections?: boolean;
+}>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
   user-select: none;
+  ${props => {
+    if (props.isLastSection && props.isCollapsed && !props.hasSubsections) {
+      return `margin-bottom: 12px;`;
+    }
+  }}
   ${props => {
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {

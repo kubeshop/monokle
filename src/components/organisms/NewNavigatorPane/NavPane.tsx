@@ -58,9 +58,21 @@ const NavPane = () => {
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>
-        <NavSectionRenderer<HelmValuesFile, HelmChartNavSectionScope> navSection={HelmChartNavSection} level={0} />
-        <NavSectionRenderer<K8sResource, KustomizationNavSectionScope> navSection={KustomizationNavSection} level={0} />
-        <NavSectionRenderer<K8sResource, K8sResourceNavSectionScope> navSection={K8sResourceNavSection} level={0} />
+        <NavSectionRenderer<HelmValuesFile, HelmChartNavSectionScope>
+          navSection={HelmChartNavSection}
+          level={0}
+          isLastSection={false}
+        />
+        <NavSectionRenderer<K8sResource, KustomizationNavSectionScope>
+          navSection={KustomizationNavSection}
+          level={0}
+          isLastSection={false}
+        />
+        <NavSectionRenderer<K8sResource, K8sResourceNavSectionScope>
+          navSection={K8sResourceNavSection}
+          level={0}
+          isLastSection={false}
+        />
       </S.List>
     </>
   );

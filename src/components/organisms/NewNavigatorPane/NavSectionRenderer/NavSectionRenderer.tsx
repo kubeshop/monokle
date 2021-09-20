@@ -10,6 +10,7 @@ import * as S from './styled';
 type NavSectionRendererProps<ItemType, ScopeType> = {
   navSection: NavSection<ItemType, ScopeType>;
   level: number;
+  isLastSection: boolean;
 };
 
 function loopSubsectionNamesDeep(
@@ -30,7 +31,7 @@ function loopSubsectionNamesDeep(
 
 function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<ItemType, ScopeType>) {
   const dispatch = useAppDispatch();
-  const {navSection, level} = props;
+  const {navSection, level, isLastSection} = props;
   const {
     name,
     scope,
@@ -113,10 +114,6 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     return null;
   }
 
-  if (!subsections && Object.keys(groupedItems).length === 0 && items.length === 0) {
-    return null;
-  }
-
   if (isSectionLoading) {
     return <S.Skeleton />;
   }
@@ -127,6 +124,9 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         isHovered={isHovered}
         isSelected={isSectionSelected && isCollapsed}
         isHighlighted={isSectionHighlighted && isCollapsed}
+        isLastSection={isLastSection}
+        hasSubsections={Boolean(subsections && subsections.length > 0)}
+        isCollapsed={isCollapsed}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -151,7 +151,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
       {!isCollapsed &&
         itemHandler &&
         Object.keys(groupedItems).length === 0 &&
-        items.map(item => (
+        items.map((item, index) => (
           <NavSectionItem<ItemType, ScopeType>
             key={getItemIdentifier(item)}
             item={item}
@@ -160,6 +160,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
             customization={itemCustomization}
             level={level + 1}
             isVisible={isItemVisible(item)}
+            isLastItem={index === items.length - 1}
           />
         ))}
       {!isCollapsed &&
@@ -171,7 +172,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
                 <S.NameContainer style={{color: 'red'}}>
                   <S.Name level={level + 1}>{groupName}</S.Name>
                 </S.NameContainer>
-                {groupItems.map(item => (
+                {groupItems.map((item, index) => (
                   <NavSectionItem<ItemType, ScopeType>
                     key={getItemIdentifier(item)}
                     item={item}
@@ -180,14 +181,20 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
                     customization={itemCustomization}
                     level={level + 2}
                     isVisible={isItemVisible(item)}
+                    isLastItem={index === groupItems.length - 1}
                   />
                 ))}
               </React.Fragment>
             )
         )}
       {subsections &&
-        subsections.map(child => (
-          <NavSectionRenderer<ItemType, ScopeType> key={child.name} navSection={child} level={level + 1} />
+        subsections.map((child, index) => (
+          <NavSectionRenderer<ItemType, ScopeType>
+            key={child.name}
+            navSection={child}
+            level={level + 1}
+            isLastSection={index === subsections.length - 1}
+          />
         ))}
     </>
   );

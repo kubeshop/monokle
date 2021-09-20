@@ -14,13 +14,14 @@ function NavSectionItem<ItemType, ScopeType>(props: {
   level: number;
   isVisible: boolean;
   customization: NavSectionItemCustomization<ItemType> | undefined;
+  isLastItem: boolean;
 }) {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const {item, scope, handler, customization = {}, level, isVisible} = props;
+  const {item, scope, handler, customization = {}, level, isVisible, isLastItem} = props;
 
   const {name, isSelected, isHighlighted, isDirty, isDisabled, shouldScrollIntoView} = useItemHandler(
     item,
@@ -74,6 +75,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
           isVisible={isVisible}
           isHovered={isHovered}
           level={level}
+          isLastItem={isLastItem}
         >
           <S.PrefixContainer>{Prefix && <Prefix {...customComponentProps} />}</S.PrefixContainer>
           <S.ItemName
