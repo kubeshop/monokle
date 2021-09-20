@@ -179,7 +179,6 @@
       "!**/node_modules/babel-runtime/**/*",
       "!**/node_modules/yaml-language-server/lib/umd/**/*",
       "!**/node_modules/antd/es/**/*",
-      "!**/node_modules/@babel/**/*",
       "!**/node_modules/@jest/**/*",
       "!**/node_modules/monaco-editor/min/**/*",
       "!**/node_modules/monaco-editor/min-maps/**/*",
