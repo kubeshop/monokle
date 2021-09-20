@@ -208,6 +208,8 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
           store.dispatch(resetLayout());
         },
       },
+      {type: 'separator'},
+      {role: 'togglefullscreen'},
     ],
   };
 };
