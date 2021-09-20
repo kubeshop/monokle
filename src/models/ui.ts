@@ -45,9 +45,6 @@ export type UiState = {
 export type PaneConfiguration = {
   leftWidth: number;
   navWidth: number;
-  rightWidth: number;
   editWidth: number;
-  separatorEditRightXPosition?: number;
-  separatorLeftNavXPosition?: number;
-  separatorNavEditXPosition?: number;
+  rightWidth: number;
 };

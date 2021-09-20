@@ -13,9 +13,6 @@ export const resetLayout = createAsyncThunk('ui/resetLayout', async (_, thunkAPI
       navWidth: 0.3333,
       editWidth: 0.3333,
       rightWidth: 0,
-      separatorEditRightXPosition: 0,
-      separatorLeftNavXPosition: 0,
-      separatorNavEditXPosition: 0,
     })
   );
 });
@@ -110,7 +107,6 @@ export const uiSlice = createSlice({
 export const {
   toggleSettings,
   toggleLeftMenu,
-  setLeftMenuIsActive,
   toggleRightMenu,
   setLeftMenuSelection,
   setRightMenuSelection,
@@ -123,5 +119,7 @@ export const {
   setMonacoEditor,
   setShouldExpandAllNodes,
   setPaneConfiguration,
+  setRightMenuIsActive,
+  setLeftMenuIsActive,
 } = uiSlice.actions;
 export default uiSlice.reducer;
