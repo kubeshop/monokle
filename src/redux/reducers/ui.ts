@@ -1,16 +1,21 @@
-import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {PaneConfiguration, UiState, NewResourceWizardInput} from '@models/ui';
 import initialState from '@redux/initialState';
 import electronStore from '@utils/electronStore';
 
-export const updatePaneConfiguration = createAsyncThunk(
-  'ui/updatePaneConfiguration',
-  async (configuration: PaneConfiguration, thunkAPI) => {
-    electronStore.set('ui.paneConfiguration', configuration);
-    thunkAPI.dispatch(uiSlice.actions.setPaneConfiguration(configuration));
-  }
-);
+export const resetLayout = createAsyncThunk('ui/resetLayout', async (_, thunkAPI) => {
+  thunkAPI.dispatch(uiSlice.actions.setLeftMenuIsActive(true));
+  thunkAPI.dispatch(uiSlice.actions.setRightMenuIsActive(false));
+  thunkAPI.dispatch(
+    uiSlice.actions.setPaneConfiguration({
+      leftWidth: 0.3333,
+      navWidth: 0.3333,
+      editWidth: 0.3333,
+      rightWidth: 0,
+    })
+  );
+});
 
 export const uiSlice = createSlice({
   name: 'ui',
@@ -24,6 +29,10 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = !state.leftMenu.isActive;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
+    setLeftMenuIsActive: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.leftMenu.isActive = action.payload;
+      electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
+    },
     setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
@@ -32,12 +41,17 @@ export const uiSlice = createSlice({
       state.rightMenu.isActive = !state.rightMenu.isActive;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
     },
+    setRightMenuIsActive: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.rightMenu.isActive = action.payload;
+      electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
+    },
     setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.rightMenu.selection = action.payload;
       electronStore.set('ui.rightMenu.selection', state.rightMenu.selection);
     },
     setPaneConfiguration(state: Draft<UiState>, action: PayloadAction<PaneConfiguration>) {
       state.paneConfiguration = action.payload;
+      electronStore.set('ui.paneConfiguration', state.paneConfiguration);
     },
     openNewResourceWizard: (
       state: Draft<UiState>,
@@ -104,5 +118,8 @@ export const {
   closeFolderExplorer,
   setMonacoEditor,
   setShouldExpandAllNodes,
+  setPaneConfiguration,
+  setRightMenuIsActive,
+  setLeftMenuIsActive,
 } = uiSlice.actions;
 export default uiSlice.reducer;

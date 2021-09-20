@@ -39,14 +39,12 @@ export type UiState = {
   };
   paneConfiguration: PaneConfiguration;
   shouldExpandAllNodes: boolean;
+  resetLayout: boolean;
 };
 
 export type PaneConfiguration = {
   leftWidth: number;
   navWidth: number;
-  rightWidth: number;
   editWidth: number;
-  separatorEditRightXPosition?: number;
-  separatorLeftNavXPosition?: number;
-  separatorNavEditXPosition?: number;
+  rightWidth: number;
 };

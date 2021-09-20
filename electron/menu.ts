@@ -12,6 +12,7 @@ import {
   setMonacoEditor,
   setShouldExpandAllNodes,
   toggleLeftMenu,
+  resetLayout,
 } from '@redux/reducers/ui';
 import {UiState} from '@models/ui';
 import {openGitHub, openDocumentation} from '@utils/shell';
@@ -173,6 +174,9 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
     label: 'View',
     submenu: [
       {
+        role: 'reload',
+      },
+      {
         label: 'Previous Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
         enabled: Boolean(isPreviousResourceEnabled),
@@ -198,7 +202,14 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
           store.dispatch(toggleLeftMenu());
         },
       },
+      {
+        label: 'Reset Layout',
+        click: () => {
+          store.dispatch(resetLayout());
+        },
+      },
       {type: 'separator'},
+      {role: 'togglefullscreen'},
     ],
   };
 };

@@ -99,15 +99,6 @@ const schema = {
           rightWidth: {
             type: 'number',
           },
-          separatorEditRightXPosition: {
-            type: 'number',
-          },
-          separatorLeftNavXPosition: {
-            type: 'number',
-          },
-          separatorNavEditXPosition: {
-            type: 'number',
-          },
         },
       },
     },
@@ -144,9 +135,6 @@ const defaults = {
       navWidth: 0.3333,
       editWidth: 0.3333,
       rightWidth: 0,
-      separatorEditRightXPosition: 0,
-      separatorLeftNavXPosition: 0,
-      separatorNavEditXPosition: 0,
     },
   },
 };
@@ -155,5 +143,7 @@ const electronStore = new ElectronStore({
   schema,
   defaults,
 });
+
+// electronStore.delete('ui');
 
 export default electronStore;
