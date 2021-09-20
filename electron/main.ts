@@ -1,4 +1,14 @@
-import 'module-alias/register';
+/* eslint-disable import/first */
+import moduleAlias from 'module-alias';
+
+moduleAlias.addAliases({
+  '@constants': `${__dirname}/../src/constants`,
+  '@models': `${__dirname}/../src/models`,
+  '@redux': `${__dirname}/../src/redux`,
+  '@utils': `${__dirname}/../src/utils`,
+  '@src': `${__dirname}/../src/`,
+  '@root': `${__dirname}/../`,
+});
 
 import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';

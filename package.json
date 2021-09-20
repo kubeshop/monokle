@@ -22,7 +22,6 @@
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
     "@craco/craco": "6.2.0",
-    "@reduxjs/toolkit": "1.6.1",
     "@testing-library/jest-dom": "5.14.1",
     "@testing-library/react": "12.0.0",
     "@testing-library/user-event": "13.2.1",
@@ -30,6 +29,7 @@
     "@types/electron-devtools-installer": "2.2.0",
     "@types/jest": "27.0.1",
     "@types/micromatch": "4.0.2",
+    "@types/module-alias": "^2.0.1",
     "@types/node": "16.6.1",
     "@types/react": "17.0.18",
     "@types/react-dom": "17.0.9",
@@ -71,6 +71,7 @@
   "dependencies": {
     "@ant-design/icons": "4.6.3",
     "@kubernetes/client-node": "0.15.1",
+    "@reduxjs/toolkit": "1.6.1",
     "@rjsf/antd": "3.1.0",
     "@rjsf/core": "3.1.0",
     "@trodi/electron-splashscreen": "1.0.2",
@@ -232,13 +233,5 @@
       "@redux/(.+)": "<rootDir>/src/redux/$1",
       "@src/(.+)": "<rootDir>/src/$1"
     }
-  },
-  "_moduleAliases": {
-    "@constants": "build/src/constants",
-    "@models": "build/src/models",
-    "@redux": "build/src/redux",
-    "@utils": "build/src/utils",
-    "@src": "build/src",
-    "@root": "build/"
   }
 }
