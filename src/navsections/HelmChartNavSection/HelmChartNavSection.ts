@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import {useSelector} from 'react-redux';
 import {HelmValuesFile} from '@models/helm';
 import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
@@ -14,6 +15,8 @@ export type HelmChartNavSectionScope = {
   previewValuesFileId: string | undefined;
   isInClusterMode: boolean;
   isFolderLoading: boolean;
+  isPreviewLoading: boolean;
+  isHelmChartPreview: boolean;
   dispatch: AppDispatch;
 };
 
@@ -26,12 +29,17 @@ const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> 
     const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
     const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
     const isInClusterMode = useSelector(isInClusterModeSelector);
+    const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
+    const previewType = useAppSelector(state => state.main.previewType);
+    const isHelmChartPreview = useMemo(() => previewType === 'helm', [previewType]);
     return {
       helmChartMap,
       helmValuesMap,
       previewValuesFileId,
       isInClusterMode: Boolean(isInClusterMode),
       isFolderLoading,
+      isPreviewLoading,
+      isHelmChartPreview,
       dispatch,
     };
   },
@@ -47,6 +55,9 @@ const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> 
     );
   },
   isLoading: scope => {
+    if (scope.isPreviewLoading && !scope.isHelmChartPreview) {
+      return true;
+    }
     return scope.isFolderLoading;
   },
   isVisible: scope => {

@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import {useSelector} from 'react-redux';
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
@@ -15,6 +16,8 @@ export type KustomizationNavSectionScope = {
   isFolderLoading: boolean;
   selectedPath: string | undefined;
   selectedResourceId: string | undefined;
+  isPreviewLoading: boolean;
+  isKustomizationPreview: boolean;
   dispatch: AppDispatch;
 };
 
@@ -28,6 +31,9 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
     const isInClusterMode = useSelector(isInClusterModeSelector);
     const selectedPath = useAppSelector(state => state.main.selectedPath);
     const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+    const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
+    const previewType = useAppSelector(state => state.main.previewType);
+    const isKustomizationPreview = useMemo(() => previewType === 'kustomization', [previewType]);
     return {
       resourceMap,
       previewResourceId,
@@ -35,6 +41,8 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
       isFolderLoading,
       selectedPath,
       selectedResourceId,
+      isPreviewLoading,
+      isKustomizationPreview,
       dispatch,
     };
   },
@@ -42,6 +50,9 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
     return Object.values(scope.resourceMap).filter(i => i.kind === 'Kustomization');
   },
   isLoading: scope => {
+    if (scope.isPreviewLoading && !scope.isKustomizationPreview) {
+      return true;
+    }
     return scope.isFolderLoading;
   },
   isVisible: scope => {
