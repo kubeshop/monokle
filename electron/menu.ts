@@ -8,13 +8,11 @@ import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
 import {
   openFolderExplorer,
-  openLeftMenu,
   openNewResourceWizard,
   setMonacoEditor,
-  setResetLayout,
   setShouldExpandAllNodes,
   toggleLeftMenu,
-  updatePaneConfiguration,
+  resetLayout,
 } from '@redux/reducers/ui';
 import {UiState} from '@models/ui';
 import {openGitHub, openDocumentation} from '@utils/shell';
@@ -176,6 +174,9 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
     label: 'View',
     submenu: [
       {
+        role: 'reload',
+      },
+      {
         label: 'Previous Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
         enabled: Boolean(isPreviousResourceEnabled),
@@ -204,19 +205,7 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {
         label: 'Reset Layout',
         click: () => {
-          store.dispatch(openLeftMenu());
-          store.dispatch(
-            updatePaneConfiguration({
-              leftWidth: 0.3333,
-              navWidth: 0.3333,
-              editWidth: 0.3333,
-              rightWidth: 0,
-              separatorEditRightXPosition: 0,
-              separatorLeftNavXPosition: 0,
-              separatorNavEditXPosition: 0,
-            })
-          );
-          store.dispatch(setResetLayout(true));
+          store.dispatch(resetLayout());
         },
       },
     ],
