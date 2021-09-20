@@ -14,6 +14,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {performResourceDiff} from '@redux/thunks/diffResource';
+import featureJson from '@src/feature-flags.json';
 
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
@@ -125,7 +126,9 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.TOGGLE_RIGHT_PANE, () => {
-    dispatch(toggleRightMenu());
+    if (featureJson.ShowRightMenu) {
+      dispatch(toggleRightMenu());
+    }
   });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK, () => {

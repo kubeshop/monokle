@@ -1,6 +1,6 @@
 # Monokle
 
-![Known Vulnerabilities](https://snyk.io/test/github/kubeshop/monokle/badge.svg)
+[![Known Vulnerabilities](https://snyk.io/test/github/kubeshop/monokle/badge.svg)](https://snyk.io/test/github/kubeshop/monokle)
 
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
@@ -11,9 +11,12 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 - Diff resources against your cluster and apply changes immediately
 - And much more!
 
+Don't hesitate to say hi to the team and ask questions on our [Discord server](https://discord.gg/uNuhy6GDyn).
+
 Check out the [Feature Overview](./docs/features.md) or watch the [Monokle 1.0 walkthrough video](https://youtu.be/9c80qj9NkQk) (approx 13 minutes):
 
 [![Monokle 1.0 Walkthrough](docs/img/monokle-welcome.png)](https://youtu.be/9c80qj9NkQk)
+
 
 ## Getting Started
 

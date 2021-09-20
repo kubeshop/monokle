@@ -34,4 +34,26 @@ export type UiState = {
     isVisible: boolean;
     errors: ResourceValidationError[];
   };
+  folderExplorer: {
+    isOpen: boolean;
+  };
+  monacoEditor: {
+    focused: boolean;
+    undo: boolean;
+    redo: boolean;
+    find: boolean;
+    replace: boolean;
+    apply: boolean;
+    diff: boolean;
+  };
+  paneConfiguration: PaneConfiguration;
+  shouldExpandAllNodes: boolean;
+  resetLayout: boolean;
+};
+
+export type PaneConfiguration = {
+  leftWidth: number;
+  navWidth: number;
+  editWidth: number;
+  rightWidth: number;
 };

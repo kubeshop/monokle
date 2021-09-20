@@ -68,30 +68,46 @@ export function parseNodePath(nodePath: string) {
 }
 
 /**
- * Returns the Scalar at the specified path
+ * Returns the Scalars at the specified path
  */
 
 export function getScalarNodes(resource: K8sResource, nodePath: string) {
-  let parent: any = getParsedDoc(resource);
+  let parents: any[] = [getParsedDoc(resource)];
 
   const names = parseNodePath(nodePath);
   for (let ix = 0; ix < names.length; ix += 1) {
-    const child = parent.get(names[ix], true);
-    if (child) {
-      // @ts-ignore
-      parent = child;
-    } else {
-      log.warn(`${nodePath} not found in resource`);
+    let nextParents: any[] = [];
+    const name = names[ix];
+
+    parents.forEach(parent => {
+      const child = parent.get(name, true);
+      if (child) {
+        if (child instanceof YAMLSeq) {
+          nextParents = nextParents.concat(child.items);
+        } else {
+          // @ts-ignore
+          nextParents.push(child);
+        }
+      }
+    });
+
+    if (nextParents.length === 0) {
       return [];
     }
+
+    parents = nextParents;
   }
 
-  if (parent instanceof YAMLSeq) {
-    return parent.items.map(node => new NodeWrapper(node, resource.lineCounter));
-  }
+  let results: NodeWrapper[] = [];
+  parents.forEach(parent => {
+    if (parent instanceof YAMLSeq) {
+      results = results.concat(parent.items.map(node => new NodeWrapper(node, resource.lineCounter)));
+    } else if (parent instanceof Scalar) {
+      results.push(new NodeWrapper(parent, resource.lineCounter));
+    }
+  });
 
-  log.warn(`node at ${nodePath} is not a YAMLSeq`);
-  return [];
+  return results;
 }
 
 /**
@@ -151,15 +167,22 @@ export function createResourceRef(
     // make sure we don't duplicate
     if (
       !resource.refs.some(
-        ref => ref.type === refType && ref.name === refName && ref.targetResourceId === targetResourceId
+        ref =>
+          ref.type === refType &&
+          ref.name === refName &&
+          ref.target?.type === 'resource' &&
+          ref.target.resourceId === targetResourceId
       )
     ) {
       resource.refs.push({
         type: refType,
         name: refName,
         position: refNode?.getNodePosition(),
-        targetResourceId,
-        targetResourceKind,
+        target: {
+          type: 'resource',
+          resourceId: targetResourceId,
+          resourceKind: targetResourceKind,
+        },
       });
     }
   } else {
@@ -226,6 +249,34 @@ export function createResourceName(filePath: string, content: any) {
   }
 
   return filePath;
+}
+
+/**
+ * Adds a file ref to the specified file to the specified resource
+ */
+
+export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string) {
+  let refType = ResourceRefType.Outgoing;
+  resource.refs = resource.refs || [];
+  const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
+
+  // make sure we don't duplicate
+  if (
+    !resource.refs.some(
+      ref =>
+        ref.type === refType && ref.name === refName && ref.target?.type === 'file' && ref.target.filePath === filePath
+    )
+  ) {
+    resource.refs.push({
+      type: refType,
+      name: refName,
+      position: refNode?.getNodePosition(),
+      target: {
+        type: 'file',
+        filePath,
+      },
+    });
+  }
 }
 
 /**
@@ -532,8 +583,8 @@ export function getLinkedResources(resource: K8sResource) {
   resource.refs
     ?.filter(ref => !isUnsatisfiedRef(ref.type))
     .forEach(ref => {
-      if (ref.targetResourceId) {
-        linkedResourceIds.push(ref.targetResourceId);
+      if (ref.target?.type === 'resource' && ref.target.resourceId) {
+        linkedResourceIds.push(ref.target.resourceId);
       }
     });
 
