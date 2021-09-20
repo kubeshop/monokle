@@ -40,11 +40,6 @@ In this screenshot
 - the linked `argo-rollouts` Deployment (via the selector in the Service manifest) is highlighted 
 - the Service manifest is shown in the editor to the right (with highlighting of the link to the Deployment on line 16)
 
-The Namespaces pop-up at the top of the K8S Resources section is populated with available/defined namespaces and 
-allows you to only show objects in the selected namespace - for example when retrieving resources from your cluster:
-
-![Namespace Filter](img/namespace-filter.gif)
-
 ## Resource Links
 
 Links between resources are indicated by link icons to the left and right each resource name:
@@ -68,6 +63,27 @@ triangle - making it easy to identify broken resource-links in your manifests:
 
 In this screenshot the `argo-rollouts-role-binding` RoleBinding contains a reference to an `argo-rollouts-role` Role, which
 doesn't exist in the current manifests.
+
+## Resource Validation
+
+Monokle automatically validates all resources of the corresponding kubernetes 1.22.1 schemas. The resource which is not validated is shown with a red error icon in the navigator. You can click on the error information button to check the error details.
+
+![Resource Validation](img/resource-validation.png)
+
+## Resource Filtering
+
+Resource filters allows you to filter the resources based on various properties such as:
+
+1. Name
+2. Kind
+3. Namespace
+4. Labels
+5. Annotations
+
+Click on the filter button on the top of the navigator to launch the dialog for configuration.
+
+![Resource Filtering](img/resource-filtering.png)
+
 
 ## Supported Resource links
 
