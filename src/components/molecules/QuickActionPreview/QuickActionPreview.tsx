@@ -1,7 +1,8 @@
 import React from 'react';
 import {Tooltip} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {stopPreview} from '@redux/services/preview';
 import * as S from './styled';
 
 function QuickActionPreview(props: {
@@ -10,7 +11,7 @@ function QuickActionPreview(props: {
   previewTooltip: string;
   reloadPreviewTooltip: string;
   exitPreviewTooltip: string;
-  selectAndPreviewOrExit: () => void;
+  selectAndPreview: () => void;
   reloadPreview: () => void;
 }) {
   const {
@@ -19,11 +20,16 @@ function QuickActionPreview(props: {
     previewTooltip,
     reloadPreviewTooltip,
     exitPreviewTooltip,
-    selectAndPreviewOrExit,
+    selectAndPreview,
     reloadPreview,
   } = props;
 
+  const dispatch = useAppDispatch();
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
+
+  const exitPreview = () => {
+    stopPreview(dispatch);
+  };
 
   if (isPreviewLoading) {
     return <S.Spin indicator={S.PreviewLoadingIcon} />;
@@ -32,9 +38,15 @@ function QuickActionPreview(props: {
   return (
     <S.Container>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isItemBeingPreviewed ? exitPreviewTooltip : previewTooltip}>
-        <S.PreviewSpan isItemSelected={isItemSelected} onClick={selectAndPreviewOrExit}>
-          {isItemBeingPreviewed ? 'Exit' : 'Preview'}
-        </S.PreviewSpan>
+        {isItemBeingPreviewed ? (
+          <S.PreviewSpan isItemSelected={isItemSelected} onClick={exitPreview}>
+            Exit
+          </S.PreviewSpan>
+        ) : (
+          <S.PreviewSpan isItemSelected={isItemSelected} onClick={selectAndPreview}>
+            Preview
+          </S.PreviewSpan>
+        )}
       </Tooltip>
 
       {isItemBeingPreviewed && (

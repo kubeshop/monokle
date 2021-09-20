@@ -61,7 +61,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
     if (handler.onClick && !isDisabled) {
       handler.onClick(item, scope);
     }
-  }, [handler]);
+  }, [handler, isDisabled, item, scope]);
 
   return (
     <ScrollIntoView ref={scrollContainer}>

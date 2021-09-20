@@ -27,7 +27,7 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<HelmValuesFile>) 
     } else {
       stopPreview(dispatch);
     }
-  }, [item]);
+  }, [item, selectedValuesFileId, previewValuesFileId]);
 
   const reloadPreview = useCallback(() => {
     if (item.id !== selectedValuesFileId) {
@@ -35,7 +35,7 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<HelmValuesFile>) 
     }
 
     startPreview(item.id, 'helm', dispatch);
-  }, [item]);
+  }, [item, selectedValuesFileId]);
 
   if (!isItemHovered) {
     return null;
@@ -48,7 +48,7 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<HelmValuesFile>) 
       previewTooltip={HelmPreviewTooltip}
       reloadPreviewTooltip={ReloadHelmPreviewTooltip}
       exitPreviewTooltip={ExitHelmPreviewTooltip}
-      selectAndPreviewOrExit={selectAndPreviewKustomization}
+      selectAndPreview={selectAndPreviewKustomization}
       reloadPreview={reloadPreview}
     />
   );

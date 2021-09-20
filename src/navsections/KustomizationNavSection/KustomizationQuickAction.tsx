@@ -31,7 +31,7 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
     } else {
       stopPreview(dispatch);
     }
-  }, [item]);
+  }, [item, selectedResourceId, previewResourceId]);
 
   const reloadPreview = useCallback(() => {
     if (item.id !== selectedResourceId) {
@@ -39,7 +39,7 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
     }
 
     startPreview(item.id, 'kustomization', dispatch);
-  }, [item]);
+  }, [item, selectedResourceId]);
 
   if (!isItemHovered) {
     return null;
@@ -52,7 +52,7 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
       previewTooltip={KustomizationPreviewTooltip}
       reloadPreviewTooltip={ReloadKustomizationPreviewTooltip}
       exitPreviewTooltip={ExitKustomizationPreviewTooltip}
-      selectAndPreviewOrExit={selectAndPreviewKustomization}
+      selectAndPreview={selectAndPreviewKustomization}
       reloadPreview={reloadPreview}
     />
   );
