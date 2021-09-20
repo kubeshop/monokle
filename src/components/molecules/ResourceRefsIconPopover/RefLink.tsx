@@ -5,6 +5,7 @@ import {ResourceRef} from '@models/k8sresource';
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {FontColors} from '@styles/Colors';
 import styled from 'styled-components';
+import path from 'path';
 
 const StyledRefText = styled.span<{isUnsatisfied: boolean}>`
   cursor: pointer;
@@ -17,6 +18,18 @@ const StyledRefText = styled.span<{isUnsatisfied: boolean}>`
     }
   }}
 `;
+
+const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
+  if (ref.target?.type === 'resource') {
+    if (ref.target.resourceId && resourceMap[ref.target.resourceId]) {
+      return resourceMap[ref.target.resourceId].name;
+    }
+  }
+  if (ref.target?.type === 'file') {
+    return path.parse(ref.target.filePath).name;
+  }
+  return ref.name;
+};
 
 const Icon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSProperties}) => {
   const {resourceRef, style} = props;
@@ -35,18 +48,18 @@ const Icon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSPrope
 const ResourceRefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType; onClick?: () => void}) => {
   const {resourceRef, resourceMap, onClick} = props;
 
-  const targetName =
-    resourceRef.targetResourceId && resourceMap[resourceRef.targetResourceId]
-      ? resourceMap[resourceRef.targetResourceId].name
-      : resourceRef.name;
-
+  const targetName = getRefTargetName(resourceRef, resourceMap);
   let linkText = targetName;
 
-  if (resourceRef.targetResourceKind) {
-    linkText = `${resourceRef.targetResourceKind}: ${targetName}`;
-  } else if (resourceRef.targetResourceId) {
-    const resourceKind = resourceMap[resourceRef.targetResourceId].kind;
-    linkText = `${resourceKind}: ${targetName}`;
+  if (resourceRef.target?.type === 'file') {
+    linkText = `File: ${targetName}`;
+  } else if (resourceRef.target?.type === 'resource') {
+    if (resourceRef.target.resourceKind) {
+      linkText = `${resourceRef.target.resourceKind}: ${targetName}`;
+    } else if (resourceRef.target.resourceId) {
+      const resourceKind = resourceMap[resourceRef.target.resourceId].kind;
+      linkText = `${resourceKind}: ${targetName}`;
+    }
   }
 
   return (

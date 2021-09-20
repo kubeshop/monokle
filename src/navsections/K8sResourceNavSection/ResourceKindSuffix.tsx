@@ -1,15 +1,12 @@
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
-import ResourceRefsPopover from '@components/molecules/ResourceRefsPopover';
 import {K8sResource} from '@models/k8sresource';
 import {NavSectionItemCustomComponentProps} from '@models/navsection';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectK8sResource} from '@redux/reducers/main';
-import {isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {useAppDispatch} from '@redux/hooks';
 import Colors from '@styles/Colors';
 import {Popover} from 'antd';
-import {useMemo} from 'react';
 import styled from 'styled-components';
 import {showValidationErrorsModal} from '@redux/reducers/ui';
+import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
 
 const StyledIconsContainer = styled.span`
   display: flex;
@@ -20,14 +17,6 @@ const StyledIconsContainer = styled.span`
 const Suffix = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
   const {item} = props;
   const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-
-  const outgoingRefs = useMemo(() => item.refs?.filter(r => isOutgoingRef(r.type) || isUnsatisfiedRef(r.type)), [item]);
-  const hasUnsatisfiedRefs = useMemo(() => outgoingRefs?.some(r => isUnsatisfiedRef(r.type)), [outgoingRefs]);
-
-  const selectResource = (resId: string) => {
-    dispatch(selectK8sResource({resourceId: resId}));
-  };
 
   const onClickErrorIcon = () => {
     if (item.validation) {
@@ -35,26 +24,9 @@ const Suffix = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
     }
   };
 
-  if (!outgoingRefs || outgoingRefs.length === 0) {
-    return null;
-  }
-
   return (
     <>
-      <Popover
-        mouseEnterDelay={0.5}
-        placement="rightTop"
-        content={
-          <ResourceRefsPopover resourceRefs={outgoingRefs} resourceMap={resourceMap} selectResource={selectResource}>
-            Outgoing Links <MonoIcon type={MonoIconTypes.OutgoingRefs} />
-          </ResourceRefsPopover>
-        }
-      >
-        <StyledIconsContainer>
-          <MonoIcon type={MonoIconTypes.OutgoingRefs} style={{marginLeft: 5}} />
-          {hasUnsatisfiedRefs && <MonoIcon type={MonoIconTypes.Warning} style={{marginLeft: 5}} />}
-        </StyledIconsContainer>
-      </Popover>
+      <ResourceRefsIconPopover resource={item} type="outgoing" />
       {item.validation && !item.validation.isValid && (
         <Popover
           placement="right"
