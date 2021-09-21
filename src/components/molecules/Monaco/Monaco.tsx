@@ -1,34 +1,30 @@
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+import React, {useEffect, useState, useRef, useMemo} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import fs from 'fs';
 import path from 'path';
-import {useMeasure, useDebounce} from 'react-use';
-import styled from 'styled-components';
+import {useMeasure} from 'react-use';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import 'monaco-yaml/lib/esm/monaco.contribution';
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor';
-
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
-import {getResourceSchema} from '@redux/services/schema';
-import {logMessage} from '@redux/services/log';
-import {updateFileEntry, updateResource, selectK8sResource, selectFile} from '@redux/reducers/main';
-import {openNewResourceWizard, setMonacoEditor} from '@redux/reducers/ui';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {selectK8sResource, selectFile} from '@redux/reducers/main';
 import {parseAllDocuments} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-
 import {useSelector} from 'react-redux';
 import {isInPreviewModeSelector} from '@redux/selectors';
-
-import {clearDecorations, setDecorations} from './editorHelpers';
-import codeIntel from './codeIntel';
+import useCodeIntel from './useCodeIntel';
+import useEditorKeybindings from './useEditorKeybindings';
+import useResourceYamlSchema from './useResourceYamlSchema';
+import useDebouncedCodeSave from './useDebouncedCodeSave';
+import useEditorUiState from './useEditorUiState';
+import * as S from './Monaco.styled';
 
 // @ts-ignore
 window.MonacoEnvironment = {
@@ -41,35 +37,12 @@ window.MonacoEnvironment = {
   },
 };
 
-const HiddenInputContainer = styled.div`
-  width: 0;
-  height: 0;
-  overflow: hidden;
-`;
-
-const HiddenInput = styled.input`
-  opacity: 0;
-`;
-
-const MonacoButtons = styled.div`
-  padding: 8px;
-  padding-right: 8px;
-`;
-
-const MonacoContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  padding-left: 0px;
-  padding-right: 8px;
-  margin: 0px;
-  margin-bottom: 20px;
-`;
-
 // @ts-ignore
 const {yaml} = languages || {};
 
 const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; applySelection: () => void}) => {
   const {editorHeight, diffSelectedResource, applySelection} = props;
+  const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
@@ -78,31 +51,19 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
-  const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const [containerRef, {width}] = useMeasure<HTMLDivElement>();
+
   const [code, setCode] = useState('');
   const [orgCode, setOrgCode] = useState<string>('');
-  const [containerRef, {width}] = useMeasure<HTMLDivElement>();
   const [isDirty, setDirty] = useState(false);
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
   const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const idsOfDecorationsRef = useRef<string[]>([]);
-  const hoverDisposablesRef = useRef<monaco.IDisposable[]>([]);
-  const commandDisposablesRef = useRef<monaco.IDisposable[]>([]);
-  const linkDisposablesRef = useRef<monaco.IDisposable[]>([]);
-  const completionDisposableRef = useRef<monaco.IDisposable | null>(null);
-  const actionSaveDisposableRef = useRef<monaco.IDisposable | null>(null);
-  const applySelectionDisposableRef = useRef<monaco.IDisposable | null>(null);
-  const diffSelectedResourceDisposableRef = useRef<monaco.IDisposable | null>(null);
-
   let editor = editorRef.current;
-
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const dispatch = useAppDispatch();
 
   const selectResource = (resourceId: string) => {
     if (resourceMap[resourceId]) {
@@ -116,6 +77,28 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     }
   };
 
+  useCodeIntel(editor, code, selectedResourceId, resourceMap, fileMap, selectResource, selectFilePath);
+  const {registerStaticActions} = useEditorKeybindings(
+    editor,
+    hiddenInputRef,
+    fileMap,
+    applySelection,
+    diffSelectedResource
+  );
+  useResourceYamlSchema(yaml, resourceMap, selectedResourceId);
+  useDebouncedCodeSave(
+    editor,
+    orgCode,
+    code,
+    isDirty,
+    isValid,
+    resourceMap,
+    selectedResourceId,
+    selectedPath,
+    setOrgCode
+  );
+  const {onEditorFocus} = useEditorUiState(editor, selectedResourceId);
+
   const onDidChangeMarkers = (e: monaco.Uri[]) => {
     const flag = monaco.editor.getModelMarkers({}).length > 0;
     setWarnings(flag);
@@ -125,85 +108,10 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     // console.log(e);
   };
 
-  useEffect(() => {
-    if (editor) {
-      applySelectionDisposableRef.current?.dispose();
-      applySelectionDisposableRef.current = editor.addAction({
-        id: 'monokle-apply-selection',
-        label: 'Apply Selection',
-        // eslint-disable-next-line no-bitwise
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KEY_S],
-        run: () => {
-          applySelection();
-        },
-      });
-    }
-  }, [editor, applySelection]);
+  const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
+    registerStaticActions(e);
 
-  useEffect(() => {
-    if (editor) {
-      diffSelectedResourceDisposableRef.current?.dispose();
-      diffSelectedResourceDisposableRef.current = editor.addAction({
-        id: 'monokle-diff-selected-resource',
-        label: 'Diff Selected Resource',
-        // eslint-disable-next-line no-bitwise
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KEY_D],
-        run: () => {
-          diffSelectedResource();
-        },
-      });
-    }
-  }, [editor, diffSelectedResource]);
-
-  const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor, m: any) => {
-    // register action to exit editor focus
-    e.addAction({
-      id: 'monokle-exit-editor-focus',
-      label: 'Exit Editor Focus',
-      // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyCode.Escape],
-      run: () => {
-        hiddenInputRef.current?.focus();
-      },
-    });
-
-    // register action to navigate back in the selection history
-    e.addAction({
-      id: 'monokle-navigate-back',
-      label: 'Navigate Back',
-      // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.LeftArrow],
-      run: () => {
-        dispatch(selectFromHistory({direction: 'left'}));
-      },
-    });
-
-    // register action to navigate forward in the selection history
-    e.addAction({
-      id: 'monokle-navigate-forward',
-      label: 'Navigate Forward',
-      // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.RightArrow],
-      run: () => {
-        dispatch(selectFromHistory({direction: 'right'}));
-      },
-    });
-
-    e.addAction({
-      id: 'monokle-open-new-resource-wizard',
-      label: 'Open New Resource Wizard',
-      // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N],
-      run: () => {
-        if (fileMap[ROOT_FILE_ENTRY]) {
-          dispatch(openNewResourceWizard());
-        }
-      },
-    });
-
-    e.onDidFocusEditorText(() => {
-      dispatch(setMonacoEditor({...monacoEditor, focused: true}));
-    });
+    e.onDidFocusEditorText(onEditorFocus);
 
     editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
 
@@ -216,7 +124,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
   };
 
-  function onChange(newValue: any, event: monaco.editor.IModelContentChangedEvent) {
+  function onChange(newValue: any) {
     setDirty(orgCode !== newValue);
     setCode(newValue);
 
@@ -224,62 +132,12 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     setValid(!parseAllDocuments(newValue).some(d => d.errors.length > 0));
   }
 
-  const saveContent = (providedEditor?: monaco.editor.IStandaloneCodeEditor) => {
-    let value = null;
-    if (providedEditor) {
-      value = providedEditor.getValue();
-    } else if (editor) {
-      value = editor.getValue();
-    } else {
-      return;
-    }
-    // is a file and no resource selected?
-    if (selectedPath && !selectedResourceId) {
-      try {
-        dispatch(updateFileEntry({path: selectedPath, content: value}));
-        setOrgCode(value);
-      } catch (e) {
-        logMessage(`Failed to update file ${e}`, dispatch);
-      }
-    } else if (selectedResourceId && resourceMap[selectedResourceId]) {
-      try {
-        dispatch(updateResource({resourceId: selectedResourceId, content: value.toString()}));
-        setOrgCode(value);
-      } catch (e) {
-        logMessage(`Failed to update resource ${e}`, dispatch);
-      }
-    }
-  };
-
-  useDebounce(
-    () => {
-      if (!isDirty || !isValid) {
-        return;
-      }
-      if (orgCode !== undefined && code !== undefined && orgCode !== code) {
-        saveContent();
-      }
-    },
-    500,
-    [code]
-  );
-
   useEffect(() => {
-    if (editor) {
-      actionSaveDisposableRef.current?.dispose();
-      const newActionSaveDisposable = editor.addAction({
-        id: 'monokle-save-content',
-        label: 'Save Content',
-        // eslint-disable-next-line no-bitwise
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
-        run: currentEditor => {
-          saveContent(currentEditor as monaco.editor.IStandaloneCodeEditor);
-        },
-      });
-      actionSaveDisposableRef.current = newActionSaveDisposable;
+    if (!firstCodeLoadedOnEditor && code) {
+      setFirstCodeLoadedOnEditor(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, selectedPath, selectedResourceId]);
+  }, [code, selectedResourceId, resourceMap]);
 
   useEffect(() => {
     let newCode = '';
@@ -300,8 +158,15 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     setDirty(false);
   }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
 
+  useEffect(() => {
+    if (editor) {
+      editor.revealLineNearTop(1);
+      editor.setSelection(new monaco.Selection(0, 0, 0, 0));
+    }
+  }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
+
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
-  const isReadOnlyMode = useCallback(() => {
+  const isReadOnlyMode = useMemo(() => {
     if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
       return true;
     }
@@ -322,155 +187,37 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     previewType,
   ]);
 
-  const options = {
-    selectOnLineNumbers: true,
-    readOnly: isReadOnlyMode(),
-    fontWeight: 'bold',
-    glyphMargin: true,
-    minimap: {
-      enabled: false,
-    },
-  };
-
-  const clearCodeIntel = () => {
-    if (editor) {
-      clearDecorations(editor, idsOfDecorationsRef.current);
-    }
-    hoverDisposablesRef.current.forEach(hoverDisposable => hoverDisposable.dispose());
-    commandDisposablesRef.current.forEach(commandDisposable => commandDisposable.dispose());
-    linkDisposablesRef.current.forEach(linkDisposable => linkDisposable.dispose());
-  };
-
-  const applyCodeIntel = () => {
-    if (editor && selectedResourceId && resourceMap[selectedResourceId]) {
-      const resource = resourceMap[selectedResourceId];
-      const {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables} =
-        codeIntel.applyForResource(resource, selectResource, selectFilePath, resourceMap, fileMap);
-      const idsOfNewDecorations = setDecorations(editor, newDecorations, idsOfDecorationsRef.current);
-      idsOfDecorationsRef.current = idsOfNewDecorations;
-      hoverDisposablesRef.current = newHoverDisposables;
-      commandDisposablesRef.current = newCommandDisposables;
-      linkDisposablesRef.current = newLinkDisposables;
-    }
-  };
-
-  useEffect(() => {
-    clearCodeIntel();
-    applyCodeIntel();
-
-    if (!firstCodeLoadedOnEditor && code) {
-      setFirstCodeLoadedOnEditor(true);
-    }
-    return () => {
-      clearCodeIntel();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, selectedResourceId, resourceMap]);
-
-  useEffect(() => {
-    let resourceSchema;
-
-    if (selectedResourceId) {
-      const resource = resourceMap[selectedResourceId];
-      if (resource) {
-        resourceSchema = getResourceSchema(resource);
-      }
-    }
-
-    yaml &&
-      yaml.yamlDefaults.setDiagnosticsOptions({
-        validate: true,
-        enableSchemaRequest: true,
-        hover: true,
-        completion: true,
-        isKubernetes: true,
-        format: true,
-        schemas: [
-          {
-            uri: 'http://monokle/k8s.json', // id of the first schema
-            fileMatch: ['*'], // associate with our model
-            schema: resourceSchema || {},
-          },
-        ],
-      });
-    if (completionDisposableRef.current && completionDisposableRef.current.dispose) {
-      completionDisposableRef.current.dispose();
-    }
-    if (editor) {
-      const newCompletionDisposable = codeIntel.applyAutocomplete(resourceMap);
-      completionDisposableRef.current = newCompletionDisposable;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId, resourceMap]);
-
-  useEffect(() => {
-    if (editor) {
-      editor.revealLineNearTop(1);
-      editor.setSelection(new monaco.Selection(0, 0, 0, 0));
-    }
-  }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
-
-  const handleClickOutside = useCallback(() => {
-    editor = editorRef.current;
-    if (editor && editor.hasTextFocus()) {
-      dispatch(setMonacoEditor({...monacoEditor, focused: true}));
-    } else {
-      dispatch(setMonacoEditor({...monacoEditor, focused: false}));
-    }
-  }, [selectedResourceId]);
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!monacoEditor.focused) {
-      return;
-    }
-
-    if (editor && monacoEditor.undo) {
-      editor.trigger(null, 'undo', null);
-      dispatch(setMonacoEditor({...monacoEditor, undo: false}));
-    }
-    if (editor && monacoEditor.redo) {
-      editor.trigger(null, 'redo', null);
-      dispatch(setMonacoEditor({...monacoEditor, redo: false}));
-    }
-    if (editor && monacoEditor.find) {
-      editor.trigger(null, 'actions.find', null);
-      dispatch(setMonacoEditor({...monacoEditor, find: false}));
-    }
-    if (editor && monacoEditor.replace) {
-      editor.trigger(null, 'editor.action.startFindReplaceAction', null);
-      dispatch(setMonacoEditor({...monacoEditor, replace: false}));
-    }
-  }, [monacoEditor]);
+  const options = useMemo(
+    () => ({
+      selectOnLineNumbers: true,
+      readOnly: isReadOnlyMode,
+      fontWeight: 'bold',
+      glyphMargin: true,
+      minimap: {
+        enabled: false,
+      },
+    }),
+    [isReadOnlyMode]
+  );
 
   return (
-    <>
-      <MonacoButtons>
-        <HiddenInputContainer>
-          <HiddenInput ref={hiddenInputRef} type="text" />
-        </HiddenInputContainer>
-      </MonacoButtons>
-      <MonacoContainer ref={containerRef}>
-        {firstCodeLoadedOnEditor && (
-          <MonacoEditor
-            width={width}
-            height={editorHeight}
-            language="yaml"
-            theme={KUBESHOP_MONACO_THEME}
-            value={code}
-            options={options}
-            onChange={onChange}
-            editorDidMount={editorDidMount}
-          />
-        )}
-      </MonacoContainer>
-    </>
+    <S.MonacoContainer ref={containerRef}>
+      <S.HiddenInputContainer>
+        <S.HiddenInput ref={hiddenInputRef} type="text" />
+      </S.HiddenInputContainer>
+      {firstCodeLoadedOnEditor && (
+        <MonacoEditor
+          width={width}
+          height={editorHeight}
+          language="yaml"
+          theme={KUBESHOP_MONACO_THEME}
+          value={code}
+          options={options}
+          onChange={onChange}
+          editorDidMount={editorDidMount}
+        />
+      )}
+    </S.MonacoContainer>
   );
 };
 export default Monaco;

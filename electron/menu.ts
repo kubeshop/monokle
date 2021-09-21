@@ -113,13 +113,13 @@ const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {
         label: 'Undo',
         click: () => {
-          store.dispatch(setMonacoEditor({...uiState.monacoEditor, undo: true}));
+          store.dispatch(setMonacoEditor({undo: true}));
         },
       },
       {
         label: 'Redo',
         click: () => {
-          store.dispatch(setMonacoEditor({...uiState.monacoEditor, redo: true}));
+          store.dispatch(setMonacoEditor({redo: true}));
         },
       },
       {type: 'separator'},
@@ -130,13 +130,13 @@ const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
       {
         label: 'Find',
         click: () => {
-          store.dispatch(setMonacoEditor({...uiState.monacoEditor, find: true}));
+          store.dispatch(setMonacoEditor({find: true}));
         },
       },
       {
         label: 'Replace',
         click: () => {
-          store.dispatch(setMonacoEditor({...uiState.monacoEditor, replace: true}));
+          store.dispatch(setMonacoEditor({replace: true}));
         },
       },
       {type: 'separator'},
@@ -144,7 +144,7 @@ const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
         label: 'Apply',
         accelerator: hotkeys.APPLY_SELECTION,
         click: () => {
-          store.dispatch(setMonacoEditor({...uiState.monacoEditor, apply: true}));
+          store.dispatch(setMonacoEditor({apply: true}));
         },
       },
       {
