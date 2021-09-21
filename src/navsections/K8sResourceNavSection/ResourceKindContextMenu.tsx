@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {FormOutlined} from '@ant-design/icons';
 import {NavSectionItemCustomComponentProps} from '@models/navsection';
 import {K8sResource} from '@models/k8sresource';
-import ActionsMenu from '@components/molecules/NavigatorRowLabel/ActionsMenu';
+import ResourceActionsMenu from '@components/molecules/ResourceActionsMenu';
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {useSelector} from 'react-redux';
@@ -33,7 +33,7 @@ const ContextMenu = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
   return (
     <Dropdown
       overlay={
-        <ActionsMenu
+        <ResourceActionsMenu
           resource={item}
           resourceMap={resourceMap}
           isInPreviewMode={isInPreviewMode}
