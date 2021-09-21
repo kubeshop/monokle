@@ -164,7 +164,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   useEffect(() => {
     if (monacoEditor.apply) {
       applySelection();
-      dispatch(setMonacoEditor({...monacoEditor, apply: false}));
+      dispatch(setMonacoEditor({apply: false}));
     }
   }, [monacoEditor]);
 
