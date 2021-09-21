@@ -144,6 +144,4 @@ const electronStore = new ElectronStore({
   defaults,
 });
 
-// electronStore.delete('ui');
-
 export default electronStore;
