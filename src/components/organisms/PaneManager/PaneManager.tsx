@@ -15,7 +15,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleLeftMenu, toggleRightMenu, setLeftMenuSelection, setRightMenuSelection} from '@redux/reducers/ui';
 import AppContext from '@src/AppContext';
-import NavPane from '@src/components/organisms/NewNavigatorPane';
+import NavigatorPane from '@components/organisms/NavigatorPane';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -170,7 +170,7 @@ const PaneManager = () => {
               </>
             }
             hideLeft={!leftActive}
-            nav={<NavPane />}
+            nav={<NavigatorPane />}
             editor={<ActionsPane contentHeight={contentHeight} />}
             right={
               <>
