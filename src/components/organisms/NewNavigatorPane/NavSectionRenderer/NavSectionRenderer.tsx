@@ -11,6 +11,8 @@ type NavSectionRendererProps<ItemType, ScopeType> = {
   navSection: NavSection<ItemType, ScopeType>;
   level: number;
   isLastSection: boolean;
+  onVisible: (sectionName: string) => void;
+  onHidden: (sectionName: string) => void;
 };
 
 function loopSubsectionNamesDeep(
@@ -31,7 +33,8 @@ function loopSubsectionNamesDeep(
 
 function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<ItemType, ScopeType>) {
   const dispatch = useAppDispatch();
-  const {navSection, level, isLastSection} = props;
+  const {navSection, level, isLastSection, onVisible, onHidden} = props;
+  const [hiddenSubsectionNames, setHiddenSubsectionNames] = useState<string[]>([]);
   const {
     name,
     scope,
@@ -48,31 +51,31 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     itemCustomization,
     subsections,
     shouldSectionExpand,
-  } = useNavSection<ItemType, ScopeType>(navSection);
+  } = useNavSection<ItemType, ScopeType>(navSection, hiddenSubsectionNames);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const collapsedNavSectionNames = useAppSelector(state => state.ui.navPane.collapsedNavSectionNames);
 
-  const allNestedSubsectionNames = useMemo(() => {
+  const allVisibileNestedSubsectionNames = useMemo(() => {
     if (!subsections) {
       return undefined;
     }
     const nestedSubsectionNames: string[] = [];
     loopSubsectionNamesDeep(subsections, subsectionName => nestedSubsectionNames.push(subsectionName));
-    return nestedSubsectionNames;
-  }, [subsections]);
+    return nestedSubsectionNames.filter(n => !hiddenSubsectionNames.includes(n));
+  }, [subsections, hiddenSubsectionNames]);
 
   const isCollapsedMode = useMemo(() => {
-    if (allNestedSubsectionNames) {
+    if (allVisibileNestedSubsectionNames) {
       if (
         collapsedNavSectionNames.includes(name) &&
-        allNestedSubsectionNames.every(s => collapsedNavSectionNames.includes(s))
+        allVisibileNestedSubsectionNames.every(s => collapsedNavSectionNames.includes(s))
       ) {
         return 'collapsed';
       }
       if (
         !collapsedNavSectionNames.includes(name) &&
-        allNestedSubsectionNames.every(s => !collapsedNavSectionNames.includes(s))
+        allVisibileNestedSubsectionNames.every(s => !collapsedNavSectionNames.includes(s))
       ) {
         return 'expanded';
       }
@@ -82,27 +85,27 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
       return 'collapsed';
     }
     return 'expanded';
-  }, [collapsedNavSectionNames, name, allNestedSubsectionNames]);
+  }, [collapsedNavSectionNames, name, allVisibileNestedSubsectionNames]);
 
   const isCollapsed = useMemo(() => {
     return isCollapsedMode === 'collapsed';
   }, [isCollapsedMode]);
 
   const expandSection = useCallback(() => {
-    if (!allNestedSubsectionNames || allNestedSubsectionNames.length === 0) {
+    if (!allVisibileNestedSubsectionNames || allVisibileNestedSubsectionNames.length === 0) {
       dispatch(expandNavSections([name]));
     } else {
-      dispatch(expandNavSections([name, ...allNestedSubsectionNames]));
+      dispatch(expandNavSections([name, ...allVisibileNestedSubsectionNames]));
     }
-  }, [name, allNestedSubsectionNames, dispatch, expandNavSections]);
+  }, [name, allVisibileNestedSubsectionNames, dispatch, expandNavSections]);
 
   const collapseSection = useCallback(() => {
-    if (!allNestedSubsectionNames || allNestedSubsectionNames.length === 0) {
+    if (!allVisibileNestedSubsectionNames || allVisibileNestedSubsectionNames.length === 0) {
       dispatch(collapseNavSections([name]));
     } else {
-      dispatch(collapseNavSections([name, ...allNestedSubsectionNames]));
+      dispatch(collapseNavSections([name, ...allVisibileNestedSubsectionNames]));
     }
-  }, [name, allNestedSubsectionNames, dispatch, collapseNavSections]);
+  }, [name, allVisibileNestedSubsectionNames, dispatch, collapseNavSections]);
 
   useEffect(() => {
     if (shouldSectionExpand) {
@@ -110,9 +113,41 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     }
   }, [shouldSectionExpand, expandSection]);
 
-  if (!isSectionVisible) {
-    return null;
-  }
+  const onSubsectionVisible = useCallback(
+    (subsectionName: string) => {
+      if (hiddenSubsectionNames.includes(subsectionName)) {
+        setHiddenSubsectionNames(prevHiddenSubsections => prevHiddenSubsections.filter(s => s !== subsectionName));
+      }
+    },
+    [hiddenSubsectionNames, setHiddenSubsectionNames]
+  );
+
+  const onSubsectionHidden = useCallback(
+    (subsectionName: string) => {
+      if (!hiddenSubsectionNames.includes(subsectionName)) {
+        setHiddenSubsectionNames(prevHiddenSubsections => [...prevHiddenSubsections, subsectionName]);
+      }
+    },
+    [hiddenSubsectionNames, setHiddenSubsectionNames]
+  );
+
+  useEffect(() => {
+    if (isSectionVisible) {
+      onVisible(name);
+    } else {
+      onHidden(name);
+    }
+  }, [isSectionVisible]);
+
+  useEffect(() => {
+    subsections?.forEach(subsection => {
+      if (hiddenSubsectionNames.includes(subsection.name)) {
+        onHidden(subsection.name);
+      } else {
+        onVisible(subsection.name);
+      }
+    });
+  }, [subsections, hiddenSubsectionNames]);
 
   if (isSectionLoading) {
     return <S.Skeleton />;
@@ -124,11 +159,12 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         isHovered={isHovered}
         isSelected={isSectionSelected && isCollapsed}
         isHighlighted={isSectionHighlighted && isCollapsed}
-        isLastSection={isLastSection}
+        isLastSection={isLastSection && isSectionVisible}
         hasSubsections={Boolean(subsections && subsections.length > 0)}
         isCollapsed={isCollapsed}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        isVisible={isSectionVisible}
       >
         <S.Name
           isSelected={isSectionSelected && isCollapsed}
@@ -194,6 +230,8 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
             navSection={child}
             level={level + 1}
             isLastSection={index === subsections.length - 1}
+            onVisible={onSubsectionVisible}
+            onHidden={onSubsectionHidden}
           />
         ))}
     </>

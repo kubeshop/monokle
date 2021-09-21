@@ -62,16 +62,22 @@ const NavPane = () => {
           navSection={HelmChartNavSection}
           level={0}
           isLastSection={false}
+          onVisible={() => {}}
+          onHidden={() => {}}
         />
         <NavSectionRenderer<K8sResource, KustomizationNavSectionScope>
           navSection={KustomizationNavSection}
           level={0}
           isLastSection={false}
+          onVisible={() => {}}
+          onHidden={() => {}}
         />
         <NavSectionRenderer<K8sResource, K8sResourceNavSectionScope>
           navSection={K8sResourceNavSection}
           level={0}
           isLastSection={false}
+          onVisible={() => {}}
+          onHidden={() => {}}
         />
       </S.List>
     </>

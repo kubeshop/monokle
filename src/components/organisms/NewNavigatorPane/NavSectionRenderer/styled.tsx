@@ -9,6 +9,7 @@ export const NameContainer = styled.li<{
   isLastSection?: boolean;
   isCollapsed?: boolean;
   hasSubsections?: boolean;
+  isVisible?: boolean;
 }>`
   display: flex;
   justify-content: space-between;
@@ -16,11 +17,17 @@ export const NameContainer = styled.li<{
   width: 100%;
   user-select: none;
   ${props => {
+    if (props.isVisible === false) {
+      return 'visibility: hidden; height: 0;';
+    }
+    return 'visibility: visible;';
+  }}
+  ${props => {
     if (props.isLastSection && props.isCollapsed && !props.hasSubsections) {
       return `margin-bottom: 12px;`;
     }
   }}
-  ${props => {
+    ${props => {
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {
         return `background: ${Colors.highlightGradientHover};`;

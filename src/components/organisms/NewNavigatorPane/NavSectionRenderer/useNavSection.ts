@@ -24,7 +24,10 @@ function makeItemToPassedConditionMap<ItemType, ScopeType>(
   return Object.fromEntries(itemEntries);
 }
 
-export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemType, ScopeType>) {
+export function useNavSection<ItemType, ScopeType>(
+  navSection: NavSection<ItemType, ScopeType>,
+  hiddenSubsectionNames: string[]
+) {
   const {
     name,
     getItems,
@@ -155,12 +158,24 @@ export function useNavSection<ItemType, ScopeType>(navSection: NavSection<ItemTy
     return subsectionNames?.map(s => navSectionMap.getByName(s)) || undefined;
   }, [navSectionMap]);
 
+  const isAnySubsectionVisible = useMemo(() => {
+    if (!subsections || subsections.length === 0) {
+      return false;
+    }
+    return subsections.some(s => !hiddenSubsectionNames.includes(s.name));
+  }, [subsections, hiddenSubsectionNames]);
+
   const isSectionVisible = useMemo(() => {
     if (!isVisible) {
-      return (subsections && subsections.length > 0) || Object.keys(groupedItems).length > 0 || items.length > 0;
+      return (
+        isAnySubsectionVisible ||
+        (Object.keys(groupedItems).length > 0 &&
+          Object.values(groupedItems).some(g => g.some(i => isItemVisible(i)))) ||
+        (items.length > 0 && items.some(i => isItemVisible(i)))
+      );
     }
     return isVisible(scope, items);
-  }, [scope, items, groupedItems, isVisible]);
+  }, [scope, items, groupedItems, isVisible, isAnySubsectionVisible]);
 
   return {
     name,
