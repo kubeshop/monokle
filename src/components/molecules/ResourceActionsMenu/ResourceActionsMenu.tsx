@@ -35,7 +35,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
   });
 }
 
-const ActionsMenu = (props: {
+const ResourceActionsMenu = (props: {
   resource: K8sResource;
   resourceMap: ResourceMapType;
   isInPreviewMode: boolean;
@@ -81,4 +81,4 @@ const ActionsMenu = (props: {
   );
 };
 
-export default ActionsMenu;
+export default ResourceActionsMenu;

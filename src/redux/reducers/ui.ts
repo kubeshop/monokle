@@ -111,7 +111,10 @@ export const uiSlice = createSlice({
       state.folderExplorer = {isOpen: false};
     },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<any>) => {
-      state.monacoEditor = action.payload;
+      state.monacoEditor = {
+        ...state.monacoEditor,
+        ...action.payload,
+      };
     },
     setShouldExpandAllNodes: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.shouldExpandAllNodes = action.payload;

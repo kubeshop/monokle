@@ -8,6 +8,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {NavSection} from '@models/navsection';
 import {isInClusterModeSelector} from '@redux/selectors';
 import KustomizationQuickAction from './KustomizationQuickAction';
+import KustomizationPrefix from './KustomizationPrefix';
+import KustomizationSuffix from './KustomizationSuffix';
 
 export type KustomizationNavSectionScope = {
   resourceMap: ResourceMapType;
@@ -78,6 +80,8 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
     },
   },
   itemCustomization: {
+    Prefix: KustomizationPrefix,
+    Suffix: KustomizationSuffix,
     QuickAction: KustomizationQuickAction,
   },
 };
