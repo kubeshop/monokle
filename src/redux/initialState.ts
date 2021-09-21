@@ -1,5 +1,5 @@
 import {AppState} from '@models/appstate';
-import {AppConfig} from '@models/appconfig';
+import {AppConfig, NewVersion} from '@models/appconfig';
 import {AlertState} from '@models/alert';
 import {LogsState} from '@models/logs';
 import {UiState} from '@models/ui';
@@ -83,8 +83,6 @@ const navigators = Object.values(
 
 const initialAppConfigState: AppConfig = {
   isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
-  isNewVersionAvailable: false,
-  isCheckingNewVersion: false,
   kubeconfigPath: '',
   settings: {
     filterObjectsOnSelection: false,
@@ -95,9 +93,10 @@ const initialAppConfigState: AppConfig = {
     language: electronStore.get('appConfig.settings.language'),
     loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
   },
-  scanExcludes: electronStore.get('appConfig.scanExcludes'),
-  fileIncludes: electronStore.get('appConfig.fileIncludes'),
+  scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
+  fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   recentFolders: electronStore.get('appConfig.recentFolders') || [],
+  newVersion: electronStore.get('appConfig.newVersion') || NewVersion.Idle,
   navigators,
 };
 

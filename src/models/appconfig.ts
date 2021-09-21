@@ -15,6 +15,16 @@ export enum Languages {
   English = 'en',
 }
 
+export enum NewVersion {
+  Errored = -2,
+  NotAvailable = -1,
+  Idle = 0,
+  Checking = 1,
+  Available = 2,
+  Downloading = 3,
+  Downloaded = 4,
+}
+
 interface AppConfig {
   /** a list of patterns to exclude when scanning the file system for resources */
   scanExcludes: string[];
@@ -26,8 +36,6 @@ interface AppConfig {
   kubeconfigPath: string;
   /** if the startup modal is visible */
   isStartupModalVisible: boolean;
-  isNewVersionAvailable: boolean;
-  isCheckingNewVersion: boolean;
   settings: {
     theme: Themes; // not used for now
     textSize: TextSizes; // not used for now
@@ -38,6 +46,7 @@ interface AppConfig {
     loadLastFolderOnStartup: boolean;
   };
   recentFolders: string[];
+  newVersion: NewVersion;
 }
 
 export type {AppConfig};

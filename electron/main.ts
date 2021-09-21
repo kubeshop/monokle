@@ -21,16 +21,18 @@ import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '@constants/constants';
 import {checkMissingDependencies} from '@utils/index';
+import ElectronStore from 'electron-store';
+import {autoUpdater} from 'electron-updater';
+import mainStore from '@redux/main-store';
+import {updateNewVersion} from '@redux/reducers/appConfig';
+import {NewVersion} from '@models/appconfig';
 
-import terminal from '../cli/terminal';
 import {createMenu} from './menu';
+import terminal from '../cli/terminal';
 
 // console.log(store);
 
 Object.assign(console, ElectronLog.functions);
-
-const ElectronStore = require('electron-store');
-const {autoUpdater} = require('electron-updater'); // Hacky way to fix for `Conflicting definitions for 'node'` error
 
 autoUpdater.logger = console;
 
@@ -115,13 +117,23 @@ ipcMain.on('app-version', event => {
   event.sender.send('app-version', {version: app.getVersion()});
 });
 
-ipcMain.on('check-update-available', () => {
-  autoUpdater.checkForUpdatesAndNotify();
+ipcMain.on('check-update-available', async () => {
+  await checkNewVersion();
 });
 
 ipcMain.on('quit-and-install', () => {
   autoUpdater.quitAndInstall();
 });
+
+const checkNewVersion = async () => {
+  try {
+    mainStore.dispatch(updateNewVersion(NewVersion.Checking));
+    const a = await autoUpdater.checkForUpdates();
+    console.log(a);
+  } catch (error) {
+    mainStore.dispatch(updateNewVersion(NewVersion.Errored));
+  }
+};
 
 function createWindow() {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
@@ -183,26 +195,25 @@ function createWindow() {
     win.webContents.openDevTools();
   }
 
-  // store.subscribe(() => {});
-
-  win.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
+  win.once('ready-to-show', async () => {
+    await checkNewVersion();
   });
 
   autoUpdater.on('update-available', () => {
-    win.webContents.send('update-available');
+    mainStore.dispatch(updateNewVersion(NewVersion.Available));
   });
 
   autoUpdater.on('update-not-available', () => {
-    win.webContents.send('update-not-available');
+    mainStore.dispatch(updateNewVersion(NewVersion.NotAvailable));
   });
 
   autoUpdater.on('download-progress', (progressObj: any) => {
     console.info(`download-progress ${JSON.stringify(progressObj)}`);
+    mainStore.dispatch(updateNewVersion(NewVersion.Downloading));
   });
 
   autoUpdater.on('update-downloaded', () => {
-    win.webContents.send('update-downloaded');
+    mainStore.dispatch(updateNewVersion(NewVersion.Downloaded));
   });
 
   return win;
@@ -210,7 +221,6 @@ function createWindow() {
 
 const openApplication = async (givenPath?: string) => {
   await app.whenReady();
-  const {default: mainStore} = await import('@redux/main-store');
 
   if (isDev) {
     // DevTools

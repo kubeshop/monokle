@@ -1,7 +1,7 @@
 import path from 'path';
 import {ipcRenderer} from 'electron';
 import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
-import {AppConfig, Themes, TextSizes, Languages} from '@models/appconfig';
+import {AppConfig, Themes, TextSizes, Languages, NewVersion} from '@models/appconfig';
 import electronStore from '@utils/electronStore';
 import {PROCESS_ENV} from '@utils/env';
 import {AlertEnum, AlertType} from '@models/alert';
@@ -99,21 +99,10 @@ export const updateLanguage = createAsyncThunk('config/updateLanguage', async (l
   thunkAPI.dispatch(configSlice.actions.setLanguage(language));
 });
 
-export const updateNewVersionAvailable = createAsyncThunk(
-  'config/updateNewVersionAvailable',
-  async (isAvailable: boolean, thunkAPI) => {
-    electronStore.set('appConfig.isNewVersionAvailable', isAvailable);
-    thunkAPI.dispatch(configSlice.actions.setNewVersionAvailable(isAvailable));
-  }
-);
-
-export const updateCheckingNewVersion = createAsyncThunk(
-  'config/updateCheckingNewVersion',
-  async (isChecking: boolean, thunkAPI) => {
-    electronStore.set('appConfig.isCheckingNewVersion', isChecking);
-    thunkAPI.dispatch(configSlice.actions.setCheckingNewVersion(isChecking));
-  }
-);
+export const updateNewVersion = createAsyncThunk('config/updateNewVersion', async (status: NewVersion, thunkAPI) => {
+  electronStore.set('appConfig.newVersion', status);
+  thunkAPI.dispatch(configSlice.actions.setNewVersion(status));
+});
 
 export const configSlice = createSlice({
   name: 'config',
@@ -149,11 +138,8 @@ export const configSlice = createSlice({
     setHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
       state.settings.helmPreviewMode = action.payload;
     },
-    setNewVersionAvailable: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      state.isNewVersionAvailable = action.payload;
-    },
-    setCheckingNewVersion: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      state.isCheckingNewVersion = action.payload;
+    setNewVersion: (state: Draft<AppConfig>, action: PayloadAction<NewVersion>) => {
+      state.newVersion = action.payload;
     },
     setLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.loadLastFolderOnStartup = action.payload;

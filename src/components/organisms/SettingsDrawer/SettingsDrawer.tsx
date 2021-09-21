@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useRef} from 'react';
 import styled from 'styled-components';
 
 import {Button, Input, Select, Tooltip, Divider, Checkbox} from 'antd';
@@ -14,8 +14,6 @@ import {
   updateFileIncludes,
   updateKubeconfig,
   updateHelmPreviewMode,
-  updateCheckingNewVersion,
-  updateNewVersionAvailable,
   updateLoadLastFolderOnStartup,
 } from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
@@ -27,6 +25,7 @@ import {
   KubeconfigPathTooltip,
 } from '@constants/tooltips';
 import {ipcRenderer} from 'electron';
+import {NewVersion} from '@models/appconfig';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -54,9 +53,7 @@ const StyledSelect = styled(Select)`
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
-  const isNewVersionAvailable = Boolean(useAppSelector(state => state.config.isNewVersionAvailable));
-  const isCheckingNewVersion = Boolean(useAppSelector(state => state.config.isCheckingNewVersion));
-  const [isUpdateDownloaded, setUpdateDownloaded] = useState(false);
+  const newVersion = useAppSelector(state => state.config.newVersion);
 
   const appConfig = useAppSelector(state => state.config);
 
@@ -106,27 +103,12 @@ const SettingsDrawer = () => {
   };
 
   const checkUpdateAvailability = () => {
-    dispatch(updateCheckingNewVersion(true));
     ipcRenderer.send('check-update-available');
   };
 
   const updateApplication = () => {
     ipcRenderer.send('quit-and-install');
   };
-
-  ipcRenderer.once('update-available', () => {
-    dispatch(updateNewVersionAvailable(true));
-    dispatch(updateCheckingNewVersion(false));
-  });
-
-  ipcRenderer.once('update-not-available', () => {
-    dispatch(updateNewVersionAvailable(false));
-    dispatch(updateCheckingNewVersion(false));
-  });
-
-  ipcRenderer.once('update-downloaded', () => {
-    setUpdateDownloaded(true);
-  });
 
   return (
     <Drawer
@@ -181,12 +163,13 @@ const SettingsDrawer = () => {
       </StyledDiv>
       <Divider />
       <StyledDiv>
-        {isNewVersionAvailable ? (
-          <StyledButton onClick={updateApplication} loading={!isUpdateDownloaded}>
-            {isUpdateDownloaded ? <span>Update Monokle</span> : <span>Downloading the update..</span>}
+        {newVersion > NewVersion.Checking ? (
+          <StyledButton onClick={updateApplication} loading={newVersion === NewVersion.Downloading}>
+            {newVersion === NewVersion.Downloaded ? <span>Update Monokle</span> : null}
+            {newVersion === NewVersion.Downloading ? <span>Downloading the update..</span> : null}
           </StyledButton>
         ) : (
-          <StyledButton onClick={checkUpdateAvailability} loading={isCheckingNewVersion}>
+          <StyledButton onClick={checkUpdateAvailability} loading={newVersion === NewVersion.Checking}>
             Check New Version
           </StyledButton>
         )}

@@ -26,6 +26,7 @@ import {stopPreview} from '@redux/services/preview';
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {openDocumentation, openGitHub} from '@utils/shell';
+import {NewVersion} from '@models/appconfig';
 
 const StyledLogo = styled.img`
   height: 24px;
@@ -146,7 +147,7 @@ const PageHeader = () => {
   const [helmChart, setHelmChart] = useState<HelmChart>();
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const isNewVersionAvailable = Boolean(useAppSelector(state => state.config.isNewVersionAvailable));
+  const newVersion = useAppSelector(state => state.config.newVersion);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -224,7 +225,7 @@ const PageHeader = () => {
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>
-            <StyledSettingsBadge count={isNewVersionAvailable ? <StyledDownloadOutlined /> : null}>
+            <StyledSettingsBadge count={newVersion > NewVersion.Checking ? <StyledDownloadOutlined /> : null}>
               <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
             </StyledSettingsBadge>
           </SettingsCol>

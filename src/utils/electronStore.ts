@@ -48,6 +48,9 @@ const schema = {
           type: 'string',
         },
       },
+      newVersion: {
+        type: 'number',
+      },
     },
   },
   ui: {
@@ -118,6 +121,7 @@ const defaults = {
       loadLastFolderOnStartup: true,
     },
     recentFolders: [],
+    newVersion: 0,
   },
   ui: {
     isSettingsOpen: false,
@@ -143,7 +147,5 @@ const electronStore = new ElectronStore({
   schema,
   defaults,
 });
-
-// electronStore.delete('ui');
 
 export default electronStore;
