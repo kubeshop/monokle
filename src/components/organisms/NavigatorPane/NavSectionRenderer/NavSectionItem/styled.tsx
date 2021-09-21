@@ -42,7 +42,7 @@ export const ItemContainer = styled.li<{
         return `background: ${Colors.blackPearl};`;
       }
     }};
-  padding-left: ${props => `${props.level * 10}px;`};
+  padding-left: ${props => `${props.level * 12}px;`};
 `;
 
 export const ItemName = styled.span<{
