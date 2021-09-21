@@ -41,21 +41,3 @@ Want to browse your cluster instead of a repo? Simply smash the "Show Cluster Ob
 the cluster into Monokle - [read more](cluster-integration.md)
 
 
-## Reload Folder On Startup
-
-You can choose to reload the last reviewed folder while launching Monokle. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
-
-![Reload](img/reload.png)
-
-## Navigation History
-
-You can easily navigate back and forth between the selected resources with the help of the Navigation button.
-
-
-![Navigation History](img/navigate-history.png)
-
-## Editing kustomizations and Helm Values
-
-While previewing, you can edit and recreate the Kustomizations or Helm preview files. It makes debugging of customizations and Helm Charts smoother.
-
-![Editing kustomizations and Helm Values](img/edit-preview.png)

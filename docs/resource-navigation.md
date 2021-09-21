@@ -84,6 +84,19 @@ Click on the filter button on the top of the navigator to launch the dialog for 
 
 ![Resource Filtering](img/resource-filtering.png)
 
+## Reload Folder On Startup
+
+You can choose to reload the last reviewed folder while launching Monokle. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
+
+![Reload](img/reload.png)
+
+## Navigation History
+
+You can easily navigate back and forth between the selected resources with the help of the Navigation button.
+
+
+![Navigation History](img/navigate-history.png)
+
 
 ## Supported Resource links
 

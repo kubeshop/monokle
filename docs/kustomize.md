@@ -30,7 +30,7 @@ Just as with K8s resources, hovering over the link-icon to the right of the kust
 
 (here we can see the 10 resources included by the selected kustomization)
 
-and hovering the link-icon to the left of the kustomization name shows its incoming links:
+Hovering the link-icon to the left of the kustomization name shows its incoming links:
 
 ![Kustomize Incoming Links](img/kustomize-incoming-links.png)  
 
@@ -66,3 +66,8 @@ specified in the kustomization configuration:
 
 ![Kustomize Preview Content](img/kustomize-preview-content.png)
 
+## Editing kustomizations and Helm Values
+
+While previewing, you can edit and recreate the Kustomizations or Helm preview files. It makes debugging of customizations and Helm Charts smoother.
+
+![Editing kustomizations and Helm Values](img/edit-preview.png)
