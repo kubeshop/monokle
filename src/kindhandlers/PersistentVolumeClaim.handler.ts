@@ -1,11 +1,11 @@
 import * as k8s from '@kubernetes/client-node';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {NAV_K8S_RESOURCES, SECTION_STORAGE} from '@constants/navigator';
+import navSectionNames from '@constants/navSectionNames';
 
 const PersistentVolumeClaimHandler: ResourceKindHandler = {
   kind: 'PersistentVolumeClaim',
   apiVersionMatcher: '**',
-  navigatorPath: [NAV_K8S_RESOURCES, SECTION_STORAGE, 'PersistentVolumeClaims'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.STORAGE, 'PersistentVolumeClaims'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
   description: '',

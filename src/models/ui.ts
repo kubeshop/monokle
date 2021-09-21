@@ -1,3 +1,5 @@
+import {ResourceValidationError} from './k8sresource';
+
 export type NewResourceWizardInput = {
   name?: string;
   kind?: string;
@@ -24,6 +26,13 @@ export type UiState = {
   rightMenu: {
     selection?: string;
     isActive: boolean;
+  };
+  navPane: {
+    collapsedNavSectionNames: string[];
+  };
+  validationErrorsModal: {
+    isVisible: boolean;
+    errors: ResourceValidationError[];
   };
   folderExplorer: {
     isOpen: boolean;

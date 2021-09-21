@@ -1,7 +1,8 @@
 import React from 'react';
 import {Modal} from 'antd';
-import {ResourceValidationError} from '@models/k8sresource';
 import styled from 'styled-components';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {hideValidationErrorsModal} from '@redux/reducers/ui';
 
 const StyledContainer = styled.div`
   margin: 20px 10px;
@@ -30,10 +31,16 @@ const StyledErrorMessage = styled.span`
   display: block;
 `;
 
-const ValidationErrorsModal = (props: {errors: ResourceValidationError[]; isVisible: boolean; onClose: () => void}) => {
-  const {errors, isVisible, onClose} = props;
+const ValidationErrorsModal = () => {
+  const dispatch = useAppDispatch();
+  const {errors, isVisible} = useAppSelector(state => state.ui.validationErrorsModal);
+
+  const closeModal = () => {
+    dispatch(hideValidationErrorsModal());
+  };
+
   return (
-    <Modal centered visible={isVisible} onCancel={() => onClose()} footer={null}>
+    <Modal centered visible={isVisible} onCancel={closeModal} footer={null}>
       <StyledContainer>
         <StyledErrorList>
           {errors.map(error => {

@@ -6,7 +6,8 @@ import {ResourceKindHandlers} from '@src/kindhandlers';
 import {useNamespaces} from '@hooks/useNamespaces';
 import Colors from '@styles/Colors';
 import {KeyValueInput} from '@components/atoms';
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateResourceFilter} from '@redux/reducers/main';
 
 const ALL_OPTIONS = '<all>';
 
@@ -60,16 +61,8 @@ const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (curren
   return keyValues;
 };
 
-export type ResourceFilterType = {
-  name?: string;
-  kind?: string;
-  namespace?: string;
-  labels: Record<string, string | null>;
-  annotations: Record<string, string | null>;
-};
-
-const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}) => {
-  const {onChange: onFilterChange} = props;
+const ResourceFilter = () => {
+  const dispatch = useAppDispatch();
   const [name, setName] = useState<string>();
   const [kind, setKind] = useState<string>();
   const [namespace, setNamespace] = useState<string>();
@@ -120,20 +113,17 @@ const ResourceFilter = (props: {onChange?: (filter: ResourceFilterType) => void}
 
   useDebounce(
     () => {
-      if (!onFilterChange) {
-        return;
-      }
-      const updatedFilters = {
+      const updatedFilter = {
         name,
         kind: kind === ALL_OPTIONS ? undefined : kind,
         namespace: namespace === ALL_OPTIONS ? undefined : namespace,
         labels,
         annotations,
       };
-      onFilterChange(updatedFilters);
+      dispatch(updateResourceFilter(updatedFilter));
     },
-    250,
-    [name, kind, namespace, labels, annotations, onFilterChange]
+    500,
+    [name, kind, namespace, labels, annotations]
   );
 
   return (

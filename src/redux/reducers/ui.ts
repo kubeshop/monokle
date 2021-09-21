@@ -2,6 +2,7 @@ import {createAsyncThunk, createSlice, Draft, PayloadAction} from '@reduxjs/tool
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {PaneConfiguration, UiState, NewResourceWizardInput} from '@models/ui';
 import initialState from '@redux/initialState';
+import {ResourceValidationError} from '@models/k8sresource';
 import electronStore from '@utils/electronStore';
 
 export const resetLayout = createAsyncThunk('ui/resetLayout', async (_, thunkAPI) => {
@@ -77,6 +78,32 @@ export const uiSlice = createSlice({
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
+    collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
+      if (expandedSections.length > 0) {
+        state.navPane.collapsedNavSectionNames.push(...expandedSections);
+      }
+    },
+    expandNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const collapsedSections = action.payload.filter(s => state.navPane.collapsedNavSectionNames.includes(s));
+      if (collapsedSections.length > 0) {
+        state.navPane.collapsedNavSectionNames = state.navPane.collapsedNavSectionNames.filter(
+          n => !collapsedSections.includes(n)
+        );
+      }
+    },
+    showValidationErrorsModal: (state: Draft<UiState>, action: PayloadAction<ResourceValidationError[]>) => {
+      state.validationErrorsModal = {
+        isVisible: true,
+        errors: action.payload,
+      };
+    },
+    hideValidationErrorsModal: (state: Draft<UiState>) => {
+      state.validationErrorsModal = {
+        isVisible: false,
+        errors: [],
+      };
+    },
     openFolderExplorer: (state: Draft<UiState>) => {
       state.folderExplorer = {isOpen: true};
     },
@@ -114,6 +141,10 @@ export const {
   closeNewResourceWizard,
   openRenameResourceModal,
   closeRenameResourceModal,
+  collapseNavSections,
+  expandNavSections,
+  showValidationErrorsModal,
+  hideValidationErrorsModal,
   openFolderExplorer,
   closeFolderExplorer,
   setMonacoEditor,

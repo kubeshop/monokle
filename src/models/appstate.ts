@@ -49,6 +49,14 @@ type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistor
 
 type PreviewType = 'kustomization' | 'cluster' | 'helm';
 
+type ResourceFilterType = {
+  name?: string;
+  kind?: string;
+  namespace?: string;
+  labels: Record<string, string | null>;
+  annotations: Record<string, string | null>;
+};
+
 interface AppState {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -57,6 +65,7 @@ interface AppState {
   fileMap: FileMapType;
   /** maps resource ids to resources */
   resourceMap: ResourceMapType;
+  resourceFilter: ResourceFilterType;
   /** maps chart ids to helm charts */
   helmChartMap: HelmChartMapType;
   /** maps values ids to helm values files */
@@ -92,6 +101,7 @@ interface AppState {
 export type {
   AppState,
   ResourceMapType,
+  ResourceFilterType,
   FileMapType,
   HelmChartMapType,
   HelmValuesMapType,
