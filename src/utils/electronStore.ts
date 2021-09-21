@@ -50,6 +50,59 @@ const schema = {
       },
     },
   },
+  ui: {
+    type: 'object',
+    properties: {
+      isSettingsOpen: {
+        type: 'boolean',
+      },
+      isNewResourceWizardOpen: {
+        type: 'boolean',
+      },
+      isFolderLoading: {
+        type: 'boolean',
+      },
+      leftMenu: {
+        type: 'object',
+        properties: {
+          selection: {
+            type: 'string',
+          },
+          isActive: {
+            type: 'boolean',
+          },
+        },
+      },
+      rightMenu: {
+        type: 'object',
+        properties: {
+          selection: {
+            type: 'string',
+          },
+          isActive: {
+            type: 'boolean',
+          },
+        },
+      },
+      paneConfiguration: {
+        type: 'object',
+        properties: {
+          leftWidth: {
+            type: 'number',
+          },
+          navWidth: {
+            type: 'number',
+          },
+          editWidth: {
+            type: 'number',
+          },
+          rightWidth: {
+            type: 'number',
+          },
+        },
+      },
+    },
+  },
 };
 
 const defaults = {
@@ -66,11 +119,31 @@ const defaults = {
     },
     recentFolders: [],
   },
+  ui: {
+    isSettingsOpen: false,
+    isNewResourceWizardOpen: false,
+    leftMenu: {
+      selection: 'file-explorer',
+      isActive: true,
+    },
+    rightMenu: {
+      selection: '',
+      isActive: false,
+    },
+    paneConfiguration: {
+      leftWidth: 0.3333,
+      navWidth: 0.3333,
+      editWidth: 0.3333,
+      rightWidth: 0,
+    },
+  },
 };
 
 const electronStore = new ElectronStore({
   schema,
   defaults,
 });
+
+// electronStore.delete('ui');
 
 export default electronStore;

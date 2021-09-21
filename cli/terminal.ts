@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const getResourcesPath = () => process.resourcesPath;
+const getResourcesPath = () => (<any>process).resourcesPath;
 
 export default (): Promise<void> => {
   const commandPath = path.resolve(getResourcesPath(), `app/darwin/bin/monokle.sh`);

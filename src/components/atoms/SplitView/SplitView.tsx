@@ -1,9 +1,35 @@
-import React, {useState, useLayoutEffect, MouseEvent, TouchEvent, ReactElement, FunctionComponent} from 'react';
+import React, {
+  useState,
+  useLayoutEffect,
+  MouseEvent,
+  TouchEvent,
+  ReactElement,
+  FunctionComponent,
+  useEffect,
+} from 'react';
 import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
+import {useAppSelector, useAppDispatch} from '@redux/hooks';
+import {setPaneConfiguration, setRightMenuIsActive, setLeftMenuIsActive} from '@redux/reducers/ui';
 
-const MIN_WIDTH = 150;
+const MIN_WIDTH = 300;
+const MIN_LEFT_PANE_WIDTH = 300;
+const MIN_RIGHT_PANE_WIDTH = 200;
 const SEPARATOR_WIDTH = 5; // width including hitbox
+
+const getSplitViewCursor = (props: StyledSplitViewProps) => {
+  if (props.draggingLeftNav && props.hideLeft) {
+    return 'e-resize !important';
+  }
+  if (props.draggingEditRight && props.hideRight) {
+    return 'w-resize !important';
+  }
+
+  if (props.draggingLeftNav || props.draggingNavEdit || props.draggingEditRight) {
+    return 'col-resize !important';
+  }
+  return '';
+};
 
 export type SplitViewProps = {
   contentWidth: number;
@@ -16,15 +42,25 @@ export type SplitViewProps = {
   className?: string;
 };
 
-const StyledSplitView = styled.div`
+export type StyledSplitViewProps = {
+  hideLeft: boolean;
+  hideRight: boolean;
+  draggingLeftNav: boolean;
+  draggingNavEdit: boolean;
+  draggingEditRight: boolean;
+};
+
+const StyledSplitView = styled.div.attrs((props: StyledSplitViewProps) => props)`
   height: 100%;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+  cursor: ${getSplitViewCursor};
 `;
 
 export type DividerProps = {
   hide: boolean;
+  paintBackground: boolean;
 };
 const StyledDivider = styled.div`
   width: 0px;
@@ -32,12 +68,14 @@ const StyledDivider = styled.div`
   margin: 1px;
   border-left: ${AppBorders.pageDivider};
 `;
+
 const StyledDividerHitBox = styled.div.attrs((props: DividerProps) => props)`
-  cursor: col-resize;
   align-self: stretch;
   display: ${props => (props.hide ? 'none' : 'flex')};
   align-items: center;
   padding: 0 1px;
+  cursor: col-resize;
+  background-color: ${props => (props.paintBackground ? 'rgba(23, 125, 220, 0.5)' : 'rgba(23, 125, 220, 0)')};
 `;
 
 const StyledPaneDiv = styled.div`
@@ -66,24 +104,61 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setViewWidth(contentWidth);
   }
 
-  // panes enabled
-  const [leftHidden, setLeftHidden] = useState<boolean>(hideLeft);
-  const [rightHidden, setRightHidden] = useState<boolean>(hideRight);
-
-  const numSeparatorsActive = 1 + (leftHidden ? 0 : 1) + (rightHidden ? 0 : 1);
+  const numSeparatorsActive = 2 + (hideLeft ? 0 : 1);
   const splitPaneWidth = viewWidth - numSeparatorsActive * SEPARATOR_WIDTH;
 
   // pane widths
-  const [leftWidth, setLeftWidth] = useState<number>(0.3333);
-  const [navWidth, setNavWidth] = useState<number>(0.3333);
-  const [editWidth, setEditWidth] = useState<number>(0.3333);
-  const [rightWidth, setRightWidth] = useState<number>(0);
+  const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
+  const [leftWidth, setLeftWidth] = useState<number>(useAppSelector(state => state.ui.paneConfiguration.leftWidth));
+  const [navWidth, setNavWidth] = useState<number>(useAppSelector(state => state.ui.paneConfiguration.navWidth));
+  const [editWidth, setEditWidth] = useState<number>(useAppSelector(state => state.ui.paneConfiguration.editWidth));
+  const [rightWidth, setRightWidth] = useState<number>(useAppSelector(state => state.ui.paneConfiguration.rightWidth));
 
-  // detect pane changes
-  if (leftHidden !== hideLeft || rightHidden !== hideRight) {
-    setLeftHidden(hideLeft);
-    setRightHidden(hideRight);
+  // separator positions
+  const [separatorLeftNavXPosition, setSeparatorLeftNavXPosition] = useState<number>(
+    leftWidth * splitPaneWidth || splitPaneWidth * 0.25
+  );
+  const [separatorNavEditXPosition, setSeparatorNavEditXPosition] = useState<number>(
+    (leftWidth + navWidth) * splitPaneWidth + SEPARATOR_WIDTH || splitPaneWidth * 0.5
+  );
+  const [separatorEditRightXPosition, setSeparatorEditRightXPosition] = useState<number>(
+    (leftWidth + navWidth + editWidth) * splitPaneWidth + SEPARATOR_WIDTH * 2 || splitPaneWidth * 0.75
+  );
 
+  // drag statuses
+  const [draggingLeftNav, setDraggingLeftNav] = useState(false);
+  const [draggingNavEdit, setDraggingNavEdit] = useState(false);
+  const [draggingEditRight, setDraggingEditRight] = useState(false);
+
+  const [mouseXPosition, setMouseXPosition] = useState(0);
+  const dispatch = useAppDispatch();
+
+  const normalizePaneWidths = (paneWidths: any, state: string) => {
+    let totalWidth: number = 0;
+    if (state === 'oo') {
+      totalWidth = paneWidths.left + paneWidths.nav + paneWidths.edit + paneWidths.right;
+    }
+    if (state === 'cc') {
+      totalWidth = paneWidths.nav + paneWidths.edit;
+    }
+    if (state === 'oc') {
+      totalWidth = paneWidths.left + paneWidths.nav + paneWidths.edit;
+    }
+    if (state === 'co') {
+      totalWidth = paneWidths.nav + paneWidths.edit + paneWidths.right;
+    }
+
+    const widthMultiplier = 1 / totalWidth;
+
+    return {
+      left: splitPaneWidth * paneWidths.left * widthMultiplier,
+      nav: splitPaneWidth * paneWidths.nav * widthMultiplier,
+      edit: splitPaneWidth * paneWidths.edit * widthMultiplier,
+      right: splitPaneWidth * paneWidths.right * widthMultiplier,
+    };
+  };
+
+  const drawLayout = (sizes: any) => {
     /*
       Possible configurations (left, right) -> left: 25%, nav: 25%, edit:25%, right:25%
       cc: closed, closed -> left: 0%, nav: 50%, edit:50%, right:0% (default)
@@ -93,30 +168,40 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     */
     const cfg = hideLeft && hideRight ? 'cc' : !hideLeft && hideRight ? 'oc' : hideLeft && !hideRight ? 'co' : 'oo';
 
-    const sizeLeft = cfg === 'oc' ? splitPaneWidth * 0.33333 : cfg === 'oo' ? splitPaneWidth * 0.25 : 0;
-    const sizeRight = cfg === 'co' ? splitPaneWidth * 0.33333 : cfg === 'oo' ? splitPaneWidth * 0.25 : 0;
-    const sizeNavEdit =
-      cfg === 'oc' || cfg === 'co'
-        ? splitPaneWidth * 0.33333
-        : cfg === 'oo'
-        ? splitPaneWidth * 0.25
-        : splitPaneWidth * 0.5;
-    setLeftWidth(sizeLeft / viewWidth);
-    setNavWidth(sizeNavEdit / viewWidth);
-    setEditWidth(sizeNavEdit / viewWidth);
-    setRightWidth(sizeRight / viewWidth);
-  }
+    sizes = normalizePaneWidths(sizes, cfg);
 
-  // separator positions and drag status
-  const [separatorLeftNavXPosition, setSeparatorLeftNavXPosition] = useState<number>(splitPaneWidth * 0.25);
-  const [separatorNavEditXPosition, setSeparatorNavEditXPosition] = useState<number>(splitPaneWidth * 0.5);
-  const [separatorEditRightXPosition, setSeparatorEditRightXPosition] = useState<number>(splitPaneWidth * 0.75);
-  const [draggingLeftNav, setDraggingLeftNav] = useState(false);
-  const [draggingNavEdit, setDraggingNavEdit] = useState(false);
-  const [draggingEditRight, setDraggingEditRight] = useState(false);
+    setLeftWidth(sizes.left / viewWidth);
+    setNavWidth(sizes.nav / viewWidth);
+    setEditWidth(sizes.edit / viewWidth);
+    setRightWidth(sizes.right / viewWidth);
+  };
+
+  useEffect(() => {
+    drawLayout({
+      left: paneConfiguration.leftWidth,
+      nav: paneConfiguration.navWidth,
+      edit: paneConfiguration.editWidth,
+      right: paneConfiguration.rightWidth,
+    });
+  }, [paneConfiguration]);
+
+  useEffect(() => {
+    dispatch(
+      setPaneConfiguration({
+        ...paneConfiguration,
+        leftWidth: hideLeft ? 0 : MIN_LEFT_PANE_WIDTH / viewWidth,
+        rightWidth: hideRight ? 0 : MIN_RIGHT_PANE_WIDTH / viewWidth,
+      })
+    );
+  }, [hideLeft, hideRight]);
 
   const onMouseDownLeftNav = (evt: MouseEvent<HTMLElement>): any => {
     setSeparatorLeftNavXPosition(evt.clientX);
+    setDraggingLeftNav(true);
+  };
+
+  const onTouchStartLeftNav = (evt: TouchEvent<HTMLElement>): any => {
+    setSeparatorLeftNavXPosition(evt.touches[0].clientX);
     setDraggingLeftNav(true);
   };
 
@@ -125,19 +210,14 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setDraggingNavEdit(true);
   };
 
-  const onMouseDownEditRight = (evt: MouseEvent<HTMLElement>): any => {
-    setSeparatorEditRightXPosition(evt.clientX);
-    setDraggingEditRight(true);
-  };
-
-  const onTouchStartLeftNav = (evt: TouchEvent<HTMLElement>): any => {
-    setSeparatorLeftNavXPosition(evt.touches[0].clientX);
-    setDraggingLeftNav(true);
-  };
-
   const onTouchStartNavEdit = (evt: TouchEvent<HTMLElement>): any => {
     setSeparatorNavEditXPosition(evt.touches[0].clientX);
     setDraggingNavEdit(true);
+  };
+
+  const onMouseDownEditRight = (evt: MouseEvent<HTMLElement>): any => {
+    setSeparatorEditRightXPosition(evt.clientX);
+    setDraggingEditRight(true);
   };
 
   const onTouchStartEditRight = (evt: TouchEvent<HTMLElement>): any => {
@@ -158,73 +238,168 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setDraggingLeftNav(false);
     setDraggingNavEdit(false);
     setDraggingEditRight(false);
+    dispatch(
+      setPaneConfiguration({
+        leftWidth,
+        navWidth,
+        editWidth,
+        rightWidth,
+      })
+    );
   };
 
   const onMove = (clientX: number) => {
-    if (draggingLeftNav && leftWidth && navWidth && separatorLeftNavXPosition) {
-      calcPaneWidth(
-        leftWidth,
-        navWidth,
-        clientX,
-        separatorLeftNavXPosition,
-        setSeparatorLeftNavXPosition,
-        setLeftWidth,
-        setNavWidth
-      );
+    let movingDirection: string = 'NOTR';
+
+    if (clientX < 45 || clientX > viewWidth) {
+      return;
     }
-    if (draggingNavEdit && navWidth && editWidth && separatorNavEditXPosition) {
-      calcPaneWidth(
-        navWidth,
-        editWidth,
-        clientX,
-        separatorNavEditXPosition,
-        setSeparatorNavEditXPosition,
-        setNavWidth,
-        setEditWidth
-      );
+    if (clientX < mouseXPosition) {
+      movingDirection = 'LEFT';
+    } else if (clientX > mouseXPosition) {
+      movingDirection = 'RIGHT';
     }
-    if (draggingEditRight && editWidth && rightWidth && separatorEditRightXPosition) {
-      calcPaneWidth(
-        editWidth,
-        rightWidth,
-        clientX,
-        separatorEditRightXPosition,
-        setSeparatorEditRightXPosition,
-        setEditWidth,
-        setRightWidth
-      );
+
+    if (draggingLeftNav) {
+      calculateLeftNavCombination(clientX, movingDirection);
     }
+    if (draggingNavEdit) {
+      calculateNavEditCombination(clientX);
+    }
+    if (draggingEditRight) {
+      calculateEditRightCombination(clientX, movingDirection);
+    }
+
+    setMouseXPosition(clientX);
   };
 
-  const calcPaneWidth = (
-    paneWidthA: number,
-    paneWidthB: number,
-    clientX: number,
-    separatorX: number,
-    setSepX: Function,
-    setWidthA: Function,
-    setWidthB: Function
-  ): void => {
-    const combinedPixelWidth = Math.floor(paneWidthA * viewWidth + paneWidthB * viewWidth);
-    const newPixelWidthA = Math.floor(paneWidthA * viewWidth + clientX - separatorX);
-    const newPixelWidthB = Math.floor(combinedPixelWidth - newPixelWidthA);
+  const calculateLeftNavCombination = (clientX: number, movingDirection: string) => {
+    const combinedPixelWidth = Math.floor((hideLeft ? 0 : leftWidth) * viewWidth + navWidth * viewWidth);
+    const newLeftWidth = Math.floor(leftWidth * viewWidth + clientX - separatorLeftNavXPosition);
+    const newNavWidth = Math.floor(combinedPixelWidth - (hideLeft ? 0 : newLeftWidth));
 
-    setSepX(clientX);
+    setSeparatorLeftNavXPosition(clientX);
 
-    // if trying to resize under minimum size
-    if (newPixelWidthA < MIN_WIDTH) {
-      setWidthA(MIN_WIDTH / viewWidth);
-      setWidthB((combinedPixelWidth - MIN_WIDTH) / viewWidth);
-      return;
-    }
-    if (newPixelWidthB < MIN_WIDTH) {
-      setWidthB(MIN_WIDTH / viewWidth);
-      setWidthA((combinedPixelWidth - MIN_WIDTH) / viewWidth);
+    if (movingDirection === 'LEFT' && !hideLeft && newLeftWidth < MIN_LEFT_PANE_WIDTH) {
+      setDraggingLeftNav(false);
+      drawLayout({
+        left: 0,
+        nav: combinedPixelWidth / viewWidth,
+        edit: editWidth,
+        right: rightWidth,
+      });
+      dispatch(setLeftMenuIsActive(false));
       return;
     }
 
-    setWidthA(newPixelWidthA / viewWidth);
-    setWidthB(newPixelWidthB / viewWidth);
+    if (movingDirection === 'RIGHT' && hideLeft && newLeftWidth > MIN_LEFT_PANE_WIDTH) {
+      drawLayout({
+        left: MIN_LEFT_PANE_WIDTH / viewWidth,
+        nav: (combinedPixelWidth - MIN_LEFT_PANE_WIDTH) / viewWidth,
+        edit: editWidth,
+        right: rightWidth,
+      });
+      dispatch(setLeftMenuIsActive(true));
+      return;
+    }
+
+    if (newNavWidth < MIN_WIDTH) {
+      drawLayout({
+        left: (combinedPixelWidth - MIN_WIDTH) / viewWidth,
+        nav: MIN_WIDTH / viewWidth,
+        edit: editWidth,
+        right: rightWidth,
+      });
+      return;
+    }
+
+    drawLayout({
+      left: newLeftWidth / viewWidth,
+      nav: newNavWidth / viewWidth,
+      edit: editWidth,
+      right: rightWidth,
+    });
+  };
+
+  const calculateNavEditCombination = (clientX: number) => {
+    const combinedPixelWidth = Math.floor(navWidth * viewWidth + editWidth * viewWidth);
+    const newNavWidth = Math.floor(navWidth * viewWidth + clientX - separatorNavEditXPosition);
+    const newEditWidth = Math.floor(combinedPixelWidth - newNavWidth);
+
+    setSeparatorNavEditXPosition(clientX);
+    if (newNavWidth < MIN_WIDTH) {
+      drawLayout({
+        left: leftWidth,
+        nav: MIN_WIDTH / viewWidth,
+        edit: (combinedPixelWidth - MIN_WIDTH) / viewWidth,
+        right: rightWidth,
+      });
+      return;
+    }
+    if (newEditWidth < MIN_WIDTH) {
+      drawLayout({
+        left: leftWidth,
+        nav: (combinedPixelWidth - MIN_WIDTH) / viewWidth,
+        edit: MIN_WIDTH / viewWidth,
+        right: rightWidth,
+      });
+      return;
+    }
+
+    drawLayout({
+      left: leftWidth,
+      nav: newNavWidth / viewWidth,
+      edit: newEditWidth / viewWidth,
+      right: rightWidth,
+    });
+  };
+
+  const calculateEditRightCombination = (clientX: number, movingDirection: string) => {
+    const combinedPixelWidth = Math.floor(editWidth * viewWidth + (hideRight ? 0 : rightWidth) * viewWidth);
+    const newEditWidth = Math.floor(editWidth * viewWidth + clientX - separatorEditRightXPosition);
+    const newRightWidth = hideRight ? 0 : Math.floor(combinedPixelWidth - newEditWidth);
+
+    setSeparatorEditRightXPosition(clientX);
+
+    if (movingDirection === 'RIGHT' && !hideRight && newRightWidth < MIN_RIGHT_PANE_WIDTH) {
+      setDraggingEditRight(false);
+      drawLayout({
+        left: leftWidth,
+        nav: navWidth,
+        edit: combinedPixelWidth / viewWidth,
+        right: 0,
+      });
+      dispatch(setRightMenuIsActive(false));
+      return;
+    }
+
+    if (movingDirection === 'LEFT' && hideRight && newRightWidth > MIN_RIGHT_PANE_WIDTH) {
+      drawLayout({
+        left: leftWidth,
+        nav: navWidth,
+        edit: (combinedPixelWidth - MIN_RIGHT_PANE_WIDTH) / viewWidth,
+        right: MIN_RIGHT_PANE_WIDTH / viewWidth,
+      });
+      dispatch(setRightMenuIsActive(true));
+      return;
+    }
+
+    if (newEditWidth < MIN_WIDTH) {
+      drawLayout({
+        left: leftWidth,
+        nav: navWidth,
+        edit: MIN_WIDTH / viewWidth,
+        right: (combinedPixelWidth - MIN_WIDTH) / viewWidth,
+      });
+      return;
+    }
+
+    drawLayout({
+      left: leftWidth,
+      nav: navWidth,
+      edit: newEditWidth / viewWidth,
+      right: newRightWidth / viewWidth,
+    });
   };
 
   useLayoutEffect(() => {
@@ -244,16 +419,22 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   });
 
   return (
-    <StyledSplitView>
-      <Pane width={leftWidth * viewWidth} hide={leftHidden}>
+    <StyledSplitView
+      draggingLeftNav={draggingLeftNav}
+      draggingNavEdit={draggingNavEdit}
+      draggingEditRight={draggingEditRight}
+      hideLeft={hideLeft}
+      hideRight={hideRight}
+    >
+      <Pane width={leftWidth * viewWidth} hide={hideLeft}>
         {left}
       </Pane>
 
       <StyledDividerHitBox
-        hide={leftHidden}
         onMouseDown={onMouseDownLeftNav}
         onTouchStart={onTouchStartLeftNav}
         onTouchEnd={onMouseUp}
+        paintBackground={draggingLeftNav}
       >
         <StyledDivider />
       </StyledDividerHitBox>
@@ -267,6 +448,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         onMouseDown={onMouseDownNavEdit}
         onTouchStart={onTouchStartNavEdit}
         onTouchEnd={onMouseUp}
+        paintBackground={draggingNavEdit}
       >
         <StyledDivider />
       </StyledDividerHitBox>
@@ -276,10 +458,11 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
       </Pane>
 
       <StyledDividerHitBox
-        hide={rightHidden}
+        hide={hideRight}
         onMouseDown={onMouseDownEditRight}
         onTouchStart={onTouchStartEditRight}
         onTouchEnd={onMouseUp}
+        paintBackground={draggingEditRight}
       >
         <StyledDivider />
       </StyledDividerHitBox>

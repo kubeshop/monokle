@@ -1,3 +1,5 @@
+import {ResourceValidationError} from './k8sresource';
+
 export type NewResourceWizardInput = {
   name?: string;
   kind?: string;
@@ -25,4 +27,33 @@ export type UiState = {
     selection?: string;
     isActive: boolean;
   };
+  navPane: {
+    collapsedNavSectionNames: string[];
+  };
+  validationErrorsModal: {
+    isVisible: boolean;
+    errors: ResourceValidationError[];
+  };
+  folderExplorer: {
+    isOpen: boolean;
+  };
+  monacoEditor: {
+    focused: boolean;
+    undo: boolean;
+    redo: boolean;
+    find: boolean;
+    replace: boolean;
+    apply: boolean;
+    diff: boolean;
+  };
+  paneConfiguration: PaneConfiguration;
+  shouldExpandAllNodes: boolean;
+  resetLayout: boolean;
+};
+
+export type PaneConfiguration = {
+  leftWidth: number;
+  navWidth: number;
+  editWidth: number;
+  rightWidth: number;
 };

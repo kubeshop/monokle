@@ -1,11 +1,11 @@
 import {ResourceMapType} from '@models/appstate';
-import {K8sResource, RefPosition, ResourceRefType, RefNode, ResourceRef} from '@models/k8sresource';
+import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {REF_PATH_SEPARATOR} from '@constants/constants';
-import {getResourceKindHandler, getIncomingRefMappers} from '@src/kindhandlers';
+import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
 import {RefMapper} from '@models/resourcekindhandler';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {traverseDocument} from './manifest-utils';
-import {NodeWrapper, getParsedDoc, createResourceRef, linkResources} from './resource';
+import {createResourceRef, getParsedDoc, linkResources, NodeWrapper} from './resource';
 
 export function isIncomingRef(refType: ResourceRefType) {
   return refType === ResourceRefType.Incoming;
@@ -21,6 +21,18 @@ export function isUnsatisfiedRef(refType: ResourceRefType) {
 
 export function hasIncomingRefs(resource: K8sResource) {
   return resource.refs?.some(e => isIncomingRef(e.type));
+}
+
+export function isFileRef(ref: ResourceRef) {
+  return ref.target?.type === 'file';
+}
+
+export function isResourceRef(ref: ResourceRef) {
+  return ref.target?.type === 'resource';
+}
+
+export function isResourceRefTo(ref: ResourceRef, resourceId: string) {
+  return ref.target?.type === 'resource' && ref.target.resourceId === resourceId;
 }
 
 export function hasOutgoingRefs(resource: K8sResource) {
@@ -251,7 +263,7 @@ function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) 
   resource.refs = resource.refs?.filter(ref => ref.type === 'incoming');
   Object.values(resourceMap).forEach(currentResource => {
     currentResource.refs = currentResource.refs?.filter(ref => {
-      if (ref.type === 'incoming' && ref.targetResourceId === resource.id) {
+      if (ref.type === 'incoming' && isResourceRefTo(ref, resource.id)) {
         return false;
       }
       return true;

@@ -37,7 +37,9 @@ enum Colors {
   highlightGreen = '#33BCB7',
 
   selectionGradient = 'linear-gradient(90deg, #3C9AE8 0%, #84E2D8 100%)',
+  selectionGradientHover = 'linear-gradient(90deg, #3C9AE8 50%, #84E2D8 100%)',
   highlightGradient = 'linear-gradient(90deg, #113536 0%, #000000 100%)',
+  highlightGradientHover = 'linear-gradient(90deg, #113536 50%, #000000 100%)',
 }
 
 export enum BackgroundColors {

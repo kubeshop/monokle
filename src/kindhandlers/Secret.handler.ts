@@ -1,11 +1,11 @@
 import * as k8s from '@kubernetes/client-node';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {NAV_K8S_RESOURCES, SECTION_CONFIGURATION} from '@constants/navigator';
+import navSectionNames from '@constants/navSectionNames';
 
 const SecretHandler: ResourceKindHandler = {
   kind: 'Secret',
   apiVersionMatcher: '**',
-  navigatorPath: [NAV_K8S_RESOURCES, SECTION_CONFIGURATION, 'Secrets'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CONFIGURATION, 'Secrets'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
   description: '',

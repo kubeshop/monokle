@@ -6,11 +6,17 @@ import {UiState} from '@models/ui';
 import electronStore from '@utils/electronStore';
 import {ObjectNavigator, NavigatorSection, NavigatorSubSection} from '@models/navigator';
 import {ResourceKindHandlers} from '@src/kindhandlers';
-import {NAV_K8S_RESOURCES_SECTIONS_ORDER} from '@constants/navigator';
+import navSectionNames from '@constants/navSectionNames';
+
+const NAV_K8S_RESOURCES_SECTIONS_ORDER = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
 
 const initialAppState: AppState = {
   selectionHistory: [],
   resourceMap: {},
+  resourceFilter: {
+    labels: {},
+    annotations: {},
+  },
   fileMap: {},
   helmChartMap: {},
   helmValuesMap: {},
@@ -102,18 +108,44 @@ const initialLogsState: LogsState = {
 };
 
 const initialUiState: UiState = {
-  isSettingsOpen: false,
+  isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
   isFolderLoading: false,
   newResourceWizard: {
+    isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
+  },
+  renameResourceModal: {
     isOpen: false,
+    resourceId: '',
   },
   leftMenu: {
-    selection: 'file-explorer',
-    isActive: true,
+    selection: electronStore.get('ui.leftMenu.selection'),
+    isActive: electronStore.get('ui.leftMenu.isActive'),
   },
   rightMenu: {
-    isActive: false,
+    isActive: electronStore.get('ui.rightMenu.isActive'),
   },
+  folderExplorer: {
+    isOpen: false,
+  },
+  monacoEditor: {
+    focused: false,
+    undo: false,
+    redo: false,
+    find: false,
+    replace: false,
+    apply: false,
+    diff: false,
+  },
+  navPane: {
+    collapsedNavSectionNames: [],
+  },
+  validationErrorsModal: {
+    isVisible: false,
+    errors: [],
+  },
+  paneConfiguration: electronStore.get('ui.paneConfiguration'),
+  shouldExpandAllNodes: false,
+  resetLayout: false,
 };
 
 export default {

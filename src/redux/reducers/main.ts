@@ -3,7 +3,14 @@ import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
 import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 import {AppConfig} from '@models/appconfig';
-import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {
+  AppState,
+  FileMapType,
+  HelmChartMapType,
+  HelmValuesMapType,
+  ResourceFilterType,
+  ResourceMapType,
+} from '@models/appstate';
 import {parseDocument} from 'yaml';
 import * as k8s from '@kubernetes/client-node';
 import fs from 'fs';
@@ -304,6 +311,9 @@ export const mainSlice = createSlice({
       state.previewLoader.isLoading = false;
       state.previewLoader.targetResourceId = undefined;
     },
+    updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
+      state.resourceFilter = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -493,5 +503,6 @@ export const {
   startPreviewLoader,
   stopPreviewLoader,
   removeResource,
+  updateResourceFilter,
 } = mainSlice.actions;
 export default mainSlice.reducer;

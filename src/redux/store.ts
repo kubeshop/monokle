@@ -1,5 +1,6 @@
 import {configureStore} from '@reduxjs/toolkit';
 import logger from 'redux-logger';
+import {forwardToMain, replayActionRenderer} from 'electron-redux';
 
 import {mainSlice} from './reducers/main';
 import {configSlice} from './reducers/appConfig';
@@ -15,8 +16,10 @@ const store = configureStore({
     logs: logsSlice.reducer,
     ui: uiSlice.reducer,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(logger),
+  middleware: getDefaultMiddleware => [forwardToMain, ...getDefaultMiddleware().concat(logger)],
 });
+
+replayActionRenderer(store);
 
 // eslint-disable-next-line no-undef
 export type RootState = ReturnType<typeof store.getState>;
