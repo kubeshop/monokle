@@ -25,6 +25,8 @@ nav:
   - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
+  - Tutorials:
+    - 'tutorial-1.md'
 
 extra:
   analytics:
