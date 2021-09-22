@@ -200,8 +200,6 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     return MIN_RIGHT_PANE_WIDTH / viewWidth;
   };
 
-  useEffect(() => {}, [leftWidth]);
-
   useEffect(() => {
     drawLayout({
       left: paneConfiguration.leftWidth,
