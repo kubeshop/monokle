@@ -1,7 +1,5 @@
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
 import {K8sResource} from '@models/k8sresource';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {Popover} from 'antd';
 import {useMemo} from 'react';
@@ -16,9 +14,7 @@ const StyledIconsContainer = styled.span`
 
 const ResourceRefsIconPopover = (props: {resource: K8sResource; type: 'incoming' | 'outgoing'}) => {
   const {resource, type} = props;
-  const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+
   const resourceRefs = useMemo(
     () =>
       resource.refs?.filter(r => {
@@ -36,18 +32,6 @@ const ResourceRefsIconPopover = (props: {resource: K8sResource; type: 'incoming'
     return resourceRefs?.some(r => isUnsatisfiedRef(r.type));
   }, [resourceRefs, type]);
 
-  const selectResource = (selectedId: string) => {
-    if (resourceMap[selectedId]) {
-      dispatch(selectK8sResource({resourceId: selectedId}));
-    }
-  };
-
-  const selectFilePath = (filePath: string) => {
-    if (fileMap[filePath]) {
-      dispatch(selectFile({filePath}));
-    }
-  };
-
   if (!resourceRefs || resourceRefs.length === 0) {
     return null;
   }
@@ -57,12 +41,7 @@ const ResourceRefsIconPopover = (props: {resource: K8sResource; type: 'incoming'
       mouseEnterDelay={0.5}
       placement="rightTop"
       content={
-        <RefsPopoverContent
-          resourceRefs={resourceRefs}
-          resourceMap={resourceMap}
-          selectResource={selectResource}
-          selectFilePath={selectFilePath}
-        >
+        <RefsPopoverContent resource={resource} resourceRefs={resourceRefs}>
           {type === 'incoming' ? (
             <>
               Incoming Links <MonoIcon type={MonoIconTypes.IncomingRefs} />
