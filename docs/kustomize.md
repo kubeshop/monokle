@@ -66,8 +66,8 @@ specified in the kustomization configuration:
 
 ![Kustomize Preview Content](img/kustomize-preview-content.png)
 
-## Editing kustomizations and Helm Values
+## Editing of kustomizations
 
-While previewing, you can edit and recreate the Kustomizations or Helm preview files. It makes debugging of customizations and Helm Charts smoother.
-
-![Editing kustomizations and Helm Values](img/edit-preview.png)
+When previewing kustomization, it is now possible to edit the previewed files and recreate the preview — instead of having to exit the preview before making the change. This makes debugging of kustomization manifests a much smoother experience.
+ 
+![Edit kustomization ](img/kust.png)
