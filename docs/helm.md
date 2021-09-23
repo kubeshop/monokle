@@ -49,3 +49,8 @@ Monokle is now in "Preview Mode" (as indicated by the header at the top):
 - selecting "Preview" for a different values file will preview the output of Helm for that file instead
 - selecting "Exit" in the top right or next to the values file restores the previous resource navigator.
 
+## Editing of Helm
+
+When previewing Helm charts, it is now possible to edit the previewed files and recreate the preview — instead of having to exit the preview before making the change. This makes debugging of Helm resources a much smoother experience.
+ 
+![Edit Helm](img/helm.png)
