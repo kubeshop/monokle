@@ -166,7 +166,8 @@ export function useNavSection<ItemType, ScopeType>(
   }, [subsections, hiddenSubsectionNames]);
 
   const isSectionVisible = useMemo(() => {
-    if (!isVisible) {
+    const shouldBeVisible = isVisible ? isVisible(scope, items) : true;
+    if (shouldBeVisible) {
       return (
         isAnySubsectionVisible ||
         (Object.keys(groupedItems).length > 0 &&
@@ -174,7 +175,7 @@ export function useNavSection<ItemType, ScopeType>(
         (items.length > 0 && items.some(i => isItemVisible(i)))
       );
     }
-    return isVisible(scope, items);
+    return false;
   }, [scope, items, groupedItems, isVisible, isAnySubsectionVisible]);
 
   return {

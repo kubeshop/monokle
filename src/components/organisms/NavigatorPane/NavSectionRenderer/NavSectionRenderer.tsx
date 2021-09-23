@@ -185,6 +185,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         )}
       </S.NameContainer>
       {!isCollapsed &&
+        isSectionVisible &&
         itemHandler &&
         Object.keys(groupedItems).length === 0 &&
         items.map((item, index) => (
@@ -200,6 +201,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
           />
         ))}
       {!isCollapsed &&
+        isSectionVisible &&
         itemHandler &&
         Object.entries(groupedItems).map(
           ([groupName, groupItems]) =>
