@@ -35,6 +35,7 @@ export interface NavSection<ItemType, ScopeType = any> {
   getItemsGrouped?: (scope: ScopeType) => Record<string, ItemType[]>;
   isLoading?: (scope: ScopeType, items: ItemType[]) => boolean;
   isVisible?: (scope: ScopeType, items: ItemType[]) => boolean;
+  isInitialized?: (scope: ScopeType, items: ItemType[]) => boolean;
   itemHandler?: NavSectionItemHandler<ItemType, ScopeType>;
   itemCustomization?: NavSectionItemCustomization<ItemType>;
 }

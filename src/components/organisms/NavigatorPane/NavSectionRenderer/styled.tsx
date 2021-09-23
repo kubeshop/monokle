@@ -10,6 +10,7 @@ export const NameContainer = styled.li<{
   isCollapsed?: boolean;
   hasSubsections?: boolean;
   isVisible?: boolean;
+  isInitialized?: boolean;
 }>`
   display: flex;
   justify-content: space-between;
@@ -23,7 +24,7 @@ export const NameContainer = styled.li<{
     return 'visibility: visible;';
   }}
   ${props => {
-    if (props.isLastSection && props.isCollapsed && !props.hasSubsections) {
+    if (props.isLastSection && (props.isCollapsed || !props.isInitialized) && !props.hasSubsections) {
       return `margin-bottom: 12px;`;
     }
   }}

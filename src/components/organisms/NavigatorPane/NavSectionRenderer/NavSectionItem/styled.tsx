@@ -4,7 +4,6 @@ import styled from 'styled-components';
 export const ItemContainer = styled.li<{
   isSelected: boolean;
   isHighlighted: boolean;
-  isVisible: boolean;
   isHovered: boolean;
   level: number;
   isLastItem: boolean;
@@ -18,12 +17,6 @@ export const ItemContainer = styled.li<{
       if (props.isLastItem) {
         return `margin-bottom: 12px;`;
       }
-    }}
-    ${props => {
-      if (props.isVisible) {
-        return 'transition: opacity 500ms ease-in;';
-      }
-      return 'transition: opacity 500ms ease-out;';
     }}
     ${props => {
       if (!props.isSelected && props.isHighlighted) {
