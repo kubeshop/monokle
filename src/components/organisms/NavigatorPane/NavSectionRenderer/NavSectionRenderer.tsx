@@ -31,6 +31,70 @@ function loopSubsectionNamesDeep(
   });
 }
 
+function NavSectionHeader(props: {
+  name: string;
+  isSectionSelected: boolean;
+  isCollapsed: boolean;
+  isSectionHighlighted: boolean;
+  isLastSection: boolean;
+  hasSubsections: boolean;
+  isSectionInitialized: boolean;
+  isSectionVisible: boolean;
+  isCollapsedMode: 'collapsed' | 'expanded' | 'mixed';
+  level: number;
+  expandSection: () => void;
+  collapseSection: () => void;
+}) {
+  const {
+    name,
+    isSectionSelected,
+    isCollapsed,
+    isSectionHighlighted,
+    isLastSection,
+    hasSubsections,
+    isSectionInitialized,
+    isSectionVisible,
+    isCollapsedMode,
+    level,
+    expandSection,
+    collapseSection,
+  } = props;
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  return (
+    <S.NameContainer
+      isHovered={isHovered}
+      isSelected={isSectionSelected && isCollapsed}
+      isHighlighted={isSectionHighlighted && isCollapsed}
+      isLastSection={isLastSection}
+      hasSubsections={hasSubsections}
+      isCollapsed={isCollapsed}
+      isInitialized={isSectionInitialized}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      isVisible={isSectionVisible}
+    >
+      <S.Name
+        isSelected={isSectionSelected && isCollapsed}
+        isHighlighted={isSectionSelected && isCollapsed}
+        level={level}
+      >
+        {name}
+      </S.Name>
+      {isHovered && isSectionInitialized && (
+        <S.Collapsible>
+          {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
+            <PlusSquareOutlined onClick={expandSection} />
+          )}
+          {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
+            <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
+          )}
+        </S.Collapsible>
+      )}
+    </S.NameContainer>
+  );
+}
+
 function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<ItemType, ScopeType>) {
   const dispatch = useAppDispatch();
   const {navSection, level, isLastSection, onVisible, onHidden} = props;
@@ -190,36 +254,20 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
 
   return (
     <>
-      <S.NameContainer
-        isHovered={isHovered}
-        isSelected={isSectionSelected && isCollapsed}
-        isHighlighted={isSectionHighlighted && isCollapsed}
+      <NavSectionHeader
+        name={name}
+        isSectionSelected={isSectionSelected}
+        isCollapsed={isCollapsed}
+        isSectionHighlighted={isSectionHighlighted}
         isLastSection={isLastSection}
         hasSubsections={Boolean(subsections && subsections.length > 0)}
-        isCollapsed={isCollapsed}
-        isInitialized={isSectionInitialized}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        isVisible={isSectionVisible}
-      >
-        <S.Name
-          isSelected={isSectionSelected && isCollapsed}
-          isHighlighted={isSectionSelected && isCollapsed}
-          level={level}
-        >
-          {name}
-        </S.Name>
-        {isHovered && isSectionInitialized && (
-          <S.Collapsible>
-            {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
-              <PlusSquareOutlined onClick={expandSection} />
-            )}
-            {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
-              <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
-            )}
-          </S.Collapsible>
-        )}
-      </S.NameContainer>
+        isSectionInitialized={isSectionInitialized}
+        isSectionVisible={isSectionVisible}
+        isCollapsedMode={isCollapsedMode}
+        level={level}
+        expandSection={expandSection}
+        collapseSection={collapseSection}
+      />
       {!isCollapsed &&
         isSectionVisible &&
         itemHandler &&
