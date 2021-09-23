@@ -118,7 +118,6 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     shouldSectionExpand,
   } = useNavSection<ItemType, ScopeType>(navSection, hiddenSubsectionNames);
 
-  const [isHovered, setIsHovered] = useState<boolean>(false);
   const collapsedNavSectionNames = useAppSelector(state => state.ui.navPane.collapsedNavSectionNames);
 
   const allVisibileNestedSubsectionNames = useMemo(() => {
