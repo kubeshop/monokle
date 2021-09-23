@@ -149,6 +149,40 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     });
   }, [subsections, hiddenSubsectionNames]);
 
+  const visibleSubsections = useMemo(
+    () => subsections?.filter(s => !hiddenSubsectionNames.includes(s.name)),
+    [subsections, hiddenSubsectionNames]
+  );
+
+  const visibleItems = useMemo(() => {
+    return items.filter(i => isItemVisible(i));
+  }, [items, isItemVisible]);
+
+  const isLastVisibleItem = useCallback(
+    (item: ItemType) => {
+      const lastVisibleItem = visibleItems[visibleItems.length - 1];
+      return Boolean(lastVisibleItem && getItemIdentifier(lastVisibleItem) === getItemIdentifier(item));
+    },
+    [visibleItems, getItemIdentifier]
+  );
+
+  const isLastVisibleGroupedItem = useCallback(
+    (groupKey: string, item: ItemType) => {
+      const groupVisibleItems = groupedItems[groupKey].filter(i => isItemVisible(i));
+      const lastVisibleItem = groupVisibleItems[groupVisibleItems.length - 1];
+      return Boolean(lastVisibleItem && getItemIdentifier(lastVisibleItem) === getItemIdentifier(item));
+    },
+    [groupedItems, getItemIdentifier]
+  );
+
+  const isLastVisibleSection = useCallback(
+    (subsectionName: string) => {
+      const lastVisibleSection = visibleSubsections ? visibleSubsections[visibleSubsections.length - 1] : undefined;
+      return Boolean(lastVisibleSection && lastVisibleSection.name === subsectionName);
+    },
+    [visibleSubsections, getItemIdentifier]
+  );
+
   if (isSectionLoading) {
     return <S.Skeleton />;
   }
@@ -188,7 +222,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         isSectionVisible &&
         itemHandler &&
         Object.keys(groupedItems).length === 0 &&
-        items.map((item, index) => (
+        items.map(item => (
           <NavSectionItem<ItemType, ScopeType>
             key={getItemIdentifier(item)}
             item={item}
@@ -197,7 +231,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
             customization={itemCustomization}
             level={level + 1}
             isVisible={isItemVisible(item)}
-            isLastItem={index === items.length - 1}
+            isLastItem={isLastVisibleItem(item)}
           />
         ))}
       {!isCollapsed &&
@@ -210,7 +244,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
                 <S.NameContainer style={{color: 'red'}}>
                   <S.Name level={level + 1}>{groupName}</S.Name>
                 </S.NameContainer>
-                {groupItems.map((item, index) => (
+                {groupItems.map(item => (
                   <NavSectionItem<ItemType, ScopeType>
                     key={getItemIdentifier(item)}
                     item={item}
@@ -219,19 +253,19 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
                     customization={itemCustomization}
                     level={level + 2}
                     isVisible={isItemVisible(item)}
-                    isLastItem={index === groupItems.length - 1}
+                    isLastItem={isLastVisibleGroupedItem(groupName, item)}
                   />
                 ))}
               </React.Fragment>
             )
         )}
       {subsections &&
-        subsections.map((child, index) => (
+        subsections.map(child => (
           <NavSectionRenderer<ItemType, ScopeType>
             key={child.name}
             navSection={child}
             level={level + 1}
-            isLastSection={index === subsections.length - 1}
+            isLastSection={isLastVisibleSection(child.name)}
             onVisible={onSubsectionVisible}
             onHidden={onSubsectionHidden}
           />

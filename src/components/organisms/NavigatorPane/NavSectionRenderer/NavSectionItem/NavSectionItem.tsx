@@ -72,7 +72,6 @@ function NavSectionItem<ItemType, ScopeType>(props: {
           onMouseLeave={() => setIsHovered(false)}
           isSelected={isSelected}
           isHighlighted={isHighlighted}
-          isVisible={isVisible}
           isHovered={isHovered}
           level={level}
           isLastItem={isLastItem}
