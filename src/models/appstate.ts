@@ -1,6 +1,7 @@
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
+import {MonoklePlugin} from './plugin';
 
 /**
  * Maps uuid:s to K8sResources
@@ -96,6 +97,7 @@ interface AppState {
   diffResourceId?: string;
   /** the diff content for the resource being diffed */
   diffContent?: string;
+  plugins: MonoklePlugin[];
 }
 
 export type {
