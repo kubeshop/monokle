@@ -47,6 +47,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     isSectionVisible,
     isSectionHighlighted,
     isSectionSelected,
+    isSectionInitialized,
     itemHandler,
     itemCustomization,
     subsections,
@@ -193,9 +194,10 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         isHovered={isHovered}
         isSelected={isSectionSelected && isCollapsed}
         isHighlighted={isSectionHighlighted && isCollapsed}
-        isLastSection={isLastSection && isSectionVisible}
+        isLastSection={isLastSection}
         hasSubsections={Boolean(subsections && subsections.length > 0)}
         isCollapsed={isCollapsed}
+        isInitialized={isSectionInitialized}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         isVisible={isSectionVisible}
@@ -207,7 +209,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         >
           {name}
         </S.Name>
-        {isHovered && (
+        {isHovered && isSectionInitialized && (
           <S.Collapsible>
             {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
               <PlusSquareOutlined onClick={expandSection} />
