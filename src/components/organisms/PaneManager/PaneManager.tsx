@@ -2,11 +2,17 @@ import React, {useState, useContext} from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
 import {Button, Space, Tooltip} from 'antd';
-import {ClusterOutlined, FolderOpenOutlined, ApartmentOutlined, CodeOutlined} from '@ant-design/icons';
+import {
+  ClusterOutlined,
+  FolderOpenOutlined,
+  ApartmentOutlined,
+  CodeOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons';
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane} from '@organisms';
+import {ActionsPane, FileTreePane, PluginManagerPane} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
 import ClustersPane from '@organisms/ClustersPane';
@@ -149,6 +155,22 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
+            {featureJson.PluginManager && (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterExplorerTooltip} placement="right">
+                <Button
+                  size="large"
+                  type="text"
+                  onClick={() => setActivePanes('left', 'plugin-manager')}
+                  icon={
+                    <MenuIcon
+                      icon={AppstoreOutlined}
+                      active={leftActive}
+                      isSelected={leftMenuSelection === 'plugin-manager'}
+                    />
+                  }
+                />
+              </Tooltip>
+            )}
           </Space>
         </StyledColumnLeftMenu>
         <StyledColumnPanes style={{width: contentWidth}}>
@@ -166,6 +188,13 @@ const PaneManager = () => {
                   }}
                 >
                   <ClustersPane />
+                </div>
+                <div
+                  style={{
+                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                  }}
+                >
+                  <PluginManagerPane />
                 </div>
               </>
             }

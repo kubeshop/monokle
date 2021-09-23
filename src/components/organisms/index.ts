@@ -11,3 +11,4 @@ export {default as PaneManager} from './PaneManager';
 export {default as NewResourceWizard} from './NewResourceWizard';
 export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as NavigatorPane} from './NavigatorPane';
+export {default as PluginManagerPane} from './PluginManagerPane';
