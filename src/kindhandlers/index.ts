@@ -11,6 +11,7 @@ import EndpointsHandler from './Endpoints.handler';
 import IngressHandler from './Ingress.handler';
 import JobHandler from './Job.handler';
 import NetworkPolicyHandler from './NetworkPolicy.handler';
+import NamespaceHandler from './Namespace.handler';
 import PersistentVolumeHandler from './PersistentVolume.handler';
 import PersistentVolumeClaimHandler from './PersistentVolumeClaim.handler';
 import PodHandler from './Pod.handler';
@@ -35,6 +36,7 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   IngressHandler,
   JobHandler,
   NetworkPolicyHandler,
+  NamespaceHandler,
   PersistentVolumeClaimHandler,
   PersistentVolumeHandler,
   PodHandler,
