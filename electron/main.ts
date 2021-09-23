@@ -21,11 +21,10 @@ import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '@constants/constants';
 import {checkMissingDependencies} from '@utils/index';
+import mainStore from '@redux/main-store';
 
 import terminal from '../cli/terminal';
-import {createMenu} from './menu';
-
-// console.log(store);
+import {createMenu, getDockMenu} from './menu';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -108,7 +107,7 @@ ipcMain.on('run-helm', (event, args: any) => {
   }
 });
 
-function createWindow() {
+export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1200,
@@ -123,6 +122,7 @@ function createWindow() {
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
       preload: path.join(__dirname, 'preload.js'),
+      enableRemoteModule: true,
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
@@ -168,12 +168,23 @@ function createWindow() {
     win.webContents.openDevTools();
   }
 
-  return win;
-}
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 
-const openApplication = async (givenPath?: string) => {
+  if (missingDependecies.length > 0) {
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
+    });
+  }
+
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('executed-from', {path: givenPath});
+  });
+
+  return win;
+};
+
+export const openApplication = async (givenPath?: string) => {
   await app.whenReady();
-  const {default: mainStore} = await import('@redux/main-store');
 
   if (isDev) {
     // DevTools
@@ -187,34 +198,25 @@ const openApplication = async (givenPath?: string) => {
   }
 
   ElectronStore.initRenderer();
-  const win = createWindow();
+  createWindow(givenPath);
 
   mainStore.subscribe(() => {
-    createMenu(win, mainStore);
-  });
-
-  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
-
-  if (missingDependecies.length > 0) {
-    win.webContents.on('did-finish-load', () => {
-      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
-    });
-  }
-
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('executed-from', {path: givenPath});
+    createMenu(mainStore);
   });
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
     app.dock.setIcon(image);
+    mainStore.subscribe(() => {
+      app.dock.setMenu(getDockMenu(mainStore));
+    });
   }
 
   console.log('info', app.getName(), app.getVersion(), app.getLocale(), givenPath);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createWindow(givenPath);
     }
   });
 

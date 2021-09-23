@@ -1,4 +1,4 @@
-import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
+import {Menu, MenuItemConstructorOptions} from 'electron';
 import hotkeys from '@constants/hotkeys';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {AppState} from '@models/appstate';
@@ -17,10 +17,11 @@ import {
 import {UiState} from '@models/ui';
 import {openGitHub, openDocumentation} from '@utils/shell';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {createWindow} from './main';
 
 const isMac = process.platform === 'darwin';
 
-const appMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+const appMenu = (store: any): MenuItemConstructorOptions => {
   return {
     label: 'Monokle',
     submenu: [
@@ -47,9 +48,10 @@ const appMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => 
   };
 };
 
-const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+const fileMenu = (store: any): MenuItemConstructorOptions => {
   const configState: AppConfig = store.getState().config;
   const mainState: AppState = store.getState().main;
+
   return {
     label: 'File',
     submenu: [
@@ -103,7 +105,7 @@ const fileMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
   };
 };
 
-const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+const editMenu = (store: any): MenuItemConstructorOptions => {
   const mainState: AppState = store.getState().main;
   const uiState: UiState = store.getState().ui;
   return {
@@ -159,7 +161,7 @@ const editMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
   };
 };
 
-const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+const viewMenu = (store: any): MenuItemConstructorOptions => {
   let mainState: AppState = store.getState().main;
   const isPreviousResourceEnabled =
     mainState.selectionHistory.length > 1 &&
@@ -214,7 +216,7 @@ const viewMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
   };
 };
 
-const windowMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+const windowMenu = (store: any): MenuItemConstructorOptions => {
   return {
     label: 'Window',
     submenu: [
@@ -228,7 +230,7 @@ const windowMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions 
   };
 };
 
-const helpMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => {
+const helpMenu = (store: any): MenuItemConstructorOptions => {
   return {
     label: 'Help',
     submenu: [
@@ -245,18 +247,23 @@ const helpMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions =>
   };
 };
 
-export const createMenu = (win: BrowserWindow, store: any) => {
-  const template: any[] = [
-    fileMenu(win, store),
-    editMenu(win, store),
-    viewMenu(win, store),
-    windowMenu(win, store),
-    helpMenu(win, store),
-  ];
+export const createMenu = (store: any) => {
+  const template: any[] = [fileMenu(store), editMenu(store), viewMenu(store), windowMenu(store), helpMenu(store)];
 
   if (isMac) {
-    template.unshift(appMenu(win, store));
+    template.unshift(appMenu(store));
   }
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+};
+
+export const getDockMenu = (store: any) => {
+  return Menu.buildFromTemplate([
+    {
+      label: 'New Window',
+      click() {
+        createWindow();
+      },
+    },
+  ]);
 };

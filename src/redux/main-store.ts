@@ -1,3 +1,4 @@
+import {BrowserWindow} from 'electron';
 import {configureStore} from '@reduxjs/toolkit';
 import {forwardToRenderer, triggerAlias, replayActionMain} from 'electron-redux';
 
@@ -7,6 +8,18 @@ import {alertSlice} from './reducers/alert';
 import {logsSlice} from './reducers/logs';
 import {uiSlice} from './reducers/ui';
 
+const multipleWindowMiddleware = () => (next: any) => (action: any) => {
+  let windowID = 'NONE';
+  if (BrowserWindow && BrowserWindow.getFocusedWindow()) {
+    windowID = String((<any>BrowserWindow.getFocusedWindow()).id);
+  }
+
+  if (Number.isInteger(Number(windowID)) && action && action.type) {
+    action.type = `${windowID}/${action.type}`;
+    return next(action);
+  }
+};
+
 const store = configureStore({
   reducer: {
     config: configSlice.reducer,
@@ -15,7 +28,12 @@ const store = configureStore({
     logs: logsSlice.reducer,
     ui: uiSlice.reducer,
   },
-  middleware: getDefaultMiddleware => [triggerAlias, ...getDefaultMiddleware(), forwardToRenderer],
+  middleware: getDefaultMiddleware => [
+    triggerAlias,
+    ...getDefaultMiddleware(),
+    multipleWindowMiddleware,
+    forwardToRenderer,
+  ],
 });
 
 replayActionMain(store);
