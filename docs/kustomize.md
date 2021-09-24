@@ -30,7 +30,7 @@ Just as with K8s resources, hovering over the link-icon to the right of the kust
 
 (here we can see the 10 resources included by the selected kustomization)
 
-and hovering the link-icon to the left of the kustomization name shows its incoming links:
+Hovering the link-icon to the left of the kustomization name shows its incoming links:
 
 ![Kustomize Incoming Links](img/kustomize-incoming-links.png)  
 
@@ -66,3 +66,8 @@ specified in the kustomization configuration:
 
 ![Kustomize Preview Content](img/kustomize-preview-content.png)
 
+## Editing of kustomizations
+
+When previewing kustomization, it is now possible to edit the previewed files and recreate the preview — instead of having to exit the preview before making the change. This makes debugging of kustomization manifests a much smoother experience.
+ 
+![Edit kustomization ](img/kust.png)
