@@ -66,8 +66,9 @@ specified in the kustomization configuration:
 
 ![Kustomize Preview Content](img/kustomize-preview-content.png)
 
-## Editing of kustomizations
+## Editing of kustomizations during preview
 
-When previewing kustomization, it is now possible to edit the previewed files and recreate the preview — instead of having to exit the preview before making the change. This makes debugging of kustomization manifests a much smoother experience.
+When previewing a kustomization it is possible to edit the previewed file and recreate the preview,
+instead of having to exit and recreate the preview to maka a change
  
-![Edit kustomization ](img/kust.png)
+![Edit kustomization during Preview](img/kust-preview-reload.png)
