@@ -25,6 +25,10 @@ nav:
   - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
+  - Tutorials:
+    - tutorials/how-to-navigate-k8s-resources-and-edit-the-source-code.md
+    - tutorials/how-to-browse-clusters.md
+    - tutorials/preview-monokle-environment-settings.md
 
 extra:
   analytics:
