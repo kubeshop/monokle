@@ -2,15 +2,21 @@ import React, {useState, useContext, useMemo} from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
 import {Button, Space, Tooltip} from 'antd';
-import {ClusterOutlined, FolderOutlined, FolderOpenOutlined, ApartmentOutlined, CodeOutlined} from '@ant-design/icons';
+import {
+  ClusterOutlined,
+  FolderOutlined,
+  FolderOpenOutlined,
+  ApartmentOutlined,
+  CodeOutlined,
+  ApiOutlined,
+} from '@ant-design/icons';
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane, NavigatorPane} from '@organisms';
+import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
-import ClustersPane from '@organisms/ClustersPane';
-import {ClusterExplorerTooltip, FileExplorerTooltip} from '@constants/tooltips';
+import {ClusterExplorerTooltip, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleLeftMenu, toggleRightMenu, setLeftMenuSelection, setRightMenuSelection} from '@redux/reducers/ui';
@@ -153,6 +159,22 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
+            {featureJson.PluginManager && (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+                <Button
+                  size="large"
+                  type="text"
+                  onClick={() => setActivePanes('left', 'plugin-manager')}
+                  icon={
+                    <MenuIcon
+                      icon={ApiOutlined}
+                      active={leftActive}
+                      isSelected={leftMenuSelection === 'plugin-manager'}
+                    />
+                  }
+                />
+              </Tooltip>
+            )}
           </Space>
         </StyledColumnLeftMenu>
         <StyledColumnPanes style={{width: contentWidth}}>
@@ -170,6 +192,13 @@ const PaneManager = () => {
                   }}
                 >
                   <ClustersPane />
+                </div>
+                <div
+                  style={{
+                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                  }}
+                >
+                  <PluginManagerPane />
                 </div>
               </>
             }
