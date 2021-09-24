@@ -17,7 +17,7 @@ import {
 import {UiState} from '@models/ui';
 import {openGitHub, openDocumentation} from '@utils/shell';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {createWindow} from './main';
+import {openApplication} from './main';
 
 const isMac = process.platform === 'darwin';
 
@@ -261,7 +261,7 @@ export const getDockMenu = (store: any) => {
     {
       label: 'New Window',
       click() {
-        createWindow();
+        openApplication();
       },
     },
   ]);

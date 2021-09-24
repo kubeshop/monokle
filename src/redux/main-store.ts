@@ -1,26 +1,13 @@
 import {BrowserWindow} from 'electron';
 import {configureStore} from '@reduxjs/toolkit';
 import {replayActionMain} from 'electron-redux';
-import {isFSA} from '@utils/fluxStandartAction';
+import {isFSA} from '@utils/fluxStandardAction';
 
 import {mainSlice} from './reducers/main';
 import {configSlice} from './reducers/appConfig';
 import {alertSlice} from './reducers/alert';
 import {logsSlice} from './reducers/logs';
 import {uiSlice} from './reducers/ui';
-
-const multipleWindowMiddleware = (storeApi: any) => (next: any) => (action: any) => {
-  let windowID = 'NONE';
-  if (BrowserWindow && BrowserWindow.getFocusedWindow()) {
-    windowID = String((<any>BrowserWindow.getFocusedWindow()).id);
-  }
-  if (Number.isInteger(Number(windowID)) && action && action.type) {
-    action.type = `${windowID}/${action.type}`;
-    return next(action);
-  }
-
-  return next(action);
-};
 
 const forwardToRenderer = () => (next: any) => (action: any) => {
   if (!isFSA(action)) return next(action);
