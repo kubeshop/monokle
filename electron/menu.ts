@@ -51,7 +51,6 @@ const appMenu = (store: any): MenuItemConstructorOptions => {
 const fileMenu = (store: any): MenuItemConstructorOptions => {
   const configState: AppConfig = store.getState().config;
   const mainState: AppState = store.getState().main;
-
   return {
     label: 'File',
     submenu: [
