@@ -56,7 +56,7 @@ interface K8sResource {
   /** temporary object used for ref positioning */
   lineCounter?: LineCounter;
   /** temporary object used for parsing refs */
-  refNodeByPath?: Record<string, RefNode>;
+  refNodesByPath?: Record<string, RefNode[]>;
 }
 
 export enum ResourceRefType {
