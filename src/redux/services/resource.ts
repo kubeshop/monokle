@@ -340,7 +340,7 @@ export function clearResourcesTemporaryObjects(resourceMap: ResourceMapType) {
   Object.values(resourceMap).forEach(r => {
     r.parsedDoc = undefined;
     r.lineCounter = undefined;
-    r.refNodeByPath = undefined;
+    r.refNodesByPath = undefined;
   });
 
   return resourceMap;

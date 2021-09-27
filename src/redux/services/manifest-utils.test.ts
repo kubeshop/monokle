@@ -224,6 +224,13 @@ test('traverse-document', () => {
     matchLabels:
       app.kubernetes.io/name: test
       app.kubernetes.io/part-of: test
+    volumes:
+    - configMap:
+        name: ssh-known-hosts-cm
+      name: ssh-known-hosts
+    - configMap:
+        name: tls-certs-cm
+      name: tls-certs
 `;
 
   const expectedResult = [
@@ -254,6 +261,10 @@ test('traverse-document', () => {
       'app.kubernetes.io/part-of',
       'test',
     ],
+    [['spec', 'volumes', 'configMap'], ['spec', 'volumes', 'configMap', 'name'], 'name', 'ssh-known-hosts-cm'],
+    [['spec', 'volumes'], ['spec', 'volumes', 'name'], 'name', 'ssh-known-hosts'],
+    [['spec', 'volumes', 'configMap'], ['spec', 'volumes', 'configMap', 'name'], 'name', 'tls-certs-cm'],
+    [['spec', 'volumes'], ['spec', 'volumes', 'name'], 'name', 'tls-certs'],
   ];
 
   const result: [string[], string[], string, string][] = [];
