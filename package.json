@@ -144,7 +144,7 @@
       "category": "public.app-category.utilities",
       "icon": "build/icon.png",
       "hardenedRuntime": true,
-      "gatekeeperAssess": false,
+      "gatekeeperAssess": true,
       "entitlements": "./electron/src/entitlements.mac.inherit.plist",
       "entitlementsInherit": "./electron/src/entitlements.mac.inherit.plist",
       "target": [
