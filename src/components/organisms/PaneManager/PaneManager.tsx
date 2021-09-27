@@ -1,21 +1,26 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useMemo} from 'react';
 import styled from 'styled-components';
 import 'antd/dist/antd.less';
 import {Button, Space, Tooltip} from 'antd';
-import {ClusterOutlined, FolderOpenOutlined, ApartmentOutlined, CodeOutlined} from '@ant-design/icons';
+import {
+  ClusterOutlined,
+  FolderOutlined,
+  FolderOpenOutlined,
+  ApartmentOutlined,
+  CodeOutlined,
+  ApiOutlined,
+} from '@ant-design/icons';
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane} from '@organisms';
+import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
-import ClustersPane from '@organisms/ClustersPane';
-import {ClusterExplorerTooltip, FileExplorerTooltip} from '@constants/tooltips';
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {ClusterExplorerTooltip, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleLeftMenu, toggleRightMenu, setLeftMenuSelection, setRightMenuSelection} from '@redux/reducers/ui';
 import AppContext from '@src/AppContext';
-import NavigatorPane from '@components/organisms/NavigatorPane';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -86,10 +91,15 @@ const PaneManager = () => {
   const contentWidth = windowSize.width - (featureJson.ShowRightMenu ? 2 : 1) * iconMenuWidth;
   const contentHeight = `${windowSize.height - 75}px`;
 
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
+
+  const isFolderOpen = useMemo(() => {
+    return Boolean(fileMap[ROOT_FILE_ENTRY]);
+  }, [fileMap]);
 
   const setActivePanes = (side: string, selectedMenu: string) => {
     if (side === 'left') {
@@ -128,7 +138,7 @@ const PaneManager = () => {
                 icon={
                   <MenuIcon
                     style={{marginLeft: 4}}
-                    icon={FolderOpenOutlined}
+                    icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
                     active={leftActive}
                     isSelected={leftMenuSelection === 'file-explorer'}
                   />
@@ -149,6 +159,22 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
+            {featureJson.PluginManager && (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+                <Button
+                  size="large"
+                  type="text"
+                  onClick={() => setActivePanes('left', 'plugin-manager')}
+                  icon={
+                    <MenuIcon
+                      icon={ApiOutlined}
+                      active={leftActive}
+                      isSelected={leftMenuSelection === 'plugin-manager'}
+                    />
+                  }
+                />
+              </Tooltip>
+            )}
           </Space>
         </StyledColumnLeftMenu>
         <StyledColumnPanes style={{width: contentWidth}}>
@@ -166,6 +192,13 @@ const PaneManager = () => {
                   }}
                 >
                   <ClustersPane />
+                </div>
+                <div
+                  style={{
+                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                  }}
+                >
+                  <PluginManagerPane />
                 </div>
               </>
             }

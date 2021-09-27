@@ -97,7 +97,7 @@
     "react-flow-renderer": "9.6.7",
     "react-hotkeys-hook": "3.4.0",
     "react-monaco-editor": "0.44.0",
-    "react-redux": "7.2.4",
+    "react-redux": "7.2.5",
     "react-use": "17.3.1",
     "redux": "4.1.1",
     "redux-logger": "3.0.6",

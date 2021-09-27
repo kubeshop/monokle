@@ -4,6 +4,7 @@ export const BrowseFolderTooltip = `Browse for folder containing manifests, kust
 export const ReloadFolderTooltip = `Reload manifests from the currently selected folder (${KEY_CTRL_CMD}+F5)`;
 export const FileExplorerTooltip = 'Show/hide File Exlorer';
 export const ClusterExplorerTooltip = 'Show/hide Cluster Preview';
+export const PluginManagerTooltip = 'Show/hide Plugin Manager';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterModeTooltip = `Retrieve and show resources in configured cluster (${KEY_CTRL_CMD}+I)`;
 export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';
