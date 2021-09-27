@@ -1,8 +1,12 @@
 import React from 'react';
-import {ResourceRef} from '@models/k8sresource';
+import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
 import styled from 'styled-components';
 import {Typography, Divider} from 'antd';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectFile, selectK8sResource} from '@redux/reducers/main';
+import {setMonacoEditor} from '@redux/reducers/ui';
+import {MonacoRange} from '@models/ui';
 import RefLink from './RefLink';
 
 const {Text} = Typography;
@@ -35,21 +39,96 @@ const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
   }
 };
 
+const getRefRange = (ref: ResourceRef) => {
+  if (!ref.position) {
+    return undefined;
+  }
+  return {
+    startLineNumber: ref.position.line,
+    endLineNumber: ref.position.line,
+    startColumn: ref.position.column,
+    endColumn: ref.position.column + ref.position.length,
+  };
+};
+
 const ResourceRefsPopover = (props: {
   children: React.ReactNode;
+  resource: K8sResource;
   resourceRefs: ResourceRef[];
-  resourceMap: ResourceMapType;
-  selectResource: (selectedResource: string) => void;
-  selectFilePath: (filePath: string) => void;
 }) => {
-  const {children, resourceRefs, resourceMap, selectResource, selectFilePath} = props;
+  const {children, resourceRefs, resource} = props;
+  const dispatch = useAppDispatch();
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+
+  const selectResource = (selectedId: string) => {
+    if (resourceMap[selectedId]) {
+      dispatch(selectK8sResource({resourceId: selectedId}));
+    }
+  };
+
+  const selectFilePath = (filePath: string) => {
+    if (fileMap[filePath]) {
+      dispatch(selectFile({filePath}));
+    }
+  };
+
+  const makeMonacoSelection = (type: 'resource' | 'file', target: string, range: MonacoRange) => {
+    const selection =
+      type === 'resource'
+        ? {
+            type,
+            resourceId: target,
+            range,
+          }
+        : {type, filePath: target, range};
+    dispatch(
+      setMonacoEditor({
+        selection,
+      })
+    );
+  };
 
   const onLinkClick = (ref: ResourceRef) => {
-    if (ref.target?.type === 'resource' && ref.target.resourceId) {
-      selectResource(ref.target.resourceId);
+    if (ref.type !== ResourceRefType.Incoming) {
+      if (selectedResourceId !== resource.id) {
+        selectResource(resource.id);
+      }
+      const refRange = getRefRange(ref);
+      if (refRange) {
+        makeMonacoSelection('resource', resource.id, refRange);
+      }
+      return;
+    }
+
+    if (ref.target?.type === 'resource') {
+      if (!ref.target.resourceId) {
+        return;
+      }
+      const targetResource = resourceMap[ref.target.resourceId];
+      if (!targetResource) {
+        return;
+      }
+      if (selectedResourceId !== targetResource.id) {
+        selectResource(targetResource.id);
+      }
+      const targetOutgoingRef = targetResource.refs?.find(
+        r => r.type === ResourceRefType.Outgoing && r.target?.type === 'resource' && r.target.resourceId === resource.id
+      );
+      if (!targetOutgoingRef) {
+        return;
+      }
+      const targetOutgoingRefRange = getRefRange(targetOutgoingRef);
+      if (targetOutgoingRefRange) {
+        makeMonacoSelection('resource', targetResource.id, targetOutgoingRefRange);
+      }
     }
     if (ref.target?.type === 'file') {
-      selectFilePath(ref.target.filePath);
+      if (selectedPath !== ref.target.filePath) {
+        selectFilePath(ref.target.filePath);
+      }
     }
   };
 

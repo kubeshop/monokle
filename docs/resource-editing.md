@@ -28,6 +28,23 @@ Broken links are shown with yellow triangles as in the Navigator:
 
 ![Source Editor Broken Links](img/source-editor-broken-links.png)
 
+## Add Resource
+
+While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the “New Resource” button at the top of the navigator to launch the “Add New Resource” dialog.
+
+![Add Resource](img/add-resource.png)
+
+For adding resources to new or existing files in the navigator, click on the Save button at the top-right corner of the interface.
+
+![Resource save](img/add-resource-save.png)
+
+## Edit Resources in Cluster
+
+You can easily view and edit resources from clusters. After making changes in a resource, you can quickly apply them back to the cluster.
+
+![Resource cluster](img/resource-cluster.png)
+
+
 #### Saving changes
 
 The [Save] button on top of the editor will be enabled if valid changes have been made - invalid yaml will not be savable.

@@ -23,7 +23,7 @@ import useCodeIntel from './useCodeIntel';
 import useEditorKeybindings from './useEditorKeybindings';
 import useResourceYamlSchema from './useResourceYamlSchema';
 import useDebouncedCodeSave from './useDebouncedCodeSave';
-import useEditorUiState from './useEditorUiState';
+import useMonacoUiState from './useMonacoUiState';
 import * as S from './Monaco.styled';
 
 // @ts-ignore
@@ -97,7 +97,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     selectedPath,
     setOrgCode
   );
-  const {onEditorFocus} = useEditorUiState(editor, selectedResourceId);
+  const {onEditorFocus} = useMonacoUiState(editor, selectedResourceId, selectedPath);
 
   const onDidChangeMarkers = (e: monaco.Uri[]) => {
     const flag = monaco.editor.getModelMarkers({}).length > 0;

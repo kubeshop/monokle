@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {PaneConfiguration, UiState, NewResourceWizardInput} from '@models/ui';
+import {PaneConfiguration, UiState, NewResourceWizardInput, MonacoUiState} from '@models/ui';
 import initialState from '@redux/initialState';
 import {ResourceValidationError} from '@models/k8sresource';
 import electronStore from '@utils/electronStore';
@@ -110,7 +110,7 @@ export const uiSlice = createSlice({
     closeFolderExplorer: (state: Draft<UiState>) => {
       state.folderExplorer = {isOpen: false};
     },
-    setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<any>) => {
+    setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
         ...state.monacoEditor,
         ...action.payload,

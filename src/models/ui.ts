@@ -8,6 +8,38 @@ export type NewResourceWizardInput = {
   selectedResourceId?: string;
 };
 
+export type MonacoRange = {
+  startLineNumber: number;
+  endLineNumber: number;
+  startColumn: number;
+  endColumn: number;
+};
+
+export type MonacoSelectionResource = {
+  type: 'resource';
+  resourceId: string;
+  range: MonacoRange;
+};
+
+export type MonacoSelectionFile = {
+  type: 'file';
+  filePath: string;
+  range: MonacoRange;
+};
+
+export type MonacoUiSelection = MonacoSelectionResource | MonacoSelectionFile;
+
+export type MonacoUiState = {
+  focused: boolean;
+  undo: boolean;
+  redo: boolean;
+  find: boolean;
+  replace: boolean;
+  apply: boolean;
+  diff: boolean;
+  selection?: MonacoUiSelection;
+};
+
 export type UiState = {
   isSettingsOpen: boolean;
   newResourceWizard: {
@@ -37,15 +69,7 @@ export type UiState = {
   folderExplorer: {
     isOpen: boolean;
   };
-  monacoEditor: {
-    focused: boolean;
-    undo: boolean;
-    redo: boolean;
-    find: boolean;
-    replace: boolean;
-    apply: boolean;
-    diff: boolean;
-  };
+  monacoEditor: MonacoUiState;
   paneConfiguration: PaneConfiguration;
   shouldExpandAllNodes: boolean;
   resetLayout: boolean;

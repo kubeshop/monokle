@@ -3,7 +3,11 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {useCallback, useEffect} from 'react';
 import {monaco} from 'react-monaco-editor';
 
-function useEditorUiState(editor: monaco.editor.IStandaloneCodeEditor | null, selectedResourceId: string | undefined) {
+function useMonacoUiState(
+  editor: monaco.editor.IStandaloneCodeEditor | null,
+  selectedResourceId: string | undefined,
+  selectedPath: string | undefined
+) {
   const dispatch = useAppDispatch();
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
 
@@ -25,6 +29,21 @@ function useEditorUiState(editor: monaco.editor.IStandaloneCodeEditor | null, se
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const selection = monacoEditor.selection;
+    if (!selection || !editor) {
+      return;
+    }
+    if (
+      (selection.type === 'file' && selection.filePath === selectedPath) ||
+      (selection.type === 'resource' && selection.resourceId === selectedResourceId)
+    ) {
+      editor.setSelection(selection.range);
+      editor.revealLineInCenter(selection.range.startLineNumber);
+      dispatch(setMonacoEditor({selection: undefined}));
+    }
+  }, [monacoEditor, selectedPath, selectedResourceId]);
 
   useEffect(() => {
     if (!monacoEditor.focused) {
@@ -52,4 +71,4 @@ function useEditorUiState(editor: monaco.editor.IStandaloneCodeEditor | null, se
   return {onEditorFocus};
 }
 
-export default useEditorUiState;
+export default useMonacoUiState;

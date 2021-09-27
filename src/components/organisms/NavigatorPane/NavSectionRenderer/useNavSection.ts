@@ -37,6 +37,7 @@ export function useNavSection<ItemType, ScopeType>(
     itemCustomization,
     isLoading,
     isVisible,
+    isInitialized,
     subsectionNames,
   } = navSection;
 
@@ -165,8 +166,19 @@ export function useNavSection<ItemType, ScopeType>(
     return subsections.some(s => !hiddenSubsectionNames.includes(s.name));
   }, [subsections, hiddenSubsectionNames]);
 
+  const isSectionInitialized = useMemo(() => {
+    if (!isInitialized) {
+      return true;
+    }
+    return isInitialized(scope, items);
+  }, [scope, items, isInitialized]);
+
   const isSectionVisible = useMemo(() => {
-    if (!isVisible) {
+    if (!isSectionInitialized) {
+      return true;
+    }
+    const shouldBeVisible = isVisible ? isVisible(scope, items) : true;
+    if (shouldBeVisible) {
       return (
         isAnySubsectionVisible ||
         (Object.keys(groupedItems).length > 0 &&
@@ -174,7 +186,7 @@ export function useNavSection<ItemType, ScopeType>(
         (items.length > 0 && items.some(i => isItemVisible(i)))
       );
     }
-    return isVisible(scope, items);
+    return false;
   }, [scope, items, groupedItems, isVisible, isAnySubsectionVisible]);
 
   return {
@@ -190,6 +202,7 @@ export function useNavSection<ItemType, ScopeType>(
     isSectionHighlighted,
     isSectionLoading,
     isSectionVisible,
+    isSectionInitialized,
     itemHandler,
     itemCustomization,
     shouldSectionExpand,

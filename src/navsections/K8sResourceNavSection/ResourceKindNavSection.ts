@@ -78,6 +78,9 @@ export function makeResourceKindNavSection(
     getItems: scope => {
       return scope.activeResources.filter(r => r.kind === kindHandler.kind);
     },
+    isInitialized: scope => {
+      return scope.activeResources.length > 0;
+    },
     itemHandler: {
       getName: item => item.name,
       getIdentifier: item => item.id,

@@ -176,6 +176,30 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setRightWidth(sizes.right / viewWidth);
   };
 
+  const calculateLeftWidthOnDrawersChange = () => {
+    if (hideLeft) {
+      return 0;
+    }
+
+    if (leftWidth > MIN_LEFT_PANE_WIDTH / viewWidth) {
+      return leftWidth;
+    }
+
+    return MIN_LEFT_PANE_WIDTH / viewWidth;
+  };
+
+  const calculateRightWidthOnDrawersChange = () => {
+    if (hideRight) {
+      return 0;
+    }
+
+    if (rightWidth > MIN_RIGHT_PANE_WIDTH / viewWidth) {
+      return rightWidth;
+    }
+
+    return MIN_RIGHT_PANE_WIDTH / viewWidth;
+  };
+
   useEffect(() => {
     drawLayout({
       left: paneConfiguration.leftWidth,
@@ -189,8 +213,8 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     dispatch(
       setPaneConfiguration({
         ...paneConfiguration,
-        leftWidth: hideLeft ? 0 : MIN_LEFT_PANE_WIDTH / viewWidth,
-        rightWidth: hideRight ? 0 : MIN_RIGHT_PANE_WIDTH / viewWidth,
+        leftWidth: calculateLeftWidthOnDrawersChange(),
+        rightWidth: calculateRightWidthOnDrawersChange(),
       })
     );
   }, [hideLeft, hideRight]);

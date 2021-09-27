@@ -31,6 +31,70 @@ function loopSubsectionNamesDeep(
   });
 }
 
+function NavSectionHeader(props: {
+  name: string;
+  isSectionSelected: boolean;
+  isCollapsed: boolean;
+  isSectionHighlighted: boolean;
+  isLastSection: boolean;
+  hasSubsections: boolean;
+  isSectionInitialized: boolean;
+  isSectionVisible: boolean;
+  isCollapsedMode: 'collapsed' | 'expanded' | 'mixed';
+  level: number;
+  expandSection: () => void;
+  collapseSection: () => void;
+}) {
+  const {
+    name,
+    isSectionSelected,
+    isCollapsed,
+    isSectionHighlighted,
+    isLastSection,
+    hasSubsections,
+    isSectionInitialized,
+    isSectionVisible,
+    isCollapsedMode,
+    level,
+    expandSection,
+    collapseSection,
+  } = props;
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  return (
+    <S.NameContainer
+      isHovered={isHovered}
+      isSelected={isSectionSelected && isCollapsed}
+      isHighlighted={isSectionHighlighted && isCollapsed}
+      isLastSection={isLastSection}
+      hasSubsections={hasSubsections}
+      isCollapsed={isCollapsed}
+      isInitialized={isSectionInitialized}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      isVisible={isSectionVisible}
+    >
+      <S.Name
+        isSelected={isSectionSelected && isCollapsed}
+        isHighlighted={isSectionSelected && isCollapsed}
+        level={level}
+      >
+        {name}
+      </S.Name>
+      {isHovered && isSectionInitialized && (
+        <S.Collapsible>
+          {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
+            <PlusSquareOutlined onClick={expandSection} />
+          )}
+          {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
+            <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
+          )}
+        </S.Collapsible>
+      )}
+    </S.NameContainer>
+  );
+}
+
 function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<ItemType, ScopeType>) {
   const dispatch = useAppDispatch();
   const {navSection, level, isLastSection, onVisible, onHidden} = props;
@@ -47,13 +111,13 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     isSectionVisible,
     isSectionHighlighted,
     isSectionSelected,
+    isSectionInitialized,
     itemHandler,
     itemCustomization,
     subsections,
     shouldSectionExpand,
   } = useNavSection<ItemType, ScopeType>(navSection, hiddenSubsectionNames);
 
-  const [isHovered, setIsHovered] = useState<boolean>(false);
   const collapsedNavSectionNames = useAppSelector(state => state.ui.navPane.collapsedNavSectionNames);
 
   const allVisibileNestedSubsectionNames = useMemo(() => {
@@ -149,45 +213,65 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     });
   }, [subsections, hiddenSubsectionNames]);
 
+  const visibleSubsections = useMemo(
+    () => subsections?.filter(s => !hiddenSubsectionNames.includes(s.name)),
+    [subsections, hiddenSubsectionNames]
+  );
+
+  const visibleItems = useMemo(() => {
+    return items.filter(i => isItemVisible(i));
+  }, [items, isItemVisible]);
+
+  const isLastVisibleItem = useCallback(
+    (item: ItemType) => {
+      const lastVisibleItem = visibleItems[visibleItems.length - 1];
+      return Boolean(lastVisibleItem && getItemIdentifier(lastVisibleItem) === getItemIdentifier(item));
+    },
+    [visibleItems, getItemIdentifier]
+  );
+
+  const isLastVisibleGroupedItem = useCallback(
+    (groupKey: string, item: ItemType) => {
+      const groupVisibleItems = groupedItems[groupKey].filter(i => isItemVisible(i));
+      const lastVisibleItem = groupVisibleItems[groupVisibleItems.length - 1];
+      return Boolean(lastVisibleItem && getItemIdentifier(lastVisibleItem) === getItemIdentifier(item));
+    },
+    [groupedItems, getItemIdentifier]
+  );
+
+  const isLastVisibleSection = useCallback(
+    (subsectionName: string) => {
+      const lastVisibleSection = visibleSubsections ? visibleSubsections[visibleSubsections.length - 1] : undefined;
+      return Boolean(lastVisibleSection && lastVisibleSection.name === subsectionName);
+    },
+    [visibleSubsections, getItemIdentifier]
+  );
+
   if (isSectionLoading) {
     return <S.Skeleton />;
   }
 
   return (
     <>
-      <S.NameContainer
-        isHovered={isHovered}
-        isSelected={isSectionSelected && isCollapsed}
-        isHighlighted={isSectionHighlighted && isCollapsed}
-        isLastSection={isLastSection && isSectionVisible}
-        hasSubsections={Boolean(subsections && subsections.length > 0)}
+      <NavSectionHeader
+        name={name}
+        isSectionSelected={isSectionSelected}
         isCollapsed={isCollapsed}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        isVisible={isSectionVisible}
-      >
-        <S.Name
-          isSelected={isSectionSelected && isCollapsed}
-          isHighlighted={isSectionSelected && isCollapsed}
-          level={level}
-        >
-          {name}
-        </S.Name>
-        {isHovered && (
-          <S.Collapsible>
-            {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
-              <PlusSquareOutlined onClick={expandSection} />
-            )}
-            {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
-              <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
-            )}
-          </S.Collapsible>
-        )}
-      </S.NameContainer>
+        isSectionHighlighted={isSectionHighlighted}
+        isLastSection={isLastSection}
+        hasSubsections={Boolean(subsections && subsections.length > 0)}
+        isSectionInitialized={isSectionInitialized}
+        isSectionVisible={isSectionVisible}
+        isCollapsedMode={isCollapsedMode}
+        level={level}
+        expandSection={expandSection}
+        collapseSection={collapseSection}
+      />
       {!isCollapsed &&
+        isSectionVisible &&
         itemHandler &&
         Object.keys(groupedItems).length === 0 &&
-        items.map((item, index) => (
+        items.map(item => (
           <NavSectionItem<ItemType, ScopeType>
             key={getItemIdentifier(item)}
             item={item}
@@ -196,10 +280,11 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
             customization={itemCustomization}
             level={level + 1}
             isVisible={isItemVisible(item)}
-            isLastItem={index === items.length - 1}
+            isLastItem={isLastVisibleItem(item)}
           />
         ))}
       {!isCollapsed &&
+        isSectionVisible &&
         itemHandler &&
         Object.entries(groupedItems).map(
           ([groupName, groupItems]) =>
@@ -208,7 +293,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
                 <S.NameContainer style={{color: 'red'}}>
                   <S.Name level={level + 1}>{groupName}</S.Name>
                 </S.NameContainer>
-                {groupItems.map((item, index) => (
+                {groupItems.map(item => (
                   <NavSectionItem<ItemType, ScopeType>
                     key={getItemIdentifier(item)}
                     item={item}
@@ -217,19 +302,19 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
                     customization={itemCustomization}
                     level={level + 2}
                     isVisible={isItemVisible(item)}
-                    isLastItem={index === groupItems.length - 1}
+                    isLastItem={isLastVisibleGroupedItem(groupName, item)}
                   />
                 ))}
               </React.Fragment>
             )
         )}
       {subsections &&
-        subsections.map((child, index) => (
+        subsections.map(child => (
           <NavSectionRenderer<ItemType, ScopeType>
             key={child.name}
             navSection={child}
             level={level + 1}
-            isLastSection={index === subsections.length - 1}
+            isLastSection={isLastVisibleSection(child.name)}
             onVisible={onSubsectionVisible}
             onHidden={onSubsectionHidden}
           />

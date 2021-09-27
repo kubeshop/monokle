@@ -25,6 +25,7 @@ const initialAppState: AppState = {
   },
   isSelectingFile: false,
   isApplyingResource: false,
+  plugins: [],
 };
 
 const navigators = Object.values(
