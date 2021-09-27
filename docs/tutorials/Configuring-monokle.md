@@ -1,8 +1,11 @@
-# Preview Monokle Environment Settings
+# Configuring Monokle
 
 Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the yaml syntax. 
 
-In this tutorial, we have illustrated the steps to set up Monokle Environment. 
+In this tutorial, we have illustrated the steps to configure Monokle Environment. 
+
+
+<em>**Note:** The setting values are initialised by default - there is no immediate need to change them </em>
 
 Let’s get started. 
 
@@ -56,6 +59,6 @@ The options for preview:
 
 ![Startup](img/startup-10.png)
 
-Thus you can set up your Monokle environment. 
+Thus you can configure your Monokle environment. 
 
 If you still have doubts, feel free to connect with us. Monokle is your K8s best friend!
