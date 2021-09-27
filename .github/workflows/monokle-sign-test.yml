@@ -85,6 +85,8 @@ jobs:
           NOTARIZE: true
           CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
           CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
 
       # Check Binary Size
       - name: Build Succeeded
