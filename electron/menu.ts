@@ -17,6 +17,7 @@ import {
 import {UiState} from '@models/ui';
 import {openGitHub, openDocumentation} from '@utils/shell';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {checkNewVersion} from './main';
 
 const isMac = process.platform === 'darwin';
 
@@ -32,9 +33,8 @@ const appMenu = (win: BrowserWindow, store: any): MenuItemConstructorOptions => 
       },
       {
         label: 'Check for Update',
-        enabled: false,
-        click: () => {
-          console.log('Check for update');
+        click: async () => {
+          await checkNewVersion();
         },
       },
       {type: 'separator'},

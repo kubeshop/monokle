@@ -125,11 +125,10 @@ ipcMain.on('quit-and-install', () => {
   autoUpdater.quitAndInstall();
 });
 
-const checkNewVersion = async () => {
+export const checkNewVersion = async () => {
   try {
     mainStore.dispatch(updateNewVersion(NewVersion.Checking));
-    const a = await autoUpdater.checkForUpdates();
-    console.log(a);
+    await autoUpdater.checkForUpdates();
   } catch (error) {
     mainStore.dispatch(updateNewVersion(NewVersion.Errored));
   }
@@ -194,10 +193,6 @@ function createWindow() {
   if (isDev) {
     win.webContents.openDevTools();
   }
-
-  win.once('ready-to-show', async () => {
-    await checkNewVersion();
-  });
 
   autoUpdater.on('update-available', () => {
     mainStore.dispatch(updateNewVersion(NewVersion.Available));
