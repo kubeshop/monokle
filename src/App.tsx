@@ -15,9 +15,11 @@ import {
 } from '@organisms';
 import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {AppState} from '@models/appstate';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {initKubeconfig} from '@redux/reducers/appConfig';
-import {ipcRenderer} from 'electron';
+import {ipcRenderer, remote} from 'electron';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
@@ -26,6 +28,7 @@ import AppContext from './AppContext';
 const App = () => {
   const dispatch = useAppDispatch();
   const size: Size = useWindowSize();
+  const mainState: AppState = useAppSelector(state => state.main);
 
   const mainHeight = `${size.height}px`;
 
@@ -33,6 +36,16 @@ const App = () => {
     dispatch(initKubeconfig());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (mainState.previewType && mainState.previewResourceId) {
+      remote.getCurrentWindow().setTitle(mainState.previewResourceId);
+    } else if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].filePath) {
+      remote.getCurrentWindow().setTitle(mainState.fileMap[ROOT_FILE_ENTRY].filePath);
+    } else {
+      remote.getCurrentWindow().setTitle('Monokle');
+    }
+  }, [mainState]);
 
   ipcRenderer.on('missing-dependency-result', (_, {dependencies}) => {
     const alert: AlertType = {

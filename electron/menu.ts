@@ -10,7 +10,6 @@ import {
   openFolderExplorer,
   openNewResourceWizard,
   setMonacoEditor,
-  setShouldExpandAllNodes,
   toggleLeftMenu,
   resetLayout,
 } from '@redux/reducers/ui';
@@ -55,6 +54,13 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
     label: 'File',
     submenu: [
       {
+        label: 'New Window',
+        click() {
+          openApplication();
+        },
+      },
+      {type: 'separator'},
+      {
         label: 'Browse Folder',
         toolTip: BrowseFolderTooltip,
         enabled: !isInPreviewModeSelector(store.getState()),
@@ -79,7 +85,6 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
           click: async () => {
             const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
             store.dispatch(setRootFolder(folder));
-            store.dispatch(setShouldExpandAllNodes(true));
           },
         })),
       },
