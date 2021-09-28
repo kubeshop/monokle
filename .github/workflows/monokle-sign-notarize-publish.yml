@@ -97,7 +97,7 @@ jobs:
       - name: Archive Binary
         uses: actions/upload-artifact@v2
         with:
-          name: dist
+          name: dist-mac
           path: dist
         if: ${{ success() }}
 
@@ -189,4 +189,11 @@ jobs:
       - name: Build Succeeded
         run: |
           cmd /r dir .\dist
+        if: ${{ success() }}
+
+      - name: Archive Binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist-win
+          path: dist
         if: ${{ success() }}
