@@ -19,6 +19,11 @@ const StyledRefText = styled.span<{isUnsatisfied: boolean}>`
   }}
 `;
 
+const StyledPositionText = styled.span`
+  margin-left: 5px;
+  color: ${FontColors.grey};
+`;
+
 const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
   if (ref.target?.type === 'resource') {
     if (ref.target.resourceId && resourceMap[ref.target.resourceId]) {
@@ -66,6 +71,11 @@ const ResourceRefLink = (props: {resourceRef: ResourceRef; resourceMap: Resource
     <div onClick={onClick}>
       {Icon && <Icon resourceRef={resourceRef} style={{marginRight: 5}} />}
       <StyledRefText isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>{linkText}</StyledRefText>
+      {resourceRef.position && (
+        <StyledPositionText>
+          {resourceRef.position.line}:{resourceRef.position.column}
+        </StyledPositionText>
+      )}
     </div>
   );
 };

@@ -11,6 +11,19 @@ import RefLink from './RefLink';
 
 const {Text} = Typography;
 
+const Container = styled.div`
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  max-height: 350px;
+  overflow-y: auto;
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+`;
+
 const PopoverTitle = styled(Text)`
   font-weight: 500;
 `;
@@ -51,11 +64,7 @@ const getRefRange = (ref: ResourceRef) => {
   };
 };
 
-const ResourceRefsPopover = (props: {
-  children: React.ReactNode;
-  resource: K8sResource;
-  resourceRefs: ResourceRef[];
-}) => {
+const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sResource; resourceRefs: ResourceRef[]}) => {
   const {children, resourceRefs, resource} = props;
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -133,7 +142,7 @@ const ResourceRefsPopover = (props: {
   };
 
   return (
-    <>
+    <Container>
       <PopoverTitle>{children}</PopoverTitle>
       <StyledDivider />
       {resourceRefs
@@ -152,11 +161,13 @@ const ResourceRefsPopover = (props: {
             key = resourceRef.target.filePath;
           }
           if (resourceRef.target?.type === 'resource') {
+            const pos = resourceRef.position;
+            const positionString = pos ? `${pos.line}-${pos.column}-${pos.length}` : '';
             if (resourceRef.target.resourceId) {
-              key = resourceRef.target.resourceId;
+              key = `${resourceRef.target.resourceId}-${positionString}`;
             } else {
               key = resourceRef.target.resourceKind
-                ? `${resourceRef.target.resourceKind}-${resourceRef.name}`
+                ? `${resourceRef.target.resourceKind}-${resourceRef.name}-${positionString}`
                 : resourceRef.name;
             }
           }
@@ -166,7 +177,7 @@ const ResourceRefsPopover = (props: {
             </StyledRefDiv>
           );
         })}
-    </>
+    </Container>
   );
 };
-export default ResourceRefsPopover;
+export default RefsPopoverContent;
