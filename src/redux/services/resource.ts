@@ -149,6 +149,16 @@ export function getK8sResources(resourceMap: ResourceMapType, type: string) {
   return Object.values(resourceMap).filter(item => item.kind === type);
 }
 
+export function areRefPosEqual(a: RefPosition | undefined, b: RefPosition | undefined) {
+  if (a === undefined && b === undefined) {
+    return true;
+  }
+  if (!a || !b) {
+    return false;
+  }
+  return a.line === b.line && a.column === b.column && a.length === b.length;
+}
+
 /**
  * Adds a resource ref with the specified type/target to the specified resource
  */
@@ -171,7 +181,8 @@ export function createResourceRef(
           ref.type === refType &&
           ref.name === refName &&
           ref.target?.type === 'resource' &&
-          ref.target.resourceId === targetResourceId
+          ref.target.resourceId === targetResourceId &&
+          areRefPosEqual(ref.position, refNode?.getNodePosition())
       )
     ) {
       resource.refs.push({
