@@ -10,6 +10,7 @@ function useCodeIntel(
   selectedResourceId: string | undefined,
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
+  isEditorMounted: boolean,
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void
 ) {
@@ -49,7 +50,7 @@ function useCodeIntel(
       clearCodeIntel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, selectedResourceId, resourceMap]);
+  }, [isEditorMounted, code, selectedResourceId, resourceMap]);
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {
