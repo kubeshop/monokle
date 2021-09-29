@@ -1,4 +1,4 @@
-import {Menu, MenuItemConstructorOptions} from 'electron';
+import {Menu, MenuItemConstructorOptions, BrowserWindow} from 'electron';
 import hotkeys from '@constants/hotkeys';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {AppState} from '@models/appstate';
@@ -54,7 +54,7 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
     label: 'File',
     submenu: [
       {
-        label: 'New Window',
+        label: 'New Monokle Window',
         click() {
           openApplication();
         },
@@ -103,6 +103,16 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
         click: () => {
           store.dispatch(stopPreviewLoader());
           store.dispatch(clearPreviewAndSelectionHistory());
+        },
+      },
+      {type: 'separator'},
+      {
+        label: 'Close Window',
+        click: () => {
+          const window = BrowserWindow.getFocusedWindow();
+          if (window) {
+            window.close();
+          }
         },
       },
     ],

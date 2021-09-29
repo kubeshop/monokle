@@ -15,10 +15,10 @@ moduleAlias.addAliases({
 
 import ENV from '../env';
 
-if (!ENV.env || ENV.env === 'development') {
-  process.env.NODE_ENV = 'development';
-} else {
+if (!ENV.env || ENV.env === 'production') {
   process.env.NODE_ENV = 'production';
+} else {
+  process.env.NODE_ENV = 'development';
 }
 
 import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
