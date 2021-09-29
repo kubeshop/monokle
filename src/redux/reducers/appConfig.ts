@@ -1,7 +1,7 @@
 import path from 'path';
 import {ipcRenderer} from 'electron';
 import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
-import {AppConfig, Themes, TextSizes, Languages, NewVersion} from '@models/appconfig';
+import {AppConfig, Themes, TextSizes, Languages, NewVersionCode} from '@models/appconfig';
 import electronStore from '@utils/electronStore';
 import {PROCESS_ENV} from '@utils/env';
 import {AlertEnum, AlertType} from '@models/alert';
@@ -99,10 +99,13 @@ export const updateLanguage = createAsyncThunk('config/updateLanguage', async (l
   thunkAPI.dispatch(configSlice.actions.setLanguage(language));
 });
 
-export const updateNewVersion = createAsyncThunk('config/updateNewVersion', async (status: NewVersion, thunkAPI) => {
-  electronStore.set('appConfig.newVersion', status);
-  thunkAPI.dispatch(configSlice.actions.setNewVersion(status));
-});
+export const updateNewVersion = createAsyncThunk(
+  'config/updateNewVersion',
+  async (newVersion: {code: NewVersionCode; data: any}, thunkAPI) => {
+    electronStore.set('appConfig.newVersion', newVersion.code);
+    thunkAPI.dispatch(configSlice.actions.setNewVersion({code: newVersion.code, data: newVersion.data}));
+  }
+);
 
 export const configSlice = createSlice({
   name: 'config',
@@ -138,7 +141,7 @@ export const configSlice = createSlice({
     setHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
       state.settings.helmPreviewMode = action.payload;
     },
-    setNewVersion: (state: Draft<AppConfig>, action: PayloadAction<NewVersion>) => {
+    setNewVersion: (state: Draft<AppConfig>, action: PayloadAction<{code: NewVersionCode; data: any}>) => {
       state.newVersion = action.payload;
     },
     setLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {

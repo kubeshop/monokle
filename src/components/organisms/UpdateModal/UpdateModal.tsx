@@ -1,8 +1,8 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {Button, Modal} from 'antd';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateNewVersion} from '@redux/reducers/appConfig';
-import {NewVersion} from '@models/appconfig';
+import {NewVersionCode} from '@models/appconfig';
 import {ipcRenderer} from 'electron';
 
 const UpdateModal = () => {
@@ -11,21 +11,36 @@ const UpdateModal = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleClose = () => {
-    dispatch(updateNewVersion(NewVersion.Idle));
+    dispatch(updateNewVersion({code: NewVersionCode.Idle, data: null}));
   };
 
   const handleInstall = () => {
-    dispatch(updateNewVersion(NewVersion.Idle));
     ipcRenderer.send('quit-and-install');
   };
 
   useEffect(() => {
-    if (newVersion < NewVersion.Idle || newVersion === NewVersion.Downloaded) {
+    if (
+      (newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
+      newVersion.code === NewVersionCode.Downloaded
+    ) {
       setIsModalVisible(true);
     } else {
       setIsModalVisible(false);
     }
   }, [newVersion]);
+
+  const getErrorMessage = useCallback(
+    (code: number) => {
+      if (code === -2) {
+        return <div>Auto-update is not enabled in development mode!</div>;
+      }
+      if (code === -10) {
+        return <div>Could not get code signature for running application!</div>;
+      }
+      return <div>Update process encountered with an error!</div>;
+    },
+    [newVersion]
+  );
 
   return (
     <Modal
@@ -35,7 +50,7 @@ const UpdateModal = () => {
       width={400}
       onCancel={handleClose}
       footer={
-        newVersion === NewVersion.Downloaded ? (
+        newVersion.code === NewVersionCode.Downloaded ? (
           <Button style={{width: 72}} type="primary" onClick={handleInstall}>
             Install
           </Button>
@@ -46,9 +61,9 @@ const UpdateModal = () => {
         )
       }
     >
-      {newVersion === NewVersion.Errored ? <div>Update process encountered with an error!</div> : null}
-      {newVersion === NewVersion.NotAvailable ? <div>New version is not available!</div> : null}
-      {newVersion === NewVersion.Downloaded ? <div>New version is downloaded!</div> : null}
+      {newVersion.code === NewVersionCode.Errored ? getErrorMessage(newVersion.data?.errorCode) : null}
+      {newVersion.code === NewVersionCode.NotAvailable ? <div>New version is not available!</div> : null}
+      {newVersion.code === NewVersionCode.Downloaded ? <div>New version is downloaded!</div> : null}
     </Modal>
   );
 };

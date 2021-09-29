@@ -26,7 +26,7 @@ import {stopPreview} from '@redux/services/preview';
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {openDocumentation, openGitHub} from '@utils/shell';
-import {NewVersion} from '@models/appconfig';
+import {NewVersionCode} from '@models/appconfig';
 
 const StyledLogo = styled.img`
   height: 24px;
@@ -225,7 +225,7 @@ const PageHeader = () => {
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>
-            <StyledSettingsBadge count={newVersion > NewVersion.Checking ? <StyledDownloadOutlined /> : null}>
+            <StyledSettingsBadge count={newVersion.code > NewVersionCode.Checking ? <StyledDownloadOutlined /> : null}>
               <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
             </StyledSettingsBadge>
           </SettingsCol>

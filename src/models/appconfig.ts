@@ -15,7 +15,7 @@ export enum Languages {
   English = 'en',
 }
 
-export enum NewVersion {
+export enum NewVersionCode {
   Errored = -2,
   NotAvailable = -1,
   Idle = 0,
@@ -46,7 +46,10 @@ interface AppConfig {
     loadLastFolderOnStartup: boolean;
   };
   recentFolders: string[];
-  newVersion: NewVersion;
+  newVersion: {
+    code: NewVersionCode;
+    data: any;
+  };
 }
 
 export type {AppConfig};
