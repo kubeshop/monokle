@@ -60,6 +60,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
   const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
+  const [isEditorMounted, setEditorMounted] = useState(false);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   let editor = editorRef.current;
@@ -77,7 +78,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     }
   };
 
-  useCodeIntel(editor, code, selectedResourceId, resourceMap, fileMap, selectResource, selectFilePath);
+  useCodeIntel(editor, code, selectedResourceId, resourceMap, fileMap, isEditorMounted, selectResource, selectFilePath);
   const {registerStaticActions} = useEditorKeybindings(
     editor,
     hiddenInputRef,
@@ -122,6 +123,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     e.onDidChangeCursorSelection(onChangeCursorSelection);
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
+    setEditorMounted(true);
   };
 
   function onChange(newValue: any) {
