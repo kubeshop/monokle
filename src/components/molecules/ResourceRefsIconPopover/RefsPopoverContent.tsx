@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
 import styled from 'styled-components';
@@ -73,6 +73,50 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
 
+  const processedRefsWithKeys = useMemo(() => {
+    return resourceRefs
+      .sort((a, b) => {
+        let kindA = getRefKind(a, resourceMap);
+        let kindB = getRefKind(b, resourceMap);
+
+        if (kindA && kindB) {
+          return kindA.localeCompare(kindB);
+        }
+        return 0;
+      })
+      .reduce<ResourceRef[]>((filteredRefs, currentRef) => {
+        if (
+          filteredRefs.some(
+            ref =>
+              ref.target?.type === 'resource' &&
+              currentRef.target?.type === 'resource' &&
+              ref.name === currentRef.name &&
+              ref.target.resourceKind === currentRef.target.resourceKind &&
+              areRefPosEqual(ref.position, currentRef.position)
+          )
+        ) {
+          return filteredRefs;
+        }
+        return [...filteredRefs, currentRef];
+      }, [])
+      .map(ref => {
+        let key = ref.name;
+        if (ref.target?.type === 'file') {
+          key = ref.target.filePath;
+        }
+        if (ref.target?.type === 'resource') {
+          const pos = ref.position;
+          const positionString = pos ? `${pos.line}-${pos.column}-${pos.length}` : '';
+          if (ref.target.resourceId) {
+            key = `${ref.target.resourceId}-${positionString}`;
+          } else {
+            key = ref.target.resourceKind ? `${ref.target.resourceKind}-${ref.name}-${positionString}` : ref.name;
+          }
+        }
+        return {ref, key};
+      });
+  }, [resourceRefs, resourceMap]);
+
   const selectResource = (selectedId: string) => {
     if (resourceMap[selectedId]) {
       dispatch(selectK8sResource({resourceId: selectedId}));
@@ -146,53 +190,11 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
     <Container>
       <PopoverTitle>{children}</PopoverTitle>
       <StyledDivider />
-      {resourceRefs
-        .sort((a, b) => {
-          let kindA = getRefKind(a, resourceMap);
-          let kindB = getRefKind(b, resourceMap);
-
-          if (kindA && kindB) {
-            return kindA.localeCompare(kindB);
-          }
-          return 0;
-        })
-        .reduce<ResourceRef[]>((filteredRefs, currentRef) => {
-          if (
-            filteredRefs.some(
-              ref =>
-                ref.target?.type === 'resource' &&
-                currentRef.target?.type === 'resource' &&
-                ref.name === currentRef.name &&
-                ref.target.resourceKind === currentRef.target.resourceKind &&
-                areRefPosEqual(ref.position, currentRef.position)
-            )
-          ) {
-            return filteredRefs;
-          }
-          return [...filteredRefs, currentRef];
-        }, [])
-        .map(resourceRef => {
-          let key = resourceRef.name;
-          if (resourceRef.target?.type === 'file') {
-            key = resourceRef.target.filePath;
-          }
-          if (resourceRef.target?.type === 'resource') {
-            const pos = resourceRef.position;
-            const positionString = pos ? `${pos.line}-${pos.column}-${pos.length}` : '';
-            if (resourceRef.target.resourceId) {
-              key = `${resourceRef.target.resourceId}-${positionString}`;
-            } else {
-              key = resourceRef.target.resourceKind
-                ? `${resourceRef.target.resourceKind}-${resourceRef.name}-${positionString}`
-                : resourceRef.name;
-            }
-          }
-          return (
-            <StyledRefDiv key={key}>
-              <RefLink resourceRef={resourceRef} resourceMap={resourceMap} onClick={() => onLinkClick(resourceRef)} />
-            </StyledRefDiv>
-          );
-        })}
+      {processedRefsWithKeys.map(({ref, key}) => (
+        <StyledRefDiv key={key}>
+          <RefLink resourceRef={ref} resourceMap={resourceMap} onClick={() => onLinkClick(ref)} />
+        </StyledRefDiv>
+      ))}
     </Container>
   );
 };
