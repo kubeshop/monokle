@@ -23,6 +23,7 @@ import {ipcRenderer, remote} from 'electron';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
+import UpdateModal from '@components/organisms/UpdateModal';
 import AppContext from './AppContext';
 
 const App = () => {
@@ -72,6 +73,7 @@ const App = () => {
         <HotKeysHandler />
         <RenameResourceModal />
         <ValidationErrorsModal />
+        <UpdateModal />
       </div>
     </AppContext.Provider>
   );

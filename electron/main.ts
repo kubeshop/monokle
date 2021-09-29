@@ -30,14 +30,17 @@ import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '@constants/constants';
 import {checkMissingDependencies} from '@utils/index';
+import ElectronStore from 'electron-store';
+import {autoUpdater} from 'electron-updater';
 import mainStore from '@redux/main-store';
+import {updateNewVersion} from '@redux/reducers/appConfig';
+import {NewVersion} from '@models/appconfig';
 
-import terminal from '../cli/terminal';
 import {createMenu, getDockMenu} from './menu';
+import terminal from '../cli/terminal';
 
 Object.assign(console, ElectronLog.functions);
-
-const ElectronStore = require('electron-store');
+autoUpdater.logger = console;
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
 
@@ -118,6 +121,27 @@ ipcMain.on('run-helm', (event, args: any) => {
   }
 });
 
+ipcMain.on('app-version', event => {
+  event.sender.send('app-version', {version: app.getVersion()});
+});
+
+ipcMain.on('check-update-available', async () => {
+  await checkNewVersion();
+});
+
+ipcMain.on('quit-and-install', () => {
+  autoUpdater.quitAndInstall();
+});
+
+export const checkNewVersion = async () => {
+  try {
+    mainStore.dispatch(updateNewVersion(NewVersion.Checking));
+    await autoUpdater.checkForUpdates();
+  } catch (error) {
+    mainStore.dispatch(updateNewVersion(NewVersion.Errored));
+  }
+};
+
 export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -178,6 +202,23 @@ export const createWindow = (givenPath?: string) => {
   if (isDev) {
     win.webContents.openDevTools();
   }
+
+  autoUpdater.on('update-available', () => {
+    mainStore.dispatch(updateNewVersion(NewVersion.Available));
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    mainStore.dispatch(updateNewVersion(NewVersion.NotAvailable));
+  });
+
+  autoUpdater.on('download-progress', (progressObj: any) => {
+    console.info(`download-progress ${JSON.stringify(progressObj)}`);
+    mainStore.dispatch(updateNewVersion(NewVersion.Downloading));
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    mainStore.dispatch(updateNewVersion(NewVersion.Downloaded));
+  });
 
   const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 

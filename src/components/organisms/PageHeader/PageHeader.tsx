@@ -2,7 +2,14 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-import {CloseCircleOutlined, GithubOutlined, QuestionCircleOutlined, SettingOutlined} from '@ant-design/icons';
+import {
+  CloseCircleOutlined,
+  GithubOutlined,
+  DownloadOutlined,
+  QuestionCircleOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
+import {Badge} from 'antd';
 import {AppBorders} from '@styles/Borders';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -19,6 +26,7 @@ import {stopPreview} from '@redux/services/preview';
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {openDocumentation, openGitHub} from '@utils/shell';
+import {NewVersion} from '@models/appconfig';
 
 const StyledLogo = styled.img`
   height: 24px;
@@ -46,12 +54,19 @@ const SettingsCol = styled(Col)`
   flex-direction: row-reverse;
 `;
 
-const StyledSettingsSpan = styled.span`
+const StyledSettingsOutlined = styled(SettingOutlined)`
   color: ${FontColors.elementSelectTitle};
-  margin-right: 8px;
-  padding-top: 10px;
   font-size: 24px;
   cursor: pointer;
+`;
+
+const StyledSettingsBadge = styled(Badge)`
+  margin-right: 8px;
+  margin-top: 13px;
+`;
+
+const StyledDownloadOutlined = styled(DownloadOutlined)`
+  color: ${FontColors.afford};
 `;
 
 const GitHubIconSpan = styled.span`
@@ -101,6 +116,14 @@ const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
   margin-right: 5px;
 `;
 
+const StyledDot = styled.div`
+  background-color: black;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  margin: 0 5px;
+`;
+
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;
   return (
@@ -124,6 +147,7 @@ const PageHeader = () => {
   const [helmChart, setHelmChart] = useState<HelmChart>();
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const newVersion = useAppSelector(state => state.config.newVersion);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -201,9 +225,9 @@ const PageHeader = () => {
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>
-            <StyledSettingsSpan onClick={toggleSettingsDrawer}>
-              <SettingOutlined />
-            </StyledSettingsSpan>
+            <StyledSettingsBadge count={newVersion > NewVersion.Checking ? <StyledDownloadOutlined /> : null}>
+              <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
+            </StyledSettingsBadge>
           </SettingsCol>
         </Row>
       </StyledHeader>

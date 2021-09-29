@@ -15,6 +15,16 @@ export enum Languages {
   English = 'en',
 }
 
+export enum NewVersion {
+  Errored = -2,
+  NotAvailable = -1,
+  Idle = 0,
+  Checking = 1,
+  Available = 2,
+  Downloading = 3,
+  Downloaded = 4,
+}
+
 interface AppConfig {
   /** a list of patterns to exclude when scanning the file system for resources */
   scanExcludes: string[];
@@ -36,6 +46,7 @@ interface AppConfig {
     loadLastFolderOnStartup: boolean;
   };
   recentFolders: string[];
+  newVersion: NewVersion;
 }
 
 export type {AppConfig};

@@ -1,7 +1,7 @@
 import React, {useRef} from 'react';
 import styled from 'styled-components';
 
-import {Button, Checkbox, Input, Select, Tooltip} from 'antd';
+import {Button, Input, Select, Tooltip, Divider, Checkbox} from 'antd';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
 
@@ -24,6 +24,8 @@ import {
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
 } from '@constants/tooltips';
+import {ipcRenderer} from 'electron';
+import {NewVersion} from '@models/appconfig';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -51,6 +53,7 @@ const StyledSelect = styled(Select)`
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
+  const newVersion = useAppSelector(state => state.config.newVersion);
 
   const appConfig = useAppSelector(state => state.config);
 
@@ -97,6 +100,14 @@ const SettingsDrawer = () => {
         dispatch(updateKubeconfig(path));
       }
     }
+  };
+
+  const checkUpdateAvailability = () => {
+    ipcRenderer.send('check-update-available');
+  };
+
+  const updateApplication = () => {
+    ipcRenderer.send('quit-and-install');
   };
 
   return (
@@ -149,6 +160,19 @@ const SettingsDrawer = () => {
             Automatically load last folder
           </Checkbox>
         </Tooltip>
+      </StyledDiv>
+      <Divider />
+      <StyledDiv>
+        {newVersion > NewVersion.Checking ? (
+          <StyledButton onClick={updateApplication} loading={newVersion === NewVersion.Downloading}>
+            {newVersion === NewVersion.Downloaded ? <span>Update Monokle</span> : null}
+            {newVersion === NewVersion.Downloading ? <span>Downloading the update..</span> : null}
+          </StyledButton>
+        ) : (
+          <StyledButton onClick={checkUpdateAvailability} loading={newVersion === NewVersion.Checking}>
+            Check New Version
+          </StyledButton>
+        )}
       </StyledDiv>
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
