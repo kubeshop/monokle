@@ -44,6 +44,7 @@
     "cross-env": "7.0.3",
     "electron": "13.4.0",
     "electron-builder": "22.11.11",
+    "electron-notarize": "1.1.0",
     "electron-reload": "2.0.0-alpha.1",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "8.3.0",
@@ -81,7 +82,6 @@
     "dagre": "0.8.5",
     "dayjs": "1.10.6",
     "electron-devtools-installer": "3.2.0",
-    "electron-is-dev": "2.0.0",
     "electron-log": "4.4.1",
     "electron-redux": "^1.5.4",
     "electron-store": "8.0.0",
@@ -91,7 +91,7 @@
     "loglevel": "1.7.1",
     "micromatch": "4.0.4",
     "module-alias": "^2.2.2",
-    "monaco-yaml": "3.1.0",
+    "monaco-yaml": "3.2.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-flow-renderer": "9.6.7",
@@ -141,10 +141,20 @@
     "copyright": "Copyright © 2021 ${author}",
     "mac": {
       "category": "public.app-category.utilities",
-      "icon": "build/icon.png"
+      "icon": "build/icon.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "./electron/src/entitlements.mac.inherit.plist",
+      "entitlementsInherit": "./electron/src/entitlements.mac.inherit.plist",
+      "target": [
+        "dmg"
+      ]
     },
+    "artifactName": "${productName}-${version}.${ext}",
+    "afterSign": "./notarization/afterSignHook.js",
     "dmg": {
-      "icon": "build/icon.png"
+      "icon": "build/icon.png",
+      "writeUpdateInfo": false
     },
     "win": {
       "target": "nsis",
@@ -154,7 +164,8 @@
       "oneClick": true,
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
-      "installerHeaderIcon": "build/icon.ico"
+      "installerHeaderIcon": "build/icon.ico",
+      "differentialPackage": false
     },
     "extends": null,
     "files": [
@@ -182,7 +193,8 @@
       "!**/node_modules/@jest/**/*",
       "!**/node_modules/monaco-editor/min/**/*",
       "!**/node_modules/monaco-editor/min-maps/**/*",
-      "!**/docs/**/*"
+      "!**/docs/**/*",
+      "!notarization/**/*"
     ],
     "extraResources": [
       {

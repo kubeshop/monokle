@@ -1,6 +1,9 @@
+/* eslint-disable import/order */
 /* eslint-disable import/first */
 import moduleAlias from 'module-alias';
+import * as ElectronLog from 'electron-log';
 
+Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
   '@constants': `${__dirname}/../src/constants`,
   '@models': `${__dirname}/../src/models`,
@@ -10,12 +13,18 @@ moduleAlias.addAliases({
   '@root': `${__dirname}/../`,
 });
 
+import ENV from '../env';
+
+if (!ENV.env || ENV.env === 'development') {
+  process.env.NODE_ENV = 'development';
+} else {
+  process.env.NODE_ENV = 'production';
+}
+
 import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';
-import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import {execSync} from 'child_process';
-import * as ElectronLog from 'electron-log';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
@@ -31,6 +40,8 @@ Object.assign(console, ElectronLog.functions);
 const ElectronStore = require('electron-store');
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
+
+const isDev = process.env.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const APP_DEPENDENCIES = ['kubectl', 'helm'];
