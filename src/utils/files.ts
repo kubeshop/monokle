@@ -8,10 +8,7 @@ export function isSubDirectory(parentDir: string, dir: string) {
 
 export function doesFileExist(filePath: string) {
   try {
-    if (fs.existsSync(filePath)) {
-      return true;
-    }
-    return false;
+    return fs.existsSync(filePath);
   } catch (err) {
     return false;
   }
