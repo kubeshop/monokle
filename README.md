@@ -52,16 +52,13 @@ simply click `Move to Bin`. No wait, did you? You should have clicked `Open`, si
 
 Clone this repo, make sure you are running the node version specified in `.npmrc`, then run:
 
+```
 cp .env.example.ts .env.ts
+```
 
 to include env variables.
 
-<details>
-  <summary>
-  Note: Default env is set to `production`. You need to change it to `development` for development usage.
-  </summary>
-</details>
-
+> 'Note: Default env is set to `production`. You need to change it to `development` for development usage.
 
 ### Mac
 
