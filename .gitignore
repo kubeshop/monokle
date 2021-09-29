@@ -17,7 +17,6 @@
 # misc
 .DS_Store
 .env
-env.ts
 .env.local
 .env.development.local
 .env.test.local
@@ -33,3 +32,5 @@ k8sdumps
 
 .vscode
 /site
+
+electron/env.ts

@@ -13,16 +13,12 @@ moduleAlias.addAliases({
   '@root': `${__dirname}/../`,
 });
 
-import {doesFileExist} from '@utils/files';
-
-const doesEnvFileExist = doesFileExist(`${__dirname}/../env.js`);
-
-if (!doesEnvFileExist) {
-  process.env.NODE_ENV = 'production';
-} else {
+try {
   // eslint-disable-next-line global-require
-  const {default: ENV} = require('../env');
-  process.env.NODE_ENV = !ENV.env || ENV.env === 'production' ? 'production' : 'development';
+  const {env} = require('./env');
+  process.env.NODE_ENV = !env || env === 'production' ? 'production' : 'development';
+} catch (error) {
+  process.env.NODE_ENV = 'production';
 }
 
 import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';

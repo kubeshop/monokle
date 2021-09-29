@@ -1,15 +1,6 @@
 import path from 'path';
-import fs from 'fs';
 
 export function isSubDirectory(parentDir: string, dir: string) {
   const relative = path.relative(parentDir, dir);
   return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
-}
-
-export function doesFileExist(filePath: string) {
-  try {
-    return fs.existsSync(filePath);
-  } catch (err) {
-    return false;
-  }
 }
