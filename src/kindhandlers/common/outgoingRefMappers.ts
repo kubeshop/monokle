@@ -36,13 +36,49 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   },
   {
     source: {
-      pathParts: ['volumes', 'configMap', 'name'],
+      pathParts: ['configMap', 'name'],
     },
     ...ConfigMapTarget,
   },
   {
     source: {
       pathParts: ['volumes', 'secret', 'secretName'],
+    },
+    ...SecretTarget,
+  },
+  {
+    source: {
+      pathParts: ['sources', 'secret', 'name'],
+    },
+    ...SecretTarget,
+  },
+  {
+    source: {
+      pathParts: ['secretRef', 'name'],
+    },
+    ...SecretTarget,
+  },
+  {
+    source: {
+      pathParts: ['controllerExpandSecretRef', 'name'],
+    },
+    ...SecretTarget,
+  },
+  {
+    source: {
+      pathParts: ['controllerPublishSecretRef', 'name'],
+    },
+    ...SecretTarget,
+  },
+  {
+    source: {
+      pathParts: ['nodePublishSecretRef', 'name'],
+    },
+    ...SecretTarget,
+  },
+  {
+    source: {
+      pathParts: ['nodeStageSecretRef', 'name'],
     },
     ...SecretTarget,
   },

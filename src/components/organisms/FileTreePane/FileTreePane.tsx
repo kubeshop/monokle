@@ -235,7 +235,6 @@ const FileTreePane = () => {
       if (folderPath) {
         setFolder(folderPath);
       }
-      dispatch(setShouldExpandAllNodes(true));
       setAutoExpandParent(true);
     },
     {isDirectoryExplorer: true}
@@ -347,7 +346,6 @@ const FileTreePane = () => {
       const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
       if (folder && fs.statSync(folder)?.isDirectory()) {
         setFolder(folder);
-        dispatch(setShouldExpandAllNodes(true));
         setAutoExpandParent(true);
       }
     });

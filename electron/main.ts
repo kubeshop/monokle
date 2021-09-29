@@ -15,10 +15,10 @@ moduleAlias.addAliases({
 
 import ENV from '../env';
 
-if (!ENV.env || ENV.env === 'development') {
-  process.env.NODE_ENV = 'development';
-} else {
+if (!ENV.env || ENV.env === 'production') {
   process.env.NODE_ENV = 'production';
+} else {
+  process.env.NODE_ENV = 'development';
 }
 
 import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
@@ -36,13 +36,10 @@ import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersion} from '@models/appconfig';
 
-import {createMenu} from './menu';
+import {createMenu, getDockMenu} from './menu';
 import terminal from '../cli/terminal';
 
-// console.log(store);
-
 Object.assign(console, ElectronLog.functions);
-
 autoUpdater.logger = console;
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
@@ -145,7 +142,7 @@ export const checkNewVersion = async () => {
   }
 };
 
-function createWindow() {
+export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1200,
@@ -160,6 +157,7 @@ function createWindow() {
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
       preload: path.join(__dirname, 'preload.js'),
+      enableRemoteModule: true,
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
@@ -222,10 +220,22 @@ function createWindow() {
     mainStore.dispatch(updateNewVersion(NewVersion.Downloaded));
   });
 
-  return win;
-}
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 
-const openApplication = async (givenPath?: string) => {
+  if (missingDependecies.length > 0) {
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
+    });
+  }
+
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('executed-from', {path: givenPath});
+  });
+
+  return win;
+};
+
+export const openApplication = async (givenPath?: string) => {
   await app.whenReady();
 
   if (isDev) {
@@ -240,34 +250,25 @@ const openApplication = async (givenPath?: string) => {
   }
 
   ElectronStore.initRenderer();
-  const win = createWindow();
+  createWindow(givenPath);
 
   mainStore.subscribe(() => {
-    createMenu(win, mainStore);
-  });
-
-  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
-
-  if (missingDependecies.length > 0) {
-    win.webContents.on('did-finish-load', () => {
-      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
-    });
-  }
-
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('executed-from', {path: givenPath});
+    createMenu(mainStore);
   });
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
     app.dock.setIcon(image);
+    mainStore.subscribe(() => {
+      app.dock.setMenu(getDockMenu(mainStore));
+    });
   }
 
   console.log('info', app.getName(), app.getVersion(), app.getLocale(), givenPath);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createWindow(givenPath);
     }
   });
 
