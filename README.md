@@ -53,7 +53,7 @@ simply click `Move to Bin`. No wait, did you? You should have clicked `Open`, si
 Clone this repo, make sure you are running the node version specified in `.npmrc`, then run:
 
 ```
-cp .env.example.ts .env.ts
+cp ./electron/env.example.ts ./electron/env.ts
 ```
 
 to include env variables.
