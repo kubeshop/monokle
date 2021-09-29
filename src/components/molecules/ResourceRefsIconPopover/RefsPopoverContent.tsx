@@ -7,6 +7,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {MonacoRange} from '@models/ui';
+import {areRefPosEqual} from '@redux/services/resource';
 import RefLink from './RefLink';
 
 const {Text} = Typography;
@@ -155,6 +156,21 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
           }
           return 0;
         })
+        .reduce<ResourceRef[]>((filteredRefs, currentRef) => {
+          if (
+            filteredRefs.some(
+              ref =>
+                ref.target?.type === 'resource' &&
+                currentRef.target?.type === 'resource' &&
+                ref.name === currentRef.name &&
+                ref.target.resourceKind === currentRef.target.resourceKind &&
+                areRefPosEqual(ref.position, currentRef.position)
+            )
+          ) {
+            return filteredRefs;
+          }
+          return [...filteredRefs, currentRef];
+        }, [])
         .map(resourceRef => {
           let key = resourceRef.name;
           if (resourceRef.target?.type === 'file') {
