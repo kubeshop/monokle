@@ -25,7 +25,7 @@ import {
   KubeconfigPathTooltip,
 } from '@constants/tooltips';
 import {ipcRenderer} from 'electron';
-import {NewVersion} from '@models/appconfig';
+import {NewVersionCode} from '@models/appconfig';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -163,13 +163,13 @@ const SettingsDrawer = () => {
       </StyledDiv>
       <Divider />
       <StyledDiv>
-        {newVersion > NewVersion.Checking ? (
-          <StyledButton onClick={updateApplication} loading={newVersion === NewVersion.Downloading}>
-            {newVersion === NewVersion.Downloaded ? <span>Update Monokle</span> : null}
-            {newVersion === NewVersion.Downloading ? <span>Downloading the update..</span> : null}
+        {newVersion.code > NewVersionCode.Checking ? (
+          <StyledButton onClick={updateApplication} loading={newVersion.code === NewVersionCode.Downloading}>
+            {newVersion.code === NewVersionCode.Downloaded ? <span>Update Monokle</span> : null}
+            {newVersion.code === NewVersionCode.Downloading ? <span>Downloading the update..</span> : null}
           </StyledButton>
         ) : (
-          <StyledButton onClick={checkUpdateAvailability} loading={newVersion === NewVersion.Checking}>
+          <StyledButton onClick={checkUpdateAvailability} loading={newVersion.code === NewVersionCode.Checking}>
             Check New Version
           </StyledButton>
         )}

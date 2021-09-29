@@ -34,7 +34,7 @@ import ElectronStore from 'electron-store';
 import {autoUpdater} from 'electron-updater';
 import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
-import {NewVersion} from '@models/appconfig';
+import {NewVersionCode} from '@models/appconfig';
 
 import {createMenu, getDockMenu} from './menu';
 import terminal from '../cli/terminal';
@@ -131,14 +131,23 @@ ipcMain.on('check-update-available', async () => {
 
 ipcMain.on('quit-and-install', () => {
   autoUpdater.quitAndInstall();
+  mainStore.dispatch(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
 
-export const checkNewVersion = async () => {
+export const checkNewVersion = async (initial?: boolean) => {
   try {
-    mainStore.dispatch(updateNewVersion(NewVersion.Checking));
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Checking, data: null}));
     await autoUpdater.checkForUpdates();
-  } catch (error) {
-    mainStore.dispatch(updateNewVersion(NewVersion.Errored));
+  } catch (error: any) {
+    if (error.errno === -2) {
+      mainStore.dispatch(
+        updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}})
+      );
+    } else {
+      mainStore.dispatch(
+        updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}})
+      );
+    }
   }
 };
 
@@ -203,21 +212,24 @@ export const createWindow = (givenPath?: string) => {
     win.webContents.openDevTools();
   }
 
-  autoUpdater.on('update-available', () => {
-    mainStore.dispatch(updateNewVersion(NewVersion.Available));
+  autoUpdater.on('update-available', (data: any) => {
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Available, data: null}));
   });
 
-  autoUpdater.on('update-not-available', () => {
-    mainStore.dispatch(updateNewVersion(NewVersion.NotAvailable));
+  autoUpdater.on('update-not-available', (data: any) => {
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.NotAvailable, data: null}));
   });
 
   autoUpdater.on('download-progress', (progressObj: any) => {
-    console.info(`download-progress ${JSON.stringify(progressObj)}`);
-    mainStore.dispatch(updateNewVersion(NewVersion.Downloading));
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: progressObj.percent}}));
   });
 
-  autoUpdater.on('update-downloaded', () => {
-    mainStore.dispatch(updateNewVersion(NewVersion.Downloaded));
+  autoUpdater.on('update-downloaded', (data: any) => {
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
+  });
+
+  autoUpdater.on('error', error => {
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -10}}));
   });
 
   const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
@@ -228,7 +240,8 @@ export const createWindow = (givenPath?: string) => {
     });
   }
 
-  win.webContents.on('did-finish-load', () => {
+  win.webContents.on('did-finish-load', async () => {
+    await checkNewVersion(true);
     win.webContents.send('executed-from', {path: givenPath});
   });
 

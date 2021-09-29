@@ -1,5 +1,5 @@
 import {AppState} from '@models/appstate';
-import {AppConfig, NewVersion} from '@models/appconfig';
+import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AlertState} from '@models/alert';
 import {LogsState} from '@models/logs';
 import {UiState} from '@models/ui';
@@ -97,7 +97,10 @@ const initialAppConfigState: AppConfig = {
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   recentFolders: electronStore.get('appConfig.recentFolders') || [],
-  newVersion: electronStore.get('appConfig.newVersion') || NewVersion.Idle,
+  newVersion: {
+    code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
+    data: null,
+  },
   navigators,
 };
 
