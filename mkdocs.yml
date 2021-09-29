@@ -28,7 +28,7 @@ nav:
   - Tutorials:
     - tutorials/how-to-navigate-k8s-resources-and-their-the-manifests.md
     - tutorials/how-to-browse-clusters.md
-    - tutorials/Configuring-monokle.md
+    - tutorials/configuring-monokle.md
 
 extra:
   analytics:
