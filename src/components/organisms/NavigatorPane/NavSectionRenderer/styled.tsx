@@ -1,4 +1,4 @@
-import Colors from '@styles/Colors';
+import Colors, {FontColors} from '@styles/Colors';
 import styled from 'styled-components';
 import {Skeleton as RawSkeleton} from 'antd';
 import {PlusSquareOutlined as RawPlusSquareOutlined} from '@ant-design/icons';
@@ -90,4 +90,10 @@ export const PlusSquareOutlined = styled(RawPlusSquareOutlined)<{isSelected: boo
       return `color: ${Colors.blackPure}`;
     }
   }}
+`;
+
+export const ItemsLength = styled.span`
+  margin-left: 8px;
+  color: ${FontColors.grey};
+  font-size: 14px;
 `;
