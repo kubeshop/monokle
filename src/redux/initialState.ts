@@ -99,7 +99,9 @@ const initialAppConfigState: AppConfig = {
   recentFolders: electronStore.get('appConfig.recentFolders') || [],
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
-    data: null,
+    data: {
+      initial: true,
+    },
   },
   navigators,
 };
