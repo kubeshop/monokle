@@ -1,4 +1,4 @@
-# How to Edit ConfigMap API Object
+# How to Edit ConfigMap 
 
 Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
 

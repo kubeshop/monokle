@@ -29,7 +29,7 @@ nav:
     - tutorials/navigate-and-edit-k8s-manifests.md
     - tutorials/how-to-browse-clusters.md
     - tutorials/configuring-monokle.md
-    - tutorials/how-to-edit-configmap-API-object.md
+    - tutorials/how-to-edit-configmap.md
 
 extra:
   analytics:
