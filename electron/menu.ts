@@ -2,7 +2,7 @@ import {Menu, MenuItemConstructorOptions, BrowserWindow} from 'electron';
 import hotkeys from '@constants/hotkeys';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {AppState} from '@models/appstate';
-import {AppConfig} from '@models/appconfig';
+import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
@@ -20,9 +20,22 @@ import {checkNewVersion, openApplication} from './main';
 
 const isMac = process.platform === 'darwin';
 
+const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => {
+  if (newVersion.code > NewVersionCode.Checking) {
+    if (newVersion.code === NewVersionCode.Downloading) {
+      return `Downloading.. %${newVersion.data?.percent}`;
+    }
+    if (newVersion.code === NewVersionCode.Downloaded) {
+      return 'Update Monokle';
+    }
+  }
+  return 'Check for Update';
+};
+
 const appMenu = (store: any): MenuItemConstructorOptions => {
+  const config: AppConfig = store.getState().config;
   return {
-    label: 'Monokle',
+    label: `Monokle${config.newVersion.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
     submenu: [
       {
         label: 'About Monokle',
@@ -31,7 +44,8 @@ const appMenu = (store: any): MenuItemConstructorOptions => {
         },
       },
       {
-        label: 'Check for Update',
+        label: getUpdateMonokleText(config.newVersion),
+        enabled: config.newVersion.code !== NewVersionCode.Downloading,
         click: async () => {
           await checkNewVersion();
         },

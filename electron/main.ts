@@ -221,7 +221,11 @@ export const createWindow = (givenPath?: string) => {
   });
 
   autoUpdater.on('download-progress', (progressObj: any) => {
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: progressObj.percent}}));
+    let percent = 0;
+    if (progressObj && progressObj.percent) {
+      percent = progressObj.percent;
+    }
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}}));
   });
 
   autoUpdater.on('update-downloaded', (data: any) => {
