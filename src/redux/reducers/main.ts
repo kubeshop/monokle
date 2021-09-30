@@ -414,6 +414,29 @@ export const mainSlice = createSlice({
         const newFileEntry = createFileEntry(relativeFilePath);
         newFileEntry.timestamp = action.payload.fileTimestamp;
         state.fileMap[relativeFilePath] = newFileEntry;
+        const parentPath = path.join(path.sep, path.basename(path.dirname(relativeFilePath))).trim();
+        const childFileName = path.basename(relativeFilePath);
+        if (parentPath === path.sep) {
+          const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
+          if (rootFileEntry.children) {
+            rootFileEntry.children.push(childFileName);
+            rootFileEntry.children.sort();
+          } else {
+            rootFileEntry.children = [childFileName];
+          }
+        } else {
+          const parentPathFileEntry = state.fileMap[parentPath];
+          if (parentPathFileEntry) {
+            if (parentPathFileEntry.children !== undefined) {
+              parentPathFileEntry.children.push(childFileName);
+              parentPathFileEntry.children.sort();
+            } else {
+              parentPathFileEntry.children = [childFileName];
+            }
+          } else {
+            log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
+          }
+        }
       }
     });
   },
