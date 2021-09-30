@@ -25,7 +25,6 @@ import {
   KubeconfigPathTooltip,
 } from '@constants/tooltips';
 import {ipcRenderer} from 'electron';
-import {NewVersionCode} from '@models/appconfig';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -53,7 +52,6 @@ const StyledSelect = styled(Select)`
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
-  const newVersion = useAppSelector(state => state.config.newVersion);
 
   const appConfig = useAppSelector(state => state.config);
 
@@ -162,18 +160,6 @@ const SettingsDrawer = () => {
         </Tooltip>
       </StyledDiv>
       <Divider />
-      <StyledDiv>
-        {newVersion.code > NewVersionCode.Checking ? (
-          <StyledButton onClick={updateApplication} loading={newVersion.code === NewVersionCode.Downloading}>
-            {newVersion.code === NewVersionCode.Downloaded ? <span>Update Monokle</span> : null}
-            {newVersion.code === NewVersionCode.Downloading ? <span>Downloading the update..</span> : null}
-          </StyledButton>
-        ) : (
-          <StyledButton onClick={checkUpdateAvailability} loading={newVersion.code === NewVersionCode.Checking}>
-            Check New Version
-          </StyledButton>
-        )}
-      </StyledDiv>
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
         <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>

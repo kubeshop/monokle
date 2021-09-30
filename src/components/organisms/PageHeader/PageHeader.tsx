@@ -2,13 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-import {
-  CloseCircleOutlined,
-  GithubOutlined,
-  DownloadOutlined,
-  QuestionCircleOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+import {CloseCircleOutlined, GithubOutlined, QuestionCircleOutlined, SettingOutlined} from '@ant-design/icons';
 import {Badge} from 'antd';
 import {AppBorders} from '@styles/Borders';
 
@@ -26,7 +20,6 @@ import {stopPreview} from '@redux/services/preview';
 import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {openDocumentation, openGitHub} from '@utils/shell';
-import {NewVersionCode} from '@models/appconfig';
 
 const StyledLogo = styled.img`
   height: 24px;
@@ -63,10 +56,6 @@ const StyledSettingsOutlined = styled(SettingOutlined)`
 const StyledSettingsBadge = styled(Badge)`
   margin-right: 8px;
   margin-top: 13px;
-`;
-
-const StyledDownloadOutlined = styled(DownloadOutlined)`
-  color: ${FontColors.afford};
 `;
 
 const GitHubIconSpan = styled.span`
@@ -147,7 +136,6 @@ const PageHeader = () => {
   const [helmChart, setHelmChart] = useState<HelmChart>();
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const newVersion = useAppSelector(state => state.config.newVersion);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -225,7 +213,7 @@ const PageHeader = () => {
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>
-            <StyledSettingsBadge count={newVersion.code > NewVersionCode.Checking ? <StyledDownloadOutlined /> : null}>
+            <StyledSettingsBadge>
               <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
             </StyledSettingsBadge>
           </SettingsCol>
