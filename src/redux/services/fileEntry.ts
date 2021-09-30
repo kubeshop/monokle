@@ -269,7 +269,15 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
  */
 
 export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState) {
-  if (!fileEntry.timestamp || fs.statSync(absolutePath).mtime.getTime() > fileEntry.timestamp) {
+  let absolutePathTimestamp: number | undefined;
+  try {
+    absolutePathTimestamp = fs.statSync(absolutePath).mtime.getTime();
+  } catch (err) {
+    if (err instanceof Error) {
+      log.warn(`[reloadFile]: ${err.message}`);
+    }
+  }
+  if (!fileEntry.timestamp || (absolutePathTimestamp && absolutePathTimestamp > fileEntry.timestamp)) {
     log.info(`updating from file ${absolutePath}`);
 
     const resourcesInFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
