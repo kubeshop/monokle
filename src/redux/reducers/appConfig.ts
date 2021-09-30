@@ -10,8 +10,8 @@ import initialState from '../initialState';
 export const initKubeconfig = createAsyncThunk<{alert?: AlertType; kubeconfig: string}>(
   'config/initKubeconfig',
   async () => {
-    if (PROCESS_ENV.KUBECONFIG) {
-      const envKubeconfigParts = PROCESS_ENV.KUBECONFIG.split(path.delimiter);
+    if ((PROCESS_ENV as any).KUBECONFIG) {
+      const envKubeconfigParts = (PROCESS_ENV as any).KUBECONFIG.split(path.delimiter);
       if (envKubeconfigParts.length > 1) {
         return {
           alert: {
@@ -23,7 +23,7 @@ export const initKubeconfig = createAsyncThunk<{alert?: AlertType; kubeconfig: s
         };
       }
       return {
-        kubeconfig: PROCESS_ENV.KUBECONFIG,
+        kubeconfig: (PROCESS_ENV as any).KUBECONFIG,
       };
     }
     const storedKubeconfig = electronStore.get('appConfig.kubeconfig');
