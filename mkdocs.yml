@@ -26,7 +26,7 @@ nav:
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
   - Tutorials:
-    - tutorials/how-to-navigate-k8s-resources-and-their-the-manifests.md
+    - tutorials/navigate-and-edit-k8s-manifests.md
     - tutorials/how-to-browse-clusters.md
     - tutorials/configuring-monokle.md
     - tutorials/how-to-edit-configmap-API-object.md
