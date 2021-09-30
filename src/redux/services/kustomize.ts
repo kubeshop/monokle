@@ -3,7 +3,6 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import log from 'loglevel';
 import {createFileRef, getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
 
 /**
@@ -100,7 +99,6 @@ function extractPatches(
           }
         });
       } else {
-        log.warn(`No resources in ${refNode.nodeValue()} - creating FileRef to ${kpath}`);
         createFileRef(kustomization, refNode, kpath, fileMap);
       }
     } else {
