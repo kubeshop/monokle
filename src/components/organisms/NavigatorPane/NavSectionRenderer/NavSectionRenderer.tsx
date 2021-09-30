@@ -1,5 +1,5 @@
 import React, {useMemo, useState, useEffect, useCallback} from 'react';
-import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
+import {MinusSquareOutlined} from '@ant-design/icons';
 import {NavSection} from '@models/navsection';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseNavSections, expandNavSections} from '@redux/reducers/ui';
@@ -42,6 +42,7 @@ function NavSectionHeader(props: {
   isSectionVisible: boolean;
   isCollapsedMode: 'collapsed' | 'expanded' | 'mixed';
   level: number;
+  itemsLength: number;
   expandSection: () => void;
   collapseSection: () => void;
 }) {
@@ -56,6 +57,7 @@ function NavSectionHeader(props: {
     isSectionVisible,
     isCollapsedMode,
     level,
+    itemsLength,
     expandSection,
     collapseSection,
   } = props;
@@ -80,11 +82,12 @@ function NavSectionHeader(props: {
         level={level}
       >
         {name}
+        {itemsLength > 0 && <S.ItemsLength>{itemsLength}</S.ItemsLength>}
       </S.Name>
       {isHovered && isSectionInitialized && (
         <S.Collapsible>
           {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
-            <PlusSquareOutlined onClick={expandSection} />
+            <S.PlusSquareOutlined isSelected={isSectionSelected} onClick={expandSection} />
           )}
           {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
             <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
@@ -161,7 +164,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     } else {
       dispatch(expandNavSections([name, ...allVisibileNestedSubsectionNames]));
     }
-  }, [name, allVisibileNestedSubsectionNames, dispatch, expandNavSections]);
+  }, [name, allVisibileNestedSubsectionNames, dispatch]);
 
   const collapseSection = useCallback(() => {
     if (!allVisibileNestedSubsectionNames || allVisibileNestedSubsectionNames.length === 0) {
@@ -169,7 +172,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     } else {
       dispatch(collapseNavSections([name, ...allVisibileNestedSubsectionNames]));
     }
-  }, [name, allVisibileNestedSubsectionNames, dispatch, collapseNavSections]);
+  }, [name, allVisibileNestedSubsectionNames, dispatch]);
 
   useEffect(() => {
     if (shouldSectionExpand) {
@@ -201,7 +204,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     } else {
       onHidden(name);
     }
-  }, [isSectionVisible]);
+  }, [isSectionVisible, name, onHidden, onVisible]);
 
   useEffect(() => {
     subsections?.forEach(subsection => {
@@ -211,7 +214,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         onVisible(subsection.name);
       }
     });
-  }, [subsections, hiddenSubsectionNames]);
+  }, [subsections, hiddenSubsectionNames, onHidden, onVisible]);
 
   const visibleSubsections = useMemo(
     () => subsections?.filter(s => !hiddenSubsectionNames.includes(s.name)),
@@ -236,7 +239,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
       const lastVisibleItem = groupVisibleItems[groupVisibleItems.length - 1];
       return Boolean(lastVisibleItem && getItemIdentifier(lastVisibleItem) === getItemIdentifier(item));
     },
-    [groupedItems, getItemIdentifier]
+    [groupedItems, getItemIdentifier, isItemVisible]
   );
 
   const isLastVisibleSection = useCallback(
@@ -244,7 +247,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
       const lastVisibleSection = visibleSubsections ? visibleSubsections[visibleSubsections.length - 1] : undefined;
       return Boolean(lastVisibleSection && lastVisibleSection.name === subsectionName);
     },
-    [visibleSubsections, getItemIdentifier]
+    [visibleSubsections]
   );
 
   if (isSectionLoading) {
@@ -264,6 +267,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         isSectionVisible={isSectionVisible}
         isCollapsedMode={isCollapsedMode}
         level={level}
+        itemsLength={visibleItems.length}
         expandSection={expandSection}
         collapseSection={collapseSection}
       />
