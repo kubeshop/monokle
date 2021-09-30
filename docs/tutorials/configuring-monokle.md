@@ -1,6 +1,6 @@
 # Configuring Monokle
 
-Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the yaml syntax. 
+Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
 
 In this tutorial, we have illustrated the steps to configure Monokle Environment. 
 

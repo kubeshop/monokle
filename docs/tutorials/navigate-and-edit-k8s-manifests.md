@@ -1,7 +1,7 @@
 # Navigate and Edit K8s  Manifests
 
 
-Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the yaml syntax. 
+Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
 
 In this tutorial, we have illustrated the steps to help you navigate K8s resources and edit their manifests for faster deployment. 
 
@@ -11,8 +11,7 @@ Let’s get started.
 
 ![Browse](img/browse-1.png)
 
-**<em>Note:** Please follow this Getting Started guide to install Monokle 🚀</em>
-
+<em>**Note:** Please follow this Getting Started guide to install Monokle 🚀</em>
 
 **Step 2:** Select your folder to parse its manifest in the file explorer. 
 
@@ -66,5 +65,5 @@ The editing menu includes the following options:
 
 Thus, you can navigate K8s resources and edit their manifests.
 
-If you still have doubts, feel free to connect with us. Monokle is your K8s best friend!
+Got queries? Please feel free to join our open source community on Discord with this [invite link](https://discord.gg/6zupCZFQbe) and start your discussion.
 
