@@ -382,6 +382,7 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
 
       parentEntry.children = parentEntry.children || [];
       parentEntry.children.push(fileEntry.name);
+      parentEntry.children.sort();
     }
 
     return fileEntry;
