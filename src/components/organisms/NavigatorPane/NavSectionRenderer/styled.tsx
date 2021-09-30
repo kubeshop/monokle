@@ -1,8 +1,9 @@
 import Colors from '@styles/Colors';
 import styled from 'styled-components';
 import {Skeleton as RawSkeleton} from 'antd';
+import {PlusSquareOutlined as RawPlusSquareOutlined} from '@ant-design/icons';
 
-export const NameContainer = styled.li<{
+type NameContainerProps = {
   isSelected?: boolean;
   isHighlighted?: boolean;
   isHovered?: boolean;
@@ -11,7 +12,9 @@ export const NameContainer = styled.li<{
   hasSubsections?: boolean;
   isVisible?: boolean;
   isInitialized?: boolean;
-}>`
+};
+
+export const NameContainer = styled.li<NameContainerProps>`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -79,4 +82,12 @@ export const Collapsible = styled.span`
 export const Skeleton = styled(RawSkeleton)`
   margin: 20px;
   width: 90%;
+`;
+
+export const PlusSquareOutlined = styled(RawPlusSquareOutlined)<{isSelected: boolean}>`
+  ${props => {
+    if (props.isSelected) {
+      return `color: ${Colors.blackPure}`;
+    }
+  }}
 `;
