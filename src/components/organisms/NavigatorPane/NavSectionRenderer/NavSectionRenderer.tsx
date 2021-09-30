@@ -42,6 +42,7 @@ function NavSectionHeader(props: {
   isSectionVisible: boolean;
   isCollapsedMode: 'collapsed' | 'expanded' | 'mixed';
   level: number;
+  itemsLength: number;
   expandSection: () => void;
   collapseSection: () => void;
 }) {
@@ -56,6 +57,7 @@ function NavSectionHeader(props: {
     isSectionVisible,
     isCollapsedMode,
     level,
+    itemsLength,
     expandSection,
     collapseSection,
   } = props;
@@ -80,6 +82,7 @@ function NavSectionHeader(props: {
         level={level}
       >
         {name}
+        {itemsLength > 0 && <S.ItemsLength>{itemsLength}</S.ItemsLength>}
       </S.Name>
       {isHovered && isSectionInitialized && (
         <S.Collapsible>
@@ -264,6 +267,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
         isSectionVisible={isSectionVisible}
         isCollapsedMode={isCollapsedMode}
         level={level}
+        itemsLength={visibleItems.length}
         expandSection={expandSection}
         collapseSection={collapseSection}
       />
