@@ -4,6 +4,13 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {ipcRenderer} from 'electron';
+import styled from 'styled-components';
+
+const StyledModal = styled(Modal)`
+  .ant-modal {
+    z-index: 1000;
+  }
+`;
 
 const UpdateModal = () => {
   const dispatch = useAppDispatch();
@@ -43,7 +50,7 @@ const UpdateModal = () => {
   );
 
   return (
-    <Modal
+    <StyledModal
       visible={isModalVisible}
       title="Update Monokle 🚀"
       centered
@@ -64,7 +71,7 @@ const UpdateModal = () => {
       {newVersion.code === NewVersionCode.Errored ? getErrorMessage(newVersion.data?.errorCode) : null}
       {newVersion.code === NewVersionCode.NotAvailable ? <div>New version is not available!</div> : null}
       {newVersion.code === NewVersionCode.Downloaded ? <div>New version is downloaded!</div> : null}
-    </Modal>
+    </StyledModal>
   );
 };
 

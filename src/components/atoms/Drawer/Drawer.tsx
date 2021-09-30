@@ -13,6 +13,7 @@ const Drawer = styled((props: DrawerProps) => <AntDrawer {...props} />)`
     `
     padding: 1px;
     margin: 0px;
+    z-index: 100;
   `};
 `;
 
