@@ -101,10 +101,11 @@ function extractPatches(
         });
       } else {
         log.warn(`No resources in ${refNode.nodeValue()} - creating FileRef to ${kpath}`);
-        createFileRef(kustomization, refNode, kpath);
+        createFileRef(kustomization, refNode, kpath, fileMap);
       }
     } else {
-      log.warn(`Failed to find ${patchPath} ${refNode.nodeValue()} in ${kustomization.filePath}`);
+      // this will create an unsatisfied file ref
+      createFileRef(kustomization, refNode, kpath, fileMap);
     }
   });
 }

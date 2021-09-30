@@ -266,8 +266,8 @@ export function createResourceName(filePath: string, content: any) {
  * Adds a file ref to the specified file to the specified resource
  */
 
-export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string) {
-  let refType = ResourceRefType.Outgoing;
+export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string, fileMap: FileMapType) {
+  let refType = fileMap[filePath] ? ResourceRefType.Outgoing : ResourceRefType.Unsatisfied;
   resource.refs = resource.refs || [];
   const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
 
