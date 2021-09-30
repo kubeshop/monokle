@@ -53,4 +53,4 @@ The comparison table will look like this:
 
 Thus you can browse cluster resources. 
 
-If you still have doubts, feel free to connect with us. Monokle is your K8s best friend!
+Got queries? Please feel free to join our open source community on Discord with this [invite link](https://discord.gg/6zupCZFQbe) and start your discussion.
