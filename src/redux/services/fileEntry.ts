@@ -366,9 +366,16 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
   if (parentEntry) {
-    const fileEntry = fs.statSync(absolutePath).isDirectory()
-      ? addFolder(absolutePath, state, appConfig)
-      : addFile(absolutePath, state);
+    let isDirectory: boolean;
+    try {
+      isDirectory = fs.statSync(absolutePath).isDirectory();
+    } catch (err) {
+      if (err instanceof Error) {
+        log.warn(`[addPath]: ${err.message}`);
+      }
+      return undefined;
+    }
+    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state);
 
     if (fileEntry) {
       state.fileMap[fileEntry.filePath] = fileEntry;
