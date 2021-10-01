@@ -106,7 +106,11 @@ export const configSlice = createSlice({
       state.settings.helmPreviewMode = action.payload;
     },
     setNewVersion: (state: Draft<AppConfig>, action: PayloadAction<{code: NewVersionCode; data: any}>) => {
-      state.newVersion = action.payload;
+      state.newVersion.code = action.payload.code;
+      state.newVersion.data = {
+        ...(state.newVersion.data && {}),
+        ...action.payload.data,
+      };
     },
     setLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.loadLastFolderOnStartup = action.payload;
