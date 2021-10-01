@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import 'antd/dist/antd.less';
 import {Layout} from '@atoms';
 import {
@@ -82,14 +82,24 @@ const App = () => {
     remote.getCurrentWindow().setTitle('Monokle');
   }, [isInPreviewMode, previewType, previewResource, previewResourceId, previewValuesFile, helmChart, fileMap]);
 
-  ipcRenderer.on('missing-dependency-result', (_, {dependencies}) => {
-    const alert: AlertType = {
-      type: AlertEnum.Warning,
-      title: 'Missing dependency',
-      message: `${dependencies.toString()} must be installed for all Monokle functionality to be available`,
+  const onMissingDependencyResult = useCallback(
+    (_, {dependencies}) => {
+      const alert: AlertType = {
+        type: AlertEnum.Warning,
+        title: 'Missing dependency',
+        message: `${dependencies.toString()} must be installed for all Monokle functionality to be available`,
+      };
+      dispatch(setAlert(alert));
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    ipcRenderer.on('missing-dependency-result', onMissingDependencyResult);
+    return () => {
+      ipcRenderer.removeListener('missing-dependency-result', onMissingDependencyResult);
     };
-    dispatch(setAlert(alert));
-  });
+  }, [onMissingDependencyResult]);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
