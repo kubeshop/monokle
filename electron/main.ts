@@ -137,7 +137,7 @@ ipcMain.on('quit-and-install', () => {
 
 export const checkNewVersion = async (initial?: boolean) => {
   try {
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Checking, data: null}));
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Checking, data: {initial: Boolean(initial)}}));
     await autoUpdater.checkForUpdates();
   } catch (error: any) {
     if (error.errno === -2) {
