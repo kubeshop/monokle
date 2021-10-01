@@ -80,7 +80,7 @@
     "antd": "4.16.13",
     "chokidar": "3.5.2",
     "dagre": "0.8.5",
-    "dayjs": "1.10.6",
+    "dayjs": "1.10.7",
     "electron-devtools-installer": "3.2.0",
     "electron-log": "4.4.1",
     "electron-redux": "1.5.4",
