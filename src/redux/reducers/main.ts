@@ -25,6 +25,7 @@ import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {K8sResource} from '@models/k8sresource';
 import {AlertType} from '@models/alert';
 import {getResourceKindHandler} from '@src/kindhandlers';
+import {getFileStats} from '@utils/files';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
@@ -117,7 +118,7 @@ export const mainSlice = createSlice({
       const appConfig = action.payload.appConfig;
       let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
       if (fileEntry) {
-        if (!fs.statSync(filePath).isDirectory()) {
+        if (getFileStats(filePath)?.isDirectory() === false) {
           log.info(`added file ${filePath} already exists - updating`);
           reloadFile(filePath, fileEntry, state);
         }
@@ -160,9 +161,9 @@ export const mainSlice = createSlice({
           let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
           const filePath = path.join(rootFolder, action.payload.path);
 
-          if (!fs.statSync(filePath).isDirectory()) {
+          if (getFileStats(filePath)?.isDirectory() === false) {
             fs.writeFileSync(filePath, action.payload.content);
-            fileEntry.timestamp = fs.statSync(filePath).mtime.getTime();
+            fileEntry.timestamp = getFileStats(filePath)?.mtime.getTime();
 
             getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
               delete state.resourceMap[r.id];

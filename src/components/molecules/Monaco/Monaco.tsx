@@ -19,6 +19,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {useSelector} from 'react-redux';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {getFileStats} from '@utils/files';
 import useCodeIntel from './useCodeIntel';
 import useEditorKeybindings from './useEditorKeybindings';
 import useResourceYamlSchema from './useResourceYamlSchema';
@@ -150,7 +151,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       }
     } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
       const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
-      if (!fs.statSync(filePath).isDirectory()) {
+      if (getFileStats(filePath)?.isDirectory() === false) {
         newCode = fs.readFileSync(filePath, 'utf8');
       }
     }

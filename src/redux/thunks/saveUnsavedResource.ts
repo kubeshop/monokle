@@ -6,7 +6,7 @@ import {AppDispatch, RootState} from '@redux/store';
 import {isUnsavedResource} from '@redux/services/resource';
 import {YAML_DOCUMENT_DELIMITER, ROOT_FILE_ENTRY} from '@constants/constants';
 import {AlertEnum, AlertType} from '@models/alert';
-import {isSubDirectory} from '@utils/files';
+import {getFileStats, isSubDirectory} from '@utils/files';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {addResource} from '@redux/reducers/main';
 import {createPreviewRejection} from './utils';
@@ -57,7 +57,12 @@ export const saveUnsavedResource = createAsyncThunk<
     return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'Could not find the resource.');
   }
 
-  const isDirectory = fs.statSync(absolutePath).isDirectory();
+  const pathStats = getFileStats(absolutePath);
+  if (pathStats === undefined) {
+    return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'Could not load stats for selected path');
+  }
+
+  const isDirectory = pathStats.isDirectory();
   let absoluteFilePath = absolutePath;
 
   /** if the absolute path is a directory, we will use the resource.name to create a new fileName */
@@ -111,7 +116,7 @@ export const saveUnsavedResource = createAsyncThunk<
     await writeFilePromise(absoluteFilePath, resource.text);
   }
 
-  const fileTimestamp = fs.statSync(absolutePath).mtime.getTime();
+  const fileTimestamp = getFileStats(absolutePath)?.mtime.getTime();
 
   return {
     resourceId,
