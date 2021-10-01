@@ -10,6 +10,7 @@ import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {getDependentResourceKinds} from '@src/kindhandlers';
 import {v4 as uuidv4} from 'uuid';
+import {getFileStats} from '@utils/files';
 import {validateResource} from './validation';
 import {processRefs} from './resourceRefs';
 
@@ -337,7 +338,7 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       fs.writeFileSync(absoluteResourcePath, newValue);
     }
 
-    fileEntry.timestamp = fs.statSync(absoluteResourcePath).mtime.getTime();
+    fileEntry.timestamp = getFileStats(absoluteResourcePath)?.mtime.getTime();
   }
 
   return valueToWrite;
@@ -523,7 +524,7 @@ export function removeResourceFromFile(
     content.substr(0, removedResource.range.start) +
       content.substr(removedResource.range.start + removedResource.range.length)
   );
-  fileEntry.timestamp = fs.statSync(absoluteFilePath).mtime.getTime();
+  fileEntry.timestamp = getFileStats(absoluteFilePath)?.mtime.getTime();
 
   delete resourceMap[removedResource.id];
 }

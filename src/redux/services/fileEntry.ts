@@ -10,6 +10,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/services/selection';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {v4 as uuidv4} from 'uuid';
+import {getFileStats} from '@utils/files';
 import {extractK8sResources, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
@@ -74,7 +75,7 @@ function processHelmChartFolder(
 
     if (fileIsExcluded(appConfig, fileEntry)) {
       fileEntry.isExcluded = true;
-    } else if (fs.statSync(filePath).isDirectory()) {
+    } else if (getFileStats(filePath)?.isDirectory()) {
       fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
     } else if (micromatch.isMatch(file, '*values*.yaml')) {
       const helmValues: HelmValuesFile = {
@@ -142,7 +143,7 @@ export function readFiles(
 
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
-      } else if (fs.statSync(filePath).isDirectory()) {
+      } else if (getFileStats(filePath)?.isDirectory()) {
         fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {

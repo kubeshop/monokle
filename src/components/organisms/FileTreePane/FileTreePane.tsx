@@ -26,8 +26,8 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {ipcRenderer} from 'electron';
 import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
-import fs from 'fs';
 import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
+import {getFileStats} from '@utils/files';
 
 interface TreeNode {
   key: string;
@@ -344,7 +344,7 @@ const FileTreePane = () => {
   useEffect(() => {
     ipcRenderer.on('executed-from', (_, data) => {
       const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
-      if (folder && fs.statSync(folder)?.isDirectory()) {
+      if (folder && getFileStats(folder)?.isDirectory()) {
         setFolder(folder);
         setAutoExpandParent(true);
       }
