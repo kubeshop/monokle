@@ -233,10 +233,6 @@ export const createWindow = (givenPath?: string) => {
     mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
   });
 
-  autoUpdater.on('error', error => {
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -10}}));
-  });
-
   const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
 
   if (missingDependecies.length > 0) {
