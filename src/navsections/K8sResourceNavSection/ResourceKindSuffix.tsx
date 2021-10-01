@@ -15,7 +15,7 @@ const StyledIconsContainer = styled.span`
 `;
 
 const Suffix = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
-  const {item} = props;
+  const {item, isItemDisabled} = props;
   const dispatch = useAppDispatch();
 
   const onClickErrorIcon = () => {
@@ -26,7 +26,7 @@ const Suffix = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
 
   return (
     <>
-      <ResourceRefsIconPopover resource={item} type="outgoing" />
+      <ResourceRefsIconPopover isDisabled={isItemDisabled} resource={item} type="outgoing" />
       {item.validation && !item.validation.isValid && (
         <Popover
           placement="right"

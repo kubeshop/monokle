@@ -34,6 +34,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
     {
       isHovered,
       isSelected,
+      isDisabled,
     }
   );
 
