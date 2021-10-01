@@ -231,6 +231,7 @@ const viewMenu = (store: any): MenuItemConstructorOptions => {
           store.dispatch(toggleLeftMenu());
         },
       },
+      {role: 'toggleDevTools'},
       {
         label: 'Reset Layout',
         click: () => {
