@@ -1,5 +1,4 @@
-import * as React from 'react';
-import {useEffect, useContext} from 'react';
+import React, {useCallback, useEffect, useContext} from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
@@ -240,13 +239,16 @@ const FileTreePane = () => {
     {isDirectoryExplorer: true}
   );
 
-  const setFolder = (folder: string) => {
-    dispatch(setRootFolder(folder));
-  };
+  const setFolder = useCallback(
+    (folder: string) => {
+      dispatch(setRootFolder(folder));
+    },
+    [dispatch]
+  );
 
-  const refreshFolder = () => {
+  const refreshFolder = useCallback(() => {
     setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
-  };
+  }, [fileMap, setFolder]);
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
@@ -334,22 +336,30 @@ const FileTreePane = () => {
       openFileExplorer();
       dispatch(closeFolderExplorer());
     }
-  }, [uiState]);
+  }, [uiState, dispatch, openFileExplorer]);
 
   const onExpand = (expandedKeysValue: React.Key[]) => {
     setExpandedKeys(expandedKeysValue);
     setAutoExpandParent(false);
   };
 
-  useEffect(() => {
-    ipcRenderer.on('executed-from', (_, data) => {
+  const onExecutedFrom = useCallback(
+    (_, data) => {
       const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
       if (folder && getFileStats(folder)?.isDirectory()) {
         setFolder(folder);
         setAutoExpandParent(true);
       }
-    });
-  }, [loadLastFolderOnStartup, recentFolders]);
+    },
+    [loadLastFolderOnStartup, setFolder, recentFolders]
+  );
+
+  useEffect(() => {
+    ipcRenderer.on('executed-from', onExecutedFrom);
+    return () => {
+      ipcRenderer.removeListener('executed-from', onExecutedFrom);
+    };
+  }, [onExecutedFrom]);
 
   return (
     <FileTreeContainer>
