@@ -54,10 +54,6 @@ ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
 });
 
-ipcMain.on('init-kubeconfig', () => {
-  initKubeconfig(mainStore, userHomeDir);
-});
-
 /**
  * called by thunk to preview a kustomization
  */
@@ -251,6 +247,7 @@ export const createWindow = (givenPath?: string) => {
 
   win.webContents.on('did-finish-load', async () => {
     await checkNewVersion(true);
+    initKubeconfig(mainStore, userHomeDir);
     win.webContents.send('executed-from', {path: givenPath});
   });
 

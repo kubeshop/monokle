@@ -2,14 +2,14 @@ import path from 'path';
 import {PROCESS_ENV} from '@utils/env';
 import {AlertEnum} from '@models/alert';
 import electronStore from '@utils/electronStore';
-import {setKubeconfig} from '@redux/reducers/appConfig';
 import {setAlert} from '@redux/reducers/alert';
+import {updateKubeconfig} from '@redux/reducers/appConfig';
 
 function initKubeconfig(store: any, userHomeDir: string) {
   if (PROCESS_ENV.KUBECONFIG) {
     const envKubeconfigParts = PROCESS_ENV.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
-      store.dispatch(setKubeconfig(envKubeconfigParts[0]));
+      store.dispatch(updateKubeconfig(envKubeconfigParts[0]));
       store.dispatch(
         setAlert({
           title: 'KUBECONFIG warning',
@@ -18,16 +18,16 @@ function initKubeconfig(store: any, userHomeDir: string) {
         })
       );
     } else {
-      store.dispatch(setKubeconfig(PROCESS_ENV.KUBECONFIG));
+      store.dispatch(updateKubeconfig(PROCESS_ENV.KUBECONFIG));
     }
     return;
   }
   const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
-    store.dispatch(setKubeconfig(storedKubeconfig));
+    store.dispatch(updateKubeconfig(storedKubeconfig));
     return;
   }
-  store.dispatch(setKubeconfig(path.join(userHomeDir, `${path.sep}.kube${path.sep}config`)));
+  store.dispatch(updateKubeconfig(path.join(userHomeDir, `${path.sep}.kube${path.sep}config`)));
 }
 
 export default initKubeconfig;

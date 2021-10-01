@@ -33,11 +33,6 @@ const App = () => {
   const mainHeight = `${size.height}px`;
 
   useEffect(() => {
-    ipcRenderer.send('init-kubeconfig');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     if (mainState.previewType && mainState.previewResourceId) {
       remote.getCurrentWindow().setTitle(mainState.previewResourceId);
     } else if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].filePath) {
