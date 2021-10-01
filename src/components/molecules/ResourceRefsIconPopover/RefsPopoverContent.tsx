@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {ResourceMapType} from '@models/appstate';
 import styled from 'styled-components';
@@ -72,6 +72,22 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const previewType = useAppSelector(state => state.main.previewType);
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+
+  const isRefLinkDisabled = useCallback(
+    (ref: ResourceRef) => {
+      if (previewType === 'kustomization' && ref.target?.type === 'resource') {
+        const targetResourceId = ref.target.resourceId;
+        const targetResource = targetResourceId ? resourceMap[targetResourceId] : undefined;
+        if (targetResource?.kind === 'Kustomization' && targetResourceId !== previewResourceId) {
+          return true;
+        }
+      }
+      return false;
+    },
+    [resourceMap, previewResourceId, previewType]
+  );
 
   const processedRefsWithKeys = useMemo(() => {
     return resourceRefs
@@ -192,7 +208,12 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
       <StyledDivider />
       {processedRefsWithKeys.map(({ref, key}) => (
         <StyledRefDiv key={key}>
-          <RefLink resourceRef={ref} resourceMap={resourceMap} onClick={() => onLinkClick(ref)} />
+          <RefLink
+            isDisabled={isRefLinkDisabled(ref)}
+            resourceRef={ref}
+            resourceMap={resourceMap}
+            onClick={() => onLinkClick(ref)}
+          />
         </StyledRefDiv>
       ))}
     </Container>

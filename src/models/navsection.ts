@@ -4,6 +4,7 @@ export type NavSectionItemCustomComponentProps<ItemType> = {
   item: ItemType;
   isItemHovered: boolean;
   isItemSelected: boolean;
+  isItemDisabled: boolean;
 };
 
 export type NavSectionItemCustomComponent<ItemType> = React.ComponentType<NavSectionItemCustomComponentProps<ItemType>>;
