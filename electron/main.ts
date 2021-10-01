@@ -36,6 +36,7 @@ import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 
+import initKubeconfig from './src/initKubeconfig';
 import {createMenu, getDockMenu} from './menu';
 import terminal from '../cli/terminal';
 
@@ -51,6 +52,10 @@ const APP_DEPENDENCIES = ['kubectl', 'helm'];
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
+});
+
+ipcMain.on('init-kubeconfig', () => {
+  initKubeconfig(mainStore, userHomeDir);
 });
 
 /**

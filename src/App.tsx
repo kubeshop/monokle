@@ -18,7 +18,6 @@ import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {AppState} from '@models/appstate';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
-import {initKubeconfig} from '@redux/reducers/appConfig';
 import {ipcRenderer, remote} from 'electron';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
@@ -34,7 +33,7 @@ const App = () => {
   const mainHeight = `${size.height}px`;
 
   useEffect(() => {
-    dispatch(initKubeconfig());
+    ipcRenderer.send('init-kubeconfig');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

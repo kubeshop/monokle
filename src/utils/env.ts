@@ -59,8 +59,4 @@ function shellEnvSync() {
   }
 }
 
-const PROCESS_ENV_LOADED = shellEnvSync();
-
-console.log('env', PROCESS_ENV_LOADED);
-
-export const PROCESS_ENV = PROCESS_ENV_LOADED;
+export const PROCESS_ENV: any = shellEnvSync();
