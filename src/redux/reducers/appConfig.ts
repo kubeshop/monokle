@@ -108,7 +108,7 @@ export const configSlice = createSlice({
     setNewVersion: (state: Draft<AppConfig>, action: PayloadAction<{code: NewVersionCode; data: any}>) => {
       state.newVersion.code = action.payload.code;
       state.newVersion.data = {
-        ...(state.newVersion.data && {}),
+        ...(state.newVersion.data || {}),
         ...action.payload.data,
       };
     },
