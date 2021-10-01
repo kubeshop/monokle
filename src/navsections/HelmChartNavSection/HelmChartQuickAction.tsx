@@ -2,7 +2,7 @@ import React, {useCallback, useMemo} from 'react';
 import {NavSectionItemCustomComponentProps} from '@models/navsection';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
-import {startPreview, stopPreview} from '@redux/services/preview';
+import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {ExitHelmPreviewTooltip, HelmPreviewTooltip, ReloadHelmPreviewTooltip} from '@constants/tooltips';
 import QuickActionPreview from '@components/molecules/QuickActionPreview';
 import {HelmValuesFile} from '@models/helm';
@@ -18,7 +18,7 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<HelmValuesFile>) 
     [previewValuesFileId, item]
   );
 
-  const selectAndPreviewKustomization = useCallback(() => {
+  const selectAndPreviewHelmValuesFile = useCallback(() => {
     if (item.id !== selectedValuesFileId) {
       dispatch(selectHelmValuesFile({valuesFileId: item.id}));
     }
@@ -27,15 +27,15 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<HelmValuesFile>) 
     } else {
       stopPreview(dispatch);
     }
-  }, [item, selectedValuesFileId, previewValuesFileId]);
+  }, [item, selectedValuesFileId, previewValuesFileId, dispatch]);
 
   const reloadPreview = useCallback(() => {
     if (item.id !== selectedValuesFileId) {
       dispatch(selectHelmValuesFile({valuesFileId: item.id}));
     }
 
-    startPreview(item.id, 'helm', dispatch);
-  }, [item, selectedValuesFileId]);
+    restartPreview(item.id, 'helm', dispatch);
+  }, [item, selectedValuesFileId, dispatch]);
 
   if (!isItemHovered) {
     return null;
@@ -48,7 +48,7 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<HelmValuesFile>) 
       previewTooltip={HelmPreviewTooltip}
       reloadPreviewTooltip={ReloadHelmPreviewTooltip}
       exitPreviewTooltip={ExitHelmPreviewTooltip}
-      selectAndPreview={selectAndPreviewKustomization}
+      selectAndPreview={selectAndPreviewHelmValuesFile}
       reloadPreview={reloadPreview}
     />
   );

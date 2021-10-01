@@ -26,6 +26,7 @@ export const startPreview = (
     dispatch(previewHelmValuesFile(targetResourceId));
   }
 };
+
 export const restartPreview = (
   targetResourceId: string,
   type: 'kustomization' | 'cluster' | 'helm',
