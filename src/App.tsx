@@ -18,7 +18,6 @@ import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useSelector} from 'react-redux';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
-import {initKubeconfig} from '@redux/reducers/appConfig';
 import {ipcRenderer, remote} from 'electron';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
@@ -45,11 +44,6 @@ const App = () => {
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
 
   const mainHeight = `${size.height}px`;
-
-  useEffect(() => {
-    dispatch(initKubeconfig());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (previewResourceId) {

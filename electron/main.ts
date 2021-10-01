@@ -36,6 +36,7 @@ import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 
+import initKubeconfig from './src/initKubeconfig';
 import {createMenu, getDockMenu} from './menu';
 import terminal from '../cli/terminal';
 
@@ -242,6 +243,7 @@ export const createWindow = (givenPath?: string) => {
 
   win.webContents.on('did-finish-load', async () => {
     await checkNewVersion(true);
+    initKubeconfig(mainStore, userHomeDir);
     win.webContents.send('executed-from', {path: givenPath});
   });
 

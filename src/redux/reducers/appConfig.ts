@@ -1,43 +1,7 @@
-import path from 'path';
-import {ipcRenderer} from 'electron';
 import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {AppConfig, Themes, TextSizes, Languages, NewVersionCode} from '@models/appconfig';
 import electronStore from '@utils/electronStore';
-import {PROCESS_ENV} from '@utils/env';
-import {AlertEnum, AlertType} from '@models/alert';
 import initialState from '../initialState';
-
-export const initKubeconfig = createAsyncThunk<{alert?: AlertType; kubeconfig: string}>(
-  'config/initKubeconfig',
-  async () => {
-    if ((PROCESS_ENV as any).KUBECONFIG) {
-      const envKubeconfigParts = (PROCESS_ENV as any).KUBECONFIG.split(path.delimiter);
-      if (envKubeconfigParts.length > 1) {
-        return {
-          alert: {
-            title: 'KUBECONFIG warning',
-            message: 'Found multiple configs, selected the first one.',
-            type: AlertEnum.Warning,
-          },
-          kubeconfig: envKubeconfigParts[0],
-        };
-      }
-      return {
-        kubeconfig: (PROCESS_ENV as any).KUBECONFIG,
-      };
-    }
-    const storedKubeconfig = electronStore.get('appConfig.kubeconfig');
-    if (storedKubeconfig) {
-      return {
-        kubeconfig: electronStore.get('appConfig.kubeconfig'),
-      };
-    }
-    const userHome = ipcRenderer.sendSync('get-user-home-dir');
-    return {
-      kubeconfig: path.join(userHome, `${path.sep}.kube${path.sep}config`),
-    };
-  }
-);
 
 export const updateStartupModalVisible = createAsyncThunk(
   'config/updateStartupModalVisible',
@@ -151,12 +115,7 @@ export const configSlice = createSlice({
       state.recentFolders = action.payload;
     },
   },
-  extraReducers: builder => {
-    builder.addCase(initKubeconfig.fulfilled, (state, action) => {
-      state.kubeconfigPath = action.payload.kubeconfig;
-    });
-  },
 });
 
-export const {setFilterObjects, setAutoZoom} = configSlice.actions;
+export const {setFilterObjects, setAutoZoom, setKubeconfig} = configSlice.actions;
 export default configSlice.reducer;
