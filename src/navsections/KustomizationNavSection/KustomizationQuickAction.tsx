@@ -3,7 +3,7 @@ import {NavSectionItemCustomComponentProps} from '@models/navsection';
 import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
-import {startPreview, stopPreview} from '@redux/services/preview';
+import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {
   ExitKustomizationPreviewTooltip,
   KustomizationPreviewTooltip,
@@ -31,15 +31,15 @@ const QuickAction = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
     } else {
       stopPreview(dispatch);
     }
-  }, [item, selectedResourceId, previewResourceId]);
+  }, [item, selectedResourceId, previewResourceId, dispatch]);
 
   const reloadPreview = useCallback(() => {
     if (item.id !== selectedResourceId) {
       dispatch(selectK8sResource({resourceId: item.id}));
     }
 
-    startPreview(item.id, 'kustomization', dispatch);
-  }, [item, selectedResourceId]);
+    restartPreview(item.id, 'kustomization', dispatch);
+  }, [item, selectedResourceId, dispatch]);
 
   if (!isItemHovered) {
     return null;
