@@ -173,7 +173,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
       return true;
     }
-    if (selectedValuesFileId !== previewValuesFileId) {
+    if (isInPreviewMode && selectedValuesFileId !== previewValuesFileId) {
       return true;
     }
     if (!selectedPath && !selectedResourceId) {
