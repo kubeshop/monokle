@@ -1,8 +1,8 @@
-# How to Edit ConfigMap 
+# How to Create and Edit ConfigMap 
 
 Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
 
-In this tutorial, we have illustrated how to edit ConfigMap API objects to store non-confidential data in key-value pairs.       
+In this tutorial, we have illustrated how to create and edit ConfigMap API objects to store non-confidential data in key-value pairs.       
 
 Let’s get started. 
 
@@ -24,22 +24,31 @@ In the file explorer, you can view manifests, including their resources, and the
 
 Once you select a manifest, its related resources shall be highlighted automatically in the navigator. 
 
-**Step 4:** Navigate and select the ConfigMap API object in the Navigator.  
+## Create Resource
+
+**Step 1:** Click on the Add button in the Navigator to launch the Add New Resource dialog for creating resources. 
+
+![Add Resource](img/add-resource.png)
+
+**Step 2:** For adding resources to new or existing files in the navigator, click on the Save button at the top-right corner of the interface.
+
+![Resource save](img/add-resource-save.png)
+
+## Using Editor 
+
+**Step 1:** Navigate and select the ConfigMap API object in the Navigator.  
 
 ![Image 4](img/image-4.png)
 
 Once you select a resource, its source code will be launched automatically in the editor. 
 
-## Using Editor 
-
 Using Editor allows you to view and edit the source code easily. 
 
-**Step 1:** Click on the Source button to view and edit the source code. 
+**Step 2:** Click on the Source button to view and edit the source code. 
 
 ![Image 5](img/image-5.png)
 
-
-**Step 2:** Right-click anywhere on the editor to launch the menu and select the required editing option from the drop-down list. 
+**Step 3:** Right-click anywhere on the editor to launch the menu and select the required editing option from the drop-down list. 
 
 ![Image 6](img/image-6.png)
 
@@ -92,7 +101,6 @@ For editing object metadata you need to provide a specific name, namespace, anno
 ![Image 13](img/image-13.png)
 
 <em>**Note:** The name of the ConfigMap must be unique within a namespace.</em>
-
 
 ### For Namespace
 

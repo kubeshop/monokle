@@ -29,7 +29,7 @@ nav:
     - tutorials/how-to-navigate-and-edit-manifests.md
     - tutorials/how-to-browse-clusters.md
     - tutorials/how-to-configure-monokle.md
-    - tutorials/how-to-edit-configmap.md
+    - tutorials/how-to-create-and-edit-configmap.md
 
 extra:
   analytics:
