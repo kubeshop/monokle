@@ -23,7 +23,6 @@ In the file explorer, you can view manifests, including their resources, and the
 ![Image 3](img/image-3.gif)
 
 Once you select a manifest, its related resources shall be highlighted automatically in the navigator. 
-
 ## Create Resource
 
 **Step 1:** Click on the Add button in the Navigator to launch the Add New Resource dialog for creating resources. 
@@ -33,7 +32,6 @@ Once you select a manifest, its related resources shall be highlighted automatic
 **Step 2:** For adding resources to new or existing files in the navigator, click on the Save button at the top-right corner of the interface.
 
 ![Resource save](img/add-resource-save.png)
-
 ## Using Editor 
 
 **Step 1:** Navigate and select the ConfigMap API object in the Navigator.  
@@ -53,13 +51,11 @@ Using Editor allows you to view and edit the source code easily.
 ![Image 6](img/image-6.png)
 
 You can also edit the source code using Form Editor that does not require any coding effort. 
-
 ## Using Form Editor
 
 The form editor collects the required information and passes it to another entity. To launch the form editor, click on the Form button. 
 
 ![Image 7](img/image-7.png)
-
 ### For Configuration Data
 
 **Step 1:** Click on the Add Item button to create a new text field for data configuration.
@@ -71,7 +67,6 @@ The form editor collects the required information and passes it to another entit
 <em>**Note:** You can also edit the existing data in the key-value pair fields.</em>
 
 ![Image 9](img/image-9.png)
-
 ### For Binary Configuration Data 
 
 **Step 1:** Click on the Add Item button to create a new binary data field for binary data configuration.
@@ -89,11 +84,9 @@ The form editor collects the required information and passes it to another entit
 ![Image 12](img/image-12.png)
 
 Now you can start editing the object metadata. 
-
 ### Object Metadata
 
 For editing object metadata you need to provide a specific name, namespace, annotations, labels, cluster name, generate name, and finalizers to uniquely identify the object.  
-
 ### For Name
 
 **Step 1:** Enter the specific key name in the name field to give a unique identity to the object.
@@ -101,7 +94,6 @@ For editing object metadata you need to provide a specific name, namespace, anno
 ![Image 13](img/image-13.png)
 
 <em>**Note:** The name of the ConfigMap must be unique within a namespace.</em>
-
 ### For Namespace
 
 **Step 1:** Enter namespace in the namespace field to organize clusters into virtual sub-clusters. 
@@ -109,7 +101,6 @@ For editing object metadata you need to provide a specific name, namespace, anno
 ![Image 14](img/image-14.png)
 
 <em>**Note:** Provide a unique namespace within the ConfigMap. If left empty, then the default namespace value shall be assigned automatically.</em> 
-
 ### For Annotations
 
 **Step 1:** Click on the Add Item button to create the new key-value field for annotations. 
@@ -121,7 +112,6 @@ For editing object metadata you need to provide a specific name, namespace, anno
 <em>**Note:** You can also edit the existing arbitrary metadata data in the fields.</em> 
 
 ![Image 16](img/image-16.png)
-
 ### For Labels
 
 **Step 1:** Click on Add Item button to create the new key-value field for labels.
@@ -133,13 +123,11 @@ For editing object metadata you need to provide a specific name, namespace, anno
 <em>**Note:**  you also can edit the existing label data in the fields.</em> 
 
 ![Image 18](img/image-18.png)
-
 ### For Cluster Name
 
 Enter the name of the cluster in the cluster field to which the object belongs.
 
 ![Image 19](img/image-19.png)
-
 ### For Generate Name
 
 Enter a prefix in the Generate Name field.
@@ -147,9 +135,7 @@ Enter a prefix in the Generate Name field.
 <em>**Note:** You can also edit the existing data in the generate name fields.</em> 
 
 ![Image 20](img/image-20.png)
-
 ### For Finalizers
-
 
 **Step 1:** Click on the Add item button to create the new finalizer field.
 
