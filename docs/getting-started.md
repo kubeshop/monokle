@@ -1,15 +1,7 @@
 # Getting Started with Monokle
 
-Monokle is a standalone desktop application, you can either download an (as of yet unsigned) installer 
+Monokle is a standalone desktop application, you can either download an installer 
 from [releases](https://github.com/kubeshop/monokle/releases) or clone our repo and run as described below!
-
-Note: If you download the unsigned binary, your OS might complain - here's how to fix it on MacOS
-- Go to Preferences > Security & Privacy > General.
-- Text will appear saying: `Monokle was blocked from use because it is not from an identified developer.`
-- Click the `Open Anyway` button. A new pop-up will say: `macOs cannot verify the developer of Monokle.Are you sure you want to open it?`,
-- Simply click `Move to Bin`. No wait, did you? You should have clicked `Open`, silly.
-
-Alternatively - check out this document from [Apple Support](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac)
 
 ## Running from source
 
