@@ -76,7 +76,7 @@ export function useNavSection<ItemType, ScopeType>(
       return makeItemToPassedConditionMap(items, scope, true, getItemIdentifier);
     }
     return makeItemToPassedConditionMap(items, scope, handleIsVisible, getItemIdentifier);
-  }, [scope, itemHandler, items]);
+  }, [scope, itemHandler, items, getItemIdentifier]);
 
   const isItemVisible = useCallback(
     (item: ItemType) => {
@@ -86,7 +86,7 @@ export function useNavSection<ItemType, ScopeType>(
       }
       return Boolean(itemVisibilityMap[itemId]);
     },
-    [itemVisibilityMap]
+    [itemVisibilityMap, getItemIdentifier]
   );
 
   const itemSelectionMap = useMemo<Record<string, boolean>>(() => {
@@ -98,7 +98,7 @@ export function useNavSection<ItemType, ScopeType>(
       return makeItemToPassedConditionMap(items, scope, false, getItemIdentifier);
     }
     return makeItemToPassedConditionMap(items, scope, handleIsSelected, getItemIdentifier);
-  }, [scope, itemHandler, items]);
+  }, [scope, itemHandler, items, getItemIdentifier]);
 
   const isSectionSelected = useMemo(() => {
     return (
@@ -116,7 +116,7 @@ export function useNavSection<ItemType, ScopeType>(
       return makeItemToPassedConditionMap(items, scope, false, getItemIdentifier);
     }
     return makeItemToPassedConditionMap(items, scope, handleIsHighlighted, getItemIdentifier);
-  }, [scope, itemHandler, items]);
+  }, [scope, itemHandler, items, getItemIdentifier]);
 
   const isSectionHighlighted = useMemo(() => {
     return (
@@ -135,7 +135,7 @@ export function useNavSection<ItemType, ScopeType>(
         return isItemVisible(item);
       });
     },
-    [groupedItems, itemVisibilityMap]
+    [groupedItems, isItemVisible]
   );
 
   const shouldSectionExpand = useMemo(() => {
@@ -157,7 +157,7 @@ export function useNavSection<ItemType, ScopeType>(
 
   const subsections = useMemo(() => {
     return subsectionNames?.map(s => navSectionMap.getByName(s)) || undefined;
-  }, [navSectionMap]);
+  }, [subsectionNames]);
 
   const isAnySubsectionVisible = useMemo(() => {
     if (!subsections || subsections.length === 0) {
@@ -187,7 +187,7 @@ export function useNavSection<ItemType, ScopeType>(
       );
     }
     return false;
-  }, [scope, items, groupedItems, isVisible, isAnySubsectionVisible]);
+  }, [scope, items, groupedItems, isVisible, isAnySubsectionVisible, isItemVisible, isSectionInitialized]);
 
   return {
     name,
