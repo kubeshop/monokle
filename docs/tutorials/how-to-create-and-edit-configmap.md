@@ -2,7 +2,7 @@
 
 Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
 
-In this tutorial, we have illustrated how to create and edit ConfigMap API objects to store non-confidential data in key-value pairs.       
+In this tutorial, we have illustrated how to create and edit ConfigMap resources to store non-confidential data in key-value pairs.       
 
 Let’s get started. 
 
@@ -32,26 +32,26 @@ Once you select a manifest, its related resources shall be highlighted automatic
 **Step 2:** For adding resources to new or existing files in the navigator, click on the Save button at the top-right corner of the interface.
 
 ![Resource save](img/add-resource-save.png)
-## Using Editor 
+## Using Source Editor 
 
-**Step 1:** Navigate and select the ConfigMap API object in the Navigator.  
+**Step 1:** Navigate and select the ConfigMap resources in the Navigator.  
 
 ![Image 4](img/image-4.png)
 
-Once you select a resource, its source code will be launched automatically in the editor. 
+Once you select a resource, its source code will be launched automatically in the source editor. 
 
-Using Editor allows you to view and edit the source code easily. 
+The Source Editor allows you to view and edit the source code easily. 
 
 **Step 2:** Click on the Source button to view and edit the source code. 
 
 ![Image 5](img/image-5.png)
 
-**Step 3:** Right-click anywhere on the editor to launch the menu and select the required editing option from the drop-down list. 
+**Step 3:** Right-click anywhere on the source editor to launch the menu and select the required editing option from the drop-down list. 
 
 ![Image 6](img/image-6.png)
 
-You can also edit the source code using Form Editor that does not require any coding effort. 
-## Using Form Editor
+You can also edit the source code using the Form Editor that does not require any coding effort. 
+## Using the Form Editor
 
 The form editor collects the required information and passes it to another entity. To launch the form editor, click on the Form button. 
 
@@ -151,7 +151,7 @@ It prompts Kubernetes to wait until specific conditions are met before it fully 
 
 <em>**Note:** Finalizer must be empty before the object is deleted from the registry.</em> 
 
-The editor provides autocomplete and autosave options, and hence you don’t have to manually save your edits. 
+The source editor provides autocomplete and autosave options, and hence you don’t have to manually save your edits. 
                  
 Thus you can edit the ConfigMap. 
 
