@@ -9,7 +9,7 @@ Let’s get started.
 
 **Step 1:** Launch Monokle and click on the Browse button to add your project folder containing K8 resources. 
 
-<em>**Note:** Please follow this Getting Started guide to install Monokle 🚀</em>
+<em>**Note:** Please follow this [Getting Started](https://github.com/kubeshop/monokle#readme) guide to install Monokle 🚀</em>
 
 ![Image](img/image-0.png)
  
