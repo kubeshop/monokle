@@ -106,7 +106,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
     name,
     scope,
     items,
-    groupedItems,
+    groups,
     getItemIdentifier,
     isGroupVisible,
     isItemVisible,
@@ -234,12 +234,16 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
   );
 
   const isLastVisibleGroupedItem = useCallback(
-    (groupKey: string, item: ItemType) => {
-      const groupVisibleItems = groupedItems[groupKey].filter(i => isItemVisible(i));
+    (groupName: string, item: ItemType) => {
+      const group = groups.find(g => g.groupName === groupName);
+      if (!group) {
+        return false;
+      }
+      const groupVisibleItems = group.groupItems.filter(i => isItemVisible(i));
       const lastVisibleItem = groupVisibleItems[groupVisibleItems.length - 1];
       return Boolean(lastVisibleItem && getItemIdentifier(lastVisibleItem) === getItemIdentifier(item));
     },
-    [groupedItems, getItemIdentifier, isItemVisible]
+    [groups, getItemIdentifier, isItemVisible]
   );
 
   const isLastVisibleSection = useCallback(
@@ -274,7 +278,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
       {!isCollapsed &&
         isSectionVisible &&
         itemHandler &&
-        Object.keys(groupedItems).length === 0 &&
+        groups.length === 0 &&
         items.map(item => (
           <NavSectionItem<ItemType, ScopeType>
             key={getItemIdentifier(item)}
@@ -290,10 +294,10 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
       {!isCollapsed &&
         isSectionVisible &&
         itemHandler &&
-        Object.entries(groupedItems).map(
-          ([groupName, groupItems]) =>
+        groups.map(
+          ({groupName, groupItems, groupId}) =>
             isGroupVisible(groupName) && (
-              <React.Fragment key={groupName}>
+              <React.Fragment key={groupId}>
                 <S.NameContainer style={{color: 'red'}}>
                   <S.Name level={level + 1}>{groupName}</S.Name>
                 </S.NameContainer>

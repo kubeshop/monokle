@@ -46,13 +46,15 @@ const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> 
   getItems: scope => {
     return Object.values(scope.helmValuesMap);
   },
-  getItemsGrouped: scope => {
-    return Object.fromEntries(
-      Object.values(scope.helmChartMap).map(helmChart => {
-        const helmValuesFiles = helmChart.valueFileIds.map(valuesFile => scope.helmValuesMap[valuesFile]);
-        return [helmChart.name, helmValuesFiles];
+  getGroups: scope => {
+    return Object.values(scope.helmChartMap)
+      .map(helmChart => {
+        const helmValuesFiles = helmChart.valueFileIds
+          .map(valuesFile => scope.helmValuesMap[valuesFile])
+          .sort((a, b) => a.name.localeCompare(b.name));
+        return {groupId: helmChart.id, groupName: helmChart.name, groupItems: helmValuesFiles};
       })
-    );
+      .sort((a, b) => a.groupName.localeCompare(b.groupName));
   },
   isLoading: scope => {
     if (scope.isPreviewLoading && !scope.isHelmChartPreview) {
