@@ -106,7 +106,7 @@ In resource navigator, you can expand or collapse individual or all sections in 
 
 The recent Folders option has been added to the system menu to make it easy to switch between your favorite resource-manifest folders. 
 
-**Action:** File > Check for Update
+**Action:** File > Recent Folders
 
 ![Recent Folders](img/recent-folder.png)
 ## Supported Resource links
