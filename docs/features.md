@@ -32,7 +32,6 @@ the cluster if you are satisfied - read more about [Kustomize](kustomize.md) and
 
 When you select a resource, Monokle will show you which file it was defined in. Also, if you mistype a referenced
 resource, Monokle will quickly show you, that you have a dead link with a warning triangle.
-
 ## Browse your clusters objects
 
 ![Browse your clusters objects](img/cluster-objects.gif)
@@ -40,4 +39,26 @@ resource, Monokle will quickly show you, that you have a dead link with a warnin
 Want to browse your cluster instead of a repo? Simply smash the "Show Cluster Objects" button to import all objects from
 the cluster into Monokle - [read more](cluster-integration.md)
 
+## Auto-update Installers
 
+Installers are notarized for both macOS and Windows, which allows you to auto-update functionalities. Monokle checks for new versions on startup and notifies the user. You can also install it manually via the new system menu. 
+
+**Action:** Electron > Check for Update
+
+![Auto Update](img/auto-update.png)
+
+## Recent Folders
+
+The recent Folders option has been added to the system menu to make it easy to switch between your favorite resource-manifest folders. 
+
+**Action:** File > Check for Update
+
+![Recent Folders](img/recent-folder.png)
+
+## Multiple Windows
+
+You can launch multiple project windows using the New Monokle Windows option. It allows you to work on multiple folders or clusters simultaneously. Thus visual navigation for the recently used pages becomes simpler and faster.   
+
+**Action:** File > New Monokle Windows
+
+![Multiple Window](img/multiple-window.png)

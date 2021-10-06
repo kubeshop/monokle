@@ -97,6 +97,11 @@ You can easily navigate back and forth between the selected resources with the h
 
 ![Navigation History](img/navigate-history.png)
 
+## Expand/Collapse Sections
+
+In resource navigator, you can expand or collapse individual or all sections in the resource navigator.
+
+![Expand](img/expand.png)
 
 ## Supported Resource links
 
