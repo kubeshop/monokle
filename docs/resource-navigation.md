@@ -102,7 +102,13 @@ You can easily navigate back and forth between the selected resources with the h
 In resource navigator, you can expand or collapse individual or all sections in the resource navigator.
 
 ![Expand](img/expand.png)
+## Recent Folders
 
+The recent Folders option has been added to the system menu to make it easy to switch between your favorite resource-manifest folders. 
+
+**Action:** File > Check for Update
+
+![Recent Folders](img/recent-folder.png)
 ## Supported Resource links
 
 Monokle currently finds and visualizes the following links between kubernetes resources - please let us know if

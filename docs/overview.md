@@ -30,6 +30,14 @@ Clicking the Settings icon on the top right opens the settings:
     - Template: uses [Helm Template](https://helm.sh/docs/helm/helm_template/)
     - Install: uses [Helm Install](https://helm.sh/docs/helm/helm_install/)
 
+  ## Multiple Windows
+
+You can launch multiple project windows using the New Monokle Windows option. It allows you to work on multiple folders or clusters simultaneously. Thus visual navigation for the recently used pages becomes simpler and faster.   
+
+**Action:** File > New Monokle Windows
+
+![Multiple Window](img/multiple-window.png)
+
 ## Keyboard Shortcuts
 
 Monokle current supports the following keyboard shortcuts:
