@@ -17,8 +17,8 @@ import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useSelector} from 'react-redux';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import {ipcRenderer, remote} from 'electron';
+// import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {ipcRenderer} from 'electron';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
@@ -61,7 +61,7 @@ const App = () => {
       setHelmChart(undefined);
     }
   }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap]);
-
+  /*
   useEffect(() => {
     if (isInPreviewMode && previewType === 'kustomization') {
       remote.getCurrentWindow().setTitle(previewResource ? `[${previewResource.name}] kustomization` : `Monokle`);
@@ -81,7 +81,7 @@ const App = () => {
     }
     remote.getCurrentWindow().setTitle('Monokle');
   }, [isInPreviewMode, previewType, previewResource, previewResourceId, previewValuesFile, helmChart, fileMap]);
-
+*/
   const onMissingDependencyResult = useCallback(
     (_, {dependencies}) => {
       const alert: AlertType = {

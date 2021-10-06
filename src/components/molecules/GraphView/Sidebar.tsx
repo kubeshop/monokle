@@ -75,9 +75,7 @@ const Sidebar = (reactFlow: any) => {
     [dispatch]
   );
 
-  function fit() {
-    zoomPanHelper.fitView();
-  }
+  const fit = () => zoomPanHelper.fitView();
 
   const handleZoom = useCallback(
     ratio => () => {
@@ -100,10 +98,10 @@ const Sidebar = (reactFlow: any) => {
         <Button type="primary" onClick={fit}>
           Fit view
         </Button>
-        <Button type="primary" onClick={handleZoom(1.4)}>
+        <Button type="primary" onClick={() => handleZoom(1.4)}>
           Zoom in
         </Button>
-        <Button type="primary" onClick={handleZoom(1 / 1.4)}>
+        <Button type="primary" onClick={() => handleZoom(1 / 1.4)}>
           Zoom out
         </Button>
         <Button type="primary" onClick={selectSelectedResource} disabled={selectedResourceId === undefined}>

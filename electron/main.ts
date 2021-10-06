@@ -21,9 +21,7 @@ try {
   process.env.NODE_ENV = 'production';
 }
 
-import {app, nativeImage, ipcMain, dialog} from 'electron';
-import * as Electron from 'electron';
-import {BrowserWindow} from '@electron/remote';
+import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import {execSync} from 'child_process';
@@ -41,9 +39,6 @@ import {NewVersionCode} from '@models/appconfig';
 import initKubeconfig from './src/initKubeconfig';
 import {createMenu, getDockMenu} from './menu';
 import terminal from '../cli/terminal';
-
-// https://www.electronjs.org/docs/breaking-changes#removed-remote-module
-require('@electron/remote/main').initialize();
 
 Object.assign(console, ElectronLog.functions);
 autoUpdater.logger = console;
@@ -188,9 +183,6 @@ export const createWindow = (givenPath?: string) => {
   };
 
   const win: any = Splashscreen.initSplashScreen(splashscreenConfig);
-  require('@electron/remote/main').enable(win.webContents);
-  // const remoteMain = remote.require('@electron/remote/main');
-  // remoteMain.enable(win.webContents);
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
