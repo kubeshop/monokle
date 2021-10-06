@@ -21,7 +21,7 @@ In the file explorer, you can view manifests, including their resources, and the
 
 **Step 3:** Scroll up & down to navigate and select the required manifests. 
 
-![Image 3](img/imaged-3.png)
+![Image 3](img/imaged-3.gif)
 
 Once you select a manifest, its related resources shall be highlighted automatically in the navigator. 
 
