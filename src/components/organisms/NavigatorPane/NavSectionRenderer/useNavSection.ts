@@ -31,7 +31,7 @@ export function useNavSection<ItemType, ScopeType>(
   const {
     name,
     getItems,
-    getItemsGrouped,
+    getGroups,
     useScope,
     itemHandler,
     itemCustomization,
@@ -50,12 +50,12 @@ export function useNavSection<ItemType, ScopeType>(
     return [];
   }, [scope, getItems]);
 
-  const groupedItems = useMemo(() => {
-    if (getItemsGrouped) {
-      return getItemsGrouped(scope);
+  const groups = useMemo(() => {
+    if (getGroups) {
+      return getGroups(scope);
     }
-    return {};
-  }, [scope, getItemsGrouped]);
+    return [];
+  }, [scope, getGroups]);
 
   const getItemIdentifier = useCallback(
     (item: ItemType) => {
@@ -128,14 +128,18 @@ export function useNavSection<ItemType, ScopeType>(
 
   const isGroupVisible = useCallback(
     (groupName: string) => {
-      if (!groupedItems || !groupedItems[groupName]) {
+      if (!groups || groups.length === 0) {
         return false;
       }
-      return groupedItems[groupName].every(item => {
+      const group = groups.find(g => g.groupName === groupName);
+      if (!group) {
+        return false;
+      }
+      return group.groupItems.every(item => {
         return isItemVisible(item);
       });
     },
-    [groupedItems, isItemVisible]
+    [groups, isItemVisible]
   );
 
   const shouldSectionExpand = useMemo(() => {
@@ -181,20 +185,19 @@ export function useNavSection<ItemType, ScopeType>(
     if (shouldBeVisible) {
       return (
         isAnySubsectionVisible ||
-        (Object.keys(groupedItems).length > 0 &&
-          Object.values(groupedItems).some(g => g.some(i => isItemVisible(i)))) ||
+        (groups.length > 0 && groups.some(g => g.groupItems.some(i => isItemVisible(i)))) ||
         (items.length > 0 && items.some(i => isItemVisible(i)))
       );
     }
     return false;
-  }, [scope, items, groupedItems, isVisible, isAnySubsectionVisible, isItemVisible, isSectionInitialized]);
+  }, [scope, items, groups, isVisible, isAnySubsectionVisible, isItemVisible, isSectionInitialized]);
 
   return {
     name,
     scope,
     subsections,
     items,
-    groupedItems,
+    groups,
     isGroupVisible,
     isItemVisible,
     getItemIdentifier,
