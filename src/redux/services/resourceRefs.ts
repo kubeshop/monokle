@@ -101,6 +101,16 @@ export function processResourceRefNodes(resource: K8sResource) {
           addRefNodeAtPath(refNode, refMapperTargetPath, resource.refNodesByPath);
         }
       }
+
+      refMapper.source.dependencies?.forEach(dependency => {
+        if (!resource.refNodesByPath) {
+          resource.refNodesByPath = {};
+        }
+        const dependencyPath = joinPathParts(dependency.pathParts);
+        if (keyPath.endsWith(dependencyPath)) {
+          addRefNodeAtPath(refNode, dependencyPath, resource.refNodesByPath);
+        }
+      });
     });
   });
 }
