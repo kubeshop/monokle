@@ -7,9 +7,12 @@ import {PROCESS_ENV, RESOURCES_PATH} from '@utils/env';
  */
 
 export function getStaticResourcePath(resourcePath: string) {
+  if (PROCESS_ENV.NODE_ENV === 'test') {
+    return path.join('resources', resourcePath);
+  }
+
   return PROCESS_ENV.NODE_ENV !== 'development'
-    ? // @ts-ignore
-      path.join(RESOURCES_PATH, 'resources', resourcePath)
+    ? path.join(RESOURCES_PATH, 'resources', resourcePath)
     : path.join('resources', resourcePath);
 }
 
