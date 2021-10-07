@@ -9,6 +9,7 @@ import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/servic
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
 import path from 'path';
+import {PROCESS_ENV} from '@utils/env';
 
 /**
  * Invokes helm install for the specified helm chart and values file
@@ -27,8 +28,8 @@ function applyHelmChartToCluster(
     ['install', '-f', getAbsoluteValuesFilePath(valuesFile, fileMap), helmChart.name, chartPath],
     {
       env: {
-        NODE_ENV: process.env.NODE_ENV,
-        PUBLIC_URL: process.env.PUBLIC_URL,
+        NODE_ENV: PROCESS_ENV.NODE_ENV,
+        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
         PATH: getShellPath(),
         KUBECONFIG: kubeconfig,
       },
