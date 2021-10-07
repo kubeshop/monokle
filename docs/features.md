@@ -32,12 +32,15 @@ the cluster if you are satisfied - read more about [Kustomize](kustomize.md) and
 
 When you select a resource, Monokle will show you which file it was defined in. Also, if you mistype a referenced
 resource, Monokle will quickly show you, that you have a dead link with a warning triangle.
-
 ## Browse your clusters objects
 
 ![Browse your clusters objects](img/cluster-objects.gif)
 
 Want to browse your cluster instead of a repo? Simply smash the "Show Cluster Objects" button to import all objects from
 the cluster into Monokle - [read more](cluster-integration.md)
+
+
+
+
 
 
