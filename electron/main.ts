@@ -31,11 +31,12 @@ import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
+import log from 'loglevel';
 
 import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
 import terminal from '../cli/terminal';
-import { downloadPlugin } from './pluginService';
+import {downloadPlugin} from './pluginService';
 
 Object.assign(console, ElectronLog.functions);
 autoUpdater.logger = console;
