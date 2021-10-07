@@ -2,6 +2,19 @@ import * as k8s from '@kubernetes/client-node';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import navSectionNames from '@constants/navSectionNames';
 
+function createSelectorOutgoingRefMappers(targetResourceKind: string) {
+  return {
+    source: {
+      pathParts: ['spec', 'selector'],
+    },
+    target: {
+      kind: targetResourceKind,
+      pathParts: ['spec', 'template', 'metadata', 'labels'],
+    },
+    matchPairs: true,
+  };
+}
+
 const ServiceHandler: ResourceKindHandler = {
   kind: 'Service',
   apiVersionMatcher: '**',
@@ -23,16 +36,12 @@ const ServiceHandler: ResourceKindHandler = {
     await k8sCoreV1Api.deleteNamespacedService(name, namespace || 'default');
   },
   outgoingRefMappers: [
-    {
-      source: {
-        pathParts: ['spec', 'selector'],
-      },
-      target: {
-        kind: 'Deployment',
-        pathParts: ['spec', 'template', 'metadata', 'labels'],
-      },
-      matchPairs: true,
-    },
+    createSelectorOutgoingRefMappers('DaemonSet'),
+    createSelectorOutgoingRefMappers('Deployment'),
+    createSelectorOutgoingRefMappers('Job'),
+    createSelectorOutgoingRefMappers('ReplicaSet'),
+    createSelectorOutgoingRefMappers('ReplicationController'),
+    createSelectorOutgoingRefMappers('StatefulSet'),
   ],
 };
 
