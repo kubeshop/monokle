@@ -8,6 +8,10 @@ interface SymbolMatcher {
 interface RefMapper {
   source: {
     pathParts: string[];
+    dependencies?: {
+      pathParts: string[];
+      requiredValue: any;
+    }[];
   };
   target: {
     kind: string;
