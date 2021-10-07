@@ -1,18 +1,15 @@
 import fs from 'fs';
 import path from 'path';
-import {PROCESS_ENV} from '@utils/env';
+import {PROCESS_ENV, RESOURCES_PATH} from '@utils/env';
 
 /**
  * Gets the absolute path to a statically bundled resource in the /resources folder
  */
 
 export function getStaticResourcePath(resourcePath: string) {
-  if (!process.resourcesPath) {
-    return '';
-  }
   return PROCESS_ENV.NODE_ENV !== 'development'
     ? // @ts-ignore
-      path.join(process.resourcesPath, 'resources', resourcePath)
+      path.join(RESOURCES_PATH, 'resources', resourcePath)
     : path.join('resources', resourcePath);
 }
 
