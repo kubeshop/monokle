@@ -21,11 +21,11 @@ import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '@constants/constants';
 import {checkMissingDependencies} from '@utils/index';
-
+import log from 'loglevel';
+import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 import terminal from '../cli/terminal';
 import {createMenu} from './menu';
-
-// console.log(store);
+import {downloadPlugin} from './pluginService';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -34,10 +34,25 @@ const ElectronStore = require('electron-store');
 const {MONOKLE_RUN_AS_NODE} = process.env;
 
 const userHomeDir = app.getPath('home');
+const userDataDir = app.getPath('userData');
+const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const APP_DEPENDENCIES = ['kubectl', 'helm'];
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
+});
+
+ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
+  try {
+    await downloadPlugin(pluginUrl, pluginsDir);
+    event.sender.send(DOWNLOAD_PLUGIN_RESULT);
+  } catch (err) {
+    if (err instanceof Error) {
+      event.sender.send(DOWNLOAD_PLUGIN_RESULT, err);
+    } else {
+      log.warn(err);
+    }
+  }
 });
 
 /**
