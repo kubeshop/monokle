@@ -172,9 +172,9 @@
       "perMachine": true,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
-      "runAfterFinish": false,
+      "runAfterFinish": true,
       "createDesktopShortcut": false,
-      "menuCategory": "Monokle"
+      "menuCategory": "Kubeshop"
     },
     "extends": null,
     "files": [
