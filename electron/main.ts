@@ -310,7 +310,7 @@ terminal()
 export const setWindowTitle = (store: any, window: BrowserWindow) => {
   const state = store.getState();
   const isInPreviewMode = isInPreviewModeSelector(state);
-  const previewType = state.main.previewResourceId;
+  const previewType = state.main.previewType;
   const previewResourceId = state.main.previewResourceId;
   const resourceMap = state.main.resourceMap;
   const previewValuesFileId = state.main.previewValuesFileId;
@@ -318,9 +318,9 @@ export const setWindowTitle = (store: any, window: BrowserWindow) => {
   const helmChartMap = state.main.helmChartMap;
   const fileMap = state.main.fileMap;
 
-  let previewResource: K8sResource | undefined = undefined;
-  let previewValuesFile: HelmValuesFile | undefined = undefined;
-  let helmChart: HelmChart | undefined = undefined;
+  let previewResource: K8sResource | undefined;
+  let previewValuesFile: HelmValuesFile | undefined;
+  let helmChart: HelmChart | undefined;
 
   if (previewResourceId) {
     previewResource = resourceMap[previewResourceId];
@@ -332,21 +332,27 @@ export const setWindowTitle = (store: any, window: BrowserWindow) => {
     helmChart = helmChartMap[valuesFile.helmChartId];
   }
 
+  let windowTitle = 'Monokle';
+
   if (isInPreviewMode && previewType === 'kustomization') {
-    window.setTitle(previewResource ? `[${previewResource.name}] kustomization` : `Monokle`);
+    windowTitle = previewResource ? `[${previewResource.name}] kustomization` : `Monokle`;
+    window.setTitle(windowTitle);
     return;
   }
   if (isInPreviewMode && previewType === 'cluster') {
-    window.setTitle(String(previewResourceId) && 'Monokle');
+    windowTitle = String(previewResourceId) || 'Monokle';
+    window.setTitle(windowTitle);
     return;
   }
   if (isInPreviewMode && previewType === 'helm') {
-    window.setTitle(`${previewValuesFile?.name} for ${helmChart?.name} Helm chart`);
+    windowTitle = `${previewValuesFile?.name} for ${helmChart?.name} Helm chart`;
+    window.setTitle(windowTitle);
     return;
   }
   if (fileMap && fileMap[ROOT_FILE_ENTRY] && fileMap[ROOT_FILE_ENTRY].filePath) {
-    window.setTitle(fileMap[ROOT_FILE_ENTRY].filePath);
+    windowTitle = fileMap[ROOT_FILE_ENTRY].filePath;
+    window.setTitle(windowTitle);
     return;
   }
-  window.setTitle('Monokle');
+  window.setTitle(windowTitle);
 };
