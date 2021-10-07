@@ -20,16 +20,19 @@ import {execSync} from 'child_process';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '@constants/constants';
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
 import {autoUpdater} from 'electron-updater';
 import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
+import {createMenu, getDockMenu} from './menu';
+import {K8sResource} from '@models/k8sresource';
+import {isInPreviewModeSelector} from '@redux/selectors';
+import {HelmChart, HelmValuesFile} from '@models/helm';
 
 import initKubeconfig from './src/initKubeconfig';
-import {createMenu, getDockMenu} from './menu';
 import terminal from '../cli/terminal';
 
 Object.assign(console, ElectronLog.functions);
@@ -159,7 +162,6 @@ export const createWindow = (givenPath?: string) => {
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
       preload: path.join(__dirname, 'preload.js'),
-      enableRemoteModule: true,
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
@@ -175,7 +177,7 @@ export const createWindow = (givenPath?: string) => {
     },
   };
 
-  const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
+  const win: any = Splashscreen.initSplashScreen(splashscreenConfig);
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -257,10 +259,11 @@ export const openApplication = async (givenPath?: string) => {
   }
 
   ElectronStore.initRenderer();
-  createWindow(givenPath);
+  const win = createWindow(givenPath);
 
   mainStore.subscribe(() => {
     createMenu(mainStore);
+    setWindowTitle(mainStore, win);
   });
 
   if (app.dock) {
@@ -303,3 +306,53 @@ if (MONOKLE_RUN_AS_NODE) {
 terminal()
   // eslint-disable-next-line no-console
   .catch(e => console.log(e));
+
+export const setWindowTitle = (store: any, window: BrowserWindow) => {
+  const state = store.getState();
+  const isInPreviewMode = isInPreviewModeSelector(state);
+  const previewType = state.main.previewType;
+  const previewResourceId = state.main.previewResourceId;
+  const resourceMap = state.main.resourceMap;
+  const previewValuesFileId = state.main.previewValuesFileId;
+  const helmValuesMap = state.main.helmValuesMap;
+  const helmChartMap = state.main.helmChartMap;
+  const fileMap = state.main.fileMap;
+
+  let previewResource: K8sResource | undefined;
+  let previewValuesFile: HelmValuesFile | undefined;
+  let helmChart: HelmChart | undefined;
+
+  if (previewResourceId) {
+    previewResource = resourceMap[previewResourceId];
+  }
+
+  if (previewValuesFileId && helmValuesMap[previewValuesFileId]) {
+    const valuesFile = helmValuesMap[previewValuesFileId];
+    previewValuesFile = valuesFile;
+    helmChart = helmChartMap[valuesFile.helmChartId];
+  }
+
+  let windowTitle = 'Monokle';
+
+  if (isInPreviewMode && previewType === 'kustomization') {
+    windowTitle = previewResource ? `[${previewResource.name}] kustomization` : `Monokle`;
+    window.setTitle(windowTitle);
+    return;
+  }
+  if (isInPreviewMode && previewType === 'cluster') {
+    windowTitle = String(previewResourceId) || 'Monokle';
+    window.setTitle(windowTitle);
+    return;
+  }
+  if (isInPreviewMode && previewType === 'helm') {
+    windowTitle = `${previewValuesFile?.name} for ${helmChart?.name} Helm chart`;
+    window.setTitle(windowTitle);
+    return;
+  }
+  if (fileMap && fileMap[ROOT_FILE_ENTRY] && fileMap[ROOT_FILE_ENTRY].filePath) {
+    windowTitle = fileMap[ROOT_FILE_ENTRY].filePath;
+    window.setTitle(windowTitle);
+    return;
+  }
+  window.setTitle(windowTitle);
+};

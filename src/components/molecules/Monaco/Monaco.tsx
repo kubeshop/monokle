@@ -127,13 +127,13 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     setEditorMounted(true);
   };
 
-  function onChange(newValue: any) {
+  const onChange = (newValue: any) => {
     setDirty(orgCode !== newValue);
     setCode(newValue);
 
     // this will slow things down if document gets large - need to find a better solution...
     setValid(!parseAllDocuments(newValue).some(d => d.errors.length > 0));
-  }
+  };
 
   useEffect(() => {
     if (!firstCodeLoadedOnEditor && code) {
