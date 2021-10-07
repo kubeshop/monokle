@@ -8,6 +8,7 @@ import {getShellPath} from '@utils/shell';
 import {setApplyingResource} from '@redux/reducers/main';
 import fs from 'fs';
 import {getAbsoluteFileEntryPath} from '@redux/services/fileEntry';
+import {PROCESS_ENV} from '@utils/env';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -16,8 +17,8 @@ import {getAbsoluteFileEntryPath} from '@redux/services/fileEntry';
 function applyFileToCluster(filePath: string, kubeconfig: string) {
   const child = spawn('kubectl', ['apply', '-f', '-'], {
     env: {
-      NODE_ENV: process.env.NODE_ENV,
-      PUBLIC_URL: process.env.PUBLIC_URL,
+      NODE_ENV: PROCESS_ENV.NODE_ENV,
+      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
       PATH: getShellPath(),
       KUBECONFIG: kubeconfig,
     },

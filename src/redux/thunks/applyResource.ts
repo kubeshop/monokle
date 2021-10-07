@@ -11,6 +11,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {getShellPath} from '@utils/shell';
 import {setApplyingResource, updateResource} from '@redux/reducers/main';
 import {getResourceFromCluster} from '@redux/thunks/utils';
+import {PROCESS_ENV} from '@utils/env';
 import {performResourceDiff} from './diffResource';
 
 /**
@@ -20,8 +21,8 @@ import {performResourceDiff} from './diffResource';
 function applyK8sResource(resource: K8sResource, kubeconfig: string) {
   const child = spawn('kubectl', ['apply', '-f', '-'], {
     env: {
-      NODE_ENV: process.env.NODE_ENV,
-      PUBLIC_URL: process.env.PUBLIC_URL,
+      NODE_ENV: PROCESS_ENV.NODE_ENV,
+      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
       PATH: getShellPath(),
       KUBECONFIG: kubeconfig,
     },
@@ -39,8 +40,8 @@ function applyKustomization(resource: K8sResource, fileMap: FileMapType, kubecon
   const folder = getAbsoluteResourceFolder(resource, fileMap);
   const child = spawn('kubectl', ['apply', '-k', folder], {
     env: {
-      NODE_ENV: process.env.NODE_ENV,
-      PUBLIC_URL: process.env.PUBLIC_URL,
+      NODE_ENV: PROCESS_ENV.NODE_ENV,
+      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
       PATH: getShellPath(),
       KUBECONFIG: kubeconfig,
     },
