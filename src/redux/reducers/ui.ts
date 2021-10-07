@@ -127,6 +127,7 @@ export const uiSlice = createSlice({
       })
       .addCase(setRootFolder.fulfilled, state => {
         state.isFolderLoading = false;
+        state.shouldExpandAllNodes = true;
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;

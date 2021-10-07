@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React, {useState, useEffect} from 'react';
+import {ipcRenderer} from 'electron';
 import {useAppSelector} from '@redux/hooks';
 import styled from 'styled-components';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import Footer from '@components/atoms/Footer';
-import packageJson from '@root/package.json';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 const StyledFooter = styled(Footer)`
@@ -18,15 +18,26 @@ const StyledFooter = styled(Footer)`
 `;
 
 const PageFooter = () => {
+  const [appVersion, setAppVersion] = useState('');
+  const [footerText, setFooterText] = useState('');
   const fileMap = useAppSelector(state => state.main.fileMap);
   const rootEntry = fileMap[ROOT_FILE_ENTRY];
 
   // not counting the root
   const nrOfFiles = Object.keys(fileMap).length - 1;
 
-  const footerText = `Monokle ${packageJson.version} - kubeshop.io 2021${
-    rootEntry && rootEntry.children ? ` - ${rootEntry.filePath} - ${nrOfFiles} files` : ''
-  }`;
+  ipcRenderer.send('app-version');
+  ipcRenderer.once('app-version', (_, {version}) => {
+    setAppVersion(version);
+  });
+
+  useEffect(() => {
+    setFooterText(
+      `Monokle ${appVersion} - kubeshop.io 2021${
+        rootEntry && rootEntry.children ? ` - ${rootEntry.filePath} - ${nrOfFiles} files` : ''
+      }`
+    );
+  }, [appVersion]);
 
   return <StyledFooter noborder="true">{footerText}</StyledFooter>;
 };

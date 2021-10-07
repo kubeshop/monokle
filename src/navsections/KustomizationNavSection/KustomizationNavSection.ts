@@ -49,7 +49,9 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
     };
   },
   getItems: scope => {
-    return Object.values(scope.resourceMap).filter(i => i.kind === 'Kustomization');
+    return Object.values(scope.resourceMap)
+      .filter(i => i.kind === 'Kustomization')
+      .sort((a, b) => a.name.localeCompare(b.name));
   },
   isLoading: scope => {
     if (scope.isPreviewLoading && !scope.isKustomizationPreview) {

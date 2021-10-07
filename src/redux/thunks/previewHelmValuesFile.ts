@@ -23,45 +23,42 @@ export const previewHelmValuesFile = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = thunkAPI.getState().config.kubeconfigPath;
-  if (state.previewValuesFileId !== valuesFileId) {
-    const valuesFile = state.helmValuesMap[valuesFileId];
-    if (valuesFile && valuesFile.filePath) {
-      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-      const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
-      const chart = state.helmChartMap[valuesFile.helmChartId];
+  const valuesFile = state.helmValuesMap[valuesFileId];
 
-      // sanity check
-      if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
-        log.info(
-          `previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`
-        );
+  if (valuesFile && valuesFile.filePath) {
+    const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+    const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
+    const chart = state.helmChartMap[valuesFile.helmChartId];
 
-        const args = {
-          helmCommand:
-            configState.settings.helmPreviewMode === 'template'
-              ? `helm template -f ${valuesFile.name} ${chart.name} .`
-              : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`,
-          cwd: folder,
-          kubeconfig,
-        };
+    // sanity check
+    if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
+      log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
-        const result = await runHelm(args);
+      const args = {
+        helmCommand:
+          configState.settings.helmPreviewMode === 'template'
+            ? `helm template -f ${valuesFile.name} ${chart.name} .`
+            : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`,
+        cwd: folder,
+        kubeconfig,
+      };
 
-        if (result.error) {
-          return createPreviewRejection(thunkAPI, 'Helm Error', result.error);
-        }
+      const result = await runHelm(args);
 
-        if (result.stdout) {
-          return createPreviewResult(result.stdout, valuesFile.id, 'Helm Preview');
-        }
+      if (result.error) {
+        return createPreviewRejection(thunkAPI, 'Helm Error', result.error);
       }
 
-      return createPreviewRejection(
-        thunkAPI,
-        'Helm Error',
-        `Unabled to run Helm for ${valuesFile.name} in folder ${folder}`
-      );
+      if (result.stdout) {
+        return createPreviewResult(result.stdout, valuesFile.id, 'Helm Preview');
+      }
     }
+
+    return createPreviewRejection(
+      thunkAPI,
+      'Helm Error',
+      `Unabled to run Helm for ${valuesFile.name} in folder ${folder}`
+    );
   }
 
   return {};

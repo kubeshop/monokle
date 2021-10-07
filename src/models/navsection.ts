@@ -4,6 +4,7 @@ export type NavSectionItemCustomComponentProps<ItemType> = {
   item: ItemType;
   isItemHovered: boolean;
   isItemSelected: boolean;
+  isItemDisabled: boolean;
 };
 
 export type NavSectionItemCustomComponent<ItemType> = React.ComponentType<NavSectionItemCustomComponentProps<ItemType>>;
@@ -32,7 +33,7 @@ export interface NavSection<ItemType, ScopeType = any> {
   useScope: () => ScopeType;
   subsectionNames?: string[];
   getItems?: (scope: ScopeType) => ItemType[];
-  getItemsGrouped?: (scope: ScopeType) => Record<string, ItemType[]>;
+  getGroups?: (scope: ScopeType) => {groupName: string; groupId: string; groupItems: ItemType[]}[];
   isLoading?: (scope: ScopeType, items: ItemType[]) => boolean;
   isVisible?: (scope: ScopeType, items: ItemType[]) => boolean;
   isInitialized?: (scope: ScopeType, items: ItemType[]) => boolean;

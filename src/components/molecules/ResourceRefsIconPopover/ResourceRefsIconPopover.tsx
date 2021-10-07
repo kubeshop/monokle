@@ -12,8 +12,12 @@ const StyledIconsContainer = styled.span`
   cursor: pointer;
 `;
 
-const ResourceRefsIconPopover = (props: {resource: K8sResource; type: 'incoming' | 'outgoing'}) => {
-  const {resource, type} = props;
+const ResourceRefsIconPopover = (props: {
+  resource: K8sResource;
+  type: 'incoming' | 'outgoing';
+  isDisabled: boolean;
+}) => {
+  const {resource, type, isDisabled} = props;
 
   const resourceRefs = useMemo(
     () =>
@@ -33,6 +37,10 @@ const ResourceRefsIconPopover = (props: {resource: K8sResource; type: 'incoming'
   }, [resourceRefs, type]);
 
   if (!resourceRefs || resourceRefs.length === 0) {
+    return null;
+  }
+
+  if (isDisabled) {
     return null;
   }
 

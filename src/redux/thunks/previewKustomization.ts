@@ -20,22 +20,20 @@ export const previewKustomization = createAsyncThunk<
   }
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
   const state = thunkAPI.getState().main;
-  if (state.previewResourceId !== resourceId) {
-    const resource = state.resourceMap[resourceId];
-    if (resource && resource.filePath) {
-      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-      const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
+  const resource = state.resourceMap[resourceId];
+  if (resource && resource.filePath) {
+    const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+    const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
 
-      log.info(`previewing ${resource.id} in folder ${folder}`);
-      const result = await runKustomize(folder);
+    log.info(`previewing ${resource.id} in folder ${folder}`);
+    const result = await runKustomize(folder);
 
-      if (result.error) {
-        return createPreviewRejection(thunkAPI, 'Kustomize Error', result.error);
-      }
+    if (result.error) {
+      return createPreviewRejection(thunkAPI, 'Kustomize Error', result.error);
+    }
 
-      if (result.stdout) {
-        return createPreviewResult(result.stdout, resource.id, 'Kustomize Preview');
-      }
+    if (result.stdout) {
+      return createPreviewResult(result.stdout, resource.id, 'Kustomize Preview');
     }
   }
 

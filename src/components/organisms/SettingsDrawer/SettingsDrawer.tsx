@@ -1,7 +1,7 @@
 import React, {useRef} from 'react';
 import styled from 'styled-components';
 
-import {Button, Checkbox, Input, Select, Tooltip} from 'antd';
+import {Button, Input, Select, Tooltip, Divider, Checkbox} from 'antd';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
 
@@ -24,6 +24,7 @@ import {
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
 } from '@constants/tooltips';
+import {ipcRenderer} from 'electron';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -99,6 +100,14 @@ const SettingsDrawer = () => {
     }
   };
 
+  const checkUpdateAvailability = () => {
+    ipcRenderer.send('check-update-available');
+  };
+
+  const updateApplication = () => {
+    ipcRenderer.send('quit-and-install');
+  };
+
   return (
     <Drawer
       width="400"
@@ -150,6 +159,7 @@ const SettingsDrawer = () => {
           </Checkbox>
         </Tooltip>
       </StyledDiv>
+      <Divider />
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
         <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>

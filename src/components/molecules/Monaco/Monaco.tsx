@@ -19,6 +19,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {useSelector} from 'react-redux';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {getFileStats} from '@utils/files';
 import useCodeIntel from './useCodeIntel';
 import useEditorKeybindings from './useEditorKeybindings';
 import useResourceYamlSchema from './useResourceYamlSchema';
@@ -60,6 +61,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
   const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
+  const [isEditorMounted, setEditorMounted] = useState(false);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   let editor = editorRef.current;
@@ -77,7 +79,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     }
   };
 
-  useCodeIntel(editor, code, selectedResourceId, resourceMap, fileMap, selectResource, selectFilePath);
+  useCodeIntel(editor, code, selectedResourceId, resourceMap, fileMap, isEditorMounted, selectResource, selectFilePath);
   const {registerStaticActions} = useEditorKeybindings(
     editor,
     hiddenInputRef,
@@ -122,15 +124,16 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     e.onDidChangeCursorSelection(onChangeCursorSelection);
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
+    setEditorMounted(true);
   };
 
-  function onChange(newValue: any) {
+  const onChange = (newValue: any) => {
     setDirty(orgCode !== newValue);
     setCode(newValue);
 
     // this will slow things down if document gets large - need to find a better solution...
     setValid(!parseAllDocuments(newValue).some(d => d.errors.length > 0));
-  }
+  };
 
   useEffect(() => {
     if (!firstCodeLoadedOnEditor && code) {
@@ -148,7 +151,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       }
     } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
       const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
-      if (!fs.statSync(filePath).isDirectory()) {
+      if (getFileStats(filePath)?.isDirectory() === false) {
         newCode = fs.readFileSync(filePath, 'utf8');
       }
     }
@@ -170,7 +173,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
       return true;
     }
-    if (selectedValuesFileId !== previewValuesFileId) {
+    if (isInPreviewMode && selectedValuesFileId !== previewValuesFileId) {
       return true;
     }
     if (!selectedPath && !selectedResourceId) {

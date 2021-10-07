@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import 'antd/dist/antd.less';
 import {Layout} from '@atoms';
 import {
@@ -16,11 +16,11 @@ import {
 import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
 import {useAppDispatch} from '@redux/hooks';
-import {initKubeconfig} from '@redux/reducers/appConfig';
 import {ipcRenderer} from 'electron';
 import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
+import UpdateModal from '@components/organisms/UpdateModal';
 import AppContext from './AppContext';
 
 const App = () => {
@@ -29,19 +29,24 @@ const App = () => {
 
   const mainHeight = `${size.height}px`;
 
-  useEffect(() => {
-    dispatch(initKubeconfig());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onMissingDependencyResult = useCallback(
+    (_, {dependencies}) => {
+      const alert: AlertType = {
+        type: AlertEnum.Warning,
+        title: 'Missing dependency',
+        message: `${dependencies.toString()} must be installed for all Monokle functionality to be available`,
+      };
+      dispatch(setAlert(alert));
+    },
+    [dispatch]
+  );
 
-  ipcRenderer.on('missing-dependency-result', (_, {dependencies}) => {
-    const alert: AlertType = {
-      type: AlertEnum.Warning,
-      title: 'Missing dependency',
-      message: `${dependencies.toString()} must be installed for all Monokle functionality to be available`,
+  useEffect(() => {
+    ipcRenderer.on('missing-dependency-result', onMissingDependencyResult);
+    return () => {
+      ipcRenderer.removeListener('missing-dependency-result', onMissingDependencyResult);
     };
-    dispatch(setAlert(alert));
-  });
+  }, [onMissingDependencyResult]);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
@@ -59,6 +64,7 @@ const App = () => {
         <HotKeysHandler />
         <RenameResourceModal />
         <ValidationErrorsModal />
+        <UpdateModal />
       </div>
     </AppContext.Provider>
   );
