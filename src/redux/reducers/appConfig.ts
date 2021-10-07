@@ -71,6 +71,14 @@ export const updateNewVersion = createAsyncThunk(
   }
 );
 
+export const updateFolderReadsMaxDepth = createAsyncThunk(
+  'config/folderReadsMaxDepth',
+  async (maxDepth: number, thunkAPI) => {
+    electronStore.set('appConfig.folderReadsMaxDepth', maxDepth);
+    thunkAPI.dispatch(configSlice.actions.setFolderReadsMaxDepth(maxDepth));
+  }
+);
+
 export const configSlice = createSlice({
   name: 'config',
   initialState: initialState.config,
@@ -117,6 +125,9 @@ export const configSlice = createSlice({
     },
     setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       state.recentFolders = action.payload;
+    },
+    setFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
+      state.folderReadsMaxDepth = action.payload;
     },
   },
 });

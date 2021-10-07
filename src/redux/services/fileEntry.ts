@@ -59,7 +59,8 @@ function processHelmChartFolder(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
-  result: string[]
+  result: string[],
+  depth: number
 ) {
   const helmChart: HelmChart = {
     id: uuidv4(),
@@ -76,7 +77,19 @@ function processHelmChartFolder(
     if (fileIsExcluded(appConfig, fileEntry)) {
       fileEntry.isExcluded = true;
     } else if (getFileStats(filePath)?.isDirectory()) {
-      fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+      if (depth === appConfig.folderReadsMaxDepth) {
+        log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
+      } else {
+        fileEntry.children = readFiles(
+          filePath,
+          appConfig,
+          resourceMap,
+          fileMap,
+          helmChartMap,
+          helmValuesMap,
+          depth + 1
+        );
+      }
     } else if (micromatch.isMatch(file, '*values*.yaml')) {
       const helmValues: HelmValuesFile = {
         id: uuidv4(),
@@ -110,7 +123,8 @@ export function readFiles(
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
-  helmValuesMap: HelmValuesMapType
+  helmValuesMap: HelmValuesMapType,
+  depth: number = 1
 ) {
   const files = fs.readdirSync(folder);
   const result: string[] = [];
@@ -133,7 +147,8 @@ export function readFiles(
       fileMap,
       helmChartMap,
       helmValuesMap,
-      result
+      result,
+      depth
     );
   } else {
     files.forEach(file => {
@@ -144,7 +159,19 @@ export function readFiles(
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
-        fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
+        if (depth === appConfig.folderReadsMaxDepth) {
+          log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
+        } else {
+          fileEntry.children = readFiles(
+            filePath,
+            appConfig,
+            resourceMap,
+            fileMap,
+            helmChartMap,
+            helmValuesMap,
+            depth + 1
+          );
+        }
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
           extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {

@@ -1,7 +1,7 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
 
-import {Button, Input, Select, Tooltip, Divider, Checkbox} from 'antd';
+import {Button, Input, Select, Tooltip, Divider, Checkbox, InputNumber} from 'antd';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
 
@@ -15,6 +15,7 @@ import {
   updateKubeconfig,
   updateHelmPreviewMode,
   updateLoadLastFolderOnStartup,
+  updateFolderReadsMaxDepth,
 } from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
 import {
@@ -25,6 +26,7 @@ import {
   KubeconfigPathTooltip,
 } from '@constants/tooltips';
 import {ipcRenderer} from 'electron';
+import {useDebounce} from 'react-use';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -54,8 +56,24 @@ const SettingsDrawer = () => {
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const appConfig = useAppSelector(state => state.config);
+  const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
+  const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
 
   const fileInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setCurrentFolderReadsMaxDepth(folderReadsMaxDepth);
+  }, [folderReadsMaxDepth]);
+
+  useDebounce(
+    () => {
+      if (currentFolderReadsMaxDepth !== folderReadsMaxDepth) {
+        dispatch(updateFolderReadsMaxDepth(currentFolderReadsMaxDepth));
+      }
+    },
+    500,
+    [currentFolderReadsMaxDepth]
+  );
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());
@@ -158,6 +176,10 @@ const SettingsDrawer = () => {
             Automatically load last folder
           </Checkbox>
         </Tooltip>
+      </StyledDiv>
+      <StyledDiv>
+        <StyledSpan>Maximum folder read recursion depth</StyledSpan>
+        <InputNumber min={1} value={currentFolderReadsMaxDepth} onChange={setCurrentFolderReadsMaxDepth} />
       </StyledDiv>
       <Divider />
       {/* <StyledDiv>
