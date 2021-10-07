@@ -7,7 +7,7 @@ import {PROCESS_ENV} from '@utils/env';
  */
 
 export function getStaticResourcePath(resourcePath: string) {
-  if (!path) {
+  if (!process.resourcesPath) {
     return '';
   }
   return PROCESS_ENV.NODE_ENV !== 'development'
