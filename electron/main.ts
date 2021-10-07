@@ -309,7 +309,7 @@ terminal()
   .catch(e => console.log(e));
 
 export const setWindowTitle = (store: any, window: BrowserWindow) => {
-  if (!store || !window) {
+  if (window.isDestroyed()) {
     return;
   }
   const state = store.getState();
