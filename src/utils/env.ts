@@ -58,7 +58,5 @@ function shellEnvSync() {
     }
   }
 }
-console.log('process.resourcesPath', process.resourcesPath);
-console.log('shellEnvSync', shellEnvSync());
 export const PROCESS_ENV: any = shellEnvSync();
 export const RESOURCES_PATH = process.resourcesPath;
