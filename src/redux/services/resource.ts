@@ -10,6 +10,7 @@ import log from 'loglevel';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {getDependentResourceKinds} from '@src/kindhandlers';
 import {v4 as uuidv4} from 'uuid';
+import {getFileStats} from '@utils/files';
 import {validateResource} from './validation';
 import {processRefs} from './resourceRefs';
 
@@ -149,6 +150,16 @@ export function getK8sResources(resourceMap: ResourceMapType, type: string) {
   return Object.values(resourceMap).filter(item => item.kind === type);
 }
 
+export function areRefPosEqual(a: RefPosition | undefined, b: RefPosition | undefined) {
+  if (a === undefined && b === undefined) {
+    return true;
+  }
+  if (!a || !b) {
+    return false;
+  }
+  return a.line === b.line && a.column === b.column && a.length === b.length;
+}
+
 /**
  * Adds a resource ref with the specified type/target to the specified resource
  */
@@ -171,7 +182,8 @@ export function createResourceRef(
           ref.type === refType &&
           ref.name === refName &&
           ref.target?.type === 'resource' &&
-          ref.target.resourceId === targetResourceId
+          ref.target.resourceId === targetResourceId &&
+          areRefPosEqual(ref.position, refNode?.getNodePosition())
       )
     ) {
       resource.refs.push({
@@ -255,8 +267,8 @@ export function createResourceName(filePath: string, content: any) {
  * Adds a file ref to the specified file to the specified resource
  */
 
-export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string) {
-  let refType = ResourceRefType.Outgoing;
+export function createFileRef(resource: K8sResource, refNode: NodeWrapper, filePath: string, fileMap: FileMapType) {
+  let refType = fileMap[filePath] ? ResourceRefType.Outgoing : ResourceRefType.Unsatisfied;
   resource.refs = resource.refs || [];
   const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
 
@@ -326,7 +338,7 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
       fs.writeFileSync(absoluteResourcePath, newValue);
     }
 
-    fileEntry.timestamp = fs.statSync(absoluteResourcePath).mtime.getTime();
+    fileEntry.timestamp = getFileStats(absoluteResourcePath)?.mtime.getTime();
   }
 
   return valueToWrite;
@@ -340,7 +352,7 @@ export function clearResourcesTemporaryObjects(resourceMap: ResourceMapType) {
   Object.values(resourceMap).forEach(r => {
     r.parsedDoc = undefined;
     r.lineCounter = undefined;
-    r.refNodeByPath = undefined;
+    r.refNodesByPath = undefined;
   });
 
   return resourceMap;
@@ -512,7 +524,7 @@ export function removeResourceFromFile(
     content.substr(0, removedResource.range.start) +
       content.substr(removedResource.range.start + removedResource.range.length)
   );
-  fileEntry.timestamp = fs.statSync(absoluteFilePath).mtime.getTime();
+  fileEntry.timestamp = getFileStats(absoluteFilePath)?.mtime.getTime();
 
   delete resourceMap[removedResource.id];
 }

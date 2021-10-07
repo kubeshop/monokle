@@ -34,6 +34,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
     {
       isHovered,
       isSelected,
+      isDisabled,
     }
   );
 
@@ -56,7 +57,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
       return;
     }
     scrollContainer.current?.scrollIntoView();
-  }, [shouldScrollIntoView]);
+  }, [shouldScrollIntoView, isScrolledIntoView]);
 
   const onClick = useCallback(() => {
     if (handler.onClick && !isDisabled) {

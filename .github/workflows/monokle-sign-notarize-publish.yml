@@ -1,4 +1,4 @@
-name: monokle-publish
+name: monokle-sign-notarize-publish
 
 on:
   release:
@@ -30,6 +30,17 @@ jobs:
         run: |
           sysctl -n machdep.cpu.brand_string
           vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
+
+      - name: Add MacOS certs
+        run: |
+          ls -la
+          chmod +x .github/workflows/scripts/add-osx-cert.sh && .github/workflows/scripts/add-osx-cert.sh
+        env:
+          CERTIFICATE_OSX_APPLICATION: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+
+      - name: Electron mac os security identities
+        run: security find-identity -v
 
       - name: Get Node Version
         run: |
@@ -68,6 +79,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
+          NOTARIZE: true
+          CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
 
       # Check Binary Size
       - name: Build Succeeded
@@ -78,7 +94,7 @@ jobs:
       - name: Archive Binary
         uses: actions/upload-artifact@v2
         with:
-          name: dist
+          name: dist-mac
           path: dist
         if: ${{ success() }}
 
@@ -101,7 +117,7 @@ jobs:
           ls -la
         if: ${{ always() }}
 
-  build-and-publishwindows:
+  build-and-publish-windows:
     runs-on: windows-latest
 
     steps:
@@ -130,6 +146,13 @@ jobs:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
 
+      - name: Get MSFT Cert
+        id: write_file
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'kubeshop_msft.p12'
+          encodedString: ${{ secrets.CERT_MSFT_KUBESHOP_P12_B64 }}
+
       # Install Dependencies
       - name: Install Dependencies
         run: |
@@ -155,10 +178,19 @@ jobs:
           npm exec -c 'electron-builder --publish "always"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+          WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
 
       # Check Binary Size
       - name: Build Succeeded
         run: |
           cmd /r dir .\dist
+        if: ${{ success() }}
+
+      - name: Archive Binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist-win
+          path: dist
         if: ${{ success() }}

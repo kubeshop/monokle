@@ -16,4 +16,12 @@ Check out the [Feature Overview](features.md) or watch the [Monokle 1.0 walkthro
 
 [![Monokle 1.0 Walkthrough](img/monokle-welcome.png)](https://youtu.be/9c80qj9NkQk)
 
+## Release blog-posts
+
+Check out what we've done with Monokle for each major release:
+
+- 1.2.0 - [Release blog-post](https://medium.com/kubeshop-i/monokle-1-2-0-is-out-2492341f0874)
+- 1.1.0 - [Release blog-post](https://medium.com/kubeshop-i/monokle-1-1-0-93c5428b2967)
+- 1.0.0 - [Initial release blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96)
+
 

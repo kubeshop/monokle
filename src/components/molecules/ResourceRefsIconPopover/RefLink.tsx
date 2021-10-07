@@ -7,16 +7,29 @@ import {FontColors} from '@styles/Colors';
 import styled from 'styled-components';
 import path from 'path';
 
-const StyledRefText = styled.span<{isUnsatisfied: boolean}>`
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline;
-  }
+const StyledRefText = styled.span<{isUnsatisfied: boolean; isDisabled: boolean}>`
   ${props => {
+    if (!props.isDisabled) {
+      return `
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }`;
+    }
+  }}
+  ${props => {
+    if (props.isDisabled) {
+      return `color: ${FontColors.grey}`;
+    }
     if (props.isUnsatisfied) {
       return `color: ${FontColors.warning};`;
     }
   }}
+`;
+
+const StyledPositionText = styled.span`
+  margin-left: 5px;
+  color: ${FontColors.grey};
 `;
 
 const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
@@ -45,8 +58,13 @@ const Icon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSPrope
   return null;
 });
 
-const ResourceRefLink = (props: {resourceRef: ResourceRef; resourceMap: ResourceMapType; onClick?: () => void}) => {
-  const {resourceRef, resourceMap, onClick} = props;
+const ResourceRefLink = (props: {
+  resourceRef: ResourceRef;
+  resourceMap: ResourceMapType;
+  onClick?: () => void;
+  isDisabled: boolean;
+}) => {
+  const {resourceRef, resourceMap, onClick, isDisabled} = props;
 
   const targetName = getRefTargetName(resourceRef, resourceMap);
   let linkText = targetName;
@@ -62,10 +80,24 @@ const ResourceRefLink = (props: {resourceRef: ResourceRef; resourceMap: Resource
     }
   }
 
+  const handleClick = () => {
+    if (isDisabled || !onClick) {
+      return;
+    }
+    onClick();
+  };
+
   return (
-    <div onClick={onClick}>
+    <div onClick={handleClick}>
       {Icon && <Icon resourceRef={resourceRef} style={{marginRight: 5}} />}
-      <StyledRefText isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>{linkText}</StyledRefText>
+      <StyledRefText isDisabled={isDisabled} isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>
+        {linkText}
+      </StyledRefText>
+      {resourceRef.position && (
+        <StyledPositionText>
+          {resourceRef.position.line}:{resourceRef.position.column}
+        </StyledPositionText>
+      )}
     </div>
   );
 };

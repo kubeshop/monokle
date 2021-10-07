@@ -1,3 +1,4 @@
+import log from 'loglevel';
 import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {FileEntry} from '@models/fileentry';
@@ -36,6 +37,15 @@ export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: Re
     });
 }
 
+function highlightResource(resourceMap: ResourceMapType, resourceId: string) {
+  const currentResource = resourceMap[resourceId];
+  if (currentResource) {
+    currentResource.isHighlighted = true;
+  } else {
+    log.warn(`[updateSelectionAndHighlights]: Couldn't find resource with id ${resourceId}`);
+  }
+}
+
 /**
  * Ensures the correct resources are selected/highlighted when selecting the
  * specified resource
@@ -51,12 +61,12 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
     state.selectedResourceId = resource.id;
 
     if (isKustomizationResource(resource)) {
-      getKustomizationRefs(state.resourceMap, resource.id, true).forEach(e => {
-        state.resourceMap[e].isHighlighted = true;
+      getKustomizationRefs(state.resourceMap, resource.id, true).forEach(resourceId => {
+        highlightResource(state.resourceMap, resourceId);
       });
     } else {
-      getLinkedResources(resource).forEach(e => {
-        state.resourceMap[e].isHighlighted = true;
+      getLinkedResources(resource).forEach(resourceId => {
+        highlightResource(state.resourceMap, resourceId);
       });
     }
 

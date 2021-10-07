@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 import {CloseCircleOutlined, GithubOutlined, QuestionCircleOutlined, SettingOutlined} from '@ant-design/icons';
+import {Badge} from 'antd';
 import {AppBorders} from '@styles/Borders';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -46,12 +47,15 @@ const SettingsCol = styled(Col)`
   flex-direction: row-reverse;
 `;
 
-const StyledSettingsSpan = styled.span`
+const StyledSettingsOutlined = styled(SettingOutlined)`
   color: ${FontColors.elementSelectTitle};
-  margin-right: 8px;
-  padding-top: 10px;
   font-size: 24px;
   cursor: pointer;
+`;
+
+const StyledSettingsBadge = styled(Badge)`
+  margin-right: 8px;
+  margin-top: 13px;
 `;
 
 const GitHubIconSpan = styled.span`
@@ -99,6 +103,14 @@ const StyledExitButton = styled.span`
 
 const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
   margin-right: 5px;
+`;
+
+const StyledDot = styled.div`
+  background-color: black;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  margin: 0 5px;
 `;
 
 const ExitButton = (props: {onClick: () => void}) => {
@@ -201,9 +213,9 @@ const PageHeader = () => {
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>
-            <StyledSettingsSpan onClick={toggleSettingsDrawer}>
-              <SettingOutlined />
-            </StyledSettingsSpan>
+            <StyledSettingsBadge>
+              <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
+            </StyledSettingsBadge>
           </SettingsCol>
         </Row>
       </StyledHeader>

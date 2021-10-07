@@ -10,6 +10,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/services/selection';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {v4 as uuidv4} from 'uuid';
+import {getFileStats} from '@utils/files';
 import {extractK8sResources, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
@@ -74,7 +75,7 @@ function processHelmChartFolder(
 
     if (fileIsExcluded(appConfig, fileEntry)) {
       fileEntry.isExcluded = true;
-    } else if (fs.statSync(filePath).isDirectory()) {
+    } else if (getFileStats(filePath)?.isDirectory()) {
       fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
     } else if (micromatch.isMatch(file, '*values*.yaml')) {
       const helmValues: HelmValuesFile = {
@@ -142,7 +143,7 @@ export function readFiles(
 
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
-      } else if (fs.statSync(filePath).isDirectory()) {
+      } else if (getFileStats(filePath)?.isDirectory()) {
         fileEntry.children = readFiles(filePath, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap);
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
@@ -269,7 +270,15 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
  */
 
 export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState) {
-  if (!fileEntry.timestamp || fs.statSync(absolutePath).mtime.getTime() > fileEntry.timestamp) {
+  let absolutePathTimestamp: number | undefined;
+  try {
+    absolutePathTimestamp = fs.statSync(absolutePath).mtime.getTime();
+  } catch (err) {
+    if (err instanceof Error) {
+      log.warn(`[reloadFile]: ${err.message}`);
+    }
+  }
+  if (!fileEntry.timestamp || (absolutePathTimestamp && absolutePathTimestamp > fileEntry.timestamp)) {
     log.info(`updating from file ${absolutePath}`);
 
     const resourcesInFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
@@ -358,15 +367,23 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
   if (parentEntry) {
-    const fileEntry = fs.statSync(absolutePath).isDirectory()
-      ? addFolder(absolutePath, state, appConfig)
-      : addFile(absolutePath, state);
+    let isDirectory: boolean;
+    try {
+      isDirectory = fs.statSync(absolutePath).isDirectory();
+    } catch (err) {
+      if (err instanceof Error) {
+        log.warn(`[addPath]: ${err.message}`);
+      }
+      return undefined;
+    }
+    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state);
 
     if (fileEntry) {
       state.fileMap[fileEntry.filePath] = fileEntry;
 
       parentEntry.children = parentEntry.children || [];
       parentEntry.children.push(fileEntry.name);
+      parentEntry.children.sort();
     }
 
     return fileEntry;

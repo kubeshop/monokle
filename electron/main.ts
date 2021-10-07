@@ -1,6 +1,9 @@
+/* eslint-disable import/order */
 /* eslint-disable import/first */
 import moduleAlias from 'module-alias';
+import * as ElectronLog from 'electron-log';
 
+Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
   '@constants': `${__dirname}/../src/constants`,
   '@models': `${__dirname}/../src/models`,
@@ -12,26 +15,29 @@ moduleAlias.addAliases({
 
 import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';
-import * as isDev from 'electron-is-dev';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import {execSync} from 'child_process';
-import * as ElectronLog from 'electron-log';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH} from '@constants/constants';
 import {checkMissingDependencies} from '@utils/index';
+import ElectronStore from 'electron-store';
+import {autoUpdater} from 'electron-updater';
+import mainStore from '@redux/main-store';
+import {updateNewVersion} from '@redux/reducers/appConfig';
+import {NewVersionCode} from '@models/appconfig';
 
+import initKubeconfig from './src/initKubeconfig';
+import {createMenu, getDockMenu} from './menu';
 import terminal from '../cli/terminal';
-import {createMenu} from './menu';
-
-// console.log(store);
 
 Object.assign(console, ElectronLog.functions);
-
-const ElectronStore = require('electron-store');
+autoUpdater.logger = console;
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
+
+const isDev = process.env.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const APP_DEPENDENCIES = ['kubectl', 'helm'];
@@ -108,7 +114,37 @@ ipcMain.on('run-helm', (event, args: any) => {
   }
 });
 
-function createWindow() {
+ipcMain.on('app-version', event => {
+  event.sender.send('app-version', {version: app.getVersion()});
+});
+
+ipcMain.on('check-update-available', async () => {
+  await checkNewVersion();
+});
+
+ipcMain.on('quit-and-install', () => {
+  autoUpdater.quitAndInstall();
+  mainStore.dispatch(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+});
+
+export const checkNewVersion = async (initial?: boolean) => {
+  try {
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Checking, data: {initial: Boolean(initial)}}));
+    await autoUpdater.checkForUpdates();
+  } catch (error: any) {
+    if (error.errno === -2) {
+      mainStore.dispatch(
+        updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}})
+      );
+    } else {
+      mainStore.dispatch(
+        updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}})
+      );
+    }
+  }
+};
+
+export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1200,
@@ -123,6 +159,7 @@ function createWindow() {
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
       preload: path.join(__dirname, 'preload.js'),
+      enableRemoteModule: true,
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
@@ -168,12 +205,45 @@ function createWindow() {
     win.webContents.openDevTools();
   }
 
-  return win;
-}
+  autoUpdater.on('update-available', (data: any) => {
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Available, data: null}));
+  });
 
-const openApplication = async (givenPath?: string) => {
+  autoUpdater.on('update-not-available', (data: any) => {
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.NotAvailable, data: null}));
+  });
+
+  autoUpdater.on('download-progress', (progressObj: any) => {
+    let percent = 0;
+    if (progressObj && progressObj.percent) {
+      percent = progressObj.percent;
+    }
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}}));
+  });
+
+  autoUpdater.on('update-downloaded', (data: any) => {
+    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
+  });
+
+  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
+
+  if (missingDependecies.length > 0) {
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
+    });
+  }
+
+  win.webContents.on('did-finish-load', async () => {
+    await checkNewVersion(true);
+    initKubeconfig(mainStore, userHomeDir);
+    win.webContents.send('executed-from', {path: givenPath});
+  });
+
+  return win;
+};
+
+export const openApplication = async (givenPath?: string) => {
   await app.whenReady();
-  const {default: mainStore} = await import('@redux/main-store');
 
   if (isDev) {
     // DevTools
@@ -187,34 +257,25 @@ const openApplication = async (givenPath?: string) => {
   }
 
   ElectronStore.initRenderer();
-  const win = createWindow();
+  createWindow(givenPath);
 
   mainStore.subscribe(() => {
-    createMenu(win, mainStore);
-  });
-
-  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
-
-  if (missingDependecies.length > 0) {
-    win.webContents.on('did-finish-load', () => {
-      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
-    });
-  }
-
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('executed-from', {path: givenPath});
+    createMenu(mainStore);
   });
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
     app.dock.setIcon(image);
+    mainStore.subscribe(() => {
+      app.dock.setMenu(getDockMenu(mainStore));
+    });
   }
 
   console.log('info', app.getName(), app.getVersion(), app.getLocale(), givenPath);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createWindow(givenPath);
     }
   });
 

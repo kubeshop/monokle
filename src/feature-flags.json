@@ -1,5 +1,6 @@
 {
   "ShowGraphView": false,
   "ShowClusterView": true,
-  "ShowRightMenu": false
+  "ShowRightMenu": false,
+  "PluginManager": false
 }
