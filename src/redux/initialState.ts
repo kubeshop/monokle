@@ -96,6 +96,7 @@ const initialAppConfigState: AppConfig = {
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
+  folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 5,
   recentFolders: electronStore.get('appConfig.recentFolders') || [],
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,

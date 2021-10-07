@@ -30,6 +30,8 @@ interface AppConfig {
   scanExcludes: string[];
   /** a list of patterns to match to against files for including */
   fileIncludes: string[];
+  /** maximum recursion depth when reading nested folders */
+  folderReadsMaxDepth: number;
   /** the currrent navigator configuration */
   navigators: ObjectNavigator[];
   /** absolute kubeconfig path */
