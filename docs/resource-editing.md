@@ -43,8 +43,6 @@ For adding resources to new or existing files in the navigator, click on the Sav
 You can easily view and edit resources from clusters. After making changes in a resource, you can quickly apply them back to the cluster.
 
 ![Resource cluster](img/resource-cluster.png)
-
-
 #### Saving changes
 
 The [Save] button on top of the editor will be enabled if valid changes have been made - invalid yaml will not be savable.
@@ -66,3 +64,26 @@ The editor provides form fields for key ConfigMap properties, allowing you to ed
 having to learn or lookup the corresponding yaml/resource documentation. Any changes made and saved (with the Save button on the top right)
 are written back to the underlying yaml.
 
+## Rename Resource
+
+You can rename resources and update all the references associated with that resource to ensure the integrity of that link.
+
+![Rename Resource](img/rename.png)
+
+## Clone Resource
+
+You can use clone action to create a new resource by using existing resources as a template. 
+
+![Clone Resource](img/clone.png)
+
+## Delete Resource
+
+You can use the delete action in the cluster mode to delete the resource from the actual cluster. 
+
+![Delete Resource](img/delete.png)
+
+## Resource Template
+
+While creating a resource, it is possible to select an existing resource as a template from the drop-down menu. 
+
+![Resource template](img/template.png)

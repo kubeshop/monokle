@@ -13,14 +13,6 @@ moduleAlias.addAliases({
   '@root': `${__dirname}/../`,
 });
 
-try {
-  // eslint-disable-next-line global-require
-  const {env} = require('./env');
-  process.env.NODE_ENV = !env || env === 'production' ? 'production' : 'development';
-} catch (error) {
-  process.env.NODE_ENV = 'production';
-}
-
 import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
