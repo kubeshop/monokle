@@ -32,6 +32,17 @@ const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => 
   return 'Check for Update';
 };
 
+const checkForUpdateMenu: any = (store: any) => {
+  const config: AppConfig = store.getState().config;
+  return {
+    label: getUpdateMonokleText(config.newVersion),
+    enabled: config.newVersion.code !== NewVersionCode.Downloading,
+    click: async () => {
+      await checkNewVersion();
+    },
+  };
+};
+
 const appMenu = (store: any): MenuItemConstructorOptions => {
   const config: AppConfig = store.getState().config;
   return {
@@ -43,13 +54,7 @@ const appMenu = (store: any): MenuItemConstructorOptions => {
           await store.dispatch(updateStartupModalVisible(true));
         },
       },
-      {
-        label: getUpdateMonokleText(config.newVersion),
-        enabled: config.newVersion.code !== NewVersionCode.Downloading,
-        click: async () => {
-          await checkNewVersion();
-        },
-      },
+      checkForUpdateMenu(store),
       {type: 'separator'},
       {label: 'Hide Monokle', role: 'hide'},
       {role: 'hideOthers'},
@@ -258,25 +263,37 @@ const windowMenu = (store: any): MenuItemConstructorOptions => {
   };
 };
 
-const helpMenu = (store: any): MenuItemConstructorOptions => {
+const helpMenu = (store: any, includeUpdateMenu?: boolean): MenuItemConstructorOptions => {
+  const submenu: any = [
+    {
+      label: 'Documentation',
+      click: openDocumentation,
+    },
+    {type: 'separator'},
+    {
+      label: 'GitHub',
+      click: openGitHub,
+    },
+  ];
+
+  if (includeUpdateMenu) {
+    submenu.push({type: 'separator'});
+    submenu.push(checkForUpdateMenu(store));
+  }
   return {
     label: 'Help',
-    submenu: [
-      {
-        label: 'Documentation',
-        click: openDocumentation,
-      },
-      {type: 'separator'},
-      {
-        label: 'GitHub',
-        click: openGitHub,
-      },
-    ],
+    submenu,
   };
 };
 
 export const createMenu = (store: any) => {
-  const template: any[] = [fileMenu(store), editMenu(store), viewMenu(store), windowMenu(store), helpMenu(store)];
+  const template: any[] = [
+    fileMenu(store),
+    editMenu(store),
+    viewMenu(store),
+    windowMenu(store),
+    helpMenu(store, !isMac),
+  ];
 
   if (isMac) {
     template.unshift(appMenu(store));
