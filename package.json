@@ -150,7 +150,7 @@
       "entitlements": "./electron/src/entitlements.mac.inherit.plist",
       "entitlementsInherit": "./electron/src/entitlements.mac.inherit.plist",
       "target": [
-        "dmg"
+        "default"
       ]
     },
     "artifactName": "${productName}-${version}.${ext}",
