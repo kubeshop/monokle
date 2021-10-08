@@ -157,7 +157,7 @@
     "afterSign": "./notarization/afterSignHook.js",
     "dmg": {
       "icon": "build/icon.png",
-      "writeUpdateInfo": false
+      "writeUpdateInfo": true
     },
     "win": {
       "target": "nsis",
@@ -168,7 +168,7 @@
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "installerHeaderIcon": "build/icon.ico",
-      "differentialPackage": false,
+      "differentialPackage": true,
       "perMachine": true,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
