@@ -51,7 +51,8 @@ Monokle is now in "Preview Mode" (as indicated by the header at the top):
 
 ## Editing of values files during preview
 
-When previewing Helm charts it is possible to edit the previewed values file and recreate the preview, 
-instead of having to exit and recreate the preview to maka a change:
+When previewing a Helm values file it is possible to edit the previewed file and recreate the preview, allowing
+you to quickly assess the impact of any changes on the generated files
+(instead of having to exit and recreate the preview to maka a change).
  
 ![Edit Helm](img/helm-preview-reload.png)
