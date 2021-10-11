@@ -1,9 +1,8 @@
-
-## How to Fix Dead-End Broken Links?
+# How to Fix Broken Links?
 
 Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
 
-In this tutorial, we have illustrated the steps to fix dead-end broken links. 
+In this tutorial, we have illustrated the steps to fix broken links. 
 
 Let’s get started. 
 

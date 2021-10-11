@@ -1,9 +1,11 @@
 # Resource Editing
 
+Monokle allows you to edit resource manifests either in a Source Editor
+
 ## Source Editor
 
 Selecting either a file or resource will show its contents in the source editor to the right. The editor will syntax-highlight for
-yaml only at this point.
+yaml and provide context-sensitive help and auto-complete functionality for standard kubernetes objects.
 
 Right-clicking in the editor shows a list of available commands - and pressing F1 opens its command-palette:
 
@@ -62,7 +64,8 @@ To start with Monokle only shows a Form Editor for ConfigMap resources:
 
 The editor provides form fields for key ConfigMap properties, allowing you to edit/discover all available properties without 
 having to learn or lookup the corresponding yaml/resource documentation. Any changes made and saved (with the Save button on the top right)
-are written back to the underlying yaml.
+are written back to the underlying yaml. Check out [this tutorial](tutorials/how-to-create-and-edit-configmap.md) for more details 
+on how to use the Form editor for ConfigMaps.
 
 ## Rename Resource
 

@@ -262,14 +262,22 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setDraggingLeftNav(false);
     setDraggingNavEdit(false);
     setDraggingEditRight(false);
-    dispatch(
-      setPaneConfiguration({
-        leftWidth,
-        navWidth,
-        editWidth,
-        rightWidth,
-      })
-    );
+
+    if (
+      paneConfiguration.leftWidth !== leftWidth ||
+      paneConfiguration.navWidth !== navWidth ||
+      paneConfiguration.editWidth !== editWidth ||
+      paneConfiguration.rightWidth !== rightWidth
+    ) {
+      dispatch(
+        setPaneConfiguration({
+          leftWidth,
+          navWidth,
+          editWidth,
+          rightWidth,
+        })
+      );
+    }
   };
 
   const onMove = (clientX: number) => {

@@ -32,6 +32,7 @@ import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
+import {PROCESS_ENV} from '@utils/env';
 
 import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
@@ -43,7 +44,7 @@ autoUpdater.logger = console;
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
 
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = PROCESS_ENV.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
@@ -76,8 +77,8 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
     let stdout = execSync('kubectl kustomize ./', {
       cwd: folder,
       env: {
-        NODE_ENV: process.env.NODE_ENV,
-        PUBLIC_URL: process.env.PUBLIC_URL,
+        NODE_ENV: PROCESS_ENV.NODE_ENV,
+        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
       },
     });
 
@@ -123,8 +124,8 @@ ipcMain.on('run-helm', (event, args: any) => {
     let stdout = execSync(args.helmCommand, {
       cwd: args.cwd,
       env: {
-        NODE_ENV: process.env.NODE_ENV,
-        PUBLIC_URL: process.env.PUBLIC_URL,
+        NODE_ENV: PROCESS_ENV.NODE_ENV,
+        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
         KUBECONFIG: args.kubeconfig,
       },
     });
@@ -326,6 +327,9 @@ terminal()
   .catch(e => console.log(e));
 
 export const setWindowTitle = (store: any, window: BrowserWindow) => {
+  if (window.isDestroyed()) {
+    return;
+  }
   const state = store.getState();
   const isInPreviewMode = isInPreviewModeSelector(state);
   const previewType = state.main.previewType;

@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -154,14 +154,14 @@
       "entitlements": "./electron/src/entitlements.mac.inherit.plist",
       "entitlementsInherit": "./electron/src/entitlements.mac.inherit.plist",
       "target": [
-        "dmg"
+        "default"
       ]
     },
     "artifactName": "${productName}-${version}.${ext}",
     "afterSign": "./notarization/afterSignHook.js",
     "dmg": {
       "icon": "build/icon.png",
-      "writeUpdateInfo": false
+      "writeUpdateInfo": true
     },
     "win": {
       "target": "nsis",
@@ -172,13 +172,13 @@
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "installerHeaderIcon": "build/icon.ico",
-      "differentialPackage": false,
+      "differentialPackage": true,
       "perMachine": true,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
-      "runAfterFinish": false,
+      "runAfterFinish": true,
       "createDesktopShortcut": false,
-      "menuCategory": "Monokle"
+      "menuCategory": "Kubeshop"
     },
     "extends": null,
     "files": [
