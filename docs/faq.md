@@ -32,28 +32,23 @@ run editor or service inside the Kubernetes cluster.
 You can launch multiple project windows using the [New Monokle Windows](./overview.md) option. It allows you to work on
 multiple folders or clusters simultaneously thus visual navigation for the multiple pages becomes simpler and faster.
 
-## 7. Can I use Monokle with Minikube?
-
-Yes, you can use Monokle with Minikube. For local Kubernetes distributions, you can directly use Monokle which helps
-manage resources, namespace isolation, and custom application catalogs.
-
-## 8. Can I use Monokle with Flux/ArgoCD?
+## 7. Can I use Monokle with Flux/ArgoCD?
 
 Yes, Monokle is used for creating / editing / debugging manifests before they are deployed to a cluster using a CD tool
 like ArgoCD or Flux. It provides a single toolchain for continuous deployment and workflow automation. It improves
 overall feature syncing frequency, performance, and efficiency.
 
-## 9. How to open Helm and Kustomization preview?
+## 8. How to open Helm and Kustomization preview?
 
 You can navigate to the resources created by Kustomize or Helm in the navigator. Hover over the resources and hit the
 [preview](./features.md) button to view the source code in the editor.
 
-## 10. Why is Autocomplete not working in the editor?
+## 9. Why is Autocomplete not working in the editor?
 
 The source editor provides an auto-complete option for only native Kubernetes resources. Therefore, autocomplete feature
 would not work with any other resource except the resources in the YAML manifests.
 
-## 11. How to save changes in the editor?
+## 10. How to save changes in the editor?
 
 Monokle source editor enables you to edit YAML manifests. The source editor automatically saves the current changes in
 the code. It helps to reduce the risk of data loss, freeze, or user error.
