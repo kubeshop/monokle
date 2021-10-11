@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -29,6 +29,7 @@
     "@types/electron-devtools-installer": "2.2.0",
     "@types/jest": "27.0.1",
     "@types/micromatch": "4.0.2",
+    "@types/node-fetch": "2.5.12",
     "@types/module-alias": "2.0.1",
     "@types/node": "16.10.2",
     "@types/react": "17.0.18",
@@ -93,6 +94,7 @@
     "loglevel": "1.7.1",
     "micromatch": "4.0.4",
     "module-alias": "^2.2.2",
+    "node-fetch": "2.6.1",
     "monaco-yaml": "3.2.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -109,6 +111,8 @@
     "shelljs": "0.8.4",
     "strip-ansi": "6.0.1",
     "styled-components": "5.3.1",
+    "tar": "6.1.11",
+    "type-fest": "2.3.4",
     "uuid": "8.3.2",
     "web-vitals": "2.1.0",
     "worker-loader": "3.0.8",
@@ -150,14 +154,14 @@
       "entitlements": "./electron/src/entitlements.mac.inherit.plist",
       "entitlementsInherit": "./electron/src/entitlements.mac.inherit.plist",
       "target": [
-        "dmg"
+        "default"
       ]
     },
     "artifactName": "${productName}-${version}.${ext}",
     "afterSign": "./notarization/afterSignHook.js",
     "dmg": {
       "icon": "build/icon.png",
-      "writeUpdateInfo": false
+      "writeUpdateInfo": true
     },
     "win": {
       "target": "nsis",
@@ -168,13 +172,13 @@
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "installerHeaderIcon": "build/icon.ico",
-      "differentialPackage": false,
+      "differentialPackage": true,
       "perMachine": true,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
-      "runAfterFinish": false,
+      "runAfterFinish": true,
       "createDesktopShortcut": false,
-      "menuCategory": "Monokle"
+      "menuCategory": "Kubeshop"
     },
     "extends": null,
     "files": [

@@ -13,9 +13,12 @@ Left to right:
   any resources will be shown.
 - The Editor section to the right contains editors/views/actions for the currently selected resource or file
 
-The top right contains two buttons
+The top right contains the following buttons
+
 - Settings (see below)
 - GitHub -> opens the Monokle GitHub repo in your system browser.
+- Help -> opens the Monokle documentation in your system browser
+
 ## Settings 
 
 Clicking the Settings icon on the top right opens the settings:
@@ -28,13 +31,30 @@ Clicking the Settings icon on the top right opens the settings:
 - **Helm Preview Mode**: which Helm command to use for generating previews (see [Working with Helm Charts](helm.md))
     - Template: uses [Helm Template](https://helm.sh/docs/helm/helm_template/)
     - Install: uses [Helm Install](https://helm.sh/docs/helm/helm_install/)
+- **On Startup**: 
+    - Automatically load last folder: will do just that on startup!
+- **Maximum folder-read recursion depth**: configures how "deep" Monokle will parse a specified folder (to avoid going too deep)
+
+## System Menu
+
+Monokle provides a system menu with common File/Edit/View/Window/Help functionality
+
+Mac System Menu:
+
+![MacOS Monokle System Menu](img/mac-system-menu.png)
+
+Windows System Menu: 
+
+![Windows Monokle System Menu](img/windows-system-menu.png)
+
 ## Multiple Windows
 
 You can launch multiple project windows using the New Monokle Windows option. It allows you to work on multiple folders or clusters simultaneously. Thus visual navigation for the recently used pages becomes simpler and faster.   
 
-**Action:** File > New Monokle Windows
+**Action:** File > New Monokle Window
 
 ![Multiple Window](img/multiple-window.png)
+
 ## Keyboard Shortcuts
 
 Monokle current supports the following keyboard shortcuts:
@@ -52,3 +72,10 @@ Monokle current supports the following keyboard shortcuts:
 - Open New Resource Wizard: Ctrl/Cmd N
 - Apply Resource or File to cluster: Ctrl/Cmd ALT S
 - Diff Resource: Ctrl/Cmd ALT D
+
+## Auto-update
+
+The Monokle (on Mac) / Help (on Windows) system menus provide a "Check for Udpate" action that will check for an update
+and prompt to download if available.
+
+![Auto Update](img/auto-update.png)

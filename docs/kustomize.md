@@ -68,7 +68,8 @@ specified in the kustomization configuration:
 
 ## Editing of kustomizations during preview
 
-When previewing a kustomization it is possible to edit the previewed file and recreate the preview,
-instead of having to exit and recreate the preview to maka a change
+When previewing a kustomization it is possible to edit the previewed kustomization.yaml file and recreate the preview, allowing 
+you to quickly assess the impact of any changes on the generated files 
+(instead of having to exit and recreate the preview to maka a change).
  
 ![Edit kustomization during Preview](img/kust-preview-reload.png)

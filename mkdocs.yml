@@ -30,7 +30,7 @@ nav:
     - tutorials/how-to-browse-clusters.md
     - tutorials/how-to-configure-monokle.md
     - tutorials/how-to-create-and-edit-configmap.md
-    - tutorials/how-to-fix-dead-end-broken-links.md
+    - tutorials/how-to-fix-broken-links.md
 
 
 extra:

@@ -1,6 +1,5 @@
 # How to Browse Clusters
 
-
 Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
 
 In this tutorial, we have illustrated the steps to help you browse and debug the resources generated with kustomize and Helm. 
