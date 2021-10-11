@@ -235,19 +235,6 @@ function handleRefMappingByKey(
   }
 
   sourceRefNodes.forEach(sourceRefNode => {
-    if (outgoingRefMapper.source.hasOptionalSibling) {
-      const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
-
-      const optionalSiblingRefNode = sourceResource.refNodesByPath
-        ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
-            refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
-          )
-        : undefined;
-      if (optionalSiblingRefNode && optionalSiblingRefNode.scalar.value === true) {
-        return;
-      }
-    }
-
     // if no target resources are found, then mark the source ref as unsatisfied
     if (targetResources.length === 0) {
       createResourceRef(
@@ -280,13 +267,27 @@ function handleRefMappingByKey(
       });
 
       if (!hasSatisfiedRefs) {
-        createResourceRef(
-          sourceResource,
-          ResourceRefType.Unsatisfied,
-          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-          undefined,
-          outgoingRefMapper.target.kind
-        );
+        let shouldCreateUnsatisfiedRef = true;
+        if (outgoingRefMapper.source.hasOptionalSibling) {
+          const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
+          const optionalSiblingRefNode = sourceResource.refNodesByPath
+            ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
+                refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
+              )
+            : undefined;
+          if (optionalSiblingRefNode && optionalSiblingRefNode.scalar.value === true) {
+            shouldCreateUnsatisfiedRef = false;
+          }
+        }
+        if (shouldCreateUnsatisfiedRef) {
+          createResourceRef(
+            sourceResource,
+            ResourceRefType.Unsatisfied,
+            new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+            undefined,
+            outgoingRefMapper.target.kind
+          );
+        }
       }
     }
   });
