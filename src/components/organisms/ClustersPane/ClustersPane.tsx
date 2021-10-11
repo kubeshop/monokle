@@ -103,12 +103,14 @@ const ClustersPane = () => {
       openFileSelect();
       dispatch(closeFolderExplorer());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiState]);
 
   useEffect(() => {
     if (kubeconfig) {
       dispatch(loadContexts(kubeconfig));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kubeconfig]);
 
   return (
@@ -136,16 +138,12 @@ const ClustersPane = () => {
 
           <StyledDiv>
             <StyledSelect
-              defaultValue={kubeConfig.currentContext}
-              onChange={handleContextChange}
+              placeholder="Select a context"
               disabled={previewType === 'cluster' && previewLoader.isLoading}
-            >
-              {kubeConfig.contexts.map(context => (
-                <StyledSelect.Option key={context.cluster} value={context.cluster}>
-                  {context.name}
-                </StyledSelect.Option>
-              ))}
-            </StyledSelect>
+              value={kubeConfig.currentContext}
+              options={kubeConfig.contexts.map(context => ({label: context.name, value: context.cluster}))}
+              onChange={handleContextChange}
+            />
           </StyledDiv>
 
           <StyledDiv>Select to retrieve resources from selected context</StyledDiv>
