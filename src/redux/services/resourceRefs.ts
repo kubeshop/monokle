@@ -102,15 +102,12 @@ export function processResourceRefNodes(resource: K8sResource) {
         }
       }
 
-      refMapper.source.dependencies?.forEach(dependency => {
-        if (!resource.refNodesByPath) {
-          resource.refNodesByPath = {};
+      if (refMapper.source.hasOptionalSibling) {
+        const optionalSiblingPath = joinPathParts([...refMapper.source.pathParts.slice(0, -1), 'optional']);
+        if (keyPath.endsWith(optionalSiblingPath)) {
+          addRefNodeAtPath(refNode, optionalSiblingPath, resource.refNodesByPath);
         }
-        const dependencyPath = joinPathParts(dependency.pathParts);
-        if (keyPath.endsWith(dependencyPath)) {
-          addRefNodeAtPath(refNode, dependencyPath, resource.refNodesByPath);
-        }
-      });
+      }
     });
   });
 }
@@ -238,6 +235,19 @@ function handleRefMappingByKey(
   }
 
   sourceRefNodes.forEach(sourceRefNode => {
+    if (outgoingRefMapper.source.hasOptionalSibling) {
+      const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
+
+      const optionalSiblingRefNode = sourceResource.refNodesByPath
+        ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
+            refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
+          )
+        : undefined;
+      if (optionalSiblingRefNode && optionalSiblingRefNode.scalar.value === true) {
+        return;
+      }
+    }
+
     // if no target resources are found, then mark the source ref as unsatisfied
     if (targetResources.length === 0) {
       createResourceRef(

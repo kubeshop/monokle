@@ -43,6 +43,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['volumes', 'secret', 'secretName'],
+      hasOptionalSibling: true,
     },
     ...SecretTarget,
   },
