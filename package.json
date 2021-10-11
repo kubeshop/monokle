@@ -191,8 +191,13 @@
           ]
         }
       ],
+      "icon": "build/icon.png",
+      "category": "Development",
       "maintainer": "Kubeshop",
       "vendor": "Kubeshop"
+    },
+    "AppImage": {
+      "priority": "standard"
     },
     "deb": {
       "packageCategory": "Kubeshop",

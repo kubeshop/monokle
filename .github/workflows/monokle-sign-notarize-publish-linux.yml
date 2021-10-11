@@ -26,11 +26,6 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v2
 
-      # Check memory and cpu
-      - name: Verify Runner Resources
-        run: |
-          vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
-
       - name: Get Node Version
         run: |
           cat .nvmrc
@@ -78,7 +73,7 @@ jobs:
       - name: Archive Binary
         uses: actions/upload-artifact@v2
         with:
-          name: dist-deb
+          name: dist-nix
           path: dist
         if: ${{ success() }}
 
