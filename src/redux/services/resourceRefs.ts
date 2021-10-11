@@ -1,4 +1,4 @@
-import {ResourceMapType} from '@models/appstate';
+import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
@@ -223,7 +223,8 @@ function handleRefMappingByParentKey(
 function handleRefMappingByKey(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
-  outgoingRefMapper: RefMapper
+  outgoingRefMapper: RefMapper,
+  processingOptions: ResourceRefsProcessingOptions
 ) {
   const outgoingRefMapperSourcePath = joinPathParts(outgoingRefMapper.source.pathParts);
   const sourceRefNodes = sourceResource.refNodesByPath
@@ -268,7 +269,7 @@ function handleRefMappingByKey(
 
       if (!hasSatisfiedRefs) {
         let shouldCreateUnsatisfiedRef = true;
-        if (outgoingRefMapper.source.hasOptionalSibling) {
+        if (outgoingRefMapper.source.hasOptionalSibling && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
           const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
           const optionalSiblingRefNode = sourceResource.refNodesByPath
             ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
@@ -309,7 +310,11 @@ function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) 
   });
 }
 
-export function processRefs(resourceMap: ResourceMapType, filter?: {resourceIds?: string[]; resourceKinds?: string[]}) {
+export function processRefs(
+  resourceMap: ResourceMapType,
+  processingOptions: ResourceRefsProcessingOptions,
+  filter?: {resourceIds?: string[]; resourceKinds?: string[]}
+) {
   const resources = Object.values(resourceMap).filter(resource => !isKustomizationResource(resource));
   resources.forEach(resource => processResourceRefNodes(resource));
 
@@ -339,7 +344,7 @@ export function processRefs(resourceMap: ResourceMapType, filter?: {resourceIds?
       if (outgoingRefMapper.matchPairs) {
         handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
       } else {
-        handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper);
+        handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
       }
     });
   });

@@ -9,6 +9,7 @@ import FilePatternList from '@molecules/FilePatternList';
 
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleSettings} from '@redux/reducers/ui';
+import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {
   updateScanExcludes,
   updateFileIncludes,
@@ -55,6 +56,7 @@ const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
+  const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const appConfig = useAppSelector(state => state.config);
   const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
   const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
@@ -101,6 +103,10 @@ const SettingsDrawer = () => {
 
   const onChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastFolderOnStartup(e.target.checked));
+  };
+
+  const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
+    dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
   };
 
   const openFileSelect = () => {
@@ -180,6 +186,15 @@ const SettingsDrawer = () => {
       <StyledDiv>
         <StyledSpan>Maximum folder read recursion depth</StyledSpan>
         <InputNumber min={1} value={currentFolderReadsMaxDepth} onChange={setCurrentFolderReadsMaxDepth} />
+      </StyledDiv>
+      <StyledDiv>
+        <StyledSpan>Resource links processing</StyledSpan>
+        <Checkbox
+          checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
+          onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
+        >
+          Ignore optional unsatisfied links
+        </Checkbox>
       </StyledDiv>
       <Divider />
       {/* <StyledDiv>

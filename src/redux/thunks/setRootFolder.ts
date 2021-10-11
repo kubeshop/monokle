@@ -26,6 +26,7 @@ export const setRootFolder = createAsyncThunk<
   }
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
   const appConfig = thunkAPI.getState().config;
+  const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
   const rootEntry: FileEntry = createFileEntry(rootFolder);
@@ -45,7 +46,7 @@ export const setRootFolder = createAsyncThunk<
   rootEntry.children = files;
 
   processKustomizations(resourceMap, fileMap);
-  processParsedResources(resourceMap);
+  processParsedResources(resourceMap, resourceRefsProcessingOptions);
 
   monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
   updateRecentFolders(thunkAPI, rootFolder);

@@ -1,5 +1,5 @@
 import log from 'loglevel';
-import {createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
 import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 import {AppConfig} from '@models/appconfig';
@@ -26,6 +26,7 @@ import {K8sResource} from '@models/k8sresource';
 import {AlertType} from '@models/alert';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFileStats} from '@utils/files';
+import electronStore from '@utils/electronStore';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
@@ -102,6 +103,14 @@ function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: b
   state.currentSelectionHistoryIndex = undefined;
 }
 
+export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
+  'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
+  async (shouldIgnore: boolean, thunkAPI) => {
+    electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
+    thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
+  }
+);
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
@@ -177,7 +186,7 @@ export const mainSlice = createSlice({
               state.resourceMap[r.id] = r;
               r.isHighlighted = true;
             });
-            reprocessResources([], state.resourceMap, state.fileMap, {
+            reprocessResources([], state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
               resourceKinds: extractedResources.map(r => r.kind),
             });
           }
@@ -205,7 +214,7 @@ export const mainSlice = createSlice({
             resource.text = action.payload.content;
             resource.content = parseDocument(action.payload.content).toJS();
           }
-          reprocessResources([resource.id], state.resourceMap, state.fileMap);
+          reprocessResources([resource.id], state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
           if (!action.payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
             updateSelectionAndHighlights(state, resource);
@@ -314,6 +323,9 @@ export const mainSlice = createSlice({
     },
     updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       state.resourceFilter = action.payload;
+    },
+    setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = action.payload;
     },
   },
   extraReducers: builder => {

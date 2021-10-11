@@ -332,7 +332,8 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     reprocessResources(
       resourcesFromFile.map(r => r.id),
       state.resourceMap,
-      state.fileMap
+      state.fileMap,
+      state.resourceRefsProcessingOptions
     );
 
     if (resourcesInFile.length === 1 && resourcesFromFile.length === 1 && wasSelected) {
@@ -357,7 +358,8 @@ function addFile(absolutePath: string, state: AppState) {
   reprocessResources(
     resourcesFromFile.map(r => r.id),
     state.resourceMap,
-    state.fileMap
+    state.fileMap,
+    state.resourceRefsProcessingOptions
   );
   return fileEntry;
 }
@@ -487,7 +489,7 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
     }
   }
 
-  reprocessResources([], state.resourceMap, state.fileMap, {
+  reprocessResources([], state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
     resourceKinds: removalSideEffect.removedResources.map(r => r.kind),
   });
 }

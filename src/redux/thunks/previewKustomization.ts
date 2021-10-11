@@ -33,7 +33,7 @@ export const previewKustomization = createAsyncThunk<
     }
 
     if (result.stdout) {
-      return createPreviewResult(result.stdout, resource.id, 'Kustomize Preview');
+      return createPreviewResult(result.stdout, resource.id, 'Kustomize Preview', state.resourceRefsProcessingOptions);
     }
   }
 
