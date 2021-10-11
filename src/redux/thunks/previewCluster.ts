@@ -12,6 +12,7 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
   try {
     const kc = new k8s.KubeConfig();
     kc.loadFromFile(configPath);
+    kc.setCurrentContext(thunkAPI.getState().config.kubeConfig.currentContext);
 
     return Promise.allSettled(
       ResourceKindHandlers.map(resourceKindHandler =>
@@ -48,17 +49,18 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
               type: AlertEnum.Warning,
             };
 
+            console.log('previewResult1', previewResult);
             return previewResult;
           }
         }
-
+        console.log('previewResult2', previewResult);
         return previewResult;
       },
       reason => {
         return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
       }
     );
-  } catch (e) {
+  } catch (e: any) {
     return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', e.message);
   }
 };
