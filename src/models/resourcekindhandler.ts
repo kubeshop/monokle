@@ -8,6 +8,7 @@ interface SymbolMatcher {
 interface RefMapper {
   source: {
     pathParts: string[];
+    hasOptionalSibling?: boolean;
   };
   target: {
     kind: string;

@@ -1,6 +1,19 @@
 const ElectronStore = require('electron-store');
 
 const schema = {
+  main: {
+    type: 'object',
+    properties: {
+      resourceRefsProcessingOptions: {
+        type: 'object',
+        properties: {
+          shouldIgnoreOptionalUnsatisfiedRefs: {
+            type: 'boolean',
+          },
+        },
+      },
+    },
+  },
   appConfig: {
     type: 'object',
     properties: {

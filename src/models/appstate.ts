@@ -58,6 +58,11 @@ type ResourceFilterType = {
   annotations: Record<string, string | null>;
 };
 
+type ResourceRefsProcessingOptions = {
+  /** if ref processing should ignore optional unsatisfied ref  */
+  shouldIgnoreOptionalUnsatisfiedRefs: boolean;
+};
+
 interface AppState {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -98,6 +103,7 @@ interface AppState {
   /** the diff content for the resource being diffed */
   diffContent?: string;
   plugins: MonoklePlugin[];
+  resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
 }
 
 export type {
@@ -110,4 +116,5 @@ export type {
   PreviewLoaderType,
   SelectionHistoryEntry,
   PreviewType,
+  ResourceRefsProcessingOptions,
 };

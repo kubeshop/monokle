@@ -1,6 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
-import {ResourceMapType} from '@models/appstate';
+import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {extractK8sResources, processParsedResources} from '@redux/services/resource';
 import {stringify} from 'yaml';
 import {AlertEnum} from '@models/alert';
@@ -24,14 +24,19 @@ export function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: stri
  * Creates a preview result from a YAML string containing resources
  */
 
-export function createPreviewResult(resourcesYaml: string, previewResourceId: string, title: string) {
+export function createPreviewResult(
+  resourcesYaml: string,
+  previewResourceId: string,
+  title: string,
+  resourceRefsProcessingOptions: ResourceRefsProcessingOptions
+) {
   const resources = extractK8sResources(resourcesYaml, PREVIEW_PREFIX + previewResourceId);
   const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
     rm[r.id] = r;
     return rm;
   }, {});
 
-  processParsedResources(resourceMap);
+  processParsedResources(resourceMap, resourceRefsProcessingOptions);
   return {
     previewResourceId,
     previewResources: resourceMap,

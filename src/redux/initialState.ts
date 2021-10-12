@@ -26,6 +26,10 @@ const initialAppState: AppState = {
   isSelectingFile: false,
   isApplyingResource: false,
   plugins: [],
+  resourceRefsProcessingOptions: {
+    shouldIgnoreOptionalUnsatisfiedRefs:
+      electronStore.get('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs') || true,
+  },
 };
 
 const navigators = Object.values(

@@ -9,6 +9,7 @@ import {createPreviewRejection, createPreviewResult, getK8sObjectsAsYaml} from '
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
+  const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   try {
     const kc = new k8s.KubeConfig();
     kc.loadFromFile(configPath);
@@ -35,7 +36,12 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
 
         // @ts-ignore
         const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-        const previewResult = createPreviewResult(allYaml, configPath, 'Get Cluster Resources');
+        const previewResult = createPreviewResult(
+          allYaml,
+          configPath,
+          'Get Cluster Resources',
+          resourceRefsProcessingOptions
+        );
 
         if (fulfilledResults.length < results.length) {
           const rejectedResult = results.find(r => r.status === 'rejected');

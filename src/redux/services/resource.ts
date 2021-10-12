@@ -1,5 +1,5 @@
 import path from 'path';
-import {AppState, FileMapType, ResourceMapType} from '@models/appstate';
+import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import fs from 'fs';
 import {PREVIEW_PREFIX, UNSAVED_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
@@ -368,6 +368,7 @@ export function reprocessResources(
   resourceIds: string[],
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
+  processingOptions: ResourceRefsProcessingOptions,
   options?: {
     resourceKinds?: string[];
   }
@@ -406,7 +407,7 @@ export function reprocessResources(
     processKustomizations(resourceMap, fileMap);
   }
 
-  processParsedResources(resourceMap, {
+  processParsedResources(resourceMap, processingOptions, {
     resourceIds,
     resourceKinds: resourceKindsToReprocess,
   });
@@ -418,6 +419,7 @@ export function reprocessResources(
 
 export function processParsedResources(
   resourceMap: ResourceMapType,
+  processingOptions: ResourceRefsProcessingOptions,
   options?: {resourceIds?: string[]; resourceKinds?: string[]}
 ) {
   if (options && options.resourceIds && options.resourceIds.length > 0) {
@@ -429,7 +431,7 @@ export function processParsedResources(
       validateResource(resource);
     });
   }
-  processRefs(resourceMap, options);
+  processRefs(resourceMap, processingOptions, options);
   clearResourcesTemporaryObjects(resourceMap);
 }
 
