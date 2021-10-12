@@ -1,6 +1,8 @@
 import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {AppConfig, Themes, TextSizes, Languages, NewVersionCode} from '@models/appconfig';
 import electronStore from '@utils/electronStore';
+import {loadContexts} from '@redux/thunks/loadKubeConfig';
+import {KubeConfig} from '@models/kubeConfig';
 import initialState from '../initialState';
 
 export const updateStartupModalVisible = createAsyncThunk(
@@ -129,8 +131,23 @@ export const configSlice = createSlice({
     setFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
       state.folderReadsMaxDepth = action.payload;
     },
+    setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      state.kubeConfig.currentContext = action.payload;
+    },
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(loadContexts.fulfilled, (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
+        state.kubeConfig = action.payload;
+      })
+      .addCase(loadContexts.rejected, state => {
+        state.kubeConfig = {
+          contexts: [],
+          currentContext: undefined,
+        };
+      });
   },
 });
 
-export const {setFilterObjects, setAutoZoom, setKubeconfig} = configSlice.actions;
+export const {setFilterObjects, setAutoZoom, setKubeconfig, setCurrentContext} = configSlice.actions;
 export default configSlice.reducer;
