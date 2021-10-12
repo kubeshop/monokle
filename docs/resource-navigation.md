@@ -1,9 +1,9 @@
 # Resource Navigation
 
 Resources can be loaded either from the file system or a configured cluster. 
+
 - Selecting the "Browse" button in the File Explorer prompts for a folder containing resource manifests
-- Selecting "Show Cluster Objects" in the Cluster Explorer loads available resources using the configured kubeconfig  
-  variable, see [Cluster Preview](cluster-integration.md) for more details
+- Selecting "Show Cluster Objects" in the Cluster Explorer loads available resources using the configured kubeconfig variable, see [Cluster Preview](cluster-integration.md) for more details
 
 Once selecting a folder the File Explorer and Navigators will be populated accordingly. Monokle will attempt to synchronize 
 automatically with any external file/folder changes made in the selected folder, but the Refresh button next to the Browse button
@@ -22,6 +22,7 @@ file will be shown in the source editor to the right - allowing for direct editi
 ![File Explorer Navigation](img/resource-navigation-2.png)
 
 In this screenshot
+
 - the argo-rollouts-aggregate-roles.yaml file is selected - the "3" after the filename indicates it contains 3 kubernetes resources
 - the 3 ClusterRole resources in thie file are highlighed in the Navigator in the middle
 - the contents of the file are shown in the editor to the right
@@ -35,6 +36,7 @@ any other resourced linked to the selected one:
 ![Resource Navigation](img/resource-navigation-1.png)
 
 In this screenshot 
+
 - the `argo-rollouts-metrics` service is selected
 - the associated `argo-rollouts-metrics-service.yaml` file is highlighted to the left
 - the linked `argo-rollouts` Deployment (via the selector in the Service manifest) is highlighted 
@@ -43,6 +45,7 @@ In this screenshot
 ## Resource Links
 
 Links between resources are indicated by link icons to the left and right each resource name:
+
 - Links to the left indicate there are incoming link to the resource, for example a ConfigMap might
   have an incoming link from a Deployment
 - Links to the right indicate there are outgoing links from the resource, for example a Service might have a
@@ -62,7 +65,8 @@ triangle - making it easy to identify broken resource-links in your manifests:
 ![Resource Navigator Broken Links](img/navigator-broken-links.png)
 
 In this screenshot the `argo-rollouts-role-binding` RoleBinding contains a reference to an `argo-rollouts-role` Role, which
-doesn't exist in the current manifests.
+doesn't exist in the current manifests. Clicking on broken links will open the corresponding reference in the editor so you 
+can easily fix it.
 
 ## Resource Validation
 

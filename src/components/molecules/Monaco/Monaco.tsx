@@ -14,7 +14,7 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {selectK8sResource, selectFile} from '@redux/reducers/main';
-import {parseAllDocuments} from 'yaml';
+import {Document, isMap, parseAllDocuments, ParsedNode} from 'yaml';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {useSelector} from 'react-redux';
@@ -40,6 +40,13 @@ window.MonacoEnvironment = {
 
 // @ts-ignore
 const {yaml} = languages || {};
+
+function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
+  return (
+    // @ts-ignore
+    d.errors.length === 0 && d.contents && isMap(d.contents) && d.contents.has('apiVersion') && d.contents.has('kind')
+  );
+}
 
 const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; applySelection: () => void}) => {
   const {editorHeight, diffSelectedResource, applySelection} = props;
@@ -132,7 +139,8 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     setCode(newValue);
 
     // this will slow things down if document gets large - need to find a better solution...
-    setValid(!parseAllDocuments(newValue).some(d => d.errors.length > 0));
+    const documents = parseAllDocuments(newValue);
+    setValid(documents.length > 0 && !documents.some(d => !isValidResourceDocument(d)));
   };
 
   useEffect(() => {

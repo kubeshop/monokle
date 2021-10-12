@@ -26,6 +26,7 @@ import {K8sResource} from '@models/k8sresource';
 import {AlertType} from '@models/alert';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFileStats} from '@utils/files';
+
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {

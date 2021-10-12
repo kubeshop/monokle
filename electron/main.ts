@@ -21,20 +21,23 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
+import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
 import {autoUpdater} from 'electron-updater';
 import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
-import {createMenu, getDockMenu} from './menu';
 import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
+import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
 
+import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
 import terminal from '../cli/terminal';
+import {downloadPlugin} from './pluginService';
 
 Object.assign(console, ElectronLog.functions);
 autoUpdater.logger = console;
@@ -44,10 +47,25 @@ const {MONOKLE_RUN_AS_NODE} = process.env;
 const isDev = PROCESS_ENV.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
+const userDataDir = app.getPath('userData');
+const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const APP_DEPENDENCIES = ['kubectl', 'helm'];
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
+});
+
+ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
+  try {
+    await downloadPlugin(pluginUrl, pluginsDir);
+    event.sender.send(DOWNLOAD_PLUGIN_RESULT);
+  } catch (err) {
+    if (err instanceof Error) {
+      event.sender.send(DOWNLOAD_PLUGIN_RESULT, err);
+    } else {
+      log.warn(err);
+    }
+  }
 });
 
 /**
