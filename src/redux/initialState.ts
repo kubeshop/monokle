@@ -109,6 +109,10 @@ const initialAppConfigState: AppConfig = {
     },
   },
   navigators,
+  kubeConfig: {
+    contexts: [],
+    currentContext: undefined,
+  },
 };
 
 const initialAlertState: AlertState = {};
