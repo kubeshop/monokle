@@ -24,19 +24,19 @@ your configurations before you deploy them to your cluster.
 
 ## 5. Does Monokle support Helm?
 
-Install [Helm](../helm.md) Charts for configuring repositories in Monokle. It contains resource definitions necessary to
-run editor or service inside the Kubernetes cluster.
+Yes, Monokle allows you to navigate and preview the output of a Helm chart for an existing values files - read more at
+[Working with Helm](./helm.md).
 
 ## 6. Can I work on multiple projects simultaneously?
 
-You can launch multiple project windows using the [New Monokle Windows](./overview.md) option. It allows you to work on
-multiple folders or clusters simultaneously thus visual navigation for the multiple pages becomes simpler and faster.
+You can launch multiple project windows using the [New Monokle Windows](../overview/#multiple-windows) option. It allows
+you to work on multiple folders or clusters simultaneously thus visual navigation for the multiple pages becomes simpler
+and faster.
 
 ## 7. Can I use Monokle with Flux/ArgoCD?
 
 Yes, Monokle is used for creating / editing / debugging manifests before they are deployed to a cluster using a CD tool
-like ArgoCD or Flux. It provides a single toolchain for continuous deployment and workflow automation. It improves
-overall feature syncing frequency, performance, and efficiency.
+like ArgoCD or Flux.
 
 ## 8. How to open Helm and Kustomization preview?
 
