@@ -28,15 +28,47 @@ export interface NavSectionItemHandler<ItemType, ScopeType> {
   onClick?: (item: ItemType, scope: ScopeType) => void;
 }
 
+interface NavSectionItemGroup<ItemType> {
+  groupId: string;
+  groupName: string;
+  groupItems: ItemType[];
+}
+
 export interface NavSection<ItemType, ScopeType = any> {
   name: string;
   useScope: () => ScopeType;
   subsectionNames?: string[];
   getItems?: (scope: ScopeType) => ItemType[];
-  getGroups?: (scope: ScopeType) => {groupName: string; groupId: string; groupItems: ItemType[]}[];
+  getGroups?: (scope: ScopeType) => NavSectionItemGroup<ItemType>[];
   isLoading?: (scope: ScopeType, items: ItemType[]) => boolean;
   isVisible?: (scope: ScopeType, items: ItemType[]) => boolean;
   isInitialized?: (scope: ScopeType, items: ItemType[]) => boolean;
   itemHandler?: NavSectionItemHandler<ItemType, ScopeType>;
   itemCustomization?: NavSectionItemCustomization<ItemType>;
+}
+
+export interface NavSectionItemInstance {
+  name: string;
+  identifier: string;
+  isSelected: boolean;
+  isHighlighted: boolean;
+  isVisible: boolean;
+  isDirty: boolean;
+  isDisabled: boolean;
+  shouldScrollIntoView: boolean;
+}
+
+export interface NavSectionItemGroupInstance {
+  groupId: string;
+  groupName: string;
+  groupItems: NavSectionItemInstance[];
+}
+
+export interface NavSectionInstance {
+  name: string;
+  subsectionNames?: string[];
+  items: NavSectionItemInstance[];
+  groups: NavSectionItemGroupInstance[];
+  isLoading: boolean;
+  isVisible: boolean;
 }
