@@ -155,7 +155,8 @@ function cleanResourceRefs(resources: K8sResource[]) {
 function handleRefMappingByParentKey(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
-  outgoingRefMapper: RefMapper
+  outgoingRefMapper: RefMapper,
+  processingOptions: ResourceRefsProcessingOptions
 ) {
   const sourceRefNodes: RefNode[] = [];
   if (!sourceResource.refNodesByPath) {
@@ -228,6 +229,26 @@ function handleRefMappingByParentKey(
   }
 }
 
+function shouldCreateUnsatisfiedRef(
+  outgoingRefMapper: RefMapper,
+  processingOptions: ResourceRefsProcessingOptions,
+  sourceResource: K8sResource,
+  sourceRefNode: RefNode
+) {
+  if (outgoingRefMapper.source.hasOptionalSibling && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
+    const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
+    const optionalSiblingRefNode = sourceResource.refNodesByPath
+      ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
+          refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
+        )
+      : undefined;
+    if (optionalSiblingRefNode && optionalSiblingRefNode.scalar.value === true) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function handleRefMappingByKey(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
@@ -246,13 +267,15 @@ function handleRefMappingByKey(
   sourceRefNodes.forEach(sourceRefNode => {
     // if no target resources are found, then mark the source ref as unsatisfied
     if (targetResources.length === 0) {
-      createResourceRef(
-        sourceResource,
-        ResourceRefType.Unsatisfied,
-        new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-        undefined,
-        outgoingRefMapper.target.kind
-      );
+      if (shouldCreateUnsatisfiedRef(outgoingRefMapper, processingOptions, sourceResource, sourceRefNode)) {
+        createResourceRef(
+          sourceResource,
+          ResourceRefType.Unsatisfied,
+          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+          undefined,
+          outgoingRefMapper.target.kind
+        );
+      }
     } else {
       let hasSatisfiedRefs = false;
 
@@ -275,28 +298,17 @@ function handleRefMappingByKey(
         });
       });
 
-      if (!hasSatisfiedRefs) {
-        let shouldCreateUnsatisfiedRef = true;
-        if (outgoingRefMapper.source.hasOptionalSibling && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
-          const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
-          const optionalSiblingRefNode = sourceResource.refNodesByPath
-            ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
-                refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
-              )
-            : undefined;
-          if (optionalSiblingRefNode && optionalSiblingRefNode.scalar.value === true) {
-            shouldCreateUnsatisfiedRef = false;
-          }
-        }
-        if (shouldCreateUnsatisfiedRef) {
-          createResourceRef(
-            sourceResource,
-            ResourceRefType.Unsatisfied,
-            new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-            undefined,
-            outgoingRefMapper.target.kind
-          );
-        }
+      if (
+        !hasSatisfiedRefs &&
+        shouldCreateUnsatisfiedRef(outgoingRefMapper, processingOptions, sourceResource, sourceRefNode)
+      ) {
+        createResourceRef(
+          sourceResource,
+          ResourceRefType.Unsatisfied,
+          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+          undefined,
+          outgoingRefMapper.target.kind
+        );
       }
     }
   });
@@ -388,7 +400,7 @@ export function processRefs(
       );
 
       if (outgoingRefMapper.matchPairs) {
-        handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
+        handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
       } else {
         handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
       }
