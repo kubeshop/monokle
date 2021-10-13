@@ -186,14 +186,14 @@
           "target": "deb",
           "arch": [
             "x64",
-            "amr64"
+            "arm64"
           ]
         },
         {
           "target": "AppImage",
           "arch": [
             "x64",
-            "amr64"
+            "arm64"
           ]
         }
       ],
