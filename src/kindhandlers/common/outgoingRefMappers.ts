@@ -25,12 +25,14 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['configMapRef', 'name'],
+      hasOptionalSibling: true,
     },
     ...ConfigMapTarget,
   },
   {
     source: {
       pathParts: ['configMapKeyRef', 'name'],
+      hasOptionalSibling: true,
     },
     ...ConfigMapTarget,
   },
@@ -43,12 +45,15 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['volumes', 'secret', 'secretName'],
+      hasOptionalSibling: true,
     },
     ...SecretTarget,
   },
   {
+    // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretprojection-v1-core
     source: {
       pathParts: ['sources', 'secret', 'name'],
+      hasOptionalSibling: true,
     },
     ...SecretTarget,
   },
@@ -85,6 +90,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['secretKeyRef', 'name'],
+      hasOptionalSibling: true,
     },
     ...SecretTarget,
   },

@@ -1,4 +1,4 @@
-import {ResourceMapType} from '@models/appstate';
+import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
@@ -99,6 +99,13 @@ export function processResourceRefNodes(resource: K8sResource) {
 
         if (keyPath.endsWith(refMapperTargetPath)) {
           addRefNodeAtPath(refNode, refMapperTargetPath, resource.refNodesByPath);
+        }
+      }
+
+      if (refMapper.source.hasOptionalSibling) {
+        const optionalSiblingPath = joinPathParts([...refMapper.source.pathParts.slice(0, -1), 'optional']);
+        if (keyPath.endsWith(optionalSiblingPath)) {
+          addRefNodeAtPath(refNode, optionalSiblingPath, resource.refNodesByPath);
         }
       }
     });
@@ -216,7 +223,8 @@ function handleRefMappingByParentKey(
 function handleRefMappingByKey(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
-  outgoingRefMapper: RefMapper
+  outgoingRefMapper: RefMapper,
+  processingOptions: ResourceRefsProcessingOptions
 ) {
   const outgoingRefMapperSourcePath = joinPathParts(outgoingRefMapper.source.pathParts);
   const sourceRefNodes = sourceResource.refNodesByPath
@@ -260,13 +268,27 @@ function handleRefMappingByKey(
       });
 
       if (!hasSatisfiedRefs) {
-        createResourceRef(
-          sourceResource,
-          ResourceRefType.Unsatisfied,
-          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-          undefined,
-          outgoingRefMapper.target.kind
-        );
+        let shouldCreateUnsatisfiedRef = true;
+        if (outgoingRefMapper.source.hasOptionalSibling && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
+          const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
+          const optionalSiblingRefNode = sourceResource.refNodesByPath
+            ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
+                refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
+              )
+            : undefined;
+          if (optionalSiblingRefNode && optionalSiblingRefNode.scalar.value === true) {
+            shouldCreateUnsatisfiedRef = false;
+          }
+        }
+        if (shouldCreateUnsatisfiedRef) {
+          createResourceRef(
+            sourceResource,
+            ResourceRefType.Unsatisfied,
+            new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+            undefined,
+            outgoingRefMapper.target.kind
+          );
+        }
       }
     }
   });
@@ -288,7 +310,11 @@ function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) 
   });
 }
 
-export function processRefs(resourceMap: ResourceMapType, filter?: {resourceIds?: string[]; resourceKinds?: string[]}) {
+export function processRefs(
+  resourceMap: ResourceMapType,
+  processingOptions: ResourceRefsProcessingOptions,
+  filter?: {resourceIds?: string[]; resourceKinds?: string[]}
+) {
   const resources = Object.values(resourceMap).filter(resource => !isKustomizationResource(resource));
   resources.forEach(resource => processResourceRefNodes(resource));
 
@@ -318,7 +344,7 @@ export function processRefs(resourceMap: ResourceMapType, filter?: {resourceIds?
       if (outgoingRefMapper.matchPairs) {
         handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
       } else {
-        handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper);
+        handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
       }
     });
   });

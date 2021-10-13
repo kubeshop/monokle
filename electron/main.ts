@@ -21,20 +21,25 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
+import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
 import {autoUpdater} from 'electron-updater';
 import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
-import {createMenu, getDockMenu} from './menu';
 import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
+import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
 
+import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
 import terminal from '../cli/terminal';
+import {downloadPlugin} from './pluginService';
+import {AlertEnum, AlertType} from '@models/alert';
+import {setAlert} from '@redux/reducers/alert';
 
 Object.assign(console, ElectronLog.functions);
 autoUpdater.logger = console;
@@ -44,10 +49,25 @@ const {MONOKLE_RUN_AS_NODE} = process.env;
 const isDev = PROCESS_ENV.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
+const userDataDir = app.getPath('userData');
+const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const APP_DEPENDENCIES = ['kubectl', 'helm'];
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
+});
+
+ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
+  try {
+    await downloadPlugin(pluginUrl, pluginsDir);
+    event.sender.send(DOWNLOAD_PLUGIN_RESULT);
+  } catch (err) {
+    if (err instanceof Error) {
+      event.sender.send(DOWNLOAD_PLUGIN_RESULT, err);
+    } else {
+      log.warn(err);
+    }
+  }
 });
 
 /**
@@ -67,13 +87,6 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
   } catch (e: any) {
     event.sender.send('kustomize-result', {error: e.toString()});
-  }
-});
-
-ipcMain.on('check-missing-dependency', event => {
-  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
-  if (missingDependecies.length > 0) {
-    event.sender.send('missing-dependency-result', {dependencies: missingDependecies});
   }
 });
 
@@ -228,17 +241,19 @@ export const createWindow = (givenPath?: string) => {
     mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
   });
 
-  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
-
-  if (missingDependecies.length > 0) {
-    win.webContents.on('did-finish-load', () => {
-      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
-    });
-  }
-
   win.webContents.on('did-finish-load', async () => {
     await checkNewVersion(true);
     initKubeconfig(mainStore, userHomeDir);
+    const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
+
+    if (missingDependecies.length > 0) {
+      const alert: AlertType = {
+        type: AlertEnum.Warning,
+        title: 'Missing dependency',
+        message: `${missingDependecies.toString()} must be installed for all Monokle functionality to be available`,
+      };
+      mainStore.dispatch(setAlert(alert));
+    }
     win.webContents.send('executed-from', {path: givenPath});
   });
 

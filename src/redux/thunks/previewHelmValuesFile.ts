@@ -50,7 +50,7 @@ export const previewHelmValuesFile = createAsyncThunk<
       }
 
       if (result.stdout) {
-        return createPreviewResult(result.stdout, valuesFile.id, 'Helm Preview');
+        return createPreviewResult(result.stdout, valuesFile.id, 'Helm Preview', state.resourceRefsProcessingOptions);
       }
     }
 

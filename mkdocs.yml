@@ -12,7 +12,8 @@ theme:
   highlightjs: true
   hljs_languages:
     - yaml
-
+  features:
+    - navigation.expand
 nav:
   - Welcome: index.md
   - Feature Overview: features.md
@@ -25,13 +26,13 @@ nav:
   - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
+  - FAQ: faq.md
   - Tutorials:
-    - tutorials/how-to-navigate-and-edit-manifests.md
-    - tutorials/how-to-browse-clusters.md
-    - tutorials/how-to-configure-monokle.md
-    - tutorials/how-to-create-and-edit-configmap.md
-    - tutorials/how-to-fix-broken-links.md
-
+      - tutorials/how-to-navigate-and-edit-manifests.md
+      - tutorials/how-to-browse-clusters.md
+      - tutorials/how-to-configure-monokle.md
+      - tutorials/how-to-create-and-edit-configmap.md
+      - tutorials/how-to-fix-broken-links.md
 
 extra:
   analytics:
@@ -41,10 +42,8 @@ extra:
   consent:
     title: Cookie consent
     description: >
-      We use cookies to recognize your repeated visits and preferences, as well
-      as to measure the effectiveness of our documentation and whether users
-      find what they're searching for. With your consent, you're helping us to
-      make our documentation better.
+      We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our
+      documentation and whether users find what they're searching for. With your consent, you're helping us to make our
+      documentation better.
 
 copyright: Copyright &copy; 2021 <a href="https://kubeshop.io">Kubeshop</a>
-

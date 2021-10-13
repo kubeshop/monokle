@@ -1,3 +1,4 @@
+import {KubeConfig} from './kubeConfig';
 import {ObjectNavigator} from './navigator';
 
 export enum Themes {
@@ -52,6 +53,7 @@ interface AppConfig {
     code: NewVersionCode;
     data: any;
   };
+  kubeConfig: KubeConfig;
 }
 
 export type {AppConfig};
