@@ -2,7 +2,7 @@ import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
-import {RefMapper} from '@models/resourcekindhandler';
+import {NamespaceRefEnum, RefMapper} from '@models/resourcekindhandler';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {traverseDocument} from './manifest-utils';
 import {createResourceRef, getParsedDoc, linkResources, NodeWrapper} from './resource';
@@ -106,6 +106,14 @@ export function processResourceRefNodes(resource: K8sResource) {
         const optionalSiblingPath = joinPathParts([...refMapper.source.pathParts.slice(0, -1), 'optional']);
         if (keyPath.endsWith(optionalSiblingPath)) {
           addRefNodeAtPath(refNode, optionalSiblingPath, resource.refNodesByPath);
+        }
+      }
+
+      if (refMapper.source.namespaceRef === NamespaceRefEnum.Explicit) {
+        const namespacePropertyName = refMapper.source.namespaceProperty || 'namespace';
+        const namespaceSiblingPath = joinPathParts([...refMapper.source.pathParts.slice(0, -1), namespacePropertyName]);
+        if (keyPath.endsWith(namespaceSiblingPath)) {
+          addRefNodeAtPath(refNode, namespaceSiblingPath, resource.refNodesByPath);
         }
       }
     });
@@ -310,6 +318,44 @@ function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) 
   });
 }
 
+function resourceMatchesRefMapper(
+  targetResource: K8sResource,
+  outgoingRefMapper: RefMapper,
+  sourceResource: K8sResource
+) {
+  if (targetResource.kind === outgoingRefMapper.target.kind) {
+    if (!outgoingRefMapper.source.namespaceRef) {
+      return true;
+    }
+
+    switch (outgoingRefMapper.source.namespaceRef) {
+      case NamespaceRefEnum.Implicit:
+        return sourceResource.namespace === targetResource.namespace;
+      case NamespaceRefEnum.Explicit:
+      case NamespaceRefEnum.OptionalImplicit: {
+        const namespacePropertyName = outgoingRefMapper.source.namespaceProperty || 'namespace';
+        const namespaceSiblingPath = joinPathParts([
+          ...outgoingRefMapper.source.pathParts.slice(0, -1),
+          namespacePropertyName,
+        ]);
+        const namespaceSiblingRefNodes = sourceResource.refNodesByPath
+          ? sourceResource.refNodesByPath[namespaceSiblingPath]
+          : undefined;
+
+        return namespaceSiblingRefNodes
+          ? namespaceSiblingRefNodes.some(refNode => refNode.scalar.value === targetResource.namespace)
+          : outgoingRefMapper.source.namespaceRef === NamespaceRefEnum.OptionalImplicit &&
+              sourceResource.namespace === targetResource.namespace;
+      }
+
+      default:
+        return true;
+    }
+  }
+
+  return false;
+}
+
 export function processRefs(
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
@@ -337,8 +383,8 @@ export function processRefs(
       return;
     }
     resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-      const targetResources = Object.values(resourceMap).filter(
-        targetResource => targetResource.kind === outgoingRefMapper.target.kind
+      const targetResources = Object.values(resourceMap).filter(targetResource =>
+        resourceMatchesRefMapper(targetResource, outgoingRefMapper, sourceResource)
       );
 
       if (outgoingRefMapper.matchPairs) {
