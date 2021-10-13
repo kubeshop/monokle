@@ -154,7 +154,12 @@
       "entitlements": "./electron/src/entitlements.mac.inherit.plist",
       "entitlementsInherit": "./electron/src/entitlements.mac.inherit.plist",
       "target": [
-        "default"
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
       ]
     },
     "artifactName": "${productName}-${version}.${ext}",
@@ -178,7 +183,8 @@
       "allowToChangeInstallationDirectory": true,
       "runAfterFinish": true,
       "createDesktopShortcut": false,
-      "menuCategory": "Kubeshop"
+      "menuCategory": "Kubeshop",
+      "shortcutName": "Monokle"
     },
     "linux": {
       "target": [
@@ -200,10 +206,13 @@
       "icon": "build/icon.png",
       "category": "Development",
       "maintainer": "Kubeshop",
-      "vendor": "Kubeshop"
+      "vendor": "Kubeshop",
+      "executableName": "Monokle",
+      "synopsis": "Your kubernetes best friend!",
+      "description": "A free, open-source tool, to help you navigate kubernetes development. By Kubeshop."
     },
     "appImage": {
-      "priority": "standard"
+      "artifactName": "Monokle-${version}.${ext}"
     },
     "deb": {
       "packageCategory": "Kubeshop",
