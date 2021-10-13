@@ -1,6 +1,9 @@
 name: monokle-sign-notarize-publish
 
 on:
+  push:
+    branches:
+      - main
   release:
     types:
       - prereleased
