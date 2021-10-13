@@ -162,7 +162,7 @@
         }
       ]
     },
-    "artifactName": "${productName}-${version}.${ext}",
+    "artifactName": "${productName}-${os}-${version}-${arch}.${ext}",
     "afterSign": "./notarization/afterSignHook.js",
     "dmg": {
       "icon": "build/icon.png",
@@ -212,7 +212,7 @@
       "description": "A free, open-source tool, to help you navigate kubernetes development. By Kubeshop."
     },
     "appImage": {
-      "artifactName": "Monokle-${version}.${ext}"
+      "artifactName": "${productName}-${os}-${version}-${arch}.${ext}"
     },
     "deb": {
       "packageCategory": "Kubeshop",
