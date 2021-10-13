@@ -3,7 +3,7 @@ name: monokle-sign-notarize-publish-linux
 on:
   push:
     branches:
-      - steen/feat/build-nix-installers
+      - main
   release:
     types:
       - prereleased
