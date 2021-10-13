@@ -202,7 +202,7 @@
       "maintainer": "Kubeshop",
       "vendor": "Kubeshop"
     },
-    "AppImage": {
+    "appImage": {
       "priority": "standard"
     },
     "deb": {
