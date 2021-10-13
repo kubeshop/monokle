@@ -180,6 +180,35 @@
       "createDesktopShortcut": false,
       "menuCategory": "Kubeshop"
     },
+    "linux": {
+      "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "amr64"
+          ]
+        },
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "amr64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "Development",
+      "maintainer": "Kubeshop",
+      "vendor": "Kubeshop"
+    },
+    "AppImage": {
+      "priority": "standard"
+    },
+    "deb": {
+      "packageCategory": "Kubeshop",
+      "priority": "standard"
+    },
     "extends": null,
     "files": [
       "build/**/*",
