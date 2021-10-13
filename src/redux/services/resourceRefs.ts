@@ -155,8 +155,7 @@ function cleanResourceRefs(resources: K8sResource[]) {
 function handleRefMappingByParentKey(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
-  outgoingRefMapper: RefMapper,
-  processingOptions: ResourceRefsProcessingOptions
+  outgoingRefMapper: RefMapper
 ) {
   const sourceRefNodes: RefNode[] = [];
   if (!sourceResource.refNodesByPath) {
@@ -400,7 +399,7 @@ export function processRefs(
       );
 
       if (outgoingRefMapper.matchPairs) {
-        handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
+        handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
       } else {
         handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
       }
