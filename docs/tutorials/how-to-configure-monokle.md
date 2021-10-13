@@ -1,37 +1,21 @@
 # How to Configure Monokle
 
-Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
+In this tutorial, we will show the steps to configure Monokle Environment. 
 
-In this tutorial, we have illustrated the steps to configure Monokle Environment. 
+<em>**Note:** All settings are initialised with default values - there is no immediate need to change them. </em>
 
+Let’s get started! 
 
-<em>**Note:** The setting values are initialised by default - there is no immediate need to change them. </em>
+## 1. Open Settings
 
-Let’s get started. 
-
-**Step 1:** Launch Monokle and click on the Browse button to add your project folder containing K8 resources. 
-
-<em>**Note:** Please follow this [Getting Started](../getting-started.md) guide to install Monokle 🚀</em>
-
-![Image](img/image-0.png)
-
-**Step 2:** Select your folder to parse its manifest in Monokle’s file explorer. 
-
-![Image](img/image-0.1.png)
-
-In the file explorer, you can view manifests, including their resources, and their relationships.
-
-**Step 3:** Scroll up & down to navigate and select the required manifests. 
-
-![Image](img/image-0.2.gif)
-
-Once you select a manifest, its related resources shall be highlighted automatically in the navigator. 
-
-**Step 4:** Click on the Settings button to set up the Kubernetes dashboard.
+Launch Monokle and click on the Settings button to access Settings
 
 ![Settings](img/settings-1.png)
 
-**Step 5:** Enter the kubeconfig file path in the KUBECONFIG text field. 
+## 2. Set kubeconfig
+
+Enter the kubeconfig file path in the KUBECONFIG text field. The kubeconfig parameter is used when viewing cluster
+resources and applying/diffing local resources to a cluster.
 
 ![Kubeconfig](img/kubeconfig-2.png)
 
@@ -45,7 +29,10 @@ Select the required folder to config the cluster.
 
 <em>**Note:** The kubectl command-line tool uses kubeconfig files to find the information for choosing a cluster and communicating with the API server.</em>
 
-**Step 6:** Click on the Add Pattern button to include the files having the corresponding extension. For example .yaml. 
+## 3. File Includes
+
+Monokle will look for kubernetes manifests in files matching this filter, by default this is set to *.yaml / *.yml files.
+Click on the Add Pattern button to include the files having the corresponding extension.
 
 ![Add pattern](img/add-pattern-5.png)
 
@@ -53,7 +40,10 @@ Enter the extension pattern in the files include textbox and hit the OK button.
 
 ![Ok](img/ok-6.png)
 
-**Step 7:** Click on the Add Pattern button to exclude the files having the corresponding extension. For example, node_modules.
+## 4. File Exclusions
+
+Monokle will ignore files/folders matching any of the specified paths (even if they match an above inclusion pattern),
+Click on the Add Pattern button to exclude the files having the corresponding extension. For example, node_modules.
 
 ![Add pattern](img/add-pattern-7.png)
 
@@ -61,17 +51,18 @@ Enter the extension pattern in the files exclude textbox and hit the OK button.
 
 ![Ok](img/ok-8.png)
 
-**Step 8:** Click on Helm Preview Mode dropdown to select any of the viewing states. 
+## 5. Helm Preview Mode
 
-The options for preview:
+Click on Helm Preview Mode dropdown to select any of the viewing states. The options for preview:
 
-**Template** - To use Helm template
- 
-**Install -** To use Helm Install
+- **Template** - To use the [Helm template command](https://helm.sh/docs/helm/helm_template/)
+- **Install** - To use the [Helm Install command](https://helm.sh/docs/helm/helm_install/)
 
 ![Helm](img/helm-9.png)
 
-**Step 9:** Tick the Automatically Load Last Folder checkbox to reload the last reviewed folder on launching Monokle. 
+## 6. On Startup
+
+Tick the Automatically Load Last Folder checkbox to reload the last reviewed folder when launching Monokle. 
 
 ![Startup](img/startup-10.png)
 
