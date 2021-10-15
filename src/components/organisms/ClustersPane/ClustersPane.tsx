@@ -127,7 +127,7 @@ const ClustersPane = () => {
       <PaneContainer>
         <ClustersContainer>
           <StyledDiv>KUBECONFIG</StyledDiv>
-          <Input value={kubeconfig} />
+          <Input defaultValue={kubeconfig} />
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
             <StyledButton ghost type="primary" onClick={openFileSelect}>
               Browse
