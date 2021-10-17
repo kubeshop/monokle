@@ -14,7 +14,7 @@ export function monitorKubeConfig(filePath: string, dispatch: AppDispatch) {
   watcher = watch(filePath, {
     persistent: true,
     usePolling: true,
-    interval: 2000,
+    interval: 1000,
   });
 
   watcher.on('all', () => {
