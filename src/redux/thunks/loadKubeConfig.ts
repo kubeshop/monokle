@@ -20,6 +20,7 @@ export const loadContexts = createAsyncThunk<
       contexts: <Array<KubeConfigContext>>kc.contexts,
       currentContext: kc.currentContext,
     };
+
     return kubeConfig;
   } catch (e: any) {
     return createPreviewRejection(thunkAPI, 'Loading kube config file failed', e.message);
