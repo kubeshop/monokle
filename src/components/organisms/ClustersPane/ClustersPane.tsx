@@ -70,6 +70,11 @@ const ClustersPane = () => {
     }
   };
 
+  const onUpdateKubeconfig = (e: any) => {
+    let value = e.target.value;
+    dispatch(updateKubeconfig(value));
+  };
+
   const connectToCluster = () => {
     if (isInPreviewMode && previewResource !== kubeconfig) {
       stopPreview(dispatch);
@@ -127,7 +132,7 @@ const ClustersPane = () => {
       <PaneContainer>
         <ClustersContainer>
           <StyledDiv>KUBECONFIG</StyledDiv>
-          <Input defaultValue={kubeconfig} />
+          <Input value={kubeconfig} onChange={onUpdateKubeconfig} />
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
             <StyledButton ghost type="primary" onClick={openFileSelect}>
               Browse
