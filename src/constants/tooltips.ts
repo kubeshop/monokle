@@ -21,5 +21,6 @@ export const KubeconfigPathTooltip = 'The path to the kubeconfig to use for clus
 export const AddInclusionPatternTooltip = 'Add pattern for files that contain resource manifests';
 export const AddExclusionPatternTooltip = 'Add pattern for files/folders to exclude when scanning for resources';
 export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
+export const KustomizeCommandTooltip = 'Set how to invoke kustomize when previewing and applying kustomization files';
 export const AutoLoadLastFolderTooltip = 'Load last folder when starting Monokle';
 export const SaveUnsavedResourceTooltip = 'Save resource to file';

@@ -5,6 +5,8 @@ import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {createFileRef, getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
 
+export type KustomizeCommandType = 'kubectl' | 'kustomize';
+
 /**
  * Creates kustomization refs between a kustomization and its resources
  */

@@ -16,7 +16,8 @@ import {
 import {UiState} from '@models/ui';
 import {openGitHub, openDocumentation} from '@utils/shell';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {checkNewVersion, openApplication} from './main';
+import {checkNewVersion} from '@root/electron/commands';
+import {openApplication} from './main';
 
 const isMac = process.platform === 'darwin';
 

@@ -13,10 +13,9 @@ moduleAlias.addAliases({
   '@root': `${__dirname}/../`,
 });
 
-import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
+import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
 import * as path from 'path';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
-import {execSync} from 'child_process';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
@@ -40,6 +39,7 @@ import terminal from '../cli/terminal';
 import {downloadPlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
+import {checkNewVersion, runHelm, runKustomize, selectFile} from '@root/electron/commands';
 
 Object.assign(console, ElectronLog.functions);
 autoUpdater.logger = console;
@@ -51,7 +51,7 @@ const isDev = PROCESS_ENV.NODE_ENV === 'development';
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
-const APP_DEPENDENCIES = ['kubectl', 'helm'];
+const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
@@ -70,65 +70,16 @@ ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   }
 });
 
-/**
- * called by thunk to preview a kustomization
- */
-
-ipcMain.on('run-kustomize', (event, folder: string) => {
-  try {
-    let stdout = execSync('kubectl kustomize ./', {
-      cwd: folder,
-      env: {
-        NODE_ENV: PROCESS_ENV.NODE_ENV,
-        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-      },
-    });
-
-    event.sender.send('kustomize-result', {stdout: stdout.toString()});
-  } catch (e: any) {
-    event.sender.send('kustomize-result', {error: e.toString()});
-  }
+ipcMain.on('run-kustomize', (event, cmdOptions: any) => {
+  runKustomize(cmdOptions.folder, cmdOptions.kustomizeCommand, event);
 });
 
 ipcMain.handle('select-file', async (event, options: any) => {
-  const browserWindow = BrowserWindow.fromId(event.sender.id);
-  let dialogOptions: Electron.OpenDialogSyncOptions = {};
-  if (options.isDirectoryExplorer) {
-    dialogOptions.properties = ['openDirectory'];
-  } else {
-    if (options.allowMultiple) {
-      dialogOptions.properties = ['multiSelections'];
-    }
-    if (options.acceptedFileExtensions) {
-      dialogOptions.filters = [{name: 'Files', extensions: options.acceptedFileExtensions}];
-    }
-  }
-
-  if (browserWindow) {
-    return dialog.showOpenDialogSync(browserWindow, dialogOptions);
-  }
-  return dialog.showOpenDialogSync(dialogOptions);
+  return selectFile(event, options);
 });
 
-/**
- * called by thunk to preview a helm chart with values file
- */
-
 ipcMain.on('run-helm', (event, args: any) => {
-  try {
-    let stdout = execSync(args.helmCommand, {
-      cwd: args.cwd,
-      env: {
-        NODE_ENV: PROCESS_ENV.NODE_ENV,
-        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-        KUBECONFIG: args.kubeconfig,
-      },
-    });
-
-    event.sender.send('helm-result', {stdout: stdout.toString()});
-  } catch (e: any) {
-    event.sender.send('helm-result', {error: e.toString()});
-  }
+  runHelm(args, event);
 });
 
 ipcMain.on('app-version', event => {
@@ -143,23 +94,6 @@ ipcMain.on('quit-and-install', () => {
   autoUpdater.quitAndInstall();
   mainStore.dispatch(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
-
-export const checkNewVersion = async (initial?: boolean) => {
-  try {
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Checking, data: {initial: Boolean(initial)}}));
-    await autoUpdater.checkForUpdates();
-  } catch (error: any) {
-    if (error.errno === -2) {
-      mainStore.dispatch(
-        updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}})
-      );
-    } else {
-      mainStore.dispatch(
-        updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}})
-      );
-    }
-  }
-};
 
 export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
