@@ -58,13 +58,21 @@ export const getResourceKindHandler = (resourceKind: string): ResourceKindHandle
   return HandlerByResourceKind[resourceKind];
 };
 
+const incomingRefMappersCache = new Map<string, RefMapper[]>();
+
 export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
-  return ResourceKindHandlers.map(
-    resourceKindHandler =>
-      resourceKindHandler.outgoingRefMappers?.filter(
-        outgoingRefMapper => outgoingRefMapper.target.kind === resourceKind
-      ) || []
-  ).flat();
+  if (!incomingRefMappersCache.has(resourceKind)) {
+    incomingRefMappersCache.set(
+      resourceKind,
+      ResourceKindHandlers.map(
+        resourceKindHandler =>
+          resourceKindHandler.outgoingRefMappers?.filter(
+            outgoingRefMapper => outgoingRefMapper.target.kind === resourceKind
+          ) || []
+      ).flat()
+    );
+  }
+  return incomingRefMappersCache.get(resourceKind) || [];
 };
 
 export const getDependentResourceKinds = (resourceKinds: string[]) => {

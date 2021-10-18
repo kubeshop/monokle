@@ -60,8 +60,6 @@ const addRefNodeAtPath = (refNode: RefNode, path: string, refNodesByPath: Record
 };
 
 export function processResourceRefNodes(resource: K8sResource) {
-  const parsedDoc = getParsedDoc(resource);
-
   const resourceKindHandler = getResourceKindHandler(resource.kind);
   if (!resourceKindHandler) {
     return;
@@ -74,6 +72,8 @@ export function processResourceRefNodes(resource: K8sResource) {
   if (!refMappers || refMappers.length === 0) {
     return;
   }
+
+  const parsedDoc = getParsedDoc(resource);
 
   traverseDocument(parsedDoc, (parentKeyPathParts, keyPathParts, key, scalar) => {
     refMappers.forEach(refMapper => {
@@ -373,34 +373,26 @@ export function processRefs(
   processingOptions: ResourceRefsProcessingOptions,
   filter?: {resourceIds?: string[]; resourceKinds?: string[]}
 ) {
-  const resources = Object.values(resourceMap).filter(resource => !isKustomizationResource(resource));
-  //  resources.forEach(resource => processResourceRefNodes(resource));
+  // select which resources to process based on optional filter
+  const resources =
+    filter?.resourceIds && filter?.resourceIds.length > 0
+      ? filter.resourceIds.map(id => resourceMap[id])
+      : filter?.resourceKinds && filter?.resourceKinds.length > 0
+      ? Object.values(resourceMap).filter(resource => filter?.resourceKinds?.includes(resource.kind))
+      : Object.values(resourceMap).filter(resource => !isKustomizationResource(resource));
 
-  let filteredResources =
-    filter && (filter.resourceKinds || filter.resourceIds)
-      ? resources.filter(resource =>
-          filter.resourceIds && filter.resourceIds.length > 0
-            ? filter.resourceIds.includes(resource.id)
-            : filter.resourceKinds && filter.resourceKinds.length > 0
-            ? filter.resourceKinds.includes(resource.kind)
-            : true
-        )
-      : resources;
-
+  // prep for processing
   let processedResourceIds = new Set<string>();
+  const k8sResources = Object.values(resourceMap);
 
-  filteredResources.forEach(sourceResource => {
+  resources.forEach(sourceResource => {
     clearResourceRefs(sourceResource, resourceMap);
     processResourceRefNodes(sourceResource);
 
     const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
-    if (
-      resourceKindHandler &&
-      resourceKindHandler.outgoingRefMappers &&
-      resourceKindHandler.outgoingRefMappers.length > 0
-    ) {
+    if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
       resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-        const targetResources = Object.values(resourceMap).filter(targetResource =>
+        const targetResources = k8sResources.filter(targetResource =>
           resourceMatchesRefMapper(targetResource, outgoingRefMapper, sourceResource)
         );
 
@@ -421,5 +413,5 @@ export function processRefs(
     }
   });
 
-  cleanResourceRefs(filteredResources);
+  cleanResourceRefs(resources);
 }
