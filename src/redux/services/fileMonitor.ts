@@ -1,10 +1,10 @@
 import {watch, FSWatcher} from 'chokidar';
 import {AppConfig} from '@models/appconfig';
 import {AppDispatch} from '@redux/store';
-import {fileChanged, pathAdded, pathRemoved} from '@redux/reducers/main';
+import {debounceWithPreviousArgs} from '@utils/helpers';
+import {multipleFilesChanged, multiplePathsAdded, multiplePathsRemoved} from '@redux/reducers/main';
 
 let watcher: FSWatcher;
-let initializing = false;
 
 /**
  * Creates a monitor for the specified folder and dispatches folder events using the specified dispatch
@@ -15,45 +15,52 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
     watcher.close();
   }
 
-  initializing = true;
   watcher = watch(folder, {
     ignored: appConfig.scanExcludes,
+    ignoreInitial: true,
     persistent: true,
     usePolling: true,
     interval: 2000,
   });
 
   watcher
-    .on('add', path => {
-      if (!initializing) {
-        dispatch(pathAdded({path, appConfig}));
-      }
-    })
-    .on('addDir', path => {
-      if (!initializing) {
-        dispatch(pathAdded({path, appConfig}));
-      }
-    })
-    .on('change', path => {
-      if (!initializing) {
-        dispatch(fileChanged({path, appConfig}));
-      }
-    })
-    .on('unlink', path => {
-      if (!initializing) {
-        dispatch(pathRemoved(path));
-      }
-    })
-    .on('unlinkDir', path => {
-      if (!initializing) {
-        dispatch(pathRemoved(path));
-      }
-    });
+    .on(
+      'add',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multiplePathsAdded({paths, appConfig}));
+      }, 1000)
+    )
+    .on(
+      'addDir',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        // dispatch(multiplePathsAdded({paths, appConfig}));
+      }, 1000)
+    )
+    .on(
+      'change',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multipleFilesChanged({paths, appConfig}));
+      }, 1000)
+    )
+    .on(
+      'unlink',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multiplePathsRemoved(paths));
+      }, 1000)
+    )
+    .on(
+      'unlinkDir',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multiplePathsRemoved(paths));
+      }, 1000)
+    );
 
   watcher
     /* eslint-disable no-console */
-    .on('error', error => console.log(`Watcher error: ${error}`))
-    .on('ready', () => {
-      initializing = false;
-    });
+    .on('error', error => console.log(`Watcher error: ${error}`));
 }
