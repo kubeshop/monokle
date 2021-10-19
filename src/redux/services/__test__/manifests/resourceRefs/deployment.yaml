@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: argocd-repo-server
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/component: repo-server
+  name: argocd-repo-server
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-repo-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argocd-repo-server
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: argocd-repo-server
+          image: quay.io/argoproj/argocd:latest
+          imagePullPolicy: Always
+          command:
+            - entrypoint.sh
+            - argocd-repo-server
+            - --redis
+            - $(ARGOCD_REDIS_SERVICE):6379
+          env:
+            - name: ARGOCD_RECONCILIATION_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: argocd-cm
+                  key: timeout.reconciliation
+                  optional: false
+            - name: ARGOCD_REPO_SERVER_LOGFORMAT
+              valueFrom:
+                configMapKeyRef:
+                  name: argocd-cm
+                  key: reposerver.log.format
+                  optional: true
+            - name: ARGOCD_REPO_SERVER_LOGLEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: argocd-cmd-params-cm
+                  key: reposerver.log.level
+                  optional: false
+            - name: ARGOCD_REPO_SERVER_PARALLELISM_LIMIT
+              valueFrom:
+                configMapKeyRef:
+                  name: argocd-cmd-params-cm
+                  key: reposerver.parallelism.limit
+                  optional: true
+          ports:
+            - containerPort: 8081
+            - containerPort: 8084
+          livenessProbe:
+            httpGet:
+              path: /healthz?full=true
+              port: 8084
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8084
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - all
+          volumeMounts:
+            - name: ssh-known-hosts
+              mountPath: /app/config/ssh
+            - name: tls-certs
+              mountPath: /app/config/tls
+            - name: gpg-keys
+              mountPath: /app/config/gpg/source
+            - name: gpg-keyring
+              mountPath: /app/config/gpg/keys
+            - name: argocd-repo-server-tls
+              mountPath: /app/config/reposerver/tls
+            - name: tmp
+              mountPath: /tmp
+            - mountPath: /helm-working-dir
+              name: helm-working-dir
+      

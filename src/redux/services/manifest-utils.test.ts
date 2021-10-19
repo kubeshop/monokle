@@ -247,10 +247,15 @@ test('traverse-document', () => {
     ],
     [['metadata', 'labels'], ['metadata', 'labels', 'app.kubernetes.io/name'], 'app.kubernetes.io/name', 'test'],
     [['metadata', 'labels'], ['metadata', 'labels', 'app.kubernetes.io/part-of'], 'app.kubernetes.io/part-of', 'test'],
-    [['metadata'], ['metadata', 'finalizers'], 'finalizers', 'test'],
-    [['metadata'], ['metadata', 'finalizers'], 'finalizers', 'test2'],
-    [['metadata', 'finalizers'], ['metadata', 'finalizers', 'test3'], 'test3', 'value'],
-    [['metadata', 'finalizers', 'test4'], ['metadata', 'finalizers', 'test4', 'test5'], 'test5', 'value'],
+    [['metadata'], ['metadata', 'finalizers', '0'], 'test'],
+    [['metadata'], ['metadata', 'finalizers', '1'], 'test2'],
+    [['metadata', 'finalizers', '2'], ['metadata', 'finalizers', '2', 'test3'], 'test3', 'value'],
+    [
+      ['metadata', 'finalizers', '3', 'test4', '0'],
+      ['metadata', 'finalizers', '3', 'test4', '0', 'test5'],
+      'test5',
+      'value',
+    ],
     [['data'], ['data', 'POSTGRES_DB'], 'POSTGRES_DB', ''],
     [['data'], ['data', 'REDIS_HOST'], 'REDIS_HOST', ''],
     [['data'], ['data', 'newKey'], 'newKey', 'New Value'],
@@ -261,15 +266,20 @@ test('traverse-document', () => {
       'app.kubernetes.io/part-of',
       'test',
     ],
-    [['spec', 'volumes', 'configMap'], ['spec', 'volumes', 'configMap', 'name'], 'name', 'ssh-known-hosts-cm'],
-    [['spec', 'volumes'], ['spec', 'volumes', 'name'], 'name', 'ssh-known-hosts'],
-    [['spec', 'volumes', 'configMap'], ['spec', 'volumes', 'configMap', 'name'], 'name', 'tls-certs-cm'],
-    [['spec', 'volumes'], ['spec', 'volumes', 'name'], 'name', 'tls-certs'],
+    [
+      ['spec', 'volumes', '0', 'configMap'],
+      ['spec', 'volumes', '0', 'configMap', 'name'],
+      'name',
+      'ssh-known-hosts-cm',
+    ],
+    [['spec', 'volumes', '0'], ['spec', 'volumes', '0', 'name'], 'name', 'ssh-known-hosts'],
+    [['spec', 'volumes', '1', 'configMap'], ['spec', 'volumes', '1', 'configMap', 'name'], 'name', 'tls-certs-cm'],
+    [['spec', 'volumes', '1'], ['spec', 'volumes', '1', 'name'], 'name', 'tls-certs'],
   ];
 
-  const result: [string[], string[], string, string][] = [];
+  const result: [string[], string[], string, string?][] = [];
   const document = parseDocument(inputYaml);
-  traverseDocument(document, (parentKeyPathParts, keyPathParts, key, scalar) => {
+  traverseDocument(document, (parentKeyPathParts, keyPathParts, key, scalar?) => {
     result.push([parentKeyPathParts, keyPathParts, key, scalar.value as string]);
   });
   expect(result).toEqual(expectedResult);

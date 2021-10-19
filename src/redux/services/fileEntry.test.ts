@@ -13,7 +13,7 @@ test('create-file-entry', () => {
   expect(e.children).toBeUndefined();
 });
 
-function readManifests(rootFolder: string) {
+export function readManifests(rootFolder: string) {
   const appConfig: AppConfig = initialState.config;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};

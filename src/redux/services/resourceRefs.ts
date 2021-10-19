@@ -83,6 +83,7 @@ export function processResourceRefNodes(resource: K8sResource) {
       if (!resource.refNodesByPath) {
         resource.refNodesByPath = {};
       }
+
       const keyPath = joinPathParts(keyPathParts);
       const parentKeyPath = joinPathParts(parentKeyPathParts);
 
