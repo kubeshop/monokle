@@ -6,6 +6,7 @@ metadata:
     app.kubernetes.io/part-of: argocd
     app.kubernetes.io/component: repo-server
   name: argocd-repo-server
+  namespace: argocd
 spec:
   selector:
     matchLabels:
@@ -16,6 +17,9 @@ spec:
         app.kubernetes.io/name: argocd-repo-server
     spec:
       automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: secretInSameNamespace
+        - name: secretInAnotherNamespace
       containers:
         - name: argocd-repo-server
           image: quay.io/argoproj/argocd:latest
@@ -88,4 +92,3 @@ spec:
               mountPath: /tmp
             - mountPath: /helm-working-dir
               name: helm-working-dir
-      

@@ -132,7 +132,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   },
   {
     source: {
-      pathParts: ['imagePullSecrets'],
+      pathParts: ['imagePullSecrets', 'name'],
       namespaceRef: NamespaceRefEnum.Implicit,
     },
     ...SecretTarget,

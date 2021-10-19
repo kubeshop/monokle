@@ -224,6 +224,9 @@ test('traverse-document', () => {
     matchLabels:
       app.kubernetes.io/name: test
       app.kubernetes.io/part-of: test
+    imagePullSecrets:
+      - name: secretInSameNamespace
+      - name: secretInAnotherNamespace
     volumes:
     - configMap:
         name: ssh-known-hosts-cm
@@ -247,8 +250,8 @@ test('traverse-document', () => {
     ],
     [['metadata', 'labels'], ['metadata', 'labels', 'app.kubernetes.io/name'], 'app.kubernetes.io/name', 'test'],
     [['metadata', 'labels'], ['metadata', 'labels', 'app.kubernetes.io/part-of'], 'app.kubernetes.io/part-of', 'test'],
-    [['metadata'], ['metadata', 'finalizers', '0'], 'test'],
-    [['metadata'], ['metadata', 'finalizers', '1'], 'test2'],
+    [['metadata'], ['metadata', 'finalizers', '0'], 'test', 'finalizers'],
+    [['metadata'], ['metadata', 'finalizers', '1'], 'test2', 'finalizers'],
     [['metadata', 'finalizers', '2'], ['metadata', 'finalizers', '2', 'test3'], 'test3', 'value'],
     [
       ['metadata', 'finalizers', '3', 'test4', '0'],
@@ -266,12 +269,17 @@ test('traverse-document', () => {
       'app.kubernetes.io/part-of',
       'test',
     ],
+
+    [['spec', 'imagePullSecrets', '0'], ['spec', 'imagePullSecrets', '0', 'name'], 'name', 'secretInSameNamespace'],
+    [['spec', 'imagePullSecrets', '1'], ['spec', 'imagePullSecrets', '1', 'name'], 'name', 'secretInAnotherNamespace'],
+
     [
       ['spec', 'volumes', '0', 'configMap'],
       ['spec', 'volumes', '0', 'configMap', 'name'],
       'name',
       'ssh-known-hosts-cm',
     ],
+
     [['spec', 'volumes', '0'], ['spec', 'volumes', '0', 'name'], 'name', 'ssh-known-hosts'],
     [['spec', 'volumes', '1', 'configMap'], ['spec', 'volumes', '1', 'configMap', 'name'], 'name', 'tls-certs-cm'],
     [['spec', 'volumes', '1'], ['spec', 'volumes', '1', 'name'], 'name', 'tls-certs'],
