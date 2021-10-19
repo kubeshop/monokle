@@ -59,17 +59,20 @@ const addRefNodeAtPath = (refNode: RefNode, path: string, refNodesByPath: Record
   }
 };
 
-export function processResourceRefNodes(resource: K8sResource) {
+const getRefMappers = (resource: K8sResource) => {
   const resourceKindHandler = getResourceKindHandler(resource.kind);
   if (!resourceKindHandler) {
-    return;
+    return [];
   }
   const outgoingRefMappers = resourceKindHandler?.outgoingRefMappers || [];
   const incomingRefMappers = getIncomingRefMappers(resource.kind);
 
-  const refMappers = [...incomingRefMappers, ...outgoingRefMappers];
+  return [...incomingRefMappers, ...outgoingRefMappers];
+};
 
-  if (!refMappers || refMappers.length === 0) {
+export function processResourceRefNodes(resource: K8sResource) {
+  const refMappers = getRefMappers(resource);
+  if (refMappers.length === 0) {
     return;
   }
 
@@ -388,28 +391,29 @@ export function processRefs(
   resources.forEach(sourceResource => {
     clearResourceRefs(sourceResource, resourceMap);
     processResourceRefNodes(sourceResource);
+    if (sourceResource.refNodesByPath && Object.values(sourceResource.refNodesByPath).length > 0) {
+      const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
+      if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
+        resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
+          const targetResources = k8sResources.filter(targetResource =>
+            resourceMatchesRefMapper(targetResource, outgoingRefMapper, sourceResource)
+          );
 
-    const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
-    if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
-      resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-        const targetResources = k8sResources.filter(targetResource =>
-          resourceMatchesRefMapper(targetResource, outgoingRefMapper, sourceResource)
-        );
+          targetResources
+            // make sure we don't process the same resource twice
+            .filter(resource => !processedResourceIds.has(resource.id))
+            .forEach(resource => {
+              processResourceRefNodes(resource);
+              processedResourceIds.add(resource.id);
+            });
 
-        targetResources
-          // make sure we don't process the same resource twice
-          .filter(resource => !processedResourceIds.has(resource.id))
-          .forEach(resource => {
-            processResourceRefNodes(resource);
-            processedResourceIds.add(resource.id);
-          });
-
-        if (outgoingRefMapper.matchPairs) {
-          handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
-        } else {
-          handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
-        }
-      });
+          if (outgoingRefMapper.matchPairs) {
+            handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
+          } else {
+            handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
+          }
+        });
+      }
     }
   });
 
