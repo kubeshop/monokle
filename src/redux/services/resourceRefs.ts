@@ -48,7 +48,7 @@ export function hasUnsatisfiedRefs(resource: K8sResource) {
 }
 
 const joinPathParts = (pathParts: string[]) => {
-  return pathParts.filter(part => Number.isNaN(parseInt(part, 10))).join(REF_PATH_SEPARATOR);
+  return pathParts.join(REF_PATH_SEPARATOR);
 };
 
 const addRefNodeAtPath = (refNode: RefNode, path: string, refNodesByPath: Record<string, RefNode[]>) => {
