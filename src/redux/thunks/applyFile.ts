@@ -67,7 +67,7 @@ export async function applyFile(filePath: string, fileMap: FileMapType, dispatch
           dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
         });
-      } catch (e) {
+      } catch (e: any) {
         log.error(e.message);
         dispatch(setApplyingResource(true));
       }

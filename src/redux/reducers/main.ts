@@ -32,13 +32,14 @@ import {parallelLimit} from 'async';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
-  addPath,
   removePath,
   getAllFileEntriesForPath,
   getFileEntryForAbsolutePath,
   getResourcesForPath,
   reloadFile,
   createFileEntry,
+  addPath,
+  addFolder,
 } from '../services/fileEntry';
 import {
   extractK8sResources,
@@ -112,6 +113,115 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
     thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
   }
 );
+/**
+ * updates the content of the specified path to the specified value
+ */
+export const updateFileEntry = createAsyncThunk(
+  'main/updateFileEntry',
+  async (payload: UpdateFileEntryPayload, thunkAPI) => {
+    const state = (<any>thunkAPI.getState()).main;
+    try {
+      const fileEntry = state.fileMap[payload.path];
+      if (fileEntry) {
+        let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+        const filePath = path.join(rootFolder, payload.path);
+
+        if (getFileStats(filePath)?.isDirectory() === false) {
+          fs.writeFileSync(filePath, payload.content);
+          fileEntry.timestamp = getFileStats(filePath)?.mtime.getTime();
+
+          getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
+            thunkAPI.dispatch(mainSlice.actions.deleteResource(r.id));
+          });
+
+          const extractedResources = await extractK8sResources(payload.content, filePath.substring(rootFolder.length));
+          Object.values(extractedResources).forEach(r => {
+            state.resourceMap[r.id] = r;
+            r.isHighlighted = true;
+          });
+          reprocessResources([], state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
+            resourceKinds: extractedResources.map(r => r.kind),
+          });
+        }
+      } else {
+        log.error(`Could not find FileEntry for ${payload.path}`);
+      }
+    } catch (e) {
+      log.error(e);
+      return original(state);
+    }
+  }
+);
+/**
+ * called by the file monitor when multiple paths are added to the file system
+ */
+export const multiplePathsAdded = createAsyncThunk(
+  'main/multiplePathsAdded',
+  async (payload: {paths: Array<string>; appConfig: AppConfig}, thunkAPI) => {
+    const state = (<any>thunkAPI.getState()).main;
+    let filePaths: Array<string> = payload.paths;
+    const appConfig = payload.appConfig;
+    await parallelLimit(
+      filePaths.map(filePath => async () => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+        if (fileEntry) {
+          if (getFileStats(filePath)?.isDirectory() === false) {
+            log.info(`added file ${filePath} already exists - updating`);
+            thunkAPI.dispatch(mainSlice.actions.reloadFile({filePath, fileEntry}));
+          }
+        } else {
+          const passedFileEntry = await addFolder(filePath, state, appConfig);
+          thunkAPI.dispatch(mainSlice.actions.addPath({filePath, appConfig, passedFileEntry}));
+        }
+      }),
+      50
+    );
+  }
+);
+/**
+ * called by the file monitor when multiple files are changed in the file system
+ */
+export const multipleFilesChanged = createAsyncThunk(
+  'main/multipleFilesChanged',
+  async (payload: {paths: Array<string>; appConfig: AppConfig}, thunkAPI) => {
+    const state = (<any>thunkAPI.getState()).main;
+    let filePaths = payload.paths;
+    const appConfig = payload.appConfig;
+    await parallelLimit(
+      filePaths.map(filePath => async () => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+        if (fileEntry) {
+          thunkAPI.dispatch(mainSlice.actions.reloadFile({filePath, fileEntry}));
+        } else {
+          const passedFileEntry = await addFolder(filePath, state, appConfig);
+          thunkAPI.dispatch(mainSlice.actions.addPath({filePath, appConfig, passedFileEntry}));
+        }
+      }),
+      50
+    );
+  }
+);
+/**
+ * called by the file monitor when a path is removed from the file system
+ */
+export const multiplePathsRemoved = createAsyncThunk(
+  'main/multiplePathsRemoved',
+  async (payload: Array<string>, thunkAPI) => {
+    const state = (<any>thunkAPI.getState()).main;
+    let filePaths: Array<string> = payload;
+    await parallelLimit(
+      filePaths.map(filePath => () => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+        if (fileEntry) {
+          thunkAPI.dispatch(mainSlice.actions.removePath({filePath, fileEntry}));
+        } else {
+          log.warn(`removed file ${filePath} not known - ignoring..`);
+        }
+      }),
+      50
+    );
+  }
+);
 
 export const mainSlice = createSlice({
   name: 'main',
@@ -121,149 +231,18 @@ export const mainSlice = createSlice({
       const resource = action.payload;
       state.resourceMap[resource.id] = resource;
     },
-    /**
-     * called by the file monitor when a path is added to the file system
-     */
-    pathAdded: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
-      let filePath = action.payload.path;
-      const appConfig = action.payload.appConfig;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        if (getFileStats(filePath)?.isDirectory() === false) {
-          log.info(`added file ${filePath} already exists - updating`);
-          reloadFile(filePath, fileEntry, state);
-        }
-      } else {
-        addPath(filePath, state, appConfig);
-      }
+    deleteResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      delete state.resourceMap[action.payload];
     },
-    /**
-     * called by the file monitor when multiple paths are added to the file system
-     */
-    multiplePathsAdded: (
-      state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
-    ) => {
-      let filePaths: Array<string> = action.payload.paths;
-      const appConfig = action.payload.appConfig;
-      parallelLimit(
-        filePaths.map(filePath => () => {
-          let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-          if (fileEntry) {
-            if (getFileStats(filePath)?.isDirectory() === false) {
-              log.info(`added file ${filePath} already exists - updating`);
-              reloadFile(filePath, fileEntry, state);
-            }
-          } else {
-            addPath(filePath, state, appConfig);
-          }
-        }),
-        20,
-        (err, results) => {}
-      );
+    reloadFile: (state: Draft<AppState>, action: PayloadAction<any>) => {
+      reloadFile(action.payload.filePath, action.payload.fileEntry, state);
     },
-    /**
-     * called by the file monitor when a file is changed in the file system
-     */
-    fileChanged: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
-      let filePath = action.payload.path;
-      const appConfig = action.payload.appConfig;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        reloadFile(filePath, fileEntry, state);
-      } else {
-        addPath(filePath, state, appConfig);
-      }
+    addPath: (state: Draft<AppState>, action: PayloadAction<any>) => {
+      const passedFileEntry = action.payload.passedFileEntry;
+      addPath(action.payload.filePath, state, action.payload.appConfig, passedFileEntry);
     },
-    /**
-     * called by the file monitor when multiple files are changed in the file system
-     */
-    multipleFilesChanged: (
-      state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
-    ) => {
-      let filePaths = action.payload.paths;
-      const appConfig = action.payload.appConfig;
-      parallelLimit(
-        filePaths.map(filePath => () => {
-          let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-          if (fileEntry) {
-            reloadFile(filePath, fileEntry, state);
-          } else {
-            addPath(filePath, state, appConfig);
-          }
-        }),
-        20,
-        () => {}
-      );
-    },
-    /**
-     * called by the file monitor when a path is removed from the file system
-     */
-    pathRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      let filePath = action.payload;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        removePath(filePath, state, fileEntry);
-      } else {
-        log.warn(`removed file ${filePath} not known - ignoring..`);
-      }
-    },
-    /**
-     * called by the file monitor when a path is removed from the file system
-     */
-    multiplePathsRemoved: (state: Draft<AppState>, action: PayloadAction<Array<string>>) => {
-      let filePaths: Array<string> = action.payload;
-      parallelLimit(
-        filePaths.map(filePath => () => {
-          let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-          if (fileEntry) {
-            removePath(filePath, state, fileEntry);
-          } else {
-            log.warn(`removed file ${filePath} not known - ignoring..`);
-          }
-        }),
-        20,
-        () => {}
-      );
-    },
-    /**
-     * updates the content of the specified path to the specified value
-     */
-    updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
-      try {
-        const fileEntry = state.fileMap[action.payload.path];
-        if (fileEntry) {
-          let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-          const filePath = path.join(rootFolder, action.payload.path);
-
-          if (getFileStats(filePath)?.isDirectory() === false) {
-            fs.writeFileSync(filePath, action.payload.content);
-            fileEntry.timestamp = getFileStats(filePath)?.mtime.getTime();
-
-            getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
-              delete state.resourceMap[r.id];
-            });
-
-            const extractedResources = extractK8sResources(
-              action.payload.content,
-              filePath.substring(rootFolder.length)
-            );
-            Object.values(extractedResources).forEach(r => {
-              state.resourceMap[r.id] = r;
-              r.isHighlighted = true;
-            });
-            reprocessResources([], state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
-              resourceKinds: extractedResources.map(r => r.kind),
-            });
-          }
-        } else {
-          log.error(`Could not find FileEntry for ${action.payload.path}`);
-        }
-      } catch (e) {
-        log.error(e);
-        return original(state);
-      }
+    removePath: (state: Draft<AppState>, action: PayloadAction<any>) => {
+      removePath(action.payload.filePath, state, action.payload.fileEntry);
     },
     /**
      * Updates the content of the specified resource to the specified value
@@ -596,13 +575,6 @@ export const {
   setSelectingFile,
   setApplyingResource,
   updateResource,
-  updateFileEntry,
-  pathAdded,
-  multiplePathsAdded,
-  fileChanged,
-  multipleFilesChanged,
-  pathRemoved,
-  multiplePathsRemoved,
   selectHelmValuesFile,
   clearPreview,
   clearPreviewAndSelectionHistory,

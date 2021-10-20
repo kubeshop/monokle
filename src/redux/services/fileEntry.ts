@@ -52,7 +52,7 @@ function isHelmChartFolder(files: string[]) {
  * Processes the specified folder as containing a Helm Chart
  */
 
-function processHelmChartFolder(
+async function processHelmChartFolder(
   folder: string,
   rootFolder: string,
   files: string[],
@@ -71,8 +71,8 @@ function processHelmChartFolder(
     valueFileIds: [],
   };
 
-  parallelLimit(
-    files.map(file => () => {
+  await parallelLimit(
+    files.map(file => async () => {
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substr(rootFolder.length);
       const fileEntry = createFileEntry(fileEntryPath);
@@ -83,7 +83,7 @@ function processHelmChartFolder(
         if (depth === appConfig.folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
         } else {
-          fileEntry.children = readFiles(
+          fileEntry.children = await readFiles(
             filePath,
             appConfig,
             resourceMap,
@@ -109,8 +109,7 @@ function processHelmChartFolder(
       fileMap[fileEntry.filePath] = fileEntry;
       result.push(fileEntry.name);
     }),
-    20,
-    () => {}
+    50
   );
 
   helmChartMap[helmChart.id] = helmChart;
@@ -123,7 +122,7 @@ function processHelmChartFolder(
  * Returns the list of filenames (not paths) found in the specified folder
  */
 
-export function readFiles(
+export async function readFiles(
   folder: string,
   appConfig: AppConfig,
   resourceMap: ResourceMapType,
@@ -144,7 +143,7 @@ export function readFiles(
 
   // is this a helm chart folder?
   if (isHelmChartFolder(files)) {
-    processHelmChartFolder(
+    await processHelmChartFolder(
       folder,
       rootFolder,
       files,
@@ -157,8 +156,8 @@ export function readFiles(
       depth
     );
   } else {
-    parallelLimit(
-      files.map(file => () => {
+    await parallelLimit(
+      files.map(file => async () => {
         const filePath = path.join(folder, file);
         const fileEntryPath = filePath.substr(rootFolder.length);
         const fileEntry = createFileEntry(fileEntryPath);
@@ -169,7 +168,7 @@ export function readFiles(
           if (depth === appConfig.folderReadsMaxDepth) {
             log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
           } else {
-            fileEntry.children = readFiles(
+            fileEntry.children = await readFiles(
               filePath,
               appConfig,
               resourceMap,
@@ -191,9 +190,9 @@ export function readFiles(
 
         fileMap[fileEntry.filePath] = fileEntry;
         result.push(fileEntry.name);
+        return fileEntry;
       }),
-      20,
-      () => {}
+      50
     );
   }
 
@@ -269,7 +268,7 @@ export function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapTy
 export function getAllFileEntriesForPath(filePath: string, fileMap: FileMapType) {
   let parent = fileMap[ROOT_FILE_ENTRY];
   const result: FileEntry[] = [];
-  
+
   filePath.split(path.sep).forEach(pathSegment => {
     if (parent.children?.includes(pathSegment)) {
       const child = fileMap[getChildFilePath(pathSegment, parent, fileMap)];
@@ -379,12 +378,12 @@ function addFile(absolutePath: string, state: AppState) {
  * Adds the folder at the specified path with the specified parent
  */
 
-function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) {
+export async function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) {
   log.info(`adding folder ${absolutePath}`);
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
     const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
-    folderEntry.children = readFiles(
+    folderEntry.children = await readFiles(
       absolutePath,
       appConfig,
       state.resourceMap,
@@ -402,7 +401,7 @@ function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) 
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState, appConfig: AppConfig) {
+export async function addPath(absolutePath: string, state: AppState, appConfig: AppConfig, passedFileEntry: any) {
   const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -416,7 +415,7 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
       }
       return undefined;
     }
-    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state);
+    const fileEntry = isDirectory ? passedFileEntry : addFile(absolutePath, state);
 
     if (fileEntry) {
       state.fileMap[fileEntry.filePath] = fileEntry;
@@ -432,7 +431,6 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
 
   return undefined;
 }
-
 /**
  * Removes the specified fileEntry and its resources from the provided state
  */
