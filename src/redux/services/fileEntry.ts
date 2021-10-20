@@ -11,6 +11,8 @@ import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/serv
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {v4 as uuidv4} from 'uuid';
 import {getFileStats} from '@utils/files';
+import {parallelLimit} from 'async';
+
 import {extractK8sResources, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
@@ -69,43 +71,47 @@ function processHelmChartFolder(
     valueFileIds: [],
   };
 
-  files.forEach(file => {
-    const filePath = path.join(folder, file);
-    const fileEntryPath = filePath.substr(rootFolder.length);
-    const fileEntry = createFileEntry(fileEntryPath);
+  parallelLimit(
+    files.map(file => () => {
+      const filePath = path.join(folder, file);
+      const fileEntryPath = filePath.substr(rootFolder.length);
+      const fileEntry = createFileEntry(fileEntryPath);
 
-    if (fileIsExcluded(appConfig, fileEntry)) {
-      fileEntry.isExcluded = true;
-    } else if (getFileStats(filePath)?.isDirectory()) {
-      if (depth === appConfig.folderReadsMaxDepth) {
-        log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
-      } else {
-        fileEntry.children = readFiles(
-          filePath,
-          appConfig,
-          resourceMap,
-          fileMap,
-          helmChartMap,
-          helmValuesMap,
-          depth + 1
-        );
+      if (fileIsExcluded(appConfig, fileEntry)) {
+        fileEntry.isExcluded = true;
+      } else if (getFileStats(filePath)?.isDirectory()) {
+        if (depth === appConfig.folderReadsMaxDepth) {
+          log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
+        } else {
+          fileEntry.children = readFiles(
+            filePath,
+            appConfig,
+            resourceMap,
+            fileMap,
+            helmChartMap,
+            helmValuesMap,
+            depth + 1
+          );
+        }
+      } else if (micromatch.isMatch(file, '*values*.yaml')) {
+        const helmValues: HelmValuesFile = {
+          id: uuidv4(),
+          filePath: fileEntryPath,
+          name: file,
+          isSelected: false,
+          helmChartId: helmChart.id,
+        };
+
+        helmValuesMap[helmValues.id] = helmValues;
+        helmChart.valueFileIds.push(helmValues.id);
       }
-    } else if (micromatch.isMatch(file, '*values*.yaml')) {
-      const helmValues: HelmValuesFile = {
-        id: uuidv4(),
-        filePath: fileEntryPath,
-        name: file,
-        isSelected: false,
-        helmChartId: helmChart.id,
-      };
 
-      helmValuesMap[helmValues.id] = helmValues;
-      helmChart.valueFileIds.push(helmValues.id);
-    }
-
-    fileMap[fileEntry.filePath] = fileEntry;
-    result.push(fileEntry.name);
-  });
+      fileMap[fileEntry.filePath] = fileEntry;
+      result.push(fileEntry.name);
+    }),
+    20,
+    () => {}
+  );
 
   helmChartMap[helmChart.id] = helmChart;
 }
@@ -151,40 +157,44 @@ export function readFiles(
       depth
     );
   } else {
-    files.forEach(file => {
-      const filePath = path.join(folder, file);
-      const fileEntryPath = filePath.substr(rootFolder.length);
-      const fileEntry = createFileEntry(fileEntryPath);
+    parallelLimit(
+      files.map(file => () => {
+        const filePath = path.join(folder, file);
+        const fileEntryPath = filePath.substr(rootFolder.length);
+        const fileEntry = createFileEntry(fileEntryPath);
 
-      if (fileIsExcluded(appConfig, fileEntry)) {
-        fileEntry.isExcluded = true;
-      } else if (getFileStats(filePath)?.isDirectory()) {
-        if (depth === appConfig.folderReadsMaxDepth) {
-          log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
-        } else {
-          fileEntry.children = readFiles(
-            filePath,
-            appConfig,
-            resourceMap,
-            fileMap,
-            helmChartMap,
-            helmValuesMap,
-            depth + 1
-          );
+        if (fileIsExcluded(appConfig, fileEntry)) {
+          fileEntry.isExcluded = true;
+        } else if (getFileStats(filePath)?.isDirectory()) {
+          if (depth === appConfig.folderReadsMaxDepth) {
+            log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
+          } else {
+            fileEntry.children = readFiles(
+              filePath,
+              appConfig,
+              resourceMap,
+              fileMap,
+              helmChartMap,
+              helmValuesMap,
+              depth + 1
+            );
+          }
+        } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+          try {
+            extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+              resourceMap[resource.id] = resource;
+            });
+          } catch (e) {
+            log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
+          }
         }
-      } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
-        try {
-          extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
-            resourceMap[resource.id] = resource;
-          });
-        } catch (e) {
-          log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
-        }
-      }
 
-      fileMap[fileEntry.filePath] = fileEntry;
-      result.push(fileEntry.name);
-    });
+        fileMap[fileEntry.filePath] = fileEntry;
+        result.push(fileEntry.name);
+      }),
+      20,
+      () => {}
+    );
   }
 
   return result;
@@ -259,6 +269,7 @@ export function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapTy
 export function getAllFileEntriesForPath(filePath: string, fileMap: FileMapType) {
   let parent = fileMap[ROOT_FILE_ENTRY];
   const result: FileEntry[] = [];
+  
   filePath.split(path.sep).forEach(pathSegment => {
     if (parent.children?.includes(pathSegment)) {
       const child = fileMap[getChildFilePath(pathSegment, parent, fileMap)];

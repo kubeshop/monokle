@@ -11,6 +11,8 @@ import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {getDependentResourceKinds} from '@src/kindhandlers';
 import {v4 as uuidv4} from 'uuid';
 import {getFileStats} from '@utils/files';
+import {parallelLimit} from 'async';
+
 import {validateResource} from './validation';
 import {processRefs} from './resourceRefs';
 
@@ -542,48 +544,52 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
   if (documents) {
     let docIndex = 0;
-    documents.forEach(doc => {
-      if (doc.errors.length > 0) {
-        log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`
-        );
-      } else {
-        const content = doc.toJS();
-        if (content && content.apiVersion && content.kind) {
-          const text = fileContent.slice(doc.range[0], doc.range[1]);
+    parallelLimit(
+      documents.map(doc => () => {
+        if (doc.errors.length > 0) {
+          log.warn(
+            `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`
+          );
+        } else {
+          const content = doc.toJS();
+          if (content && content.apiVersion && content.kind) {
+            const text = fileContent.slice(doc.range[0], doc.range[1]);
 
-          let resource: K8sResource = {
-            name: createResourceName(relativePath, content),
-            filePath: relativePath,
-            id: (content.metadata && content.metadata.uid) || uuidv4(),
-            isHighlighted: false,
-            isSelected: false,
-            kind: content.kind,
-            version: content.apiVersion,
-            content,
-            text,
-          };
+            let resource: K8sResource = {
+              name: createResourceName(relativePath, content),
+              filePath: relativePath,
+              id: (content.metadata && content.metadata.uid) || uuidv4(),
+              isHighlighted: false,
+              isSelected: false,
+              kind: content.kind,
+              version: content.apiVersion,
+              content,
+              text,
+            };
 
-          // if this is a single-resource file we can save the parsedDoc and lineCounter
-          if (documents.length === 1) {
-            resource.parsedDoc = doc;
-            resource.lineCounter = lineCounter;
-          } else {
-            // for multi-resource files we just save the range - the parsedDoc and lineCounter will
-            // be created on demand (since they are incorrect in this context)
-            resource.range = {start: doc.range[0], length: doc.range[1] - doc.range[0]};
+            // if this is a single-resource file we can save the parsedDoc and lineCounter
+            if (documents.length === 1) {
+              resource.parsedDoc = doc;
+              resource.lineCounter = lineCounter;
+            } else {
+              // for multi-resource files we just save the range - the parsedDoc and lineCounter will
+              // be created on demand (since they are incorrect in this context)
+              resource.range = {start: doc.range[0], length: doc.range[1] - doc.range[0]};
+            }
+
+            // set the namespace if available
+            if (content.metadata?.namespace) {
+              resource.namespace = content.metadata.namespace;
+            }
+
+            result.push(resource);
           }
-
-          // set the namespace if available
-          if (content.metadata?.namespace) {
-            resource.namespace = content.metadata.namespace;
-          }
-
-          result.push(resource);
         }
-      }
-      docIndex += 1;
-    });
+        docIndex += 1;
+      }),
+      20,
+      () => {}
+    );
   }
   return result;
 }

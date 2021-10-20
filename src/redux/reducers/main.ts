@@ -27,6 +27,8 @@ import {AlertType} from '@models/alert';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFileStats} from '@utils/files';
 import electronStore from '@utils/electronStore';
+import {parallelLimit} from 'async';
+
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
@@ -144,17 +146,21 @@ export const mainSlice = createSlice({
     ) => {
       let filePaths: Array<string> = action.payload.paths;
       const appConfig = action.payload.appConfig;
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-        if (fileEntry) {
-          if (getFileStats(filePath)?.isDirectory() === false) {
-            log.info(`added file ${filePath} already exists - updating`);
-            reloadFile(filePath, fileEntry, state);
+      parallelLimit(
+        filePaths.map(filePath => () => {
+          let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+          if (fileEntry) {
+            if (getFileStats(filePath)?.isDirectory() === false) {
+              log.info(`added file ${filePath} already exists - updating`);
+              reloadFile(filePath, fileEntry, state);
+            }
+          } else {
+            addPath(filePath, state, appConfig);
           }
-        } else {
-          addPath(filePath, state, appConfig);
-        }
-      });
+        }),
+        20,
+        (err, results) => {}
+      );
     },
     /**
      * called by the file monitor when a file is changed in the file system
@@ -178,14 +184,18 @@ export const mainSlice = createSlice({
     ) => {
       let filePaths = action.payload.paths;
       const appConfig = action.payload.appConfig;
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-        if (fileEntry) {
-          reloadFile(filePath, fileEntry, state);
-        } else {
-          addPath(filePath, state, appConfig);
-        }
-      });
+      parallelLimit(
+        filePaths.map(filePath => () => {
+          let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+          if (fileEntry) {
+            reloadFile(filePath, fileEntry, state);
+          } else {
+            addPath(filePath, state, appConfig);
+          }
+        }),
+        20,
+        () => {}
+      );
     },
     /**
      * called by the file monitor when a path is removed from the file system
@@ -204,14 +214,18 @@ export const mainSlice = createSlice({
      */
     multiplePathsRemoved: (state: Draft<AppState>, action: PayloadAction<Array<string>>) => {
       let filePaths: Array<string> = action.payload;
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-        if (fileEntry) {
-          removePath(filePath, state, fileEntry);
-        } else {
-          log.warn(`removed file ${filePath} not known - ignoring..`);
-        }
-      });
+      parallelLimit(
+        filePaths.map(filePath => () => {
+          let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+          if (fileEntry) {
+            removePath(filePath, state, fileEntry);
+          } else {
+            log.warn(`removed file ${filePath} not known - ignoring..`);
+          }
+        }),
+        20,
+        () => {}
+      );
     },
     /**
      * updates the content of the specified path to the specified value

@@ -2,7 +2,7 @@ import {watch, FSWatcher} from 'chokidar';
 import {AppConfig} from '@models/appconfig';
 import {AppDispatch} from '@redux/store';
 import {debounceWithPreviousArgs} from '@utils/helpers';
-import {multipleFilesChanged, multiplePathsAdded, multiplePathsRemoved} from '@redux/reducers/main';
+import {multiplePathsAdded, multipleFilesChanged, multiplePathsRemoved} from '@redux/reducers/main';
 
 let watcher: FSWatcher;
 
@@ -35,7 +35,7 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
       'addDir',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        // dispatch(multiplePathsAdded({paths, appConfig}));
+        dispatch(multiplePathsAdded({paths, appConfig}));
       }, 1000)
     )
     .on(
