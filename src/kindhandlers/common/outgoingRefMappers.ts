@@ -52,7 +52,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretvolumesource-v1-core
     source: {
-      pathParts: ['volumes', 'secret', 'secretName'],
+      pathParts: ['volumes', '*', 'secret', 'secretName'],
       hasOptionalSibling: true,
     },
     ...SecretTarget,
@@ -60,7 +60,16 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
     source: {
-      pathParts: ['azureFile', 'secretName'],
+      pathParts: ['spec', 'azureFile', 'secretName'],
+      namespaceRef: NamespaceRefEnum.Explicit,
+      namespaceProperty: 'secretNamespace',
+    },
+    ...SecretTarget,
+  },
+  {
+    // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
+    source: {
+      pathParts: ['inlineVolumeSpec', 'azureFile', 'secretName'],
       namespaceRef: NamespaceRefEnum.Explicit,
       namespaceProperty: 'secretNamespace',
     },
@@ -69,14 +78,14 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilevolumesource-v1-core
     source: {
-      pathParts: ['volumes', 'azureFile', 'secretName'],
+      pathParts: ['volumes', '*', 'azureFile', 'secretName'],
     },
     ...SecretTarget,
   },
   {
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretprojection-v1-core
     source: {
-      pathParts: ['sources', 'secret', 'name'],
+      pathParts: ['sources', '*', 'secret', 'name'],
       hasOptionalSibling: true,
     },
     ...SecretTarget,
@@ -132,7 +141,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   },
   {
     source: {
-      pathParts: ['imagePullSecrets', 'name'],
+      pathParts: ['imagePullSecrets', '*', 'name'],
       namespaceRef: NamespaceRefEnum.Implicit,
     },
     ...SecretTarget,

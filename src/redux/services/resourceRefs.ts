@@ -59,16 +59,70 @@ const addRefNodeAtPath = (refNode: RefNode, path: string, refNodesByPath: Record
   }
 };
 
-const getRefMappers = (resource: K8sResource) => {
-  const resourceKindHandler = getResourceKindHandler(resource.kind);
-  if (!resourceKindHandler) {
-    return [];
-  }
-  const outgoingRefMappers = resourceKindHandler?.outgoingRefMappers || [];
-  const incomingRefMappers = getIncomingRefMappers(resource.kind);
+/**
+ * Cache of refMappers for a specific resource kind
+ */
 
-  return [...incomingRefMappers, ...outgoingRefMappers];
+const refMapperCache = new Map<string, RefMapper[]>();
+
+const getRefMappers = (resource: K8sResource) => {
+  if (!refMapperCache.has(resource.kind)) {
+    const resourceKindHandler = getResourceKindHandler(resource.kind);
+    if (!resourceKindHandler) {
+      refMapperCache.set(resource.kind, []);
+    } else {
+      const outgoingRefMappers = resourceKindHandler?.outgoingRefMappers || [];
+      const incomingRefMappers = getIncomingRefMappers(resource.kind);
+
+      refMapperCache.set(resource.kind, [...incomingRefMappers, ...outgoingRefMappers]);
+    }
+  }
+
+  return refMapperCache.get(resource.kind) || [];
 };
+
+/**
+ * Checks if a node path ends with a refMapper path
+ */
+
+function pathEndsWithPath(pathParts: string[], endPathParts: string[]) {
+  if (endPathParts.length > pathParts.length) {
+    return false;
+  }
+
+  for (let c = 0; c < endPathParts.length; c += 1) {
+    const pathIx = pathParts.length - 1 - c;
+    const endPathIx = endPathParts.length - 1 - c;
+
+    if (pathParts[pathIx] !== '*' && endPathParts[endPathIx] !== '*' && pathParts[pathIx] !== endPathParts[endPathIx]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Checks if a node path equals a refMapper path
+ */
+
+function pathEqualsPath(pathParts: string[], path2Parts: string[]) {
+  if (pathParts.length !== path2Parts.length) {
+    return false;
+  }
+
+  for (let c = 0; c < pathParts.length; c += 1) {
+    if (pathParts[c] !== '*' && path2Parts[c] !== '*' && pathParts[c] !== path2Parts[c]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Creates all refNodes for a resource for further processing
+ */
 
 export function processResourceRefNodes(resource: K8sResource) {
   const refMappers = getRefMappers(resource);
@@ -84,45 +138,46 @@ export function processResourceRefNodes(resource: K8sResource) {
         resource.refNodesByPath = {};
       }
 
-      const keyPath = joinPathParts(keyPathParts);
-      const parentKeyPath = joinPathParts(parentKeyPathParts);
-
-      const refMapperSourcePath = joinPathParts(refMapper.source.pathParts);
-      const refMapperTargetPath = joinPathParts(refMapper.target.pathParts);
-
-      const refNode = {scalar, key, parentKeyPath};
+      const refNode = {scalar, key, parentKeyPath: joinPathParts(parentKeyPathParts)};
 
       if (refMapper.matchPairs) {
-        if (refMapperSourcePath === parentKeyPath || refMapperTargetPath === parentKeyPath) {
-          addRefNodeAtPath(refNode, keyPath, resource.refNodesByPath);
+        if (
+          pathEqualsPath(refMapper.source.pathParts, parentKeyPathParts) ||
+          pathEqualsPath(refMapper.target.pathParts, parentKeyPathParts)
+        ) {
+          addRefNodeAtPath(refNode, joinPathParts(keyPathParts), resource.refNodesByPath);
         }
       } else {
-        if (keyPath.endsWith(refMapperSourcePath)) {
-          addRefNodeAtPath(refNode, refMapperSourcePath, resource.refNodesByPath);
+        if (pathEndsWithPath(keyPathParts, refMapper.source.pathParts)) {
+          addRefNodeAtPath(refNode, joinPathParts(refMapper.source.pathParts), resource.refNodesByPath);
         }
 
-        if (keyPath.endsWith(refMapperTargetPath)) {
-          addRefNodeAtPath(refNode, refMapperTargetPath, resource.refNodesByPath);
+        if (pathEndsWithPath(keyPathParts, refMapper.target.pathParts)) {
+          addRefNodeAtPath(refNode, joinPathParts(refMapper.target.pathParts), resource.refNodesByPath);
         }
       }
 
       if (refMapper.source.hasOptionalSibling) {
-        const optionalSiblingPath = joinPathParts([...refMapper.source.pathParts.slice(0, -1), 'optional']);
-        if (keyPath.endsWith(optionalSiblingPath)) {
-          addRefNodeAtPath(refNode, optionalSiblingPath, resource.refNodesByPath);
+        const optionalPathParts = [...refMapper.source.pathParts.slice(0, -1), 'optional'];
+        if (pathEndsWithPath(keyPathParts, optionalPathParts)) {
+          addRefNodeAtPath(refNode, joinPathParts(optionalPathParts), resource.refNodesByPath);
         }
       }
 
       if (refMapper.source.namespaceRef === NamespaceRefEnum.Explicit) {
         const namespacePropertyName = refMapper.source.namespaceProperty || 'namespace';
-        const namespaceSiblingPath = joinPathParts([...refMapper.source.pathParts.slice(0, -1), namespacePropertyName]);
-        if (keyPath.endsWith(namespaceSiblingPath)) {
-          addRefNodeAtPath(refNode, namespaceSiblingPath, resource.refNodesByPath);
+        const namespacePathParts = [...refMapper.source.pathParts.slice(0, -1), namespacePropertyName];
+        if (pathEndsWithPath(keyPathParts, namespacePathParts)) {
+          addRefNodeAtPath(refNode, joinPathParts(namespacePathParts), resource.refNodesByPath);
         }
       }
     });
   });
 }
+
+/**
+ * Clears invalid resourceRefs from a resource after processing
+ */
 
 function cleanResourceRefs(resources: K8sResource[]) {
   resources.forEach(resource => {
@@ -155,6 +210,10 @@ function cleanResourceRefs(resources: K8sResource[]) {
     resource.refs = cleanRefs.length > 0 ? cleanRefs : undefined;
   });
 }
+
+/**
+ * Creates resource refs from a specified resource to target resources using the specified refMapper
+ */
 
 function handleRefMappingByParentKey(
   sourceResource: K8sResource,
@@ -232,6 +291,10 @@ function handleRefMappingByParentKey(
   }
 }
 
+/**
+ * Checks for an optional flag to determine if an unsatisfied resourceRef should be created or not
+ */
+
 function shouldCreateUnsatisfiedRef(
   outgoingRefMapper: RefMapper,
   processingOptions: ResourceRefsProcessingOptions,
@@ -251,6 +314,10 @@ function shouldCreateUnsatisfiedRef(
   }
   return true;
 }
+
+/**
+ * Creates resource refs from a specified resource to target resources using the specified refMapper
+ */
 
 function handleRefMappingByKey(
   sourceResource: K8sResource,
@@ -371,6 +438,10 @@ function resourceMatchesRefMapper(
 
   return false;
 }
+
+/**
+ * Updates all refs for the specified resources
+ */
 
 export function processRefs(
   resourceMap: ResourceMapType,
