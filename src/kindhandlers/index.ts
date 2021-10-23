@@ -1,5 +1,6 @@
 import {ResourceKindHandler, RefMapper} from '@models/resourcekindhandler';
 
+import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
 import ConfigMapHandler from './ConfigMap.handler';
@@ -48,6 +49,7 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceHandler,
   ServiceAccountHandler,
   StatefulSetHandler,
+  VolumeAttachmentHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(

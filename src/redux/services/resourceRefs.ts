@@ -2,7 +2,7 @@ import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
-import {NamespaceRefEnum, RefMapper} from '@models/resourcekindhandler';
+import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {traverseDocument} from './manifest-utils';
 import {createResourceRef, getParsedDoc, linkResources, NodeWrapper} from './resource';
@@ -164,7 +164,7 @@ export function processResourceRefNodes(resource: K8sResource) {
         }
       }
 
-      if (refMapper.source.namespaceRef === NamespaceRefEnum.Explicit) {
+      if (refMapper.source.namespaceRef === NamespaceRefTypeEnum.Explicit) {
         const namespacePropertyName = refMapper.source.namespaceProperty || 'namespace';
         const namespacePathParts = [...refMapper.source.pathParts.slice(0, -1), namespacePropertyName];
         if (pathEndsWithPath(keyPathParts, namespacePathParts)) {
@@ -265,7 +265,10 @@ function handleRefMappingByParentKey(
             }
           });
         targetNodes.forEach(targetNode => {
-          if (sourceRefNode.key === targetNode.key && sourceRefNode.scalar.value === targetNode.scalar.value) {
+          if (
+            sourceRefNode.key === targetNode.key &&
+            shouldCreateSatisifedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)
+          ) {
             foundMatchByTargetResourceId[targetResource.id] = true;
             linkResources(
               sourceResource,
@@ -316,6 +319,50 @@ function shouldCreateUnsatisfiedRef(
 }
 
 /**
+ * Checks if the nodes and eventual namespace descriminators match
+ */
+
+function shouldCreateSatisifedRef(
+  sourceRefNode: RefNode,
+  targetNode: RefNode,
+  sourceResource: K8sResource,
+  targetResource: K8sResource,
+  outgoingRefMapper: RefMapper
+) {
+  if (sourceRefNode.scalar.value !== targetNode.scalar.value) {
+    return false;
+  }
+
+  switch (outgoingRefMapper.source.namespaceRef) {
+    case NamespaceRefTypeEnum.Implicit:
+      return sourceResource.namespace === targetResource.namespace;
+    case NamespaceRefTypeEnum.Explicit:
+    case NamespaceRefTypeEnum.OptionalExplicit: {
+      const namespacePropertyName = outgoingRefMapper.source.namespaceProperty || 'namespace';
+      const namespaceSiblingPath = joinPathParts([
+        ...outgoingRefMapper.source.pathParts.slice(0, -1),
+        namespacePropertyName,
+      ]);
+      const namespaceSiblingRefNodes = sourceResource.refNodesByPath
+        ? sourceResource.refNodesByPath[namespaceSiblingPath]
+        : undefined;
+
+      return namespaceSiblingRefNodes
+        ? namespaceSiblingRefNodes.some(
+            refNode =>
+              refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath) &&
+              refNode.scalar.value === targetResource.namespace
+          )
+        : outgoingRefMapper.source.namespaceRef === NamespaceRefTypeEnum.OptionalExplicit &&
+            sourceResource.namespace === targetResource.namespace;
+    }
+
+    default:
+      return true;
+  }
+}
+
+/**
  * Creates resource refs from a specified resource to target resources using the specified refMapper
  */
 
@@ -356,7 +403,7 @@ function handleRefMappingByKey(
           : undefined;
 
         targetNodes?.forEach(targetNode => {
-          if (sourceRefNode.scalar.value === targetNode.scalar.value) {
+          if (shouldCreateSatisifedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)) {
             hasSatisfiedRefs = true;
             linkResources(
               sourceResource,
@@ -401,42 +448,11 @@ function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) 
 }
 
 /**
- * Checks if the specified targetResource matches the refMapper and corresponding sourceResource - based on it's kind
- * and optional namespace descriminator in the refMapper
+ * Checks if the specified targetResource matches the refMapper
  */
 
-function resourceMatchesRefMapper(
-  targetResource: K8sResource,
-  outgoingRefMapper: RefMapper,
-  sourceResource: K8sResource
-) {
-  if (targetResource.kind === outgoingRefMapper.target.kind) {
-    switch (outgoingRefMapper.source.namespaceRef) {
-      case NamespaceRefEnum.Implicit:
-        return sourceResource.namespace === targetResource.namespace;
-      case NamespaceRefEnum.Explicit:
-      case NamespaceRefEnum.OptionalImplicit: {
-        const namespacePropertyName = outgoingRefMapper.source.namespaceProperty || 'namespace';
-        const namespaceSiblingPath = joinPathParts([
-          ...outgoingRefMapper.source.pathParts.slice(0, -1),
-          namespacePropertyName,
-        ]);
-        const namespaceSiblingRefNodes = sourceResource.refNodesByPath
-          ? sourceResource.refNodesByPath[namespaceSiblingPath]
-          : undefined;
-
-        return namespaceSiblingRefNodes
-          ? namespaceSiblingRefNodes.some(refNode => refNode.scalar.value === targetResource.namespace)
-          : outgoingRefMapper.source.namespaceRef === NamespaceRefEnum.OptionalImplicit &&
-              sourceResource.namespace === targetResource.namespace;
-      }
-
-      default:
-        return true;
-    }
-  }
-
-  return false;
+function resourceMatchesRefMapper(targetResource: K8sResource, outgoingRefMapper: RefMapper) {
+  return targetResource.kind === outgoingRefMapper.target.kind;
 }
 
 /**
@@ -468,7 +484,7 @@ export function processRefs(
       if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
         resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
           const targetResources = k8sResources.filter(targetResource =>
-            resourceMatchesRefMapper(targetResource, outgoingRefMapper, sourceResource)
+            resourceMatchesRefMapper(targetResource, outgoingRefMapper)
           );
 
           targetResources
