@@ -55,11 +55,9 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
               type: AlertEnum.Warning,
             };
 
-            console.log('previewResult1', previewResult);
             return previewResult;
           }
         }
-        console.log('previewResult2', previewResult);
         return previewResult;
       },
       reason => {

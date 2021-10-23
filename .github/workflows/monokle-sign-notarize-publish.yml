@@ -1,6 +1,9 @@
 name: monokle-sign-notarize-publish
 
 on:
+  push:
+    branches:
+      - main
   release:
     types:
       - prereleased
@@ -14,12 +17,10 @@ jobs:
     runs-on: macOS-latest
 
     steps:
-      # Make sure build is clean and no files from a previous run are re-used.
-      - name: Cleanup files before run
-        run: |
-          rm -rf *
-          rm /Users/runner/.npm/_logs/*.log || true
-        if: ${{ always() }}
+      - name: Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
@@ -121,11 +122,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # Make sure build is clean and no files from a previous run are re-used.
-      - name: Cleanup files before run
-        run: |
-          cmd /r dir
-        if: ${{ always() }}
+      - name: Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project

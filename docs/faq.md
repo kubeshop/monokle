@@ -2,19 +2,19 @@
 
 You will need to install the following two prerequisites to successfully run Monokle:
 
-1. [Helm](https://helm.sh/docs/intro/install/)
-2. [Kubectl](https://kubernetes.io/docs/tasks/tools/)
+1. [Helm](https://helm.sh/docs/intro/install/) - required for [Helm Preview](./helm.md#helm-preview) functionality
+2. [Kubectl](https://kubernetes.io/docs/tasks/tools/) - required for [Kustomize Preview](./kustomize.md#kustomize-preview) and [Apply/Diff](./apply-and-diff.md) functionality
 
 ## 2. What OS does Monokle support?
 
-Monokle supports all Windows, MacOS and Linux - but provides installers for MacOS and Windows. For running Monokle on
-Linux you have to run it using the source, follow the steps as outlined in the [Getting Started](./getting-started.md)
+Monokle supports Windows, MacOS and Linux - get the latest installers for MacOS and Windows on [GitHub](https://github.com/kubeshop/monokle). For running Monokle on
+Linux you have to run it from the source, follow the steps as outlined in the [Getting Started](./getting-started.md)
 documentation.
 
 ## 3. Why can’t I add any clusters?
 
-While adding new clusters, a valid Kubeconfig file is required. Please check if all the needed configuration settings
-are present in the Kubeconfig file are valid or not. We can use validation tools like YAMLLint for that. For more detail
+While adding new clusters, a valid kubeconfig file is required. Please check that all the needed configuration settings
+are present in your kubeconfig file are valid or not For more detail
 read [kubeconfig](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) documentation.
 
 ## 4. Why is Kubectl required to run Monokle?
@@ -35,13 +35,13 @@ and faster.
 
 ## 7. Can I use Monokle with Flux/ArgoCD?
 
-Yes, Monokle is used for creating / editing / debugging manifests before they are deployed to a cluster using a CD tool
+Yes, Monokle can be used for creating / editing / debugging manifests before they are deployed to a cluster using a CD tool
 like ArgoCD or Flux.
 
 ## 8. How to open Helm and Kustomization preview?
 
 You can navigate to the resources created by Kustomize or Helm in the navigator. Hover over the resources and hit the
-[preview](./features.md) button to view the source code in the editor.
+ button to perform the preview and see the generated resources in the navigator.
 
 ## 9. Why is Autocomplete not working in the editor?
 
@@ -50,5 +50,4 @@ would not work with any other resource except the resources in the YAML manifest
 
 ## 10. How to save changes in the editor?
 
-Monokle source editor enables you to edit YAML manifests. The source editor automatically saves the current changes in
-the code. It helps to reduce the risk of data loss, freeze, or user error.
+The source editor automatically saves the current changes in your resource manifests as long as they are valid yaml files.

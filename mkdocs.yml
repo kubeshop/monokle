@@ -12,7 +12,8 @@ theme:
   highlightjs: true
   hljs_languages:
     - yaml
-
+  features:
+    - navigation.expand
 nav:
   - Welcome: index.md
   - Feature Overview: features.md
@@ -25,13 +26,13 @@ nav:
   - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
   - Architecture: architecture.md
-  - FAQs: faq.md
+  - FAQ: faq.md
   - Tutorials:
       - tutorials/how-to-navigate-and-edit-manifests.md
       - tutorials/how-to-browse-clusters.md
       - tutorials/how-to-configure-monokle.md
       - tutorials/how-to-create-and-edit-configmap.md
-      - tutorials/how-to-fix-dead-end-broken-links.md
+      - tutorials/how-to-fix-broken-links.md
 
 extra:
   analytics:

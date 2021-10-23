@@ -1,38 +1,45 @@
-# How to Create and Edit ConfigMaps 
+# How to work with ConfigMaps 
 
-Monokle is a fully integrated IDE for managing manifests. It provides instant access for debugging Kubernetes resources without looking into the YAML syntax. 
-
-In this tutorial, we have illustrated how to create and edit ConfigMap resources to store non-confidential data in key-value pairs.       
+In this Monokle tutorial, we will illustrate how to create and edit ConfigMap resources to store non-confidential 
+data in key-value pairs.       
 
 Let’s get started. 
 
-**Step 1:** Launch Monokle and click on the Browse button to add your project folder containing K8 resources. 
+## Launch Monokle
+
+Launch Monokle and click on the Browse button to add your project folder containing K8 resources. 
 
 <em>**Note:** Please follow this [Getting Started](../getting-started.md) guide to install Monokle 🚀</em>
 
 ![Image 1](img/image-1.png)
 
-**Step 2:** Select your folder to parse its manifest in the file explorer. 
+## Select Folder
+
+Select your folder to parse its manifest in the file explorer. 
 
 ![Image 2](img/image-2.png)
 
 In the file explorer, you can view manifests, including their resources, and their relationships.
 
-**Step 3:** Scroll up & down to navigate and select the required manifests. 
+## Select Manifests
+
+Scroll up & down to navigate and select the required manifests. 
 
 ![Image 3](img/image-3.gif)
 
-Once you select a manifest, its related resources shall be highlighted automatically in the navigator. 
-## Create Resource
+Once you select a manifest, its related resources shall be highlighted automatically in the navigator.
 
-**Step 1:** Click on the Add button in the Navigator to launch the Add New Resource dialog for creating resources. 
+## Create a new resource
+
+Click on the Add button in the Navigator to launch the Add New Resource dialog for creating resources. 
 
 ![Add Resource](img/add-resource.png)
 
-**Step 2:** For adding resources to new or existing files in the navigator, click on the Save button at the top-right corner of the interface.
+For adding resources to new or existing files in the navigator, click on the Save button at the top-right corner of the interface.
 
 ![Resource save](img/add-resource-save.png)
-## Using Source Editor 
+
+## Use the source Editor 
 
 **Step 1:** Navigate and select the ConfigMap resources in the Navigator.  
 
@@ -50,12 +57,14 @@ The Source Editor allows you to view and edit the source code easily.
 
 ![Image 6](img/image-6.png)
 
-You can also edit the source code using the Form Editor that does not require any coding effort. 
+You can also edit the source code using the Form Editor that does not require any coding effort.
+
 ## Using the Form Editor
 
 The form editor collects the required information and passes it to another entity. To launch the form editor, click on the Form button. 
 
 ![Image 7](img/image-7.png)
+
 ### For Configuration Data
 
 **Step 1:** Click on the Add Item button to create a new text field for data configuration.
@@ -67,6 +76,7 @@ The form editor collects the required information and passes it to another entit
 <em>**Note:** You can also edit the existing data in the key-value pair fields.</em>
 
 ![Image 9](img/image-9.png)
+
 ### For Binary Configuration Data 
 
 **Step 1:** Click on the Add Item button to create a new binary data field for binary data configuration.
