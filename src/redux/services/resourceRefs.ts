@@ -438,12 +438,9 @@ function handleRefMappingByKey(
 function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) {
   resource.refs = resource.refs?.filter(ref => ref.type === 'incoming');
   Object.values(resourceMap).forEach(currentResource => {
-    currentResource.refs = currentResource.refs?.filter(ref => {
-      if (ref.type === 'incoming' && isResourceRefTo(ref, resource.id)) {
-        return false;
-      }
-      return true;
-    });
+    currentResource.refs = currentResource.refs?.filter(
+      ref => ref.type !== 'incoming' || !isResourceRefTo(ref, resource.id)
+    );
   });
 }
 
