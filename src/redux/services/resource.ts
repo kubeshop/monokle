@@ -272,23 +272,15 @@ export function createFileRef(resource: K8sResource, refNode: NodeWrapper, fileP
   resource.refs = resource.refs || [];
   const refName = (refNode ? refNode.nodeValue() : filePath) || '<missing>';
 
-  // make sure we don't duplicate
-  if (
-    !resource.refs.some(
-      ref =>
-        ref.type === refType && ref.name === refName && ref.target?.type === 'file' && ref.target.filePath === filePath
-    )
-  ) {
-    resource.refs.push({
-      type: refType,
-      name: refName,
-      position: refNode?.getNodePosition(),
-      target: {
-        type: 'file',
-        filePath,
-      },
-    });
-  }
+  resource.refs.push({
+    type: refType,
+    name: refName,
+    position: refNode?.getNodePosition(),
+    target: {
+      type: 'file',
+      filePath,
+    },
+  });
 }
 
 /**
