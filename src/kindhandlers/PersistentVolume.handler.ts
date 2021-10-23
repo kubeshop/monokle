@@ -1,6 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {NamespaceRefTypeEnum, ResourceKindHandler} from '@models/resourcekindhandler';
 import navSectionNames from '@constants/navSectionNames';
+import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
 const PersistentVolumeHandler: ResourceKindHandler = {
   kind: 'PersistentVolume',
@@ -28,6 +29,30 @@ const PersistentVolumeHandler: ResourceKindHandler = {
         pathParts: ['spec', 'claimRef', 'name'],
       },
       target: {kind: 'PersistentVolumeClaim', pathParts: ['metadata', 'name']},
+    },
+    {
+      // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core
+      source: {
+        pathParts: ['secretRef', 'name'],
+        namespaceRef: NamespaceRefTypeEnum.Explicit,
+      },
+      ...SecretTarget,
+    },
+    {
+      // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
+      source: {
+        pathParts: ['spec', 'azureFile', 'secretName'],
+        namespaceRef: NamespaceRefTypeEnum.Explicit,
+        namespaceProperty: 'secretNamespace',
+      },
+      ...SecretTarget,
+    },
+    {
+      // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilevolumesource-v1-core
+      source: {
+        pathParts: ['volumes', '*', 'azureFile', 'secretName'],
+      },
+      ...SecretTarget,
     },
   ],
 };

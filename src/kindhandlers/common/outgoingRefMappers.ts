@@ -1,27 +1,27 @@
-import {NamespaceRefEnum, RefMapper} from '@models/resourcekindhandler';
+import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
 
-const ConfigMapTarget = {
+export const ConfigMapTarget = {
   target: {
     kind: 'ConfigMap',
     pathParts: ['metadata', 'name'],
   },
 };
 
-const SecretTarget = {
+export const SecretTarget = {
   target: {
     kind: 'Secret',
     pathParts: ['metadata', 'name'],
   },
 };
 
-const ServiceAccountTarget = {
+export const ServiceAccountTarget = {
   target: {
     kind: 'ServiceAccount',
     pathParts: ['metadata', 'name'],
   },
 };
 
-const PersistentVolumeClaimTarget = {
+export const PersistentVolumeClaimTarget = {
   target: {
     kind: 'PersistentVolumeClaim',
     pathParts: ['metadata', 'name'],
@@ -58,31 +58,6 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     ...SecretTarget,
   },
   {
-    // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
-    source: {
-      pathParts: ['spec', 'azureFile', 'secretName'],
-      namespaceRef: NamespaceRefEnum.Explicit,
-      namespaceProperty: 'secretNamespace',
-    },
-    ...SecretTarget,
-  },
-  {
-    // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
-    source: {
-      pathParts: ['inlineVolumeSpec', 'azureFile', 'secretName'],
-      namespaceRef: NamespaceRefEnum.Explicit,
-      namespaceProperty: 'secretNamespace',
-    },
-    ...SecretTarget,
-  },
-  {
-    // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilevolumesource-v1-core
-    source: {
-      pathParts: ['volumes', '*', 'azureFile', 'secretName'],
-    },
-    ...SecretTarget,
-  },
-  {
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretprojection-v1-core
     source: {
       pathParts: ['sources', '*', 'secret', 'name'],
@@ -96,7 +71,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // or https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#localobjectreference-v1-core (without namespace)
     source: {
       pathParts: ['secretRef', 'name'],
-      namespaceRef: NamespaceRefEnum.OptionalImplicit, // secretRefs can be either
+      namespaceRef: NamespaceRefTypeEnum.OptionalExplicit, // secretRefs can be either
     },
     ...SecretTarget,
   },
@@ -104,7 +79,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core (with namespace)
     source: {
       pathParts: ['controllerExpandSecretRef', 'name'],
-      namespaceRef: NamespaceRefEnum.Explicit,
+      namespaceRef: NamespaceRefTypeEnum.Explicit,
     },
     ...SecretTarget,
   },
@@ -112,7 +87,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core (with namespace)
     source: {
       pathParts: ['controllerPublishSecretRef', 'name'],
-      namespaceRef: NamespaceRefEnum.Explicit,
+      namespaceRef: NamespaceRefTypeEnum.Explicit,
     },
     ...SecretTarget,
   },
@@ -120,7 +95,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core (with namespace)
     source: {
       pathParts: ['nodePublishSecretRef', 'name'],
-      namespaceRef: NamespaceRefEnum.Explicit,
+      namespaceRef: NamespaceRefTypeEnum.Explicit,
     },
     ...SecretTarget,
   },
@@ -128,7 +103,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core (with namespace)
     source: {
       pathParts: ['nodeStageSecretRef', 'name'],
-      namespaceRef: NamespaceRefEnum.Explicit,
+      namespaceRef: NamespaceRefTypeEnum.Explicit,
     },
     ...SecretTarget,
   },
@@ -142,7 +117,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['imagePullSecrets', '*', 'name'],
-      namespaceRef: NamespaceRefEnum.Implicit,
+      namespaceRef: NamespaceRefTypeEnum.Implicit,
     },
     ...SecretTarget,
   },
@@ -156,7 +131,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#persistentvolumeclaimvolumesource-v1-core
     source: {
       pathParts: ['persistentVolumeClaim', 'claimName'],
-      namespaceRef: NamespaceRefEnum.Implicit,
+      namespaceRef: NamespaceRefTypeEnum.Implicit,
     },
     ...PersistentVolumeClaimTarget,
   },
