@@ -2,7 +2,7 @@ import path from 'path';
 import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import fs from 'fs';
-import {PREVIEW_PREFIX, UNSAVED_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {KUSTOMIZATION_KIND, PREVIEW_PREFIX, UNSAVED_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
@@ -234,9 +234,9 @@ export function getNamespaces(resourceMap: ResourceMapType) {
  * Creates a UI friendly resource name
  */
 
-export function createResourceName(filePath: string, content: any) {
+export function createResourceName(filePath: string, content: any, kind: string) {
   // for Kustomizations we return the name of the containing folder ('base', 'staging', etc)
-  if (content.kind === 'Kustomization') {
+  if (kind === KUSTOMIZATION_KIND) {
     const ix = filePath.lastIndexOf(path.sep);
     if (ix > 0) {
       return filePath.substr(1, ix - 1);
@@ -380,7 +380,7 @@ export function reprocessResources(
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
     if (resource) {
-      resource.name = createResourceName(resource.filePath, resource.content);
+      resource.name = createResourceName(resource.filePath, resource.content, resource.kind);
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
       resource.namespace = resource.content.metadata?.namespace;
@@ -545,7 +545,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
 
           let resource: K8sResource = {
-            name: createResourceName(relativePath, content),
+            name: createResourceName(relativePath, content, content.kind),
             filePath: relativePath,
             id: (content.metadata && content.metadata.uid) || uuidv4(),
             isHighlighted: false,
@@ -570,6 +570,26 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           if (content.metadata?.namespace) {
             resource.namespace = content.metadata.namespace;
           }
+
+          result.push(resource);
+        }
+        // handle special case of untyped kustomization.yaml files
+        else if (content && relativePath.endsWith('/kustomization.yaml') && documents.length === 1) {
+          let resource: K8sResource = {
+            name: createResourceName(relativePath, content, KUSTOMIZATION_KIND),
+            filePath: relativePath,
+            id: uuidv4(),
+            isHighlighted: false,
+            isSelected: false,
+            kind: KUSTOMIZATION_KIND,
+            version: 'kustomize.config.k8s.io/v1beta1',
+            content,
+            text: fileContent,
+          };
+
+          // if this is a single-resource file we can save the parsedDoc and lineCounter
+          resource.parsedDoc = doc;
+          resource.lineCounter = lineCounter;
 
           result.push(resource);
         }

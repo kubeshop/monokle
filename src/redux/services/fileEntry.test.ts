@@ -29,7 +29,7 @@ test('read-files', () => {
 
   expect(files.length).toBe(7);
   expect(Object.values(fileMap).length).toBe(27);
-  expect(getK8sResources(resourceMap, 'Kustomization').length).toBe(5);
+  expect(getK8sResources(resourceMap, KUSTOMIZATION_KIND).length).toBe(5);
   expect(getResourcesForPath(createSafePath('/base/argo-rollouts-aggregate-roles.yaml'), resourceMap).length).toBe(3);
 });
 

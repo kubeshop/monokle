@@ -7,6 +7,7 @@ import {AppDispatch} from '@redux/store';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {NavSection} from '@models/navsection';
 import {isInClusterModeSelector} from '@redux/selectors';
+import {KUSTOMIZATION_KIND} from '@constants/constants';
 import KustomizationQuickAction from './KustomizationQuickAction';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationSuffix from './KustomizationSuffix';
@@ -50,7 +51,7 @@ const KustomizationNavSection: NavSection<K8sResource, KustomizationNavSectionSc
   },
   getItems: scope => {
     return Object.values(scope.resourceMap)
-      .filter(i => i.kind === 'Kustomization')
+      .filter(i => i.kind === KUSTOMIZATION_KIND)
       .sort((a, b) => a.name.localeCompare(b.name));
   },
   isLoading: scope => {
