@@ -94,6 +94,7 @@ const initialAppConfigState: AppConfig = {
     filterObjectsOnSelection: false,
     autoZoomGraphOnSelection: true,
     helmPreviewMode: electronStore.get('appConfig.settings.helmPreviewMode') || 'template',
+    kustomizeCommand: electronStore.get('appConfig.settings.kustomizeCommand') || 'kubectl',
     theme: electronStore.get('appConfig.settings.theme'),
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),

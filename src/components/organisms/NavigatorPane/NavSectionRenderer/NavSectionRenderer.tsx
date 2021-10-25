@@ -255,7 +255,7 @@ function NavSectionRenderer<ItemType, ScopeType>(props: NavSectionRendererProps<
   );
 
   if (isSectionLoading) {
-    return <S.Skeleton />;
+    return <S.Skeleton active />;
   }
 
   return (

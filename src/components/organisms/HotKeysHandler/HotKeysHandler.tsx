@@ -66,7 +66,7 @@ const HotKeysHandler = () => {
         mainState.fileMap,
         dispatch,
         configState.kubeconfigPath,
-        {isClusterPreview}
+        {isClusterPreview, kustomizeCommand: configState.settings.kustomizeCommand}
       );
     } else if (mainState.selectedPath) {
       applyFileWithConfirm(mainState.selectedPath, mainState.fileMap, dispatch, configState.kubeconfigPath);

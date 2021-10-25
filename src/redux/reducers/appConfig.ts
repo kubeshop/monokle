@@ -3,6 +3,7 @@ import {AppConfig, Themes, TextSizes, Languages, NewVersionCode} from '@models/a
 import electronStore from '@utils/electronStore';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 import {KubeConfig} from '@models/kubeConfig';
+import {KustomizeCommandType} from '@redux/services/kustomize';
 import initialState from '../initialState';
 
 export const updateStartupModalVisible = createAsyncThunk(
@@ -39,6 +40,14 @@ export const updateHelmPreviewMode = createAsyncThunk(
   async (helmPreviewMode: 'template' | 'install', thunkAPI) => {
     electronStore.set('appConfig.settings.helmPreviewMode', helmPreviewMode);
     thunkAPI.dispatch(configSlice.actions.setHelmPreviewMode(helmPreviewMode));
+  }
+);
+
+export const updateKustomizeCommand = createAsyncThunk(
+  'config/updateKustomizeCommand',
+  async (kustomizeCommand: KustomizeCommandType, thunkAPI) => {
+    electronStore.set('appConfig.settings.kustomizeCommand', kustomizeCommand);
+    thunkAPI.dispatch(configSlice.actions.setKustomizeCommand(kustomizeCommand));
   }
 );
 
@@ -114,6 +123,9 @@ export const configSlice = createSlice({
     },
     setHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
       state.settings.helmPreviewMode = action.payload;
+    },
+    setKustomizeCommand: (state: Draft<AppConfig>, action: PayloadAction<'kubectl' | 'kustomize'>) => {
+      state.settings.kustomizeCommand = action.payload;
     },
     setNewVersion: (state: Draft<AppConfig>, action: PayloadAction<{code: NewVersionCode; data: any}>) => {
       state.newVersion.code = action.payload.code;
