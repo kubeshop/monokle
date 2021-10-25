@@ -1,4 +1,4 @@
-import {exec, execSync} from 'child_process';
+import {execSync} from 'child_process';
 import {PROCESS_ENV} from '@utils/env';
 import {BrowserWindow, dialog} from 'electron';
 import mainStore from '@redux/main-store';
@@ -14,23 +14,15 @@ import {KustomizeCommandType} from '@redux/services/kustomize';
 export const runKustomize = (folder: string, kustomizeCommand: KustomizeCommandType, event: Electron.IpcMainEvent) => {
   try {
     let cmd = kustomizeCommand === 'kubectl' ? 'kubectl kustomize' : 'kustomize build ';
-    exec(
-      `${cmd} .`,
-      {
-        cwd: folder,
-        env: {
-          NODE_ENV: PROCESS_ENV.NODE_ENV,
-          PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-        },
+    let stdout = execSync(`${cmd} .`, {
+      cwd: folder,
+      env: {
+        NODE_ENV: PROCESS_ENV.NODE_ENV,
+        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
       },
-      (error, stdout, stderr) => {
-        if (error) {
-          event.sender.send('kustomize-result', {error: error.toString()});
-        } else {
-          event.sender.send('kustomize-result', {stdout: stdout.toString()});
-        }
-      }
-    );
+    });
+
+    event.sender.send('kustomize-result', {stdout: stdout.toString()});
   } catch (e: any) {
     event.sender.send('kustomize-result', {error: e.toString()});
   }
