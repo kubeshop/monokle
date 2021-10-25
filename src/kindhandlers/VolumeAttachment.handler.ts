@@ -3,32 +3,35 @@ import {NamespaceRefTypeEnum, ResourceKindHandler} from '@models/resourcekindhan
 import navSectionNames from '@constants/navSectionNames';
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
-const PersistentVolumeHandler: ResourceKindHandler = {
-  kind: 'PersistentVolume',
+const VolumeAttachmentHandler: ResourceKindHandler = {
+  kind: 'VolumeAttachment',
   apiVersionMatcher: '**',
-  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.STORAGE, 'PersistentVolumes'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.STORAGE, 'VolumeAttachments'],
   clusterApiVersion: 'v1',
-  validationSchemaPrefix: 'io.k8s.api.core.v1',
+  validationSchemaPrefix: 'storage.k8s.io.v1',
   description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string): Promise<any> {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    return k8sCoreV1Api.readPersistentVolume(name);
+    const k8sStorageApi = kubeconfig.makeApiClient(k8s.StorageV1Api);
+    return k8sStorageApi.readVolumeAttachment(name);
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    const response = await k8sCoreV1Api.listPersistentVolume();
+    const k8sStorageApi = kubeconfig.makeApiClient(k8s.StorageV1Api);
+    const response = await k8sStorageApi.listVolumeAttachment();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string) {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    await k8sCoreV1Api.deletePersistentVolume(name);
+    const k8sStorageApi = kubeconfig.makeApiClient(k8s.StorageV1Api);
+    await k8sStorageApi.deleteVolumeAttachment(name);
   },
   outgoingRefMappers: [
     {
+      // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
       source: {
-        pathParts: ['spec', 'claimRef', 'name'],
+        pathParts: ['inlineVolumeSpec', 'azureFile', 'secretName'],
+        namespaceRef: NamespaceRefTypeEnum.Explicit,
+        namespaceProperty: 'secretNamespace',
       },
-      target: {kind: 'PersistentVolumeClaim', pathParts: ['metadata', 'name']},
+      ...SecretTarget,
     },
     {
       // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core
@@ -47,14 +50,7 @@ const PersistentVolumeHandler: ResourceKindHandler = {
       },
       ...SecretTarget,
     },
-    {
-      // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilevolumesource-v1-core
-      source: {
-        pathParts: ['volumes', '*', 'azureFile', 'secretName'],
-      },
-      ...SecretTarget,
-    },
   ],
 };
 
-export default PersistentVolumeHandler;
+export default VolumeAttachmentHandler;

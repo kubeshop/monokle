@@ -7,7 +7,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@redux/store';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationResource, KustomizeCommandType} from '@redux/services/kustomize';
 import {getShellPath} from '@utils/shell';
 import {setApplyingResource, updateResource} from '@redux/reducers/main';
 import {getResourceFromCluster} from '@redux/thunks/utils';
@@ -36,16 +36,33 @@ function applyK8sResource(resource: K8sResource, kubeconfig: string) {
  * Invokes kubectl -k for the content of the specified kustomization
  */
 
-function applyKustomization(resource: K8sResource, fileMap: FileMapType, kubeconfig: string) {
+function applyKustomization(
+  resource: K8sResource,
+  fileMap: FileMapType,
+  kubeconfig: string,
+  kustomizeCommand: KustomizeCommandType
+) {
   const folder = getAbsoluteResourceFolder(resource, fileMap);
-  const child = spawn('kubectl', ['apply', '-k', folder], {
-    env: {
-      NODE_ENV: PROCESS_ENV.NODE_ENV,
-      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-      PATH: getShellPath(),
-      KUBECONFIG: kubeconfig,
-    },
-  });
+  const child =
+    kustomizeCommand === 'kubectl'
+      ? spawn(`kubectl apply -k ${folder}`, {
+          shell: true,
+          env: {
+            NODE_ENV: PROCESS_ENV.NODE_ENV,
+            PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
+            PATH: getShellPath(),
+            KUBECONFIG: kubeconfig,
+          },
+        })
+      : spawn(`kustomize build ${folder} | kubectl apply -k -`, {
+          shell: true,
+          env: {
+            NODE_ENV: PROCESS_ENV.NODE_ENV,
+            PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
+            PATH: getShellPath(),
+            KUBECONFIG: kubeconfig,
+          },
+        });
   return child;
 }
 
@@ -64,6 +81,7 @@ export async function applyResource(
   options?: {
     isClusterPreview?: boolean;
     shouldPerformDiff?: boolean;
+    kustomizeCommand?: 'kubectl' | 'kustomize';
   }
 ) {
   try {
@@ -73,7 +91,12 @@ export async function applyResource(
 
       try {
         const child = isKustomizationResource(resource)
-          ? applyKustomization(resource, fileMap, kubeconfig)
+          ? applyKustomization(
+              resource,
+              fileMap,
+              kubeconfig,
+              options && options.kustomizeCommand ? options.kustomizeCommand : 'kubectl'
+            )
           : applyK8sResource(resource, kubeconfig);
 
         child.on('exit', (code, signal) => {

@@ -110,8 +110,13 @@ function createNodePath(path: readonly any[]) {
 
 function getPathParts(pathArray: any[]) {
   const pathParts: string[] = [];
-  pathArray.forEach((item: any) => {
-    if (isPair(item)) {
+  pathArray.forEach((item: any, index) => {
+    if (isSeq(item) && index < pathArray.length - 1) {
+      const ix = item.items.indexOf(pathArray[index + 1]);
+      if (ix >= 0) {
+        pathParts.push(String(ix));
+      }
+    } else if (isPair(item)) {
       const itemKeyScalar = item.key as Scalar;
       pathParts.push(itemKeyScalar.value as string);
     }
@@ -130,22 +135,22 @@ export function traverseDocument(
       if (isScalar(pair.key) && isScalar(pair.value)) {
         const scalarKey = pair.key as Scalar;
         const keyPathParts = [...parentKeyPathParts, scalarKey.value as string];
-
         const scalarValue = pair.value as Scalar;
 
         callback(parentKeyPathParts, keyPathParts, scalarKey.value as string, scalarValue);
       }
     },
-    Seq(_, node, path) {
-      const seqPair = path.slice(-1)[0];
-      const parentKeyPathParts = getPathParts(path.slice(0, -1) as any);
+    Seq(index, node, path) {
+      const seqPair = path[path.length - 1];
 
       if (isPair(seqPair)) {
-        node.items.forEach(item => {
+        const parentKeyPathParts = getPathParts(path.slice(0, -1) as any);
+
+        node.items.forEach((item, ix) => {
           if (isScalar(item)) {
             const scalarSeqKey = seqPair.key as Scalar;
-            const keyPathParts = [...parentKeyPathParts, scalarSeqKey.value as string];
-            callback(parentKeyPathParts, keyPathParts, scalarSeqKey.value as string, item as Scalar);
+            const keyPathParts = [...parentKeyPathParts.concat([scalarSeqKey.value as string]), String(ix)];
+            callback(parentKeyPathParts, keyPathParts, item.value as string, scalarSeqKey);
           }
         });
       }

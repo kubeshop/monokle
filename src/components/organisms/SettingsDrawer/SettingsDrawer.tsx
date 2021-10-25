@@ -17,6 +17,7 @@ import {
   updateHelmPreviewMode,
   updateLoadLastFolderOnStartup,
   updateFolderReadsMaxDepth,
+  updateKustomizeCommand,
 } from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
 import {
@@ -25,6 +26,7 @@ import {
   AutoLoadLastFolderTooltip,
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
+  KustomizeCommandTooltip,
 } from '@constants/tooltips';
 import {ipcRenderer} from 'electron';
 import {useDebounce} from 'react-use';
@@ -101,6 +103,12 @@ const SettingsDrawer = () => {
     }
   };
 
+  const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
+    if (selectedKustomizeCommand === 'kubectl' || selectedKustomizeCommand === 'kustomize') {
+      dispatch(updateKustomizeCommand(selectedKustomizeCommand));
+    }
+  };
+
   const onChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastFolderOnStartup(e.target.checked));
   };
@@ -111,6 +119,11 @@ const SettingsDrawer = () => {
 
   const openFileSelect = () => {
     fileInput && fileInput.current?.click();
+  };
+
+  const onUpdateKubeconfig = (e: any) => {
+    let value = e.target.value;
+    dispatch(updateKubeconfig(value));
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
@@ -145,7 +158,7 @@ const SettingsDrawer = () => {
       <StyledDiv>
         <StyledSpan>KUBECONFIG</StyledSpan>
         <Tooltip title={KubeconfigPathTooltip}>
-          <Input value={appConfig.kubeconfigPath} />
+          <Input value={appConfig.kubeconfigPath} onChange={onUpdateKubeconfig} />
         </Tooltip>
         <StyledButton onClick={openFileSelect}>Browse</StyledButton>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
@@ -172,6 +185,15 @@ const SettingsDrawer = () => {
           <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
             <Select.Option value="template">Template</Select.Option>
             <Select.Option value="install">Install</Select.Option>
+          </StyledSelect>
+        </Tooltip>
+      </StyledDiv>
+      <StyledDiv>
+        <StyledSpan>Kustomize Command</StyledSpan>
+        <Tooltip title={KustomizeCommandTooltip}>
+          <StyledSelect value={appConfig.settings.kustomizeCommand} onChange={onChangeKustomizeCommand}>
+            <Select.Option value="kubectl">Use kubectl</Select.Option>
+            <Select.Option value="kustomize">Use kustomize</Select.Option>
           </StyledSelect>
         </Tooltip>
       </StyledDiv>

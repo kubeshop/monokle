@@ -5,6 +5,8 @@ import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {createFileRef, getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
 
+export type KustomizeCommandType = 'kubectl' | 'kustomize';
+
 /**
  * Creates kustomization refs between a kustomization and its resources
  */
@@ -51,7 +53,7 @@ export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceM
  * Processes a resource ref in a kustomization and creates corresponding resourcerefs
  */
 
-function processKustomizationResource(
+function processKustomizationResourceRef(
   kustomization: K8sResource,
   refNode: NodeWrapper,
   resourceMap: ResourceMapType,
@@ -114,7 +116,7 @@ function extractPatches(
 
 export function processKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
   getK8sResources(resourceMap, 'Kustomization')
-    .filter(k => k.content.resources || k.content.bases || k.content.patchesStrategicMerge)
+    .filter(k => k.content.resources || k.content.bases || k.content.patchesStrategicMerge || k.content.patchesJson6902)
     .forEach(kustomization => {
       let resources = getScalarNodes(kustomization, 'resources') || [];
       if (kustomization.content.bases) {
@@ -122,11 +124,15 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
       }
 
       resources.forEach((refNode: NodeWrapper) => {
-        processKustomizationResource(kustomization, refNode, resourceMap, fileMap);
+        processKustomizationResourceRef(kustomization, refNode, resourceMap, fileMap);
       });
 
-      extractPatches(kustomization, fileMap, resourceMap, 'patchesStrategicMerge');
-      extractPatches(kustomization, fileMap, resourceMap, 'patchesJson6902:path');
+      if (kustomization.content.patchesStrategicMerge) {
+        extractPatches(kustomization, fileMap, resourceMap, 'patchesStrategicMerge');
+      }
+      if (kustomization.content.patchesJson6902) {
+        extractPatches(kustomization, fileMap, resourceMap, 'patchesJson6902:path');
+      }
     });
 }
 

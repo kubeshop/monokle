@@ -49,10 +49,10 @@ export async function createPreviewResult(
 }
 
 /**
- * Creates a preview rejection that displays an error alert
+ * Creates a thunk rejection that displays an error alert
  */
 
-export function createPreviewRejection(thunkAPI: any, title: string, message: string) {
+export function createRejectionWithAlert(thunkAPI: any, title: string, message: string) {
   return thunkAPI.rejectWithValue({
     alert: {
       title,

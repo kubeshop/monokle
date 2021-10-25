@@ -82,7 +82,7 @@ const FilePatternList = (props: FilePatternListProps) => {
         <>
           <Input
             ref={inputRef}
-            value={patternInput}
+            defaultValue={patternInput}
             onChange={e => setPatternInput(e.target.value)}
             onPressEnter={addPattern}
           />
