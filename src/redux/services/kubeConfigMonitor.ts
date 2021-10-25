@@ -16,7 +16,12 @@ export function monitorKubeConfig(filePath: string, dispatch: AppDispatch) {
     ignoreInitial: true,
   });
 
-  watcher.on('all', () => {
+  watcher.on('all', (type: string) => {
+    if (type === 'unlink') {
+      watcher.close();
+      dispatch(loadContexts(''));
+      return;
+    }
     dispatch(loadContexts(filePath));
   });
 
