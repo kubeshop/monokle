@@ -17,7 +17,12 @@ const register = (navSection: NavSection<any, any>) => {
   NavSectionMap[navSection.name] = navSection;
 };
 
+const getAll = () => {
+  return Object.values(NavSectionMap);
+};
+
 export default {
+  getAll,
   getByName,
   register,
 };

@@ -1,7 +1,6 @@
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
-import {NavSectionInstance} from './navsection';
 import {MonoklePlugin} from './plugin';
 
 /**
@@ -105,7 +104,6 @@ interface AppState {
   diffContent?: string;
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
-  navSectionInstancesById: Record<string, NavSectionInstance>;
 }
 
 export type {

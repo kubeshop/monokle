@@ -1,3 +1,4 @@
+import {RootState} from '@redux/store';
 import React from 'react';
 
 export type NavSectionItemCustomComponentProps<ItemType> = {
@@ -36,8 +37,10 @@ interface NavSectionItemGroup<ItemType> {
 
 export interface NavSection<ItemType, ScopeType = any> {
   name: string;
-  useScope: () => ScopeType;
+  id: string;
   subsectionNames?: string[];
+  useScope: () => ScopeType;
+  getScope: (state: RootState) => ScopeType;
   getItems?: (scope: ScopeType) => ItemType[];
   getGroups?: (scope: ScopeType) => NavSectionItemGroup<ItemType>[];
   isLoading?: (scope: ScopeType, items: ItemType[]) => boolean;
@@ -49,7 +52,7 @@ export interface NavSection<ItemType, ScopeType = any> {
 
 export interface NavSectionItemInstance {
   name: string;
-  identifier: string;
+  id: string;
   isSelected: boolean;
   isHighlighted: boolean;
   isVisible: boolean;
@@ -61,14 +64,28 @@ export interface NavSectionItemInstance {
 export interface NavSectionItemGroupInstance {
   groupId: string;
   groupName: string;
-  groupItems: NavSectionItemInstance[];
+  groupItemIds: string[];
 }
 
 export interface NavSectionInstance {
   name: string;
   subsectionNames?: string[];
-  items: NavSectionItemInstance[];
-  groups: NavSectionItemGroupInstance[];
-  isLoading: boolean;
-  isVisible: boolean;
+  itemIds?: string[];
+  groupIds?: NavSectionItemGroupInstance[];
+  isLoading?: boolean;
+  isVisible?: boolean;
+  isInitialized?: boolean;
+}
+
+export interface NavSectionState {
+  instanceMap: Record<string, NavSectionInstance>;
+  itemInstanceMap: Record<string, NavSectionItemInstance>;
+  itemGroupInstanceMap: Record<string, NavSectionItemGroupInstance>;
+  scopeMap: Record<string, Record<string, any>>;
+}
+
+export interface UpdateNavSectionStatePayload {
+  instances: NavSectionInstance[];
+  itemInstances: NavSectionItemInstance[];
+  scopeMap: Record<string, Record<string, any>>;
 }

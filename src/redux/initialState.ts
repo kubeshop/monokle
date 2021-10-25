@@ -7,6 +7,7 @@ import electronStore from '@utils/electronStore';
 import {ObjectNavigator, NavigatorSection, NavigatorSubSection} from '@models/navigator';
 import {ResourceKindHandlers} from '@src/kindhandlers';
 import navSectionNames from '@constants/navSectionNames';
+import {NavSectionState} from '@models/navsection';
 
 const NAV_K8S_RESOURCES_SECTIONS_ORDER = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
 
@@ -162,10 +163,18 @@ const initialUiState: UiState = {
   resetLayout: false,
 };
 
+const initialNavSectionState: NavSectionState = {
+  instanceMap: {},
+  itemInstanceMap: {},
+  itemGroupInstanceMap: {},
+  scopeMap: {},
+};
+
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
   main: initialAppState,
   logs: initialLogsState,
   ui: initialUiState,
+  navSection: initialNavSectionState,
 };

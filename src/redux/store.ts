@@ -7,6 +7,7 @@ import {configSlice} from './reducers/appConfig';
 import {alertSlice} from './reducers/alert';
 import {logsSlice} from './reducers/logs';
 import {uiSlice} from './reducers/ui';
+import {navSectionSlice} from './reducers/navSection';
 
 const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ const store = configureStore({
     alert: alertSlice.reducer,
     logs: logsSlice.reducer,
     ui: uiSlice.reducer,
+    navSection: navSectionSlice.reducer,
   },
   middleware: getDefaultMiddleware => [forwardToMain, ...getDefaultMiddleware().concat(logger)],
 });
