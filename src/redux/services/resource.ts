@@ -11,7 +11,6 @@ import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {getDependentResourceKinds} from '@src/kindhandlers';
 import {v4 as uuidv4} from 'uuid';
 import {getFileStats} from '@utils/files';
-
 import {validateResource} from './validation';
 import {processRefs} from './resourceRefs';
 
@@ -535,7 +534,6 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
   if (documents) {
     let docIndex = 0;
-
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
         log.warn(
@@ -574,7 +572,6 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           }
 
           result.push(resource);
-          return resource;
         }
       }
       docIndex += 1;

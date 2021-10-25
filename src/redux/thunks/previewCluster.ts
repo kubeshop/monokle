@@ -15,50 +15,55 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
     kc.loadFromFile(configPath);
     kc.setCurrentContext(thunkAPI.getState().config.kubeConfig.currentContext);
 
-    const results = await Promise.allSettled(
+    return Promise.allSettled(
       ResourceKindHandlers.map(resourceKindHandler =>
         resourceKindHandler
           .listResourcesInCluster(kc)
           .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
       )
-    );
+    ).then(
+      results => {
+        const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
-    const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+        if (fulfilledResults.length === 0) {
+          return createRejectionWithAlert(
+            thunkAPI,
+            'Cluster Resources Failed',
+            // @ts-ignore
+            results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
+          );
+        }
 
-    if (fulfilledResults.length === 0) {
-      return createRejectionWithAlert(
-        thunkAPI,
-        'Cluster Resources Failed',
         // @ts-ignore
-        results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
-      );
-    }
+        const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+        const previewResult = createPreviewResult(
+          allYaml,
+          configPath,
+          'Get Cluster Resources',
+          resourceRefsProcessingOptions
+        );
 
-    // @ts-ignore
-    const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-    const previewResult = await createPreviewResult(
-      allYaml,
-      configPath,
-      'Get Cluster Resources',
-      resourceRefsProcessingOptions
-    );
+        if (fulfilledResults.length < results.length) {
+          const rejectedResult = results.find(r => r.status === 'rejected');
+          if (rejectedResult) {
+            // @ts-ignore
+            const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
 
-    if (fulfilledResults.length < results.length) {
-      const rejectedResult = results.find(r => r.status === 'rejected');
-      if (rejectedResult) {
-        // @ts-ignore
-        const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
+            previewResult.alert = {
+              title: 'Get Cluster Resources',
+              message: `Failed to get all cluster resources: ${reason}`,
+              type: AlertEnum.Warning,
+            };
 
-        previewResult.alert = {
-          title: 'Get Cluster Resources',
-          message: `Failed to get all cluster resources: ${reason}`,
-          type: AlertEnum.Warning,
-        };
-
+            return previewResult;
+          }
+        }
         return previewResult;
+      },
+      reason => {
+        return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', reason.message);
       }
-    }
-    return previewResult;
+    );
   } catch (e: any) {
     return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', e.message);
   }

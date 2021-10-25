@@ -24,13 +24,13 @@ export function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: stri
  * Creates a preview result from a YAML string containing resources
  */
 
-export async function createPreviewResult(
+export function createPreviewResult(
   resourcesYaml: string,
   previewResourceId: string,
   title: string,
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions
 ) {
-  const resources = await extractK8sResources(resourcesYaml, PREVIEW_PREFIX + previewResourceId);
+  const resources = extractK8sResources(resourcesYaml, PREVIEW_PREFIX + previewResourceId);
   const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
     rm[r.id] = r;
     return rm;
