@@ -9,7 +9,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {getFileStats, isSubDirectory} from '@utils/files';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {addResource} from '@redux/reducers/main';
-import {createPreviewRejection} from './utils';
+import {createRejectionWithAlert} from './utils';
 
 type SaveUnsavedResourcePayload = {
   resourceId: string;
@@ -42,11 +42,11 @@ export const saveUnsavedResource = createAsyncThunk<
   let resourceRange: {start: number; length: number} | undefined;
 
   if (!rootFolder) {
-    return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'Could not find the root folder.');
+    return createRejectionWithAlert(thunkAPI, 'Resource Save Failed', 'Could not find the root folder.');
   }
 
   if (rootFolder.filePath !== absolutePath && !isSubDirectory(rootFolder.filePath, absolutePath)) {
-    return createPreviewRejection(
+    return createRejectionWithAlert(
       thunkAPI,
       'Resource Save Failed',
       'The selected path is not a sub-directory of the root directory.'
@@ -54,12 +54,12 @@ export const saveUnsavedResource = createAsyncThunk<
   }
 
   if (!resource || !isUnsavedResource(resource)) {
-    return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'Could not find the resource.');
+    return createRejectionWithAlert(thunkAPI, 'Resource Save Failed', 'Could not find the resource.');
   }
 
   const pathStats = getFileStats(absolutePath);
   if (pathStats === undefined) {
-    return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'Could not load stats for selected path');
+    return createRejectionWithAlert(thunkAPI, 'Resource Save Failed', 'Could not load stats for selected path');
   }
 
   const isDirectory = pathStats.isDirectory();
@@ -72,13 +72,17 @@ export const saveUnsavedResource = createAsyncThunk<
   }
 
   if (path.extname(absoluteFilePath) !== '.yaml') {
-    return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'The selected file does not have .yaml extension.');
+    return createRejectionWithAlert(
+      thunkAPI,
+      'Resource Save Failed',
+      'The selected file does not have .yaml extension.'
+    );
   }
 
   if (fs.existsSync(absoluteFilePath)) {
     const rootFileEntry = mainState.fileMap[ROOT_FILE_ENTRY];
     if (!rootFileEntry) {
-      return createPreviewRejection(thunkAPI, 'Resource Save Failed', 'Could not find the root folder.');
+      return createRejectionWithAlert(thunkAPI, 'Resource Save Failed', 'Could not find the root folder.');
     }
 
     const fileContent = await readFilePromise(absoluteFilePath, 'utf-8');

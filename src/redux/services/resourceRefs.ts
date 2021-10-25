@@ -2,7 +2,7 @@ import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
-import {RefMapper} from '@models/resourcekindhandler';
+import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {traverseDocument} from './manifest-utils';
 import {createResourceRef, getParsedDoc, linkResources, NodeWrapper} from './resource';
@@ -59,58 +59,125 @@ const addRefNodeAtPath = (refNode: RefNode, path: string, refNodesByPath: Record
   }
 };
 
+/**
+ * Cache of refMappers for a specific resource kind
+ */
+
+const refMapperCache = new Map<string, RefMapper[]>();
+
+const getRefMappers = (resource: K8sResource) => {
+  if (!refMapperCache.has(resource.kind)) {
+    const resourceKindHandler = getResourceKindHandler(resource.kind);
+    if (!resourceKindHandler) {
+      refMapperCache.set(resource.kind, []);
+    } else {
+      const outgoingRefMappers = resourceKindHandler?.outgoingRefMappers || [];
+      const incomingRefMappers = getIncomingRefMappers(resource.kind);
+
+      refMapperCache.set(resource.kind, [...incomingRefMappers, ...outgoingRefMappers]);
+    }
+  }
+
+  return refMapperCache.get(resource.kind) || [];
+};
+
+/**
+ * Checks if a node path ends with a refMapper path
+ */
+
+function pathEndsWithPath(pathParts: string[], endPathParts: string[]) {
+  if (endPathParts.length > pathParts.length) {
+    return false;
+  }
+
+  for (let c = 0; c < endPathParts.length; c += 1) {
+    const pathIx = pathParts.length - 1 - c;
+    const endPathIx = endPathParts.length - 1 - c;
+
+    if (pathParts[pathIx] !== '*' && endPathParts[endPathIx] !== '*' && pathParts[pathIx] !== endPathParts[endPathIx]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Checks if a node path equals a refMapper path
+ */
+
+function pathEqualsPath(pathParts: string[], path2Parts: string[]) {
+  if (pathParts.length !== path2Parts.length) {
+    return false;
+  }
+
+  for (let c = 0; c < pathParts.length; c += 1) {
+    if (pathParts[c] !== '*' && path2Parts[c] !== '*' && pathParts[c] !== path2Parts[c]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Creates all refNodes for a resource for further processing
+ */
+
 export function processResourceRefNodes(resource: K8sResource) {
+  const refMappers = getRefMappers(resource);
+  if (refMappers.length === 0) {
+    return;
+  }
+
   const parsedDoc = getParsedDoc(resource);
-
-  const resourceKindHandler = getResourceKindHandler(resource.kind);
-  if (!resourceKindHandler) {
-    return;
-  }
-  const outgoingRefMappers = resourceKindHandler?.outgoingRefMappers || [];
-  const incomingRefMappers = getIncomingRefMappers(resource.kind);
-
-  const refMappers = [...incomingRefMappers, ...outgoingRefMappers];
-
-  if (!refMappers || refMappers.length === 0) {
-    return;
-  }
 
   traverseDocument(parsedDoc, (parentKeyPathParts, keyPathParts, key, scalar) => {
     refMappers.forEach(refMapper => {
       if (!resource.refNodesByPath) {
         resource.refNodesByPath = {};
       }
-      const keyPath = joinPathParts(keyPathParts);
-      const parentKeyPath = joinPathParts(parentKeyPathParts);
 
-      const refMapperSourcePath = joinPathParts(refMapper.source.pathParts);
-      const refMapperTargetPath = joinPathParts(refMapper.target.pathParts);
-
-      const refNode = {scalar, key, parentKeyPath};
+      const refNode = {scalar, key, parentKeyPath: joinPathParts(parentKeyPathParts)};
 
       if (refMapper.matchPairs) {
-        if (refMapperSourcePath === parentKeyPath || refMapperTargetPath === parentKeyPath) {
-          addRefNodeAtPath(refNode, keyPath, resource.refNodesByPath);
+        if (
+          pathEqualsPath(refMapper.source.pathParts, parentKeyPathParts) ||
+          pathEqualsPath(refMapper.target.pathParts, parentKeyPathParts)
+        ) {
+          addRefNodeAtPath(refNode, joinPathParts(keyPathParts), resource.refNodesByPath);
         }
       } else {
-        if (keyPath.endsWith(refMapperSourcePath)) {
-          addRefNodeAtPath(refNode, refMapperSourcePath, resource.refNodesByPath);
+        if (pathEndsWithPath(keyPathParts, refMapper.source.pathParts)) {
+          addRefNodeAtPath(refNode, joinPathParts(refMapper.source.pathParts), resource.refNodesByPath);
         }
 
-        if (keyPath.endsWith(refMapperTargetPath)) {
-          addRefNodeAtPath(refNode, refMapperTargetPath, resource.refNodesByPath);
+        if (pathEndsWithPath(keyPathParts, refMapper.target.pathParts)) {
+          addRefNodeAtPath(refNode, joinPathParts(refMapper.target.pathParts), resource.refNodesByPath);
         }
       }
 
       if (refMapper.source.hasOptionalSibling) {
-        const optionalSiblingPath = joinPathParts([...refMapper.source.pathParts.slice(0, -1), 'optional']);
-        if (keyPath.endsWith(optionalSiblingPath)) {
-          addRefNodeAtPath(refNode, optionalSiblingPath, resource.refNodesByPath);
+        const optionalPathParts = [...refMapper.source.pathParts.slice(0, -1), 'optional'];
+        if (pathEndsWithPath(keyPathParts, optionalPathParts)) {
+          addRefNodeAtPath(refNode, joinPathParts(optionalPathParts), resource.refNodesByPath);
+        }
+      }
+
+      if (refMapper.source.namespaceRef === NamespaceRefTypeEnum.Explicit) {
+        const namespacePropertyName = refMapper.source.namespaceProperty || 'namespace';
+        const namespacePathParts = [...refMapper.source.pathParts.slice(0, -1), namespacePropertyName];
+        if (pathEndsWithPath(keyPathParts, namespacePathParts)) {
+          addRefNodeAtPath(refNode, joinPathParts(namespacePathParts), resource.refNodesByPath);
         }
       }
     });
   });
 }
+
+/**
+ * Clears invalid resourceRefs from a resource after processing
+ */
 
 function cleanResourceRefs(resources: K8sResource[]) {
   resources.forEach(resource => {
@@ -143,6 +210,10 @@ function cleanResourceRefs(resources: K8sResource[]) {
     resource.refs = cleanRefs.length > 0 ? cleanRefs : undefined;
   });
 }
+
+/**
+ * Creates resource refs from a specified resource to target resources using the specified refMapper
+ */
 
 function handleRefMappingByParentKey(
   sourceResource: K8sResource,
@@ -194,7 +265,10 @@ function handleRefMappingByParentKey(
             }
           });
         targetNodes.forEach(targetNode => {
-          if (sourceRefNode.key === targetNode.key && sourceRefNode.scalar.value === targetNode.scalar.value) {
+          if (
+            sourceRefNode.key === targetNode.key &&
+            shouldCreateSatisifedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)
+          ) {
             foundMatchByTargetResourceId[targetResource.id] = true;
             linkResources(
               sourceResource,
@@ -220,6 +294,78 @@ function handleRefMappingByParentKey(
   }
 }
 
+/**
+ * Checks for an optional flag to determine if an unsatisfied resourceRef should be created or not
+ */
+
+function shouldCreateUnsatisfiedRef(
+  outgoingRefMapper: RefMapper,
+  processingOptions: ResourceRefsProcessingOptions,
+  sourceResource: K8sResource,
+  sourceRefNode: RefNode
+) {
+  if (outgoingRefMapper.source.hasOptionalSibling && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
+    const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
+    const optionalSiblingRefNode = sourceResource.refNodesByPath
+      ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
+          refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
+        )
+      : undefined;
+    if (optionalSiblingRefNode && optionalSiblingRefNode.scalar.value === true) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Checks if the nodes and eventual namespace descriminators match
+ */
+
+function shouldCreateSatisifedRef(
+  sourceRefNode: RefNode,
+  targetNode: RefNode,
+  sourceResource: K8sResource,
+  targetResource: K8sResource,
+  outgoingRefMapper: RefMapper
+) {
+  if (sourceRefNode.scalar.value !== targetNode.scalar.value) {
+    return false;
+  }
+
+  switch (outgoingRefMapper.source.namespaceRef) {
+    case NamespaceRefTypeEnum.Implicit:
+      return sourceResource.namespace === targetResource.namespace;
+    case NamespaceRefTypeEnum.Explicit:
+    case NamespaceRefTypeEnum.OptionalExplicit: {
+      const namespacePropertyName = outgoingRefMapper.source.namespaceProperty || 'namespace';
+      const namespaceSiblingPath = joinPathParts([
+        ...outgoingRefMapper.source.pathParts.slice(0, -1),
+        namespacePropertyName,
+      ]);
+      const namespaceSiblingRefNodes = sourceResource.refNodesByPath
+        ? sourceResource.refNodesByPath[namespaceSiblingPath]
+        : undefined;
+
+      return namespaceSiblingRefNodes
+        ? namespaceSiblingRefNodes.some(
+            refNode =>
+              refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath) &&
+              refNode.scalar.value === targetResource.namespace
+          )
+        : outgoingRefMapper.source.namespaceRef === NamespaceRefTypeEnum.OptionalExplicit &&
+            sourceResource.namespace === targetResource.namespace;
+    }
+
+    default:
+      return true;
+  }
+}
+
+/**
+ * Creates resource refs from a specified resource to target resources using the specified refMapper
+ */
+
 function handleRefMappingByKey(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
@@ -238,13 +384,15 @@ function handleRefMappingByKey(
   sourceRefNodes.forEach(sourceRefNode => {
     // if no target resources are found, then mark the source ref as unsatisfied
     if (targetResources.length === 0) {
-      createResourceRef(
-        sourceResource,
-        ResourceRefType.Unsatisfied,
-        new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-        undefined,
-        outgoingRefMapper.target.kind
-      );
+      if (shouldCreateUnsatisfiedRef(outgoingRefMapper, processingOptions, sourceResource, sourceRefNode)) {
+        createResourceRef(
+          sourceResource,
+          ResourceRefType.Unsatisfied,
+          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+          undefined,
+          outgoingRefMapper.target.kind
+        );
+      }
     } else {
       let hasSatisfiedRefs = false;
 
@@ -255,7 +403,7 @@ function handleRefMappingByKey(
           : undefined;
 
         targetNodes?.forEach(targetNode => {
-          if (sourceRefNode.scalar.value === targetNode.scalar.value) {
+          if (shouldCreateSatisifedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)) {
             hasSatisfiedRefs = true;
             linkResources(
               sourceResource,
@@ -267,28 +415,17 @@ function handleRefMappingByKey(
         });
       });
 
-      if (!hasSatisfiedRefs) {
-        let shouldCreateUnsatisfiedRef = true;
-        if (outgoingRefMapper.source.hasOptionalSibling && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
-          const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
-          const optionalSiblingRefNode = sourceResource.refNodesByPath
-            ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
-                refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
-              )
-            : undefined;
-          if (optionalSiblingRefNode && optionalSiblingRefNode.scalar.value === true) {
-            shouldCreateUnsatisfiedRef = false;
-          }
-        }
-        if (shouldCreateUnsatisfiedRef) {
-          createResourceRef(
-            sourceResource,
-            ResourceRefType.Unsatisfied,
-            new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-            undefined,
-            outgoingRefMapper.target.kind
-          );
-        }
+      if (
+        !hasSatisfiedRefs &&
+        shouldCreateUnsatisfiedRef(outgoingRefMapper, processingOptions, sourceResource, sourceRefNode)
+      ) {
+        createResourceRef(
+          sourceResource,
+          ResourceRefType.Unsatisfied,
+          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+          undefined,
+          outgoingRefMapper.target.kind
+        );
       }
     }
   });
@@ -301,53 +438,69 @@ function handleRefMappingByKey(
 function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) {
   resource.refs = resource.refs?.filter(ref => ref.type === 'incoming');
   Object.values(resourceMap).forEach(currentResource => {
-    currentResource.refs = currentResource.refs?.filter(ref => {
-      if (ref.type === 'incoming' && isResourceRefTo(ref, resource.id)) {
-        return false;
-      }
-      return true;
-    });
+    currentResource.refs = currentResource.refs?.filter(
+      ref => ref.type !== 'incoming' || !isResourceRefTo(ref, resource.id)
+    );
   });
 }
+
+/**
+ * Checks if the specified targetResource matches the refMapper
+ */
+
+function resourceMatchesRefMapper(targetResource: K8sResource, outgoingRefMapper: RefMapper) {
+  return targetResource.kind === outgoingRefMapper.target.kind;
+}
+
+/**
+ * Updates all refs for the specified resources
+ */
 
 export function processRefs(
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
   filter?: {resourceIds?: string[]; resourceKinds?: string[]}
 ) {
-  const resources = Object.values(resourceMap).filter(resource => !isKustomizationResource(resource));
-  resources.forEach(resource => processResourceRefNodes(resource));
+  // select which resources to process based on optional filter
+  const resources =
+    filter?.resourceIds && filter?.resourceIds.length > 0
+      ? filter.resourceIds.map(id => resourceMap[id])
+      : filter?.resourceKinds && filter?.resourceKinds.length > 0
+      ? Object.values(resourceMap).filter(resource => filter?.resourceKinds?.includes(resource.kind))
+      : Object.values(resourceMap).filter(resource => !isKustomizationResource(resource));
 
-  let filteredResources =
-    filter && filter.resourceKinds
-      ? resources.filter(resource =>
-          filter.resourceKinds && filter.resourceKinds.length > 0 ? filter.resourceKinds.includes(resource.kind) : true
-        )
-      : resources;
+  // prep for processing
+  let processedResourceIds = new Set<string>();
+  const k8sResources = Object.values(resourceMap);
 
-  filteredResources.forEach(sourceResource => {
+  resources.forEach(sourceResource => {
     clearResourceRefs(sourceResource, resourceMap);
+    processResourceRefNodes(sourceResource);
+    if (sourceResource.refNodesByPath && Object.values(sourceResource.refNodesByPath).length > 0) {
+      const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
+      if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
+        resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
+          const targetResources = k8sResources.filter(targetResource =>
+            resourceMatchesRefMapper(targetResource, outgoingRefMapper)
+          );
 
-    const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
-    if (
-      !resourceKindHandler ||
-      !resourceKindHandler.outgoingRefMappers ||
-      resourceKindHandler.outgoingRefMappers.length === 0
-    ) {
-      return;
-    }
-    resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-      const targetResources = Object.values(resourceMap).filter(
-        targetResource => targetResource.kind === outgoingRefMapper.target.kind
-      );
+          targetResources
+            // make sure we don't process the same resource twice
+            .filter(resource => !processedResourceIds.has(resource.id))
+            .forEach(resource => {
+              processResourceRefNodes(resource);
+              processedResourceIds.add(resource.id);
+            });
 
-      if (outgoingRefMapper.matchPairs) {
-        handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
-      } else {
-        handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
+          if (outgoingRefMapper.matchPairs) {
+            handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
+          } else {
+            handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
+          }
+        });
       }
-    });
+    }
   });
 
-  cleanResourceRefs(filteredResources);
+  cleanResourceRefs(resources);
 }

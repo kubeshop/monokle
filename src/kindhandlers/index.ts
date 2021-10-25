@@ -1,5 +1,6 @@
 import {ResourceKindHandler, RefMapper} from '@models/resourcekindhandler';
 
+import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
 import ConfigMapHandler from './ConfigMap.handler';
@@ -48,6 +49,7 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceHandler,
   ServiceAccountHandler,
   StatefulSetHandler,
+  VolumeAttachmentHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(
@@ -58,13 +60,21 @@ export const getResourceKindHandler = (resourceKind: string): ResourceKindHandle
   return HandlerByResourceKind[resourceKind];
 };
 
+const incomingRefMappersCache = new Map<string, RefMapper[]>();
+
 export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
-  return ResourceKindHandlers.map(
-    resourceKindHandler =>
-      resourceKindHandler.outgoingRefMappers?.filter(
-        outgoingRefMapper => outgoingRefMapper.target.kind === resourceKind
-      ) || []
-  ).flat();
+  if (!incomingRefMappersCache.has(resourceKind)) {
+    incomingRefMappersCache.set(
+      resourceKind,
+      ResourceKindHandlers.map(
+        resourceKindHandler =>
+          resourceKindHandler.outgoingRefMappers?.filter(
+            outgoingRefMapper => outgoingRefMapper.target.kind === resourceKind
+          ) || []
+      ).flat()
+    );
+  }
+  return incomingRefMappersCache.get(resourceKind) || [];
 };
 
 export const getDependentResourceKinds = (resourceKinds: string[]) => {

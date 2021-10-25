@@ -113,6 +113,11 @@ const SettingsDrawer = () => {
     fileInput && fileInput.current?.click();
   };
 
+  const onUpdateKubeconfig = (e: any) => {
+    let value = e.target.value;
+    dispatch(updateKubeconfig(value));
+  };
+
   const onSelectFile = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (fileInput.current?.files && fileInput.current.files.length > 0) {
@@ -145,7 +150,7 @@ const SettingsDrawer = () => {
       <StyledDiv>
         <StyledSpan>KUBECONFIG</StyledSpan>
         <Tooltip title={KubeconfigPathTooltip}>
-          <Input value={appConfig.kubeconfigPath} />
+          <Input value={appConfig.kubeconfigPath} onChange={onUpdateKubeconfig} />
         </Tooltip>
         <StyledButton onClick={openFileSelect}>Browse</StyledButton>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />

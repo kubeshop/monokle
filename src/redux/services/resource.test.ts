@@ -64,7 +64,7 @@ test('get-scalar-nodes-with-array', () => {
   expect(nameNodes[1].nodeValue()).toBe('clusterrole-to-role.yaml');
 });
 
-function extractTestResources(relativePath: string) {
+export function extractTestResources(relativePath: string) {
   const fileContent = loadTestResource(relativePath);
   return extractK8sResources(fileContent, relativePath);
 }

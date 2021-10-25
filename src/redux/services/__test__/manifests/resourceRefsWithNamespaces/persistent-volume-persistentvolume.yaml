@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: persistent-volume-1
+spec:
+  azureFile:
+    secretName: SecretInAnotherNamespace
+    secretNamespace: notargocd
+    shareName: someShare
