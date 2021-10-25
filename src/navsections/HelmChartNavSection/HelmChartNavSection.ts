@@ -1,12 +1,7 @@
-import {useMemo} from 'react';
-import {useSelector} from 'react-redux';
 import {HelmValuesFile} from '@models/helm';
 import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
 import {selectHelmValuesFile} from '@redux/reducers/main';
-import {AppDispatch} from '@redux/store';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {NavSection} from '@models/navsection';
-import {isInClusterModeSelector} from '@redux/selectors';
 import HelmChartQuickAction from './HelmChartQuickAction';
 
 export type HelmChartNavSectionScope = {
@@ -17,30 +12,22 @@ export type HelmChartNavSectionScope = {
   isFolderLoading: boolean;
   isPreviewLoading: boolean;
   isHelmChartPreview: boolean;
-  dispatch: AppDispatch;
 };
 
 const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> = {
   name: 'Helm Charts',
-  useScope: () => {
-    const dispatch = useAppDispatch();
-    const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-    const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-    const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
-    const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
-    const isInClusterMode = useSelector(isInClusterModeSelector);
-    const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
-    const previewType = useAppSelector(state => state.main.previewType);
-    const isHelmChartPreview = useMemo(() => previewType === 'helm', [previewType]);
+  id: 'helm_charts',
+  getScope: state => {
     return {
-      helmChartMap,
-      helmValuesMap,
-      previewValuesFileId,
-      isInClusterMode: Boolean(isInClusterMode),
-      isFolderLoading,
-      isPreviewLoading,
-      isHelmChartPreview,
-      dispatch,
+      helmChartMap: state.main.helmChartMap,
+      helmValuesMap: state.main.helmValuesMap,
+      previewValuesFileId: state.main.previewValuesFileId,
+      isInClusterMode: Boolean(
+        state.main.previewResourceId && state.main.previewResourceId.endsWith(state.config.kubeconfigPath)
+      ),
+      isFolderLoading: state.ui.isFolderLoading,
+      isPreviewLoading: state.main.previewLoader.isLoading,
+      isHelmChartPreview: state.main.previewType === 'helm',
     };
   },
   getItems: scope => {
@@ -72,8 +59,8 @@ const HelmChartNavSection: NavSection<HelmValuesFile, HelmChartNavSectionScope> 
       return item.isSelected;
     },
     isDisabled: (item, scope) => Boolean(scope.previewValuesFileId && scope.previewValuesFileId !== item.id),
-    onClick: (item, scope) => {
-      scope.dispatch(selectHelmValuesFile({valuesFileId: item.id}));
+    onClick: (item, scope, dispatch) => {
+      dispatch(selectHelmValuesFile({valuesFileId: item.id}));
     },
   },
   itemCustomization: {

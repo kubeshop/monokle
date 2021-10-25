@@ -1,4 +1,4 @@
-import {RootState} from '@redux/store';
+import {AppDispatch, RootState} from '@redux/store';
 import React from 'react';
 
 export type NavSectionItemCustomComponentProps<ItemType> = {
@@ -26,7 +26,7 @@ export interface NavSectionItemHandler<ItemType, ScopeType> {
   isDirty?: (item: ItemType, scope: ScopeType) => boolean;
   isDisabled?: (item: ItemType, scope: ScopeType) => boolean;
   shouldScrollIntoView?: (item: ItemType, scope: ScopeType) => boolean;
-  onClick?: (item: ItemType, scope: ScopeType) => void;
+  onClick?: (item: ItemType, scope: ScopeType, dispatch: AppDispatch) => void;
 }
 
 interface NavSectionItemGroup<ItemType> {
@@ -39,7 +39,6 @@ export interface NavSection<ItemType, ScopeType = any> {
   name: string;
   id: string;
   subsectionNames?: string[];
-  useScope: () => ScopeType;
   getScope: (state: RootState) => ScopeType;
   getItems?: (scope: ScopeType) => ItemType[];
   getGroups?: (scope: ScopeType) => NavSectionItemGroup<ItemType>[];

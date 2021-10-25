@@ -57,8 +57,8 @@ store.subscribe(() => {
     return !shallowEqual(state.navSection.itemInstanceMap[nextItemInstance.id], nextItemInstance);
   });
 
-  const updatedNavSectionInstances = navSectionInstances.filter(nextInstance => {
-    return !shallowEqual(state.navSection.instanceMap[nextInstance.name], nextInstance);
+  const updatedNavSectionInstances = navSectionInstances.filter(nextSectionInstance => {
+    return !shallowEqual(state.navSection.instanceMap[nextSectionInstance.name], nextSectionInstance);
   });
 
   store.dispatch(

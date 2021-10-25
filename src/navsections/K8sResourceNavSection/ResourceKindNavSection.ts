@@ -1,14 +1,11 @@
-import {useSelector} from 'react-redux';
 import {NavSection} from '@models/navsection';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {ResourceFilterType} from '@models/appstate';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {AppDispatch} from '@redux/store';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isPassingKeyValueFilter} from '@utils/filter';
-import {activeResourcesSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
+import {PREVIEW_PREFIX} from '@constants/constants';
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSuffix from './ResourceKindSuffix';
@@ -58,7 +55,6 @@ export type ResourceKindNavSectionScope = {
   resourceFilter: ResourceFilterType;
   selectedResourceId: string | undefined;
   selectedPath: string | undefined;
-  dispatch: AppDispatch;
 };
 
 export function makeResourceKindNavSection(
@@ -67,13 +63,18 @@ export function makeResourceKindNavSection(
   const kindSectionName = kindHandler.navigatorPath[2];
   const navSection: NavSection<K8sResource, ResourceKindNavSectionScope> = {
     name: kindSectionName,
-    useScope: () => {
-      const dispatch = useAppDispatch();
-      const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-      const activeResources = useSelector(activeResourcesSelector);
-      const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-      const selectedPath = useAppSelector(state => state.main.selectedPath);
-      return {activeResources, resourceFilter, selectedResourceId, selectedPath, dispatch};
+    id: kindSectionName,
+    getScope: state => {
+      return {
+        activeResources: Object.values(state.main.resourceMap).filter(
+          r =>
+            (state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
+            r.filePath.startsWith(PREVIEW_PREFIX)
+        ),
+        resourceFilter: state.main.resourceFilter,
+        selectedResourceId: state.main.selectedResourceId,
+        selectedPath: state.main.selectedPath,
+      };
     },
     getItems: scope => {
       return scope.activeResources
@@ -89,8 +90,8 @@ export function makeResourceKindNavSection(
       isSelected: item => item.isSelected,
       isHighlighted: item => item.isHighlighted,
       isDirty: item => isUnsavedResource(item),
-      onClick: (item, scope) => {
-        scope.dispatch(selectK8sResource({resourceId: item.id}));
+      onClick: (item, scope, dispatch) => {
+        dispatch(selectK8sResource({resourceId: item.id}));
       },
       isVisible: (item, scope) => {
         const isPassingFilter = isResourcePassingFilter(item, scope.resourceFilter);
