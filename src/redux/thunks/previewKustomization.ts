@@ -5,7 +5,7 @@ import {AppDispatch, RootState} from '@redux/store';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import path from 'path';
 import log from 'loglevel';
-import {createPreviewRejection, createPreviewResult} from '@redux/thunks/utils';
+import {createRejectionWithAlert, createPreviewResult} from '@redux/thunks/utils';
 import {AppConfig} from '@models/appconfig';
 
 /**
@@ -31,7 +31,7 @@ export const previewKustomization = createAsyncThunk<
     const result = await runKustomize(folder, appConfig);
 
     if (result.error) {
-      return createPreviewRejection(thunkAPI, 'Kustomize Error', result.error);
+      return createRejectionWithAlert(thunkAPI, 'Kustomize Error', result.error);
     }
 
     if (result.stdout) {

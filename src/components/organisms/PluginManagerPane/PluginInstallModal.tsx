@@ -35,7 +35,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   return (
     <Modal visible={isVisible} onCancel={onClose} onOk={handleOk}>
       <p>Plugin URL:</p>
-      <Input value={pluginUrl} onChange={e => setPluginUrl(e.target.value)} />
+      <Input defaultValue={pluginUrl} onChange={e => setPluginUrl(e.target.value)} />
       {errorMessage && (
         <div>
           <p>{errorMessage}</p>

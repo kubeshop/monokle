@@ -4,7 +4,7 @@ import {AppDispatch, RootState} from '@redux/store';
 import * as k8s from '@kubernetes/client-node';
 import {stringify} from 'yaml';
 import log from 'loglevel';
-import {createPreviewRejection, getResourceFromCluster} from '@redux/thunks/utils';
+import {createRejectionWithAlert, getResourceFromCluster} from '@redux/thunks/utils';
 import {getResourceKindHandler} from '@src/kindhandlers';
 /**
  * Thunk to diff a resource against the configured cluster
@@ -26,7 +26,7 @@ export const performResourceDiff = createAsyncThunk<
     if (resource && resource.text) {
       const resourceKindHandler = getResourceKindHandler(resource.kind);
       if (!resourceKindHandler) {
-        return createPreviewRejection(
+        return createRejectionWithAlert(
           thunkAPI,
           'Diff Resource',
           `Could not find Kind Handler for resoruce ${resource.id}`
@@ -41,7 +41,7 @@ export const performResourceDiff = createAsyncThunk<
           return {diffContent: stringify(res.body, {sortMapEntries: true}), diffResourceId};
         }
 
-        return createPreviewRejection(
+        return createRejectionWithAlert(
           thunkAPI,
           'Diff Resources',
           `Failed to get ${resource.content.kind} from cluster`
@@ -52,7 +52,7 @@ export const performResourceDiff = createAsyncThunk<
         let message = `${resource.content.kind} ${resource.content.metadata.name} not found in cluster`;
         let title = 'Diff failed';
 
-        return createPreviewRejection(thunkAPI, title, message);
+        return createRejectionWithAlert(thunkAPI, title, message);
       };
 
       try {
@@ -63,7 +63,7 @@ export const performResourceDiff = createAsyncThunk<
       }
     }
   } catch (e) {
-    createPreviewRejection(thunkAPI, 'Diff Resource', `Failed to diff resources; ${e.message}`);
+    createRejectionWithAlert(thunkAPI, 'Diff Resource', `Failed to diff resources; ${e.message}`);
     log.error(e);
   }
 

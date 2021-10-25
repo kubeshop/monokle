@@ -136,7 +136,12 @@ const ResourceFilter = () => {
       </StyledTitleContainer>
       <FieldContainer>
         <FieldLabel>Name:</FieldLabel>
-        <Input autoFocus placeholder="All or part of name..." value={name} onChange={e => setName(e.target.value)} />
+        <Input
+          autoFocus
+          placeholder="All or part of name..."
+          defaultValue={name}
+          onChange={e => setName(e.target.value)}
+        />
       </FieldContainer>
       <FieldContainer>
         <FieldLabel>Kind:</FieldLabel>
