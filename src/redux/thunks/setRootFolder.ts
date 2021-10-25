@@ -59,7 +59,9 @@ export const setRootFolder = createAsyncThunk<
     helmValuesMap,
     alert: {
       title: 'Folder Import',
-      message: `${Object.values(resourceMap).length} resources found in ${Object.values(fileMap).length} files`,
+      message: `${Object.values(resourceMap).length} resources found in ${
+        Object.values(fileMap).filter(f => !f.children).length
+      } files`,
       type: AlertEnum.Success,
     },
   };

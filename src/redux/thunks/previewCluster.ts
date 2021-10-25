@@ -4,7 +4,7 @@ import {AppDispatch, RootState} from '@redux/store';
 import * as k8s from '@kubernetes/client-node';
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 import {AlertEnum} from '@models/alert';
-import {createPreviewRejection, createPreviewResult, getK8sObjectsAsYaml} from '@redux/thunks/utils';
+import {createRejectionWithAlert, createPreviewResult, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
@@ -26,7 +26,7 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
         const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
         if (fulfilledResults.length === 0) {
-          return createPreviewRejection(
+          return createRejectionWithAlert(
             thunkAPI,
             'Cluster Resources Failed',
             // @ts-ignore
@@ -55,19 +55,17 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
               type: AlertEnum.Warning,
             };
 
-            console.log('previewResult1', previewResult);
             return previewResult;
           }
         }
-        console.log('previewResult2', previewResult);
         return previewResult;
       },
       reason => {
-        return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', reason.message);
+        return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', reason.message);
       }
     );
   } catch (e: any) {
-    return createPreviewRejection(thunkAPI, 'Cluster Resources Failed', e.message);
+    return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', e.message);
   }
 };
 

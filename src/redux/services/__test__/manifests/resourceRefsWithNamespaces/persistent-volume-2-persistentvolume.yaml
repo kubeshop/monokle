@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: persistent-volume-2
+spec:
+  azureFile:
+    secretName: SecretInAnotherNamespace
+    secretNamespace: argocd
+    shareName: someShare
+  cinder:
+    secretRef:
+      name: SecretInAnotherNamespace
+      namespace: notargocd
+  cephfs:
+    secretRef:
+      name: SecretInAnotherNamespace
+      namespace: argocd

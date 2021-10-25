@@ -6,7 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import log from 'loglevel';
 import {ipcRenderer} from 'electron';
-import {createPreviewRejection, createPreviewResult} from '@redux/thunks/utils';
+import {createRejectionWithAlert, createPreviewResult} from '@redux/thunks/utils';
 
 /**
  * Thunk to preview a Helm Chart
@@ -46,7 +46,7 @@ export const previewHelmValuesFile = createAsyncThunk<
       const result = await runHelm(args);
 
       if (result.error) {
-        return createPreviewRejection(thunkAPI, 'Helm Error', result.error);
+        return createRejectionWithAlert(thunkAPI, 'Helm Error', result.error);
       }
 
       if (result.stdout) {
@@ -54,7 +54,7 @@ export const previewHelmValuesFile = createAsyncThunk<
       }
     }
 
-    return createPreviewRejection(
+    return createRejectionWithAlert(
       thunkAPI,
       'Helm Error',
       `Unabled to run Helm for ${valuesFile.name} in folder ${folder}`

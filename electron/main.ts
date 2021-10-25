@@ -38,6 +38,8 @@ import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
 import terminal from '../cli/terminal';
 import {downloadPlugin} from './pluginService';
+import {AlertEnum, AlertType} from '@models/alert';
+import {setAlert} from '@redux/reducers/alert';
 
 Object.assign(console, ElectronLog.functions);
 autoUpdater.logger = console;
@@ -85,13 +87,6 @@ ipcMain.on('run-kustomize', (event, folder: string) => {
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
   } catch (e: any) {
     event.sender.send('kustomize-result', {error: e.toString()});
-  }
-});
-
-ipcMain.on('check-missing-dependency', event => {
-  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
-  if (missingDependecies.length > 0) {
-    event.sender.send('missing-dependency-result', {dependencies: missingDependecies});
   }
 });
 
@@ -246,17 +241,19 @@ export const createWindow = (givenPath?: string) => {
     mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
   });
 
-  const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
-
-  if (missingDependecies.length > 0) {
-    win.webContents.on('did-finish-load', () => {
-      win.webContents.send('missing-dependency-result', {dependencies: missingDependecies});
-    });
-  }
-
   win.webContents.on('did-finish-load', async () => {
     await checkNewVersion(true);
     initKubeconfig(mainStore, userHomeDir);
+    const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
+
+    if (missingDependecies.length > 0) {
+      const alert: AlertType = {
+        type: AlertEnum.Warning,
+        title: 'Missing dependency',
+        message: `${missingDependecies.toString()} must be installed for all Monokle functionality to be available`,
+      };
+      mainStore.dispatch(setAlert(alert));
+    }
     win.webContents.send('executed-from', {path: givenPath});
   });
 

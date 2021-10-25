@@ -28,8 +28,9 @@ const initialAppState: AppState = {
   isApplyingResource: false,
   plugins: [],
   resourceRefsProcessingOptions: {
-    shouldIgnoreOptionalUnsatisfiedRefs:
-      electronStore.get('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs') || true,
+    shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
+      'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
+    ),
   },
 };
 
