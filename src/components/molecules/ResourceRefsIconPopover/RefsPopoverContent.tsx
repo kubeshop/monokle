@@ -8,6 +8,7 @@ import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {MonacoRange} from '@models/ui';
 import {areRefPosEqual} from '@redux/services/resource';
+import {KUSTOMIZATION_KIND} from '@constants/constants';
 import RefLink from './RefLink';
 
 const {Text} = Typography;
@@ -80,7 +81,7 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
       if (previewType === 'kustomization' && ref.target?.type === 'resource') {
         const targetResourceId = ref.target.resourceId;
         const targetResource = targetResourceId ? resourceMap[targetResourceId] : undefined;
-        if (targetResource?.kind === 'Kustomization' && targetResourceId !== previewResourceId) {
+        if (targetResource?.kind === KUSTOMIZATION_KIND && targetResourceId !== previewResourceId) {
           return true;
         }
       }
