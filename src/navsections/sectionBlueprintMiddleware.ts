@@ -94,6 +94,9 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
           ),
         };
       });
+      itemInstances?.forEach(itemInstance => {
+        itemInstanceMap[itemInstance.id] = itemInstance;
+      });
     }
 
     const isSectionSelected = Boolean(itemInstances?.some(i => i.isSelected === true));
@@ -124,9 +127,6 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       visibleGroupIds,
     };
     sectionInstanceMap[sectionBlueprint.id] = navSectionInstance;
-    itemInstances?.forEach(itemInstance => {
-      itemInstanceMap[itemInstance.id] = itemInstance;
-    });
   });
 
   // const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(

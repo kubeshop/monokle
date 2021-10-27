@@ -5,6 +5,7 @@ import {SectionBlueprint} from '@models/navigator';
 import KustomizationQuickAction from './KustomizationQuickAction';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationSuffix from './KustomizationSuffix';
+import sectionBlueprintMap from '../sectionBlueprintMap';
 
 export type KustomizationScopeType = {
   resourceMap: ResourceMapType;
@@ -19,7 +20,7 @@ export type KustomizationScopeType = {
 
 const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, KustomizationScopeType> = {
   name: 'Kustomizations',
-  id: 'kustomizations',
+  id: 'Kustomizations',
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
@@ -79,5 +80,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     },
   },
 };
+
+sectionBlueprintMap.register(KustomizationSectionBlueprint);
 
 export default KustomizationSectionBlueprint;

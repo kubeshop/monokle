@@ -2,9 +2,9 @@ import React, {useCallback, useContext} from 'react';
 import AppContext from '@src/AppContext';
 import {K8sResource} from '@models/k8sresource';
 import {HelmValuesFile} from '@models/helm';
-import KustomizationNavSection, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
-import HelmChartNavSection, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
-import K8sResourceNavSection, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
+import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
+import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
+import K8sResourceSectionBlueprint, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
 import {Popover} from 'antd';
 import {PlusOutlined, FilterOutlined} from '@ant-design/icons';
 import ResourceFilter from '@components/molecules/ResourceFilter';
@@ -59,17 +59,17 @@ const NavPane = () => {
       </S.TitleBar>
       <S.List height={navigatorHeight}>
         <SectionRenderer<HelmValuesFile, HelmChartScopeType>
-          sectionBlueprint={HelmChartNavSection}
+          sectionBlueprint={HelmChartSectionBlueprint}
           level={0}
           isLastSection={false}
         />
         <SectionRenderer<K8sResource, KustomizationScopeType>
-          sectionBlueprint={KustomizationNavSection}
+          sectionBlueprint={KustomizationSectionBlueprint}
           level={0}
           isLastSection={false}
         />
         <SectionRenderer<K8sResource, K8sResourceScopeType>
-          sectionBlueprint={K8sResourceNavSection}
+          sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}
           isLastSection={false}
         />

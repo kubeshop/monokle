@@ -2,7 +2,7 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandlers} from '@src/kindhandlers';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-import navSectionMap from '@src/navsections/sectionBlueprintMap';
+import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 import {SectionBlueprint} from '@models/navigator';
 import {PREVIEW_PREFIX} from '@constants/constants';
 import {makeResourceKindNavSection} from './ResourceKindSectionBlueprint';
@@ -34,7 +34,7 @@ const childSections = childSectionNames.map(childSectionName => {
     makeResourceKindNavSection(kindHandler)
   );
 
-  kindHandlerSections.forEach(k => navSectionMap.register(k));
+  kindHandlerSections.forEach(k => sectionBlueprintMap.register(k));
 
   const subsection: SectionBlueprint<K8sResource, {activeResources: K8sResource[]}> = {
     name: childSectionName,
@@ -57,9 +57,9 @@ const childSections = childSectionNames.map(childSectionName => {
   return subsection;
 });
 
-childSections.forEach(s => navSectionMap.register(s));
+childSections.forEach(s => sectionBlueprintMap.register(s));
 
-const K8sResourceNavSection: SectionBlueprint<K8sResource, K8sResourceScopeType> = {
+const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScopeType> = {
   name: navSectionNames.K8S_RESOURCES,
   id: navSectionNames.K8S_RESOURCES,
   childSectionIds: childSectionNames,
@@ -84,4 +84,6 @@ const K8sResourceNavSection: SectionBlueprint<K8sResource, K8sResourceScopeType>
   },
 };
 
-export default K8sResourceNavSection;
+sectionBlueprintMap.register(K8sResourceSectionBlueprint);
+
+export default K8sResourceSectionBlueprint;
