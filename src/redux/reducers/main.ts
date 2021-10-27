@@ -514,6 +514,19 @@ export const mainSlice = createSlice({
         }
       }
     });
+
+    builder.addMatcher(
+      action => true,
+      (state, action) => {
+        if (action.payload?.alert) {
+          const notification: AlertType = action.payload.alert;
+          notification.id = uuidv4();
+          notification.hasSeen = false;
+          notification.createdAt = new Date().getTime();
+          state.notifications = [notification, ...state.notifications];
+        }
+      }
+    );
   },
 });
 

@@ -36,6 +36,7 @@ const StyledDateSpan = styled(StyledSpan)`
 
 const StyledMessageSpan = styled(StyledSpan)`
   color: ${Colors.whitePure};
+  width: 100%;
 `;
 
 const StyledStatusBadge = styled(Badge)`
