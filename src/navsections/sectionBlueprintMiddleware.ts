@@ -84,13 +84,13 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
         return {
           name: itemBlueprint.getName(rawItem),
           id: itemBlueprint.getInstanceId(rawItem),
-          isSelected: Boolean(itemBuilder?.isSelected && itemBuilder.isSelected(rawItem, sectionScope)),
-          isHighlighted: Boolean(itemBuilder?.isHighlighted && itemBuilder.isHighlighted(rawItem, sectionScope)),
-          isVisible: Boolean(itemBuilder?.isVisible && itemBuilder.isVisible(rawItem, sectionScope)),
-          isDirty: Boolean(itemBuilder?.isDirty && itemBuilder.isDirty(rawItem, sectionScope)),
-          isDisabled: Boolean(itemBuilder?.isDisabled && itemBuilder.isDisabled(rawItem, sectionScope)),
+          isSelected: Boolean(itemBuilder?.isSelected ? itemBuilder.isSelected(rawItem, sectionScope) : false),
+          isHighlighted: Boolean(itemBuilder?.isHighlighted ? itemBuilder.isHighlighted(rawItem, sectionScope) : false),
+          isVisible: Boolean(itemBuilder?.isVisible ? itemBuilder.isVisible(rawItem, sectionScope) : true),
+          isDirty: Boolean(itemBuilder?.isDirty ? itemBuilder.isDirty(rawItem, sectionScope) : false),
+          isDisabled: Boolean(itemBuilder?.isDisabled ? itemBuilder.isDisabled(rawItem, sectionScope) : false),
           shouldScrollIntoView: Boolean(
-            itemBuilder?.shouldScrollIntoView && itemBuilder.shouldScrollIntoView(rawItem, sectionScope)
+            itemBuilder?.shouldScrollIntoView ? itemBuilder.shouldScrollIntoView(rawItem, sectionScope) : false
           ),
         };
       });
@@ -110,14 +110,13 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       id: sectionBlueprint.id,
       itemIds: itemInstances?.map(i => i.id) || [],
       groups: sectionGroups,
-      isLoading: Boolean(sectionBuilder?.isLoading && sectionBuilder.isLoading(sectionScope, rawItems)),
-      // isVisible: Boolean(
-      //   sectionBuilder?.isVisible &&
-      //     sectionBuilder.isVisible(sectionScope, rawItems) &&
-      //     (visibleItemIds.length > 0 || visibleGroupIds.length > 0)
-      // ),
-      isVisible: true,
-      isInitialized: Boolean(sectionBuilder?.isInitialized && sectionBuilder.isInitialized(sectionScope, rawItems)),
+      isLoading: Boolean(sectionBuilder?.isLoading ? sectionBuilder.isLoading(sectionScope, rawItems) : false),
+      isVisible: sectionBuilder?.isVisible
+        ? sectionBuilder.isVisible(sectionScope, rawItems)
+        : visibleItemIds.length > 0 || visibleGroupIds.length > 0,
+      isInitialized: Boolean(
+        sectionBuilder?.isInitialized ? sectionBuilder.isInitialized(sectionScope, rawItems) : true
+      ),
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
       shouldExpand: Boolean(

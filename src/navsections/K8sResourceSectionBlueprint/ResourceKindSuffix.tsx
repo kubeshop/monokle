@@ -18,6 +18,9 @@ const Suffix = (props: ItemCustomComponentProps) => {
   const dispatch = useAppDispatch();
 
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
+  if (!resource) {
+    return null;
+  }
 
   const onClickErrorIcon = () => {
     if (resource.validation) {

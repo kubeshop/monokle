@@ -1,5 +1,5 @@
-import React, {useCallback} from 'react';
-import {SectionBlueprint, SectionInstance} from '@models/navigator';
+import React, {useCallback, useMemo} from 'react';
+import {ItemGroup, SectionBlueprint, SectionInstance} from '@models/navigator';
 import {useAppSelector} from '@redux/hooks';
 // import {shallowEqual} from 'react-redux';
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
@@ -21,6 +21,15 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
   const sectionInstance: SectionInstance | undefined = useAppSelector(
     state => state.navigator.sectionInstanceMap[sectionId]
   );
+
+  const itemGroupById: Record<string, ItemGroup> = useMemo(() => {
+    return sectionInstance?.groups
+      .map<[string, ItemGroup]>(g => [g.id, g])
+      .reduce<Record<string, ItemGroup>>((acc, [k, v]) => {
+        acc[k] = v;
+        return acc;
+      }, {});
+  }, [sectionInstance?.groups]);
 
   // console.log({sectionInstance});
 
@@ -82,6 +91,10 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
   //   [visibleSubsections]
   // );
 
+  if (!sectionInstance?.isVisible) {
+    return null;
+  }
+
   if (sectionInstance?.isLoading) {
     return <S.Skeleton />;
   }
@@ -116,6 +129,28 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
             isLastItem={false}
           />
         ))}
+      {sectionInstance?.isVisible &&
+        itemBlueprint &&
+        itemGroupById &&
+        sectionInstance.visibleGroupIds.map(groupId => {
+          const group = itemGroupById[groupId];
+          return (
+            <React.Fragment key={group.id}>
+              <S.NameContainer style={{color: 'red'}}>
+                <S.Name level={level + 1}>{group.name}</S.Name>
+              </S.NameContainer>
+              {group.itemIds.map(itemId => (
+                <ItemRenderer<ItemType, ScopeType>
+                  key={itemId}
+                  itemId={itemId}
+                  blueprint={itemBlueprint}
+                  level={level + 2}
+                  isLastItem={false} // isLastVisibleItemInstanceInGroup(group.name, itemInstance.id)
+                />
+              ))}
+            </React.Fragment>
+          );
+        })}
       {/* {sectionInstance?.isVisible && // !isCollapsed &&
         itemBlueprint &&
         sectionInstance.visibleGroupIds.map(groupId => (

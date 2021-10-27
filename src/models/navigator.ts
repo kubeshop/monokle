@@ -48,7 +48,7 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
   customization?: ItemCustomization;
 }
 
-interface ItemGroup {
+export interface ItemGroup {
   id: string;
   name: string;
   itemIds: string[];

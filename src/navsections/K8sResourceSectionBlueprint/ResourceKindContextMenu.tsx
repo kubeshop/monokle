@@ -26,6 +26,10 @@ const ContextMenu = (props: ItemCustomComponentProps) => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
 
+  if (!resource) {
+    return null;
+  }
+
   return (
     <Dropdown
       overlay={
