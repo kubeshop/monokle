@@ -85,6 +85,9 @@ export function makeResourceKindNavSection(
       isInitialized: scope => {
         return scope.activeResources.length > 0;
       },
+      isVisible: scope => {
+        return scope.activeResources.length === 0;
+      },
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,

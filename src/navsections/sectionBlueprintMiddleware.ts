@@ -29,6 +29,24 @@ const hasNavigatorStateChanged = (navigatorState: NavigatorState, newNavigatorSt
   );
 };
 
+const computeSectionVisibility = (
+  sectionInstance: SectionInstance,
+  sectionInstanceMap: Record<string, SectionInstance>
+) => {
+  const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
+  if (sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0) {
+    const childSectionVisibilityMap: Record<string, boolean> = {};
+    sectionBlueprint.childSectionIds.forEach(childSectionId => {
+      const childSectionInstance = sectionInstanceMap[childSectionId];
+      const isChildSectionVisible = computeSectionVisibility(childSectionInstance, sectionInstanceMap);
+      childSectionVisibilityMap[childSectionId] = isChildSectionVisible;
+    });
+    sectionInstance.isVisible =
+      sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
+  }
+  return sectionInstance.isVisible;
+};
+
 const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   const sectionInstanceMap: Record<string, SectionInstance> = {};
   const itemInstanceMap: Record<string, ItemInstance> = {};
@@ -101,6 +119,9 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
 
     const isSectionSelected = Boolean(itemInstances?.some(i => i.isSelected === true));
     const isSectionHighlighted = Boolean(itemInstances?.some(i => i.isHighlighted === true));
+    const isSectionInitialized = Boolean(
+      sectionBuilder?.isInitialized ? sectionBuilder.isInitialized(sectionScope, rawItems) : true
+    );
     const sectionGroups = sectionBuilder?.getGroups ? sectionBuilder.getGroups(sectionScope) : [];
     const visibleItemIds = itemInstances?.filter(i => i.isVisible === true).map(i => i.id) || [];
     const visibleGroupIds = sectionGroups
@@ -111,12 +132,11 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       itemIds: itemInstances?.map(i => i.id) || [],
       groups: sectionGroups,
       isLoading: Boolean(sectionBuilder?.isLoading ? sectionBuilder.isLoading(sectionScope, rawItems) : false),
-      isVisible: sectionBuilder?.isVisible
-        ? sectionBuilder.isVisible(sectionScope, rawItems)
-        : visibleItemIds.length > 0 || visibleGroupIds.length > 0,
-      isInitialized: Boolean(
-        sectionBuilder?.isInitialized ? sectionBuilder.isInitialized(sectionScope, rawItems) : true
-      ),
+      isVisible:
+        Boolean(sectionBuilder?.isVisible && sectionBuilder.isVisible(sectionScope, rawItems)) ||
+        visibleItemIds.length > 0 ||
+        visibleGroupIds.length > 0,
+      isInitialized: isSectionInitialized,
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
       shouldExpand: Boolean(
@@ -128,26 +148,13 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     sectionInstanceMap[sectionBlueprint.id] = navSectionInstance;
   });
 
-  // const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(
-  //   sectionInstance => !sectionBlueprintMap.getById(sectionInstance.id).parentSectionId
-  // );
+  const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(
+    sectionInstance => !sectionBlueprintMap.getById(sectionInstance.id).parentSectionId
+  );
 
-  // const computeSectionVisibility = (sectionInstance: SectionInstance) => {
-  //   const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
-  //   if (sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0) {
-  //     const childSectionVisibilityMap: Record<string, boolean> = {};
-  //     sectionBlueprint.childSectionIds.forEach(childSectionId => {
-  //       const childSectionInstance = sectionInstanceMap[childSectionId];
-  //       const isChildSectionVisible = computeSectionVisibility(childSectionInstance);
-  //       childSectionVisibilityMap[childSectionId] = isChildSectionVisible;
-  //     });
-  //     sectionInstance.isVisible =
-  //       sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
-  //   }
-  //   return sectionInstance.isVisible;
-  // };
-
-  // sectionInstanceRoots.forEach(sectionInstanceRoot => computeSectionVisibility(sectionInstanceRoot));
+  asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
+    computeSectionVisibility(sectionInstanceRoot, sectionInstanceMap)
+  );
 
   if (Object.keys(itemInstanceMap).length === 0 && Object.keys(sectionInstanceMap).length === 0) {
     return;

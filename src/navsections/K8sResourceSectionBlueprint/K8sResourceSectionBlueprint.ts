@@ -36,7 +36,7 @@ const childSections = childSectionNames.map(childSectionName => {
 
   kindHandlerSections.forEach(k => sectionBlueprintMap.register(k));
 
-  const subsection: SectionBlueprint<K8sResource, {activeResources: K8sResource[]}> = {
+  const subsection: SectionBlueprint<K8sResource, {activeResourcesLength: number}> = {
     name: childSectionName,
     id: childSectionName,
     childSectionIds: kindHandlerSections.map(k => k.name),
@@ -46,11 +46,14 @@ const childSections = childSectionNames.map(childSectionName => {
           (state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
           r.filePath.startsWith(PREVIEW_PREFIX)
       );
-      return {activeResources};
+      return {activeResourcesLength: activeResources.length};
     },
     builder: {
       isInitialized: scope => {
-        return scope.activeResources.length > 0;
+        return scope.activeResourcesLength > 0;
+      },
+      isVisible: scope => {
+        return scope.activeResourcesLength === 0;
       },
     },
   };
@@ -80,6 +83,9 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
     },
     isInitialized: scope => {
       return scope.activeResourcesLength > 0;
+    },
+    isVisible: scope => {
+      return scope.activeResourcesLength === 0;
     },
   },
 };
