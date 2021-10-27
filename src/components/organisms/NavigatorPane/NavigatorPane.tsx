@@ -15,6 +15,7 @@ import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {MonoPaneTitle} from '@components/atoms';
 import SectionRenderer from './SectionRenderer';
+import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 import * as S from './NavigatorPane.styled';
 
 const NavPane = () => {
@@ -38,7 +39,10 @@ const NavPane = () => {
   return (
     <>
       <S.TitleBar>
-        <MonoPaneTitle>Navigator</MonoPaneTitle>
+        <MonoPaneTitle>
+          Navigator <WarningsAndErrorsDisplay />
+        </MonoPaneTitle>
+
         <S.TitleBarRightButtons>
           <S.PlusButton
             disabled={!doesRootFileEntryExist() || isInClusterMode || isInPreviewMode}
