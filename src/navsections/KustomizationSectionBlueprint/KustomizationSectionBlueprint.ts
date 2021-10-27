@@ -51,6 +51,9 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     isVisible: scope => {
       return !scope.isInClusterMode;
     },
+    isInitialized: (_, rawItems) => {
+      return rawItems.length > 0;
+    },
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,

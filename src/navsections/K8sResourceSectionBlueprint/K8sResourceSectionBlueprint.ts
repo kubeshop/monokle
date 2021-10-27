@@ -52,9 +52,7 @@ const childSections = childSectionNames.map(childSectionName => {
       isInitialized: scope => {
         return scope.activeResourcesLength > 0;
       },
-      isVisible: scope => {
-        return scope.activeResourcesLength === 0;
-      },
+      shouldBeVisibleBeforeInitialized: true,
     },
   };
   return subsection;
@@ -84,9 +82,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
     isInitialized: scope => {
       return scope.activeResourcesLength > 0;
     },
-    isVisible: scope => {
-      return scope.activeResourcesLength === 0;
-    },
+    shouldBeVisibleBeforeInitialized: true,
   },
 };
 
