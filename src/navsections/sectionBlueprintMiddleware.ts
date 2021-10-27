@@ -1,7 +1,7 @@
 import {shallowEqual} from 'react-redux';
 import {Middleware} from 'redux';
-import {updateNavigatorState} from '@redux/reducers/navigator';
-import {ItemInstance, NavigatorState, SectionInstance} from '@models/navigator';
+import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
+import {ItemInstance, NavigatorInstanceState, SectionInstance} from '@models/navigator';
 import {AppDispatch, RootState} from '@redux/store';
 import asyncLib from 'async';
 import sectionBlueprintMap from './sectionBlueprintMap';
@@ -9,7 +9,6 @@ import sectionBlueprintMap from './sectionBlueprintMap';
 const fullScopeCache: Record<string, any> = {};
 
 const pickPartialRecord = (record: Record<string, any>, keys: string[]) => {
-  // return Object.fromEntries(Object.entries(record).filter(([key]) => keys.includes(key)));
   return Object.entries(record)
     .filter(([key]) => keys.includes(key))
     .reduce<Record<string, any>>((acc, [k, v]) => {
@@ -18,8 +17,11 @@ const pickPartialRecord = (record: Record<string, any>, keys: string[]) => {
     }, {});
 };
 
-const hasNavigatorStateChanged = (navigatorState: NavigatorState, newNavigatorState: NavigatorState) => {
-  const {itemInstanceMap, sectionInstanceMap} = newNavigatorState;
+const hasNavigatorInstanceStateChanged = (
+  navigatorState: NavigatorInstanceState,
+  newNavigatorInstanceState: NavigatorInstanceState
+) => {
+  const {itemInstanceMap, sectionInstanceMap} = newNavigatorInstanceState;
   return (
     !shallowEqual(pickPartialRecord(navigatorState.itemInstanceMap, Object.keys(itemInstanceMap)), itemInstanceMap) ||
     !shallowEqual(
@@ -187,19 +189,24 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     return;
   }
 
-  const newNavigatorState: NavigatorState = {
+  const newNavigatorInstanceState: NavigatorInstanceState = {
     sectionInstanceMap,
     itemInstanceMap,
   };
 
-  if (hasNavigatorStateChanged(state.navigator, newNavigatorState)) {
-    dispatch(updateNavigatorState(newNavigatorState));
+  if (hasNavigatorInstanceStateChanged(state.navigator, newNavigatorInstanceState)) {
+    dispatch(updateNavigatorInstanceState(newNavigatorInstanceState));
   }
 };
 
 export const sectionBlueprintMiddleware: Middleware = store => next => action => {
   next(action);
-  if (action?.type === updateNavigatorState.type) {
+  // ignore actions that will not affect any section scope
+  if (
+    action?.type === updateNavigatorInstanceState.type ||
+    action?.type === expandSectionIds.type ||
+    action?.type === collapseSectionIds.type
+  ) {
     console.log('Not processing.');
     return;
   }

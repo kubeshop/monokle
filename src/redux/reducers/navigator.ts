@@ -1,12 +1,12 @@
 import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import initialState from '@redux/initialState';
-import {NavigatorState} from '@models/navigator';
+import {NavigatorInstanceState, NavigatorState} from '@models/navigator';
 
 export const navigatorSlice = createSlice({
   name: 'navigator',
   initialState: initialState.navigator,
   reducers: {
-    updateNavigatorState: (state: Draft<NavigatorState>, action: PayloadAction<NavigatorState>) => {
+    updateNavigatorInstanceState: (state: Draft<NavigatorState>, action: PayloadAction<NavigatorInstanceState>) => {
       const {sectionInstanceMap, itemInstanceMap} = action.payload;
       Object.entries(sectionInstanceMap).forEach(([sectionId, sectionInstance]) => {
         state.sectionInstanceMap[sectionId] = sectionInstance;
@@ -15,8 +15,18 @@ export const navigatorSlice = createSlice({
         state.itemInstanceMap[itemId] = itemInstance;
       });
     },
+    collapseSectionIds: (state: Draft<NavigatorState>, action: PayloadAction<string[]>) => {
+      action.payload.forEach(sectionId => {
+        if (!state.collapsedSectionIds.includes(sectionId)) {
+          state.collapsedSectionIds.push(sectionId);
+        }
+      });
+    },
+    expandSectionIds: (state: Draft<NavigatorState>, action: PayloadAction<string[]>) => {
+      state.collapsedSectionIds = state.collapsedSectionIds.filter(sectionId => !action.payload.includes(sectionId));
+    },
   },
 });
 
-export const {updateNavigatorState} = navigatorSlice.actions;
+export const {updateNavigatorInstanceState, collapseSectionIds, expandSectionIds} = navigatorSlice.actions;
 export default navigatorSlice.reducer;

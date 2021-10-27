@@ -101,7 +101,11 @@ export interface SectionInstance {
   shouldExpand: boolean;
 }
 
-export interface NavigatorState {
+export interface NavigatorInstanceState {
   sectionInstanceMap: Record<string, SectionInstance>;
   itemInstanceMap: Record<string, ItemInstance>;
+}
+
+export interface NavigatorState extends NavigatorInstanceState {
+  collapsedSectionIds: string[];
 }

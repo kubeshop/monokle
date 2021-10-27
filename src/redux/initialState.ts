@@ -107,6 +107,7 @@ const initialUiState: UiState = {
 const initialNavigatorState: NavigatorState = {
   sectionInstanceMap: {},
   itemInstanceMap: {},
+  collapsedSectionIds: [],
 };
 
 export default {
