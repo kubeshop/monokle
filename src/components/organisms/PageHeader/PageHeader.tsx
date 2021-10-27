@@ -2,13 +2,19 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-import {CloseCircleOutlined, GithubOutlined, QuestionCircleOutlined, SettingOutlined} from '@ant-design/icons';
+import {
+  CloseCircleOutlined,
+  GithubOutlined,
+  QuestionCircleOutlined,
+  SettingOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import {Badge} from 'antd';
 import {AppBorders} from '@styles/Borders';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {toggleSettings} from '@redux/reducers/ui';
+import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 import Row from '@components/atoms/Row';
 import Col from '@components/atoms/Col';
@@ -56,6 +62,17 @@ const StyledSettingsOutlined = styled(SettingOutlined)`
 const StyledSettingsBadge = styled(Badge)`
   margin-right: 8px;
   margin-top: 13px;
+`;
+
+const StyledNotificationsBadge = styled(Badge)`
+  margin-right: 8px;
+  margin-top: 13px;
+`;
+
+const StyledExclamationCircleOutlined = styled(ExclamationCircleOutlined)`
+  color: ${FontColors.elementSelectTitle};
+  font-size: 24px;
+  cursor: pointer;
 `;
 
 const GitHubIconSpan = styled.span`
@@ -158,6 +175,10 @@ const PageHeader = () => {
     dispatch(toggleSettings());
   };
 
+  const toggleNotificationsDrawer = () => {
+    dispatch(toggleNotifications());
+  };
+
   const showStartupModal = () => {
     dispatch(updateStartupModalVisible(true));
   };
@@ -216,6 +237,9 @@ const PageHeader = () => {
             <StyledSettingsBadge>
               <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
             </StyledSettingsBadge>
+            <StyledNotificationsBadge>
+              <StyledExclamationCircleOutlined onClick={toggleNotificationsDrawer} />
+            </StyledNotificationsBadge>
           </SettingsCol>
         </Row>
       </StyledHeader>

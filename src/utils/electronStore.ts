@@ -75,6 +75,9 @@ const schema = {
       isSettingsOpen: {
         type: 'boolean',
       },
+      isNotificationsOpen: {
+        type: 'boolean',
+      },
       isNewResourceWizardOpen: {
         type: 'boolean',
       },

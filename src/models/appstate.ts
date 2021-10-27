@@ -1,4 +1,5 @@
 import {HelmChart, HelmValuesFile} from '@models/helm';
+import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
 import {MonoklePlugin} from './plugin';
@@ -104,6 +105,7 @@ interface AppState {
   diffContent?: string;
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
+  notifications: AlertType[];
 }
 
 export type {

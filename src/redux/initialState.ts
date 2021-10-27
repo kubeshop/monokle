@@ -27,6 +27,7 @@ const initialAppState: AppState = {
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
     ),
   },
+  notifications: [],
 };
 
 const initialAppConfigState: AppConfig = {
@@ -66,6 +67,7 @@ const initialLogsState: LogsState = {
 
 const initialUiState: UiState = {
   isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
+  isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
   isFolderLoading: false,
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
