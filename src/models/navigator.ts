@@ -66,6 +66,7 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
     isLoading?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
+    shouldBeVisibleBeforeInitialized?: boolean;
   };
   itemBlueprint?: ItemBlueprint<RawItemType, ScopeType>;
 }
@@ -93,6 +94,7 @@ export interface SectionInstance {
   visibleGroupIds: string[];
   visibleChildSectionIds?: string[];
   visibleDescendantSectionIds?: string[];
+  visibleDescendantItemsCount?: number;
   isLoading: boolean;
   isVisible: boolean;
   isInitialized: boolean;

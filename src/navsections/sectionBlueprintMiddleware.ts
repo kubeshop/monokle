@@ -31,19 +31,28 @@ const hasNavigatorInstanceStateChanged = (
   );
 };
 
+/**
+ * Compute the visibility of each section based on the visibility of it's children
+ * Compute the array of all visible descendant sections for each section
+ */
 function computeSectionVisibility(
   sectionInstance: SectionInstance,
   sectionInstanceMap: Record<string, SectionInstance>
-): [boolean, string[] | undefined] {
+): [boolean, string[] | undefined, number | undefined] {
   const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
+  let visibleDescendantItemsCount = 0;
+
   if (sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0) {
     const childSectionVisibilityMap: Record<string, boolean> = {};
+
     sectionBlueprint.childSectionIds.forEach(childSectionId => {
       const childSectionInstance = sectionInstanceMap[childSectionId];
-      const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection] = computeSectionVisibility(
-        childSectionInstance,
-        sectionInstanceMap
-      );
+      const [
+        isChildSectionVisible,
+        visibleDescendantSectionIdsOfChildSection,
+        visibleDescendantItemsCountOfChildSection,
+      ] = computeSectionVisibility(childSectionInstance, sectionInstanceMap);
+
       if (visibleDescendantSectionIdsOfChildSection) {
         if (sectionInstance.visibleDescendantSectionIds) {
           sectionInstance.visibleDescendantSectionIds.push(...visibleDescendantSectionIdsOfChildSection);
@@ -51,6 +60,11 @@ function computeSectionVisibility(
           sectionInstance.visibleDescendantSectionIds = [...visibleDescendantSectionIdsOfChildSection];
         }
       }
+
+      if (visibleDescendantItemsCountOfChildSection) {
+        visibleDescendantItemsCount += visibleDescendantItemsCountOfChildSection;
+      }
+
       childSectionVisibilityMap[childSectionId] = isChildSectionVisible;
       if (isChildSectionVisible) {
         if (sectionInstance.visibleChildSectionIds) {
@@ -60,6 +74,7 @@ function computeSectionVisibility(
         }
       }
     });
+
     if (sectionInstance.visibleChildSectionIds) {
       if (sectionInstance.visibleDescendantSectionIds) {
         sectionInstance.visibleDescendantSectionIds.push(...sectionInstance.visibleChildSectionIds);
@@ -68,12 +83,25 @@ function computeSectionVisibility(
         sectionInstance.visibleDescendantSectionIds = [...sectionInstance.visibleChildSectionIds];
       }
     }
+
     sectionInstance.isVisible =
       sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
   }
-  return [sectionInstance.isVisible, sectionInstance.visibleDescendantSectionIds];
-}
 
+  if (sectionInstance.visibleItemIds) {
+    visibleDescendantItemsCount += sectionInstance.visibleItemIds.length;
+  }
+
+  sectionInstance.visibleDescendantItemsCount = visibleDescendantItemsCount;
+  return [
+    sectionInstance.isVisible,
+    sectionInstance.visibleDescendantSectionIds,
+    sectionInstance.visibleDescendantItemsCount,
+  ];
+}
+/**
+ * Build the section and item instances based on the registered section blueprints
+ */
 const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   const sectionInstanceMap: Record<string, SectionInstance> = {};
   const itemInstanceMap: Record<string, ItemInstance> = {};
@@ -82,6 +110,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   const scopeKeysBySectionId: Record<string, string[]> = {};
   const isChangedByScopeKey: Record<string, boolean> = {};
 
+  // check if anything from the full scope has changed and store the keys of changed values
   asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
     const sectionScope = sectionBlueprint.getScope(state);
     const sectionScopeKeys: string[] = [];
@@ -122,6 +151,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     let itemInstances: ItemInstance[] | undefined;
     let rawItems: any[] = [];
 
+    // build the item instances if the section has the itemBlueprint defined
     if (itemBlueprint) {
       rawItems = (sectionBlueprint.builder?.getRawItems && sectionBlueprint.builder.getRawItems(sectionScope)) || [];
       const itemBuilder = itemBlueprint.builder;
@@ -156,15 +186,17 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     }));
     const visibleItemIds = itemInstances?.filter(i => i.isVisible === true).map(i => i.id) || [];
     const visibleGroupIds = sectionInstanceGroups.filter(g => g.visibleItemIds.length > 0).map(g => g.id);
-    const navSectionInstance: SectionInstance = {
+    const sectionInstance: SectionInstance = {
       id: sectionBlueprint.id,
       itemIds: itemInstances?.map(i => i.id) || [],
       groups: sectionInstanceGroups,
       isLoading: Boolean(sectionBuilder?.isLoading ? sectionBuilder.isLoading(sectionScope, rawItems) : false),
       isVisible:
-        Boolean(sectionBuilder?.isVisible && sectionBuilder.isVisible(sectionScope, rawItems)) ||
-        visibleItemIds.length > 0 ||
-        visibleGroupIds.length > 0,
+        Boolean(sectionBuilder?.shouldBeVisibleBeforeInitialized === true && !isSectionInitialized) ||
+        (isSectionInitialized &&
+          (Boolean(sectionBuilder?.isVisible && sectionBuilder.isVisible(sectionScope, rawItems)) ||
+            visibleItemIds.length > 0 ||
+            visibleGroupIds.length > 0)),
       isInitialized: isSectionInitialized,
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
@@ -174,7 +206,10 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       visibleItemIds,
       visibleGroupIds,
     };
-    sectionInstanceMap[sectionBlueprint.id] = navSectionInstance;
+    sectionInstanceMap[sectionBlueprint.id] = sectionInstance;
+    if (sectionInstance.id === 'Helm Charts') {
+      console.log({sectionInstance});
+    }
   });
 
   const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(
