@@ -113,7 +113,7 @@ const NotificationsDrawer = () => {
           </StyledDiv>
         ))
       ) : (
-        <StyledNoNotificationsContainer>There is any notifications to show</StyledNoNotificationsContainer>
+        <StyledNoNotificationsContainer>There is no notifications to show</StyledNoNotificationsContainer>
       )}
     </Drawer>
   );
