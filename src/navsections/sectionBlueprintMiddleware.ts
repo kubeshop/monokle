@@ -2,7 +2,7 @@ import {shallowEqual} from 'react-redux';
 import {Middleware} from 'redux';
 import {updateNavigatorState} from '@redux/reducers/navigator';
 import {ItemInstance, NavigatorState, SectionInstance} from '@models/navigator';
-import {RootState} from '@redux/store';
+import {AppDispatch, RootState} from '@redux/store';
 import asyncLib from 'async';
 import sectionBlueprintMap from './sectionBlueprintMap';
 
@@ -29,16 +29,7 @@ const hasNavigatorStateChanged = (navigatorState: NavigatorState, newNavigatorSt
   );
 };
 
-// const processSectionBlueprints = () => {};
-
-export const sectionBlueprintMiddleware: Middleware = store => next => action => {
-  next(action);
-  const state: RootState = store.getState();
-  if (action?.type === updateNavigatorState.type) {
-    console.log('Not processing.');
-    return;
-  }
-
+const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   const sectionInstanceMap: Record<string, SectionInstance> = {};
   const itemInstanceMap: Record<string, ItemInstance> = {};
 
@@ -46,7 +37,7 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
   const scopeKeysBySectionId: Record<string, string[]> = {};
   const isChangedByScopeKey: Record<string, boolean> = {};
 
-  asyncLib.each(sectionBlueprintMap.getAll(), sectionBlueprint => {
+  asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
     const sectionScope = sectionBlueprint.getScope(state);
     const sectionScopeKeys: string[] = [];
     Object.entries(sectionScope).forEach(([key, value]) => {
@@ -69,7 +60,7 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
     return;
   }
 
-  asyncLib.each(sectionBlueprintMap.getAll(), sectionBlueprint => {
+  asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
     const sectionScopeKeys = scopeKeysBySectionId[sectionBlueprint.id];
     const hasSectionScopeChanged = Object.entries(isChangedByScopeKey).some(
       ([key, value]) => sectionScopeKeys.includes(key) && value === true
@@ -169,6 +160,16 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
   };
 
   if (hasNavigatorStateChanged(state.navigator, newNavigatorState)) {
-    store.dispatch(updateNavigatorState(newNavigatorState));
+    dispatch(updateNavigatorState(newNavigatorState));
   }
+};
+
+export const sectionBlueprintMiddleware: Middleware = store => next => action => {
+  next(action);
+  if (action?.type === updateNavigatorState.type) {
+    console.log('Not processing.');
+    return;
+  }
+  const state: RootState = store.getState();
+  processSectionBlueprints(state, store.dispatch);
 };
