@@ -3,6 +3,7 @@ import {Middleware} from 'redux';
 import {updateNavigatorState} from '@redux/reducers/navigator';
 import {ItemInstance, NavigatorState, SectionInstance} from '@models/navigator';
 import {RootState} from '@redux/store';
+import asyncLib from 'async';
 import sectionBlueprintMap from './sectionBlueprintMap';
 
 const fullScopeCache: Record<string, any> = {};
@@ -28,6 +29,8 @@ const hasNavigatorStateChanged = (navigatorState: NavigatorState, newNavigatorSt
   );
 };
 
+// const processSectionBlueprints = () => {};
+
 export const sectionBlueprintMiddleware: Middleware = store => next => action => {
   next(action);
   const state: RootState = store.getState();
@@ -43,7 +46,7 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
   const scopeKeysBySectionId: Record<string, string[]> = {};
   const isChangedByScopeKey: Record<string, boolean> = {};
 
-  sectionBlueprintMap.getAll().forEach(sectionBlueprint => {
+  asyncLib.each(sectionBlueprintMap.getAll(), sectionBlueprint => {
     const sectionScope = sectionBlueprint.getScope(state);
     const sectionScopeKeys: string[] = [];
     Object.entries(sectionScope).forEach(([key, value]) => {
@@ -66,7 +69,7 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
     return;
   }
 
-  sectionBlueprintMap.getAll().forEach(sectionBlueprint => {
+  asyncLib.each(sectionBlueprintMap.getAll(), sectionBlueprint => {
     const sectionScopeKeys = scopeKeysBySectionId[sectionBlueprint.id];
     const hasSectionScopeChanged = Object.entries(isChangedByScopeKey).some(
       ([key, value]) => sectionScopeKeys.includes(key) && value === true
