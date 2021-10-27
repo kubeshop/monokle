@@ -1,3 +1,4 @@
+import {KustomizeCommandType} from '@redux/services/kustomize';
 import {KubeConfig} from './kubeConfig';
 
 export enum Themes {
@@ -43,6 +44,7 @@ interface AppConfig {
     filterObjectsOnSelection: boolean;
     autoZoomGraphOnSelection: boolean;
     helmPreviewMode: 'template' | 'install';
+    kustomizeCommand: KustomizeCommandType;
     loadLastFolderOnStartup: boolean;
   };
   recentFolders: string[];

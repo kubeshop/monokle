@@ -4,7 +4,7 @@ import {applyResource} from '@redux/thunks/applyResource';
 import {ThunkDispatch} from 'redux-thunk';
 import {Modal} from 'antd';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationResource, KustomizeCommandType} from '@redux/services/kustomize';
 
 export function applyResourceWithConfirm(
   selectedResource: K8sResource,
@@ -15,6 +15,7 @@ export function applyResourceWithConfirm(
   options?: {
     isClusterPreview?: boolean;
     shouldPerformDiff?: boolean;
+    kustomizeCommand?: KustomizeCommandType;
   }
 ) {
   const title = isKustomizationResource(selectedResource)

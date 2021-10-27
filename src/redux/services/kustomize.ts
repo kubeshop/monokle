@@ -3,7 +3,10 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
 import {getResourcesForPath} from '@redux/services/fileEntry';
+import {KUSTOMIZATION_KIND} from '@constants/constants';
 import {createFileRef, getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
+
+export type KustomizeCommandType = 'kubectl' | 'kustomize';
 
 /**
  * Creates kustomization refs between a kustomization and its resources
@@ -31,7 +34,7 @@ function linkParentKustomization(
  */
 
 export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === 'Kustomization';
+  return r && r.kind === KUSTOMIZATION_KIND;
 }
 
 /**
@@ -113,7 +116,7 @@ function extractPatches(
  */
 
 export function processKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
-  getK8sResources(resourceMap, 'Kustomization')
+  getK8sResources(resourceMap, KUSTOMIZATION_KIND)
     .filter(k => k.content.resources || k.content.bases || k.content.patchesStrategicMerge || k.content.patchesJson6902)
     .forEach(kustomization => {
       let resources = getScalarNodes(kustomization, 'resources') || [];
@@ -154,7 +157,7 @@ export function getKustomizationRefs(
           if (target) {
             linkedResourceIds.push(r.target.resourceId);
 
-            if (target.kind === 'Kustomization' && r.type === ResourceRefType.Outgoing) {
+            if (target.kind === KUSTOMIZATION_KIND && r.type === ResourceRefType.Outgoing) {
               linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target.resourceId));
             }
           }

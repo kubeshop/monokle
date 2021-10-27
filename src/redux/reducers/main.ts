@@ -136,6 +136,27 @@ export const mainSlice = createSlice({
       }
     },
     /**
+     * called by the file monitor when multiple paths are added to the file system
+     */
+    multiplePathsAdded: (
+      state: Draft<AppState>,
+      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
+    ) => {
+      let filePaths: Array<string> = action.payload.paths;
+      const appConfig = action.payload.appConfig;
+      filePaths.forEach((filePath: string) => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+        if (fileEntry) {
+          if (getFileStats(filePath)?.isDirectory() === false) {
+            log.info(`added file ${filePath} already exists - updating`);
+            reloadFile(filePath, fileEntry, state);
+          }
+        } else {
+          addPath(filePath, state, appConfig);
+        }
+      });
+    },
+    /**
      * called by the file monitor when a file is changed in the file system
      */
     fileChanged: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
@@ -149,6 +170,24 @@ export const mainSlice = createSlice({
       }
     },
     /**
+     * called by the file monitor when multiple files are changed in the file system
+     */
+    multipleFilesChanged: (
+      state: Draft<AppState>,
+      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
+    ) => {
+      let filePaths = action.payload.paths;
+      const appConfig = action.payload.appConfig;
+      filePaths.forEach((filePath: string) => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+        if (fileEntry) {
+          reloadFile(filePath, fileEntry, state);
+        } else {
+          addPath(filePath, state, appConfig);
+        }
+      });
+    },
+    /**
      * called by the file monitor when a path is removed from the file system
      */
     pathRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
@@ -159,6 +198,20 @@ export const mainSlice = createSlice({
       } else {
         log.warn(`removed file ${filePath} not known - ignoring..`);
       }
+    },
+    /**
+     * called by the file monitor when a path is removed from the file system
+     */
+    multiplePathsRemoved: (state: Draft<AppState>, action: PayloadAction<Array<string>>) => {
+      let filePaths: Array<string> = action.payload;
+      filePaths.forEach((filePath: string) => {
+        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+        if (fileEntry) {
+          removePath(filePath, state, fileEntry);
+        } else {
+          log.warn(`removed file ${filePath} not known - ignoring..`);
+        }
+      });
     },
     /**
      * updates the content of the specified path to the specified value
@@ -531,8 +584,11 @@ export const {
   updateResource,
   updateFileEntry,
   pathAdded,
+  multiplePathsAdded,
   fileChanged,
+  multipleFilesChanged,
   pathRemoved,
+  multiplePathsRemoved,
   selectHelmValuesFile,
   clearPreview,
   clearPreviewAndSelectionHistory,

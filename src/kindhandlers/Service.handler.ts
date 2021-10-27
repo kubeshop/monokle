@@ -36,6 +36,16 @@ const ServiceHandler: ResourceKindHandler = {
     await k8sCoreV1Api.deleteNamespacedService(name, namespace || 'default');
   },
   outgoingRefMappers: [
+    {
+      source: {
+        pathParts: ['spec', 'selector'],
+      },
+      target: {
+        kind: 'Pod',
+        pathParts: ['metadata', 'labels'],
+      },
+      matchPairs: true,
+    },
     createSelectorOutgoingRefMappers('DaemonSet'),
     createSelectorOutgoingRefMappers('Deployment'),
     createSelectorOutgoingRefMappers('Job'),

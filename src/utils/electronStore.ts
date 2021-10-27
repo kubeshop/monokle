@@ -50,6 +50,9 @@ const schema = {
           helmPreviewMode: {
             type: 'string',
           },
+          kustomizeCommand: {
+            type: 'string',
+          },
           loadLastFolderOnStartup: {
             type: 'boolean',
           },

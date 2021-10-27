@@ -9,6 +9,8 @@ import {alertSlice} from './reducers/alert';
 import {logsSlice} from './reducers/logs';
 import {uiSlice} from './reducers/ui';
 
+let lastFocusedWindow: BrowserWindow | null = null;
+
 const forwardToRenderer = () => (next: any) => (action: any) => {
   if (!isFSA(action)) return next(action);
   if (action.meta && action.meta.scope === 'local') return next(action);
@@ -21,7 +23,13 @@ const forwardToRenderer = () => (next: any) => (action: any) => {
     },
   };
 
-  BrowserWindow.getFocusedWindow()?.webContents.send('redux-action', rendererAction);
+  if (BrowserWindow.getFocusedWindow()) {
+    lastFocusedWindow = BrowserWindow.getFocusedWindow();
+  }
+
+  if (lastFocusedWindow) {
+    lastFocusedWindow.webContents.send('redux-action', rendererAction);
+  }
 
   return next(action);
 };

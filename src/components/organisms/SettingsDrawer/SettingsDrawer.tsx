@@ -17,6 +17,7 @@ import {
   updateHelmPreviewMode,
   updateLoadLastFolderOnStartup,
   updateFolderReadsMaxDepth,
+  updateKustomizeCommand,
 } from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
 import {
@@ -25,6 +26,7 @@ import {
   AutoLoadLastFolderTooltip,
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
+  KustomizeCommandTooltip,
 } from '@constants/tooltips';
 import {ipcRenderer} from 'electron';
 import {useDebounce} from 'react-use';
@@ -98,6 +100,12 @@ const SettingsDrawer = () => {
   const onChangeHelmPreviewMode = (selectedHelmPreviewMode: any) => {
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
       dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
+    }
+  };
+
+  const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
+    if (selectedKustomizeCommand === 'kubectl' || selectedKustomizeCommand === 'kustomize') {
+      dispatch(updateKustomizeCommand(selectedKustomizeCommand));
     }
   };
 
@@ -177,6 +185,15 @@ const SettingsDrawer = () => {
           <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
             <Select.Option value="template">Template</Select.Option>
             <Select.Option value="install">Install</Select.Option>
+          </StyledSelect>
+        </Tooltip>
+      </StyledDiv>
+      <StyledDiv>
+        <StyledSpan>Kustomize Command</StyledSpan>
+        <Tooltip title={KustomizeCommandTooltip}>
+          <StyledSelect value={appConfig.settings.kustomizeCommand} onChange={onChangeKustomizeCommand}>
+            <Select.Option value="kubectl">Use kubectl</Select.Option>
+            <Select.Option value="kustomize">Use kustomize</Select.Option>
           </StyledSelect>
         </Tooltip>
       </StyledDiv>

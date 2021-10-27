@@ -3,6 +3,7 @@ import initialState from '@redux/initialState';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {getK8sResources} from '@redux/services/resource';
 import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
+import {KUSTOMIZATION_KIND} from '@constants/constants';
 import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
 test('create-file-entry', () => {
@@ -29,7 +30,7 @@ test('read-files', () => {
 
   expect(files.length).toBe(7);
   expect(Object.values(fileMap).length).toBe(27);
-  expect(getK8sResources(resourceMap, 'Kustomization').length).toBe(5);
+  expect(getK8sResources(resourceMap, KUSTOMIZATION_KIND).length).toBe(5);
   expect(getResourcesForPath(createSafePath('/base/argo-rollouts-aggregate-roles.yaml'), resourceMap).length).toBe(3);
 });
 
