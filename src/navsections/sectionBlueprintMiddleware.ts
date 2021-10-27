@@ -40,6 +40,13 @@ const computeSectionVisibility = (
       const childSectionInstance = sectionInstanceMap[childSectionId];
       const isChildSectionVisible = computeSectionVisibility(childSectionInstance, sectionInstanceMap);
       childSectionVisibilityMap[childSectionId] = isChildSectionVisible;
+      if (isChildSectionVisible) {
+        if (sectionInstance.visibleChildSectionIds) {
+          sectionInstance.visibleChildSectionIds.push(childSectionId);
+        } else {
+          sectionInstance.visibleChildSectionIds = [childSectionId];
+        }
+      }
     });
     sectionInstance.isVisible =
       sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
@@ -123,14 +130,16 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       sectionBuilder?.isInitialized ? sectionBuilder.isInitialized(sectionScope, rawItems) : true
     );
     const sectionGroups = sectionBuilder?.getGroups ? sectionBuilder.getGroups(sectionScope) : [];
+    const sectionInstanceGroups = sectionGroups.map(g => ({
+      ...g,
+      visibleItemIds: g.itemIds.filter(itemId => itemInstanceMap[itemId].isVisible === true),
+    }));
     const visibleItemIds = itemInstances?.filter(i => i.isVisible === true).map(i => i.id) || [];
-    const visibleGroupIds = sectionGroups
-      .filter(g => g.itemIds.some(itemId => itemInstanceMap[itemId].isVisible === true))
-      .map(g => g.id);
+    const visibleGroupIds = sectionInstanceGroups.filter(g => g.visibleItemIds.length > 0).map(g => g.id);
     const navSectionInstance: SectionInstance = {
       id: sectionBlueprint.id,
       itemIds: itemInstances?.map(i => i.id) || [],
-      groups: sectionGroups,
+      groups: sectionInstanceGroups,
       isLoading: Boolean(sectionBuilder?.isLoading ? sectionBuilder.isLoading(sectionScope, rawItems) : false),
       isVisible:
         Boolean(sectionBuilder?.isVisible && sectionBuilder.isVisible(sectionScope, rawItems)) ||

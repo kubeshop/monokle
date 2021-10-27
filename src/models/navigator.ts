@@ -48,7 +48,7 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
   customization?: ItemCustomization;
 }
 
-export interface ItemGroup {
+export interface ItemGroupBlueprint {
   id: string;
   name: string;
   itemIds: string[];
@@ -62,12 +62,16 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   childSectionIds?: string[];
   builder?: {
     getRawItems?: (scope: ScopeType) => RawItemType[];
-    getGroups?: (scope: ScopeType) => ItemGroup[];
+    getGroups?: (scope: ScopeType) => ItemGroupBlueprint[];
     isLoading?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
   };
   itemBlueprint?: ItemBlueprint<RawItemType, ScopeType>;
+}
+
+export interface ItemGroupInstance extends ItemGroupBlueprint {
+  visibleItemIds: string[];
 }
 
 export interface ItemInstance {
@@ -84,9 +88,10 @@ export interface ItemInstance {
 export interface SectionInstance {
   id: string;
   itemIds: string[];
-  groups: ItemGroup[];
+  groups: ItemGroupInstance[];
   visibleItemIds: string[];
   visibleGroupIds: string[];
+  visibleChildSectionIds?: string[];
   isLoading: boolean;
   isVisible: boolean;
   isInitialized: boolean;

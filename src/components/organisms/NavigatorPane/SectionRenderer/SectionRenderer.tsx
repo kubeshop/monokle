@@ -1,7 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
-import {ItemGroup, SectionBlueprint, SectionInstance} from '@models/navigator';
+import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navigator';
 import {useAppSelector} from '@redux/hooks';
-// import {shallowEqual} from 'react-redux';
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
 import ItemRenderer from './ItemRenderer';
 import NavSectionHeader from './SectionHeader';
@@ -22,74 +21,46 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
     state => state.navigator.sectionInstanceMap[sectionId]
   );
 
-  const itemGroupById: Record<string, ItemGroup> = useMemo(() => {
+  const groupInstanceById: Record<string, ItemGroupInstance> = useMemo(() => {
     return sectionInstance?.groups
-      .map<[string, ItemGroup]>(g => [g.id, g])
-      .reduce<Record<string, ItemGroup>>((acc, [k, v]) => {
+      .map<[string, ItemGroupInstance]>(g => [g.id, g])
+      .reduce<Record<string, ItemGroupInstance>>((acc, [k, v]) => {
         acc[k] = v;
         return acc;
       }, {});
   }, [sectionInstance?.groups]);
 
-  // console.log({sectionInstance});
+  const lastVisibleChildSectionId = useMemo(() => {
+    if (!sectionInstance?.visibleChildSectionIds) {
+      return undefined;
+    }
+    return sectionInstance.visibleChildSectionIds
+      ? sectionInstance.visibleChildSectionIds[sectionInstance.visibleChildSectionIds.length - 1]
+      : undefined;
+  }, [sectionInstance?.visibleChildSectionIds]);
 
-  // const sectionItemInstanceMap = useAppSelector(
-  //   state =>
-  //     Object.fromEntries(
-  //       Object.values(state.navigator.itemInstanceMap)
-  //         .filter(i => sectionInstance?.itemIds.includes(i.id))
-  //         .map(i => [i.id, i])
-  //     ),
-  //   shallowEqual
-  // );
-
-  // const visibleItemInstances = useMemo(() => {
-  //   return Object.values(sectionItemInstanceMap).filter(i => i.isVisible === true);
-  // }, [sectionItemInstanceMap]);
-
-  // const visibleGroups = useMemo(() => {
-  //   return sectionInstance?.groups.filter(g => sectionInstance?.visibleGroupIds.includes(g.id));
-  // }, [sectionInstance?.groups, sectionInstance?.visibleGroupIds]);
-
-  // const isLastVisibleItemInstance = useCallback(
-  //   (itemId: string) => {
-  //     const lastVisibleItem = visibleItemInstances[visibleItemInstances.length - 1];
-  //     return Boolean(lastVisibleItem && lastVisibleItem.id === itemId);
-  //   },
-  //   [visibleItemInstances]
-  // );
-
-  // const isLastVisibleItemInstanceInGroup = useCallback(
-  //   (groupId: string, itemId: string) => {
-  //     const isGroupVisible = sectionInstance?.visibleGroupIds.some(gid => gid === groupId);
-  //     if (!isGroupVisible) {
-  //       return false;
-  //     }
-  //     const group = sectionInstance?.groups.find(g => g.id === groupId);
-  //     if (!group) {
-  //       return false;
-  //     }
-  //     const groupVisibleItems = group.itemIds.map(id => sectionItemInstanceMap[id]).filter(i => i.isVisible);
-  //     const lastVisibleItem = groupVisibleItems[groupVisibleItems.length - 1];
-  //     return Boolean(lastVisibleItem && lastVisibleItem.id === itemId);
-  //   },
-  //   [sectionInstance?.groups, sectionItemInstanceMap, sectionInstance?.visibleGroupIds]
-  // );
-
-  const isGroupVisible = useCallback(
-    (groupId: string) => {
-      return sectionInstance?.visibleGroupIds.some(gid => gid === groupId);
+  const isLastVisibleItemId = useCallback(
+    (itemId: string) => {
+      if (!sectionInstance?.visibleItemIds) {
+        return false;
+      }
+      const lastVisibleItemId = sectionInstance.visibleItemIds[sectionInstance.visibleItemIds.length - 1];
+      return itemId === lastVisibleItemId;
     },
-    [sectionInstance?.visibleGroupIds]
+    [sectionInstance?.visibleItemIds]
   );
 
-  // const isLastVisibleSection = useCallback(
-  //   (subsectionName: string) => {
-  //     const lastVisibleSection = visibleSubsections ? visibleSubsections[visibleSubsections.length - 1] : undefined;
-  //     return Boolean(lastVisibleSection && lastVisibleSection.name === subsectionName);
-  //   },
-  //   [visibleSubsections]
-  // );
+  const isLastVisibleItemIdInGroup = useCallback(
+    (groupId: string, itemId: string) => {
+      const groupInstance = groupInstanceById[groupId];
+      if (!groupInstance) {
+        return false;
+      }
+      const lastVisibleItemIdInGroup = groupInstance.visibleItemIds[groupInstance.visibleItemIds.length - 1];
+      return itemId === lastVisibleItemIdInGroup;
+    },
+    [groupInstanceById]
+  );
 
   if (!sectionInstance?.isVisible) {
     return null;
@@ -126,49 +97,31 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
             itemId={itemId}
             blueprint={itemBlueprint}
             level={level + 1}
-            isLastItem={false}
+            isLastItem={isLastVisibleItemId(itemId)}
           />
         ))}
       {sectionInstance?.isVisible &&
         itemBlueprint &&
-        itemGroupById &&
+        groupInstanceById &&
         sectionInstance.visibleGroupIds.map(groupId => {
-          const group = itemGroupById[groupId];
+          const group = groupInstanceById[groupId];
           return (
             <React.Fragment key={group.id}>
               <S.NameContainer style={{color: 'red'}}>
                 <S.Name level={level + 1}>{group.name}</S.Name>
               </S.NameContainer>
-              {group.itemIds.map(itemId => (
+              {group.visibleItemIds.map(itemId => (
                 <ItemRenderer<ItemType, ScopeType>
                   key={itemId}
                   itemId={itemId}
                   blueprint={itemBlueprint}
                   level={level + 2}
-                  isLastItem={false} // isLastVisibleItemInstanceInGroup(group.name, itemInstance.id)
+                  isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
                 />
               ))}
             </React.Fragment>
           );
         })}
-      {/* {sectionInstance?.isVisible && // !isCollapsed &&
-        itemBlueprint &&
-        sectionInstance.visibleGroupIds.map(groupId => (
-          <React.Fragment key={group.id}>
-            <S.NameContainer style={{color: 'red'}}>
-              <S.Name level={level + 1}>{group.name}</S.Name>
-            </S.NameContainer>
-            {group.itemIds.map(itemId => (
-              <ItemRenderer<ItemType, ScopeType>
-                key={itemId}
-                itemId={itemId}
-                blueprint={itemBlueprint}
-                level={level + 2}
-                isLastItem={false} // isLastVisibleItemInstanceInGroup(group.name, itemInstance.id)
-              />
-            ))}
-          </React.Fragment>
-        ))} */}
       {sectionBlueprint.childSectionIds &&
         sectionBlueprint.childSectionIds
           .map(childSectionId => navSectionMap.getById(childSectionId))
@@ -177,7 +130,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
               key={child.name}
               sectionBlueprint={child}
               level={level + 1}
-              isLastSection={false} // isLastVisibleSection(child.name)
+              isLastSection={child.id === lastVisibleChildSectionId}
             />
           ))}
     </>
