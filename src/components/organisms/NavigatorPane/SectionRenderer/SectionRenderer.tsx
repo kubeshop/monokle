@@ -146,7 +146,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
         isSectionInitialized={Boolean(sectionInstance?.isInitialized)}
         isSectionVisible={Boolean(sectionInstance?.isVisible)}
         level={level}
-        itemsLength={sectionInstance?.visibleItemIds.length || 0}
+        itemsLength={sectionInstance?.visibleDescendantItemsCount || 0}
         expandSection={expandSection}
         collapseSection={collapseSection}
       />

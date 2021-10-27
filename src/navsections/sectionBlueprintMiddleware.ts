@@ -38,16 +38,21 @@ const hasNavigatorInstanceStateChanged = (
 function computeSectionVisibility(
   sectionInstance: SectionInstance,
   sectionInstanceMap: Record<string, SectionInstance>
-): [boolean, string[] | undefined] {
+): [boolean, string[] | undefined, number | undefined] {
   const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
+  let visibleDescendantItemsCount = 0;
+
   if (sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0) {
     const childSectionVisibilityMap: Record<string, boolean> = {};
+
     sectionBlueprint.childSectionIds.forEach(childSectionId => {
       const childSectionInstance = sectionInstanceMap[childSectionId];
-      const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection] = computeSectionVisibility(
-        childSectionInstance,
-        sectionInstanceMap
-      );
+      const [
+        isChildSectionVisible,
+        visibleDescendantSectionIdsOfChildSection,
+        visibleDescendantItemsCountOfChildSection,
+      ] = computeSectionVisibility(childSectionInstance, sectionInstanceMap);
+
       if (visibleDescendantSectionIdsOfChildSection) {
         if (sectionInstance.visibleDescendantSectionIds) {
           sectionInstance.visibleDescendantSectionIds.push(...visibleDescendantSectionIdsOfChildSection);
@@ -55,6 +60,11 @@ function computeSectionVisibility(
           sectionInstance.visibleDescendantSectionIds = [...visibleDescendantSectionIdsOfChildSection];
         }
       }
+
+      if (visibleDescendantItemsCountOfChildSection) {
+        visibleDescendantItemsCount += visibleDescendantItemsCountOfChildSection;
+      }
+
       childSectionVisibilityMap[childSectionId] = isChildSectionVisible;
       if (isChildSectionVisible) {
         if (sectionInstance.visibleChildSectionIds) {
@@ -64,6 +74,7 @@ function computeSectionVisibility(
         }
       }
     });
+
     if (sectionInstance.visibleChildSectionIds) {
       if (sectionInstance.visibleDescendantSectionIds) {
         sectionInstance.visibleDescendantSectionIds.push(...sectionInstance.visibleChildSectionIds);
@@ -72,10 +83,21 @@ function computeSectionVisibility(
         sectionInstance.visibleDescendantSectionIds = [...sectionInstance.visibleChildSectionIds];
       }
     }
+
     sectionInstance.isVisible =
       sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
   }
-  return [sectionInstance.isVisible, sectionInstance.visibleDescendantSectionIds];
+
+  if (sectionInstance.visibleItemIds) {
+    visibleDescendantItemsCount += sectionInstance.visibleItemIds.length;
+  }
+
+  sectionInstance.visibleDescendantItemsCount = visibleDescendantItemsCount;
+  return [
+    sectionInstance.isVisible,
+    sectionInstance.visibleDescendantSectionIds,
+    sectionInstance.visibleDescendantItemsCount,
+  ];
 }
 /**
  * Build the section and item instances based on the registered section blueprints
