@@ -2,6 +2,7 @@ import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {selectK8sResource} from '@redux/reducers/main';
 import {SectionBlueprint} from '@models/navigator';
+import {KUSTOMIZATION_KIND} from '@constants/constants';
 import KustomizationQuickAction from './KustomizationQuickAction';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationSuffix from './KustomizationSuffix';
@@ -38,7 +39,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
   builder: {
     getRawItems: scope => {
       return Object.values(scope.resourceMap)
-        .filter(i => i.kind === 'Kustomization')
+        .filter(i => i.kind === KUSTOMIZATION_KIND)
         .sort((a, b) => a.name.localeCompare(b.name));
     },
     isLoading: scope => {
