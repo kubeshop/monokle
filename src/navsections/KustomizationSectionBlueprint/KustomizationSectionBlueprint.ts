@@ -76,7 +76,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     customization: {
       prefix: {component: KustomizationPrefix},
       suffix: {component: KustomizationSuffix},
-      quickAction: {component: KustomizationQuickAction},
+      quickAction: {component: KustomizationQuickAction, options: {isVisibleOnHover: true}},
     },
   },
 };

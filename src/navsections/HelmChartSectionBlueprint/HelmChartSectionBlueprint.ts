@@ -72,6 +72,7 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
     customization: {
       quickAction: {
         component: HelmChartQuickAction,
+        options: {isVisibleOnHover: true},
       },
     },
   },

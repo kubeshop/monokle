@@ -118,7 +118,7 @@ export function makeResourceKindNavSection(
       customization: {
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
-        contextMenu: {component: ResourceKindContextMenu},
+        contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
       },
     },
   };
