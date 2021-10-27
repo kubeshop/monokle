@@ -2,9 +2,9 @@ import React, {useCallback, useContext} from 'react';
 import AppContext from '@src/AppContext';
 import {K8sResource} from '@models/k8sresource';
 import {HelmValuesFile} from '@models/helm';
-import KustomizationNavSection, {KustomizationNavSectionScope} from '@src/navsections/KustomizationNavSection';
-import HelmChartNavSection, {HelmChartNavSectionScope} from '@src/navsections/HelmChartNavSection';
-import K8sResourceNavSection, {K8sResourceNavSectionScope} from '@src/navsections/K8sResourceNavSection';
+import KustomizationNavSection, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
+import HelmChartNavSection, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
+import K8sResourceNavSection, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
 import {Popover} from 'antd';
 import {PlusOutlined, FilterOutlined} from '@ant-design/icons';
 import ResourceFilter from '@components/molecules/ResourceFilter';
@@ -14,7 +14,7 @@ import {useSelector} from 'react-redux';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {MonoPaneTitle} from '@components/atoms';
-import NavSectionRenderer from './NavSectionRenderer';
+import SectionRenderer from './SectionRenderer';
 import * as S from './NavigatorPane.styled';
 
 const NavPane = () => {
@@ -58,26 +58,20 @@ const NavPane = () => {
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>
-        <NavSectionRenderer<HelmValuesFile, HelmChartNavSectionScope>
-          navSection={HelmChartNavSection}
+        <SectionRenderer<HelmValuesFile, HelmChartScopeType>
+          sectionBlueprint={HelmChartNavSection}
           level={0}
           isLastSection={false}
-          onVisible={() => {}}
-          onHidden={() => {}}
         />
-        <NavSectionRenderer<K8sResource, KustomizationNavSectionScope>
-          navSection={KustomizationNavSection}
+        <SectionRenderer<K8sResource, KustomizationScopeType>
+          sectionBlueprint={KustomizationNavSection}
           level={0}
           isLastSection={false}
-          onVisible={() => {}}
-          onHidden={() => {}}
         />
-        <NavSectionRenderer<K8sResource, K8sResourceNavSectionScope>
-          navSection={K8sResourceNavSection}
+        <SectionRenderer<K8sResource, K8sResourceScopeType>
+          sectionBlueprint={K8sResourceNavSection}
           level={0}
           isLastSection={false}
-          onVisible={() => {}}
-          onHidden={() => {}}
         />
       </S.List>
     </>

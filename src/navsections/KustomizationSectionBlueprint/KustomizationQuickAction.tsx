@@ -1,6 +1,4 @@
 import React, {useCallback, useMemo} from 'react';
-import {NavSectionItemCustomComponentProps} from '@models/navsection';
-import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
@@ -10,44 +8,41 @@ import {
   ReloadKustomizationPreviewTooltip,
 } from '@constants/tooltips';
 import QuickActionPreview from '@components/molecules/QuickActionPreview';
+import {ItemCustomComponentProps} from '@models/navigator';
 
-const QuickAction = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
-  const {item, isItemSelected, isItemHovered} = props;
+const QuickAction = (props: ItemCustomComponentProps) => {
+  const {itemInstance} = props;
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
 
   const isItemBeingPreviewed = useMemo(
-    () => previewResourceId !== undefined && previewResourceId === item.id,
-    [previewResourceId, item]
+    () => previewResourceId !== undefined && previewResourceId === itemInstance.id,
+    [previewResourceId, itemInstance]
   );
 
   const selectAndPreviewKustomization = useCallback(() => {
-    if (item.id !== selectedResourceId) {
-      dispatch(selectK8sResource({resourceId: item.id}));
+    if (itemInstance.id !== selectedResourceId) {
+      dispatch(selectK8sResource({resourceId: itemInstance.id}));
     }
-    if (item.id !== previewResourceId) {
-      startPreview(item.id, 'kustomization', dispatch);
+    if (itemInstance.id !== previewResourceId) {
+      startPreview(itemInstance.id, 'kustomization', dispatch);
     } else {
       stopPreview(dispatch);
     }
-  }, [item, selectedResourceId, previewResourceId, dispatch]);
+  }, [itemInstance, selectedResourceId, previewResourceId, dispatch]);
 
   const reloadPreview = useCallback(() => {
-    if (item.id !== selectedResourceId) {
-      dispatch(selectK8sResource({resourceId: item.id}));
+    if (itemInstance.id !== selectedResourceId) {
+      dispatch(selectK8sResource({resourceId: itemInstance.id}));
     }
 
-    restartPreview(item.id, 'kustomization', dispatch);
-  }, [item, selectedResourceId, dispatch]);
-
-  if (!isItemHovered) {
-    return null;
-  }
+    restartPreview(itemInstance.id, 'kustomization', dispatch);
+  }, [itemInstance, selectedResourceId, dispatch]);
 
   return (
     <QuickActionPreview
-      isItemSelected={isItemSelected}
+      isItemSelected={itemInstance.isSelected}
       isItemBeingPreviewed={isItemBeingPreviewed}
       previewTooltip={KustomizationPreviewTooltip}
       reloadPreviewTooltip={ReloadKustomizationPreviewTooltip}

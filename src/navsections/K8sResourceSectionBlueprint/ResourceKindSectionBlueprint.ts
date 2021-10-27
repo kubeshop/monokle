@@ -1,10 +1,10 @@
-import {NavSection} from '@models/navsection';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {ResourceFilterType} from '@models/appstate';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {isUnsavedResource} from '@redux/services/resource';
+import {SectionBlueprint} from '@models/navigator';
 import {PREVIEW_PREFIX} from '@constants/constants';
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindPrefix from './ResourceKindPrefix';
@@ -50,7 +50,7 @@ function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterT
   return true;
 }
 
-export type ResourceKindNavSectionScope = {
+export type ResourceKindScopeType = {
   activeResources: K8sResource[];
   resourceFilter: ResourceFilterType;
   selectedResourceId: string | undefined;
@@ -59,9 +59,9 @@ export type ResourceKindNavSectionScope = {
 
 export function makeResourceKindNavSection(
   kindHandler: ResourceKindHandler
-): NavSection<K8sResource, ResourceKindNavSectionScope> {
+): SectionBlueprint<K8sResource, ResourceKindScopeType> {
   const kindSectionName = kindHandler.navigatorPath[2];
-  const navSection: NavSection<K8sResource, ResourceKindNavSectionScope> = {
+  const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
     getScope: state => {
@@ -76,42 +76,48 @@ export function makeResourceKindNavSection(
         selectedPath: state.main.selectedPath,
       };
     },
-    getItems: scope => {
-      return scope.activeResources
-        .filter(r => r.kind === kindHandler.kind)
-        .sort((a, b) => a.name.localeCompare(b.name));
-    },
-    isInitialized: scope => {
-      return scope.activeResources.length > 0;
-    },
-    itemHandler: {
-      getName: item => item.name,
-      getIdentifier: item => item.id,
-      isSelected: item => item.isSelected,
-      isHighlighted: item => item.isHighlighted,
-      isDirty: item => isUnsavedResource(item),
-      onClick: (item, scope, dispatch) => {
-        dispatch(selectK8sResource({resourceId: item.id}));
+    builder: {
+      getRawItems: scope => {
+        return scope.activeResources
+          .filter(r => r.kind === kindHandler.kind)
+          .sort((a, b) => a.name.localeCompare(b.name));
       },
-      isVisible: (item, scope) => {
-        const isPassingFilter = isResourcePassingFilter(item, scope.resourceFilter);
-        return isPassingFilter;
-      },
-      shouldScrollIntoView: (item, scope) => {
-        if (item.isHighlighted && scope.selectedPath) {
-          return true;
-        }
-        if (item.isSelected && scope.selectedResourceId) {
-          return true;
-        }
-        return false;
+      isInitialized: scope => {
+        return scope.activeResources.length > 0;
       },
     },
-    itemCustomization: {
-      Prefix: ResourceKindPrefix,
-      Suffix: ResourceKindSuffix,
-      ContextMenu: ResourceKindContextMenu,
+    itemBlueprint: {
+      getName: rawItem => rawItem.name,
+      getInstanceId: rawItem => rawItem.id,
+      builder: {
+        isSelected: rawItem => rawItem.isSelected,
+        isHighlighted: rawItem => rawItem.isHighlighted,
+        isDirty: rawItem => isUnsavedResource(rawItem),
+        isVisible: (rawItem, scope) => {
+          const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
+          return isPassingFilter;
+        },
+        shouldScrollIntoView: (rawItem, scope) => {
+          if (rawItem.isHighlighted && scope.selectedPath) {
+            return true;
+          }
+          if (rawItem.isSelected && scope.selectedResourceId) {
+            return true;
+          }
+          return false;
+        },
+      },
+      instanceHandler: {
+        onClick: (itemInstance, dispatch) => {
+          dispatch(selectK8sResource({resourceId: itemInstance.id}));
+        },
+      },
+      customization: {
+        prefix: {component: ResourceKindPrefix},
+        suffix: {component: ResourceKindSuffix},
+        contextMenu: {component: ResourceKindContextMenu},
+      },
     },
   };
-  return navSection;
+  return sectionBlueprint;
 }

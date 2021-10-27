@@ -1,12 +1,11 @@
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
-import {K8sResource} from '@models/k8sresource';
-import {NavSectionItemCustomComponentProps} from '@models/navsection';
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import Colors from '@styles/Colors';
 import {Popover} from 'antd';
 import styled from 'styled-components';
 import {showValidationErrorsModal} from '@redux/reducers/ui';
 import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
+import {ItemCustomComponentProps} from '@models/navigator';
 
 const StyledIconsContainer = styled.span`
   display: flex;
@@ -14,26 +13,28 @@ const StyledIconsContainer = styled.span`
   cursor: pointer;
 `;
 
-const Suffix = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
-  const {item, isItemDisabled} = props;
+const Suffix = (props: ItemCustomComponentProps) => {
+  const {itemInstance} = props;
   const dispatch = useAppDispatch();
 
+  const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
+
   const onClickErrorIcon = () => {
-    if (item.validation) {
-      dispatch(showValidationErrorsModal(item.validation.errors));
+    if (resource.validation) {
+      dispatch(showValidationErrorsModal(resource.validation.errors));
     }
   };
 
   return (
     <>
-      <ResourceRefsIconPopover isDisabled={isItemDisabled} resource={item} type="outgoing" />
-      {item.validation && !item.validation.isValid && (
+      <ResourceRefsIconPopover isDisabled={itemInstance.isDisabled} resource={resource} type="outgoing" />
+      {resource.validation && !resource.validation.isValid && (
         <Popover
           placement="right"
           content={
             <div>
               <span>
-                {item.validation.errors.length} error{item.validation.errors.length !== 1 && 's'}
+                {resource.validation.errors.length} error{resource.validation.errors.length !== 1 && 's'}
               </span>
             </div>
           }

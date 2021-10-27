@@ -1,49 +1,44 @@
 import React, {useCallback, useMemo} from 'react';
-import {NavSectionItemCustomComponentProps} from '@models/navsection';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {ExitHelmPreviewTooltip, HelmPreviewTooltip, ReloadHelmPreviewTooltip} from '@constants/tooltips';
 import QuickActionPreview from '@components/molecules/QuickActionPreview';
-import {HelmValuesFile} from '@models/helm';
+import {ItemCustomComponentProps} from '@models/navigator';
 
-const QuickAction = (props: NavSectionItemCustomComponentProps<HelmValuesFile>) => {
-  const {item, isItemSelected, isItemHovered} = props;
+const QuickAction = (props: ItemCustomComponentProps) => {
+  const {itemInstance} = props;
   const dispatch = useAppDispatch();
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
 
   const isItemBeingPreviewed = useMemo(
-    () => previewValuesFileId !== undefined && previewValuesFileId === item.id,
-    [previewValuesFileId, item]
+    () => previewValuesFileId !== undefined && previewValuesFileId === itemInstance.id,
+    [previewValuesFileId, itemInstance]
   );
 
   const selectAndPreviewHelmValuesFile = useCallback(() => {
-    if (item.id !== selectedValuesFileId) {
-      dispatch(selectHelmValuesFile({valuesFileId: item.id}));
+    if (itemInstance.id !== selectedValuesFileId) {
+      dispatch(selectHelmValuesFile({valuesFileId: itemInstance.id}));
     }
-    if (item.id !== previewValuesFileId) {
-      startPreview(item.id, 'helm', dispatch);
+    if (itemInstance.id !== previewValuesFileId) {
+      startPreview(itemInstance.id, 'helm', dispatch);
     } else {
       stopPreview(dispatch);
     }
-  }, [item, selectedValuesFileId, previewValuesFileId, dispatch]);
+  }, [itemInstance, selectedValuesFileId, previewValuesFileId, dispatch]);
 
   const reloadPreview = useCallback(() => {
-    if (item.id !== selectedValuesFileId) {
-      dispatch(selectHelmValuesFile({valuesFileId: item.id}));
+    if (itemInstance.id !== selectedValuesFileId) {
+      dispatch(selectHelmValuesFile({valuesFileId: itemInstance.id}));
     }
 
-    restartPreview(item.id, 'helm', dispatch);
-  }, [item, selectedValuesFileId, dispatch]);
-
-  if (!isItemHovered) {
-    return null;
-  }
+    restartPreview(itemInstance.id, 'helm', dispatch);
+  }, [itemInstance, selectedValuesFileId, dispatch]);
 
   return (
     <QuickActionPreview
-      isItemSelected={isItemSelected}
+      isItemSelected={itemInstance.isSelected}
       isItemBeingPreviewed={isItemBeingPreviewed}
       previewTooltip={HelmPreviewTooltip}
       reloadPreviewTooltip={ReloadHelmPreviewTooltip}

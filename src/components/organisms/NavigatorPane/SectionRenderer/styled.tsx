@@ -9,7 +9,7 @@ type NameContainerProps = {
   isHovered?: boolean;
   isLastSection?: boolean;
   isCollapsed?: boolean;
-  hasSubsections?: boolean;
+  hasChildSections?: boolean;
   isVisible?: boolean;
   isInitialized?: boolean;
 };
@@ -27,7 +27,7 @@ export const NameContainer = styled.li<NameContainerProps>`
     return 'visibility: visible;';
   }}
   ${props => {
-    if (props.isLastSection && (props.isCollapsed || !props.isInitialized) && !props.hasSubsections) {
+    if (props.isLastSection && (props.isCollapsed || !props.isInitialized) && !props.hasChildSections) {
       return `margin-bottom: 12px;`;
     }
   }}
