@@ -10,31 +10,31 @@ export const ItemContainer = styled.li<{
 }>`
   display: flex;
   align-items: center;
-  width: 100%
+  width: 100%;
   cursor: pointer;
   user-select: none;
-    ${props => {
-      if (props.isLastItem) {
-        return `margin-bottom: 12px;`;
-      }
-    }}
-    ${props => {
-      if (!props.isSelected && props.isHighlighted) {
-        if (props.isHovered) {
-          return `background: ${Colors.highlightGradientHover};`;
-        }
-        return `background: ${Colors.highlightGradient};`;
-      }
-      if (props.isSelected) {
-        if (props.isHovered) {
-          return `background: ${Colors.selectionGradientHover};`;
-        }
-        return `background: ${Colors.selectionGradient};`;
-      }
+  ${props => {
+    if (props.isLastItem) {
+      return `margin-bottom: 12px;`;
+    }
+  }}
+  ${props => {
+    if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {
-        return `background: ${Colors.blackPearl};`;
+        return `background: ${Colors.highlightGradientHover};`;
       }
-    }};
+      return `background: ${Colors.highlightGradient};`;
+    }
+    if (props.isSelected) {
+      if (props.isHovered) {
+        return `background: ${Colors.selectionGradientHover};`;
+      }
+      return `background: ${Colors.selectionGradient};`;
+    }
+    if (props.isHovered) {
+      return `background: ${Colors.blackPearl};`;
+    }
+  }};
   padding-left: ${props => `${props.level * 12}px;`};
 `;
 

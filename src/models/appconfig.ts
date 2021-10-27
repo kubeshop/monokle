@@ -1,6 +1,5 @@
 import {KustomizeCommandType} from '@redux/services/kustomize';
 import {KubeConfig} from './kubeConfig';
-import {ObjectNavigator} from './navigator';
 
 export enum Themes {
   Dark = 'dark',
@@ -34,8 +33,6 @@ interface AppConfig {
   fileIncludes: string[];
   /** maximum recursion depth when reading nested folders */
   folderReadsMaxDepth: number;
-  /** the currrent navigator configuration */
-  navigators: ObjectNavigator[];
   /** absolute kubeconfig path */
   kubeconfigPath: string;
   /** if the startup modal is visible */

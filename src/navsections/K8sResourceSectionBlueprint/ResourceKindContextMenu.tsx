@@ -2,13 +2,12 @@ import React from 'react';
 import {Dropdown} from 'antd';
 import styled from 'styled-components';
 import {FormOutlined} from '@ant-design/icons';
-import {NavSectionItemCustomComponentProps} from '@models/navsection';
-import {K8sResource} from '@models/k8sresource';
 import ResourceActionsMenu from '@components/molecules/ResourceActionsMenu';
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {useSelector} from 'react-redux';
 import Colors from '@styles/Colors';
+import {ItemCustomComponentProps} from '@models/navigator';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   color: ${props => (props.isSelected ? Colors.blackPure : Colors.whitePure)};
@@ -20,13 +19,14 @@ const StyledActionsMenuIcon = styled(FormOutlined)`
   padding: 0 10px;
 `;
 
-const ContextMenu = (props: NavSectionItemCustomComponentProps<K8sResource>) => {
-  const {item, isItemHovered, isItemSelected} = props;
+const ContextMenu = (props: ItemCustomComponentProps) => {
+  const {itemInstance} = props;
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
 
-  if (!isItemHovered) {
+  if (!resource) {
     return null;
   }
 
@@ -34,7 +34,7 @@ const ContextMenu = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
     <Dropdown
       overlay={
         <ResourceActionsMenu
-          resource={item}
+          resource={resource}
           resourceMap={resourceMap}
           isInPreviewMode={isInPreviewMode}
           previewType={previewType}
@@ -44,7 +44,7 @@ const ContextMenu = (props: NavSectionItemCustomComponentProps<K8sResource>) => 
       placement="bottomCenter"
       overlayStyle={{width: 100}}
     >
-      <StyledActionsMenuIconContainer isSelected={isItemSelected}>
+      <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
         <StyledActionsMenuIcon />
       </StyledActionsMenuIconContainer>
     </Dropdown>

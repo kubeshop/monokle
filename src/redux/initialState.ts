@@ -4,11 +4,7 @@ import {AlertState} from '@models/alert';
 import {LogsState} from '@models/logs';
 import {UiState} from '@models/ui';
 import electronStore from '@utils/electronStore';
-import {ObjectNavigator, NavigatorSection, NavigatorSubSection} from '@models/navigator';
-import {ResourceKindHandlers} from '@src/kindhandlers';
-import navSectionNames from '@constants/navSectionNames';
-
-const NAV_K8S_RESOURCES_SECTIONS_ORDER = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
+import {NavigatorState} from '@models/navigator';
 
 const initialAppState: AppState = {
   selectionHistory: [],
@@ -33,60 +29,6 @@ const initialAppState: AppState = {
   },
 };
 
-const navigators = Object.values(
-  ResourceKindHandlers.reduce<Record<string, ObjectNavigator>>((navigatorsByName, kindHandler) => {
-    const [navigatorName, sectionName, subsectionName] = kindHandler.navigatorPath;
-    const currentNavigator: ObjectNavigator = navigatorsByName[navigatorName] || {
-      name: navigatorName,
-      sections: [],
-    };
-
-    const newSubsection: NavigatorSubSection = {
-      name: subsectionName,
-      kindSelector: kindHandler.kind,
-      apiVersionSelector: kindHandler.apiVersionMatcher,
-    };
-
-    const currentSection: NavigatorSection | undefined = currentNavigator.sections.find(s => s.name === sectionName);
-    if (currentSection) {
-      currentSection.subsections = [...currentSection.subsections, newSubsection];
-    }
-
-    let newNavigatorSections = currentNavigator.sections;
-
-    if (!currentSection) {
-      const newSection = {
-        name: sectionName,
-        subsections: [newSubsection],
-      };
-
-      const newSectionIndex = newNavigatorSections.findIndex(section => {
-        if (
-          NAV_K8S_RESOURCES_SECTIONS_ORDER.indexOf(section.name) >
-          NAV_K8S_RESOURCES_SECTIONS_ORDER.indexOf(newSection.name)
-        ) {
-          return true;
-        }
-        return false;
-      });
-
-      if (newSectionIndex === -1) {
-        newNavigatorSections.push(newSection);
-      } else {
-        newNavigatorSections.splice(newSectionIndex, 0, newSection);
-      }
-    }
-
-    return {
-      ...navigatorsByName,
-      [navigatorName]: {
-        ...currentNavigator,
-        sections: newNavigatorSections,
-      },
-    };
-  }, {})
-);
-
 const initialAppConfigState: AppConfig = {
   isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
   kubeconfigPath: '',
@@ -110,7 +52,6 @@ const initialAppConfigState: AppConfig = {
       initial: true,
     },
   },
-  navigators,
   kubeConfig: {
     contexts: [],
     currentContext: undefined,
@@ -164,10 +105,17 @@ const initialUiState: UiState = {
   resetLayout: false,
 };
 
+const initialNavigatorState: NavigatorState = {
+  sectionInstanceMap: {},
+  itemInstanceMap: {},
+  collapsedSectionIds: [],
+};
+
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
   main: initialAppState,
   logs: initialLogsState,
   ui: initialUiState,
+  navigator: initialNavigatorState,
 };
