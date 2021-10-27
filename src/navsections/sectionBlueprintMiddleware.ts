@@ -29,16 +29,26 @@ const hasNavigatorStateChanged = (navigatorState: NavigatorState, newNavigatorSt
   );
 };
 
-const computeSectionVisibility = (
+function computeSectionVisibility(
   sectionInstance: SectionInstance,
   sectionInstanceMap: Record<string, SectionInstance>
-) => {
+): [boolean, string[] | undefined] {
   const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
   if (sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0) {
     const childSectionVisibilityMap: Record<string, boolean> = {};
     sectionBlueprint.childSectionIds.forEach(childSectionId => {
       const childSectionInstance = sectionInstanceMap[childSectionId];
-      const isChildSectionVisible = computeSectionVisibility(childSectionInstance, sectionInstanceMap);
+      const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection] = computeSectionVisibility(
+        childSectionInstance,
+        sectionInstanceMap
+      );
+      if (visibleDescendantSectionIdsOfChildSection) {
+        if (sectionInstance.visibleDescendantSectionIds) {
+          sectionInstance.visibleDescendantSectionIds.push(...visibleDescendantSectionIdsOfChildSection);
+        } else {
+          sectionInstance.visibleDescendantSectionIds = [...visibleDescendantSectionIdsOfChildSection];
+        }
+      }
       childSectionVisibilityMap[childSectionId] = isChildSectionVisible;
       if (isChildSectionVisible) {
         if (sectionInstance.visibleChildSectionIds) {
@@ -48,11 +58,19 @@ const computeSectionVisibility = (
         }
       }
     });
+    if (sectionInstance.visibleChildSectionIds) {
+      if (sectionInstance.visibleDescendantSectionIds) {
+        sectionInstance.visibleDescendantSectionIds.push(...sectionInstance.visibleChildSectionIds);
+        sectionInstance.visibleDescendantSectionIds = [...new Set(sectionInstance.visibleDescendantSectionIds)];
+      } else {
+        sectionInstance.visibleDescendantSectionIds = [...sectionInstance.visibleChildSectionIds];
+      }
+    }
     sectionInstance.isVisible =
       sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
   }
-  return sectionInstance.isVisible;
-};
+  return [sectionInstance.isVisible, sectionInstance.visibleDescendantSectionIds];
+}
 
 const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   const sectionInstanceMap: Record<string, SectionInstance> = {};

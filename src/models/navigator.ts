@@ -92,6 +92,7 @@ export interface SectionInstance {
   visibleItemIds: string[];
   visibleGroupIds: string[];
   visibleChildSectionIds?: string[];
+  visibleDescendantSectionIds?: string[];
   isLoading: boolean;
   isVisible: boolean;
   isInitialized: boolean;
