@@ -30,7 +30,7 @@ import {
   toggleRightMenu,
   setLeftMenuSelection,
   setRightMenuSelection,
-  toggleNavigatorDiff,
+  openNavigatorDiff,
 } from '@redux/reducers/ui';
 import AppContext from '@src/AppContext';
 
@@ -139,8 +139,8 @@ const PaneManager = () => {
     }
   };
 
-  const openNavigatorDiff = () => {
-    dispatch(toggleNavigatorDiff());
+  const openNavigatorDiffDrawer = () => {
+    dispatch(openNavigatorDiff());
   };
 
   return (
@@ -181,7 +181,7 @@ const PaneManager = () => {
               <Button
                 size="large"
                 type="text"
-                onClick={openNavigatorDiff}
+                onClick={openNavigatorDiffDrawer}
                 icon={
                   <MenuIcon icon={SwapOutlined} active={isNavigatorDiffVisible} isSelected={isNavigatorDiffVisible} />
                 }

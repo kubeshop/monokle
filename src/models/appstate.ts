@@ -63,6 +63,11 @@ type ResourceRefsProcessingOptions = {
   shouldIgnoreOptionalUnsatisfiedRefs: boolean;
 };
 
+type ClusterToLocalResourcesMatch = {
+  clusterResourceId?: string;
+  localResourceIds?: string[];
+};
+
 interface AppState {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -105,6 +110,7 @@ interface AppState {
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
   hasNavigatorDiffLoaded: boolean;
+  clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
 }
 
 export type {
@@ -118,4 +124,5 @@ export type {
   SelectionHistoryEntry,
   PreviewType,
   ResourceRefsProcessingOptions,
+  ClusterToLocalResourcesMatch,
 };

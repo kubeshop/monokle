@@ -1,7 +1,7 @@
 import {createSelector} from 'reselect';
 import {K8sResource} from '@models/k8sresource';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 import {RootState} from './store';
 
 export const rootFolderSelector = createSelector(
@@ -20,7 +20,9 @@ export const activeResourcesSelector = createSelector(
   (state: RootState) => state.main.previewValuesFileId,
   (resources, previewResource, previewValuesFile) =>
     resources.filter(
-      r => (previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)
+      r =>
+        ((previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)) &&
+        !r.filePath.startsWith(CLUSTER_DIFF_PREFIX)
     )
 );
 
@@ -51,7 +53,8 @@ export const isInPreviewModeSelector = createSelector(
 
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
-  appState => appState.main.previewResourceId && appState.main.previewResourceId.endsWith(appState.config.kubeconfigPath)
+  appState =>
+    appState.main.previewResourceId && appState.main.previewResourceId.endsWith(appState.config.kubeconfigPath)
 );
 
 export const logsSelector = createSelector(

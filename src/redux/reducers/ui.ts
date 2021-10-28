@@ -26,8 +26,11 @@ export const uiSlice = createSlice({
       state.isSettingsOpen = !state.isSettingsOpen;
       electronStore.set('ui.isSettingsOpen', state.isSettingsOpen);
     },
-    toggleNavigatorDiff: (state: Draft<UiState>) => {
-      state.isNavigatorDiffVisible = !state.isNavigatorDiffVisible;
+    openNavigatorDiff: (state: Draft<UiState>) => {
+      state.isNavigatorDiffVisible = true;
+    },
+    closeNavigatorDiff: (state: Draft<UiState>) => {
+      state.isNavigatorDiffVisible = false;
     },
     toggleLeftMenu: (state: Draft<UiState>) => {
       state.leftMenu.isActive = !state.leftMenu.isActive;
@@ -140,7 +143,8 @@ export const uiSlice = createSlice({
 
 export const {
   toggleSettings,
-  toggleNavigatorDiff,
+  openNavigatorDiff,
+  closeNavigatorDiff,
   toggleLeftMenu,
   toggleRightMenu,
   setLeftMenuSelection,

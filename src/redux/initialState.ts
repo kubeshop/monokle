@@ -28,6 +28,7 @@ const initialAppState: AppState = {
     ),
   },
   hasNavigatorDiffLoaded: false,
+  clusterToLocalResourcesMatches: [],
 };
 
 const initialAppConfigState: AppConfig = {

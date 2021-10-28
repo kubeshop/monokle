@@ -5,7 +5,7 @@ import {selectK8sResource} from '@redux/reducers/main';
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {isUnsavedResource} from '@redux/services/resource';
 import {SectionBlueprint} from '@models/navigator';
-import {PREVIEW_PREFIX} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSuffix from './ResourceKindSuffix';
@@ -68,8 +68,9 @@ export function makeResourceKindNavSection(
       return {
         activeResources: Object.values(state.main.resourceMap).filter(
           r =>
-            (state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
-            r.filePath.startsWith(PREVIEW_PREFIX)
+            ((state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
+              r.filePath.startsWith(PREVIEW_PREFIX)) &&
+            !r.filePath.startsWith(CLUSTER_DIFF_PREFIX)
         ),
         resourceFilter: state.main.resourceFilter,
         selectedResourceId: state.main.selectedResourceId,
