@@ -26,7 +26,7 @@ const StyledNoNotificationsContainer = styled(StyledDiv)`
 const StyledMessageBodyContainer = styled(StyledDiv)`
   display: flex;
   flex-direction: column;
-  width: 100%
+  width: 100%;
 `;
 
 const StyledSpan = styled.span`

@@ -3,21 +3,9 @@ import {SectionBlueprint} from '@models/navigator';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {v4 as uuidv4} from 'uuid';
 
-type ClusterDiffScopeType = {
+export type ClusterDiffScopeType = {
   resourceMap: ResourceMapType;
   clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
-};
-
-const getResourceIdentifierFromMatch = (match: ClusterToLocalResourcesMatch, resourceMap: ResourceMapType) => {
-  if (match.clusterResourceId) {
-    const clusterResource = resourceMap[match.clusterResourceId];
-    return makeResourceNameKindNamespaceIdentifier(clusterResource);
-  }
-  if (match.localResourceIds && match.localResourceIds.length > 0) {
-    const firstLocalResource = resourceMap[match.localResourceIds[0]];
-    return makeResourceNameKindNamespaceIdentifier(firstLocalResource);
-  }
-  return uuidv4();
 };
 
 const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch, ClusterDiffScopeType> = {
@@ -39,10 +27,25 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
   },
   itemBlueprint: {
     getName(rawItem, scope) {
-      return getResourceIdentifierFromMatch(rawItem, scope.resourceMap);
+      const clusterResource = rawItem.clusterResourceId ? scope.resourceMap[rawItem.clusterResourceId] : undefined;
+      const firstLocalResource =
+        rawItem.localResourceIds && rawItem.localResourceIds.length > 0
+          ? scope.resourceMap[rawItem.localResourceIds[0]]
+          : undefined;
+      const leftName = clusterResource ? clusterResource.name : 'Resource not found in Cluster.';
+      const rightName = firstLocalResource ? firstLocalResource.name : 'Resource not found locally.';
+      return `${leftName} <---> ${rightName}`;
     },
     getInstanceId(rawItem, scope) {
-      return getResourceIdentifierFromMatch(rawItem, scope.resourceMap);
+      if (rawItem.clusterResourceId) {
+        const clusterResource = scope.resourceMap[rawItem.clusterResourceId];
+        return makeResourceNameKindNamespaceIdentifier(clusterResource);
+      }
+      if (rawItem.localResourceIds && rawItem.localResourceIds.length > 0) {
+        const firstLocalResource = scope.resourceMap[rawItem.localResourceIds[0]];
+        return makeResourceNameKindNamespaceIdentifier(firstLocalResource);
+      }
+      return uuidv4();
     },
   },
 };

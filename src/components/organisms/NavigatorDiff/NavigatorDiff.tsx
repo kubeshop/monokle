@@ -7,6 +7,8 @@ import AppContext from '@src/AppContext';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 import {HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
+import {ClusterToLocalResourcesMatch} from '@models/appstate';
+import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 import * as S from './NavigatorDiff.styled';
 
 function NavigatorDiff(props: {hideTitleBar?: boolean}) {
@@ -30,6 +32,11 @@ function NavigatorDiff(props: {hideTitleBar?: boolean}) {
         />
         <SectionRenderer<K8sResource, KustomizationScopeType>
           sectionBlueprint={KustomizationSectionBlueprint}
+          level={0}
+          isLastSection={false}
+        />
+        <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
+          sectionBlueprint={ClusterDiffSectionBlueprint}
           level={0}
           isLastSection={false}
         />
