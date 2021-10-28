@@ -12,22 +12,26 @@ export const loadContexts = createAsyncThunk<
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/loadContexts', (configPath: string, thunkAPI: any) => {
-  const stats = fs.statSync(configPath);
+>('main/loadContexts', async (configPath: string, thunkAPI: any) => {
+  try {
+    const stats = await fs.promises.stat(configPath);
 
-  if (stats.isFile()) {
-    try {
-      const kc = new k8s.KubeConfig();
-      kc.loadFromFile(configPath);
+    if (stats.isFile()) {
+      try {
+        const kc = new k8s.KubeConfig();
+        kc.loadFromFile(configPath);
 
-      const kubeConfig: KubeConfig = {
-        contexts: <Array<KubeConfigContext>>kc.contexts,
-        currentContext: kc.currentContext,
-      };
-      return kubeConfig;
-    } catch (e: any) {
-      return createRejectionWithAlert(thunkAPI, 'Loading kube config file failed', e.message);
+        const kubeConfig: KubeConfig = {
+          contexts: <Array<KubeConfigContext>>kc.contexts,
+          currentContext: kc.currentContext,
+        };
+        return kubeConfig;
+      } catch (e: any) {
+        return createRejectionWithAlert(thunkAPI, 'Loading kubeconfig file failed', e.message);
+      }
     }
+  } catch (e) {
+    //
   }
 
   return thunkAPI.reject();

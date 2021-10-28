@@ -13,6 +13,7 @@ import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {closeFolderExplorer} from '@redux/reducers/ui';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
+import {useDebounce} from 'react-use';
 
 const StyledDiv = styled.div`
   margin-bottom: 10px;
@@ -111,12 +112,15 @@ const ClustersPane = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiState]);
 
-  useEffect(() => {
-    if (kubeconfig) {
-      dispatch(loadContexts(kubeconfig));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kubeconfig]);
+  useDebounce(
+    () => {
+      if (kubeconfig) {
+        dispatch(loadContexts(kubeconfig));
+      }
+    },
+    2000,
+    [kubeconfig]
+  );
 
   return (
     <>
