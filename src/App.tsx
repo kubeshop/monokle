@@ -17,6 +17,7 @@ import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import UpdateModal from '@components/organisms/UpdateModal';
+import NavigatorDiffDrawer from '@components/organisms/NavigatorDiffDrawer';
 import AppContext from './AppContext';
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
         <Layout style={{height: mainHeight}}>
           <PageHeader />
           <SettingsDrawer />
+          <NavigatorDiffDrawer />
           <PaneManager />
           <PageFooter />
         </Layout>

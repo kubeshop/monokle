@@ -66,6 +66,7 @@ const initialLogsState: LogsState = {
 
 const initialUiState: UiState = {
   isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
+  isNavigatorDiffVisible: false,
   isFolderLoading: false,
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),

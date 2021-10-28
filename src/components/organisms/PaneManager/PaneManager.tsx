@@ -14,7 +14,7 @@ import {
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane, NavigatorDiff} from '@organisms';
+import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
 import {
@@ -25,7 +25,13 @@ import {
 } from '@constants/tooltips';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {toggleLeftMenu, toggleRightMenu, setLeftMenuSelection, setRightMenuSelection} from '@redux/reducers/ui';
+import {
+  toggleLeftMenu,
+  toggleRightMenu,
+  setLeftMenuSelection,
+  setRightMenuSelection,
+  toggleNavigatorDiff,
+} from '@redux/reducers/ui';
 import AppContext from '@src/AppContext';
 
 const StyledRow = styled(Row)`
@@ -103,6 +109,8 @@ const PaneManager = () => {
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
 
+  const isNavigatorDiffVisible = useAppSelector(state => state.ui.isNavigatorDiffVisible);
+
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
@@ -129,6 +137,10 @@ const PaneManager = () => {
         }
       }
     }
+  };
+
+  const openNavigatorDiff = () => {
+    dispatch(toggleNavigatorDiff());
   };
 
   return (
@@ -169,13 +181,9 @@ const PaneManager = () => {
               <Button
                 size="large"
                 type="text"
-                onClick={() => setActivePanes('left', 'navigator-diff')}
+                onClick={openNavigatorDiff}
                 icon={
-                  <MenuIcon
-                    icon={SwapOutlined}
-                    active={leftActive}
-                    isSelected={leftMenuSelection === 'navigator-diff'}
-                  />
+                  <MenuIcon icon={SwapOutlined} active={isNavigatorDiffVisible} isSelected={isNavigatorDiffVisible} />
                 }
               />
             </Tooltip>
@@ -219,9 +227,6 @@ const PaneManager = () => {
                   }}
                 >
                   <PluginManagerPane />
-                </div>
-                <div style={{display: leftMenuSelection === 'navigator-diff' ? 'inline' : 'none'}}>
-                  <NavigatorDiff />
                 </div>
               </>
             }

@@ -9,16 +9,19 @@ import {HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 import * as S from './NavigatorDiff.styled';
 
-function NavigatorDiff() {
+function NavigatorDiff(props: {hideTitleBar?: boolean}) {
+  const {hideTitleBar = false} = props;
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   return (
     <>
-      <S.TitleBar>
-        <MonoPaneTitle>Navigator Diff</MonoPaneTitle>
-      </S.TitleBar>
+      {!hideTitleBar && (
+        <S.TitleBar>
+          <MonoPaneTitle>Navigator Diff</MonoPaneTitle>
+        </S.TitleBar>
+      )}
       <S.List height={navigatorHeight}>
         <SectionRenderer<HelmValuesFile, HelmChartScopeType>
           sectionBlueprint={HelmChartSectionBlueprint}
