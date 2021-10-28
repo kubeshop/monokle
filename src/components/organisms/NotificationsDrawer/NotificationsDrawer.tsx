@@ -23,6 +23,12 @@ const StyledNoNotificationsContainer = styled(StyledDiv)`
   justify-content: center;
 `;
 
+const StyledMessageBodyContainer = styled(StyledDiv)`
+  display: flex;
+  flex-direction: column;
+  width: 100%
+`;
+
 const StyledSpan = styled.span`
   font-weight: 500;
   font-size: 12px;
@@ -34,9 +40,17 @@ const StyledDateSpan = styled(StyledSpan)`
   color: ${Colors.grey500};
 `;
 
+const StyledTitleSpan = styled(StyledSpan)`
+  color: ${Colors.whitePure};
+  width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+`;
+
 const StyledMessageSpan = styled(StyledSpan)`
   color: ${Colors.whitePure};
   width: 100%;
+  margin-bottom: 0px;
 `;
 
 const StyledStatusBadge = styled(Badge)`
@@ -109,7 +123,10 @@ const NotificationsDrawer = () => {
             </StyledDateSpan>
             <StyledMessageContainer>
               <StyledStatusBadge>{getNotificationBadge(notification.type)}</StyledStatusBadge>
-              <StyledMessageSpan>{notification.message}</StyledMessageSpan>
+              <StyledMessageBodyContainer>
+                <StyledTitleSpan>{notification.title}</StyledTitleSpan>
+                <StyledMessageSpan>{notification.message}</StyledMessageSpan>
+              </StyledMessageBodyContainer>
             </StyledMessageContainer>
           </StyledDiv>
         ))
