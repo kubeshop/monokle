@@ -1,7 +1,7 @@
 import log from 'loglevel';
 import {createAsyncThunk, createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 import {AppConfig} from '@models/appconfig';
 import {
   AppState,
@@ -27,6 +27,7 @@ import {AlertType} from '@models/alert';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFileStats} from '@utils/files';
 import electronStore from '@utils/electronStore';
+import {loadNavigatorDiff} from '@redux/thunks/loadNavigatorDiff';
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
@@ -505,6 +506,26 @@ export const mainSlice = createSlice({
         }
       }
     });
+
+    builder
+      .addCase(loadNavigatorDiff.pending, state => {
+        state.hasNavigatorDiffLoaded = false;
+      })
+      .addCase(loadNavigatorDiff.fulfilled, (state, action) => {
+        const clusterResourceMap = action.payload.resourceMap;
+        if (!clusterResourceMap) {
+          return;
+        }
+        // remove previous cluster diff resources
+        Object.values(state.resourceMap)
+          .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
+          .forEach(r => delete state.resourceMap[r.id]);
+        // add resources from cluster diff to the resource map
+        Object.values(clusterResourceMap).forEach(r => {
+          state.resourceMap[r.id] = r;
+        });
+        state.hasNavigatorDiffLoaded = true;
+      });
   },
 });
 

@@ -27,6 +27,7 @@ const initialAppState: AppState = {
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
     ),
   },
+  hasNavigatorDiffLoaded: false,
 };
 
 const initialAppConfigState: AppConfig = {

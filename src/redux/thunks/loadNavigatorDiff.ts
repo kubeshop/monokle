@@ -1,0 +1,76 @@
+import {createAsyncThunk} from '@reduxjs/toolkit';
+import {AppDispatch, RootState} from '@redux/store';
+import getClusterObjects from '@redux/services/getClusterObjects';
+import {extractK8sResources} from '@redux/services/resource';
+import {CLUSTER_DIFF_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+import {ResourceMapType} from '@models/appstate';
+import {AlertEnum, AlertType} from '@models/alert';
+import {createRejectionWithAlert} from './utils';
+
+export type OpenNavigatorDiffPayload = {
+  resourceMap?: ResourceMapType;
+  alert?: AlertType;
+};
+
+const NAVIGATOR_DIFF_FAILED = 'Navigator Diff Failed';
+
+export const loadNavigatorDiff = createAsyncThunk<
+  OpenNavigatorDiffPayload,
+  undefined,
+  {
+    dispatch: AppDispatch;
+    state: RootState;
+  }
+>('main/loadNavigatorDiff', async (_, thunkAPI) => {
+  const state = thunkAPI.getState();
+  if (!state.config.kubeConfig.currentContext) {
+    return createRejectionWithAlert(thunkAPI, NAVIGATOR_DIFF_FAILED, 'Could not find current kubeconfig context.');
+  }
+  try {
+    return getClusterObjects(state.config.kubeconfigPath, state.config.kubeConfig.currentContext).then(
+      results => {
+        const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+
+        if (fulfilledResults.length === 0) {
+          return createRejectionWithAlert(
+            thunkAPI,
+            NAVIGATOR_DIFF_FAILED,
+            // @ts-ignore
+            results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
+          );
+        }
+
+        // @ts-ignore
+        const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+        const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + state.config.kubeconfigPath);
+        const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
+          rm[r.id] = r;
+          return rm;
+        }, {});
+
+        if (fulfilledResults.length < results.length) {
+          const rejectedResult = results.find(r => r.status === 'rejected');
+          if (rejectedResult) {
+            // @ts-ignore
+            const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
+
+            const alert = {
+              title: 'Navigator Diff',
+              message: `Failed to get all cluster resources: ${reason}`,
+              type: AlertEnum.Warning,
+            };
+
+            return {resourceMap, alert};
+          }
+        }
+
+        return {resourceMap};
+      },
+      reason => {
+        return createRejectionWithAlert(thunkAPI, NAVIGATOR_DIFF_FAILED, reason.message);
+      }
+    );
+  } catch (e: any) {
+    return createRejectionWithAlert(thunkAPI, NAVIGATOR_DIFF_FAILED, e.message);
+  }
+});

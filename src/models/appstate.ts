@@ -104,6 +104,7 @@ interface AppState {
   diffContent?: string;
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
+  hasNavigatorDiffLoaded: boolean;
 }
 
 export type {
