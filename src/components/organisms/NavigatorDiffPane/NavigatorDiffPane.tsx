@@ -1,12 +1,24 @@
 import React, {useCallback, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNavigatorDiff} from '@redux/reducers/ui';
-import Drawer from '@components/atoms/Drawer';
-import {NavigatorDiff} from '@organisms';
+import {NavigatorDiff} from '@molecules';
 import {loadNavigatorDiff} from '@redux/thunks/loadNavigatorDiff';
 import {Skeleton} from 'antd';
+import styled from 'styled-components';
 
-function NavigatorDiffDrawer() {
+const Container = styled.div`
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 95%;
+  height: 100%;
+`;
+
+const SkeletonContainer = styled.div`
+  padding: 10px;
+`;
+
+function NavigatorDiffPane() {
   const dispatch = useAppDispatch();
 
   const hasNavigatorDiffLoaded = useAppSelector(state => state.main.navigatorDiff.hasLoaded);
@@ -30,18 +42,16 @@ function NavigatorDiffDrawer() {
   }, [hasNavigatorDiffFailed, closeDrawer]);
 
   return (
-    <Drawer
-      width="800"
-      noborder="true"
-      title="Navigator Diff"
-      placement="left"
-      closable={false}
-      onClose={closeDrawer}
-      visible={isNavigatorDiffVisible}
-    >
-      {hasNavigatorDiffLoaded ? <NavigatorDiff hideTitleBar /> : <Skeleton />}
-    </Drawer>
+    <Container>
+      {!hasNavigatorDiffLoaded ? (
+        <SkeletonContainer>
+          <Skeleton />
+        </SkeletonContainer>
+      ) : (
+        <NavigatorDiff />
+      )}
+    </Container>
   );
 }
 
-export default NavigatorDiffDrawer;
+export default NavigatorDiffPane;

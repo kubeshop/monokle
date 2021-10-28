@@ -14,7 +14,7 @@ import {
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane} from '@organisms';
+import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane, NavigatorDiffPane} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
 import {
@@ -31,6 +31,7 @@ import {
   setLeftMenuSelection,
   setRightMenuSelection,
   openNavigatorDiff,
+  closeNavigatorDiff,
 } from '@redux/reducers/ui';
 import AppContext from '@src/AppContext';
 
@@ -117,6 +118,7 @@ const PaneManager = () => {
 
   const setActivePanes = (side: string, selectedMenu: string) => {
     if (side === 'left') {
+      dispatch(closeNavigatorDiff());
       if (leftMenuSelection === selectedMenu) {
         dispatch(toggleLeftMenu());
       } else {
@@ -140,6 +142,7 @@ const PaneManager = () => {
   };
 
   const openNavigatorDiffDrawer = () => {
+    dispatch(setLeftMenuSelection(''));
     dispatch(openNavigatorDiff());
   };
 
@@ -205,47 +208,51 @@ const PaneManager = () => {
             )}
           </Space>
         </StyledColumnLeftMenu>
-        <StyledColumnPanes style={{width: contentWidth}}>
-          <SplitView
-            contentWidth={contentWidth}
-            left={
-              <>
-                <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
-                  <FileTreePane />
-                </div>
-                <div
-                  style={{
-                    display:
-                      featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
-                  }}
-                >
-                  <ClustersPane />
-                </div>
-                <div
-                  style={{
-                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
-                  }}
-                >
-                  <PluginManagerPane />
-                </div>
-              </>
-            }
-            hideLeft={!leftActive}
-            nav={<NavigatorPane />}
-            editor={<ActionsPane contentHeight={contentHeight} />}
-            right={
-              <>
-                {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                  <GraphView editorHeight={contentHeight} />
-                ) : undefined}
-                <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
-                  <LogViewer editorHeight={contentHeight} />
-                </div>
-              </>
-            }
-            hideRight={!rightActive}
-          />
-        </StyledColumnPanes>
+        {isNavigatorDiffVisible ? (
+          <NavigatorDiffPane />
+        ) : (
+          <StyledColumnPanes style={{width: contentWidth}}>
+            <SplitView
+              contentWidth={contentWidth}
+              left={
+                <>
+                  <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
+                    <FileTreePane />
+                  </div>
+                  <div
+                    style={{
+                      display:
+                        featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
+                    }}
+                  >
+                    <ClustersPane />
+                  </div>
+                  <div
+                    style={{
+                      display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                    }}
+                  >
+                    <PluginManagerPane />
+                  </div>
+                </>
+              }
+              hideLeft={!leftActive}
+              nav={<NavigatorPane />}
+              editor={<ActionsPane contentHeight={contentHeight} />}
+              right={
+                <>
+                  {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
+                    <GraphView editorHeight={contentHeight} />
+                  ) : undefined}
+                  <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
+                    <LogViewer editorHeight={contentHeight} />
+                  </div>
+                </>
+              }
+              hideRight={!rightActive}
+            />
+          </StyledColumnPanes>
+        )}
         <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
           <Space direction="vertical" style={{width: 43}}>
             <Button

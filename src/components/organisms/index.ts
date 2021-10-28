@@ -13,5 +13,5 @@ export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as NavigatorPane} from './NavigatorPane';
 export {default as PluginManagerPane} from './PluginManagerPane';
 export {default as ClustersPane} from './ClustersPane';
-export {default as NavigatorDiff} from './NavigatorDiff';
+export {default as NavigatorDiffPane} from './NavigatorDiffPane';
 export {default as NotificationsDrawer} from './NotificationsDrawer';

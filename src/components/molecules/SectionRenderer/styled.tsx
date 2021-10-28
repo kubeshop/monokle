@@ -51,7 +51,7 @@ export const NameContainer = styled.li<NameContainerProps>`
 `;
 
 export const Name = styled.span<{isSelected?: boolean; isHighlighted?: boolean; level: number}>`
-  padding: 2px 12px;
+  padding: 2px 16px;
   font-size: ${props => {
     return `${24 - 4 * props.level}px;`;
   }};

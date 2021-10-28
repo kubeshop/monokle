@@ -11,19 +11,16 @@ import {ClusterToLocalResourcesMatch} from '@models/appstate';
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 import * as S from './NavigatorDiff.styled';
 
-function NavigatorDiff(props: {hideTitleBar?: boolean}) {
-  const {hideTitleBar = false} = props;
+function NavigatorDiff() {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   return (
     <>
-      {!hideTitleBar && (
-        <S.TitleBar>
-          <MonoPaneTitle>Navigator Diff</MonoPaneTitle>
-        </S.TitleBar>
-      )}
+      <S.TitleBar>
+        <MonoPaneTitle>Navigator Diff</MonoPaneTitle>
+      </S.TitleBar>
       <S.List height={navigatorHeight}>
         <SectionRenderer<HelmValuesFile, HelmChartScopeType>
           sectionBlueprint={HelmChartSectionBlueprint}

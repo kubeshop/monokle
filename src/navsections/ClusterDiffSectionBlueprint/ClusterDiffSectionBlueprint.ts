@@ -10,8 +10,8 @@ export type ClusterDiffScopeType = {
 };
 
 const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch, ClusterDiffScopeType> = {
-  name: 'Cluster Diff',
-  id: 'Cluster Diff',
+  name: 'K8s Resources Diff',
+  id: 'K8s Resources Diff',
   getScope(state) {
     return {
       resourceMap: state.main.resourceMap,
