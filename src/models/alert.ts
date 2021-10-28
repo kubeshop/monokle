@@ -15,7 +15,10 @@ export type AlertState = {
 };
 
 export type AlertType = {
+  id?: string;
   title: string;
   message: string;
   type: AlertEnum;
+  hasSeen?: boolean;
+  createdAt?: number;
 };
