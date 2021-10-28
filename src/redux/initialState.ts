@@ -29,6 +29,7 @@ const initialAppState: AppState = {
   },
   hasNavigatorDiffLoaded: false,
   clusterToLocalResourcesMatches: [],
+  notifications: [],
 };
 
 const initialAppConfigState: AppConfig = {
@@ -69,6 +70,7 @@ const initialLogsState: LogsState = {
 const initialUiState: UiState = {
   isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
   isNavigatorDiffVisible: false,
+  isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
   isFolderLoading: false,
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),

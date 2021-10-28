@@ -12,6 +12,7 @@ import {
   PaneManager,
   NewResourceWizard,
   RenameResourceModal,
+  NotificationsDrawer,
 } from '@organisms';
 import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
@@ -33,6 +34,7 @@ const App = () => {
           <PageHeader />
           <SettingsDrawer />
           <NavigatorDiffDrawer />
+          <NotificationsDrawer />
           <PaneManager />
           <PageFooter />
         </Layout>

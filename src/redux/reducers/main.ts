@@ -29,6 +29,8 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFileStats} from '@utils/files';
 import electronStore from '@utils/electronStore';
 import {loadNavigatorDiff} from '@redux/thunks/loadNavigatorDiff';
+import {v4 as uuidv4} from 'uuid';
+
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
@@ -383,6 +385,13 @@ export const mainSlice = createSlice({
     setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = action.payload;
     },
+    addNotification: (state: Draft<AppState>, action: PayloadAction<AlertType>) => {
+      const notification: AlertType = action.payload;
+      notification.id = uuidv4();
+      notification.hasSeen = false;
+      notification.createdAt = new Date().getTime();
+      state.notifications = [notification, ...state.notifications];
+    },
   },
   extraReducers: builder => {
     builder
@@ -508,6 +517,19 @@ export const mainSlice = createSlice({
         }
       }
     });
+
+    builder.addMatcher(
+      action => true,
+      (state, action) => {
+        if (action.payload?.alert) {
+          const notification: AlertType = action.payload.alert;
+          notification.id = uuidv4();
+          notification.hasSeen = false;
+          notification.createdAt = new Date().getTime();
+          state.notifications = [notification, ...state.notifications];
+        }
+      }
+    );
 
     builder
       .addCase(loadNavigatorDiff.pending, state => {
@@ -697,5 +719,6 @@ export const {
   stopPreviewLoader,
   removeResource,
   updateResourceFilter,
+  addNotification,
 } = mainSlice.actions;
 export default mainSlice.reducer;

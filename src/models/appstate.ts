@@ -1,4 +1,5 @@
 import {HelmChart, HelmValuesFile} from '@models/helm';
+import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
 import {MonoklePlugin} from './plugin';
@@ -111,6 +112,7 @@ interface AppState {
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
   hasNavigatorDiffLoaded: boolean;
   clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
+  notifications: AlertType[];
 }
 
 export type {

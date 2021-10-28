@@ -48,6 +48,10 @@ export const uiSlice = createSlice({
       state.rightMenu.isActive = !state.rightMenu.isActive;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
     },
+    toggleNotifications: (state: Draft<UiState>) => {
+      state.isNotificationsOpen = !state.isNotificationsOpen;
+      electronStore.set('ui.isNotificationsOpen', state.isNotificationsOpen);
+    },
     setRightMenuIsActive: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.rightMenu.isActive = action.payload;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
@@ -147,6 +151,7 @@ export const {
   closeNavigatorDiff,
   toggleLeftMenu,
   toggleRightMenu,
+  toggleNotifications,
   setLeftMenuSelection,
   setRightMenuSelection,
   openNewResourceWizard,
