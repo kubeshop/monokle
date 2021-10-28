@@ -30,6 +30,7 @@ import {getFileStats} from '@utils/files';
 import electronStore from '@utils/electronStore';
 import {loadNavigatorDiff} from '@redux/thunks/loadNavigatorDiff';
 import {v4 as uuidv4} from 'uuid';
+import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -611,9 +612,6 @@ export const mainSlice = createSlice({
     });
   },
 });
-
-const makeResourceNameKindNamespaceIdentifier = (resource: K8sResource) =>
-  `${resource.name}#${resource.kind}#${resource.namespace ? resource.namespace : 'default'}`;
 
 function groupResourcesByIdentifier(
   resources: K8sResource[],

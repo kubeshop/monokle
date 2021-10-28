@@ -32,8 +32,8 @@ export interface ItemCustomization {
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
-  getName: (rawItem: RawItemType) => string;
-  getInstanceId: (rawItem: RawItemType) => string;
+  getName: (rawItem: RawItemType, scope: ScopeType) => string;
+  getInstanceId: (rawItem: RawItemType, scope: ScopeType) => string;
   builder?: {
     isSelected?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isHighlighted?: (rawItem: RawItemType, scope: ScopeType) => boolean;

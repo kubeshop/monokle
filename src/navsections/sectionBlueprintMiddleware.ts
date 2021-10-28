@@ -157,8 +157,8 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       const itemBuilder = itemBlueprint.builder;
       itemInstances = rawItems?.map(rawItem => {
         return {
-          name: itemBlueprint.getName(rawItem),
-          id: itemBlueprint.getInstanceId(rawItem),
+          name: itemBlueprint.getName(rawItem, sectionScope),
+          id: itemBlueprint.getInstanceId(rawItem, sectionScope),
           isSelected: Boolean(itemBuilder?.isSelected ? itemBuilder.isSelected(rawItem, sectionScope) : false),
           isHighlighted: Boolean(itemBuilder?.isHighlighted ? itemBuilder.isHighlighted(rawItem, sectionScope) : false),
           isVisible: Boolean(itemBuilder?.isVisible ? itemBuilder.isVisible(rawItem, sectionScope) : true),
