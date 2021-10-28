@@ -71,6 +71,8 @@ const initialLogsState: LogsState = {
   logs: [''],
 };
 
+const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
+
 const initialUiState: UiState = {
   isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
   isNavigatorDiffVisible: false,
@@ -84,8 +86,9 @@ const initialUiState: UiState = {
     resourceId: '',
   },
   leftMenu: {
-    selection: electronStore.get('ui.leftMenu.selection'),
-    isActive: electronStore.get('ui.leftMenu.isActive'),
+    selection: uiLeftMenuSelection,
+    isActive:
+      !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
   },
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),

@@ -22,6 +22,7 @@ import {
   FileExplorerTooltip,
   PluginManagerTooltip,
   NavigatorDiffTooltip,
+  NavigatorDiffDisabledTooltip,
 } from '@constants/tooltips';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
@@ -81,9 +82,9 @@ const MenuIcon = (props: {
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const style = {
-    ...customStyle,
     fontSize: 25,
     color: Colors.grey7,
+    ...customStyle,
   };
 
   if (isHovered || (active && isSelected)) {
@@ -180,13 +181,23 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NavigatorDiffTooltip} placement="right">
+            <Tooltip
+              mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
+              title={isFolderOpen ? NavigatorDiffTooltip : NavigatorDiffDisabledTooltip}
+              placement="right"
+            >
               <Button
+                disabled={!isFolderOpen}
                 size="large"
                 type="text"
                 onClick={openNavigatorDiffDrawer}
                 icon={
-                  <MenuIcon icon={SwapOutlined} active={isNavigatorDiffVisible} isSelected={isNavigatorDiffVisible} />
+                  <MenuIcon
+                    style={!isFolderOpen ? {color: Colors.grey900} : undefined}
+                    icon={SwapOutlined}
+                    active={isNavigatorDiffVisible}
+                    isSelected={isNavigatorDiffVisible}
+                  />
                 }
               />
             </Tooltip>

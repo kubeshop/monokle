@@ -1,7 +1,5 @@
 import {ClusterToLocalResourcesMatch, ResourceMapType} from '@models/appstate';
 import {SectionBlueprint} from '@models/navigator';
-import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
-import {v4 as uuidv4} from 'uuid';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 
 export type ClusterDiffScopeType = {
@@ -22,6 +20,25 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     getRawItems(scope) {
       return scope.clusterToLocalResourcesMatches;
     },
+    getGroups(scope) {
+      const matchesGroupedByResourceKind = scope.clusterToLocalResourcesMatches.reduce<
+        Record<string, ClusterToLocalResourcesMatch[]>
+      >((acc, match) => {
+        if (acc[match.resourceKind]) {
+          acc[match.resourceKind].push(match);
+        } else {
+          acc[match.resourceKind] = [match];
+        }
+        return acc;
+      }, {});
+      return Object.entries(matchesGroupedByResourceKind).map(([resourceKind, matches]) => {
+        return {
+          id: resourceKind,
+          name: resourceKind,
+          itemIds: matches.map(match => `${match.resourceName}#${match.resourceKind}#${match.resourceNamespace}`),
+        };
+      });
+    },
     isInitialized(scope) {
       return scope.clusterToLocalResourcesMatches.length > 0;
     },
@@ -37,16 +54,8 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
       const rightName = firstLocalResource ? firstLocalResource.name : 'Resource not found locally.';
       return `${leftName} <---> ${rightName}`;
     },
-    getInstanceId(rawItem, scope) {
-      if (rawItem.clusterResourceId) {
-        const clusterResource = scope.resourceMap[rawItem.clusterResourceId];
-        return makeResourceNameKindNamespaceIdentifier(clusterResource);
-      }
-      if (rawItem.localResourceIds && rawItem.localResourceIds.length > 0) {
-        const firstLocalResource = scope.resourceMap[rawItem.localResourceIds[0]];
-        return makeResourceNameKindNamespaceIdentifier(firstLocalResource);
-      }
-      return uuidv4();
+    getInstanceId(rawItem) {
+      return `${rawItem.resourceName}#${rawItem.resourceKind}#${rawItem.resourceNamespace}`;
     },
   },
 };

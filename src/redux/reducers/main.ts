@@ -566,12 +566,18 @@ export const mainSlice = createSlice({
           if (!matchingLocalResources || matchingLocalResources.length === 0) {
             clusterToLocalResourcesMatches.push({
               clusterResourceId: currentClusterResource.id,
+              resourceName: currentClusterResource.name,
+              resourceKind: currentClusterResource.kind,
+              resourceNamespace: currentClusterResource.namespace || 'default',
             });
           } else {
             const matchingLocalResourceIds = matchingLocalResources.map(r => r.id);
             clusterToLocalResourcesMatches.push({
               clusterResourceId: currentClusterResource.id,
               localResourceIds: matchingLocalResourceIds,
+              resourceName: currentClusterResource.name,
+              resourceKind: currentClusterResource.kind,
+              resourceNamespace: currentClusterResource.namespace || 'default',
             });
             localResourceIdsAlreadyMatched.push(...matchingLocalResourceIds);
           }
@@ -591,8 +597,14 @@ export const mainSlice = createSlice({
 
         localResourceIdentifiersNotMatched.forEach(identifier => {
           const currentLocalResources = groupedLocalResources[identifier];
+          if (!currentLocalResources || currentLocalResources.length === 0) {
+            return;
+          }
           clusterToLocalResourcesMatches.push({
             localResourceIds: currentLocalResources.map(r => r.id),
+            resourceName: currentLocalResources[0].name,
+            resourceKind: currentLocalResources[0].kind,
+            resourceNamespace: currentLocalResources[0].namespace || 'default',
           });
         });
 

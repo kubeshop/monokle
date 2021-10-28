@@ -6,6 +6,7 @@ export const FileExplorerTooltip = 'Show/hide File Exlorer';
 export const ClusterExplorerTooltip = 'Show/hide Cluster Preview';
 export const PluginManagerTooltip = 'Show/hide Plugin Manager';
 export const NavigatorDiffTooltip = 'Show/hide Navigator Diff';
+export const NavigatorDiffDisabledTooltip = 'Browse for a folder to enable the Navigator Diff';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterModeTooltip = `Retrieve and show resources in configured cluster (${KEY_CTRL_CMD}+I)`;
 export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';
