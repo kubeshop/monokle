@@ -9,14 +9,20 @@ import {
   ApartmentOutlined,
   CodeOutlined,
   ApiOutlined,
+  SwapOutlined,
 } from '@ant-design/icons';
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane} from '@organisms';
+import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane, NavigatorDiff} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
-import {ClusterExplorerTooltip, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
+import {
+  ClusterExplorerTooltip,
+  FileExplorerTooltip,
+  PluginManagerTooltip,
+  NavigatorDiffTooltip,
+} from '@constants/tooltips';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleLeftMenu, toggleRightMenu, setLeftMenuSelection, setRightMenuSelection} from '@redux/reducers/ui';
@@ -159,6 +165,20 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NavigatorDiffTooltip} placement="right">
+              <Button
+                size="large"
+                type="text"
+                onClick={() => setActivePanes('left', 'navigator-diff')}
+                icon={
+                  <MenuIcon
+                    icon={SwapOutlined}
+                    active={leftActive}
+                    isSelected={leftMenuSelection === 'navigator-diff'}
+                  />
+                }
+              />
+            </Tooltip>
             {featureJson.PluginManager && (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
                 <Button
@@ -199,6 +219,9 @@ const PaneManager = () => {
                   }}
                 >
                   <PluginManagerPane />
+                </div>
+                <div style={{display: leftMenuSelection === 'navigator-diff' ? 'inline' : 'none'}}>
+                  <NavigatorDiff />
                 </div>
               </>
             }

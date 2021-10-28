@@ -14,7 +14,7 @@ import {useSelector} from 'react-redux';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {MonoPaneTitle} from '@components/atoms';
-import SectionRenderer from './SectionRenderer';
+import {SectionRenderer} from '@components/molecules';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 import * as S from './NavigatorPane.styled';
 

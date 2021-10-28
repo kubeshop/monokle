@@ -57,6 +57,7 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;
     },
+    shouldBeVisibleBeforeInitialized: true,
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,

@@ -6,3 +6,4 @@ export {default as Monaco} from './Monaco';
 export {default as ResourceActionsMenu} from './ResourceActionsMenu';
 export {default as ScrollIntoView} from './ScrollIntoView';
 export {default as TitleBar} from './TitleBar';
+export {default as SectionRenderer} from './SectionRenderer';
