@@ -207,9 +207,6 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       visibleGroupIds,
     };
     sectionInstanceMap[sectionBlueprint.id] = sectionInstance;
-    if (sectionInstance.id === 'Helm Charts') {
-      console.log({sectionInstance});
-    }
   });
 
   const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(

@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
 import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
 import ItemRenderer from './ItemRenderer';
-import NavSectionHeader from './SectionHeader';
+import SectionHeader from './SectionHeader';
 import * as S from './styled';
 
 type SectionRendererProps<ItemType, ScopeType> = {
@@ -135,7 +135,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
 
   return (
     <>
-      <NavSectionHeader
+      <SectionHeader
         name={sectionName}
         isSectionSelected={Boolean(sectionInstance?.isSelected)}
         isCollapsed={isCollapsed}

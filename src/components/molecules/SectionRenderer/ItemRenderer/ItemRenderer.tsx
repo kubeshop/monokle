@@ -7,12 +7,14 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useItemCustomization} from './useItemCustomization';
 import * as S from './styled';
 
-function NavSectionItem<ItemType, ScopeType>(props: {
+export type ItemRendererProps<ItemType, ScopeType> = {
   itemId: string;
   blueprint: ItemBlueprint<ItemType, ScopeType>;
   level: number;
   isLastItem: boolean;
-}) {
+};
+
+function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
@@ -100,4 +102,4 @@ function NavSectionItem<ItemType, ScopeType>(props: {
   );
 }
 
-export default NavSectionItem;
+export default ItemRenderer;
