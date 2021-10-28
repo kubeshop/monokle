@@ -4,6 +4,8 @@ import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
 import {useAppSelector} from '@redux/hooks';
 import {ResourceRefType} from '@models/k8sresource';
 import Colors from '@styles/Colors';
+import {isInPreviewModeSelector} from '@redux/selectors';
+import {PREVIEW_PREFIX} from '@constants/constants';
 
 const Container = styled.span`
   width: 100%;
@@ -25,18 +27,27 @@ const Label = styled.span`
 
 function WarningsAndErrorsDisplay() {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
 
   const warningsCount = useMemo(() => {
-    return Object.values(resourceMap).reduce<number>((acc, resource) => {
-      return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
-    }, 0);
-  }, [resourceMap]);
+    return Object.values(resourceMap)
+      .filter(resource =>
+        isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
+      )
+      .reduce<number>((acc, resource) => {
+        return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
+      }, 0);
+  }, [resourceMap, isInPreviewMode]);
 
   const errorsCount = useMemo(() => {
-    return Object.values(resourceMap).reduce<number>((acc, resource) => {
-      return acc + (resource.validation && !resource.validation.isValid ? resource.validation.errors.length : 0);
-    }, 0);
-  }, [resourceMap]);
+    return Object.values(resourceMap)
+      .filter(resource =>
+        isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
+      )
+      .reduce<number>((acc, resource) => {
+        return acc + (resource.validation && !resource.validation.isValid ? resource.validation.errors.length : 0);
+      }, 0);
+  }, [resourceMap, isInPreviewMode]);
 
   return (
     <Container>
@@ -46,7 +57,7 @@ function WarningsAndErrorsDisplay() {
           <Label>{warningsCount}</Label>
         </WarningContainer>
       )}
-      {errorsCount && (
+      {errorsCount > 0 && (
         <ErrorContainer>
           <MonoIcon type={MonoIconTypes.Error} />
           <Label>{errorsCount}</Label>
