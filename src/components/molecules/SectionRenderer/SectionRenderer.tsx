@@ -3,7 +3,7 @@ import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navi
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
 import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
-import ItemRenderer from './ItemRenderer';
+import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
 import SectionHeader from './SectionHeader';
 import * as S from './styled';
 
@@ -11,10 +11,11 @@ type SectionRendererProps<ItemType, ScopeType> = {
   sectionBlueprint: SectionBlueprint<ItemType, ScopeType>;
   level: number;
   isLastSection: boolean;
+  itemRendererOptions?: ItemRendererOptions;
 };
 
 function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemType, ScopeType>) {
-  const {sectionBlueprint, level, isLastSection} = props;
+  const {sectionBlueprint, level, isLastSection, itemRendererOptions} = props;
 
   const {itemBlueprint, name: sectionName, id: sectionId} = sectionBlueprint;
 
@@ -162,6 +163,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
             blueprint={itemBlueprint}
             level={level + 1}
             isLastItem={isLastVisibleItemId(itemId)}
+            options={itemRendererOptions}
           />
         ))}
       {sectionInstance?.isVisible &&
@@ -182,6 +184,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
                   blueprint={itemBlueprint}
                   level={level + 2}
                   isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
+                  options={itemRendererOptions}
                 />
               ))}
             </React.Fragment>

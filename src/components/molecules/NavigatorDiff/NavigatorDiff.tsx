@@ -9,7 +9,23 @@ import {HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 import {ClusterToLocalResourcesMatch} from '@models/appstate';
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
+import styled from 'styled-components';
+import {AppBorders} from '@styles/Borders';
 import * as S from './NavigatorDiff.styled';
+
+const Container = styled.div`
+  overflow-y: scroll;
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+  height: 100%;
+`;
+
+const TopContainer = styled(Container)`
+  max-height: 200px;
+  border-bottom: ${AppBorders.sectionDivider};
+`;
 
 function NavigatorDiff() {
   const {windowSize} = useContext(AppContext);
@@ -22,21 +38,33 @@ function NavigatorDiff() {
         <MonoPaneTitle>Navigator Diff</MonoPaneTitle>
       </S.TitleBar>
       <S.List height={navigatorHeight}>
-        <SectionRenderer<HelmValuesFile, HelmChartScopeType>
-          sectionBlueprint={HelmChartSectionBlueprint}
-          level={0}
-          isLastSection={false}
-        />
-        <SectionRenderer<K8sResource, KustomizationScopeType>
-          sectionBlueprint={KustomizationSectionBlueprint}
-          level={0}
-          isLastSection={false}
-        />
-        <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
-          sectionBlueprint={ClusterDiffSectionBlueprint}
-          level={0}
-          isLastSection={false}
-        />
+        <TopContainer>
+          <SectionRenderer<HelmValuesFile, HelmChartScopeType>
+            sectionBlueprint={HelmChartSectionBlueprint}
+            level={0}
+            isLastSection={false}
+            itemRendererOptions={{
+              disablePrefix: true,
+              disableSuffix: true,
+            }}
+          />
+          <SectionRenderer<K8sResource, KustomizationScopeType>
+            sectionBlueprint={KustomizationSectionBlueprint}
+            level={0}
+            isLastSection={false}
+            itemRendererOptions={{
+              disablePrefix: true,
+              disableSuffix: true,
+            }}
+          />
+        </TopContainer>
+        <Container>
+          <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
+            sectionBlueprint={ClusterDiffSectionBlueprint}
+            level={0}
+            isLastSection={false}
+          />
+        </Container>
       </S.List>
     </>
   );

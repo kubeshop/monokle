@@ -1,7 +1,7 @@
 import log from 'loglevel';
 import {createAsyncThunk, createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 import {AppConfig} from '@models/appconfig';
 import {
   AppState,
@@ -534,7 +534,10 @@ export const mainSlice = createSlice({
         }
 
         const localResources = Object.values(state.resourceMap).filter(
-          resource => !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) && !resource.name.startsWith('Patch:')
+          resource =>
+            !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+            !resource.name.startsWith('Patch:') &&
+            resource.kind !== KUSTOMIZATION_KIND
         );
 
         const groupedLocalResources = groupResourcesByIdentifier(
