@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNavigatorDiff} from '@redux/reducers/ui';
 import Drawer from '@components/atoms/Drawer';
@@ -9,17 +9,25 @@ import {Skeleton} from 'antd';
 function NavigatorDiffDrawer() {
   const dispatch = useAppDispatch();
 
-  const hasNavigatorDiffLoaded = useAppSelector(state => state.main.hasNavigatorDiffLoaded);
+  const hasNavigatorDiffLoaded = useAppSelector(state => state.main.navigatorDiff.hasLoaded);
+  const hasNavigatorDiffFailed = useAppSelector(state => state.main.navigatorDiff.hasFailed);
   const isNavigatorDiffVisible = useAppSelector(state => state.ui.isNavigatorDiffVisible);
-  const closeDrawer = () => {
+
+  const closeDrawer = useCallback(() => {
     dispatch(closeNavigatorDiff());
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     if (isNavigatorDiffVisible && !hasNavigatorDiffLoaded) {
       dispatch(loadNavigatorDiff());
     }
   }, [isNavigatorDiffVisible, hasNavigatorDiffLoaded, dispatch]);
+
+  useEffect(() => {
+    if (hasNavigatorDiffFailed) {
+      closeDrawer();
+    }
+  }, [hasNavigatorDiffFailed, closeDrawer]);
 
   return (
     <Drawer

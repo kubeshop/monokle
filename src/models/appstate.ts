@@ -110,8 +110,12 @@ interface AppState {
   diffContent?: string;
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
-  hasNavigatorDiffLoaded: boolean;
-  clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
+  navigatorDiff: {
+    hasLoaded: boolean;
+    hasFailed: boolean;
+    hideClusterOnlyResources: boolean;
+    clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
+  };
   notifications: AlertType[];
 }
 

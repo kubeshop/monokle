@@ -27,8 +27,12 @@ const initialAppState: AppState = {
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
     ),
   },
-  hasNavigatorDiffLoaded: false,
-  clusterToLocalResourcesMatches: [],
+  navigatorDiff: {
+    clusterToLocalResourcesMatches: [],
+    hasLoaded: false,
+    hasFailed: false,
+    hideClusterOnlyResources: true,
+  },
   notifications: [],
 };
 

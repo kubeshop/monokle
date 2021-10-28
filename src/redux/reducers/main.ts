@@ -521,13 +521,27 @@ export const mainSlice = createSlice({
 
     builder
       .addCase(loadNavigatorDiff.pending, state => {
-        state.hasNavigatorDiffLoaded = false;
+        state.navigatorDiff.hasLoaded = false;
+      })
+      .addCase(loadNavigatorDiff.rejected, state => {
+        state.navigatorDiff.hasLoaded = true;
+        state.navigatorDiff.hasFailed = true;
       })
       .addCase(loadNavigatorDiff.fulfilled, (state, action) => {
         const clusterResourceMap = action.payload.resourceMap;
         if (!clusterResourceMap) {
           return;
         }
+
+        const localResources = Object.values(state.resourceMap).filter(
+          resource => !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) && !resource.name.startsWith('Patch:')
+        );
+
+        const groupedLocalResources = groupResourcesByIdentifier(
+          localResources,
+          makeResourceNameKindNamespaceIdentifier
+        );
+
         // remove previous cluster diff resources
         Object.values(state.resourceMap)
           .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
@@ -537,20 +551,13 @@ export const mainSlice = createSlice({
           state.resourceMap[r.id] = r;
         });
 
-        const localResources = Object.values(state.resourceMap).filter(
-          resource => !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX)
-        );
-        const groupedLocalResources = groupResourcesByIdentifier(
-          localResources,
-          makeResourceNameKindNamespaceIdentifier
-        );
         const clusterResources = Object.values(clusterResourceMap);
         const groupedClusterResources = groupResourcesByIdentifier(
           clusterResources,
           makeResourceNameKindNamespaceIdentifier
         );
 
-        const clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[] = [];
+        let clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[] = [];
         const localResourceIdsAlreadyMatched: string[] = [];
 
         Object.entries(groupedClusterResources).forEach(([identifier, value]) => {
@@ -570,6 +577,10 @@ export const mainSlice = createSlice({
           }
         });
 
+        if (state.navigatorDiff.hideClusterOnlyResources) {
+          clusterToLocalResourcesMatches = clusterToLocalResourcesMatches.filter(match => match.localResourceIds);
+        }
+
         const localResourceIdentifiersNotMatched = [
           ...new Set(
             localResources
@@ -585,8 +596,9 @@ export const mainSlice = createSlice({
           });
         });
 
-        state.clusterToLocalResourcesMatches = clusterToLocalResourcesMatches;
-        state.hasNavigatorDiffLoaded = true;
+        state.navigatorDiff.clusterToLocalResourcesMatches = clusterToLocalResourcesMatches;
+        state.navigatorDiff.hasLoaded = true;
+        state.navigatorDiff.hasFailed = false;
       });
 
     builder.addCase(closeNavigatorDiff.type, state => {
@@ -594,8 +606,9 @@ export const mainSlice = createSlice({
       Object.values(state.resourceMap)
         .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
         .forEach(r => delete state.resourceMap[r.id]);
-      state.clusterToLocalResourcesMatches = [];
-      state.hasNavigatorDiffLoaded = false;
+      state.navigatorDiff.clusterToLocalResourcesMatches = [];
+      state.navigatorDiff.hasLoaded = false;
+      state.navigatorDiff.hasFailed = false;
     });
 
     builder.addMatcher(

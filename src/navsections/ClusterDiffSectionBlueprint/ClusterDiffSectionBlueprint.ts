@@ -2,6 +2,7 @@ import {ClusterToLocalResourcesMatch, ResourceMapType} from '@models/appstate';
 import {SectionBlueprint} from '@models/navigator';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {v4 as uuidv4} from 'uuid';
+import sectionBlueprintMap from '../sectionBlueprintMap';
 
 export type ClusterDiffScopeType = {
   resourceMap: ResourceMapType;
@@ -14,7 +15,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
   getScope(state) {
     return {
       resourceMap: state.main.resourceMap,
-      clusterToLocalResourcesMatches: state.main.clusterToLocalResourcesMatches,
+      clusterToLocalResourcesMatches: state.main.navigatorDiff.clusterToLocalResourcesMatches,
     };
   },
   builder: {
@@ -49,5 +50,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     },
   },
 };
+
+sectionBlueprintMap.register(ClusterDiffSectionBlueprint);
 
 export default ClusterDiffSectionBlueprint;
