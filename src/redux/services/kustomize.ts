@@ -38,6 +38,14 @@ export function isKustomizationResource(r: K8sResource | undefined) {
 }
 
 /**
+ * Checks if the specified resource is a kustomization patch
+ */
+
+export function isKustomizationPatch(r: K8sResource) {
+  return r.name.startsWith('Patch: ');
+}
+
+/**
  * Checks if the specified fileEntry is a kustomization file
  */
 

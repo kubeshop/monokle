@@ -21,6 +21,7 @@ import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm
 import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
 import {setMonacoEditor} from '@redux/reducers/ui';
 
+import {isKustomizationPatch} from '@redux/services/kustomize';
 import {
   StyledLeftArrowButton,
   StyledRightArrowButton,
@@ -245,7 +246,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     size="small"
                     ghost
                     onClick={applySelection}
-                    disabled={!selectedResourceId && !selectedPath}
+                    disabled={
+                      (!selectedResourceId && !selectedPath) ||
+                      (selectedResource && isKustomizationPatch(selectedResource))
+                    }
                   >
                     Apply
                   </Button>
@@ -256,7 +260,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     type="primary"
                     ghost
                     onClick={diffSelectedResource}
-                    disabled={!selectedResourceId}
+                    disabled={!selectedResourceId || (selectedResource && isKustomizationPatch(selectedResource))}
                   >
                     Diff
                   </DiffButton>
