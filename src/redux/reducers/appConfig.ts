@@ -4,6 +4,7 @@ import electronStore from '@utils/electronStore';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 import {KubeConfig} from '@models/kubeConfig';
 import {KustomizeCommandType} from '@redux/services/kustomize';
+import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
 import initialState from '../initialState';
 
 export const updateStartupModalVisible = createAsyncThunk(
@@ -15,7 +16,7 @@ export const updateStartupModalVisible = createAsyncThunk(
 );
 
 export const updateKubeconfig = createAsyncThunk('config/updateKubeconfig', async (kubeconfig: string, thunkAPI) => {
-  // monitorKubeConfig(kubeconfig, thunkAPI.dispatch);
+  monitorKubeConfig(kubeconfig, thunkAPI.dispatch);
   electronStore.set('appConfig.kubeconfig', kubeconfig);
   thunkAPI.dispatch(configSlice.actions.setKubeconfig(kubeconfig));
 });
