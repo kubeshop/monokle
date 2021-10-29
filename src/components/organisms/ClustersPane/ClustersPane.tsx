@@ -1,4 +1,4 @@
-import React, {useRef, useCallback, useEffect} from 'react';
+import React, {useRef, useCallback, useEffect, useState} from 'react';
 import {Button, Col, Input, Row, Tooltip, Select} from 'antd';
 import styled from 'styled-components';
 import {useSelector} from 'react-redux';
@@ -12,8 +12,8 @@ import {setCurrentContext, updateKubeconfig} from '@redux/reducers/appConfig';
 import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {closeFolderExplorer} from '@redux/reducers/ui';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
 import {useDebounce} from 'react-use';
+import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 const StyledDiv = styled.div`
   margin-bottom: 10px;
@@ -53,8 +53,23 @@ const ClustersPane = () => {
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const kubeConfig = useAppSelector(state => state.config.kubeConfig);
   const uiState = useAppSelector(state => state.ui);
+  const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
 
   const fileInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setCurrentKubeConfig(kubeconfig);
+  }, [kubeconfig]);
+
+  useDebounce(
+    () => {
+      if (currentKubeConfig !== kubeconfig) {
+        dispatch(updateKubeconfig(currentKubeConfig));
+      }
+    },
+    1000,
+    [currentKubeConfig]
+  );
 
   const openFileSelect = () => {
     fileInput && fileInput.current?.click();
@@ -73,7 +88,7 @@ const ClustersPane = () => {
 
   const onUpdateKubeconfig = (e: any) => {
     let value = e.target.value;
-    dispatch(updateKubeconfig(value));
+    setCurrentKubeConfig(value);
   };
 
   const connectToCluster = () => {
@@ -112,15 +127,11 @@ const ClustersPane = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiState]);
 
-  useDebounce(
-    () => {
-      if (kubeconfig) {
-        dispatch(loadContexts(kubeconfig));
-      }
-    },
-    2000,
-    [kubeconfig]
-  );
+  useEffect(() => {
+    if (kubeconfig) {
+      dispatch(loadContexts(kubeconfig));
+    }
+  }, [kubeconfig]);
 
   return (
     <>
@@ -136,7 +147,7 @@ const ClustersPane = () => {
       <PaneContainer>
         <ClustersContainer>
           <StyledDiv>KUBECONFIG</StyledDiv>
-          <Input value={kubeconfig} onChange={onUpdateKubeconfig} />
+          <Input value={currentKubeConfig} onChange={onUpdateKubeconfig} />
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
             <StyledButton ghost type="primary" onClick={openFileSelect}>
               Browse
