@@ -4,7 +4,6 @@ import AppContext from '@src/AppContext';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 import {ItemBlueprint} from '@models/navigator';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectInstance} from '@redux/reducers/navigator';
 import {useItemCustomization} from './useItemCustomization';
 import * as S from './styled';
 
@@ -58,7 +57,6 @@ function NavSectionItem<ItemType, ScopeType>(props: {
   useEffect(() => {
     if (selectedInstanceId && itemId === selectedInstanceId) {
       onClick();
-      selectInstance(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedInstanceId]);
