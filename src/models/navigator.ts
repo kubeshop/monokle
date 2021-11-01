@@ -110,4 +110,5 @@ export interface NavigatorInstanceState {
 
 export interface NavigatorState extends NavigatorInstanceState {
   collapsedSectionIds: string[];
+  selectedInstanceId: string | null;
 }
