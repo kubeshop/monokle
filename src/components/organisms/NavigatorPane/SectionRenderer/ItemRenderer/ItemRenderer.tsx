@@ -4,6 +4,7 @@ import AppContext from '@src/AppContext';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 import {ItemBlueprint} from '@models/navigator';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectInstance} from '@redux/reducers/navigator';
 import {useItemCustomization} from './useItemCustomization';
 import * as S from './styled';
 
@@ -22,6 +23,7 @@ function NavSectionItem<ItemType, ScopeType>(props: {
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
+  const selectedInstanceId = useAppSelector(state => state.navigator.selectedInstanceId);
   const {instanceHandler} = blueprint;
 
   const {Prefix, Suffix, QuickAction, ContextMenu} = useItemCustomization(blueprint.customization);
@@ -52,6 +54,14 @@ function NavSectionItem<ItemType, ScopeType>(props: {
       instanceHandler.onClick(itemInstance, dispatch);
     }
   }, [instanceHandler, itemInstance, dispatch]);
+
+  useEffect(() => {
+    if (selectedInstanceId && itemId === selectedInstanceId) {
+      onClick();
+      selectInstance(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedInstanceId]);
 
   return (
     <ScrollIntoView ref={scrollContainer}>

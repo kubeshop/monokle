@@ -111,6 +111,7 @@ const initialNavigatorState: NavigatorState = {
   sectionInstanceMap: {},
   itemInstanceMap: {},
   collapsedSectionIds: [],
+  selectedInstanceId: null,
 };
 
 export default {
