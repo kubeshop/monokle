@@ -1,5 +1,7 @@
 import {useState, useCallback} from 'react';
 import {FileExplorerOptions, FileExplorerProps} from '@atoms/FileExplorer';
+import {useAppSelector} from '@redux/hooks';
+import {getRootFolder} from '@redux/services/fileEntry';
 
 type FileExplorerSelectResult = {
   filePath?: string;
@@ -7,11 +9,9 @@ type FileExplorerSelectResult = {
   folderPath?: string;
 };
 
-export const useFileExplorer = (
-  onSelect: (result: FileExplorerSelectResult) => void,
-  options?: FileExplorerOptions
-) => {
+export const useFileExplorer = (onSelect: (result: FileExplorerSelectResult) => void, options: FileExplorerOptions) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const fileMap = useAppSelector(state => state.main.fileMap);
 
   const handleOnSelect = useCallback(
     (fileList: string[]) => {
@@ -41,7 +41,11 @@ export const useFileExplorer = (
 
   const openFileExplorer = useCallback(() => {
     setIsOpen(true);
-  }, [setIsOpen]);
+  }, [setIsOpen, fileMap]);
+
+  if (!options.defaultPath) {
+    options.defaultPath = getRootFolder(fileMap);
+  }
 
   const fileExplorerProps: FileExplorerProps = {
     options,

@@ -111,6 +111,14 @@ function processHelmChartFolder(
 }
 
 /**
+ * Returns the root folder for the specified fileMap
+ */
+
+export function getRootFolder(fileMap: FileMapType) {
+  return fileMap && fileMap[ROOT_FILE_ENTRY] ? fileMap[ROOT_FILE_ENTRY].filePath : undefined;
+}
+
+/**
  * Recursively reads the provided folder in line with the provided appConfig and populates the
  * provided maps with found files and resources.
  *
