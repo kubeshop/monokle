@@ -60,9 +60,10 @@ const SettingsDrawer = () => {
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const appConfig = useAppSelector(state => state.config);
+  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
   const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
-
+  const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -121,9 +122,23 @@ const SettingsDrawer = () => {
     fileInput && fileInput.current?.click();
   };
 
+  useEffect(() => {
+    setCurrentKubeConfig(kubeconfig);
+  }, [kubeconfig]);
+
+  useDebounce(
+    () => {
+      if (currentKubeConfig !== kubeconfig) {
+        dispatch(updateKubeconfig(currentKubeConfig));
+      }
+    },
+    1000,
+    [currentKubeConfig]
+  );
+
   const onUpdateKubeconfig = (e: any) => {
     let value = e.target.value;
-    dispatch(updateKubeconfig(value));
+    setCurrentKubeConfig(value);
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
@@ -158,7 +173,7 @@ const SettingsDrawer = () => {
       <StyledDiv>
         <StyledSpan>KUBECONFIG</StyledSpan>
         <Tooltip title={KubeconfigPathTooltip}>
-          <Input value={appConfig.kubeconfigPath} onChange={onUpdateKubeconfig} />
+          <Input value={currentKubeConfig} onChange={onUpdateKubeconfig} />
         </Tooltip>
         <StyledButton onClick={openFileSelect}>Browse</StyledButton>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
