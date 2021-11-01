@@ -62,16 +62,20 @@ const NavPane = () => {
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>
-        <SectionRenderer<HelmValuesFile, HelmChartScopeType>
-          sectionBlueprint={HelmChartSectionBlueprint}
-          level={0}
-          isLastSection={false}
-        />
-        <SectionRenderer<K8sResource, KustomizationScopeType>
-          sectionBlueprint={KustomizationSectionBlueprint}
-          level={0}
-          isLastSection={false}
-        />
+        {!isInClusterMode && (
+          <>
+            <SectionRenderer<HelmValuesFile, HelmChartScopeType>
+              sectionBlueprint={HelmChartSectionBlueprint}
+              level={0}
+              isLastSection={false}
+            />
+            <SectionRenderer<K8sResource, KustomizationScopeType>
+              sectionBlueprint={KustomizationSectionBlueprint}
+              level={0}
+              isLastSection={false}
+            />
+          </>
+        )}
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}
