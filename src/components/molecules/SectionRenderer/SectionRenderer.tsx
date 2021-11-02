@@ -175,7 +175,10 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
           return (
             <React.Fragment key={group.id}>
               <S.NameContainer style={{color: 'red'}}>
-                <S.Name level={level + 1}>{group.name}</S.Name>
+                <S.Name level={level + 1}>
+                  {group.name}
+                  <S.ItemsLength>{group.visibleItemIds.length}</S.ItemsLength>
+                </S.Name>
               </S.NameContainer>
               {group.visibleItemIds.map(itemId => (
                 <ItemRenderer<ItemType, ScopeType>
