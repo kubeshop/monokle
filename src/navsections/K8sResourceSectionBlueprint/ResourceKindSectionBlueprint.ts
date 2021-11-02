@@ -9,6 +9,7 @@ import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSuffix from './ResourceKindSuffix';
+import ResourceKindNameDisplay from './ResourceKindNameDisplay';
 
 function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (
@@ -118,6 +119,9 @@ export function makeResourceKindNavSection(
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
         contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
+        nameDisplay: {
+          component: ResourceKindNameDisplay,
+        },
       },
     },
   };
