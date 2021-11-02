@@ -13,13 +13,13 @@ import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
 import * as S from './NavigatorDiff.styled';
 
-const Container = styled.div`
+const Container = styled.div<{height?: number}>`
   overflow-y: scroll;
   ::-webkit-scrollbar {
     width: 0;
     background: transparent;
   }
-  height: 100%;
+  ${props => props.height && `height: ${props.height};`}
 `;
 
 const TopContainer = styled(Container)`
@@ -58,7 +58,7 @@ function NavigatorDiff() {
             }}
           />
         </TopContainer>
-        <Container>
+        <Container height={navigatorHeight - 200}>
           <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
             sectionBlueprint={ClusterDiffSectionBlueprint}
             level={0}
