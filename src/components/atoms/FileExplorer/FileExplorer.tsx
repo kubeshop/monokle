@@ -3,12 +3,14 @@ import {ipcRenderer} from 'electron';
 
 export type DirectoryOptions = {
   isDirectoryExplorer: true;
+  defaultPath?: string;
 };
 
 export type FileOptions = {
   isDirectoryExplorer?: false;
   allowMultiple?: boolean;
   acceptedFileExtensions?: string[];
+  defaultPath?: string;
 };
 
 export type FileExplorerOptions = DirectoryOptions | FileOptions;

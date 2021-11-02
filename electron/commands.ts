@@ -46,6 +46,10 @@ export const selectFile = (event: Electron.IpcMainInvokeEvent, options: any) => 
     }
   }
 
+  if (options.defaultPath) {
+    dialogOptions.defaultPath = options.defaultPath;
+  }
+
   if (browserWindow) {
     return dialog.showOpenDialogSync(browserWindow, dialogOptions);
   }
