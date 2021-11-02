@@ -47,7 +47,6 @@ export const ItemName = styled.span<{
   level: number;
 }>`
   padding: 2px 0;
-  cursor: pointer;
   font-size: 12px;
   ${props => {
     if (props.isSelected) {

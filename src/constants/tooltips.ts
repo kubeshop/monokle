@@ -26,3 +26,6 @@ export const HelmPreviewModeTooltip = 'Set which Helm command to use when genera
 export const KustomizeCommandTooltip = 'Set how to invoke kustomize when previewing and applying kustomization files';
 export const AutoLoadLastFolderTooltip = 'Load last folder when starting Monokle';
 export const SaveUnsavedResourceTooltip = 'Save resource to file';
+export const ClusterDiffApplyTooltip = 'Apply this resource to your configured cluster';
+export const ClusterDiffSaveTooltip = 'Save this resource to the currently selected folder';
+export const ClusterDiffCompareTooltip = 'Compare resources - Opens the Diff Modal';

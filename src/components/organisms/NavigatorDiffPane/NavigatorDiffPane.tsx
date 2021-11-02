@@ -26,11 +26,20 @@ function NavigatorDiffPane() {
   const hasNavigatorDiffFailed = useAppSelector(state => state.main.navigatorDiff.hasFailed);
   const isNavigatorDiffVisible = useAppSelector(state => state.ui.isNavigatorDiffVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
 
   useEffect(() => {
     dispatch(loadNavigatorDiff());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInPreviewMode]);
+
+  // TODO: improve this by updating the clusterToLocalResourcesMatches after apply instead of reloading the entire navigator diff
+  useEffect(() => {
+    if (!isApplyingResource) {
+      dispatch(loadNavigatorDiff());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isApplyingResource]);
 
   const closeDrawer = useCallback(() => {
     dispatch(closeNavigatorDiff());
