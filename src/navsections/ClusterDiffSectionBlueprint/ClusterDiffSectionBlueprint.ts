@@ -46,7 +46,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
   },
   itemBlueprint: {
     getName(rawItem) {
-      return `${rawItem.resourceName}#${rawItem.resourceKind}#${rawItem.resourceNamespace}`;
+      return rawItem.resourceName;
     },
     getInstanceId(rawItem) {
       return `${rawItem.resourceName}#${rawItem.resourceKind}#${rawItem.resourceNamespace}`;
