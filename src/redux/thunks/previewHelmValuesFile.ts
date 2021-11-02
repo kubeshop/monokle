@@ -37,9 +37,8 @@ export const previewHelmValuesFile = createAsyncThunk<
       const args = {
         helmCommand:
           configState.settings.helmPreviewMode === 'template'
-            ? `helm template -f ${valuesFile.name} ${chart.name} .`
-            : `helm install -f ${valuesFile.name} ${chart.name} . --dry-run`,
-        cwd: folder,
+            ? `helm template -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder}`
+            : `helm install -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder} --dry-run`,
         kubeconfig,
       };
 
