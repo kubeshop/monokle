@@ -35,6 +35,18 @@ export interface ItemCustomization {
   };
 }
 
+export type SectionCustomComponentProps = {
+  sectionInstance: SectionInstance;
+};
+
+export type SectionCustomComponent = React.ComponentType<SectionCustomComponentProps>;
+
+export interface SectionCustomization {
+  nameDisplay?: {
+    component: SectionCustomComponent;
+  };
+}
+
 export interface ItemBlueprint<RawItemType, ScopeType> {
   getName: (rawItem: RawItemType, scope: ScopeType) => string;
   getInstanceId: (rawItem: RawItemType, scope: ScopeType) => string;
@@ -73,6 +85,7 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
     shouldBeVisibleBeforeInitialized?: boolean;
   };
+  customization?: SectionCustomization;
   itemBlueprint?: ItemBlueprint<RawItemType, ScopeType>;
 }
 

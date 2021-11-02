@@ -6,6 +6,7 @@ import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
 import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
 import SectionHeader from './SectionHeader';
 import * as S from './styled';
+import {useSectionCustomization} from './useSectionCustomization';
 
 type SectionRendererProps<ItemType, ScopeType> = {
   sectionBlueprint: SectionBlueprint<ItemType, ScopeType>;
@@ -24,6 +25,8 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
   );
 
   const dispatch = useAppDispatch();
+
+  const {NameDisplay} = useSectionCustomization(sectionBlueprint.customization);
 
   const collapsedSectionIds = useAppSelector(state => state.navigator.collapsedSectionIds);
 
@@ -138,6 +141,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
     <>
       <SectionHeader
         name={sectionName}
+        sectionInstance={sectionInstance}
         isSectionSelected={Boolean(sectionInstance?.isSelected)}
         isCollapsed={isCollapsed}
         isCollapsedMode={isCollapsedMode}
@@ -150,6 +154,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
         itemsLength={sectionInstance?.visibleDescendantItemsCount || 0}
         expandSection={expandSection}
         collapseSection={collapseSection}
+        CustomNameDisplay={NameDisplay ? NameDisplay.Component : undefined}
       />
       {sectionInstance &&
         sectionInstance.isVisible &&

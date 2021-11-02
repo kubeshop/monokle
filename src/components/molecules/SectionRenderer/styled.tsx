@@ -18,6 +18,7 @@ export const NameContainer = styled.li<NameContainerProps>`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   width: 100%;
   user-select: none;
   ${props => {

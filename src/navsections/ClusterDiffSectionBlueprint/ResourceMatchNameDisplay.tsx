@@ -30,7 +30,7 @@ const IconsContainer = styled.div`
   font-size: 14px;
 `;
 
-function ClusterDiffNameDisplay(props: ItemCustomComponentProps) {
+function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -88,4 +88,4 @@ function ClusterDiffNameDisplay(props: ItemCustomComponentProps) {
   );
 }
 
-export default ClusterDiffNameDisplay;
+export default ResourceMatchNameDisplay;

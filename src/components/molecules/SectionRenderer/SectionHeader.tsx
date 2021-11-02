@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
 import {MinusSquareOutlined} from '@ant-design/icons';
+import {SectionCustomComponent, SectionInstance} from '@models/navigator';
 import * as S from './styled';
 
 function SectionHeader(props: {
   name: string;
+  sectionInstance: SectionInstance;
   isSectionSelected: boolean;
   isCollapsed: boolean;
   isSectionHighlighted: boolean;
@@ -16,9 +18,11 @@ function SectionHeader(props: {
   itemsLength: number;
   expandSection: () => void;
   collapseSection: () => void;
+  CustomNameDisplay?: SectionCustomComponent;
 }) {
   const {
     name,
+    sectionInstance,
     isSectionSelected,
     isCollapsed,
     isSectionHighlighted,
@@ -31,6 +35,7 @@ function SectionHeader(props: {
     itemsLength,
     expandSection,
     collapseSection,
+    CustomNameDisplay,
   } = props;
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -47,23 +52,29 @@ function SectionHeader(props: {
       onMouseLeave={() => setIsHovered(false)}
       isVisible={isSectionVisible}
     >
-      <S.Name
-        isSelected={isSectionSelected && isCollapsed}
-        isHighlighted={isSectionSelected && isCollapsed}
-        level={level}
-      >
-        {name}
-        {itemsLength > 0 && <S.ItemsLength>{itemsLength}</S.ItemsLength>}
-      </S.Name>
-      {isHovered && isSectionInitialized && (
-        <S.Collapsible>
-          {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
-            <S.PlusSquareOutlined isSelected={isSectionSelected} onClick={expandSection} />
+      {CustomNameDisplay ? (
+        <CustomNameDisplay sectionInstance={sectionInstance} />
+      ) : (
+        <>
+          <S.Name
+            isSelected={isSectionSelected && isCollapsed}
+            isHighlighted={isSectionSelected && isCollapsed}
+            level={level}
+          >
+            {name}
+            {itemsLength > 0 && <S.ItemsLength>{itemsLength}</S.ItemsLength>}
+          </S.Name>
+          {isHovered && isSectionInitialized && (
+            <S.Collapsible>
+              {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
+                <S.PlusSquareOutlined isSelected={isSectionSelected} onClick={expandSection} />
+              )}
+              {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
+                <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
+              )}
+            </S.Collapsible>
           )}
-          {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
-            <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
-          )}
-        </S.Collapsible>
+        </>
       )}
     </S.NameContainer>
   );

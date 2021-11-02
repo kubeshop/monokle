@@ -1,7 +1,8 @@
 import {ClusterToLocalResourcesMatch, ResourceMapType} from '@models/appstate';
 import {SectionBlueprint} from '@models/navigator';
 import sectionBlueprintMap from '../sectionBlueprintMap';
-import ClusterDiffNameDisplay from './ClusterDiffNameDisplay';
+import ResourceDiffSectionNameDisplay from './ResourceDiffSectionNameDisplay';
+import ResourceMatchNameDisplay from './ResourceMatchNameDisplay';
 
 export type ClusterDiffScopeType = {
   resourceMap: ResourceMapType;
@@ -44,6 +45,11 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
       return scope.clusterToLocalResourcesMatches.length > 0;
     },
   },
+  customization: {
+    nameDisplay: {
+      component: ResourceDiffSectionNameDisplay,
+    },
+  },
   itemBlueprint: {
     getName(rawItem) {
       return rawItem.resourceName;
@@ -62,7 +68,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
       },
     },
     customization: {
-      nameDisplay: {component: ClusterDiffNameDisplay},
+      nameDisplay: {component: ResourceMatchNameDisplay},
     },
   },
 };
