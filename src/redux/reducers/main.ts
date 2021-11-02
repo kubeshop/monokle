@@ -533,12 +533,19 @@ export const mainSlice = createSlice({
           return;
         }
 
-        const localResources = Object.values(state.resourceMap).filter(
+        const isInPreviewMode = Boolean(state.previewResourceId) || Boolean(state.previewValuesFileId);
+
+        let localResources: K8sResource[] = [];
+        localResources = Object.values(state.resourceMap).filter(
           resource =>
             !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
             !resource.name.startsWith('Patch:') &&
             resource.kind !== KUSTOMIZATION_KIND
         );
+
+        if (isInPreviewMode) {
+          localResources = localResources.filter(resource => resource.filePath.startsWith(PREVIEW_PREFIX));
+        }
 
         const groupedLocalResources = groupResourcesByIdentifier(
           localResources,

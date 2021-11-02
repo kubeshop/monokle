@@ -5,6 +5,7 @@ import {NavigatorDiff} from '@molecules';
 import {loadNavigatorDiff} from '@redux/thunks/loadNavigatorDiff';
 import {Skeleton} from 'antd';
 import styled from 'styled-components';
+import {isInPreviewModeSelector} from '@redux/selectors';
 
 const Container = styled.div`
   display: block;
@@ -24,6 +25,12 @@ function NavigatorDiffPane() {
   const hasNavigatorDiffLoaded = useAppSelector(state => state.main.navigatorDiff.hasLoaded);
   const hasNavigatorDiffFailed = useAppSelector(state => state.main.navigatorDiff.hasFailed);
   const isNavigatorDiffVisible = useAppSelector(state => state.ui.isNavigatorDiffVisible);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
+  useEffect(() => {
+    dispatch(loadNavigatorDiff());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInPreviewMode]);
 
   const closeDrawer = useCallback(() => {
     dispatch(closeNavigatorDiff());
