@@ -130,6 +130,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   });
 
   if (Object.values(isChangedByScopeKey).every(isChanged => isChanged === false)) {
+    // eslint-disable-next-line no-console
     console.log('fullScope did not change.');
     return;
   }
@@ -140,6 +141,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       ([key, value]) => sectionScopeKeys.includes(key) && value === true
     );
     if (!hasSectionScopeChanged) {
+      // eslint-disable-next-line no-console
       console.log(`Section ${sectionBlueprint.id} scope did not change`);
       return;
     }
@@ -167,6 +169,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
           shouldScrollIntoView: Boolean(
             itemBuilder?.shouldScrollIntoView ? itemBuilder.shouldScrollIntoView(rawItem, sectionScope) : false
           ),
+          meta: itemBuilder?.getMeta ? itemBuilder.getMeta(rawItem, sectionScope) : undefined,
         };
       });
       itemInstances?.forEach(itemInstance => {
@@ -239,6 +242,7 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
     action?.type === expandSectionIds.type ||
     action?.type === collapseSectionIds.type
   ) {
+    // eslint-disable-next-line no-console
     console.log('Not processing.');
     return;
   }

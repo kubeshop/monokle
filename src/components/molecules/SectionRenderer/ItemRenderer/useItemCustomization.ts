@@ -18,6 +18,10 @@ export function useItemCustomization(customization: ItemCustomization = {}) {
     () => ({Component: customization.contextMenu?.component, options: customization.contextMenu?.options}),
     [customization.contextMenu]
   );
+  const NameDisplay = useMemo(
+    () => ({Component: customization.nameDisplay?.component, options: customization.nameDisplay?.options}),
+    [customization.nameDisplay]
+  );
 
-  return {Prefix, Suffix, QuickAction, ContextMenu};
+  return {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay};
 }

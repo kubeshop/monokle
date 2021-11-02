@@ -1,6 +1,7 @@
 import {ClusterToLocalResourcesMatch, ResourceMapType} from '@models/appstate';
 import {SectionBlueprint} from '@models/navigator';
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import ClusterDiffNameDisplay from './ClusterDiffNameDisplay';
 
 export type ClusterDiffScopeType = {
   resourceMap: ResourceMapType;
@@ -44,18 +45,24 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     },
   },
   itemBlueprint: {
-    getName(rawItem, scope) {
-      const clusterResource = rawItem.clusterResourceId ? scope.resourceMap[rawItem.clusterResourceId] : undefined;
-      const firstLocalResource =
-        rawItem.localResourceIds && rawItem.localResourceIds.length > 0
-          ? scope.resourceMap[rawItem.localResourceIds[0]]
-          : undefined;
-      const leftName = clusterResource ? clusterResource.name : 'Resource not found in Cluster.';
-      const rightName = firstLocalResource ? firstLocalResource.name : 'Resource not found locally.';
-      return `${leftName} <---> ${rightName}`;
+    getName(rawItem) {
+      return `${rawItem.resourceName}#${rawItem.resourceKind}#${rawItem.resourceNamespace}`;
     },
     getInstanceId(rawItem) {
       return `${rawItem.resourceName}#${rawItem.resourceKind}#${rawItem.resourceNamespace}`;
+    },
+    builder: {
+      getMeta(rawItem, scope) {
+        return {
+          clusterResource: rawItem.clusterResourceId ? scope.resourceMap[rawItem.clusterResourceId] : undefined,
+          localResources: rawItem.localResourceIds
+            ? rawItem.localResourceIds.map(id => scope.resourceMap[id])
+            : undefined,
+        };
+      },
+    },
+    customization: {
+      nameDisplay: {component: ClusterDiffNameDisplay},
     },
   },
 };

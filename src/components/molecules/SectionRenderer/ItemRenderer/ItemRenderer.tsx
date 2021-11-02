@@ -34,7 +34,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
   const {instanceHandler} = blueprint;
 
-  const {Prefix, Suffix, QuickAction, ContextMenu} = useItemCustomization(blueprint.customization);
+  const {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay} = useItemCustomization(blueprint.customization);
 
   const scrollContainer = useRef<ScrollContainerRef>(null);
   const isScrolledIntoView = useCallback(() => {
@@ -87,8 +87,14 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
           isDisabled={itemInstance.isDisabled}
           onClick={onClick}
         >
-          {itemInstance.name}
-          {itemInstance.isDirty && <span>*</span>}
+          {NameDisplay.Component ? (
+            <NameDisplay.Component itemInstance={itemInstance} />
+          ) : (
+            <>
+              {itemInstance.name}
+              {itemInstance.isDirty && <span>*</span>}
+            </>
+          )}
         </S.ItemName>
         {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
           <S.SuffixContainer>

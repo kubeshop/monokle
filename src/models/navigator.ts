@@ -29,6 +29,10 @@ export interface ItemCustomization {
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
   };
+  nameDisplay?: {
+    component: ItemCustomComponent;
+    options?: ItemCustomComponentOptions;
+  };
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
@@ -41,6 +45,7 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
     isDirty?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isDisabled?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     shouldScrollIntoView?: (rawItem: RawItemType, scope: ScopeType) => boolean;
+    getMeta?: (rawItem: RawItemType, scope: ScopeType) => any;
   };
   instanceHandler?: {
     onClick?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
@@ -84,6 +89,7 @@ export interface ItemInstance {
   isDirty: boolean;
   isDisabled: boolean;
   shouldScrollIntoView: boolean;
+  meta?: any;
 }
 
 export interface SectionInstance {
