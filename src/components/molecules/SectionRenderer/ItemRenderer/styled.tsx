@@ -7,12 +7,13 @@ export const ItemContainer = styled.li<{
   isHovered: boolean;
   level: number;
   isLastItem: boolean;
+  hasOnClick: boolean;
 }>`
   display: flex;
   align-items: center;
   width: 100%;
-  cursor: pointer;
   user-select: none;
+  ${props => props.hasOnClick && `cursor: pointer;`}
   ${props => {
     if (props.isLastItem) {
       return `margin-bottom: 12px;`;

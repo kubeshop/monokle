@@ -81,6 +81,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         isHovered={isHovered}
         level={level}
         isLastItem={isLastItem}
+        hasOnClick={Boolean(instanceHandler?.onClick)}
       >
         <S.PrefixContainer>
           {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
