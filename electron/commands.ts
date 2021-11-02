@@ -14,8 +14,7 @@ import {KustomizeCommandType} from '@redux/services/kustomize';
 export const runKustomize = (folder: string, kustomizeCommand: KustomizeCommandType, event: Electron.IpcMainEvent) => {
   try {
     let cmd = kustomizeCommand === 'kubectl' ? 'kubectl kustomize' : 'kustomize build ';
-    let stdout = execSync(`${cmd} .`, {
-      cwd: folder,
+    let stdout = execSync(`${cmd} ${folder}`, {
       env: {
         NODE_ENV: PROCESS_ENV.NODE_ENV,
         PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
@@ -63,7 +62,6 @@ export const selectFile = (event: Electron.IpcMainInvokeEvent, options: any) => 
 export const runHelm = (args: any, event: Electron.IpcMainEvent) => {
   try {
     let stdout = execSync(args.helmCommand, {
-      cwd: args.cwd,
       env: {
         NODE_ENV: PROCESS_ENV.NODE_ENV,
         PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
