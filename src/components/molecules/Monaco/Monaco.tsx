@@ -71,8 +71,9 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const [isEditorMounted, setEditorMounted] = useState(false);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-  let editor = editorRef.current;
   const hiddenInputRef = useRef<HTMLInputElement>(null);
+  const [editor, setEditor] = useState(editorRef.current);
+  const [editingRResourceId, setEditingRResourceId] = useState<string | undefined>(undefined);
 
   const selectResource = (resourceId: string) => {
     if (resourceMap[resourceId]) {
@@ -121,8 +122,9 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     registerStaticActions(e);
 
     e.onDidFocusEditorText(onEditorFocus);
-
+    
     editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
+    setEditor(e);
 
     // @ts-ignore
     monaco.editor.onDidChangeMarkers(onDidChangeMarkers);
@@ -164,9 +166,13 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       }
     }
 
-    setCode(newCode);
-    setOrgCode(newCode);
-    setDirty(false);
+    if (!editingRResourceId || selectedResourceId !== editingRResourceId) {
+      setCode(newCode);
+      setOrgCode(newCode);
+      setDirty(false);
+      setEditingRResourceId(selectedResourceId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
 
   useEffect(() => {
@@ -174,6 +180,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       editor.revealLineNearTop(1);
       editor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, selectedResourceId, firstCodeLoadedOnEditor]);
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
