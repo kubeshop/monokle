@@ -88,7 +88,9 @@ const Notification: React.FC<NotificationProps> = props => {
   const {notification, badge} = props;
   const {createdAt, title, message} = notification;
 
-  const {isCopied, setCopyToClipboardState} = useCopyToClipboard(message);
+  const copyToClipboardMessage = `Title: ${title}. Description: ${message}.`;
+
+  const {isCopied, setCopyToClipboardState} = useCopyToClipboard(copyToClipboardMessage);
 
   const onCopyToClipboard = () => {
     if (isCopied) {
