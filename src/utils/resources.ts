@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import flatten from 'flat';
 import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {isPassingKeyValueFilter} from '@utils/filter';
@@ -43,4 +45,21 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
     }
   }
   return true;
+}
+
+export function isLocalResourceDifferentThanClusterResource(localResource: K8sResource, clusterResource: K8sResource) {
+  const flatLocalResourceContent = flatten<any, string[]>(localResource.content, {delimiter: '#'});
+  const localResourceContentPaths = Object.keys(flatLocalResourceContent);
+  let isDiff: boolean = false;
+  for (let i = 0; i < localResourceContentPaths.length; i += 1) {
+    const currentPathString = localResourceContentPaths[i];
+    const currentPath = currentPathString.split('#');
+    const localValue = _.get(localResource.content, currentPath);
+    const clusterValue = _.get(clusterResource.content, currentPath);
+    if (!_.isEqual(localValue, clusterValue)) {
+      isDiff = true;
+      break;
+    }
+  }
+  return isDiff;
 }
