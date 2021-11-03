@@ -1,11 +1,12 @@
 import React, {useCallback} from 'react';
 import Drawer from '@components/atoms/Drawer';
 import styled from 'styled-components';
+import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
 import {toggleNotifications} from '@redux/reducers/ui';
-import {ExclamationCircleOutlined, CheckCircleOutlined, InfoCircleOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, CheckCircleOutlined, InfoCircleOutlined, CopyOutlined} from '@ant-design/icons';
 import Colors, {FontColors} from '@styles/Colors';
-import {Badge} from 'antd';
+import {Badge, Tooltip} from 'antd';
 import {AlertEnum, AlertType} from '@models/alert';
 import {DateTime} from 'luxon';
 
@@ -26,7 +27,7 @@ const StyledNoNotificationsContainer = styled(StyledDiv)`
 const StyledMessageBodyContainer = styled(StyledDiv)`
   display: flex;
   flex-direction: column;
-  width: 100%
+  width: 100%;
 `;
 
 const StyledSpan = styled.span`
@@ -78,6 +79,49 @@ const StyledExclamationCircleOutlinedWarning = styled(ExclamationCircleOutlined)
   font-size: 16px;
 `;
 
+type NotificationProps = {
+  notification: any;
+  badge: JSX.Element;
+};
+
+const Notification: React.FC<NotificationProps> = props => {
+  const {notification, badge} = props;
+  const {createdAt, title, message} = notification;
+
+  const copyToClipboardMessage = `Title: ${title}. Description: ${message}.`;
+
+  const {isCopied, setCopyToClipboardState} = useCopyToClipboard(copyToClipboardMessage);
+
+  const onCopyToClipboard = () => {
+    if (isCopied) {
+      return;
+    }
+
+    setCopyToClipboardState(true);
+  };
+
+  return (
+    <StyledDiv key={notification.id}>
+      <StyledDateSpan>
+        {DateTime.fromMillis(Number(createdAt)).toRelativeCalendar()}&nbsp;
+        {DateTime.fromMillis(Number(createdAt)).toFormat('T')}
+      </StyledDateSpan>
+      <StyledMessageContainer>
+        <StyledStatusBadge>{badge}</StyledStatusBadge>
+        <Tooltip title={isCopied ? 'Copied!' : 'Copy'}>
+          <StyledStatusBadge>
+            <CopyOutlined onClick={onCopyToClipboard} />
+          </StyledStatusBadge>
+        </Tooltip>
+        <StyledMessageBodyContainer>
+          <StyledTitleSpan>{title}</StyledTitleSpan>
+          <StyledMessageSpan>{message}</StyledMessageSpan>
+        </StyledMessageBodyContainer>
+      </StyledMessageContainer>
+    </StyledDiv>
+  );
+};
+
 const NotificationsDrawer = () => {
   const dispatch = useAppDispatch();
   const isNotificationsOpen = Boolean(useAppSelector(state => state.ui.isNotificationsOpen));
@@ -115,21 +159,9 @@ const NotificationsDrawer = () => {
       visible={isNotificationsOpen}
     >
       {notifications && notifications.length > 0 ? (
-        notifications.map(notification => (
-          <StyledDiv key={notification.id}>
-            <StyledDateSpan>
-              {DateTime.fromMillis(Number(notification.createdAt)).toRelativeCalendar()}&nbsp;
-              {DateTime.fromMillis(Number(notification.createdAt)).toFormat('T')}
-            </StyledDateSpan>
-            <StyledMessageContainer>
-              <StyledStatusBadge>{getNotificationBadge(notification.type)}</StyledStatusBadge>
-              <StyledMessageBodyContainer>
-                <StyledTitleSpan>{notification.title}</StyledTitleSpan>
-                <StyledMessageSpan>{notification.message}</StyledMessageSpan>
-              </StyledMessageBodyContainer>
-            </StyledMessageContainer>
-          </StyledDiv>
-        ))
+        notifications.map(notification => {
+          return <Notification notification={notification} badge={getNotificationBadge(notification.type)} />;
+        })
       ) : (
         <StyledNoNotificationsContainer>There is no notifications to show</StyledNoNotificationsContainer>
       )}
