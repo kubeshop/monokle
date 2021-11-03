@@ -7,5 +7,5 @@ export {default as ResourceActionsMenu} from './ResourceActionsMenu';
 export {default as ScrollIntoView} from './ScrollIntoView';
 export {default as TitleBar} from './TitleBar';
 export {default as SectionRenderer} from './SectionRenderer';
-export {default as NavigatorDiff} from './NavigatorDiff';
+export {default as ClusterDiff} from './ClusterDiff';
 export {default as ResourceFilter} from './ResourceFilter';

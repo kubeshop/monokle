@@ -113,7 +113,7 @@ interface AppState {
   diffContent?: string;
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
-  navigatorDiff: {
+  clusterDiff: {
     hasLoaded: boolean;
     hasFailed: boolean;
     hideClusterOnlyResources: boolean;

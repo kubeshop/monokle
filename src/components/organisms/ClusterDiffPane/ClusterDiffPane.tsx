@@ -1,8 +1,8 @@
 import React, {useCallback, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {closeNavigatorDiff} from '@redux/reducers/ui';
-import {NavigatorDiff} from '@molecules';
-import {loadNavigatorDiff} from '@redux/thunks/loadNavigatorDiff';
+import {closeClusterDiff} from '@redux/reducers/ui';
+import {ClusterDiff} from '@molecules';
+import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {Skeleton} from 'antd';
 import styled from 'styled-components';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -19,55 +19,55 @@ const SkeletonContainer = styled.div`
   padding: 10px;
 `;
 
-function NavigatorDiffPane() {
+function ClusterDiffPane() {
   const dispatch = useAppDispatch();
 
-  const hasNavigatorDiffLoaded = useAppSelector(state => state.main.navigatorDiff.hasLoaded);
-  const hasNavigatorDiffFailed = useAppSelector(state => state.main.navigatorDiff.hasFailed);
-  const isNavigatorDiffVisible = useAppSelector(state => state.ui.isNavigatorDiffVisible);
+  const hasClusterDiffLoaded = useAppSelector(state => state.main.clusterDiff.hasLoaded);
+  const hasClusterDiffFailed = useAppSelector(state => state.main.clusterDiff.hasFailed);
+  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
 
   useEffect(() => {
-    dispatch(loadNavigatorDiff());
+    dispatch(loadClusterDiff());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInPreviewMode]);
 
-  // TODO: improve this by updating the clusterToLocalResourcesMatches after apply instead of reloading the entire navigator diff
+  // TODO: improve this by updating the clusterToLocalResourcesMatches after apply instead of reloading the entire cluster diff
   useEffect(() => {
     if (!isApplyingResource) {
-      dispatch(loadNavigatorDiff());
+      dispatch(loadClusterDiff());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isApplyingResource]);
 
   const closeDrawer = useCallback(() => {
-    dispatch(closeNavigatorDiff());
+    dispatch(closeClusterDiff());
   }, [dispatch]);
 
   useEffect(() => {
-    if (isNavigatorDiffVisible && !hasNavigatorDiffLoaded) {
-      dispatch(loadNavigatorDiff());
+    if (isClusterDiffVisible && !hasClusterDiffLoaded) {
+      dispatch(loadClusterDiff());
     }
-  }, [isNavigatorDiffVisible, hasNavigatorDiffLoaded, dispatch]);
+  }, [isClusterDiffVisible, hasClusterDiffLoaded, dispatch]);
 
   useEffect(() => {
-    if (hasNavigatorDiffFailed) {
+    if (hasClusterDiffFailed) {
       closeDrawer();
     }
-  }, [hasNavigatorDiffFailed, closeDrawer]);
+  }, [hasClusterDiffFailed, closeDrawer]);
 
   return (
     <Container>
-      {!hasNavigatorDiffLoaded ? (
+      {!hasClusterDiffLoaded ? (
         <SkeletonContainer>
           <Skeleton />
         </SkeletonContainer>
       ) : (
-        <NavigatorDiff />
+        <ClusterDiff />
       )}
     </Container>
   );
 }
 
-export default NavigatorDiffPane;
+export default ClusterDiffPane;

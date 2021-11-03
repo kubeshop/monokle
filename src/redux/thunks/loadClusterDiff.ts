@@ -7,24 +7,24 @@ import {ResourceMapType} from '@models/appstate';
 import {AlertEnum, AlertType} from '@models/alert';
 import {createRejectionWithAlert} from './utils';
 
-export type OpenNavigatorDiffPayload = {
+export type LoadClusterDiffPayload = {
   resourceMap?: ResourceMapType;
   alert?: AlertType;
 };
 
-const NAVIGATOR_DIFF_FAILED = 'Navigator Diff Failed';
+const CLUSTER_DIFF_FAILED = 'Cluster Diff Failed';
 
-export const loadNavigatorDiff = createAsyncThunk<
-  OpenNavigatorDiffPayload,
+export const loadClusterDiff = createAsyncThunk<
+  LoadClusterDiffPayload,
   undefined,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/loadNavigatorDiff', async (_, thunkAPI) => {
+>('main/loadClusterDiff', async (_, thunkAPI) => {
   const state = thunkAPI.getState();
   if (!state.config.kubeConfig.currentContext) {
-    return createRejectionWithAlert(thunkAPI, NAVIGATOR_DIFF_FAILED, 'Could not find current kubeconfig context.');
+    return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, 'Could not find current kubeconfig context.');
   }
   try {
     return getClusterObjects(state.config.kubeconfigPath, state.config.kubeConfig.currentContext).then(
@@ -34,7 +34,7 @@ export const loadNavigatorDiff = createAsyncThunk<
         if (fulfilledResults.length === 0) {
           return createRejectionWithAlert(
             thunkAPI,
-            NAVIGATOR_DIFF_FAILED,
+            CLUSTER_DIFF_FAILED,
             // @ts-ignore
             results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
           );
@@ -55,7 +55,7 @@ export const loadNavigatorDiff = createAsyncThunk<
             const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
 
             const alert = {
-              title: 'Navigator Diff',
+              title: 'Cluster Diff',
               message: `Failed to get all cluster resources: ${reason}`,
               type: AlertEnum.Warning,
             };
@@ -67,10 +67,10 @@ export const loadNavigatorDiff = createAsyncThunk<
         return {resourceMap};
       },
       reason => {
-        return createRejectionWithAlert(thunkAPI, NAVIGATOR_DIFF_FAILED, reason.message);
+        return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, reason.message);
       }
     );
   } catch (e: any) {
-    return createRejectionWithAlert(thunkAPI, NAVIGATOR_DIFF_FAILED, e.message);
+    return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, e.message);
   }
 });

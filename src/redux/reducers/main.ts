@@ -28,7 +28,7 @@ import {AlertType} from '@models/alert';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFileStats} from '@utils/files';
 import electronStore from '@utils/electronStore';
-import {loadNavigatorDiff} from '@redux/thunks/loadNavigatorDiff';
+import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {v4 as uuidv4} from 'uuid';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 
@@ -52,7 +52,7 @@ import {
   reprocessResources,
   saveResource,
 } from '../services/resource';
-import {closeNavigatorDiff} from './ui';
+import {closeClusterDiff} from './ui';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -520,14 +520,14 @@ export const mainSlice = createSlice({
     });
 
     builder
-      .addCase(loadNavigatorDiff.pending, state => {
-        state.navigatorDiff.hasLoaded = false;
+      .addCase(loadClusterDiff.pending, state => {
+        state.clusterDiff.hasLoaded = false;
       })
-      .addCase(loadNavigatorDiff.rejected, state => {
-        state.navigatorDiff.hasLoaded = true;
-        state.navigatorDiff.hasFailed = true;
+      .addCase(loadClusterDiff.rejected, state => {
+        state.clusterDiff.hasLoaded = true;
+        state.clusterDiff.hasFailed = true;
       })
-      .addCase(loadNavigatorDiff.fulfilled, (state, action) => {
+      .addCase(loadClusterDiff.fulfilled, (state, action) => {
         const clusterResourceMap = action.payload.resourceMap;
         if (!clusterResourceMap) {
           return;
@@ -593,7 +593,7 @@ export const mainSlice = createSlice({
           }
         });
 
-        if (state.navigatorDiff.hideClusterOnlyResources) {
+        if (state.clusterDiff.hideClusterOnlyResources) {
           clusterToLocalResourcesMatches = clusterToLocalResourcesMatches.filter(match => match.localResourceIds);
         }
 
@@ -618,19 +618,19 @@ export const mainSlice = createSlice({
           });
         });
 
-        state.navigatorDiff.clusterToLocalResourcesMatches = clusterToLocalResourcesMatches;
-        state.navigatorDiff.hasLoaded = true;
-        state.navigatorDiff.hasFailed = false;
+        state.clusterDiff.clusterToLocalResourcesMatches = clusterToLocalResourcesMatches;
+        state.clusterDiff.hasLoaded = true;
+        state.clusterDiff.hasFailed = false;
       });
 
-    builder.addCase(closeNavigatorDiff.type, state => {
+    builder.addCase(closeClusterDiff.type, state => {
       // remove previous cluster diff resources
       Object.values(state.resourceMap)
         .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
         .forEach(r => delete state.resourceMap[r.id]);
-      state.navigatorDiff.clusterToLocalResourcesMatches = [];
-      state.navigatorDiff.hasLoaded = false;
-      state.navigatorDiff.hasFailed = false;
+      state.clusterDiff.clusterToLocalResourcesMatches = [];
+      state.clusterDiff.hasLoaded = false;
+      state.clusterDiff.hasFailed = false;
     });
 
     builder.addMatcher(

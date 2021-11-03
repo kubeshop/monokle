@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
 import {Button, Popover} from 'antd';
 import {FilterOutlined} from '@ant-design/icons';
-import * as S from './NavigatorDiff.styled';
+import * as S from './ClusterDiff.styled';
 
 const Container = styled.div<{height?: number}>`
   overflow-y: scroll;
@@ -29,7 +29,7 @@ const TopContainer = styled(Container)`
   border-bottom: ${AppBorders.sectionDivider};
 `;
 
-function NavigatorDiff() {
+function ClusterDiff() {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
@@ -37,7 +37,7 @@ function NavigatorDiff() {
   return (
     <>
       <S.TitleBar>
-        <MonoPaneTitle>Navigator Diff</MonoPaneTitle>
+        <MonoPaneTitle>Cluster Diff</MonoPaneTitle>
         <S.TitleBarRightButtons>
           <Popover content={<ResourceFilter />} trigger="click">
             <Button type="link" size="small" icon={<FilterOutlined />} />
@@ -77,4 +77,4 @@ function NavigatorDiff() {
   );
 }
 
-export default NavigatorDiff;
+export default ClusterDiff;

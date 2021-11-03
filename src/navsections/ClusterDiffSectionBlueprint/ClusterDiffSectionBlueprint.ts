@@ -17,7 +17,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
   getScope(state) {
     return {
       resourceMap: state.main.resourceMap,
-      clusterToLocalResourcesMatches: state.main.navigatorDiff.clusterToLocalResourcesMatches,
+      clusterToLocalResourcesMatches: state.main.clusterDiff.clusterToLocalResourcesMatches,
       resourceFilter: state.main.resourceFilter,
     };
   },

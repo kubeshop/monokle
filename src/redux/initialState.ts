@@ -27,7 +27,7 @@ const initialAppState: AppState = {
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
     ),
   },
-  navigatorDiff: {
+  clusterDiff: {
     clusterToLocalResourcesMatches: [],
     hasLoaded: false,
     hasFailed: false,
@@ -75,7 +75,7 @@ const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 
 const initialUiState: UiState = {
   isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
-  isNavigatorDiffVisible: false,
+  isClusterDiffVisible: false,
   isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
   isFolderLoading: false,
   newResourceWizard: {

@@ -42,7 +42,7 @@ export type MonacoUiState = {
 
 export type UiState = {
   isSettingsOpen: boolean;
-  isNavigatorDiffVisible: boolean;
+  isClusterDiffVisible: boolean;
   isNotificationsOpen: boolean;
   newResourceWizard: {
     isOpen: boolean;

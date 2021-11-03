@@ -14,15 +14,15 @@ import {
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane, NavigatorDiffPane} from '@organisms';
+import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane, ClusterDiffPane} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
 import {
   ClusterExplorerTooltip,
   FileExplorerTooltip,
   PluginManagerTooltip,
-  NavigatorDiffTooltip,
-  NavigatorDiffDisabledTooltip,
+  ClusterDiffTooltip,
+  ClusterDiffDisabledTooltip,
 } from '@constants/tooltips';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
@@ -31,8 +31,8 @@ import {
   toggleRightMenu,
   setLeftMenuSelection,
   setRightMenuSelection,
-  openNavigatorDiff,
-  closeNavigatorDiff,
+  openClusterDiff,
+  closeClusterDiff,
 } from '@redux/reducers/ui';
 import AppContext from '@src/AppContext';
 
@@ -111,7 +111,7 @@ const PaneManager = () => {
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
 
-  const isNavigatorDiffVisible = useAppSelector(state => state.ui.isNavigatorDiffVisible);
+  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
 
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
@@ -119,7 +119,7 @@ const PaneManager = () => {
 
   const setActivePanes = (side: string, selectedMenu: string) => {
     if (side === 'left') {
-      dispatch(closeNavigatorDiff());
+      dispatch(closeClusterDiff());
       if (leftMenuSelection === selectedMenu) {
         dispatch(toggleLeftMenu());
       } else {
@@ -142,9 +142,9 @@ const PaneManager = () => {
     }
   };
 
-  const openNavigatorDiffDrawer = () => {
+  const openClusterDiffDrawer = () => {
     dispatch(setLeftMenuSelection(''));
-    dispatch(openNavigatorDiff());
+    dispatch(openClusterDiff());
   };
 
   return (
@@ -183,20 +183,20 @@ const PaneManager = () => {
             </Tooltip>
             <Tooltip
               mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
-              title={isFolderOpen ? NavigatorDiffTooltip : NavigatorDiffDisabledTooltip}
+              title={isFolderOpen ? ClusterDiffTooltip : ClusterDiffDisabledTooltip}
               placement="right"
             >
               <Button
                 disabled={!isFolderOpen}
                 size="large"
                 type="text"
-                onClick={openNavigatorDiffDrawer}
+                onClick={openClusterDiffDrawer}
                 icon={
                   <MenuIcon
                     style={!isFolderOpen ? {color: Colors.grey900} : undefined}
                     icon={SwapOutlined}
-                    active={isNavigatorDiffVisible}
-                    isSelected={isNavigatorDiffVisible}
+                    active={isClusterDiffVisible}
+                    isSelected={isClusterDiffVisible}
                   />
                 }
               />
@@ -219,8 +219,8 @@ const PaneManager = () => {
             )}
           </Space>
         </StyledColumnLeftMenu>
-        {isNavigatorDiffVisible ? (
-          <NavigatorDiffPane />
+        {isClusterDiffVisible ? (
+          <ClusterDiffPane />
         ) : (
           <StyledColumnPanes style={{width: contentWidth}}>
             <SplitView
