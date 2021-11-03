@@ -73,7 +73,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const [editor, setEditor] = useState(editorRef.current);
-  const [editingRResourceId, setEditingRResourceId] = useState<string | undefined>(undefined);
+  const [editingResourceId, setEditingResourceId] = useState<string | undefined>(undefined);
 
   const selectResource = (resourceId: string) => {
     if (resourceMap[resourceId]) {
@@ -122,7 +122,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     registerStaticActions(e);
 
     e.onDidFocusEditorText(onEditorFocus);
-    
+
     editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
     setEditor(e);
 
@@ -166,11 +166,11 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       }
     }
 
-    if (!editingRResourceId || selectedResourceId !== editingRResourceId) {
+    if (!editingResourceId || selectedResourceId !== editingResourceId) {
       setCode(newCode);
       setOrgCode(newCode);
       setDirty(false);
-      setEditingRResourceId(selectedResourceId);
+      setEditingResourceId(selectedResourceId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileMap, selectedPath, selectedResourceId, resourceMap]);
