@@ -19,8 +19,8 @@ export function applyResourceWithConfirm(
   }
 ) {
   const title = isKustomizationResource(selectedResource)
-    ? `Apply ${selectedResource.name} kustomization your cluster?`
-    : `Apply ${selectedResource.name} to your cluster?`;
+    ? `Deploy ${selectedResource.name} kustomization to your cluster?`
+    : `Deploy ${selectedResource.name} to your cluster?`;
 
   Modal.confirm({
     title,
