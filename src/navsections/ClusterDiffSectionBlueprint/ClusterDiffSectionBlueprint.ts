@@ -1,5 +1,6 @@
-import {ClusterToLocalResourcesMatch, ResourceMapType} from '@models/appstate';
+import {ClusterToLocalResourcesMatch, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {SectionBlueprint} from '@models/navigator';
+import {isResourcePassingFilter} from '@utils/resources';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import ResourceDiffSectionNameDisplay from './ResourceDiffSectionNameDisplay';
 import ResourceMatchNameDisplay from './ResourceMatchNameDisplay';
@@ -7,6 +8,7 @@ import ResourceMatchNameDisplay from './ResourceMatchNameDisplay';
 export type ClusterDiffScopeType = {
   resourceMap: ResourceMapType;
   clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
+  resourceFilter: ResourceFilterType;
 };
 
 const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch, ClusterDiffScopeType> = {
@@ -16,6 +18,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     return {
       resourceMap: state.main.resourceMap,
       clusterToLocalResourcesMatches: state.main.navigatorDiff.clusterToLocalResourcesMatches,
+      resourceFilter: state.main.resourceFilter,
     };
   },
   builder: {
@@ -65,6 +68,20 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
             ? rawItem.localResourceIds.map(id => scope.resourceMap[id])
             : undefined,
         };
+      },
+      isVisible(rawItem, scope) {
+        const clusterResource = rawItem.clusterResourceId ? scope.resourceMap[rawItem.clusterResourceId] : undefined;
+        const firstLocalResource =
+          rawItem.localResourceIds && rawItem.localResourceIds.length > 0
+            ? scope.resourceMap[rawItem.localResourceIds[0]]
+            : undefined;
+        if (clusterResource && isResourcePassingFilter(clusterResource, scope.resourceFilter)) {
+          return true;
+        }
+        if (firstLocalResource && isResourcePassingFilter(firstLocalResource, scope.resourceFilter)) {
+          return true;
+        }
+        return false;
       },
     },
     customization: {

@@ -2,54 +2,14 @@ import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {ResourceFilterType} from '@models/appstate';
 import {selectK8sResource} from '@redux/reducers/main';
-import {isPassingKeyValueFilter} from '@utils/filter';
 import {isUnsavedResource} from '@redux/services/resource';
 import {SectionBlueprint} from '@models/navigator';
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
+import {isResourcePassingFilter} from '@utils/resources';
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSuffix from './ResourceKindSuffix';
 import ResourceKindNameDisplay from './ResourceKindNameDisplay';
-
-function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
-  if (
-    filters.name &&
-    filters.name.trim() !== '' &&
-    resource.name.toLowerCase().indexOf(filters.name.toLowerCase()) === -1
-  ) {
-    return false;
-  }
-  if (filters.kind && resource.kind !== filters.kind) {
-    return false;
-  }
-  if (filters.namespace) {
-    if (!resource.namespace && filters.namespace !== 'default') {
-      return false;
-    }
-    return resource.namespace === filters.namespace;
-  }
-  if (filters.labels && Object.keys(filters.labels).length > 0) {
-    const resourceLabels = resource.content?.metadata?.labels;
-    if (!resourceLabels) {
-      return false;
-    }
-    const isPassingLabelFilter = isPassingKeyValueFilter(resourceLabels, filters.labels);
-    if (!isPassingLabelFilter) {
-      return false;
-    }
-  }
-  if (filters.annotations && Object.keys(filters.annotations).length > 0) {
-    const resourceAnnotations = resource.content?.metadata?.annotations;
-    if (!resourceAnnotations) {
-      return false;
-    }
-    const isPassingAnnotationsFilter = isPassingKeyValueFilter(resourceAnnotations, filters.annotations);
-    if (!isPassingAnnotationsFilter) {
-      return false;
-    }
-  }
-  return true;
-}
 
 export type ResourceKindScopeType = {
   activeResources: K8sResource[];

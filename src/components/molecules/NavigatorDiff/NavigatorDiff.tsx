@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import {MonoPaneTitle} from '@components/atoms';
 import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
 import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
-import {SectionRenderer} from '@components/molecules';
+import {SectionRenderer, ResourceFilter} from '@components/molecules';
 import AppContext from '@src/AppContext';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 import {HelmValuesFile} from '@models/helm';
@@ -11,6 +11,8 @@ import {ClusterToLocalResourcesMatch} from '@models/appstate';
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 import styled from 'styled-components';
 import {AppBorders} from '@styles/Borders';
+import {Button, Popover} from 'antd';
+import {FilterOutlined} from '@ant-design/icons';
 import * as S from './NavigatorDiff.styled';
 
 const Container = styled.div<{height?: number}>`
@@ -36,6 +38,11 @@ function NavigatorDiff() {
     <>
       <S.TitleBar>
         <MonoPaneTitle>Navigator Diff</MonoPaneTitle>
+        <S.TitleBarRightButtons>
+          <Popover content={<ResourceFilter />} trigger="click">
+            <Button type="link" size="small" icon={<FilterOutlined />} />
+          </Popover>
+        </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>
         <TopContainer>

@@ -14,6 +14,12 @@ export const TitleBar = styled.div`
   background: ${BackgroundColors.darkThemeBackground};
 `;
 
+export const TitleBarRightButtons = styled.div`
+  float: right;
+  display: flex;
+  align-items: center;
+`;
+
 export const List = styled.ol<{height: number}>`
   list-style-type: none;
   padding: 0;
