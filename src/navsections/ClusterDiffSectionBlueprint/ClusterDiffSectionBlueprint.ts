@@ -2,7 +2,7 @@ import {ClusterToLocalResourcesMatch, ResourceFilterType, ResourceMapType} from 
 import {SectionBlueprint} from '@models/navigator';
 import {isResourcePassingFilter} from '@utils/resources';
 import sectionBlueprintMap from '../sectionBlueprintMap';
-import ResourceDiffSectionNameDisplay from './ResourceDiffSectionNameDisplay';
+import ClusterDiffSectionNameDisplay from './ClusterDiffSectionNameDisplay';
 import ResourceMatchNameDisplay from './ResourceMatchNameDisplay';
 
 export type ClusterDiffScopeType = {
@@ -50,7 +50,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
   },
   customization: {
     nameDisplay: {
-      component: ResourceDiffSectionNameDisplay,
+      component: ClusterDiffSectionNameDisplay,
     },
   },
   itemBlueprint: {

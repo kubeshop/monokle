@@ -24,23 +24,21 @@ const Spacing = styled.div`
   width: 60px;
 `;
 
-const Title = styled.h1`
-  display: block;
-  width: 100%;
-  flex: 0 0 100%;
+const StyledTag = styled(Tag)`
+  padding: 5px 10px;
+  font-size: 14px;
 `;
 
 function ResourceDiffSectionNameDisplay() {
   return (
     <NameDisplayContainer>
-      <Title>K8s Resource Diff</Title>
       <TagsContainer>
         <TagWrapper>
-          <Tag>Local</Tag>
+          <StyledTag>Local Resources</StyledTag>
         </TagWrapper>
         <Spacing />
         <TagWrapper>
-          <Tag>Cluster</Tag>
+          <StyledTag>Cluster Resources</StyledTag>
         </TagWrapper>
       </TagsContainer>
     </NameDisplayContainer>
