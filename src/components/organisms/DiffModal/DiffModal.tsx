@@ -1,10 +1,11 @@
-import * as React from 'react';
 import styled from 'styled-components';
 import {Button, Modal} from 'antd';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useEffect, useState} from 'react';
 import {stringify} from 'yaml';
+
+import Icon from '@components/atoms/Icon';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
@@ -115,8 +116,8 @@ const DiffModal = () => {
         <>
           <LeftButton onClick={handleOk}>Close</LeftButton>
           <LeftButton onClick={handleRefresh}>Refresh</LeftButton>
-          <Button type="primary" ghost onClick={handleApply}>
-            Apply
+          <Button type="primary" ghost onClick={handleApply} icon={<Icon name="kubernetes" />}>
+            Deploy
           </Button>
         </>
       }
