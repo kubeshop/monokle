@@ -10,23 +10,21 @@ import {K8sResource} from '@models/k8sresource';
 import {ClusterToLocalResourcesMatch} from '@models/appstate';
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 import styled from 'styled-components';
-import {AppBorders} from '@styles/Borders';
 import {Button, Popover} from 'antd';
 import {FilterOutlined} from '@ant-design/icons';
 import * as S from './ClusterDiff.styled';
 
 const Container = styled.div<{height?: number}>`
-  overflow-y: scroll;
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
+  display: flex;
   ${props => props.height && `height: ${props.height};`}
 `;
 
-const TopContainer = styled(Container)`
-  max-height: 200px;
-  border-bottom: ${AppBorders.sectionDivider};
+const LeftPane = styled.div`
+  width: 300px;
+`;
+
+const RightPane = styled.div`
+  flex-grow: 1;
 `;
 
 function ClusterDiff() {
@@ -35,17 +33,12 @@ function ClusterDiff() {
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   return (
-    <>
-      <S.TitleBar>
-        <MonoPaneTitle>Cluster Diff</MonoPaneTitle>
-        <S.TitleBarRightButtons>
-          <Popover content={<ResourceFilter />} trigger="click">
-            <Button type="link" size="small" icon={<FilterOutlined />} />
-          </Popover>
-        </S.TitleBarRightButtons>
-      </S.TitleBar>
-      <S.List height={navigatorHeight}>
-        <TopContainer>
+    <Container>
+      <LeftPane>
+        <S.TitleBar>
+          <MonoPaneTitle>Navigator</MonoPaneTitle>
+        </S.TitleBar>
+        <S.List height={navigatorHeight}>
           <SectionRenderer<HelmValuesFile, HelmChartScopeType>
             sectionBlueprint={HelmChartSectionBlueprint}
             level={0}
@@ -64,16 +57,26 @@ function ClusterDiff() {
               disableSuffix: true,
             }}
           />
-        </TopContainer>
-        <Container height={navigatorHeight - 200}>
+        </S.List>
+      </LeftPane>
+      <RightPane>
+        <S.TitleBar>
+          <MonoPaneTitle>Cluster Diff</MonoPaneTitle>
+          <S.TitleBarRightButtons>
+            <Popover content={<ResourceFilter />} trigger="click">
+              <Button type="link" size="small" icon={<FilterOutlined />} />
+            </Popover>
+          </S.TitleBarRightButtons>
+        </S.TitleBar>
+        <S.List height={navigatorHeight}>
           <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
             sectionBlueprint={ClusterDiffSectionBlueprint}
             level={0}
             isLastSection={false}
           />
-        </Container>
-      </S.List>
-    </>
+        </S.List>
+      </RightPane>
+    </Container>
   );
 }
 

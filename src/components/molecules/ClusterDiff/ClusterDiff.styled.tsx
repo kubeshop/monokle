@@ -5,7 +5,6 @@ import {BackgroundColors} from '@styles/Colors';
 export const TitleBar = styled.div`
   display: flex;
   height: 24px;
-  justify-content: space-between;
   border-bottom: ${AppBorders.sectionDivider};
   width: 100%;
   height: 40px;
@@ -15,9 +14,9 @@ export const TitleBar = styled.div`
 `;
 
 export const TitleBarRightButtons = styled.div`
-  float: right;
   display: flex;
   align-items: center;
+  margin-left: 10px;
 `;
 
 export const List = styled.ol<{height: number}>`
