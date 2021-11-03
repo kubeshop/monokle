@@ -141,17 +141,22 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
 const editMenu = (store: any): MenuItemConstructorOptions => {
   const mainState: AppState = store.getState().main;
   const uiState: UiState = store.getState().ui;
+
+  const isMonacoActionEnabled = Boolean(mainState.selectedResourceId) && uiState.monacoEditor.focused;
+
   return {
     label: 'Edit',
-    enabled: Boolean(mainState.selectedResourceId) && uiState.monacoEditor.focused,
+
     submenu: [
       {
+        enabled: isMonacoActionEnabled,
         label: 'Undo',
         click: () => {
           store.dispatch(setMonacoEditor({undo: true}));
         },
       },
       {
+        enabled: isMonacoActionEnabled,
         label: 'Redo',
         click: () => {
           store.dispatch(setMonacoEditor({redo: true}));
@@ -163,12 +168,14 @@ const editMenu = (store: any): MenuItemConstructorOptions => {
       {role: 'paste'},
       {type: 'separator'},
       {
+        enabled: isMonacoActionEnabled,
         label: 'Find',
         click: () => {
           store.dispatch(setMonacoEditor({find: true}));
         },
       },
       {
+        enabled: isMonacoActionEnabled,
         label: 'Replace',
         click: () => {
           store.dispatch(setMonacoEditor({replace: true}));
@@ -176,6 +183,7 @@ const editMenu = (store: any): MenuItemConstructorOptions => {
       },
       {type: 'separator'},
       {
+        enabled: isMonacoActionEnabled,
         label: 'Apply',
         accelerator: hotkeys.APPLY_SELECTION,
         click: () => {
@@ -183,6 +191,7 @@ const editMenu = (store: any): MenuItemConstructorOptions => {
         },
       },
       {
+        enabled: isMonacoActionEnabled,
         label: 'Diff',
         accelerator: hotkeys.DIFF_RESOURCE,
         click: async () => {
@@ -288,7 +297,7 @@ const helpMenu = (store: any, includeUpdateMenu?: boolean): MenuItemConstructorO
 };
 
 export const createMenu = (store: any) => {
-  const template: any[] = [
+  const template: MenuItemConstructorOptions[] = [
     fileMenu(store),
     editMenu(store),
     viewMenu(store),
