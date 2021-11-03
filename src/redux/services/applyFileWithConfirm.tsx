@@ -10,7 +10,7 @@ export function applyFileWithConfirm(
   dispatch: ThunkDispatch<any, any, any>,
   kubeconfig: string
 ) {
-  const title = `Apply ${fileMap[selectedPath].name} to your cluster?`;
+  const title = `Deploy ${fileMap[selectedPath].name} to your cluster?`;
 
   Modal.confirm({
     title,

@@ -2,6 +2,8 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {Tabs, Col, Row, Button, Tooltip, Menu, Dropdown} from 'antd';
 import {CodeOutlined, ContainerOutlined, ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
+import Icon from '@components/atoms/Icon';
+
 import Monaco from '@molecules/Monaco';
 import FormEditor from '@molecules/FormEditor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -250,8 +252,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
                       (!selectedResourceId && !selectedPath) ||
                       (selectedResource && isKustomizationPatch(selectedResource))
                     }
+                    icon={<Icon name="kubernetes" />}
                   >
-                    Apply
+                    Deploy
                   </Button>
                 </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
