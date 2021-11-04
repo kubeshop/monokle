@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {MinusSquareOutlined} from '@ant-design/icons';
 import * as S from './styled';
 
-function SectionHeader(props: {
+interface SectionHeaderProps {
   name: string;
   isSectionSelected: boolean;
   isCollapsed: boolean;
@@ -16,7 +16,9 @@ function SectionHeader(props: {
   itemsLength: number;
   expandSection: () => void;
   collapseSection: () => void;
-}) {
+}
+
+function SectionHeader(props: SectionHeaderProps) {
   const {
     name,
     isSectionSelected,

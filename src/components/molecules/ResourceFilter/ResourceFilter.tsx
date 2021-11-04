@@ -63,9 +63,11 @@ const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (curren
 
 const ResourceFilter = () => {
   const dispatch = useAppDispatch();
-  const [name, setName] = useState<string>();
-  const [kind, setKind] = useState<string>();
-  const [namespace, setNamespace] = useState<string>();
+
+  // TODO: Should we use here Antd Form instead of storing all the field values in useStates?
+  const [name, setName] = useState('');
+  const [kind, setKind] = useState(ALL_OPTIONS);
+  const [namespace, setNamespace] = useState(ALL_OPTIONS);
   const [labels, setLabels] = useState<Record<string, string | null>>({});
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const allNamespaces = useNamespaces({extra: ['all', 'default']});
@@ -88,7 +90,7 @@ const ResourceFilter = () => {
   }, [resourceMap]);
 
   const resetFilters = () => {
-    setName(undefined);
+    setName('');
     setKind(ALL_OPTIONS);
     setNamespace(ALL_OPTIONS);
     setLabels({});
@@ -96,19 +98,19 @@ const ResourceFilter = () => {
   };
 
   const updateKind = (selectedKind: string) => {
-    if (selectedKind === ALL_OPTIONS) {
-      setKind(undefined);
-    } else {
-      setKind(selectedKind);
-    }
+    // if (selectedKind === ALL_OPTIONS) {
+    //   setKind(ALL_OPTIONS);
+    // } else {
+    setKind(selectedKind);
+    // }
   };
 
   const updateNamespace = (selectedNamespace: string) => {
-    if (selectedNamespace === ALL_OPTIONS) {
-      setNamespace(undefined);
-    } else {
-      setNamespace(selectedNamespace);
-    }
+    // if (selectedNamespace === ALL_OPTIONS) {
+    //   setNamespace(ALL_OPTIONS);
+    // } else {
+    setNamespace(selectedNamespace);
+    // }
   };
 
   useDebounce(
@@ -140,6 +142,7 @@ const ResourceFilter = () => {
           autoFocus
           placeholder="All or part of name..."
           defaultValue={name}
+          value={name}
           onChange={e => setName(e.target.value)}
         />
       </FieldContainer>
