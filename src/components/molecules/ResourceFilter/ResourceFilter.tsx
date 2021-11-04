@@ -63,11 +63,9 @@ const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (curren
 
 const ResourceFilter = () => {
   const dispatch = useAppDispatch();
-
-  // TODO: Should we use here Antd Form instead of storing all the field values in useStates?
-  const [name, setName] = useState('');
-  const [kind, setKind] = useState(ALL_OPTIONS);
-  const [namespace, setNamespace] = useState(ALL_OPTIONS);
+  const [name, setName] = useState<string>();
+  const [kind, setKind] = useState<string>();
+  const [namespace, setNamespace] = useState<string>();
   const [labels, setLabels] = useState<Record<string, string | null>>({});
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const allNamespaces = useNamespaces({extra: ['all', 'default']});
@@ -98,19 +96,19 @@ const ResourceFilter = () => {
   };
 
   const updateKind = (selectedKind: string) => {
-    // if (selectedKind === ALL_OPTIONS) {
-    //   setKind(ALL_OPTIONS);
-    // } else {
-    setKind(selectedKind);
-    // }
+    if (selectedKind === ALL_OPTIONS) {
+      setKind(undefined);
+    } else {
+      setKind(selectedKind);
+    }
   };
 
   const updateNamespace = (selectedNamespace: string) => {
-    // if (selectedNamespace === ALL_OPTIONS) {
-    //   setNamespace(ALL_OPTIONS);
-    // } else {
-    setNamespace(selectedNamespace);
-    // }
+    if (selectedNamespace === ALL_OPTIONS) {
+      setNamespace(undefined);
+    } else {
+      setNamespace(selectedNamespace);
+    }
   };
 
   useDebounce(
@@ -148,7 +146,13 @@ const ResourceFilter = () => {
       </FieldContainer>
       <FieldContainer>
         <FieldLabel>Kind:</FieldLabel>
-        <Select showSearch defaultValue={ALL_OPTIONS} value={kind} onChange={updateKind} style={{width: '100%'}}>
+        <Select
+          showSearch
+          defaultValue={ALL_OPTIONS}
+          value={kind || ALL_OPTIONS}
+          onChange={updateKind}
+          style={{width: '100%'}}
+        >
           <Select.Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
             {ALL_OPTIONS}
           </Select.Option>
@@ -164,7 +168,7 @@ const ResourceFilter = () => {
         <Select
           showSearch
           defaultValue={ALL_OPTIONS}
-          value={namespace}
+          value={namespace || ALL_OPTIONS}
           onChange={updateNamespace}
           style={{width: '100%'}}
         >

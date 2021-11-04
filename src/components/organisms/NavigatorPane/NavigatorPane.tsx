@@ -12,7 +12,7 @@ import ResourceFilter from '@components/molecules/ResourceFilter';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 import {useSelector} from 'react-redux';
-import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector, activeResourcesSelector} from '@redux/selectors';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {MonoPaneTitle} from '@components/atoms';
 import SectionRenderer from './SectionRenderer';
@@ -28,6 +28,7 @@ const NavPane: React.FC = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   // TODO: remove this any
   const resourceFilters: any = useAppSelector(state => state.main.resourceFilter);
+  const activeResources = useAppSelector(activeResourcesSelector);
 
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
@@ -66,7 +67,9 @@ const NavPane: React.FC = () => {
             popoverContent={<ResourceFilter />}
             popoverTrigger="click"
             iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-            isDisabled={!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode}
+            isDisabled={
+              (!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0
+            }
           />
           {appliedFilters.length ? <S.FiltersNumber>{appliedFilters.length} filters applied</S.FiltersNumber> : null}
         </S.TitleBarRightButtons>

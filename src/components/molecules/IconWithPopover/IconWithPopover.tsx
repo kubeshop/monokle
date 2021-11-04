@@ -18,7 +18,7 @@ const IconWithPopover: React.FC<IconWithPopoverProps> = props => {
   const iconToDisplay = iconComponent || (iconName ? <Icon name={iconName} /> : null);
 
   return (
-    <Popover content={popoverContent} trigger={popoverTrigger}>
+    <Popover content={isDisabled ? <span>Filter is disabled</span> : popoverContent} trigger={popoverTrigger}>
       <Button disabled={isDisabled} type={buttonType} size="small" icon={iconToDisplay} />
     </Popover>
   );
