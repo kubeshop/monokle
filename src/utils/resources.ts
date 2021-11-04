@@ -3,6 +3,8 @@ import flatten from 'flat';
 import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {isPassingKeyValueFilter} from '@utils/filter';
+import {removeNestedEmptyObjects} from '@utils/objects';
+import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
 export const makeResourceNameKindNamespaceIdentifier = (resource: K8sResource) =>
   `${resource.name}#${resource.kind}#${resource.namespace ? resource.namespace : 'default'}`;
@@ -47,19 +49,41 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   return true;
 }
 
-export function isLocalResourceDifferentThanClusterResource(localResource: K8sResource, clusterResource: K8sResource) {
-  const flatLocalResourceContent = flatten<any, string[]>(localResource.content, {delimiter: '#'});
-  const localResourceContentPaths = Object.keys(flatLocalResourceContent);
-  let isDiff: boolean = false;
-  for (let i = 0; i < localResourceContentPaths.length; i += 1) {
-    const currentPathString = localResourceContentPaths[i];
-    const currentPath = currentPathString.split('#');
-    const localValue = _.get(localResource.content, currentPath);
-    const clusterValue = _.get(clusterResource.content, currentPath);
-    if (!_.isEqual(localValue, clusterValue)) {
-      isDiff = true;
-      break;
+export function diffLocalToClusterResources(localResource: K8sResource, clusterResource: K8sResource) {
+  const flattenClusterResourceContent = flatten<any, any>(clusterResource.content, {delimiter: '#'});
+  const clusterResourceContentPaths = Object.keys(flattenClusterResourceContent);
+
+  // deep copy of the clusterResource.content
+  const newClusterContent = JSON.parse(JSON.stringify(clusterResource.content));
+
+  const clusterResourcePathsToRemove: string[] = [];
+  CLUSTER_RESOURCE_IGNORED_PATHS.forEach(ignoredPath => {
+    if (ignoredPath.startsWith('...')) {
+      clusterResourcePathsToRemove.push(
+        ...clusterResourceContentPaths.filter(contentPath => contentPath.endsWith(ignoredPath.substring(3)))
+      );
+    } else {
+      clusterResourcePathsToRemove.push(ignoredPath);
     }
+  });
+
+  clusterResourcePathsToRemove.forEach(pathToRemove => {
+    _.unset(newClusterContent, pathToRemove.split('#'));
+  });
+
+  if (
+    _.get(newClusterContent, 'metadata.namespace') === 'default' &&
+    _.get(localResource.content, 'metadata.namespace') === undefined
+  ) {
+    _.unset(newClusterContent, 'metadata.namespace');
   }
-  return isDiff;
+
+  const cleanLocalResourceContent = removeNestedEmptyObjects(localResource.content);
+  const cleanClusterResourceContent = removeNestedEmptyObjects(newClusterContent);
+
+  return {
+    areDifferent: !_.isEqual(cleanLocalResourceContent, cleanClusterResourceContent),
+    cleanLocalResourceContent,
+    cleanClusterResourceContent,
+  };
 }

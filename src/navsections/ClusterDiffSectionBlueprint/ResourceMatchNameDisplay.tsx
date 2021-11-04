@@ -10,7 +10,7 @@ import {Tooltip} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
-import {isLocalResourceDifferentThanClusterResource} from '@utils/resources';
+import {diffLocalToClusterResources} from '@utils/resources';
 
 const Container = styled.div<{highlightdiff: boolean}>`
   width: 800px;
@@ -53,7 +53,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     if (!firstLocalResource || !clusterResource) {
       return false;
     }
-    return isLocalResourceDifferentThanClusterResource(firstLocalResource, clusterResource);
+    return diffLocalToClusterResources(firstLocalResource, clusterResource).areDifferent;
   }, [firstLocalResource, clusterResource]);
 
   const onClickDiff = () => {
