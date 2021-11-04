@@ -68,7 +68,7 @@ const NavPane: React.FC = () => {
             iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
             isDisabled={!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode}
           />
-          {appliedFilters.length ? <S.FiltersAmount>{appliedFilters.length} filters applied</S.FiltersAmount> : null}
+          {appliedFilters.length ? <S.FiltersNumber>{appliedFilters.length} filters applied</S.FiltersNumber> : null}
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>

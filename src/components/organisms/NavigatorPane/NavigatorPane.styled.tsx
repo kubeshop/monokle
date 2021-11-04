@@ -38,6 +38,6 @@ export const PlusButton = styled(Button)``;
 
 export const FilterButton = styled(Button)``;
 
-export const FiltersAmount = styled.div`
+export const FiltersNumber = styled.div`
   margin-left: 5px;
 `;
