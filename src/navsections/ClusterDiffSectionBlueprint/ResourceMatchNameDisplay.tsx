@@ -6,7 +6,7 @@ import Colors from '@styles/Colors';
 import {SwapOutlined, ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {Tooltip} from 'antd';
+import {Tooltip, Tag} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
@@ -40,6 +40,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
 
   const {clusterResource, localResources} = (itemInstance.meta || {}) as {
     clusterResource?: K8sResource;
@@ -76,7 +77,12 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
 
   return (
     <Container highlightdiff={areResourcesDifferent}>
-      <Label disabled={!firstLocalResource}>{itemInstance.name}</Label>
+      <Label disabled={!firstLocalResource}>
+        {!resourceFilterNamespace && (
+          <Tag>{firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}</Tag>
+        )}
+        {itemInstance.name}
+      </Label>
       <IconsContainer>
         {firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffApplyTooltip}>
@@ -94,7 +100,11 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
           </Tooltip>
         )}
       </IconsContainer>
-      <Label disabled={!clusterResource}>{itemInstance.name}</Label>
+
+      <Label disabled={!clusterResource}>
+        {!resourceFilterNamespace && <Tag>{clusterResource?.namespace ? clusterResource.namespace : 'default'}</Tag>}
+        {itemInstance.name}
+      </Label>
     </Container>
   );
 }

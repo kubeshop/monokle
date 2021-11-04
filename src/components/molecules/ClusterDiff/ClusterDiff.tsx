@@ -12,6 +12,7 @@ import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsection
 import styled from 'styled-components';
 import {Button, Popover} from 'antd';
 import {FilterOutlined} from '@ant-design/icons';
+import ResourceNamespaceFilter from '../ResourceNamespaceFilter';
 import * as S from './ClusterDiff.styled';
 
 const Container = styled.div<{height?: number}>`
@@ -25,6 +26,16 @@ const LeftPane = styled.div`
 
 const RightPane = styled.div`
   flex-grow: 1;
+`;
+
+const NamespaceFilterContainer = styled.div`
+  display: flex;
+  align-items: center;
+  width: 300px;
+`;
+
+const NamespaceFilterLabel = styled.span`
+  margin-right: 10px;
 `;
 
 function ClusterDiff() {
@@ -66,6 +77,9 @@ function ClusterDiff() {
             <Popover content={<ResourceFilter />} trigger="click">
               <Button type="link" size="small" icon={<FilterOutlined />} />
             </Popover>
+            <NamespaceFilterContainer>
+              <NamespaceFilterLabel>Namespace:</NamespaceFilterLabel> <ResourceNamespaceFilter />
+            </NamespaceFilterContainer>
           </S.TitleBarRightButtons>
         </S.TitleBar>
         <S.List height={navigatorHeight}>
