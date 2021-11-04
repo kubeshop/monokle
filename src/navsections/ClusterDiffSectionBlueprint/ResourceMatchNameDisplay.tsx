@@ -10,11 +10,15 @@ import {Tooltip} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {isLocalResourceDifferentThanClusterResource} from '@utils/resources';
 
-const Container = styled.div`
+const Container = styled.div<{highlightdiff: boolean}>`
   width: 800px;
   display: flex;
   justify-content: space-between;
+  margin-left: -24px;
+  padding-left: 24px;
+  ${props => props.highlightdiff && `background: ${Colors.diffBackground}`}
 `;
 
 const Label = styled.span<{disabled?: boolean}>`
@@ -45,6 +49,13 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     return localResources && localResources.length > 0 ? localResources[0] : undefined;
   }, [localResources]);
 
+  const areResourcesDifferent = useMemo(() => {
+    if (!firstLocalResource || !clusterResource) {
+      return false;
+    }
+    return isLocalResourceDifferentThanClusterResource(firstLocalResource, clusterResource);
+  }, [firstLocalResource, clusterResource]);
+
   const onClickDiff = () => {
     if (!firstLocalResource) {
       return;
@@ -64,7 +75,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   }
 
   return (
-    <Container>
+    <Container highlightdiff={areResourcesDifferent}>
       <Label disabled={!firstLocalResource}>{itemInstance.name}</Label>
       <IconsContainer>
         {firstLocalResource && (
