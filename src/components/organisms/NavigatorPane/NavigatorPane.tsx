@@ -12,6 +12,7 @@ import ResourceFilter from '@components/molecules/ResourceFilter';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 import {useSelector} from 'react-redux';
+import {ResourceFilterType} from '@models/appstate';
 import {isInClusterModeSelector, isInPreviewModeSelector, activeResourcesSelector} from '@redux/selectors';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {MonoPaneTitle} from '@components/atoms';
@@ -26,17 +27,16 @@ const NavPane: React.FC = () => {
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
-  // TODO: remove this any
-  const resourceFilters: any = useAppSelector(state => state.main.resourceFilter);
+  const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
   const activeResources = useAppSelector(activeResourcesSelector);
 
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const appliedFilters = useMemo(() => {
-    return Object.keys(resourceFilters)
-      .map(filterName => {
-        return {filterName, filterValue: resourceFilters[filterName]};
+    return Object.entries(resourceFilters)
+      .map(([key, value]) => {
+        return {filterName: key, filterValue: value};
       })
       .filter(filter => filter.filterValue && Object.values(filter.filterValue).length);
   }, [resourceFilters]);
