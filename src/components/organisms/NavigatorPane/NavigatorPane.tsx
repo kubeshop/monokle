@@ -7,6 +7,9 @@ import IconWithPopover from '@components/molecules/IconWithPopover';
 import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
 import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
 import K8sResourceSectionBlueprint, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
+import UnknownResourceSectionBlueprint, {
+  UnknownResourceScopeType,
+} from '@src/navsections/UnknownResourceSectionBlueprint';
 import {Badge} from 'antd';
 import {PlusOutlined, FilterOutlined} from '@ant-design/icons';
 import ResourceFilter from '@components/molecules/ResourceFilter';
@@ -89,6 +92,11 @@ const NavPane: React.FC = () => {
         />
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
+          level={0}
+          isLastSection={false}
+        />
+        <SectionRenderer<K8sResource, UnknownResourceScopeType>
+          sectionBlueprint={UnknownResourceSectionBlueprint}
           level={0}
           isLastSection={false}
         />
