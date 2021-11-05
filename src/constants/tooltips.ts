@@ -27,5 +27,5 @@ export const KustomizeCommandTooltip = 'Set how to invoke kustomize when preview
 export const AutoLoadLastFolderTooltip = 'Load last folder when starting Monokle';
 export const SaveUnsavedResourceTooltip = 'Save resource to file';
 export const ClusterDiffApplyTooltip = 'Apply this resource to your configured cluster';
-export const ClusterDiffSaveTooltip = 'Save this resource locally';
+export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
 export const ClusterDiffCompareTooltip = 'Compare resources - Opens the Diff Modal';

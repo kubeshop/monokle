@@ -1,9 +1,10 @@
 import styled from 'styled-components';
-import {Button, Modal, Switch} from 'antd';
+import {Button, Modal, Switch, Tag} from 'antd';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useEffect, useMemo, useState} from 'react';
 import {parse, stringify} from 'yaml';
+// import flatten, {unflatten} from 'flat';
 
 import Icon from '@components/atoms/Icon';
 
@@ -14,6 +15,8 @@ import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {K8sResource} from '@models/k8sresource';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
+import {updateResource} from '@redux/reducers/main';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close {
@@ -60,6 +63,19 @@ const StyledSwitchLabel = styled.span`
   cursor: pointer;
 `;
 
+const TagsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 40px;
+  padding-bottom: 5px;
+`;
+
+const StyledTag = styled(Tag)`
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: 600;
+`;
+
 const DiffModal = () => {
   const dispatch = useAppDispatch();
 
@@ -84,18 +100,26 @@ const DiffModal = () => {
   };
 
   useEffect(() => {
-    if (resourceMap && diffResourceId) {
-      const resource = resourceMap[diffResourceId];
-      if (resource) {
-        setDiffResource(resource);
-        setResourceContent(stringify(resource.content, {sortMapEntries: true}));
-      }
+    if (!diffResourceId) {
+      return;
+    }
+    setDiffResource(resourceMap[diffResourceId]);
+  }, [diffResourceId, resourceMap]);
+
+  useEffect(() => {
+    if (resourceMap && diffResource) {
+      setResourceContent(stringify(diffResource.content, {sortMapEntries: true}));
     }
 
     setVisible(Boolean(performResourceDiff) && Boolean(resourceMap) && Boolean(diffContent));
-    setShouldDiffIgnorePaths(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [diffContent]);
+  }, [diffContent, diffResource]);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setShouldDiffIgnorePaths(true);
+    }
+  }, [isVisible]);
 
   const cleanDiffContent = useMemo(() => {
     if (!diffContent) return undefined;
@@ -105,18 +129,13 @@ const DiffModal = () => {
     }
     const diffContentObject = parse(diffContent);
     const newDiffContentObject = removeIgnoredPathsFromResourceContent(diffContentObject);
-    const diffResourceContentKeys = Object.keys(diffResource.content);
-    // order the keys of the new diffContentObject by the local resource(diffResource here) keys order
-    const cleanDiffContentObject = Object.keys(newDiffContentObject)
-      .sort((a, b) => {
-        return diffResourceContentKeys.indexOf(a) - diffResourceContentKeys.indexOf(b);
-      })
-      .reduce((acc: any, key) => {
-        acc[key] = newDiffContentObject[key];
-        return acc;
-      }, {});
-    return stringify(cleanDiffContentObject);
+    const cleanDiffContentString = stringify(newDiffContentObject, {sortMapEntries: true});
+    return cleanDiffContentString;
   }, [diffContent, diffResource?.content, shouldDiffIgnorePaths]);
+
+  const areResourcesDifferent = useMemo(() => {
+    return resourceContent !== cleanDiffContent;
+  }, [resourceContent, cleanDiffContent]);
 
   const handleApply = () => {
     if (diffResourceId) {
@@ -128,6 +147,19 @@ const DiffModal = () => {
         });
       }
     }
+  };
+
+  const handleReplace = () => {
+    if (!diffResource || !shouldDiffIgnorePaths || !cleanDiffContent) {
+      return;
+    }
+    dispatch(
+      updateResource({
+        resourceId: diffResource.id,
+        content: cleanDiffContent,
+        preventSelectionAndHighlightsUpdate: true,
+      })
+    );
   };
 
   const handleRefresh = () => {
@@ -155,12 +187,30 @@ const DiffModal = () => {
             <Switch checked={shouldDiffIgnorePaths} />
             <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
           </SwitchContainer>
-          <Button type="primary" ghost onClick={handleApply} icon={<Icon name="kubernetes" />}>
-            Deploy
-          </Button>
         </>
       }
     >
+      <TagsContainer>
+        <StyledTag color="cyan">Local</StyledTag>
+        <Button
+          type="primary"
+          ghost
+          onClick={handleApply}
+          icon={<Icon name="kubernetes" />}
+          disabled={!areResourcesDifferent}
+        >
+          Deploy local resource to cluster <ArrowRightOutlined />
+        </Button>
+        <Button
+          type="primary"
+          ghost
+          onClick={handleReplace}
+          disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}
+        >
+          <ArrowLeftOutlined /> Replace local resource with cluster resource
+        </Button>
+        <StyledTag color="cyan">Cluster</StyledTag>
+      </TagsContainer>
       <MonacoDiffContainer>
         <MonacoDiffEditor
           width="980"

@@ -80,19 +80,8 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     if (!firstLocalResource || !clusterResource) {
       return;
     }
-    const localResourceContentKeys = Object.keys(firstLocalResource.content);
     const newClusterResoureContent = removeIgnoredPathsFromResourceContent(clusterResource.content);
-
-    const cleanClusterResourceContent = Object.keys(newClusterResoureContent)
-      .sort((a, b) => {
-        return localResourceContentKeys.indexOf(a) - localResourceContentKeys.indexOf(b);
-      })
-      .reduce((acc: any, key) => {
-        acc[key] = newClusterResoureContent[key];
-        return acc;
-      }, {});
-
-    const clusterResourceContentText = stringify(cleanClusterResourceContent);
+    const clusterResourceContentText = stringify(newClusterResoureContent, {sortMapEntries: true});
 
     dispatch(
       updateResource({
@@ -108,7 +97,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       return;
     }
     Modal.confirm({
-      title: `Save ${clusterResource.name} to local?`,
+      title: `Replace local ${clusterResource.name} with cluster version?`,
       icon: <ExclamationCircleOutlined />,
       centered: true,
       onOk() {
