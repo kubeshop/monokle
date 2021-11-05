@@ -9,6 +9,7 @@ export type ClusterDiffScopeType = {
   resourceMap: ResourceMapType;
   clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
   resourceFilter: ResourceFilterType;
+  isPreviewLoading: boolean;
 };
 
 const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch, ClusterDiffScopeType> = {
@@ -19,6 +20,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
       resourceMap: state.main.resourceMap,
       clusterToLocalResourcesMatches: state.main.clusterDiff.clusterToLocalResourcesMatches,
       resourceFilter: state.main.resourceFilter,
+      isPreviewLoading: state.main.previewLoader.isLoading,
     };
   },
   builder: {
@@ -46,6 +48,9 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     },
     isInitialized(scope) {
       return scope.clusterToLocalResourcesMatches.length > 0;
+    },
+    isLoading(scope) {
+      return scope.isPreviewLoading;
     },
   },
   customization: {
