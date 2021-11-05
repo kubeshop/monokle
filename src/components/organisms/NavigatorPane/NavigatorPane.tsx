@@ -7,6 +7,7 @@ import IconWithPopover from '@components/molecules/IconWithPopover';
 import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
 import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
 import K8sResourceSectionBlueprint, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
+import {Badge} from 'antd';
 import {PlusOutlined, FilterOutlined} from '@ant-design/icons';
 import ResourceFilter from '@components/molecules/ResourceFilter';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -63,15 +64,16 @@ const NavPane: React.FC = () => {
             size="small"
             icon={<PlusOutlined />}
           />
-          <IconWithPopover
-            popoverContent={<ResourceFilter />}
-            popoverTrigger="click"
-            iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-            isDisabled={
-              (!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0
-            }
-          />
-          {appliedFilters.length ? <S.FiltersNumber>{appliedFilters.length} filters applied</S.FiltersNumber> : null}
+          <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+            <IconWithPopover
+              popoverContent={<ResourceFilter />}
+              popoverTrigger="click"
+              iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+              isDisabled={
+                (!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0
+              }
+            />
+          </Badge>
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>
