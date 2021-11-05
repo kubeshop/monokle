@@ -28,6 +28,7 @@ const Spacing = styled.div`
 const StyledTag = styled(Tag)`
   padding: 5px 10px;
   font-size: 14px;
+  font-weight: 600;
 `;
 
 function ResourceDiffSectionNameDisplay() {
@@ -35,11 +36,11 @@ function ResourceDiffSectionNameDisplay() {
     <NameDisplayContainer>
       <TagsContainer>
         <TagWrapper>
-          <StyledTag>Local Resources</StyledTag>
+          <StyledTag color="cyan">Local Resources</StyledTag>
         </TagWrapper>
         <Spacing />
         <TagWrapper>
-          <StyledTag>Cluster Resources</StyledTag>
+          <StyledTag color="cyan">Cluster Resources</StyledTag>
         </TagWrapper>
       </TagsContainer>
     </NameDisplayContainer>
