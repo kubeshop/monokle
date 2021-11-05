@@ -10,7 +10,9 @@ import {K8sResource} from '@models/k8sresource';
 import {ClusterToLocalResourcesMatch} from '@models/appstate';
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 import styled from 'styled-components';
-import {Divider} from 'antd';
+import {Button, Divider} from 'antd';
+import {useAppDispatch} from '@redux/hooks';
+import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import ClusterDiffNamespaceFilter from './ClusterDiffNamespaceFilter';
 import * as S from './ClusterDiff.styled';
 
@@ -31,16 +33,29 @@ const FilterContainer = styled.span`
   margin-left: 10px;
 `;
 
+const RefreshButton = styled(Button)`
+  margin-top: 1px;
+  margin-left: 8px;
+`;
+
 function ClusterDiff() {
+  const dispatch = useAppDispatch();
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
+
+  const onClickRefresh = () => {
+    dispatch(loadClusterDiff());
+  };
 
   return (
     <Container>
       <LeftPane>
         <S.TitleBar>
           <MonoPaneTitle>Cluster Diff</MonoPaneTitle>
+          <RefreshButton onClick={onClickRefresh} size="small" type="primary" ghost>
+            Refresh
+          </RefreshButton>
           <Divider type="vertical" style={{height: 40}} />
           <S.TitleBarRightButtons>
             <ClusterDiffNamespaceFilter />

@@ -4,6 +4,7 @@ import {BackgroundColors} from '@styles/Colors';
 
 export const TitleBar = styled.div`
   display: flex;
+  align-items: center;
   height: 24px;
   border-bottom: ${AppBorders.sectionDivider};
   width: 100%;
