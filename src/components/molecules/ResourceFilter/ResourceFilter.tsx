@@ -88,7 +88,7 @@ const ResourceFilter = () => {
   }, [resourceMap]);
 
   const resetFilters = () => {
-    setName(undefined);
+    setName('');
     setKind(ALL_OPTIONS);
     setNamespace(ALL_OPTIONS);
     setLabels({});
@@ -140,12 +140,19 @@ const ResourceFilter = () => {
           autoFocus
           placeholder="All or part of name..."
           defaultValue={name}
+          value={name}
           onChange={e => setName(e.target.value)}
         />
       </FieldContainer>
       <FieldContainer>
         <FieldLabel>Kind:</FieldLabel>
-        <Select showSearch defaultValue={ALL_OPTIONS} value={kind} onChange={updateKind} style={{width: '100%'}}>
+        <Select
+          showSearch
+          defaultValue={ALL_OPTIONS}
+          value={kind || ALL_OPTIONS}
+          onChange={updateKind}
+          style={{width: '100%'}}
+        >
           <Select.Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
             {ALL_OPTIONS}
           </Select.Option>
@@ -161,7 +168,7 @@ const ResourceFilter = () => {
         <Select
           showSearch
           defaultValue={ALL_OPTIONS}
-          value={namespace}
+          value={namespace || ALL_OPTIONS}
           onChange={updateNamespace}
           style={{width: '100%'}}
         >
