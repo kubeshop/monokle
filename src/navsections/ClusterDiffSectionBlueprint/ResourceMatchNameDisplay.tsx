@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {ItemCustomComponentProps} from '@models/navigator';
 import {K8sResource} from '@models/k8sresource';
 import styled from 'styled-components';
@@ -14,13 +14,15 @@ import {diffLocalToClusterResources, removeIgnoredPathsFromResourceContent} from
 import {stringify} from 'yaml';
 import {updateResource} from '@redux/reducers/main';
 
-const Container = styled.div<{highlightdiff: boolean}>`
+const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
   width: 800px;
   display: flex;
   justify-content: space-between;
   margin-left: -24px;
   padding-left: 24px;
-  ${props => props.highlightdiff && `background: ${Colors.diffBackground}`}
+  ${props => props.highlightdiff && `background: ${Colors.diffBackground}; color: white !important;`}
+  ${props => props.hovered && `background: ${Colors.blackPearl};`}
+  ${props => props.highlightdiff && props.hovered && `background: ${Colors.diffBackgroundHover}`}
 `;
 
 const Label = styled.span<{disabled?: boolean}>`
@@ -43,6 +45,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const {clusterResource, localResources} = (itemInstance.meta || {}) as {
     clusterResource?: K8sResource;
@@ -122,10 +125,17 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   }
 
   return (
-    <Container highlightdiff={areResourcesDifferent}>
+    <Container
+      hovered={isHovered}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      highlightdiff={areResourcesDifferent}
+    >
       <Label disabled={!firstLocalResource}>
         {!resourceFilterNamespace && (
-          <Tag>{firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}</Tag>
+          <Tag color={areResourcesDifferent ? 'orange' : 'default'}>
+            {firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}
+          </Tag>
         )}
         {itemInstance.name}
       </Label>
@@ -148,7 +158,11 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       </IconsContainer>
 
       <Label disabled={!clusterResource}>
-        {!resourceFilterNamespace && <Tag>{clusterResource?.namespace ? clusterResource.namespace : 'default'}</Tag>}
+        {!resourceFilterNamespace && (
+          <Tag color={areResourcesDifferent ? 'orange' : 'default'}>
+            {clusterResource?.namespace ? clusterResource.namespace : 'default'}
+          </Tag>
+        )}
         {itemInstance.name}
       </Label>
     </Container>

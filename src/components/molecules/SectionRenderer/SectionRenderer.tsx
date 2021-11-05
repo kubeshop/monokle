@@ -155,6 +155,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
         expandSection={expandSection}
         collapseSection={collapseSection}
         CustomNameDisplay={NameDisplay ? NameDisplay.Component : undefined}
+        disableHoverStyle={Boolean(sectionBlueprint.customization?.disableHoverStyle)}
       />
       {sectionInstance &&
         sectionInstance.isVisible &&

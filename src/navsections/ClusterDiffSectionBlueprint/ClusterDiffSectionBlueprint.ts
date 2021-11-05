@@ -59,6 +59,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     nameDisplay: {
       component: ClusterDiffSectionNameDisplay,
     },
+    disableHoverStyle: true,
   },
   itemBlueprint: {
     getName(rawItem) {
@@ -93,6 +94,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     },
     customization: {
       nameDisplay: {component: ResourceMatchNameDisplay},
+      disableHoverStyle: true,
     },
   },
 };

@@ -33,6 +33,7 @@ export interface ItemCustomization {
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
   };
+  disableHoverStyle?: boolean;
 }
 
 export type SectionCustomComponentProps = {
@@ -45,6 +46,7 @@ export interface SectionCustomization {
   nameDisplay?: {
     component: SectionCustomComponent;
   };
+  disableHoverStyle?: boolean;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {

@@ -19,6 +19,7 @@ interface SectionHeaderProps {
   expandSection: () => void;
   collapseSection: () => void;
   CustomNameDisplay?: SectionCustomComponent;
+  disableHoverStyle: boolean;
 }
 
 function SectionHeader(props: SectionHeaderProps) {
@@ -38,6 +39,7 @@ function SectionHeader(props: SectionHeaderProps) {
     expandSection,
     collapseSection,
     CustomNameDisplay,
+    disableHoverStyle,
   } = props;
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -53,6 +55,7 @@ function SectionHeader(props: SectionHeaderProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       isVisible={isSectionVisible}
+      disableHoverStyle={disableHoverStyle}
     >
       {CustomNameDisplay ? (
         <CustomNameDisplay sectionInstance={sectionInstance} />

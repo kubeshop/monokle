@@ -14,6 +14,7 @@ const TagsContainer = styled.div`
   justify-content: space-between;
   margin-left: 24px;
   font-size: 16px;
+  margin-top: 16px;
 `;
 
 const TagWrapper = styled.div`

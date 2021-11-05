@@ -4,6 +4,7 @@ import styled from 'styled-components';
 export const ItemContainer = styled.li<{
   isSelected: boolean;
   isHighlighted: boolean;
+  disableHoverStyle: boolean;
   isHovered: boolean;
   level: number;
   isLastItem: boolean;
@@ -20,6 +21,9 @@ export const ItemContainer = styled.li<{
     }
   }}
   ${props => {
+    if (props.disableHoverStyle) {
+      return;
+    }
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {
         return `background: ${Colors.highlightGradientHover};`;

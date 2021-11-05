@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import {Button, Divider} from 'antd';
 import {useAppDispatch} from '@redux/hooks';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+import {ReloadOutlined} from '@ant-design/icons';
 import ClusterDiffNamespaceFilter from './ClusterDiffNamespaceFilter';
 import * as S from './ClusterDiff.styled';
 
@@ -53,7 +54,7 @@ function ClusterDiff() {
       <LeftPane>
         <S.TitleBar>
           <MonoPaneTitle>Cluster Diff</MonoPaneTitle>
-          <RefreshButton onClick={onClickRefresh} size="small" type="primary" ghost>
+          <RefreshButton icon={<ReloadOutlined />} onClick={onClickRefresh} size="small" type="primary" ghost>
             Refresh
           </RefreshButton>
           <Divider type="vertical" style={{height: 40}} />

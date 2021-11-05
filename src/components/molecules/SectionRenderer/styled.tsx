@@ -12,6 +12,7 @@ type NameContainerProps = {
   hasChildSections?: boolean;
   isVisible?: boolean;
   isInitialized?: boolean;
+  disableHoverStyle?: boolean;
 };
 
 export const NameContainer = styled.li<NameContainerProps>`
@@ -33,6 +34,9 @@ export const NameContainer = styled.li<NameContainerProps>`
     }
   }}
     ${props => {
+    if (props.disableHoverStyle) {
+      return;
+    }
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {
         return `background: ${Colors.highlightGradientHover};`;

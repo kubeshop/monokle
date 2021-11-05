@@ -78,6 +78,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         onMouseLeave={() => setIsHovered(false)}
         isSelected={itemInstance.isSelected}
         isHighlighted={itemInstance.isHighlighted}
+        disableHoverStyle={Boolean(blueprint.customization?.disableHoverStyle)}
         isHovered={isHovered}
         level={level}
         isLastItem={isLastItem}
