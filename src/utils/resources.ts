@@ -21,10 +21,8 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
     return false;
   }
   if (filters.namespace) {
-    if (!resource.namespace && filters.namespace !== 'default') {
-      return false;
-    }
-    return resource.namespace === filters.namespace;
+    const resourceNamespace = resource.namespace || 'default';
+    return resourceNamespace === filters.namespace;
   }
   if (filters.labels && Object.keys(filters.labels).length > 0) {
     const resourceLabels = resource.content?.metadata?.labels;
