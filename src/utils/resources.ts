@@ -47,12 +47,12 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   return true;
 }
 
-export function diffLocalToClusterResources(localResource: K8sResource, clusterResource: K8sResource) {
-  const flattenClusterResourceContent = flatten<any, any>(clusterResource.content, {delimiter: '#'});
+export function removeIgnoredPathsFromResourceContent(clusterResourceContent: any, localResourceNamespace?: string) {
+  const flattenClusterResourceContent = flatten<any, any>(clusterResourceContent, {delimiter: '#'});
   const clusterResourceContentPaths = Object.keys(flattenClusterResourceContent);
 
-  // deep copy of the clusterResource.content
-  const newClusterContent = JSON.parse(JSON.stringify(clusterResource.content));
+  // deep copy of the clusterResourceContent
+  const newClusterContent = JSON.parse(JSON.stringify(clusterResourceContent));
 
   const clusterResourcePathsToRemove: string[] = [];
   CLUSTER_RESOURCE_IGNORED_PATHS.forEach(ignoredPath => {
@@ -69,15 +69,20 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
     _.unset(newClusterContent, pathToRemove.split('#'));
   });
 
-  if (
-    _.get(newClusterContent, 'metadata.namespace') === 'default' &&
-    _.get(localResource.content, 'metadata.namespace') === undefined
-  ) {
+  if (_.get(newClusterContent, 'metadata.namespace') === 'default' && localResourceNamespace === undefined) {
     _.unset(newClusterContent, 'metadata.namespace');
   }
 
+  return removeNestedEmptyObjects(newClusterContent);
+}
+
+export function diffLocalToClusterResources(localResource: K8sResource, clusterResource: K8sResource) {
+  const cleanClusterResourceContent = removeIgnoredPathsFromResourceContent(
+    clusterResource.content,
+    _.get(localResource.content, 'metadata.namespace')
+  );
+
   const cleanLocalResourceContent = removeNestedEmptyObjects(localResource.content);
-  const cleanClusterResourceContent = removeNestedEmptyObjects(newClusterContent);
 
   return {
     areDifferent: !_.isEqual(cleanLocalResourceContent, cleanClusterResourceContent),
