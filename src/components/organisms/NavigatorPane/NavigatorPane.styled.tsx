@@ -31,8 +31,13 @@ export const TitleBarRightButtons = styled.div`
   float: right;
   display: flex;
   align-items: center;
+  padding-right: 16px;
 `;
 
 export const PlusButton = styled(Button)``;
 
 export const FilterButton = styled(Button)``;
+
+export const FiltersNumber = styled.div`
+  margin-left: 5px;
+`;

@@ -21,14 +21,14 @@ function useMonacoUiState(
     } else {
       dispatch(setMonacoEditor({focused: false}));
     }
-  }, [selectedResourceId]);
+  }, [editor, selectedResourceId]);
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [editor]);
 
   useEffect(() => {
     const selection = monacoEditor.selection;

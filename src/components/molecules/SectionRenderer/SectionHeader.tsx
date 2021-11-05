@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {MinusSquareOutlined} from '@ant-design/icons';
 import {SectionCustomComponent, SectionInstance} from '@models/navigator';
 import * as S from './styled';
 
-function SectionHeader(props: {
+interface SectionHeaderProps {
   name: string;
   sectionInstance: SectionInstance;
   isSectionSelected: boolean;
@@ -19,7 +19,9 @@ function SectionHeader(props: {
   expandSection: () => void;
   collapseSection: () => void;
   CustomNameDisplay?: SectionCustomComponent;
-}) {
+}
+
+function SectionHeader(props: SectionHeaderProps) {
   const {
     name,
     sectionInstance,
