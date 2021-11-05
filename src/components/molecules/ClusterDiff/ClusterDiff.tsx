@@ -20,11 +20,11 @@ const Container = styled.div<{height?: number}>`
   ${props => props.height && `height: ${props.height};`}
 `;
 
-const LeftPane = styled.div`
+const RightPane = styled.div`
   width: 300px;
 `;
 
-const RightPane = styled.div`
+const LeftPane = styled.div`
   flex-grow: 1;
 `;
 
@@ -47,6 +47,26 @@ function ClusterDiff() {
     <Container>
       <LeftPane>
         <S.TitleBar>
+          <MonoPaneTitle>Cluster Diff</MonoPaneTitle>
+          <S.TitleBarRightButtons>
+            <Popover content={<ResourceFilter />} trigger="click">
+              <Button type="link" size="small" icon={<FilterOutlined />} />
+            </Popover>
+            <NamespaceFilterContainer>
+              <NamespaceFilterLabel>Namespace:</NamespaceFilterLabel> <ResourceNamespaceFilter />
+            </NamespaceFilterContainer>
+          </S.TitleBarRightButtons>
+        </S.TitleBar>
+        <S.List height={navigatorHeight}>
+          <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
+            sectionBlueprint={ClusterDiffSectionBlueprint}
+            level={0}
+            isLastSection={false}
+          />
+        </S.List>
+      </LeftPane>
+      <RightPane>
+        <S.TitleBar>
           <MonoPaneTitle>Navigator</MonoPaneTitle>
         </S.TitleBar>
         <S.List height={navigatorHeight}>
@@ -67,26 +87,6 @@ function ClusterDiff() {
               disablePrefix: true,
               disableSuffix: true,
             }}
-          />
-        </S.List>
-      </LeftPane>
-      <RightPane>
-        <S.TitleBar>
-          <MonoPaneTitle>Cluster Diff</MonoPaneTitle>
-          <S.TitleBarRightButtons>
-            <Popover content={<ResourceFilter />} trigger="click">
-              <Button type="link" size="small" icon={<FilterOutlined />} />
-            </Popover>
-            <NamespaceFilterContainer>
-              <NamespaceFilterLabel>Namespace:</NamespaceFilterLabel> <ResourceNamespaceFilter />
-            </NamespaceFilterContainer>
-          </S.TitleBarRightButtons>
-        </S.TitleBar>
-        <S.List height={navigatorHeight}>
-          <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
-            sectionBlueprint={ClusterDiffSectionBlueprint}
-            level={0}
-            isLastSection={false}
           />
         </S.List>
       </RightPane>
