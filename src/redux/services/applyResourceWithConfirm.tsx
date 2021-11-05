@@ -25,6 +25,7 @@ export function applyResourceWithConfirm(
   Modal.confirm({
     title,
     icon: <ExclamationCircleOutlined />,
+    centered: true,
     onOk() {
       return new Promise(resolve => {
         applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig, options);

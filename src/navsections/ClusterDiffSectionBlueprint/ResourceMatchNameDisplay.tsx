@@ -3,14 +3,16 @@ import {ItemCustomComponentProps} from '@models/navigator';
 import {K8sResource} from '@models/k8sresource';
 import styled from 'styled-components';
 import Colors from '@styles/Colors';
-import {SwapOutlined, ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
+import {SwapOutlined, ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {Tooltip, Tag} from 'antd';
+import {Tooltip, Tag, Modal} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
-import {diffLocalToClusterResources} from '@utils/resources';
+import {diffLocalToClusterResources, removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {stringify} from 'yaml';
+import {updateResource} from '@redux/reducers/main';
 
 const Container = styled.div<{highlightdiff: boolean}>`
   width: 800px;
@@ -71,6 +73,50 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     applyResourceWithConfirm(firstLocalResource, resourceMap, fileMap, dispatch, kubeconfigPath);
   };
 
+  const saveClusterResourceToLocal = () => {
+    if (!firstLocalResource || !clusterResource) {
+      return;
+    }
+    const localResourceContentKeys = Object.keys(firstLocalResource.content);
+    const newClusterResoureContent = removeIgnoredPathsFromResourceContent(clusterResource.content);
+
+    const cleanClusterResourceContent = Object.keys(newClusterResoureContent)
+      .sort((a, b) => {
+        return localResourceContentKeys.indexOf(a) - localResourceContentKeys.indexOf(b);
+      })
+      .reduce((acc: any, key) => {
+        acc[key] = newClusterResoureContent[key];
+        return acc;
+      }, {});
+
+    const clusterResourceContentText = stringify(cleanClusterResourceContent);
+
+    dispatch(
+      updateResource({
+        resourceId: firstLocalResource.id,
+        content: clusterResourceContentText,
+        preventSelectionAndHighlightsUpdate: true,
+      })
+    );
+  };
+
+  const onClickSave = () => {
+    if (!firstLocalResource || !clusterResource) {
+      return;
+    }
+    Modal.confirm({
+      title: `Save ${clusterResource.name} to local?`,
+      icon: <ExclamationCircleOutlined />,
+      centered: true,
+      onOk() {
+        return new Promise(resolve => {
+          saveClusterResourceToLocal();
+          resolve({});
+        });
+      },
+      onCancel() {},
+    });
+  };
   if (!clusterResource && !localResources) {
     return null;
   }
@@ -96,7 +142,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
         )}
         {clusterResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffSaveTooltip}>
-            <ArrowLeftOutlined />
+            <ArrowLeftOutlined onClick={onClickSave} />
           </Tooltip>
         )}
       </IconsContainer>
