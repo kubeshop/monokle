@@ -133,7 +133,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     >
       <Label disabled={!firstLocalResource}>
         {!resourceFilterNamespace && (
-          <Tag color={areResourcesDifferent ? 'orange' : 'default'}>
+          <Tag color={areResourcesDifferent ? 'orange' : 'blue'}>
             {firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}
           </Tag>
         )}
@@ -159,8 +159,10 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
 
       <Label disabled={!clusterResource}>
         {!resourceFilterNamespace && (
-          <Tag color={areResourcesDifferent ? 'orange' : 'default'}>
-            {clusterResource?.namespace ? clusterResource.namespace : 'default'}
+          <Tag color={areResourcesDifferent ? 'orange' : !clusterResource ? 'rgba(58, 67, 68, 0.3)' : 'blue'}>
+            <span style={{color: !clusterResource ? '#686868' : undefined}}>
+              {clusterResource?.namespace ? clusterResource.namespace : 'default'}
+            </span>
           </Tag>
         )}
         {itemInstance.name}
