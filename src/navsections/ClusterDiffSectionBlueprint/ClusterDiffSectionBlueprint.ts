@@ -38,13 +38,15 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
         }
         return acc;
       }, {});
-      return Object.entries(matchesGroupedByResourceKind).map(([resourceKind, matches]) => {
-        return {
-          id: resourceKind,
-          name: resourceKind,
-          itemIds: matches.map(match => `${match.resourceName}#${match.resourceKind}#${match.resourceNamespace}`),
-        };
-      });
+      return Object.entries(matchesGroupedByResourceKind)
+        .map(([resourceKind, matches]) => {
+          return {
+            id: resourceKind,
+            name: resourceKind,
+            itemIds: matches.map(match => `${match.resourceName}#${match.resourceKind}#${match.resourceNamespace}`),
+          };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
     },
     isInitialized(scope) {
       return scope.clusterToLocalResourcesMatches.length > 0;
