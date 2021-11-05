@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import {MonoPaneTitle} from '@components/atoms';
 import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
 import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
-import {SectionRenderer, ResourceFilter} from '@components/molecules';
+import {SectionRenderer, ResourceFilterIconWithPopover} from '@components/molecules';
 import AppContext from '@src/AppContext';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 import {HelmValuesFile} from '@models/helm';
@@ -10,8 +10,7 @@ import {K8sResource} from '@models/k8sresource';
 import {ClusterToLocalResourcesMatch} from '@models/appstate';
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 import styled from 'styled-components';
-import {Button, Popover} from 'antd';
-import {FilterOutlined} from '@ant-design/icons';
+import {Divider} from 'antd';
 import ClusterDiffNamespaceFilter from './ClusterDiffNamespaceFilter';
 import * as S from './ClusterDiff.styled';
 
@@ -28,6 +27,10 @@ const LeftPane = styled.div`
   flex-grow: 1;
 `;
 
+const FilterContainer = styled.span`
+  margin-left: 10px;
+`;
+
 function ClusterDiff() {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
@@ -38,11 +41,12 @@ function ClusterDiff() {
       <LeftPane>
         <S.TitleBar>
           <MonoPaneTitle>Cluster Diff</MonoPaneTitle>
+          <Divider type="vertical" style={{height: 40}} />
           <S.TitleBarRightButtons>
-            <Popover content={<ResourceFilter />} trigger="click">
-              <Button type="link" size="small" icon={<FilterOutlined />} />
-            </Popover>
             <ClusterDiffNamespaceFilter />
+            <FilterContainer>
+              <ResourceFilterIconWithPopover />
+            </FilterContainer>
           </S.TitleBarRightButtons>
         </S.TitleBar>
         <S.List height={navigatorHeight}>
@@ -53,6 +57,7 @@ function ClusterDiff() {
           />
         </S.List>
       </LeftPane>
+      <Divider type="vertical" style={{height: '100vh', margin: 0}} />
       <RightPane>
         <S.TitleBar>
           <MonoPaneTitle>Navigator</MonoPaneTitle>
