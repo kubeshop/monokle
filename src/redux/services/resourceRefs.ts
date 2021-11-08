@@ -3,7 +3,7 @@ import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@
 import {REF_PATH_SEPARATOR} from '@constants/constants';
 import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
 import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {traverseDocument} from './manifest-utils';
 import {createResourceRef, getParsedDoc, linkResources, NodeWrapper} from './resource';
 
@@ -449,7 +449,7 @@ function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) 
  */
 
 function resourceMatchesRefMapper(targetResource: K8sResource, outgoingRefMapper: RefMapper) {
-  return targetResource.kind === outgoingRefMapper.target.kind;
+  return targetResource.kind === outgoingRefMapper.target.kind && !isKustomizationPatch(targetResource);
 }
 
 /**
@@ -467,7 +467,9 @@ export function processRefs(
       ? filter.resourceIds.map(id => resourceMap[id])
       : filter?.resourceKinds && filter?.resourceKinds.length > 0
       ? Object.values(resourceMap).filter(resource => filter?.resourceKinds?.includes(resource.kind))
-      : Object.values(resourceMap).filter(resource => !isKustomizationResource(resource));
+      : Object.values(resourceMap).filter(
+          resource => !isKustomizationResource(resource) && !isKustomizationPatch(resource)
+        );
 
   // prep for processing
   let processedResourceIds = new Set<string>();

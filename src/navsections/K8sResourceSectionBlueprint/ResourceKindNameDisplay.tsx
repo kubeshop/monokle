@@ -7,8 +7,7 @@ function ResourceKindNameDisplay(props: ItemCustomComponentProps) {
   if (itemInstance.name.startsWith('Patch:')) {
     return (
       <>
-        <Tag>Patch</Tag>
-        {itemInstance.name.replace('Patch:', '').trim()}
+        {itemInstance.name.replace('Patch:', '').trim()} <Tag>Patch</Tag>
       </>
     );
   }
