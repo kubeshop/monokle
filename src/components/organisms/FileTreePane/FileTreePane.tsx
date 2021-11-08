@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useContext} from 'react';
+import React, {useCallback, useEffect, useContext, useMemo} from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
@@ -10,7 +10,7 @@ import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY, FILE_TREE_HEIGHT_OFFSET} from '@constants/constants';
 
 import AppContext from '@src/AppContext';
-import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
+import {FolderAddOutlined, ReloadOutlined, FolderOutlined, FolderOpenOutlined} from '@ant-design/icons';
 
 import {FileEntry} from '@models/fileentry';
 import {FileMapType, ResourceMapType} from '@models/appstate';
@@ -20,7 +20,7 @@ import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import {useSelector} from 'react-redux';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {uniqueArr} from '@utils/index';
-import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
+import {BrowseFolderTooltip, CollapseTreeTooltip, ExpandTreeTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {ipcRenderer} from 'electron';
 import FileExplorer from '@atoms/FileExplorer';
@@ -191,6 +191,16 @@ const TitleBarContainer = styled.div`
 
 const RightButtons = styled.div`
   display: flex;
+  align-items: center;
+
+  button:not(:last-child),
+  .ant-tooltip-disabled-compatible-wrapper:not(:last-child) {
+    margin-right: 10px;
+  }
+
+  .ant-tooltip-disabled-compatible-wrapper {
+    margin-bottom: 1px;
+  }
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -198,14 +208,9 @@ const StyledSkeleton = styled(Skeleton)`
   width: 90%;
 `;
 
-const ReloadButton = styled(Button)`
-  margin-left: 8px;
-  margin-top: ${props => (props.disabled ? '0px' : '1px')};
-`;
+const ReloadButton = styled(Button)``;
 
-const BrowseButton = styled(Button)`
-  margin-top: 1px;
-`;
+const BrowseButton = styled(Button)``;
 
 const FileTreePane = () => {
   const {windowSize} = useContext(AppContext);
@@ -361,6 +366,42 @@ const FileTreePane = () => {
     };
   }, [onExecutedFrom]);
 
+  const allTreeKeys = useMemo(() => {
+    if (!tree) return [];
+
+    // The root element goes first anyway if tree exists
+    const treeKeys: string[] = [tree.key];
+
+    /**
+     * Recursively finds all the keys and pushes them into array.
+     */
+    const recursivelyGetAllTheKeys = (arr: TreeNode[]) => {
+      if (!arr) return;
+
+      arr.forEach((data: TreeNode) => {
+        const {children} = data;
+
+        if (!children.length) return;
+
+        treeKeys.push(data.key);
+
+        recursivelyGetAllTheKeys(data.children);
+      });
+    };
+
+    recursivelyGetAllTheKeys(tree?.children);
+
+    return treeKeys;
+  }, [tree]);
+
+  const onCollapseAll = () => {
+    setExpandedKeys([]);
+  };
+
+  const onExpandAll = () => {
+    setExpandedKeys(allTreeKeys);
+  };
+
   return (
     <FileTreeContainer>
       <Row>
@@ -390,13 +431,18 @@ const FileTreePane = () => {
                     disabled={!fileMap[ROOT_FILE_ENTRY]}
                   />
                 </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={CollapseTreeTooltip}>
+                  <Button icon={<FolderOutlined />} onClick={onCollapseAll} type="primary" ghost size="small" />
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ExpandTreeTooltip}>
+                  <Button icon={<FolderOpenOutlined />} onClick={onExpandAll} type="primary" ghost size="small" />
+                </Tooltip>
               </RightButtons>
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
         <FileExplorer {...fileExplorerProps} />
       </Row>
-
       {uiState.isFolderLoading ? (
         <StyledSkeleton active />
       ) : tree ? (

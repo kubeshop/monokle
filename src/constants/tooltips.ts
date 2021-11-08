@@ -2,6 +2,8 @@ const KEY_CTRL_CMD = process.platform === 'darwin' ? '⌘' : 'CTRL';
 
 export const BrowseFolderTooltip = `Browse for folder containing manifests, kustomizations or Helm charts (${KEY_CTRL_CMD}+O)`;
 export const ReloadFolderTooltip = `Reload manifests from the currently selected folder (${KEY_CTRL_CMD}+F5)`;
+export const ExpandTreeTooltip = 'Expand tree';
+export const CollapseTreeTooltip = 'Collapse tree';
 export const FileExplorerTooltip = 'Show/hide File Exlorer';
 export const ClusterExplorerTooltip = 'Show/hide Cluster Preview';
 export const PluginManagerTooltip = 'Show/hide Plugin Manager';
