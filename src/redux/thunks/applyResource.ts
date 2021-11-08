@@ -140,7 +140,7 @@ export async function applyResource(
           dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
         });
-      } catch (e) {
+      } catch (e: any) {
         log.error(e.message);
         dispatch(setApplyingResource(true));
       }

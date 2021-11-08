@@ -9,17 +9,31 @@ import {
   ApartmentOutlined,
   CodeOutlined,
   ApiOutlined,
+  SwapOutlined,
 } from '@ant-design/icons';
 import Colors, {BackgroundColors} from '@styles/Colors';
 import {AppBorders} from '@styles/Borders';
 import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane} from '@organisms';
+import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane, ClusterDiffPane} from '@organisms';
 import {LogViewer, GraphView} from '@molecules';
 import featureJson from '@src/feature-flags.json';
-import {ClusterExplorerTooltip, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
+import {
+  ClusterExplorerTooltip,
+  FileExplorerTooltip,
+  PluginManagerTooltip,
+  ClusterDiffTooltip,
+  ClusterDiffDisabledTooltip,
+} from '@constants/tooltips';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {toggleLeftMenu, toggleRightMenu, setLeftMenuSelection, setRightMenuSelection} from '@redux/reducers/ui';
+import {
+  toggleLeftMenu,
+  toggleRightMenu,
+  setLeftMenuSelection,
+  setRightMenuSelection,
+  openClusterDiff,
+  closeClusterDiff,
+} from '@redux/reducers/ui';
 import AppContext from '@src/AppContext';
 
 const StyledRow = styled(Row)`
@@ -68,9 +82,9 @@ const MenuIcon = (props: {
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const style = {
-    ...customStyle,
     fontSize: 25,
     color: Colors.grey7,
+    ...customStyle,
   };
 
   if (isHovered || (active && isSelected)) {
@@ -97,12 +111,15 @@ const PaneManager = () => {
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
 
+  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
+
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
 
   const setActivePanes = (side: string, selectedMenu: string) => {
     if (side === 'left') {
+      dispatch(closeClusterDiff());
       if (leftMenuSelection === selectedMenu) {
         dispatch(toggleLeftMenu());
       } else {
@@ -123,6 +140,11 @@ const PaneManager = () => {
         }
       }
     }
+  };
+
+  const openClusterDiffDrawer = () => {
+    dispatch(setLeftMenuSelection(''));
+    dispatch(openClusterDiff());
   };
 
   return (
@@ -159,6 +181,26 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
+            <Tooltip
+              mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
+              title={isFolderOpen ? ClusterDiffTooltip : ClusterDiffDisabledTooltip}
+              placement="right"
+            >
+              <Button
+                disabled={!isFolderOpen}
+                size="large"
+                type="text"
+                onClick={openClusterDiffDrawer}
+                icon={
+                  <MenuIcon
+                    style={!isFolderOpen ? {color: Colors.grey900} : undefined}
+                    icon={SwapOutlined}
+                    active={isClusterDiffVisible}
+                    isSelected={isClusterDiffVisible}
+                  />
+                }
+              />
+            </Tooltip>
             {featureJson.PluginManager && (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
                 <Button
@@ -177,47 +219,51 @@ const PaneManager = () => {
             )}
           </Space>
         </StyledColumnLeftMenu>
-        <StyledColumnPanes style={{width: contentWidth}}>
-          <SplitView
-            contentWidth={contentWidth}
-            left={
-              <>
-                <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
-                  <FileTreePane />
-                </div>
-                <div
-                  style={{
-                    display:
-                      featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
-                  }}
-                >
-                  <ClustersPane />
-                </div>
-                <div
-                  style={{
-                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
-                  }}
-                >
-                  <PluginManagerPane />
-                </div>
-              </>
-            }
-            hideLeft={!leftActive}
-            nav={<NavigatorPane />}
-            editor={<ActionsPane contentHeight={contentHeight} />}
-            right={
-              <>
-                {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                  <GraphView editorHeight={contentHeight} />
-                ) : undefined}
-                <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
-                  <LogViewer editorHeight={contentHeight} />
-                </div>
-              </>
-            }
-            hideRight={!rightActive}
-          />
-        </StyledColumnPanes>
+        {isClusterDiffVisible ? (
+          <ClusterDiffPane />
+        ) : (
+          <StyledColumnPanes style={{width: contentWidth}}>
+            <SplitView
+              contentWidth={contentWidth}
+              left={
+                <>
+                  <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
+                    <FileTreePane />
+                  </div>
+                  <div
+                    style={{
+                      display:
+                        featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
+                    }}
+                  >
+                    <ClustersPane />
+                  </div>
+                  <div
+                    style={{
+                      display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                    }}
+                  >
+                    <PluginManagerPane />
+                  </div>
+                </>
+              }
+              hideLeft={!leftActive}
+              nav={<NavigatorPane />}
+              editor={<ActionsPane contentHeight={contentHeight} />}
+              right={
+                <>
+                  {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
+                    <GraphView editorHeight={contentHeight} />
+                  ) : undefined}
+                  <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
+                    <LogViewer editorHeight={contentHeight} />
+                  </div>
+                </>
+              }
+              hideRight={!rightActive}
+            />
+          </StyledColumnPanes>
+        )}
         <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
           <Space direction="vertical" style={{width: 43}}>
             <Button

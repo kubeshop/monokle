@@ -1,9 +1,11 @@
 import {useState} from 'react';
 import {MinusSquareOutlined} from '@ant-design/icons';
+import {SectionCustomComponent, SectionInstance} from '@models/navigator';
 import * as S from './styled';
 
 interface SectionHeaderProps {
   name: string;
+  sectionInstance: SectionInstance;
   isSectionSelected: boolean;
   isCollapsed: boolean;
   isSectionHighlighted: boolean;
@@ -16,11 +18,14 @@ interface SectionHeaderProps {
   itemsLength: number;
   expandSection: () => void;
   collapseSection: () => void;
+  CustomNameDisplay?: SectionCustomComponent;
+  disableHoverStyle: boolean;
 }
 
 function SectionHeader(props: SectionHeaderProps) {
   const {
     name,
+    sectionInstance,
     isSectionSelected,
     isCollapsed,
     isSectionHighlighted,
@@ -33,6 +38,8 @@ function SectionHeader(props: SectionHeaderProps) {
     itemsLength,
     expandSection,
     collapseSection,
+    CustomNameDisplay,
+    disableHoverStyle,
   } = props;
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -48,24 +55,31 @@ function SectionHeader(props: SectionHeaderProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       isVisible={isSectionVisible}
+      disableHoverStyle={disableHoverStyle}
     >
-      <S.Name
-        isSelected={isSectionSelected && isCollapsed}
-        isHighlighted={isSectionSelected && isCollapsed}
-        level={level}
-      >
-        {name}
-        {itemsLength > 0 && <S.ItemsLength>{itemsLength}</S.ItemsLength>}
-      </S.Name>
-      {isHovered && isSectionInitialized && (
-        <S.Collapsible>
-          {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
-            <S.PlusSquareOutlined isSelected={isSectionSelected} onClick={expandSection} />
+      {CustomNameDisplay ? (
+        <CustomNameDisplay sectionInstance={sectionInstance} />
+      ) : (
+        <>
+          <S.Name
+            isSelected={isSectionSelected && isCollapsed}
+            isHighlighted={isSectionSelected && isCollapsed}
+            level={level}
+          >
+            {name}
+            {itemsLength > 0 && <S.ItemsLength>{itemsLength}</S.ItemsLength>}
+          </S.Name>
+          {isHovered && isSectionInitialized && (
+            <S.Collapsible>
+              {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
+                <S.PlusSquareOutlined isSelected={isSectionSelected} onClick={expandSection} />
+              )}
+              {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
+                <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
+              )}
+            </S.Collapsible>
           )}
-          {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
-            <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
-          )}
-        </S.Collapsible>
+        </>
       )}
     </S.NameContainer>
   );

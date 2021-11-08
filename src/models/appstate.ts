@@ -64,6 +64,14 @@ type ResourceRefsProcessingOptions = {
   shouldIgnoreOptionalUnsatisfiedRefs: boolean;
 };
 
+type ClusterToLocalResourcesMatch = {
+  resourceKind: string;
+  resourceName: string;
+  resourceNamespace: string;
+  clusterResourceId?: string;
+  localResourceIds?: string[];
+};
+
 interface AppState {
   /** maps filePath to FileEntry
    * - filePath is relative to selected rootFolder
@@ -105,6 +113,12 @@ interface AppState {
   diffContent?: string;
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
+  clusterDiff: {
+    hasLoaded: boolean;
+    hasFailed: boolean;
+    hideClusterOnlyResources: boolean;
+    clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
+  };
   notifications: AlertType[];
 }
 
@@ -119,4 +133,5 @@ export type {
   SelectionHistoryEntry,
   PreviewType,
   ResourceRefsProcessingOptions,
+  ClusterToLocalResourcesMatch,
 };

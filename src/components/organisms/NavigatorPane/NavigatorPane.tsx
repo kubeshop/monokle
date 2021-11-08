@@ -9,7 +9,6 @@ import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/He
 import K8sResourceSectionBlueprint, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
 import {Badge} from 'antd';
 import {PlusOutlined, FilterOutlined} from '@ant-design/icons';
-import ResourceFilter from '@components/molecules/ResourceFilter';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 import {useSelector} from 'react-redux';
@@ -17,7 +16,7 @@ import {ResourceFilterType} from '@models/appstate';
 import {isInClusterModeSelector, isInPreviewModeSelector, activeResourcesSelector} from '@redux/selectors';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {MonoPaneTitle} from '@components/atoms';
-import SectionRenderer from './SectionRenderer';
+import {SectionRenderer, ResourceFilter} from '@components/molecules';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 import * as S from './NavigatorPane.styled';
 

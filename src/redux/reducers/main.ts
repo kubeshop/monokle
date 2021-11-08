@@ -1,10 +1,11 @@
 import log from 'loglevel';
 import {createAsyncThunk, createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 import {AppConfig} from '@models/appconfig';
 import {
   AppState,
+  ClusterToLocalResourcesMatch,
   FileMapType,
   HelmChartMapType,
   HelmValuesMapType,
@@ -27,7 +28,9 @@ import {AlertType} from '@models/alert';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFileStats} from '@utils/files';
 import electronStore from '@utils/electronStore';
+import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {v4 as uuidv4} from 'uuid';
+import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 
 import initialState from '../initialState';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
@@ -49,6 +52,7 @@ import {
   reprocessResources,
   saveResource,
 } from '../services/resource';
+import {closeClusterDiff} from './ui';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -515,6 +519,120 @@ export const mainSlice = createSlice({
       }
     });
 
+    builder
+      .addCase(loadClusterDiff.pending, state => {
+        state.clusterDiff.hasLoaded = false;
+      })
+      .addCase(loadClusterDiff.rejected, state => {
+        state.clusterDiff.hasLoaded = true;
+        state.clusterDiff.hasFailed = true;
+      })
+      .addCase(loadClusterDiff.fulfilled, (state, action) => {
+        const clusterResourceMap = action.payload.resourceMap;
+        if (!clusterResourceMap) {
+          return;
+        }
+
+        const isInPreviewMode = Boolean(state.previewResourceId) || Boolean(state.previewValuesFileId);
+
+        let localResources: K8sResource[] = [];
+        localResources = Object.values(state.resourceMap).filter(
+          resource =>
+            !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+            !resource.name.startsWith('Patch:') &&
+            resource.kind !== KUSTOMIZATION_KIND
+        );
+
+        if (isInPreviewMode) {
+          localResources = localResources.filter(resource => resource.filePath.startsWith(PREVIEW_PREFIX));
+        }
+
+        const groupedLocalResources = groupResourcesByIdentifier(
+          localResources,
+          makeResourceNameKindNamespaceIdentifier
+        );
+
+        // remove previous cluster diff resources
+        Object.values(state.resourceMap)
+          .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
+          .forEach(r => delete state.resourceMap[r.id]);
+        // add resources from cluster diff to the resource map
+        Object.values(clusterResourceMap).forEach(r => {
+          state.resourceMap[r.id] = r;
+        });
+
+        const clusterResources = Object.values(clusterResourceMap);
+        const groupedClusterResources = groupResourcesByIdentifier(
+          clusterResources,
+          makeResourceNameKindNamespaceIdentifier
+        );
+
+        let clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[] = [];
+        const localResourceIdsAlreadyMatched: string[] = [];
+
+        Object.entries(groupedClusterResources).forEach(([identifier, value]) => {
+          const currentClusterResource = value[0];
+          const matchingLocalResources = groupedLocalResources[identifier];
+          if (!matchingLocalResources || matchingLocalResources.length === 0) {
+            clusterToLocalResourcesMatches.push({
+              clusterResourceId: currentClusterResource.id,
+              resourceName: currentClusterResource.name,
+              resourceKind: currentClusterResource.kind,
+              resourceNamespace: currentClusterResource.namespace || 'default',
+            });
+          } else {
+            const matchingLocalResourceIds = matchingLocalResources.map(r => r.id);
+            clusterToLocalResourcesMatches.push({
+              clusterResourceId: currentClusterResource.id,
+              localResourceIds: matchingLocalResourceIds,
+              resourceName: currentClusterResource.name,
+              resourceKind: currentClusterResource.kind,
+              resourceNamespace: currentClusterResource.namespace || 'default',
+            });
+            localResourceIdsAlreadyMatched.push(...matchingLocalResourceIds);
+          }
+        });
+
+        if (state.clusterDiff.hideClusterOnlyResources) {
+          clusterToLocalResourcesMatches = clusterToLocalResourcesMatches.filter(match => match.localResourceIds);
+        }
+
+        const localResourceIdentifiersNotMatched = [
+          ...new Set(
+            localResources
+              .filter(r => !localResourceIdsAlreadyMatched.includes(r.id))
+              .map(r => makeResourceNameKindNamespaceIdentifier(r))
+          ),
+        ];
+
+        localResourceIdentifiersNotMatched.forEach(identifier => {
+          const currentLocalResources = groupedLocalResources[identifier];
+          if (!currentLocalResources || currentLocalResources.length === 0) {
+            return;
+          }
+          clusterToLocalResourcesMatches.push({
+            localResourceIds: currentLocalResources.map(r => r.id),
+            resourceName: currentLocalResources[0].name,
+            resourceKind: currentLocalResources[0].kind,
+            resourceNamespace: currentLocalResources[0].namespace || 'default',
+          });
+        });
+
+        state.clusterDiff.clusterToLocalResourcesMatches = clusterToLocalResourcesMatches;
+        state.clusterDiff.hasLoaded = true;
+        state.clusterDiff.hasFailed = false;
+      });
+
+    builder.addCase(closeClusterDiff.type, state => {
+      // remove previous cluster diff resources
+      Object.values(state.resourceMap)
+        .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
+        .forEach(r => delete state.resourceMap[r.id]);
+      state.clusterDiff.clusterToLocalResourcesMatches = [];
+      state.clusterDiff.hasLoaded = false;
+      state.clusterDiff.hasFailed = false;
+    });
+
     builder.addMatcher(
       action => true,
       (state, action) => {
@@ -529,6 +647,22 @@ export const mainSlice = createSlice({
     );
   },
 });
+
+function groupResourcesByIdentifier(
+  resources: K8sResource[],
+  makeIdentifier: (resource: K8sResource) => string
+): Record<string, K8sResource[]> {
+  const groupedResources: Record<string, K8sResource[]> = {};
+  resources.forEach(resource => {
+    const identifier = makeIdentifier(resource);
+    if (groupedResources[identifier]) {
+      groupedResources[identifier].push(resource);
+    } else {
+      groupedResources[identifier] = [resource];
+    }
+  });
+  return groupedResources;
+}
 
 /**
  * Sets/clears preview resources

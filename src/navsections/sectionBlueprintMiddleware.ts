@@ -130,6 +130,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   });
 
   if (Object.values(isChangedByScopeKey).every(isChanged => isChanged === false)) {
+    // eslint-disable-next-line no-console
     console.log('fullScope did not change.');
     return;
   }
@@ -140,6 +141,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       ([key, value]) => sectionScopeKeys.includes(key) && value === true
     );
     if (!hasSectionScopeChanged) {
+      // eslint-disable-next-line no-console
       console.log(`Section ${sectionBlueprint.id} scope did not change`);
       return;
     }
@@ -157,8 +159,8 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       const itemBuilder = itemBlueprint.builder;
       itemInstances = rawItems?.map(rawItem => {
         return {
-          name: itemBlueprint.getName(rawItem),
-          id: itemBlueprint.getInstanceId(rawItem),
+          name: itemBlueprint.getName(rawItem, sectionScope),
+          id: itemBlueprint.getInstanceId(rawItem, sectionScope),
           isSelected: Boolean(itemBuilder?.isSelected ? itemBuilder.isSelected(rawItem, sectionScope) : false),
           isHighlighted: Boolean(itemBuilder?.isHighlighted ? itemBuilder.isHighlighted(rawItem, sectionScope) : false),
           isVisible: Boolean(itemBuilder?.isVisible ? itemBuilder.isVisible(rawItem, sectionScope) : true),
@@ -167,6 +169,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
           shouldScrollIntoView: Boolean(
             itemBuilder?.shouldScrollIntoView ? itemBuilder.shouldScrollIntoView(rawItem, sectionScope) : false
           ),
+          meta: itemBuilder?.getMeta ? itemBuilder.getMeta(rawItem, sectionScope) : undefined,
         };
       });
       itemInstances?.forEach(itemInstance => {
@@ -194,9 +197,8 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       isVisible:
         Boolean(sectionBuilder?.shouldBeVisibleBeforeInitialized === true && !isSectionInitialized) ||
         (isSectionInitialized &&
-          (Boolean(sectionBuilder?.isVisible && sectionBuilder.isVisible(sectionScope, rawItems)) ||
-            visibleItemIds.length > 0 ||
-            visibleGroupIds.length > 0)),
+          Boolean(sectionBuilder?.isVisible ? sectionBuilder.isVisible(sectionScope, rawItems) : true) &&
+          (visibleItemIds.length > 0 || visibleGroupIds.length > 0)),
       isInitialized: isSectionInitialized,
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
@@ -207,9 +209,6 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       visibleGroupIds,
     };
     sectionInstanceMap[sectionBlueprint.id] = sectionInstance;
-    if (sectionInstance.id === 'Helm Charts') {
-      console.log({sectionInstance});
-    }
   });
 
   const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(
@@ -242,6 +241,7 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
     action?.type === expandSectionIds.type ||
     action?.type === collapseSectionIds.type
   ) {
+    // eslint-disable-next-line no-console
     console.log('Not processing.');
     return;
   }

@@ -29,11 +29,29 @@ export interface ItemCustomization {
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
   };
+  nameDisplay?: {
+    component: ItemCustomComponent;
+    options?: ItemCustomComponentOptions;
+  };
+  disableHoverStyle?: boolean;
+}
+
+export type SectionCustomComponentProps = {
+  sectionInstance: SectionInstance;
+};
+
+export type SectionCustomComponent = React.ComponentType<SectionCustomComponentProps>;
+
+export interface SectionCustomization {
+  nameDisplay?: {
+    component: SectionCustomComponent;
+  };
+  disableHoverStyle?: boolean;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
-  getName: (rawItem: RawItemType) => string;
-  getInstanceId: (rawItem: RawItemType) => string;
+  getName: (rawItem: RawItemType, scope: ScopeType) => string;
+  getInstanceId: (rawItem: RawItemType, scope: ScopeType) => string;
   builder?: {
     isSelected?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isHighlighted?: (rawItem: RawItemType, scope: ScopeType) => boolean;
@@ -41,6 +59,7 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
     isDirty?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isDisabled?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     shouldScrollIntoView?: (rawItem: RawItemType, scope: ScopeType) => boolean;
+    getMeta?: (rawItem: RawItemType, scope: ScopeType) => any;
   };
   instanceHandler?: {
     onClick?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
@@ -68,6 +87,7 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
     shouldBeVisibleBeforeInitialized?: boolean;
   };
+  customization?: SectionCustomization;
   itemBlueprint?: ItemBlueprint<RawItemType, ScopeType>;
 }
 
@@ -84,6 +104,7 @@ export interface ItemInstance {
   isDirty: boolean;
   isDisabled: boolean;
   shouldScrollIntoView: boolean;
+  meta?: any;
 }
 
 export interface SectionInstance {
