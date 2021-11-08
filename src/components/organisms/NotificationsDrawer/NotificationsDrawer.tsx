@@ -8,7 +8,7 @@ import {ExclamationCircleOutlined, CheckCircleOutlined, InfoCircleOutlined, Copy
 import Colors, {FontColors} from '@styles/Colors';
 import {Badge, Tooltip} from 'antd';
 import {AlertEnum, AlertType} from '@models/alert';
-import {DateTime} from 'luxon'; // Trigger precommit
+import {DateTime} from 'luxon';
 
 const StyledDiv = styled.div`
   margin-bottom: 12px;
