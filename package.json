@@ -144,7 +144,7 @@
     "lint:config": "eslint .",
     "lint:src": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "lintfix": "eslint --fix \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
-    "precommit:lint": "npm run lint",
+    "precommit": "npm run lint",
     "format:all": "prettier --write \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "prepare": "husky install",
     "release:patch": "standard-version --release-as patch",
@@ -275,8 +275,9 @@
     }
   },
   "lint-staged": {
-    "\"{src,test}/**/*.{js,jsx,ts,tsx}\"": [
+    "{src,test}/**/*.{js,jsx,ts,tsx}": [
       "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\" --fix",
+      "prettier --write",
       "git add"
     ],
     ".": [

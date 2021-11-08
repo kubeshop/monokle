@@ -1,32 +1,38 @@
-import React, {useCallback, useEffect, useContext} from 'react';
-import styled from 'styled-components';
-import path from 'path';
-import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
+import {Button, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
+import {ipcRenderer} from 'electron';
 import micromatch from 'micromatch';
+import path from 'path';
+import React, {useCallback, useContext, useEffect} from 'react';
+import {useSelector} from 'react-redux';
+import styled from 'styled-components';
 
-import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY, FILE_TREE_HEIGHT_OFFSET} from '@constants/constants';
-
-import AppContext from '@src/AppContext';
 import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {FileEntry} from '@models/fileentry';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {stopPreview} from '@redux/services/preview';
-import {getResourcesForPath, getChildFilePath} from '@redux/services/fileEntry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
-import {useSelector} from 'react-redux';
-import {isInPreviewModeSelector} from '@redux/selectors';
-import {uniqueArr} from '@utils/index';
-import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {ipcRenderer} from 'electron';
 import FileExplorer from '@atoms/FileExplorer';
-import {useFileExplorer} from '@hooks/useFileExplorer';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
+import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {stopPreview} from '@redux/services/preview';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
 import {getFileStats} from '@utils/files';
+import {uniqueArr} from '@utils/index';
+
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
+
+import AppContext from '@src/AppContext';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
+
+import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
+
+import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
 interface TreeNode {
   key: string;
