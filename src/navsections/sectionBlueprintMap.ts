@@ -12,7 +12,8 @@ const getById = (name: string) => {
 
 const register = (sectionBlueprint: SectionBlueprint<any, any>) => {
   if (SectionBlueprintMap[sectionBlueprint.id]) {
-    throw new Error(`sectionBlueprint with id ${sectionBlueprint.id} already exists in the SectionBlueprintMap`);
+    // eslint-disable-next-line no-console
+    console.warn(`Overriding existing sectionBlueprint with id ${sectionBlueprint.id}`);
   }
   SectionBlueprintMap[sectionBlueprint.id] = sectionBlueprint;
 };

@@ -12,12 +12,14 @@ type NameContainerProps = {
   hasChildSections?: boolean;
   isVisible?: boolean;
   isInitialized?: boolean;
+  disableHoverStyle?: boolean;
 };
 
 export const NameContainer = styled.li<NameContainerProps>`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   width: 100%;
   user-select: none;
   ${props => {
@@ -32,6 +34,9 @@ export const NameContainer = styled.li<NameContainerProps>`
     }
   }}
     ${props => {
+    if (props.disableHoverStyle) {
+      return;
+    }
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {
         return `background: ${Colors.highlightGradientHover};`;
@@ -51,7 +56,7 @@ export const NameContainer = styled.li<NameContainerProps>`
 `;
 
 export const Name = styled.span<{isSelected?: boolean; isHighlighted?: boolean; level: number}>`
-  padding: 2px 12px;
+  padding: 2px 16px;
   font-size: ${props => {
     return `${24 - 4 * props.level}px;`;
   }};

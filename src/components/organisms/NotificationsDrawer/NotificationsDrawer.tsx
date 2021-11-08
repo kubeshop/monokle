@@ -59,6 +59,11 @@ const StyledStatusBadge = styled(Badge)`
   margin-top: 4px;
 `;
 
+const StyledCopyOutlined = styled(CopyOutlined)`
+  margin-right: 8px;
+  margin-top: 4px;
+`;
+
 const StyledExclamationCircleOutlined = styled(ExclamationCircleOutlined)`
   color: ${FontColors.error};
   font-size: 16px;
@@ -109,9 +114,7 @@ const Notification: React.FC<NotificationProps> = props => {
       <StyledMessageContainer>
         <StyledStatusBadge>{badge}</StyledStatusBadge>
         <Tooltip title={isCopied ? 'Copied!' : 'Copy'}>
-          <StyledStatusBadge>
-            <CopyOutlined onClick={onCopyToClipboard} />
-          </StyledStatusBadge>
+          <StyledCopyOutlined onClick={onCopyToClipboard} />
         </Tooltip>
         <StyledMessageBodyContainer>
           <StyledTitleSpan>{title}</StyledTitleSpan>
@@ -160,7 +163,13 @@ const NotificationsDrawer = () => {
     >
       {notifications && notifications.length > 0 ? (
         notifications.map(notification => {
-          return <Notification notification={notification} badge={getNotificationBadge(notification.type)} />;
+          return (
+            <Notification
+              key={notification.id}
+              notification={notification}
+              badge={getNotificationBadge(notification.type)}
+            />
+          );
         })
       ) : (
         <StyledNoNotificationsContainer>There is no notifications to show</StyledNoNotificationsContainer>

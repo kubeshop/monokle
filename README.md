@@ -79,6 +79,7 @@ There is a lot of functionality currently being considered:
 - Improved Cluster functionality - see [Cluster integration](https://github.com/kubeshop/monokle/projects/8)
 - Plugin/extension mechanism - see https://github.com/kubeshop/monokle/issues/177
 - Improved resource filtering/navigation - see [Resource Navigation](https://github.com/kubeshop/monokle/projects/2)
+- Improved Helm integration - see [Helm integration](https://github.com/kubeshop/monokle/projects/12)
 
 Don't hesitate provide any feedback you might have to help us prioritize and improve our backlog!
 

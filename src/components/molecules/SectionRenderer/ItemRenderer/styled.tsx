@@ -4,21 +4,26 @@ import styled from 'styled-components';
 export const ItemContainer = styled.li<{
   isSelected: boolean;
   isHighlighted: boolean;
+  disableHoverStyle: boolean;
   isHovered: boolean;
   level: number;
   isLastItem: boolean;
+  hasOnClick: boolean;
 }>`
   display: flex;
   align-items: center;
   width: 100%;
-  cursor: pointer;
   user-select: none;
+  ${props => props.hasOnClick && `cursor: pointer;`}
   ${props => {
     if (props.isLastItem) {
       return `margin-bottom: 12px;`;
     }
   }}
   ${props => {
+    if (props.disableHoverStyle) {
+      return;
+    }
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {
         return `background: ${Colors.highlightGradientHover};`;
@@ -46,7 +51,6 @@ export const ItemName = styled.span<{
   level: number;
 }>`
   padding: 2px 0;
-  cursor: pointer;
   font-size: 12px;
   ${props => {
     if (props.isSelected) {

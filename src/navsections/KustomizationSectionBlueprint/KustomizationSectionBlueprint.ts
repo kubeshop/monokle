@@ -54,6 +54,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;
     },
+    shouldBeVisibleBeforeInitialized: true,
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,

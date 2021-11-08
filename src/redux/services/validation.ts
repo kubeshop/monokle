@@ -1,6 +1,7 @@
 import {K8sResource} from '@models/k8sresource';
 import log from 'loglevel';
 import Ajv, {ValidateFunction} from 'ajv';
+import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getResourceSchema} from './schema';
 
 /**
@@ -10,7 +11,7 @@ import {getResourceSchema} from './schema';
 const validatorCache = new Map<string, ValidateFunction>();
 
 export function validateResource(resource: K8sResource) {
-  if (resource.name.startsWith('Patch: ')) {
+  if (isKustomizationPatch(resource)) {
     return;
   }
 
