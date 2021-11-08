@@ -1,14 +1,20 @@
-import React, {useCallback} from 'react';
-import Drawer from '@components/atoms/Drawer';
-import styled from 'styled-components';
-import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {toggleNotifications} from '@redux/reducers/ui';
-import {ExclamationCircleOutlined, CheckCircleOutlined, InfoCircleOutlined, CopyOutlined} from '@ant-design/icons';
-import Colors, {FontColors} from '@styles/Colors';
 import {Badge, Tooltip} from 'antd';
-import {AlertEnum, AlertType} from '@models/alert';
 import {DateTime} from 'luxon';
+import React, {useCallback} from 'react';
+import styled from 'styled-components';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {toggleNotifications} from '@redux/reducers/ui';
+
+import {AlertEnum, AlertType} from '@models/alert';
+
+import Drawer from '@components/atoms/Drawer';
+
+import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
+
+import {CheckCircleOutlined, CopyOutlined, ExclamationCircleOutlined, InfoCircleOutlined} from '@ant-design/icons';
+
+import Colors, {FontColors} from '@styles/Colors';
 
 const StyledDiv = styled.div`
   margin-bottom: 12px;
