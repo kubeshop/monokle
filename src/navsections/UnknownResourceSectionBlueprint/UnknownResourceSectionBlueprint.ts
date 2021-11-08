@@ -5,6 +5,7 @@ import {ResourceKindHandlers} from '@src/kindhandlers';
 import {isUnsavedResource} from '@redux/services/resource';
 import {selectK8sResource} from '@redux/reducers/main';
 import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {isResourcePassingFilter} from '@utils/resources';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 
 export type UnknownResourceScopeType = {
@@ -13,11 +14,6 @@ export type UnknownResourceScopeType = {
   selectedPath?: string;
   selectedResourceId?: string;
 };
-
-// TODO: Replace this with the updated method from the Cluster Diff PR
-function isResourcePassingFilter(resource: K8sResource, filter: ResourceFilterType) {
-  return true;
-}
 
 const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
 
