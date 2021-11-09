@@ -66,7 +66,7 @@ export const performResourceDiff = createAsyncThunk<
         return handleRejection(err);
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     return createRejectionWithAlert(thunkAPI, 'Diff Resource', `Failed to diff resources; ${e.message}`);
   }
 

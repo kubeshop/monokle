@@ -11,7 +11,6 @@ import {performResourceDiff} from '@redux/thunks/diffResource';
 
 import {K8sResource} from '@models/k8sresource';
 
-// import flatten, {unflatten} from 'flat';
 import Icon from '@components/atoms/Icon';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';

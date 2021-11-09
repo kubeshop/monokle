@@ -45,6 +45,15 @@ const RefreshButton = styled(Button)`
   margin-left: 8px;
 `;
 
+const ListContainer = styled.div`
+  overflow-y: scroll;
+  height: 800px;
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+`;
+
 function ClusterDiff() {
   const dispatch = useAppDispatch();
   // const {windowSize} = useContext(AppContext);
@@ -70,13 +79,16 @@ function ClusterDiff() {
             </FilterContainer> */}
           </S.TitleBarRightButtons>
         </S.TitleBar>
-        <S.List>
-          <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
-            sectionBlueprint={ClusterDiffSectionBlueprint}
-            level={0}
-            isLastSection={false}
-          />
-        </S.List>
+        <Divider style={{margin: '8px 0'}} />
+        <ListContainer>
+          <S.List>
+            <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
+              sectionBlueprint={ClusterDiffSectionBlueprint}
+              level={0}
+              isLastSection={false}
+            />
+          </S.List>
+        </ListContainer>
       </LeftPane>
       {/* <Divider type="vertical" style={{height: '100vh', margin: 0}} />
       <RightPane>

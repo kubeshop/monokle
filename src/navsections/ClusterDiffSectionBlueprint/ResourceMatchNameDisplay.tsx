@@ -4,9 +4,8 @@ import styled from 'styled-components';
 import {stringify} from 'yaml';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateResource} from '@redux/reducers/main';
+import {setDiffResourceInClusterDiff, updateResource} from '@redux/reducers/main';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
-import {performResourceDiff} from '@redux/thunks/diffResource';
 
 import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
@@ -78,7 +77,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     if (!firstLocalResource) {
       return;
     }
-    dispatch(performResourceDiff(firstLocalResource.id));
+    dispatch(setDiffResourceInClusterDiff(firstLocalResource.id));
   };
 
   const onClickApply = () => {

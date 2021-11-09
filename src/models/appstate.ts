@@ -1,4 +1,5 @@
 import {HelmChart, HelmValuesFile} from '@models/helm';
+
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
@@ -118,6 +119,8 @@ interface AppState {
     hasFailed: boolean;
     hideClusterOnlyResources: boolean;
     clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
+    diffResourceId?: string;
+    refreshDiffResource?: boolean;
   };
   notifications: AlertType[];
 }
