@@ -20,7 +20,7 @@ export const TitleBarRightButtons = styled.div`
   margin-left: 10px;
 `;
 
-export const List = styled.ol<{height: number}>`
+export const List = styled.ol<{height?: number}>`
   list-style-type: none;
   padding: 0;
   overflow-y: auto;
@@ -28,6 +28,6 @@ export const List = styled.ol<{height: number}>`
     width: 0;
     background: transparent;
   }
-  ${props => `height: ${props.height}px;`}
+  ${props => props.height && `height: ${props.height}px;`}
   padding-bottom: 20px;
 `;

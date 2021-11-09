@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeClusterDiff} from '@redux/reducers/ui';
 import {ClusterDiff} from '@molecules';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
-import {Skeleton} from 'antd';
+import {Modal, Skeleton} from 'antd';
 import styled from 'styled-components';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
@@ -19,7 +19,7 @@ const SkeletonContainer = styled.div`
   padding: 10px;
 `;
 
-function ClusterDiffPane() {
+function ClusterDiffModal() {
   const dispatch = useAppDispatch();
 
   const hasClusterDiffLoaded = useAppSelector(state => state.main.clusterDiff.hasLoaded);
@@ -58,16 +58,18 @@ function ClusterDiffPane() {
   }, [hasClusterDiffFailed, closeDrawer]);
 
   return (
-    <Container>
-      {!hasClusterDiffLoaded ? (
-        <SkeletonContainer>
-          <Skeleton />
-        </SkeletonContainer>
-      ) : (
-        <ClusterDiff />
-      )}
-    </Container>
+    <Modal visible={isClusterDiffVisible} width={800} onCancel={closeDrawer}>
+      <Container>
+        {!hasClusterDiffLoaded ? (
+          <SkeletonContainer>
+            <Skeleton />
+          </SkeletonContainer>
+        ) : (
+          <ClusterDiff />
+        )}
+      </Container>
+    </Modal>
   );
 }
 
-export default ClusterDiffPane;
+export default ClusterDiffModal;

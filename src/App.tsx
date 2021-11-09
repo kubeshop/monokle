@@ -18,6 +18,7 @@ import {Size} from '@models/window';
 import {useWindowSize} from '@utils/hooks';
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import UpdateModal from '@components/organisms/UpdateModal';
+import {ClusterDiffModal} from '@components/organisms';
 import AppContext from './AppContext';
 
 const App = () => {
@@ -43,6 +44,7 @@ const App = () => {
         <RenameResourceModal />
         <ValidationErrorsModal />
         <UpdateModal />
+        <ClusterDiffModal />
       </div>
     </AppContext.Provider>
   );

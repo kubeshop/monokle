@@ -1,12 +1,12 @@
 import React, {useContext} from 'react';
 import {MonoPaneTitle} from '@components/atoms';
-import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
-import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
+// import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
+// import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
 import {SectionRenderer, ResourceFilterIconWithPopover} from '@components/molecules';
 import AppContext from '@src/AppContext';
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
-import {HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
+// import {HelmValuesFile} from '@models/helm';
+// import {K8sResource} from '@models/k8sresource';
 import {ClusterToLocalResourcesMatch} from '@models/appstate';
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 import styled from 'styled-components';
@@ -65,7 +65,7 @@ function ClusterDiff() {
             </FilterContainer>
           </S.TitleBarRightButtons>
         </S.TitleBar>
-        <S.List height={navigatorHeight}>
+        <S.List>
           <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
             sectionBlueprint={ClusterDiffSectionBlueprint}
             level={0}
@@ -73,7 +73,7 @@ function ClusterDiff() {
           />
         </S.List>
       </LeftPane>
-      <Divider type="vertical" style={{height: '100vh', margin: 0}} />
+      {/* <Divider type="vertical" style={{height: '100vh', margin: 0}} />
       <RightPane>
         <S.TitleBar>
           <MonoPaneTitle>Navigator</MonoPaneTitle>
@@ -98,7 +98,7 @@ function ClusterDiff() {
             }}
           />
         </S.List>
-      </RightPane>
+      </RightPane> */}
     </Container>
   );
 }
