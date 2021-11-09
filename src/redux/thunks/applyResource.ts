@@ -1,17 +1,21 @@
-import {K8sResource} from '@models/k8sresource';
 import {spawn} from 'child_process';
 import log from 'loglevel';
 import {stringify} from 'yaml';
-import {FileMapType, ResourceMapType} from '@models/appstate';
+
 import {setAlert} from '@redux/reducers/alert';
-import {AlertEnum, AlertType} from '@models/alert';
-import {AppDispatch} from '@redux/store';
-import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
-import {isKustomizationResource, KustomizeCommandType} from '@redux/services/kustomize';
-import {getShellPath} from '@utils/shell';
 import {setApplyingResource, updateResource} from '@redux/reducers/main';
+import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
+import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kustomize';
+import {AppDispatch} from '@redux/store';
 import {getResourceFromCluster} from '@redux/thunks/utils';
+
+import {AlertEnum, AlertType} from '@models/alert';
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {K8sResource} from '@models/k8sresource';
+
 import {PROCESS_ENV} from '@utils/env';
+import {getShellPath} from '@utils/shell';
+
 import {performResourceDiff} from './diffResource';
 
 /**

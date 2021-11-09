@@ -1,10 +1,13 @@
 // eslint-disable-next-line import/no-named-default
 import {default as AntdIcon} from '@ant-design/icons';
 
-import Kubernetes from './Icons/Kubernetes';
+import Colors from '@styles/Colors';
+
+import {Collapse, Kubernetes} from './Icons';
 
 type IconProps = {
   name: string;
+  color?: Colors;
 };
 
 type IconsHashTable = {
@@ -13,12 +16,13 @@ type IconsHashTable = {
 
 const icons: IconsHashTable = {
   kubernetes: Kubernetes,
+  collapse: Collapse,
 };
 
 const Icon: React.FC<IconProps> = props => {
-  const {name} = props;
+  const {name, color = Colors.whitePure} = props;
 
-  return <AntdIcon component={icons[name]} />;
+  return <AntdIcon component={icons[name]} style={{color}} />;
 };
 
 export default Icon;

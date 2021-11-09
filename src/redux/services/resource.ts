@@ -1,18 +1,24 @@
+import fs from 'fs';
+import log from 'loglevel';
 import path from 'path';
+import {v4 as uuidv4} from 'uuid';
+import {LineCounter, Scalar, YAMLSeq, parseAllDocuments, parseDocument} from 'yaml';
+
+import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
+
 import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
-import fs from 'fs';
+
 import {KUSTOMIZATION_KIND, PREVIEW_PREFIX, UNSAVED_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
-import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
-import {LineCounter, parseAllDocuments, parseDocument, Scalar, YAMLSeq} from 'yaml';
-import log from 'loglevel';
-import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
-import {getDependentResourceKinds} from '@src/kindhandlers';
-import {v4 as uuidv4} from 'uuid';
+
 import {getFileStats} from '@utils/files';
-import {validateResource} from './validation';
+
+import {getDependentResourceKinds} from '@src/kindhandlers';
+
 import {processRefs} from './resourceRefs';
+import {validateResource} from './validation';
 
 /**
  * Parse documents lazily...

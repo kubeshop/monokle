@@ -2,10 +2,11 @@ const KEY_CTRL_CMD = process.platform === 'darwin' ? '⌘' : 'CTRL';
 
 export const BrowseFolderTooltip = `Browse for folder containing manifests, kustomizations or Helm charts (${KEY_CTRL_CMD}+O)`;
 export const ReloadFolderTooltip = `Reload manifests from the currently selected folder (${KEY_CTRL_CMD}+F5)`;
+export const ToggleTreeTooltip = 'Toggle tree';
 export const FileExplorerTooltip = 'Show/hide File Exlorer';
 export const ClusterExplorerTooltip = 'Show/hide Cluster Preview';
 export const PluginManagerTooltip = 'Show/hide Plugin Manager';
-export const ClusterDiffTooltip = 'Show/hide Cluster Diff';
+export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Diff';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterModeTooltip = `Retrieve and show resources in configured cluster (${KEY_CTRL_CMD}+I)`;
@@ -28,4 +29,4 @@ export const AutoLoadLastFolderTooltip = 'Load last folder when starting Monokle
 export const SaveUnsavedResourceTooltip = 'Save resource to file';
 export const ClusterDiffApplyTooltip = 'Apply this resource to your configured cluster';
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
-export const ClusterDiffCompareTooltip = 'Compare resources - Opens the Diff Modal';
+export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';

@@ -1,0 +1,25 @@
+{
+  "importOrder": [
+    "@redux",
+    "@models",
+    "@organisms",
+    "@molecules",
+    "@atoms",
+    "@components",
+    "@hooks",
+    "@ant-design/icons",
+    "@constants",
+    "@utils",
+    "@assets",
+    "@styles",
+    "@src",
+    "./"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "singleQuote": true,
+  "arrowParens": "avoid",
+  "bracketSpacing": false,
+  "semi": true,
+  "trailingComma": "es5"
+}

@@ -1,22 +1,25 @@
-import styled from 'styled-components';
 import {Button, Modal, Switch, Tag} from 'antd';
-import {MonacoDiffEditor} from 'react-monaco-editor';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useEffect, useMemo, useState} from 'react';
+import {MonacoDiffEditor} from 'react-monaco-editor';
+import styled from 'styled-components';
 import {parse, stringify} from 'yaml';
-// import flatten, {unflatten} from 'flat';
 
-import Icon from '@components/atoms/Icon';
-
-import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-
-import Colors from '@styles/Colors';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateResource} from '@redux/reducers/main';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {performResourceDiff} from '@redux/thunks/diffResource';
+
 import {K8sResource} from '@models/k8sresource';
-import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+
+// import flatten, {unflatten} from 'flat';
+import Icon from '@components/atoms/Icon';
+
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
-import {updateResource} from '@redux/reducers/main';
+
+import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
+import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+
+import Colors from '@styles/Colors';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close {
@@ -191,7 +194,7 @@ const DiffModal = () => {
       }
     >
       <TagsContainer>
-        <StyledTag color="cyan">Local</StyledTag>
+        <StyledTag>Local</StyledTag>
         <Button
           type="primary"
           ghost
@@ -209,7 +212,7 @@ const DiffModal = () => {
         >
           <ArrowLeftOutlined /> Replace local resource with cluster resource
         </Button>
-        <StyledTag color="cyan">Cluster</StyledTag>
+        <StyledTag>Cluster</StyledTag>
       </TagsContainer>
       <MonacoDiffContainer>
         <MonacoDiffEditor
