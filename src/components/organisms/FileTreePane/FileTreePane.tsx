@@ -197,6 +197,13 @@ const TitleBarContainer = styled.div`
   justify-content: space-between;
 `;
 
+const Title = styled.span`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 10px;
+`;
+
 const RightButtons = styled.div`
   display: flex;
   align-items: center;
@@ -412,7 +419,7 @@ const FileTreePane = () => {
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <TitleBarContainer>
-              <span>File Explorer</span>
+              <Title>File Explorer</Title>
               <RightButtons>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
                   <BrowseButton
@@ -422,7 +429,7 @@ const FileTreePane = () => {
                     ghost
                     onClick={openFileExplorer}
                   >
-                    Browse
+                    {Number(uiState.paneConfiguration.leftWidth.toFixed(2)) < 0.2 ? '' : 'Browse'}
                   </BrowseButton>
                 </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
