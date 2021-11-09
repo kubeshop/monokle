@@ -11,7 +11,7 @@ import {performResourceDiff} from '@redux/thunks/diffResource';
 import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
-import {ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined, SwapOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
@@ -34,6 +34,12 @@ const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
 const Label = styled.span<{disabled?: boolean}>`
   width: 300px;
   ${props => props.disabled && `color: ${Colors.grey800};`}
+`;
+
+const StyledDiffSpan = styled.span`
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0 8px;
 `;
 
 const IconsContainer = styled.div`
@@ -150,7 +156,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
         )}
         {clusterResource && firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffCompareTooltip}>
-            <SwapOutlined onClick={onClickDiff} />
+            <StyledDiffSpan onClick={onClickDiff}>Diff</StyledDiffSpan>
           </Tooltip>
         )}
         {clusterResource && (

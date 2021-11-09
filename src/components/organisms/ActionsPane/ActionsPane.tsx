@@ -6,7 +6,7 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
-import {isKustomizationPatch} from '@redux/services/kustomize';
+import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
@@ -271,7 +271,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     type="primary"
                     ghost
                     onClick={diffSelectedResource}
-                    disabled={!selectedResourceId || (selectedResource && isKustomizationPatch(selectedResource))}
+                    disabled={
+                      !selectedResourceId ||
+                      (selectedResource &&
+                        (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)))
+                    }
                   >
                     Diff
                   </DiffButton>

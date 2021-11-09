@@ -141,9 +141,8 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
 const editMenu = (store: any): MenuItemConstructorOptions => {
   const mainState: AppState = store.getState().main;
   const uiState: UiState = store.getState().ui;
-
   const isMonacoActionEnabled = Boolean(mainState.selectedResourceId) && uiState.monacoEditor.focused;
-
+  
   return {
     label: 'Edit',
 

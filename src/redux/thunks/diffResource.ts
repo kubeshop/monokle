@@ -1,4 +1,3 @@
-import log from 'loglevel';
 import {stringify} from 'yaml';
 
 import {SetDiffDataPayload} from '@redux/reducers/main';
@@ -32,6 +31,7 @@ export const performResourceDiff = createAsyncThunk<
       if (!resourceKindHandler) {
         return createRejectionWithAlert(thunkAPI, 'Diff Resource', `Could not find kind handler for ${resource.kind}`);
       }
+
       const kc = new k8s.KubeConfig();
       kc.loadFromFile(config.kubeconfigPath);
       if (config.kubeConfig.currentContext) {
@@ -70,8 +70,7 @@ export const performResourceDiff = createAsyncThunk<
       }
     }
   } catch (e) {
-    createRejectionWithAlert(thunkAPI, 'Diff Resource', `Failed to diff resources; ${e.message}`);
-    log.error(e);
+    return createRejectionWithAlert(thunkAPI, 'Diff Resource', `Failed to diff resources; ${e.message}`);
   }
 
   return {};

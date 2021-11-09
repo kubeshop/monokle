@@ -195,7 +195,7 @@ const DiffModal = () => {
       }
     >
       <TagsContainer>
-        <StyledTag color="cyan">Local</StyledTag>
+        <StyledTag>Local</StyledTag>
         <Button
           type="primary"
           ghost
@@ -213,7 +213,7 @@ const DiffModal = () => {
         >
           <ArrowLeftOutlined /> Replace local resource with cluster resource
         </Button>
-        <StyledTag color="cyan">Cluster</StyledTag>
+        <StyledTag>Cluster</StyledTag>
       </TagsContainer>
       <MonacoDiffContainer>
         <MonacoDiffEditor

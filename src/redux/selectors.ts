@@ -1,7 +1,11 @@
 import {createSelector} from 'reselect';
-import {K8sResource} from '@models/k8sresource';
+
 import {isKustomizationResource} from '@redux/services/kustomize';
+
+import {K8sResource} from '@models/k8sresource';
+
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {RootState} from './store';
 
 export const rootFolderSelector = createSelector(

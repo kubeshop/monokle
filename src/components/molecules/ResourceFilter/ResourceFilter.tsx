@@ -1,13 +1,18 @@
-import React, {useCallback, useState} from 'react';
+import {Button, Input, Select} from 'antd';
+import React, {useCallback, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
-import {Input, Select, Button} from 'antd';
 import styled from 'styled-components';
-import {ResourceKindHandlers} from '@src/kindhandlers';
-import {useNamespaces} from '@hooks/useNamespaces';
-import Colors from '@styles/Colors';
-import {KeyValueInput} from '@components/atoms';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
+
+import {KeyValueInput} from '@components/atoms';
+
+import {useNamespaces} from '@hooks/useNamespaces';
+
+import Colors from '@styles/Colors';
+
+import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const ALL_OPTIONS = '<all>';
 
@@ -38,6 +43,8 @@ const StyledTitleLabel = styled.span`
 const StyledTitleButton = styled(Button)`
   padding: 0;
 `;
+
+const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
 const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
   const keyValues: Record<string, string[]> = {};
@@ -70,6 +77,17 @@ const ResourceFilter = () => {
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const allNamespaces = useNamespaces({extra: ['all', 'default']});
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+
+  const allResourceKinds = useMemo(() => {
+    return [
+      ...new Set([
+        ...KnownResourceKinds,
+        ...Object.values(resourceMap)
+          .filter(r => !KnownResourceKinds.includes(r.kind))
+          .map(r => r.kind),
+      ]),
+    ].sort();
+  }, [resourceMap]);
 
   const getAllLabels = useCallback(() => {
     const allLabels: Record<string, string[]> = makeKeyValuesFromObjectList(
@@ -156,9 +174,9 @@ const ResourceFilter = () => {
           <Select.Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
             {ALL_OPTIONS}
           </Select.Option>
-          {ResourceKindHandlers.map(kindHandler => (
-            <Select.Option key={kindHandler.kind} value={kindHandler.kind}>
-              {kindHandler.kind}
+          {allResourceKinds.map(resourceKind => (
+            <Select.Option key={resourceKind} value={resourceKind}>
+              {resourceKind}
             </Select.Option>
           ))}
         </Select>

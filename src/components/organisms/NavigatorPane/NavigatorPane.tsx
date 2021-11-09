@@ -1,24 +1,36 @@
+import {Badge, Button, Tooltip} from 'antd';
 import {useCallback, useContext, useMemo} from 'react';
-import AppContext from '@src/AppContext';
-import {K8sResource} from '@models/k8sresource';
+import {useSelector} from 'react-redux';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openClusterDiff, openNewResourceWizard} from '@redux/reducers/ui';
+import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+
+import {ResourceFilterType} from '@models/appstate';
 import {HelmValuesFile} from '@models/helm';
-import Colors from '@styles/Colors';
+import {K8sResource} from '@models/k8sresource';
+
+import {MonoPaneTitle} from '@components/atoms';
+import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import IconWithPopover from '@components/molecules/IconWithPopover';
-import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
+
+import {FilterOutlined, PlusOutlined, SwapOutlined} from '@ant-design/icons';
+
+import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {ClusterDiffTooltip} from '@constants/tooltips';
+
+import Colors from '@styles/Colors';
+
+import AppContext from '@src/AppContext';
 import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
 import K8sResourceSectionBlueprint, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
-import {Badge} from 'antd';
-import {PlusOutlined, FilterOutlined} from '@ant-design/icons';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
-import {useSelector} from 'react-redux';
-import {ResourceFilterType} from '@models/appstate';
-import {isInClusterModeSelector, isInPreviewModeSelector, activeResourcesSelector} from '@redux/selectors';
-import {openNewResourceWizard} from '@redux/reducers/ui';
-import {MonoPaneTitle} from '@components/atoms';
-import {SectionRenderer, ResourceFilter} from '@components/molecules';
-import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
+import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
+import UnknownResourceSectionBlueprint, {
+  UnknownResourceScopeType,
+} from '@src/navsections/UnknownResourceSectionBlueprint';
+
 import * as S from './NavigatorPane.styled';
+import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -49,6 +61,10 @@ const NavPane: React.FC = () => {
     dispatch(openNewResourceWizard());
   };
 
+  const onClickClusterComparison = () => {
+    dispatch(openClusterDiff());
+  };
+
   return (
     <>
       <S.TitleBar>
@@ -73,6 +89,18 @@ const NavPane: React.FC = () => {
               }
             />
           </Badge>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffTooltip} placement="bottom">
+            <Button
+              onClick={onClickClusterComparison}
+              icon={<SwapOutlined />}
+              type="primary"
+              ghost
+              size="small"
+              style={{marginLeft: 8}}
+            >
+              Cluster Comparison
+            </Button>
+          </Tooltip>
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>
@@ -88,6 +116,11 @@ const NavPane: React.FC = () => {
         />
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
+          level={0}
+          isLastSection={false}
+        />
+        <SectionRenderer<K8sResource, UnknownResourceScopeType>
+          sectionBlueprint={UnknownResourceSectionBlueprint}
           level={0}
           isLastSection={false}
         />
