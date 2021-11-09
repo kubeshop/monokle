@@ -1,9 +1,9 @@
-import {Badge, Button, Tooltip} from 'antd';
-import {useCallback, useContext, useMemo} from 'react';
+import {Badge} from 'antd';
+import {useContext, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openClusterDiff, openNewResourceWizard} from '@redux/reducers/ui';
+import {openNewResourceWizard} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import {ResourceFilterType} from '@models/appstate';
@@ -14,10 +14,9 @@ import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import IconWithPopover from '@components/molecules/IconWithPopover';
 
-import {FilterOutlined, PlusOutlined, SwapOutlined} from '@ant-design/icons';
+import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
-import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {ClusterDiffTooltip} from '@constants/tooltips';
+import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import Colors from '@styles/Colors';
 
@@ -26,6 +25,7 @@ import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/He
 import K8sResourceSectionBlueprint, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
 import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
 
+import ClusterComparisonButton from './ClusterComparisonButton';
 import * as S from './NavigatorPane.styled';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
@@ -50,16 +50,12 @@ const NavPane: React.FC = () => {
       .filter(filter => filter.filterValue && Object.values(filter.filterValue).length);
   }, [resourceFilters]);
 
-  const doesRootFileEntryExist = useCallback(() => {
+  const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
 
   const onClickNewResource = () => {
     dispatch(openNewResourceWizard());
-  };
-
-  const onClickClusterComparison = () => {
-    dispatch(openClusterDiff());
   };
 
   return (
@@ -70,7 +66,7 @@ const NavPane: React.FC = () => {
         </MonoPaneTitle>
         <S.TitleBarRightButtons>
           <S.PlusButton
-            disabled={!doesRootFileEntryExist() || isInClusterMode || isInPreviewMode}
+            disabled={!isFolderOpen || isInClusterMode || isInPreviewMode}
             onClick={onClickNewResource}
             type="link"
             size="small"
@@ -81,23 +77,10 @@ const NavPane: React.FC = () => {
               popoverContent={<ResourceFilter />}
               popoverTrigger="click"
               iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-              isDisabled={
-                (!doesRootFileEntryExist() && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0
-              }
+              isDisabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
             />
           </Badge>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffTooltip} placement="bottom">
-            <Button
-              onClick={onClickClusterComparison}
-              icon={<SwapOutlined />}
-              type="primary"
-              ghost
-              size="small"
-              style={{marginLeft: 8}}
-            >
-              Cluster Comparison
-            </Button>
-          </Tooltip>
+          <ClusterComparisonButton />
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>

@@ -1,7 +1,21 @@
+import fs from 'fs';
 import log from 'loglevel';
-import {createAsyncThunk, createSlice, Draft, original, PayloadAction} from '@reduxjs/toolkit';
 import path from 'path';
-import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {v4 as uuidv4} from 'uuid';
+import {parseDocument} from 'yaml';
+
+import {resetSelectionHistory} from '@redux/services/selectionHistory';
+import {performResourceDiff} from '@redux/thunks/diffResource';
+import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
+import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {Draft, PayloadAction, createAsyncThunk, createSlice, original} from '@reduxjs/toolkit';
+
+import {AlertType} from '@models/alert';
 import {AppConfig} from '@models/appconfig';
 import {
   AppState,
@@ -12,36 +26,25 @@ import {
   ResourceFilterType,
   ResourceMapType,
 } from '@models/appstate';
-import {parseDocument} from 'yaml';
-import * as k8s from '@kubernetes/client-node';
-import fs from 'fs';
-import {previewKustomization} from '@redux/thunks/previewKustomization';
-import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {performResourceDiff} from '@redux/thunks/diffResource';
-import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
-import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {K8sResource} from '@models/k8sresource';
-import {AlertType} from '@models/alert';
-import {getResourceKindHandler} from '@src/kindhandlers';
-import {getFileStats} from '@utils/files';
+
+import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+
 import electronStore from '@utils/electronStore';
-import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
-import {v4 as uuidv4} from 'uuid';
+import {getFileStats} from '@utils/files';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 import initialState from '../initialState';
-import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {
   addPath,
-  removePath,
+  createFileEntry,
   getAllFileEntriesForPath,
   getFileEntryForAbsolutePath,
   getResourcesForPath,
   reloadFile,
-  createFileEntry,
+  removePath,
 } from '../services/fileEntry';
 import {
   extractK8sResources,
@@ -52,7 +55,10 @@ import {
   reprocessResources,
   saveResource,
 } from '../services/resource';
+import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {closeClusterDiff} from './ui';
+// eslint-disable-next-line
+import * as k8s from '@kubernetes/client-node';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;

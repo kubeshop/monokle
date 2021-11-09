@@ -1,9 +1,11 @@
-import {HelmValuesFile} from '@models/helm';
-import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
 import {selectHelmValuesFile} from '@redux/reducers/main';
+
+import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
+import {HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
-import HelmChartQuickAction from './HelmChartQuickAction';
+
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import HelmChartQuickAction from './HelmChartQuickAction';
 
 export type HelmChartScopeType = {
   helmChartMap: HelmChartMapType;
@@ -57,7 +59,6 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;
     },
-    shouldBeVisibleBeforeInitialized: true,
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,

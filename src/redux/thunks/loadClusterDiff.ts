@@ -1,10 +1,13 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
-import {AppDispatch, RootState} from '@redux/store';
 import getClusterObjects from '@redux/services/getClusterObjects';
 import {extractK8sResources} from '@redux/services/resource';
-import {CLUSTER_DIFF_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
-import {ResourceMapType} from '@models/appstate';
+import {AppDispatch, RootState} from '@redux/store';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {AlertEnum, AlertType} from '@models/alert';
+import {ResourceMapType} from '@models/appstate';
+
+import {CLUSTER_DIFF_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+
 import {createRejectionWithAlert} from './utils';
 
 export type LoadClusterDiffPayload = {
@@ -12,7 +15,7 @@ export type LoadClusterDiffPayload = {
   alert?: AlertType;
 };
 
-const CLUSTER_DIFF_FAILED = 'Cluster Diff Failed';
+const CLUSTER_DIFF_FAILED = 'Cluster Comparison Failed';
 
 export const loadClusterDiff = createAsyncThunk<
   LoadClusterDiffPayload,
@@ -23,6 +26,9 @@ export const loadClusterDiff = createAsyncThunk<
   }
 >('main/loadClusterDiff', async (_, thunkAPI) => {
   const state = thunkAPI.getState();
+  if (!state.ui.isClusterDiffVisible) {
+    return;
+  }
   if (!state.config.kubeConfig.currentContext) {
     return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, 'Could not find current kubeconfig context.');
   }

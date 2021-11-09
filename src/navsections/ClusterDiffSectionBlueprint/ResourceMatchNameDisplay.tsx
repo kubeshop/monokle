@@ -21,18 +21,18 @@ import {diffLocalToClusterResources, removeIgnoredPathsFromResourceContent} from
 import Colors from '@styles/Colors';
 
 const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
-  width: 800px;
+  width: 900px;
   display: flex;
   justify-content: space-between;
   margin-left: -24px;
   padding-left: 24px;
-  ${props => props.highlightdiff && `background: ${Colors.diffBackground}; color: white !important;`}
+  ${props => props.highlightdiff && `background: ${Colors.diffBackground}; color: ${Colors.yellow10} !important;`}
   ${props => props.hovered && `background: ${Colors.blackPearl};`}
   ${props => props.highlightdiff && props.hovered && `background: ${Colors.diffBackgroundHover}`}
 `;
 
 const Label = styled.span<{disabled?: boolean}>`
-  width: 300px;
+  width: 350px;
   ${props => props.disabled && `color: ${Colors.grey800};`}
 `;
 
@@ -134,7 +134,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     >
       <Label disabled={!firstLocalResource}>
         {!resourceFilterNamespace && (
-          <Tag color={areResourcesDifferent ? 'orange' : 'blue'}>
+          <Tag color={areResourcesDifferent ? 'yellow' : 'default'}>
             {firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}
           </Tag>
         )}
@@ -143,24 +143,25 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       <IconsContainer>
         {firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffApplyTooltip}>
-            <ArrowRightOutlined onClick={onClickApply} />
+            <ArrowRightOutlined style={{color: Colors.blue6}} onClick={onClickApply} />
           </Tooltip>
         )}
         {clusterResource && firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffCompareTooltip}>
-            <StyledDiffSpan onClick={onClickDiff}>Diff</StyledDiffSpan>
+            <StyledDiffSpan style={{color: Colors.blue6}} onClick={onClickDiff}>
+              Diff
+            </StyledDiffSpan>
           </Tooltip>
         )}
         {clusterResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffSaveTooltip}>
-            <ArrowLeftOutlined onClick={onClickSave} />
+            <ArrowLeftOutlined style={{color: Colors.blue6}} onClick={onClickSave} />
           </Tooltip>
         )}
       </IconsContainer>
-
       <Label disabled={!clusterResource}>
         {!resourceFilterNamespace && (
-          <Tag color={areResourcesDifferent ? 'orange' : !clusterResource ? 'rgba(58, 67, 68, 0.3)' : 'blue'}>
+          <Tag color={areResourcesDifferent ? 'yellow' : !clusterResource ? 'rgba(58, 67, 68, 0.3)' : 'default'}>
             <span style={{color: !clusterResource ? '#686868' : undefined}}>
               {clusterResource?.namespace ? clusterResource.namespace : 'default'}
             </span>

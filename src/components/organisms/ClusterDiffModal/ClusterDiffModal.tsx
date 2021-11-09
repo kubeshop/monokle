@@ -1,5 +1,5 @@
 import {Button, Modal, Skeleton} from 'antd';
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -39,15 +39,37 @@ function ClusterDiffModal() {
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
+  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+
+  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
+
+  const previewResource = useMemo(() => {
+    if (!previewResourceId) {
+      return null;
+    }
+    return resourceMap[previewResourceId];
+  }, [resourceMap, previewResourceId]);
+
+  const previewValuesFile = useMemo(() => {
+    if (!previewValuesFileId) {
+      return null;
+    }
+    return helmValuesMap[previewValuesFileId];
+  }, [helmValuesMap, previewValuesFileId]);
 
   useEffect(() => {
-    dispatch(loadClusterDiff());
+    if (isClusterDiffVisible) {
+      dispatch(loadClusterDiff());
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInPreviewMode]);
 
   // TODO: improve this by updating the clusterToLocalResourcesMatches after apply instead of reloading the entire cluster diff
   useEffect(() => {
-    if (!isApplyingResource) {
+    if (!isApplyingResource && isClusterDiffVisible) {
       dispatch(loadClusterDiff());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,9 +91,19 @@ function ClusterDiffModal() {
     }
   }, [hasClusterDiffFailed, closeDrawer]);
 
+  const title = useMemo(() => {
+    if (previewResource) {
+      return `Comparing kustomization preview resources to Cluster resources (${currentContext})`;
+    }
+    if (previewValuesFile) {
+      return `Comparing Helm Chart preview resources to Cluster resources (${currentContext})`;
+    }
+    return `Comparing Local Resources to Cluster resources (${currentContext})`;
+  }, [previewResource, previewValuesFile, currentContext]);
+
   return (
     <StyledModal
-      title="Comparing Local Resources to Cluster Resources"
+      title={title}
       visible={isClusterDiffVisible}
       width={1000}
       onCancel={closeDrawer}

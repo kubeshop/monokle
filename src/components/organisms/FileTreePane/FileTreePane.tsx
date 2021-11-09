@@ -449,6 +449,7 @@ const FileTreePane = () => {
                     type="primary"
                     ghost
                     size="small"
+                    disabled={!fileMap[ROOT_FILE_ENTRY]}
                   />
                 </Tooltip>
               </RightButtons>
