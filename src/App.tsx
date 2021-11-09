@@ -1,25 +1,31 @@
 import React from 'react';
-import 'antd/dist/antd.less';
-import {Layout} from '@atoms';
-import {
-  PageHeader,
-  PageFooter,
-  MessageBox,
-  SettingsDrawer,
-  DiffModal,
-  StartupModal,
-  HotKeysHandler,
-  PaneManager,
-  NewResourceWizard,
-  RenameResourceModal,
-  NotificationsDrawer,
-} from '@organisms';
+
 import {Size} from '@models/window';
-import {useWindowSize} from '@utils/hooks';
+
+import {
+  DiffModal,
+  HotKeysHandler,
+  MessageBox,
+  NewResourceWizard,
+  NotificationsDrawer,
+  PageFooter,
+  PageHeader,
+  PaneManager,
+  RenameResourceModal,
+  SettingsDrawer,
+  StartupModal,
+} from '@organisms';
+
+import {Layout} from '@atoms';
+
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
-import UpdateModal from '@components/organisms/UpdateModal';
 import {ClusterDiffModal} from '@components/organisms';
+import UpdateModal from '@components/organisms/UpdateModal';
+
+import {useWindowSize} from '@utils/hooks';
+
 import AppContext from './AppContext';
+import 'antd/dist/antd.less';
 
 const App = () => {
   const size: Size = useWindowSize();

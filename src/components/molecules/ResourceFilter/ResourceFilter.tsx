@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 import {Input, Select, Button} from 'antd';
 import styled from 'styled-components';
@@ -39,6 +39,8 @@ const StyledTitleButton = styled(Button)`
   padding: 0;
 `;
 
+const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
+
 const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
   const keyValues: Record<string, string[]> = {};
   Object.values(objectList).forEach(currentObject => {
@@ -70,6 +72,17 @@ const ResourceFilter = () => {
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const allNamespaces = useNamespaces({extra: ['all', 'default']});
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+
+  const allResourceKinds = useMemo(() => {
+    return [
+      ...new Set([
+        ...KnownResourceKinds,
+        ...Object.values(resourceMap)
+          .filter(r => !KnownResourceKinds.includes(r.kind))
+          .map(r => r.kind),
+      ]),
+    ].sort();
+  }, [resourceMap]);
 
   const getAllLabels = useCallback(() => {
     const allLabels: Record<string, string[]> = makeKeyValuesFromObjectList(
@@ -156,9 +169,9 @@ const ResourceFilter = () => {
           <Select.Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
             {ALL_OPTIONS}
           </Select.Option>
-          {ResourceKindHandlers.map(kindHandler => (
-            <Select.Option key={kindHandler.kind} value={kindHandler.kind}>
-              {kindHandler.kind}
+          {allResourceKinds.map(resourceKind => (
+            <Select.Option key={resourceKind} value={resourceKind}>
+              {resourceKind}
             </Select.Option>
           ))}
         </Select>
