@@ -1,32 +1,40 @@
-import React, {useCallback, useEffect, useContext, useMemo} from 'react';
-import styled from 'styled-components';
-import path from 'path';
-import {Row, Button, Tree, Typography, Skeleton, Tooltip} from 'antd';
+import {Button, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
+import {ipcRenderer} from 'electron';
 import micromatch from 'micromatch';
+import path from 'path';
+import React, {useCallback, useContext, useEffect, useMemo} from 'react';
+import {useSelector} from 'react-redux';
+import styled from 'styled-components';
 
-import Colors, {FontColors, BackgroundColors} from '@styles/Colors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY, FILE_TREE_HEIGHT_OFFSET} from '@constants/constants';
+import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
+import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {stopPreview} from '@redux/services/preview';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
+
+import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import FileExplorer from '@atoms/FileExplorer';
+
+import Icon from '@components/atoms/Icon';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
+
+import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
+
+import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {BrowseFolderTooltip, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
+
+import {getFileStats} from '@utils/files';
+import {uniqueArr} from '@utils/index';
+
+import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
-import {FolderAddOutlined, ReloadOutlined, FolderOutlined, FolderOpenOutlined} from '@ant-design/icons';
-
-import {FileEntry} from '@models/fileentry';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {stopPreview} from '@redux/services/preview';
-import {getResourcesForPath, getChildFilePath} from '@redux/services/fileEntry';
-import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
-import {useSelector} from 'react-redux';
-import {isInPreviewModeSelector} from '@redux/selectors';
-import {uniqueArr} from '@utils/index';
-import {BrowseFolderTooltip, CollapseTreeTooltip, ExpandTreeTooltip, ReloadFolderTooltip} from '@constants/tooltips';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {ipcRenderer} from 'electron';
-import FileExplorer from '@atoms/FileExplorer';
-import {useFileExplorer} from '@hooks/useFileExplorer';
-import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
-import {getFileStats} from '@utils/files';
 
 interface TreeNode {
   key: string;
@@ -394,12 +402,8 @@ const FileTreePane = () => {
     return treeKeys;
   }, [tree]);
 
-  const onCollapseAll = () => {
-    setExpandedKeys([]);
-  };
-
-  const onExpandAll = () => {
-    setExpandedKeys(allTreeKeys);
+  const onToggleTree = () => {
+    setExpandedKeys(prevState => (prevState.length ? [] : allTreeKeys));
   };
 
   return (
@@ -431,11 +435,14 @@ const FileTreePane = () => {
                     disabled={!fileMap[ROOT_FILE_ENTRY]}
                   />
                 </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={CollapseTreeTooltip}>
-                  <Button icon={<FolderOutlined />} onClick={onCollapseAll} type="primary" ghost size="small" />
-                </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ExpandTreeTooltip}>
-                  <Button icon={<FolderOpenOutlined />} onClick={onExpandAll} type="primary" ghost size="small" />
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+                  <Button
+                    icon={<Icon name="collapse" color={Colors.blue6} />}
+                    onClick={onToggleTree}
+                    type="primary"
+                    ghost
+                    size="small"
+                  />
                 </Tooltip>
               </RightButtons>
             </TitleBarContainer>
