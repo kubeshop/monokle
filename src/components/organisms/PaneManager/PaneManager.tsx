@@ -1,40 +1,42 @@
-import React, {useState, useContext, useMemo} from 'react';
-import styled from 'styled-components';
-import 'antd/dist/antd.less';
 import {Button, Space, Tooltip} from 'antd';
+import React, {useContext, useMemo, useState} from 'react';
+import styled from 'styled-components';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
-  ClusterOutlined,
-  FolderOutlined,
-  FolderOpenOutlined,
-  ApartmentOutlined,
-  CodeOutlined,
-  ApiOutlined,
-  SwapOutlined,
-} from '@ant-design/icons';
-import Colors, {BackgroundColors} from '@styles/Colors';
-import {AppBorders} from '@styles/Borders';
-import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane} from '@organisms';
-import {LogViewer, GraphView} from '@molecules';
-import featureJson from '@src/feature-flags.json';
-import {
-  ClusterExplorerTooltip,
-  FileExplorerTooltip,
-  PluginManagerTooltip,
-  ClusterDiffTooltip,
-  ClusterDiffDisabledTooltip,
-} from '@constants/tooltips';
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {
-  toggleLeftMenu,
-  toggleRightMenu,
+  closeClusterDiff,
+  openClusterDiff,
   setLeftMenuSelection,
   setRightMenuSelection,
-  openClusterDiff,
-  closeClusterDiff,
+  toggleLeftMenu,
+  toggleRightMenu,
 } from '@redux/reducers/ui';
+
+import {ActionsPane, ClustersPane, FileTreePane, NavigatorPane, PluginManagerPane} from '@organisms';
+
+import {GraphView, LogViewer} from '@molecules';
+
+import {Col, Content, Row, SplitView} from '@atoms';
+
+import {
+  ApartmentOutlined,
+  ApiOutlined,
+  ClusterOutlined,
+  CodeOutlined,
+  FolderOpenOutlined,
+  FolderOutlined,
+} from '@ant-design/icons';
+
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {ClusterExplorerTooltip, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
+
+import {AppBorders} from '@styles/Borders';
+import Colors, {BackgroundColors} from '@styles/Colors';
+
 import AppContext from '@src/AppContext';
+import featureJson from '@src/feature-flags.json';
+
+import 'antd/dist/antd.less';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -176,26 +178,6 @@ const PaneManager = () => {
                     icon={ClusterOutlined}
                     active={leftActive}
                     isSelected={leftMenuSelection === 'cluster-explorer'}
-                  />
-                }
-              />
-            </Tooltip>
-            <Tooltip
-              mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
-              title={isFolderOpen ? ClusterDiffTooltip : ClusterDiffDisabledTooltip}
-              placement="right"
-            >
-              <Button
-                disabled={!isFolderOpen}
-                size="large"
-                type="text"
-                onClick={openClusterDiffDrawer}
-                icon={
-                  <MenuIcon
-                    style={!isFolderOpen ? {color: Colors.grey900} : undefined}
-                    icon={SwapOutlined}
-                    active={isClusterDiffVisible}
-                    isSelected={isClusterDiffVisible}
                   />
                 }
               />
