@@ -1,40 +1,42 @@
-import React, {useState, useContext, useMemo} from 'react';
-import styled from 'styled-components';
-import 'antd/dist/antd.less';
 import {Button, Space, Tooltip} from 'antd';
+import React, {useContext, useMemo, useState} from 'react';
+import styled from 'styled-components';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
-  ClusterOutlined,
-  FolderOutlined,
-  FolderOpenOutlined,
-  ApartmentOutlined,
-  CodeOutlined,
-  ApiOutlined,
-  SwapOutlined,
-} from '@ant-design/icons';
-import Colors, {BackgroundColors} from '@styles/Colors';
-import {AppBorders} from '@styles/Borders';
-import {Row, Col, Content, SplitView} from '@atoms';
-import {ActionsPane, FileTreePane, PluginManagerPane, NavigatorPane, ClustersPane, ClusterDiffPane} from '@organisms';
-import {LogViewer, GraphView} from '@molecules';
-import featureJson from '@src/feature-flags.json';
-import {
-  ClusterExplorerTooltip,
-  FileExplorerTooltip,
-  PluginManagerTooltip,
-  ClusterDiffTooltip,
-  ClusterDiffDisabledTooltip,
-} from '@constants/tooltips';
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {
-  toggleLeftMenu,
-  toggleRightMenu,
+  closeClusterDiff,
+  openClusterDiff,
   setLeftMenuSelection,
   setRightMenuSelection,
-  openClusterDiff,
-  closeClusterDiff,
+  toggleLeftMenu,
+  toggleRightMenu,
 } from '@redux/reducers/ui';
+
+import {ActionsPane, ClustersPane, FileTreePane, NavigatorPane, PluginManagerPane} from '@organisms';
+
+import {GraphView, LogViewer} from '@molecules';
+
+import {Col, Content, Row, SplitView} from '@atoms';
+
+import {
+  ApartmentOutlined,
+  ApiOutlined,
+  ClusterOutlined,
+  CodeOutlined,
+  FolderOpenOutlined,
+  FolderOutlined,
+} from '@ant-design/icons';
+
+import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {ClusterExplorerTooltip, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
+
+import {AppBorders} from '@styles/Borders';
+import Colors, {BackgroundColors} from '@styles/Colors';
+
 import AppContext from '@src/AppContext';
+import featureJson from '@src/feature-flags.json';
+
+import 'antd/dist/antd.less';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -143,7 +145,6 @@ const PaneManager = () => {
   };
 
   const openClusterDiffDrawer = () => {
-    dispatch(setLeftMenuSelection(''));
     dispatch(openClusterDiff());
   };
 
@@ -181,26 +182,6 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
-            <Tooltip
-              mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
-              title={isFolderOpen ? ClusterDiffTooltip : ClusterDiffDisabledTooltip}
-              placement="right"
-            >
-              <Button
-                disabled={!isFolderOpen}
-                size="large"
-                type="text"
-                onClick={openClusterDiffDrawer}
-                icon={
-                  <MenuIcon
-                    style={!isFolderOpen ? {color: Colors.grey900} : undefined}
-                    icon={SwapOutlined}
-                    active={isClusterDiffVisible}
-                    isSelected={isClusterDiffVisible}
-                  />
-                }
-              />
-            </Tooltip>
             {featureJson.PluginManager && (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
                 <Button
@@ -219,51 +200,49 @@ const PaneManager = () => {
             )}
           </Space>
         </StyledColumnLeftMenu>
-        {isClusterDiffVisible ? (
-          <ClusterDiffPane />
-        ) : (
-          <StyledColumnPanes style={{width: contentWidth}}>
-            <SplitView
-              contentWidth={contentWidth}
-              left={
-                <>
-                  <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
-                    <FileTreePane />
-                  </div>
-                  <div
-                    style={{
-                      display:
-                        featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
-                    }}
-                  >
-                    <ClustersPane />
-                  </div>
-                  <div
-                    style={{
-                      display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
-                    }}
-                  >
-                    <PluginManagerPane />
-                  </div>
-                </>
-              }
-              hideLeft={!leftActive}
-              nav={<NavigatorPane />}
-              editor={<ActionsPane contentHeight={contentHeight} />}
-              right={
-                <>
-                  {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                    <GraphView editorHeight={contentHeight} />
-                  ) : undefined}
-                  <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
-                    <LogViewer editorHeight={contentHeight} />
-                  </div>
-                </>
-              }
-              hideRight={!rightActive}
-            />
-          </StyledColumnPanes>
-        )}
+
+        <StyledColumnPanes style={{width: contentWidth}}>
+          <SplitView
+            contentWidth={contentWidth}
+            left={
+              <>
+                <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
+                  <FileTreePane />
+                </div>
+                <div
+                  style={{
+                    display:
+                      featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
+                  }}
+                >
+                  <ClustersPane />
+                </div>
+                <div
+                  style={{
+                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                  }}
+                >
+                  <PluginManagerPane />
+                </div>
+              </>
+            }
+            hideLeft={!leftActive}
+            nav={<NavigatorPane />}
+            editor={<ActionsPane contentHeight={contentHeight} />}
+            right={
+              <>
+                {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
+                  <GraphView editorHeight={contentHeight} />
+                ) : undefined}
+                <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
+                  <LogViewer editorHeight={contentHeight} />
+                </div>
+              </>
+            }
+            hideRight={!rightActive}
+          />
+        </StyledColumnPanes>
+
         <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
           <Space direction="vertical" style={{width: 43}}>
             <Button
