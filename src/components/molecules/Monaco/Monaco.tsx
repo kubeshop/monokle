@@ -1,31 +1,36 @@
-import React, {useEffect, useState, useRef, useMemo} from 'react';
-import MonacoEditor, {monaco} from 'react-monaco-editor';
+/* eslint-disable import/order */
 import fs from 'fs';
-import path from 'path';
-import {useMeasure} from 'react-use';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import 'monaco-yaml/lib/esm/monaco.contribution';
-import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor';
+import path from 'path';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import MonacoEditor, {monaco} from 'react-monaco-editor';
+import {useSelector} from 'react-redux';
+import {useMeasure} from 'react-use';
+import {Document, ParsedNode, isMap, parseAllDocuments} from 'yaml';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectFile, selectK8sResource} from '@redux/reducers/main';
+import {isInPreviewModeSelector} from '@redux/selectors';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
+import {getFileStats} from '@utils/files';
+import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
+
+import * as S from './Monaco.styled';
+import useCodeIntel from './useCodeIntel';
+import useDebouncedCodeSave from './useDebouncedCodeSave';
+import useEditorKeybindings from './useEditorKeybindings';
+import useMonacoUiState from './useMonacoUiState';
+import useResourceYamlSchema from './useResourceYamlSchema';
+import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
+import 'monaco-yaml/lib/esm/monaco.contribution';
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
-import {selectK8sResource, selectFile} from '@redux/reducers/main';
-import {Document, isMap, parseAllDocuments, ParsedNode} from 'yaml';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-import {useSelector} from 'react-redux';
-import {isInPreviewModeSelector} from '@redux/selectors';
-import {getFileStats} from '@utils/files';
-import useCodeIntel from './useCodeIntel';
-import useEditorKeybindings from './useEditorKeybindings';
-import useResourceYamlSchema from './useResourceYamlSchema';
-import useDebouncedCodeSave from './useDebouncedCodeSave';
-import useMonacoUiState from './useMonacoUiState';
-import * as S from './Monaco.styled';
 
 // @ts-ignore
 window.MonacoEnvironment = {
@@ -223,7 +228,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       <S.HiddenInputContainer>
         <S.HiddenInput ref={hiddenInputRef} type="text" />
       </S.HiddenInputContainer>
-      {firstCodeLoadedOnEditor && (
+      {firstCodeLoadedOnEditor && editingResourceId === selectedResourceId && (
         <MonacoEditor
           width={width}
           height={editorHeight}
