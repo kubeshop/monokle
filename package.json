@@ -276,13 +276,10 @@
   },
   "lint-staged": {
     "{src,test}/**/*.{js,jsx,ts,tsx}": [
-      "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\" --fix",
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ],
     ".": [
-      "eslint . --fix",
-      "git add"
+      "eslint . --fix"
     ],
     "*.css": "stylelint --fix"
   },

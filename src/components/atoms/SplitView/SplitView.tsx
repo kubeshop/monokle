@@ -1,16 +1,10 @@
-import React, {
-  useState,
-  useLayoutEffect,
-  MouseEvent,
-  TouchEvent,
-  ReactElement,
-  FunctionComponent,
-  useEffect,
-} from 'react';
+import {FunctionComponent, MouseEvent, ReactElement, TouchEvent, useEffect, useLayoutEffect, useState} from 'react';
 import styled from 'styled-components';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setLeftMenuIsActive, setPaneConfiguration, setRightMenuIsActive} from '@redux/reducers/ui';
+
 import {AppBorders} from '@styles/Borders';
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {setPaneConfiguration, setRightMenuIsActive, setLeftMenuIsActive} from '@redux/reducers/ui';
 
 const MIN_WIDTH = 300;
 const MIN_LEFT_PANE_WIDTH = 300;
