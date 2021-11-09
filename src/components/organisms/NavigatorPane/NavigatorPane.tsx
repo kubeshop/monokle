@@ -24,6 +24,9 @@ import AppContext from '@src/AppContext';
 import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
 import K8sResourceSectionBlueprint, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
 import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
+import UnknownResourceSectionBlueprint, {
+  UnknownResourceScopeType,
+} from '@src/navsections/UnknownResourceSectionBlueprint';
 
 import ClusterComparisonButton from './ClusterComparisonButton';
 import * as S from './NavigatorPane.styled';
@@ -96,6 +99,11 @@ const NavPane: React.FC = () => {
         />
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
+          level={0}
+          isLastSection={false}
+        />
+        <SectionRenderer<K8sResource, UnknownResourceScopeType>
+          sectionBlueprint={UnknownResourceSectionBlueprint}
           level={0}
           isLastSection={false}
         />
