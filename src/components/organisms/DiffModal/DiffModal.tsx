@@ -39,8 +39,10 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-const LeftButton = styled(Button)`
-  float: left;
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px;
 `;
 
 const MonacoDiffContainer = styled.div`
@@ -57,7 +59,10 @@ const MonacoDiffContainer = styled.div`
 `;
 
 const SwitchContainer = styled.span`
-  margin-right: 20px;
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+  padding-bottom: 0;
 `;
 
 const StyledSwitchLabel = styled.span`
@@ -68,7 +73,7 @@ const StyledSwitchLabel = styled.span`
 const TagsContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 10px 40px;
+  padding: 10px 12px;
   padding-bottom: 5px;
 `;
 
@@ -181,17 +186,19 @@ const DiffModal = () => {
       centered
       width={1000}
       onCancel={handleOk}
-      footer={
-        <>
-          <LeftButton onClick={handleOk}>Close</LeftButton>
-          <LeftButton onClick={handleRefresh}>Refresh</LeftButton>
-          <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-            <Switch checked={shouldDiffIgnorePaths} />
-            <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
-          </SwitchContainer>
-        </>
-      }
+      footer={null}
     >
+      <MonacoDiffContainer>
+        <MonacoDiffEditor
+          width="980"
+          height="600"
+          language="yaml"
+          original={resourceContent}
+          value={cleanDiffContent}
+          options={options}
+          theme={KUBESHOP_MONACO_THEME}
+        />
+      </MonacoDiffContainer>
       <TagsContainer>
         <StyledTag>Local</StyledTag>
         <Button
@@ -213,17 +220,16 @@ const DiffModal = () => {
         </Button>
         <StyledTag>Cluster</StyledTag>
       </TagsContainer>
-      <MonacoDiffContainer>
-        <MonacoDiffEditor
-          width="980"
-          height="600"
-          language="yaml"
-          original={resourceContent}
-          value={cleanDiffContent}
-          options={options}
-          theme={KUBESHOP_MONACO_THEME}
-        />
-      </MonacoDiffContainer>
+      <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+        <Switch checked={shouldDiffIgnorePaths} />
+        <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
+      </SwitchContainer>
+      <ButtonContainer>
+        <Button onClick={handleRefresh}>Refresh</Button>
+        <Button onClick={handleOk} style={{marginLeft: 12}}>
+          Close
+        </Button>
+      </ButtonContainer>
     </StyledModal>
   );
 };

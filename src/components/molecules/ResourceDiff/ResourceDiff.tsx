@@ -124,6 +124,17 @@ const ResourceDiff = (props: {
 
   return (
     <>
+      <MonacoDiffContainer>
+        <MonacoDiffEditor
+          width="980"
+          height="700"
+          language="yaml"
+          original={localResourceText}
+          value={cleanClusterResourceText}
+          options={options}
+          theme={KUBESHOP_MONACO_THEME}
+        />
+      </MonacoDiffContainer>
       <TagsContainer>
         <StyledTag>Local</StyledTag>
         <Button
@@ -145,17 +156,6 @@ const ResourceDiff = (props: {
         </Button>
         <StyledTag>Cluster</StyledTag>
       </TagsContainer>
-      <MonacoDiffContainer>
-        <MonacoDiffEditor
-          width="980"
-          height="700"
-          language="yaml"
-          original={localResourceText}
-          value={cleanClusterResourceText}
-          options={options}
-          theme={KUBESHOP_MONACO_THEME}
-        />
-      </MonacoDiffContainer>
       <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
         <Switch checked={shouldDiffIgnorePaths} />
         <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
