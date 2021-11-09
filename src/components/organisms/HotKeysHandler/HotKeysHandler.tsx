@@ -1,19 +1,24 @@
 import React, {useCallback} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
-import hotkeys from '@constants/hotkeys';
 import {useSelector} from 'react-redux';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openNewResourceWizard, toggleLeftMenu, toggleRightMenu, toggleSettings} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {toggleSettings, toggleLeftMenu, toggleRightMenu, openNewResourceWizard} from '@redux/reducers/ui';
-import {startPreview, stopPreview} from '@redux/services/preview';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
-import FileExplorer from '@atoms/FileExplorer';
-import {useFileExplorer} from '@hooks/useFileExplorer';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {startPreview, stopPreview} from '@redux/services/preview';
 import {performResourceDiff} from '@redux/thunks/diffResource';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import FileExplorer from '@atoms/FileExplorer';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+import hotkeys from '@constants/hotkeys';
+
 import featureJson from '@src/feature-flags.json';
 
 const HotKeysHandler = () => {
@@ -66,10 +71,17 @@ const HotKeysHandler = () => {
         mainState.fileMap,
         dispatch,
         configState.kubeconfigPath,
+        configState.kubeConfig.currentContext || '',
         {isClusterPreview, kustomizeCommand: configState.settings.kustomizeCommand}
       );
     } else if (mainState.selectedPath) {
-      applyFileWithConfirm(mainState.selectedPath, mainState.fileMap, dispatch, configState.kubeconfigPath);
+      applyFileWithConfirm(
+        mainState.selectedPath,
+        mainState.fileMap,
+        dispatch,
+        configState.kubeconfigPath,
+        configState.kubeConfig.currentContext || ''
+      );
     }
   }, [
     mainState.selectedResourceId,

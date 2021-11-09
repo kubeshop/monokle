@@ -1,10 +1,13 @@
-import {K8sResource} from '@models/k8sresource';
-import {ResourceMapType, FileMapType} from '@models/appstate';
-import {applyResource} from '@redux/thunks/applyResource';
-import {ThunkDispatch} from 'redux-thunk';
 import {Modal} from 'antd';
+import {ThunkDispatch} from 'redux-thunk';
+
+import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kustomize';
+import {applyResource} from '@redux/thunks/applyResource';
+
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {K8sResource} from '@models/k8sresource';
+
 import {ExclamationCircleOutlined} from '@ant-design/icons';
-import {isKustomizationResource, KustomizeCommandType} from '@redux/services/kustomize';
 
 export function applyResourceWithConfirm(
   selectedResource: K8sResource,
@@ -12,6 +15,7 @@ export function applyResourceWithConfirm(
   fileMap: FileMapType,
   dispatch: ThunkDispatch<any, any, any>,
   kubeconfig: string,
+  context: string,
   options?: {
     isClusterPreview?: boolean;
     shouldPerformDiff?: boolean;
@@ -19,8 +23,8 @@ export function applyResourceWithConfirm(
   }
 ) {
   const title = isKustomizationResource(selectedResource)
-    ? `Deploy ${selectedResource.name} kustomization to your cluster?`
-    : `Deploy ${selectedResource.name} to your cluster?`;
+    ? `Deploy ${selectedResource.name} kustomization to cluster [${context}]?`
+    : `Deploy ${selectedResource.name} to cluster [${context}]?`;
 
   Modal.confirm({
     title,
@@ -28,7 +32,7 @@ export function applyResourceWithConfirm(
     centered: true,
     onOk() {
       return new Promise(resolve => {
-        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig, options);
+        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig, context, options);
         resolve({});
       });
     },

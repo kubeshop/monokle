@@ -1,18 +1,24 @@
+import {Modal, Tag, Tooltip} from 'antd';
 import React, {useMemo, useState} from 'react';
-import {ItemCustomComponentProps} from '@models/navigator';
-import {K8sResource} from '@models/k8sresource';
 import styled from 'styled-components';
-import Colors from '@styles/Colors';
-import {SwapOutlined, ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
-import {performResourceDiff} from '@redux/thunks/diffResource';
+import {stringify} from 'yaml';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {Tooltip, Tag, Modal} from 'antd';
+import {updateResource} from '@redux/reducers/main';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {performResourceDiff} from '@redux/thunks/diffResource';
+
+import {K8sResource} from '@models/k8sresource';
+import {ItemCustomComponentProps} from '@models/navigator';
+
+import {ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined, SwapOutlined} from '@ant-design/icons';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+
 import {diffLocalToClusterResources, removeIgnoredPathsFromResourceContent} from '@utils/resources';
-import {stringify} from 'yaml';
-import {updateResource} from '@redux/reducers/main';
+
+import Colors from '@styles/Colors';
 
 const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
   width: 800px;
@@ -44,6 +50,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -73,7 +80,14 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     if (!firstLocalResource) {
       return;
     }
-    applyResourceWithConfirm(firstLocalResource, resourceMap, fileMap, dispatch, kubeconfigPath);
+    applyResourceWithConfirm(
+      firstLocalResource,
+      resourceMap,
+      fileMap,
+      dispatch,
+      kubeconfigPath,
+      kubeconfigContext || ''
+    );
   };
 
   const saveClusterResourceToLocal = () => {

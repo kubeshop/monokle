@@ -1,11 +1,16 @@
-import * as k8s from '@kubernetes/client-node';
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
-import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
-import {extractK8sResources, processParsedResources} from '@redux/services/resource';
 import {stringify} from 'yaml';
+
+import {extractK8sResources, processParsedResources} from '@redux/services/resource';
+
 import {AlertEnum} from '@models/alert';
+import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
+
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import * as k8s from '@kubernetes/client-node';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document
@@ -28,7 +33,9 @@ export function createPreviewResult(
   resourcesYaml: string,
   previewResourceId: string,
   title: string,
-  resourceRefsProcessingOptions: ResourceRefsProcessingOptions
+  resourceRefsProcessingOptions: ResourceRefsProcessingOptions,
+  previewKubeConfigPath?: string,
+  previewKubeConfigContext?: string
 ) {
   const resources = extractK8sResources(resourcesYaml, PREVIEW_PREFIX + previewResourceId);
   const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
@@ -45,6 +52,8 @@ export function createPreviewResult(
       message: `Previewing ${Object.keys(resourceMap).length} resources`,
       type: AlertEnum.Success,
     },
+    previewKubeConfigPath,
+    previewKubeConfigContext,
   };
 }
 
@@ -62,12 +71,15 @@ export function createRejectionWithAlert(thunkAPI: any, title: string, message: 
   });
 }
 
-export async function getResourceFromCluster(resource: K8sResource, kubeconfigPath: string) {
+export async function getResourceFromCluster(resource: K8sResource, kubeconfigPath: string, context?: string) {
   const resourceKindHandler = getResourceKindHandler(resource.kind);
 
   if (resource && resource.text && resourceKindHandler) {
     const kc = new k8s.KubeConfig();
     kc.loadFromFile(kubeconfigPath);
+    if (context && context.length > 0) {
+      kc.setCurrentContext(context);
+    }
 
     const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(
       kc,

@@ -1,11 +1,15 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
+import log from 'loglevel';
+import {stringify} from 'yaml';
+
 import {SetDiffDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
-import * as k8s from '@kubernetes/client-node';
-import {stringify} from 'yaml';
-import log from 'loglevel';
 import {createRejectionWithAlert, getResourceFromCluster} from '@redux/thunks/utils';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import * as k8s from '@kubernetes/client-node';
+
 /**
  * Thunk to diff a resource against the configured cluster
  */
@@ -19,21 +23,20 @@ export const performResourceDiff = createAsyncThunk<
   }
 >('main/setDiffContent', async (diffResourceId, thunkAPI) => {
   const resourceMap = thunkAPI.getState().main.resourceMap;
-  const kubeconfig = thunkAPI.getState().config.kubeconfigPath;
+  const config = thunkAPI.getState().config;
   try {
     const resource = resourceMap[diffResourceId];
 
     if (resource && resource.text) {
       const resourceKindHandler = getResourceKindHandler(resource.kind);
       if (!resourceKindHandler) {
-        return createRejectionWithAlert(
-          thunkAPI,
-          'Diff Resource',
-          `Could not find Kind Handler for resoruce ${resource.id}`
-        );
+        return createRejectionWithAlert(thunkAPI, 'Diff Resource', `Could not find kind handler for ${resource.kind}`);
       }
       const kc = new k8s.KubeConfig();
-      kc.loadFromFile(kubeconfig);
+      kc.loadFromFile(config.kubeconfigPath);
+      if (config.kubeConfig.currentContext) {
+        kc.setCurrentContext(config.kubeConfig.currentContext);
+      }
 
       const handleResource = (res: any) => {
         if (res.body) {
@@ -44,19 +47,23 @@ export const performResourceDiff = createAsyncThunk<
         return createRejectionWithAlert(
           thunkAPI,
           'Diff Resources',
-          `Failed to get ${resource.content.kind} from cluster`
+          `Failed to get ${resource.content.kind} from cluster [${config.kubeConfig.currentContext}]`
         );
       };
 
       const handleRejection = (rej: any) => {
-        let message = `${resource.content.kind} ${resource.content.metadata.name} not found in cluster`;
+        let message = `${resource.content.kind} ${resource.content.metadata.name} not found in cluster [${config.kubeConfig.currentContext}]`;
         let title = 'Diff failed';
 
         return createRejectionWithAlert(thunkAPI, title, message);
       };
 
       try {
-        const resourceFromCluster = await getResourceFromCluster(resource, kubeconfig);
+        const resourceFromCluster = await getResourceFromCluster(
+          resource,
+          config.kubeconfigPath,
+          config.kubeConfig.currentContext
+        );
         return handleResource(resourceFromCluster);
       } catch (err) {
         return handleRejection(err);

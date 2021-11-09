@@ -1,4 +1,5 @@
 import {HelmChart, HelmValuesFile} from '@models/helm';
+
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
@@ -105,6 +106,10 @@ interface AppState {
   previewLoader: PreviewLoaderType;
   /** the resource currently being previewed */
   previewResourceId?: string;
+  /** the kubeconfig path for current cluster preview */
+  previewKubeConfigPath?: string;
+  /** the kubeconfig context for current cluster preview */
+  previewKubeConfigContext?: string;
   /** the values file currently being previewed */
   previewValuesFileId?: string;
   /** the resource currently being diffed */

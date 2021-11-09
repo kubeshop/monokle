@@ -1,39 +1,45 @@
+import {Button, Col, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Tabs, Col, Row, Button, Tooltip, Menu, Dropdown} from 'antd';
-import {CodeOutlined, ContainerOutlined, ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setMonacoEditor} from '@redux/reducers/ui';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
+import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
+import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {isKustomizationPatch} from '@redux/services/kustomize';
+import {isUnsavedResource} from '@redux/services/resource';
+import {performResourceDiff} from '@redux/thunks/diffResource';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
+
+import {K8sResource} from '@models/k8sresource';
+
+import FormEditor from '@molecules/FormEditor';
+import Monaco from '@molecules/Monaco';
+
+import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import TabHeader from '@atoms/TabHeader';
+
+import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
 
-import Monaco from '@molecules/Monaco';
-import FormEditor from '@molecules/FormEditor';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import TabHeader from '@atoms/TabHeader';
-import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
-import {K8sResource} from '@models/k8sresource';
-import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
-import {performResourceDiff} from '@redux/thunks/diffResource';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
-import {TOOLTIP_DELAY} from '@constants/constants';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
-import {isUnsavedResource} from '@redux/services/resource';
 import {useFileExplorer} from '@hooks/useFileExplorer';
-import FileExplorer from '@components/atoms/FileExplorer';
-import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
-import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
-import {setMonacoEditor} from '@redux/reducers/ui';
 
-import {isKustomizationPatch} from '@redux/services/kustomize';
+import {ArrowLeftOutlined, ArrowRightOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
+
 import {
+  ActionsPaneContainer,
+  DiffButton,
+  RightButtons,
+  SaveButton,
   StyledLeftArrowButton,
   StyledRightArrowButton,
   StyledSkeleton,
   StyledTabs,
   TitleBarContainer,
-  DiffButton,
-  SaveButton,
-  RightButtons,
-  ActionsPaneContainer,
 } from './ActionsPane.styled';
 
 const {TabPane} = Tabs;
@@ -51,6 +57,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const kustomizeCommand = useAppSelector(state => state.config.settings.kustomizeCommand);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
@@ -143,17 +150,18 @@ const ActionsPane = (props: {contentHeight: string}) => {
           helmChartMap[helmValuesFile.helmChartId],
           fileMap,
           dispatch,
-          kubeconfig
+          kubeconfig,
+          kubeconfigContext || ''
         );
       }
     } else if (selectedResource) {
       const isClusterPreview = previewType === 'cluster';
-      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig, {
+      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
         isClusterPreview,
         kustomizeCommand,
       });
     } else if (selectedPath) {
-      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
+      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig, kubeconfigContext || '');
     }
   }, [
     selectedResource,
