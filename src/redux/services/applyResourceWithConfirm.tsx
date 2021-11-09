@@ -1,10 +1,13 @@
-import {K8sResource} from '@models/k8sresource';
-import {ResourceMapType, FileMapType} from '@models/appstate';
-import {applyResource} from '@redux/thunks/applyResource';
-import {ThunkDispatch} from 'redux-thunk';
 import {Modal} from 'antd';
+import {ThunkDispatch} from 'redux-thunk';
+
+import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kustomize';
+import {applyResource} from '@redux/thunks/applyResource';
+
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {K8sResource} from '@models/k8sresource';
+
 import {ExclamationCircleOutlined} from '@ant-design/icons';
-import {isKustomizationResource, KustomizeCommandType} from '@redux/services/kustomize';
 
 export function applyResourceWithConfirm(
   selectedResource: K8sResource,

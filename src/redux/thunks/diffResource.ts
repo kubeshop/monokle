@@ -1,11 +1,14 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
+import {stringify} from 'yaml';
+
 import {SetDiffDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
-import * as k8s from '@kubernetes/client-node';
-import {stringify} from 'yaml';
-import log from 'loglevel';
 import {createRejectionWithAlert, getResourceFromCluster} from '@redux/thunks/utils';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import * as k8s from '@kubernetes/client-node';
+
 /**
  * Thunk to diff a resource against the configured cluster
  */
@@ -32,6 +35,7 @@ export const performResourceDiff = createAsyncThunk<
           `Could not find Kind Handler for resoruce ${resource.id}`
         );
       }
+
       const kc = new k8s.KubeConfig();
       kc.loadFromFile(kubeconfig);
 
@@ -63,8 +67,7 @@ export const performResourceDiff = createAsyncThunk<
       }
     }
   } catch (e) {
-    createRejectionWithAlert(thunkAPI, 'Diff Resource', `Failed to diff resources; ${e.message}`);
-    log.error(e);
+    return createRejectionWithAlert(thunkAPI, 'Diff Resource', `Failed to diff resources; ${e.message}`);
   }
 
   return {};

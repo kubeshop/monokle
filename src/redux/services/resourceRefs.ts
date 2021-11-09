@@ -1,11 +1,15 @@
+import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
-import {REF_PATH_SEPARATOR} from '@constants/constants';
-import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
 import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
-import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+
+import {REF_PATH_SEPARATOR} from '@constants/constants';
+
+import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
+
 import {traverseDocument} from './manifest-utils';
-import {createResourceRef, getParsedDoc, linkResources, NodeWrapper} from './resource';
+import {NodeWrapper, createResourceRef, getParsedDoc, linkResources} from './resource';
 
 export function isIncomingRef(refType: ResourceRefType) {
   return refType === ResourceRefType.Incoming;
