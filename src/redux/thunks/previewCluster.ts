@@ -1,12 +1,15 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
-import * as k8s from '@kubernetes/client-node';
-import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {AlertEnum} from '@models/alert';
-import {createRejectionWithAlert, createPreviewResult, getK8sObjectsAsYaml} from '@redux/thunks/utils';
+
+import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
+
+import * as k8s from '@kubernetes/client-node';
 
 const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
@@ -40,7 +43,9 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
           allYaml,
           configPath,
           'Get Cluster Resources',
-          resourceRefsProcessingOptions
+          resourceRefsProcessingOptions,
+          configPath,
+          thunkAPI.getState().config.kubeConfig.currentContext
         );
 
         if (fulfilledResults.length < results.length) {

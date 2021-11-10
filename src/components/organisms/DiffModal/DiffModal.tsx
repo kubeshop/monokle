@@ -96,6 +96,7 @@ const DiffModal = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const [isVisible, setVisible] = useState(false);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
@@ -148,7 +149,7 @@ const DiffModal = () => {
     if (diffResourceId) {
       const resource = resourceMap[diffResourceId];
       if (resource) {
-        applyResourceWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig, {
+        applyResourceWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
           isClusterPreview: previewType === 'cluster',
           shouldPerformDiff: true,
         });

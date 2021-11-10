@@ -71,6 +71,7 @@ const ResourceDiff = (props: {
   const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
   const options = {
@@ -102,7 +103,7 @@ const ResourceDiff = (props: {
     if (onApply) {
       onApply();
     }
-    applyResourceWithConfirm(localResource, resourceMap, fileMap, dispatch, kubeconfig, {
+    applyResourceWithConfirm(localResource, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
       isClusterPreview: previewType === 'cluster',
       shouldPerformDiff: true,
       isInClusterDiff,

@@ -1,11 +1,16 @@
+import {selectK8sResource} from '@redux/reducers/main';
+import {isUnsavedResource} from '@redux/services/resource';
+
 import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandlers} from '@src/kindhandlers';
-import {isUnsavedResource} from '@redux/services/resource';
-import {selectK8sResource} from '@redux/reducers/main';
+
 import {KUSTOMIZATION_KIND} from '@constants/constants';
+
 import {isResourcePassingFilter} from '@utils/resources';
+
+import {ResourceKindHandlers} from '@src/kindhandlers';
+
 import sectionBlueprintMap from '../sectionBlueprintMap';
 
 export type UnknownResourceScopeType = {

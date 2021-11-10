@@ -57,6 +57,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const kustomizeCommand = useAppSelector(state => state.config.settings.kustomizeCommand);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
@@ -149,17 +150,18 @@ const ActionsPane = (props: {contentHeight: string}) => {
           helmChartMap[helmValuesFile.helmChartId],
           fileMap,
           dispatch,
-          kubeconfig
+          kubeconfig,
+          kubeconfigContext || ''
         );
       }
     } else if (selectedResource) {
       const isClusterPreview = previewType === 'cluster';
-      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig, {
+      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
         isClusterPreview,
         kustomizeCommand,
       });
     } else if (selectedPath) {
-      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig);
+      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig, kubeconfigContext || '');
     }
   }, [
     selectedResource,
