@@ -7,7 +7,7 @@ import {Collapse, Kubernetes} from './Icons';
 
 type IconProps = {
   name: string;
-  color?: Colors;
+  color?: Colors | '';
 };
 
 type IconsHashTable = {
@@ -20,7 +20,7 @@ const icons: IconsHashTable = {
 };
 
 const Icon: React.FC<IconProps> = props => {
-  const {name, color = Colors.whitePure} = props;
+  const {name, color = ''} = props;
 
   return <AntdIcon component={icons[name]} style={{color}} />;
 };

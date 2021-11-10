@@ -1,7 +1,6 @@
-import React, {useState, useEffect} from 'react';
-import styled from 'styled-components';
-
 import {Button, Input, Tooltip} from 'antd';
+import {useEffect, useState} from 'react';
+import styled from 'styled-components';
 
 import {useFocus} from '@utils/hooks';
 
@@ -11,6 +10,7 @@ type FilePatternListProps = {
   value: string[];
   onChange: (patterns: string[]) => void;
   tooltip: string;
+  isSettingsOpened?: boolean;
 };
 
 const StyledUl = styled.ul`
@@ -24,7 +24,8 @@ const StyledButton = styled(Button)`
 `;
 
 const FilePatternList = (props: FilePatternListProps) => {
-  const {value, onChange, tooltip} = props;
+  const {value, onChange, tooltip, isSettingsOpened} = props;
+
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<Input>();
@@ -64,6 +65,13 @@ const FilePatternList = (props: FilePatternListProps) => {
     }
   }, [isAddingPattern, focusInput]);
 
+  useEffect(() => {
+    if (!isSettingsOpened) {
+      setIsAddingPattern(false);
+      setPatternInput('');
+    }
+  }, [isSettingsOpened]);
+
   return (
     <div>
       <StyledUl>
@@ -77,7 +85,6 @@ const FilePatternList = (props: FilePatternListProps) => {
           />
         ))}
       </StyledUl>
-
       {isAddingPattern ? (
         <>
           <Input
