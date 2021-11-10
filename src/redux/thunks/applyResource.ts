@@ -3,7 +3,7 @@ import log from 'loglevel';
 import {stringify} from 'yaml';
 
 import {setAlert} from '@redux/reducers/alert';
-import {setApplyingResource, updateResource} from '@redux/reducers/main';
+import {setApplyingResource, setClusterDiffRefreshDiffResource, updateResource} from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kustomize';
 import {AppDispatch} from '@redux/store';
@@ -86,6 +86,7 @@ export async function applyResource(
   context: string,
   options?: {
     isClusterPreview?: boolean;
+    isInClusterDiff?: boolean;
     shouldPerformDiff?: boolean;
     kustomizeCommand?: 'kubectl' | 'kustomize';
   }
@@ -132,7 +133,11 @@ export async function applyResource(
               }
             });
           } else if (options?.shouldPerformDiff) {
-            dispatch(performResourceDiff(resource.id));
+            if (options?.isInClusterDiff) {
+              dispatch(setClusterDiffRefreshDiffResource(true));
+            } else {
+              dispatch(performResourceDiff(resource.id));
+            }
           }
           dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));

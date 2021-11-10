@@ -57,7 +57,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {closeClusterDiff} from './ui';
-// eslint-disable-next-line import/order
+// eslint-disable-next-line
 import * as k8s from '@kubernetes/client-node';
 
 export type SetRootFolderPayload = {
@@ -403,6 +403,12 @@ export const mainSlice = createSlice({
       notification.createdAt = new Date().getTime();
       state.notifications = [notification, ...state.notifications];
     },
+    setDiffResourceInClusterDiff: (state: Draft<AppState>, action: PayloadAction<string | undefined>) => {
+      state.clusterDiff.diffResourceId = action.payload;
+    },
+    setClusterDiffRefreshDiffResource: (state: Draft<AppState>, action: PayloadAction<boolean | undefined>) => {
+      state.clusterDiff.refreshDiffResource = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -532,10 +538,14 @@ export const mainSlice = createSlice({
     builder
       .addCase(loadClusterDiff.pending, state => {
         state.clusterDiff.hasLoaded = false;
+        state.clusterDiff.diffResourceId = undefined;
+        state.clusterDiff.refreshDiffResource = undefined;
       })
       .addCase(loadClusterDiff.rejected, state => {
         state.clusterDiff.hasLoaded = true;
         state.clusterDiff.hasFailed = true;
+        state.clusterDiff.diffResourceId = undefined;
+        state.clusterDiff.refreshDiffResource = undefined;
       })
       .addCase(loadClusterDiff.fulfilled, (state, action) => {
         const clusterResourceMap = action.payload.resourceMap;
@@ -631,6 +641,8 @@ export const mainSlice = createSlice({
         state.clusterDiff.clusterToLocalResourcesMatches = clusterToLocalResourcesMatches;
         state.clusterDiff.hasLoaded = true;
         state.clusterDiff.hasFailed = false;
+        state.clusterDiff.diffResourceId = undefined;
+        state.clusterDiff.refreshDiffResource = undefined;
       });
 
     builder.addCase(closeClusterDiff.type, state => {
@@ -641,6 +653,8 @@ export const mainSlice = createSlice({
       state.clusterDiff.clusterToLocalResourcesMatches = [];
       state.clusterDiff.hasLoaded = false;
       state.clusterDiff.hasFailed = false;
+      state.clusterDiff.diffResourceId = undefined;
+      state.clusterDiff.refreshDiffResource = undefined;
     });
 
     builder.addMatcher(
@@ -765,5 +779,7 @@ export const {
   removeResource,
   updateResourceFilter,
   addNotification,
+  setDiffResourceInClusterDiff,
+  setClusterDiffRefreshDiffResource,
 } = mainSlice.actions;
 export default mainSlice.reducer;

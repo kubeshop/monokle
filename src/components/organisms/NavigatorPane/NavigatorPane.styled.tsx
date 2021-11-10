@@ -1,5 +1,6 @@
-import styled from 'styled-components';
 import {Button} from 'antd';
+import styled from 'styled-components';
+
 import {AppBorders} from '@styles/Borders';
 import {BackgroundColors} from '@styles/Colors';
 
@@ -25,6 +26,7 @@ export const TitleBar = styled.div`
   margin: 0;
   padding: 0;
   background: ${BackgroundColors.darkThemeBackground};
+  overflow: hidden;
 `;
 
 export const TitleBarRightButtons = styled.div`

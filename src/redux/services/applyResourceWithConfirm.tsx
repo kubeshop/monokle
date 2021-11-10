@@ -18,6 +18,7 @@ export function applyResourceWithConfirm(
   context: string,
   options?: {
     isClusterPreview?: boolean;
+    isInClusterDiff?: boolean;
     shouldPerformDiff?: boolean;
     kustomizeCommand?: KustomizeCommandType;
   }

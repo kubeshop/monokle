@@ -10,3 +10,4 @@ export {default as SectionRenderer} from './SectionRenderer';
 export {default as ClusterDiff} from './ClusterDiff';
 export {default as ResourceFilter} from './ResourceFilter';
 export {default as ResourceFilterIconWithPopover} from './ResourceFilterIconWithPopover';
+export {default as ResourceDiff} from './ResourceDiff';

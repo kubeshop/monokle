@@ -123,6 +123,8 @@ interface AppState {
     hasFailed: boolean;
     hideClusterOnlyResources: boolean;
     clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
+    diffResourceId?: string;
+    refreshDiffResource?: boolean;
   };
   notifications: AlertType[];
 }
