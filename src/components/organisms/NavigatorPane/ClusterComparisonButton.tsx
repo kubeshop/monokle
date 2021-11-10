@@ -49,7 +49,7 @@ function ClusterComparisonButton() {
         style={{marginLeft: 8}}
         disabled={!isFolderOpen || isInClusterMode}
       >
-        {Number(navWidth.toFixed(2)) < 0.24 ? '' : 'Cluster Comparison'}
+        {Number(navWidth.toFixed(2)) < 0.3 ? '' : 'Cluster Comparison'}
       </Button>
     </Tooltip>
   );

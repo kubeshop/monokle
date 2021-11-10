@@ -1,13 +1,18 @@
+import {Dropdown, Menu} from 'antd';
 import React, {useMemo} from 'react';
 import styled from 'styled-components';
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {ResourceRefType} from '@models/k8sresource';
-import Colors from '@styles/Colors';
-import {isInPreviewModeSelector} from '@redux/selectors';
-import {PREVIEW_PREFIX} from '@constants/constants';
-import {Dropdown, Menu} from 'antd';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectInstance} from '@redux/reducers/navigator';
+import {isInPreviewModeSelector} from '@redux/selectors';
+
+import {ResourceRefType} from '@models/k8sresource';
+
+import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+
+import {PREVIEW_PREFIX} from '@constants/constants';
+
+import Colors from '@styles/Colors';
 
 const Container = styled.span`
   width: 100%;
@@ -32,6 +37,10 @@ const Label = styled.span`
 const StyledMenu = styled(Menu)`
   max-height: 400px;
   overflow-y: scroll;
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
   padding: 4px 0;
 `;
 

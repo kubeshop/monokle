@@ -5,7 +5,7 @@ import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {KUSTOMIZATION_KIND, PREVIEW_PREFIX} from '@constants/constants';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -18,6 +18,8 @@ export type UnknownResourceScopeType = {
   resourceFilter: ResourceFilterType;
   selectedPath?: string;
   selectedResourceId?: string;
+  isInPreviewMode: boolean;
+  isPreviewLoading: boolean;
 };
 
 const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
@@ -31,15 +33,23 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       resourceFilter: state.main.resourceFilter,
       selectedPath: state.main.selectedPath,
       selectedResourceId: state.main.selectedResourceId,
+      isInPreviewMode: Boolean(state.main.previewResourceId) || Boolean(state.main.previewValuesFileId),
+      isPreviewLoading: state.main.previewLoader.isLoading,
     };
   },
   builder: {
     getRawItems: scope => {
-      return Object.values(scope.resourceMap).filter(resource => !KnownResourceKinds.includes(resource.kind));
+      return Object.values(scope.resourceMap).filter(
+        resource =>
+          !KnownResourceKinds.includes(resource.kind) &&
+          (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
+      );
     },
     getGroups: scope => {
       const unknownResources = Object.values(scope.resourceMap).filter(
-        resource => !KnownResourceKinds.includes(resource.kind)
+        resource =>
+          !KnownResourceKinds.includes(resource.kind) &&
+          (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
       );
       const unknownResourcesByKind: Record<string, K8sResource[]> = unknownResources.reduce<
         Record<string, K8sResource[]>
@@ -63,6 +73,9 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     },
     isVisible: (_, rawItems) => {
       return rawItems.length > 0;
+    },
+    isLoading: scope => {
+      return scope.isPreviewLoading;
     },
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;

@@ -47,7 +47,7 @@ const RefreshButton = styled(Button)`
 
 const ListContainer = styled.div`
   overflow-y: scroll;
-  height: 800px;
+  height: 70vh;
   ::-webkit-scrollbar {
     width: 0;
     background: transparent;

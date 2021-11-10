@@ -1,13 +1,13 @@
-import React from 'react';
-import styled from 'styled-components';
+// import React from 'react';
+// import styled from 'styled-components';
 
 // import {Tag} from 'antd';
 
-const NameDisplayContainer = styled.div`
-  margin-left: 16px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-`;
+// const NameDisplayContainer = styled.div`
+//   margin-left: 16px;
+//   padding-top: 8px;
+//   padding-bottom: 8px;
+// `;
 
 // const TagsContainer = styled.div`
 //   width: 800px;
@@ -33,20 +33,21 @@ const NameDisplayContainer = styled.div`
 // `;
 
 function ResourceDiffSectionNameDisplay() {
-  return (
-    <NameDisplayContainer>
-      <h1>K8s Resources</h1>
-      {/* <TagsContainer>
-        <TagWrapper>
-          <StyledTag color="cyan">Local Resources</StyledTag>
-        </TagWrapper>
-        <Spacing />
-        <TagWrapper>
-          <StyledTag color="cyan">Cluster Resources</StyledTag>
-        </TagWrapper>
-      </TagsContainer> */}
-    </NameDisplayContainer>
-  );
+  return null;
+  // return (
+  //   <NameDisplayContainer>
+  //     <h1>K8s Resources</h1>
+  //     {/* <TagsContainer>
+  //       <TagWrapper>
+  //         <StyledTag color="cyan">Local Resources</StyledTag>
+  //       </TagWrapper>
+  //       <Spacing />
+  //       <TagWrapper>
+  //         <StyledTag color="cyan">Cluster Resources</StyledTag>
+  //       </TagWrapper>
+  //     </TagsContainer> */}
+  //   </NameDisplayContainer>
+  // );
 }
 
 export default ResourceDiffSectionNameDisplay;

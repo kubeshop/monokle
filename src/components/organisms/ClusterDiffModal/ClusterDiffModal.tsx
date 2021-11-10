@@ -19,8 +19,8 @@ const Container = styled.div`
   display: block;
   margin: 0;
   padding: 0;
-  height: 70vh;
-  overflow: auto;
+  height: 75vh;
+  overflow: hidden;
 `;
 
 const SkeletonContainer = styled.div`
@@ -151,7 +151,7 @@ function ClusterDiffModal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isApplyingResource]);
 
-  const closeDrawer = useCallback(() => {
+  const closeModal = useCallback(() => {
     dispatch(closeClusterDiff());
   }, [dispatch]);
 
@@ -163,9 +163,9 @@ function ClusterDiffModal() {
 
   useEffect(() => {
     if (hasClusterDiffFailed) {
-      closeDrawer();
+      closeModal();
     }
-  }, [hasClusterDiffFailed, closeDrawer]);
+  }, [hasClusterDiffFailed, closeModal]);
 
   const title = useMemo(() => {
     if (isResourceDiffVisible) {
@@ -188,29 +188,39 @@ function ClusterDiffModal() {
     // eslint-disable-next-line
   }, [previewResource, previewValuesFile, currentContext, isResourceDiffVisible, closeResourceDiff]);
 
+  const onCancel = () => {
+    if (isResourceDiffVisible) {
+      closeResourceDiff();
+    } else {
+      closeModal();
+    }
+  };
+
   return (
     <StyledModal
       title={title}
       visible={isClusterDiffVisible}
-      width={1000}
-      onCancel={closeDrawer}
-      footer={<Button onClick={closeDrawer}>Close</Button>}
+      width="90vw"
+      style={{maxWidth: 1000}}
+      onCancel={onCancel}
+      footer={<Button onClick={closeModal}>Close</Button>}
+      centered
     >
       <Container>
         {!hasClusterDiffLoaded ? (
           <SkeletonContainer>
-            <Skeleton />
+            <Skeleton active />
           </SkeletonContainer>
         ) : isResourceDiffVisible ? (
           resourceDiffState.isLoading ? (
             <SkeletonContainer>
-              <Skeleton />
+              <Skeleton active />
             </SkeletonContainer>
           ) : (
             resourceDiffState.localResource &&
             resourceDiffState.clusterResourceText && (
               <>
-                <div style={{display: 'flex', justifyContent: 'center', margin: '12px 0'}}>
+                <div style={{display: 'flex', justifyContent: 'center', margin: '8px 0'}}>
                   <span style={{fontWeight: 600}}>Resource Diff on {resourceDiffState.localResource?.name}</span>
                 </div>
                 <ResourceDiff

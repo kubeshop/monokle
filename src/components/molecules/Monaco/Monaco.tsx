@@ -12,6 +12,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
+import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
+
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {getFileStats} from '@utils/files';
@@ -22,7 +24,6 @@ import useCodeIntel from './useCodeIntel';
 import useDebouncedCodeSave from './useDebouncedCodeSave';
 import useEditorKeybindings from './useEditorKeybindings';
 import useMonacoUiState from './useMonacoUiState';
-import useResourceYamlSchema from './useResourceYamlSchema';
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml/lib/esm/monaco.contribution';
 // @ts-ignore
