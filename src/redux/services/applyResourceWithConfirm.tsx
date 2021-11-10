@@ -17,6 +17,7 @@ export function applyResourceWithConfirm(
   kubeconfig: string,
   options?: {
     isClusterPreview?: boolean;
+    isInClusterDiff?: boolean;
     shouldPerformDiff?: boolean;
     kustomizeCommand?: KustomizeCommandType;
   }

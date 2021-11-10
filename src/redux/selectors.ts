@@ -58,7 +58,7 @@ export const isInPreviewModeSelector = createSelector(
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
   appState =>
-    appState.main.previewResourceId && appState.main.previewResourceId.endsWith(appState.config.kubeconfigPath)
+    Boolean(appState.main.previewResourceId && appState.main.previewResourceId.endsWith(appState.config.kubeconfigPath))
 );
 
 export const logsSelector = createSelector(

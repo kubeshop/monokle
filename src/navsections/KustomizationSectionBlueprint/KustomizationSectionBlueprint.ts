@@ -1,12 +1,15 @@
+import {selectK8sResource} from '@redux/reducers/main';
+
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {selectK8sResource} from '@redux/reducers/main';
 import {SectionBlueprint} from '@models/navigator';
+
 import {KUSTOMIZATION_KIND} from '@constants/constants';
-import KustomizationQuickAction from './KustomizationQuickAction';
-import KustomizationPrefix from './KustomizationPrefix';
-import KustomizationSuffix from './KustomizationSuffix';
+
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import KustomizationPrefix from './KustomizationPrefix';
+import KustomizationQuickAction from './KustomizationQuickAction';
+import KustomizationSuffix from './KustomizationSuffix';
 
 export type KustomizationScopeType = {
   resourceMap: ResourceMapType;
@@ -54,7 +57,6 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;
     },
-    shouldBeVisibleBeforeInitialized: true,
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,

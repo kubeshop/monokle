@@ -19,6 +19,7 @@ enum Colors {
   yellowWarning = '#ffe17f',
   yellowWarningCompliment = '#FFF3CA',
   yellow7 = '#E8D639',
+  yellow10 = '#FAFAB5',
 
   redError = '#e65a6d',
   redErrorCompliment = '#F4BAB8',
@@ -40,8 +41,8 @@ enum Colors {
   selectionGradientHover = 'linear-gradient(90deg, #3C9AE8 50%, #84E2D8 100%)',
   highlightGradient = 'linear-gradient(90deg, #113536 0%, #000000 100%)',
   highlightGradientHover = 'linear-gradient(90deg, #113536 50%, #000000 100%)',
-  diffBackground = 'rgba(251, 176, 52, 0.3)',
-  diffBackgroundHover = 'rgba(251, 176, 52, 0.4)',
+  diffBackground = '#2B2611',
+  diffBackgroundHover = '#27220f',
 }
 
 export enum BackgroundColors {
