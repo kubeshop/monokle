@@ -52,7 +52,7 @@ export const performResourceDiff = createAsyncThunk<
       };
 
       const handleRejection = (rej: any) => {
-        let message = `${resource.content.kind} ${resource.content.metadata.name} not found in cluster [${config.kubeConfig.currentContext}]`;
+        let message = `Failed to retrieve ${resource.content.kind} ${resource.content.metadata.name} from cluster [${config.kubeConfig.currentContext}]`;
         let title = 'Diff failed';
 
         return createRejectionWithAlert(thunkAPI, title, message);
