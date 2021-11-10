@@ -68,7 +68,7 @@ const ClustersPane = () => {
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const isEditingDisabled = uiState.isClusterDiffVisible;
+  const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
 
   useEffect(() => {
     setCurrentKubeConfig(kubeconfig);
@@ -199,7 +199,6 @@ const ClustersPane = () => {
                 ghost
                 loading={previewType === 'cluster' && previewLoader.isLoading}
                 onClick={isInClusterMode ? reconnectToCluster : connectToCluster}
-                disabled={isEditingDisabled}
               >
                 {createClusterObjectsLabel()}
               </StyledButton>

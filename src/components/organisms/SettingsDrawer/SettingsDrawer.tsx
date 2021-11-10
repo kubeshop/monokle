@@ -16,6 +16,7 @@ import {
 } from '@redux/reducers/appConfig';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {toggleSettings} from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
 import FilePatternList from '@molecules/FilePatternList';
@@ -63,11 +64,12 @@ const SettingsDrawer = () => {
   const uiState = useAppSelector(state => state.ui);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const isEditingDisabled = uiState.isClusterDiffVisible;
+  const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
 
   useEffect(() => {
     setCurrentFolderReadsMaxDepth(folderReadsMaxDepth);
