@@ -6,21 +6,11 @@ import {K8sResource} from '@models/k8sresource';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import * as k8s from '@kubernetes/client-node';
-
 export const getClusterResourceText = async (localResource: K8sResource, kubeconfig: string, context: string) => {
   try {
     const resourceKindHandler = getResourceKindHandler(localResource.kind);
     if (!resourceKindHandler) {
       throw new Error(`Could not find Kind Handler for resoruce ${localResource.id}`);
-    }
-
-    console.log(`using context ${context}`);
-
-    const kc = new k8s.KubeConfig();
-    kc.loadFromFile(kubeconfig);
-    if (context && context.length > 0) {
-      kc.setCurrentContext(context);
     }
 
     const handleResource = (res: any) => {
@@ -37,7 +27,7 @@ export const getClusterResourceText = async (localResource: K8sResource, kubecon
     };
 
     try {
-      const resourceFromCluster = await getResourceFromCluster(localResource, kubeconfig);
+      const resourceFromCluster = await getResourceFromCluster(localResource, kubeconfig, context);
       return handleResource(resourceFromCluster);
     } catch {
       return handleRejection();
