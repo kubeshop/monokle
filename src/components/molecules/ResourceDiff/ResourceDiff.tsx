@@ -14,12 +14,17 @@ import Icon from '@components/atoms/Icon';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
+import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
-const MonacoDiffContainer = styled.div`
+const MonacoDiffContainer = styled.div<{height: string; width: string}>`
+  ${props => `
+    height: ${props.height};
+    width: ${props.width};
+  `}
   padding: 8px;
   & .monaco-editor .monaco-editor-background {
     background-color: ${Colors.grey1000} !important;
@@ -67,6 +72,8 @@ const ResourceDiff = (props: {
   const dispatch = useAppDispatch();
   const {localResource, clusterResourceText, isInClusterDiff, onApply} = props;
 
+  const windowSize = useWindowSize();
+
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -75,6 +82,7 @@ const ResourceDiff = (props: {
 
   const options = {
     renderSideBySide: true,
+    automaticLayoutResize: true,
     minimap: {
       enabled: false,
     },
@@ -97,6 +105,10 @@ const ResourceDiff = (props: {
   const areResourcesDifferent = useMemo(() => {
     return localResourceText !== cleanClusterResourceText;
   }, [localResourceText, cleanClusterResourceText]);
+
+  const monacoDiffContainerWidth = useMemo(() => {
+    return (windowSize.width * 86.5) / 100 > 1000 ? '1000px' : '86.5vw';
+  }, [windowSize.width]);
 
   const handleApply = () => {
     if (onApply) {
@@ -124,10 +136,9 @@ const ResourceDiff = (props: {
 
   return (
     <>
-      <MonacoDiffContainer>
+      <MonacoDiffContainer width={monacoDiffContainerWidth} height="58vh">
         <MonacoDiffEditor
-          width="85vw"
-          height="54vh"
+          key={monacoDiffContainerWidth}
           language="yaml"
           original={localResourceText}
           value={cleanClusterResourceText}

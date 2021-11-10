@@ -19,7 +19,7 @@ const Container = styled.div`
   display: block;
   margin: 0;
   padding: 0;
-  height: 70vh;
+  height: 75vh;
   overflow: hidden;
 `;
 
@@ -192,19 +192,21 @@ function ClusterDiffModal() {
     <StyledModal
       title={title}
       visible={isClusterDiffVisible}
-      width={1000}
+      width="90vw"
+      style={{maxWidth: 1000}}
       onCancel={closeDrawer}
       footer={<Button onClick={closeDrawer}>Close</Button>}
+      centered
     >
       <Container>
         {!hasClusterDiffLoaded ? (
           <SkeletonContainer>
-            <Skeleton />
+            <Skeleton active />
           </SkeletonContainer>
         ) : isResourceDiffVisible ? (
           resourceDiffState.isLoading ? (
             <SkeletonContainer>
-              <Skeleton />
+              <Skeleton active />
             </SkeletonContainer>
           ) : (
             resourceDiffState.localResource &&
