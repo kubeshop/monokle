@@ -1,25 +1,27 @@
+import {Button, Checkbox, Divider, Input, InputNumber, Select, Tooltip} from 'antd';
+import {ipcRenderer} from 'electron';
 import React, {useEffect, useRef, useState} from 'react';
+import {useDebounce} from 'react-use';
 import styled from 'styled-components';
 
-import {Button, Input, Select, Tooltip, Divider, Checkbox, InputNumber} from 'antd';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {
+  updateFileIncludes,
+  updateFolderReadsMaxDepth,
+  updateHelmPreviewMode,
+  updateKubeconfig,
+  updateKustomizeCommand,
+  updateLoadLastFolderOnStartup,
+  updateScanExcludes,
+} from '@redux/reducers/appConfig';
+import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
+import {toggleSettings} from '@redux/reducers/ui';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
-
 import FilePatternList from '@molecules/FilePatternList';
 
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {toggleSettings} from '@redux/reducers/ui';
-import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
-import {
-  updateScanExcludes,
-  updateFileIncludes,
-  updateKubeconfig,
-  updateHelmPreviewMode,
-  updateLoadLastFolderOnStartup,
-  updateFolderReadsMaxDepth,
-  updateKustomizeCommand,
-} from '@redux/reducers/appConfig';
 import Drawer from '@components/atoms/Drawer';
+
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
@@ -28,8 +30,6 @@ import {
   KubeconfigPathTooltip,
   KustomizeCommandTooltip,
 } from '@constants/tooltips';
-import {ipcRenderer} from 'electron';
-import {useDebounce} from 'react-use';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -56,15 +56,18 @@ const StyledSelect = styled(Select)`
 
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
-  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
+  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const appConfig = useAppSelector(state => state.config);
+  const uiState = useAppSelector(state => state.ui);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
   const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
+
+  const isEditingDisabled = uiState.isClusterDiffVisible;
 
   useEffect(() => {
     setCurrentFolderReadsMaxDepth(folderReadsMaxDepth);
@@ -119,6 +122,9 @@ const SettingsDrawer = () => {
   };
 
   const openFileSelect = () => {
+    if (isEditingDisabled) {
+      return;
+    }
     fileInput && fileInput.current?.click();
   };
 
@@ -137,6 +143,9 @@ const SettingsDrawer = () => {
   );
 
   const onUpdateKubeconfig = (e: any) => {
+    if (isEditingDisabled) {
+      return;
+    }
     let value = e.target.value;
     setCurrentKubeConfig(value);
   };
@@ -173,9 +182,11 @@ const SettingsDrawer = () => {
       <StyledDiv>
         <StyledSpan>KUBECONFIG</StyledSpan>
         <Tooltip title={KubeconfigPathTooltip}>
-          <Input value={currentKubeConfig} onChange={onUpdateKubeconfig} />
+          <Input value={currentKubeConfig} onChange={onUpdateKubeconfig} disabled={isEditingDisabled} />
         </Tooltip>
-        <StyledButton onClick={openFileSelect}>Browse</StyledButton>
+        <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
+          Browse
+        </StyledButton>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </StyledDiv>
       <StyledDiv>
@@ -184,6 +195,7 @@ const SettingsDrawer = () => {
           value={appConfig.fileIncludes}
           onChange={onChangeFileIncludes}
           tooltip={AddInclusionPatternTooltip}
+          isSettingsOpened={isSettingsOpened}
         />
       </StyledDiv>
       <StyledDiv>
@@ -192,6 +204,7 @@ const SettingsDrawer = () => {
           value={appConfig.scanExcludes}
           onChange={onChangeScanExcludes}
           tooltip={AddExclusionPatternTooltip}
+          isSettingsOpened={isSettingsOpened}
         />
       </StyledDiv>
       <StyledDiv>

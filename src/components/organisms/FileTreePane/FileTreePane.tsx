@@ -230,7 +230,9 @@ const BrowseButton = styled(Button)``;
 const FileTreePane = () => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
+
   const dispatch = useAppDispatch();
+
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
@@ -248,6 +250,8 @@ const FileTreePane = () => {
   const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
   const [autoExpandParent, setAutoExpandParent] = React.useState(true);
   const treeRef = React.useRef<any>();
+
+  const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -439,17 +443,17 @@ const FileTreePane = () => {
                     icon={<ReloadOutlined />}
                     type="primary"
                     ghost
-                    disabled={!fileMap[ROOT_FILE_ENTRY]}
+                    disabled={isButtonDisabled}
                   />
                 </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
                   <Button
-                    icon={<Icon name="collapse" color={Colors.blue6} />}
+                    icon={<Icon name="collapse" color={isButtonDisabled ? '' : Colors.blue6} />}
                     onClick={onToggleTree}
                     type="primary"
                     ghost
                     size="small"
-                    disabled={!fileMap[ROOT_FILE_ENTRY]}
+                    disabled={isButtonDisabled}
                   />
                 </Tooltip>
               </RightButtons>

@@ -20,6 +20,7 @@ const Container = styled.div`
   margin: 0;
   padding: 0;
   height: 70vh;
+  overflow: auto;
 `;
 
 const SkeletonContainer = styled.div`
