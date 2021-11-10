@@ -126,8 +126,8 @@ const ResourceDiff = (props: {
     <>
       <MonacoDiffContainer>
         <MonacoDiffEditor
-          width="980"
-          height="700"
+          width="85vw"
+          height="54vh"
           language="yaml"
           original={localResourceText}
           value={cleanClusterResourceText}

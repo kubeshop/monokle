@@ -20,6 +20,7 @@ const Container = styled.div`
   margin: 0;
   padding: 0;
   height: 70vh;
+  overflow: hidden;
 `;
 
 const SkeletonContainer = styled.div`
@@ -209,7 +210,7 @@ function ClusterDiffModal() {
             resourceDiffState.localResource &&
             resourceDiffState.clusterResourceText && (
               <>
-                <div style={{display: 'flex', justifyContent: 'center', margin: '12px 0'}}>
+                <div style={{display: 'flex', justifyContent: 'center', margin: '8px 0'}}>
                   <span style={{fontWeight: 600}}>Resource Diff on {resourceDiffState.localResource?.name}</span>
                 </div>
                 <ResourceDiff
