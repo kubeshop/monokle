@@ -1,5 +1,5 @@
 import {Button, Input, Select} from 'antd';
-import React, {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 import styled from 'styled-components';
 
@@ -77,6 +77,7 @@ const ResourceFilter = () => {
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const allNamespaces = useNamespaces({extra: ['all', 'default']});
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const filtersMap = useAppSelector(state => state.main.resourceFilter);
 
   const allResourceKinds = useMemo(() => {
     return [
@@ -143,6 +144,10 @@ const ResourceFilter = () => {
     500,
     [name, kind, namespace, labels, annotations]
   );
+
+  useEffect(() => {
+    setNamespace(filtersMap.namespace);
+  }, [filtersMap]);
 
   return (
     <BaseContainer>
