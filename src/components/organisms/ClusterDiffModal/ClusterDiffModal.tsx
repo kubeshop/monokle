@@ -151,7 +151,7 @@ function ClusterDiffModal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isApplyingResource]);
 
-  const closeDrawer = useCallback(() => {
+  const closeModal = useCallback(() => {
     dispatch(closeClusterDiff());
   }, [dispatch]);
 
@@ -163,9 +163,9 @@ function ClusterDiffModal() {
 
   useEffect(() => {
     if (hasClusterDiffFailed) {
-      closeDrawer();
+      closeModal();
     }
-  }, [hasClusterDiffFailed, closeDrawer]);
+  }, [hasClusterDiffFailed, closeModal]);
 
   const title = useMemo(() => {
     if (isResourceDiffVisible) {
@@ -188,14 +188,22 @@ function ClusterDiffModal() {
     // eslint-disable-next-line
   }, [previewResource, previewValuesFile, currentContext, isResourceDiffVisible, closeResourceDiff]);
 
+  const onCancel = () => {
+    if (isResourceDiffVisible) {
+      closeResourceDiff();
+    } else {
+      closeModal();
+    }
+  };
+
   return (
     <StyledModal
       title={title}
       visible={isClusterDiffVisible}
       width="90vw"
       style={{maxWidth: 1000}}
-      onCancel={closeDrawer}
-      footer={<Button onClick={closeDrawer}>Close</Button>}
+      onCancel={onCancel}
+      footer={<Button onClick={closeModal}>Close</Button>}
       centered
     >
       <Container>
