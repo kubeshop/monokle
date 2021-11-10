@@ -1,12 +1,14 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
-import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {AppDispatch, RootState} from '@redux/store';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import path from 'path';
+import {ipcRenderer} from 'electron';
 import fs from 'fs';
 import log from 'loglevel';
-import {ipcRenderer} from 'electron';
-import {createRejectionWithAlert, createPreviewResult} from '@redux/thunks/utils';
+import path from 'path';
+
+import {SetPreviewDataPayload} from '@redux/reducers/main';
+import {AppDispatch, RootState} from '@redux/store';
+import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 /**
  * Thunk to preview a Helm Chart
@@ -23,6 +25,7 @@ export const previewHelmValuesFile = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = thunkAPI.getState().config.kubeconfigPath;
+  const kubeconfigContext = thunkAPI.getState().config.kubeConfig.currentContext;
   const valuesFile = state.helmValuesMap[valuesFileId];
 
   if (valuesFile && valuesFile.filePath) {
@@ -38,7 +41,7 @@ export const previewHelmValuesFile = createAsyncThunk<
         helmCommand:
           configState.settings.helmPreviewMode === 'template'
             ? `helm template -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder}`
-            : `helm install -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder} --dry-run`,
+            : `helm install --kube-context ${kubeconfigContext} -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder} --dry-run`,
         kubeconfig,
       };
 

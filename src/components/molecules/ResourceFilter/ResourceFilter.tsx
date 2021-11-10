@@ -1,13 +1,18 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import {Button, Input, Select} from 'antd';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
-import {Input, Select, Button} from 'antd';
 import styled from 'styled-components';
-import {ResourceKindHandlers} from '@src/kindhandlers';
-import {useNamespaces} from '@hooks/useNamespaces';
-import Colors from '@styles/Colors';
-import {KeyValueInput} from '@components/atoms';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
+
+import {KeyValueInput} from '@components/atoms';
+
+import {useNamespaces} from '@hooks/useNamespaces';
+
+import Colors from '@styles/Colors';
+
+import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const ALL_OPTIONS = '<all>';
 
@@ -72,6 +77,7 @@ const ResourceFilter = () => {
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
   const allNamespaces = useNamespaces({extra: ['all', 'default']});
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const filtersMap = useAppSelector(state => state.main.resourceFilter);
 
   const allResourceKinds = useMemo(() => {
     return [
@@ -138,6 +144,10 @@ const ResourceFilter = () => {
     500,
     [name, kind, namespace, labels, annotations]
   );
+
+  useEffect(() => {
+    setNamespace(filtersMap.namespace);
+  }, [filtersMap]);
 
   return (
     <BaseContainer>

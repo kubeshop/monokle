@@ -22,8 +22,8 @@ import {performResourceDiff} from './diffResource';
  * Invokes kubectl for the content of the specified resource
  */
 
-function applyK8sResource(resource: K8sResource, kubeconfig: string) {
-  const child = spawn('kubectl', ['apply', '-f', '-'], {
+function applyK8sResource(resource: K8sResource, kubeconfig: string, context: string) {
+  const child = spawn('kubectl', ['--context', context, 'apply', '-f', '-'], {
     env: {
       NODE_ENV: PROCESS_ENV.NODE_ENV,
       PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
@@ -44,12 +44,13 @@ function applyKustomization(
   resource: K8sResource,
   fileMap: FileMapType,
   kubeconfig: string,
+  context: string,
   kustomizeCommand: KustomizeCommandType
 ) {
   const folder = getAbsoluteResourceFolder(resource, fileMap);
   const child =
     kustomizeCommand === 'kubectl'
-      ? spawn(`kubectl apply -k ${folder}`, {
+      ? spawn(`kubectl --context ${context} apply -k ${folder}`, {
           shell: true,
           env: {
             NODE_ENV: PROCESS_ENV.NODE_ENV,
@@ -58,7 +59,7 @@ function applyKustomization(
             KUBECONFIG: kubeconfig,
           },
         })
-      : spawn(`kustomize build ${folder} | kubectl apply -k -`, {
+      : spawn(`kustomize build ${folder} | kubectl --context ${context} apply -k -`, {
           shell: true,
           env: {
             NODE_ENV: PROCESS_ENV.NODE_ENV,
@@ -82,6 +83,7 @@ export async function applyResource(
   fileMap: FileMapType,
   dispatch: AppDispatch,
   kubeconfig: string,
+  context: string,
   options?: {
     isClusterPreview?: boolean;
     isInClusterDiff?: boolean;
@@ -100,9 +102,10 @@ export async function applyResource(
               resource,
               fileMap,
               kubeconfig,
+              context,
               options && options.kustomizeCommand ? options.kustomizeCommand : 'kubectl'
             )
-          : applyK8sResource(resource, kubeconfig);
+          : applyK8sResource(resource, kubeconfig, context);
 
         child.on('exit', (code, signal) => {
           log.info(`kubectl exited with code ${code} and signal ${signal}`);
@@ -112,11 +115,11 @@ export async function applyResource(
         child.stdout.on('data', data => {
           const alert: AlertType = {
             type: AlertEnum.Success,
-            title: 'Apply completed',
+            title: `Applied ${resource.name} to cluster ${context} successfully`,
             message: data.toString(),
           };
           if (options?.isClusterPreview) {
-            getResourceFromCluster(resource, kubeconfig).then(resourceFromCluster => {
+            getResourceFromCluster(resource, kubeconfig, context).then(resourceFromCluster => {
               delete resourceFromCluster.body.metadata?.managedFields;
               const updatedResourceText = stringify(resourceFromCluster.body, {sortMapEntries: true});
               dispatch(
@@ -143,7 +146,7 @@ export async function applyResource(
         child.stderr.on('data', data => {
           const alert: AlertType = {
             type: AlertEnum.Error,
-            title: 'Apply failed',
+            title: `Applying ${resource.name} to cluster ${context} failed`,
             message: data.toString(),
           };
           dispatch(setAlert(alert));

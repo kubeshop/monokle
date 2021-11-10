@@ -1,28 +1,38 @@
-import React, {useRef, useCallback, useEffect, useState} from 'react';
-import {Button, Col, Input, Row, Tooltip, Select} from 'antd';
-import styled from 'styled-components';
+import {Button, Col, Input, Row, Select, Tooltip} from 'antd';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {isInPreviewModeSelector, isInClusterModeSelector} from '@redux/selectors';
-
-import {BackgroundColors} from '@styles/Colors';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
-import {startPreview, stopPreview, restartPreview} from '@redux/services/preview';
-import {setCurrentContext, updateKubeconfig} from '@redux/reducers/appConfig';
-import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
-import {TOOLTIP_DELAY} from '@constants/constants';
-import {closeFolderExplorer} from '@redux/reducers/ui';
 import {useDebounce} from 'react-use';
+import styled from 'styled-components';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setCurrentContext, updateKubeconfig} from '@redux/reducers/appConfig';
+import {closeFolderExplorer} from '@redux/reducers/ui';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
+import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
+
+import {BackgroundColors} from '@styles/Colors';
+
 const StyledDiv = styled.div`
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   margin-top: 10px;
+
+  .ant-input {
+    margin-bottom: 15px;
+  }
 `;
 
-const StyledButton = styled(Button)`
-  margin-top: 10px;
+const StyledHeading = styled.h2`
+  font-size: 16px;
+  margin-bottom: 7px;
 `;
+
+const StyledButton = styled(Button)``;
 
 const StyledSelect = styled(Select)`
   width: 100%;
@@ -45,6 +55,7 @@ const ClustersContainer = styled.div`
 
 const ClustersPane = () => {
   const dispatch = useAppDispatch();
+
   const previewResource = useAppSelector(state => state.main.previewResourceId);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
@@ -53,9 +64,11 @@ const ClustersPane = () => {
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const kubeConfig = useAppSelector(state => state.config.kubeConfig);
   const uiState = useAppSelector(state => state.ui);
-  const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
 
+  const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
+
+  const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
 
   useEffect(() => {
     setCurrentKubeConfig(kubeconfig);
@@ -72,11 +85,17 @@ const ClustersPane = () => {
   );
 
   const openFileSelect = () => {
+    if (isEditingDisabled) {
+      return;
+    }
     fileInput && fileInput.current?.click();
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
     e.preventDefault();
+    if (isEditingDisabled) {
+      return;
+    }
     if (fileInput.current?.files && fileInput.current.files.length > 0) {
       const file: any = fileInput.current.files[0];
       if (file.path) {
@@ -87,6 +106,9 @@ const ClustersPane = () => {
   };
 
   const onUpdateKubeconfig = (e: any) => {
+    if (isEditingDisabled) {
+      return;
+    }
     let value = e.target.value;
     setCurrentKubeConfig(value);
   };
@@ -106,6 +128,9 @@ const ClustersPane = () => {
   };
 
   const handleContextChange = (context: any) => {
+    if (isEditingDisabled) {
+      return;
+    }
     dispatch(setCurrentContext(context));
   };
 
@@ -146,38 +171,39 @@ const ClustersPane = () => {
       </TitleRow>
       <PaneContainer>
         <ClustersContainer>
-          <StyledDiv>KUBECONFIG</StyledDiv>
-          <Input value={currentKubeConfig} onChange={onUpdateKubeconfig} />
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-            <StyledButton ghost type="primary" onClick={openFileSelect}>
-              Browse
-            </StyledButton>
-          </Tooltip>
-          <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
-          <StyledDiv>Select to retrieve resources from configured kubeconfig</StyledDiv>
-
           <StyledDiv>
+            <StyledHeading>KUBECONFIG</StyledHeading>
+            <Input value={currentKubeConfig} onChange={onUpdateKubeconfig} disabled={isEditingDisabled} />
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
+              <StyledButton ghost type="primary" onClick={openFileSelect} disabled={isEditingDisabled}>
+                Browse
+              </StyledButton>
+            </Tooltip>
+          </StyledDiv>
+          <StyledDiv>
+            <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
+            <StyledHeading>Select to retrieve resources from configured kubeconfig</StyledHeading>
             <StyledSelect
               placeholder="Select a context"
-              disabled={previewType === 'cluster' && previewLoader.isLoading}
+              disabled={(previewType === 'cluster' && previewLoader.isLoading) || isEditingDisabled}
               value={kubeConfig.currentContext}
               options={kubeConfig.contexts.map(context => ({label: context.name, value: context.cluster}))}
               onChange={handleContextChange}
             />
           </StyledDiv>
-
-          <StyledDiv>Select to retrieve resources from selected context</StyledDiv>
-
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
-            <StyledButton
-              type="primary"
-              ghost
-              loading={previewType === 'cluster' && previewLoader.isLoading}
-              onClick={isInClusterMode ? reconnectToCluster : connectToCluster}
-            >
-              {createClusterObjectsLabel()}
-            </StyledButton>
-          </Tooltip>
+          <StyledDiv>
+            <StyledHeading>Select to retrieve resources from selected context</StyledHeading>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
+              <StyledButton
+                type="primary"
+                ghost
+                loading={previewType === 'cluster' && previewLoader.isLoading}
+                onClick={isInClusterMode ? reconnectToCluster : connectToCluster}
+              >
+                {createClusterObjectsLabel()}
+              </StyledButton>
+            </Tooltip>
+          </StyledDiv>
         </ClustersContainer>
       </PaneContainer>
     </>

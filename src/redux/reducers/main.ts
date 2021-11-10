@@ -84,6 +84,8 @@ export type SetPreviewDataPayload = {
   previewResourceId?: string;
   previewResources?: ResourceMapType;
   alert?: AlertType;
+  previewKubeConfigPath?: string;
+  previewKubeConfigContext?: string;
 };
 
 export type SetDiffDataPayload = {
@@ -307,10 +309,12 @@ export const mainSlice = createSlice({
         removeResourceFromFile(resource, state.fileMap, state.resourceMap);
         return;
       }
-      if (state.previewType === 'cluster' && state.previewResourceId) {
+      if (state.previewType === 'cluster' && state.previewKubeConfigPath && state.previewKubeConfigContext) {
         try {
           const kubeConfig = new k8s.KubeConfig();
-          kubeConfig.loadFromFile(state.previewResourceId);
+          kubeConfig.loadFromFile(state.previewKubeConfigPath);
+          kubeConfig.setCurrentContext(state.previewKubeConfigContext);
+
           const kindHandler = getResourceKindHandler(resource.kind);
           if (kindHandler?.deleteResourceInCluster) {
             kindHandler.deleteResourceInCluster(kubeConfig, resource.name, resource.namespace);
@@ -709,6 +713,8 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
     }
     if (state.previewType === 'cluster') {
       state.previewResourceId = payload.previewResourceId;
+      state.previewKubeConfigPath = payload.previewKubeConfigPath;
+      state.previewKubeConfigContext = payload.previewKubeConfigContext;
     }
   }
 

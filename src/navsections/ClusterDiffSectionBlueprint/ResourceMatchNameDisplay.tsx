@@ -55,6 +55,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -84,7 +85,14 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     if (!firstLocalResource) {
       return;
     }
-    applyResourceWithConfirm(firstLocalResource, resourceMap, fileMap, dispatch, kubeconfigPath);
+    applyResourceWithConfirm(
+      firstLocalResource,
+      resourceMap,
+      fileMap,
+      dispatch,
+      kubeconfigPath,
+      kubeconfigContext || ''
+    );
   };
 
   const saveClusterResourceToLocal = () => {

@@ -66,7 +66,7 @@ function ClusterDiffModal() {
 
   const loadClusterResourceText = async (localResource: K8sResource) => {
     try {
-      const {clusterResourceText} = await getClusterResourceText(localResource, kubeconfigPath);
+      const {clusterResourceText} = await getClusterResourceText(localResource, kubeconfigPath, currentContext || '');
       setResourceDiffState({
         isLoading: false,
         localResource,

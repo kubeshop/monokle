@@ -15,6 +15,7 @@ export function applyResourceWithConfirm(
   fileMap: FileMapType,
   dispatch: ThunkDispatch<any, any, any>,
   kubeconfig: string,
+  context: string,
   options?: {
     isClusterPreview?: boolean;
     isInClusterDiff?: boolean;
@@ -23,8 +24,8 @@ export function applyResourceWithConfirm(
   }
 ) {
   const title = isKustomizationResource(selectedResource)
-    ? `Deploy ${selectedResource.name} kustomization to your cluster?`
-    : `Deploy ${selectedResource.name} to your cluster?`;
+    ? `Deploy ${selectedResource.name} kustomization to cluster [${context}]?`
+    : `Deploy ${selectedResource.name} to cluster [${context}]?`;
 
   Modal.confirm({
     title,
@@ -32,7 +33,7 @@ export function applyResourceWithConfirm(
     centered: true,
     onOk() {
       return new Promise(resolve => {
-        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig, options);
+        applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfig, context, options);
         resolve({});
       });
     },

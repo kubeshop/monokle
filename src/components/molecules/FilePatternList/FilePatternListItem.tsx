@@ -1,11 +1,10 @@
-import React, {useState, useEffect} from 'react';
-
+import {Button, Input} from 'antd';
+import {useEffect, useState} from 'react';
 import styled from 'styled-components';
 
-import {useFocus} from '@utils/hooks';
+import {DeleteOutlined, EditOutlined} from '@ant-design/icons';
 
-import {Input, Button} from 'antd';
-import {EditOutlined, DeleteOutlined} from '@ant-design/icons';
+import {useFocus} from '@utils/hooks';
 
 type FilePatternListItemProps = {
   pattern: string;
@@ -38,7 +37,6 @@ const FilePatternListItem = (props: FilePatternListItemProps) => {
 
   const [isEditing, setIsEditing] = useState<Boolean>(false);
   const [isHovered, setIsHovered] = useState<Boolean>(false);
-
   const [patternInput, setPatternInput] = useState<string>(pattern);
 
   const [inputRef, focusInput] = useFocus<Input>();
