@@ -12,6 +12,8 @@ import {K8sResource} from '@models/k8sresource';
 
 import Icon from '@components/atoms/Icon';
 
+import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
+
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {useWindowSize} from '@utils/hooks';
@@ -19,6 +21,11 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
+
+import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
+
+// @ts-ignore
+const {yaml} = languages || {};
 
 const MonacoDiffContainer = styled.div<{height: string; width: string}>`
   ${props => `
@@ -80,6 +87,8 @@ const ResourceDiff = (props: {
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
+
+  useResourceYamlSchema(yaml, resourceMap, localResource.id);
 
   const options = {
     renderSideBySide: true,
