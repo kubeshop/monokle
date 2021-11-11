@@ -1,6 +1,9 @@
 # Monokle
 
+[![Release](https://img.shields.io/github/v/release/kubeshop/monokle)]([https://](https://github.com/kubeshop/monokle/releases/latest))
+[![License](https://img.shields.io/github/license/kubeshop/monokle)](https://github.com/kubeshop/monokle/blob/main/LICENSE)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/kMJxmuYTMu)
+[![Nightly Build](https://img.shields.io/github/workflow/status/kubeshop/monokle/monokle-build-nightly?label=nightly-build)](https://github.com/kubeshop/monokle/tags)
 [![Known Vulnerabilities](https://snyk.io/test/github/kubeshop/monokle/badge.svg)](https://snyk.io/test/github/kubeshop/monokle)
 
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
@@ -14,63 +17,24 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 - Diff resources against your cluster and apply changes immediately
 - And much more...
 
-Read the [Feature Overview](./docs/features.md) or watch the
-[Monokle 1.0 walkthrough video](https://youtu.be/9c80qj9NkQk) (approx 13 minutes):
+Read the [Feature Overview](./docs/features.md) document, watch the
+[Monokle 1.0 walkthrough video](https://youtu.be/9c80qj9NkQk) (approx 13 minutes) or read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and
+  overview
 
 [![Monokle 1.0 Walkthrough](docs/img/monokle-welcome.png)](https://youtu.be/9c80qj9NkQk)
 
-## Getting Started
+## Download & Install
 
-Either download an installer from [releases](https://github.com/kubeshop/monokle/releases) or
-clone/build as described below.
+Download and install the latest version below
 
-- Read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and
-  overview
-- Ask questions, report bugs, suggest features, join our discussions
-  [here on GitHub](https://github.com/kubeshop/monokle/discussions)
-- See "Getting Involved" below on how to get involved!
+### macOS
 
-> Don't hesitate to say hi to the team and ask questions on our [Discord server](https://discord.gg/uNuhy6GDyn).
-
-## Building / running
-
-Clone this repo and make sure you are running the node version specified in `.npmrc`
-
-### Mac
-
-```
-nvm install # assert nodejs version
-npm install
-```
-
-run with
-
-```
-npm run electron:dev
-```
+[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.dmg` file
 
 ### Windows
 
-```
-npm install --force
-```
+[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.exe` file
 
-run with
-
-```
-npm run electron:dev
-```
-
-The Electron app will reload if you make edits in the `electron` directory.<br> You will also see any lint errors in the
-console.
-
-Use
-
-```
-npm run electron:build
-```
-
-to build the Electron app package for production to the `dist` folder.
 
 ## Roadmap
 
@@ -89,8 +53,9 @@ Don't hesitate provide any feedback you might have to help us prioritize and imp
 - Check out our [Contributor Guide](https://github.com/kubeshop/.github/blob/main/CONTRIBUTING.md) and
   [Code of Conduct](https://github.com/kubeshop/.github/blob/main/CODE_OF_CONDUCT.md)
 - Fork/Clone the repo and make sure you can run it as shown above
-- Check out the [architecture.md](docs/architecture.md) document to get a high-level understanding of how Monokle works
+- Check out the [Development](docs/development.md) document for building and running steps
+- Check out the [Architecture](docs/architecture.md) document to get a high-level understanding of how Monokle works
 - Check out the Roadmap above and open [issues](https://github.com/kubeshop/monokle/issues) here on GitHub
 - Get in touch with the team by starting a [discussion]() on what you want to help with - or open an issue of your own
   that you would like to contribute to the project.
-- Join our our [Discord server](https://discord.gg/uNuhy6GDyn) to get in touch with the team on any matter!
+- Don't hesitate to say hi to the team and ask questions on our [Discord server](https://discord.gg/uNuhy6GDyn)
