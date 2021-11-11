@@ -222,6 +222,10 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     [isReadOnlyMode]
   );
 
+  if (!selectedResourceId && !selectedPath && !selectedValuesFileId) {
+    return null;
+  }
+
   return (
     <S.MonacoContainer ref={containerRef}>
       <S.HiddenInputContainer>
