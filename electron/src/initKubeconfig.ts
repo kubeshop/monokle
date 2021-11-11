@@ -28,10 +28,13 @@ function initKubeconfig(store: any, userHomeDir: string) {
   }
   const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
   const storedIsKubeconfigPathValid: boolean = electronStore.get('appConfig.isKubeconfigPathValid');
+  const hasUserPerformedClickOnClusterIcon: boolean = electronStore.get('appConfig.hasUserPerformedClickOnClusterIcon');
+  if (hasUserPerformedClickOnClusterIcon) {
+    store.dispatch(onUserPerformedClickOnClusterIcon());
+  }
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
     store.dispatch(updateKubeconfig(storedKubeconfig));
     store.dispatch(setKubeconfigPathValidity(storedIsKubeconfigPathValid));
-    store.dispatch(onUserPerformedClickOnClusterIcon());
     return;
   }
   store.dispatch(updateKubeconfig(path.join(userHomeDir, `${path.sep}.kube${path.sep}config`)));
