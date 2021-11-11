@@ -1,5 +1,6 @@
-import {AppDispatch, RootState} from '@redux/store';
 import React from 'react';
+
+import {AppDispatch, RootState} from '@redux/store';
 
 export type ItemCustomComponentProps = {
   itemInstance: ItemInstance;
@@ -46,6 +47,9 @@ export interface SectionCustomization {
   nameDisplay?: {
     component: SectionCustomComponent;
   };
+  emptyDisplay?: {
+    component: SectionCustomComponent;
+  };
   disableHoverStyle?: boolean;
 }
 
@@ -85,6 +89,7 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
     isLoading?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
+    isEmpty?: (scope: ScopeType, items: RawItemType[]) => boolean;
     shouldBeVisibleBeforeInitialized?: boolean;
   };
   customization?: SectionCustomization;
@@ -121,6 +126,7 @@ export interface SectionInstance {
   isInitialized: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
+  isEmpty: boolean;
   shouldExpand: boolean;
 }
 
