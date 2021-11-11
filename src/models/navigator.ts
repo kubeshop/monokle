@@ -47,6 +47,9 @@ export interface SectionCustomization {
   nameDisplay?: {
     component: SectionCustomComponent;
   };
+  nameSuffix?: {
+    component: SectionCustomComponent;
+  };
   emptyDisplay?: {
     component: SectionCustomComponent;
   };

@@ -30,7 +30,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
 
   const dispatch = useAppDispatch();
 
-  const {NameDisplay, EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
+  const {NameDisplay, EmptyDisplay, NameSuffix} = useSectionCustomization(sectionBlueprint.customization);
 
   const collapsedSectionIds = useAppSelector(state => state.navigator.collapsedSectionIds);
 
@@ -175,6 +175,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
         expandSection={expandSection}
         collapseSection={collapseSection}
         CustomNameDisplay={NameDisplay ? NameDisplay.Component : undefined}
+        CustomNameSuffix={NameSuffix ? NameSuffix.Component : undefined}
         disableHoverStyle={Boolean(sectionBlueprint.customization?.disableHoverStyle)}
       />
       {sectionInstance &&

@@ -1,6 +1,9 @@
 import {useState} from 'react';
-import {MinusSquareOutlined} from '@ant-design/icons';
+
 import {SectionCustomComponent, SectionInstance} from '@models/navigator';
+
+import {MinusSquareOutlined} from '@ant-design/icons';
+
 import * as S from './styled';
 
 interface SectionHeaderProps {
@@ -19,6 +22,7 @@ interface SectionHeaderProps {
   expandSection: () => void;
   collapseSection: () => void;
   CustomNameDisplay?: SectionCustomComponent;
+  CustomNameSuffix?: SectionCustomComponent;
   disableHoverStyle: boolean;
 }
 
@@ -39,6 +43,7 @@ function SectionHeader(props: SectionHeaderProps) {
     expandSection,
     collapseSection,
     CustomNameDisplay,
+    CustomNameSuffix,
     disableHoverStyle,
   } = props;
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -68,6 +73,7 @@ function SectionHeader(props: SectionHeaderProps) {
           >
             {name}
             {itemsLength > 0 && <S.ItemsLength>{itemsLength}</S.ItemsLength>}
+            {CustomNameSuffix && <CustomNameSuffix sectionInstance={sectionInstance} />}
           </S.Name>
           {isHovered && isSectionInitialized && (
             <S.Collapsible>

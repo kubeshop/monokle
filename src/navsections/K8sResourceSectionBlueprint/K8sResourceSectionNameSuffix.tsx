@@ -8,32 +8,31 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import Colors, {BackgroundColors} from '@styles/Colors';
 
 const S = {
-  Container: styled.div`
+  Container: styled.span`
     display: flex;
     align-items: center;
-  `,
-  TitleSpan: styled.span`
-    padding: 2px 16px;
-    font-size: 24px;
   `,
   PreviewOutputTag: styled(Tag)`
     font-size: 12px;
     font-weight: 600;
     background: ${BackgroundColors.previewModeBackground};
     color: ${Colors.blackPure};
-    margin-top: 3px;
+    margin-bottom: 10px;
   `,
 };
 
-function K8sResourceSectionNameDisplay() {
+function K8sResourceSectionNameSuffix() {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
 
-  return (
-    <S.Container>
-      <S.TitleSpan>K8s Resources</S.TitleSpan>
-      {isInPreviewMode && <S.PreviewOutputTag>Preview Output</S.PreviewOutputTag>}
-    </S.Container>
-  );
+  if (isInPreviewMode) {
+    return (
+      <S.Container>
+        <S.PreviewOutputTag>Preview Output</S.PreviewOutputTag>
+      </S.Container>
+    );
+  }
+
+  return null;
 }
 
-export default K8sResourceSectionNameDisplay;
+export default K8sResourceSectionNameSuffix;
