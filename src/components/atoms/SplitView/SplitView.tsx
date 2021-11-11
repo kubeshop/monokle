@@ -307,14 +307,22 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     setSeparatorLeftNavXPosition(clientX);
 
     if (movingDirection === 'LEFT' && !hideLeft && newLeftWidth < MIN_LEFT_PANE_WIDTH) {
-      setDraggingLeftNav(false);
+      // setDraggingLeftNav(false);
+      // drawLayout({
+      //   left: 0,
+      //   nav: combinedPixelWidth / viewWidth,
+      //   edit: editWidth,
+      //   right: rightWidth,
+      // });
+      // dispatch(setLeftMenuIsActive(false));
+      // return;
       drawLayout({
-        left: 0,
-        nav: combinedPixelWidth / viewWidth,
+        left: MIN_LEFT_PANE_WIDTH / viewWidth,
+        nav: (combinedPixelWidth - MIN_LEFT_PANE_WIDTH) / viewWidth,
         edit: editWidth,
         right: rightWidth,
       });
-      dispatch(setLeftMenuIsActive(false));
+      dispatch(setLeftMenuIsActive(true));
       return;
     }
 
