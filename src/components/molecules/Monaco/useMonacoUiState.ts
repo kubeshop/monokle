@@ -1,7 +1,8 @@
+import {useEffect} from 'react';
+import {monaco} from 'react-monaco-editor';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {useCallback, useEffect} from 'react';
-import {monaco} from 'react-monaco-editor';
 
 function useMonacoUiState(
   editor: monaco.editor.IStandaloneCodeEditor | null,
@@ -11,24 +12,25 @@ function useMonacoUiState(
   const dispatch = useAppDispatch();
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
 
-  const onEditorFocus = () => {
-    dispatch(setMonacoEditor({focused: true}));
-  };
+  // const onEditorFocus = () => {
+  //   dispatch(setMonacoEditor({focused: true}));
+  // };
 
-  const handleClickOutside = useCallback(() => {
-    if (editor && editor.hasTextFocus()) {
-      dispatch(setMonacoEditor({focused: true}));
-    } else {
-      dispatch(setMonacoEditor({focused: false}));
-    }
-  }, [editor, selectedResourceId]);
+  // const handleClickOutside = useCallback(() => {
+  //   if (editor && editor.hasTextFocus()) {
+  //     dispatch(setMonacoEditor({focused: true}));
+  //   } else {
+  //     dispatch(setMonacoEditor({focused: false}));
+  //   }
+  //   // eslint-disable-next-line
+  // }, [selectedResourceId]);
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [editor]);
+  // useEffect(() => {
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleClickOutside);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const selection = monacoEditor.selection;
@@ -43,7 +45,8 @@ function useMonacoUiState(
       editor.revealLineInCenter(selection.range.startLineNumber);
       dispatch(setMonacoEditor({selection: undefined}));
     }
-  }, [monacoEditor, selectedPath, selectedResourceId]);
+    // eslint-disable-next-line
+  }, [monacoEditor.selection, selectedPath, selectedResourceId]);
 
   useEffect(() => {
     if (!monacoEditor.focused) {
@@ -66,9 +69,10 @@ function useMonacoUiState(
       editor.trigger(null, 'editor.action.startFindReplaceAction', null);
       dispatch(setMonacoEditor({replace: false}));
     }
-  }, [monacoEditor]);
+    // eslint-disable-next-line
+  }, [monacoEditor.undo, monacoEditor.redo, monacoEditor.find, monacoEditor.replace]);
 
-  return {onEditorFocus};
+  // return {onEditorFocus};
 }
 
 export default useMonacoUiState;
