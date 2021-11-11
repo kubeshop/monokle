@@ -178,13 +178,13 @@ export const createWindow = (givenPath?: string) => {
   win.webContents.on('did-finish-load', async () => {
     await checkNewVersion(true);
     initKubeconfig(mainStore, userHomeDir);
-    const missingDependecies = checkMissingDependencies(APP_DEPENDENCIES);
+    const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
 
-    if (missingDependecies.length > 0) {
+    if (missingDependencies.length > 0) {
       const alert: AlertType = {
         type: AlertEnum.Warning,
         title: 'Missing dependency',
-        message: `${missingDependecies.toString()} must be installed for all Monokle functionality to be available`,
+        message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available`,
       };
       mainStore.dispatch(setAlert(alert));
     }
