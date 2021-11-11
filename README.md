@@ -17,11 +17,9 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 - Diff resources against your cluster and apply changes immediately
 - And much more...
 
-Read the [Feature Overview](./docs/features.md) document, watch the
-[Monokle 1.0 walkthrough video](https://youtu.be/9c80qj9NkQk) (approx 13 minutes) or read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and
-  overview
+Read the [Feature Overview](./docs/features.md) document or read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview
 
-[![Monokle 1.0 Walkthrough](docs/img/monokle-welcome.png)](https://youtu.be/9c80qj9NkQk)
+![Monokle 1.0 Walkthrough](docs/img/monokle-welcome.png)
 
 ## Download & Install
 
