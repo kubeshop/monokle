@@ -1,10 +1,12 @@
-import {AppState} from '@models/appstate';
-import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AlertState} from '@models/alert';
+import {AppConfig, NewVersionCode} from '@models/appconfig';
+import {AppState} from '@models/appstate';
 import {LogsState} from '@models/logs';
-import {UiState} from '@models/ui';
-import electronStore from '@utils/electronStore';
 import {NavigatorState} from '@models/navigator';
+import {UiState} from '@models/ui';
+import {UiCoachState} from '@models/uiCoach';
+
+import electronStore from '@utils/electronStore';
 
 const initialAppState: AppState = {
   selectionHistory: [],
@@ -39,6 +41,7 @@ const initialAppState: AppState = {
 const initialAppConfigState: AppConfig = {
   isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
   kubeconfigPath: '',
+  isKubeconfigPathValid: false,
   settings: {
     filterObjectsOnSelection: false,
     autoZoomGraphOnSelection: true,
@@ -124,6 +127,10 @@ const initialNavigatorState: NavigatorState = {
   selectedInstanceId: null,
 };
 
+const initialUiCoachState: UiCoachState = {
+  hasUserPerformedClickOnClusterIcon: false,
+};
+
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
@@ -131,4 +138,5 @@ export default {
   logs: initialLogsState,
   ui: initialUiState,
   navigator: initialNavigatorState,
+  uiCoach: initialUiCoachState,
 };

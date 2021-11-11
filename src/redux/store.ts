@@ -1,14 +1,17 @@
-import {configureStore} from '@reduxjs/toolkit';
-import logger from 'redux-logger';
 import {forwardToMain, replayActionRenderer} from 'electron-redux';
+import logger from 'redux-logger';
+
+import {configureStore} from '@reduxjs/toolkit';
+
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 
-import {mainSlice} from './reducers/main';
-import {configSlice} from './reducers/appConfig';
 import {alertSlice} from './reducers/alert';
+import {configSlice} from './reducers/appConfig';
 import {logsSlice} from './reducers/logs';
-import {uiSlice} from './reducers/ui';
+import {mainSlice} from './reducers/main';
 import {navigatorSlice} from './reducers/navigator';
+import {uiSlice} from './reducers/ui';
+import {uiCoachSlice} from './reducers/uiCoach';
 
 const store = configureStore({
   reducer: {
@@ -18,6 +21,7 @@ const store = configureStore({
     logs: logsSlice.reducer,
     ui: uiSlice.reducer,
     navigator: navigatorSlice.reducer,
+    uiCoach: uiCoachSlice.reducer,
   },
   middleware: getDefaultMiddleware => [
     forwardToMain,

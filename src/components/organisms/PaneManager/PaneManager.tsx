@@ -1,4 +1,4 @@
-import {Button, Space, Tooltip} from 'antd';
+import {Badge, Button, Space, Tooltip} from 'antd';
 import React, {useContext, useMemo, useState} from 'react';
 import styled from 'styled-components';
 
@@ -11,6 +11,7 @@ import {
   toggleLeftMenu,
   toggleRightMenu,
 } from '@redux/reducers/ui';
+import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 
 import {ActionsPane, ClustersPane, FileTreePane, NavigatorPane, PluginManagerPane} from '@organisms';
 
@@ -25,10 +26,13 @@ import {
   CodeOutlined,
   FolderOpenOutlined,
   FolderOutlined,
+  WarningFilled,
 } from '@ant-design/icons';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterExplorerTooltip, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
+
+import electronStore from '@utils/electronStore';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -81,11 +85,13 @@ const MenuIcon = (props: {
   style?: React.CSSProperties;
 }) => {
   const {icon: IconComponent, active, isSelected, style: customStyle = {}} = props;
+  const {color = Colors.grey7} = customStyle;
+
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const style = {
     fontSize: 25,
-    color: Colors.grey7,
+    color,
     ...customStyle,
   };
 
@@ -112,8 +118,10 @@ const PaneManager = () => {
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
-
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
+  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
+  const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
 
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
@@ -144,6 +152,22 @@ const PaneManager = () => {
     }
   };
 
+  const badgeChild =
+    !kubeconfigPath || !isKubeconfigPathValid || !hasUserPerformedClickOnClusterIcon ? (
+      <WarningFilled
+        style={{
+          color: !hasUserPerformedClickOnClusterIcon
+            ? Colors.blue6
+            : !isKubeconfigPathValid
+            ? Colors.redError
+            : Colors.yellowWarning,
+        }}
+      />
+    ) : (
+      // Badge is not shown if count is 0
+      0
+    );
+
   const openClusterDiffDrawer = () => {
     dispatch(openClusterDiff());
   };
@@ -172,13 +196,21 @@ const PaneManager = () => {
               <Button
                 size="large"
                 type="text"
-                onClick={() => setActivePanes('left', 'cluster-explorer')}
+                onClick={() => {
+                  setActivePanes('left', 'cluster-explorer');
+                  if (!hasUserPerformedClickOnClusterIcon) {
+                    dispatch(onUserPerformedClickOnClusterIcon());
+                    electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
+                  }
+                }}
                 icon={
-                  <MenuIcon
-                    icon={ClusterOutlined}
-                    active={leftActive}
-                    isSelected={leftMenuSelection === 'cluster-explorer'}
-                  />
+                  <Badge count={badgeChild}>
+                    <MenuIcon
+                      icon={ClusterOutlined}
+                      active={leftActive}
+                      isSelected={leftMenuSelection === 'cluster-explorer'}
+                    />
+                  </Badge>
                 }
               />
             </Tooltip>

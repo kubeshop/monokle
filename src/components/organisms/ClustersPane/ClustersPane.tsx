@@ -5,7 +5,7 @@ import {useDebounce} from 'react-use';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCurrentContext, updateKubeconfig} from '@redux/reducers/appConfig';
+import {setCurrentContext, setKubeconfigPathValidity, updateKubeconfig} from '@redux/reducers/appConfig';
 import {closeFolderExplorer} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
@@ -13,10 +13,14 @@ import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
 
+import {WarningOutlined} from '@ant-design/icons';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
 
-import {BackgroundColors} from '@styles/Colors';
+import Colors, {BackgroundColors} from '@styles/Colors';
+
+import * as k8s from '@kubernetes/client-node';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -61,27 +65,38 @@ const ClustersPane = () => {
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
-  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
-  const kubeConfig = useAppSelector(state => state.config.kubeConfig);
+  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeconfig = useAppSelector(state => state.config.kubeConfig);
+  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const uiState = useAppSelector(state => state.ui);
+  const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
 
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
 
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
+  const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
 
   useEffect(() => {
-    setCurrentKubeConfig(kubeconfig);
-  }, [kubeconfig]);
+    setCurrentKubeConfig(kubeconfigPath);
+  }, [kubeconfigPath]);
 
   useDebounce(
     () => {
-      if (currentKubeConfig !== kubeconfig) {
+      try {
+        const kc = new k8s.KubeConfig();
+
+        kc.loadFromFile(currentKubeConfig);
+
+        dispatch(setKubeconfigPathValidity(Boolean(kc.contexts) || false));
+      } catch (err) {
+        dispatch(setKubeconfigPathValidity(!currentKubeConfig.length));
+      } finally {
         dispatch(updateKubeconfig(currentKubeConfig));
       }
     },
     1000,
-    [currentKubeConfig]
+    [currentKubeConfig, kubeconfigPath]
   );
 
   const openFileSelect = () => {
@@ -114,17 +129,17 @@ const ClustersPane = () => {
   };
 
   const connectToCluster = () => {
-    if (isInPreviewMode && previewResource !== kubeconfig) {
+    if (isInPreviewMode && previewResource !== kubeconfigPath) {
       stopPreview(dispatch);
     }
-    startPreview(kubeconfig, 'cluster', dispatch);
+    startPreview(kubeconfigPath, 'cluster', dispatch);
   };
 
   const reconnectToCluster = () => {
-    if (isInPreviewMode && previewResource !== kubeconfig) {
+    if (isInPreviewMode && previewResource !== kubeconfigPath) {
       stopPreview(dispatch);
     }
-    restartPreview(kubeconfig, 'cluster', dispatch);
+    restartPreview(kubeconfigPath, 'cluster', dispatch);
   };
 
   const handleContextChange = (context: any) => {
@@ -153,10 +168,10 @@ const ClustersPane = () => {
   }, [uiState]);
 
   useEffect(() => {
-    if (kubeconfig) {
-      dispatch(loadContexts(kubeconfig));
+    if (kubeconfigPath) {
+      dispatch(loadContexts(kubeconfigPath));
     }
-  }, [kubeconfig]);
+  }, [kubeconfigPath]);
 
   return (
     <>
@@ -172,7 +187,16 @@ const ClustersPane = () => {
       <PaneContainer>
         <ClustersContainer>
           <StyledDiv>
-            <StyledHeading>KUBECONFIG</StyledHeading>
+            <StyledHeading>
+              KUBECONFIG
+              {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon ? (
+                <WarningOutlined
+                  style={{color: !isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning, marginLeft: 5}}
+                />
+              ) : (
+                ''
+              )}
+            </StyledHeading>
             <Input value={currentKubeConfig} onChange={onUpdateKubeconfig} disabled={isEditingDisabled} />
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
               <StyledButton ghost type="primary" onClick={openFileSelect} disabled={isEditingDisabled}>
@@ -185,15 +209,18 @@ const ClustersPane = () => {
             <StyledHeading>Select context to use:</StyledHeading>
             <StyledSelect
               placeholder="Select a context"
-              disabled={(previewType === 'cluster' && previewLoader.isLoading) || isEditingDisabled}
-              value={kubeConfig.currentContext}
-              options={kubeConfig.contexts.map(context => ({label: context.name, value: context.cluster}))}
+              disabled={
+                (previewType === 'cluster' && previewLoader.isLoading) || isEditingDisabled || isClusterActionDisabled
+              }
+              value={kubeconfig.currentContext}
+              options={kubeconfig.contexts.map(context => ({label: context.name, value: context.cluster}))}
               onChange={handleContextChange}
             />
           </StyledDiv>
           <StyledDiv>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
               <StyledButton
+                disabled={isClusterActionDisabled}
                 type="primary"
                 ghost
                 loading={previewType === 'cluster' && previewLoader.isLoading}

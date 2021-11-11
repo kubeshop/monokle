@@ -1,9 +1,13 @@
 import path from 'path';
-import {PROCESS_ENV} from '@utils/env';
-import {AlertEnum} from '@models/alert';
-import electronStore from '@utils/electronStore';
+
 import {setAlert} from '@redux/reducers/alert';
-import {updateKubeconfig} from '@redux/reducers/appConfig';
+import {setKubeconfigPathValidity, updateKubeconfig} from '@redux/reducers/appConfig';
+import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
+
+import {AlertEnum} from '@models/alert';
+
+import electronStore from '@utils/electronStore';
+import {PROCESS_ENV} from '@utils/env';
 
 function initKubeconfig(store: any, userHomeDir: string) {
   if (PROCESS_ENV.KUBECONFIG) {
@@ -23,8 +27,11 @@ function initKubeconfig(store: any, userHomeDir: string) {
     return;
   }
   const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
+  const storedIsKubeconfigPathValid: boolean = electronStore.get('appConfig.isKubeconfigPathValid');
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
     store.dispatch(updateKubeconfig(storedKubeconfig));
+    store.dispatch(setKubeconfigPathValidity(storedIsKubeconfigPathValid));
+    store.dispatch(onUserPerformedClickOnClusterIcon());
     return;
   }
   store.dispatch(updateKubeconfig(path.join(userHomeDir, `${path.sep}.kube${path.sep}config`)));
