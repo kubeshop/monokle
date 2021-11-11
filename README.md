@@ -1,5 +1,6 @@
 # Monokle
 
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/kMJxmuYTMu)
 [![Known Vulnerabilities](https://snyk.io/test/github/kubeshop/monokle/badge.svg)](https://snyk.io/test/github/kubeshop/monokle)
 
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
