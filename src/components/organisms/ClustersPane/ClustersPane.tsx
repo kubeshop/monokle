@@ -182,7 +182,7 @@ const ClustersPane = () => {
           </StyledDiv>
           <StyledDiv>
             <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
-            <StyledHeading>Select to retrieve resources from configured kubeconfig</StyledHeading>
+            <StyledHeading>Select context to use:</StyledHeading>
             <StyledSelect
               placeholder="Select a context"
               disabled={(previewType === 'cluster' && previewLoader.isLoading) || isEditingDisabled}
@@ -192,7 +192,6 @@ const ClustersPane = () => {
             />
           </StyledDiv>
           <StyledDiv>
-            <StyledHeading>Select to retrieve resources from selected context</StyledHeading>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
               <StyledButton
                 type="primary"
