@@ -1,7 +1,7 @@
 import {shell} from 'electron';
+import * as os from 'os';
 // @ts-ignore
 import shellPath from 'shell-path';
-import * as os from 'os';
 
 let cachedShellPath: string | undefined;
 
@@ -15,6 +15,10 @@ export function getShellPath() {
 
 export function openGitHub() {
   shell.openExternal('https://github.com/kubeshop/monokle');
+}
+
+export function openDiscord() {
+  shell.openExternal('https://discord.gg/kMJxmuYTMu');
 }
 
 export function openDocumentation() {

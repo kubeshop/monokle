@@ -1,31 +1,36 @@
-import React, {useState, useEffect} from 'react';
-import styled from 'styled-components';
-
-import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-import {
-  CloseCircleOutlined,
-  GithubOutlined,
-  QuestionCircleOutlined,
-  SettingOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
 import {Badge} from 'antd';
-import {AppBorders} from '@styles/Borders';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
+import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
-import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
-import Row from '@components/atoms/Row';
-import Col from '@components/atoms/Col';
-import Header from '@components/atoms/Header';
-import {isInPreviewModeSelector, activeResourcesSelector} from '@redux/selectors';
-import {useSelector} from 'react-redux';
+import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
-import {K8sResource} from '@models/k8sresource';
 import {HelmChart, HelmValuesFile} from '@models/helm';
-import {openDocumentation, openGitHub} from '@utils/shell';
+import {K8sResource} from '@models/k8sresource';
+
+import Col from '@components/atoms/Col';
+import Header from '@components/atoms/Header';
+import Row from '@components/atoms/Row';
+
+import {
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  GithubOutlined,
+  QuestionCircleOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
+
+import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
+
+import DiscordLogo from '@assets/DiscordLogo.svg';
+import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
+
+import {AppBorders} from '@styles/Borders';
+import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
 const StyledLogo = styled.img`
   height: 24px;
@@ -231,6 +236,11 @@ const PageHeader = () => {
             <GitHubIconSpan>
               <QuestionCircleOutlined size={24} onClick={openDocumentation} />
             </GitHubIconSpan>
+            <StyledNotificationsBadge>
+              <span onClick={openDiscord}>
+                <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer'}} />
+              </span>
+            </StyledNotificationsBadge>
             <GitHubIconSpan>
               <GithubOutlined size={24} onClick={openGitHub} />
             </GitHubIconSpan>
