@@ -1,39 +1,54 @@
-## Building / running
+# Development
 
-Clone this repo and make sure you are running the node version specified in `.npmrc`
+Monokle is an Electron desktop application built with React & TypeScript.  
 
-### Mac
+This project was bootstrapped from
+https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, 
+which provides:
+- TypeScript supports for Electron main process source code
+- Hot-relaod support for Electron app
+- Electron Builder support
 
+Check out the [Architecture](./architecture.md) document for more information.
+
+## Building & running
+
+### Prerequisites
+
+- [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
+- [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager
+- Clone this repository
+- Make sure you are running the node version specified in `.npmrc` or if you are using [nvm](https://github.com/nvm-sh/nvm) you can run the `nvm install` command to quickly install and use the required node version
+
+### Running
+
+1. Install npm dependencies
 ```
-nvm install # assert nodejs version
 npm install
 ```
 
-run with
+2. Start the application
 
 ```
 npm run electron:dev
 ```
 
-### Windows
+## Hot reloading
 
-```
-npm install --force
-```
-
-run with
-
-```
-npm run electron:dev
-```
-
-The Electron app will reload if you make edits in the `electron` directory.<br> You will also see any lint errors in the
+The Electron app will reload if you make edits in the `electron` directory.  
+You will also see any lint errors in the
 console.
 
-Use
+
+## Building
+Run the following command to build the Electron app package for production
 
 ```
 npm run electron:build
 ```
 
-to build the Electron app package for production to the `dist` folder.
+The output will be located in the `dist` folder.
+
+## Help & Support
+
+Feel free to reach out and ask questions on our [Discord server](https://discord.gg/uNuhy6GDyn)
