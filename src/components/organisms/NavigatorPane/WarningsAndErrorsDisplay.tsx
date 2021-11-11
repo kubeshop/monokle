@@ -16,6 +16,7 @@ import Colors from '@styles/Colors';
 
 const Container = styled.span`
   width: 100%;
+  white-space: nowrap;
 `;
 
 const WarningContainer = styled.span`
