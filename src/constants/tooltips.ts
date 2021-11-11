@@ -11,7 +11,7 @@ export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Clu
 export const ClusterDiffDisabledInClusterPreviewTooltip =
   'Cluster Comparison is disabled while previewing Cluster resources';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
-export const ClusterModeTooltip = `Retrieve and show resources in configured cluster (${KEY_CTRL_CMD}+I)`;
+export const ClusterModeTooltip = `Retrieve and show resources in selected context (${KEY_CTRL_CMD}+I)`;
 export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';
 export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
 export const ReloadKustomizationPreviewTooltip = 'Reload the preview of this Kustomization';
