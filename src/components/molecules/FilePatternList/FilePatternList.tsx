@@ -1,6 +1,8 @@
 import {Button, Input, Tooltip} from 'antd';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
+
+import {useOnClickOutside} from '@hooks/useOnClickOutside';
 
 import {useFocus} from '@utils/hooks';
 
@@ -29,6 +31,12 @@ const FilePatternList = (props: FilePatternListProps) => {
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<Input>();
+  const filePatternInputRef = useRef<any>();
+
+  useOnClickOutside(filePatternInputRef, () => {
+    setIsAddingPattern(false);
+    setPatternInput('');
+  });
 
   const isPatternUnique = (patternStr: string) => {
     return !value.includes(patternStr);
@@ -86,7 +94,7 @@ const FilePatternList = (props: FilePatternListProps) => {
         ))}
       </StyledUl>
       {isAddingPattern ? (
-        <>
+        <div ref={filePatternInputRef}>
           <Input
             ref={inputRef}
             defaultValue={patternInput}
@@ -95,7 +103,7 @@ const FilePatternList = (props: FilePatternListProps) => {
           />
           <StyledButton onClick={addPattern}>OK</StyledButton>
           <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
-        </>
+        </div>
       ) : (
         <Tooltip title={tooltip}>
           <Button onClick={() => setIsAddingPattern(true)}>Add Pattern</Button>

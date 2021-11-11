@@ -1,5 +1,7 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+
 import {Size} from '@models/window';
+
 import {FormInstance} from 'antd/lib/form';
 
 export function useFocus<T>(): [React.RefObject<T>, () => void] {
