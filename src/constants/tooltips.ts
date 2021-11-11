@@ -7,9 +7,9 @@ export const FileExplorerTooltip = 'Show/hide File Exlorer';
 export const ClusterExplorerTooltip = 'Show/hide Cluster Preview';
 export const PluginManagerTooltip = 'Show/hide Plugin Manager';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
-export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Comparison';
+export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
 export const ClusterDiffDisabledInClusterPreviewTooltip =
-  'Cluster Comparison is disabled while previewing Cluster resources';
+  'Cluster Compare is disabled while previewing Cluster resources';
 export const BrowseKubeconfigTooltip = 'Browse for kubeconfig file';
 export const ClusterModeTooltip = `Retrieve and show resources in selected context (${KEY_CTRL_CMD}+I)`;
 export const KustomizationPreviewTooltip = 'Preview the output of this Kustomize file';

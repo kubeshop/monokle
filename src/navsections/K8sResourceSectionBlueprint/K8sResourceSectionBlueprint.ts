@@ -1,10 +1,14 @@
-import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandlers} from '@src/kindhandlers';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 import {SectionBlueprint} from '@models/navigator';
-import {PREVIEW_PREFIX} from '@constants/constants';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
+
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import navSectionNames from '@constants/navSectionNames';
+
+import {ResourceKindHandlers} from '@src/kindhandlers';
+import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
+
+import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
 import {makeResourceKindNavSection} from './ResourceKindSectionBlueprint';
 
 const childSectionNames = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
@@ -25,6 +29,7 @@ ResourceKindHandlers.forEach(kindHandler => {
 
 export type K8sResourceScopeType = {
   isFolderLoading: boolean;
+  isFolderOpen: boolean;
   isPreviewLoading: boolean;
   activeResourcesLength: number;
 };
@@ -67,6 +72,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
   getScope: state => {
     return {
       isFolderLoading: state.ui.isFolderLoading,
+      isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isPreviewLoading: state.main.previewLoader.isLoading,
       activeResourcesLength: Object.values(state.main.resourceMap).filter(
         r =>
@@ -82,7 +88,15 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
     isInitialized: scope => {
       return scope.activeResourcesLength > 0;
     },
+    isEmpty: scope => {
+      return scope.isFolderOpen && scope.activeResourcesLength === 0;
+    },
     shouldBeVisibleBeforeInitialized: true,
+  },
+  customization: {
+    emptyDisplay: {
+      component: K8sResourceSectionEmptyDisplay,
+    },
   },
 };
 

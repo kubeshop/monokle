@@ -15,7 +15,7 @@ export type LoadClusterDiffPayload = {
   alert?: AlertType;
 };
 
-const CLUSTER_DIFF_FAILED = 'Cluster Comparison Failed';
+const CLUSTER_DIFF_FAILED = 'Cluster Compare Failed';
 
 export const loadClusterDiff = createAsyncThunk<
   LoadClusterDiffPayload,

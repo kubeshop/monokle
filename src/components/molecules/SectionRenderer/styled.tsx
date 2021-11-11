@@ -1,7 +1,9 @@
-import Colors, {FontColors} from '@styles/Colors';
-import styled from 'styled-components';
 import {Skeleton as RawSkeleton} from 'antd';
+import styled from 'styled-components';
+
 import {PlusSquareOutlined as RawPlusSquareOutlined} from '@ant-design/icons';
+
+import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
   isSelected?: boolean;
@@ -101,4 +103,10 @@ export const ItemsLength = styled.span`
   margin-left: 8px;
   color: ${FontColors.grey};
   font-size: 14px;
+`;
+
+export const EmptyDisplayContainer = styled.div<{level: number}>`
+  margin-left: ${props => {
+    return `${16 + 8 * props.level}px`;
+  }};
 `;

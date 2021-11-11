@@ -173,7 +173,7 @@ function ClusterDiffModal() {
         <>
           <span onClick={closeResourceDiff} style={{cursor: 'pointer'}}>
             <ArrowLeftOutlined style={{marginRight: 8}} />
-            Back to Cluster Comparison
+            Back to Cluster Compare
           </span>
         </>
       );

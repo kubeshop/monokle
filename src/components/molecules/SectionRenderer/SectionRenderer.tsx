@@ -1,8 +1,12 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
-import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navigator';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import navSectionMap from '@src/navsections/sectionBlueprintMap';
 import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
+
+import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navigator';
+
+import navSectionMap from '@src/navsections/sectionBlueprintMap';
+
 import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
 import SectionHeader from './SectionHeader';
 import * as S from './styled';
@@ -26,7 +30,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
 
   const dispatch = useAppDispatch();
 
-  const {NameDisplay} = useSectionCustomization(sectionBlueprint.customization);
+  const {NameDisplay, EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
 
   const collapsedSectionIds = useAppSelector(state => state.navigator.collapsedSectionIds);
 
@@ -135,6 +139,22 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
 
   if (sectionInstance?.isLoading) {
     return <S.Skeleton />;
+  }
+
+  if (sectionInstance?.isEmpty) {
+    if (EmptyDisplay && EmptyDisplay.Component) {
+      return (
+        <S.EmptyDisplayContainer level={level}>
+          <EmptyDisplay.Component sectionInstance={sectionInstance} />
+        </S.EmptyDisplayContainer>
+      );
+    }
+    return (
+      <S.EmptyDisplayContainer level={level}>
+        <h1>{sectionBlueprint.name}</h1>
+        <p>Section is empty.</p>
+      </S.EmptyDisplayContainer>
+    );
   }
 
   return (

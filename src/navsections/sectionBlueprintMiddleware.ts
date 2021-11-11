@@ -1,9 +1,12 @@
+import asyncLib from 'async';
 import {shallowEqual} from 'react-redux';
 import {Middleware} from 'redux';
+
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
-import {ItemInstance, NavigatorInstanceState, SectionInstance} from '@models/navigator';
 import {AppDispatch, RootState} from '@redux/store';
-import asyncLib from 'async';
+
+import {ItemInstance, NavigatorInstanceState, SectionInstance} from '@models/navigator';
+
 import sectionBlueprintMap from './sectionBlueprintMap';
 
 const fullScopeCache: Record<string, any> = {};
@@ -202,6 +205,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       isInitialized: isSectionInitialized,
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
+      isEmpty: Boolean(sectionBuilder?.isEmpty ? sectionBuilder.isEmpty(sectionScope, rawItems) : false),
       shouldExpand: Boolean(
         itemInstances?.some(itemInstance => itemInstance.isVisible && itemInstance.shouldScrollIntoView)
       ),
