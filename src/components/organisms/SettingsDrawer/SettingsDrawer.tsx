@@ -32,6 +32,8 @@ import {
   KustomizeCommandTooltip,
 } from '@constants/tooltips';
 
+import {useFocus} from '@utils/hooks';
+
 const StyledDiv = styled.div`
   margin-bottom: 20px;
 `;
@@ -68,6 +70,7 @@ const SettingsDrawer = () => {
   const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
+  const [inputRef, focusInput] = useFocus<Input>();
 
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
 
@@ -184,7 +187,13 @@ const SettingsDrawer = () => {
       <StyledDiv>
         <StyledSpan>KUBECONFIG</StyledSpan>
         <Tooltip title={KubeconfigPathTooltip}>
-          <Input value={currentKubeConfig} onChange={onUpdateKubeconfig} disabled={isEditingDisabled} />
+          <Input
+            ref={inputRef}
+            value={currentKubeConfig}
+            onChange={onUpdateKubeconfig}
+            disabled={isEditingDisabled}
+            onClick={() => focusInput()}
+          />
         </Tooltip>
         <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
           Browse
