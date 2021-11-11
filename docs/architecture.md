@@ -1,13 +1,16 @@
 ## Monokle Architecture
 
-Monokle is a "straight-forward" React/typescript application using Redux Toolkit for state-mgmt. 
-Visuals are done with antd design and a bunch of fairly common libraries/frameworks are used internally
-for common functionality (see components below). 
+Monokle is an Electron desktop application built with React & TypeScript.  
+
+Redux Toolkit is used for state management.   
+
+Visuals are done using Ant Design.  
+
+Other fairly common libraries/frameworks are used internally for common functionality (see components below).   
 
 This project was bootstrapped from
 https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder, 
-which provides
-
+which provides:
 - TypeScript supports for Electron main process source code
 - Hot-relaod support for Electron app
 - Electron Builder support

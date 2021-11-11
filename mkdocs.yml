@@ -17,7 +17,7 @@ theme:
 nav:
   - Welcome: index.md
   - Feature Overview: features.md
-  - Getting Started: getting-started.md
+  - Development: development.md
   - UI Overview: overview.md
   - Navigating Resources: resource-navigation.md
   - Resource Editing: resource-editing.md
