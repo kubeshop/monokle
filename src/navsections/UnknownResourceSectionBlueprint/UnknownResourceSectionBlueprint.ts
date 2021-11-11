@@ -20,6 +20,7 @@ export type UnknownResourceScopeType = {
   selectedResourceId?: string;
   isInPreviewMode: boolean;
   isPreviewLoading: boolean;
+  isFolderLoading: boolean;
 };
 
 const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
@@ -35,6 +36,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       selectedResourceId: state.main.selectedResourceId,
       isInPreviewMode: Boolean(state.main.previewResourceId) || Boolean(state.main.previewValuesFileId),
       isPreviewLoading: state.main.previewLoader.isLoading,
+      isFolderLoading: state.ui.isFolderLoading,
     };
   },
   builder: {
@@ -75,7 +77,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       return rawItems.length > 0;
     },
     isLoading: scope => {
-      return scope.isPreviewLoading;
+      return scope.isPreviewLoading || scope.isFolderLoading;
     },
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;

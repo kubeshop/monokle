@@ -125,6 +125,15 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   }
 );
 
+const clearSelectedResourceOnPreviewExit = (state: AppState) => {
+  if (state.selectedResourceId) {
+    const selectedResource = state.resourceMap[state.selectedResourceId];
+    if (selectedResource.filePath.startsWith(PREVIEW_PREFIX)) {
+      state.selectedResourceId = undefined;
+    }
+  }
+};
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
@@ -372,10 +381,12 @@ export const mainSlice = createSlice({
       state.isApplyingResource = action.payload;
     },
     clearPreview: (state: Draft<AppState>) => {
+      clearSelectedResourceOnPreviewExit(state);
       setPreviewData({}, state);
       state.previewType = undefined;
     },
     clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+      clearSelectedResourceOnPreviewExit(state);
       setPreviewData({}, state);
       state.previewType = undefined;
       state.currentSelectionHistoryIndex = undefined;
@@ -417,6 +428,9 @@ export const mainSlice = createSlice({
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
+        state.selectedResourceId = action.payload.previewResourceId;
+        state.selectedPath = undefined;
+        state.selectedValuesFileId = undefined;
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -431,6 +445,9 @@ export const mainSlice = createSlice({
         state.previewLoader.targetResourceId = undefined;
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
+        state.selectedResourceId = undefined;
+        state.selectedPath = undefined;
+        state.selectedValuesFileId = action.payload.previewResourceId;
       })
       .addCase(previewHelmValuesFile.rejected, (state, action) => {
         state.previewLoader.isLoading = false;
@@ -444,6 +461,7 @@ export const mainSlice = createSlice({
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
+        state.selectedResourceId = undefined;
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;

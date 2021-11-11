@@ -9,6 +9,7 @@ import {ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
+import K8sResourceSectionNameSuffix from './K8sResourceSectionNameSuffix';
 import {makeResourceKindNavSection} from './ResourceKindSectionBlueprint';
 
 const childSectionNames = navSectionNames.representation[navSectionNames.K8S_RESOURCES];
@@ -96,6 +97,9 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
   customization: {
     emptyDisplay: {
       component: K8sResourceSectionEmptyDisplay,
+    },
+    nameSuffix: {
+      component: K8sResourceSectionNameSuffix,
     },
   },
 };
