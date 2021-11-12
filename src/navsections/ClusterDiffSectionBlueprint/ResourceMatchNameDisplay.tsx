@@ -12,7 +12,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 
 import {diffLocalToClusterResources, removeIgnoredPathsFromResourceContent} from '@utils/resources';
@@ -160,7 +160,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
             </StyledDiffSpan>
           </Tooltip>
         )}
-        {clusterResource && (
+        {clusterResource && !firstLocalResource?.filePath.startsWith(PREVIEW_PREFIX) && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffSaveTooltip}>
             <ArrowLeftOutlined style={{color: Colors.blue6}} onClick={onClickSave} />
           </Tooltip>

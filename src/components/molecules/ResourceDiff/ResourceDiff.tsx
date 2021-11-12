@@ -16,6 +16,8 @@ import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
+import {PREVIEW_PREFIX} from '@constants/constants';
+
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
@@ -171,7 +173,9 @@ const ResourceDiff = (props: {
           type="primary"
           ghost
           onClick={handleReplace}
-          disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}
+          disabled={
+            !shouldDiffIgnorePaths || !areResourcesDifferent || localResource.filePath.startsWith(PREVIEW_PREFIX)
+          }
         >
           <ArrowLeftOutlined /> Replace local resource with cluster resource
         </Button>
