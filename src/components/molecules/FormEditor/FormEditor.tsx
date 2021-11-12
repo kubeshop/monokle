@@ -1,18 +1,19 @@
 import React, {useCallback, useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {useDebounce} from 'react-use';
+import styled from 'styled-components';
+import {stringify} from 'yaml';
+
 import {useAppDispatch} from '@redux/hooks';
-import {withTheme} from '@rjsf/core';
+import {updateResource} from '@redux/reducers/main';
+import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
+import {loadResource} from '@redux/services';
+import {logMessage} from '@redux/services/log';
+import {mergeManifests} from '@redux/services/manifest-utils';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
-import {loadResource} from '@redux/services';
-import {useDebounce} from 'react-use';
-import {updateResource} from '@redux/reducers/main';
-import {logMessage} from '@redux/services/log';
-import {stringify} from 'yaml';
-import {mergeManifests} from '@redux/services/manifest-utils';
-import styled from 'styled-components';
-import {useSelector} from 'react-redux';
-import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
+import {withTheme} from '@rjsf/core';
 import isDeepEqual from 'fast-deep-equal/es6/react';
 
 const Form = withTheme(AntDTheme);
@@ -197,7 +198,7 @@ const FormEditor = (props: {contentHeight: string}) => {
 
   useEffect(() => {
     if (selectedResource) {
-      setFormData({currFormData: selectedResource.content, orgFormData: undefined});
+      setFormData({currFormData: selectedResource.content, orgFormData: formData.orgFormData || undefined});
     }
   }, [selectedResource]);
 
