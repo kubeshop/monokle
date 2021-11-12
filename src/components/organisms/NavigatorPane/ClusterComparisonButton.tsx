@@ -14,11 +14,14 @@ import {
   ClusterDiffTooltip,
 } from '@constants/tooltips';
 
+import {useWindowSize} from '@utils/hooks';
+
 function ClusterComparisonButton() {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const navWidth = useAppSelector(state => state.ui.paneConfiguration.navWidth);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const windowSize = useWindowSize();
 
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
@@ -29,8 +32,8 @@ function ClusterComparisonButton() {
   };
 
   const shouldHideClusterComparisonText = useMemo(() => {
-    return window.innerWidth * Number(navWidth.toFixed(2)) < 350;
-  }, [navWidth]);
+    return windowSize.width * Number(navWidth.toFixed(2)) < 350;
+  }, [navWidth, windowSize.width]);
 
   return (
     <Tooltip
