@@ -81,6 +81,14 @@ interface AppState {
   fileMap: FileMapType;
   /** maps resource ids to resources */
   resourceMap: ResourceMapType;
+  /**
+   * Whether the app's storage is rehydrating
+   */
+  isRehydrating: boolean;
+  /**
+   * Whether the app's storage was rehydrated
+   */
+  wasRehydrated: boolean;
   resourceFilter: ResourceFilterType;
   /** maps chart ids to helm charts */
   helmChartMap: HelmChartMapType;

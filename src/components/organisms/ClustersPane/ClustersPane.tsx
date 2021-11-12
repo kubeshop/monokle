@@ -70,6 +70,7 @@ const ClustersPane = () => {
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const uiState = useAppSelector(state => state.ui);
   const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
+  const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
 
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
@@ -189,7 +190,7 @@ const ClustersPane = () => {
           <StyledDiv>
             <StyledHeading>
               KUBECONFIG
-              {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon ? (
+              {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated ? (
                 <WarningOutlined
                   style={{color: !isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning, marginLeft: 5}}
                 />

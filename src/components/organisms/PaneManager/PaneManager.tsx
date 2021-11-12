@@ -30,7 +30,7 @@ import {
 } from '@ant-design/icons';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {ClusterExplorerTooltip, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
+import {ClusterExplorerTooltips, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 
 import electronStore from '@utils/electronStore';
 
@@ -114,6 +114,7 @@ const PaneManager = () => {
   const contentHeight = `${windowSize.height - 75}px`;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
@@ -152,21 +153,55 @@ const PaneManager = () => {
     }
   };
 
-  const badgeChild =
-    !kubeconfigPath || !isKubeconfigPathValid || !hasUserPerformedClickOnClusterIcon ? (
-      <WarningFilled
-        style={{
-          color: !hasUserPerformedClickOnClusterIcon
-            ? Colors.blue6
-            : !isKubeconfigPathValid
-            ? Colors.redError
-            : Colors.yellowWarning,
-        }}
-      />
-    ) : (
-      // Badge is not shown if count is 0
-      0
-    );
+  const getBadgeChild = () => {
+    if (!wasRehydrated) {
+      return;
+    }
+
+    if (!hasUserPerformedClickOnClusterIcon) {
+      return {dot: true};
+    }
+
+    if (!kubeconfigPath || !isKubeconfigPathValid) {
+      const color = !isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning;
+
+      return {
+        count: (
+          <WarningFilled
+            style={{
+              color,
+            }}
+          />
+        ),
+      };
+    }
+
+    return {count: 0}; // Badge is not shown if count is 0;
+  };
+
+  const badgeChild = getBadgeChild();
+
+  const getClusterExplorerTooltipText = () => {
+    if (!wasRehydrated) {
+      return;
+    }
+
+    if (!hasUserPerformedClickOnClusterIcon) {
+      return ClusterExplorerTooltips.firstTimeSeeing;
+    }
+
+    if (!kubeconfigPath) {
+      return ClusterExplorerTooltips.noKubeconfigPath;
+    }
+
+    if (!isKubeconfigPathValid) {
+      return ClusterExplorerTooltips.notValidKubeconfigPath;
+    }
+
+    return ClusterExplorerTooltips.default;
+  };
+
+  const clusterExplorerTooltipText = getClusterExplorerTooltipText();
 
   const openClusterDiffDrawer = () => {
     dispatch(openClusterDiff());
@@ -192,19 +227,21 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterExplorerTooltip} placement="right">
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
               <Button
                 size="large"
                 type="text"
-                onClick={() => {
+                onClick={async () => {
                   setActivePanes('left', 'cluster-explorer');
+
+                  electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
+
                   if (!hasUserPerformedClickOnClusterIcon) {
                     dispatch(onUserPerformedClickOnClusterIcon());
-                    electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
                   }
                 }}
                 icon={
-                  <Badge count={badgeChild}>
+                  <Badge {...badgeChild} color={Colors.blue6}>
                     <MenuIcon
                       icon={ClusterOutlined}
                       active={leftActive}

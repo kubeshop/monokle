@@ -9,6 +9,8 @@ import {UiCoachState} from '@models/uiCoach';
 import electronStore from '@utils/electronStore';
 
 const initialAppState: AppState = {
+  isRehydrating: false,
+  wasRehydrated: false,
   selectionHistory: [],
   resourceMap: {},
   resourceFilter: {

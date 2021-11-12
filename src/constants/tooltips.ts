@@ -4,7 +4,12 @@ export const BrowseFolderTooltip = `Browse for folder containing manifests, kust
 export const ReloadFolderTooltip = `Reload manifests from the currently selected folder (${KEY_CTRL_CMD}+F5)`;
 export const ToggleTreeTooltip = 'Expand/Collapse all folders';
 export const FileExplorerTooltip = 'Show/hide File Exlorer';
-export const ClusterExplorerTooltip = 'Show/hide Cluster Preview';
+export const ClusterExplorerTooltips = {
+  default: 'Show/hide Cluster Preview',
+  firstTimeSeeing: 'Configure your Kubeconfig path to enable Cluster features',
+  noKubeconfigPath: 'Kubeconfig path is missing, configure it to enable Cluster features',
+  notValidKubeconfigPath: 'The specified Kubeconfig path is not valid',
+};
 export const PluginManagerTooltip = 'Show/hide Plugin Manager';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';

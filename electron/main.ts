@@ -40,6 +40,7 @@ import {downloadPlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, selectFile} from '@root/electron/commands';
+import {setAppRehydrating} from '@redux/reducers/main';
 
 Object.assign(console, ElectronLog.functions);
 autoUpdater.logger = console;
@@ -176,8 +177,10 @@ export const createWindow = (givenPath?: string) => {
   });
 
   win.webContents.on('did-finish-load', async () => {
+    await mainStore.dispatch(setAppRehydrating(true));
     await checkNewVersion(true);
-    initKubeconfig(mainStore, userHomeDir);
+    await initKubeconfig(mainStore, userHomeDir);
+    mainStore.dispatch(setAppRehydrating(false));
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
 
     if (missingDependencies.length > 0) {
