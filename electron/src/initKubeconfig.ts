@@ -1,11 +1,15 @@
 import path from 'path';
-import {PROCESS_ENV} from '@utils/env';
-import {AlertEnum} from '@models/alert';
-import electronStore from '@utils/electronStore';
-import {setAlert} from '@redux/reducers/alert';
-import {updateKubeconfig} from '@redux/reducers/appConfig';
 
-function initKubeconfig(store: any, userHomeDir: string) {
+import {setAlert} from '@redux/reducers/alert';
+import {setKubeconfigPathValidity, updateKubeconfig} from '@redux/reducers/appConfig';
+import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
+
+import {AlertEnum} from '@models/alert';
+
+import electronStore from '@utils/electronStore';
+import {PROCESS_ENV} from '@utils/env';
+
+async function initKubeconfig(store: any, userHomeDir: string) {
   if (PROCESS_ENV.KUBECONFIG) {
     const envKubeconfigParts = PROCESS_ENV.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
@@ -22,12 +26,25 @@ function initKubeconfig(store: any, userHomeDir: string) {
     }
     return;
   }
-  const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
+  const storedKubeconfig: string | undefined = await electronStore.get('appConfig.kubeconfig');
+  const storedIsKubeconfigPathValid: boolean = await electronStore.get('appConfig.isKubeconfigPathValid');
+  const hasUserPerformedClickOnClusterIcon: boolean = await electronStore.get(
+    'appConfig.hasUserPerformedClickOnClusterIcon'
+  );
+
+
+  if (hasUserPerformedClickOnClusterIcon) {
+    store.dispatch(onUserPerformedClickOnClusterIcon());
+  }
+
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
     store.dispatch(updateKubeconfig(storedKubeconfig));
+    store.dispatch(setKubeconfigPathValidity(storedIsKubeconfigPathValid));
     return;
   }
+
   store.dispatch(updateKubeconfig(path.join(userHomeDir, `${path.sep}.kube${path.sep}config`)));
+  store.dispatch(setKubeconfigPathValidity(true));
 }
 
 export default initKubeconfig;

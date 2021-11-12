@@ -1,10 +1,13 @@
-import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
-import {AppConfig, Themes, TextSizes, Languages, NewVersionCode} from '@models/appconfig';
-import electronStore from '@utils/electronStore';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
-import {KubeConfig} from '@models/kubeConfig';
-import {KustomizeCommandType} from '@redux/services/kustomize';
 import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
+import {KustomizeCommandType} from '@redux/services/kustomize';
+import {loadContexts} from '@redux/thunks/loadKubeConfig';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+
+import {AppConfig, Languages, NewVersionCode, TextSizes, Themes} from '@models/appconfig';
+import {KubeConfig} from '@models/kubeConfig';
+
+import electronStore from '@utils/electronStore';
+
 import initialState from '../initialState';
 
 export const updateStartupModalVisible = createAsyncThunk(
@@ -20,6 +23,14 @@ export const updateKubeconfig = createAsyncThunk('config/updateKubeconfig', asyn
   electronStore.set('appConfig.kubeconfig', kubeconfig);
   thunkAPI.dispatch(configSlice.actions.setKubeconfig(kubeconfig));
 });
+
+export const setKubeconfigPathValidity = createAsyncThunk(
+  'config/setKubeconfigPathValidity',
+  async (isKubeconfigPathValid: boolean, thunkAPI) => {
+    electronStore.set('appConfig.isKubeconfigPathValid', isKubeconfigPathValid);
+    thunkAPI.dispatch(configSlice.actions.setKubeconfigPathValidity(isKubeconfigPathValid));
+  }
+);
 
 export const updateScanExcludes = createAsyncThunk(
   'config/updateScanExcludes',
@@ -104,6 +115,9 @@ export const configSlice = createSlice({
     },
     setKubeconfig: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       state.kubeconfigPath = action.payload;
+    },
+    setKubeconfigPathValidity: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.isKubeconfigPathValid = action.payload;
     },
     setStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.isStartupModalVisible = action.payload;

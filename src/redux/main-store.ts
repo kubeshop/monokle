@@ -1,13 +1,16 @@
 import {BrowserWindow} from 'electron';
-import {configureStore} from '@reduxjs/toolkit';
 import {replayActionMain} from 'electron-redux';
+
+import {configureStore} from '@reduxjs/toolkit';
+
 import {isFSA} from '@utils/fluxStandardAction';
 
-import {mainSlice} from './reducers/main';
-import {configSlice} from './reducers/appConfig';
 import {alertSlice} from './reducers/alert';
+import {configSlice} from './reducers/appConfig';
 import {logsSlice} from './reducers/logs';
+import {mainSlice} from './reducers/main';
 import {uiSlice} from './reducers/ui';
+import {uiCoachSlice} from './reducers/uiCoach';
 
 let lastFocusedWindow: BrowserWindow | null = null;
 
@@ -41,6 +44,7 @@ const store = configureStore({
     alert: alertSlice.reducer,
     logs: logsSlice.reducer,
     ui: uiSlice.reducer,
+    uiCoach: uiCoachSlice.reducer,
   },
   middleware: getDefaultMiddleware => [...getDefaultMiddleware(), forwardToRenderer],
 });

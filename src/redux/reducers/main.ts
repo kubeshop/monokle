@@ -138,6 +138,12 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
   reducers: {
+    setAppRehydrating: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
+      state.isRehydrating = action.payload;
+      if (!action.payload) {
+        state.wasRehydrated = !action.payload;
+      }
+    },
     addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;
       state.resourceMap[resource.id] = resource;
@@ -793,6 +799,7 @@ function selectFilePath(filePath: string, state: AppState) {
 }
 
 export const {
+  setAppRehydrating,
   addResource,
   selectK8sResource,
   selectFile,

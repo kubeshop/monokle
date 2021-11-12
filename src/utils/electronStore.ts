@@ -23,6 +23,9 @@ const schema = {
       kubeconfig: {
         type: 'string',
       },
+      isKubeconfigPathValid: {
+        type: 'boolean',
+      },
       scanExcludes: {
         type: 'array',
         items: {
@@ -122,6 +125,14 @@ const schema = {
             type: 'number',
           },
         },
+      },
+    },
+  },
+  uiCoach: {
+    type: 'object',
+    properties: {
+      hasUserPerformedClickOnClusterIcon: {
+        type: 'boolean',
       },
     },
   },
