@@ -16,7 +16,7 @@ import {
 
 import {useWindowSize} from '@utils/hooks';
 
-function ClusterComparisonButton() {
+function ClusterCompareButton() {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const navWidth = useAppSelector(state => state.ui.paneConfiguration.navWidth);
@@ -31,7 +31,7 @@ function ClusterComparisonButton() {
     dispatch(openClusterDiff());
   };
 
-  const shouldHideClusterComparisonText = useMemo(() => {
+  const shouldHideClusterCompareText = useMemo(() => {
     return windowSize.width * Number(navWidth.toFixed(2)) < 350;
   }, [navWidth, windowSize.width]);
 
@@ -56,10 +56,10 @@ function ClusterComparisonButton() {
         style={{marginLeft: 8}}
         disabled={!isFolderOpen || isInClusterMode}
       >
-        {shouldHideClusterComparisonText ? '' : 'Cluster Compare'}
+        {shouldHideClusterCompareText ? '' : 'Cluster Compare'}
       </Button>
     </Tooltip>
   );
 }
 
-export default ClusterComparisonButton;
+export default ClusterCompareButton;
