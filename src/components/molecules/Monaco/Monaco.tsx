@@ -177,7 +177,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     setDirty(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPath, selectedResourceId]);
+  }, [selectedPath, selectedResourceId ? resourceMap[selectedResourceId] : undefined]);
 
   useEffect(() => {
     if (editor) {

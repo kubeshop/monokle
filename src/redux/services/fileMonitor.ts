@@ -1,8 +1,11 @@
-import {watch, FSWatcher} from 'chokidar';
-import {AppConfig} from '@models/appconfig';
+import {FSWatcher, watch} from 'chokidar';
+
+import {multipleFilesChanged, multiplePathsAdded, multiplePathsRemoved} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
+
+import {AppConfig} from '@models/appconfig';
+
 import {debounceWithPreviousArgs} from '@utils/helpers';
-import {multiplePathsAdded, multipleFilesChanged, multiplePathsRemoved} from '@redux/reducers/main';
 
 let watcher: FSWatcher;
 
@@ -20,7 +23,7 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
     ignoreInitial: true,
     persistent: true,
     usePolling: true,
-    interval: 2000,
+    interval: 1000,
   });
 
   watcher
