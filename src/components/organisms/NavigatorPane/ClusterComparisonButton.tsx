@@ -28,6 +28,10 @@ function ClusterComparisonButton() {
     dispatch(openClusterDiff());
   };
 
+  const shouldHideClusterComparisonText = useMemo(() => {
+    return window.innerWidth * Number(navWidth.toFixed(2)) < 350;
+  }, [navWidth]);
+
   return (
     <Tooltip
       mouseEnterDelay={isFolderOpen ? TOOLTIP_DELAY : 0}
@@ -49,7 +53,7 @@ function ClusterComparisonButton() {
         style={{marginLeft: 8}}
         disabled={!isFolderOpen || isInClusterMode}
       >
-        {Number(navWidth.toFixed(2)) < 0.3 ? '' : 'Cluster Compare'}
+        {shouldHideClusterComparisonText ? '' : 'Cluster Compare'}
       </Button>
     </Tooltip>
   );
