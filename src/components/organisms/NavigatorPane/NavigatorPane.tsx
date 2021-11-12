@@ -28,7 +28,7 @@ import UnknownResourceSectionBlueprint, {
   UnknownResourceScopeType,
 } from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import ClusterComparisonButton from './ClusterComparisonButton';
+import ClusterCompareButton from './ClusterCompareButton';
 import * as S from './NavigatorPane.styled';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
@@ -83,7 +83,7 @@ const NavPane: React.FC = () => {
               isDisabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
             />
           </Badge>
-          <ClusterComparisonButton />
+          <ClusterCompareButton />
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>

@@ -499,6 +499,23 @@ export const mainSlice = createSlice({
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
       state.previewType = undefined;
+      state.previewValuesFileId = undefined;
+      state.previewLoader = {
+        isLoading: false,
+        targetResourceId: undefined,
+      };
+      state.diffResourceId = undefined;
+      state.diffContent = undefined;
+      state.isSelectingFile = false;
+      state.isApplyingResource = false;
+      state.clusterDiff = {
+        hasLoaded: false,
+        hasFailed: false,
+        hideClusterOnlyResources: true,
+        clusterToLocalResourcesMatches: [],
+        diffResourceId: undefined,
+        refreshDiffResource: undefined,
+      };
       resetSelectionHistory(state);
     });
 
