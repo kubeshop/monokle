@@ -12,7 +12,7 @@ import {ClusterToLocalResourcesMatch} from '@models/appstate';
 // import {MonoPaneTitle} from '@components/atoms';
 // import HelmChartSectionBlueprint, {HelmChartScopeType} from '@src/navsections/HelmChartSectionBlueprint';
 // import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
-import {SectionRenderer} from '@components/molecules';
+import {ResourceFilterIconWithPopover, SectionRenderer} from '@components/molecules';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
@@ -36,9 +36,9 @@ const LeftPane = styled.div`
   flex-grow: 1;
 `;
 
-// const FilterContainer = styled.span`
-//   margin-left: 10px;
-// `;
+const FilterContainer = styled.span`
+  margin-left: 10px;
+`;
 
 const RefreshButton = styled(Button)`
   margin-top: 1px;
@@ -74,9 +74,9 @@ function ClusterDiff() {
           <Divider type="vertical" style={{height: 40, marginLeft: 16}} />
           <S.TitleBarRightButtons>
             <ClusterDiffNamespaceFilter />
-            {/* <FilterContainer>
+            <FilterContainer>
               <ResourceFilterIconWithPopover />
-            </FilterContainer> */}
+            </FilterContainer>
           </S.TitleBarRightButtons>
         </S.TitleBar>
         <Divider style={{margin: '8px 0'}} />

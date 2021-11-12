@@ -1,5 +1,5 @@
 import {Button, Input, Select} from 'antd';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 import styled from 'styled-components';
 
@@ -79,6 +79,8 @@ const ResourceFilter = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
 
+  const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
+
   const allResourceKinds = useMemo(() => {
     return [
       ...new Set([
@@ -90,23 +92,16 @@ const ResourceFilter = () => {
     ].sort();
   }, [resourceMap]);
 
-  const getAllLabels = useCallback(() => {
-    const allLabels: Record<string, string[]> = makeKeyValuesFromObjectList(
-      Object.values(resourceMap),
-      resource => resource.content?.metadata?.labels
-    );
-    return allLabels;
+  const allLabels = useMemo<Record<string, string[]>>(() => {
+    return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.labels);
   }, [resourceMap]);
 
-  const getAllAnnotations = useCallback(() => {
-    const allAnnotations: Record<string, string[]> = makeKeyValuesFromObjectList(
-      Object.values(resourceMap),
-      resource => resource.content?.metadata?.annotations
-    );
-    return allAnnotations;
+  const allAnnotations = useMemo<Record<string, string[]>>(() => {
+    return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.annotations);
   }, [resourceMap]);
 
   const resetFilters = () => {
+    setWasLocalUpdate(true);
     setName('');
     setKind(ALL_OPTIONS);
     setNamespace(ALL_OPTIONS);
@@ -114,7 +109,22 @@ const ResourceFilter = () => {
     setAnnotations({});
   };
 
+  const updateName = (newName: string) => {
+    setWasLocalUpdate(true);
+    setName(newName);
+  };
+
+  const updateLabels = (newLabels: Record<string, string | null>) => {
+    setWasLocalUpdate(true);
+    setLabels(newLabels);
+  };
+  const updateAnnotations = (newAnnotations: Record<string, string | null>) => {
+    setWasLocalUpdate(true);
+    setAnnotations(newAnnotations);
+  };
+
   const updateKind = (selectedKind: string) => {
+    setWasLocalUpdate(true);
     if (selectedKind === ALL_OPTIONS) {
       setKind(undefined);
     } else {
@@ -123,6 +133,7 @@ const ResourceFilter = () => {
   };
 
   const updateNamespace = (selectedNamespace: string) => {
+    setWasLocalUpdate(true);
     if (selectedNamespace === ALL_OPTIONS) {
       setNamespace(undefined);
     } else {
@@ -132,6 +143,9 @@ const ResourceFilter = () => {
 
   useDebounce(
     () => {
+      if (!wasLocalUpdate) {
+        return;
+      }
       const updatedFilter = {
         name,
         kind: kind === ALL_OPTIONS ? undefined : kind,
@@ -146,7 +160,17 @@ const ResourceFilter = () => {
   );
 
   useEffect(() => {
-    setNamespace(filtersMap.namespace);
+    if (!wasLocalUpdate) {
+      setName(filtersMap.name);
+      setKind(filtersMap.kind);
+      setNamespace(filtersMap.namespace);
+      setLabels(filtersMap.labels);
+      setAnnotations(filtersMap.annotations);
+    }
+  }, [wasLocalUpdate, filtersMap]);
+
+  useEffect(() => {
+    setWasLocalUpdate(false);
   }, [filtersMap]);
 
   return (
@@ -164,7 +188,7 @@ const ResourceFilter = () => {
           placeholder="All or part of name..."
           defaultValue={name}
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={e => updateName(e.target.value)}
         />
       </FieldContainer>
       <FieldContainer>
@@ -203,10 +227,10 @@ const ResourceFilter = () => {
         </Select>
       </FieldContainer>
       <FieldContainer>
-        <KeyValueInput label="Labels:" data={getAllLabels()} value={labels} onChange={setLabels} />
+        <KeyValueInput label="Labels:" data={allLabels} value={labels} onChange={updateLabels} />
       </FieldContainer>
       <FieldContainer>
-        <KeyValueInput label="Annotations:" data={getAllAnnotations()} value={annotations} onChange={setAnnotations} />
+        <KeyValueInput label="Annotations:" data={allAnnotations} value={annotations} onChange={updateAnnotations} />
       </FieldContainer>
     </BaseContainer>
   );
