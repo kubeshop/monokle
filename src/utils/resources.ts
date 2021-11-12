@@ -1,10 +1,13 @@
-import _ from 'lodash';
 import flatten from 'flat';
+import _ from 'lodash';
+
 import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
+
+import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
+
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';
-import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
 export const makeResourceNameKindNamespaceIdentifier = (resource: K8sResource) =>
   `${resource.name}#${resource.kind}#${resource.namespace ? resource.namespace : 'default'}`;
@@ -22,7 +25,9 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   }
   if (filters.namespace) {
     const resourceNamespace = resource.namespace || 'default';
-    return resourceNamespace === filters.namespace;
+    if (resourceNamespace !== filters.namespace) {
+      return false;
+    }
   }
   if (filters.labels && Object.keys(filters.labels).length > 0) {
     const resourceLabels = resource.content?.metadata?.labels;

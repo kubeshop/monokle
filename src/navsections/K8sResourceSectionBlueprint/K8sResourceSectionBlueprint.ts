@@ -1,9 +1,12 @@
+import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
+
+import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
@@ -27,13 +30,6 @@ ResourceKindHandlers.forEach(kindHandler => {
     kindHandlersBySubsectionName[subsectionName] = [kindHandler];
   }
 });
-
-export type K8sResourceScopeType = {
-  isFolderLoading: boolean;
-  isFolderOpen: boolean;
-  isPreviewLoading: boolean;
-  activeResourcesLength: number;
-};
 
 const childSections = childSectionNames.map(childSectionName => {
   const kindHandlerSections = (kindHandlersBySubsectionName[childSectionName] || []).map(kindHandler =>
@@ -66,6 +62,14 @@ const childSections = childSectionNames.map(childSectionName => {
 
 childSections.forEach(s => sectionBlueprintMap.register(s));
 
+export type K8sResourceScopeType = {
+  isFolderLoading: boolean;
+  isFolderOpen: boolean;
+  isPreviewLoading: boolean;
+  activeResources: K8sResource[];
+  resourceFilter: ResourceFilterType;
+};
+
 const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScopeType> = {
   name: navSectionNames.K8S_RESOURCES,
   id: navSectionNames.K8S_RESOURCES,
@@ -75,11 +79,12 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
       isFolderLoading: state.ui.isFolderLoading,
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isPreviewLoading: state.main.previewLoader.isLoading,
-      activeResourcesLength: Object.values(state.main.resourceMap).filter(
+      activeResources: Object.values(state.main.resourceMap).filter(
         r =>
           (state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
           r.filePath.startsWith(PREVIEW_PREFIX)
-      ).length,
+      ),
+      resourceFilter: state.main.resourceFilter,
     };
   },
   builder: {
@@ -87,10 +92,14 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
       return scope.isFolderLoading || scope.isPreviewLoading;
     },
     isInitialized: scope => {
-      return scope.activeResourcesLength > 0;
+      return scope.activeResources.length > 0;
     },
     isEmpty: scope => {
-      return scope.isFolderOpen && scope.activeResourcesLength === 0;
+      return (
+        scope.isFolderOpen &&
+        (scope.activeResources.length === 0 ||
+          scope.activeResources.every(resource => !isResourcePassingFilter(resource, scope.resourceFilter)))
+      );
     },
     shouldBeVisibleBeforeInitialized: true,
   },

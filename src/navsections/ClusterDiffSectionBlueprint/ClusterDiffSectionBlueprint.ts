@@ -1,7 +1,10 @@
 import {ClusterToLocalResourcesMatch, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {SectionBlueprint} from '@models/navigator';
+
 import {isResourcePassingFilter} from '@utils/resources';
+
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import ClusterDiffSectionEmptyDisplay from './ClusterDiffSectionEmptyDisplay';
 import ClusterDiffSectionNameDisplay from './ClusterDiffSectionNameDisplay';
 import ResourceMatchNameDisplay from './ResourceMatchNameDisplay';
 
@@ -54,10 +57,17 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     isLoading(scope) {
       return scope.isPreviewLoading;
     },
+    isEmpty(_, __, itemInstances) {
+      const isSectionEmpty = Boolean(itemInstances && itemInstances.every(i => !i.isVisible));
+      return isSectionEmpty;
+    },
   },
   customization: {
     nameDisplay: {
       component: ClusterDiffSectionNameDisplay,
+    },
+    emptyDisplay: {
+      component: ClusterDiffSectionEmptyDisplay,
     },
     disableHoverStyle: true,
   },

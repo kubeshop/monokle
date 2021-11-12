@@ -92,7 +92,7 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
     isLoading?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
-    isEmpty?: (scope: ScopeType, items: RawItemType[]) => boolean;
+    isEmpty?: (scope: ScopeType, items: RawItemType[], itemInstances?: ItemInstance[]) => boolean;
     shouldBeVisibleBeforeInitialized?: boolean;
   };
   customization?: SectionCustomization;

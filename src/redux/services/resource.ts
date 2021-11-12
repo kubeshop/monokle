@@ -11,7 +11,13 @@ import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
-import {KUSTOMIZATION_KIND, PREVIEW_PREFIX, UNSAVED_PREFIX, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+import {
+  CLUSTER_DIFF_PREFIX,
+  KUSTOMIZATION_KIND,
+  PREVIEW_PREFIX,
+  UNSAVED_PREFIX,
+  YAML_DOCUMENT_DELIMITER,
+} from '@constants/constants';
 
 import {getFileStats} from '@utils/files';
 
@@ -229,6 +235,9 @@ export function linkResources(
 export function getNamespaces(resourceMap: ResourceMapType) {
   const namespaces: string[] = [];
   Object.values(resourceMap).forEach(e => {
+    if (e.filePath.startsWith(CLUSTER_DIFF_PREFIX)) {
+      return;
+    }
     if (e.namespace && !namespaces.includes(e.namespace)) {
       namespaces.push(e.namespace);
     }
