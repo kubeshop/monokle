@@ -88,9 +88,7 @@ function computeSectionVisibility(
     }
 
     sectionInstance.isVisible =
-      (sectionBlueprint && sectionBlueprint.customization?.emptyDisplay && sectionInstance.isEmpty) ||
-      sectionInstance.isVisible ||
-      Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
+      sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
   }
 
   if (sectionInstance.visibleItemIds) {
@@ -187,6 +185,9 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     const isSectionInitialized = Boolean(
       sectionBuilder?.isInitialized ? sectionBuilder.isInitialized(sectionScope, rawItems) : true
     );
+    const isSectionEmpty = Boolean(
+      sectionBuilder?.isEmpty ? sectionBuilder.isEmpty(sectionScope, rawItems, itemInstances) : false
+    );
     const sectionGroups = sectionBuilder?.getGroups ? sectionBuilder.getGroups(sectionScope) : [];
     const sectionInstanceGroups = sectionGroups.map(g => ({
       ...g,
@@ -201,13 +202,14 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       isLoading: Boolean(sectionBuilder?.isLoading ? sectionBuilder.isLoading(sectionScope, rawItems) : false),
       isVisible:
         Boolean(sectionBuilder?.shouldBeVisibleBeforeInitialized === true && !isSectionInitialized) ||
+        (sectionBlueprint && sectionBlueprint.customization?.emptyDisplay && isSectionEmpty) ||
         (isSectionInitialized &&
           Boolean(sectionBuilder?.isVisible ? sectionBuilder.isVisible(sectionScope, rawItems) : true) &&
           (visibleItemIds.length > 0 || visibleGroupIds.length > 0)),
       isInitialized: isSectionInitialized,
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
-      isEmpty: Boolean(sectionBuilder?.isEmpty ? sectionBuilder.isEmpty(sectionScope, rawItems) : false),
+      isEmpty: isSectionEmpty,
       shouldExpand: Boolean(
         itemInstances?.some(itemInstance => itemInstance.isVisible && itemInstance.shouldScrollIntoView)
       ),
