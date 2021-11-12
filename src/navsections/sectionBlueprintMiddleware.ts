@@ -88,7 +88,9 @@ function computeSectionVisibility(
     }
 
     sectionInstance.isVisible =
-      sectionInstance.isVisible || Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
+      (sectionBlueprint && sectionBlueprint.customization?.emptyDisplay && sectionInstance.isEmpty) ||
+      sectionInstance.isVisible ||
+      Object.values(childSectionVisibilityMap).some(isVisible => isVisible === true);
   }
 
   if (sectionInstance.visibleItemIds) {
