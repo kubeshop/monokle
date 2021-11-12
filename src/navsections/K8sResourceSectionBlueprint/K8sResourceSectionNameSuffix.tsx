@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 
@@ -19,15 +19,27 @@ const S = {
     color: ${Colors.blackPure};
     margin-bottom: 10px;
   `,
+  ClusterOutputTag: styled(Tag)`
+    font-size: 12px;
+    font-weight: 700;
+    background: ${BackgroundColors.clusterModeBackground};
+    color: ${Colors.blackPure};
+    margin-bottom: 10px;
+  `,
 };
 
 function K8sResourceSectionNameSuffix() {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   if (isInPreviewMode) {
     return (
       <S.Container>
-        <S.PreviewOutputTag>Preview Output</S.PreviewOutputTag>
+        {isInClusterMode ? (
+          <S.ClusterOutputTag>Cluster Preview Output</S.ClusterOutputTag>
+        ) : (
+          <S.PreviewOutputTag>Preview Output</S.PreviewOutputTag>
+        )}
       </S.Container>
     );
   }
