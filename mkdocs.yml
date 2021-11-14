@@ -16,8 +16,8 @@ theme:
     - navigation.expand
 nav:
   - Welcome: index.md
+  - Getting Started: getting-started.md
   - Feature Overview: features.md
-  - Development: development.md
   - UI Overview: overview.md
   - Navigating Resources: resource-navigation.md
   - Resource Editing: resource-editing.md
@@ -25,6 +25,7 @@ nav:
   - Working with Helm Charts: helm.md
   - Cluster Integration: cluster-integration.md
   - Apply/Diff: apply-and-diff.md
+  - Development: development.md
   - Architecture: architecture.md
   - FAQ: faq.md
   - Tutorials:

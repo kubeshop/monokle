@@ -15,11 +15,9 @@ Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 - Refactor resources with maintained integrity of names and references
 - Preview and debug resources generated with kustomize or helm
 - Diff resources against your cluster and apply changes immediately
-- And much more...
+- And much more, check out the [Documentation](https://kubeshop.github.io/monokle/)
 
-Read the [Feature Overview](./docs/features.md) document or read the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview
-
-![Monokle 1.0 Walkthrough](docs/img/monokle-welcome.png)
+Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) document or the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview.
 
 ## Download & Install
 
@@ -33,6 +31,9 @@ Download and install the latest version below
 
 [**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.exe` file
 
+### Linux (since Monokle 1.3.0)
+
+[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.appImage`/`.deb` file for your platform
 
 ## Roadmap
 
@@ -51,9 +52,7 @@ Don't hesitate provide any feedback you might have to help us prioritize and imp
 - Check out our [Contributor Guide](https://github.com/kubeshop/.github/blob/main/CONTRIBUTING.md) and
   [Code of Conduct](https://github.com/kubeshop/.github/blob/main/CODE_OF_CONDUCT.md)
 - Fork/Clone the repo and make sure you can run it as shown above
-- Check out the [Development](docs/development.md) document for building and running steps
+- Check out the [Development](docs/development.md) document for how to build and run Monokle from its source
 - Check out the [Architecture](docs/architecture.md) document to get a high-level understanding of how Monokle works
 - Check out the Roadmap above and open [issues](https://github.com/kubeshop/monokle/issues) here on GitHub
-- Get in touch with the team by starting a [discussion]() on what you want to help with - or open an issue of your own
-  that you would like to contribute to the project.
-- Don't hesitate to say hi to the team and ask questions on our [Discord server](https://discord.gg/uNuhy6GDyn)
+- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn)
