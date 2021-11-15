@@ -1,6 +1,6 @@
 # Monokle
 
-[![Release](https://img.shields.io/github/v/release/kubeshop/monokle)]([https://](https://github.com/kubeshop/monokle/releases/latest))
+[![Release](https://img.shields.io/github/v/release/kubeshop/monokle)](<[https://](https://github.com/kubeshop/monokle/releases/latest)>)
 [![License](https://img.shields.io/github/license/kubeshop/monokle)](https://github.com/kubeshop/monokle/blob/main/LICENSE)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/kMJxmuYTMu)
 [![Nightly Build](https://img.shields.io/github/workflow/status/kubeshop/monokle/monokle-build-nightly?label=nightly-build)](https://github.com/kubeshop/monokle/tags)
@@ -9,6 +9,8 @@
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
 > Read the [1.2.0 Release blog-post](https://medium.com/kubeshop-i/monokle-1-2-0-is-out-2492341f0874)
+
+![Monokle Overview](docs/img/monokle-overview.gif)
 
 - Quickly get a high-level view of your manifests, their contained resources and relationships
 - Easily edit resources without having to learn or look up yaml syntax
