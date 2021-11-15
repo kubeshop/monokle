@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -164,7 +164,7 @@
       "entitlementsInherit": "./electron/src/entitlements.mac.inherit.plist",
       "target": [
         {
-          "target": "dmg",
+          "target": "default",
           "arch": [
             "universal"
           ]
