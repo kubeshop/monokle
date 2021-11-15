@@ -1,8 +1,11 @@
+import {Button, Skeleton, Tabs} from 'antd';
 import styled from 'styled-components';
+
 import {PaneContainer} from '@atoms';
-import {Tabs, Button, Skeleton} from 'antd';
 
 export const StyledTabs = styled(Tabs)`
+  overflow: visible;
+
   & .ant-tabs-nav {
     padding: 0 16px;
     margin-bottom: 0px;
@@ -15,7 +18,6 @@ export const StyledTabs = styled(Tabs)`
 
 export const ActionsPaneContainer = styled(PaneContainer)`
   height: 100%;
-  overflow-y: hidden;
 `;
 
 export const TitleBarContainer = styled.div`
