@@ -24,6 +24,7 @@ nav:
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
   - Cluster Integration: cluster-integration.md
+  - Cluster Compare: cluster-compare.md
   - Apply/Diff: apply-and-diff.md
   - Development: development.md
   - Architecture: architecture.md
