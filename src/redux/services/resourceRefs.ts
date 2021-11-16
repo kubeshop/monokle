@@ -1,5 +1,4 @@
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
-import {Draft} from '@reduxjs/toolkit';
 
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
@@ -516,7 +515,7 @@ export function processRefs(
  * Return a list of resource ids to reprocess when the specified resource has been updated
  */
 
-export function findResourcesToReprocess(resource: Draft<K8sResource>, resourceMap: ResourceMapType) {
+export function findResourcesToReprocess(resource: K8sResource, resourceMap: ResourceMapType) {
   // the resource itself
   let resources = [resource.id];
 
