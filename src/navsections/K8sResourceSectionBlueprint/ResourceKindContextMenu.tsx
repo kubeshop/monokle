@@ -1,22 +1,19 @@
-import React from 'react';
 import {Dropdown} from 'antd';
+import React from 'react';
+import {useSelector} from 'react-redux';
 import styled from 'styled-components';
-import {FormOutlined} from '@ant-design/icons';
-import ResourceActionsMenu from '@components/molecules/ResourceActionsMenu';
+
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {useSelector} from 'react-redux';
-import Colors from '@styles/Colors';
+
 import {ItemCustomComponentProps} from '@models/navigator';
 
-const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
-  color: ${props => (props.isSelected ? Colors.blackPure : Colors.whitePure)};
-  cursor: pointer;
-`;
+import {Dots} from '@atoms';
 
-const StyledActionsMenuIcon = styled(FormOutlined)`
-  font-size: 14px;
-  padding: 0 10px;
+import ResourceActionsMenu from '@components/molecules/ResourceActionsMenu';
+
+const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
+  cursor: pointer;
 `;
 
 const ContextMenu = (props: ItemCustomComponentProps) => {
@@ -45,7 +42,7 @@ const ContextMenu = (props: ItemCustomComponentProps) => {
       overlayStyle={{width: 100}}
     >
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
-        <StyledActionsMenuIcon />
+        <Dots />
       </StyledActionsMenuIconContainer>
     </Dropdown>
   );
