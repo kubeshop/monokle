@@ -98,6 +98,7 @@ const ResourceDiff = (props: {
     minimap: {
       enabled: false,
     },
+    readOnly: true,
   };
 
   const localResourceText = useMemo(() => {

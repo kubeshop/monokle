@@ -101,6 +101,7 @@ const DiffModal = () => {
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
   const options = {
+    readOnly: true,
     renderSideBySide: true,
     minimap: {
       enabled: false,
