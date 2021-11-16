@@ -1,13 +1,17 @@
-import {K8sResource} from '@models/k8sresource';
-import log from 'loglevel';
 import Ajv, {ValidateFunction} from 'ajv';
+import log from 'loglevel';
+
 import {isKustomizationPatch} from '@redux/services/kustomize';
+
+import {K8sResource} from '@models/k8sresource';
+
 import {getResourceSchema} from './schema';
 
 /**
  * Validates the specified resource against its JSON Schema and adds validation details
  */
 
+const ignoredProperties = ['lastProbeTime', 'creationTimestamp'];
 const validatorCache = new Map<string, ValidateFunction>();
 
 export function validateResource(resource: K8sResource) {
@@ -28,11 +32,11 @@ export function validateResource(resource: K8sResource) {
   const validate = validatorCache.get(resource.kind);
   if (validate) {
     try {
-      const validationResult = validate(resource.content);
-      resource.validation = {
-        isValid: Boolean(validationResult),
-        errors: validate.errors
-          ? validate.errors.map(err => {
+      validate(resource.content);
+      const errors = validate.errors
+        ? validate.errors
+            .filter(err => !ignoredProperties.some(ignored => err.dataPath.endsWith(ignored)))
+            .map(err => {
               const error = {
                 property: err.dataPath,
                 message: err.message || 'message',
@@ -45,7 +49,11 @@ export function validateResource(resource: K8sResource) {
               }
               return error;
             })
-          : [],
+        : [];
+
+      resource.validation = {
+        isValid: errors.length === 0,
+        errors,
       };
     } catch (e) {
       log.warn('Failed to validate', e);
