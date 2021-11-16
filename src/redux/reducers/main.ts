@@ -4,6 +4,7 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {parseDocument} from 'yaml';
 
+import {findResourcesToReprocess} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -264,11 +265,21 @@ export const mainSlice = createSlice({
               action.payload.content,
               filePath.substring(rootFolder.length)
             );
+
+            let resourceIds: string[] = [];
+
+            // only recalculate refs for resources that already have refs
+            Object.values(state.resourceMap)
+              .filter(r => r.refs)
+              .forEach(r => resourceIds.push(r.id));
+
             Object.values(extractedResources).forEach(r => {
               state.resourceMap[r.id] = r;
               r.isHighlighted = true;
+              resourceIds.push(r.id);
             });
-            reprocessResources([], state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
+
+            reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
               resourceKinds: extractedResources.map(r => r.kind),
             });
           }
@@ -296,7 +307,10 @@ export const mainSlice = createSlice({
             resource.text = action.payload.content;
             resource.content = parseDocument(action.payload.content).toJS();
           }
-          reprocessResources([resource.id], state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
+
+          let resources = findResourcesToReprocess(resource, state.resourceMap);
+
+          reprocessResources(resources, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
           if (!action.payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
             updateSelectionAndHighlights(state, resource);

@@ -1,4 +1,5 @@
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+import {Draft} from '@reduxjs/toolkit';
 
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
@@ -509,4 +510,31 @@ export function processRefs(
   });
 
   cleanResourceRefs(resources);
+}
+
+/**
+ * Return a list of resource ids to reprocess when the specified resource has been updated
+ */
+
+export function findResourcesToReprocess(resource: Draft<K8sResource>, resourceMap: ResourceMapType) {
+  // the resource itself
+  let resources = [resource.id];
+
+  // all existing resources with incoming refs to the resource (since they might have broken)
+  resource.refs
+    ?.filter(ref => isIncomingRef(ref.type))
+    .forEach(ref => {
+      if (ref.target?.type === 'resource' && ref.target.resourceId) {
+        resources.push(ref.target.resourceId);
+      }
+    });
+
+  // all existing resources with broken refs (since they might now work) -> this should be improved to
+  // only return resources that could actually refer to the updated resource.
+  Object.values(resourceMap)
+    .filter(r => resources.indexOf(r.id) === -1)
+    .filter(r => r.refs?.some(ref => isUnsatisfiedRef(ref.type)))
+    .forEach(r => resources.push(r.id));
+
+  return resources;
 }
