@@ -16,11 +16,15 @@ import * as k8s from '@kubernetes/client-node';
  * Utility to convert list of objects returned by k8s api to a single YAML document
  */
 
-export function getK8sObjectsAsYaml(items: any[], kind: string, apiVersion: string) {
+export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: string): string {
   return items
     .map(item => {
       delete item.metadata?.managedFields;
-      return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
+      if (kind && apiVersion) {
+        return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
+      }
+
+      return stringify(item);
     })
     .join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
 }
