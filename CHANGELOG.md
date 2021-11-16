@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/kubeshop/monokle/compare/v1.3.0...v1.3.1) (2021-11-15)
+
+
+### Bug Fixes
+
+* fixed behavior when context-sensitive pop-up was cropped ([4170209](https://github.com/kubeshop/monokle/commit/4170209c862c0c4a2d32084d294f2ac03c793a6c))
+
 ## [1.3.0](https://github.com/kubeshop/monokle/compare/v1.1.0...v1.3.0) (2021-11-12)
 
 
