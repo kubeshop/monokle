@@ -60,7 +60,6 @@ const NodeTitleContainer = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: ${Colors.blue10};
 `;
 
 const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) => {
@@ -129,6 +128,9 @@ const FileTreeContainer = styled.div`
   }
   & .ant-tree-treenode-selected::before {
     background: ${Colors.selectionGradient} !important;
+  }
+  & .file-entry-name {
+    color: ${Colors.blue10};
   }
   & .ant-tree-treenode-selected .file-entry-name {
     color: ${Colors.blackPure} !important;
@@ -225,12 +227,18 @@ const TreeTitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  height: 100%;
+
+  & .ant-dropdown-trigger {
+    height: inherit;
+    margin-right: 10px;
+  }
 `;
 
 const TreeTitleText = styled.span`
   flex: 1;
   overflow: hidden;
-  color: black;
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -248,16 +256,19 @@ const TreeItem: React.FC<any> = props => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const [isTitleHovered, setTitleHoverState] = useState(false);
 
+  const relativePath: string =
+    fileMap[ROOT_FILE_ENTRY].filePath === treeKey ? treeKey.split('/').reverse()[0] : treeKey;
+
+  const fullPath =
+    fileMap[ROOT_FILE_ENTRY].filePath === treeKey
+      ? fileMap[ROOT_FILE_ENTRY].filePath
+      : `${fileMap[ROOT_FILE_ENTRY].filePath}${treeKey}`;
+
   const platformFilemanagerNames: {[name: string]: string} = {
     darwin: 'finder',
   };
 
   const platformFilemanagerName = platformFilemanagerNames[os.platform()] || 'explorer';
-
-  const pathToFile =
-    fileMap[ROOT_FILE_ENTRY].filePath === treeKey
-      ? fileMap[ROOT_FILE_ENTRY].filePath
-      : `${fileMap[ROOT_FILE_ENTRY].filePath}${treeKey}`;
 
   const menu = (
     <Menu>
@@ -265,11 +276,31 @@ const TreeItem: React.FC<any> = props => {
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          shell.showItemInFolder(pathToFile);
+          shell.showItemInFolder(fullPath);
         }}
         key="reveal_in_finder"
       >
         Reveal in {platformFilemanagerName}
+      </Menu.Item>
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+
+          navigator.clipboard.writeText(fullPath);
+        }}
+        key="copy_full_path"
+      >
+        Copy path
+      </Menu.Item>
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+
+          navigator.clipboard.writeText(relativePath);
+        }}
+        key="copy_relative_path"
+      >
+        Copy relative path
       </Menu.Item>
     </Menu>
   );
@@ -286,7 +317,11 @@ const TreeItem: React.FC<any> = props => {
       <TreeTitleText>{title}</TreeTitleText>
       {isTitleHovered ? (
         <ContextMenu overlay={menu}>
-          <div>
+          <div
+            onClick={e => {
+              e.stopPropagation();
+            }}
+          >
             <Dots />
           </div>
         </ContextMenu>
@@ -482,6 +517,10 @@ const FileTreePane = () => {
   }, [tree]);
 
   const onToggleTree = () => {
+    if (!expandedKeys.includes(fileMap[ROOT_FILE_ENTRY].filePath)) {
+      return setExpandedKeys(allTreeKeys);
+    }
+
     setExpandedKeys(prevState => (prevState.length ? [] : allTreeKeys));
   };
 
