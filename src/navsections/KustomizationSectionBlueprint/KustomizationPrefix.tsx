@@ -1,6 +1,8 @@
-import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
-import {ItemCustomComponentProps} from '@models/navigator';
 import {useAppSelector} from '@redux/hooks';
+
+import {ItemCustomComponentProps} from '@models/navigator';
+
+import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
 
 const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
@@ -8,7 +10,14 @@ const Prefix = (props: ItemCustomComponentProps) => {
   if (!resource) {
     return null;
   }
-  return <ResourceRefsIconPopover isDisabled={itemInstance.isDisabled} resource={resource} type="incoming" />;
+  return (
+    <ResourceRefsIconPopover
+      isSelected={itemInstance.isSelected}
+      isDisabled={itemInstance.isDisabled}
+      resource={resource}
+      type="incoming"
+    />
+  );
 };
 
 export default Prefix;
