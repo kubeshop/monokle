@@ -1,8 +1,9 @@
-import {Button, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
-import {ipcRenderer} from 'electron';
+import {Button, Menu, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
+import {ipcRenderer, shell} from 'electron';
 import micromatch from 'micromatch';
+import os from 'os';
 import path from 'path';
-import React, {useCallback, useContext, useEffect, useMemo} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import styled from 'styled-components';
 
@@ -20,7 +21,9 @@ import {FileEntry} from '@models/fileentry';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import FileExplorer from '@atoms/FileExplorer';
 
+import Dots from '@components/atoms/Dots';
 import Icon from '@components/atoms/Icon';
+import ContextMenu from '@components/molecules/ContextMenu';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -121,7 +124,7 @@ const FileTreeContainer = styled.div`
     margin-left: 0px !important;
     border-left: 8px hidden transparent;
     padding-left: 8px;
-    padding-bottom: 2px;
+    padding-bottom: 0px;
     background: ${Colors.selectionGradient} !important;
   }
   & .ant-tree-treenode-selected::before {
@@ -218,6 +221,18 @@ const RightButtons = styled.div`
   }
 `;
 
+const TreeTitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const TreeTitleText = styled.span`
+  flex: 1;
+  overflow: hidden;
+  color: black;
+`;
+
 const StyledSkeleton = styled(Skeleton)`
   margin: 20px;
   width: 90%;
@@ -226,6 +241,59 @@ const StyledSkeleton = styled(Skeleton)`
 const ReloadButton = styled(Button)``;
 
 const BrowseButton = styled(Button)``;
+
+const TreeItem: React.FC<any> = props => {
+  const {title, treeKey} = props;
+
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const [isTitleHovered, setTitleHoverState] = useState(false);
+
+  const platformFilemanagerNames: {[name: string]: string} = {
+    darwin: 'finder',
+  };
+
+  const platformFilemanagerName = platformFilemanagerNames[os.platform()] || 'explorer';
+
+  const pathToFile =
+    fileMap[ROOT_FILE_ENTRY].filePath === treeKey
+      ? fileMap[ROOT_FILE_ENTRY].filePath
+      : `${fileMap[ROOT_FILE_ENTRY].filePath}${treeKey}`;
+
+  const menu = (
+    <Menu>
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+
+          shell.showItemInFolder(pathToFile);
+        }}
+        key="reveal_in_finder"
+      >
+        Reveal in {platformFilemanagerName}
+      </Menu.Item>
+    </Menu>
+  );
+
+  return (
+    <TreeTitleWrapper
+      onMouseEnter={() => {
+        setTitleHoverState(true);
+      }}
+      onMouseLeave={() => {
+        setTitleHoverState(false);
+      }}
+    >
+      <TreeTitleText>{title}</TreeTitleText>
+      {isTitleHovered ? (
+        <ContextMenu overlay={menu}>
+          <div>
+            <Dots />
+          </div>
+        </ContextMenu>
+      ) : null}
+    </TreeTitleWrapper>
+  );
+};
 
 const FileTreePane = () => {
   const {windowSize} = useContext(AppContext);
@@ -245,11 +313,11 @@ const FileTreePane = () => {
   const recentFolders = useAppSelector(state => state.config.recentFolders);
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
-  const [tree, setTree] = React.useState<TreeNode | null>(null);
-  const [expandedKeys, setExpandedKeys] = React.useState<Array<React.Key>>([]);
-  const [highlightNode, setHighlightNode] = React.useState<TreeNode>();
-  const [autoExpandParent, setAutoExpandParent] = React.useState(true);
-  const treeRef = React.useRef<any>();
+  const [tree, setTree] = useState<TreeNode | null>(null);
+  const [expandedKeys, setExpandedKeys] = useState<Array<React.Key>>([]);
+  const [highlightNode, setHighlightNode] = useState<TreeNode>();
+  const [autoExpandParent, setAutoExpandParent] = useState(true);
+  const treeRef = useRef<any>();
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
@@ -473,6 +541,9 @@ const FileTreePane = () => {
           ref={treeRef}
           expandedKeys={expandedKeys}
           onExpand={onExpand}
+          titleRender={event => {
+            return <TreeItem treeKey={event.key} title={event.title} />;
+          }}
           autoExpandParent={autoExpandParent}
           selectedKeys={[selectedPath || '-']}
           filterTreeNode={node => {

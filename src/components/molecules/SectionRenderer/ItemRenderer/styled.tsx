@@ -1,5 +1,6 @@
-import Colors from '@styles/Colors';
 import styled from 'styled-components';
+
+import Colors from '@styles/Colors';
 
 export const ItemContainer = styled.li<{
   isSelected: boolean;
@@ -52,6 +53,9 @@ export const ItemName = styled.span<{
 }>`
   padding: 2px 0;
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   ${props => {
     if (props.isSelected) {
       return `font-weight: 700;`;
