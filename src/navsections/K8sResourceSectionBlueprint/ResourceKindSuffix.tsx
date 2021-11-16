@@ -1,11 +1,15 @@
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import Colors from '@styles/Colors';
 import {Popover} from 'antd';
 import styled from 'styled-components';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {showValidationErrorsModal} from '@redux/reducers/ui';
-import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
+
 import {ItemCustomComponentProps} from '@models/navigator';
+
+import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
+
+import Colors from '@styles/Colors';
 
 const StyledIconsContainer = styled.span`
   display: flex;
@@ -30,7 +34,12 @@ const Suffix = (props: ItemCustomComponentProps) => {
 
   return (
     <>
-      <ResourceRefsIconPopover isDisabled={itemInstance.isDisabled} resource={resource} type="outgoing" />
+      <ResourceRefsIconPopover
+        isSelected={itemInstance.isSelected}
+        isDisabled={itemInstance.isDisabled}
+        resource={resource}
+        type="outgoing"
+      />
       {resource.validation && !resource.validation.isValid && (
         <Popover
           placement="right"

@@ -1,12 +1,18 @@
 import React from 'react';
-import MonokleIncomingRefs from '@assets/MonokleIncomingRefs.svg';
-import MonokleOutgoingRefs from '@assets/MonokleOutgoingRefs.svg';
-import MonokleWarning from '@assets/MonokleWarning.svg';
+
 import {ExclamationCircleOutlined} from '@ant-design/icons';
+
+import MonokleIncomingRefs from '@assets/MonokleIncomingRefs.svg';
+import MonokleIncomingRefsBlack from '@assets/MonokleIncomingRefsBlack.svg';
+import MonokleOutgoingRefs from '@assets/MonokleOutgoingRefs.svg';
+import MonokleOutgoingRefsBlack from '@assets/MonokleOutgoingRefsBlack.svg';
+import MonokleWarning from '@assets/MonokleWarning.svg';
 
 export enum MonoIconTypes {
   IncomingRefs,
+  IncomingRefsBlack,
   OutgoingRefs,
+  OutgoingRefsBlack,
   Warning,
   Error,
 }
@@ -26,8 +32,14 @@ const getIconSvg = (type: MonoIconTypes) => {
     case MonoIconTypes.IncomingRefs:
       return MonokleIncomingRefs;
 
+    case MonoIconTypes.IncomingRefsBlack:
+      return MonokleIncomingRefsBlack;
+
     case MonoIconTypes.OutgoingRefs:
       return MonokleOutgoingRefs;
+
+    case MonoIconTypes.OutgoingRefsBlack:
+      return MonokleOutgoingRefsBlack;
 
     case MonoIconTypes.Warning:
       return MonokleWarning;
