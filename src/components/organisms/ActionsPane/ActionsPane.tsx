@@ -175,6 +175,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     helmChartMap,
     helmValuesMap,
     selectedValuesFileId,
+    kubeconfigContext,
   ]);
 
   useEffect(() => {

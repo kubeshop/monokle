@@ -1,4 +1,3 @@
-import {spawn} from 'child_process';
 import fs from 'fs';
 import log from 'loglevel';
 
@@ -6,29 +5,17 @@ import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteFileEntryPath} from '@redux/services/fileEntry';
 import {AppDispatch} from '@redux/store';
+import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {FileMapType} from '@models/appstate';
-
-import {PROCESS_ENV} from '@utils/env';
-import {getShellPath} from '@utils/shell';
 
 /**
  * Invokes kubectl for the content of the specified resource
  */
 
 function applyFileToCluster(filePath: string, kubeconfig: string, context: string) {
-  const child = spawn('kubectl', ['--context', context, 'apply', '-f', '-'], {
-    env: {
-      NODE_ENV: PROCESS_ENV.NODE_ENV,
-      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-      PATH: getShellPath(),
-      KUBECONFIG: kubeconfig,
-    },
-  });
-  child.stdin.write(fs.readFileSync(filePath, 'utf8'));
-  child.stdin.end();
-  return child;
+  return applyYamlToCluster(fs.readFileSync(filePath, 'utf8'), kubeconfig, context);
 }
 
 /**

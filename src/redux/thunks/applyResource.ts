@@ -7,6 +7,7 @@ import {setApplyingResource, setClusterDiffRefreshDiffResource, updateResource} 
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kustomize';
 import {AppDispatch} from '@redux/store';
+import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {getResourceFromCluster} from '@redux/thunks/utils';
 
 import {AlertEnum, AlertType} from '@models/alert';
@@ -23,17 +24,7 @@ import {performResourceDiff} from './diffResource';
  */
 
 function applyK8sResource(resource: K8sResource, kubeconfig: string, context: string) {
-  const child = spawn('kubectl', ['--context', context, 'apply', '-f', '-'], {
-    env: {
-      NODE_ENV: PROCESS_ENV.NODE_ENV,
-      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-      PATH: getShellPath(),
-      KUBECONFIG: kubeconfig,
-    },
-  });
-  child.stdin.write(resource.text);
-  child.stdin.end();
-  return child;
+  return applyYamlToCluster(resource.text, kubeconfig, context);
 }
 
 /**
