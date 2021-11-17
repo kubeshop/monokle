@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - auto-updater
   release:
     types:
       - prereleased
