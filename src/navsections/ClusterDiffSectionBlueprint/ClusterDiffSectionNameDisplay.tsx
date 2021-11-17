@@ -2,8 +2,12 @@ import {Button, Tag} from 'antd';
 import React from 'react';
 import styled from 'styled-components';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {isInPreviewModeSelector} from '@redux/selectors';
+import {stopPreview} from '@redux/services/preview';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+
+import {PreviewDropdown} from '@components/molecules';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
@@ -43,8 +47,14 @@ const ReloadButton = styled(Button)`
 
 function ResourceDiffSectionNameDisplay() {
   const dispatch = useAppDispatch();
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
   const onClickReload = () => {
     dispatch(loadClusterDiff());
+  };
+
+  const onClickExitPreview = () => {
+    stopPreview(dispatch);
   };
 
   return (
@@ -52,11 +62,17 @@ function ResourceDiffSectionNameDisplay() {
       <TagsContainer>
         <TagWrapper>
           <StyledTag>Local Resources</StyledTag>
+          {isInPreviewMode && (
+            <Button type="primary" ghost onClick={onClickExitPreview} style={{marginLeft: 8}}>
+              Exit preview
+            </Button>
+          )}
+          <PreviewDropdown />
         </TagWrapper>
         <Spacing />
         <TagWrapper>
           <StyledTag>Cluster Resources</StyledTag>
-          <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} size="small" type="primary" ghost>
+          <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} type="primary" ghost>
             Reload
           </ReloadButton>
         </TagWrapper>

@@ -411,6 +411,7 @@ export const mainSlice = createSlice({
       state.previewType = undefined;
       state.currentSelectionHistoryIndex = undefined;
       state.selectionHistory = [];
+      state.clusterDiff.shouldReload = true;
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;
@@ -451,6 +452,7 @@ export const mainSlice = createSlice({
         state.selectedResourceId = action.payload.previewResourceId;
         state.selectedPath = undefined;
         state.selectedValuesFileId = undefined;
+        state.clusterDiff.shouldReload = true;
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -595,12 +597,14 @@ export const mainSlice = createSlice({
         state.clusterDiff.hasLoaded = false;
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
+        state.clusterDiff.shouldReload = undefined;
       })
       .addCase(loadClusterDiff.rejected, state => {
         state.clusterDiff.hasLoaded = true;
         state.clusterDiff.hasFailed = true;
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
+        state.clusterDiff.shouldReload = undefined;
       })
       .addCase(loadClusterDiff.fulfilled, (state, action) => {
         const clusterResourceMap = action.payload.resourceMap;
@@ -698,6 +702,7 @@ export const mainSlice = createSlice({
         state.clusterDiff.hasFailed = false;
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
+        state.clusterDiff.shouldReload = undefined;
       });
 
     builder.addCase(closeClusterDiff.type, state => {
@@ -710,6 +715,7 @@ export const mainSlice = createSlice({
       state.clusterDiff.hasFailed = false;
       state.clusterDiff.diffResourceId = undefined;
       state.clusterDiff.refreshDiffResource = undefined;
+      state.clusterDiff.shouldReload = undefined;
     });
 
     builder.addMatcher(
