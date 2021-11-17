@@ -77,20 +77,38 @@ jobs:
           ls -la
           npm list --depth=1
 
-      - name: Apply tag
-        run: |
-          git tag latest-version || true
-          git push origin latest-version || true
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
-
       - name: Build
         run: |
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+
+      - name: Package and build
+        run: |
+          npm exec -c "electron-builder --publish \"always\""
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+          NOTARIZE: true
+          CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        if: github.ref != 'refs/heads/auto-updater'
+
+      - name: Package and build
+        run: |
+          npm exec -c "electron-builder --publish \"always\""
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+          NOTARIZE: true
+          CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        if: github.ref != 'refs/heads/auto-updater'
 
       - name: Package
         run: |
@@ -103,6 +121,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        if: github.ref == 'refs/heads/auto-updater'
 
       # Check Binary Size
       - name: Build Succeeded
@@ -114,11 +133,12 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip"'
+          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
           draft: true
           omitBody: true
           token: ${{ secrets.github_token }}
           tag: latest-version
+        if: github.ref == 'refs/heads/auto-updater'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -203,14 +223,6 @@ jobs:
           cmd /r dir
           npm list --depth=1
 
-      - name: Apply tag
-        run: |
-          git tag latest-version || true
-          git push origin latest-version || true
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
-
       - name: Build
         run: |
           npm run electron:build:ci
@@ -237,11 +249,12 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap"'
+          artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap'
           draft: true
           omitBody: true
           token: ${{ secrets.github_token }}
           tag: latest-version
+        if: github.ref == 'refs/heads/auto-updater'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2

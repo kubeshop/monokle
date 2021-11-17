@@ -60,14 +60,6 @@ jobs:
           ls -la
           npm list --depth=1
 
-      - name: Apply tag
-        run: |
-          git tag latest-version || true
-          git push origin latest-version || true
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
-
       - name: Build
         run: |
           npm run electron:build:ci
@@ -75,12 +67,21 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
+      - name: Package and publish
+        run: |
+          npm exec -c "electron-builder --publish \"always\""
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+        if: github.ref != 'refs/heads/auto-updater'
+
       - name: Package
         run: |
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
+        if: github.ref == 'refs/heads/auto-updater'
 
       # Check Binary Size
       - name: Build Succeeded
@@ -92,18 +93,12 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage"'
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
           draft: true
           omitBody: true
           token: ${{ secrets.github_token }}
           tag: latest-version
-
-      # - name: Upload Release Assets
-      #   uses: erdkse/upload-assets@v1.0.1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.github_token }}
-      #   with:
-      #     asset_paths: '["dist/latest-linux.yml", "dist/latest-linux-arm64.yml", "dist/Monokle-linux-*"]'
+        if: github.ref == 'refs/heads/auto-updater'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
