@@ -39,7 +39,6 @@ const ContextMenu = (props: ItemCustomComponentProps) => {
       }
       trigger={['click']}
       placement="bottomCenter"
-      overlayStyle={{width: 100}}
     >
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
         <Dots />

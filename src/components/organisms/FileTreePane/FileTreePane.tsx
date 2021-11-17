@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-imports-ts */
 import {Button, Menu, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
 import {ipcRenderer, shell} from 'electron';
 import micromatch from 'micromatch';
@@ -8,13 +9,17 @@ import {useSelector} from 'react-redux';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
+// import {setAlert} from '@redux/reducers/alert';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {stopPreview} from '@redux/services/preview';
+import store from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {AlertEnum} from '@models/alert';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 
@@ -32,7 +37,7 @@ import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {BrowseFolderTooltip, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
 
-import {getFileStats} from '@utils/files';
+import {deleteFileOrDirectory, getFileStats} from '@utils/files';
 import {uniqueArr} from '@utils/index';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
@@ -44,7 +49,11 @@ interface TreeNode {
   title: React.ReactNode;
   children: TreeNode[];
   highlight: boolean;
+  /**
+   * Whether the TreeNode has children
+   */
   isLeaf?: boolean;
+  icon?: React.ReactNode;
 }
 
 const StyledNumberOfResources = styled(Typography.Text)`
@@ -88,10 +97,12 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
   };
 
   if (fileEntry.children) {
-    node.children = fileEntry.children
-      .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
-      .filter(childEntry => childEntry)
-      .map(childEntry => createNode(childEntry, fileMap, resourceMap));
+    if (fileEntry.children.length) {
+      node.children = fileEntry.children
+        .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
+        .filter(childEntry => childEntry)
+        .map(childEntry => createNode(childEntry, fileMap, resourceMap));
+    }
   } else {
     node.isLeaf = true;
   }
@@ -239,6 +250,7 @@ const TreeTitleWrapper = styled.div`
 const TreeTitleText = styled.span`
   flex: 1;
   overflow: hidden;
+  position: relative;
 `;
 
 const StyledSkeleton = styled(Skeleton)`
@@ -250,14 +262,19 @@ const ReloadButton = styled(Button)``;
 
 const BrowseButton = styled(Button)``;
 
-const TreeItem: React.FC<any> = props => {
+interface TreeItemProps {
+  title: React.ReactNode;
+  treeKey: string | number;
+}
+
+const TreeItem: React.FC<TreeItemProps> = props => {
   const {title, treeKey} = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const [isTitleHovered, setTitleHoverState] = useState(false);
 
-  const relativePath: string =
-    fileMap[ROOT_FILE_ENTRY].filePath === treeKey ? treeKey.split('/').reverse()[0] : treeKey;
+  const relativePath =
+    fileMap[ROOT_FILE_ENTRY].filePath === treeKey ? treeKey.split('/').reverse()[0] : String(treeKey);
 
   const fullPath =
     fileMap[ROOT_FILE_ENTRY].filePath === treeKey
@@ -269,6 +286,27 @@ const TreeItem: React.FC<any> = props => {
   };
 
   const platformFilemanagerName = platformFilemanagerNames[os.platform()] || 'explorer';
+
+  const onDeleting = (args: any) => {
+    const {isDirectory, name, err = undefined} = args;
+    if (err) {
+      return store.dispatch(
+        setAlert({
+          title: 'Deleting failed',
+          message: `Something went wrong during deleting a ${isDirectory ? 'directory' : 'file'}`,
+          type: AlertEnum.Error,
+        })
+      );
+    }
+
+    store.dispatch(
+      setAlert({
+        title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
+        message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
+        type: AlertEnum.Success,
+      })
+    );
+  };
 
   const menu = (
     <Menu>
@@ -296,11 +334,21 @@ const TreeItem: React.FC<any> = props => {
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          navigator.clipboard.writeText(relativePath);
+          navigator.clipboard.writeText(String(relativePath));
         }}
         key="copy_relative_path"
       >
         Copy relative path
+      </Menu.Item>
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+
+          deleteFileOrDirectory(fullPath, onDeleting);
+        }}
+        key="delete"
+      >
+        Delete
       </Menu.Item>
     </Menu>
   );
@@ -581,7 +629,7 @@ const FileTreePane = () => {
           expandedKeys={expandedKeys}
           onExpand={onExpand}
           titleRender={event => {
-            return <TreeItem treeKey={event.key} title={event.title} />;
+            return <TreeItem treeKey={event.key} title={event.title} {...event} />;
           }}
           autoExpandParent={autoExpandParent}
           selectedKeys={[selectedPath || '-']}
