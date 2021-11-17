@@ -104,18 +104,6 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
 
-      # - name: Create Release
-      #   uses: actions/create-release@v1
-      #   id: latest-version-release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.github_token }}
-      #   with:
-      #     tag_name: latest-version
-      #     release_name: Release latest-version
-      #     draft: true
-      #     prerelease: true
-      #   if: github.ref == 'refs/heads/auto-updater'
-
       # Check Binary Size
       - name: Build Succeeded
         run: |
@@ -126,18 +114,11 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-mac.yml,dist/Monokle-mac-*"'
+          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip"'
           draft: true
           omitBody: true
           token: ${{ secrets.github_token }}
           tag: latest-version
-
-      # - name: Upload Release Assets
-      #   uses: erdkse/upload-assets@v1.0.1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.github_token }}
-      #   with:
-      #     asset_paths: '["dist/latest-mac.yml", "dist/Monokle-mac-*"]'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -246,30 +227,21 @@ jobs:
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
 
-      # - name: Create Release
-      #   uses: actions/create-release@v1
-      #   id: latest-version-release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.github_token }}
-      #   with:
-      #     tag_name: latest-version
-      #     release_name: Release latest-version
-      #     draft: true
-      #     prerelease: true
-      #   if: github.ref == 'refs/heads/auto-updater'
-
       # Check Binary Size
       - name: Build Succeeded
         run: |
           cmd /r dir .\dist
         if: ${{ success() }}
 
-      # - name: Upload Release Assets
-      #   uses: erdkse/upload-assets@v1.0.1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.github_token }}
-      #   with:
-      #     asset_paths: '["dist/latest.yml", "dist/Monokle-win-*"]'
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap"'
+          draft: true
+          omitBody: true
+          token: ${{ secrets.github_token }}
+          tag: latest-version
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2

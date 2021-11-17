@@ -82,23 +82,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
 
-      # - name: Create Release
-      #   uses: actions/create-release@v1
-      #   id: latest-version-release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.github_token }}
-      #   with:
-      #     tag_name: latest-version
-      #     release_name: Release latest-version
-      #     draft: true
-      #     prerelease: true
-      #   if: github.ref == 'refs/heads/auto-updater'
-
       # Check Binary Size
       - name: Build Succeeded
         run: |
           ls -alh dist | grep Monokle && du -sh dist || true
         if: ${{ success() }}
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage"'
+          draft: true
+          omitBody: true
+          token: ${{ secrets.github_token }}
+          tag: latest-version
 
       # - name: Upload Release Assets
       #   uses: erdkse/upload-assets@v1.0.1
