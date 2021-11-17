@@ -391,6 +391,7 @@ export function reprocessResources(
   const dependentResourceKinds = getDependentResourceKinds(resourceKinds);
   let resourceKindsToReprocess = [...resourceKinds, ...dependentResourceKinds];
   resourceKindsToReprocess = [...new Set(resourceKindsToReprocess)];
+  let hasKustomizations = false;
 
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
@@ -399,25 +400,22 @@ export function reprocessResources(
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
       resource.namespace = resource.content.metadata?.namespace;
+
+      if (isKustomizationResource(resource)) {
+        hasKustomizations = true;
+      }
     }
   });
-
-  let hasKustomizations = false;
-  Object.values(resourceMap).forEach(resource => {
-    if (isKustomizationResource(resource)) {
-      resource.refs = undefined;
-      hasKustomizations = true;
-    }
-  });
-
-  if (hasKustomizations) {
-    processKustomizations(resourceMap, fileMap);
-  }
 
   processParsedResources(resourceMap, processingOptions, {
     resourceIds,
     resourceKinds: resourceKindsToReprocess,
   });
+
+  if (hasKustomizations) {
+    processKustomizations(resourceMap, fileMap);
+    clearResourcesTemporaryObjects(resourceMap);
+  }
 }
 
 /**
