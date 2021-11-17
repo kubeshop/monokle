@@ -1,9 +1,10 @@
 import {notification} from 'antd';
+import {useEffect} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {clearAlert} from '@redux/reducers/alert';
+
 import {AlertEnum} from '@models/alert';
-import {useEffect} from 'react';
 
 const MessageBox = () => {
   const dispatch = useAppDispatch();
@@ -24,7 +25,7 @@ const MessageBox = () => {
       notification[type]({
         message: alert.title,
         description: alert.message,
-        duration: type === 'error' ? 0 : 2,
+        duration: type === 'error' ? 0 : alert.duration || 2,
       });
 
       dispatch(clearAlert());
