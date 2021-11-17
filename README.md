@@ -51,10 +51,11 @@ Don't hesitate provide any feedback you might have to help us prioritize and imp
 
 ## Getting involved
 
+- We WANT and NEED your feedback please. Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn)
 - Check out our [Contributor Guide](https://github.com/kubeshop/.github/blob/main/CONTRIBUTING.md) and
   [Code of Conduct](https://github.com/kubeshop/.github/blob/main/CODE_OF_CONDUCT.md)
 - Fork/Clone the repo and make sure you can run it as shown above
 - Check out the [Development](docs/development.md) document for how to build and run Monokle from its source
 - Check out the [Architecture](docs/architecture.md) document to get a high-level understanding of how Monokle works
 - Check out the Roadmap above and open [issues](https://github.com/kubeshop/monokle/issues) here on GitHub
-- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn)
+
