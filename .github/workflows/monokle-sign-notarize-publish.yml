@@ -42,6 +42,10 @@ jobs:
           sysctl -n machdep.cpu.brand_string
           vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
 
+      - name: Install Tools
+        run: |
+          brew install jq
+
       - name: Add MacOS certs
         run: |
           ls -la
@@ -84,20 +88,7 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and build
-        run: |
-          npm exec -c "electron-builder --publish \"always\""
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-          EP_PRE_RELEASE: true
-          NOTARIZE: true
-          CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
-          CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-        if: github.ref != 'refs/heads/auto-updater'
-
-      - name: Package and build
+      - name: Package and Publish
         run: |
           npm exec -c "electron-builder --publish \"always\""
         env:
@@ -112,6 +103,8 @@ jobs:
 
       - name: Package
         run: |
+          contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
+          contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -230,6 +223,16 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
+      - name: Package and Publish
+        run: |
+          npm exec -c 'electron-builder --publish "always"'
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
+          EP_PRE_RELEASE: true
+        if: github.ref != 'refs/heads/auto-updater'
+
       - name: Package
         run: |
           npm exec -c 'electron-builder --publish "never"'
@@ -238,6 +241,7 @@ jobs:
           WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
+        if: github.ref == 'refs/heads/auto-updater'
 
       # Check Binary Size
       - name: Build Succeeded

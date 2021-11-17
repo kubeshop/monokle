@@ -60,6 +60,10 @@ jobs:
           ls -la
           npm list --depth=1
 
+      - name: Install Tools
+        run: |
+          apt-get install jq
+
       - name: Build
         run: |
           npm run electron:build:ci
@@ -67,7 +71,7 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and publish
+      - name: Package and Publish
         run: |
           npm exec -c "electron-builder --publish \"always\""
         env:
@@ -77,6 +81,8 @@ jobs:
 
       - name: Package
         run: |
+          contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
+          contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
