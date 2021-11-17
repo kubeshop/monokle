@@ -112,7 +112,6 @@ jobs:
           draft: true
           omitBody: true
           token: ${{ secrets.github_token }}
-          tag: latest-version
         if: "contains(github.ref, 'latest-version')"
 
       - name: Archive Binary
