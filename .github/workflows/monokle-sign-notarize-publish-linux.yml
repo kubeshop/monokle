@@ -18,6 +18,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Delete release and tagname
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: latest-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        if: github.ref == 'refs/heads/auto-updater'
+
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -53,12 +62,11 @@ jobs:
 
       - name: Apply tag
         run: |
-          git push --delete origin latest-version || true 
           git tag latest-version || true
           git push origin latest-version || true
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: steps.extract_branch.outputs.branch == 'auto-updater'
+        if: github.ref == 'refs/heads/auto-updater'
 
       - name: Build
         run: |
