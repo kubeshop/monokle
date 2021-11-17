@@ -1,8 +1,6 @@
 import {Skeleton as RawSkeleton} from 'antd';
 import styled from 'styled-components';
 
-import {PlusSquareOutlined as RawPlusSquareOutlined} from '@ant-design/icons';
-
 import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
@@ -89,14 +87,6 @@ export const Collapsible = styled.span`
 export const Skeleton = styled(RawSkeleton)`
   margin: 20px;
   width: 90%;
-`;
-
-export const PlusSquareOutlined = styled(RawPlusSquareOutlined)<{isSelected: boolean}>`
-  ${props => {
-    if (props.isSelected) {
-      return `color: ${Colors.blackPure}`;
-    }
-  }}
 `;
 
 export const ItemsLength = styled.span`
