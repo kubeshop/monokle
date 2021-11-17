@@ -1,11 +1,15 @@
 import {execSync} from 'child_process';
-import {PROCESS_ENV} from '@utils/env';
 import {BrowserWindow, dialog} from 'electron';
+
 import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
-import {NewVersionCode} from '@models/appconfig';
-import {autoUpdater} from 'electron-updater';
 import {KustomizeCommandType} from '@redux/services/kustomize';
+
+import {NewVersionCode} from '@models/appconfig';
+
+import {PROCESS_ENV} from '@utils/env';
+
+import autoUpdater from './auto-update';
 
 /**
  * called by thunk to preview a kustomization
