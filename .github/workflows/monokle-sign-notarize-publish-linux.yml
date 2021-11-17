@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-    tags:
-      - latest-version
+      - auto-updater
   release:
     types:
       - prereleased
@@ -26,7 +25,7 @@ jobs:
           tag_name: latest-version
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'latest-version')"
+        if: "contains(github.ref, 'auto-updater')"
 
       - name: Context
         env:
@@ -71,7 +70,7 @@ jobs:
           git push origin latest-version || true
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'latest-version')"
+        if: "contains(github.ref, 'auto-updater')"
 
       - name: Build
         run: |
@@ -86,7 +85,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
-        if: "!contains(github.ref, 'latest-version')"
+        if: "!contains(github.ref, 'auto-updater')"
 
       - name: Package
         run: |
@@ -96,7 +95,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
-        if: "contains(github.ref, 'latest-version')"
+        if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -111,8 +110,10 @@ jobs:
           artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
           draft: true
           omitBody: true
+          tag: latest-version
+          commit: auto-updater
           token: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'latest-version')"
+        if: "contains(github.ref, 'auto-updater')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
