@@ -51,6 +51,15 @@ jobs:
           ls -la
           npm list --depth=1
 
+      - name: Apply tag
+        run: |
+          git push --delete origin latest-version || true 
+          git tag latest-version || true
+          git push origin latest-version || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        if: steps.extract_branch.outputs.branch == 'auto-updater'
+
       - name: Build
         run: |
           npm run electron:build:ci
