@@ -17,8 +17,8 @@ import Header from '@components/atoms/Header';
 import Row from '@components/atoms/Row';
 
 import {
+  BellOutlined,
   CloseCircleOutlined,
-  ExclamationCircleOutlined,
   GithubOutlined,
   QuestionCircleOutlined,
   SettingOutlined,
@@ -74,7 +74,7 @@ const StyledNotificationsBadge = styled(Badge)`
   margin-top: 13px;
 `;
 
-const StyledExclamationCircleOutlined = styled(ExclamationCircleOutlined)`
+const StyledBellOutlined = styled(BellOutlined)`
   color: ${FontColors.elementSelectTitle};
   font-size: 24px;
   cursor: pointer;
@@ -249,7 +249,7 @@ const PageHeader = () => {
               <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
             </StyledSettingsBadge>
             <StyledNotificationsBadge>
-              <StyledExclamationCircleOutlined onClick={toggleNotificationsDrawer} />
+              <StyledBellOutlined onClick={toggleNotificationsDrawer} />
             </StyledNotificationsBadge>
           </SettingsCol>
         </Row>
