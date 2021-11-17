@@ -127,7 +127,8 @@ jobs:
         with:
           allowUpdates: true
           artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
-          draft: true
+          draft: false
+          prerelease: true
           omitBody: true
           tag: 'latest-version'
           commit: 'auto-updater'
@@ -255,7 +256,8 @@ jobs:
         with:
           allowUpdates: true
           artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap'
-          draft: true
+          draft: false
+          prerelease: true
           omitBody: true
           tag: 'latest-version'
           commit: 'auto-updater'

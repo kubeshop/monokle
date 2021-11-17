@@ -100,7 +100,8 @@ jobs:
         with:
           allowUpdates: true
           artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
-          draft: true
+          draft: false
+          prerelease: true
           omitBody: true
           tag: 'latest-version'
           commit: 'auto-updater'
