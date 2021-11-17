@@ -204,7 +204,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
               <S.NameContainer style={{color: 'red'}}>
                 <S.Name level={level + 1}>
                   {group.name}
-                  <S.ItemsLength>{group.visibleItemIds.length}</S.ItemsLength>
+                  <S.ItemsLength selected={false}>{group.visibleItemIds.length}</S.ItemsLength>
                 </S.Name>
               </S.NameContainer>
               {group.visibleItemIds.map(itemId => (
