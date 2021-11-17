@@ -1,4 +1,4 @@
-import {Button, Tag} from 'antd';
+import {Button} from 'antd';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -21,9 +21,8 @@ const TagsContainer = styled.div`
   width: 800px;
   display: flex;
   justify-content: space-between;
-  margin-left: 24px;
+  margin-left: 8px;
   font-size: 16px;
-  margin-top: 16px;
 `;
 
 const TagWrapper = styled.div`
@@ -34,15 +33,16 @@ const Spacing = styled.div`
   width: 60px;
 `;
 
-const StyledTag = styled(Tag)`
-  padding: 5px 10px;
-  font-size: 14px;
-  font-weight: 600;
+const StyledTitle = styled.h1`
+  padding: 0;
+  margin: 0;
+  font-size: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  margin-bottom: 8px;
 `;
 
 const ReloadButton = styled(Button)`
   margin-top: 1px;
-  margin-left: 8px;
 `;
 
 function ResourceDiffSectionNameDisplay() {
@@ -61,9 +61,9 @@ function ResourceDiffSectionNameDisplay() {
     <NameDisplayContainer>
       <TagsContainer>
         <TagWrapper>
-          <StyledTag>Local Resources</StyledTag>
+          <StyledTitle>Local Resources</StyledTitle>
           {isInPreviewMode && (
-            <Button type="primary" ghost onClick={onClickExitPreview} style={{marginLeft: 8}}>
+            <Button type="primary" ghost onClick={onClickExitPreview}>
               Exit preview
             </Button>
           )}
@@ -71,7 +71,7 @@ function ResourceDiffSectionNameDisplay() {
         </TagWrapper>
         <Spacing />
         <TagWrapper>
-          <StyledTag>Cluster Resources</StyledTag>
+          <StyledTitle>Cluster Resources</StyledTitle>
           <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} type="primary" ghost>
             Reload
           </ReloadButton>
