@@ -82,17 +82,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
 
-      - name: Create Release
-        uses: actions/create-release@v1
-        id: latest-version-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          tag_name: latest-version
-          release_name: Release latest-version
-          draft: true
-          prerelease: true
-        if: github.ref == 'refs/heads/auto-updater'
+      # - name: Create Release
+      #   uses: actions/create-release@v1
+      #   id: latest-version-release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.github_token }}
+      #   with:
+      #     tag_name: latest-version
+      #     release_name: Release latest-version
+      #     draft: true
+      #     prerelease: true
+      #   if: github.ref == 'refs/heads/auto-updater'
 
       # Check Binary Size
       - name: Build Succeeded
@@ -100,12 +100,12 @@ jobs:
           ls -alh dist | grep Monokle && du -sh dist || true
         if: ${{ success() }}
 
-      - name: Upload Release Assets
-        uses: erdkse/upload-assets@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          asset_paths: '["dist/latest-linux.yml", "dist/latest-linux-arm64.yml", "dist/Monokle-linux-*"]'
+      # - name: Upload Release Assets
+      #   uses: erdkse/upload-assets@v1.0.1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.github_token }}
+      #   with:
+      #     asset_paths: '["dist/latest-linux.yml", "dist/latest-linux-arm64.yml", "dist/Monokle-linux-*"]'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2

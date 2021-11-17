@@ -104,17 +104,17 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
 
-      - name: Create Release
-        uses: actions/create-release@v1
-        id: latest-version-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          tag_name: latest-version
-          release_name: Release latest-version
-          draft: true
-          prerelease: true
-        if: github.ref == 'refs/heads/auto-updater'
+      # - name: Create Release
+      #   uses: actions/create-release@v1
+      #   id: latest-version-release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.github_token }}
+      #   with:
+      #     tag_name: latest-version
+      #     release_name: Release latest-version
+      #     draft: true
+      #     prerelease: true
+      #   if: github.ref == 'refs/heads/auto-updater'
 
       # Check Binary Size
       - name: Build Succeeded
@@ -122,12 +122,20 @@ jobs:
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
 
-      - name: Upload Release Assets
-        uses: erdkse/upload-assets@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+      - uses: ncipollo/release-action@v1
         with:
-          asset_paths: '["dist/latest-mac.yml", "dist/Monokle-mac-*"]'
+          allowUpdates: true
+          artifacts: 'dist/latest-mac.yml,dist/Monokle-mac-*"'
+          draft: true
+          omitBody: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Upload Release Assets
+      #   uses: erdkse/upload-assets@v1.0.1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.github_token }}
+      #   with:
+      #     asset_paths: '["dist/latest-mac.yml", "dist/Monokle-mac-*"]'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -236,17 +244,17 @@ jobs:
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
 
-      - name: Create Release
-        uses: actions/create-release@v1
-        id: latest-version-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          tag_name: latest-version
-          release_name: Release latest-version
-          draft: true
-          prerelease: true
-        if: github.ref == 'refs/heads/auto-updater'
+      # - name: Create Release
+      #   uses: actions/create-release@v1
+      #   id: latest-version-release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.github_token }}
+      #   with:
+      #     tag_name: latest-version
+      #     release_name: Release latest-version
+      #     draft: true
+      #     prerelease: true
+      #   if: github.ref == 'refs/heads/auto-updater'
 
       # Check Binary Size
       - name: Build Succeeded
@@ -254,12 +262,12 @@ jobs:
           cmd /r dir .\dist
         if: ${{ success() }}
 
-      - name: Upload Release Assets
-        uses: erdkse/upload-assets@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          asset_paths: '["dist/latest.yml", "dist/Monokle-win-*"]'
+      # - name: Upload Release Assets
+      #   uses: erdkse/upload-assets@v1.0.1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.github_token }}
+      #   with:
+      #     asset_paths: '["dist/latest.yml", "dist/Monokle-win-*"]'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
