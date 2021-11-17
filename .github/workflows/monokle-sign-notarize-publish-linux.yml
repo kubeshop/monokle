@@ -75,12 +75,19 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and Publish
+      - name: Package
         run: |
-          npm exec -c "electron-builder --publish \"always\""
+          npm exec -c "electron-builder"
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
+
+      - name: Upload Release Assets
+        uses: erdkse/upload-assets@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          asset_paths: '["./dist/latest-linux.yml", "./dist/latest-linux-arm64.yml", "./dist/Monokle-linux-*"]'
 
       # Check Binary Size
       - name: Build Succeeded
