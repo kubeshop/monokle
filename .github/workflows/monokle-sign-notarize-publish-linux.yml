@@ -62,7 +62,7 @@ jobs:
 
       - name: Install Tools
         run: |
-          apt-get install jq
+          sudo apt-get install jq
 
       - name: Build
         run: |
