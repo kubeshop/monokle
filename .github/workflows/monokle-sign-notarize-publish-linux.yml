@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - auto-updater
+    tags:
+      - latest-version
   release:
     types:
       - prereleased
@@ -18,14 +19,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Delete release and tagname
+      - name: Delete release
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
           delete_release: true
-          tag_name: latest-version
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Context
         env:
@@ -70,7 +70,7 @@ jobs:
           git push origin latest-version || true
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Build
         run: |
@@ -85,7 +85,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
-        if: github.ref != 'refs/heads/auto-updater'
+        if: "!contains(github.ref, 'latest-version')"
 
       - name: Package
         run: |
@@ -95,7 +95,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -112,7 +112,7 @@ jobs:
           omitBody: true
           token: ${{ secrets.github_token }}
           tag: latest-version
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2

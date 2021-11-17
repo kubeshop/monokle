@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - auto-updater
+    tags:
+      - latest-version
   release:
     types:
       - prereleased
@@ -15,7 +16,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build-and-publish-mac:
-    runs-on: macOS-latest
+    runs-on: macos-latest
 
     steps:
       - name: Delete release and tagname
@@ -25,7 +26,7 @@ jobs:
           tag_name: latest-version
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Context
         env:
@@ -87,7 +88,7 @@ jobs:
           git push origin latest-version || true
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Build
         run: |
@@ -107,7 +108,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-        if: github.ref != 'refs/heads/auto-updater'
+        if: "!contains(github.ref, 'latest-version')"
 
       - name: Package
         run: |
@@ -122,7 +123,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -139,7 +140,7 @@ jobs:
           omitBody: true
           token: ${{ secrets.github_token }}
           tag: latest-version
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -178,7 +179,7 @@ jobs:
           tag_name: latest-version
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Context
         env:
@@ -230,7 +231,7 @@ jobs:
           git push origin latest-version || true
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Build
         run: |
@@ -247,7 +248,7 @@ jobs:
           WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
-        if: github.ref != 'refs/heads/auto-updater'
+        if: "!contains(github.ref, 'latest-version')"
 
       - name: Package
         run: |
@@ -257,7 +258,7 @@ jobs:
           WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -274,7 +275,7 @@ jobs:
           omitBody: true
           token: ${{ secrets.github_token }}
           tag: latest-version
-        if: github.ref == 'refs/heads/auto-updater'
+        if: "contains(github.ref, 'latest-version')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
