@@ -2,7 +2,9 @@ import {useState} from 'react';
 
 import {SectionCustomComponent, SectionInstance} from '@models/navigator';
 
-import {MinusSquareOutlined} from '@ant-design/icons';
+import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
+
+import Colors from '@styles/Colors';
 
 import * as S from './styled';
 
@@ -78,7 +80,10 @@ function SectionHeader(props: SectionHeaderProps) {
           {isHovered && isSectionInitialized && (
             <S.Collapsible>
               {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
-                <S.PlusSquareOutlined isSelected={isSectionSelected} onClick={expandSection} />
+                <PlusSquareOutlined
+                  style={{color: isSectionSelected ? Colors.blackPure : undefined}}
+                  onClick={expandSection}
+                />
               )}
               {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
                 <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
