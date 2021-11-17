@@ -65,6 +65,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const previewType = useAppSelector(state => state.main.previewType);
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
+  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
@@ -294,6 +295,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />
                 ) : (
+                  !isClusterDiffVisible &&
                   (selectedResourceId || selectedPath || selectedValuesFileId) && (
                     <Monaco
                       editorHeight={`${parseInt(contentHeight, 10) - 120}`}
