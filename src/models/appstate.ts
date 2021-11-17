@@ -129,6 +129,7 @@ interface AppState {
   clusterDiff: {
     hasLoaded: boolean;
     hasFailed: boolean;
+    shouldReload?: boolean;
     hideClusterOnlyResources: boolean;
     clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
     diffResourceId?: string;

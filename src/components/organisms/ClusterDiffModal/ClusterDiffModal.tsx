@@ -68,6 +68,7 @@ function ClusterDiffModal() {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const diffResourceId = useAppSelector(state => state.main.clusterDiff.diffResourceId);
   const refreshDiffResource = useAppSelector(state => state.main.clusterDiff.refreshDiffResource);
+  const shouldReload = useAppSelector(state => state.main.clusterDiff.shouldReload);
 
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
@@ -151,30 +152,23 @@ function ClusterDiffModal() {
     return helmValuesMap[previewValuesFileId];
   }, [helmValuesMap, previewValuesFileId]);
 
-  useEffect(() => {
-    if (isClusterDiffVisible) {
-      dispatch(loadClusterDiff());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInPreviewMode]);
-
   // TODO: improve this by updating the clusterToLocalResourcesMatches after apply instead of reloading the entire cluster diff
   useEffect(() => {
     if (!isApplyingResource && isClusterDiffVisible && !refreshDiffResource) {
       dispatch(loadClusterDiff());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isApplyingResource]);
+  }, [isApplyingResource, refreshDiffResource]);
 
   const closeModal = useCallback(() => {
     dispatch(closeClusterDiff());
   }, [dispatch]);
 
   useEffect(() => {
-    if (isClusterDiffVisible && !hasClusterDiffLoaded) {
+    if (isClusterDiffVisible && (!hasClusterDiffLoaded || shouldReload)) {
       dispatch(loadClusterDiff());
     }
-  }, [isClusterDiffVisible, hasClusterDiffLoaded, dispatch]);
+  }, [isClusterDiffVisible, hasClusterDiffLoaded, shouldReload, dispatch]);
 
   useEffect(() => {
     if (hasClusterDiffFailed) {

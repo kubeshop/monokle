@@ -13,6 +13,8 @@ export type ClusterDiffScopeType = {
   clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
   resourceFilter: ResourceFilterType;
   isPreviewLoading: boolean;
+  hasClusterDiffLoaded: boolean;
+  isClusterDiffVisible: boolean;
 };
 
 const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch, ClusterDiffScopeType> = {
@@ -24,6 +26,8 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
       clusterToLocalResourcesMatches: state.main.clusterDiff.clusterToLocalResourcesMatches,
       resourceFilter: state.main.resourceFilter,
       isPreviewLoading: state.main.previewLoader.isLoading,
+      hasClusterDiffLoaded: state.main.clusterDiff.hasLoaded,
+      isClusterDiffVisible: state.ui.isClusterDiffVisible,
     };
   },
   builder: {
@@ -55,7 +59,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
       return scope.clusterToLocalResourcesMatches.length > 0;
     },
     isLoading(scope) {
-      return scope.isPreviewLoading;
+      return scope.isClusterDiffVisible && (!scope.hasClusterDiffLoaded || scope.isPreviewLoading);
     },
     isEmpty(_, __, itemInstances) {
       const isSectionEmpty = Boolean(itemInstances && itemInstances.every(i => !i.isVisible));

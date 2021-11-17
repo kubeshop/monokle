@@ -1,9 +1,13 @@
-import {Button, Tag} from 'antd';
+import {Button} from 'antd';
 import React from 'react';
 import styled from 'styled-components';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {isInPreviewModeSelector} from '@redux/selectors';
+import {stopPreview} from '@redux/services/preview';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+
+import {PreviewDropdown} from '@components/molecules';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
@@ -14,49 +18,59 @@ const NameDisplayContainer = styled.div`
 `;
 
 const TagsContainer = styled.div`
-  width: 800px;
+  width: 900px;
   display: flex;
   justify-content: space-between;
-  margin-left: 24px;
+  margin-left: 8px;
   font-size: 16px;
-  margin-top: 16px;
 `;
 
 const TagWrapper = styled.div`
-  width: 250px;
+  width: 400px;
 `;
 
 const Spacing = styled.div`
   width: 60px;
 `;
 
-const StyledTag = styled(Tag)`
-  padding: 5px 10px;
-  font-size: 14px;
-  font-weight: 600;
+const StyledTitle = styled.h1`
+  padding: 0;
+  margin: 0;
+  font-size: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  margin-bottom: 8px;
 `;
 
-const ReloadButton = styled(Button)`
-  margin-top: 1px;
-  margin-left: 8px;
-`;
+const ReloadButton = styled(Button)``;
 
 function ResourceDiffSectionNameDisplay() {
   const dispatch = useAppDispatch();
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
   const onClickReload = () => {
     dispatch(loadClusterDiff());
+  };
+
+  const onClickExitPreview = () => {
+    stopPreview(dispatch);
   };
 
   return (
     <NameDisplayContainer>
       <TagsContainer>
         <TagWrapper>
-          <StyledTag>Local Resources</StyledTag>
+          <StyledTitle>Local Resources</StyledTitle>
+          {isInPreviewMode && (
+            <Button type="primary" ghost onClick={onClickExitPreview} style={{marginRight: 8}}>
+              Exit preview
+            </Button>
+          )}
+          <PreviewDropdown btnStyle={{maxWidth: '285px'}} />
         </TagWrapper>
         <Spacing />
         <TagWrapper>
-          <StyledTag>Cluster Resources</StyledTag>
-          <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} size="small" type="primary" ghost>
+          <StyledTitle>Cluster Resources</StyledTitle>
+          <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} type="primary" ghost>
             Reload
           </ReloadButton>
         </TagWrapper>
