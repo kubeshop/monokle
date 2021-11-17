@@ -104,6 +104,17 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
 
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          tag_name: latest-version
+          release_name: Release latest-version
+          draft: true
+          prerelease: true
+        if: github.ref == 'refs/heads/auto-updater'
+
       - name: Upload Release Assets
         uses: erdkse/upload-assets@v1.0.1
         env:
@@ -223,6 +234,17 @@ jobs:
           WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          tag_name: latest-version
+          release_name: Release latest-version
+          draft: true
+          prerelease: true
+        if: github.ref == 'refs/heads/auto-updater'
 
       - name: Upload Release Assets
         uses: erdkse/upload-assets@v1.0.1
