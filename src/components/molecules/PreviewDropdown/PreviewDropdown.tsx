@@ -1,6 +1,7 @@
 import {Button, Dropdown, Menu} from 'antd';
 import React, {useCallback, useMemo} from 'react';
 import {shallowEqual} from 'react-redux';
+import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
@@ -26,6 +27,12 @@ type KustomizationMenuItem = {
   id: string;
   name: string;
 };
+
+const StyledButton = styled(Button)`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
 
 const PreviewMenu = (props: {
   helmCharts: HelmChartMenuItem[];
@@ -55,7 +62,8 @@ const PreviewMenu = (props: {
   );
 };
 
-const PreviewDropdown = () => {
+const PreviewDropdown = (props: {btnStyle?: React.CSSProperties}) => {
+  const {btnStyle} = props;
   const dispatch = useAppDispatch();
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
@@ -158,15 +166,17 @@ const PreviewDropdown = () => {
         />
       }
     >
-      <Button
+      <StyledButton
+        type={previewText ? 'default' : 'primary'}
+        ghost={!previewText}
         style={
           previewText
-            ? {background: BackgroundColors.previewModeBackground, color: Colors.blackPure, marginTop: 8}
-            : undefined
+            ? {background: BackgroundColors.previewModeBackground, color: Colors.blackPure, ...btnStyle}
+            : btnStyle
         }
       >
         <span>{previewText || 'Preview'}</span> <DownOutlined />
-      </Button>
+      </StyledButton>
     </Dropdown>
   );
 };

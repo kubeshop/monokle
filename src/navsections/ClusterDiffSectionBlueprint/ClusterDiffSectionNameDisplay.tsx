@@ -18,7 +18,7 @@ const NameDisplayContainer = styled.div`
 `;
 
 const TagsContainer = styled.div`
-  width: 800px;
+  width: 900px;
   display: flex;
   justify-content: space-between;
   margin-left: 8px;
@@ -26,7 +26,7 @@ const TagsContainer = styled.div`
 `;
 
 const TagWrapper = styled.div`
-  width: 250px;
+  width: 400px;
 `;
 
 const Spacing = styled.div`
@@ -41,9 +41,7 @@ const StyledTitle = styled.h1`
   margin-bottom: 8px;
 `;
 
-const ReloadButton = styled(Button)`
-  margin-top: 1px;
-`;
+const ReloadButton = styled(Button)``;
 
 function ResourceDiffSectionNameDisplay() {
   const dispatch = useAppDispatch();
@@ -63,11 +61,11 @@ function ResourceDiffSectionNameDisplay() {
         <TagWrapper>
           <StyledTitle>Local Resources</StyledTitle>
           {isInPreviewMode && (
-            <Button type="primary" ghost onClick={onClickExitPreview}>
+            <Button type="primary" ghost onClick={onClickExitPreview} style={{marginRight: 8}}>
               Exit preview
             </Button>
           )}
-          <PreviewDropdown />
+          <PreviewDropdown btnStyle={{maxWidth: '285px'}} />
         </TagWrapper>
         <Spacing />
         <TagWrapper>
