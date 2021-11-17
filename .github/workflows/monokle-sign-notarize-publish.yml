@@ -23,7 +23,6 @@ jobs:
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
           delete_release: true
-          tag_name: latest-version
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         if: "contains(github.ref, 'latest-version')"
