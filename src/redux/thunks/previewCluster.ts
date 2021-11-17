@@ -5,7 +5,6 @@ import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {AlertEnum} from '@models/alert';
-import {ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
@@ -22,71 +21,75 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
     kc.loadFromFile(configPath);
     kc.setCurrentContext(thunkAPI.getState().config.kubeConfig.currentContext);
 
-    return Promise.allSettled(
+    const results = await Promise.allSettled(
       ResourceKindHandlers.map(resourceKindHandler =>
         resourceKindHandler
           .listResourcesInCluster(kc)
           .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
       )
-    ).then(
-      async results => {
-        const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
-
-        if (fulfilledResults.length === 0) {
-          return createRejectionWithAlert(
-            thunkAPI,
-            'Cluster Resources Failed',
-            // @ts-ignore
-            results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
-          );
-        }
-
-        // @ts-ignore
-        const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-        const previewResult = createPreviewResult(
-          allYaml,
-          configPath,
-          'Get Cluster Resources',
-          resourceRefsProcessingOptions,
-          configPath,
-          thunkAPI.getState().config.kubeConfig.currentContext
-        );
-
-        // if the cluster contains CRDs we need to check if there any corresponding resources also
-        const customResourceDefinitions = Object.values(previewResult.previewResources).filter(
-          r => r.kind === 'CustomResourceDefinition'
-        );
-        if (customResourceDefinitions.length > 0) {
-          await loadCustomResourceObjects(
-            kc,
-            customResourceDefinitions,
-            configPath,
-            previewResult,
-            resourceRefsProcessingOptions
-          );
-        }
-
-        if (fulfilledResults.length < results.length) {
-          const rejectedResult = results.find(r => r.status === 'rejected');
-          if (rejectedResult) {
-            // @ts-ignore
-            const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
-
-            previewResult.alert = {
-              title: 'Get Cluster Resources',
-              message: `Failed to get all cluster resources: ${reason}`,
-              type: AlertEnum.Warning,
-            };
-
-            return previewResult;
-          }
-        }
-        return previewResult;
-      },
-      reason => {
-        return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', reason.message);
-      }
     );
+
+    const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+    if (fulfilledResults.length === 0) {
+      return createRejectionWithAlert(
+        thunkAPI,
+        'Cluster Resources Failed',
+        // @ts-ignore
+        results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
+      );
+    }
+
+    // @ts-ignore
+    const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+    const previewResult = createPreviewResult(
+      allYaml,
+      configPath,
+      'Get Cluster Resources',
+      resourceRefsProcessingOptions,
+      configPath,
+      thunkAPI.getState().config.kubeConfig.currentContext
+    );
+
+    // if the cluster contains CRDs we need to check if there any corresponding resources also
+    const customResourceDefinitions = Object.values(previewResult.previewResources).filter(
+      r => r.kind === 'CustomResourceDefinition'
+    );
+    if (customResourceDefinitions.length > 0) {
+      const customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions);
+
+      // if any were found we need to merge them into the preview-result
+      if (customResourceObjects.length > 0) {
+        const customResourcesYaml = customResourceObjects.join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+        const customResources = extractK8sResources(customResourcesYaml, PREVIEW_PREFIX + configPath);
+        customResources.forEach(r => {
+          previewResult.previewResources[r.id] = r;
+        });
+
+        // only process newly added custom resources
+        processParsedResources(previewResult.previewResources, resourceRefsProcessingOptions, {
+          resourceIds: customResources.map(r => r.id),
+        });
+
+        previewResult.alert.message = `Previewing ${Object.keys(previewResult.previewResources).length} resources`;
+      }
+    }
+
+    if (fulfilledResults.length < results.length) {
+      const rejectedResult = results.find(r => r.status === 'rejected');
+      if (rejectedResult) {
+        // @ts-ignore
+        const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
+
+        previewResult.alert = {
+          title: 'Get Cluster Resources',
+          message: `Failed to get all cluster resources: ${reason}`,
+          type: AlertEnum.Warning,
+        };
+
+        return previewResult;
+      }
+    }
+    return previewResult;
   } catch (e: any) {
     return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', e.message);
   }
@@ -167,13 +170,7 @@ function findDefaultVersion(r: K8sResource) {
  * Load custom resource objects for CRDs found in cluster
  */
 
-async function loadCustomResourceObjects(
-  kc: KubeConfig,
-  customResourceDefinitions: K8sResource[],
-  configPath: string,
-  previewResult: SetPreviewDataPayload,
-  resourceRefsProcessingOptions: ResourceRefsProcessingOptions
-) {
+async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitions: K8sResource[]): Promise<string[]> {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
   try {
@@ -188,33 +185,12 @@ async function loadCustomResourceObjects(
         )
     );
 
-    if (!previewResult.previewResources) {
-      previewResult.previewResources = {};
-    }
-
-    await Promise.allSettled(customObjects).then(
-      customResults => {
-        const fulfilled = customResults.filter(r => r.status === 'fulfilled' && r.value);
-        if (fulfilled.length > 0) {
-          // @ts-ignore
-          const customResourcesYaml = fulfilled.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-          const customResources = extractK8sResources(customResourcesYaml, PREVIEW_PREFIX + configPath);
-          customResources.forEach(r => {
-            // @ts-ignore
-            previewResult.previewResources[r.id] = r;
-          });
-
-          // @ts-ignore
-          processParsedResources(previewResult.previewResources, resourceRefsProcessingOptions, {
-            resourceIds: customResources.map(r => r.id),
-          });
-        }
-      },
-      reason => {
-        console.log(reason);
-      }
-    );
+    const customResults = await Promise.allSettled(customObjects);
+    // @ts-ignore
+    return customResults.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
   } catch (e) {
     console.log(e);
   }
+
+  return [];
 }
