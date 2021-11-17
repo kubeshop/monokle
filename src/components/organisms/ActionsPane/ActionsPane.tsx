@@ -294,11 +294,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />
                 ) : (
-                  <Monaco
-                    editorHeight={`${parseInt(contentHeight, 10) - 120}`}
-                    applySelection={applySelection}
-                    diffSelectedResource={diffSelectedResource}
-                  />
+                  (selectedResourceId || selectedPath || selectedValuesFileId) && (
+                    <Monaco
+                      editorHeight={`${parseInt(contentHeight, 10) - 120}`}
+                      applySelection={applySelection}
+                      diffSelectedResource={diffSelectedResource}
+                    />
+                  )
                 )}
               </TabPane>
               {selectedResource && selectedResource?.kind === 'ConfigMap' && (
