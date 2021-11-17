@@ -116,18 +116,18 @@ jobs:
           prerelease: true
         if: github.ref == 'refs/heads/auto-updater'
 
-      - name: Upload Release Assets
-        uses: erdkse/upload-assets@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          asset_paths: '["./dist/latest-mac.yml", "./dist/Monokle-mac-*"]'
-
       # Check Binary Size
       - name: Build Succeeded
         run: |
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
+
+      - name: Upload Release Assets
+        uses: erdkse/upload-assets@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          asset_paths: '["dist/latest-mac.yml", "dist/Monokle-mac-*"]'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -248,18 +248,18 @@ jobs:
           prerelease: true
         if: github.ref == 'refs/heads/auto-updater'
 
-      - name: Upload Release Assets
-        uses: erdkse/upload-assets@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          asset_paths: '["./dist/latest.yml", "./dist/Monokle-win-*"]'
-
       # Check Binary Size
       - name: Build Succeeded
         run: |
           cmd /r dir .\dist
         if: ${{ success() }}
+
+      - name: Upload Release Assets
+        uses: erdkse/upload-assets@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          asset_paths: '["dist/latest.yml", "dist/Monokle-win-*"]'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2

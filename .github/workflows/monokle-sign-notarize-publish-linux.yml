@@ -94,18 +94,18 @@ jobs:
           prerelease: true
         if: github.ref == 'refs/heads/auto-updater'
 
-      - name: Upload Release Assets
-        uses: erdkse/upload-assets@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          asset_paths: '["./dist/latest-linux.yml", "./dist/latest-linux-arm64.yml", "./dist/Monokle-linux-*"]'
-
       # Check Binary Size
       - name: Build Succeeded
         run: |
           ls -alh dist | grep Monokle && du -sh dist || true
         if: ${{ success() }}
+
+      - name: Upload Release Assets
+        uses: erdkse/upload-assets@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          asset_paths: '["dist/latest-linux.yml", "dist/latest-linux-arm64.yml", "dist/Monokle-linux-*"]'
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
