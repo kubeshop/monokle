@@ -150,6 +150,7 @@ const PageHeader = () => {
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const activeResources = useSelector(activeResourcesSelector);
+  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewType = useAppSelector(state => state.main.previewType);
@@ -210,7 +211,7 @@ const PageHeader = () => {
           <StyledModeSpan>CLUSTER MODE</StyledModeSpan>
           {previewResourceId && (
             <StyledResourceSpan>
-              Previewing {previewResourceId} cluster - {activeResources.length} resources
+              Previewing context [{currentContext}] - {activeResources.length} resources
             </StyledResourceSpan>
           )}
           <ExitButton onClick={onClickExit} />

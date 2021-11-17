@@ -291,23 +291,23 @@ export const setWindowTitle = (store: any, window: BrowserWindow) => {
   let windowTitle = 'Monokle';
 
   if (isInPreviewMode && previewType === 'kustomization') {
-    windowTitle = previewResource ? `[${previewResource.name}] kustomization` : `Monokle`;
+    windowTitle = previewResource ? `Monokle - previewing [${previewResource.name}] kustomization` : `Monokle`;
     window.setTitle(windowTitle);
     return;
   }
   if (isInPreviewMode && previewType === 'cluster') {
-    windowTitle = String(previewResourceId) || 'Monokle';
+    windowTitle = `Monokle - previewing context [${  String(state.config.kubeConfig.currentContext)  }]` || 'Monokle';
     window.setTitle(windowTitle);
     return;
   }
   if (isInPreviewMode && previewType === 'helm') {
-    windowTitle = `${previewValuesFile?.name} for ${helmChart?.name} Helm chart`;
+    windowTitle = `Monokle - previewing ${previewValuesFile?.name} for ${helmChart?.name} Helm chart`;
     window.setTitle(windowTitle);
     return;
   }
   if (fileMap && fileMap[ROOT_FILE_ENTRY] && fileMap[ROOT_FILE_ENTRY].filePath) {
     windowTitle = fileMap[ROOT_FILE_ENTRY].filePath;
-    window.setTitle(windowTitle);
+    window.setTitle(`Monokle - ${windowTitle}`);
     return;
   }
   window.setTitle(windowTitle);

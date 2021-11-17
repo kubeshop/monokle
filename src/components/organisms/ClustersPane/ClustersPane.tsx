@@ -152,12 +152,12 @@ const ClustersPane = () => {
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <span>Reload Cluster Objects</span>;
+      return <span>Reload Cluster Resources</span>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
-      return <span>Loading Cluster Objects</span>;
+      return <span>Loading Cluster Resources</span>;
     }
-    return <span>Show Cluster Objects</span>;
+    return <span>Show Cluster Resources</span>;
   }, [previewType, previewLoader, isInClusterMode]);
 
   useEffect(() => {
