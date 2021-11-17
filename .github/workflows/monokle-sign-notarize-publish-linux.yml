@@ -102,8 +102,8 @@ jobs:
           artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
           draft: true
           omitBody: true
-          tag: latest-version
-          commit: auto-updater
+          tag: 'latest-version'
+          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
         if: "contains(github.ref, 'auto-updater')"
 

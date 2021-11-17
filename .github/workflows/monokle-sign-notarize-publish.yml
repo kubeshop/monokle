@@ -129,8 +129,8 @@ jobs:
           artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
           draft: true
           omitBody: true
-          tag: latest-version
-          commit: auto-updater
+          tag: 'latest-version'
+          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
         if: "contains(github.ref, 'auto-updater')"
 
@@ -257,8 +257,8 @@ jobs:
           artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap'
           draft: true
           omitBody: true
-          tag: latest-version
-          commit: auto-updater
+          tag: 'latest-version'
+          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
         if: "contains(github.ref, 'auto-updater')"
 
