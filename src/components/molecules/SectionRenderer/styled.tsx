@@ -89,10 +89,10 @@ export const Skeleton = styled(RawSkeleton)`
   width: 90%;
 `;
 
-export const ItemsLength = styled.span`
+export const ItemsLength = styled.span<{selected: boolean}>`
   margin-left: 8px;
-  color: ${FontColors.grey};
   font-size: 14px;
+  ${props => (props.selected ? `color: ${Colors.blackPure};` : `color: ${FontColors.grey};`)}
 `;
 
 export const EmptyDisplayContainer = styled.div<{level: number}>`

@@ -74,7 +74,9 @@ function SectionHeader(props: SectionHeaderProps) {
             level={level}
           >
             {name}
-            {itemsLength > 0 && <S.ItemsLength>{itemsLength}</S.ItemsLength>}
+            {itemsLength > 0 && (
+              <S.ItemsLength selected={isSectionSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
+            )}
             {CustomNameSuffix && <CustomNameSuffix sectionInstance={sectionInstance} />}
           </S.Name>
           {isHovered && isSectionInitialized && (
