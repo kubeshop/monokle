@@ -122,13 +122,15 @@ jobs:
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
 
-      - uses: ncipollo/release-action@v1
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
           artifacts: 'dist/latest-mac.yml,dist/Monokle-mac-*"'
           draft: true
           omitBody: true
           token: ${{ secrets.github_token }}
+          tag: latest-version
 
       # - name: Upload Release Assets
       #   uses: erdkse/upload-assets@v1.0.1
