@@ -128,7 +128,7 @@ jobs:
           artifacts: 'dist/latest-mac.yml,dist/Monokle-mac-*"'
           draft: true
           omitBody: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.github_token }}
 
       # - name: Upload Release Assets
       #   uses: erdkse/upload-assets@v1.0.1
