@@ -366,6 +366,21 @@ export function clearResourcesTemporaryObjects(resourceMap: ResourceMapType) {
 }
 
 /**
+ * Reprocess kustomization-specific references for all kustomizations
+ */
+
+function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
+  Object.values(resourceMap)
+    .filter(r => isKustomizationResource(r))
+    .forEach(r => {
+      r.refs = [];
+    });
+
+  processKustomizations(resourceMap, fileMap);
+  clearResourcesTemporaryObjects(resourceMap);
+}
+
+/**
  * Reprocesses the specified resourceIds in regard to refs/etc (called after updating...)
  *
  * This could be more intelligent - it updates everything brute force for now...
@@ -413,8 +428,7 @@ export function reprocessResources(
   });
 
   if (hasKustomizations) {
-    processKustomizations(resourceMap, fileMap);
-    clearResourcesTemporaryObjects(resourceMap);
+    reprocessKustomizations(resourceMap, fileMap);
   }
 }
 
