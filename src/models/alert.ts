@@ -20,4 +20,5 @@ export type AlertType = {
   type: AlertEnum;
   hasSeen?: boolean;
   createdAt?: number;
+  duration?: number | null;
 };
