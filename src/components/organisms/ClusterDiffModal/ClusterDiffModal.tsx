@@ -15,6 +15,8 @@ import {ClusterDiff, ResourceDiff} from '@molecules';
 
 import {ArrowLeftOutlined} from '@ant-design/icons';
 
+import Colors, {BackgroundColors} from '@styles/Colors';
+
 const Container = styled.div`
   display: block;
   margin: 0;
@@ -27,10 +29,23 @@ const SkeletonContainer = styled.div`
   padding: 10px;
 `;
 
-const StyledModal = styled(Modal)`
+const StyledModal = styled(Modal)<{previewing: boolean}>`
   & .ant-modal-body {
     padding: 8px;
   }
+  ${props =>
+    props.previewing &&
+    `
+    & .ant-modal-header {
+      background: ${BackgroundColors.previewModeBackground};
+    }
+    & .ant-modal-title {
+      color: ${Colors.blackPure} !important;
+    }
+    & .ant-modal-close-x {
+      color: ${Colors.blackPure} !important;
+    }
+  `}
 `;
 
 type ResourceDiffState = {
@@ -205,6 +220,7 @@ function ClusterDiffModal() {
       onCancel={onCancel}
       footer={<Button onClick={closeModal}>Close</Button>}
       centered
+      previewing={isInPreviewMode}
     >
       <Container>
         {!hasClusterDiffLoaded ? (

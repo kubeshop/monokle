@@ -1,6 +1,11 @@
-import {Tag} from 'antd';
+import {Button, Tag} from 'antd';
 import React from 'react';
 import styled from 'styled-components';
+
+import {useAppDispatch} from '@redux/hooks';
+import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+
+import {ReloadOutlined} from '@ant-design/icons';
 
 const NameDisplayContainer = styled.div`
   margin-left: 16px;
@@ -31,7 +36,17 @@ const StyledTag = styled(Tag)`
   font-weight: 600;
 `;
 
+const ReloadButton = styled(Button)`
+  margin-top: 1px;
+  margin-left: 8px;
+`;
+
 function ResourceDiffSectionNameDisplay() {
+  const dispatch = useAppDispatch();
+  const onClickReload = () => {
+    dispatch(loadClusterDiff());
+  };
+
   return (
     <NameDisplayContainer>
       <TagsContainer>
@@ -41,6 +56,9 @@ function ResourceDiffSectionNameDisplay() {
         <Spacing />
         <TagWrapper>
           <StyledTag>Cluster Resources</StyledTag>
+          <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} size="small" type="primary" ghost>
+            Reload
+          </ReloadButton>
         </TagWrapper>
       </TagsContainer>
     </NameDisplayContainer>

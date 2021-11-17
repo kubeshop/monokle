@@ -1,15 +1,10 @@
-import {Button, Divider} from 'antd';
+import {Divider} from 'antd';
 import React from 'react';
 import styled from 'styled-components';
-
-import {useAppDispatch} from '@redux/hooks';
-import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
 import {ClusterToLocalResourcesMatch} from '@models/appstate';
 
 import {ResourceFilterIconWithPopover, SectionRenderer} from '@components/molecules';
-
-import {ReloadOutlined} from '@ant-design/icons';
 
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 
@@ -29,11 +24,6 @@ const FilterContainer = styled.span`
   margin-left: 10px;
 `;
 
-const RefreshButton = styled(Button)`
-  margin-top: 1px;
-  margin-left: 8px;
-`;
-
 const ListContainer = styled.div`
   overflow-y: scroll;
   height: 70vh;
@@ -44,19 +34,10 @@ const ListContainer = styled.div`
 `;
 
 function ClusterDiff() {
-  const dispatch = useAppDispatch();
-  const onClickRefresh = () => {
-    dispatch(loadClusterDiff());
-  };
-
   return (
     <Container>
       <LeftPane>
         <S.TitleBar>
-          <RefreshButton icon={<ReloadOutlined />} onClick={onClickRefresh} size="small" type="primary" ghost>
-            Refresh
-          </RefreshButton>
-          <Divider type="vertical" style={{height: 40, marginLeft: 16}} />
           <S.TitleBarRightButtons>
             <ClusterDiffNamespaceFilter />
             <FilterContainer>
