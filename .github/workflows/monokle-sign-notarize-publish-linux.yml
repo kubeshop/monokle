@@ -64,6 +64,14 @@ jobs:
         run: |
           sudo apt-get install jq
 
+      - name: Apply tag
+        run: |
+          git tag latest-version || true
+          git push origin latest-version || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        if: github.ref == 'refs/heads/auto-updater'
+
       - name: Build
         run: |
           npm run electron:build:ci

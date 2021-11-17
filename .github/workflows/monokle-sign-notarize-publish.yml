@@ -81,6 +81,14 @@ jobs:
           ls -la
           npm list --depth=1
 
+      - name: Apply tag
+        run: |
+          git tag latest-version || true
+          git push origin latest-version || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        if: github.ref == 'refs/heads/auto-updater'
+
       - name: Build
         run: |
           npm run electron:build:ci
@@ -215,6 +223,14 @@ jobs:
         run: |
           cmd /r dir
           npm list --depth=1
+
+      - name: Apply tag
+        run: |
+          git tag latest-version || true
+          git push origin latest-version || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        if: github.ref == 'refs/heads/auto-updater'
 
       - name: Build
         run: |
