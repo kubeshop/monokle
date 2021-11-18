@@ -7,7 +7,7 @@ const DotsContainer = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  margin-right: 10px;
+  height: inherit;
 `;
 
 const Dot = styled.div`
@@ -29,8 +29,10 @@ interface DotsProps {
 const Dots: React.FC<DotsProps> = props => {
   const {dotNumber = 3, color = Colors.blue6} = props;
 
-  const dots = Array.from({length: dotNumber}).map(() => {
-    return <Dot color={color} />;
+  const dots = Array.from({length: dotNumber}).map((_, index) => {
+    const key = `dot_${index}`;
+
+    return <Dot key={key} color={color} />;
   });
 
   return <DotsContainer>{dots}</DotsContainer>;
