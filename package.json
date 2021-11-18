@@ -280,8 +280,7 @@
     ],
     ".": [
       "eslint . --fix"
-    ],
-    "*.css": "stylelint --fix"
+    ]
   },
   "eslintConfig": {
     "extends": [
