@@ -441,6 +441,33 @@ export const mainSlice = createSlice({
     setClusterDiffRefreshDiffResource: (state: Draft<AppState>, action: PayloadAction<boolean | undefined>) => {
       state.clusterDiff.refreshDiffResource = action.payload;
     },
+    selectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      const matchId = action.payload;
+      if (!state.clusterDiff.selectedMatches.includes(matchId)) {
+        state.clusterDiff.selectedMatches.push(matchId);
+      }
+    },
+    selectAllClusterDiffMatches: (state: Draft<AppState>) => {
+      state.clusterDiff.selectedMatches = state.clusterDiff.clusterToLocalResourcesMatches.map(match =>
+        makeResourceNameKindNamespaceIdentifier({
+          name: match.resourceName,
+          kind: match.resourceKind,
+          namespace: match.resourceNamespace,
+        })
+      );
+    },
+    unselectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      const matchId = action.payload;
+      if (state.clusterDiff.selectedMatches.includes(matchId)) {
+        state.clusterDiff.selectedMatches = state.clusterDiff.selectedMatches.filter(m => m !== matchId);
+      }
+    },
+    unselectAllClusterDiffMatches: (state: Draft<AppState>) => {
+      state.clusterDiff.selectedMatches = [];
+    },
+    reloadClusterDiff: (state: Draft<AppState>) => {
+      state.clusterDiff.shouldReload = true;
+    },
   },
   extraReducers: builder => {
     builder
@@ -537,6 +564,7 @@ export const mainSlice = createSlice({
         clusterToLocalResourcesMatches: [],
         diffResourceId: undefined,
         refreshDiffResource: undefined,
+        selectedMatches: [],
       };
       resetSelectionHistory(state);
     });
@@ -598,6 +626,7 @@ export const mainSlice = createSlice({
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
         state.clusterDiff.shouldReload = undefined;
+        state.clusterDiff.selectedMatches = [];
       })
       .addCase(loadClusterDiff.rejected, state => {
         state.clusterDiff.hasLoaded = true;
@@ -605,6 +634,7 @@ export const mainSlice = createSlice({
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
         state.clusterDiff.shouldReload = undefined;
+        state.clusterDiff.selectedMatches = [];
       })
       .addCase(loadClusterDiff.fulfilled, (state, action) => {
         const clusterResourceMap = action.payload.resourceMap;
@@ -654,6 +684,7 @@ export const mainSlice = createSlice({
           const matchingLocalResources = groupedLocalResources[identifier];
           if (!matchingLocalResources || matchingLocalResources.length === 0) {
             clusterToLocalResourcesMatches.push({
+              id: identifier,
               clusterResourceId: currentClusterResource.id,
               resourceName: currentClusterResource.name,
               resourceKind: currentClusterResource.kind,
@@ -662,6 +693,7 @@ export const mainSlice = createSlice({
           } else {
             const matchingLocalResourceIds = matchingLocalResources.map(r => r.id);
             clusterToLocalResourcesMatches.push({
+              id: identifier,
               clusterResourceId: currentClusterResource.id,
               localResourceIds: matchingLocalResourceIds,
               resourceName: currentClusterResource.name,
@@ -690,6 +722,7 @@ export const mainSlice = createSlice({
             return;
           }
           clusterToLocalResourcesMatches.push({
+            id: identifier,
             localResourceIds: currentLocalResources.map(r => r.id),
             resourceName: currentLocalResources[0].name,
             resourceKind: currentLocalResources[0].kind,
@@ -703,6 +736,7 @@ export const mainSlice = createSlice({
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
         state.clusterDiff.shouldReload = undefined;
+        state.clusterDiff.selectedMatches = [];
       });
 
     builder.addCase(closeClusterDiff.type, state => {
@@ -716,6 +750,7 @@ export const mainSlice = createSlice({
       state.clusterDiff.diffResourceId = undefined;
       state.clusterDiff.refreshDiffResource = undefined;
       state.clusterDiff.shouldReload = undefined;
+      state.clusterDiff.selectedMatches = [];
     });
 
     builder.addMatcher(
@@ -843,5 +878,10 @@ export const {
   addNotification,
   setDiffResourceInClusterDiff,
   setClusterDiffRefreshDiffResource,
+  selectClusterDiffMatch,
+  selectAllClusterDiffMatches,
+  unselectClusterDiffMatch,
+  unselectAllClusterDiffMatches,
+  reloadClusterDiff,
 } = mainSlice.actions;
 export default mainSlice.reducer;

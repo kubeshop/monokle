@@ -1,8 +1,9 @@
-import {Button} from 'antd';
+import {Button, Checkbox} from 'antd';
 import React from 'react';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectAllClusterDiffMatches, unselectAllClusterDiffMatches} from '@redux/reducers/main';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -41,11 +42,27 @@ const StyledTitle = styled.h1`
   margin-bottom: 8px;
 `;
 
+const CheckboxWrapper = styled.div`
+  display: inline-block;
+  margin-top: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+`;
+
+const CheckboxLabel = styled.span`
+  margin-left: 5px;
+`;
+
 const ReloadButton = styled(Button)``;
 
 function ResourceDiffSectionNameDisplay() {
   const dispatch = useAppDispatch();
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
+  const areAllMatchesSelected = useAppSelector(
+    state =>
+      state.main.clusterDiff.selectedMatches.length === state.main.clusterDiff.clusterToLocalResourcesMatches.length
+  );
 
   const onClickReload = () => {
     dispatch(loadClusterDiff());
@@ -53,6 +70,14 @@ function ResourceDiffSectionNameDisplay() {
 
   const onClickExitPreview = () => {
     stopPreview(dispatch);
+  };
+
+  const onClickSelectAll = () => {
+    if (areAllMatchesSelected) {
+      dispatch(unselectAllClusterDiffMatches());
+    } else {
+      dispatch(selectAllClusterDiffMatches());
+    }
   };
 
   return (
@@ -68,13 +93,17 @@ function ResourceDiffSectionNameDisplay() {
           <PreviewDropdown btnStyle={{maxWidth: '285px'}} />
         </TagWrapper>
         <Spacing />
-        <TagWrapper>
+        <TagWrapper style={{paddingLeft: 45}}>
           <StyledTitle>Cluster Resources</StyledTitle>
           <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} type="primary" ghost>
             Reload
           </ReloadButton>
         </TagWrapper>
       </TagsContainer>
+      <CheckboxWrapper onClick={onClickSelectAll}>
+        <Checkbox checked={areAllMatchesSelected} />
+        <CheckboxLabel>{areAllMatchesSelected ? 'Deselect all' : 'Select all'}</CheckboxLabel>
+      </CheckboxWrapper>
     </NameDisplayContainer>
   );
 }

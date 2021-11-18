@@ -66,6 +66,7 @@ type ResourceRefsProcessingOptions = {
 };
 
 type ClusterToLocalResourcesMatch = {
+  id: string;
   resourceKind: string;
   resourceName: string;
   resourceNamespace: string;
@@ -134,6 +135,7 @@ interface AppState {
     clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
     diffResourceId?: string;
     refreshDiffResource?: boolean;
+    selectedMatches: string[];
   };
   notifications: AlertType[];
 }

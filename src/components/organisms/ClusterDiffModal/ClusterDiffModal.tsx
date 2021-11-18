@@ -6,6 +6,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setClusterDiffRefreshDiffResource, setDiffResourceInClusterDiff} from '@redux/reducers/main';
 import {closeClusterDiff} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {applySelectedMatchesWithConfirm} from '@redux/services/applySelectedMatchesWithConfirm';
 import {getClusterResourceText} from '@redux/services/clusterResource';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
@@ -13,7 +14,9 @@ import {K8sResource} from '@models/k8sresource';
 
 import {ClusterDiff, ResourceDiff} from '@molecules';
 
-import {ArrowLeftOutlined} from '@ant-design/icons';
+import Icon from '@components/atoms/Icon';
+
+import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 
@@ -69,6 +72,7 @@ function ClusterDiffModal() {
   const diffResourceId = useAppSelector(state => state.main.clusterDiff.diffResourceId);
   const refreshDiffResource = useAppSelector(state => state.main.clusterDiff.refreshDiffResource);
   const shouldReload = useAppSelector(state => state.main.clusterDiff.shouldReload);
+  const selectedMatchesLength = useAppSelector(state => state.main.clusterDiff.selectedMatches.length);
 
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
@@ -197,6 +201,13 @@ function ClusterDiffModal() {
     // eslint-disable-next-line
   }, [previewResource, previewValuesFile, currentContext, isResourceDiffVisible, closeResourceDiff]);
 
+  const onClickDeploySelected = () => {
+    if (!currentContext) {
+      return;
+    }
+    applySelectedMatchesWithConfirm(selectedMatchesLength, currentContext, dispatch);
+  };
+
   const onCancel = () => {
     if (isResourceDiffVisible) {
       closeResourceDiff();
@@ -212,7 +223,22 @@ function ClusterDiffModal() {
       width="90vw"
       style={{maxWidth: 1000}}
       onCancel={onCancel}
-      footer={<Button onClick={closeModal}>Close</Button>}
+      footer={
+        <>
+          <Button
+            type="primary"
+            ghost
+            style={{float: 'left'}}
+            icon={<Icon name="kubernetes" />}
+            disabled={selectedMatchesLength === 0 || !currentContext}
+            onClick={onClickDeploySelected}
+          >
+            Deploy selected resources ({selectedMatchesLength}) to cluster
+            <ArrowRightOutlined />
+          </Button>
+          <Button onClick={closeModal}>Close</Button>
+        </>
+      }
       centered
       previewing={isInPreviewMode}
     >

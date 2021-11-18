@@ -1,7 +1,7 @@
 import {ClusterToLocalResourcesMatch, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {SectionBlueprint} from '@models/navigator';
 
-import {isResourcePassingFilter} from '@utils/resources';
+import {isResourcePassingFilter, makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import ClusterDiffSectionEmptyDisplay from './ClusterDiffSectionEmptyDisplay';
@@ -50,7 +50,13 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
           return {
             id: resourceKind,
             name: resourceKind,
-            itemIds: matches.map(match => `${match.resourceName}#${match.resourceKind}#${match.resourceNamespace}`),
+            itemIds: matches.map(match =>
+              makeResourceNameKindNamespaceIdentifier({
+                name: match.resourceName,
+                kind: match.resourceKind,
+                namespace: match.resourceNamespace,
+              })
+            ),
           };
         })
         .sort((a, b) => a.name.localeCompare(b.name));
@@ -80,11 +86,18 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
       return rawItem.resourceName;
     },
     getInstanceId(rawItem) {
-      return `${rawItem.resourceName}#${rawItem.resourceKind}#${rawItem.resourceNamespace}`;
+      return makeResourceNameKindNamespaceIdentifier({
+        name: rawItem.resourceName,
+        kind: rawItem.resourceKind,
+        namespace: rawItem.resourceNamespace,
+      });
     },
     builder: {
       getMeta(rawItem, scope) {
         return {
+          resourceName: rawItem.resourceName,
+          resourceKind: rawItem.resourceKind,
+          resourceNamespace: rawItem.resourceNamespace,
           clusterResource: rawItem.clusterResourceId ? scope.resourceMap[rawItem.clusterResourceId] : undefined,
           localResources: rawItem.localResourceIds
             ? rawItem.localResourceIds.map(id => scope.resourceMap[id])

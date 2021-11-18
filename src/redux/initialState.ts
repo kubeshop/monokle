@@ -36,6 +36,7 @@ const initialAppState: AppState = {
     hasLoaded: false,
     hasFailed: false,
     hideClusterOnlyResources: true,
+    selectedMatches: [],
   },
   notifications: [],
 };
