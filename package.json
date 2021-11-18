@@ -277,9 +277,6 @@
   "lint-staged": {
     "{src,test}/**/*.{js,jsx,ts,tsx}": [
       "prettier --write"
-    ],
-    ".": [
-      "eslint . --fix"
     ]
   },
   "eslintConfig": {
