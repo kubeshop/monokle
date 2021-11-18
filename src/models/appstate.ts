@@ -66,6 +66,7 @@ type ResourceRefsProcessingOptions = {
 };
 
 type ClusterToLocalResourcesMatch = {
+  id: string;
   resourceKind: string;
   resourceName: string;
   resourceNamespace: string;

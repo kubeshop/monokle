@@ -20,7 +20,11 @@ import {ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined} from '
 import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 
-import {diffLocalToClusterResources, removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {
+  diffLocalToClusterResources,
+  makeResourceNameKindNamespaceIdentifier,
+  removeIgnoredPathsFromResourceContent,
+} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
@@ -74,7 +78,11 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const matchId = useMemo(() => {
-    return `${matchMeta.resourceName}#${matchMeta.resourceKind}#${matchMeta.resourceNamespace}`;
+    return makeResourceNameKindNamespaceIdentifier({
+      name: matchMeta.resourceName,
+      kind: matchMeta.resourceKind,
+      namespace: matchMeta.resourceNamespace,
+    });
   }, [matchMeta]);
 
   const isMatchSelected = useAppSelector(state => state.main.clusterDiff.selectedMatches.includes(matchId));

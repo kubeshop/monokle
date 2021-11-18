@@ -9,8 +9,15 @@ import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';
 
-export const makeResourceNameKindNamespaceIdentifier = (resource: K8sResource) =>
-  `${resource.name}#${resource.kind}#${resource.namespace ? resource.namespace : 'default'}`;
+export function makeResourceNameKindNamespaceIdentifier(partialResource: {
+  name: string;
+  kind: string;
+  namespace?: string;
+}) {
+  return `${partialResource.name}#${partialResource.kind}#${
+    partialResource.namespace ? partialResource.namespace : 'default'
+  }`;
+}
 
 export function isResourcePassingFilter(resource: K8sResource, filters: ResourceFilterType) {
   if (

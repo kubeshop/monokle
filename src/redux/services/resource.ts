@@ -30,7 +30,7 @@ import {validateResource} from './validation';
  * Parse documents lazily...
  */
 
-function doesTextStartWithYamlDocumentDelimiter(text: string) {
+export function doesTextStartWithYamlDocumentDelimiter(text: string) {
   return ['\n', '\r\n', '\r'].some(lineEnding => {
     return text.startsWith(`${YAML_DOCUMENT_DELIMITER}${lineEnding}`);
   });
