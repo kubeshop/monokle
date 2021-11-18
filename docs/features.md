@@ -41,8 +41,61 @@ Want to browse your cluster instead of a repo? Simply smash the "Show Cluster Ob
 the cluster into Monokle - [read more](cluster-integration.md). If you need to make any immediate hot-fixes simply modify
 the resource in the source editor and click the "Apply" button.
 
+## Cluster Compare
 
+Cluster Compare functionality in Monokle 1.3.0 allows you to compare a set of local resources (plain or generated with Kustomize/helm) against a cluster. 
 
+![Cluster Compare](img/clustercompare-1.png)
 
+## The Improved Validation Logic and Error Display
 
+In the latest Monokle 1.3.0, all the errors can be found at the top of the resource navigator to view the invalid resources.  
 
+![The Improved Validation Logic and Error Display](img/resource-navigator.png)
+
+Selecting a resource from the list will automatically open it for editing in the editor.  
+[The Improved Validation Logic and Error Display](img/resourcenavigator.gif)
+
+## Handling Multiple KubeConfig Contexts
+
+Supposedly, the chosen Kubernetes file contains numerous contexts. Monokle 1.3.0 will find those and allow you to select the right one for your cluster operations. 
+
+![Handling Multiple KubeConfig Contexts](img/selectcontext.png)
+
+## Linux installer/Packages 
+
+The Monokle 1.3.0 includes several packages for different Linux distros. 
+
+![Linux installers/Packages](img/linuxpackages.png)
+
+## Improved Kustomize Support
+
+The Monokle 1.3.0 supports all types of kustomization files with or without the kind/api version. Moreover, it also offers an option to choose the command to kustomize the resources.  
+
+![Improved Kustomize Support](img/kustomizesupport.png)
+
+## Managing Optional References 
+
+Monokle 1.3.0 does not show incorrect optional references as errors in resources. 
+
+![Managing Optional References](img/optionalreferences.png)
+
+As can be observed from the above snippet, configMapKeyRef has a value set to true - showing no error for the invalid for the name reference, in comparison to the one below which is set to false.  
+
+![Managing Optional References](img/optionalreferences2.png)
+
+You can always disable it in the Settings pane by selecting “Ignore Optional Unsatisfied Links.” 
+
+![Managing Optional references](img/optionalreferences3.png)
+
+## “Unknown Resource Kind” Shown In Navigator 
+
+In Monokle 1.3.0, the unrecognized resources shown under a dedicated “Unknown” section are placed at the bottom of Navigator. 
+
+![Unknown Resource Kind](img/unknown.png)
+
+## Notification Centre 
+
+In Monokle 1.3.0, a Notification center is added that allows you to have a quick view of all the past notifications. 
+
+![Notification Centre](img/notifications.png)
