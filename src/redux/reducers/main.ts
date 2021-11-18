@@ -129,7 +129,7 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
 const clearSelectedResourceOnPreviewExit = (state: AppState) => {
   if (state.selectedResourceId) {
     const selectedResource = state.resourceMap[state.selectedResourceId];
-    if (selectedResource.filePath.startsWith(PREVIEW_PREFIX)) {
+    if (selectedResource && selectedResource.filePath.startsWith(PREVIEW_PREFIX)) {
       state.selectedResourceId = undefined;
     }
   }
