@@ -44,7 +44,7 @@ const PreviewMenu = (props: {
 
   return (
     <Menu onClick={onClick} selectedKeys={previewKey ? [previewKey] : undefined}>
-      <SubMenu title="Helm Charts" key="helmcharts">
+      <SubMenu title="Helm Charts" key="helmcharts" disabled={helmCharts.length === 0}>
         {helmCharts.map(helmChart => (
           <Menu.ItemGroup title={helmChart.name} key={helmChart.id}>
             {helmChart.subItems.map(valuesFile => (
@@ -53,7 +53,12 @@ const PreviewMenu = (props: {
           </Menu.ItemGroup>
         ))}
       </SubMenu>
-      <SubMenu title="Kustomizations" style={{maxHeight: 250}} key="kustomizations">
+      <SubMenu
+        title="Kustomizations"
+        style={{maxHeight: 250}}
+        key="kustomizations"
+        disabled={kustomizations.length === 0}
+      >
         {kustomizations.map(kustomization => (
           <Menu.Item key={`kustomization__${kustomization.id}`}>{kustomization.name}</Menu.Item>
         ))}
@@ -157,6 +162,7 @@ const PreviewDropdown = (props: {btnStyle?: React.CSSProperties}) => {
 
   return (
     <Dropdown
+      disabled={helmCharts.length === 0 && kustomizations.length === 0}
       overlay={
         <PreviewMenu
           helmCharts={helmCharts}

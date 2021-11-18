@@ -277,11 +277,7 @@
   "lint-staged": {
     "{src,test}/**/*.{js,jsx,ts,tsx}": [
       "prettier --write"
-    ],
-    ".": [
-      "eslint . --fix"
-    ],
-    "*.css": "stylelint --fix"
+    ]
   },
   "eslintConfig": {
     "extends": [

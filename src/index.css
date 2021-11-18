@@ -38,3 +38,8 @@ code {
   color: #1890FF !important;
   text-decoration: underline;
 }
+
+.ant-menu-submenu-popup {
+  max-height: 250px !important;
+  overflow-y: scroll !important;
+}
