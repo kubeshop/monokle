@@ -447,11 +447,19 @@ export const mainSlice = createSlice({
         state.clusterDiff.selectedMatches.push(matchId);
       }
     },
+    selectAllClusterDiffMatches: (state: Draft<AppState>) => {
+      state.clusterDiff.selectedMatches = state.clusterDiff.clusterToLocalResourcesMatches.map(
+        match => `${match.resourceName}#${match.resourceKind}#${match.resourceNamespace}`
+      );
+    },
     unselectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const matchId = action.payload;
       if (state.clusterDiff.selectedMatches.includes(matchId)) {
         state.clusterDiff.selectedMatches = state.clusterDiff.selectedMatches.filter(m => m !== matchId);
       }
+    },
+    unselectAllClusterDiffMatches: (state: Draft<AppState>) => {
+      state.clusterDiff.selectedMatches = [];
     },
   },
   extraReducers: builder => {
@@ -611,6 +619,7 @@ export const mainSlice = createSlice({
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
         state.clusterDiff.shouldReload = undefined;
+        state.clusterDiff.selectedMatches = [];
       })
       .addCase(loadClusterDiff.rejected, state => {
         state.clusterDiff.hasLoaded = true;
@@ -618,6 +627,7 @@ export const mainSlice = createSlice({
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
         state.clusterDiff.shouldReload = undefined;
+        state.clusterDiff.selectedMatches = [];
       })
       .addCase(loadClusterDiff.fulfilled, (state, action) => {
         const clusterResourceMap = action.payload.resourceMap;
@@ -716,6 +726,7 @@ export const mainSlice = createSlice({
         state.clusterDiff.diffResourceId = undefined;
         state.clusterDiff.refreshDiffResource = undefined;
         state.clusterDiff.shouldReload = undefined;
+        state.clusterDiff.selectedMatches = [];
       });
 
     builder.addCase(closeClusterDiff.type, state => {
@@ -729,6 +740,7 @@ export const mainSlice = createSlice({
       state.clusterDiff.diffResourceId = undefined;
       state.clusterDiff.refreshDiffResource = undefined;
       state.clusterDiff.shouldReload = undefined;
+      state.clusterDiff.selectedMatches = [];
     });
 
     builder.addMatcher(
@@ -857,6 +869,8 @@ export const {
   setDiffResourceInClusterDiff,
   setClusterDiffRefreshDiffResource,
   selectClusterDiffMatch,
+  selectAllClusterDiffMatches,
   unselectClusterDiffMatch,
+  unselectAllClusterDiffMatches,
 } = mainSlice.actions;
 export default mainSlice.reducer;
