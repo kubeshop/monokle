@@ -10,11 +10,10 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
+import {closeFolderExplorer, openRenameEntityModal, setShouldExpandAllNodes} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {stopPreview} from '@redux/services/preview';
-import store from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {AlertEnum} from '@models/alert';
@@ -281,7 +280,7 @@ const SpinnerWrapper = styled.div`
 
 interface ProcessingEntity {
   processingEntityID?: string;
-  processingType?: 'delete';
+  processingType?: 'delete' | 'rename';
 }
 
 interface TreeItemProps {
@@ -290,6 +289,7 @@ interface TreeItemProps {
   setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
   processingEntity: ProcessingEntity;
   onDeleting: (args: DeleteEntityCallback) => void;
+  onRenaming: (absolutePath: string) => void;
 }
 
 function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
@@ -308,7 +308,7 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {title, treeKey, setProcessingEntity, processingEntity, onDeleting} = props;
+  const {title, treeKey, setProcessingEntity, processingEntity, onDeleting, onRenaming} = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const [isTitleHovered, setTitleHoverState] = useState(false);
@@ -378,6 +378,16 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           Delete
         </Menu.Item>
       ) : null}
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+
+          onRenaming(absolutePath);
+        }}
+        key="rename_entity"
+      >
+        Rename
+      </Menu.Item>
     </Menu>
   );
   //
@@ -529,7 +539,7 @@ const FileTreePane = () => {
     const {isDirectory, name, err} = args;
 
     if (err) {
-      store.dispatch(
+      dispatch(
         setAlert({
           title: 'Deleting failed',
           message: `Something went wrong during deleting a ${isDirectory ? 'directory' : 'file'}`,
@@ -537,7 +547,7 @@ const FileTreePane = () => {
         })
       );
     } else {
-      store.dispatch(
+      dispatch(
         setAlert({
           title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
           message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
@@ -554,6 +564,10 @@ const FileTreePane = () => {
     setTimeout(() => {
       setProcessingEntity({processingEntityID: undefined, processingType: undefined});
     }, 2000);
+  };
+
+  const onRenaming = (absolutePathToEntity: string) => {
+    dispatch(openRenameEntityModal(absolutePathToEntity));
   };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
@@ -637,10 +651,6 @@ const FileTreePane = () => {
   }, [tree]);
 
   const onToggleTree = () => {
-    if (!expandedKeys.includes(fileMap[ROOT_FILE_ENTRY].filePath)) {
-      return setExpandedKeys(allTreeKeys);
-    }
-
     setExpandedKeys(prevState => (prevState.length ? [] : allTreeKeys));
   };
 
@@ -708,6 +718,7 @@ const FileTreePane = () => {
                 processingEntity={processingEntity}
                 setProcessingEntity={setProcessingEntity}
                 onDeleting={onDeleting}
+                onRenaming={onRenaming}
                 {...event}
               />
             );

@@ -1,9 +1,13 @@
-import {createAsyncThunk, createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {PaneConfiguration, UiState, NewResourceWizardInput, MonacoUiState} from '@models/ui';
 import initialState from '@redux/initialState';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+
 import {ResourceValidationError} from '@models/k8sresource';
+import {MonacoUiState, NewResourceWizardInput, PaneConfiguration, UiState} from '@models/ui';
+
 import electronStore from '@utils/electronStore';
+
+import path from 'path/posix';
 
 export const resetLayout = createAsyncThunk('ui/resetLayout', async (_, thunkAPI) => {
   thunkAPI.dispatch(uiSlice.actions.setLeftMenuIsActive(true));
@@ -78,6 +82,20 @@ export const uiSlice = createSlice({
       state.newResourceWizard.isOpen = false;
       electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
       state.newResourceWizard.defaultInput = undefined;
+    },
+    openRenameEntityModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.renameEntityModal = {
+        isOpen: true,
+        entityName: path.basename(action.payload),
+        absolutePathToEntity: action.payload,
+      };
+    },
+    closeRenameEntityModal: (state: Draft<UiState>) => {
+      state.renameEntityModal = {
+        isOpen: false,
+        entityName: '',
+        absolutePathToEntity: '',
+      };
     },
     openRenameResourceModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.renameResourceModal = {
@@ -169,5 +187,7 @@ export const {
   setPaneConfiguration,
   setRightMenuIsActive,
   setLeftMenuIsActive,
+  openRenameEntityModal,
+  closeRenameEntityModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

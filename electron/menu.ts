@@ -162,9 +162,10 @@ const editMenu = (store: any): MenuItemConstructorOptions => {
         },
       },
       {type: 'separator'},
-      {role: 'cut'},
       {role: 'copy'},
+      {role: 'cut'},
       {role: 'paste'},
+      {role: 'selectAll'},
       {type: 'separator'},
       {
         enabled: isMonacoActionEnabled,

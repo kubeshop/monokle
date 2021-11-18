@@ -91,6 +91,11 @@ const initialUiState: UiState = {
     isOpen: false,
     resourceId: '',
   },
+  renameEntityModal: {
+    isOpen: false,
+    entityName: '',
+    absolutePathToEntity: '',
+  },
   leftMenu: {
     selection: uiLeftMenuSelection,
     isActive:
