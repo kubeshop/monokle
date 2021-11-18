@@ -1,5 +1,4 @@
-/* eslint-disable unused-imports/no-unused-imports-ts */
-import {Button, Menu, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
+import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
 import {ipcRenderer, shell} from 'electron';
 import micromatch from 'micromatch';
 import os from 'os';
@@ -10,7 +9,6 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-// import {setAlert} from '@redux/reducers/alert';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -32,12 +30,12 @@ import ContextMenu from '@components/molecules/ContextMenu';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {BrowseFolderTooltip, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
 
-import {deleteFileOrDirectory, getFileStats} from '@utils/files';
+import {DeleteEntityCallback, deleteEntity, getFileStats} from '@utils/files';
 import {uniqueArr} from '@utils/index';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
@@ -276,28 +274,48 @@ const SpinnerWrapper = styled.div`
   width: 100%;
 
   @supports (backdrop-filter: blur(10px)) or (--webkit-backdrop-filter: blur(10px)) {
-    background-color: rgba(24, 144, 255, 0.05);
     backdrop-filter: blur(5px);
     --webkit-backdrop-filter: blur(5px);
   }
 `;
 
+interface ProcessingEntity {
+  processingEntityID?: string;
+  processingType?: 'delete';
+}
+
 interface TreeItemProps {
   title: React.ReactNode;
   treeKey: string;
-  setDeletingPath: Dispatch<SetStateAction<string>>;
-  deletingId: string;
+  setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
+  processingEntity: ProcessingEntity;
+  onDeleting: (args: DeleteEntityCallback) => void;
+}
+
+function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
+  const title = `Are you sure you want to delete "${path.basename(entityInfo.entityAbsolutePath)}"?`;
+
+  Modal.confirm({
+    title,
+    icon: <ExclamationCircleOutlined />,
+    onOk() {
+      onOk();
+    },
+    onCancel() {
+      onCancel();
+    },
+  });
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {title, treeKey, setDeletingPath, deletingId} = props;
+  const {title, treeKey, setProcessingEntity, processingEntity, onDeleting} = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const [isTitleHovered, setTitleHoverState] = useState(false);
 
   const relativePath = fileMap[ROOT_FILE_ENTRY].filePath === treeKey ? treeKey.split('/').reverse()[0] : treeKey;
 
-  const fullPath =
+  const absolutePath =
     fileMap[ROOT_FILE_ENTRY].filePath === treeKey
       ? fileMap[ROOT_FILE_ENTRY].filePath
       : `${fileMap[ROOT_FILE_ENTRY].filePath}${treeKey}`;
@@ -308,44 +326,13 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const platformFilemanagerName = platformFilemanagerNames[os.platform()] || 'explorer';
 
-  const onDeleting = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
-    const {isDirectory, name, err} = args;
-
-    if (err) {
-      store.dispatch(
-        setAlert({
-          title: 'Deleting failed',
-          message: `Something went wrong during deleting a ${isDirectory ? 'directory' : 'file'}`,
-          type: AlertEnum.Error,
-        })
-      );
-    } else {
-      store.dispatch(
-        setAlert({
-          title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
-          message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
-          type: AlertEnum.Success,
-        })
-      );
-    }
-
-    /**
-     * Deleting is performed immediately.
-     * The Ant Tree component is not updated immediately.
-     * I show the loader long enough to let the Ant Tree component update.
-     */
-    setTimeout(() => {
-      setDeletingPath('');
-    }, 2000);
-  };
-
   const menu = (
     <Menu>
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          shell.showItemInFolder(fullPath);
+          shell.showItemInFolder(absolutePath);
         }}
         key="reveal_in_finder"
       >
@@ -355,7 +342,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          navigator.clipboard.writeText(fullPath);
+          navigator.clipboard.writeText(absolutePath);
         }}
         key="copy_full_path"
       >
@@ -365,7 +352,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          navigator.clipboard.writeText(String(relativePath));
+          navigator.clipboard.writeText(relativePath);
         }}
         key="copy_relative_path"
       >
@@ -374,13 +361,19 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       {/* You would not like to be able to delete the root folder maybe? */}
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
         <Menu.Item
+          key="delete_entity"
           onClick={e => {
             e.domEvent.stopPropagation();
 
-            setDeletingPath(treeKey);
-            deleteFileOrDirectory(fullPath, onDeleting);
+            deleteEntityWizard(
+              {entityAbsolutePath: absolutePath},
+              () => {
+                setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
+                deleteEntity(absolutePath, onDeleting);
+              },
+              () => {}
+            );
           }}
-          key="delete"
         >
           Delete
         </Menu.Item>
@@ -398,12 +391,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       }}
     >
       <TreeTitleText>{title}</TreeTitleText>
-      {deletingId === treeKey ? (
+      {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' ? (
         <SpinnerWrapper>
           <Spinner />
         </SpinnerWrapper>
       ) : null}
-      {isTitleHovered ? (
+      {isTitleHovered && !processingEntity.processingType ? (
         <ContextMenu overlay={menu}>
           <div
             onClick={e => {
@@ -441,7 +434,10 @@ const FileTreePane = () => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const treeRef = useRef<any>();
-  const [deletingId, setDeletingPath] = useState('');
+  const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({
+    processingEntityID: undefined,
+    processingType: undefined,
+  });
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
@@ -527,6 +523,37 @@ const FileTreePane = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPath]);
+
+  const onDeleting = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
+    const {isDirectory, name, err} = args;
+
+    if (err) {
+      store.dispatch(
+        setAlert({
+          title: 'Deleting failed',
+          message: `Something went wrong during deleting a ${isDirectory ? 'directory' : 'file'}`,
+          type: AlertEnum.Error,
+        })
+      );
+    } else {
+      store.dispatch(
+        setAlert({
+          title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
+          message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
+          type: AlertEnum.Success,
+        })
+      );
+    }
+
+    /**
+     * Deleting is performed immediately.
+     * The Ant Tree component is not updated immediately.
+     * I show the loader long enough to let the Ant Tree component update.
+     */
+    setTimeout(() => {
+      setProcessingEntity({processingEntityID: undefined, processingType: undefined});
+    }, 2000);
+  };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
     if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(info.node.key), fileInclude))) {
@@ -674,8 +701,9 @@ const FileTreePane = () => {
               <TreeItem
                 treeKey={String(event.key)}
                 title={event.title}
-                setDeletingPath={setDeletingPath}
-                deletingId={deletingId}
+                processingEntity={processingEntity}
+                setProcessingEntity={setProcessingEntity}
+                onDeleting={onDeleting}
                 {...event}
               />
             );

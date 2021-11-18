@@ -7,7 +7,7 @@ const PaneContainer = styled.div`
   height: 100%;
   width: 100%;
   margin: 0px;
-  overflow-y: scroll;
+  overflow-y: visible;
   ::-webkit-scrollbar {
     width: 0;
     background: transparent;

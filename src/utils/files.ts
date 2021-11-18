@@ -4,6 +4,12 @@ import path from 'path';
 
 import {lstat} from 'fs/promises';
 
+export interface DeleteEntityCallback {
+  isDirectory: boolean;
+  name: string;
+  err: NodeJS.ErrnoException | null;
+}
+
 export function isSubDirectory(parentDir: string, dir: string) {
   const relative = path.relative(parentDir, dir);
   return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
@@ -21,15 +27,17 @@ export function getFileStats(filePath: string): fs.Stats | undefined {
 }
 
 /**
- * Deletes file or directory by specified path
+ * Deletes entity by specified path
  *
  * @param absolutePath
- * Absolute path to your file or directory
+ * Absolute path to your entity
+ * @param callback
+ * Function which is called whenever the entity was deleted or not
  */
 
-export async function deleteFileOrDirectory(absolutePath: string, callback: any): Promise<void> {
+export async function deleteEntity(absolutePath: string, callback: (args: DeleteEntityCallback) => any): Promise<void> {
   const isDirectory = (await lstat(absolutePath)).isDirectory();
-  const name = absolutePath.split('/').reverse()[0];
+  const name = path.basename(absolutePath);
 
   if (path.isAbsolute(absolutePath)) {
     return fs.rm(absolutePath, {recursive: true, force: true}, err => {
