@@ -4,7 +4,7 @@ import {ipcRenderer, shell} from 'electron';
 import micromatch from 'micromatch';
 import os from 'os';
 import path from 'path';
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import styled from 'styled-components';
 
@@ -23,7 +23,7 @@ import {AlertEnum} from '@models/alert';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 
-import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
 import FileExplorer from '@atoms/FileExplorer';
 
 import Dots from '@components/atoms/Dots';
@@ -262,19 +262,40 @@ const ReloadButton = styled(Button)``;
 
 const BrowseButton = styled(Button)``;
 
+const SpinnerWrapper = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+
+  @supports (backdrop-filter: blur(10px)) or (--webkit-backdrop-filter: blur(10px)) {
+    background-color: rgba(24, 144, 255, 0.05);
+    backdrop-filter: blur(5px);
+    --webkit-backdrop-filter: blur(5px);
+  }
+`;
+
 interface TreeItemProps {
   title: React.ReactNode;
-  treeKey: string | number;
+  treeKey: string;
+  setDeletingPath: Dispatch<SetStateAction<string>>;
+  deletingId: string;
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {title, treeKey} = props;
+  const {title, treeKey, setDeletingPath, deletingId} = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const [isTitleHovered, setTitleHoverState] = useState(false);
 
-  const relativePath =
-    fileMap[ROOT_FILE_ENTRY].filePath === treeKey ? treeKey.split('/').reverse()[0] : String(treeKey);
+  const relativePath = fileMap[ROOT_FILE_ENTRY].filePath === treeKey ? treeKey.split('/').reverse()[0] : treeKey;
 
   const fullPath =
     fileMap[ROOT_FILE_ENTRY].filePath === treeKey
@@ -287,25 +308,35 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const platformFilemanagerName = platformFilemanagerNames[os.platform()] || 'explorer';
 
-  const onDeleting = (args: any) => {
-    const {isDirectory, name, err = undefined} = args;
+  const onDeleting = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
+    const {isDirectory, name, err} = args;
+
     if (err) {
-      return store.dispatch(
+      store.dispatch(
         setAlert({
           title: 'Deleting failed',
           message: `Something went wrong during deleting a ${isDirectory ? 'directory' : 'file'}`,
           type: AlertEnum.Error,
         })
       );
+    } else {
+      store.dispatch(
+        setAlert({
+          title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
+          message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
+          type: AlertEnum.Success,
+        })
+      );
     }
 
-    store.dispatch(
-      setAlert({
-        title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
-        message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
-        type: AlertEnum.Success,
-      })
-    );
+    /**
+     * Deleting is performed immediately.
+     * The Ant Tree component is not updated immediately.
+     * I show the loader long enough to let the Ant Tree component update.
+     */
+    setTimeout(() => {
+      setDeletingPath('');
+    }, 2000);
   };
 
   const menu = (
@@ -340,19 +371,23 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         Copy relative path
       </Menu.Item>
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
+      {/* You would not like to be able to delete the root folder maybe? */}
+      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
+        <Menu.Item
+          onClick={e => {
+            e.domEvent.stopPropagation();
 
-          deleteFileOrDirectory(fullPath, onDeleting);
-        }}
-        key="delete"
-      >
-        Delete
-      </Menu.Item>
+            setDeletingPath(treeKey);
+            deleteFileOrDirectory(fullPath, onDeleting);
+          }}
+          key="delete"
+        >
+          Delete
+        </Menu.Item>
+      ) : null}
     </Menu>
   );
-
+  //
   return (
     <TreeTitleWrapper
       onMouseEnter={() => {
@@ -363,6 +398,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       }}
     >
       <TreeTitleText>{title}</TreeTitleText>
+      {deletingId === treeKey ? (
+        <SpinnerWrapper>
+          <Spinner />
+        </SpinnerWrapper>
+      ) : null}
       {isTitleHovered ? (
         <ContextMenu overlay={menu}>
           <div
@@ -401,6 +441,7 @@ const FileTreePane = () => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const treeRef = useRef<any>();
+  const [deletingId, setDeletingPath] = useState('');
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
@@ -629,7 +670,15 @@ const FileTreePane = () => {
           expandedKeys={expandedKeys}
           onExpand={onExpand}
           titleRender={event => {
-            return <TreeItem treeKey={event.key} title={event.title} {...event} />;
+            return (
+              <TreeItem
+                treeKey={String(event.key)}
+                title={event.title}
+                setDeletingPath={setDeletingPath}
+                deletingId={deletingId}
+                {...event}
+              />
+            );
           }}
           autoExpandParent={autoExpandParent}
           selectedKeys={[selectedPath || '-']}

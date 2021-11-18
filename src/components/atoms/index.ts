@@ -12,3 +12,4 @@ export {default as Content} from './Content';
 export {default as SplitView} from './SplitView';
 export {default as KeyValueInput} from './KeyValueInput';
 export {default as Dots} from './Dots';
+export {default as Spinner} from './Spinner';

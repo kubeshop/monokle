@@ -33,11 +33,7 @@ export async function deleteFileOrDirectory(absolutePath: string, callback: any)
 
   if (path.isAbsolute(absolutePath)) {
     return fs.rm(absolutePath, {recursive: true, force: true}, err => {
-      if (err) {
-        callback({isDirectory, name, err});
-      }
-
-      callback({isDirectory, name});
+      callback({isDirectory, name, err});
     });
   }
 }
