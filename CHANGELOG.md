@@ -2,6 +2,57 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.2](https://github.com/kubeshop/monokle/compare/v1.3.1...v1.3.2) (2021-11-18)
+
+
+### Features
+
+* add checkboxes to select resource matches ([ded1626](https://github.com/kubeshop/monokle/commit/ded16269cd77979d43c156d87671663e362ca561))
+* added Copy full path and Copy relative path buttons to File Explorer ([cfdbcfb](https://github.com/kubeshop/monokle/commit/cfdbcfb8d7d16bdeabde6372276710644fc2c503))
+* added Delete file/folder button to File Explorer ([35ec4e5](https://github.com/kubeshop/monokle/commit/35ec4e56b577368d564ef16a8ce003552d41e550))
+* added open in finder/explorer button in File Explorer ([0578eb6](https://github.com/kubeshop/monokle/commit/0578eb625b9b61204ea34496a9f1202eff0229a0))
+* create new tag automatically ([8b8e5bc](https://github.com/kubeshop/monokle/commit/8b8e5bcefb3a0c5569803207d464d636cdcd925f))
+* create release on every push to auto-updater branch ([498dba9](https://github.com/kubeshop/monokle/commit/498dba9904f8d65022db7215f382e699d63b9bab))
+* delete latest-version release and tag name ([9b5d29b](https://github.com/kubeshop/monokle/commit/9b5d29b97c980445f5e8b7b5843bfc6ac6b9cbfd))
+* disable automatic publish ([222f122](https://github.com/kubeshop/monokle/commit/222f122de046557c06010b5224f99b3dfe41ab5e))
+* fetch updates from latest-version tag ([3d81450](https://github.com/kubeshop/monokle/commit/3d8145088edf9905c011c23c930963b20f85e79e))
+* force creating release for same tag ([ec29c76](https://github.com/kubeshop/monokle/commit/ec29c768620f3c2658c94eb25b3c2a9243aebfd9))
+* logic to deploy multiple selected resources ([0ba7b67](https://github.com/kubeshop/monokle/commit/0ba7b678fbb03e93af671a2f298d34657c055cd3))
+* preview dropdown in cluster compare ([f9ab649](https://github.com/kubeshop/monokle/commit/f9ab6491a15b30182a1316d85cb2d9bda5c84928))
+* select/deselect all cluster compare matches ([b231cb0](https://github.com/kubeshop/monokle/commit/b231cb08175e64ab586b1ad402637033409619a8))
+* set cluster compare header color on preview ([330843a](https://github.com/kubeshop/monokle/commit/330843a6a66e973ff31a2d0a454c011e6e86f2b4))
+
+
+### Bug Fixes
+
+* added retrieval of custom resource objects from cluster ([9040a10](https://github.com/kubeshop/monokle/commit/9040a10eadd718ff1acca27b6269129b4b94fea6))
+* check if file exists before deletion ([13b882d](https://github.com/kubeshop/monokle/commit/13b882d71c64d29b0201df703abd19e0aa622377))
+* check that selectedResource is valid ([8b9c721](https://github.com/kubeshop/monokle/commit/8b9c721865a76457e951c36798d0ebcf33dbbbee))
+* disable selecting excluded files ([88c9a4d](https://github.com/kubeshop/monokle/commit/88c9a4df6338b0cc5757060901b911c29a4d298d))
+* editing values files ([f19f62a](https://github.com/kubeshop/monokle/commit/f19f62a2d82d7a74fab96def39c418a9ce39acab))
+* ensured old refs are removed ([bf3d7f4](https://github.com/kubeshop/monokle/commit/bf3d7f48d334b153f123e04da195939239f7d0fb))
+* ensured old refs are removed ([1f24098](https://github.com/kubeshop/monokle/commit/1f240984225aef48bf00599c953085aca5dfdbed))
+* extracted apply to shared method and fixed context dependency ([208d233](https://github.com/kubeshop/monokle/commit/208d233eb379593b3185f342b057fbae33e5f973))
+* fixed behavior when dev server did not run ([6450f2c](https://github.com/kubeshop/monokle/commit/6450f2cc205fe66de8c77c1a76f0cb746e961dd7))
+* fixed behavior when dev server did not run ([cb2f579](https://github.com/kubeshop/monokle/commit/cb2f579adb7ec7c3677f81eab611a0d6377e6911))
+* fixed method signature ([59ec10b](https://github.com/kubeshop/monokle/commit/59ec10bed152b51a588b01b1314ce2f3e66bee50))
+* fixed recalculation of kustomization resources on change ([9f58e45](https://github.com/kubeshop/monokle/commit/9f58e45fdb61f9f058b94122f4564f21df2e09a0))
+* fixed the main layout ([710616f](https://github.com/kubeshop/monokle/commit/710616f5915b56ef93170c4798eb2fe457b0cc6a))
+* improved wording in page header and window title ([6f9ba26](https://github.com/kubeshop/monokle/commit/6f9ba26756b80472f2f110b662b915d216baa658))
+* intermediate fix that ignores lastProbeTime/creationTimestamp validation errors ([fb215c9](https://github.com/kubeshop/monokle/commit/fb215c9b58c93d0bd0dec8e78357668078547d32))
+* max height for antd submenu popup ([f1b5589](https://github.com/kubeshop/monokle/commit/f1b558903b9e80f9d52282522374bc8e3d14b0b2))
+* missing prop ([1dea6e6](https://github.com/kubeshop/monokle/commit/1dea6e6f0c715da7d435667a422519feaccc4ced))
+* patch tag color ([e604620](https://github.com/kubeshop/monokle/commit/e60462062231c4aa51bf4ece7410acaa91626686))
+* react prop error ([cb4f76d](https://github.com/kubeshop/monokle/commit/cb4f76df592740a7910a7284a505e16d2f9953bf))
+* refactored in line with comments and fixed alert message ([9c910ee](https://github.com/kubeshop/monokle/commit/9c910ee6707581e71b17c00d5515faa90df2a2ba))
+* reprocess all resources for file updates ([32fa37b](https://github.com/kubeshop/monokle/commit/32fa37bb6217aae2973c4e0a9d681090e77fd6b2))
+* section items length color ([d6bb08f](https://github.com/kubeshop/monokle/commit/d6bb08f055d98402af0947908770576bcd610f99))
+* select values file path on preview ([0c14241](https://github.com/kubeshop/monokle/commit/0c142410142e31720dbdd506b0d7e6f0edaf5510))
+* set diff editors as read only ([f4e2982](https://github.com/kubeshop/monokle/commit/f4e2982a090bd2a0aabca7352ae176af915d832f))
+* unmount editor while cluster compare is open ([ad9da94](https://github.com/kubeshop/monokle/commit/ad9da94eecdb9b8e1110c9f62566ac12151af9eb))
+* unmount monaco ([5b68f77](https://github.com/kubeshop/monokle/commit/5b68f7728191eecb9c101478a438911064e0f943))
+* updated vulnerable dependencies and electron to 15.3.2 ([15d781e](https://github.com/kubeshop/monokle/commit/15d781e54e82e2d4528c7920b3ff0b29512b9320))
+
 ### [1.3.1](https://github.com/kubeshop/monokle/compare/v1.3.0...v1.3.1) (2021-11-15)
 
 
