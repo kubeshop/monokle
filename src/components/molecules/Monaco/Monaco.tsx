@@ -180,7 +180,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   }, [selectedPath, selectedResourceId]);
 
   useEffect(() => {
-    if (selectedResourceId && resourceMap[selectedResourceId].text !== code) {
+    if (selectedResourceId && resourceMap[selectedResourceId] && resourceMap[selectedResourceId].text !== code) {
       setCode(resourceMap[selectedResourceId].text);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

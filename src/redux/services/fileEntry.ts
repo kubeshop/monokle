@@ -1,16 +1,21 @@
 import fs from 'fs';
-import path from 'path';
-import micromatch from 'micromatch';
 import log from 'loglevel';
-import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
-import {AppConfig} from '@models/appconfig';
-import {FileEntry} from '@models/fileentry';
-import {K8sResource} from '@models/k8sresource';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/services/selection';
-import {HelmChart, HelmValuesFile} from '@models/helm';
+import micromatch from 'micromatch';
+import path from 'path';
 import {v4 as uuidv4} from 'uuid';
+
+import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/services/selection';
+
+import {AppConfig} from '@models/appconfig';
+import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
+import {HelmChart, HelmValuesFile} from '@models/helm';
+import {K8sResource} from '@models/k8sresource';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {getFileStats} from '@utils/files';
+
 import {extractK8sResources, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
@@ -293,6 +298,10 @@ export function getChildFilePath(child: string, parentEntry: FileEntry, fileMap:
  */
 
 export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapType) {
+  if (!fileMap[ROOT_FILE_ENTRY]) {
+    return undefined;
+  }
+
   const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
   if (filePath === rootFolder) {
     return fileMap[ROOT_FILE_ENTRY];
