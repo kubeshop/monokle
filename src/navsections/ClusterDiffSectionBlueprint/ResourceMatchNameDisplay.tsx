@@ -1,10 +1,15 @@
-import {Modal, Tag, Tooltip} from 'antd';
+import {Checkbox, Modal, Tag, Tooltip} from 'antd';
 import React, {useMemo, useState} from 'react';
 import styled from 'styled-components';
 import {stringify} from 'yaml';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setDiffResourceInClusterDiff, updateResource} from '@redux/reducers/main';
+import {
+  selectClusterDiffMatch,
+  setDiffResourceInClusterDiff,
+  unselectClusterDiffMatch,
+  updateResource,
+} from '@redux/reducers/main';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 
 import {K8sResource} from '@models/k8sresource';
@@ -42,7 +47,7 @@ const StyledDiffSpan = styled.span`
 `;
 
 const IconsContainer = styled.div`
-  width: 60px;
+  width: 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -51,6 +56,15 @@ const IconsContainer = styled.div`
 
 function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const {itemInstance} = props;
+
+  const {clusterResource, localResources, ...matchMeta} = (itemInstance.meta || {}) as {
+    resourceName: string;
+    resourceKind: string;
+    resourceNamespace: string;
+    clusterResource?: K8sResource;
+    localResources?: K8sResource[];
+  };
+
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -59,10 +73,12 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {clusterResource, localResources} = (itemInstance.meta || {}) as {
-    clusterResource?: K8sResource;
-    localResources?: K8sResource[];
-  };
+  const matchId = useMemo(() => {
+    return `${matchMeta.resourceName}#${matchMeta.resourceKind}#${matchMeta.resourceNamespace}`;
+  }, [matchMeta]);
+
+  const isMatchSelected = useAppSelector(state => state.main.clusterDiff.selectedMatches.includes(matchId));
+
   const firstLocalResource = useMemo(() => {
     return localResources && localResources.length > 0 ? localResources[0] : undefined;
   }, [localResources]);
@@ -128,6 +144,15 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       onCancel() {},
     });
   };
+
+  const onCheckboxChange = () => {
+    if (isMatchSelected) {
+      dispatch(unselectClusterDiffMatch(matchId));
+    } else {
+      dispatch(selectClusterDiffMatch(matchId));
+    }
+  };
+
   if (!clusterResource && !localResources) {
     return null;
   }
@@ -139,6 +164,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       onMouseLeave={() => setIsHovered(false)}
       highlightdiff={areResourcesDifferent}
     >
+      <Checkbox checked={isMatchSelected} onChange={onCheckboxChange} />
       <Label disabled={!firstLocalResource}>
         {!resourceFilterNamespace && (
           <Tag color={areResourcesDifferent ? 'yellow' : 'default'}>

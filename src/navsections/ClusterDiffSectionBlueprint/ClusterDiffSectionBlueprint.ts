@@ -85,6 +85,9 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
     builder: {
       getMeta(rawItem, scope) {
         return {
+          resourceName: rawItem.resourceName,
+          resourceKind: rawItem.resourceKind,
+          resourceNamespace: rawItem.resourceNamespace,
           clusterResource: rawItem.clusterResourceId ? scope.resourceMap[rawItem.clusterResourceId] : undefined,
           localResources: rawItem.localResourceIds
             ? rawItem.localResourceIds.map(id => scope.resourceMap[id])

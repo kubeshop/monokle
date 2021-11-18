@@ -441,6 +441,18 @@ export const mainSlice = createSlice({
     setClusterDiffRefreshDiffResource: (state: Draft<AppState>, action: PayloadAction<boolean | undefined>) => {
       state.clusterDiff.refreshDiffResource = action.payload;
     },
+    selectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      const matchId = action.payload;
+      if (!state.clusterDiff.selectedMatches.includes(matchId)) {
+        state.clusterDiff.selectedMatches.push(matchId);
+      }
+    },
+    unselectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      const matchId = action.payload;
+      if (state.clusterDiff.selectedMatches.includes(matchId)) {
+        state.clusterDiff.selectedMatches = state.clusterDiff.selectedMatches.filter(m => m !== matchId);
+      }
+    },
   },
   extraReducers: builder => {
     builder
@@ -537,6 +549,7 @@ export const mainSlice = createSlice({
         clusterToLocalResourcesMatches: [],
         diffResourceId: undefined,
         refreshDiffResource: undefined,
+        selectedMatches: [],
       };
       resetSelectionHistory(state);
     });
@@ -843,5 +856,7 @@ export const {
   addNotification,
   setDiffResourceInClusterDiff,
   setClusterDiffRefreshDiffResource,
+  selectClusterDiffMatch,
+  unselectClusterDiffMatch,
 } = mainSlice.actions;
 export default mainSlice.reducer;

@@ -68,7 +68,7 @@ function ResourceDiffSectionNameDisplay() {
           <PreviewDropdown btnStyle={{maxWidth: '285px'}} />
         </TagWrapper>
         <Spacing />
-        <TagWrapper>
+        <TagWrapper style={{paddingLeft: 45}}>
           <StyledTitle>Cluster Resources</StyledTitle>
           <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} type="primary" ghost>
             Reload

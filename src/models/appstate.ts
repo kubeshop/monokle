@@ -134,6 +134,7 @@ interface AppState {
     clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[];
     diffResourceId?: string;
     refreshDiffResource?: boolean;
+    selectedMatches: string[];
   };
   notifications: AlertType[];
 }
