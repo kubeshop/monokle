@@ -428,6 +428,7 @@ const FileTreePane = () => {
   const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
   const recentFolders = useAppSelector(state => state.config.recentFolders);
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
+  const scanExcludes = useAppSelector(state => state.config.scanExcludes);
   const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
   const [tree, setTree] = useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = useState<Array<React.Key>>([]);
@@ -557,6 +558,9 @@ const FileTreePane = () => {
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
     if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(info.node.key), fileInclude))) {
+      return;
+    }
+    if (scanExcludes.some(scanExclude => micromatch.isMatch(path.basename(info.node.key), scanExclude))) {
       return;
     }
     if (info.node.key) {
