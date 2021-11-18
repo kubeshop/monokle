@@ -507,6 +507,11 @@ export function removeResourceFromFile(
   }
   const absoluteFilePath = getAbsoluteResourcePath(removedResource, fileMap);
 
+  if (!fs.existsSync(absoluteFilePath)) {
+    log.error(`[removeResourceFromFile] - ${absoluteFilePath} doesn't exist`);
+    return;
+  }
+
   // get list of resourceIds in file sorted by startPosition
   const resourceIds = getResourcesForPath(removedResource.filePath, resourceMap)
     .sort((a, b) => {
