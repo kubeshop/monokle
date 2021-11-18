@@ -495,7 +495,9 @@ export const mainSlice = createSlice({
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
-        state.selectedPath = undefined;
+        if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
+          selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
+        }
         state.selectedValuesFileId = action.payload.previewResourceId;
       })
       .addCase(previewHelmValuesFile.rejected, (state, action) => {
