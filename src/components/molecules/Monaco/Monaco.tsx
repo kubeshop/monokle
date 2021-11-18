@@ -145,9 +145,13 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     setDirty(orgCode !== newValue);
     setCode(newValue);
 
-    // this will slow things down if document gets large - need to find a better solution...
-    const documents = parseAllDocuments(newValue);
-    setValid(documents.length > 0 && !documents.some(d => !isValidResourceDocument(d)));
+    if (selectedResourceId) {
+      // this will slow things down if document gets large - need to find a better solution...
+      const documents = parseAllDocuments(newValue);
+      setValid(documents.length > 0 && !documents.some(d => !isValidResourceDocument(d)));
+    } else {
+      setValid(true);
+    }
   };
 
   useEffect(() => {
