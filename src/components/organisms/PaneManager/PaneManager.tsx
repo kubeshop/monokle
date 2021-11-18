@@ -75,7 +75,7 @@ const StyledColumnRightMenu = styled(Col)`
 `;
 
 const StyledContent = styled(Content)`
-  overflow-y: visible;
+  overflow-y: clip;
 `;
 
 const MenuIcon = (props: {
