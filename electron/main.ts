@@ -23,7 +23,6 @@ import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constan
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
-import {autoUpdater} from 'electron-updater';
 import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
@@ -41,9 +40,9 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, selectFile} from '@root/electron/commands';
 import {setAppRehydrating} from '@redux/reducers/main';
+import autoUpdater from './auto-update';
 
 Object.assign(console, ElectronLog.functions);
-autoUpdater.logger = console;
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
 

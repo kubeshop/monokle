@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - auto-updater
   release:
     types:
       - prereleased
@@ -17,6 +18,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Delete release
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: latest-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        if: "contains(github.ref, 'auto-updater')"
+
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -50,6 +60,10 @@ jobs:
           ls -la
           npm list --depth=1
 
+      - name: Install Tools
+        run: |
+          sudo apt-get install jq
+
       - name: Build
         run: |
           npm run electron:build:ci
@@ -63,12 +77,36 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
+        if: "!contains(github.ref, 'auto-updater')"
+
+      - name: Package
+        run: |
+          contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
+          contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
+          npm exec -c "electron-builder --publish \"never\""
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+        if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size
       - name: Build Succeeded
         run: |
           ls -alh dist | grep Monokle && du -sh dist || true
         if: ${{ success() }}
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
+          draft: false
+          prerelease: true
+          omitBody: true
+          tag: 'latest-version'
+          commit: 'auto-updater'
+          token: ${{ secrets.github_token }}
+        if: "contains(github.ref, 'auto-updater')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
