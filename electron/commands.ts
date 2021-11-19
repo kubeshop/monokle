@@ -22,6 +22,7 @@ export const runKustomize = (folder: string, kustomizeCommand: KustomizeCommandT
       env: {
         NODE_ENV: PROCESS_ENV.NODE_ENV,
         PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
+        PATH: PROCESS_ENV.PATH,
       },
     });
 
@@ -70,6 +71,7 @@ export const runHelm = (args: any, event: Electron.IpcMainEvent) => {
         NODE_ENV: PROCESS_ENV.NODE_ENV,
         PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
         KUBECONFIG: args.kubeconfig,
+        PATH: PROCESS_ENV.PATH,
       },
     });
 
