@@ -15,7 +15,7 @@ import ResourceActionsMenu from '@components/molecules/ResourceActionsMenu';
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
   margin-right: 8px;
-  padding: 0 6px;
+  padding: 8px;
   display: flex;
   align-items: center;
 `;

@@ -329,6 +329,7 @@ export const mainSlice = createSlice({
       }
       if (state.selectedResourceId === resourceId) {
         clearResourceSelections(state.resourceMap);
+        state.selectedResourceId = undefined;
       }
       if (isUnsavedResource(resource)) {
         delete state.resourceMap[resource.id];
