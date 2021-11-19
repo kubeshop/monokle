@@ -1,4 +1,5 @@
 import asyncLib from 'async';
+import log from 'loglevel';
 import {shallowEqual} from 'react-redux';
 import {Middleware} from 'redux';
 
@@ -134,7 +135,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
 
   if (Object.values(isChangedByScopeKey).every(isChanged => isChanged === false)) {
     // eslint-disable-next-line no-console
-    console.log('fullScope did not change.');
+    log.debug('fullScope did not change.');
     return;
   }
 
@@ -145,7 +146,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     );
     if (!hasSectionScopeChanged) {
       // eslint-disable-next-line no-console
-      console.log(`Section ${sectionBlueprint.id} scope did not change`);
+      log.debug(`Section ${sectionBlueprint.id} scope did not change`);
       return;
     }
     const sectionScope = pickPartialRecord(fullScope, scopeKeysBySectionId[sectionBlueprint.id]);
@@ -250,7 +251,7 @@ export const sectionBlueprintMiddleware: Middleware = store => next => action =>
     action?.type === collapseSectionIds.type
   ) {
     // eslint-disable-next-line no-console
-    console.log('Not processing.');
+    log.debug('Not processing.');
     return;
   }
   const state: RootState = store.getState();

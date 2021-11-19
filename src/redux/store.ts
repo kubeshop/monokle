@@ -1,7 +1,7 @@
 import {forwardToMain, replayActionRenderer} from 'electron-redux';
-import logger from 'redux-logger';
+import {createLogger} from 'redux-logger';
 
-import {configureStore} from '@reduxjs/toolkit';
+import {Middleware, configureStore} from '@reduxjs/toolkit';
 
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 
@@ -9,9 +9,20 @@ import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
 import {logsSlice} from './reducers/logs';
 import {mainSlice} from './reducers/main';
-import {navigatorSlice} from './reducers/navigator';
+import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {uiSlice} from './reducers/ui';
 import {uiCoachSlice} from './reducers/uiCoach';
+
+const middlewares: Middleware[] = [];
+
+if (process.env.NODE_ENV === `development`) {
+  const reduxLoggerMiddleware = createLogger({
+    predicate: (getState, action) => action.type !== updateNavigatorInstanceState.type,
+    collapsed: (getState, action, logEntry) => !logEntry?.error,
+  });
+
+  middlewares.push(reduxLoggerMiddleware);
+}
 
 const store = configureStore({
   reducer: {
@@ -25,7 +36,7 @@ const store = configureStore({
   },
   middleware: getDefaultMiddleware => [
     forwardToMain,
-    ...getDefaultMiddleware().concat(logger),
+    ...getDefaultMiddleware().concat(middlewares),
     sectionBlueprintMiddleware,
   ],
 });
