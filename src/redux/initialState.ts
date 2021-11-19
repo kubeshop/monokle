@@ -58,7 +58,7 @@ const initialAppConfigState: AppConfig = {
     loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
-  isScanExcludesUpdated: false,
+  isScanExcludesUpdated: 'outdated',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
   recentFolders: electronStore.get('appConfig.recentFolders') || [],

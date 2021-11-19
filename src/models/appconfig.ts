@@ -33,7 +33,7 @@ interface AppConfig {
   /**
    * Whether the scan excludes list is updated (actual)
    */
-  isScanExcludesUpdated: boolean;
+  isScanExcludesUpdated: 'outdated' | 'applied';
   /** a list of patterns to match to against files for including */
   fileIncludes: string[];
   /** maximum recursion depth when reading nested folders */

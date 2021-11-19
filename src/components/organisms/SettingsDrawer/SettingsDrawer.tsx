@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
-  setScanExcludesOutdated,
+  setScanExcludesStatus,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
@@ -99,7 +99,7 @@ const SettingsDrawer = () => {
 
   const onChangeScanExcludes = (patterns: string[]) => {
     dispatch(updateScanExcludes(patterns));
-    dispatch(setScanExcludesOutdated());
+    dispatch(setScanExcludesStatus('outdated'));
   };
 
   // const onChangeTheme = (e: RadioChangeEvent) => {

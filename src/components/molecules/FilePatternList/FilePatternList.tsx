@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setScanExcludesUpdated} from '@redux/reducers/appConfig';
+import {setScanExcludesStatus} from '@redux/reducers/appConfig';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {useOnClickOutside} from '@hooks/useOnClickOutside';
@@ -122,10 +122,10 @@ const FilePatternList = (props: FilePatternListProps) => {
               Add Pattern
             </Button>
           </Tooltip>
-          {!appConfig.isScanExcludesUpdated && type === 'excludes' ? (
+          {appConfig.isScanExcludesUpdated === 'outdated' && type === 'excludes' ? (
             <Button
               onClick={() => {
-                dispatch(setScanExcludesUpdated());
+                dispatch(setScanExcludesStatus('applied'));
                 dispatch(setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath));
               }}
             >

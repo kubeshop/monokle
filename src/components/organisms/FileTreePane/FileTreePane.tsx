@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setScanExcludesOutdated, setScanExcludesUpdated, updateScanExcludes} from '@redux/reducers/appConfig';
+import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {closeFolderExplorer, openRenameEntityModal, setShouldExpandAllNodes} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -499,7 +499,7 @@ const FileTreePane = () => {
 
   const setFolder = useCallback(
     (folder: string) => {
-      dispatch(setScanExcludesUpdated());
+      dispatch(setScanExcludesStatus('applied'));
       dispatch(setRootFolder(folder));
     },
     [dispatch]
@@ -630,11 +630,11 @@ const FileTreePane = () => {
       icon: <ExclamationCircleOutlined />,
       cancelText: 'Not now',
       onOk: () => {
-        setScanExcludesUpdated();
+        setScanExcludesStatus('applied');
         refreshFolder();
       },
       onCancel: () => {
-        dispatch(setScanExcludesOutdated());
+        dispatch(setScanExcludesStatus('outdated'));
       },
     });
   };
@@ -715,7 +715,7 @@ const FileTreePane = () => {
             <TitleBarContainer>
               <Title>
                 File Explorer{' '}
-                {!isScanExcludesUpdated ? (
+                {isScanExcludesUpdated === 'outdated' ? (
                   <Tooltip title={FileExplorerChanged}>
                     <ExclamationCircleOutlined />
                   </Tooltip>
