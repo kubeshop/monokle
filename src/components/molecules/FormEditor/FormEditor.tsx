@@ -145,17 +145,8 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
   const [hasChanged, setHasChanged] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
-
-  let schema;
-  let uiSchema;
-
-  if (type === 'metadata') {
-    schema = selectedResource && getFormSchema(type);
-    uiSchema = selectedResource && getUiSchema(type);
-  } else {
-    schema = selectedResource && getFormSchema(selectedResource.kind);
-    uiSchema = selectedResource && getUiSchema(selectedResource.kind);
-  }
+  const [schema, setSchema] = useState({});
+  const [uiSchema, setUiSchema] = useState({});
 
   const onFormUpdate = useCallback(
     (e: any) => {
@@ -212,9 +203,13 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
 
   useEffect(() => {
     if (selectedResource) {
+      setSchema(getFormSchema(type === 'metadata' ? type : selectedResource.kind));
+      setUiSchema(getUiSchema(type === 'metadata' ? type : selectedResource.kind));
+
       setFormData({currFormData: selectedResource.content, orgFormData: formData.orgFormData || undefined});
     }
-  }, [selectedResource]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedResource, type]);
 
   if (!selectedResource) {
     return <div>Nothing selected...</div>;
