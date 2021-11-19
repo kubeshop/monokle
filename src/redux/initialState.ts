@@ -58,6 +58,7 @@ const initialAppConfigState: AppConfig = {
     loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
+  isScanExcludesUpdated: false,
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
   recentFolders: electronStore.get('appConfig.recentFolders') || [],
@@ -71,7 +72,7 @@ const initialAppConfigState: AppConfig = {
     contexts: [],
     currentContext: undefined,
   },
-  os: os.platform(),
+  osPlatform: os.platform(),
 };
 
 const initialAlertState: AlertState = {};

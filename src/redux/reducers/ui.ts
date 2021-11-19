@@ -85,9 +85,9 @@ export const uiSlice = createSlice({
     },
     openRenameEntityModal: (
       state: Draft<UiState>,
-      action: PayloadAction<{os: string; absolutePathToEntity: string}>
+      action: PayloadAction<{absolutePathToEntity: string; osPlatform: string}>
     ) => {
-      const getBasename = action.payload.os === 'win32' ? path.win32.basename : path.basename;
+      const getBasename = action.payload.osPlatform === 'win32' ? path.win32.basename : path.basename;
 
       state.renameEntityModal = {
         isOpen: true,

@@ -2,7 +2,13 @@ import {Button, Input, Tooltip} from 'antd';
 import {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
 
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setScanExcludesUpdated} from '@redux/reducers/appConfig';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
 import {useOnClickOutside} from '@hooks/useOnClickOutside';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useFocus} from '@utils/hooks';
 
@@ -13,6 +19,7 @@ type FilePatternListProps = {
   onChange: (patterns: string[]) => void;
   tooltip: string;
   isSettingsOpened?: boolean;
+  type?: 'excludes' | 'includes';
 };
 
 const StyledUl = styled.ul`
@@ -26,12 +33,16 @@ const StyledButton = styled(Button)`
 `;
 
 const FilePatternList = (props: FilePatternListProps) => {
-  const {value, onChange, tooltip, isSettingsOpened} = props;
+  const {value, onChange, tooltip, isSettingsOpened, type} = props;
+
+  const dispatch = useAppDispatch();
 
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<Input>();
   const filePatternInputRef = useRef<any>();
+  const appConfig = useAppSelector(state => state.config);
+  const fileMap = useAppSelector(state => state.main.fileMap);
 
   useOnClickOutside(filePatternInputRef, () => {
     setIsAddingPattern(false);
@@ -105,9 +116,23 @@ const FilePatternList = (props: FilePatternListProps) => {
           <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
         </div>
       ) : (
-        <Tooltip title={tooltip}>
-          <Button onClick={() => setIsAddingPattern(true)}>Add Pattern</Button>
-        </Tooltip>
+        <>
+          <Tooltip title={tooltip}>
+            <Button onClick={() => setIsAddingPattern(true)} style={{marginRight: 10}}>
+              Add Pattern
+            </Button>
+          </Tooltip>
+          {!appConfig.isScanExcludesUpdated && type === 'excludes' ? (
+            <Button
+              onClick={() => {
+                dispatch(setScanExcludesUpdated());
+                dispatch(setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath));
+              }}
+            >
+              Apply changes
+            </Button>
+          ) : null}
+        </>
       )}
     </div>
   );

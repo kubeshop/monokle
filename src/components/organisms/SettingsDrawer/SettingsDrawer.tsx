@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
+  setScanExcludesOutdated,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
@@ -98,6 +99,7 @@ const SettingsDrawer = () => {
 
   const onChangeScanExcludes = (patterns: string[]) => {
     dispatch(updateScanExcludes(patterns));
+    dispatch(setScanExcludesOutdated());
   };
 
   // const onChangeTheme = (e: RadioChangeEvent) => {
@@ -216,6 +218,7 @@ const SettingsDrawer = () => {
           onChange={onChangeScanExcludes}
           tooltip={AddExclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
+          type="excludes"
         />
       </StyledDiv>
       <StyledDiv>
