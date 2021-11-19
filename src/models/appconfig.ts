@@ -56,6 +56,7 @@ interface AppConfig {
     data: any;
   };
   kubeConfig: KubeConfig;
+  os: NodeJS.Platform;
 }
 
 export type {AppConfig};

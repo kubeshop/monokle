@@ -83,11 +83,16 @@ export const uiSlice = createSlice({
       electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
       state.newResourceWizard.defaultInput = undefined;
     },
-    openRenameEntityModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    openRenameEntityModal: (
+      state: Draft<UiState>,
+      action: PayloadAction<{os: string; absolutePathToEntity: string}>
+    ) => {
+      const getBasename = action.payload.os === 'win32' ? path.win32.basename : path.basename;
+
       state.renameEntityModal = {
         isOpen: true,
-        entityName: path.basename(action.payload),
-        absolutePathToEntity: action.payload,
+        entityName: getBasename(action.payload.absolutePathToEntity),
+        absolutePathToEntity: action.payload.absolutePathToEntity,
       };
     },
     closeRenameEntityModal: (state: Draft<UiState>) => {

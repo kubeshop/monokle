@@ -1,7 +1,6 @@
-import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
+import {Button, Divider, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
 import {ipcRenderer, shell} from 'electron';
 import micromatch from 'micromatch';
-import os from 'os';
 import path from 'path';
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
@@ -289,7 +288,7 @@ interface TreeItemProps {
   setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
   processingEntity: ProcessingEntity;
   onDeleting: (args: DeleteEntityCallback) => void;
-  onRenaming: (absolutePath: string) => void;
+  onRenaming: (absolutePath: string, os: any) => void;
 }
 
 function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
@@ -311,20 +310,22 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const {title, treeKey, setProcessingEntity, processingEntity, onDeleting, onRenaming} = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const userOS = useAppSelector(state => state.config.os);
   const [isTitleHovered, setTitleHoverState] = useState(false);
 
-  const relativePath = fileMap[ROOT_FILE_ENTRY].filePath === treeKey ? treeKey.split('/').reverse()[0] : treeKey;
+  const getBasename = userOS === 'win32' ? path.win32.basename : path.basename;
 
-  const absolutePath =
-    fileMap[ROOT_FILE_ENTRY].filePath === treeKey
-      ? fileMap[ROOT_FILE_ENTRY].filePath
-      : `${fileMap[ROOT_FILE_ENTRY].filePath}${treeKey}`;
+  const isRoot = fileMap[ROOT_FILE_ENTRY].filePath === treeKey;
+  const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
+  const absolutePath = isRoot
+    ? fileMap[ROOT_FILE_ENTRY].filePath
+    : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
 
   const platformFilemanagerNames: {[name: string]: string} = {
     darwin: 'finder',
   };
 
-  const platformFilemanagerName = platformFilemanagerNames[os.platform()] || 'explorer';
+  const platformFilemanagerName = platformFilemanagerNames[userOS] || 'explorer';
 
   const menu = (
     <Menu>
@@ -338,6 +339,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         Reveal in {platformFilemanagerName}
       </Menu.Item>
+      <Divider style={{margin: 0}} />
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
@@ -358,39 +360,41 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         Copy relative path
       </Menu.Item>
-      {/* You would not like to be able to delete the root folder maybe? */}
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-        <Menu.Item
-          key="delete_entity"
-          onClick={e => {
-            e.domEvent.stopPropagation();
+        <>
+          <Divider style={{margin: 0}} />
+          <Menu.Item
+            onClick={e => {
+              e.domEvent.stopPropagation();
 
-            deleteEntityWizard(
-              {entityAbsolutePath: absolutePath},
-              () => {
-                setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
-                deleteEntity(absolutePath, onDeleting);
-              },
-              () => {}
-            );
-          }}
-        >
-          Delete
-        </Menu.Item>
+              onRenaming(absolutePath, userOS);
+            }}
+            key="rename_entity"
+          >
+            Rename
+          </Menu.Item>
+          <Menu.Item
+            key="delete_entity"
+            onClick={e => {
+              e.domEvent.stopPropagation();
+
+              deleteEntityWizard(
+                {entityAbsolutePath: absolutePath},
+                () => {
+                  setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
+                  deleteEntity(absolutePath, onDeleting);
+                },
+                () => {}
+              );
+            }}
+          >
+            Delete
+          </Menu.Item>
+        </>
       ) : null}
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
-          onRenaming(absolutePath);
-        }}
-        key="rename_entity"
-      >
-        Rename
-      </Menu.Item>
     </Menu>
   );
-  //
+
   return (
     <TreeTitleWrapper
       onMouseEnter={() => {
@@ -566,8 +570,8 @@ const FileTreePane = () => {
     }, 2000);
   };
 
-  const onRenaming = (absolutePathToEntity: string) => {
-    dispatch(openRenameEntityModal(absolutePathToEntity));
+  const onRenaming = (absolutePathToEntity: string, os: string) => {
+    dispatch(openRenameEntityModal({absolutePathToEntity, os}));
   };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {

@@ -1,3 +1,5 @@
+import os from 'os';
+
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
@@ -69,6 +71,7 @@ const initialAppConfigState: AppConfig = {
     contexts: [],
     currentContext: undefined,
   },
+  os: os.platform(),
 };
 
 const initialAlertState: AlertState = {};
