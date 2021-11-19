@@ -26,19 +26,27 @@ const formSchemaCache = new Map<string, any>();
 const uiformSchemaCache = new Map<string, any>();
 
 function getFormSchema(kind: string) {
-  if (!formSchemaCache.has(kind)) {
-    formSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`)));
-  }
+  try {
+    if (!formSchemaCache.has(kind)) {
+      formSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`)));
+    }
 
-  return formSchemaCache.get(kind);
+    return formSchemaCache.get(kind);
+  } catch (error) {
+    return undefined;
+  }
 }
 
 function getUiSchema(kind: string) {
-  if (!uiformSchemaCache.has(kind)) {
-    uiformSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`)));
-  }
+  try {
+    if (!uiformSchemaCache.has(kind)) {
+      uiformSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`)));
+    }
 
-  return uiformSchemaCache.get(kind);
+    return uiformSchemaCache.get(kind);
+  } catch (error) {
+    return undefined;
+  }
 }
 
 const FormContainer = styled.div<{contentHeight: string}>`
@@ -127,8 +135,8 @@ const FormContainer = styled.div<{contentHeight: string}>`
   }
 `;
 
-const FormEditor = (props: {contentHeight: string}) => {
-  const {contentHeight} = props;
+const FormEditor = (props: {contentHeight: string; type: string}) => {
+  const {contentHeight, type} = props;
   const selectedResource = useSelector(selectedResourceSelector);
   const [formData, setFormData] = useState<{
     currFormData: any;
@@ -138,10 +146,16 @@ const FormEditor = (props: {contentHeight: string}) => {
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  let schema =
-    selectedResource && selectedResource.kind === 'ConfigMap' ? getFormSchema(selectedResource.kind) : undefined;
-  let uiSchema =
-    selectedResource && selectedResource.kind === 'ConfigMap' ? getUiSchema(selectedResource.kind) : undefined;
+  let schema;
+  let uiSchema;
+
+  if (type === 'metadata') {
+    schema = selectedResource && getFormSchema(type);
+    uiSchema = selectedResource && getUiSchema(type);
+  } else {
+    schema = selectedResource && getFormSchema(selectedResource.kind);
+    uiSchema = selectedResource && getUiSchema(selectedResource.kind);
+  }
 
   const onFormUpdate = useCallback(
     (e: any) => {
@@ -206,8 +220,8 @@ const FormEditor = (props: {contentHeight: string}) => {
     return <div>Nothing selected...</div>;
   }
 
-  if (selectedResource?.kind !== 'ConfigMap') {
-    return <div>Form editor only for ConfigMap resources...</div>;
+  if (!schema || !uiSchema) {
+    return <div>Not supported resource type..</div>;
   }
 
   return (
