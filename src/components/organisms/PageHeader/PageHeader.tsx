@@ -32,6 +32,8 @@ import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
+import {DiscordTooltip, DocumentationTooltip, GitHubTooltip, NotificationsTooltip, SettingsTooltip} from './tooltips';
+
 const StyledLogo = styled.img`
   height: 24px;
   margin: 4px;
@@ -234,29 +236,29 @@ const PageHeader = () => {
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
           <SettingsCol span={12}>
-            <Tooltip title="Documentation" placement="left">
+            <Tooltip title={DocumentationTooltip} placement="bottomRight">
               <GitHubIconSpan>
                 <QuestionCircleOutlined size={24} onClick={openDocumentation} />
               </GitHubIconSpan>
             </Tooltip>
-            <Tooltip title="Discord">
+            <Tooltip title={DiscordTooltip} placement="bottomRight">
               <StyledNotificationsBadge>
                 <span onClick={openDiscord}>
                   <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer'}} />
                 </span>
               </StyledNotificationsBadge>
             </Tooltip>
-            <Tooltip title="GitHub">
+            <Tooltip title={GitHubTooltip} placement="bottomRight">
               <GitHubIconSpan>
                 <GithubOutlined size={24} onClick={openGitHub} />
               </GitHubIconSpan>
             </Tooltip>
-            <Tooltip title="Settings">
+            <Tooltip title={SettingsTooltip}>
               <StyledSettingsBadge>
                 <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
               </StyledSettingsBadge>
             </Tooltip>
-            <Tooltip title="Notifications">
+            <Tooltip title={NotificationsTooltip}>
               <StyledNotificationsBadge>
                 <StyledBellOutlined onClick={toggleNotificationsDrawer} />
               </StyledNotificationsBadge>
