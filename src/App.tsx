@@ -20,6 +20,7 @@ import {Layout} from '@atoms';
 
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import {ClusterDiffModal} from '@components/organisms';
+import RenameEntityModal from '@components/organisms/RenameEntityModal';
 import UpdateModal from '@components/organisms/UpdateModal';
 
 import {useWindowSize} from '@utils/hooks';
@@ -51,6 +52,7 @@ const App = () => {
         <ValidationErrorsModal />
         <UpdateModal />
         <ClusterDiffModal />
+        <RenameEntityModal />
       </div>
     </AppContext.Provider>
   );

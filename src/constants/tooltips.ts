@@ -37,3 +37,4 @@ export const SaveUnsavedResourceTooltip = 'Save resource to file';
 export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
 export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
+export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';

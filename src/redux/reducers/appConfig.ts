@@ -162,6 +162,9 @@ export const configSlice = createSlice({
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       state.kubeConfig.currentContext = action.payload;
     },
+    setScanExcludesStatus: (state: Draft<AppConfig>, action: PayloadAction<'outdated' | 'applied'>) => {
+      state.isScanExcludesUpdated = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -177,5 +180,6 @@ export const configSlice = createSlice({
   },
 });
 
-export const {setFilterObjects, setAutoZoom, setKubeconfig, setCurrentContext} = configSlice.actions;
+export const {setFilterObjects, setAutoZoom, setKubeconfig, setCurrentContext, setScanExcludesStatus} =
+  configSlice.actions;
 export default configSlice.reducer;

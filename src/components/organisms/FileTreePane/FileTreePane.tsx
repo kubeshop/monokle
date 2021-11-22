@@ -1,7 +1,6 @@
 import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
 import {ipcRenderer, shell} from 'electron';
 import micromatch from 'micromatch';
-import os from 'os';
 import path from 'path';
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
@@ -9,12 +8,12 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
+import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {closeFolderExplorer, setShouldExpandAllNodes} from '@redux/reducers/ui';
+import {closeFolderExplorer, openRenameEntityModal, setShouldExpandAllNodes} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {stopPreview} from '@redux/services/preview';
-import store from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {AlertEnum} from '@models/alert';
@@ -33,7 +32,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {BrowseFolderTooltip, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
+import {BrowseFolderTooltip, FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
 
 import {DeleteEntityCallback, deleteEntity, getFileStats} from '@utils/files';
 import {uniqueArr} from '@utils/index';
@@ -52,6 +51,7 @@ interface TreeNode {
    */
   isLeaf?: boolean;
   icon?: React.ReactNode;
+  isExcluded?: boolean;
 }
 
 const StyledNumberOfResources = styled(Typography.Text)`
@@ -92,6 +92,7 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, resourceMap: Res
     ),
     children: [],
     highlight: false,
+    isExcluded: fileEntry.isExcluded,
   };
 
   if (fileEntry.children) {
@@ -279,9 +280,12 @@ const SpinnerWrapper = styled.div`
   }
 `;
 
+const ContextMenuDivider = styled.div`
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+`;
 interface ProcessingEntity {
   processingEntityID?: string;
-  processingType?: 'delete';
+  processingType?: 'delete' | 'rename';
 }
 
 interface TreeItemProps {
@@ -289,7 +293,10 @@ interface TreeItemProps {
   treeKey: string;
   setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
   processingEntity: ProcessingEntity;
-  onDeleting: (args: DeleteEntityCallback) => void;
+  onDelete: (args: DeleteEntityCallback) => void;
+  onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
+  onExcludeFromProcessing: (relativePath: string) => void;
+  isExcluded?: Boolean;
 }
 
 function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
@@ -308,23 +315,34 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
-  const {title, treeKey, setProcessingEntity, processingEntity, onDeleting} = props;
+  const {
+    title,
+    treeKey,
+    isExcluded,
+    setProcessingEntity,
+    processingEntity,
+    onDelete,
+    onRename,
+    onExcludeFromProcessing,
+  } = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
   const [isTitleHovered, setTitleHoverState] = useState(false);
 
-  const relativePath = fileMap[ROOT_FILE_ENTRY].filePath === treeKey ? treeKey.split('/').reverse()[0] : treeKey;
+  const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
 
-  const absolutePath =
-    fileMap[ROOT_FILE_ENTRY].filePath === treeKey
-      ? fileMap[ROOT_FILE_ENTRY].filePath
-      : `${fileMap[ROOT_FILE_ENTRY].filePath}${treeKey}`;
+  const isRoot = fileMap[ROOT_FILE_ENTRY].filePath === treeKey;
+  const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
+  const absolutePath = isRoot
+    ? fileMap[ROOT_FILE_ENTRY].filePath
+    : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
 
   const platformFilemanagerNames: {[name: string]: string} = {
     darwin: 'finder',
   };
 
-  const platformFilemanagerName = platformFilemanagerNames[os.platform()] || 'explorer';
+  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'explorer';
 
   const menu = (
     <Menu>
@@ -338,6 +356,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         Reveal in {platformFilemanagerName}
       </Menu.Item>
+      <ContextMenuDivider />
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
@@ -358,29 +377,53 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         Copy relative path
       </Menu.Item>
-      {/* You would not like to be able to delete the root folder maybe? */}
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-        <Menu.Item
-          key="delete_entity"
-          onClick={e => {
-            e.domEvent.stopPropagation();
+        <>
+          {!isExcluded ? (
+            <Menu.Item
+              onClick={e => {
+                e.domEvent.stopPropagation();
 
-            deleteEntityWizard(
-              {entityAbsolutePath: absolutePath},
-              () => {
-                setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
-                deleteEntity(absolutePath, onDeleting);
-              },
-              () => {}
-            );
-          }}
-        >
-          Delete
-        </Menu.Item>
+                onExcludeFromProcessing(relativePath);
+              }}
+              key="add_to_files_exclude"
+            >
+              Add to Files: Exclude
+            </Menu.Item>
+          ) : null}
+          <ContextMenuDivider />
+          <Menu.Item
+            onClick={e => {
+              e.domEvent.stopPropagation();
+
+              onRename(absolutePath, osPlatform);
+            }}
+            key="rename_entity"
+          >
+            Rename
+          </Menu.Item>
+          <Menu.Item
+            key="delete_entity"
+            onClick={e => {
+              e.domEvent.stopPropagation();
+
+              deleteEntityWizard(
+                {entityAbsolutePath: absolutePath},
+                () => {
+                  setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
+                  deleteEntity(absolutePath, onDelete);
+                },
+                () => {}
+              );
+            }}
+          >
+            Delete
+          </Menu.Item>
+        </>
       ) : null}
     </Menu>
   );
-  //
+
   return (
     <TreeTitleWrapper
       onMouseEnter={() => {
@@ -429,7 +472,9 @@ const FileTreePane = () => {
   const recentFolders = useAppSelector(state => state.config.recentFolders);
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const scanExcludes = useAppSelector(state => state.config.scanExcludes);
+  const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
+  const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
   const [tree, setTree] = useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
@@ -454,6 +499,7 @@ const FileTreePane = () => {
 
   const setFolder = useCallback(
     (folder: string) => {
+      dispatch(setScanExcludesStatus('applied'));
       dispatch(setRootFolder(folder));
     },
     [dispatch]
@@ -525,11 +571,11 @@ const FileTreePane = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPath]);
 
-  const onDeleting = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
+  const onDelete = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
     const {isDirectory, name, err} = args;
 
     if (err) {
-      store.dispatch(
+      dispatch(
         setAlert({
           title: 'Deleting failed',
           message: `Something went wrong during deleting a ${isDirectory ? 'directory' : 'file'}`,
@@ -537,7 +583,7 @@ const FileTreePane = () => {
         })
       );
     } else {
-      store.dispatch(
+      dispatch(
         setAlert({
           title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
           message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
@@ -556,6 +602,10 @@ const FileTreePane = () => {
     }, 2000);
   };
 
+  const onRename = (absolutePathToEntity: string, osPlatform: string) => {
+    dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
+  };
+
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
     if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(info.node.key), fileInclude))) {
       return;
@@ -570,6 +620,23 @@ const FileTreePane = () => {
       dispatch(setSelectingFile(true));
       dispatch(selectFile({filePath: info.node.key}));
     }
+  };
+
+  const onExcludeFromProcessing = async (relativePath: string) => {
+    dispatch(updateScanExcludes([...excludedFromScanFiles, relativePath]));
+
+    Modal.confirm({
+      title: 'You should reload the file explorer to have your changes applied. Do you want to do it now?',
+      icon: <ExclamationCircleOutlined />,
+      cancelText: 'Not now',
+      onOk: () => {
+        setScanExcludesStatus('applied');
+        refreshFolder();
+      },
+      onCancel: () => {
+        dispatch(setScanExcludesStatus('outdated'));
+      },
+    });
   };
 
   useEffect(() => {
@@ -637,10 +704,6 @@ const FileTreePane = () => {
   }, [tree]);
 
   const onToggleTree = () => {
-    if (!expandedKeys.includes(fileMap[ROOT_FILE_ENTRY].filePath)) {
-      return setExpandedKeys(allTreeKeys);
-    }
-
     setExpandedKeys(prevState => (prevState.length ? [] : allTreeKeys));
   };
 
@@ -650,7 +713,16 @@ const FileTreePane = () => {
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <TitleBarContainer>
-              <Title>File Explorer</Title>
+              <Title>
+                File Explorer{' '}
+                {isScanExcludesUpdated === 'outdated' ? (
+                  <Tooltip title={FileExplorerChanged}>
+                    <ExclamationCircleOutlined />
+                  </Tooltip>
+                ) : (
+                  ''
+                )}
+              </Title>
               <RightButtons>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
                   <BrowseButton
@@ -707,7 +779,9 @@ const FileTreePane = () => {
                 title={event.title}
                 processingEntity={processingEntity}
                 setProcessingEntity={setProcessingEntity}
-                onDeleting={onDeleting}
+                onDelete={onDelete}
+                onRename={onRename}
+                onExcludeFromProcessing={onExcludeFromProcessing}
                 {...event}
               />
             );

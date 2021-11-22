@@ -30,6 +30,10 @@ export enum NewVersionCode {
 interface AppConfig {
   /** a list of patterns to exclude when scanning the file system for resources */
   scanExcludes: string[];
+  /**
+   * Whether the scan excludes list is updated (actual)
+   */
+  isScanExcludesUpdated: 'outdated' | 'applied';
   /** a list of patterns to match to against files for including */
   fileIncludes: string[];
   /** maximum recursion depth when reading nested folders */
@@ -56,6 +60,7 @@ interface AppConfig {
     data: any;
   };
   kubeConfig: KubeConfig;
+  osPlatform: NodeJS.Platform;
 }
 
 export type {AppConfig};

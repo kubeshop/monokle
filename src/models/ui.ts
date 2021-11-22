@@ -52,6 +52,11 @@ export type UiState = {
     isOpen: boolean;
     resourceId: string;
   };
+  renameEntityModal: {
+    isOpen: boolean;
+    entityName: string;
+    absolutePathToEntity: string;
+  };
   isFolderLoading: boolean;
   leftMenu: {
     selection: string;

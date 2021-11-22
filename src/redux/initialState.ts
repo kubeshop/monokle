@@ -1,3 +1,5 @@
+import os from 'os';
+
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
@@ -56,6 +58,7 @@ const initialAppConfigState: AppConfig = {
     loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
+  isScanExcludesUpdated: 'outdated',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
   recentFolders: electronStore.get('appConfig.recentFolders') || [],
@@ -69,6 +72,7 @@ const initialAppConfigState: AppConfig = {
     contexts: [],
     currentContext: undefined,
   },
+  osPlatform: os.platform(),
 };
 
 const initialAlertState: AlertState = {};
@@ -90,6 +94,11 @@ const initialUiState: UiState = {
   renameResourceModal: {
     isOpen: false,
     resourceId: '',
+  },
+  renameEntityModal: {
+    isOpen: false,
+    entityName: '',
+    absolutePathToEntity: '',
   },
   leftMenu: {
     selection: uiLeftMenuSelection,
