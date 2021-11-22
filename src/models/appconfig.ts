@@ -53,6 +53,7 @@ interface AppConfig {
     helmPreviewMode: 'template' | 'install';
     kustomizeCommand: KustomizeCommandType;
     loadLastFolderOnStartup: boolean;
+    hideExcludedFilesInFileExplorer: boolean;
   };
   recentFolders: string[];
   newVersion: {

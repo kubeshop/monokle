@@ -10,6 +10,7 @@ import {
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
+  updateHideExcludedFilesInFileExplorer,
   updateKubeconfig,
   updateKustomizeCommand,
   updateLoadLastFolderOnStartup,
@@ -112,6 +113,10 @@ const SettingsDrawer = () => {
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
       dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
     }
+  };
+
+  const onChangeHideExcludedFilesInFileExplorer = (e: any) => {
+    dispatch(updateHideExcludedFilesInFileExplorer(e.target.checked));
   };
 
   const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
@@ -246,6 +251,15 @@ const SettingsDrawer = () => {
             Automatically load last folder
           </Checkbox>
         </Tooltip>
+      </StyledDiv>
+      <StyledDiv>
+        <StyledSpan>File Explorer</StyledSpan>
+        <Checkbox
+          checked={appConfig.settings.hideExcludedFilesInFileExplorer}
+          onChange={onChangeHideExcludedFilesInFileExplorer}
+        >
+          Hide excluded files
+        </Checkbox>
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Maximum folder read recursion depth</StyledSpan>
