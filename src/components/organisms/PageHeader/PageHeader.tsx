@@ -1,4 +1,4 @@
-import {Badge} from 'antd';
+import {Badge, Tooltip} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import styled from 'styled-components';
@@ -234,23 +234,33 @@ const PageHeader = () => {
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
           <SettingsCol span={12}>
-            <GitHubIconSpan>
-              <QuestionCircleOutlined size={24} onClick={openDocumentation} />
-            </GitHubIconSpan>
-            <StyledNotificationsBadge>
-              <span onClick={openDiscord}>
-                <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer'}} />
-              </span>
-            </StyledNotificationsBadge>
-            <GitHubIconSpan>
-              <GithubOutlined size={24} onClick={openGitHub} />
-            </GitHubIconSpan>
-            <StyledSettingsBadge>
-              <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
-            </StyledSettingsBadge>
-            <StyledNotificationsBadge>
-              <StyledBellOutlined onClick={toggleNotificationsDrawer} />
-            </StyledNotificationsBadge>
+            <Tooltip title="Documentation" placement="left">
+              <GitHubIconSpan>
+                <QuestionCircleOutlined size={24} onClick={openDocumentation} />
+              </GitHubIconSpan>
+            </Tooltip>
+            <Tooltip title="Discord">
+              <StyledNotificationsBadge>
+                <span onClick={openDiscord}>
+                  <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer'}} />
+                </span>
+              </StyledNotificationsBadge>
+            </Tooltip>
+            <Tooltip title="GitHub">
+              <GitHubIconSpan>
+                <GithubOutlined size={24} onClick={openGitHub} />
+              </GitHubIconSpan>
+            </Tooltip>
+            <Tooltip title="Settings">
+              <StyledSettingsBadge>
+                <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
+              </StyledSettingsBadge>
+            </Tooltip>
+            <Tooltip title="Notifications">
+              <StyledNotificationsBadge>
+                <StyledBellOutlined onClick={toggleNotificationsDrawer} />
+              </StyledNotificationsBadge>
+            </Tooltip>
           </SettingsCol>
         </Row>
       </StyledHeader>
