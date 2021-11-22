@@ -1,11 +1,16 @@
 import React from 'react';
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+
+import path from 'path';
+import styled from 'styled-components';
+
 import {ResourceMapType} from '@models/appstate';
 import {ResourceRef} from '@models/k8sresource';
+
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+
+import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+
 import {FontColors} from '@styles/Colors';
-import styled from 'styled-components';
-import path from 'path';
 
 const StyledRefText = styled.span<{isUnsatisfied: boolean; isDisabled: boolean}>`
   ${props => {

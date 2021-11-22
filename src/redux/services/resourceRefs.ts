@@ -1,10 +1,10 @@
-import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+import {REF_PATH_SEPARATOR} from '@constants/constants';
 
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefNode, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
 
-import {REF_PATH_SEPARATOR} from '@constants/constants';
+import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
 

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {MonoklePlugin} from '@models/plugin';
 
 function PluginInformation(props: {plugin: MonoklePlugin}) {

@@ -1,8 +1,17 @@
-import {Button, Col, Input, Row, Select, Tooltip} from 'antd';
+import * as k8s from '@kubernetes/client-node';
+
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
+
+import {Button, Col, Input, Row, Select, Tooltip} from 'antd';
+
+import {WarningOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, setKubeconfigPathValidity, updateKubeconfig} from '@redux/reducers/appConfig';
@@ -13,14 +22,7 @@ import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import {MonoPaneTitle, MonoPaneTitleCol, PaneContainer} from '@atoms';
 
-import {WarningOutlined} from '@ant-design/icons';
-
-import {TOOLTIP_DELAY} from '@constants/constants';
-import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
-
 import Colors, {BackgroundColors} from '@styles/Colors';
-
-import * as k8s from '@kubernetes/client-node';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;

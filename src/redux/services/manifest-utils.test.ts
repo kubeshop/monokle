@@ -1,4 +1,5 @@
 import {parseDocument} from 'yaml';
+
 import {mergeManifests, traverseDocument} from '@redux/services/manifest-utils';
 
 test('manifest-merge-all-match', () => {

@@ -1,11 +1,12 @@
 import {Modal} from 'antd';
-import {ThunkDispatch} from 'redux-thunk';
 
-import {applyFile} from '@redux/thunks/applyFile';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
+import {ThunkDispatch} from 'redux-thunk';
 
 import {FileMapType} from '@models/appstate';
 
-import {ExclamationCircleOutlined} from '@ant-design/icons';
+import {applyFile} from '@redux/thunks/applyFile';
 
 export function applyFileWithConfirm(
   selectedPath: string,

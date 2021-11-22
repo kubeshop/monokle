@@ -1,7 +1,8 @@
-import initialState from '@redux/initialState';
 import {Draft, createSlice} from '@reduxjs/toolkit';
 
 import {UiCoachState} from '@models/uiCoach';
+
+import initialState from '@redux/initialState';
 
 export const uiCoachSlice = createSlice({
   name: 'uiCoach',

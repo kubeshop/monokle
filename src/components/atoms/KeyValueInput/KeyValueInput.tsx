@@ -1,9 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import styled from 'styled-components';
+
+import {Button, Select} from 'antd';
+
+import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
+
 import isDeepEqual from 'fast-deep-equal/es6/react';
-import {Select, Button} from 'antd';
-import {PlusOutlined, MinusOutlined} from '@ant-design/icons';
+import styled from 'styled-components';
 import {v4 as uuidv4} from 'uuid';
+
 import Colors from '@styles/Colors';
 
 const Container = styled.div`

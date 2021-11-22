@@ -1,9 +1,9 @@
 import log from 'loglevel';
 
+import {K8sResource} from '@models/k8sresource';
+
 import {loadResource} from '@redux/services';
 import {isKustomizationResource} from '@redux/services/kustomize';
-
-import {K8sResource} from '@models/k8sresource';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 

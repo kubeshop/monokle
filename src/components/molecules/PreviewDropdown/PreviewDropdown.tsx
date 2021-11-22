@@ -1,19 +1,20 @@
-import {Button, Dropdown, Menu} from 'antd';
 import React, {useCallback, useMemo} from 'react';
 import {shallowEqual} from 'react-redux';
+
+import {Button, Dropdown, Menu} from 'antd';
+
+import {DownOutlined} from '@ant-design/icons';
+
+import {MenuClickEventHandler} from 'rc-menu/lib/interface';
 import styled from 'styled-components';
+
+import {KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 
-import {DownOutlined} from '@ant-design/icons';
-
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-
 import Colors, {BackgroundColors} from '@styles/Colors';
-
-import {MenuClickEventHandler} from 'rc-menu/lib/interface';
 
 const {SubMenu} = Menu;
 

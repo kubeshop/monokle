@@ -1,6 +1,6 @@
-import {useAppSelector} from '@redux/hooks';
-
 import {ItemCustomComponentProps} from '@models/navigator';
+
+import {useAppSelector} from '@redux/hooks';
 
 import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
 

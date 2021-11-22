@@ -1,10 +1,11 @@
-import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
-import {KustomizeCommandType} from '@redux/services/kustomize';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import {AppConfig, Languages, NewVersionCode, TextSizes, Themes} from '@models/appconfig';
 import {KubeConfig} from '@models/kubeConfig';
+
+import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
+import {KustomizeCommandType} from '@redux/services/kustomize';
+import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import electronStore from '@utils/electronStore';
 
@@ -69,6 +70,14 @@ export const updateLoadLastFolderOnStartup = createAsyncThunk(
   async (autoLoad: boolean, thunkAPI) => {
     electronStore.set('appConfig.settings.loadLastFolderOnStartup', autoLoad);
     thunkAPI.dispatch(configSlice.actions.setLoadLastFolderOnStartup(autoLoad));
+  }
+);
+
+export const updateHideExcludedFilesInFileExplorer = createAsyncThunk(
+  'config/updateHideExcludedFilesInFileExplorer',
+  async (hideExcludedFiles: boolean, thunkAPI) => {
+    electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', hideExcludedFiles);
+    thunkAPI.dispatch(configSlice.actions.setHideExcludedFilesInFileExplorer(hideExcludedFiles));
   }
 );
 
@@ -152,6 +161,9 @@ export const configSlice = createSlice({
     },
     setLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.loadLastFolderOnStartup = action.payload;
+    },
+    setHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.settings.hideExcludedFilesInFileExplorer = action.payload;
     },
     setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       state.recentFolders = action.payload;

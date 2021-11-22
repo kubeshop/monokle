@@ -1,16 +1,17 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 
+import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navigator';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseSectionIds, expandSectionIds} from '@redux/reducers/navigator';
-
-import {ItemGroupInstance, SectionBlueprint, SectionInstance} from '@models/navigator';
 
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
 
 import ItemRenderer, {ItemRendererOptions} from './ItemRenderer';
 import SectionHeader from './SectionHeader';
-import * as S from './styled';
 import {useSectionCustomization} from './useSectionCustomization';
+
+import * as S from './styled';
 
 type SectionRendererProps<ItemType, ScopeType> = {
   sectionBlueprint: SectionBlueprint<ItemType, ScopeType>;

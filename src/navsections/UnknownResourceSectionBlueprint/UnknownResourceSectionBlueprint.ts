@@ -1,11 +1,11 @@
-import {selectK8sResource} from '@redux/reducers/main';
-import {isUnsavedResource} from '@redux/services/resource';
+import {KUSTOMIZATION_KIND, PREVIEW_PREFIX} from '@constants/constants';
 
 import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
-import {KUSTOMIZATION_KIND, PREVIEW_PREFIX} from '@constants/constants';
+import {selectK8sResource} from '@redux/reducers/main';
+import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 

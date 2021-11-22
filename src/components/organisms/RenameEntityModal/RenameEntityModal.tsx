@@ -1,17 +1,18 @@
-import {Button, Form, Input, Modal} from 'antd';
-import path from 'path';
 import {useEffect} from 'react';
+
+import {Button, Form, Input, Modal} from 'antd';
+import {useForm} from 'antd/lib/form/Form';
+
+import path from 'path';
+
+import {AlertEnum} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeRenameEntityModal} from '@redux/reducers/ui';
 
-import {AlertEnum} from '@models/alert';
-
 import {RenameEntityCallback, checkIfEntityExists, renameEntity} from '@utils/files';
 import {useFocus} from '@utils/hooks';
-
-import {useForm} from 'antd/lib/form/Form';
 
 const prohibitedFirstSymbols = ['/', '\\'];
 

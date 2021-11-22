@@ -1,16 +1,20 @@
 import * as React from 'react';
-import {Row} from 'antd';
-import ReactFlow, {Edge, Node, isNode, Position, MiniMap, ReactFlowProvider} from 'react-flow-renderer';
 import {useCallback, useEffect, useState} from 'react';
+import ReactFlow, {Edge, MiniMap, Node, Position, ReactFlowProvider, isNode} from 'react-flow-renderer';
 import {useSelector} from 'react-redux';
-import dagre from 'dagre';
 import {useMeasure} from 'react-use';
 
+import {Row} from 'antd';
+
+import dagre from 'dagre';
+
+import {K8sResource, ResourceRef} from '@models/k8sresource';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 import {selectK8sResource} from '@redux/reducers/main';
 import {activeResourcesSelector} from '@redux/selectors';
-import {K8sResource, ResourceRef} from '@models/k8sresource';
+import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+
 import Sidebar from './Sidebar';
 
 function mapResourceToElement(resource: K8sResource): Node {

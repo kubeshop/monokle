@@ -1,10 +1,10 @@
 import flatten from 'flat';
 import _ from 'lodash';
 
+import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
+
 import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-
-import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
 import {isPassingKeyValueFilter} from '@utils/filter';
 import {removeNestedEmptyObjects} from '@utils/objects';

@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {monaco} from 'react-monaco-editor';
-import {useMeasure} from 'react-use';
 import {useSelector} from 'react-redux';
+import {useMeasure} from 'react-use';
+
 import styled from 'styled-components';
 
 import {logsSelector} from '@redux/selectors';

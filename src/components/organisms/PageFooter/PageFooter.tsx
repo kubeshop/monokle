@@ -1,12 +1,17 @@
-import React, {useState, useEffect} from 'react';
 import {ipcRenderer} from 'electron';
-import {useAppSelector} from '@redux/hooks';
+
+import React, {useEffect, useState} from 'react';
+
 import styled from 'styled-components';
 
-import Colors, {BackgroundColors} from '@styles/Colors';
-import {AppBorders} from '@styles/Borders';
-import Footer from '@components/atoms/Footer';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
+
+import {useAppSelector} from '@redux/hooks';
+
+import Footer from '@components/atoms/Footer';
+
+import {AppBorders} from '@styles/Borders';
+import Colors, {BackgroundColors} from '@styles/Colors';
 
 const StyledFooter = styled(Footer)`
   width: 100%;

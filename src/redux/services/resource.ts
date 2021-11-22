@@ -4,13 +4,6 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {LineCounter, Scalar, YAMLSeq, parseAllDocuments, parseDocument} from 'yaml';
 
-import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
-import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
-
-import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
-import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
-
 import {
   CLUSTER_DIFF_PREFIX,
   KUSTOMIZATION_KIND,
@@ -18,6 +11,13 @@ import {
   UNSAVED_PREFIX,
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
+
+import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
+import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
+
+import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
+import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
 

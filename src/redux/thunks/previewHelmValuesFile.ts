@@ -1,14 +1,16 @@
 import {ipcRenderer} from 'electron';
+
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
-import {createAsyncThunk} from '@reduxjs/toolkit';
-
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 /**
  * Thunk to preview a Helm Chart

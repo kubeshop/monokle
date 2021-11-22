@@ -1,10 +1,12 @@
-import {Popover} from 'antd';
 import {useMemo} from 'react';
+
+import {Popover} from 'antd';
+
 import styled from 'styled-components';
 
-import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
-
 import {K8sResource} from '@models/k8sresource';
+
+import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
 

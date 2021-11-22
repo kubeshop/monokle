@@ -1,6 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
+
 import AntRow, {RowProps as AntRowProps} from 'antd/lib/row/index';
+
+import styled from 'styled-components';
 
 export type RowProps = AntRowProps & {
   noborder?: React.ReactNode;

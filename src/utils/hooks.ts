@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 
-import {Size} from '@models/window';
-
 import {FormInstance} from 'antd/lib/form';
+
+import {Size} from '@models/window';
 
 export function useFocus<T>(): [React.RefObject<T>, () => void] {
   const htmlElRef = useRef<T>(null);

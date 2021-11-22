@@ -1,15 +1,19 @@
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
+
 import {ResourceFilterType} from '@models/appstate';
+import {K8sResource} from '@models/k8sresource';
+import {SectionBlueprint} from '@models/navigator';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
+
 import {selectK8sResource} from '@redux/reducers/main';
 import {isUnsavedResource} from '@redux/services/resource';
-import {SectionBlueprint} from '@models/navigator';
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
+
 import {isResourcePassingFilter} from '@utils/resources';
+
 import ResourceKindContextMenu from './ResourceKindContextMenu';
+import ResourceKindNameDisplay from './ResourceKindNameDisplay';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSuffix from './ResourceKindSuffix';
-import ResourceKindNameDisplay from './ResourceKindNameDisplay';
 
 export type ResourceKindScopeType = {
   activeResources: K8sResource[];

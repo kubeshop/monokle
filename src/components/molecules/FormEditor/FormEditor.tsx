@@ -1,6 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
+
+// @ts-ignore
+import {Theme as AntDTheme} from '@rjsf/antd';
+import {withTheme} from '@rjsf/core';
+
+import isDeepEqual from 'fast-deep-equal/es6/react';
 import styled from 'styled-components';
 import {stringify} from 'yaml';
 
@@ -10,11 +16,6 @@ import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selector
 import {loadResource} from '@redux/services';
 import {logMessage} from '@redux/services/log';
 import {mergeManifests} from '@redux/services/manifest-utils';
-
-// @ts-ignore
-import {Theme as AntDTheme} from '@rjsf/antd';
-import {withTheme} from '@rjsf/core';
-import isDeepEqual from 'fast-deep-equal/es6/react';
 
 const Form = withTheme(AntDTheme);
 

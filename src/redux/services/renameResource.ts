@@ -1,7 +1,10 @@
 import {stringify} from 'yaml';
+
 import {ResourceMapType} from '@models/appstate';
+
 import {updateResource} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
+
 import {isIncomingRef} from './resourceRefs';
 
 export const renameResource = (

@@ -1,6 +1,9 @@
 import * as k8s from '@kubernetes/client-node';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+
 import navSectionNames from '@constants/navSectionNames';
+
+import {ResourceKindHandler} from '@models/resourcekindhandler';
+
 import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 
 const PodHandler: ResourceKindHandler = {

@@ -1,20 +1,29 @@
 /* eslint-disable import/order */
-import fs from 'fs';
-import 'monaco-editor';
-import path from 'path';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
 import {useSelector} from 'react-redux';
 import {useMeasure} from 'react-use';
+
+import fs from 'fs';
+import 'monaco-editor';
+import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
+import 'monaco-yaml/lib/esm/monaco.contribution';
+import path from 'path';
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {Document, ParsedNode, isMap, parseAllDocuments} from 'yaml';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
-
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {getFileStats} from '@utils/files';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
@@ -24,14 +33,6 @@ import useCodeIntel from './useCodeIntel';
 import useDebouncedCodeSave from './useDebouncedCodeSave';
 import useEditorKeybindings from './useEditorKeybindings';
 import useMonacoUiState from './useMonacoUiState';
-import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
-import 'monaco-yaml/lib/esm/monaco.contribution';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 
 // @ts-ignore
 window.MonacoEnvironment = {

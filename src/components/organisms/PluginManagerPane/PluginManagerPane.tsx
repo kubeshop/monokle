@@ -1,10 +1,16 @@
 import React, {useMemo, useState} from 'react';
-import {TitleBar} from '@components/molecules';
-import {useAppSelector} from '@redux/hooks';
-import {PlusOutlined} from '@ant-design/icons';
+
 import {Button} from 'antd';
+
+import {PlusOutlined} from '@ant-design/icons';
+
+import {useAppSelector} from '@redux/hooks';
+
+import {TitleBar} from '@components/molecules';
+
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
+
 import * as S from './styled';
 
 function PluginManagerPane() {

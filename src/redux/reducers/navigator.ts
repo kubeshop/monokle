@@ -1,6 +1,8 @@
-import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
-import initialState from '@redux/initialState';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
+
 import {NavigatorInstanceState, NavigatorState} from '@models/navigator';
+
+import initialState from '@redux/initialState';
 
 export const navigatorSlice = createSlice({
   name: 'navigator',

@@ -1,8 +1,20 @@
-import {Button, Checkbox, Divider, Input, InputNumber, Select, Tooltip} from 'antd';
 import {ipcRenderer} from 'electron';
+
 import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
+
+import {Button, Checkbox, Divider, Input, InputNumber, Select, Tooltip} from 'antd';
+
 import styled from 'styled-components';
+
+import {
+  AddExclusionPatternTooltip,
+  AddInclusionPatternTooltip,
+  AutoLoadLastFolderTooltip,
+  HelmPreviewModeTooltip,
+  KubeconfigPathTooltip,
+  KustomizeCommandTooltip,
+} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -10,6 +22,7 @@ import {
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
+  updateHideExcludedFilesInFileExplorer,
   updateKubeconfig,
   updateKustomizeCommand,
   updateLoadLastFolderOnStartup,
@@ -23,15 +36,6 @@ import {isInClusterModeSelector} from '@redux/selectors';
 import FilePatternList from '@molecules/FilePatternList';
 
 import Drawer from '@components/atoms/Drawer';
-
-import {
-  AddExclusionPatternTooltip,
-  AddInclusionPatternTooltip,
-  AutoLoadLastFolderTooltip,
-  HelmPreviewModeTooltip,
-  KubeconfigPathTooltip,
-  KustomizeCommandTooltip,
-} from '@constants/tooltips';
 
 import {useFocus} from '@utils/hooks';
 
@@ -112,6 +116,10 @@ const SettingsDrawer = () => {
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
       dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
     }
+  };
+
+  const onChangeHideExcludedFilesInFileExplorer = (e: any) => {
+    dispatch(updateHideExcludedFilesInFileExplorer(e.target.checked));
   };
 
   const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
@@ -246,6 +254,15 @@ const SettingsDrawer = () => {
             Automatically load last folder
           </Checkbox>
         </Tooltip>
+      </StyledDiv>
+      <StyledDiv>
+        <StyledSpan>File Explorer</StyledSpan>
+        <Checkbox
+          checked={appConfig.settings.hideExcludedFilesInFileExplorer}
+          onChange={onChangeHideExcludedFilesInFileExplorer}
+        >
+          Hide excluded files
+        </Checkbox>
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Maximum folder read recursion depth</StyledSpan>

@@ -1,5 +1,7 @@
-import {Tag} from 'antd';
 import React from 'react';
+
+import {Tag} from 'antd';
+
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';

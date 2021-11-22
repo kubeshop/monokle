@@ -1,4 +1,5 @@
-import {useState, useRef, useEffect} from 'react';
+import {useEffect, useRef, useState} from 'react';
+
 import {useAppSelector} from '@redux/hooks';
 import {getNamespaces} from '@redux/services/resource';
 

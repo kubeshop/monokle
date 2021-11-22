@@ -1,14 +1,18 @@
 import React from 'react';
+
 import {Menu, Modal} from 'antd';
+
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
+import {PreviewType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
+
 import {useAppDispatch} from '@redux/hooks';
 import {removeResource} from '@redux/reducers/main';
-import {AppDispatch} from '@redux/store';
-import {ExclamationCircleOutlined} from '@ant-design/icons';
-import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {openNewResourceWizard, openRenameResourceModal} from '@redux/reducers/ui';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {PreviewType, ResourceMapType} from '@models/appstate';
+import {isFileResource, isUnsavedResource} from '@redux/services/resource';
+import {AppDispatch} from '@redux/store';
 
 function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMapType, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;

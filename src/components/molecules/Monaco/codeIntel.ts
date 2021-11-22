@@ -1,19 +1,21 @@
 import {monaco} from 'react-monaco-editor';
-import {isUnsatisfiedRef, isOutgoingRef} from '@redux/services/resourceRefs';
-import {K8sResource, ResourceRef, RefPosition} from '@models/k8sresource';
+
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {K8sResource, RefPosition, ResourceRef} from '@models/k8sresource';
+
+import {isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {ResourceKindHandlers, getIncomingRefMappers} from '@src/kindhandlers';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
 
+import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
 import {
   createCommandMarkdownLink,
   createCompletionProvider,
   createGlyphDecoration,
-  createInlineDecoration,
   createHoverProvider,
-  createMarkdownString,
+  createInlineDecoration,
   createLinkProvider,
+  createMarkdownString,
   getSymbolsBeforePosition,
 } from './editorHelpers';
 

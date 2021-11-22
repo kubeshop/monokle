@@ -1,18 +1,20 @@
-import {Badge, Tooltip} from 'antd';
-import {DateTime} from 'luxon';
 import React, {useCallback} from 'react';
+
+import {Badge, Tooltip} from 'antd';
+
+import {CheckCircleOutlined, CopyOutlined, ExclamationCircleOutlined, InfoCircleOutlined} from '@ant-design/icons';
+
+import {DateTime} from 'luxon';
 import styled from 'styled-components';
+
+import {AlertEnum, AlertType} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleNotifications} from '@redux/reducers/ui';
 
-import {AlertEnum, AlertType} from '@models/alert';
-
 import Drawer from '@components/atoms/Drawer';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
-
-import {CheckCircleOutlined, CopyOutlined, ExclamationCircleOutlined, InfoCircleOutlined} from '@ant-design/icons';
 
 import Colors, {FontColors} from '@styles/Colors';
 

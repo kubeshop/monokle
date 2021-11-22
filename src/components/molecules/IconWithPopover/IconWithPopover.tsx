@@ -1,5 +1,6 @@
 import React from 'react';
-import {Popover, Button} from 'antd';
+
+import {Button, Popover} from 'antd';
 
 import Icon from '@components/atoms/Icon';
 

@@ -1,13 +1,14 @@
+import * as k8s from '@kubernetes/client-node';
+
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {stringify} from 'yaml';
 
 import {SetDiffDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
 import {createRejectionWithAlert, getResourceFromCluster} from '@redux/thunks/utils';
-import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
-
-import * as k8s from '@kubernetes/client-node';
 
 /**
  * Thunk to diff a resource against the configured cluster

@@ -1,5 +1,7 @@
-import {Divider} from 'antd';
 import React from 'react';
+
+import {Divider} from 'antd';
+
 import styled from 'styled-components';
 
 import {ClusterToLocalResourcesMatch} from '@models/appstate';
