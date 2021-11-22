@@ -1,11 +1,17 @@
-import React, {useCallback, useState, useRef, useEffect, useContext} from 'react';
-import ScrollIntoView, {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
-import AppContext from '@src/AppContext';
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
-import {ItemBlueprint} from '@models/navigator';
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {useItemCustomization} from './useItemCustomization';
+
+import {ItemBlueprint} from '@models/navigator';
+
+import ScrollIntoView, {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
+
+import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+
+import AppContext from '@src/AppContext';
+
 import * as S from './styled';
+import {useItemCustomization} from './useItemCustomization';
 
 export type ItemRendererOptions = {
   disablePrefix?: boolean;
@@ -111,6 +117,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
             <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
           </S.SuffixContainer>
         )}
+        <S.BlankSpace onClick={onClick} />
         {QuickAction.Component &&
           !options?.disableQuickAction &&
           (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (

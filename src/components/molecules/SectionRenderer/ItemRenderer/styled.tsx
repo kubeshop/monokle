@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
 
-export const ItemContainer = styled.li<{
+type ItemContainerProps = {
   isSelected: boolean;
   isHighlighted: boolean;
   disableHoverStyle: boolean;
@@ -10,7 +10,9 @@ export const ItemContainer = styled.li<{
   level: number;
   isLastItem: boolean;
   hasOnClick: boolean;
-}>`
+};
+
+export const ItemContainer = styled.li<ItemContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
@@ -44,13 +46,15 @@ export const ItemContainer = styled.li<{
   padding-left: ${props => `${props.level * 12}px;`};
 `;
 
-export const ItemName = styled.span<{
+type ItemNameProps = {
   isSelected: boolean;
   isHighlighted: boolean;
   isDirty: boolean;
   isDisabled: boolean;
   level: number;
-}>`
+};
+
+export const ItemName = styled.span<ItemNameProps>`
   padding: 2px 0;
   font-size: 12px;
   overflow: hidden;
@@ -96,4 +100,9 @@ export const QuickActionContainer = styled.span`
 
 export const ContextMenuContainer = styled.span`
   margin-left: auto;
+`;
+
+export const BlankSpace = styled.span`
+  flex-grow: 1;
+  height: 20px;
 `;
