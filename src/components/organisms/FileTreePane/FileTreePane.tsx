@@ -668,6 +668,15 @@ const FileTreePane = () => {
     [loadLastFolderOnStartup, setFolder, recentFolders]
   );
 
+  // called from main thread to avoid running setRootFolder in main thread
+  useEffect(() => {
+    ipcRenderer.on('set-root-folder', (_, data) => {
+      if (data) {
+        setFolder(data);
+      }
+    });
+  }, []);
+
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);
     return () => {

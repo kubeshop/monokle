@@ -66,6 +66,14 @@ const appMenu = (store: any): MenuItemConstructorOptions => {
   };
 };
 
+// need this for now to avoid set-root-folder being run in the main thread
+function setRootFolderInRendererThread(folder: string) {
+  const window = BrowserWindow.getFocusedWindow();
+  if (window) {
+    window.webContents.send('set-root-folder', folder);
+  }
+}
+
 const fileMenu = (store: any): MenuItemConstructorOptions => {
   const configState: AppConfig = store.getState().config;
   const mainState: AppState = store.getState().main;
@@ -92,8 +100,7 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
         enabled: !isInPreviewModeSelector(store.getState()) && Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
         toolTip: ReloadFolderTooltip,
         click: async () => {
-          const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
-          store.dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
+          setRootFolderInRendererThread(mainState.fileMap[ROOT_FILE_ENTRY].filePath);
         },
       },
       {type: 'separator'},
@@ -102,8 +109,7 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
         submenu: configState.recentFolders.map((folder: string) => ({
           label: folder,
           click: async () => {
-            const {setRootFolder} = await import('@redux/thunks/setRootFolder'); // Temporary fix until refactor
-            store.dispatch(setRootFolder(folder));
+            setRootFolderInRendererThread(folder);
           },
         })),
       },
@@ -142,7 +148,7 @@ const editMenu = (store: any): MenuItemConstructorOptions => {
   const mainState: AppState = store.getState().main;
   const uiState: UiState = store.getState().ui;
   const isMonacoActionEnabled = Boolean(mainState.selectedResourceId) && uiState.monacoEditor.focused;
-  
+
   return {
     label: 'Edit',
 
