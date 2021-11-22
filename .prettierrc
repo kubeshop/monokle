@@ -7,7 +7,7 @@
     "^@ant-design?.+$",
     "^@reduxjs?.+$",
     "^@rjsf?.+$",
-    "<THIRD_PARTY_MODULES>",
+    "^(?![@\\.]).+$",
     "^@constants",
     "^@models",
     "^@redux",
