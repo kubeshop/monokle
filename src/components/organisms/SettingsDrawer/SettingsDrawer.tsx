@@ -253,12 +253,12 @@ const SettingsDrawer = () => {
         </Tooltip>
       </StyledDiv>
       <StyledDiv>
-        <StyledSpan>On Folder Scan Start</StyledSpan>
+        <StyledSpan>File Explorer</StyledSpan>
         <Checkbox
           checked={appConfig.settings.hideExcludedFilesInFileExplorer}
           onChange={onChangeHideExcludedFilesInFileExplorer}
         >
-          Hide files from the Files: Exclude list in the File Explorer
+          Hide excluded files
         </Checkbox>
       </StyledDiv>
       <StyledDiv>
