@@ -1,4 +1,4 @@
-import {Badge} from 'antd';
+import {Badge, Tooltip} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import styled from 'styled-components';
@@ -31,6 +31,8 @@ import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
+
+import {DiscordTooltip, DocumentationTooltip, GitHubTooltip, NotificationsTooltip, SettingsTooltip} from './tooltips';
 
 const StyledLogo = styled.img`
   height: 24px;
@@ -234,23 +236,33 @@ const PageHeader = () => {
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
           <SettingsCol span={12}>
-            <GitHubIconSpan>
-              <QuestionCircleOutlined size={24} onClick={openDocumentation} />
-            </GitHubIconSpan>
-            <StyledNotificationsBadge>
-              <span onClick={openDiscord}>
-                <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer'}} />
-              </span>
-            </StyledNotificationsBadge>
-            <GitHubIconSpan>
-              <GithubOutlined size={24} onClick={openGitHub} />
-            </GitHubIconSpan>
-            <StyledSettingsBadge>
-              <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
-            </StyledSettingsBadge>
-            <StyledNotificationsBadge>
-              <StyledBellOutlined onClick={toggleNotificationsDrawer} />
-            </StyledNotificationsBadge>
+            <Tooltip title={DocumentationTooltip} placement="bottomRight">
+              <GitHubIconSpan>
+                <QuestionCircleOutlined size={24} onClick={openDocumentation} />
+              </GitHubIconSpan>
+            </Tooltip>
+            <Tooltip title={DiscordTooltip} placement="bottomRight">
+              <StyledNotificationsBadge>
+                <span onClick={openDiscord}>
+                  <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer'}} />
+                </span>
+              </StyledNotificationsBadge>
+            </Tooltip>
+            <Tooltip title={GitHubTooltip} placement="bottomRight">
+              <GitHubIconSpan>
+                <GithubOutlined size={24} onClick={openGitHub} />
+              </GitHubIconSpan>
+            </Tooltip>
+            <Tooltip title={SettingsTooltip}>
+              <StyledSettingsBadge>
+                <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
+              </StyledSettingsBadge>
+            </Tooltip>
+            <Tooltip title={NotificationsTooltip}>
+              <StyledNotificationsBadge>
+                <StyledBellOutlined onClick={toggleNotificationsDrawer} />
+              </StyledNotificationsBadge>
+            </Tooltip>
           </SettingsCol>
         </Row>
       </StyledHeader>

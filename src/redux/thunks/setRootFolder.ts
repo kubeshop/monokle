@@ -1,15 +1,18 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
+import {configSlice} from '@redux/reducers/appConfig';
 import {SetRootFolderPayload} from '@redux/reducers/main';
-import {AppDispatch, RootState} from '@redux/store';
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
 import {createFileEntry, readFiles} from '@redux/services/fileEntry';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {processKustomizations} from '@redux/services/kustomize';
 import {processParsedResources} from '@redux/services/resource';
-import {monitorRootFolder} from '@redux/services/fileMonitor';
+import {AppDispatch, RootState} from '@redux/store';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {AlertEnum} from '@models/alert';
-import {configSlice} from '@redux/reducers/appConfig';
+import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import electronStore from '@utils/electronStore';
 import {getFileStats} from '@utils/files';
 
@@ -32,6 +35,8 @@ export const setRootFolder = createAsyncThunk<
   const rootEntry: FileEntry = createFileEntry(rootFolder);
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
+
+  //  console.log(`setting root folder from process type ${process?.type}`);
 
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
 

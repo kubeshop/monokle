@@ -1,14 +1,19 @@
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 import util from 'util';
-import {createAsyncThunk} from '@reduxjs/toolkit';
-import {AppDispatch, RootState} from '@redux/store';
-import {isUnsavedResource} from '@redux/services/resource';
-import {YAML_DOCUMENT_DELIMITER, ROOT_FILE_ENTRY} from '@constants/constants';
-import {AlertEnum, AlertType} from '@models/alert';
-import {getFileStats, isSubDirectory} from '@utils/files';
-import {getResourcesForPath} from '@redux/services/fileEntry';
+
 import {addResource} from '@redux/reducers/main';
+import {getResourcesForPath} from '@redux/services/fileEntry';
+import {isUnsavedResource} from '@redux/services/resource';
+import {AppDispatch, RootState} from '@redux/store';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
+import {AlertEnum, AlertType} from '@models/alert';
+
+import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+
+import {getFileStats, getFileTimestamp, isSubDirectory} from '@utils/files';
+
 import {createRejectionWithAlert} from './utils';
 
 type SaveUnsavedResourcePayload = {
@@ -120,7 +125,7 @@ export const saveUnsavedResource = createAsyncThunk<
     await writeFilePromise(absoluteFilePath, resource.text);
   }
 
-  const fileTimestamp = getFileStats(absolutePath)?.mtime.getTime();
+  const fileTimestamp = getFileTimestamp(absoluteFilePath);
 
   return {
     resourceId,

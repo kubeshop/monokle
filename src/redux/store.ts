@@ -1,4 +1,4 @@
-import {forwardToMain, replayActionRenderer} from 'electron-redux';
+import {forwardToMainWithParams, replayActionRenderer} from 'electron-redux';
 import {createLogger} from 'redux-logger';
 
 import {Middleware, configureStore} from '@reduxjs/toolkit';
@@ -35,7 +35,9 @@ const store = configureStore({
     uiCoach: uiCoachSlice.reducer,
   },
   middleware: getDefaultMiddleware => [
-    forwardToMain,
+    forwardToMainWithParams({
+      blacklist: [/^@@/, /.\.*pending/],
+    }),
     ...getDefaultMiddleware().concat(middlewares),
     sectionBlueprintMiddleware,
   ],

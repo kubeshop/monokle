@@ -14,7 +14,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {getFileStats} from '@utils/files';
+import {getFileStats, getFileTimestamp} from '@utils/files';
 
 import {extractK8sResources, reprocessResources} from './resource';
 
@@ -168,6 +168,7 @@ export function readFiles(
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substr(rootFolder.length);
       const fileEntry = createFileEntry(fileEntryPath);
+      fileEntry.timestamp = getFileTimestamp(filePath);
 
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
@@ -314,16 +315,10 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
  */
 
 export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState) {
-  let absolutePathTimestamp: number | undefined;
-  try {
-    absolutePathTimestamp = fs.statSync(absolutePath).mtime.getTime();
-  } catch (err) {
-    if (err instanceof Error) {
-      log.warn(`[reloadFile]: ${err.message}`);
-    }
-  }
+  let absolutePathTimestamp = getFileTimestamp(absolutePath);
+
   if (!fileEntry.timestamp || (absolutePathTimestamp && absolutePathTimestamp > fileEntry.timestamp)) {
-    log.info(`updating from file ${absolutePath}`);
+    fileEntry.timestamp = absolutePathTimestamp;
 
     const resourcesInFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
     let wasSelected = false;
@@ -356,6 +351,8 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     if (resourcesInFile.length === 1 && resourcesFromFile.length === 1 && wasSelected) {
       updateSelectionAndHighlights(state, resourcesFromFile[0]);
     }
+  } else {
+    log.info(`ignoring changed file ${absolutePath} because of timestamp`);
   }
 }
 

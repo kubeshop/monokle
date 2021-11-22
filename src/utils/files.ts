@@ -19,6 +19,13 @@ export function isSubDirectory(parentDir: string, dir: string) {
   return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
 }
 
+export function getFileTimestamp(filePath: string): number | undefined {
+  const stats = getFileStats(filePath);
+  if (stats) {
+    return stats.mtimeMs;
+  }
+}
+
 export function getFileStats(filePath: string): fs.Stats | undefined {
   try {
     return fs.statSync(filePath);
