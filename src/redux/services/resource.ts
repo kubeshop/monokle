@@ -19,7 +19,7 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
-import {getFileStats} from '@utils/files';
+import {getFileTimestamp} from '@utils/files';
 
 import {getDependentResourceKinds} from '@src/kindhandlers';
 
@@ -334,18 +334,18 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
         valueToWrite = `${YAML_DOCUMENT_DELIMITER}\n${valueToWrite}`;
       }
 
-      fs.writeFileSync(
-        absoluteResourcePath,
+      const newFileContent =
         content.substr(0, resource.range.start) +
-          valueToWrite +
-          content.substr(resource.range.start + resource.range.length)
-      );
+        valueToWrite +
+        content.substr(resource.range.start + resource.range.length);
+
+      fs.writeFileSync(absoluteResourcePath, newFileContent);
     } else {
       // only document => just write to file
       fs.writeFileSync(absoluteResourcePath, newValue);
     }
 
-    fileEntry.timestamp = getFileStats(absoluteResourcePath)?.mtime.getTime();
+    fileEntry.timestamp = getFileTimestamp(absoluteResourcePath);
   }
 
   return valueToWrite;
@@ -550,8 +550,7 @@ export function removeResourceFromFile(
     content.substr(0, removedResource.range.start) +
       content.substr(removedResource.range.start + removedResource.range.length)
   );
-  fileEntry.timestamp = getFileStats(absoluteFilePath)?.mtime.getTime();
-
+  fileEntry.timestamp = getFileTimestamp(absoluteFilePath);
   delete resourceMap[removedResource.id];
 }
 

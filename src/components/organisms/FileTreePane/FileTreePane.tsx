@@ -657,6 +657,12 @@ const FileTreePane = () => {
     setAutoExpandParent(false);
   };
 
+  const onSelectRootFolderFromMainThread = useCallback((_: any, data: string) => {
+    if (data) {
+      setFolder(data);
+    }
+  }, []);
+
   const onExecutedFrom = useCallback(
     (_, data) => {
       const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
@@ -667,6 +673,14 @@ const FileTreePane = () => {
     },
     [loadLastFolderOnStartup, setFolder, recentFolders]
   );
+
+  // called from main thread to avoid running setRootFolder in main thread
+  useEffect(() => {
+    ipcRenderer.on('set-root-folder', onSelectRootFolderFromMainThread);
+    return () => {
+      ipcRenderer.removeListener('set-root-folder', onSelectRootFolderFromMainThread);
+    };
+  }, []);
 
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);

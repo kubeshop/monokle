@@ -32,7 +32,7 @@ import {K8sResource} from '@models/k8sresource';
 import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import electronStore from '@utils/electronStore';
-import {getFileStats} from '@utils/files';
+import {getFileStats, getFileTimestamp} from '@utils/files';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -255,7 +255,7 @@ export const mainSlice = createSlice({
 
           if (getFileStats(filePath)?.isDirectory() === false) {
             fs.writeFileSync(filePath, action.payload.content);
-            fileEntry.timestamp = getFileStats(filePath)?.mtime.getTime();
+            fileEntry.timestamp = getFileTimestamp(filePath);
 
             getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
               delete state.resourceMap[r.id];
@@ -294,32 +294,43 @@ export const mainSlice = createSlice({
     /**
      * Updates the content of the specified resource to the specified value
      */
-    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
-      try {
-        const resource = state.resourceMap[action.payload.resourceId];
-        if (resource) {
-          if (isFileResource(resource)) {
-            const updatedFileText = saveResource(resource, action.payload.content, state.fileMap);
-            resource.text = updatedFileText;
-            resource.content = parseDocument(updatedFileText).toJS();
-            recalculateResourceRanges(resource, state);
-          } else {
-            resource.text = action.payload.content;
-            resource.content = parseDocument(action.payload.content).toJS();
-          }
+    updateResource: {
+      reducer: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
+        try {
+          const resource = state.resourceMap[action.payload.resourceId];
+          if (resource) {
+            if (isFileResource(resource)) {
+              const updatedFileText = saveResource(resource, action.payload.content, state.fileMap);
+              resource.text = updatedFileText;
+              resource.content = parseDocument(updatedFileText).toJS();
+              recalculateResourceRanges(resource, state);
+            } else {
+              resource.text = action.payload.content;
+              resource.content = parseDocument(action.payload.content).toJS();
+            }
 
-          let resources = findResourcesToReprocess(resource, state.resourceMap);
+            let resources = findResourcesToReprocess(resource, state.resourceMap);
 
-          reprocessResources(resources, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
-          if (!action.payload.preventSelectionAndHighlightsUpdate) {
-            resource.isSelected = false;
-            updateSelectionAndHighlights(state, resource);
+            reprocessResources(resources, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
+            if (!action.payload.preventSelectionAndHighlightsUpdate) {
+              resource.isSelected = false;
+              updateSelectionAndHighlights(state, resource);
+            }
           }
+        } catch (e) {
+          log.error(e);
+          return original(state);
         }
-      } catch (e) {
-        log.error(e);
-        return original(state);
-      }
+      },
+      prepare: (payload: UpdateResourcePayload) => {
+        // only run this action in the renderer thread - to avoid sync issues when both threads are updating the same file
+        return {
+          payload,
+          meta: {
+            scope: 'local',
+          },
+        };
+      },
     },
     removeResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const resourceId = action.payload;
