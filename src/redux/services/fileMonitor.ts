@@ -15,57 +15,55 @@ let watcher: FSWatcher;
 
 export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch: AppDispatch) {
   if (watcher) {
-    const watched = Object.keys(watcher.getWatched());
-    watcher.unwatch(watched);
-    watcher.add(folder);
-  } else {
-    watcher = watch(folder, {
-      ignored: appConfig.scanExcludes,
-      ignoreInitial: true,
-      persistent: true,
-      usePolling: true,
-      interval: 1000,
-    });
-
-    watcher
-      .on(
-        'add',
-        debounceWithPreviousArgs((args: any[]) => {
-          const paths: Array<string> = args.map(arg => arg[0]);
-          dispatch(multiplePathsAdded({paths, appConfig}));
-        }, 1000)
-      )
-      .on(
-        'addDir',
-        debounceWithPreviousArgs((args: any[]) => {
-          const paths: Array<string> = args.map(arg => arg[0]);
-          dispatch(multiplePathsAdded({paths, appConfig}));
-        }, 1000)
-      )
-      .on(
-        'change',
-        debounceWithPreviousArgs((args: any[]) => {
-          const paths: Array<string> = args.map(arg => arg[0]);
-          dispatch(multipleFilesChanged({paths, appConfig}));
-        }, 1000)
-      )
-      .on(
-        'unlink',
-        debounceWithPreviousArgs((args: any[]) => {
-          const paths: Array<string> = args.map(arg => arg[0]);
-          dispatch(multiplePathsRemoved(paths));
-        }, 1000)
-      )
-      .on(
-        'unlinkDir',
-        debounceWithPreviousArgs((args: any[]) => {
-          const paths: Array<string> = args.map(arg => arg[0]);
-          dispatch(multiplePathsRemoved(paths));
-        }, 1000)
-      );
-
-    watcher
-      /* eslint-disable no-console */
-      .on('error', error => console.log(`Watcher error: ${error}`));
+    watcher.close();
   }
+
+  watcher = watch(folder, {
+    ignored: appConfig.scanExcludes,
+    ignoreInitial: true,
+    persistent: true,
+    usePolling: true,
+    interval: 1000,
+  });
+
+  watcher
+    .on(
+      'add',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multiplePathsAdded({paths, appConfig}));
+      }, 1000)
+    )
+    .on(
+      'addDir',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multiplePathsAdded({paths, appConfig}));
+      }, 1000)
+    )
+    .on(
+      'change',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multipleFilesChanged({paths, appConfig}));
+      }, 1000)
+    )
+    .on(
+      'unlink',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multiplePathsRemoved(paths));
+      }, 1000)
+    )
+    .on(
+      'unlinkDir',
+      debounceWithPreviousArgs((args: any[]) => {
+        const paths: Array<string> = args.map(arg => arg[0]);
+        dispatch(multiplePathsRemoved(paths));
+      }, 1000)
+    );
+
+  watcher
+    /* eslint-disable no-console */
+    .on('error', error => console.log(`Watcher error: ${error}`));
 }

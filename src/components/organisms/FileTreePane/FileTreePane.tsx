@@ -675,6 +675,9 @@ const FileTreePane = () => {
         setFolder(data);
       }
     });
+    return () => {
+      ipcRenderer.removeListener('set-root-folder', onExecutedFrom);
+    };
   }, []);
 
   useEffect(() => {
