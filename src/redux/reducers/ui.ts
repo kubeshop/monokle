@@ -1,3 +1,5 @@
+import path from 'path';
+
 import initialState from '@redux/initialState';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
@@ -6,8 +8,6 @@ import {ResourceValidationError} from '@models/k8sresource';
 import {MonacoUiState, NewResourceWizardInput, PaneConfiguration, UiState} from '@models/ui';
 
 import electronStore from '@utils/electronStore';
-
-import path from 'path/posix';
 
 export const resetLayout = createAsyncThunk('ui/resetLayout', async (_, thunkAPI) => {
   thunkAPI.dispatch(uiSlice.actions.setLeftMenuIsActive(true));

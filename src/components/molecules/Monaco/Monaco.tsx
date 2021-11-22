@@ -134,7 +134,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     // @ts-ignore
     monaco.editor.onDidChangeMarkers(onDidChangeMarkers);
 
-    e.updateOptions({tabSize: 2});
+    e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
     e.onDidChangeCursorSelection(onChangeCursorSelection);
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
