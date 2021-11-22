@@ -1,8 +1,8 @@
 import {useState} from 'react';
 
-import {SectionCustomComponent, SectionInstance} from '@models/navigator';
-
 import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
+
+import {SectionCustomComponent, SectionInstance} from '@models/navigator';
 
 import Colors from '@styles/Colors';
 

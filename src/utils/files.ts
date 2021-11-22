@@ -1,8 +1,7 @@
 import fs from 'fs';
+import {lstat} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
-
-import {lstat} from 'fs/promises';
 
 export function checkIfEntityExists(absolutePath: string) {
   try {

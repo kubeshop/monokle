@@ -1,5 +1,9 @@
-import {Button, Checkbox} from 'antd';
 import React from 'react';
+
+import {Button, Checkbox} from 'antd';
+
+import {ReloadOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -9,8 +13,6 @@ import {stopPreview} from '@redux/services/preview';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
 import {PreviewDropdown} from '@components/molecules';
-
-import {ReloadOutlined} from '@ant-design/icons';
 
 const NameDisplayContainer = styled.div`
   margin-left: 16px;

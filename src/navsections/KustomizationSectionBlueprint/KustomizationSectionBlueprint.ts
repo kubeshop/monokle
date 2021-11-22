@@ -1,10 +1,10 @@
-import {selectK8sResource} from '@redux/reducers/main';
+import {KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {selectK8sResource} from '@redux/reducers/main';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizationPrefix from './KustomizationPrefix';

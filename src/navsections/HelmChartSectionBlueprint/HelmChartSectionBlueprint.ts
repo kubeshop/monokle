@@ -1,8 +1,8 @@
-import {selectHelmValuesFile} from '@redux/reducers/main';
-
 import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
 import {HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
+
+import {selectHelmValuesFile} from '@redux/reducers/main';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import HelmChartQuickAction from './HelmChartQuickAction';

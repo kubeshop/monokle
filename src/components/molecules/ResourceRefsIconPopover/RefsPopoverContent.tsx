@@ -1,14 +1,20 @@
 import React, {useCallback, useMemo} from 'react';
-import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
-import {ResourceMapType} from '@models/appstate';
+
+import {Divider, Typography} from 'antd';
+
 import styled from 'styled-components';
-import {Typography, Divider} from 'antd';
+
+import {KUSTOMIZATION_KIND} from '@constants/constants';
+
+import {ResourceMapType} from '@models/appstate';
+import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
+import {MonacoRange} from '@models/ui';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {MonacoRange} from '@models/ui';
 import {areRefPosEqual} from '@redux/services/resource';
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+
 import RefLink from './RefLink';
 
 const {Text} = Typography;

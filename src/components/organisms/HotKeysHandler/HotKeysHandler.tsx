@@ -2,6 +2,9 @@ import React, {useCallback} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+import hotkeys from '@constants/hotkeys';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, toggleLeftMenu, toggleRightMenu, toggleSettings} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -15,9 +18,6 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import FileExplorer from '@atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
-
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
 
 import featureJson from '@src/feature-flags.json';
 

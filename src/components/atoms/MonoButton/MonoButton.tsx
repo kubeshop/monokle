@@ -1,6 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
+
 import {Button, ButtonProps} from 'antd';
+
+import styled from 'styled-components';
 
 export type MonoButtonProps = ButtonProps & {
   large?: React.ReactNode;

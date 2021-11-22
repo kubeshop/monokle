@@ -1,8 +1,12 @@
 import React from 'react';
+
 import {Tooltip} from 'antd';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {stopPreview} from '@redux/services/preview';
+
 import * as S from './styled';
 
 function QuickActionPreview(props: {

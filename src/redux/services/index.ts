@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+
 import {PROCESS_ENV, RESOURCES_PATH} from '@utils/env';
 
 /**

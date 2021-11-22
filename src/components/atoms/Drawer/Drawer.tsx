@@ -1,6 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
+
 import AntDrawer, {DrawerProps as AntDrawerProps} from 'antd/lib/drawer/index';
+
+import styled from 'styled-components';
 
 export type DrawerProps = AntDrawerProps & {
   noborder?: React.ReactNode;

@@ -1,5 +1,6 @@
-import {useEffect} from 'react';
 import {ipcRenderer} from 'electron';
+
+import {useEffect} from 'react';
 
 export type DirectoryOptions = {
   isDirectoryExplorer: true;

@@ -1,8 +1,20 @@
-import {Button, Checkbox, Divider, Input, InputNumber, Select, Tooltip} from 'antd';
 import {ipcRenderer} from 'electron';
+
 import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
+
+import {Button, Checkbox, Divider, Input, InputNumber, Select, Tooltip} from 'antd';
+
 import styled from 'styled-components';
+
+import {
+  AddExclusionPatternTooltip,
+  AddInclusionPatternTooltip,
+  AutoLoadLastFolderTooltip,
+  HelmPreviewModeTooltip,
+  KubeconfigPathTooltip,
+  KustomizeCommandTooltip,
+} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -24,15 +36,6 @@ import {isInClusterModeSelector} from '@redux/selectors';
 import FilePatternList from '@molecules/FilePatternList';
 
 import Drawer from '@components/atoms/Drawer';
-
-import {
-  AddExclusionPatternTooltip,
-  AddInclusionPatternTooltip,
-  AutoLoadLastFolderTooltip,
-  HelmPreviewModeTooltip,
-  KubeconfigPathTooltip,
-  KustomizeCommandTooltip,
-} from '@constants/tooltips';
 
 import {useFocus} from '@utils/hooks';
 

@@ -1,15 +1,16 @@
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import log from 'loglevel';
+
+import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+
+import {AlertEnum, AlertType} from '@models/alert';
+import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
 import {reloadClusterDiff} from '@redux/reducers/main';
 import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {AppDispatch, RootState} from '@redux/store';
-import {createAsyncThunk} from '@reduxjs/toolkit';
-
-import {AlertEnum, AlertType} from '@models/alert';
-import {K8sResource} from '@models/k8sresource';
-
-import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {applyYamlToCluster} from './applyYaml';
 

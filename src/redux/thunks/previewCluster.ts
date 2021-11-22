@@ -1,18 +1,19 @@
-import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {extractK8sResources, processParsedResources} from '@redux/services/resource';
-import {AppDispatch, RootState} from '@redux/store';
-import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
+import * as k8s from '@kubernetes/client-node';
+import {KubeConfig} from '@kubernetes/client-node';
+
 import {createAsyncThunk} from '@reduxjs/toolkit';
+
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+import {SetPreviewDataPayload} from '@redux/reducers/main';
+import {extractK8sResources, processParsedResources} from '@redux/services/resource';
+import {AppDispatch, RootState} from '@redux/store';
+import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
-
-import * as k8s from '@kubernetes/client-node';
-import {KubeConfig} from '@kubernetes/client-node';
 
 const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;

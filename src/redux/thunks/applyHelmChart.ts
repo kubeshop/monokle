@@ -2,14 +2,14 @@ import {spawn} from 'child_process';
 import log from 'loglevel';
 import path from 'path';
 
+import {AlertEnum, AlertType} from '@models/alert';
+import {FileMapType} from '@models/appstate';
+import {HelmChart, HelmValuesFile} from '@models/helm';
+
 import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 import {AppDispatch} from '@redux/store';
-
-import {AlertEnum, AlertType} from '@models/alert';
-import {FileMapType} from '@models/appstate';
-import {HelmChart, HelmValuesFile} from '@models/helm';
 
 import {PROCESS_ENV} from '@utils/env';
 import {getShellPath} from '@utils/shell';

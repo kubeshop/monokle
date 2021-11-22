@@ -1,20 +1,7 @@
-import {Badge, Tooltip} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
-import styled from 'styled-components';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
-import {stopPreview} from '@redux/services/preview';
-
-import {HelmChart, HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
-
-import Col from '@components/atoms/Col';
-import Header from '@components/atoms/Header';
-import Row from '@components/atoms/Row';
+import {Badge, Tooltip} from 'antd';
 
 import {
   BellOutlined,
@@ -23,6 +10,21 @@ import {
   QuestionCircleOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
+
+import styled from 'styled-components';
+
+import {HelmChart, HelmValuesFile} from '@models/helm';
+import {K8sResource} from '@models/k8sresource';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateStartupModalVisible} from '@redux/reducers/appConfig';
+import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {stopPreview} from '@redux/services/preview';
+
+import Col from '@components/atoms/Col';
+import Header from '@components/atoms/Header';
+import Row from '@components/atoms/Row';
 
 import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
 

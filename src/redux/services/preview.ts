@@ -1,13 +1,13 @@
 import {
-  startPreviewLoader,
-  stopPreviewLoader,
   clearPreview,
   clearPreviewAndSelectionHistory,
+  startPreviewLoader,
+  stopPreviewLoader,
 } from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
-import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {previewKustomization} from '@redux/thunks/previewKustomization';
 
 export const startPreview = (
   targetResourceId: string,

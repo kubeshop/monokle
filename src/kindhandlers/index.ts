@@ -1,6 +1,7 @@
-import {ResourceKindHandler, RefMapper} from '@models/resourcekindhandler';
+import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
+
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
 import ConfigMapHandler from './ConfigMap.handler';
@@ -11,8 +12,8 @@ import DeploymentHandler from './Deployment.handler';
 import EndpointsHandler from './Endpoints.handler';
 import IngressHandler from './Ingress.handler';
 import JobHandler from './Job.handler';
-import NetworkPolicyHandler from './NetworkPolicy.handler';
 import NamespaceHandler from './Namespace.handler';
+import NetworkPolicyHandler from './NetworkPolicy.handler';
 import PersistentVolumeHandler from './PersistentVolume.handler';
 import PersistentVolumeClaimHandler from './PersistentVolumeClaim.handler';
 import PodHandler from './Pod.handler';

@@ -1,5 +1,5 @@
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 
 export function loadTestResource(resourcePath: string) {
   return fs.readFileSync(getTestResourcePath(resourcePath), 'utf-8');

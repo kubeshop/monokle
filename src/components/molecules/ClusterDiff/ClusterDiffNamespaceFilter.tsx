@@ -1,6 +1,9 @@
 import React, {useMemo} from 'react';
-import {useAppSelector} from '@redux/hooks';
+
 import styled from 'styled-components';
+
+import {useAppSelector} from '@redux/hooks';
+
 import ResourceNamespaceFilter from '../ResourceNamespaceFilter';
 
 const NamespaceFilterContainer = styled.div`

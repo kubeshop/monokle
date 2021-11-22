@@ -1,13 +1,20 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {Modal, Form, Input, Select} from 'antd';
+import React, {useEffect, useRef, useState} from 'react';
+
+import {Form, Input, Modal, Select} from 'antd';
+
 import {InfoCircleOutlined} from '@ant-design/icons';
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
-import {closeNewResourceWizard} from '@redux/reducers/ui';
-import {useResetFormOnCloseModal} from '@utils/hooks';
-import {createUnsavedResource} from '@redux/services/unsavedResource';
-import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
-import {useNamespaces, NO_NAMESPACE} from '@hooks/useNamespaces';
+
 import {K8sResource} from '@models/k8sresource';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {closeNewResourceWizard} from '@redux/reducers/ui';
+import {createUnsavedResource} from '@redux/services/unsavedResource';
+
+import {NO_NAMESPACE, useNamespaces} from '@hooks/useNamespaces';
+
+import {useResetFormOnCloseModal} from '@utils/hooks';
+
+import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 const SELECT_OPTION_NONE = '<none>';
 

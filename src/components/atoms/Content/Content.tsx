@@ -1,6 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
+
 import Layout, {LayoutProps} from 'antd/lib/layout/index';
+
+import styled from 'styled-components';
 
 const AntContent = Layout.Content;
 

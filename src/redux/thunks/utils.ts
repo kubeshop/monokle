@@ -1,16 +1,16 @@
+import * as k8s from '@kubernetes/client-node';
+
 import {stringify} from 'yaml';
 
-import {extractK8sResources, processParsedResources} from '@redux/services/resource';
+import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
-import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+import {extractK8sResources, processParsedResources} from '@redux/services/resource';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
-
-import * as k8s from '@kubernetes/client-node';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document

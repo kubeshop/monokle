@@ -1,8 +1,10 @@
-import {useRef, useEffect} from 'react';
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
-import {clearDecorations, setDecorations} from './editorHelpers';
+
+import {FileMapType, ResourceMapType} from '@models/appstate';
+
 import codeIntel from './codeIntel';
+import {clearDecorations, setDecorations} from './editorHelpers';
 
 function useCodeIntel(
   editor: monaco.editor.IStandaloneCodeEditor | null,

@@ -2,6 +2,10 @@ import {spawn} from 'child_process';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
+import {AlertEnum, AlertType} from '@models/alert';
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {K8sResource} from '@models/k8sresource';
+
 import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource, setClusterDiffRefreshDiffResource, updateResource} from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
@@ -9,10 +13,6 @@ import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kus
 import {AppDispatch} from '@redux/store';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {getResourceFromCluster} from '@redux/thunks/utils';
-
-import {AlertEnum, AlertType} from '@models/alert';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
 
 import {PROCESS_ENV} from '@utils/env';
 import {getShellPath} from '@utils/shell';

@@ -1,22 +1,23 @@
-import {Badge} from 'antd';
 import {useContext, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openNewResourceWizard} from '@redux/reducers/ui';
-import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {Badge} from 'antd';
+
+import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
+
+import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ResourceFilterType} from '@models/appstate';
 import {HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openNewResourceWizard} from '@redux/reducers/ui';
+import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+
 import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import IconWithPopover from '@components/molecules/IconWithPopover';
-
-import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
-
-import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import Colors from '@styles/Colors';
 

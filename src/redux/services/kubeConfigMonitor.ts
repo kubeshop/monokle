@@ -1,7 +1,8 @@
-import {watch, FSWatcher} from 'chokidar';
+import {FSWatcher, watch} from 'chokidar';
+import fs from 'fs';
+
 import {AppDispatch} from '@redux/store';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
-import fs from 'fs';
 
 let watcher: FSWatcher;
 

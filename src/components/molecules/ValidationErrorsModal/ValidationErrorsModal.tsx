@@ -1,6 +1,9 @@
 import React from 'react';
+
 import {Modal} from 'antd';
+
 import styled from 'styled-components';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {hideValidationErrorsModal} from '@redux/reducers/ui';
 

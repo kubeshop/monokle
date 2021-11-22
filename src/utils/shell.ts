@@ -1,4 +1,5 @@
 import {shell} from 'electron';
+
 import * as os from 'os';
 // @ts-ignore
 import shellPath from 'shell-path';

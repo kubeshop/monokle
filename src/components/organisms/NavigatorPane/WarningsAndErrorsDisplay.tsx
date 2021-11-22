@@ -1,16 +1,18 @@
-import {Dropdown, Menu} from 'antd';
 import React, {useMemo} from 'react';
+
+import {Dropdown, Menu} from 'antd';
+
 import styled from 'styled-components';
+
+import {PREVIEW_PREFIX} from '@constants/constants';
+
+import {ResourceRefType} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectInstance} from '@redux/reducers/navigator';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
-import {ResourceRefType} from '@models/k8sresource';
-
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
-
-import {PREVIEW_PREFIX} from '@constants/constants';
 
 import Colors from '@styles/Colors';
 

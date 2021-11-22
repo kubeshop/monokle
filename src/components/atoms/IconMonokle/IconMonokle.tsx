@@ -1,9 +1,12 @@
 import React from 'react';
+
 import styled from 'styled-components';
-import MonokleLogoLight from '@assets/MonokleLogoLight.svg';
-import MonokleLogoDark from '@assets/MonokleLogoDark.svg';
-import {updateStartupModalVisible} from '@redux/reducers/appConfig';
+
 import {useAppDispatch} from '@redux/hooks';
+import {updateStartupModalVisible} from '@redux/reducers/appConfig';
+
+import MonokleLogoDark from '@assets/MonokleLogoDark.svg';
+import MonokleLogoLight from '@assets/MonokleLogoLight.svg';
 
 export type IconMonokleProps = {
   useDarkTheme?: React.ReactNode;

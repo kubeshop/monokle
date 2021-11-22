@@ -1,10 +1,15 @@
-import {useEffect, useState, useCallback} from 'react';
+import {ipcRenderer} from 'electron';
+
+import {useCallback, useEffect, useState} from 'react';
+
 import {Button, Modal} from 'antd';
+
+import styled from 'styled-components';
+
+import {NewVersionCode} from '@models/appconfig';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateNewVersion} from '@redux/reducers/appConfig';
-import {NewVersionCode} from '@models/appconfig';
-import {ipcRenderer} from 'electron';
-import styled from 'styled-components';
 
 const StyledModal = styled(Modal)`
   .ant-modal {

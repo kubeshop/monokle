@@ -1,12 +1,13 @@
 import {Modal} from 'antd';
-import {ThunkDispatch} from 'redux-thunk';
 
-import {applyHelmChart} from '@redux/thunks/applyHelmChart';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
+import {ThunkDispatch} from 'redux-thunk';
 
 import {FileMapType} from '@models/appstate';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 
-import {ExclamationCircleOutlined} from '@ant-design/icons';
+import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 
 export function applyHelmChartWithConfirm(
   valuesFile: HelmValuesFile,

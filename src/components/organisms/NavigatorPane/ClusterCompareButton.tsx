@@ -1,9 +1,6 @@
-import {Button, Tooltip} from 'antd';
 import React, {useMemo} from 'react';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openClusterDiff} from '@redux/reducers/ui';
-import {isInClusterModeSelector} from '@redux/selectors';
+import {Button, Tooltip} from 'antd';
 
 import {SwapOutlined} from '@ant-design/icons';
 
@@ -13,6 +10,10 @@ import {
   ClusterDiffDisabledTooltip,
   ClusterDiffTooltip,
 } from '@constants/tooltips';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openClusterDiff} from '@redux/reducers/ui';
+import {isInClusterModeSelector} from '@redux/selectors';
 
 import {useWindowSize} from '@utils/hooks';
 

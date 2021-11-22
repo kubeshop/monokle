@@ -1,7 +1,17 @@
-import {Checkbox, Modal, Tag, Tooltip} from 'antd';
 import React, {useMemo, useState} from 'react';
+
+import {Checkbox, Modal, Tag, Tooltip} from 'antd';
+
+import {ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 import {stringify} from 'yaml';
+
+import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
+import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
+
+import {K8sResource} from '@models/k8sresource';
+import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -11,14 +21,6 @@ import {
   updateResource,
 } from '@redux/reducers/main';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
-
-import {K8sResource} from '@models/k8sresource';
-import {ItemCustomComponentProps} from '@models/navigator';
-
-import {ArrowLeftOutlined, ArrowRightOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
-
-import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
-import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 
 import {
   diffLocalToClusterResources,

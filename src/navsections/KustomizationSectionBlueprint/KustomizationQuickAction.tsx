@@ -1,14 +1,18 @@
 import React, {useCallback, useMemo} from 'react';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectK8sResource} from '@redux/reducers/main';
-import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
+
 import {
   ExitKustomizationPreviewTooltip,
   KustomizationPreviewTooltip,
   ReloadKustomizationPreviewTooltip,
 } from '@constants/tooltips';
-import QuickActionPreview from '@components/molecules/QuickActionPreview';
+
 import {ItemCustomComponentProps} from '@models/navigator';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectK8sResource} from '@redux/reducers/main';
+import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
+
+import QuickActionPreview from '@components/molecules/QuickActionPreview';
 
 const QuickAction = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;

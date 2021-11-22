@@ -1,6 +1,8 @@
 import * as k8s from '@kubernetes/client-node';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+
 import navSectionNames from '@constants/navSectionNames';
+
+import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 const ClusterRoleHandler: ResourceKindHandler = {
   kind: 'ClusterRole',

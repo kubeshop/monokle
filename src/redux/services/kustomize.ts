@@ -1,10 +1,14 @@
 import path from 'path';
+
+import {KUSTOMIZATION_KIND} from '@constants/constants';
+
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource, ResourceRefType} from '@models/k8sresource';
+
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-import {createFileRef, getK8sResources, getScalarNodes, linkResources, NodeWrapper} from './resource';
+
+import {NodeWrapper, createFileRef, getK8sResources, getScalarNodes, linkResources} from './resource';
 
 export type KustomizeCommandType = 'kubectl' | 'kustomize';
 

@@ -1,17 +1,18 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 
 import {ItemBlueprint} from '@models/navigator';
 
-import ScrollIntoView, {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+import ScrollIntoView, {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
 
 import AppContext from '@src/AppContext';
 
-import * as S from './styled';
 import {useItemCustomization} from './useItemCustomization';
+
+import * as S from './styled';
 
 export type ItemRendererOptions = {
   disablePrefix?: boolean;

@@ -1,8 +1,14 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
-import {AppDispatch, RootState} from '@redux/store';
 import * as k8s from '@kubernetes/client-node';
-import {KubeConfig, KubeConfigContext} from '@models/kubeConfig';
+
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import fs from 'fs';
+import log from 'loglevel';
+
+import {KubeConfig, KubeConfigContext} from '@models/kubeConfig';
+
+import {AppDispatch, RootState} from '@redux/store';
+
 import {createRejectionWithAlert} from './utils';
 
 export const loadContexts = createAsyncThunk<
@@ -22,7 +28,7 @@ export const loadContexts = createAsyncThunk<
         kc.loadFromFile(configPath);
 
         const kubeConfig: KubeConfig = {
-          contexts: <Array<KubeConfigContext>>kc.contexts,
+          contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
         };
         return kubeConfig;
@@ -31,8 +37,7 @@ export const loadContexts = createAsyncThunk<
       }
     }
   } catch (e) {
-    //
+    log.info(e);
   }
-
   return thunkAPI.reject();
 });

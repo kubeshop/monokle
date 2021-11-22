@@ -1,5 +1,5 @@
-import fetch from 'node-fetch';
 import fs from 'fs';
+import fetch from 'node-fetch';
 
 export async function downloadFile(sourceUrl: string, destinationFilePath: string): Promise<void> {
   const response = await fetch(sourceUrl);

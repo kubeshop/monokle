@@ -1,11 +1,13 @@
 import React, {useCallback, useEffect} from 'react';
+import {useStore, useZoomPanHelper} from 'react-flow-renderer';
+
+import {Button, Checkbox, Space} from 'antd';
+
 // @ts-ignore
 import {Easing, Tween, autoPlay} from 'es6-tween';
-import {useStore, useZoomPanHelper} from 'react-flow-renderer';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutoZoom} from '@redux/reducers/appConfig';
-import {Button, Checkbox, Space} from 'antd';
 
 autoPlay(true);
 

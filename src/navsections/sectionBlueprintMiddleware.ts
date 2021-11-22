@@ -1,12 +1,13 @@
+import {shallowEqual} from 'react-redux';
+
 import asyncLib from 'async';
 import log from 'loglevel';
-import {shallowEqual} from 'react-redux';
 import {Middleware} from 'redux';
+
+import {ItemInstance, NavigatorInstanceState, SectionInstance} from '@models/navigator';
 
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
 import {AppDispatch, RootState} from '@redux/store';
-
-import {ItemInstance, NavigatorInstanceState, SectionInstance} from '@models/navigator';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
 

@@ -1,10 +1,14 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {Modal, Input, Checkbox} from 'antd';
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
+import React, {useEffect, useRef, useState} from 'react';
+
+import {Checkbox, Input, Modal} from 'antd';
+
+import styled from 'styled-components';
+
+import {K8sResource} from '@models/k8sresource';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
 import {renameResource} from '@redux/services/renameResource';
-import styled from 'styled-components';
-import {K8sResource} from '@models/k8sresource';
 
 const CheckboxContainer = styled.div`
   margin-top: 10px;
