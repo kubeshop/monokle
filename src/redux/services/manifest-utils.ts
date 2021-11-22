@@ -1,4 +1,4 @@
-import {Document, isMap, isPair, isSeq, ParsedNode, parseDocument, visit, Scalar, isScalar} from 'yaml';
+import {Document, ParsedNode, Scalar, isMap, isPair, isScalar, isSeq, parseDocument, visit} from 'yaml';
 
 function copyValueIfMissing(templateDoc: Document.Parsed<ParsedNode>, path: readonly any[]) {
   const templateNode = findValueNode(templateDoc, path);

@@ -1,9 +1,10 @@
 import {Modal} from 'antd';
+
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
 import {ThunkDispatch} from 'redux-thunk';
 
 import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
-
-import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 export function applySelectedMatchesWithConfirm(
   selectedMatchesLength: number,

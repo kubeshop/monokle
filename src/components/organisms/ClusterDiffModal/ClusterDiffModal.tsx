@@ -1,6 +1,12 @@
-import {Button, Modal, Skeleton, message} from 'antd';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+
+import {Button, Modal, Skeleton, message} from 'antd';
+
+import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
+
+import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setClusterDiffRefreshDiffResource, setDiffResourceInClusterDiff} from '@redux/reducers/main';
@@ -10,13 +16,9 @@ import {applySelectedMatchesWithConfirm} from '@redux/services/applySelectedMatc
 import {getClusterResourceText} from '@redux/services/clusterResource';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
-import {K8sResource} from '@models/k8sresource';
-
 import {ClusterDiff, ResourceDiff} from '@molecules';
 
 import Icon from '@components/atoms/Icon';
-
-import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 

@@ -1,9 +1,9 @@
 import Ajv, {ValidateFunction} from 'ajv';
 import log from 'loglevel';
 
-import {isKustomizationPatch} from '@redux/services/kustomize';
-
 import {K8sResource} from '@models/k8sresource';
+
+import {isKustomizationPatch} from '@redux/services/kustomize';
 
 import {getResourceSchema} from './schema';
 

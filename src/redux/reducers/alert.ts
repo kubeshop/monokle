@@ -1,6 +1,9 @@
-import {createSlice, Draft, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+
 import {AlertState, AlertType} from '@models/alert';
+
 import initialState from '@redux/initialState';
+
 import {mainSlice} from './main';
 
 export const setAlert = createAsyncThunk('alert/setAlert', async (alert: AlertType, thunkAPI) => {

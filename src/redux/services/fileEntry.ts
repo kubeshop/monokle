@@ -4,7 +4,7 @@ import micromatch from 'micromatch';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
-import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/services/selection';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
@@ -12,7 +12,7 @@ import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/services/selection';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 

@@ -1,6 +1,9 @@
 import * as k8s from '@kubernetes/client-node';
-import {NamespaceRefTypeEnum, ResourceKindHandler} from '@models/resourcekindhandler';
+
 import navSectionNames from '@constants/navSectionNames';
+
+import {NamespaceRefTypeEnum, ResourceKindHandler} from '@models/resourcekindhandler';
+
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
 const VolumeAttachmentHandler: ResourceKindHandler = {

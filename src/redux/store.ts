@@ -1,7 +1,8 @@
 import {forwardToMainWithParams, replayActionRenderer} from 'electron-redux';
-import {createLogger} from 'redux-logger';
 
 import {Middleware, configureStore} from '@reduxjs/toolkit';
+
+import {createLogger} from 'redux-logger';
 
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 

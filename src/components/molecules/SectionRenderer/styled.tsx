@@ -1,4 +1,5 @@
 import {Skeleton as RawSkeleton} from 'antd';
+
 import styled from 'styled-components';
 
 import Colors, {FontColors} from '@styles/Colors';

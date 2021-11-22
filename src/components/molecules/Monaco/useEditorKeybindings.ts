@@ -1,10 +1,13 @@
+import {useEffect, useRef} from 'react';
+import {monaco} from 'react-monaco-editor';
+
 import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {FileMapType} from '@models/appstate';
+
 import {useAppDispatch} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
-import {useEffect, useRef} from 'react';
-import {monaco} from 'react-monaco-editor';
 
 function useEditorKeybindings(
   editor: monaco.editor.IStandaloneCodeEditor | null,

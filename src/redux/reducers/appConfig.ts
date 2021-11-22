@@ -1,10 +1,11 @@
-import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
-import {KustomizeCommandType} from '@redux/services/kustomize';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import {AppConfig, Languages, NewVersionCode, TextSizes, Themes} from '@models/appconfig';
 import {KubeConfig} from '@models/kubeConfig';
+
+import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
+import {KustomizeCommandType} from '@redux/services/kustomize';
+import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import electronStore from '@utils/electronStore';
 

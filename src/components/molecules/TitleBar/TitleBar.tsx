@@ -1,5 +1,7 @@
 import React from 'react';
+
 import {MonoPaneTitle} from '@components/atoms';
+
 import * as S from './styled';
 
 function TitleBar(props: {title: string; children?: React.ReactNode}) {

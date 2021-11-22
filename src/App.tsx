@@ -1,5 +1,7 @@
 import React from 'react';
 
+import 'antd/dist/antd.less';
+
 import {Size} from '@models/window';
 
 import {
@@ -26,7 +28,6 @@ import UpdateModal from '@components/organisms/UpdateModal';
 import {useWindowSize} from '@utils/hooks';
 
 import AppContext from './AppContext';
-import 'antd/dist/antd.less';
 
 const App = () => {
   const size: Size = useWindowSize();

@@ -1,5 +1,13 @@
-import {Button, Col, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 import React, {useCallback, useEffect, useState} from 'react';
+
+import {Button, Col, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
+
+import {ArrowLeftOutlined, ArrowRightOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
+
+import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setMonacoEditor} from '@redux/reducers/ui';
@@ -12,8 +20,6 @@ import {performResourceDiff} from '@redux/thunks/diffResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
-import {K8sResource} from '@models/k8sresource';
-
 import FormEditor from '@molecules/FormEditor';
 import Monaco from '@molecules/Monaco';
 
@@ -24,11 +30,6 @@ import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
-
-import {ArrowLeftOutlined, ArrowRightOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
-
-import {TOOLTIP_DELAY} from '@constants/constants';
-import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
 
 import {
   ActionsPaneContainer,

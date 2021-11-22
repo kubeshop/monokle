@@ -1,14 +1,16 @@
-import {Button, Input, Tooltip} from 'antd';
 import {useEffect, useRef, useState} from 'react';
+
+import {Button, Input, Tooltip} from 'antd';
+
 import styled from 'styled-components';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setScanExcludesStatus} from '@redux/reducers/appConfig';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {useOnClickOutside} from '@hooks/useOnClickOutside';
-
-import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useFocus} from '@utils/hooks';
 

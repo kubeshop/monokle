@@ -1,30 +1,31 @@
-import {Button, Switch, Tag} from 'antd';
 import {useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
+
+import {Button, Switch, Tag} from 'antd';
+
+import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
+
+import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import styled from 'styled-components';
 import {parse, stringify} from 'yaml';
+
+import {PREVIEW_PREFIX} from '@constants/constants';
+
+import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 
-import {K8sResource} from '@models/k8sresource';
-
 import Icon from '@components/atoms/Icon';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
-
-import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
-
-import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
-
-import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 
 // @ts-ignore
 const {yaml} = languages || {};

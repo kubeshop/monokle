@@ -1,6 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
+
 import AntCol, {ColProps as AntColProps} from 'antd/lib/col/index';
+
+import styled from 'styled-components';
+
 import {AppBorders} from '@styles/Borders';
 
 export type MonoPaneTitleColProps = AntColProps & {};

@@ -1,11 +1,11 @@
 import {monaco} from 'react-monaco-editor';
 import {useDebounce} from 'react-use';
 
+import {ResourceMapType} from '@models/appstate';
+
 import {useAppDispatch} from '@redux/hooks';
 import {updateFileEntry, updateResource} from '@redux/reducers/main';
 import {logMessage} from '@redux/services/log';
-
-import {ResourceMapType} from '@models/appstate';
 
 function useDebouncedCodeSave(
   editor: monaco.editor.IStandaloneCodeEditor | null,

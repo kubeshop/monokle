@@ -1,7 +1,10 @@
+import {Spin as RawSpin} from 'antd';
+
 import {LoadingOutlined} from '@ant-design/icons';
-import Colors from '@styles/Colors';
+
 import styled from 'styled-components';
-import {Spin as RawSpin} from "antd";
+
+import Colors from '@styles/Colors';
 
 export const PreviewLoadingIcon = <LoadingOutlined style={{fontSize: 16}} spin />;
 

@@ -1,10 +1,10 @@
 import {createSelector} from 'reselect';
 
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {RootState} from './store';
 

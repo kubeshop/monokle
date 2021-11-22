@@ -1,10 +1,10 @@
+import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import navSectionNames from '@constants/navSectionNames';
+
 import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
-import navSectionNames from '@constants/navSectionNames';
 
 import {isResourcePassingFilter} from '@utils/resources';
 

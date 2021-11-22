@@ -1,10 +1,11 @@
 import {Popover} from 'antd';
+
 import styled from 'styled-components';
+
+import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {showValidationErrorsModal} from '@redux/reducers/ui';
-
-import {ItemCustomComponentProps} from '@models/navigator';
 
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
 import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';

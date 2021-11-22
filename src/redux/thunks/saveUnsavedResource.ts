@@ -1,16 +1,17 @@
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+
+import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+
+import {AlertEnum, AlertType} from '@models/alert';
 
 import {addResource} from '@redux/reducers/main';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isUnsavedResource} from '@redux/services/resource';
 import {AppDispatch, RootState} from '@redux/store';
-import {createAsyncThunk} from '@reduxjs/toolkit';
-
-import {AlertEnum, AlertType} from '@models/alert';
-
-import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {getFileStats, getFileTimestamp, isSubDirectory} from '@utils/files';
 

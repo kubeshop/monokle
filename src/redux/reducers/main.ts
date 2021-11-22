@@ -1,20 +1,15 @@
+// eslint-disable-next-line
+import * as k8s from '@kubernetes/client-node';
+
+import {Draft, PayloadAction, createAsyncThunk, createSlice, original} from '@reduxjs/toolkit';
+
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {parseDocument} from 'yaml';
 
-import {findResourcesToReprocess} from '@redux/services/resourceRefs';
-import {resetSelectionHistory} from '@redux/services/selectionHistory';
-import {performResourceDiff} from '@redux/thunks/diffResource';
-import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
-import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
-import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
-import {previewKustomization} from '@redux/thunks/previewKustomization';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {Draft, PayloadAction, createAsyncThunk, createSlice, original} from '@reduxjs/toolkit';
+import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
 import {AppConfig} from '@models/appconfig';
@@ -29,7 +24,16 @@ import {
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
-import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {findResourcesToReprocess} from '@redux/services/resourceRefs';
+import {resetSelectionHistory} from '@redux/services/selectionHistory';
+import {performResourceDiff} from '@redux/thunks/diffResource';
+import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
+import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
+import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
 import {getFileStats, getFileTimestamp} from '@utils/files';
@@ -58,8 +62,6 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {closeClusterDiff} from './ui';
-// eslint-disable-next-line
-import * as k8s from '@kubernetes/client-node';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;

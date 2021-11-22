@@ -1,6 +1,9 @@
-import React, {useState} from 'react';
-import {Input, Modal} from 'antd';
 import {ipcRenderer} from 'electron';
+
+import React, {useState} from 'react';
+
+import {Input, Modal} from 'antd';
+
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 
 const downloadPlugin = (pluginUrl: string) => {

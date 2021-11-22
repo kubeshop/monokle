@@ -1,4 +1,4 @@
-import {SelectionHistoryEntry, AppState} from '@models/appstate';
+import {AppState, SelectionHistoryEntry} from '@models/appstate';
 
 type resetSelectionHistoryOptions = {
   initialPaths?: (string | undefined)[];

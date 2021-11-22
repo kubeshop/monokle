@@ -1,9 +1,12 @@
-import {AppConfig} from '@models/appconfig';
-import initialState from '@redux/initialState';
-import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
-import {getK8sResources} from '@redux/services/resource';
-import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
 import {KUSTOMIZATION_KIND} from '@constants/constants';
+
+import {AppConfig} from '@models/appconfig';
+import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
+
+import initialState from '@redux/initialState';
+import {createSafePath, getTestResourcePath} from '@redux/services/__test__/utils';
+import {getK8sResources} from '@redux/services/resource';
+
 import {createFileEntry, getResourcesForPath, readFiles} from './fileEntry';
 
 test('create-file-entry', () => {

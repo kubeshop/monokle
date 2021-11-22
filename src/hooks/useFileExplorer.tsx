@@ -1,7 +1,9 @@
-import {useState, useCallback} from 'react';
-import {FileExplorerOptions, FileExplorerProps} from '@atoms/FileExplorer';
+import {useCallback, useState} from 'react';
+
 import {useAppSelector} from '@redux/hooks';
 import {getRootFolder} from '@redux/services/fileEntry';
+
+import {FileExplorerOptions, FileExplorerProps} from '@atoms/FileExplorer';
 
 type FileExplorerSelectResult = {
   filePath?: string;

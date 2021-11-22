@@ -1,12 +1,17 @@
 import * as React from 'react';
-import styled from 'styled-components';
+
 import {Button, Modal} from 'antd';
+
+import styled from 'styled-components';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
+
+import {openGitHub} from '@utils/shell';
+
 import MonokleStartupBackground from '@assets/MonokleStartupBackground.svg';
 
 import Colors from '@styles/Colors';
-import {openGitHub} from '@utils/shell';
 
 const StyledModal = styled(Modal)`
   .ant-modal-close-icon {

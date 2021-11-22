@@ -1,8 +1,11 @@
 import React, {useMemo} from 'react';
+
 import {Select} from 'antd';
-import {useNamespaces} from '@hooks/useNamespaces';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
+
+import {useNamespaces} from '@hooks/useNamespaces';
 
 const ALL_OPTIONS = '<all>';
 

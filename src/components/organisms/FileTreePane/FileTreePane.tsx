@@ -1,10 +1,22 @@
-import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
 import {ipcRenderer, shell} from 'electron';
-import micromatch from 'micromatch';
-import path from 'path';
+
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
+
+import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
+
+import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
+
+import micromatch from 'micromatch';
+import path from 'path';
 import styled from 'styled-components';
+
+import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {BrowseFolderTooltip, FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
+
+import {AlertEnum} from '@models/alert';
+import {FileMapType, ResourceMapType} from '@models/appstate';
+import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -16,10 +28,6 @@ import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {AlertEnum} from '@models/alert';
-import {FileMapType, ResourceMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-
 import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
 import FileExplorer from '@atoms/FileExplorer';
 
@@ -28,11 +36,6 @@ import Icon from '@components/atoms/Icon';
 import ContextMenu from '@components/molecules/ContextMenu';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
-
-import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
-
-import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {BrowseFolderTooltip, FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
 
 import {DeleteEntityCallback, deleteEntity, getFileStats} from '@utils/files';
 import {uniqueArr} from '@utils/index';

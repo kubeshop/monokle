@@ -1,12 +1,17 @@
 import {ipcRenderer} from 'electron';
+
 import {createAsyncThunk} from '@reduxjs/toolkit';
+
+import log from 'loglevel';
+import path from 'path';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
+import {AppConfig} from '@models/appconfig';
+
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import path from 'path';
-import log from 'loglevel';
-import {createRejectionWithAlert, createPreviewResult} from '@redux/thunks/utils';
-import {AppConfig} from '@models/appconfig';
+import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 /**
  * Thunk to preview kustomizations

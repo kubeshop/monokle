@@ -1,8 +1,9 @@
-import {selectFile, selectK8sResource} from '@redux/reducers/main';
-import {AppDispatch, RootState} from '@redux/store';
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {SelectionHistoryEntry} from '@models/appstate';
+
+import {selectFile, selectK8sResource} from '@redux/reducers/main';
+import {AppDispatch, RootState} from '@redux/store';
 
 export const selectFromHistory = createAsyncThunk<
   {

@@ -1,5 +1,7 @@
-import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
+
 import {LogsState} from '@models/logs';
+
 import initialState from '@redux/initialState';
 
 export const logsSlice = createSlice({

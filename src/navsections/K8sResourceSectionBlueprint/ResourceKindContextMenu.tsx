@@ -1,12 +1,14 @@
-import {Dropdown} from 'antd';
 import React from 'react';
 import {useSelector} from 'react-redux';
+
+import {Dropdown} from 'antd';
+
 import styled from 'styled-components';
+
+import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
-
-import {ItemCustomComponentProps} from '@models/navigator';
 
 import {Dots} from '@atoms';
 

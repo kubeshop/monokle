@@ -1,6 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
+
 import {Typography} from 'antd';
+
+import styled from 'styled-components';
 
 import {FontColors} from '@styles/Colors';
 

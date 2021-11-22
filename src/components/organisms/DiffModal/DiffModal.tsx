@@ -1,19 +1,21 @@
-import {Button, Modal, Switch, Tag} from 'antd';
 import {useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
+
+import {Button, Modal, Switch, Tag} from 'antd';
+
+import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 import {parse, stringify} from 'yaml';
+
+import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 
-import {K8sResource} from '@models/k8sresource';
-
 import Icon from '@components/atoms/Icon';
-
-import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';

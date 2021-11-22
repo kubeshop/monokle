@@ -1,14 +1,14 @@
 import fs from 'fs';
 import log from 'loglevel';
 
+import {AlertEnum, AlertType} from '@models/alert';
+import {FileMapType} from '@models/appstate';
+
 import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteFileEntryPath} from '@redux/services/fileEntry';
 import {AppDispatch} from '@redux/store';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
-
-import {AlertEnum, AlertType} from '@models/alert';
-import {FileMapType} from '@models/appstate';
 
 /**
  * Invokes kubectl for the content of the specified resource

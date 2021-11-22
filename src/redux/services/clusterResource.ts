@@ -1,8 +1,8 @@
 import {stringify} from 'yaml';
 
-import {getResourceFromCluster} from '@redux/thunks/utils';
-
 import {K8sResource} from '@models/k8sresource';
+
+import {getResourceFromCluster} from '@redux/thunks/utils';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 

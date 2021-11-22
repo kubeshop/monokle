@@ -1,9 +1,9 @@
 import {useEffect} from 'react';
 
+import {ResourceMapType} from '@models/appstate';
+
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getResourceSchema} from '@redux/services/schema';
-
-import {ResourceMapType} from '@models/appstate';
 
 function useResourceYamlSchema(yaml: any, resourceMap: ResourceMapType, resourceId: string | undefined) {
   useEffect(() => {

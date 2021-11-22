@@ -1,11 +1,10 @@
 import {monaco} from 'react-monaco-editor';
-import {v4 as uuidv4} from 'uuid';
-
-// @ts-ignore
-import {CommandsRegistry} from 'monaco-editor/esm/vs/platform/commands/common/commands';
 
 // @ts-ignore
 import {getDocumentSymbols} from 'monaco-editor/esm/vs/editor/contrib/documentSymbols/documentSymbols';
+// @ts-ignore
+import {CommandsRegistry} from 'monaco-editor/esm/vs/platform/commands/common/commands';
+import {v4 as uuidv4} from 'uuid';
 
 import {
   GlyphDecorationTypes,
