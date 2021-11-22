@@ -56,6 +56,7 @@ const initialAppConfigState: AppConfig = {
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
     loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
+    hideExcludedFilesInFileExplorer: false,
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'outdated',

@@ -72,6 +72,14 @@ export const updateLoadLastFolderOnStartup = createAsyncThunk(
   }
 );
 
+export const updateHideExcludedFilesInFileExplorer = createAsyncThunk(
+  'config/updateHideExcludedFilesInFileExplorer',
+  async (hideExcludedFiles: boolean, thunkAPI) => {
+    electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', hideExcludedFiles);
+    thunkAPI.dispatch(configSlice.actions.setHideExcludedFilesInFileExplorer(hideExcludedFiles));
+  }
+);
+
 export const updateTheme = createAsyncThunk('config/updateTheme', async (theme: Themes, thunkAPI) => {
   electronStore.set('appConfig.settings.theme', theme);
   thunkAPI.dispatch(configSlice.actions.setTheme(theme));
@@ -152,6 +160,9 @@ export const configSlice = createSlice({
     },
     setLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.loadLastFolderOnStartup = action.payload;
+    },
+    setHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.settings.hideExcludedFilesInFileExplorer = action.payload;
     },
     setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       state.recentFolders = action.payload;
