@@ -27,11 +27,6 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
       });
       return false;
     } catch (e: any) {
-      // If kubectl kustomize was ran and threw an exception that it could not find any kustomization file - should return false
-      if (e.message.includes("unable to find one of 'kustomization.yaml', 'kustomization.yml' or 'Kustomization'")) {
-        return false;
-      }
-
       return true;
     }
   });
