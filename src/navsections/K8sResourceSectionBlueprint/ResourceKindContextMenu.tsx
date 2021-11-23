@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Dropdown} from 'antd';
@@ -14,6 +14,8 @@ import {Dots} from '@atoms';
 
 import ResourceActionsMenu from '@components/molecules/ResourceActionsMenu';
 
+import Colors from '@styles/Colors';
+
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
   margin-right: 8px;
@@ -28,6 +30,12 @@ const ContextMenu = (props: ItemCustomComponentProps) => {
   const previewType = useAppSelector(state => state.main.previewType);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
+
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+
+  const isResourceSelected = useMemo(() => {
+    return itemInstance.id === selectedResourceId;
+  }, [itemInstance, selectedResourceId]);
 
   if (!resource) {
     return null;
@@ -47,7 +55,7 @@ const ContextMenu = (props: ItemCustomComponentProps) => {
       placement="bottomCenter"
     >
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
-        <Dots />
+        <Dots color={isResourceSelected ? Colors.blackPure : undefined} />
       </StyledActionsMenuIconContainer>
     </Dropdown>
   );

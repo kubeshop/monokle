@@ -345,7 +345,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [isTitleHovered, setTitleHoverState] = useState(false);
+
+  const isFileSelected = useMemo(() => {
+    return treeKey === selectedPath;
+  }, [treeKey, selectedPath]);
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
 
@@ -464,7 +469,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
               e.stopPropagation();
             }}
           >
-            <Dots />
+            <Dots color={isFileSelected ? Colors.blackPure : undefined} />
           </div>
         </ContextMenu>
       ) : null}
