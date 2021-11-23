@@ -144,7 +144,7 @@
     "lint:config": "eslint .",
     "lint:src": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "lintfix": "eslint --fix \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
-    "precommit": "npm run lint",
+    "prepush": "npm run lint",
     "format:all": "prettier --write \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "prepare": "husky install",
     "release:patch": "standard-version --release-as patch",
