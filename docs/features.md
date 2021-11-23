@@ -58,7 +58,7 @@ Selecting a resource from the list will automatically open it for editing in the
 
 ## Handling Multiple KubeConfig Contexts
 
-If the selected Kubernetes file contains numerous contexts, Monokle will find those and allow you to select the right one for your cluster operations. 
+If the selected Kubeconfig file contains numerous contexts, Monokle will find those and allow you to select the right one for your cluster operations. 
 
 ![Handling Multiple KubeConfig Contexts](img/selectcontext.png)
 
@@ -70,7 +70,7 @@ Monokle 1.3.0 includes several packages for different Linux distros.
 
 ## Improved Kustomize Support
 
-The Monokle 1.3.0 supports all types of kustomization files with or without the kind/api version. Moreover, it also offers an option to choose the command to run kustomize.  
+Monokle 1.3.0 supports all types of kustomization files with or without the kind/api version. Moreover, it also offers an option to choose the command to run kustomize.  
 
 ![Improved Kustomize Support](img/kustomizesupport.png)
 
