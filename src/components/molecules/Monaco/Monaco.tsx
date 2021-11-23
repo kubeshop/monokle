@@ -6,6 +6,7 @@ import {useMeasure} from 'react-use';
 
 import fs from 'fs';
 import 'monaco-editor';
+// @ts-ignore
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml/lib/esm/monaco.contribution';
 import path from 'path';
