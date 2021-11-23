@@ -137,7 +137,6 @@ const initialNavigatorState: NavigatorState = {
   sectionInstanceMap: {},
   itemInstanceMap: {},
   collapsedSectionIds: [],
-  selectedInstanceId: null,
 };
 
 const initialUiCoachState: UiCoachState = {
