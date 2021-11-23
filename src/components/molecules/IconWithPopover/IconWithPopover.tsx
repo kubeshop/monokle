@@ -2,13 +2,13 @@ import React from 'react';
 
 import {Button, Popover} from 'antd';
 
-import Icon from '@components/atoms/Icon';
+import Icon, {IconNames} from '@components/atoms/Icon';
 
 interface IconWithPopoverProps {
   popoverContent: React.ReactNode | (() => React.ReactNode);
   popoverTrigger: string | string[];
   isDisabled?: boolean;
-  iconName?: string;
+  iconName?: IconNames;
   buttonType?: 'default' | 'primary' | 'ghost' | 'dashed' | 'link' | 'text';
   iconComponent: React.ReactNode;
 }

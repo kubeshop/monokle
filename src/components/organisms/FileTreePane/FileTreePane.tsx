@@ -794,7 +794,7 @@ const FileTreePane = () => {
                 </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
                   <Button
-                    icon={<Icon name="collapse" color={isButtonDisabled ? '' : Colors.blue6} />}
+                    icon={<Icon name="collapse" color={isButtonDisabled ? undefined : Colors.blue6} />}
                     onClick={onToggleTree}
                     type="primary"
                     ghost
