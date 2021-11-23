@@ -81,6 +81,10 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const [editor, setEditor] = useState(editorRef.current);
 
+  const selectedResource = useMemo(() => {
+    return selectedResourceId ? resourceMap[selectedResourceId] : undefined;
+  }, [selectedResourceId, resourceMap]);
+
   const selectResource = (resourceId: string) => {
     if (resourceMap[resourceId]) {
       dispatch(selectK8sResource({resourceId}));
@@ -185,11 +189,11 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   }, [selectedPath, selectedResourceId]);
 
   useEffect(() => {
-    if (selectedResourceId && resourceMap[selectedResourceId] && resourceMap[selectedResourceId].text !== code) {
-      setCode(resourceMap[selectedResourceId].text);
+    if (selectedResource && selectedResource.text !== code) {
+      setCode(selectedResource.text);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceMap]);
+  }, [selectedResource]);
 
   useEffect(() => {
     if (editor) {
