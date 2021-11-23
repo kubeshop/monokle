@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 
@@ -50,6 +50,14 @@ function SectionHeader(props: SectionHeaderProps) {
   } = props;
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
+  const toggleCollapse = useCallback(() => {
+    if (isCollapsed) {
+      expandSection();
+    } else {
+      collapseSection();
+    }
+  }, [isCollapsed, expandSection, collapseSection]);
+
   return (
     <S.NameContainer
       isHovered={isHovered}
@@ -72,6 +80,7 @@ function SectionHeader(props: SectionHeaderProps) {
             isSelected={isSectionSelected && isCollapsed}
             isHighlighted={isSectionSelected && isCollapsed}
             level={level}
+            onClick={toggleCollapse}
           >
             {name}
             {itemsLength > 0 && (
@@ -79,6 +88,7 @@ function SectionHeader(props: SectionHeaderProps) {
             )}
             {CustomNameSuffix && <CustomNameSuffix sectionInstance={sectionInstance} />}
           </S.Name>
+          <S.BlankSpace level={level} onClick={toggleCollapse} />
           {isHovered && isSectionInitialized && (
             <S.Collapsible>
               {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
