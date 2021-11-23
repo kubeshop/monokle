@@ -41,6 +41,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, selectFile} from '@root/electron/commands';
 import {setAppRehydrating} from '@redux/reducers/main';
 import autoUpdater from './auto-update';
+import { indexOf } from 'lodash';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -181,6 +182,12 @@ export const createWindow = (givenPath?: string) => {
     await initKubeconfig(mainStore, userHomeDir);
     mainStore.dispatch(setAppRehydrating(false));
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
+    const isUserAbleToRunKubectlKustomize = checkMissingDependencies(['kubectl kustomize --help']);
+
+    if (missingDependencies.includes('kustomize') && isUserAbleToRunKubectlKustomize) {
+      missingDependencies.splice(indexOf(missingDependencies, 'kustomize'), 1);
+      
+    }
 
     if (missingDependencies.length > 0) {
       const alert: AlertType = {
