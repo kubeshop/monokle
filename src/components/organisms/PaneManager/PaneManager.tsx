@@ -29,11 +29,21 @@ import {
 } from '@redux/reducers/ui';
 import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 
-import {ActionsPane, ClustersPane, FileTreePane, NavigatorPane, PluginManagerPane} from '@organisms';
+import {
+  ActionsPane,
+  ClustersPane,
+  FileTreePane,
+  HelmPane,
+  KustomizePane,
+  NavigatorPane,
+  PluginManagerPane,
+} from '@organisms';
 
 import {GraphView, LogViewer} from '@molecules';
 
-import {Col, Content, Row, SplitView} from '@atoms';
+import {Col, Content, Icon, Row, SplitView} from '@atoms';
+
+import {IconNames} from '@components/atoms/Icon';
 
 import electronStore from '@utils/electronStore';
 
@@ -80,15 +90,20 @@ const StyledContent = styled(Content)`
 `;
 
 const MenuIcon = (props: {
-  icon: React.ElementType;
+  icon?: React.ElementType;
+  iconName?: IconNames;
   active: boolean;
   isSelected: boolean;
   style?: React.CSSProperties;
 }) => {
-  const {icon: IconComponent, active, isSelected, style: customStyle = {}} = props;
+  const {icon: IconComponent, iconName, active, isSelected, style: customStyle = {}} = props;
   const {color = Colors.grey7} = customStyle;
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  if (!IconComponent && !iconName) {
+    throw new Error('[MenuIcon]: Either icon or iconName should be specified.');
+  }
 
   const style = {
     fontSize: 25,
@@ -100,9 +115,24 @@ const MenuIcon = (props: {
     style.color = Colors.grey400;
   }
 
-  return (
-    <IconComponent style={style} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} />
-  );
+  if (IconComponent) {
+    return (
+      <IconComponent style={style} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} />
+    );
+  }
+
+  if (iconName) {
+    return (
+      <Icon
+        name={iconName}
+        style={style}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      />
+    );
+  }
+
+  return null;
 };
 
 const iconMenuWidth = 45;
@@ -252,6 +282,28 @@ const PaneManager = () => {
                 }
               />
             </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
+              <Button
+                size="large"
+                type="text"
+                onClick={() => setActivePanes('left', 'kustomize-pane')}
+                icon={
+                  <MenuIcon
+                    iconName="kustomize"
+                    active={leftActive}
+                    isSelected={leftMenuSelection === 'kustomize-pane'}
+                  />
+                }
+              />
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
+              <Button
+                size="large"
+                type="text"
+                onClick={() => setActivePanes('left', 'helm-pane')}
+                icon={<MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />}
+              />
+            </Tooltip>
             {featureJson.PluginManager && (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
                 <Button
@@ -286,6 +338,12 @@ const PaneManager = () => {
                   }}
                 >
                   <ClustersPane />
+                </div>
+                <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
+                  <KustomizePane />
+                </div>
+                <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
+                  <HelmPane />
                 </div>
                 <div
                   style={{
