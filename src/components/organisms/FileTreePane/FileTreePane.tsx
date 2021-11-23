@@ -345,7 +345,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [isTitleHovered, setTitleHoverState] = useState(false);
+
+  const isFileSelected = useMemo(() => {
+    return treeKey === selectedPath;
+  }, [treeKey, selectedPath]);
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
 
@@ -464,7 +469,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
               e.stopPropagation();
             }}
           >
-            <Dots />
+            <Dots color={isFileSelected ? Colors.blackPure : undefined} />
           </div>
         </ContextMenu>
       ) : null}
@@ -771,6 +776,26 @@ const FileTreePane = () => {
                 )}
               </Title>
               <RightButtons>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                  <ReloadButton
+                    size="small"
+                    onClick={refreshFolder}
+                    icon={<ReloadOutlined />}
+                    type="link"
+                    ghost
+                    disabled={isButtonDisabled}
+                  />
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+                  <Button
+                    icon={<Icon name="collapse" />}
+                    onClick={onToggleTree}
+                    type="link"
+                    ghost
+                    size="small"
+                    disabled={isButtonDisabled}
+                  />
+                </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
                   <BrowseButton
                     icon={<FolderAddOutlined />}
@@ -781,26 +806,6 @@ const FileTreePane = () => {
                   >
                     {Number(uiState.paneConfiguration.leftWidth.toFixed(2)) < 0.2 ? '' : 'Browse'}
                   </BrowseButton>
-                </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                  <ReloadButton
-                    size="small"
-                    onClick={refreshFolder}
-                    icon={<ReloadOutlined />}
-                    type="primary"
-                    ghost
-                    disabled={isButtonDisabled}
-                  />
-                </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
-                  <Button
-                    icon={<Icon name="collapse" color={isButtonDisabled ? '' : Colors.blue6} />}
-                    onClick={onToggleTree}
-                    type="primary"
-                    ghost
-                    size="small"
-                    disabled={isButtonDisabled}
-                  />
                 </Tooltip>
               </RightButtons>
             </TitleBarContainer>
