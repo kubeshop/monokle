@@ -139,30 +139,28 @@ const FormContainer = styled.div<{contentHeight: string}>`
 const FormEditor = (props: {contentHeight: string; type: string}) => {
   const {contentHeight, type} = props;
   const selectedResource = useSelector(selectedResourceSelector);
-  const [formData, setFormData] = useState<{
-    currFormData: any;
-    orgFormData: any;
-  }>({currFormData: undefined, orgFormData: undefined});
+  const [currentFormData, setCurrentFormData] = useState();
+  const [orgFormData, setOrgFormData] = useState();
   const [hasChanged, setHasChanged] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const [schema, setSchema] = useState({});
   const [uiSchema, setUiSchema] = useState({});
 
-  const onFormUpdate = useCallback(
-    (e: any) => {
-      if (e.formData === undefined) {
+  const onFormChange = useCallback(
+    ({formData}) => {
+      if (formData === undefined) {
         return;
       }
-      if (formData.orgFormData) {
-        setFormData({currFormData: e.formData, orgFormData: formData.orgFormData});
-        setHasChanged(!isDeepEqual(e.formData, formData.orgFormData));
+      setCurrentFormData(formData);
+      if (orgFormData) {
+        setHasChanged(!isDeepEqual(formData, orgFormData));
       } else {
-        setFormData({currFormData: e.formData, orgFormData: e.formData});
+        setOrgFormData(formData);
         setHasChanged(false);
       }
     },
-    [formData]
+    [orgFormData]
   );
 
   const onFormSubmit = useCallback(
@@ -187,10 +185,10 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
   );
 
   const submitForm = useCallback(() => {
-    if (formData) {
-      onFormSubmit(formData.currFormData, null);
+    if (currentFormData) {
+      onFormSubmit(currentFormData, null);
     }
-  }, [formData, onFormSubmit]);
+  }, [currentFormData, onFormSubmit]);
 
   useDebounce(
     () => {
@@ -207,7 +205,8 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
       setSchema(getFormSchema(type === 'metadata' ? type : selectedResource.kind));
       setUiSchema(getUiSchema(type === 'metadata' ? type : selectedResource.kind));
 
-      setFormData({currFormData: selectedResource.content, orgFormData: formData.orgFormData || undefined});
+      setCurrentFormData(selectedResource.content);
+      setOrgFormData(undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource, type]);
@@ -225,8 +224,8 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
       <Form
         schema={schema}
         uiSchema={uiSchema}
-        formData={formData.currFormData}
-        onChange={onFormUpdate}
+        formData={currentFormData}
+        onChange={onFormChange}
         onSubmit={onFormSubmit}
         disabled={isInPreviewMode}
       >
