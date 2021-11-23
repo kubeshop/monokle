@@ -771,6 +771,26 @@ const FileTreePane = () => {
                 )}
               </Title>
               <RightButtons>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                  <ReloadButton
+                    size="small"
+                    onClick={refreshFolder}
+                    icon={<ReloadOutlined />}
+                    type="link"
+                    ghost
+                    disabled={isButtonDisabled}
+                  />
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+                  <Button
+                    icon={<Icon name="collapse" />}
+                    onClick={onToggleTree}
+                    type="link"
+                    ghost
+                    size="small"
+                    disabled={isButtonDisabled}
+                  />
+                </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
                   <BrowseButton
                     icon={<FolderAddOutlined />}
@@ -781,26 +801,6 @@ const FileTreePane = () => {
                   >
                     {Number(uiState.paneConfiguration.leftWidth.toFixed(2)) < 0.2 ? '' : 'Browse'}
                   </BrowseButton>
-                </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                  <ReloadButton
-                    size="small"
-                    onClick={refreshFolder}
-                    icon={<ReloadOutlined />}
-                    type="primary"
-                    ghost
-                    disabled={isButtonDisabled}
-                  />
-                </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
-                  <Button
-                    icon={<Icon name="collapse" color={isButtonDisabled ? '' : Colors.blue6} />}
-                    onClick={onToggleTree}
-                    type="primary"
-                    ghost
-                    size="small"
-                    disabled={isButtonDisabled}
-                  />
                 </Tooltip>
               </RightButtons>
             </TitleBarContainer>
