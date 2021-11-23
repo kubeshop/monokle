@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.3](https://github.com/kubeshop/monokle/compare/v1.3.3-20211120.0...v1.3.3) (2021-11-23)
+
+
+### Features
+
+* added Remove from Files: Exclude button, added new setting Hide Excluded Files ([89a7d5d](https://github.com/kubeshop/monokle/commit/89a7d5da45b4a8169b7f98a3a56961920ee8ca48))
+* added tooltips to all icons in the right top corner ([27e0828](https://github.com/kubeshop/monokle/commit/27e08282f26e5435bf9b2bfc014a955b89365480))
+* click on item black spance triggers onClick ([1ccd405](https://github.com/kubeshop/monokle/commit/1ccd405a55e6b283bc917458fda199bce5cb75cb))
+* nav sections toggle collapse on click ([f12d2c7](https://github.com/kubeshop/monokle/commit/f12d2c757d9b0921d57a6dc6b07c65827e9e7748))
+
+
+### Bug Fixes
+
+* changed due to comment in PR ([83a9dd8](https://github.com/kubeshop/monokle/commit/83a9dd8637e1fcd607ec5e8cee15f97024a76024))
+* errors&warnings navigation ([fb85fc3](https://github.com/kubeshop/monokle/commit/fb85fc3dd86bbfe354130757cc7c24957fde1109))
+* fixed clean-up of set-root-folder listener and recreation of file monitor ([cf6cca0](https://github.com/kubeshop/monokle/commit/cf6cca07ba24f14d16975132bdd2d6fd1624c6e0))
+* fixed correct handler cleanup for setrootfolder ([ca04cff](https://github.com/kubeshop/monokle/commit/ca04cfff2392ce74fd60ebd4566d14ce372b85e7))
+* fixed path to path library, fixed monaco editor scroll ([5ba35d4](https://github.com/kubeshop/monokle/commit/5ba35d4063759210aa5b8cabf4f84491b038cc95))
+* hide dependency warning if the user can run kubectl kustomize ([7ff4520](https://github.com/kubeshop/monokle/commit/7ff4520ca61dd532b26f2f5d08de58add7320094))
+* improved action propagation across threads and fileMonitor/timestamp handling ([eb2f8a1](https://github.com/kubeshop/monokle/commit/eb2f8a1ad457979a16f9d5d256f483505021bf61))
+* monaco import error ([06affc6](https://github.com/kubeshop/monokle/commit/06affc63d3678e5c66eb187150f8ff6098cc6af5))
+* prettierrc and loadKubeConfig formatting ([f5ca29e](https://github.com/kubeshop/monokle/commit/f5ca29e55c9ad2835f87bd8f28b2e112287f862a))
+* updated react-monaco-editor and monaco-editor-webpack-plugin dependencies ([d430ef8](https://github.com/kubeshop/monokle/commit/d430ef8a07a7131492f5d284a4d7055b98be4848))
+* upgrade async from 3.2.1 to 3.2.2 ([5c83d17](https://github.com/kubeshop/monokle/commit/5c83d174110b57372665c405ef2071ebf7792852))
+* upgrade node-fetch from 2.6.5 to 2.6.6 ([511fff8](https://github.com/kubeshop/monokle/commit/511fff8b2a29dcc0aa71f66ffed493f80c5baeb5))
+* upgrade redux from 4.1.1 to 4.1.2 ([7bcef57](https://github.com/kubeshop/monokle/commit/7bcef57983a6ed43003596a40d73d27031711d3c))
+* upgrade reselect from 4.0.0 to 4.1.1 ([ce001b2](https://github.com/kubeshop/monokle/commit/ce001b2aeb27a9c91d6e6fba28c55c6824999d8e))
+* upgrade styled-components from 5.3.1 to 5.3.3 ([815795b](https://github.com/kubeshop/monokle/commit/815795bd2838d342bea75f6d65ba55ff328d5b8c))
+* upgrade type-fest from 2.5.1 to 2.5.2 ([573c0bb](https://github.com/kubeshop/monokle/commit/573c0bb08556fff4f24cbceb72c56e501d4cd59c))
+
 ### [1.3.2](https://github.com/kubeshop/monokle/compare/v1.3.1...v1.3.2) (2021-11-18)
 
 
