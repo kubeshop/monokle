@@ -27,12 +27,8 @@ export const navigatorSlice = createSlice({
     expandSectionIds: (state: Draft<NavigatorState>, action: PayloadAction<string[]>) => {
       state.collapsedSectionIds = state.collapsedSectionIds.filter(sectionId => !action.payload.includes(sectionId));
     },
-    selectInstance: (state: Draft<NavigatorState>, action: PayloadAction<string | null>) => {
-      state.selectedInstanceId = action.payload;
-    },
   },
 });
 
-export const {updateNavigatorInstanceState, collapseSectionIds, expandSectionIds, selectInstance} =
-  navigatorSlice.actions;
+export const {updateNavigatorInstanceState, collapseSectionIds, expandSectionIds} = navigatorSlice.actions;
 export default navigatorSlice.reducer;

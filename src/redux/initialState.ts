@@ -92,6 +92,10 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
   },
+  createFolderModal: {
+    isOpen: false,
+    rootDir: '',
+  },
   renameResourceModal: {
     isOpen: false,
     resourceId: '',
@@ -137,7 +141,6 @@ const initialNavigatorState: NavigatorState = {
   sectionInstanceMap: {},
   itemInstanceMap: {},
   collapsedSectionIds: [],
-  selectedInstanceId: null,
 };
 
 const initialUiCoachState: UiCoachState = {

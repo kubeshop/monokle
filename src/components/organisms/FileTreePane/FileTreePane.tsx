@@ -1,4 +1,4 @@
-import {ipcRenderer, shell} from 'electron';
+import {ipcRenderer} from 'electron';
 
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
@@ -22,7 +22,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {closeFolderExplorer, openRenameEntityModal, setShouldExpandAllNodes} from '@redux/reducers/ui';
+import {
+  closeFolderExplorer,
+  openCreateFolderModal,
+  openRenameEntityModal,
+  setShouldExpandAllNodes,
+} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {stopPreview} from '@redux/services/preview';
@@ -39,6 +44,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {DeleteEntityCallback, deleteEntity, getFileStats} from '@utils/files';
 import {uniqueArr} from '@utils/index';
+import {showItemInFolder} from '@utils/shell';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
@@ -49,6 +55,7 @@ interface TreeNode {
   title: React.ReactNode;
   children: TreeNode[];
   highlight: boolean;
+  isFolder?: boolean;
   /**
    * Whether the TreeNode has children
    */
@@ -117,6 +124,7 @@ const createNode = (
           return !childEntry.isExcluded;
         });
     }
+    node.isFolder = true;
   } else {
     node.isLeaf = true;
   }
@@ -312,7 +320,9 @@ interface TreeItemProps {
   onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
   onExcludeFromProcessing: (relativePath: string) => void;
   onIncludeToProcessing: (relativePath: string) => void;
+  onCreateFolder: (absolutePath: string) => void;
   isExcluded?: Boolean;
+  isFolder?: Boolean;
 }
 
 function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
@@ -341,11 +351,18 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onRename,
     onExcludeFromProcessing,
     onIncludeToProcessing,
+    onCreateFolder,
+    isFolder,
   } = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [isTitleHovered, setTitleHoverState] = useState(false);
+
+  const isFileSelected = useMemo(() => {
+    return treeKey === selectedPath;
+  }, [treeKey, selectedPath]);
 
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
 
@@ -356,18 +373,30 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
 
   const platformFilemanagerNames: {[name: string]: string} = {
-    darwin: 'finder',
+    darwin: 'Finder',
   };
 
-  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'explorer';
+  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
 
   const menu = (
     <Menu>
+      {isFolder ? (
+        <Menu.Item
+          onClick={e => {
+            e.domEvent.stopPropagation();
+
+            onCreateFolder(absolutePath);
+          }}
+          key="create_directory"
+        >
+          New Folder
+        </Menu.Item>
+      ) : null}
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          shell.showItemInFolder(absolutePath);
+          showItemInFolder(absolutePath);
         }}
         key="reveal_in_finder"
       >
@@ -382,7 +411,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         }}
         key="copy_full_path"
       >
-        Copy path
+        Copy Path
       </Menu.Item>
       <Menu.Item
         onClick={e => {
@@ -392,7 +421,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         }}
         key="copy_relative_path"
       >
-        Copy relative path
+        Copy Relative Path
       </Menu.Item>
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
         <>
@@ -464,7 +493,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
               e.stopPropagation();
             }}
           >
-            <Dots />
+            <Dots color={isFileSelected ? Colors.blackPure : undefined} />
           </div>
         </ContextMenu>
       ) : null}
@@ -754,6 +783,10 @@ const FileTreePane = () => {
     setExpandedKeys(prevState => (prevState.length ? [] : allTreeKeys));
   };
 
+  const onCreateFolder = (absolutePath: string) => {
+    dispatch(openCreateFolderModal(absolutePath));
+  };
+
   return (
     <FileTreeContainer>
       <Row>
@@ -771,6 +804,26 @@ const FileTreePane = () => {
                 )}
               </Title>
               <RightButtons>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                  <ReloadButton
+                    size="small"
+                    onClick={refreshFolder}
+                    icon={<ReloadOutlined />}
+                    type="link"
+                    ghost
+                    disabled={isButtonDisabled}
+                  />
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+                  <Button
+                    icon={<Icon name="collapse" />}
+                    onClick={onToggleTree}
+                    type="link"
+                    ghost
+                    size="small"
+                    disabled={isButtonDisabled}
+                  />
+                </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
                   <BrowseButton
                     icon={<FolderAddOutlined />}
@@ -781,26 +834,6 @@ const FileTreePane = () => {
                   >
                     {Number(uiState.paneConfiguration.leftWidth.toFixed(2)) < 0.2 ? '' : 'Browse'}
                   </BrowseButton>
-                </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                  <ReloadButton
-                    size="small"
-                    onClick={refreshFolder}
-                    icon={<ReloadOutlined />}
-                    type="primary"
-                    ghost
-                    disabled={isButtonDisabled}
-                  />
-                </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
-                  <Button
-                    icon={<Icon name="collapse" color={isButtonDisabled ? undefined : Colors.blue6} />}
-                    onClick={onToggleTree}
-                    type="primary"
-                    ghost
-                    size="small"
-                    disabled={isButtonDisabled}
-                  />
                 </Tooltip>
               </RightButtons>
             </TitleBarContainer>
@@ -830,6 +863,7 @@ const FileTreePane = () => {
                 onRename={onRename}
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
+                onCreateFolder={onCreateFolder}
                 {...event}
               />
             );

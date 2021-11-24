@@ -64,6 +64,7 @@ export const Name = styled.span<{isSelected?: boolean; isHighlighted?: boolean; 
   margin-left: ${props => {
     return `${8 * props.level}px`;
   }};
+  cursor: pointer;
   ${props => {
     if (props.isSelected) {
       return `font-weight: 700;`;
@@ -101,9 +102,17 @@ export const EmptyDisplayContainer = styled.div<{level: number}>`
     return `${16 + 8 * props.level}px`;
   }};
 `;
+
 export const BeforeInitializationContainer = styled.div<{level: number}>`
   padding-top: 16px;
   margin-left: ${props => {
     return `${16 + 8 * props.level}px`;
   }};
+`;
+
+export const BlankSpace = styled.span<{level?: number}>`
+  flex-grow: 1;
+  height: 32px;
+  cursor: pointer;
+  ${props => props.level && `height: ${32 - props.level * 8}px;`}
 `;
