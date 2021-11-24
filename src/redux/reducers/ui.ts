@@ -109,6 +109,18 @@ export const uiSlice = createSlice({
         resourceId: action.payload,
       };
     },
+    openCreateDirectoryModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.createDirectoryModal = {
+        isOpen: true,
+        rootDir: action.payload,
+      };
+    },
+    closeCreateDirectoryModal: (state: Draft<UiState>) => {
+      state.createDirectoryModal = {
+        isOpen: false,
+        rootDir: '',
+      };
+    },
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
@@ -195,5 +207,7 @@ export const {
   setLeftMenuIsActive,
   openRenameEntityModal,
   closeRenameEntityModal,
+  openCreateDirectoryModal,
+  closeCreateDirectoryModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

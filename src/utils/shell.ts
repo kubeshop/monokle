@@ -14,6 +14,10 @@ export function getShellPath() {
   return cachedShellPath;
 }
 
+export function showItemInFolder(fullPath: string) {
+  shell.showItemInFolder(fullPath);
+}
+
 export function openGitHub() {
   shell.openExternal('https://github.com/kubeshop/monokle');
 }

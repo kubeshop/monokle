@@ -92,6 +92,10 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
   },
+  createDirectoryModal: {
+    isOpen: false,
+    rootDir: '',
+  },
   renameResourceModal: {
     isOpen: false,
     resourceId: '',

@@ -95,3 +95,13 @@ export async function renameEntity(
     });
   }
 }
+
+export interface CreateDirectoryCallback {
+  rootDir: string;
+  dirName: string;
+  err: NodeJS.ErrnoException | null;
+}
+
+export function createDirectory(rootDir: string, dirName: string, callback: (args: CreateDirectoryCallback) => any) {
+  return fs.mkdir(`${rootDir}${path.sep}${dirName}`, err => callback({rootDir, dirName, err}));
+}

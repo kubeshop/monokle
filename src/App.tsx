@@ -1,5 +1,3 @@
-import React from 'react';
-
 import 'antd/dist/antd.less';
 
 import {Size} from '@models/window';
@@ -22,6 +20,7 @@ import {Layout} from '@atoms';
 
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import {ClusterDiffModal} from '@components/organisms';
+import CreateDirectoryModal from '@components/organisms/CreateDirectoryModal';
 import RenameEntityModal from '@components/organisms/RenameEntityModal';
 import UpdateModal from '@components/organisms/UpdateModal';
 
@@ -54,6 +53,7 @@ const App = () => {
         <UpdateModal />
         <ClusterDiffModal />
         <RenameEntityModal />
+        <CreateDirectoryModal />
       </div>
     </AppContext.Provider>
   );
