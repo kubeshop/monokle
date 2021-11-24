@@ -109,14 +109,14 @@ export const uiSlice = createSlice({
         resourceId: action.payload,
       };
     },
-    openCreateDirectoryModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
-      state.createDirectoryModal = {
+    openCreateFolderModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.createFolderModal = {
         isOpen: true,
         rootDir: action.payload,
       };
     },
-    closeCreateDirectoryModal: (state: Draft<UiState>) => {
-      state.createDirectoryModal = {
+    closeCreateFolderModal: (state: Draft<UiState>) => {
+      state.createFolderModal = {
         isOpen: false,
         rootDir: '',
       };
@@ -207,7 +207,7 @@ export const {
   setLeftMenuIsActive,
   openRenameEntityModal,
   closeRenameEntityModal,
-  openCreateDirectoryModal,
-  closeCreateDirectoryModal,
+  openCreateFolderModal,
+  closeCreateFolderModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

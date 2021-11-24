@@ -24,7 +24,7 @@ import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConf
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
-  openCreateDirectoryModal,
+  openCreateFolderModal,
   openRenameEntityModal,
   setShouldExpandAllNodes,
 } from '@redux/reducers/ui';
@@ -320,7 +320,7 @@ interface TreeItemProps {
   onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
   onExcludeFromProcessing: (relativePath: string) => void;
   onIncludeToProcessing: (relativePath: string) => void;
-  onCreateDirectory: (absolutePath: string) => void;
+  onCreateFolder: (absolutePath: string) => void;
   isExcluded?: Boolean;
   isFolder?: Boolean;
 }
@@ -351,7 +351,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onRename,
     onExcludeFromProcessing,
     onIncludeToProcessing,
-    onCreateDirectory,
+    onCreateFolder,
     isFolder,
   } = props;
 
@@ -385,7 +385,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           onClick={e => {
             e.domEvent.stopPropagation();
 
-            onCreateDirectory(absolutePath);
+            onCreateFolder(absolutePath);
           }}
           key="create_directory"
         >
@@ -783,8 +783,8 @@ const FileTreePane = () => {
     setExpandedKeys(prevState => (prevState.length ? [] : allTreeKeys));
   };
 
-  const onCreateDirectory = (absolutePath: string) => {
-    dispatch(openCreateDirectoryModal(absolutePath));
+  const onCreateFolder = (absolutePath: string) => {
+    dispatch(openCreateFolderModal(absolutePath));
   };
 
   return (
@@ -863,7 +863,7 @@ const FileTreePane = () => {
                 onRename={onRename}
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
-                onCreateDirectory={onCreateDirectory}
+                onCreateFolder={onCreateFolder}
                 {...event}
               />
             );

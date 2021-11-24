@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-imports-ts */
 import {useEffect} from 'react';
 
 import {Button, Form, Input, Modal} from 'antd';
@@ -10,15 +9,15 @@ import {AlertEnum} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {closeCreateDirectoryModal, closeRenameEntityModal} from '@redux/reducers/ui';
+import {closeCreateFolderModal} from '@redux/reducers/ui';
 
-import {CreateDirectoryCallback, checkIfEntityExists, createDirectory} from '@utils/files';
+import {CreateFolderCallback, checkIfEntityExists, createFolder} from '@utils/files';
 import {useFocus} from '@utils/hooks';
 
 const prohibitedFirstSymbols = ['/', '\\'];
 
-const CreateDirectoryModal: React.FC = () => {
-  const uiState = useAppSelector(state => state.ui.createDirectoryModal);
+const CreateFolderModal: React.FC = () => {
+  const uiState = useAppSelector(state => state.ui.createFolderModal);
 
   const dispatch = useAppDispatch();
 
@@ -26,33 +25,33 @@ const CreateDirectoryModal: React.FC = () => {
 
   const [inputRef, focus] = useFocus<any>();
 
-  const onFinish = (values: {directoryName: string}) => {
-    const {directoryName} = values;
+  const onFinish = (values: {folderName: string}) => {
+    const {folderName} = values;
 
-    createDirectory(uiState.rootDir, directoryName, onCreate);
+    createFolder(uiState.rootDir, folderName, onCreate);
   };
 
-  const onCreate = (args: CreateDirectoryCallback) => {
-    const {dirName, err} = args;
+  const onCreate = (args: CreateFolderCallback) => {
+    const {folderName, err} = args;
 
     if (err) {
       dispatch(
         setAlert({
           title: 'Creating failed',
-          message: 'Something went wrong during creating a directory',
+          message: 'Something went wrong during creating a folder',
           type: AlertEnum.Error,
         })
       );
     } else {
       dispatch(
         setAlert({
-          title: 'Successfully created a directory',
-          message: `You have successfully created the "${dirName}" directory`,
+          title: 'Successfully created a folder',
+          message: `You have successfully created the "${folderName}" folder`,
           type: AlertEnum.Success,
         })
       );
 
-      dispatch(closeCreateDirectoryModal());
+      dispatch(closeCreateFolderModal());
     }
   };
 
@@ -72,16 +71,16 @@ const CreateDirectoryModal: React.FC = () => {
 
   return (
     <Modal
-      title="Create directory"
+      title="Create folder"
       visible={uiState?.isOpen}
       onCancel={() => {
-        dispatch(closeCreateDirectoryModal());
+        dispatch(closeCreateFolderModal());
       }}
       footer={[
         <Button
           key="cancel"
           onClick={() => {
-            dispatch(closeCreateDirectoryModal());
+            dispatch(closeCreateFolderModal());
           }}
         >
           Cancel
@@ -99,24 +98,24 @@ const CreateDirectoryModal: React.FC = () => {
     >
       <Form layout="vertical" form={createFolderForm} initialValues={{directoryName: ''}} onFinish={onFinish}>
         <Form.Item
-          label="Directory name"
-          name="directoryName"
+          label="Folder name"
+          name="folderName"
           rules={[
             ({getFieldValue}) => ({
               validator: (rule, value) => {
                 return new Promise((resolve: (value?: any) => void, reject) => {
-                  const directoryNameValue: string = getFieldValue('directoryName').toLowerCase();
+                  const folderNameValue: string = getFieldValue('folderName').toLowerCase();
 
-                  if (!directoryNameValue) {
+                  if (!folderNameValue) {
                     reject(new Error("This field can't be empty"));
                   }
 
-                  if (prohibitedFirstSymbols.some(symbol => symbol === directoryNameValue[0])) {
-                    reject(new Error(`Directory name can't start with prohibited symbol - "${directoryNameValue[0]}"`));
+                  if (prohibitedFirstSymbols.some(symbol => symbol === folderNameValue[0])) {
+                    reject(new Error(`Folder name can't start with prohibited symbol - "${folderNameValue[0]}"`));
                   }
 
-                  if (checkIfEntityExists(path.join(uiState.rootDir, path.sep, directoryNameValue))) {
-                    reject(new Error('A file or directory with this name already exists in this location'));
+                  if (checkIfEntityExists(path.join(uiState.rootDir, path.sep, folderNameValue))) {
+                    reject(new Error('A file or folder with this name already exists in this location'));
                   }
 
                   resolve();
@@ -132,4 +131,4 @@ const CreateDirectoryModal: React.FC = () => {
   );
 };
 
-export default CreateDirectoryModal;
+export default CreateFolderModal;

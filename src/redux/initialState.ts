@@ -92,7 +92,7 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
   },
-  createDirectoryModal: {
+  createFolderModal: {
     isOpen: false,
     rootDir: '',
   },

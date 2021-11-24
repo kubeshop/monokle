@@ -20,7 +20,7 @@ import {Layout} from '@atoms';
 
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import {ClusterDiffModal} from '@components/organisms';
-import CreateDirectoryModal from '@components/organisms/CreateDirectoryModal';
+import CreateFolderModal from '@components/organisms/CreateFolderModal';
 import RenameEntityModal from '@components/organisms/RenameEntityModal';
 import UpdateModal from '@components/organisms/UpdateModal';
 
@@ -53,7 +53,7 @@ const App = () => {
         <UpdateModal />
         <ClusterDiffModal />
         <RenameEntityModal />
-        <CreateDirectoryModal />
+        <CreateFolderModal />
       </div>
     </AppContext.Provider>
   );
