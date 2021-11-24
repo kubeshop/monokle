@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {Form, Input, Modal, Select} from 'antd';
 
@@ -13,6 +13,7 @@ import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {NO_NAMESPACE, useNamespaces} from '@hooks/useNamespaces';
 
 import {useResetFormOnCloseModal} from '@utils/hooks';
+import {openUniqueObjectNameTopic} from '@utils/shell';
 
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -133,6 +134,14 @@ const NewResourceWizard = () => {
             {pattern: /^[a-z]$|^([a-z\-.])*[a-z]$/, message: 'Wrong pattern'},
             {max: 63, type: 'string', message: 'Too long'},
           ]}
+          tooltip={{
+            title: () => (
+              <span>
+                Unique object name - <a onClick={openUniqueObjectNameTopic}>read more</a>
+              </span>
+            ),
+            icon: <InfoCircleOutlined />,
+          }}
         >
           <Input maxLength={63} />
         </Form.Item>
