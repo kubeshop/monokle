@@ -125,8 +125,16 @@ const NewResourceWizard = () => {
   return (
     <Modal title="Add New Resource" visible={newResourceWizardState.isOpen} onOk={onOk} onCancel={onCancel}>
       <Form form={form} layout="vertical" onValuesChange={onFormValuesChange} onFinish={onFinish}>
-        <Form.Item name="name" label="Name" required>
-          <Input />
+        <Form.Item
+          name="name"
+          label="Name"
+          rules={[
+            {required: true, message: 'This field is required'},
+            {pattern: /^[a-z]$|^([a-z\-.])*[a-z]$/, message: 'Wrong pattern'},
+            {max: 63, type: 'string', message: 'Too long'},
+          ]}
+        >
+          <Input maxLength={63} />
         </Form.Item>
         <Form.Item
           name="kind"
