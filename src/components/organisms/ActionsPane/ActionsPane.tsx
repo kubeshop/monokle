@@ -45,6 +45,8 @@ import {
 
 const {TabPane} = Tabs;
 
+const formSupportedResourceTypes = ['ConfigMap', 'Role', 'ClusterRole', 'RoleBinding', 'ClusterRoleBinding'];
+
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
 
@@ -204,7 +206,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (key === 'form' && (!selectedResourceId || selectedResource?.kind !== 'ConfigMap')) {
+    if (
+      key === 'form' &&
+      (!selectedResourceId || (selectedResource && !formSupportedResourceTypes.includes(selectedResource.kind)))
+    ) {
       setKey('source');
     }
   }, [selectedResourceId, selectedResource, key]);
@@ -317,9 +322,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   <FormEditor contentHeight={contentHeight} type="metadata" />
                 )}
               </TabPane>
-              {selectedResource && selectedResource?.kind === 'ConfigMap' && (
+              {selectedResource && selectedResource.kind && formSupportedResourceTypes.includes(selectedResource.kind) && (
                 <TabPane
-                  tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
+                  tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
                   disabled={!selectedResourceId}
                   key="form"
                 >

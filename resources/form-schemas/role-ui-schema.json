@@ -1,0 +1,20 @@
+{
+  "ui:title": "Role Properties",
+  "rules": {
+    "ui:title": "Object Rules",
+    "items": {
+      "apiGroups": {
+        "ui:title": "API Groups",
+        "ui:help": "Lorem ipsum dolor sid amed"
+      },
+      "resources": {
+        "ui:title": "Resources",
+        "ui:help": "Lorem ipsum dolor sid amed"
+      },
+      "verbs": {
+        "ui:title": "Verbs",
+        "ui:help": "Lorem ipsum dolor sid amed"
+      }
+    }
+  }
+}

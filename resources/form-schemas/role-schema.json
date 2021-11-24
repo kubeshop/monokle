@@ -1,0 +1,31 @@
+{
+  "properties": {
+    "rules": {
+      "items": {
+        "type": "object",
+        "properties": {
+          "apiGroups": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "resources": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "verbs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        }
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}
