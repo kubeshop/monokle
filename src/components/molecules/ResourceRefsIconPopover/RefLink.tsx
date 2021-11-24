@@ -8,7 +8,7 @@ import {ResourceRef} from '@models/k8sresource';
 
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+import {Icon} from '@atoms';
 
 import {FontColors} from '@styles/Colors';
 
@@ -49,16 +49,16 @@ const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
   return ref.name;
 };
 
-const Icon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSProperties}) => {
+const RefIcon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSProperties}) => {
   const {resourceRef, style} = props;
   if (isOutgoingRef(resourceRef.type)) {
-    return <MonoIcon type={MonoIconTypes.OutgoingRefs} style={style} />;
+    return <Icon name="outgoingRefs" style={style} />;
   }
   if (isIncomingRef(resourceRef.type)) {
-    return <MonoIcon type={MonoIconTypes.IncomingRefs} style={style} />;
+    return <Icon name="incomingRefs" style={style} />;
   }
   if (isUnsatisfiedRef(resourceRef.type)) {
-    return <MonoIcon type={MonoIconTypes.Warning} style={style} />;
+    return <Icon name="warning" style={style} />;
   }
   return null;
 });
@@ -94,7 +94,7 @@ const ResourceRefLink = (props: {
 
   return (
     <div onClick={handleClick}>
-      {Icon && <Icon resourceRef={resourceRef} style={{marginRight: 5}} />}
+      {RefIcon && <RefIcon resourceRef={resourceRef} style={{marginRight: 5}} />}
       <StyledRefText isDisabled={isDisabled} isUnsatisfied={isUnsatisfiedRef(resourceRef.type)}>
         {linkText}
       </StyledRefText>

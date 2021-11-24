@@ -1,12 +1,20 @@
 import React, {useMemo} from 'react';
 
-import AntdIcon from '@ant-design/icons';
+import AntdIcon, {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import Colors from '@styles/Colors';
 
-import {Collapse, Helm, Kubernetes, Kustomize} from './Icons';
+import {Collapse, Helm, IncomingRefs, Kubernetes, Kustomize, OutgoingRefs, Warning} from './Icons';
 
-export type IconNames = 'kubernetes' | 'collapse' | 'helm' | 'kustomize';
+export type IconNames =
+  | 'kubernetes'
+  | 'collapse'
+  | 'helm'
+  | 'kustomize'
+  | 'incomingRefs'
+  | 'outgoingRefs'
+  | 'warning'
+  | 'error';
 
 type IconProps = {
   name: IconNames;
@@ -16,11 +24,15 @@ type IconProps = {
   onMouseLeave?: React.MouseEventHandler;
 };
 
-const icons: Record<IconNames, () => JSX.Element> = {
+const icons: Record<IconNames, React.ComponentType<any>> = {
   kubernetes: Kubernetes,
   collapse: Collapse,
   helm: Helm,
   kustomize: Kustomize,
+  incomingRefs: IncomingRefs,
+  outgoingRefs: OutgoingRefs,
+  warning: Warning,
+  error: ExclamationCircleOutlined,
 };
 
 const Icon: React.FC<IconProps> = props => {
