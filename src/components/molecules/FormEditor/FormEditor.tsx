@@ -145,11 +145,6 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
   const [schema, setSchema] = useState({});
   const [uiSchema, setUiSchema] = useState({});
 
-  let schema =
-    selectedResource && selectedResource.kind === 'ConfigMap' ? getFormSchema(selectedResource.kind) : undefined;
-  let uiSchema =
-    selectedResource && selectedResource.kind === 'ConfigMap' ? getUiSchema(selectedResource.kind) : undefined;
-
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
   };
@@ -172,6 +167,8 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
   useEffect(() => {
     if (selectedResource) {
       setFormData(selectedResource.content);
+      setSchema(getFormSchema(type === 'metadata' ? type : selectedResource.kind));
+      setUiSchema(getUiSchema(type === 'metadata' ? type : selectedResource.kind));
     }
   }, [selectedResource]);
 
