@@ -12,7 +12,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+import {Icon} from '@atoms';
 
 import Colors from '@styles/Colors';
 
@@ -153,7 +153,7 @@ function WarningsAndErrorsDisplay() {
       {warningsCount > 0 && (
         <Dropdown overlay={<RefDropdownMenu warnings={warnings} />} trigger={['click']} placement="bottomCenter">
           <WarningContainer>
-            <MonoIcon type={MonoIconTypes.Warning} />
+            <Icon name="warning" />
             <Label>{warningsCount}</Label>
           </WarningContainer>
         </Dropdown>
@@ -161,7 +161,7 @@ function WarningsAndErrorsDisplay() {
       {errorsCount > 0 && (
         <Dropdown overlay={<RefDropdownMenu warnings={errors} />} trigger={['click']} placement="bottomCenter">
           <ErrorContainer>
-            <MonoIcon type={MonoIconTypes.Error} />
+            <Icon name="error" />
             <Label>{errorsCount}</Label>
           </ErrorContainer>
         </Dropdown>

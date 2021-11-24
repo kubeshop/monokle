@@ -7,7 +7,8 @@ import {ItemCustomComponentProps} from '@models/navigator';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {showValidationErrorsModal} from '@redux/reducers/ui';
 
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+import {Icon} from '@atoms';
+
 import ResourceRefsIconPopover from '@components/molecules/ResourceRefsIconPopover';
 
 import Colors from '@styles/Colors';
@@ -53,7 +54,11 @@ const Suffix = (props: ItemCustomComponentProps) => {
           }
         >
           <StyledIconsContainer onClick={onClickErrorIcon}>
-            <MonoIcon type={MonoIconTypes.Error} style={{marginLeft: 5, color: Colors.redError}} />
+            <Icon
+              name="error"
+              style={{marginLeft: 5}}
+              color={itemInstance.isSelected ? Colors.blackPure : Colors.redError}
+            />
           </StyledIconsContainer>
         </Popover>
       )}
