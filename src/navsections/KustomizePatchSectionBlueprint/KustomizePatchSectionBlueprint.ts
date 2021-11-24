@@ -26,6 +26,7 @@ export const KUSTOMIZE_PATCH_SECTION_NAME = 'Patch Resources' as const;
 const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePatchScopeType> = {
   name: KUSTOMIZE_PATCH_SECTION_NAME,
   id: KUSTOMIZE_PATCH_SECTION_NAME,
+  rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
@@ -84,15 +85,6 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
       isVisible: (rawItem, scope) => {
         const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
         return isPassingFilter;
-      },
-      shouldScrollIntoView: (rawItem, scope) => {
-        if (rawItem.isHighlighted && scope.selectedPath) {
-          return true;
-        }
-        if (rawItem.isSelected && scope.selectedResourceId) {
-          return true;
-        }
-        return false;
       },
     },
     instanceHandler: {

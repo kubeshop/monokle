@@ -30,6 +30,7 @@ export const UNKNOWN_RESOURCE_SECTION_NAME = 'Unknown Resources' as const;
 const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownResourceScopeType> = {
   name: UNKNOWN_RESOURCE_SECTION_NAME,
   id: UNKNOWN_RESOURCE_SECTION_NAME,
+  rootSectionId: UNKNOWN_RESOURCE_SECTION_NAME,
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
@@ -95,15 +96,6 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       isVisible: (rawItem, scope) => {
         const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
         return isPassingFilter;
-      },
-      shouldScrollIntoView: (rawItem, scope) => {
-        if (rawItem.isHighlighted && scope.selectedPath) {
-          return true;
-        }
-        if (rawItem.isSelected && scope.selectedResourceId) {
-          return true;
-        }
-        return false;
       },
     },
     instanceHandler: {

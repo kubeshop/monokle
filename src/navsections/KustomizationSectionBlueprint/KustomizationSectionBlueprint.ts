@@ -6,6 +6,7 @@ import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
 
+import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationQuickAction from './KustomizationQuickAction';
@@ -27,6 +28,7 @@ export const KUSTOMIZATION_SECTION_NAME = 'Kustomizations' as const;
 const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, KustomizationScopeType> = {
   name: KUSTOMIZATION_SECTION_NAME,
   id: KUSTOMIZATION_SECTION_NAME,
+  rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
@@ -67,15 +69,6 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
       isSelected: (rawItem, scope) => rawItem.isSelected || scope.previewResourceId === rawItem.id,
       isHighlighted: rawItem => rawItem.isHighlighted,
       isDisabled: (rawItem, scope) => Boolean(scope.previewResourceId && scope.previewResourceId !== rawItem.id),
-      shouldScrollIntoView: (rawItem, scope) => {
-        if (rawItem.isHighlighted && scope.selectedPath) {
-          return true;
-        }
-        if (rawItem.isSelected && scope.selectedResourceId) {
-          return true;
-        }
-        return false;
-      },
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {

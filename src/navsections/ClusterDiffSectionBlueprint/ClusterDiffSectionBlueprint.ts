@@ -17,9 +17,12 @@ export type ClusterDiffScopeType = {
   isClusterDiffVisible: boolean;
 };
 
+export const CLUSTER_DIFF_SECTION_NAME = 'K8s Resources Diff' as const;
+
 const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch, ClusterDiffScopeType> = {
-  name: 'K8s Resources Diff',
-  id: 'K8s Resources Diff',
+  name: CLUSTER_DIFF_SECTION_NAME,
+  id: CLUSTER_DIFF_SECTION_NAME,
+  rootSectionId: CLUSTER_DIFF_SECTION_NAME,
   getScope(state) {
     return {
       resourceMap: state.main.resourceMap,

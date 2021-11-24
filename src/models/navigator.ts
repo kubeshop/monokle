@@ -65,7 +65,6 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
     isVisible?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isDirty?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isDisabled?: (rawItem: RawItemType, scope: ScopeType) => boolean;
-    shouldScrollIntoView?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     getMeta?: (rawItem: RawItemType, scope: ScopeType) => any;
   };
   instanceHandler?: {
@@ -84,6 +83,7 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   name: string;
   id: string;
   getScope: (state: RootState) => ScopeType;
+  rootSectionId: string;
   parentSectionId?: string;
   childSectionIds?: string[];
   builder?: {
@@ -105,18 +105,21 @@ export interface ItemGroupInstance extends ItemGroupBlueprint {
 
 export interface ItemInstance {
   id: string;
+  sectionId: string;
+  rootSectionId: string;
   name: string;
   isSelected: boolean;
   isHighlighted: boolean;
   isVisible: boolean;
   isDirty: boolean;
   isDisabled: boolean;
-  shouldScrollIntoView: boolean;
+  shouldScrollIntoView?: boolean;
   meta?: any;
 }
 
 export interface SectionInstance {
   id: string;
+  rootSectionId: string;
   itemIds: string[];
   groups: ItemGroupInstance[];
   visibleItemIds: string[];

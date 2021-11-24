@@ -1,4 +1,5 @@
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
+import navSectionNames from '@constants/navSectionNames';
 
 import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
@@ -28,6 +29,7 @@ export function makeResourceKindNavSection(
   const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
+    rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       return {
         activeResources: Object.values(state.main.resourceMap).filter(
@@ -63,15 +65,6 @@ export function makeResourceKindNavSection(
         isVisible: (rawItem, scope) => {
           const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
           return isPassingFilter;
-        },
-        shouldScrollIntoView: (rawItem, scope) => {
-          if (rawItem.isHighlighted && scope.selectedPath) {
-            return true;
-          }
-          if (rawItem.isSelected && scope.selectedResourceId) {
-            return true;
-          }
-          return false;
         },
       },
       instanceHandler: {
