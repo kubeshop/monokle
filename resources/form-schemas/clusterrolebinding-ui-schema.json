@@ -1,0 +1,35 @@
+{
+  "ui:title": "RoleBinding Properties",
+  "subjects": {
+    "ui:title": "Object subjects",
+    "items": {
+      "kind": {
+        "ui:title": "Kind",
+        "ui:help": "Lorem ipsum dolor sid amed"
+      },
+      "name": {
+        "ui:title": "Name",
+        "ui:help": "Lorem ipsum dolor sid amed"
+      },
+      "apiGroup": {
+        "ui:title": "API Group",
+        "ui:help": "Lorem ipsum dolor sid amed"
+      }
+    }
+  },
+  "roleRef": {
+    "ui:title": "Object subjects",
+    "kind": {
+      "ui:title": "Kind",
+      "ui:help": "Lorem ipsum dolor sid amed"
+    },
+    "name": {
+      "ui:title": "Name",
+      "ui:help": "Lorem ipsum dolor sid amed"
+    },
+    "apiGroup": {
+      "ui:title": "API Group",
+      "ui:help": "Lorem ipsum dolor sid amed"
+    }
+  }
+}
