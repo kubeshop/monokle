@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 
 import {Button, Col, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 
-import {ArrowLeftOutlined, ArrowRightOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
@@ -30,6 +30,8 @@ import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
+
+import {openExternalResourceKindDocumentation, resourceKindDocLinks} from '@utils/shell';
 
 import {
   ActionsPaneContainer,
@@ -292,7 +294,22 @@ const ActionsPane = (props: {contentHeight: string}) => {
       <ActionsPaneContainer>
         <Row>
           <Col span={24}>
-            <StyledTabs defaultActiveKey="source" activeKey={key} onChange={k => setKey(k)}>
+            <StyledTabs
+              defaultActiveKey="source"
+              activeKey={key}
+              onChange={k => setKey(k)}
+              tabBarExtraContent={
+                selectedResource && resourceKindDocLinks[selectedResource?.kind] ? (
+                  <Button
+                    onClick={() => openExternalResourceKindDocumentation(selectedResource?.kind)}
+                    type="link"
+                    ghost
+                  >
+                    See {selectedResource?.kind} documentation <BookOutlined />
+                  </Button>
+                ) : null
+              }
+            >
               <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />

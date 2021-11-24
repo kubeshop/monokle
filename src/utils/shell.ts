@@ -4,7 +4,18 @@ import * as os from 'os';
 // @ts-ignore
 import shellPath from 'shell-path';
 
+import {ResourceKind} from '@models/resourcekindhandler';
+
 let cachedShellPath: string | undefined;
+
+// Documentation links hash-table
+export const resourceKindDocLinks: {[name: string]: string} = {
+  ConfigMap: 'https://kubernetes.io/docs/concepts/configuration/configmap/',
+  Secret: 'https://kubernetes.io/docs/concepts/configuration/secret/',
+  Namespace: 'https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/',
+  Ingress: 'https://kubernetes.io/docs/concepts/services-networking/ingress/',
+  ClusterRole: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole',
+};
 
 export function getShellPath() {
   if (cachedShellPath === undefined) {
@@ -36,4 +47,8 @@ export function openUniqueObjectNameTopic() {
 
 export function openNamespaceTopic() {
   shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#rfc-1035-label-names');
+}
+
+export function openExternalResourceKindDocumentation(resourceKind: ResourceKind) {
+  shell.openExternal(resourceKindDocLinks[resourceKind]);
 }
