@@ -307,6 +307,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   )
                 )}
               </TabPane>
+              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
+                {uiState.isFolderLoading || previewLoader.isLoading ? (
+                  <StyledSkeleton active />
+                ) : (
+                  <FormEditor contentHeight={contentHeight} type="metadata" />
+                )}
+              </TabPane>
               {selectedResource && selectedResource?.kind === 'ConfigMap' && (
                 <TabPane
                   tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}
@@ -316,7 +323,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   {uiState.isFolderLoading || previewLoader.isLoading ? (
                     <StyledSkeleton active />
                   ) : (
-                    <FormEditor contentHeight={contentHeight} />
+                    <FormEditor contentHeight={contentHeight} type="resource" />
                   )}
                 </TabPane>
               )}

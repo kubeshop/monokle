@@ -199,6 +199,57 @@ immutable: true`;
   expect(result).toEqual(expectedYaml);
 });
 
+test('manifest-merge-complex', () => {
+  const yaml = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iptv
+  namespace: default
+  labels:
+    app: iptv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iptv
+  template:
+    metadata:
+      labels:
+        app: iptv
+    spec:
+      containers:
+        - name: iptv
+          image: ghcr.io/pierre-emmanuelj/iptv-proxy/iptv-proxy:latest-arm64
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: '512m'
+            requests:
+              memory: 1.5Gi
+              cpu: '480m'
+          env:
+            - name: M3U_URL
+              value: 'http://v605.germanyservers.online:8000/get.php?username=erdikose&password=lrZxfBQm&type=m3u_plus&output=ts'
+            - name: PORT
+              value: '8080'
+            - name: GIN_MODE
+              value: 'release'
+            - name: USER
+              value: 'erdkse'
+            - name: PASSWORD
+              value: 'erdkse'`;
+
+  const result = mergeManifests(yaml, yaml);
+  expect(result).toEqual(yaml);
+});
+
 test('traverse-document', () => {
   const inputYaml = `
   apiVersion: v1
