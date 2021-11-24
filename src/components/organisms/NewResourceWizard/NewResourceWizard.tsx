@@ -13,7 +13,7 @@ import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {NO_NAMESPACE, useNamespaces} from '@hooks/useNamespaces';
 
 import {useResetFormOnCloseModal} from '@utils/hooks';
-import {openUniqueObjectNameTopic} from '@utils/shell';
+import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -170,7 +170,14 @@ const NewResourceWizard = () => {
         <Form.Item
           name="namespace"
           label="Namespace"
-          tooltip={{title: 'Select the namespace', icon: <InfoCircleOutlined />}}
+          tooltip={{
+            title: () => (
+              <span>
+                Namespace - <a onClick={openNamespaceTopic}>read more</a>
+              </span>
+            ),
+            icon: <InfoCircleOutlined />,
+          }}
           initialValue={NO_NAMESPACE}
         >
           <Select>
