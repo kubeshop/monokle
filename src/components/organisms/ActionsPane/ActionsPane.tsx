@@ -31,7 +31,9 @@ import Icon from '@components/atoms/Icon';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {openExternalResourceKindDocumentation, resourceKindDocLinks} from '@utils/shell';
+import {openExternalResourceKindDocumentation} from '@utils/shell';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {
   ActionsPaneContainer,
@@ -110,6 +112,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
       isDirectoryExplorer: true,
     }
   );
+
+  const resourceKindDocumentation = selectedResource && getResourceKindHandler(selectedResource.kind);
 
   const getSaveButtonMenu = useCallback(
     () => (
@@ -290,7 +294,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
-
       <ActionsPaneContainer>
         <Row>
           <Col span={24}>
@@ -299,9 +302,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
               activeKey={key}
               onChange={k => setKey(k)}
               tabBarExtraContent={
-                selectedResource && resourceKindDocLinks[selectedResource?.kind] ? (
+                selectedResource && resourceKindDocumentation?.helpLink ? (
                   <Button
-                    onClick={() => openExternalResourceKindDocumentation(selectedResource?.kind)}
+                    onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
                     type="link"
                     ghost
                   >

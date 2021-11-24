@@ -54,6 +54,12 @@ interface ResourceKindHandler {
   description: string;
 
   /**
+   * An external link to documentation
+   */
+
+  helpLink?: string;
+
+  /**
    * Retrieve the specified resource of this type using the provided kubeconfig
    */
 
