@@ -11,7 +11,6 @@ import {isUnsavedResource} from '@redux/services/resource';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
-import ResourceKindNameDisplay from './ResourceKindNameDisplay';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSuffix from './ResourceKindSuffix';
 
@@ -35,7 +34,8 @@ export function makeResourceKindNavSection(
           r =>
             ((state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
               r.filePath.startsWith(PREVIEW_PREFIX)) &&
-            !r.filePath.startsWith(CLUSTER_DIFF_PREFIX)
+            !r.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+            !r.name.startsWith('Patch:')
         ),
         resourceFilter: state.main.resourceFilter,
         selectedResourceId: state.main.selectedResourceId,
@@ -83,9 +83,6 @@ export function makeResourceKindNavSection(
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
         contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
-        nameDisplay: {
-          component: ResourceKindNameDisplay,
-        },
       },
     },
   };

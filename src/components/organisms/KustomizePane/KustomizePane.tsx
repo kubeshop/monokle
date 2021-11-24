@@ -9,6 +9,7 @@ import {SectionRenderer} from '@components/molecules';
 
 import AppContext from '@src/AppContext';
 import KustomizationSectionBlueprint, {KustomizationScopeType} from '@src/navsections/KustomizationSectionBlueprint';
+import KustomizePatchSectionBlueprint, {KustomizePatchScopeType} from '@src/navsections/KustomizePatchSectionBlueprint';
 
 import * as S from './styled';
 
@@ -25,6 +26,11 @@ const HelmPane: React.FC = () => {
       <S.List height={navigatorHeight}>
         <SectionRenderer<K8sResource, KustomizationScopeType>
           sectionBlueprint={KustomizationSectionBlueprint}
+          level={0}
+          isLastSection={false}
+        />
+        <SectionRenderer<K8sResource, KustomizePatchScopeType>
+          sectionBlueprint={KustomizePatchSectionBlueprint}
           level={0}
           isLastSection={false}
         />
