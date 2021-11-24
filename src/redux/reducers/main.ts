@@ -527,6 +527,12 @@ export const mainSlice = createSlice({
         state.previewLoader.targetResourceId = undefined;
         resetSelectionHistory(state, {initialResourceIds: [state.previewResourceId]});
         state.selectedResourceId = undefined;
+        state.selectedPath = undefined;
+        state.selectedValuesFileId = undefined;
+        Object.values(state.resourceMap).forEach(resource => {
+          resource.isSelected = false;
+          resource.isHighlighted = false;
+        });
       })
       .addCase(previewCluster.rejected, state => {
         state.previewLoader.isLoading = false;
