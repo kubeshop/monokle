@@ -177,6 +177,7 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
       setSchema(getFormSchema(type === 'metadata' ? type : selectedResource.kind));
       setUiSchema(getUiSchema(type === 'metadata' ? type : selectedResource.kind));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource]);
 
   if (!selectedResource) {

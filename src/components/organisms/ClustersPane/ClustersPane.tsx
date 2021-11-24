@@ -174,7 +174,7 @@ const ClustersPane = () => {
     if (kubeconfigPath) {
       dispatch(loadContexts(kubeconfigPath));
     }
-  }, [kubeconfigPath]);
+  }, [kubeconfigPath, dispatch]);
 
   return (
     <>

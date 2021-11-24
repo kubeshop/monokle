@@ -35,7 +35,7 @@ const FileExplorer = (props: FileExplorerProps) => {
         }
       });
     }
-  }, [isOpen, onOpen, onSelect]);
+  }, [isOpen, options, onOpen, onSelect]);
 
   return null;
 };

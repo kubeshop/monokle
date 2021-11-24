@@ -3,6 +3,8 @@ import {KubeConfig} from '@kubernetes/client-node';
 
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+import log from 'loglevel';
+
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
@@ -190,7 +192,7 @@ async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitio
     // @ts-ignore
     return customResults.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
   } catch (e) {
-    console.log(e);
+    log.warn(e);
   }
 
   return [];

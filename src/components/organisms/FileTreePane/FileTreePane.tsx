@@ -569,7 +569,7 @@ const FileTreePane = () => {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
       dispatch(setShouldExpandAllNodes(false));
     }
-  }, [resourceMap, fileMap, shouldExpandAllNodes, dispatch]);
+  }, [resourceMap, fileMap, shouldExpandAllNodes, hideExcludedFilesInFileExplorer, dispatch]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
@@ -719,11 +719,14 @@ const FileTreePane = () => {
     setAutoExpandParent(false);
   };
 
-  const onSelectRootFolderFromMainThread = useCallback((_: any, data: string) => {
-    if (data) {
-      setFolder(data);
-    }
-  }, []);
+  const onSelectRootFolderFromMainThread = useCallback(
+    (_: any, data: string) => {
+      if (data) {
+        setFolder(data);
+      }
+    },
+    [setFolder]
+  );
 
   const onExecutedFrom = useCallback(
     (_, data) => {
@@ -742,7 +745,7 @@ const FileTreePane = () => {
     return () => {
       ipcRenderer.removeListener('set-root-folder', onSelectRootFolderFromMainThread);
     };
-  }, []);
+  }, [onSelectRootFolderFromMainThread]);
 
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);

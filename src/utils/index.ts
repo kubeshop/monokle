@@ -1,4 +1,5 @@
 import {execSync} from 'child_process';
+import log from 'loglevel';
 
 import {PROCESS_ENV} from '@utils/env';
 
@@ -14,7 +15,7 @@ export const uniqueArr = <T>(arr: Array<T>): Array<T> => {
 };
 
 export const checkMissingDependencies = (dependencies: Array<string>): Array<string> => {
-  console.log(`checking dependencies with process path: ${PROCESS_ENV.PATH}`);
+  log.info(`checking dependencies with process path: ${PROCESS_ENV.PATH}`);
 
   return dependencies.filter(d => {
     try {

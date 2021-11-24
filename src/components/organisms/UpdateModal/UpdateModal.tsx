@@ -41,18 +41,15 @@ const UpdateModal = () => {
     }
   }, [newVersion]);
 
-  const getErrorMessage = useCallback(
-    (code: number) => {
-      if (code === -2) {
-        return <div>Auto-update is not enabled in development mode!</div>;
-      }
-      if (code === -10) {
-        return <div>Could not get code signature for running application!</div>;
-      }
-      return <div>Update process encountered with an error!</div>;
-    },
-    [newVersion]
-  );
+  const getErrorMessage = useCallback((code: number) => {
+    if (code === -2) {
+      return <div>Auto-update is not enabled in development mode!</div>;
+    }
+    if (code === -10) {
+      return <div>Could not get code signature for running application!</div>;
+    }
+    return <div>Update process encountered with an error!</div>;
+  }, []);
 
   return (
     <StyledModal

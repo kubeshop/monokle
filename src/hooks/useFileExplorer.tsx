@@ -43,7 +43,7 @@ export const useFileExplorer = (onSelect: (result: FileExplorerSelectResult) => 
 
   const openFileExplorer = useCallback(() => {
     setIsOpen(true);
-  }, [setIsOpen, fileMap]);
+  }, [setIsOpen]);
 
   if (!options.defaultPath) {
     options.defaultPath = getRootFolder(fileMap);
