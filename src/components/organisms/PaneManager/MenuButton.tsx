@@ -25,15 +25,27 @@ const StyledButton = styled(Button)<{isHovered: boolean; hasGradientBackground: 
   }}
 `;
 
-const MenuButton: React.FC<{sectionNames?: string[]; isSelected: boolean; onClick: () => void}> = props => {
-  const {children, sectionNames, isSelected, onClick} = props;
+const MenuButton: React.FC<{
+  shouldWatchSelectedPath?: boolean;
+  sectionNames?: string[];
+  isSelected: boolean;
+  isActive: boolean;
+  onClick: () => void;
+}> = props => {
+  const {children, sectionNames, shouldWatchSelectedPath, isSelected, isActive, onClick} = props;
 
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const sectionInstanceByName = useAppSelector(
     state => (sectionNames ? _.pick(state.navigator.sectionInstanceMap, sectionNames) : undefined),
     shallowEqual
   );
+
+  const isAnyHelmValuesFileSelected = useMemo(() => {
+    return Object.values(helmValuesMap).some(v => v.isSelected);
+  }, [helmValuesMap]);
 
   const isAnySectionSelected = useMemo(() => {
     if (!sectionInstanceByName) {
@@ -44,7 +56,14 @@ const MenuButton: React.FC<{sectionNames?: string[]; isSelected: boolean; onClic
 
   const style: React.CSSProperties = {};
 
-  if (isAnySectionSelected && !isSelected) {
+  const hasGradientBackground = useMemo(() => {
+    return Boolean(
+      (isAnySectionSelected || (shouldWatchSelectedPath && selectedPath && !isAnyHelmValuesFileSelected)) &&
+        (!isSelected || !isActive)
+    );
+  }, [isAnySectionSelected, shouldWatchSelectedPath, selectedPath, isAnyHelmValuesFileSelected, isSelected, isActive]);
+
+  if (hasGradientBackground) {
     if (isHovered) {
       style.background = Colors.selectionGradientHover;
     } else {
@@ -55,7 +74,7 @@ const MenuButton: React.FC<{sectionNames?: string[]; isSelected: boolean; onClic
   return (
     <StyledButton
       isHovered={isHovered}
-      hasGradientBackground={isAnySectionSelected && !isSelected}
+      hasGradientBackground={hasGradientBackground}
       size="large"
       type="text"
       onClick={onClick}

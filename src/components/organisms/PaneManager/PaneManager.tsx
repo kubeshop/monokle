@@ -19,14 +19,7 @@ import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterExplorerTooltips, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  closeClusterDiff,
-  openClusterDiff,
-  setLeftMenuSelection,
-  setRightMenuSelection,
-  toggleLeftMenu,
-  toggleRightMenu,
-} from '@redux/reducers/ui';
+import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
 import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 
 import {
@@ -118,7 +111,6 @@ const PaneManager = () => {
 
   const setActivePanes = (side: string, selectedMenu: string) => {
     if (side === 'left') {
-      dispatch(closeClusterDiff());
       if (leftMenuSelection === selectedMenu) {
         dispatch(toggleLeftMenu());
       } else {
@@ -191,10 +183,6 @@ const PaneManager = () => {
 
   const clusterExplorerTooltipText = getClusterExplorerTooltipText();
 
-  const openClusterDiffDrawer = () => {
-    dispatch(openClusterDiff());
-  };
-
   return (
     <StyledContent style={{height: contentHeight}}>
       <StyledRow style={{height: contentHeight + 4}}>
@@ -203,6 +191,8 @@ const PaneManager = () => {
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
               <MenuButton
                 isSelected={leftMenuSelection === 'file-explorer'}
+                isActive={leftActive}
+                shouldWatchSelectedPath
                 onClick={() => setActivePanes('left', 'file-explorer')}
               >
                 <MenuIcon
@@ -216,6 +206,7 @@ const PaneManager = () => {
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
               <MenuButton
                 isSelected={leftMenuSelection === 'cluster-explorer'}
+                isActive={leftActive}
                 onClick={async () => {
                   setActivePanes('left', 'cluster-explorer');
                   electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
@@ -236,6 +227,7 @@ const PaneManager = () => {
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
               <MenuButton
                 isSelected={leftMenuSelection === 'kustomize-pane'}
+                isActive={leftActive}
                 onClick={() => setActivePanes('left', 'kustomize-pane')}
                 sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
               >
@@ -249,6 +241,7 @@ const PaneManager = () => {
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
               <MenuButton
                 isSelected={leftMenuSelection === 'helm-pane'}
+                isActive={leftActive}
                 onClick={() => setActivePanes('left', 'helm-pane')}
                 sectionNames={[HELM_CHART_SECTION_NAME]}
               >
@@ -259,6 +252,7 @@ const PaneManager = () => {
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
                 <MenuButton
                   isSelected={leftMenuSelection === 'plugin-manager'}
+                  isActive={leftActive}
                   onClick={() => setActivePanes('left', 'plugin-manager')}
                 >
                   <MenuIcon
