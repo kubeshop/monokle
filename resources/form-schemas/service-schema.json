@@ -1,0 +1,74 @@
+{
+  "properties": {
+    "spec": {
+      "type": "object",
+      "properties": {
+        "selector": {
+          "type": "object",
+          "properties": {
+            "app": {
+              "type": "string"
+            }
+          }
+        },
+        "type": {
+          "type": "string"
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "protocol": {
+                "type": "string"
+              },
+              "port": {
+                "type": "string"
+              },
+              "targetPort": {
+                "type": "string"
+              },
+              "nodePort": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "clusterIP": {
+          "type": "string"
+        },
+        "externalIPs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "loadBalancer": {
+          "type": "object",
+          "properties": {
+            "ingress": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ip": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object"
+}

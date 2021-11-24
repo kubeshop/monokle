@@ -151,7 +151,6 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
 
   useDebounce(
     () => {
-      console.log('formData', formData);
       if (selectedResource) {
         let formString = stringify(formData);
         const content = mergeManifests(selectedResource.text, formString);
@@ -174,6 +173,7 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
 
   useEffect(() => {
     if (selectedResource) {
+      console.log(selectedResource.kind);
       setFormData(selectedResource.content);
       setSchema(getFormSchema(type === 'metadata' ? type : selectedResource.kind));
       setUiSchema(getUiSchema(type === 'metadata' ? type : selectedResource.kind));

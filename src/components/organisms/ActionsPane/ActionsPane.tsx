@@ -45,7 +45,15 @@ import {
 
 const {TabPane} = Tabs;
 
-const formSupportedResourceTypes = ['ConfigMap', 'Role', 'ClusterRole', 'RoleBinding', 'ClusterRoleBinding'];
+const formSupportedResourceTypes = [
+  'ConfigMap',
+  'Role',
+  'ClusterRole',
+  'RoleBinding',
+  'ClusterRoleBinding',
+  'Deployment',
+  'Service',
+];
 
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;

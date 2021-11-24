@@ -1,0 +1,65 @@
+{
+  "ui:title": "Service Properties",
+  "spec": {
+    "ui:title": "Object specs",
+    "selector": {
+      "ui:title": "Selector",
+      "app": {
+        "ui:title": "App",
+        "ui:help": "Lorem ipsum dolor sid amed"
+      }
+    },
+    "type": {
+      "ui:title": "Type",
+      "ui:help": "Lorem ipsum dolor sid amed"
+    },
+    "ports": {
+      "ui:title": "Ports",
+      "items": {
+        "name": {
+          "ui:title": "Name",
+          "ui:help": "Lorem ipsum dolor sid amed"
+        },
+        "protocol": {
+          "ui:title": "Protocol",
+          "ui:help": "Lorem ipsum dolor sid amed"
+        },
+        "port": {
+          "ui:title": "Port",
+          "ui:help": "Lorem ipsum dolor sid amed"
+        },
+        "targetPort": {
+          "ui:title": "Target Port",
+          "ui:help": "Lorem ipsum dolor sid amed"
+        },
+        "nodePort": {
+          "ui:title": "Node Port",
+          "ui:help": "Lorem ipsum dolor sid amed"
+        }
+      }
+    },
+    "clusterIP": {
+      "ui:title": "Cluster IP",
+      "ui:help": "Lorem ipsum dolor sid amed"
+    },
+    "externalIPs": {
+      "ui:title": "External IP",
+      "ui:help": "Lorem ipsum dolor sid amed"
+    }
+  },
+  "status": {
+    "ui:title": "Status",
+    "loadBalancer": {
+      "ui:title": "Load Balancer",
+      "ingress": {
+        "ui:title": "Ingress",
+        "items": {
+          "ip": {
+            "ui:title": "IP",
+            "ui:help": "Lorem ipsum dolor sid amed"
+          }
+        }
+      }
+    }
+  }
+}
