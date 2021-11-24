@@ -3,11 +3,11 @@
     "ui:title": "Object Metadata",
     "name": {
       "ui:title": "Name",
-      "ui:help": "(the name of this ConfigMap, must be unique within a namespace)"
+      "ui:help": "(the name of this object, must be unique within a namespace)"
     },
     "namespace": {
       "ui:title": "Namespace",
-      "ui:help": "(defines the namespace in within this ConfigMap must be unique, empty = default)"
+      "ui:help": "(defines the namespace in within this object must be unique, empty = default)"
     },
     "labels": {
       "ui:title": "Labels",
