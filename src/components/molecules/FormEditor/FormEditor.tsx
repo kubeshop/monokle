@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
 
@@ -6,15 +6,15 @@ import {useDebounce} from 'react-use';
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
 
-import isDeepEqual from 'fast-deep-equal/es6/react';
 import styled from 'styled-components';
 import {stringify} from 'yaml';
+
+import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
 import {loadResource} from '@redux/services';
-import {logMessage} from '@redux/services/log';
 import {mergeManifests} from '@redux/services/manifest-utils';
 
 const Form = withTheme(AntDTheme);
@@ -131,11 +131,7 @@ const FormContainer = styled.div<{contentHeight: string}>`
 const FormEditor = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
   const selectedResource = useSelector(selectedResourceSelector);
-  const [formData, setFormData] = useState<{
-    currFormData: any;
-    orgFormData: any;
-  }>({currFormData: undefined, orgFormData: undefined});
-  const [hasChanged, setHasChanged] = useState<boolean>(false);
+  const [formData, setFormData] = useState<any>();
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
@@ -144,62 +140,28 @@ const FormEditor = (props: {contentHeight: string}) => {
   let uiSchema =
     selectedResource && selectedResource.kind === 'ConfigMap' ? getUiSchema(selectedResource.kind) : undefined;
 
-  const onFormUpdate = useCallback(
-    (e: any) => {
-      if (e.formData === undefined) {
-        return;
-      }
-      if (formData.orgFormData) {
-        setFormData({currFormData: e.formData, orgFormData: formData.orgFormData});
-        setHasChanged(!isDeepEqual(e.formData, formData.orgFormData));
-      } else {
-        setFormData({currFormData: e.formData, orgFormData: e.formData});
-        setHasChanged(false);
-      }
-    },
-    [formData]
-  );
-
-  const onFormSubmit = useCallback(
-    (data: any, e: any) => {
-      try {
-        if (selectedResource) {
-          let formString = stringify(data);
-          const content = mergeManifests(selectedResource.text, formString);
-
-          /* log.debug(resource.text);
-          log.debug(formString);
-          log.debug(content); */
-
-          setHasChanged(false);
-          dispatch(updateResource({resourceId: selectedResource.id, content}));
-        }
-      } catch (err) {
-        logMessage(`Failed to update resource ${err}`, dispatch);
-      }
-    },
-    [selectedResource, dispatch]
-  );
-
-  const submitForm = useCallback(() => {
-    if (formData) {
-      onFormSubmit(formData.currFormData, null);
-    }
-  }, [formData, onFormSubmit]);
+  const onFormUpdate = (e: any) => {
+    setFormData(e.formData);
+  };
 
   useDebounce(
     () => {
-      if (hasChanged) {
-        submitForm();
+      if (selectedResource) {
+        let formString = stringify(formData);
+        const content = mergeManifests(selectedResource.text, formString);
+
+        if (content.trim() !== selectedResource.text.trim()) {
+          dispatch(updateResource({resourceId: selectedResource.id, content}));
+        }
       }
     },
-    250,
-    [hasChanged]
+    DEFAULT_EDITOR_DEBOUNCE,
+    [formData, selectedResource]
   );
 
   useEffect(() => {
     if (selectedResource) {
-      setFormData({currFormData: selectedResource.content, orgFormData: formData.orgFormData || undefined});
+      setFormData(selectedResource.content);
     }
   }, [selectedResource]);
 
@@ -213,14 +175,7 @@ const FormEditor = (props: {contentHeight: string}) => {
 
   return (
     <FormContainer contentHeight={contentHeight}>
-      <Form
-        schema={schema}
-        uiSchema={uiSchema}
-        formData={formData.currFormData}
-        onChange={onFormUpdate}
-        onSubmit={onFormSubmit}
-        disabled={isInPreviewMode}
-      >
+      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} disabled={isInPreviewMode}>
         <div />
       </Form>
     </FormContainer>

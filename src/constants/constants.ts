@@ -11,3 +11,5 @@ export const NAVIGATOR_HEIGHT_OFFSET = 110;
 export const FILE_TREE_HEIGHT_OFFSET = 122;
 export const REF_PATH_SEPARATOR = '#';
 export const KUSTOMIZATION_KIND = 'Kustomization';
+export const DEFAULT_EDITOR_DEBOUNCE = 500;
+export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;

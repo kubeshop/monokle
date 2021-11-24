@@ -1,6 +1,8 @@
 import {monaco} from 'react-monaco-editor';
 import {useDebounce} from 'react-use';
 
+import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
+
 import {ResourceMapType} from '@models/appstate';
 
 import {useAppDispatch} from '@redux/hooks';
@@ -53,7 +55,7 @@ function useDebouncedCodeSave(
         saveContent();
       }
     },
-    500,
+    DEFAULT_EDITOR_DEBOUNCE,
     [code]
   );
 }

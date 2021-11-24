@@ -1,11 +1,12 @@
-import {execSync} from 'child_process';
 import {BrowserWindow, dialog} from 'electron';
+
+import {execSync} from 'child_process';
+
+import {NewVersionCode} from '@models/appconfig';
 
 import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {KustomizeCommandType} from '@redux/services/kustomize';
-
-import {NewVersionCode} from '@models/appconfig';
 
 import {PROCESS_ENV} from '@utils/env';
 

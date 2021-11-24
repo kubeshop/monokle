@@ -7,6 +7,7 @@ import {Button, Checkbox, Divider, Input, InputNumber, Select, Tooltip} from 'an
 
 import styled from 'styled-components';
 
+import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE} from '@constants/constants';
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
@@ -89,7 +90,7 @@ const SettingsDrawer = () => {
         dispatch(updateFolderReadsMaxDepth(currentFolderReadsMaxDepth));
       }
     },
-    500,
+    DEFAULT_EDITOR_DEBOUNCE,
     [currentFolderReadsMaxDepth]
   );
 
@@ -153,7 +154,7 @@ const SettingsDrawer = () => {
         dispatch(updateKubeconfig(currentKubeConfig));
       }
     },
-    1000,
+    DEFAULT_KUBECONFIG_DEBOUNCE,
     [currentKubeConfig]
   );
 
