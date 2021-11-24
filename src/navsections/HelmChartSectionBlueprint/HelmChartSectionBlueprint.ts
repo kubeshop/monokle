@@ -17,9 +17,11 @@ export type HelmChartScopeType = {
   isHelmChartPreview: boolean;
 };
 
+export const HELM_CHART_SECTION_NAME = 'Helm Charts' as const;
+
 const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScopeType> = {
-  name: 'Helm Charts',
-  id: 'Helm Charts',
+  name: HELM_CHART_SECTION_NAME,
+  id: HELM_CHART_SECTION_NAME,
   getScope: state => {
     return {
       helmChartMap: state.main.helmChartMap,

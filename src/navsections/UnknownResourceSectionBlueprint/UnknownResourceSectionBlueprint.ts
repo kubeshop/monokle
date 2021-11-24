@@ -25,9 +25,11 @@ export type UnknownResourceScopeType = {
 
 const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
 
+export const UNKNOWN_RESOURCE_SECTION_NAME = 'Unknown Resources' as const;
+
 const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownResourceScopeType> = {
-  name: 'Unknown Resources',
-  id: 'Unknown Resources',
+  name: UNKNOWN_RESOURCE_SECTION_NAME,
+  id: UNKNOWN_RESOURCE_SECTION_NAME,
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,

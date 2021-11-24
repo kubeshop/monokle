@@ -70,6 +70,8 @@ export type K8sResourceScopeType = {
   resourceFilter: ResourceFilterType;
 };
 
+export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
+
 const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScopeType> = {
   name: navSectionNames.K8S_RESOURCES,
   id: navSectionNames.K8S_RESOURCES,

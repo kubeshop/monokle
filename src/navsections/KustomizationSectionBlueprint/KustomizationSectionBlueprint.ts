@@ -22,9 +22,11 @@ export type KustomizationScopeType = {
   isKustomizationPreview: boolean;
 };
 
+export const KUSTOMIZATION_SECTION_NAME = 'Kustomizations' as const;
+
 const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, KustomizationScopeType> = {
-  name: 'Kustomizations',
-  id: 'Kustomizations',
+  name: KUSTOMIZATION_SECTION_NAME,
+  id: KUSTOMIZATION_SECTION_NAME,
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,

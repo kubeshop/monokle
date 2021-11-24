@@ -21,9 +21,11 @@ export type KustomizePatchScopeType = {
   isFolderLoading: boolean;
 };
 
+export const KUSTOMIZE_PATCH_SECTION_NAME = 'Patch Resources' as const;
+
 const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePatchScopeType> = {
-  name: 'Patch Resources',
-  id: 'Patch Resources',
+  name: KUSTOMIZE_PATCH_SECTION_NAME,
+  id: KUSTOMIZE_PATCH_SECTION_NAME,
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
