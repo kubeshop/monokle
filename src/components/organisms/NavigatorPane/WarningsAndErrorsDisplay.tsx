@@ -9,7 +9,7 @@ import {PREVIEW_PREFIX} from '@constants/constants';
 import {ResourceRefType} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectInstance} from '@redux/reducers/navigator';
+import {selectK8sResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
 import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
@@ -72,7 +72,7 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
   return (
     <StyledMenu>
       {warnings.map(warning => (
-        <StyledMenuItem key={warning.id} onClick={() => dispatch(selectInstance(warning.id))}>
+        <StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
           <Label>{warning.type}:</Label>
           <Label>&nbsp;{warning.name}</Label>
           <Label>&nbsp;({warning.count})</Label>

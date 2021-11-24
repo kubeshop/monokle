@@ -10,7 +10,7 @@ import {WarningOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
 import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -98,7 +98,7 @@ const ClustersPane = () => {
         dispatch(updateKubeconfig(currentKubeConfig));
       }
     },
-    1000,
+    DEFAULT_KUBECONFIG_DEBOUNCE,
     [currentKubeConfig, kubeconfigPath]
   );
 

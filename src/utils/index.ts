@@ -26,7 +26,7 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
         },
       });
       return false;
-    } catch (e) {
+    } catch (e: any) {
       return true;
     }
   });

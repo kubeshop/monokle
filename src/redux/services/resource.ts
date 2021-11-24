@@ -343,6 +343,7 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
     } else {
       // only document => just write to file
       fs.writeFileSync(absoluteResourcePath, newValue);
+      valueToWrite = newValue;
     }
 
     fileEntry.timestamp = getFileTimestamp(absoluteResourcePath);

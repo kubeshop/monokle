@@ -5,6 +5,8 @@ import {Button, Input, Select} from 'antd';
 
 import styled from 'styled-components';
 
+import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 
@@ -157,7 +159,7 @@ const ResourceFilter = () => {
       };
       dispatch(updateResourceFilter(updatedFilter));
     },
-    500,
+    DEFAULT_EDITOR_DEBOUNCE,
     [name, kind, namespace, labels, annotations]
   );
 

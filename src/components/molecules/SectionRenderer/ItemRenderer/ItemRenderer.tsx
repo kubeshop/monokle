@@ -39,7 +39,6 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
-  const selectedInstanceId = useAppSelector(state => state.navigator.selectedInstanceId);
   const {instanceHandler} = blueprint;
 
   const {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay} = useItemCustomization(blueprint.customization);
@@ -70,13 +69,6 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
       instanceHandler.onClick(itemInstance, dispatch);
     }
   }, [instanceHandler, itemInstance, dispatch]);
-
-  useEffect(() => {
-    if (selectedInstanceId && itemId === selectedInstanceId) {
-      onClick();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedInstanceId]);
 
   return (
     <ScrollIntoView ref={scrollContainer}>

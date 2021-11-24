@@ -6,6 +6,7 @@ import {useMeasure} from 'react-use';
 
 import fs from 'fs';
 import 'monaco-editor';
+// @ts-ignore
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml/lib/esm/monaco.contribution';
 import path from 'path';
@@ -80,6 +81,10 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const [editor, setEditor] = useState(editorRef.current);
+
+  const selectedResource = useMemo(() => {
+    return selectedResourceId ? resourceMap[selectedResourceId] : undefined;
+  }, [selectedResourceId, resourceMap]);
 
   const selectResource = (resourceId: string) => {
     if (resourceMap[resourceId]) {
@@ -185,11 +190,11 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   }, [selectedPath, selectedResourceId]);
 
   useEffect(() => {
-    if (selectedResourceId && resourceMap[selectedResourceId] && resourceMap[selectedResourceId].text !== code) {
-      setCode(resourceMap[selectedResourceId].text);
+    if (selectedResource && selectedResource.text !== code) {
+      setCode(selectedResource.text);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceMap]);
+  }, [selectedResource]);
 
   useEffect(() => {
     if (editor) {

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
 
@@ -6,15 +6,15 @@ import {useDebounce} from 'react-use';
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
 
-import isDeepEqual from 'fast-deep-equal/es6/react';
 import styled from 'styled-components';
 import {stringify} from 'yaml';
+
+import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
 import {loadResource} from '@redux/services';
-import {logMessage} from '@redux/services/log';
 import {mergeManifests} from '@redux/services/manifest-utils';
 
 const Form = withTheme(AntDTheme);
@@ -139,77 +139,41 @@ const FormContainer = styled.div<{contentHeight: string}>`
 const FormEditor = (props: {contentHeight: string; type: string}) => {
   const {contentHeight, type} = props;
   const selectedResource = useSelector(selectedResourceSelector);
-  const [currentFormData, setCurrentFormData] = useState();
-  const [orgFormData, setOrgFormData] = useState();
-  const [hasChanged, setHasChanged] = useState<boolean>(false);
+  const [formData, setFormData] = useState<any>();
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const [schema, setSchema] = useState({});
   const [uiSchema, setUiSchema] = useState({});
 
-  const onFormChange = useCallback(
-    ({formData}) => {
-      if (formData === undefined) {
-        return;
-      }
-      setCurrentFormData(formData);
-      if (orgFormData) {
-        setHasChanged(!isDeepEqual(formData, orgFormData));
-      } else {
-        setOrgFormData(formData);
-        setHasChanged(false);
-      }
-    },
-    [orgFormData]
-  );
+  let schema =
+    selectedResource && selectedResource.kind === 'ConfigMap' ? getFormSchema(selectedResource.kind) : undefined;
+  let uiSchema =
+    selectedResource && selectedResource.kind === 'ConfigMap' ? getUiSchema(selectedResource.kind) : undefined;
 
-  const onFormSubmit = useCallback(
-    (data: any, e: any) => {
-      try {
-        if (selectedResource) {
-          let formString = stringify(data);
-          const content = mergeManifests(selectedResource.text, formString);
-
-          /* log.debug(resource.text);
-          log.debug(formString);
-          log.debug(content); */
-
-          setHasChanged(false);
-          dispatch(updateResource({resourceId: selectedResource.id, content}));
-        }
-      } catch (err) {
-        logMessage(`Failed to update resource ${err}`, dispatch);
-      }
-    },
-    [selectedResource, dispatch]
-  );
-
-  const submitForm = useCallback(() => {
-    if (currentFormData) {
-      onFormSubmit(currentFormData, null);
-    }
-  }, [currentFormData, onFormSubmit]);
+  const onFormUpdate = (e: any) => {
+    setFormData(e.formData);
+  };
 
   useDebounce(
     () => {
-      if (hasChanged) {
-        submitForm();
+      if (selectedResource) {
+        let formString = stringify(formData);
+        const content = mergeManifests(selectedResource.text, formString);
+
+        if (content.trim() !== selectedResource.text.trim()) {
+          dispatch(updateResource({resourceId: selectedResource.id, content}));
+        }
       }
     },
-    250,
-    [hasChanged]
+    DEFAULT_EDITOR_DEBOUNCE,
+    [formData, selectedResource]
   );
 
   useEffect(() => {
     if (selectedResource) {
-      setSchema(getFormSchema(type === 'metadata' ? type : selectedResource.kind));
-      setUiSchema(getUiSchema(type === 'metadata' ? type : selectedResource.kind));
-
-      setCurrentFormData(selectedResource.content);
-      setOrgFormData(undefined);
+      setFormData(selectedResource.content);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, type]);
+  }, [selectedResource]);
 
   if (!selectedResource) {
     return <div>Nothing selected...</div>;
@@ -221,14 +185,7 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
 
   return (
     <FormContainer contentHeight={contentHeight}>
-      <Form
-        schema={schema}
-        uiSchema={uiSchema}
-        formData={currentFormData}
-        onChange={onFormChange}
-        onSubmit={onFormSubmit}
-        disabled={isInPreviewMode}
-      >
+      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} disabled={isInPreviewMode}>
         <div />
       </Form>
     </FormContainer>
