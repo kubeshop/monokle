@@ -156,6 +156,13 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
         const content = mergeManifests(selectedResource.text, formString);
 
         if (content.trim() !== selectedResource.text.trim()) {
+          /*
+          console.log('Replacing resource content');
+          console.log(selectedResource.text);
+          console.log('with');
+          console.log(content);
+*/
+
           dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
       }
