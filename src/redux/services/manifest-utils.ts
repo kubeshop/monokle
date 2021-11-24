@@ -36,7 +36,8 @@ export function mergeManifests(template: string, values: string) {
     Seq(key, node, path) {
       const valueNode = findValueNode(valuesDoc, path);
       if (isSeq(valueNode)) {
-        // brute-force replace sequences for now - need to revisit...
+        // brute-force replace sequences for now - need to revisit since sequence nodes could be/contain objects
+        // that would be reordered unintentionally
         node.items = valueNode.items;
         if (node.items.length === 0) {
           pathsToRemove.push(createNodePath(path));
@@ -73,6 +74,7 @@ export function mergeManifests(template: string, values: string) {
       if (key !== 'value' || node.items.length > 0) {
         copyValueIfMissing(templateDoc, path);
       }
+      return visit.SKIP;
     },
   });
 
