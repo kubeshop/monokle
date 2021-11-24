@@ -86,6 +86,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
         const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
         return isPassingFilter;
       },
+      isDisabled: (_, scope) => scope.isInPreviewMode,
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
