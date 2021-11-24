@@ -203,27 +203,6 @@ const PaneManager = () => {
                 />
               </MenuButton>
             </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
-              <MenuButton
-                isSelected={leftMenuSelection === 'cluster-explorer'}
-                isActive={leftActive}
-                onClick={async () => {
-                  setActivePanes('left', 'cluster-explorer');
-                  electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
-                  if (!hasUserPerformedClickOnClusterIcon) {
-                    dispatch(onUserPerformedClickOnClusterIcon());
-                  }
-                }}
-              >
-                <Badge {...badgeChild} color={Colors.blue6}>
-                  <MenuIcon
-                    icon={ClusterOutlined}
-                    active={leftActive}
-                    isSelected={leftMenuSelection === 'cluster-explorer'}
-                  />
-                </Badge>
-              </MenuButton>
-            </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
               <MenuButton
                 isSelected={leftMenuSelection === 'kustomize-pane'}
@@ -246,6 +225,27 @@ const PaneManager = () => {
                 sectionNames={[HELM_CHART_SECTION_NAME]}
               >
                 <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
+              </MenuButton>
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
+              <MenuButton
+                isSelected={leftMenuSelection === 'cluster-explorer'}
+                isActive={leftActive}
+                onClick={async () => {
+                  setActivePanes('left', 'cluster-explorer');
+                  electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
+                  if (!hasUserPerformedClickOnClusterIcon) {
+                    dispatch(onUserPerformedClickOnClusterIcon());
+                  }
+                }}
+              >
+                <Badge {...badgeChild} color={Colors.blue6}>
+                  <MenuIcon
+                    icon={ClusterOutlined}
+                    active={leftActive}
+                    isSelected={leftMenuSelection === 'cluster-explorer'}
+                  />
+                </Badge>
               </MenuButton>
             </Tooltip>
             {featureJson.PluginManager && (
