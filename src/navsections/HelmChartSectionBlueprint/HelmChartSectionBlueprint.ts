@@ -1,3 +1,5 @@
+import {ROOT_FILE_ENTRY} from '@constants/constants';
+
 import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
 import {HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
@@ -6,12 +8,14 @@ import {selectHelmValuesFile} from '@redux/reducers/main';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import HelmChartQuickAction from './HelmChartQuickAction';
+import HelmChartSectionEmptyDisplay from './HelmChartSectionEmptyDisplay';
 
 export type HelmChartScopeType = {
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
   previewValuesFileId: string | undefined;
   isInClusterMode: boolean;
+  isFolderOpen: boolean;
   isFolderLoading: boolean;
   isPreviewLoading: boolean;
   isHelmChartPreview: boolean;
@@ -31,6 +35,7 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
       isInClusterMode: Boolean(
         state.main.previewResourceId && state.main.previewResourceId.endsWith(state.config.kubeconfigPath)
       ),
+      isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isFolderLoading: state.ui.isFolderLoading,
       isPreviewLoading: state.main.previewLoader.isLoading,
       isHelmChartPreview: state.main.previewType === 'helm',
@@ -56,12 +61,17 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
       }
       return scope.isFolderLoading;
     },
-    isVisible: scope => {
-      return !scope.isInClusterMode;
-    },
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;
     },
+    isEmpty: (scope, rawItems) => {
+      return scope.isFolderOpen && rawItems.length === 0;
+    },
+    shouldBeVisibleBeforeInitialized: true,
+  },
+  customization: {
+    emptyDisplay: {component: HelmChartSectionEmptyDisplay},
+    beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,
@@ -70,7 +80,8 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
       isSelected: rawItem => {
         return rawItem.isSelected;
       },
-      isDisabled: (rawItem, scope) => Boolean(scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id),
+      isDisabled: (rawItem, scope) =>
+        Boolean((scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) || scope.isInClusterMode),
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {

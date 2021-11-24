@@ -54,6 +54,7 @@ export interface SectionCustomization {
     component: SectionCustomComponent;
   };
   disableHoverStyle?: boolean;
+  beforeInitializationText?: string;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
