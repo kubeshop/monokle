@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {Form, Input, Modal, Select} from 'antd';
 
@@ -13,6 +13,7 @@ import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {NO_NAMESPACE, useNamespaces} from '@hooks/useNamespaces';
 
 import {useResetFormOnCloseModal} from '@utils/hooks';
+import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -125,8 +126,24 @@ const NewResourceWizard = () => {
   return (
     <Modal title="Add New Resource" visible={newResourceWizardState.isOpen} onOk={onOk} onCancel={onCancel}>
       <Form form={form} layout="vertical" onValuesChange={onFormValuesChange} onFinish={onFinish}>
-        <Form.Item name="name" label="Name" required>
-          <Input />
+        <Form.Item
+          name="name"
+          label="Name"
+          rules={[
+            {required: true, message: 'This field is required'},
+            {pattern: /^[a-z]$|^([a-z\-.])*[a-z]$/, message: 'Wrong pattern'},
+            {max: 63, type: 'string', message: 'Too long'},
+          ]}
+          tooltip={{
+            title: () => (
+              <span>
+                Unique object name - <a onClick={openUniqueObjectNameTopic}>read more</a>
+              </span>
+            ),
+            icon: <InfoCircleOutlined />,
+          }}
+        >
+          <Input maxLength={63} />
         </Form.Item>
         <Form.Item
           name="kind"
@@ -153,7 +170,14 @@ const NewResourceWizard = () => {
         <Form.Item
           name="namespace"
           label="Namespace"
-          tooltip={{title: 'Select the namespace', icon: <InfoCircleOutlined />}}
+          tooltip={{
+            title: () => (
+              <span>
+                Namespace - <a onClick={openNamespaceTopic}>read more</a>
+              </span>
+            ),
+            icon: <InfoCircleOutlined />,
+          }}
           initialValue={NO_NAMESPACE}
         >
           <Select>
