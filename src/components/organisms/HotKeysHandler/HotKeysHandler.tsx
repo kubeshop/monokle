@@ -88,6 +88,8 @@ const HotKeysHandler = () => {
     mainState.resourceMap,
     mainState.fileMap,
     configState.kubeconfigPath,
+    configState.kubeConfig.currentContext,
+    configState.settings.kustomizeCommand,
     mainState.selectedPath,
     mainState.previewType,
     dispatch,

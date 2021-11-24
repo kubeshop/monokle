@@ -177,6 +177,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
     helmValuesMap,
     selectedValuesFileId,
     kubeconfigContext,
+    kustomizeCommand,
+    selectedResourceId,
   ]);
 
   useEffect(() => {
@@ -184,6 +186,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
       applySelection();
       dispatch(setMonacoEditor({apply: false}));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {

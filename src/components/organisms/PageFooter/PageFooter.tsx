@@ -42,7 +42,7 @@ const PageFooter = () => {
         rootEntry && rootEntry.children ? ` - ${rootEntry.filePath} - ${nrOfFiles} files` : ''
       }`
     );
-  }, [appVersion]);
+  }, [appVersion, nrOfFiles, rootEntry]);
 
   return <StyledFooter noborder="true">{footerText}</StyledFooter>;
 };

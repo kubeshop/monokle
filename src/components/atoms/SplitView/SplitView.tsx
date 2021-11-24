@@ -202,6 +202,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
       edit: paneConfiguration.editWidth,
       right: paneConfiguration.rightWidth,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paneConfiguration]);
 
   useEffect(() => {
@@ -212,6 +213,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         rightWidth: calculateRightWidthOnDrawersChange(),
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hideLeft, hideRight]);
 
   const onMouseDownLeftNav = (evt: MouseEvent<HTMLElement>): any => {

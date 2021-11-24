@@ -201,6 +201,7 @@ const FormEditor = (props: {contentHeight: string}) => {
     if (selectedResource) {
       setFormData({currFormData: selectedResource.content, orgFormData: formData.orgFormData || undefined});
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource]);
 
   if (!selectedResource) {
