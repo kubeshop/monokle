@@ -43,7 +43,7 @@ export const ItemContainer = styled.li<ItemContainerProps>`
       return `background: ${Colors.blackPearl};`;
     }
   }};
-  padding-left: ${props => `${props.level * 12}px;`};
+  padding-left: ${props => `${(props.level + 1) * 8 + 1}px;`};
 `;
 
 type ItemNameProps = {

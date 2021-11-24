@@ -1,5 +1,3 @@
-import {KUSTOMIZATION_KIND, PREVIEW_PREFIX} from '@constants/constants';
-
 import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
@@ -9,11 +7,11 @@ import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {ResourceKindHandlers} from '@src/kindhandlers';
-
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import KustomizePatchPrefix from './KustomizePatchPrefix';
+import KustomizePatchSuffix from './KustomizePatchSuffix';
 
-export type UnknownResourceScopeType = {
+export type KustomizePatchScopeType = {
   resourceMap: ResourceMapType;
   resourceFilter: ResourceFilterType;
   selectedPath?: string;
@@ -23,14 +21,12 @@ export type UnknownResourceScopeType = {
   isFolderLoading: boolean;
 };
 
-const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
+export const KUSTOMIZE_PATCH_SECTION_NAME = 'Patch Resources' as const;
 
-export const UNKNOWN_RESOURCE_SECTION_NAME = 'Unknown Resources' as const;
-
-const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownResourceScopeType> = {
-  name: UNKNOWN_RESOURCE_SECTION_NAME,
-  id: UNKNOWN_RESOURCE_SECTION_NAME,
-  rootSectionId: UNKNOWN_RESOURCE_SECTION_NAME,
+const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePatchScopeType> = {
+  name: KUSTOMIZE_PATCH_SECTION_NAME,
+  id: KUSTOMIZE_PATCH_SECTION_NAME,
+  rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
@@ -44,29 +40,22 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
   },
   builder: {
     getRawItems: scope => {
-      return Object.values(scope.resourceMap).filter(
-        resource =>
-          !KnownResourceKinds.includes(resource.kind) &&
-          (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
-      );
+      return Object.values(scope.resourceMap).filter(resource => resource.name.startsWith('Patch:'));
     },
     getGroups: scope => {
-      const unknownResources = Object.values(scope.resourceMap).filter(
-        resource =>
-          !KnownResourceKinds.includes(resource.kind) &&
-          (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
+      const patchResources = Object.values(scope.resourceMap).filter(resource => resource.name.startsWith('Patch:'));
+      const patcheResourcesByKind: Record<string, K8sResource[]> = patchResources.reduce<Record<string, K8sResource[]>>(
+        (acc, resource) => {
+          if (acc[resource.kind]) {
+            acc[resource.kind].push(resource);
+          } else {
+            acc[resource.kind] = [resource];
+          }
+          return acc;
+        },
+        {}
       );
-      const unknownResourcesByKind: Record<string, K8sResource[]> = unknownResources.reduce<
-        Record<string, K8sResource[]>
-      >((acc, resource) => {
-        if (acc[resource.kind]) {
-          acc[resource.kind].push(resource);
-        } else {
-          acc[resource.kind] = [resource];
-        }
-        return acc;
-      }, {});
-      return Object.entries(unknownResourcesByKind)
+      return Object.entries(patcheResourcesByKind)
         .map(([resourceKind, resources]) => {
           return {
             id: resourceKind,
@@ -97,15 +86,24 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
         const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
         return isPassingFilter;
       },
+      isDisabled: (_, scope) => scope.isInPreviewMode,
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
         dispatch(selectK8sResource({resourceId: itemInstance.id}));
       },
     },
+    customization: {
+      prefix: {
+        component: KustomizePatchPrefix,
+      },
+      suffix: {
+        component: KustomizePatchSuffix,
+      },
+    },
   },
 };
 
-sectionBlueprintMap.register(UnknownResourceSectionBlueprint);
+sectionBlueprintMap.register(KustomizePatchSectionBlueprint);
 
-export default UnknownResourceSectionBlueprint;
+export default KustomizePatchSectionBlueprint;

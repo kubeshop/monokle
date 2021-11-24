@@ -1,4 +1,4 @@
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {KUSTOMIZATION_KIND, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
@@ -6,15 +6,18 @@ import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
 
+import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationQuickAction from './KustomizationQuickAction';
+import KustomizationSectionEmptyDisplay from './KustomizationSectionEmptyDisplay';
 import KustomizationSuffix from './KustomizationSuffix';
 
 export type KustomizationScopeType = {
   resourceMap: ResourceMapType;
   previewResourceId: string | undefined;
   isInClusterMode: boolean;
+  isFolderOpen: boolean;
   isFolderLoading: boolean;
   selectedPath: string | undefined;
   selectedResourceId: string | undefined;
@@ -22,13 +25,17 @@ export type KustomizationScopeType = {
   isKustomizationPreview: boolean;
 };
 
+export const KUSTOMIZATION_SECTION_NAME = 'Kustomizations' as const;
+
 const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, KustomizationScopeType> = {
-  name: 'Kustomizations',
-  id: 'Kustomizations',
+  name: KUSTOMIZATION_SECTION_NAME,
+  id: KUSTOMIZATION_SECTION_NAME,
+  rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
       previewResourceId: state.main.previewResourceId,
+      isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isFolderLoading: state.ui.isFolderLoading,
       isInClusterMode: Boolean(
         state.main.previewResourceId && state.main.previewResourceId.endsWith(state.config.kubeconfigPath)
@@ -51,12 +58,19 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
       }
       return scope.isFolderLoading;
     },
-    isVisible: scope => {
-      return !scope.isInClusterMode;
-    },
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;
     },
+    isEmpty: (scope, rawItems) => {
+      return scope.isFolderOpen && rawItems.length === 0;
+    },
+    shouldBeVisibleBeforeInitialized: true,
+  },
+  customization: {
+    emptyDisplay: {
+      component: KustomizationSectionEmptyDisplay,
+    },
+    beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,
@@ -64,16 +78,8 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     builder: {
       isSelected: (rawItem, scope) => rawItem.isSelected || scope.previewResourceId === rawItem.id,
       isHighlighted: rawItem => rawItem.isHighlighted,
-      isDisabled: (rawItem, scope) => Boolean(scope.previewResourceId && scope.previewResourceId !== rawItem.id),
-      shouldScrollIntoView: (rawItem, scope) => {
-        if (rawItem.isHighlighted && scope.selectedPath) {
-          return true;
-        }
-        if (rawItem.isSelected && scope.selectedResourceId) {
-          return true;
-        }
-        return false;
-      },
+      isDisabled: (rawItem, scope) =>
+        Boolean((scope.previewResourceId && scope.previewResourceId !== rawItem.id) || scope.isInClusterMode),
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {

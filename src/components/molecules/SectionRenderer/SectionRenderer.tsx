@@ -134,6 +134,14 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
     [groupInstanceById]
   );
 
+  if (!sectionInstance?.isInitialized && sectionBlueprint.customization?.beforeInitializationText) {
+    return (
+      <S.BeforeInitializationContainer level={level}>
+        <p>{sectionBlueprint.customization.beforeInitializationText}</p>
+      </S.BeforeInitializationContainer>
+    );
+  }
+
   if (!sectionInstance?.isVisible) {
     return null;
   }

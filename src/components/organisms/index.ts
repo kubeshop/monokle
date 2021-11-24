@@ -16,3 +16,5 @@ export {default as ClustersPane} from './ClustersPane';
 export {default as ClusterDiffModal} from './ClusterDiffModal';
 export {default as NotificationsDrawer} from './NotificationsDrawer';
 export {default as RenameEntityModal} from './RenameEntityModal';
+export {default as HelmPane} from './HelmPane';
+export {default as KustomizePane} from './KustomizePane';

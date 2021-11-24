@@ -1,4 +1,4 @@
-import React, {useContext, useMemo, useState} from 'react';
+import React, {useContext, useMemo} from 'react';
 
 import {Badge, Button, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
@@ -19,17 +19,18 @@ import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterExplorerTooltips, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  closeClusterDiff,
-  openClusterDiff,
-  setLeftMenuSelection,
-  setRightMenuSelection,
-  toggleLeftMenu,
-  toggleRightMenu,
-} from '@redux/reducers/ui';
+import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
 import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 
-import {ActionsPane, ClustersPane, FileTreePane, NavigatorPane, PluginManagerPane} from '@organisms';
+import {
+  ActionsPane,
+  ClustersPane,
+  FileTreePane,
+  HelmPane,
+  KustomizePane,
+  NavigatorPane,
+  PluginManagerPane,
+} from '@organisms';
 
 import {GraphView, LogViewer} from '@molecules';
 
@@ -42,6 +43,12 @@ import Colors, {BackgroundColors} from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
 import featureJson from '@src/feature-flags.json';
+import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprint';
+import {KUSTOMIZATION_SECTION_NAME} from '@src/navsections/KustomizationSectionBlueprint';
+import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSectionBlueprint';
+
+import MenuButton from './MenuButton';
+import MenuIcon from './MenuIcon';
 
 const StyledRow = styled(Row)`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -79,32 +86,6 @@ const StyledContent = styled(Content)`
   overflow-y: clip;
 `;
 
-const MenuIcon = (props: {
-  icon: React.ElementType;
-  active: boolean;
-  isSelected: boolean;
-  style?: React.CSSProperties;
-}) => {
-  const {icon: IconComponent, active, isSelected, style: customStyle = {}} = props;
-  const {color = Colors.grey7} = customStyle;
-
-  const [isHovered, setIsHovered] = useState<boolean>(false);
-
-  const style = {
-    fontSize: 25,
-    color,
-    ...customStyle,
-  };
-
-  if (isHovered || (active && isSelected)) {
-    style.color = Colors.grey400;
-  }
-
-  return (
-    <IconComponent style={style} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} />
-  );
-};
-
 const iconMenuWidth = 45;
 
 const PaneManager = () => {
@@ -120,7 +101,6 @@ const PaneManager = () => {
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
-  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
@@ -131,7 +111,6 @@ const PaneManager = () => {
 
   const setActivePanes = (side: string, selectedMenu: string) => {
     if (side === 'left') {
-      dispatch(closeClusterDiff());
       if (leftMenuSelection === selectedMenu) {
         dispatch(toggleLeftMenu());
       } else {
@@ -204,68 +183,84 @@ const PaneManager = () => {
 
   const clusterExplorerTooltipText = getClusterExplorerTooltipText();
 
-  const openClusterDiffDrawer = () => {
-    dispatch(openClusterDiff());
-  };
-
   return (
     <StyledContent style={{height: contentHeight}}>
       <StyledRow style={{height: contentHeight + 4}}>
         <StyledColumnLeftMenu>
           <Space direction="vertical" style={{width: 43}}>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
-              <Button
-                size="large"
-                type="text"
+              <MenuButton
+                isSelected={leftMenuSelection === 'file-explorer'}
+                isActive={leftActive}
+                shouldWatchSelectedPath
                 onClick={() => setActivePanes('left', 'file-explorer')}
-                icon={
-                  <MenuIcon
-                    style={{marginLeft: 4}}
-                    icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
-                    active={leftActive}
-                    isSelected={leftMenuSelection === 'file-explorer'}
-                  />
-                }
-              />
+              >
+                <MenuIcon
+                  style={{marginLeft: 4}}
+                  icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
+                  active={leftActive}
+                  isSelected={leftMenuSelection === 'file-explorer'}
+                />
+              </MenuButton>
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
+              <MenuButton
+                isSelected={leftMenuSelection === 'kustomize-pane'}
+                isActive={leftActive}
+                onClick={() => setActivePanes('left', 'kustomize-pane')}
+                sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
+              >
+                <MenuIcon
+                  iconName="kustomize"
+                  active={leftActive}
+                  isSelected={leftMenuSelection === 'kustomize-pane'}
+                />
+              </MenuButton>
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
+              <MenuButton
+                isSelected={leftMenuSelection === 'helm-pane'}
+                isActive={leftActive}
+                onClick={() => setActivePanes('left', 'helm-pane')}
+                sectionNames={[HELM_CHART_SECTION_NAME]}
+              >
+                <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
+              </MenuButton>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
-              <Button
-                size="large"
-                type="text"
+              <MenuButton
+                isSelected={leftMenuSelection === 'cluster-explorer'}
+                isActive={leftActive}
                 onClick={async () => {
                   setActivePanes('left', 'cluster-explorer');
-
                   electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
-
                   if (!hasUserPerformedClickOnClusterIcon) {
                     dispatch(onUserPerformedClickOnClusterIcon());
                   }
                 }}
-                icon={
-                  <Badge {...badgeChild} color={Colors.blue6}>
-                    <MenuIcon
-                      icon={ClusterOutlined}
-                      active={leftActive}
-                      isSelected={leftMenuSelection === 'cluster-explorer'}
-                    />
-                  </Badge>
-                }
-              />
+              >
+                <Badge {...badgeChild} color={Colors.blue6}>
+                  <MenuIcon
+                    icon={ClusterOutlined}
+                    active={leftActive}
+                    isSelected={leftMenuSelection === 'cluster-explorer'}
+                  />
+                </Badge>
+              </MenuButton>
             </Tooltip>
             {featureJson.PluginManager && (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
-                <Button
-                  size="large"
-                  type="text"
+                <MenuButton
+                  isSelected={leftMenuSelection === 'plugin-manager'}
+                  isActive={leftActive}
                   onClick={() => setActivePanes('left', 'plugin-manager')}
-                  icon={
-                    <MenuIcon
-                      icon={ApiOutlined}
-                      active={leftActive}
-                      isSelected={leftMenuSelection === 'plugin-manager'}
-                    />
-                  }
-                />
+                >
+                  <MenuIcon
+                    icon={ApiOutlined}
+                    active={leftActive}
+                    isSelected={leftMenuSelection === 'plugin-manager'}
+                  />
+                </MenuButton>
               </Tooltip>
             )}
           </Space>
@@ -286,6 +281,12 @@ const PaneManager = () => {
                   }}
                 >
                   <ClustersPane />
+                </div>
+                <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
+                  <KustomizePane />
+                </div>
+                <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
+                  <HelmPane />
                 </div>
                 <div
                   style={{

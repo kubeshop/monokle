@@ -4,6 +4,8 @@ import asyncLib from 'async';
 import log from 'loglevel';
 import {Middleware} from 'redux';
 
+import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+
 import {ItemInstance, NavigatorInstanceState, SectionInstance} from '@models/navigator';
 
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
@@ -12,6 +14,12 @@ import {AppDispatch, RootState} from '@redux/store';
 import sectionBlueprintMap from './sectionBlueprintMap';
 
 const fullScopeCache: Record<string, any> = {};
+
+let paneHeight: number = window.innerHeight - NAVIGATOR_HEIGHT_OFFSET;
+
+window.addEventListener('resize', () => {
+  paneHeight = window.innerHeight - NAVIGATOR_HEIGHT_OFFSET;
+});
 
 const pickPartialRecord = (record: Record<string, any>, keys: string[]) => {
   return Object.entries(record)
@@ -35,6 +43,38 @@ const hasNavigatorInstanceStateChanged = (
     )
   );
 };
+
+function isScrolledIntoView(elementId: string) {
+  const element = document.getElementById(elementId);
+  const boundingClientRect = element?.getBoundingClientRect();
+  if (!boundingClientRect) {
+    return false;
+  }
+  const elementTop = boundingClientRect.top;
+  const elementBottom = boundingClientRect.bottom;
+  return elementTop < paneHeight && elementBottom >= 0;
+}
+
+function computeItemScrollIntoView(sectionInstance: SectionInstance, itemInstanceMap: Record<string, ItemInstance>) {
+  const allDescendantVisibleItems = Object.values(itemInstanceMap).filter(
+    i => i.rootSectionId === sectionInstance.id && i.isVisible
+  );
+
+  const selectedItem = allDescendantVisibleItems.find(i => i.isSelected);
+
+  if (selectedItem) {
+    if (!isScrolledIntoView(selectedItem.id)) {
+      selectedItem.shouldScrollIntoView = true;
+    }
+    return;
+  }
+
+  const highlightedItems = allDescendantVisibleItems.filter(i => i.isHighlighted);
+  const isAnyHighlightedItemInView = highlightedItems.some(i => isScrolledIntoView(i.id));
+  if (highlightedItems.length > 0 && !isAnyHighlightedItemInView) {
+    highlightedItems[0].shouldScrollIntoView = true;
+  }
+}
 
 /**
  * Compute the visibility of each section based on the visibility of it's children
@@ -166,14 +206,13 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
         return {
           name: itemBlueprint.getName(rawItem, sectionScope),
           id: itemBlueprint.getInstanceId(rawItem, sectionScope),
+          sectionId: sectionBlueprint.id,
+          rootSectionId: sectionBlueprint.rootSectionId,
           isSelected: Boolean(itemBuilder?.isSelected ? itemBuilder.isSelected(rawItem, sectionScope) : false),
           isHighlighted: Boolean(itemBuilder?.isHighlighted ? itemBuilder.isHighlighted(rawItem, sectionScope) : false),
           isVisible: Boolean(itemBuilder?.isVisible ? itemBuilder.isVisible(rawItem, sectionScope) : true),
           isDirty: Boolean(itemBuilder?.isDirty ? itemBuilder.isDirty(rawItem, sectionScope) : false),
           isDisabled: Boolean(itemBuilder?.isDisabled ? itemBuilder.isDisabled(rawItem, sectionScope) : false),
-          shouldScrollIntoView: Boolean(
-            itemBuilder?.shouldScrollIntoView ? itemBuilder.shouldScrollIntoView(rawItem, sectionScope) : false
-          ),
           meta: itemBuilder?.getMeta ? itemBuilder.getMeta(rawItem, sectionScope) : undefined,
         };
       });
@@ -199,6 +238,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     const visibleGroupIds = sectionInstanceGroups.filter(g => g.visibleItemIds.length > 0).map(g => g.id);
     const sectionInstance: SectionInstance = {
       id: sectionBlueprint.id,
+      rootSectionId: sectionBlueprint.rootSectionId,
       itemIds: itemInstances?.map(i => i.id) || [],
       groups: sectionInstanceGroups,
       isLoading: Boolean(sectionBuilder?.isLoading ? sectionBuilder.isLoading(sectionScope, rawItems) : false),
@@ -227,6 +267,10 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
 
   asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
     computeSectionVisibility(sectionInstanceRoot, sectionInstanceMap)
+  );
+
+  asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
+    computeItemScrollIntoView(sectionInstanceRoot, itemInstanceMap)
   );
 
   if (Object.keys(itemInstanceMap).length === 0 && Object.keys(sectionInstanceMap).length === 0) {

@@ -44,25 +44,13 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay} = useItemCustomization(blueprint.customization);
 
   const scrollContainer = useRef<ScrollContainerRef>(null);
-  const isScrolledIntoView = useCallback(() => {
-    const boundingClientRect = scrollContainer.current?.getBoundingClientRect();
-    if (!boundingClientRect) {
-      return false;
-    }
-    const elementTop = boundingClientRect.top;
-    const elementBottom = boundingClientRect.bottom;
-    return elementTop < navigatorHeight && elementBottom >= 0;
-  }, [navigatorHeight]);
 
   useEffect(() => {
     if (!itemInstance.shouldScrollIntoView) {
       return;
     }
-    if (isScrolledIntoView()) {
-      return;
-    }
     scrollContainer.current?.scrollIntoView();
-  }, [itemInstance.shouldScrollIntoView, isScrolledIntoView]);
+  }, [itemInstance.shouldScrollIntoView]);
 
   const onClick = useCallback(() => {
     if (instanceHandler && instanceHandler.onClick && !itemInstance.isDisabled) {
@@ -71,7 +59,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   }, [instanceHandler, itemInstance, dispatch]);
 
   return (
-    <ScrollIntoView ref={scrollContainer}>
+    <ScrollIntoView id={itemInstance.id} ref={scrollContainer}>
       <S.ItemContainer
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

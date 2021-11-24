@@ -1,4 +1,5 @@
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
+import navSectionNames from '@constants/navSectionNames';
 
 import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
@@ -11,7 +12,6 @@ import {isUnsavedResource} from '@redux/services/resource';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
-import ResourceKindNameDisplay from './ResourceKindNameDisplay';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSuffix from './ResourceKindSuffix';
 
@@ -29,13 +29,15 @@ export function makeResourceKindNavSection(
   const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
+    rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       return {
         activeResources: Object.values(state.main.resourceMap).filter(
           r =>
             ((state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
               r.filePath.startsWith(PREVIEW_PREFIX)) &&
-            !r.filePath.startsWith(CLUSTER_DIFF_PREFIX)
+            !r.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+            !r.name.startsWith('Patch:')
         ),
         resourceFilter: state.main.resourceFilter,
         selectedResourceId: state.main.selectedResourceId,
@@ -64,15 +66,6 @@ export function makeResourceKindNavSection(
           const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
           return isPassingFilter;
         },
-        shouldScrollIntoView: (rawItem, scope) => {
-          if (rawItem.isHighlighted && scope.selectedPath) {
-            return true;
-          }
-          if (rawItem.isSelected && scope.selectedResourceId) {
-            return true;
-          }
-          return false;
-        },
       },
       instanceHandler: {
         onClick: (itemInstance, dispatch) => {
@@ -83,9 +76,6 @@ export function makeResourceKindNavSection(
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
         contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
-        nameDisplay: {
-          component: ResourceKindNameDisplay,
-        },
       },
     },
   };

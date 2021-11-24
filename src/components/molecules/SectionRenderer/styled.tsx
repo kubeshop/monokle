@@ -103,6 +103,13 @@ export const EmptyDisplayContainer = styled.div<{level: number}>`
   }};
 `;
 
+export const BeforeInitializationContainer = styled.div<{level: number}>`
+  padding-top: 16px;
+  margin-left: ${props => {
+    return `${16 + 8 * props.level}px`;
+  }};
+`;
+
 export const BlankSpace = styled.span<{level?: number}>`
   flex-grow: 1;
   height: 32px;

@@ -13,3 +13,4 @@ export {default as SplitView} from './SplitView';
 export {default as KeyValueInput} from './KeyValueInput';
 export {default as Dots} from './Dots';
 export {default as Spinner} from './Spinner';
+export {default as Icon} from './Icon';

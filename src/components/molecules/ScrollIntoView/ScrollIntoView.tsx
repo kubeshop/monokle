@@ -2,6 +2,7 @@ import React from 'react';
 
 interface ScrollIntoViewProps {
   children: React.ReactNode;
+  id: string;
 }
 
 export type ScrollContainerRef = {
@@ -9,7 +10,7 @@ export type ScrollContainerRef = {
   getBoundingClientRect: () => DOMRect | undefined;
 };
 
-const ScrollIntoView = React.forwardRef(({children}: ScrollIntoViewProps, ref) => {
+const ScrollIntoView = React.forwardRef(({children, id}: ScrollIntoViewProps, ref) => {
   const containerRef = React.useRef<HTMLSpanElement>(null);
   React.useImperativeHandle(ref, () => {
     return {
@@ -22,7 +23,11 @@ const ScrollIntoView = React.forwardRef(({children}: ScrollIntoViewProps, ref) =
     };
   });
 
-  return <span ref={containerRef}>{children}</span>;
+  return (
+    <span id={id} ref={containerRef}>
+      {children}
+    </span>
+  );
 });
 
 export default ScrollIntoView;
