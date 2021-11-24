@@ -1,4 +1,4 @@
-import {ipcRenderer, shell} from 'electron';
+import {ipcRenderer} from 'electron';
 
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
@@ -22,7 +22,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
-import {closeFolderExplorer, openRenameEntityModal, setShouldExpandAllNodes} from '@redux/reducers/ui';
+import {
+  closeFolderExplorer,
+  openCreateFolderModal,
+  openRenameEntityModal,
+  setShouldExpandAllNodes,
+} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {stopPreview} from '@redux/services/preview';
@@ -39,6 +44,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {DeleteEntityCallback, deleteEntity, getFileStats} from '@utils/files';
 import {uniqueArr} from '@utils/index';
+import {showItemInFolder} from '@utils/shell';
 
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
@@ -49,6 +55,7 @@ interface TreeNode {
   title: React.ReactNode;
   children: TreeNode[];
   highlight: boolean;
+  isFolder?: boolean;
   /**
    * Whether the TreeNode has children
    */
@@ -117,6 +124,7 @@ const createNode = (
           return !childEntry.isExcluded;
         });
     }
+    node.isFolder = true;
   } else {
     node.isLeaf = true;
   }
@@ -312,7 +320,9 @@ interface TreeItemProps {
   onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
   onExcludeFromProcessing: (relativePath: string) => void;
   onIncludeToProcessing: (relativePath: string) => void;
+  onCreateFolder: (absolutePath: string) => void;
   isExcluded?: Boolean;
+  isFolder?: Boolean;
 }
 
 function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
@@ -341,6 +351,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onRename,
     onExcludeFromProcessing,
     onIncludeToProcessing,
+    onCreateFolder,
+    isFolder,
   } = props;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -361,18 +373,30 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
 
   const platformFilemanagerNames: {[name: string]: string} = {
-    darwin: 'finder',
+    darwin: 'Finder',
   };
 
-  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'explorer';
+  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
 
   const menu = (
     <Menu>
+      {isFolder ? (
+        <Menu.Item
+          onClick={e => {
+            e.domEvent.stopPropagation();
+
+            onCreateFolder(absolutePath);
+          }}
+          key="create_directory"
+        >
+          New Folder
+        </Menu.Item>
+      ) : null}
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          shell.showItemInFolder(absolutePath);
+          showItemInFolder(absolutePath);
         }}
         key="reveal_in_finder"
       >
@@ -387,7 +411,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         }}
         key="copy_full_path"
       >
-        Copy path
+        Copy Path
       </Menu.Item>
       <Menu.Item
         onClick={e => {
@@ -397,7 +421,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         }}
         key="copy_relative_path"
       >
-        Copy relative path
+        Copy Relative Path
       </Menu.Item>
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
         <>
@@ -759,6 +783,10 @@ const FileTreePane = () => {
     setExpandedKeys(prevState => (prevState.length ? [] : allTreeKeys));
   };
 
+  const onCreateFolder = (absolutePath: string) => {
+    dispatch(openCreateFolderModal(absolutePath));
+  };
+
   return (
     <FileTreeContainer>
       <Row>
@@ -835,6 +863,7 @@ const FileTreePane = () => {
                 onRename={onRename}
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
+                onCreateFolder={onCreateFolder}
                 {...event}
               />
             );

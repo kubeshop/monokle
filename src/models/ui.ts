@@ -48,6 +48,10 @@ export type UiState = {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;
   };
+  createFolderModal: {
+    isOpen: boolean;
+    rootDir: string;
+  };
   renameResourceModal?: {
     isOpen: boolean;
     resourceId: string;
