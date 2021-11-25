@@ -13,3 +13,5 @@ export const REF_PATH_SEPARATOR = '#';
 export const KUSTOMIZATION_KIND = 'Kustomization';
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
+export const ACTIONS_PANE_FOOTER_HEIGHT = 200;
+export const ACTIONS_PANE_TAB_PANE_OFFSET = 106;

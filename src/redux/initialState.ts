@@ -135,6 +135,7 @@ const initialUiState: UiState = {
   paneConfiguration: electronStore.get('ui.paneConfiguration'),
   shouldExpandAllNodes: false,
   resetLayout: false,
+  isActionsPaneFooterExpanded: false,
 };
 
 const initialNavigatorState: NavigatorState = {

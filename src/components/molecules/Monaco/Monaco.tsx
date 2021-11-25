@@ -68,7 +68,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const [containerRef, {width}] = useMeasure<HTMLDivElement>();
+  const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
   const [code, setCode] = useState('');
   const [orgCode, setOrgCode] = useState<string>('');
@@ -246,8 +246,8 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       </S.HiddenInputContainer>
       {firstCodeLoadedOnEditor && (
         <MonacoEditor
-          width={width}
-          height={editorHeight}
+          width={containerWidth}
+          height={containerHeight}
           language="yaml"
           theme={KUBESHOP_MONACO_THEME}
           value={code}

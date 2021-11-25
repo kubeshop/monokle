@@ -20,6 +20,7 @@ const StyledFooter = styled(Footer)`
   background: ${BackgroundColors.darkThemeBackground};
   border-top: ${AppBorders.pageDivider};
   color: ${Colors.grey7};
+  user-select: none;
 `;
 
 const PageFooter = () => {

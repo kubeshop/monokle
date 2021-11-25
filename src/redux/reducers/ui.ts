@@ -165,6 +165,13 @@ export const uiSlice = createSlice({
     setShouldExpandAllNodes: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.shouldExpandAllNodes = action.payload;
     },
+    toggleExpandActionsPaneFooter: (state: Draft<UiState>) => {
+      if (state.isActionsPaneFooterExpanded) {
+        state.isActionsPaneFooterExpanded = false;
+      } else {
+        state.isActionsPaneFooterExpanded = true;
+      }
+    },
   },
   extraReducers: builder => {
     builder
@@ -209,5 +216,6 @@ export const {
   closeRenameEntityModal,
   openCreateFolderModal,
   closeCreateFolderModal,
+  toggleExpandActionsPaneFooter,
 } = uiSlice.actions;
 export default uiSlice.reducer;

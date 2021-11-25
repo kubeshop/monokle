@@ -80,6 +80,7 @@ export type UiState = {
   folderExplorer: {
     isOpen: boolean;
   };
+  isActionsPaneFooterExpanded: boolean;
   monacoEditor: MonacoUiState;
   paneConfiguration: PaneConfiguration;
   shouldExpandAllNodes: boolean;
