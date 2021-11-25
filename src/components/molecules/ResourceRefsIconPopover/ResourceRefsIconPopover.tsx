@@ -8,7 +8,9 @@ import {K8sResource} from '@models/k8sresource';
 
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
-import MonoIcon, {MonoIconTypes} from '@components/atoms/MonoIcon';
+import {Icon} from '@atoms';
+
+import Colors from '@styles/Colors';
 
 import RefsPopoverContent from './RefsPopoverContent';
 
@@ -17,6 +19,10 @@ const StyledIconsContainer = styled.span`
   align-items: center;
   cursor: pointer;
 `;
+
+const baseIconStyle: React.CSSProperties = {
+  fontSize: '14px',
+};
 
 const ResourceRefsIconPopover = (props: {
   resource: K8sResource;
@@ -45,16 +51,10 @@ const ResourceRefsIconPopover = (props: {
 
   const iconType = useMemo(() => {
     if (type === 'incoming') {
-      if (isSelected) {
-        return MonoIconTypes.IncomingRefsBlack;
-      }
-      return MonoIconTypes.IncomingRefs;
+      return 'incomingRefs';
     }
-    if (isSelected) {
-      return MonoIconTypes.OutgoingRefsBlack;
-    }
-    return MonoIconTypes.OutgoingRefs;
-  }, [type, isSelected]);
+    return 'outgoingRefs';
+  }, [type]);
 
   if (!resourceRefs || resourceRefs.length === 0) {
     return null;
@@ -72,19 +72,29 @@ const ResourceRefsIconPopover = (props: {
         <RefsPopoverContent resource={resource} resourceRefs={resourceRefs}>
           {type === 'incoming' ? (
             <>
-              Incoming Links <MonoIcon type={MonoIconTypes.IncomingRefs} />
+              Incoming Links <Icon name="incomingRefs" />
             </>
           ) : (
             <>
-              Outgoing Links <MonoIcon type={MonoIconTypes.OutgoingRefs} />
+              Outgoing Links <Icon name="outgoingRefs" />
             </>
           )}
         </RefsPopoverContent>
       }
     >
       <StyledIconsContainer>
-        <MonoIcon type={iconType} style={type === 'incoming' ? {marginRight: 5} : {marginLeft: 5}} />
-        {hasUnsatisfiedRefs && <MonoIcon type={MonoIconTypes.Warning} style={{marginLeft: 5}} />}
+        <Icon
+          name={iconType}
+          style={type === 'incoming' ? {...baseIconStyle, marginRight: 5} : {...baseIconStyle, marginLeft: 5}}
+          color={isSelected ? Colors.blackPure : Colors.blue10}
+        />
+        {hasUnsatisfiedRefs && (
+          <Icon
+            name="warning"
+            style={{...baseIconStyle, marginLeft: 5}}
+            color={isSelected ? Colors.blackPure : Colors.yellowWarning}
+          />
+        )}
       </StyledIconsContainer>
     </Popover>
   );

@@ -24,6 +24,7 @@ const NetworkPolicyHandler: ResourceKindHandler = {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     await k8sNetworkingV1Api.deleteNamespacedNetworkPolicy(name, namespace || 'default');
   },
+  helpLink: 'https://kubernetes.io/docs/concepts/services-networking/network-policies/',
 };
 
 export default NetworkPolicyHandler;

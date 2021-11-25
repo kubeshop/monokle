@@ -54,6 +54,7 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
       ...SecretTarget,
     },
   ],
+  helpLink: 'https://kubernetes.io/docs/concepts/storage/volumes/',
 };
 
 export default VolumeAttachmentHandler;

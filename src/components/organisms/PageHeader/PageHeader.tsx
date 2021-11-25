@@ -13,6 +13,8 @@ import {
 
 import styled from 'styled-components';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
@@ -228,27 +230,27 @@ const PageHeader = () => {
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
           <SettingsCol span={12}>
-            <Tooltip title={DocumentationTooltip} placement="bottomRight">
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
               <IconContainerSpan>
                 <QuestionCircleOutlined size={24} onClick={openDocumentation} />
               </IconContainerSpan>
             </Tooltip>
-            <Tooltip title={DiscordTooltip} placement="bottomRight">
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiscordTooltip} placement="bottomRight">
               <IconContainerSpan onClick={openDiscord}>
                 <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer', marginBottom: '4px'}} />
               </IconContainerSpan>
             </Tooltip>
-            <Tooltip title={GitHubTooltip} placement="bottomRight">
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={GitHubTooltip} placement="bottomRight">
               <IconContainerSpan>
                 <GithubOutlined size={24} onClick={openGitHub} />
               </IconContainerSpan>
             </Tooltip>
-            <Tooltip title={SettingsTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
               <IconContainerSpan>
                 <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
               </IconContainerSpan>
             </Tooltip>
-            <Tooltip title={NotificationsTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
               <IconContainerSpan>
                 <StyledBellOutlined onClick={toggleNotificationsDrawer} />
               </IconContainerSpan>

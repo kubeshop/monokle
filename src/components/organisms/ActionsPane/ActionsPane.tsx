@@ -2,10 +2,19 @@ import React, {useCallback, useEffect, useState} from 'react';
 
 import {Button, Col, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 
-import {ArrowLeftOutlined, ArrowRightOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+
+import path from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
+import {
+  AddResourceToExistingFileTooltip,
+  ApplyFileTooltip,
+  ApplyTooltip,
+  DiffTooltip,
+  SaveResourceToNewFileTooltip,
+  SaveUnsavedResourceTooltip,
+} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 
@@ -14,6 +23,7 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {performResourceDiff} from '@redux/thunks/diffResource';
@@ -31,17 +41,23 @@ import Icon from '@components/atoms/Icon';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {openExternalResourceKindDocumentation} from '@utils/shell';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 import {
   ActionsPaneContainer,
   DiffButton,
   RightButtons,
   SaveButton,
+  StyledExtraRightButton,
   StyledLeftArrowButton,
   StyledRightArrowButton,
   StyledSkeleton,
   StyledTabs,
   TitleBarContainer,
 } from './ActionsPane.styled';
+import {OpenExternalDocumentationTooltip} from './tooltips';
 
 const {TabPane} = Tabs;
 
@@ -96,41 +112,55 @@ const ActionsPane = (props: {contentHeight: string}) => {
   );
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    ({filePath}) => {
-      if (!filePath) {
+    ({existingFilePath}) => {
+      if (!existingFilePath) {
         return;
       }
-      onSelect(filePath);
+      onSelect(existingFilePath);
     },
     {
+      title: `Add Resource ${selectedResource?.name} to file`,
       acceptedFileExtensions: ['.yaml'],
+      action: 'open',
     }
   );
 
   const {openFileExplorer: openDirectoryExplorer, fileExplorerProps: directoryExplorerProps} = useFileExplorer(
-    ({folderPath}) => {
-      if (!folderPath) {
+    ({saveFilePath}) => {
+      if (!saveFilePath) {
         return;
       }
-      onSelect(folderPath);
+      onSelect(saveFilePath);
     },
     {
-      isDirectoryExplorer: true,
+      acceptedFileExtensions: ['.yaml'],
+      title: `Save Resource ${selectedResource?.name} to file`,
+      defaultPath: path.join(
+        getRootFolder(fileMap) || '',
+        `${selectedResource?.name}-${selectedResource?.kind.toLowerCase()}.yaml`
+      ),
+      action: 'save',
     }
   );
+
+  const resourceKindDocumentation = selectedResource && getResourceKindHandler(selectedResource.kind);
 
   const getSaveButtonMenu = useCallback(
     () => (
       <Menu>
         <Menu.Item key="to-existing-file">
-          <Button onClick={() => openFileExplorer()} type="text">
-            To existing file
-          </Button>
+          <Tooltip title={AddResourceToExistingFileTooltip}>
+            <Button onClick={() => openFileExplorer()} type="text">
+              To existing file..
+            </Button>
+          </Tooltip>
         </Menu.Item>
         <Menu.Item key="to-directory">
-          <Button onClick={() => openDirectoryExplorer()} type="text">
-            To new file in directory
-          </Button>
+          <Tooltip title={SaveResourceToNewFileTooltip}>
+            <Button onClick={() => openDirectoryExplorer()} type="text">
+              To new file..
+            </Button>
+          </Tooltip>
         </Menu.Item>
       </Menu>
     ),
@@ -304,11 +334,27 @@ const ActionsPane = (props: {contentHeight: string}) => {
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
-
       <ActionsPaneContainer>
         <Row>
           <Col span={24}>
-            <StyledTabs defaultActiveKey="source" activeKey={key} onChange={k => setKey(k)}>
+            <StyledTabs
+              defaultActiveKey="source"
+              activeKey={key}
+              onChange={k => setKey(k)}
+              tabBarExtraContent={
+                selectedResource && resourceKindDocumentation?.helpLink ? (
+                  <Tooltip title={OpenExternalDocumentationTooltip}>
+                    <StyledExtraRightButton
+                      onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
+                      type="link"
+                      ghost
+                    >
+                      See {selectedResource?.kind} documentation <BookOutlined />
+                    </StyledExtraRightButton>
+                  </Tooltip>
+                ) : null
+              }
+            >
               <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />

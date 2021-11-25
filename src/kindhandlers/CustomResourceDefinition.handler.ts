@@ -24,6 +24,7 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
     await k8sExtensionsV1Api.deleteCustomResourceDefinition(name);
   },
+  helpLink: 'https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/',
 };
 
 export default CustomResourceDefinitionHandler;

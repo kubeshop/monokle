@@ -27,6 +27,7 @@ const DaemonSetHandler: ResourceKindHandler = {
     await k8sAppV1Api.deleteNamespacedDaemonSet(name, namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
+  helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/',
 };
 
 export default DaemonSetHandler;

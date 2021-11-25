@@ -37,3 +37,9 @@ export function openUniqueObjectNameTopic() {
 export function openNamespaceTopic() {
   shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#rfc-1035-label-names');
 }
+
+export function openExternalResourceKindDocumentation(resourceKindDocLink?: string) {
+  if (resourceKindDocLink) {
+    shell.openExternal(resourceKindDocLink);
+  }
+}

@@ -5,6 +5,7 @@ import {useEffect} from 'react';
 export type DirectoryOptions = {
   isDirectoryExplorer: true;
   defaultPath?: string;
+  title?: string;
 };
 
 export type FileOptions = {
@@ -12,6 +13,8 @@ export type FileOptions = {
   allowMultiple?: boolean;
   acceptedFileExtensions?: string[];
   defaultPath?: string;
+  title?: string;
+  action?: 'save' | 'open';
 };
 
 export type FileExplorerOptions = DirectoryOptions | FileOptions;
@@ -29,11 +32,22 @@ const FileExplorer = (props: FileExplorerProps) => {
   useEffect(() => {
     if (isOpen) {
       onOpen();
-      ipcRenderer.invoke('select-file', options).then(files => {
-        if (files) {
-          onSelect(files);
-        }
-      });
+
+      // @ts-ignore
+      if (options?.action === 'save') {
+        ipcRenderer.invoke('save-file', options).then(file => {
+          if (file) {
+            console.log(`Saving file to ${file}`);
+            onSelect([file]);
+          }
+        });
+      } else {
+        ipcRenderer.invoke('select-file', options).then(files => {
+          if (files) {
+            onSelect(files);
+          }
+        });
+      }
     }
   }, [isOpen, options, onOpen, onSelect]);
 
