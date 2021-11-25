@@ -114,11 +114,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
   );
 
   const {openFileExplorer: openDirectoryExplorer, fileExplorerProps: directoryExplorerProps} = useFileExplorer(
-    ({newFilePath}) => {
-      if (!newFilePath) {
+    ({saveFilePath}) => {
+      if (!saveFilePath) {
         return;
       }
-      onSelect(newFilePath);
+      onSelect(saveFilePath);
     },
     {
       acceptedFileExtensions: ['.yaml'],

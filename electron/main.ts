@@ -42,6 +42,7 @@ import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog
 import {setAppRehydrating} from '@redux/reducers/main';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
+import {FileExplorerOptions} from '@atoms/FileExplorer';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -75,11 +76,11 @@ ipcMain.on('run-kustomize', (event, cmdOptions: any) => {
   runKustomize(cmdOptions.folder, cmdOptions.kustomizeCommand, event);
 });
 
-ipcMain.handle('select-file', async (event, options: any) => {
+ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
   return selectFileDialog(event, options);
 });
 
-ipcMain.handle('save-file', async (event, options: any) => {
+ipcMain.handle('save-file', async (event, options: FileExplorerOptions) => {
   return saveFileDialog(event, options);
 });
 

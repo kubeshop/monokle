@@ -8,7 +8,8 @@ import {FileExplorerOptions, FileExplorerProps} from '@atoms/FileExplorer';
 type FileExplorerSelectResult = {
   existingFilePath?: string;
   filePaths?: string[];
-  newFilePath?: string;
+  saveFilePath?: string;
+  folderPath?: string;
 };
 
 export const useFileExplorer = (onSelect: (result: FileExplorerSelectResult) => void, options: FileExplorerOptions) => {
@@ -20,7 +21,7 @@ export const useFileExplorer = (onSelect: (result: FileExplorerSelectResult) => 
       setIsOpen(false);
       if (options?.isDirectoryExplorer) {
         onSelect({
-          newFilePath: fileList[0],
+          folderPath: fileList[0],
         });
         return;
       }
@@ -32,7 +33,7 @@ export const useFileExplorer = (onSelect: (result: FileExplorerSelectResult) => 
       }
       if (options?.action === 'save') {
         onSelect({
-          newFilePath: fileList[0],
+          saveFilePath: fileList[0],
         });
       } else {
         onSelect({
