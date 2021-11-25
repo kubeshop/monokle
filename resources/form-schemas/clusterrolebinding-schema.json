@@ -20,7 +20,8 @@
     "roleRef": {
       "properties": {
         "kind": {
-          "type": "string"
+          "type": "string",
+          "enum": ["Role", "ClusterRole"]
         },
         "name": {
           "type": "string"

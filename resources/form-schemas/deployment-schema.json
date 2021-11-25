@@ -107,10 +107,11 @@
                               "type": "string"
                             },
                             "valueFrom": {
-                              "type": "object",
+                              "type": ["object"],
+                              "default": null,
                               "properties": {
                                 "secretKeyRef": {
-                                  "type": "object",
+                                  "type": ["object"],
                                   "properties": {
                                     "name": {
                                       "type": "string"
@@ -181,7 +182,7 @@
                         "type": "string"
                       },
                       "hostPath": {
-                        "type": "object",
+                        "type": ["object", "null"],
                         "properties": {
                           "path": {
                             "type": "string"

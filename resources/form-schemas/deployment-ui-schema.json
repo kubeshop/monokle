@@ -5,19 +5,16 @@
     "selector": {
       "ui:title": "Selector",
       "matchLabels": {
-        "ui:title": "Match Labels",
-        "ui:help": "Lorem ipsum dolor sid amed"
+        "ui:title": "Match Labels"
       }
     },
     "replicas": {
-      "ui:title": "Replicas",
-      "ui:help": "Lorem ipsum dolor sid amed"
+      "ui:title": "Replicas"
     },
     "strategy": {
       "ui:title": "Strategy",
       "type": {
-        "ui:title": "Type",
-        "ui:help": "Lorem ipsum dolor sid amed"
+        "ui:title": "Type"
       }
     },
     "template": {
@@ -25,8 +22,7 @@
       "metadata": {
         "ui:title": "Metadata",
         "labels": {
-          "ui:title": "Labels",
-          "ui:help": "Lorem ipsum dolor sid amed"
+          "ui:title": "Labels"
         }
       },
       "spec": {
@@ -35,23 +31,19 @@
           "ui:title": "Containers",
           "items": {
             "name": {
-              "ui:title": "Name",
-              "ui:help": "Lorem ipsum dolor sid amed"
+              "ui:title": "Name"
             },
             "image": {
-              "ui:title": "Image",
-              "ui:help": "Lorem ipsum dolor sid amed"
+              "ui:title": "Image"
             },
             "ports": {
               "ui:title": "Ports",
               "items": {
                 "name": {
-                  "ui:title": "Name",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Name"
                 },
                 "containerPort": {
-                  "ui:title": "Container Port",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Container Port"
                 }
               }
             },
@@ -59,23 +51,19 @@
               "limits": {
                 "ui:title": "Limits",
                 "memory": {
-                  "ui:title": "Memory",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Memory"
                 },
                 "cpu": {
-                  "ui:title": "CPU",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "CPU"
                 }
               },
               "requests": {
                 "ui:title": "Requests",
                 "memory": {
-                  "ui:title": "Memory",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Memory"
                 },
                 "cpu": {
-                  "ui:title": "CPU",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "CPU"
                 }
               }
             },
@@ -83,24 +71,20 @@
               "ui:title": "Environments",
               "items": {
                 "name": {
-                  "ui:title": "Name",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Name"
                 },
                 "value": {
-                  "ui:title": "Value",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Value"
                 },
                 "valueFrom": {
                   "ui:title": "Value From",
                   "secretKeyRef": {
                     "ui:title": "Secret Key Ref",
                     "name": {
-                      "ui:title": "Name",
-                      "ui:help": "Lorem ipsum dolor sid amed"
+                      "ui:title": "Name"
                     },
                     "key": {
-                      "ui:title": "Key",
-                      "ui:help": "Lorem ipsum dolor sid amed"
+                      "ui:title": "Key"
                     }
                   }
                 }
@@ -110,73 +94,61 @@
               "ui:title": "Volume Mounts",
               "items": {
                 "name": {
-                  "ui:title": "Name",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Name"
                 },
                 "mountPath": {
-                  "ui:title": "Mounth Path",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Mounth Path"
                 },
                 "readOnly": {
-                  "ui:title": "Read Only",
-                  "ui:help": "Lorem ipsum dolor sid amed"
+                  "ui:title": "Read Only"
                 }
               }
             },
             "command": {
               "ui:title": "Commands",
               "items": {
-                "ui:title": "Command",
-                "ui:help": "Lorem ipsum dolor sid amed"
+                "ui:title": "Command"
               }
             },
             "imagePullPolicy": {
-              "ui:title": "Image Pull Policy",
-              "ui:help": "Lorem ipsum dolor sid amed"
+              "ui:title": "Image Pull Policy"
             }
           }
         },
         "securityContext": {
           "ui:title": "Security Context",
           "runAsNonRoot": {
-            "ui:title": "Run as Non Root",
-            "ui:help": "Lorem ipsum dolor sid amed"
+            "ui:title": "Run as Non Root"
           }
         },
         "serviceAccountName": {
-          "ui:title": "Service Account Name",
-          "ui:help": "Lorem ipsum dolor sid amed"
+          "ui:title": "Service Account Name"
         },
         "volumes": {
           "ui:title": "Volumes",
           "items": {
             "emptyDir": {
-              "ui:title": "Empty Dir",
-              "ui:help": "Lorem ipsum dolor sid amed"
+              "ui:title": "Empty Dir"
             },
             "name": {
-              "ui:title": "Name",
-              "ui:help": "Lorem ipsum dolor sid amed"
+              "ui:title": "Name"
             },
             "hostPath": {
               "ui:title": "Host Path",
               "path": {
-                "ui:title": "Path",
-                "ui:help": "Lorem ipsum dolor sid amed"
+                "ui:title": "Path"
               }
             }
           }
         },
         "terminationGracePeriodSeconds": {
-          "ui:title": "Termination Grace Period Seconds",
-          "ui:help": "Lorem ipsum dolor sid amed"
+          "ui:title": "Termination Grace Period Seconds"
         },
         "imagePullSecrets": {
           "ui:title": "Image Pull Secrets",
           "items": {
             "name": {
-              "ui:title": "Name",
-              "ui:help": "Lorem ipsum dolor sid amed"
+              "ui:title": "Name"
             }
           }
         }

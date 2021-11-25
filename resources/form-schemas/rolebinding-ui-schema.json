@@ -4,32 +4,27 @@
     "ui:title": "Object subjects",
     "items": {
       "kind": {
-        "ui:title": "Kind",
-        "ui:help": "Lorem ipsum dolor sid amed"
+        "ui:title": "Kind"
       },
       "name": {
-        "ui:title": "Name",
-        "ui:help": "Lorem ipsum dolor sid amed"
+        "ui:title": "Name"
       },
       "apiGroup": {
-        "ui:title": "API Group",
-        "ui:help": "Lorem ipsum dolor sid amed"
+        "ui:title": "API Group"
       }
     }
   },
   "roleRef": {
     "ui:title": "Object subjects",
     "kind": {
-      "ui:title": "Kind",
-      "ui:help": "Lorem ipsum dolor sid amed"
+      "ui:title": "Kind"
     },
     "name": {
       "ui:title": "Name",
-      "ui:help": "Lorem ipsum dolor sid amed"
+      "ui:help": "This must match the name of the Role or ClusterRole you wish to bind to"
     },
     "apiGroup": {
-      "ui:title": "API Group",
-      "ui:help": "Lorem ipsum dolor sid amed"
+      "ui:title": "API Group"
     }
   }
 }
