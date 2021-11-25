@@ -39,6 +39,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
 import AppContext from '@src/AppContext';
+import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import * as S from './ActionsPane.styled';
@@ -77,7 +78,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const dispatch = useAppDispatch();
 
   const editorTabPaneHeight = useMemo(() => {
-    const defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
+    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
+    if (!featureFlags.ActionsPaneFooter) {
+      defaultHeight += 20;
+    }
     if (isActionsPaneFooterExpanded) {
       return defaultHeight - ACTIONS_PANE_FOOTER_HEIGHT;
     }
@@ -365,7 +369,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
             )}
           </S.Tabs>
         </S.TabsContainer>
-        <ActionsPaneFooter />
+        {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}
       </S.ActionsPaneContainer>
     </>
   );

@@ -2,5 +2,6 @@
   "ShowGraphView": false,
   "ShowClusterView": true,
   "ShowRightMenu": false,
-  "PluginManager": false
+  "PluginManager": false,
+  "ActionsPaneFooter": false
 }
