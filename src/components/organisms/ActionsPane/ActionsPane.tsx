@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 
 import {Button, Col, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 
-import {ArrowLeftOutlined, ArrowRightOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ApplyFileTooltip, ApplyTooltip, DiffTooltip, SaveUnsavedResourceTooltip} from '@constants/tooltips';
@@ -30,6 +30,10 @@ import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
+
+import {openExternalResourceKindDocumentation} from '@utils/shell';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {
   ActionsPaneContainer,
@@ -108,6 +112,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
       isDirectoryExplorer: true,
     }
   );
+
+  const resourceKindDocumentation = selectedResource && getResourceKindHandler(selectedResource.kind);
 
   const getSaveButtonMenu = useCallback(
     () => (
@@ -291,11 +297,25 @@ const ActionsPane = (props: {contentHeight: string}) => {
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
-
       <ActionsPaneContainer>
         <Row>
           <Col span={24}>
-            <StyledTabs defaultActiveKey="source" activeKey={key} onChange={k => setKey(k)}>
+            <StyledTabs
+              defaultActiveKey="source"
+              activeKey={key}
+              onChange={k => setKey(k)}
+              tabBarExtraContent={
+                selectedResource && resourceKindDocumentation?.helpLink ? (
+                  <Button
+                    onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
+                    type="link"
+                    ghost
+                  >
+                    See {selectedResource?.kind} documentation <BookOutlined />
+                  </Button>
+                ) : null
+              }
+            >
               <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <StyledSkeleton active />

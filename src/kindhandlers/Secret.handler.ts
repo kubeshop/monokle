@@ -32,6 +32,7 @@ const SecretHandler: ResourceKindHandler = {
       target: {kind: 'ServiceAccount', pathParts: ['metadata', 'name']},
     },
   ],
+  helpLink: 'https://kubernetes.io/docs/concepts/configuration/secret/',
 };
 
 export default SecretHandler;

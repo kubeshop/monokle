@@ -27,12 +27,13 @@ interface RefMapper {
   matchPairs?: boolean;
 }
 
+export type ResourceKind = string;
 interface ResourceKindHandler {
   /**
    * The kubernetes kind of this resource
    */
 
-  kind: string;
+  kind: ResourceKind;
 
   /**
    * a standard matcher for selecting resources of this kind
@@ -51,6 +52,12 @@ interface ResourceKindHandler {
    */
 
   description: string;
+
+  /**
+   * An external link to documentation
+   */
+
+  helpLink?: string;
 
   /**
    * Retrieve the specified resource of this type using the provided kubeconfig

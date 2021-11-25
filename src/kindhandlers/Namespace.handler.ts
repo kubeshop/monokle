@@ -24,6 +24,7 @@ const NamespaceHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     await k8sCoreV1Api.deleteNamespace(name);
   },
+  helpLink: 'https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/',
 };
 
 export default NamespaceHandler;

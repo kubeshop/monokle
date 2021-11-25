@@ -24,6 +24,7 @@ const ConfigMapHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     await k8sCoreV1Api.deleteNamespacedConfigMap(name, namespace || 'default');
   },
+  helpLink: 'https://kubernetes.io/docs/concepts/configuration/configmap/',
 };
 
 export default ConfigMapHandler;
