@@ -9,6 +9,10 @@
       "ui:title": "Type",
       "ui:help": "Lorem ipsum dolor sid amed"
     },
+    "externalName": {
+      "ui:title": "External Name",
+      "ui:help": "Lorem ipsum dolor sid amed"
+    },
     "ports": {
       "ui:title": "Ports",
       "items": {

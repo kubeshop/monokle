@@ -15,7 +15,7 @@
           }
         },
         "replicas": {
-          "type": "string"
+          "type": "number"
         },
         "strategy": {
           "type": "object",
@@ -63,7 +63,7 @@
                               "type": "string"
                             },
                             "containerPort": {
-                              "type": "string"
+                              "type": "number"
                             }
                           }
                         }
