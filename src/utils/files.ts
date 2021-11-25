@@ -96,22 +96,17 @@ export async function renameEntity(
   }
 }
 
-export interface CreateFolderCallback {
-  rootDir: string;
-  entityName: string;
-  err: NodeJS.ErrnoException | null;
-}
-export interface CreateFileCallback {
+export interface CreateEntityCallback {
   rootDir: string;
   entityName: string;
   err: NodeJS.ErrnoException | null;
 }
 
-export function createFolder(rootDir: string, folderName: string, callback: (args: CreateFolderCallback) => any) {
+export function createFolder(rootDir: string, folderName: string, callback: (args: CreateEntityCallback) => any) {
   return fs.mkdir(`${rootDir}${path.sep}${folderName}`, err => callback({rootDir, entityName: folderName, err}));
 }
 
-export function createFile(rootDir: string, fileName: string, callback: (args: CreateFileCallback) => any) {
+export function createFile(rootDir: string, fileName: string, callback: (args: CreateEntityCallback) => any) {
   return fs.writeFile(`${rootDir}${path.sep}${fileName}`, '', {}, err =>
     callback({rootDir, entityName: fileName, err})
   );

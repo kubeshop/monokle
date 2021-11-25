@@ -49,7 +49,7 @@ export type UiState = {
     defaultInput?: NewResourceWizardInput;
     absolutePath?: string;
   };
-  createFolderModal: {
+  createEntityModal: {
     isOpen: boolean;
     rootDir: string;
     type: string;

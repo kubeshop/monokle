@@ -11,13 +11,13 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeCreateFolderModal} from '@redux/reducers/ui';
 
-import {CreateFileCallback, CreateFolderCallback, checkIfEntityExists, createFile, createFolder} from '@utils/files';
+import {CreateEntityCallback, checkIfEntityExists, createFile, createFolder} from '@utils/files';
 import {useFocus} from '@utils/hooks';
 
 const prohibitedFirstSymbols = ['/', '\\'];
 
-const CreateFolderModal: React.FC = () => {
-  const uiState = useAppSelector(state => state.ui.createFolderModal);
+const CreateEntityModal: React.FC = () => {
+  const uiState = useAppSelector(state => state.ui.createEntityModal);
 
   const dispatch = useAppDispatch();
 
@@ -35,7 +35,7 @@ const CreateFolderModal: React.FC = () => {
     }
   };
 
-  const onCreate = (args: CreateFolderCallback | CreateFileCallback) => {
+  const onCreate = (args: CreateEntityCallback) => {
     const {entityName, err} = args;
 
     if (err) {
@@ -135,4 +135,4 @@ const CreateFolderModal: React.FC = () => {
   );
 };
 
-export default CreateFolderModal;
+export default CreateEntityModal;

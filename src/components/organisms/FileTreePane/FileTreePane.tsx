@@ -24,7 +24,7 @@ import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConf
 import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
-  openCreateFolderModal,
+  openCreateEntityModal,
   openNewResourceWizard,
   openRenameEntityModal,
   setShouldExpandAllNodes,
@@ -819,11 +819,11 @@ const FileTreePane = () => {
   };
 
   const onCreateFolder = (absolutePath: string) => {
-    dispatch(openCreateFolderModal({rootDir: absolutePath, type: 'folder'}));
+    dispatch(openCreateEntityModal({rootDir: absolutePath, type: 'folder'}));
   };
 
   const onCreateFile = (absolutePath: string) => {
-    dispatch(openCreateFolderModal({rootDir: absolutePath, type: 'file'}));
+    dispatch(openCreateEntityModal({rootDir: absolutePath, type: 'file'}));
   };
 
   return (
