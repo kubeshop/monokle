@@ -25,16 +25,17 @@
                 "type": "string"
               },
               "protocol": {
-                "type": "string"
+                "type": "string",
+                "enum": ["TCP", "UDP", "SCTP"]
               },
               "port": {
-                "type": "string"
+                "type": "number"
               },
               "targetPort": {
-                "type": "string"
+                "type": "number"
               },
               "nodePort": {
-                "type": "string"
+                "type": "number"
               }
             }
           }

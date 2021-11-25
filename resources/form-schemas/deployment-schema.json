@@ -17,6 +17,15 @@
         "replicas": {
           "type": "string"
         },
+        "strategy": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["Recreate", "RollingUpdate"]
+            }
+          }
+        },
         "template": {
           "type": "object",
           "properties": {
@@ -140,7 +149,8 @@
                         }
                       },
                       "imagePullPolicy": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": ["Always", "IfNotPresent", "Never"]
                       }
                     }
                   }
