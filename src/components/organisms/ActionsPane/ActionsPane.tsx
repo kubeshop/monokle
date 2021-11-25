@@ -1,17 +1,23 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 
-import {Button, Col, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
+import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
-import {TOOLTIP_DELAY} from '@constants/constants';
+import {
+  ACTIONS_PANE_FOOTER_HEIGHT,
+  ACTIONS_PANE_TAB_PANE_OFFSET,
+  NAVIGATOR_HEIGHT_OFFSET,
+  TOOLTIP_DELAY,
+} from '@constants/constants';
 import {
   AddResourceToExistingFileTooltip,
   ApplyFileTooltip,
   ApplyTooltip,
   DiffTooltip,
+  OpenExternalDocumentationTooltip,
   SaveResourceToNewFileTooltip,
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
@@ -43,26 +49,18 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
+import AppContext from '@src/AppContext';
+import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {
-  ActionsPaneContainer,
-  DiffButton,
-  RightButtons,
-  SaveButton,
-  StyledExtraRightButton,
-  StyledLeftArrowButton,
-  StyledRightArrowButton,
-  StyledSkeleton,
-  StyledTabs,
-  TitleBarContainer,
-} from './ActionsPane.styled';
-import {OpenExternalDocumentationTooltip} from './tooltips';
+import * as S from './ActionsPane.styled';
+import ActionsPaneFooter from './ActionsPaneFooter';
 
 const {TabPane} = Tabs;
 
 const isSupportedResourceKind = (selectedResource: K8sResource | undefined): boolean => {
   if (selectedResource) {
+    console.log(selectedResource.kind);
     return ['ConfigMap', 'Role', 'ClusterRole', 'RoleBinding', 'ClusterRoleBinding', 'Deployment', 'Service'].includes(
       selectedResource.kind
     );
@@ -72,6 +70,10 @@ const isSupportedResourceKind = (selectedResource: K8sResource | undefined): boo
 
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
+
+  const {windowSize} = useContext(AppContext);
+  const windowHeight = windowSize.height;
+  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
@@ -92,8 +94,20 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const previewType = useAppSelector(state => state.main.previewType);
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
+  const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
+
+  const editorTabPaneHeight = useMemo(() => {
+    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
+    if (!featureFlags.ActionsPaneFooter) {
+      defaultHeight += 20;
+    }
+    if (isActionsPaneFooterExpanded) {
+      return defaultHeight - ACTIONS_PANE_FOOTER_HEIGHT;
+    }
+    return defaultHeight;
+  }, [contentHeight, isActionsPaneFooterExpanded]);
 
   const onSelect = useCallback(
     (absolutePath: string) => {
@@ -243,7 +257,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (key === 'form' && (!selectedResourceId || isSupportedResourceKind(selectedResource))) {
+    if (key === 'form' && (!selectedResourceId || !isSupportedResourceKind(selectedResource))) {
       setKey('source');
     }
   }, [selectedResourceId, selectedResource, key]);
@@ -262,17 +276,17 @@ const ActionsPane = (props: {contentHeight: string}) => {
         <FileExplorer {...directoryExplorerProps} />
         <MonoPaneTitleCol>
           <MonoPaneTitle>
-            <TitleBarContainer>
+            <S.TitleBarContainer>
               <span>Editor</span>
-              <RightButtons>
-                <StyledLeftArrowButton
+              <S.RightButtons>
+                <S.LeftArrowButton
                   onClick={onClickLeftArrow}
                   disabled={!isLeftArrowEnabled}
                   type="link"
                   size="small"
                   icon={<ArrowLeftOutlined />}
                 />
-                <StyledRightArrowButton
+                <S.RightArrowButton
                   onClick={onClickRightArrow}
                   disabled={!isRightArrowEnabled}
                   type="link"
@@ -283,9 +297,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {isSelectedResourceUnsaved() && (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
                     <Dropdown overlay={getSaveButtonMenu()}>
-                      <SaveButton type="primary" size="small">
+                      <S.SaveButton type="primary" size="small">
                         Save
-                      </SaveButton>
+                      </S.SaveButton>
                     </Dropdown>
                   </Tooltip>
                 )}
@@ -311,7 +325,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   </Button>
                 </Tooltip>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
-                  <DiffButton
+                  <S.DiffButton
                     size="small"
                     type="primary"
                     ghost
@@ -323,72 +337,75 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     }
                   >
                     Diff
-                  </DiffButton>
+                  </S.DiffButton>
                 </Tooltip>
-              </RightButtons>
-            </TitleBarContainer>
+              </S.RightButtons>
+            </S.TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
-      <ActionsPaneContainer>
-        <Row>
-          <Col span={24}>
-            <StyledTabs
-              defaultActiveKey="source"
-              activeKey={key}
-              onChange={k => setKey(k)}
-              tabBarExtraContent={
-                selectedResource && resourceKindDocumentation?.helpLink ? (
-                  <Tooltip title={OpenExternalDocumentationTooltip}>
-                    <StyledExtraRightButton
-                      onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
-                      type="link"
-                      ghost
-                    >
-                      See {selectedResource?.kind} documentation <BookOutlined />
-                    </StyledExtraRightButton>
-                  </Tooltip>
-                ) : null
-              }
+      <S.ActionsPaneContainer $height={navigatorHeight}>
+        <S.TabsContainer>
+          <S.Tabs
+            defaultActiveKey="source"
+            activeKey={key}
+            onChange={k => setKey(k)}
+            tabBarExtraContent={
+              selectedResource && resourceKindDocumentation?.helpLink ? (
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
+                  <S.ExtraRightButton
+                    onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
+                    type="link"
+                    ghost
+                  >
+                    See {selectedResource?.kind} documentation <BookOutlined />
+                  </S.ExtraRightButton>
+                </Tooltip>
+              ) : null
+            }
+          >
+            <TabPane
+              style={{height: editorTabPaneHeight, width: '100%'}}
+              tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}
+              key="source"
             >
-              <TabPane tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>} key="source">
-                {uiState.isFolderLoading || previewLoader.isLoading ? (
-                  <StyledSkeleton active />
-                ) : (
-                  !isClusterDiffVisible &&
-                  (selectedResourceId || selectedPath || selectedValuesFileId) && (
-                    <Monaco
-                      editorHeight={`${parseInt(contentHeight, 10) - 120}`}
-                      applySelection={applySelection}
-                      diffSelectedResource={diffSelectedResource}
-                    />
-                  )
-                )}
-              </TabPane>
-              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
-                {uiState.isFolderLoading || previewLoader.isLoading ? (
-                  <StyledSkeleton active />
-                ) : (
-                  <FormEditor contentHeight={contentHeight} type="metadata" />
-                )}
-              </TabPane>
-              {selectedResource && isSupportedResourceKind(selectedResource) && (
-                <TabPane
-                  tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
-                  disabled={!selectedResourceId}
-                  key="form"
-                >
-                  {uiState.isFolderLoading || previewLoader.isLoading ? (
-                    <StyledSkeleton active />
-                  ) : (
-                    <FormEditor contentHeight={contentHeight} type="resource" />
-                  )}
-                </TabPane>
+              {uiState.isFolderLoading || previewLoader.isLoading ? (
+                <S.Skeleton active />
+              ) : (
+                !isClusterDiffVisible &&
+                (selectedResourceId || selectedPath || selectedValuesFileId) && (
+                  <Monaco
+                    editorHeight={`${parseInt(contentHeight, 10) - 120}`}
+                    applySelection={applySelection}
+                    diffSelectedResource={diffSelectedResource}
+                  />
+                )
               )}
-            </StyledTabs>
-          </Col>
-        </Row>
-      </ActionsPaneContainer>
+            </TabPane>
+            <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
+              {uiState.isFolderLoading || previewLoader.isLoading ? (
+                <S.Skeleton active />
+              ) : (
+                <FormEditor contentHeight={contentHeight} type="metadata" />
+              )}
+            </TabPane>
+            {selectedResource && isSupportedResourceKind(selectedResource) && (
+              <TabPane
+                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
+                disabled={!selectedResourceId}
+                key="form"
+              >
+                {uiState.isFolderLoading || previewLoader.isLoading ? (
+                  <S.Skeleton active />
+                ) : (
+                  <FormEditor contentHeight={contentHeight} type="resource" />
+                )}
+              </TabPane>
+            )}
+          </S.Tabs>
+        </S.TabsContainer>
+        {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}
+      </S.ActionsPaneContainer>
     </>
   );
 };

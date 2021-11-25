@@ -8,7 +8,7 @@ import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {KustomizeCommandType} from '@redux/services/kustomize';
 
-import {FileExplorerOptions} from '@atoms/FileExplorer';
+import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
 import {PROCESS_ENV} from '@utils/env';
 
@@ -69,7 +69,7 @@ export const selectFileDialog = (event: Electron.IpcMainInvokeEvent, options: Fi
  * prompts to select a file using the native dialogs
  */
 
-export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: FileExplorerOptions) => {
+export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: FileOptions) => {
   const browserWindow = BrowserWindow.fromId(event.sender.id);
   let dialogOptions: Electron.SaveDialogSyncOptions = {};
   if (options.acceptedFileExtensions) {

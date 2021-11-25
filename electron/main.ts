@@ -42,7 +42,7 @@ import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog
 import {setAppRehydrating} from '@redux/reducers/main';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
-import {FileExplorerOptions} from '@atoms/FileExplorer';
+import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -80,7 +80,7 @@ ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
   return selectFileDialog(event, options);
 });
 
-ipcMain.handle('save-file', async (event, options: FileExplorerOptions) => {
+ipcMain.handle('save-file', async (event, options: FileOptions) => {
   return saveFileDialog(event, options);
 });
 
