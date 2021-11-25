@@ -1,10 +1,10 @@
-import {Button, Skeleton, Tabs} from 'antd';
+import {Button, Skeleton as RawSkeleton, Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
-import {PaneContainer} from '@atoms';
+import {BackgroundColors} from '@styles/Colors';
 
-export const StyledTabs = styled(Tabs)`
+export const Tabs = styled(RawTabs)`
   overflow: visible;
 
   & .ant-tabs-nav {
@@ -17,8 +17,22 @@ export const StyledTabs = styled(Tabs)`
   }
 `;
 
-export const ActionsPaneContainer = styled(PaneContainer)`
-  height: 100%;
+export const ActionsPaneContainer = styled.div<{$height: number}>`
+  ${props => props.$height && `height: ${props.$height}px;`}
+  width: 100%;
+  background-color: ${BackgroundColors.darkThemeBackground};
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-content: start;
+  align-items: start;
+`;
+
+export const TabsContainer = styled.div`
+  flex-grow: 1;
+  flex-basis: 0;
+  width: 100%;
 `;
 
 export const TitleBarContainer = styled.div`
@@ -41,20 +55,20 @@ export const SaveButton = styled(Button)`
   margin-right: 8px;
 `;
 
-export const StyledSkeleton = styled(Skeleton)`
+export const Skeleton = styled(RawSkeleton)`
   margin: 20px;
   padding: 8px;
   width: 95%;
 `;
 
-export const StyledLeftArrowButton = styled(Button)`
+export const LeftArrowButton = styled(Button)`
   margin-right: 5px;
 `;
 
-export const StyledRightArrowButton = styled(Button)`
+export const RightArrowButton = styled(Button)`
   margin-right: 10px;
 `;
 
-export const StyledExtraRightButton = styled(Button)`
+export const ExtraRightButton = styled(Button)`
   padding: 4px 0px;
 `;
