@@ -5,10 +5,8 @@
       "properties": {
         "selector": {
           "type": "object",
-          "properties": {
-            "app": {
-              "type": "string"
-            }
+          "additionalProperties": {
+            "type": "string"
           }
         },
         "type": {

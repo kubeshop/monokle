@@ -1,0 +1,141 @@
+{
+  "properties": {
+    "spec": {
+      "type": "object",
+      "properties": {
+        "selector": {
+          "type": "object",
+          "properties": {
+            "matchLabels": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "replicas": {
+          "type": "string"
+        },
+        "template": {
+          "type": "object",
+          "properties": {
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "spec": {
+              "type": "object",
+              "properties": {
+                "containers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "ports": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "containerPort": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "resources": {
+                        "type": "object",
+                        "properties": {
+                          "limits": {
+                            "type": "object",
+                            "properties": {
+                              "memory": {
+                                "type": "string"
+                              },
+                              "cpu": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "requests": {
+                            "type": "object",
+                            "properties": {
+                              "memory": {
+                                "type": "string"
+                              },
+                              "cpu": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "env": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "value": {
+                              "type": "string"
+                            },
+                            "valueFrom": {
+                              "type": "object",
+                              "properties": {
+                                "secretKeyRef": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "key": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "imagePullSecrets": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object"
+}

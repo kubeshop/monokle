@@ -1,0 +1,12 @@
+{
+  "ui:title": "Service Properties",
+  "spec": {
+    "ui:title": "Object specs",
+    "selector": {
+      "ui:title": "Selector",
+      "matchLabels": {
+        "ui:title": "Match Labels"
+      }
+    }
+  }
+}

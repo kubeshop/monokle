@@ -3,11 +3,7 @@
   "spec": {
     "ui:title": "Object specs",
     "selector": {
-      "ui:title": "Selector",
-      "app": {
-        "ui:title": "App",
-        "ui:help": "Lorem ipsum dolor sid amed"
-      }
+      "ui:title": "Selector"
     },
     "type": {
       "ui:title": "Type",
