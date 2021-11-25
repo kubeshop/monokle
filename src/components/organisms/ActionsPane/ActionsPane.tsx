@@ -307,13 +307,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
               onChange={k => setKey(k)}
               tabBarExtraContent={
                 selectedResource && resourceKindDocumentation?.helpLink ? (
-                  <StyledExtraRightButton
-                    onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
-                    type="link"
-                    ghost
-                  >
-                    See {selectedResource?.kind} documentation <BookOutlined />
-                  </StyledExtraRightButton>
+                  <Tooltip title="Open Kubernetes documentation for this resource type in external browser">
+                    <StyledExtraRightButton
+                      onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
+                      type="link"
+                      ghost
+                    >
+                      See {selectedResource?.kind} documentation <BookOutlined />
+                    </StyledExtraRightButton>
+                  </Tooltip>
                 ) : null
               }
             >
