@@ -173,7 +173,6 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
 
   useEffect(() => {
     if (selectedResource) {
-      console.log(selectedResource.kind);
       setFormData(selectedResource.content);
       setSchema(getFormSchema(type === 'metadata' ? type : selectedResource.kind));
       setUiSchema(getUiSchema(type === 'metadata' ? type : selectedResource.kind));

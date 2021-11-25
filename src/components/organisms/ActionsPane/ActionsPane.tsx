@@ -61,15 +61,14 @@ import {OpenExternalDocumentationTooltip} from './tooltips';
 
 const {TabPane} = Tabs;
 
-const formSupportedResourceTypes = [
-  'ConfigMap',
-  'Role',
-  'ClusterRole',
-  'RoleBinding',
-  'ClusterRoleBinding',
-  'Deployment',
-  'Service',
-];
+const isSupportedResourceKind = (selectedResource: K8sResource | undefined): boolean => {
+  if (selectedResource) {
+    return ['ConfigMap', 'Role', 'ClusterRole', 'RoleBinding', 'ClusterRoleBinding', 'Deployment', 'Service'].includes(
+      selectedResource.kind
+    );
+  }
+  return false;
+};
 
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
@@ -244,10 +243,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (
-      key === 'form' &&
-      (!selectedResourceId || (selectedResource && !formSupportedResourceTypes.includes(selectedResource.kind)))
-    ) {
+    if (key === 'form' && (!selectedResourceId || isSupportedResourceKind(selectedResource))) {
       setKey('source');
     }
   }, [selectedResourceId, selectedResource, key]);
@@ -376,7 +372,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   <FormEditor contentHeight={contentHeight} type="metadata" />
                 )}
               </TabPane>
-              {selectedResource && selectedResource.kind && formSupportedResourceTypes.includes(selectedResource.kind) && (
+              {selectedResource && isSupportedResourceKind(selectedResource) && (
                 <TabPane
                   tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
                   disabled={!selectedResourceId}
