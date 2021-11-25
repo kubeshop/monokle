@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 
-import {Form, Input, Modal, Select} from 'antd';
+import {Checkbox, Form, Input, Modal, Select} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
@@ -8,8 +8,11 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
-import {createUnsavedResource} from '@redux/services/unsavedResource';
+import {createResource} from '@redux/services/createResource';
 
+import FileExplorer from '@components/atoms/FileExplorer';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
 import {NO_NAMESPACE, useNamespaces} from '@hooks/useNamespaces';
 
 import {useResetFormOnCloseModal} from '@utils/hooks';
@@ -25,6 +28,7 @@ const NewResourceWizard = () => {
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const namespaces = useNamespaces({extra: ['none', 'default']});
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
+  const [shouldSaveToFolder, setShouldSaveState] = useState(true);
   const lastKindRef = useRef<string>();
   const defaultInput = newResourceWizardState.defaultInput;
   const defaultValues = defaultInput
@@ -36,6 +40,19 @@ const NewResourceWizard = () => {
     : undefined;
   const [form] = Form.useForm();
   lastKindRef.current = form.getFieldValue('kind');
+
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (!folderPath) {
+        return '';
+      }
+
+      createResourceProcessing(folderPath);
+    },
+    {
+      isDirectoryExplorer: true,
+    }
+  );
 
   useResetFormOnCloseModal({form, visible: newResourceWizardState.isOpen, defaultValues});
 
@@ -50,6 +67,7 @@ const NewResourceWizard = () => {
   }, [resourceMap]);
 
   const closeWizard = () => {
+    setShouldSaveState(true);
     dispatch(closeNewResourceWizard());
   };
 
@@ -103,21 +121,33 @@ const NewResourceWizard = () => {
       return;
     }
 
+    if (shouldSaveToFolder) {
+      openFileExplorer();
+    } else {
+      createResourceProcessing();
+
+      closeWizard();
+    }
+  };
+
+  const createResourceProcessing = (parentFolder?: string) => {
+    const formValues = form.getFieldsValue();
+
     const selectedResource =
-      data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE
-        ? resourceMap[data.selectedResourceId]
+      formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
+        ? resourceMap[formValues.selectedResourceId]
         : undefined;
     const jsonTemplate = selectedResource?.content;
 
-    createUnsavedResource(
+    createResource(
       {
-        name: data.name,
-        kind: data.kind,
-        namespace: data.namespace === NO_NAMESPACE ? undefined : data.namespace,
-        apiVersion: data.apiVersion,
+        name: formValues.name,
+        kind: formValues.kind,
+        namespace: formValues.namespace === NO_NAMESPACE ? undefined : formValues.namespace,
+        apiVersion: formValues.apiVersion,
       },
       dispatch,
-      jsonTemplate
+      {jsonTemplate, parentFolder}
     );
 
     closeWizard();
@@ -204,7 +234,13 @@ const NewResourceWizard = () => {
             ))}
           </Select>
         </Form.Item>
+        <Form.Item>
+          <Checkbox onChange={e => setShouldSaveState(e.target.checked)} checked={shouldSaveToFolder}>
+            Save to folder
+          </Checkbox>
+        </Form.Item>
       </Form>
+      <FileExplorer {...fileExplorerProps} />
     </Modal>
   );
 };

@@ -7,6 +7,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {addResource, selectK8sResource} from '@redux/reducers/main';
 import {AppDispatch} from '@redux/store';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `
@@ -19,13 +20,17 @@ metadata:
 }
 
 /**
- * Creates an unsaved Resource which will have it's filePath set as unsaved://resourceId
+ * Creates a saved or unsaved Resource which will have its filePath set as unsaved://resourceId if it's unsaved
  */
-export function createUnsavedResource(
+export function createResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
   dispatch: AppDispatch,
-  jsonTemplate?: any
+  config: {
+    parentFolder?: string;
+    jsonTemplate?: any;
+  }
 ) {
+  const {parentFolder, jsonTemplate} = config;
   const newResourceId = uuidv4();
   let newResourceText: string;
   let newResourceContent: any;
@@ -59,7 +64,17 @@ export function createUnsavedResource(
     text: newResourceText,
     content: newResourceContent,
   };
-
   dispatch(addResource(newResource));
   dispatch(selectK8sResource({resourceId: newResource.id}));
+
+  if (parentFolder) {
+    dispatch(
+      saveUnsavedResource({
+        resourceId: newResource.id,
+        absolutePath: parentFolder,
+        newResource,
+        isNewResourceProvided: true,
+      })
+    );
+  }
 }
