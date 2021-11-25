@@ -13,6 +13,10 @@
       },
       "verbs": {
         "ui:title": "Verbs",
+        "ui:widget": "checkboxes",
+        "ui:options": {
+          "inline": true
+        },
         "ui:help": "Lorem ipsum dolor sid amed"
       }
     }

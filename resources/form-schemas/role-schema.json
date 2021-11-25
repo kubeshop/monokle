@@ -18,9 +18,11 @@
           },
           "verbs": {
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": ["create", "get", "list", "watch", "update", "patch", "delete"]
             },
-            "type": "array"
+            "type": "array",
+            "uniqueItems": true
           }
         }
       },
