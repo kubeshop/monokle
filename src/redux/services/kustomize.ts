@@ -88,6 +88,8 @@ function processKustomizationResourceRef(
       // resource is file -> check for contained resources
       linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
     }
+  } else {
+    createFileRef(kustomization, refNode, kpath, fileMap);
   }
 }
 
