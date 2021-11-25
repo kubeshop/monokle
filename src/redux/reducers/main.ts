@@ -125,6 +125,7 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   async (shouldIgnore: boolean, thunkAPI) => {
     electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
     thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
+    thunkAPI.dispatch(mainSlice.actions.reprocessAllResources());
   }
 );
 
@@ -292,6 +293,13 @@ export const mainSlice = createSlice({
         log.error(e);
         return original(state);
       }
+    },
+    /**
+     * Reprocess all resources - called when changing processing-related options
+     */
+    reprocessAllResources: (state: Draft<AppState>) => {
+      const resourceIds = Object.values(state.resourceMap).map(r => r.id);
+      reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
     },
     /**
      * Updates the content of the specified resource to the specified value
@@ -905,5 +913,6 @@ export const {
   unselectClusterDiffMatch,
   unselectAllClusterDiffMatches,
   reloadClusterDiff,
+  reprocessAllResources,
 } = mainSlice.actions;
 export default mainSlice.reducer;

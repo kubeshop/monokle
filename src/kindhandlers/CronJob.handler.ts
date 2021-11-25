@@ -27,6 +27,7 @@ const CronJobHandler: ResourceKindHandler = {
     await k8sBatchV1Api.deleteNamespacedCronJob(name, namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
+  helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/',
 };
 
 export default CronJobHandler;

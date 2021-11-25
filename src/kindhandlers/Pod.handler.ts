@@ -27,6 +27,7 @@ const PodHandler: ResourceKindHandler = {
     await k8sCoreV1Api.deleteNamespacedPod(name, namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
+  helpLink: 'https://kubernetes.io/docs/concepts/workloads/pods/',
 };
 
 export default PodHandler;

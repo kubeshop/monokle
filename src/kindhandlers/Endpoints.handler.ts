@@ -35,6 +35,7 @@ const EndpointsHandler: ResourceKindHandler = {
       },
     },
   ],
+  helpLink: 'https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#endpoints-v1-core',
 };
 
 export default EndpointsHandler;
