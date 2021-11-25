@@ -58,14 +58,19 @@ import ActionsPaneFooter from './ActionsPaneFooter';
 
 const {TabPane} = Tabs;
 
+const formSupportedResourceKinds = [
+  'ConfigMap',
+  'Role',
+  'ClusterRole',
+  'RoleBinding',
+  'ClusterRoleBinding',
+  'Deployment',
+  'Service',
+  'Secret',
+];
+
 const isSupportedResourceKind = (selectedResource: K8sResource | undefined): boolean => {
-  if (selectedResource) {
-    console.log(selectedResource.kind);
-    return ['ConfigMap', 'Role', 'ClusterRole', 'RoleBinding', 'ClusterRoleBinding', 'Deployment', 'Service'].includes(
-      selectedResource.kind
-    );
-  }
-  return false;
+  return selectedResource ? formSupportedResourceKinds.includes(selectedResource.kind) : false;
 };
 
 const ActionsPane = (props: {contentHeight: string}) => {
