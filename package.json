@@ -115,7 +115,7 @@
     "redux": "4.1.2",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.4.0",
-    "reselect": "4.1.1",
+    "reselect": "4.1.2",
     "shell-path": "2.1.0",
     "shelljs": "0.8.4",
     "strip-ansi": "6.0.1",
