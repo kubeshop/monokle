@@ -3,6 +3,8 @@ import {useSelector} from 'react-redux';
 
 import {Select} from 'antd';
 
+import {uniq} from 'lodash';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
@@ -45,9 +47,11 @@ export const NamespaceSelection = ({value, onChange}: any) => {
   useEffect(() => {
     if (resourceMap) {
       setNamespaces(
-        Object.values(resourceMap)
-          .map((resource: K8sResource) => resource.namespace)
-          .filter(namespace => namespace && namespace !== 'default')
+        uniq(
+          Object.values(resourceMap)
+            .map((resource: K8sResource) => resource.namespace)
+            .filter(namespace => namespace && namespace !== 'default')
+        )
       );
     } else {
       setNamespaces([]);
