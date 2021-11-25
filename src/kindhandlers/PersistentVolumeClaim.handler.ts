@@ -35,6 +35,7 @@ const PersistentVolumeClaimHandler: ResourceKindHandler = {
       },
     },
   ],
+  helpLink: 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/#expanding-persistent-volumes-claims',
 };
 
 export default PersistentVolumeClaimHandler;

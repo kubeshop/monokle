@@ -40,6 +40,7 @@ import {
   DiffButton,
   RightButtons,
   SaveButton,
+  StyledExtraRightButton,
   StyledLeftArrowButton,
   StyledRightArrowButton,
   StyledSkeleton,
@@ -306,13 +307,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
               onChange={k => setKey(k)}
               tabBarExtraContent={
                 selectedResource && resourceKindDocumentation?.helpLink ? (
-                  <Button
+                  <StyledExtraRightButton
                     onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
                     type="link"
                     ghost
                   >
                     See {selectedResource?.kind} documentation <BookOutlined />
-                  </Button>
+                  </StyledExtraRightButton>
                 ) : null
               }
             >

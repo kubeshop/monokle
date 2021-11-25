@@ -55,6 +55,7 @@ const ServiceHandler: ResourceKindHandler = {
     createSelectorOutgoingRefMappers('ReplicationController'),
     createSelectorOutgoingRefMappers('StatefulSet'),
   ],
+  helpLink: 'https://kubernetes.io/docs/concepts/services-networking/service/',
 };
 
 export default ServiceHandler;

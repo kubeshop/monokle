@@ -54,3 +54,7 @@ export const StyledLeftArrowButton = styled(Button)`
 export const StyledRightArrowButton = styled(Button)`
   margin-right: 10px;
 `;
+
+export const StyledExtraRightButton = styled(Button)`
+  padding: 4px 0px;
+`;

@@ -27,6 +27,7 @@ const JobHandler: ResourceKindHandler = {
     await k8sBatchV1Api.deleteNamespacedJob(name, namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
+  helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/job/',
 };
 
 export default JobHandler;
