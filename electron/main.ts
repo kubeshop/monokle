@@ -38,10 +38,11 @@ import terminal from '../cli/terminal';
 import {downloadPlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
-import {checkNewVersion, runHelm, runKustomize, selectFile} from '@root/electron/commands';
+import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
 import {setAppRehydrating} from '@redux/reducers/main';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
+import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -75,8 +76,12 @@ ipcMain.on('run-kustomize', (event, cmdOptions: any) => {
   runKustomize(cmdOptions.folder, cmdOptions.kustomizeCommand, event);
 });
 
-ipcMain.handle('select-file', async (event, options: any) => {
-  return selectFile(event, options);
+ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
+  return selectFileDialog(event, options);
+});
+
+ipcMain.handle('save-file', async (event, options: FileOptions) => {
+  return saveFileDialog(event, options);
 });
 
 ipcMain.on('run-helm', (event, args: any) => {
@@ -186,7 +191,7 @@ export const createWindow = (givenPath?: string) => {
 
     if (missingDependencies.includes('kustomize') && isUserAbleToRunKubectlKustomize) {
       missingDependencies.splice(indexOf(missingDependencies, 'kustomize'), 1);
-      
+
     }
 
     if (missingDependencies.length > 0) {
