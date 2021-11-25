@@ -2,22 +2,9 @@ import {ipcRenderer} from 'electron';
 
 import {useEffect} from 'react';
 
-export type DirectoryOptions = {
-  isDirectoryExplorer: true;
-  defaultPath?: string;
-  title?: string;
-};
+import log from 'loglevel';
 
-export type FileOptions = {
-  isDirectoryExplorer?: false;
-  allowMultiple?: boolean;
-  acceptedFileExtensions?: string[];
-  defaultPath?: string;
-  title?: string;
-  action?: 'save' | 'open';
-};
-
-export type FileExplorerOptions = DirectoryOptions | FileOptions;
+import {FileExplorerOptions} from './FileExplorerOptions';
 
 export type FileExplorerProps = {
   isOpen: boolean;
@@ -37,7 +24,7 @@ const FileExplorer = (props: FileExplorerProps) => {
       if (options?.action === 'save') {
         ipcRenderer.invoke('save-file', options).then(file => {
           if (file) {
-            console.log(`Saving file to ${file}`);
+            log.info(`Saving file to ${file}`);
             onSelect([file]);
           }
         });
