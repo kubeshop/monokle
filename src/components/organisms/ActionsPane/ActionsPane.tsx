@@ -47,6 +47,7 @@ import {
   StyledTabs,
   TitleBarContainer,
 } from './ActionsPane.styled';
+import {OpenExternalDocumentationTooltip} from './tooltips';
 
 const {TabPane} = Tabs;
 
@@ -307,7 +308,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
               onChange={k => setKey(k)}
               tabBarExtraContent={
                 selectedResource && resourceKindDocumentation?.helpLink ? (
-                  <Tooltip title="Open Kubernetes documentation for this resource type in external browser">
+                  <Tooltip title={OpenExternalDocumentationTooltip}>
                     <StyledExtraRightButton
                       onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
                       type="link"
