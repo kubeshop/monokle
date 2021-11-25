@@ -10,7 +10,6 @@ import {AlertEnum, AlertType} from '@models/alert';
 
 import {addResource} from '@redux/reducers/main';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isUnsavedResource} from '@redux/services/resource';
 import {AppDispatch, RootState} from '@redux/store';
 
 import {getFileStats, getFileTimestamp, isSubDirectory} from '@utils/files';
@@ -59,83 +58,82 @@ export const saveUnsavedResource = createAsyncThunk<
     );
   }
 
-  if (!resource || !isUnsavedResource(resource)) {
+  if (!resource) {
     return createRejectionWithAlert(thunkAPI, 'Resource Save Failed', 'Could not find the resource.');
   }
 
   const pathStats = getFileStats(absolutePath);
+
+  // new file?
   if (pathStats === undefined) {
-    return createRejectionWithAlert(thunkAPI, 'Resource Save Failed', 'Could not load stats for selected path');
-  }
+    await writeFilePromise(absolutePath, resource.text);
+  } else {
+    const isDirectory = pathStats.isDirectory();
 
-  const isDirectory = pathStats.isDirectory();
-  let absoluteFilePath = absolutePath;
-
-  /** if the absolute path is a directory, we will use the resource.name to create a new fileName */
-  if (isDirectory) {
-    const fileName = `${resource.name}-${resource.kind.toLowerCase()}.yaml`;
-    absoluteFilePath = path.join(absolutePath, fileName);
-  }
-
-  if (path.extname(absoluteFilePath) !== '.yaml') {
-    return createRejectionWithAlert(
-      thunkAPI,
-      'Resource Save Failed',
-      'The selected file does not have .yaml extension.'
-    );
-  }
-
-  if (fs.existsSync(absoluteFilePath)) {
-    const rootFileEntry = mainState.fileMap[ROOT_FILE_ENTRY];
-    if (!rootFileEntry) {
-      return createRejectionWithAlert(thunkAPI, 'Resource Save Failed', 'Could not find the root folder.');
+    /** if the absolute path is a directory, we will use the resource.name to create a new fileName */
+    if (isDirectory) {
+      const fileName = `${resource.name}-${resource.kind.toLowerCase()}.yaml`;
+      absolutePath = path.join(absolutePath, fileName);
     }
 
-    const fileContent = await readFilePromise(absoluteFilePath, 'utf-8');
-    const relativeFilePath = absoluteFilePath.substr(mainState.fileMap[ROOT_FILE_ENTRY].filePath.length);
-    const resourcesFromFile = getResourcesForPath(relativeFilePath, mainState.resourceMap);
-
-    if (resourcesFromFile.length === 1) {
-      thunkAPI.dispatch(
-        addResource({
-          ...resourcesFromFile[0],
-          range: {
-            start: 0,
-            length: fileContent.length,
-          },
-        })
+    if (path.extname(absolutePath) !== '.yaml') {
+      return createRejectionWithAlert(
+        thunkAPI,
+        'Resource Save Failed',
+        'The selected file does not have .yaml extension.'
       );
     }
 
-    let contentToAppend = resource.text;
-    if (fileContent.trim().length > 0) {
-      if (fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
-        contentToAppend = `\n${resource.text}`;
-      } else {
-        contentToAppend = `\n${YAML_DOCUMENT_DELIMITER}\n${resource.text}`;
+    if (fs.existsSync(absolutePath)) {
+      const rootFileEntry = mainState.fileMap[ROOT_FILE_ENTRY];
+      if (!rootFileEntry) {
+        return createRejectionWithAlert(thunkAPI, 'Resource Save Failed', 'Could not find the root folder.');
       }
+
+      const fileContent = await readFilePromise(absolutePath, 'utf-8');
+      const relativeFilePath = absolutePath.substr(mainState.fileMap[ROOT_FILE_ENTRY].filePath.length);
+      const resourcesFromFile = getResourcesForPath(relativeFilePath, mainState.resourceMap);
+
+      if (resourcesFromFile.length === 1) {
+        thunkAPI.dispatch(
+          addResource({
+            ...resourcesFromFile[0],
+            range: {
+              start: 0,
+              length: fileContent.length,
+            },
+          })
+        );
+      }
+
+      let contentToAppend = resource.text;
+      if (fileContent.trim().length > 0) {
+        if (fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
+          contentToAppend = `\n${resource.text}`;
+        } else {
+          contentToAppend = `\n${YAML_DOCUMENT_DELIMITER}\n${resource.text}`;
+        }
+      }
+
+      resourceRange = {
+        start: fileContent.length,
+        length: contentToAppend.length,
+      };
+
+      await appendFilePromise(absolutePath, contentToAppend);
     }
-
-    resourceRange = {
-      start: fileContent.length,
-      length: contentToAppend.length,
-    };
-
-    await appendFilePromise(absoluteFilePath, contentToAppend);
-  } else {
-    await writeFilePromise(absoluteFilePath, resource.text);
   }
 
-  const fileTimestamp = getFileTimestamp(absoluteFilePath);
+  const fileTimestamp = getFileTimestamp(absolutePath);
 
   return {
     resourceId,
-    resourceFilePath: absoluteFilePath,
+    resourceFilePath: absolutePath,
     resourceRange,
     fileTimestamp,
     alert: {
       title: 'Resource Saved',
-      message: `Saved resource to ${absoluteFilePath}`,
+      message: `Saved resource to ${absolutePath}`,
       type: AlertEnum.Success,
     },
   };
