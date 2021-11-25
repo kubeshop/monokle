@@ -71,12 +71,15 @@ export const uiSlice = createSlice({
     },
     openNewResourceWizard: (
       state: Draft<UiState>,
-      action: PayloadAction<{defaultInput?: NewResourceWizardInput} | undefined>
+      action: PayloadAction<{defaultInput?: NewResourceWizardInput; absolutePath?: string} | undefined>
     ) => {
       state.newResourceWizard.isOpen = true;
       electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
       if (action.payload && action.payload.defaultInput) {
         state.newResourceWizard.defaultInput = action.payload.defaultInput;
+      }
+      if (action.payload && action.payload.absolutePath) {
+        state.newResourceWizard.absolutePath = action.payload.absolutePath;
       }
     },
     closeNewResourceWizard: (state: Draft<UiState>) => {

@@ -7,8 +7,10 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {addResource, selectK8sResource} from '@redux/reducers/main';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 
 import {NO_NAMESPACE, useNamespaces} from '@hooks/useNamespaces';
 
@@ -109,16 +111,27 @@ const NewResourceWizard = () => {
         : undefined;
     const jsonTemplate = selectedResource?.content;
 
-    createUnsavedResource(
+    const unsavedResource: K8sResource = createUnsavedResource(
       {
         name: data.name,
         kind: data.kind,
         namespace: data.namespace === NO_NAMESPACE ? undefined : data.namespace,
         apiVersion: data.apiVersion,
       },
-      dispatch,
       jsonTemplate
     );
+
+    if (newResourceWizardState.absolutePath) {
+      dispatch(
+        saveUnsavedResource({
+          resourceId: unsavedResource.id,
+          absolutePath: newResourceWizardState.absolutePath,
+          providedResource: unsavedResource,
+        })
+      );
+    }
+    dispatch(addResource(unsavedResource));
+    dispatch(selectK8sResource({resourceId: unsavedResource.id}));
 
     closeWizard();
   };

@@ -25,6 +25,7 @@ import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
   openCreateFolderModal,
+  openNewResourceWizard,
   openRenameEntityModal,
   setShouldExpandAllNodes,
 } from '@redux/reducers/ui';
@@ -361,6 +362,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [isTitleHovered, setTitleHoverState] = useState(false);
+  const dispatch = useAppDispatch();
 
   const isFileSelected = useMemo(() => {
     return treeKey === selectedPath;
@@ -417,6 +419,22 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         Reveal in {platformFilemanagerName}
       </Menu.Item>
       <ContextMenuDivider />
+      {!isFolder && (
+        <>
+          <Menu.Item
+            onClick={e => {
+              e.domEvent.stopPropagation();
+
+              dispatch(openNewResourceWizard({absolutePath}));
+            }}
+            key="add_new_resource"
+          >
+            Add New Resource
+          </Menu.Item>
+          <ContextMenuDivider />
+        </>
+      )}
+
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();

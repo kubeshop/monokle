@@ -47,6 +47,7 @@ export type UiState = {
   newResourceWizard: {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;
+    absolutePath?: string;
   };
   createFolderModal: {
     isOpen: boolean;

@@ -5,9 +5,6 @@ import {UNSAVED_PREFIX} from '@constants/constants';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {addResource, selectK8sResource} from '@redux/reducers/main';
-import {AppDispatch} from '@redux/store';
-
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `
 apiVersion: ${input.apiVersion ? input.apiVersion : 'v1'}
@@ -23,9 +20,8 @@ metadata:
  */
 export function createUnsavedResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
-  dispatch: AppDispatch,
   jsonTemplate?: any
-) {
+): K8sResource {
   const newResourceId = uuidv4();
   let newResourceText: string;
   let newResourceContent: any;
@@ -60,6 +56,5 @@ export function createUnsavedResource(
     content: newResourceContent,
   };
 
-  dispatch(addResource(newResource));
-  dispatch(selectK8sResource({resourceId: newResource.id}));
+  return newResource;
 }
