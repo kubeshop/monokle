@@ -37,7 +37,7 @@ export const runKustomize = (folder: string, kustomizeCommand: KustomizeCommandT
  * prompts to select a file using the native dialogs
  */
 
-export const selectFile = (event: Electron.IpcMainInvokeEvent, options: any) => {
+export const selectFileDialog = (event: Electron.IpcMainInvokeEvent, options: any) => {
   const browserWindow = BrowserWindow.fromId(event.sender.id);
   let dialogOptions: Electron.OpenDialogSyncOptions = {};
   if (options.isDirectoryExplorer) {
@@ -51,6 +51,8 @@ export const selectFile = (event: Electron.IpcMainInvokeEvent, options: any) => 
     }
   }
 
+  dialogOptions.properties?.push('createDirectory');
+
   if (options.defaultPath) {
     dialogOptions.defaultPath = options.defaultPath;
   }
@@ -59,6 +61,33 @@ export const selectFile = (event: Electron.IpcMainInvokeEvent, options: any) => 
     return dialog.showOpenDialogSync(browserWindow, dialogOptions);
   }
   return dialog.showOpenDialogSync(dialogOptions);
+};
+
+/**
+ * prompts to select a file using the native dialogs
+ */
+
+export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: any) => {
+  const browserWindow = BrowserWindow.fromId(event.sender.id);
+  let dialogOptions: Electron.SaveDialogSyncOptions = {};
+  if (options.acceptedFileExtensions) {
+    dialogOptions.filters = [{name: 'Files', extensions: options.acceptedFileExtensions}];
+  }
+
+  dialogOptions.properties?.push('createDirectory');
+
+  if (options.defaultPath) {
+    dialogOptions.defaultPath = options.defaultPath;
+  }
+
+  if (options.title) {
+    dialogOptions.title = options.title;
+  }
+
+  if (browserWindow) {
+    return dialog.showSaveDialogSync(browserWindow, dialogOptions);
+  }
+  return dialog.showSaveDialogSync(dialogOptions);
 };
 
 /**

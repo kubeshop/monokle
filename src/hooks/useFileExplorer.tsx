@@ -6,9 +6,9 @@ import {getRootFolder} from '@redux/services/fileEntry';
 import {FileExplorerOptions, FileExplorerProps} from '@atoms/FileExplorer';
 
 type FileExplorerSelectResult = {
-  filePath?: string;
+  existingFilePath?: string;
   filePaths?: string[];
-  folderPath?: string;
+  newFilePath?: string;
 };
 
 export const useFileExplorer = (onSelect: (result: FileExplorerSelectResult) => void, options: FileExplorerOptions) => {
@@ -20,7 +20,7 @@ export const useFileExplorer = (onSelect: (result: FileExplorerSelectResult) => 
       setIsOpen(false);
       if (options?.isDirectoryExplorer) {
         onSelect({
-          folderPath: fileList[0],
+          newFilePath: fileList[0],
         });
         return;
       }
@@ -30,9 +30,15 @@ export const useFileExplorer = (onSelect: (result: FileExplorerSelectResult) => 
         });
         return;
       }
-      onSelect({
-        filePath: fileList[0],
-      });
+      if (options?.action === 'save') {
+        onSelect({
+          newFilePath: fileList[0],
+        });
+      } else {
+        onSelect({
+          existingFilePath: fileList[0],
+        });
+      }
     },
     [setIsOpen, onSelect, options]
   );
