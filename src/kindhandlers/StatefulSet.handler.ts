@@ -27,6 +27,7 @@ const StatefulSetHandler: ResourceKindHandler = {
     await k8sAppV1Api.deleteNamespacedStatefulSet(name, namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
+  helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/',
 };
 
 export default StatefulSetHandler;

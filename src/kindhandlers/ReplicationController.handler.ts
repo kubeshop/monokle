@@ -27,6 +27,7 @@ const ReplicationControllerHandler: ResourceKindHandler = {
     await k8sCoreV1Api.deleteNamespacedReplicationController(name, namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
+  helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/',
 };
 
 export default ReplicationControllerHandler;

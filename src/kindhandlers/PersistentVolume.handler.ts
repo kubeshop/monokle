@@ -58,6 +58,7 @@ const PersistentVolumeHandler: ResourceKindHandler = {
       ...SecretTarget,
     },
   ],
+  helpLink: 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/',
 };
 
 export default PersistentVolumeHandler;

@@ -40,12 +40,14 @@ import {
   DiffButton,
   RightButtons,
   SaveButton,
+  StyledExtraRightButton,
   StyledLeftArrowButton,
   StyledRightArrowButton,
   StyledSkeleton,
   StyledTabs,
   TitleBarContainer,
 } from './ActionsPane.styled';
+import {OpenExternalDocumentationTooltip} from './tooltips';
 
 const {TabPane} = Tabs;
 
@@ -306,13 +308,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
               onChange={k => setKey(k)}
               tabBarExtraContent={
                 selectedResource && resourceKindDocumentation?.helpLink ? (
-                  <Button
-                    onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
-                    type="link"
-                    ghost
-                  >
-                    See {selectedResource?.kind} documentation <BookOutlined />
-                  </Button>
+                  <Tooltip title={OpenExternalDocumentationTooltip}>
+                    <StyledExtraRightButton
+                      onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
+                      type="link"
+                      ghost
+                    >
+                      See {selectedResource?.kind} documentation <BookOutlined />
+                    </StyledExtraRightButton>
+                  </Tooltip>
                 ) : null
               }
             >

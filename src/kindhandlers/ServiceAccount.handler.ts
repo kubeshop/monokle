@@ -30,6 +30,7 @@ const ServiceAccountHandler: ResourceKindHandler = {
       target: {kind: 'Secret', pathParts: ['metadata', 'name']},
     },
   ],
+  helpLink: 'https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/',
 };
 
 export default ServiceAccountHandler;

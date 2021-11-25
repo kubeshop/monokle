@@ -24,6 +24,7 @@ const RoleHandler: ResourceKindHandler = {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
     await k8sRbacV1Api.deleteNamespacedRole(name, namespace || 'default');
   },
+  helpLink: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole',
 };
 
 export default RoleHandler;

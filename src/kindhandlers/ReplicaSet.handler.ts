@@ -27,6 +27,7 @@ const ReplicaSetHandler: ResourceKindHandler = {
     await k8sAppV1Api.deleteNamespacedReplicaSet(name, namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
+  helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/',
 };
 
 export default ReplicaSetHandler;

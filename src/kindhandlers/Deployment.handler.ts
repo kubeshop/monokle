@@ -27,6 +27,7 @@ const DeploymentHandler: ResourceKindHandler = {
     await k8sAppV1Api.deleteNamespacedDeployment(name, namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
+  helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/deployment/',
 };
 
 export default DeploymentHandler;
