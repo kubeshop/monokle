@@ -17,6 +17,8 @@ import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selector
 import {loadResource} from '@redux/services';
 import {mergeManifests} from '@redux/services/manifest-utils';
 
+import {NamespaceSelection} from './FormWidgets';
+
 const Form = withTheme(AntDTheme);
 
 /**
@@ -190,7 +192,16 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
 
   return (
     <FormContainer contentHeight={contentHeight}>
-      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={onFormUpdate} disabled={isInPreviewMode}>
+      <Form
+        schema={schema}
+        uiSchema={uiSchema}
+        formData={formData}
+        onChange={onFormUpdate}
+        widgets={{
+          namespaceSelection: NamespaceSelection,
+        }}
+        disabled={isInPreviewMode}
+      >
         <div />
       </Form>
     </FormContainer>
