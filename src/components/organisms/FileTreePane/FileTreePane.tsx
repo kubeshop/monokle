@@ -321,6 +321,7 @@ interface TreeItemProps {
   onExcludeFromProcessing: (relativePath: string) => void;
   onIncludeToProcessing: (relativePath: string) => void;
   onCreateFolder: (absolutePath: string) => void;
+  onCreateFile: (absolutePath: string) => void;
   isExcluded?: Boolean;
   isFolder?: Boolean;
 }
@@ -352,6 +353,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onExcludeFromProcessing,
     onIncludeToProcessing,
     onCreateFolder,
+    onCreateFile,
     isFolder,
   } = props;
 
@@ -390,6 +392,18 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           key="create_directory"
         >
           New Folder
+        </Menu.Item>
+      ) : null}
+      {isFolder ? (
+        <Menu.Item
+          onClick={e => {
+            e.domEvent.stopPropagation();
+
+            onCreateFile(absolutePath);
+          }}
+          key="create_file"
+        >
+          New File
         </Menu.Item>
       ) : null}
       <Menu.Item
@@ -787,7 +801,11 @@ const FileTreePane = () => {
   };
 
   const onCreateFolder = (absolutePath: string) => {
-    dispatch(openCreateFolderModal(absolutePath));
+    dispatch(openCreateFolderModal({rootDir: absolutePath, type: 'folder'}));
+  };
+
+  const onCreateFile = (absolutePath: string) => {
+    dispatch(openCreateFolderModal({rootDir: absolutePath, type: 'file'}));
   };
 
   return (
@@ -867,6 +885,7 @@ const FileTreePane = () => {
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
                 onCreateFolder={onCreateFolder}
+                onCreateFile={onCreateFile}
                 {...event}
               />
             );

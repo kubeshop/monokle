@@ -109,15 +109,17 @@ export const uiSlice = createSlice({
         resourceId: action.payload,
       };
     },
-    openCreateFolderModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    openCreateFolderModal: (state: Draft<UiState>, action: PayloadAction<{type: string; rootDir: string}>) => {
       state.createFolderModal = {
         isOpen: true,
-        rootDir: action.payload,
+        type: action.payload.type,
+        rootDir: action.payload.rootDir,
       };
     },
     closeCreateFolderModal: (state: Draft<UiState>) => {
       state.createFolderModal = {
         isOpen: false,
+        type: '',
         rootDir: '',
       };
     },

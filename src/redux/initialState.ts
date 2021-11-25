@@ -95,6 +95,7 @@ const initialUiState: UiState = {
   createFolderModal: {
     isOpen: false,
     rootDir: '',
+    type: '',
   },
   renameResourceModal: {
     isOpen: false,

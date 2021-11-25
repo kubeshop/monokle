@@ -51,6 +51,7 @@ export type UiState = {
   createFolderModal: {
     isOpen: boolean;
     rootDir: string;
+    type: string;
   };
   renameResourceModal?: {
     isOpen: boolean;

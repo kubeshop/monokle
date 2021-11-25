@@ -11,7 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeCreateFolderModal} from '@redux/reducers/ui';
 
-import {CreateFolderCallback, checkIfEntityExists, createFolder} from '@utils/files';
+import {CreateFileCallback, CreateFolderCallback, checkIfEntityExists, createFile, createFolder} from '@utils/files';
 import {useFocus} from '@utils/hooks';
 
 const prohibitedFirstSymbols = ['/', '\\'];
@@ -28,11 +28,15 @@ const CreateFolderModal: React.FC = () => {
   const onFinish = (values: {folderName: string}) => {
     const {folderName} = values;
 
-    createFolder(uiState.rootDir, folderName, onCreate);
+    if (uiState.type === 'folder') {
+      createFolder(uiState.rootDir, folderName, onCreate);
+    } else {
+      createFile(uiState.rootDir, folderName, onCreate);
+    }
   };
 
-  const onCreate = (args: CreateFolderCallback) => {
-    const {folderName, err} = args;
+  const onCreate = (args: CreateFolderCallback | CreateFileCallback) => {
+    const {entityName, err} = args;
 
     if (err) {
       dispatch(
@@ -45,8 +49,8 @@ const CreateFolderModal: React.FC = () => {
     } else {
       dispatch(
         setAlert({
-          title: 'Successfully created a folder',
-          message: `You have successfully created the "${folderName}" folder`,
+          title: 'Successfully created',
+          message: `You have successfully created the "${entityName}"`,
           type: AlertEnum.Success,
         })
       );
@@ -71,7 +75,7 @@ const CreateFolderModal: React.FC = () => {
 
   return (
     <Modal
-      title="Create folder"
+      title={`Create ${uiState.type === 'folder' ? 'folder' : 'file'}`}
       visible={uiState?.isOpen}
       onCancel={() => {
         dispatch(closeCreateFolderModal());
@@ -98,7 +102,7 @@ const CreateFolderModal: React.FC = () => {
     >
       <Form layout="vertical" form={createFolderForm} initialValues={{directoryName: ''}} onFinish={onFinish}>
         <Form.Item
-          label="Folder name"
+          label={`${uiState.type === 'folder' ? 'Folder' : 'File'} name`}
           name="folderName"
           rules={[
             ({getFieldValue}) => ({
