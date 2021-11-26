@@ -177,7 +177,8 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
       }
     } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
       const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
-      if (getFileStats(filePath)?.isDirectory() === false) {
+      const fileStats = getFileStats(filePath);
+      if (fileStats && fileStats.isFile()) {
         newCode = fs.readFileSync(filePath, 'utf8');
       }
     }

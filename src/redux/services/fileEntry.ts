@@ -443,9 +443,6 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
 export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect?: PathRemovalSideEffect) {
   log.info(`removing file ${fileEntry.filePath}`);
   getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(resource => {
-    if (state.selectedResourceId === resource.id) {
-      updateSelectionAndHighlights(state, resource);
-    }
     if (removalSideEffect) {
       removalSideEffect.removedResources.push(resource);
     }
@@ -491,6 +488,9 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
   if (state.selectedPath && !state.fileMap[state.selectedPath]) {
     state.selectedPath = undefined;
     clearResourceSelections(state.resourceMap);
+  } else if (state.selectedResourceId && !state.resourceMap[state.selectedResourceId]) {
+    state.selectedResourceId = undefined;
+    clearResourceSelections(state.resourceMap);
   }
 
   // remove from parent
@@ -503,7 +503,13 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
     }
   }
 
-  reprocessResources([], state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
-    resourceKinds: removalSideEffect.removedResources.map(r => r.kind),
-  });
+  reprocessResources(
+    Object.values(state.resourceMap).map(r => r.id),
+    state.resourceMap,
+    state.fileMap,
+    state.resourceRefsProcessingOptions,
+    {
+      resourceKinds: removalSideEffect.removedResources.map(r => r.kind),
+    }
+  );
 }
