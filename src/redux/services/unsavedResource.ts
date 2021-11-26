@@ -19,7 +19,7 @@ metadata:
 }
 
 /**
- * Creates an unsaved Resource which will have it's filePath set as unsaved://resourceId
+ * Creates an unsaved Resource which will have its filePath set as unsaved://resourceId
  */
 export function createUnsavedResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
@@ -59,7 +59,8 @@ export function createUnsavedResource(
     text: newResourceText,
     content: newResourceContent,
   };
-
   dispatch(addResource(newResource));
   dispatch(selectK8sResource({resourceId: newResource.id}));
+
+  return newResource;
 }

@@ -1,14 +1,19 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Form, Input, Modal, Select} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
+
+import path from 'path/posix';
+
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 
 import {NO_NAMESPACE, useNamespaces} from '@hooks/useNamespaces';
 
@@ -17,14 +22,21 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
+import {SaveToFolderWrapper, StyledCheckbox, StyledSelect} from './NewResourceWizard.styled';
+
 const SELECT_OPTION_NONE = '<none>';
+
+const {Option} = Select;
 
 const NewResourceWizard = () => {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const namespaces = useNamespaces({extra: ['none', 'default']});
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
+  const [shouldSaveToFolder, setShouldSaveState] = useState(true);
+  const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const lastKindRef = useRef<string>();
   const defaultInput = newResourceWizardState.defaultInput;
   const defaultValues = defaultInput
@@ -103,24 +115,72 @@ const NewResourceWizard = () => {
       return;
     }
 
+    createResourceProcessing();
+
+    closeWizard();
+  };
+
+  const getFullFileName = (filename: string) => {
+    if (filename.endsWith('.yaml') || filename.endsWith('.yml')) {
+      return filename;
+    }
+
+    return `${filename}.yaml`;
+  };
+
+  const createResourceProcessing = () => {
+    const formValues = form.getFieldsValue();
+
     const selectedResource =
-      data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE
-        ? resourceMap[data.selectedResourceId]
+      formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
+        ? resourceMap[formValues.selectedResourceId]
         : undefined;
     const jsonTemplate = selectedResource?.content;
 
-    createUnsavedResource(
+    const newResource = createUnsavedResource(
       {
-        name: data.name,
-        kind: data.kind,
-        namespace: data.namespace === NO_NAMESPACE ? undefined : data.namespace,
-        apiVersion: data.apiVersion,
+        name: formValues.name,
+        kind: formValues.kind,
+        namespace: formValues.namespace === NO_NAMESPACE ? undefined : formValues.namespace,
+        apiVersion: formValues.apiVersion,
       },
       dispatch,
       jsonTemplate
     );
 
+    const fullFileName = getFullFileName(formValues.name);
+
+    if (shouldSaveToFolder) {
+      setTimeout(() => {
+        dispatch(
+          saveUnsavedResource({
+            resourceId: newResource.id,
+            absolutePath:
+              selectedFolder === ROOT_FILE_ENTRY
+                ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName)
+                : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, path.sep, fullFileName),
+          })
+        );
+      }, 500);
+    }
+
     closeWizard();
+  };
+
+  const foldersList = useMemo(
+    () =>
+      Object.entries(fileMap)
+        .map(([key, value]) => ({folderName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
+        .filter(file => file.isFolder),
+    [fileMap]
+  );
+
+  const renderSelectOptions = () => {
+    return foldersList.map(folder => (
+      <Option key={folder.folderName} value={folder.folderName}>
+        {folder.folderName}
+      </Option>
+    ));
   };
 
   return (
@@ -204,6 +264,21 @@ const NewResourceWizard = () => {
             ))}
           </Select>
         </Form.Item>
+        {fileMap[ROOT_FILE_ENTRY] ? (
+          <SaveToFolderWrapper>
+            <StyledCheckbox onChange={e => setShouldSaveState(e.target.checked)} checked={shouldSaveToFolder}>
+              Save to folder
+            </StyledCheckbox>
+            <StyledSelect
+              showSearch
+              disabled={!shouldSaveToFolder}
+              onChange={(value: any) => setSelectedFolder(value)}
+              value={selectedFolder}
+            >
+              {renderSelectOptions()}
+            </StyledSelect>
+          </SaveToFolderWrapper>
+        ) : null}
       </Form>
     </Modal>
   );
