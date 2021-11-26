@@ -170,7 +170,7 @@ const NewResourceWizard = () => {
   const foldersList = useMemo(
     () =>
       Object.entries(fileMap)
-        .map(([key, value]) => ({folderName: key, isFolder: Boolean(value.children)}))
+        .map(([key, value]) => ({folderName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
         .filter(file => file.isFolder),
     [fileMap]
   );
