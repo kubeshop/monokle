@@ -7,7 +7,6 @@ import util from 'util';
 import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
-import {K8sResource} from '@models/k8sresource';
 
 import {addResource} from '@redux/reducers/main';
 import {getResourcesForPath} from '@redux/services/fileEntry';
@@ -28,8 +27,6 @@ type SaveUnsavedResourcePayload = {
 type SaveUnsavedResourceArgs = {
   resourceId: string;
   absolutePath: string;
-  newResource?: K8sResource;
-  isNewResourceProvided?: boolean;
 };
 
 const readFilePromise = util.promisify(fs.readFile);
@@ -43,9 +40,9 @@ export const saveUnsavedResource = createAsyncThunk<
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/saveUnsavedResource', async ({resourceId, absolutePath, newResource, isNewResourceProvided}, thunkAPI) => {
+>('main/saveUnsavedResource', async ({resourceId, absolutePath}, thunkAPI) => {
   const mainState = thunkAPI.getState().main;
-  const resource = isNewResourceProvided ? newResource : mainState.resourceMap[resourceId];
+  const resource = mainState.resourceMap[resourceId];
   const rootFolder = mainState.fileMap[ROOT_FILE_ENTRY];
   let resourceRange: {start: number; length: number} | undefined;
 
