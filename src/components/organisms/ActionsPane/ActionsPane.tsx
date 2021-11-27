@@ -249,7 +249,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   useEffect(() => {
     if (
-      key === 'form' &&
+      (key === 'metadataForm' || key === 'form') &&
       (!selectedResourceId ||
         !(resourceKindHandler && resourceKindHandler.formSchema && resourceKindHandler.formUiSchema))
     ) {

@@ -15,7 +15,7 @@ const Option = Select.Option;
 const NEW_ITEM = 'CREATE_NEW_ITEM';
 const EMPTY_VALUE = 'NONE';
 
-export const NamespaceSelection = ({value, onChange}: any) => {
+export const NamespaceSelection = ({value, onChange, disabled}: any) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useSelector(selectedResourceSelector);
   const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
@@ -74,6 +74,7 @@ export const NamespaceSelection = ({value, onChange}: any) => {
       optionFilterProp="children"
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
+      disabled={disabled}
     >
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && namespaces.filter(namespace => namespace === inputValue).length === 0 && (
