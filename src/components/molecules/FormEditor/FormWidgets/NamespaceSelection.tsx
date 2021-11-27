@@ -13,6 +13,7 @@ import {selectedResourceSelector} from '@redux/selectors';
 const Option = Select.Option;
 
 const NEW_ITEM = 'CREATE_NEW_ITEM';
+const EMPTY_VALUE = 'NONE';
 
 export const NamespaceSelection = ({value, onChange}: any) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -35,12 +36,20 @@ export const NamespaceSelection = ({value, onChange}: any) => {
 
   useEffect(() => {
     setInputValue('');
-    setSelectValue(value);
+    if (!value) {
+      setSelectValue(EMPTY_VALUE);
+    } else {
+      setSelectValue(value);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource, value]);
 
   useEffect(() => {
-    onChange(selectValue);
+    if (selectValue === EMPTY_VALUE) {
+      onChange(undefined);
+    } else {
+      onChange(selectValue);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectValue]);
 
@@ -50,7 +59,7 @@ export const NamespaceSelection = ({value, onChange}: any) => {
         uniq(
           Object.values(resourceMap)
             .map((resource: K8sResource) => resource.namespace)
-            .filter(namespace => namespace && namespace !== 'default')
+            .filter(namespace => Boolean(namespace))
         )
       );
     } else {
@@ -66,7 +75,7 @@ export const NamespaceSelection = ({value, onChange}: any) => {
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
     >
-      <Option value="default">default</Option>
+      <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && namespaces.filter(namespace => namespace === inputValue).length === 0 && (
         <Option key={inputValue} value={NEW_ITEM}>
           {`create '${inputValue}'`}
