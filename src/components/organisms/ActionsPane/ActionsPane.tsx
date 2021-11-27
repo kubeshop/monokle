@@ -52,26 +52,12 @@ import {openExternalResourceKindDocumentation} from '@utils/shell';
 import AppContext from '@src/AppContext';
 import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
+import {getFormSchema, getUiSchema} from '@src/kindhandlers/common/formLoader';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneFooter from './ActionsPaneFooter';
 
 const {TabPane} = Tabs;
-
-const formSupportedResourceKinds = [
-  'ConfigMap',
-  'Role',
-  'ClusterRole',
-  'RoleBinding',
-  'ClusterRoleBinding',
-  'Deployment',
-  'Service',
-  'Secret',
-];
-
-const isSupportedResourceKind = (selectedResource: K8sResource | undefined): boolean => {
-  return selectedResource ? formSupportedResourceKinds.includes(selectedResource.kind) : false;
-};
 
 const ActionsPane = (props: {contentHeight: string}) => {
   const {contentHeight} = props;
@@ -161,7 +147,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   );
 
-  const resourceKindDocumentation = selectedResource && getResourceKindHandler(selectedResource.kind);
+  const resourceKindHandler = selectedResource && getResourceKindHandler(selectedResource.kind);
 
   const getSaveButtonMenu = useCallback(
     () => (
@@ -262,10 +248,14 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (key === 'form' && (!selectedResourceId || !isSupportedResourceKind(selectedResource))) {
+    if (
+      key === 'form' &&
+      (!selectedResourceId ||
+        !(resourceKindHandler && resourceKindHandler.formSchema && resourceKindHandler.formUiSchema))
+    ) {
       setKey('source');
     }
-  }, [selectedResourceId, selectedResource, key]);
+  }, [selectedResourceId, selectedResource, key, resourceKindHandler]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
@@ -356,10 +346,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
             activeKey={key}
             onChange={k => setKey(k)}
             tabBarExtraContent={
-              selectedResource && resourceKindDocumentation?.helpLink ? (
+              selectedResource && resourceKindHandler?.helpLink ? (
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
                   <S.ExtraRightButton
-                    onClick={() => openExternalResourceKindDocumentation(resourceKindDocumentation?.helpLink)}
+                    onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
                     type="link"
                     ghost
                   >
@@ -387,26 +377,40 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 )
               )}
             </TabPane>
-            <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
-              {uiState.isFolderLoading || previewLoader.isLoading ? (
-                <S.Skeleton active />
-              ) : (
-                <FormEditor contentHeight={contentHeight} type="metadata" />
-              )}
-            </TabPane>
-            {selectedResource && isSupportedResourceKind(selectedResource) && (
-              <TabPane
-                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
-                disabled={!selectedResourceId}
-                key="form"
-              >
+            {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
+              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : (
-                  <FormEditor contentHeight={contentHeight} type="resource" />
+                  <FormEditor
+                    contentHeight={contentHeight}
+                    formSchema={getFormSchema('metadata')}
+                    formUiSchema={getUiSchema('metadata')}
+                  />
                 )}
               </TabPane>
             )}
+
+            {selectedResource &&
+              resourceKindHandler &&
+              resourceKindHandler.formSchema &&
+              resourceKindHandler.formUiSchema && (
+                <TabPane
+                  tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
+                  disabled={!selectedResourceId}
+                  key="form"
+                >
+                  {uiState.isFolderLoading || previewLoader.isLoading ? (
+                    <S.Skeleton active />
+                  ) : (
+                    <FormEditor
+                      contentHeight={contentHeight}
+                      formSchema={resourceKindHandler.formSchema}
+                      formUiSchema={resourceKindHandler.formUiSchema}
+                    />
+                  )}
+                </TabPane>
+              )}
           </S.Tabs>
         </S.TabsContainer>
         {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}

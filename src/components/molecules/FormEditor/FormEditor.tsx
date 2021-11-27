@@ -14,7 +14,6 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 import {useAppDispatch} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
-import {loadResource} from '@redux/services';
 import {mergeManifests} from '@redux/services/manifest-utils';
 
 import {NamespaceSelection} from './FormWidgets';
@@ -24,33 +23,6 @@ const Form = withTheme(AntDTheme);
 /**
  * Load schemas every time for now - should be cached in the future...
  */
-
-const formSchemaCache = new Map<string, any>();
-const uiformSchemaCache = new Map<string, any>();
-
-function getFormSchema(kind: string) {
-  try {
-    if (!formSchemaCache.has(kind)) {
-      formSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`)));
-    }
-
-    return formSchemaCache.get(kind);
-  } catch (error) {
-    return undefined;
-  }
-}
-
-function getUiSchema(kind: string) {
-  try {
-    if (!uiformSchemaCache.has(kind)) {
-      uiformSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`)));
-    }
-
-    return uiformSchemaCache.get(kind);
-  } catch (error) {
-    return undefined;
-  }
-}
 
 const FormContainer = styled.div<{contentHeight: string}>`
   width: 100%;
@@ -138,14 +110,12 @@ const FormContainer = styled.div<{contentHeight: string}>`
   }
 `;
 
-const FormEditor = (props: {contentHeight: string; type: string}) => {
-  const {contentHeight, type} = props;
+const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema: any}) => {
+  const {contentHeight, formSchema, formUiSchema} = props;
   const selectedResource = useSelector(selectedResourceSelector);
   const [formData, setFormData] = useState<any>();
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const [schema, setSchema] = useState({});
-  const [uiSchema, setUiSchema] = useState({});
 
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
@@ -176,8 +146,6 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
   useEffect(() => {
     if (selectedResource) {
       setFormData(selectedResource.content);
-      setSchema(getFormSchema(type === 'metadata' ? type : selectedResource.kind));
-      setUiSchema(getUiSchema(type === 'metadata' ? type : selectedResource.kind));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource]);
@@ -186,15 +154,15 @@ const FormEditor = (props: {contentHeight: string; type: string}) => {
     return <div>Nothing selected...</div>;
   }
 
-  if (!schema || !uiSchema) {
+  if (!formSchema || !formUiSchema) {
     return <div>Not supported resource type..</div>;
   }
 
   return (
     <FormContainer contentHeight={contentHeight}>
       <Form
-        schema={schema}
-        uiSchema={uiSchema}
+        schema={formSchema}
+        uiSchema={formUiSchema}
         formData={formData}
         onChange={onFormUpdate}
         widgets={{
