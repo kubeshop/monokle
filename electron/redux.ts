@@ -8,6 +8,8 @@ import {promiseTimeout} from '@utils/promises';
 
 const FETCH_STORE_STATE_TIMEOUT = 10000;
 
+export type MainDispatch = (action: AnyAction) => void;
+
 export const dispatchToAllWindows = (action: AnyAction) => {
   const allWebContents = webContents.getAllWebContents();
 
@@ -18,6 +20,10 @@ export const dispatchToAllWindows = (action: AnyAction) => {
 
 export const dispatchToWindow = (window: BrowserWindow, action: AnyAction) => {
   window.webContents.send('redux-dispatch', action);
+};
+
+export const createDispatchForWindow = (window: BrowserWindow) => {
+  return dispatchToWindow.bind(null, window);
 };
 
 export const dispatchToFocusedWindow = (action: AnyAction) => {

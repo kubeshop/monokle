@@ -1,24 +1,17 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {createAsyncThunk} from '@reduxjs/toolkit';
+import {AnyAction} from '@reduxjs/toolkit';
 
 import fs from 'fs';
 import log from 'loglevel';
 
+import {AlertEnum} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/kubeConfig';
 
-import {AppDispatch, RootState} from '@redux/store';
+import {setAlert} from '@redux/reducers/alert';
+import {setContexts} from '@redux/reducers/appConfig';
 
-import {createRejectionWithAlert} from './utils';
-
-export const loadContexts = createAsyncThunk<
-  any,
-  string,
-  {
-    dispatch: AppDispatch;
-    state: RootState;
-  }
->('main/loadContexts', async (configPath: string, thunkAPI: any) => {
+export const loadContexts = async (configPath: string, dispatch: (action: AnyAction) => void) => {
   try {
     const stats = await fs.promises.stat(configPath);
 
@@ -31,13 +24,18 @@ export const loadContexts = createAsyncThunk<
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
         };
-        return kubeConfig;
+        dispatch(setContexts(kubeConfig));
       } catch (e: any) {
-        return createRejectionWithAlert(thunkAPI, 'Loading kubeconfig file failed', e.message);
+        dispatch(
+          setAlert({
+            title: 'Loading kubeconfig file failed',
+            message: e.message,
+            type: AlertEnum.Error,
+          })
+        );
       }
     }
   } catch (e) {
     log.info(e);
   }
-  return thunkAPI.reject();
-});
+};

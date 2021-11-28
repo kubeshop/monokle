@@ -1,10 +1,10 @@
 import {BrowserWindow, dialog} from 'electron';
 
 import {execSync} from 'child_process';
+import {AnyAction} from 'redux';
 
 import {NewVersionCode} from '@models/appconfig';
 
-import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {KustomizeCommandType} from '@redux/services/kustomize';
 
@@ -117,19 +117,15 @@ export const runHelm = (args: any, event: Electron.IpcMainEvent) => {
  * Checks for a new version of monokle
  */
 
-export const checkNewVersion = async (initial?: boolean) => {
+export const checkNewVersion = async (dispatch: (action: AnyAction) => void, initial?: boolean) => {
   try {
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Checking, data: {initial: Boolean(initial)}}));
+    dispatch(updateNewVersion({code: NewVersionCode.Checking, data: {initial: Boolean(initial)}}));
     await autoUpdater.checkForUpdates();
   } catch (error: any) {
     if (error.errno === -2) {
-      mainStore.dispatch(
-        updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}})
-      );
+      dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: -2, initial: Boolean(initial)}}));
     } else {
-      mainStore.dispatch(
-        updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}})
-      );
+      dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}}));
     }
   }
 };

@@ -1,5 +1,3 @@
-import {forwardToMainWithParams, replayActionRenderer} from 'electron-redux';
-
 import {Middleware, configureStore} from '@reduxjs/toolkit';
 
 import {createLogger} from 'redux-logger';
@@ -35,16 +33,8 @@ const store = configureStore({
     navigator: navigatorSlice.reducer,
     uiCoach: uiCoachSlice.reducer,
   },
-  middleware: getDefaultMiddleware => [
-    forwardToMainWithParams({
-      blacklist: [/^@@/, /.\.*pending/],
-    }),
-    ...getDefaultMiddleware().concat(middlewares),
-    sectionBlueprintMiddleware,
-  ],
+  middleware: getDefaultMiddleware => [...getDefaultMiddleware().concat(middlewares), sectionBlueprintMiddleware],
 });
-
-replayActionRenderer(store);
 
 // eslint-disable-next-line no-undef
 export type RootState = ReturnType<typeof store.getState>;

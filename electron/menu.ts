@@ -1,23 +1,28 @@
-import {Menu, MenuItemConstructorOptions, BrowserWindow} from 'electron';
-import hotkeys from '@constants/hotkeys';
-import {updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {AppState} from '@models/appstate';
-import {AppConfig, NewVersionCode} from '@models/appconfig';
+import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
+
 import {ROOT_FILE_ENTRY} from '@constants/constants';
+import hotkeys from '@constants/hotkeys';
 import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
+
+import {NewVersionCode} from '@models/appconfig';
+
+import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
 import {
   openFolderExplorer,
   openNewResourceWizard,
+  resetLayout,
   setMonacoEditor,
   toggleLeftMenu,
-  resetLayout,
 } from '@redux/reducers/ui';
-import {UiState} from '@models/ui';
-import {openGitHub, openDocumentation} from '@utils/shell';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {checkNewVersion} from '@root/electron/commands';
+import {RootState} from '@redux/store';
+
+import {openDocumentation, openGitHub} from '@utils/shell';
+
+import {checkNewVersion} from './commands';
 import {openApplication} from './main';
+import {MainDispatch} from './redux';
 
 const isMac = process.platform === 'darwin';
 
@@ -33,29 +38,27 @@ const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => 
   return 'Check for Update';
 };
 
-const checkForUpdateMenu: any = (store: any) => {
-  const config: AppConfig = store.getState().config;
+const checkForUpdateMenu = (state: RootState, dispatch: MainDispatch) => {
   return {
-    label: getUpdateMonokleText(config.newVersion),
-    enabled: config.newVersion.code !== NewVersionCode.Downloading,
+    label: getUpdateMonokleText(state.config.newVersion),
+    enabled: state.config.newVersion.code !== NewVersionCode.Downloading,
     click: async () => {
-      await checkNewVersion();
+      await checkNewVersion(dispatch);
     },
   };
 };
 
-const appMenu = (store: any): MenuItemConstructorOptions => {
-  const config: AppConfig = store.getState().config;
+const appMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
-    label: `Monokle${config.newVersion.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
+    label: `Monokle${state.config.newVersion.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
     submenu: [
       {
         label: 'About Monokle',
-        click: async () => {
-          await store.dispatch(updateStartupModalVisible(true));
+        click: () => {
+          dispatch(updateStartupModalVisible(true));
         },
       },
-      checkForUpdateMenu(store),
+      checkForUpdateMenu(state, dispatch),
       {type: 'separator'},
       {label: 'Hide Monokle', role: 'hide'},
       {role: 'hideOthers'},
@@ -74,9 +77,7 @@ function setRootFolderInRendererThread(folder: string) {
   }
 }
 
-const fileMenu = (store: any): MenuItemConstructorOptions => {
-  const configState: AppConfig = store.getState().config;
-  const mainState: AppState = store.getState().main;
+const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: 'File',
     submenu: [
@@ -90,23 +91,23 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
       {
         label: 'Browse Folder',
         toolTip: BrowseFolderTooltip,
-        enabled: !isInPreviewModeSelector(store.getState()),
+        enabled: !isInPreviewModeSelector(state),
         click: async () => {
-          store.dispatch(openFolderExplorer());
+          dispatch(openFolderExplorer());
         },
       },
       {
         label: 'Refresh Folder',
-        enabled: !isInPreviewModeSelector(store.getState()) && Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
+        enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         toolTip: ReloadFolderTooltip,
         click: async () => {
-          setRootFolderInRendererThread(mainState.fileMap[ROOT_FILE_ENTRY].filePath);
+          setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
         },
       },
       {type: 'separator'},
       {
         label: 'Recent Folders',
-        submenu: configState.recentFolders.map((folder: string) => ({
+        submenu: state.config.recentFolders.map((folder: string) => ({
           label: folder,
           click: async () => {
             setRootFolderInRendererThread(folder);
@@ -116,18 +117,18 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
       {type: 'separator'},
       {
         label: 'New Resource',
-        enabled: Boolean(mainState.fileMap[ROOT_FILE_ENTRY]),
+        enabled: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         click: async () => {
-          store.dispatch(openNewResourceWizard());
+          dispatch(openNewResourceWizard());
         },
       },
       {type: 'separator'},
       {
         label: 'Exit Preview',
-        enabled: isInPreviewModeSelector(store.getState()),
+        enabled: isInPreviewModeSelector(state),
         click: () => {
-          store.dispatch(stopPreviewLoader());
-          store.dispatch(clearPreviewAndSelectionHistory());
+          dispatch(stopPreviewLoader());
+          dispatch(clearPreviewAndSelectionHistory());
         },
       },
       {type: 'separator'},
@@ -144,11 +145,8 @@ const fileMenu = (store: any): MenuItemConstructorOptions => {
   };
 };
 
-const editMenu = (store: any): MenuItemConstructorOptions => {
-  const mainState: AppState = store.getState().main;
-  const uiState: UiState = store.getState().ui;
-  const isMonacoActionEnabled = Boolean(mainState.selectedResourceId) && uiState.monacoEditor.focused;
-
+const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+  const isMonacoActionEnabled = Boolean(state.main.selectedResourceId) && state.ui.monacoEditor.focused;
   return {
     label: 'Edit',
 
@@ -157,14 +155,14 @@ const editMenu = (store: any): MenuItemConstructorOptions => {
         enabled: isMonacoActionEnabled,
         label: 'Undo',
         click: () => {
-          store.dispatch(setMonacoEditor({undo: true}));
+          dispatch(setMonacoEditor({undo: true}));
         },
       },
       {
         enabled: isMonacoActionEnabled,
         label: 'Redo',
         click: () => {
-          store.dispatch(setMonacoEditor({redo: true}));
+          dispatch(setMonacoEditor({redo: true}));
         },
       },
       {type: 'separator'},
@@ -177,14 +175,14 @@ const editMenu = (store: any): MenuItemConstructorOptions => {
         enabled: isMonacoActionEnabled,
         label: 'Find',
         click: () => {
-          store.dispatch(setMonacoEditor({find: true}));
+          dispatch(setMonacoEditor({find: true}));
         },
       },
       {
         enabled: isMonacoActionEnabled,
         label: 'Replace',
         click: () => {
-          store.dispatch(setMonacoEditor({replace: true}));
+          dispatch(setMonacoEditor({replace: true}));
         },
       },
       {type: 'separator'},
@@ -193,32 +191,32 @@ const editMenu = (store: any): MenuItemConstructorOptions => {
         label: 'Apply',
         accelerator: hotkeys.APPLY_SELECTION,
         click: () => {
-          store.dispatch(setMonacoEditor({apply: true}));
+          dispatch(setMonacoEditor({apply: true}));
         },
       },
-      {
-        enabled: isMonacoActionEnabled,
-        label: 'Diff',
-        accelerator: hotkeys.DIFF_RESOURCE,
-        click: async () => {
-          const {performResourceDiff} = await import('@redux/thunks/diffResource');
-          store.dispatch(performResourceDiff(<string>mainState.selectedResourceId));
-        },
-      },
+      // TODO: we need a way to trigger the diff by dispatching a simple action instead of a thunk
+      // {
+      //   enabled: isMonacoActionEnabled,
+      //   label: 'Diff',
+      //   accelerator: hotkeys.DIFF_RESOURCE,
+      //   click: async () => {
+      //     const {performResourceDiff} = await import('@redux/thunks/diffResource');
+      //     dispatch(performResourceDiff(<string>mainState.selectedResourceId));
+      //   },
+      // },
     ],
   };
 };
 
-const viewMenu = (store: any): MenuItemConstructorOptions => {
-  let mainState: AppState = store.getState().main;
+const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   const isPreviousResourceEnabled =
-    mainState.selectionHistory.length > 1 &&
-    (mainState.currentSelectionHistoryIndex === undefined ||
-      (mainState.currentSelectionHistoryIndex && mainState.currentSelectionHistoryIndex > 0));
+    state.main.selectionHistory.length > 1 &&
+    (state.main.currentSelectionHistoryIndex === undefined ||
+      (state.main.currentSelectionHistoryIndex && state.main.currentSelectionHistoryIndex > 0));
   const isNextResourceEnabled =
-    mainState.selectionHistory.length > 1 &&
-    mainState.currentSelectionHistoryIndex !== undefined &&
-    mainState.currentSelectionHistoryIndex < mainState.selectionHistory.length - 1;
+    state.main.selectionHistory.length > 1 &&
+    state.main.currentSelectionHistoryIndex !== undefined &&
+    state.main.currentSelectionHistoryIndex < state.main.selectionHistory.length - 1;
 
   return {
     label: 'View',
@@ -229,34 +227,36 @@ const viewMenu = (store: any): MenuItemConstructorOptions => {
       {
         label: 'Previous Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
-        enabled: Boolean(isPreviousResourceEnabled),
-        click: async () => {
-          const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
-          store.dispatch(selectFromHistory({direction: 'left'}));
-        },
+        enabled: false,
+        // enabled: Boolean(isPreviousResourceEnabled),
+        // click: async () => {
+        //   const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
+        //   dispatch(selectFromHistory({direction: 'left'}));
+        // },
       },
       {
         label: 'Next Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD,
-        enabled: Boolean(isNextResourceEnabled),
-        click: async () => {
-          const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
-          store.dispatch(selectFromHistory({direction: 'right'}));
-        },
+        enabled: false,
+        // enabled: Boolean(isNextResourceEnabled),
+        // click: async () => {
+        //   const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
+        //   dispatch(selectFromHistory({direction: 'right'}));
+        // },
       },
       {type: 'separator'},
       {
         label: 'Toggle Left Menu',
         accelerator: hotkeys.TOGGLE_LEFT_PANE,
         click: () => {
-          store.dispatch(toggleLeftMenu());
+          dispatch(toggleLeftMenu());
         },
       },
       {role: 'toggleDevTools'},
       {
         label: 'Reset Layout',
         click: () => {
-          store.dispatch(resetLayout());
+          dispatch(resetLayout());
         },
       },
       {type: 'separator'},
@@ -265,7 +265,7 @@ const viewMenu = (store: any): MenuItemConstructorOptions => {
   };
 };
 
-const windowMenu = (store: any): MenuItemConstructorOptions => {
+const windowMenu = (): MenuItemConstructorOptions => {
   return {
     label: 'Window',
     submenu: [
@@ -279,7 +279,11 @@ const windowMenu = (store: any): MenuItemConstructorOptions => {
   };
 };
 
-const helpMenu = (store: any, includeUpdateMenu?: boolean): MenuItemConstructorOptions => {
+const helpMenu = (
+  state: RootState,
+  dispatch: MainDispatch,
+  includeUpdateMenu?: boolean
+): MenuItemConstructorOptions => {
   const submenu: any = [
     {
       label: 'Documentation',
@@ -294,7 +298,7 @@ const helpMenu = (store: any, includeUpdateMenu?: boolean): MenuItemConstructorO
 
   if (includeUpdateMenu) {
     submenu.push({type: 'separator'});
-    submenu.push(checkForUpdateMenu(store));
+    submenu.push(checkForUpdateMenu(state, dispatch));
   }
   return {
     label: 'Help',
@@ -302,23 +306,23 @@ const helpMenu = (store: any, includeUpdateMenu?: boolean): MenuItemConstructorO
   };
 };
 
-export const createMenu = (store: any) => {
+export const createMenu = (state: RootState, dispatch: MainDispatch) => {
   const template: MenuItemConstructorOptions[] = [
-    fileMenu(store),
-    editMenu(store),
-    viewMenu(store),
-    windowMenu(store),
-    helpMenu(store, !isMac),
+    fileMenu(state, dispatch),
+    editMenu(state, dispatch),
+    viewMenu(state, dispatch),
+    windowMenu(),
+    helpMenu(state, dispatch, !isMac),
   ];
 
   if (isMac) {
-    template.unshift(appMenu(store));
+    template.unshift(appMenu(state, dispatch));
   }
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 };
 
-export const getDockMenu = (store: any) => {
+export const getDockMenu = () => {
   return Menu.buildFromTemplate([
     {
       label: 'New Window',

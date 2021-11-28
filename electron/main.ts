@@ -23,7 +23,6 @@ import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constan
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
-import mainStore from '@redux/main-store';
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
@@ -43,6 +42,8 @@ import {setAppRehydrating} from '@redux/reducers/main';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
+import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './redux';
+import { RootState } from '@redux/store';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -93,12 +94,12 @@ ipcMain.on('app-version', event => {
 });
 
 ipcMain.on('check-update-available', async () => {
-  await checkNewVersion();
+  await checkNewVersion(dispatchToAllWindows);
 });
 
 ipcMain.on('quit-and-install', () => {
   autoUpdater.quitAndInstall();
-  mainStore.dispatch(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+  dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
 
 export const createWindow = (givenPath?: string) => {
@@ -131,7 +132,7 @@ export const createWindow = (givenPath?: string) => {
     },
   };
 
-  const win: any = Splashscreen.initSplashScreen(splashscreenConfig);
+  const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -162,11 +163,11 @@ export const createWindow = (givenPath?: string) => {
   }
 
   autoUpdater.on('update-available', (data: any) => {
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Available, data: null}));
+    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Available, data: null}));
   });
 
   autoUpdater.on('update-not-available', (data: any) => {
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.NotAvailable, data: null}));
+    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.NotAvailable, data: null}));
   });
 
   autoUpdater.on('download-progress', (progressObj: any) => {
@@ -174,20 +175,23 @@ export const createWindow = (givenPath?: string) => {
     if (progressObj && progressObj.percent) {
       percent = progressObj.percent;
     }
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}}));
+    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}}));
   });
 
   autoUpdater.on('update-downloaded', (data: any) => {
-    mainStore.dispatch(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
+    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
   });
 
   win.webContents.on('did-finish-load', async () => {
-    await mainStore.dispatch(setAppRehydrating(true));
-    await checkNewVersion(true);
-    await initKubeconfig(mainStore, userHomeDir);
-    mainStore.dispatch(setAppRehydrating(false));
+    const dispatch = createDispatchForWindow(win);
+
+    dispatch(setAppRehydrating(true));
+    await checkNewVersion(dispatch, true);
+    initKubeconfig(dispatch, userHomeDir);
+    dispatch(setAppRehydrating(false));
+
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
-    const isUserAbleToRunKubectlKustomize = checkMissingDependencies(['kubectl kustomize --help']);
+    const isUserAbleToRunKubectlKustomize = checkMissingDependencies(['kubectl kustomize']);
 
     if (missingDependencies.includes('kustomize') && isUserAbleToRunKubectlKustomize) {
       missingDependencies.splice(indexOf(missingDependencies, 'kustomize'), 1);
@@ -200,9 +204,14 @@ export const createWindow = (givenPath?: string) => {
         title: 'Missing dependency',
         message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available`,
       };
-      mainStore.dispatch(setAlert(alert));
+      dispatchToWindow(win, setAlert(alert));
     }
     win.webContents.send('executed-from', {path: givenPath});
+
+    subscribeToStoreStateChanges(win.webContents, (storeState) => {
+      createMenu(storeState, dispatch);
+      setWindowTitle(storeState, win);
+    });
   });
 
   return win;
@@ -225,17 +234,11 @@ export const openApplication = async (givenPath?: string) => {
   ElectronStore.initRenderer();
   const win = createWindow(givenPath);
 
-  mainStore.subscribe(() => {
-    createMenu(mainStore);
-    setWindowTitle(mainStore, win);
-  });
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
     app.dock.setIcon(image);
-    mainStore.subscribe(() => {
-      app.dock.setMenu(getDockMenu(mainStore));
-    });
+    app.dock.setMenu(getDockMenu());
   }
 
   console.log('info', app.getName(), app.getVersion(), app.getLocale(), givenPath);
@@ -271,11 +274,10 @@ terminal()
   // eslint-disable-next-line no-console
   .catch(e => console.log(e));
 
-export const setWindowTitle = (store: any, window: BrowserWindow) => {
+export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   if (window.isDestroyed()) {
     return;
   }
-  const state = store.getState();
   const isInPreviewMode = isInPreviewModeSelector(state);
   const previewType = state.main.previewType;
   const previewResourceId = state.main.previewResourceId;
