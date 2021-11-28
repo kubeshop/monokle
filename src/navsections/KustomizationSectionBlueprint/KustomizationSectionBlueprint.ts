@@ -58,8 +58,8 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
       }
       return scope.isFolderLoading;
     },
-    isInitialized: (_, rawItems) => {
-      return rawItems.length > 0;
+    isInitialized: scope => {
+      return scope.isFolderOpen;
     },
     isEmpty: (scope, rawItems) => {
       return scope.isFolderOpen && rawItems.length === 0;
