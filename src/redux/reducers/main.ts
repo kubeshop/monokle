@@ -61,6 +61,7 @@ import {
   saveResource,
 } from '../services/resource';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
+import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
 export type SetRootFolderPayload = {
@@ -450,13 +451,6 @@ export const mainSlice = createSlice({
     setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = action.payload;
     },
-    addNotification: (state: Draft<AppState>, action: PayloadAction<AlertType>) => {
-      const notification: AlertType = action.payload;
-      notification.id = uuidv4();
-      notification.hasSeen = false;
-      notification.createdAt = new Date().getTime();
-      state.notifications = [notification, ...state.notifications];
-    },
     setDiffResourceInClusterDiff: (state: Draft<AppState>, action: PayloadAction<string | undefined>) => {
       state.clusterDiff.diffResourceId = action.payload;
     },
@@ -492,6 +486,14 @@ export const mainSlice = createSlice({
     },
   },
   extraReducers: builder => {
+    builder.addCase(setAlert, (state, action) => {
+      const notification: AlertType = action.payload;
+      notification.id = uuidv4();
+      notification.hasSeen = false;
+      notification.createdAt = new Date().getTime();
+      state.notifications = [notification, ...state.notifications];
+    });
+
     builder
       .addCase(previewKustomization.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
@@ -905,7 +907,6 @@ export const {
   stopPreviewLoader,
   removeResource,
   updateResourceFilter,
-  addNotification,
   setDiffResourceInClusterDiff,
   setClusterDiffRefreshDiffResource,
   selectClusterDiffMatch,
