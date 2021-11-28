@@ -110,7 +110,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
         );
       }
     },
-    [selectedResourceId, dispatch]
+    [selectedResource, dispatch]
   );
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
