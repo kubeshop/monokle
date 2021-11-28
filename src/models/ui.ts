@@ -6,6 +6,7 @@ export type NewResourceWizardInput = {
   apiVersion?: string;
   namespace?: string;
   selectedResourceId?: string;
+  targetFolder?: string;
 };
 
 export type MonacoRange = {
@@ -39,6 +40,13 @@ export type MonacoUiState = {
   diff: boolean;
   selection?: MonacoUiSelection;
 };
+
+export type LeftMenuSelection =
+  | 'file-explorer'
+  | 'helm-pane'
+  | 'kustomize-pane'
+  | 'cluster-explorer'
+  | 'plugin-manager';
 
 export type UiState = {
   isSettingsOpen: boolean;

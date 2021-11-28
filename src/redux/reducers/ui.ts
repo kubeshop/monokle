@@ -2,8 +2,10 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 
 import path from 'path';
 
+import {KUSTOMIZATION_KIND} from '@constants/constants';
+
 import {ResourceValidationError} from '@models/k8sresource';
-import {MonacoUiState, NewResourceWizardInput, PaneConfiguration, UiState} from '@models/ui';
+import {LeftMenuSelection, MonacoUiState, NewResourceWizardInput, PaneConfiguration, UiState} from '@models/ui';
 
 import initialState from '@redux/initialState';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -45,7 +47,7 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
-    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelection>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
@@ -178,9 +180,18 @@ export const uiSlice = createSlice({
       .addCase(setRootFolder.pending, state => {
         state.isFolderLoading = true;
       })
-      .addCase(setRootFolder.fulfilled, state => {
+      .addCase(setRootFolder.fulfilled, (state, action) => {
         state.isFolderLoading = false;
         state.shouldExpandAllNodes = true;
+        if (
+          state.leftMenu.selection === 'kustomize-pane' &&
+          !Object.values(action.payload.resourceMap).some(r => r.kind === KUSTOMIZATION_KIND)
+        ) {
+          state.leftMenu.selection = 'file-explorer';
+        }
+        if (state.leftMenu.selection === 'helm-pane' && Object.values(action.payload.helmChartMap).length === 0) {
+          state.leftMenu.selection = 'file-explorer';
+        }
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;

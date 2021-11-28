@@ -225,6 +225,15 @@ export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMa
 }
 
 /**
+ * Returns the relative path to the folder containing the file containing the
+ * specified resource
+ */
+
+export function getResourceFolder(resource: K8sResource) {
+  return resource.filePath.substr(0, resource.filePath.lastIndexOf('/'));
+}
+
+/**
  * Returns the absolute path to the file that containing specified resource
  */
 
