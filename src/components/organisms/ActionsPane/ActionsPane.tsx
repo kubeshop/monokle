@@ -101,17 +101,16 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const onSelect = useCallback(
     (absolutePath: string) => {
-      if (!selectedResourceId) {
-        return;
+      if (selectedResource) {
+        dispatch(
+          saveUnsavedResource({
+            resource: selectedResource,
+            absolutePath,
+          })
+        );
       }
-      dispatch(
-        saveUnsavedResource({
-          resourceId: selectedResourceId,
-          absolutePath,
-        })
-      );
     },
-    [selectedResourceId, dispatch]
+    [selectedResource, dispatch]
   );
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(

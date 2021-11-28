@@ -11,6 +11,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {reprocessAllResources} from '@redux/reducers/main';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
@@ -150,18 +151,19 @@ const NewResourceWizard = () => {
 
     const fullFileName = getFullFileName(formValues.name);
 
+    // validate and update any possible broking incoming links that are now fixed
+    dispatch(reprocessAllResources());
+
     if (shouldSaveToFolder) {
-      setTimeout(() => {
-        dispatch(
-          saveUnsavedResource({
-            resourceId: newResource.id,
-            absolutePath:
-              selectedFolder === ROOT_FILE_ENTRY
-                ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName)
-                : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, path.sep, fullFileName),
-          })
-        );
-      }, 500);
+      dispatch(
+        saveUnsavedResource({
+          resource: newResource,
+          absolutePath:
+            selectedFolder === ROOT_FILE_ENTRY
+              ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName)
+              : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, path.sep, fullFileName),
+        })
+      );
     }
 
     closeWizard();
