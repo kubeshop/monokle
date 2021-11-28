@@ -25,6 +25,7 @@ import SecretHandler from './Secret.handler';
 import ServiceHandler from './Service.handler';
 import ServiceAccountHandler from './ServiceAccount.handler';
 import StatefulSetHandler from './StatefulSet.handler';
+import {getFormSchema, getUiSchema} from './common/formLoader';
 
 export const ResourceKindHandlers: ResourceKindHandler[] = [
   ClusterRoleHandler,
@@ -54,7 +55,13 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
 ];
 
 const HandlerByResourceKind = Object.fromEntries(
-  ResourceKindHandlers.map(kindHandler => [kindHandler.kind, kindHandler])
+  ResourceKindHandlers.map(kindHandler => ({
+    ...kindHandler,
+    formEditorOptions: {
+      editorSchema: getFormSchema(kindHandler.kind),
+      editorUiSchema: getUiSchema(kindHandler.kind),
+    },
+  })).map(kindHandler => [kindHandler.kind, kindHandler])
 );
 
 export const getResourceKindHandler = (resourceKind: string): ResourceKindHandler | undefined => {

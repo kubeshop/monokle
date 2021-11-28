@@ -18,6 +18,8 @@ import styled from 'styled-components';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterExplorerTooltips, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 
+import {LeftMenuSelection} from '@models/ui';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
 import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
@@ -109,19 +111,19 @@ const PaneManager = () => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
 
-  const setActivePanes = (side: string, selectedMenu: string) => {
-    if (side === 'left') {
-      if (leftMenuSelection === selectedMenu) {
+  const setLeftActiveMenu = (selectedMenu: LeftMenuSelection) => {
+    if (leftMenuSelection === selectedMenu) {
+      dispatch(toggleLeftMenu());
+    } else {
+      dispatch(setLeftMenuSelection(selectedMenu));
+      if (!leftActive) {
         dispatch(toggleLeftMenu());
-      } else {
-        dispatch(setLeftMenuSelection(selectedMenu));
-        if (!leftActive) {
-          dispatch(toggleLeftMenu());
-        }
       }
     }
+  };
 
-    if (side === 'right' && featureJson.ShowRightMenu) {
+  const setRightActiveMenu = (selectedMenu: string) => {
+    if (featureJson.ShowRightMenu) {
       if (rightMenuSelection === selectedMenu) {
         dispatch(toggleRightMenu());
       } else {
@@ -193,7 +195,7 @@ const PaneManager = () => {
                 isSelected={leftMenuSelection === 'file-explorer'}
                 isActive={leftActive}
                 shouldWatchSelectedPath
-                onClick={() => setActivePanes('left', 'file-explorer')}
+                onClick={() => setLeftActiveMenu('file-explorer')}
               >
                 <MenuIcon
                   style={{marginLeft: 4}}
@@ -207,7 +209,7 @@ const PaneManager = () => {
               <MenuButton
                 isSelected={leftMenuSelection === 'kustomize-pane'}
                 isActive={leftActive}
-                onClick={() => setActivePanes('left', 'kustomize-pane')}
+                onClick={() => setLeftActiveMenu('kustomize-pane')}
                 sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
               >
                 <MenuIcon
@@ -221,7 +223,7 @@ const PaneManager = () => {
               <MenuButton
                 isSelected={leftMenuSelection === 'helm-pane'}
                 isActive={leftActive}
-                onClick={() => setActivePanes('left', 'helm-pane')}
+                onClick={() => setLeftActiveMenu('helm-pane')}
                 sectionNames={[HELM_CHART_SECTION_NAME]}
               >
                 <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
@@ -232,7 +234,7 @@ const PaneManager = () => {
                 isSelected={leftMenuSelection === 'cluster-explorer'}
                 isActive={leftActive}
                 onClick={async () => {
-                  setActivePanes('left', 'cluster-explorer');
+                  setLeftActiveMenu('cluster-explorer');
                   electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
                   if (!hasUserPerformedClickOnClusterIcon) {
                     dispatch(onUserPerformedClickOnClusterIcon());
@@ -253,7 +255,7 @@ const PaneManager = () => {
                 <MenuButton
                   isSelected={leftMenuSelection === 'plugin-manager'}
                   isActive={leftActive}
-                  onClick={() => setActivePanes('left', 'plugin-manager')}
+                  onClick={() => setLeftActiveMenu('plugin-manager')}
                 >
                   <MenuIcon
                     icon={ApiOutlined}
@@ -319,7 +321,7 @@ const PaneManager = () => {
             <Button
               size="large"
               type="text"
-              onClick={() => setActivePanes('right', 'graph')}
+              onClick={() => setRightActiveMenu('graph')}
               icon={
                 <MenuIcon icon={ApartmentOutlined} active={rightActive} isSelected={rightMenuSelection === 'graph'} />
               }
@@ -329,7 +331,7 @@ const PaneManager = () => {
             <Button
               size="large"
               type="text"
-              onClick={() => setActivePanes('right', 'logs')}
+              onClick={() => setRightActiveMenu('logs')}
               icon={<MenuIcon icon={CodeOutlined} active={rightActive} isSelected={rightMenuSelection === 'logs'} />}
             />
           </Space>

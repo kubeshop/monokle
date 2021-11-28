@@ -1,0 +1,77 @@
+{
+  "properties": {
+    "spec": {
+      "type": "object",
+      "properties": {
+        "selector": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
+        },
+        "externalName": {
+          "type": "string"
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "protocol": {
+                "type": "string",
+                "enum": ["TCP", "UDP", "SCTP"]
+              },
+              "port": {
+                "type": "number"
+              },
+              "targetPort": {
+                "type": "number"
+              },
+              "nodePort": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "clusterIP": {
+          "type": "string"
+        },
+        "externalIPs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "loadBalancer": {
+          "type": "object",
+          "properties": {
+            "ingress": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ip": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object"
+}

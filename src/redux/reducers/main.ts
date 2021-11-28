@@ -154,22 +154,6 @@ export const mainSlice = createSlice({
       state.resourceMap[resource.id] = resource;
     },
     /**
-     * called by the file monitor when a path is added to the file system
-     */
-    pathAdded: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
-      let filePath = action.payload.path;
-      const appConfig = action.payload.appConfig;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        if (getFileStats(filePath)?.isDirectory() === false) {
-          log.info(`added file ${filePath} already exists - updating`);
-          reloadFile(filePath, fileEntry, state);
-        }
-      } else {
-        addPath(filePath, state, appConfig);
-      }
-    },
-    /**
      * called by the file monitor when multiple paths are added to the file system
      */
     multiplePathsAdded: (
@@ -191,19 +175,6 @@ export const mainSlice = createSlice({
       });
     },
     /**
-     * called by the file monitor when a file is changed in the file system
-     */
-    fileChanged: (state: Draft<AppState>, action: PayloadAction<{path: string; appConfig: AppConfig}>) => {
-      let filePath = action.payload.path;
-      const appConfig = action.payload.appConfig;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        reloadFile(filePath, fileEntry, state);
-      } else {
-        addPath(filePath, state, appConfig);
-      }
-    },
-    /**
      * called by the file monitor when multiple files are changed in the file system
      */
     multipleFilesChanged: (
@@ -221,18 +192,7 @@ export const mainSlice = createSlice({
         }
       });
     },
-    /**
-     * called by the file monitor when a path is removed from the file system
-     */
-    pathRemoved: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      let filePath = action.payload;
-      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-      if (fileEntry) {
-        removePath(filePath, state, fileEntry);
-      } else {
-        log.warn(`removed file ${filePath} not known - ignoring..`);
-      }
-    },
+
     /**
      * called by the file monitor when a path is removed from the file system
      */
@@ -894,11 +854,8 @@ export const {
   setApplyingResource,
   updateResource,
   updateFileEntry,
-  pathAdded,
   multiplePathsAdded,
-  fileChanged,
   multipleFilesChanged,
-  pathRemoved,
   multiplePathsRemoved,
   selectHelmValuesFile,
   clearPreview,

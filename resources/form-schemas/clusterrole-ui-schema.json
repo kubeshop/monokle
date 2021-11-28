@@ -1,0 +1,21 @@
+{
+  "ui:title": "ClusterRole Properties",
+  "rules": {
+    "ui:title": "Object Rules",
+    "items": {
+      "apiGroups": {
+        "ui:title": "API Groups"
+      },
+      "resources": {
+        "ui:title": "Resources"
+      },
+      "verbs": {
+        "ui:title": "Verbs",
+        "ui:widget": "checkboxes",
+        "ui:options": {
+          "inline": true
+        }
+      }
+    }
+  }
+}
