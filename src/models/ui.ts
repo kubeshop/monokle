@@ -40,6 +40,13 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
+export type LeftMenuSelection =
+  | 'file-explorer'
+  | 'helm-pane'
+  | 'kustomize-pane'
+  | 'cluster-explorer'
+  | 'plugin-manager';
+
 export type UiState = {
   isSettingsOpen: boolean;
   isClusterDiffVisible: boolean;
