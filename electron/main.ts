@@ -191,7 +191,7 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setAppRehydrating(false));
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
-    const isUserAbleToRunKubectlKustomize = checkMissingDependencies(['kubectl kustomize']);
+    const isUserAbleToRunKubectlKustomize = checkMissingDependencies(['kubectl kustomize --help']);
 
     if (missingDependencies.includes('kustomize') && isUserAbleToRunKubectlKustomize) {
       missingDependencies.splice(indexOf(missingDependencies, 'kustomize'), 1);
