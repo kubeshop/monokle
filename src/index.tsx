@@ -4,6 +4,7 @@ import {Provider} from 'react-redux';
 
 import * as log from 'loglevel';
 
+import '@redux/mainProcess';
 import store from '@redux/store';
 
 import App from './App';
