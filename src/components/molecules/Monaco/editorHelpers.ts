@@ -22,8 +22,7 @@ export function setDecorations(
   newDecorations: monaco.editor.IModelDeltaDecoration[],
   idsOfOldDecorations: string[] = []
 ) {
-  const decorationIds = editor.deltaDecorations(idsOfOldDecorations, newDecorations);
-  return decorationIds;
+  return editor.deltaDecorations(idsOfOldDecorations, newDecorations);
 }
 
 export function createGlyphDecoration(lineIndex: number, glyphDecorationType: GlyphDecorationTypes) {
@@ -82,13 +81,14 @@ export function createHoverProvider(range: monaco.IRange, contents: monaco.IMark
   return hoverDisposable;
 }
 
-export function createLinkProvider(range: monaco.IRange, handler: () => void) {
+export function createLinkProvider(range: monaco.IRange, tooltip: string, handler: () => void) {
   const linkDisposable: monaco.IDisposable = monaco.languages.registerLinkProvider('yaml', {
     provideLinks: () => {
       return {
         links: [
           {
             range,
+            tooltip,
           },
         ],
       };

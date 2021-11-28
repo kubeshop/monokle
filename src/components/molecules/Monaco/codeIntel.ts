@@ -3,7 +3,8 @@ import {monaco} from 'react-monaco-editor';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRef} from '@models/k8sresource';
 
-import {isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {getResourceFolder} from '@redux/services/fileEntry';
+import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {ResourceKindHandlers, getIncomingRefMappers} from '@src/kindhandlers';
 
@@ -120,25 +121,24 @@ export function applyForResource(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void,
+  createResource: (outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void,
   resourceMap: ResourceMapType,
   fileMap: FileMapType
 ) {
   const refs = resource.refs;
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
-  const newHoverDisposables: monaco.IDisposable[] = [];
-  const newCommandDisposables: monaco.IDisposable[] = [];
-  const newLinkDisposables: monaco.IDisposable[] = [];
+  const newDisposables: monaco.IDisposable[] = [];
 
   if (!refs || refs.length === 0) {
-    return {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables};
+    return {newDecorations, newDisposables};
   }
 
-  const unsatisfiedRefs = refs?.filter(r => isUnsatisfiedRef(r.type));
   const listOfOutgoingRefsByEqualPos: {position: RefPosition; outgoingRefs: ResourceRef[]}[] = [];
 
+  // find refs that can be decorated
   refs.forEach(ref => {
     const refPos = ref.position;
-    if (refPos && isOutgoingRef(ref.type)) {
+    if (refPos && !isIncomingRef(ref.type)) {
       const refsByEqualPosIndex = listOfOutgoingRefsByEqualPos.findIndex(e => areRefPosEqual(e.position, refPos));
       if (refsByEqualPosIndex === -1) {
         listOfOutgoingRefsByEqualPos.push({
@@ -151,18 +151,7 @@ export function applyForResource(
     }
   });
 
-  unsatisfiedRefs.forEach(ref => {
-    const refPos = ref.position;
-    if (refPos) {
-      const inlineRange = new monaco.Range(refPos.line, refPos.column, refPos.line, refPos.column + refPos.length);
-      const glyphDecoration = createGlyphDecoration(refPos.line, GlyphDecorationTypes.UnsatisfiedRef);
-      newDecorations.push(glyphDecoration);
-
-      const inlineDecoration = createInlineDecoration(inlineRange, InlineDecorationTypes.UnsatisfiedRef);
-      newDecorations.push(inlineDecoration);
-    }
-  });
-
+  // decorate matched refs
   listOfOutgoingRefsByEqualPos.forEach(({outgoingRefs, position}) => {
     const inlineRange = new monaco.Range(
       position.line,
@@ -171,10 +160,18 @@ export function applyForResource(
       position.column + position.length
     );
 
-    const glyphDecoration = createGlyphDecoration(position.line, GlyphDecorationTypes.SatisfiedRef);
+    // unsatisfied refs take precedence for decorations
+    const hasUnsatisfiedRef = outgoingRefs.some(ref => isUnsatisfiedRef(ref.type));
+    const glyphDecoration = createGlyphDecoration(
+      position.line,
+      hasUnsatisfiedRef ? GlyphDecorationTypes.UnsatisfiedRef : GlyphDecorationTypes.SatisfiedRef
+    );
     newDecorations.push(glyphDecoration);
 
-    const inlineDecoration = createInlineDecoration(inlineRange, InlineDecorationTypes.SatisfiedRef);
+    const inlineDecoration = createInlineDecoration(
+      inlineRange,
+      hasUnsatisfiedRef ? InlineDecorationTypes.UnsatisfiedRef : InlineDecorationTypes.SatisfiedRef
+    );
     newDecorations.push(inlineDecoration);
 
     const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
@@ -183,7 +180,26 @@ export function applyForResource(
         return;
       }
 
-      if (outgoingRef.target.type === 'resource' && outgoingRef.target.resourceId) {
+      // add command for creating resource from unsatisfied ref
+      if (isUnsatisfiedRef(outgoingRef.type)) {
+        if (
+          outgoingRef.target.type === 'resource' &&
+          !outgoingRef.target.resourceId &&
+          outgoingRef.target.resourceKind
+        ) {
+          const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+            `Create ${outgoingRef.target.resourceKind} Resource`,
+            () => {
+              // @ts-ignore
+              createResource(outgoingRef, resource.namespace, getResourceFolder(resource));
+            }
+          );
+          commandMarkdownLinkList.push(commandMarkdownLink);
+          newDisposables.push(commandDisposable);
+        }
+      }
+      // add command for navigating to resource
+      else if (outgoingRef.target.type === 'resource' && outgoingRef.target.resourceId) {
         const outgoingRefResource = resourceMap[outgoingRef.target.resourceId];
         if (!outgoingRefResource) {
           return;
@@ -196,9 +212,10 @@ export function applyForResource(
           }
         );
         commandMarkdownLinkList.push(commandMarkdownLink);
-        newCommandDisposables.push(commandDisposable);
+        newDisposables.push(commandDisposable);
       }
-      if (outgoingRef.target.type === 'file') {
+      // add command for navigating to file
+      else if (outgoingRef.target.type === 'file') {
         const outgoingRefFile = fileMap[outgoingRef.target.filePath];
         if (!outgoingRefFile) {
           return;
@@ -211,33 +228,40 @@ export function applyForResource(
           }
         );
         commandMarkdownLinkList.push(commandMarkdownLink);
-        newCommandDisposables.push(commandDisposable);
+        newDisposables.push(commandDisposable);
       }
     });
 
+    // aggregate commands into markdown
     if (commandMarkdownLinkList.length > 0) {
       const hoverDisposable = createHoverProvider(inlineRange, [
         createMarkdownString('Outgoing Links'),
         ...commandMarkdownLinkList,
       ]);
-      newHoverDisposables.push(hoverDisposable);
+      newDisposables.push(hoverDisposable);
     }
 
+    // create default link if there is only one command
     if (outgoingRefs.length === 1) {
       const outgoingRef = outgoingRefs[0];
-      const linkDisposable = createLinkProvider(inlineRange, () => {
-        if (outgoingRef.target?.type === 'resource' && outgoingRef.target.resourceId) {
-          selectResource(outgoingRef.target.resourceId);
+      const linkDisposable = createLinkProvider(
+        inlineRange,
+        isUnsatisfiedRef(outgoingRef.type) ? 'Create resource' : 'Open resource',
+        () => {
+          if (isUnsatisfiedRef(outgoingRef.type)) {
+            createResource(outgoingRef, resource.namespace, getResourceFolder(resource));
+          } else if (outgoingRef.target?.type === 'resource' && outgoingRef.target.resourceId) {
+            selectResource(outgoingRef.target.resourceId);
+          } else if (outgoingRef.target?.type === 'file' && outgoingRef.target.filePath) {
+            selectFilePath(outgoingRef.target.filePath);
+          }
         }
-        if (outgoingRef.target?.type === 'file' && outgoingRef.target.filePath) {
-          selectFilePath(outgoingRef.target.filePath);
-        }
-      });
-      newLinkDisposables.push(linkDisposable);
+      );
+      newDisposables.push(linkDisposable);
     }
   });
 
-  return {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables};
+  return {newDecorations, newDisposables};
 }
 
 export default {
