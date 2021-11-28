@@ -1,0 +1,158 @@
+{
+  "ui:title": "Service Properties",
+  "spec": {
+    "ui:title": "Object specs",
+    "selector": {
+      "ui:title": "Selector",
+      "matchLabels": {
+        "ui:title": "Match Labels"
+      }
+    },
+    "replicas": {
+      "ui:title": "Replicas"
+    },
+    "strategy": {
+      "ui:title": "Strategy",
+      "type": {
+        "ui:title": "Type"
+      }
+    },
+    "template": {
+      "ui:title": "Template",
+      "metadata": {
+        "ui:title": "Metadata",
+        "labels": {
+          "ui:title": "Labels"
+        }
+      },
+      "spec": {
+        "ui:title": "Spec",
+        "containers": {
+          "ui:title": "Containers",
+          "items": {
+            "name": {
+              "ui:title": "Name"
+            },
+            "image": {
+              "ui:title": "Image"
+            },
+            "ports": {
+              "ui:title": "Ports",
+              "items": {
+                "name": {
+                  "ui:title": "Name"
+                },
+                "containerPort": {
+                  "ui:title": "Container Port"
+                }
+              }
+            },
+            "resources": {
+              "limits": {
+                "ui:title": "Limits",
+                "memory": {
+                  "ui:title": "Memory"
+                },
+                "cpu": {
+                  "ui:title": "CPU"
+                }
+              },
+              "requests": {
+                "ui:title": "Requests",
+                "memory": {
+                  "ui:title": "Memory"
+                },
+                "cpu": {
+                  "ui:title": "CPU"
+                }
+              }
+            },
+            "env": {
+              "ui:title": "Environments",
+              "items": {
+                "name": {
+                  "ui:title": "Name"
+                },
+                "value": {
+                  "ui:title": "Value"
+                },
+                "valueFrom": {
+                  "ui:title": "Value From",
+                  "secretKeyRef": {
+                    "ui:title": "Secret Key Ref",
+                    "name": {
+                      "ui:title": "Name"
+                    },
+                    "key": {
+                      "ui:title": "Key"
+                    }
+                  }
+                }
+              }
+            },
+            "volumeMounts": {
+              "ui:title": "Volume Mounts",
+              "items": {
+                "name": {
+                  "ui:title": "Name"
+                },
+                "mountPath": {
+                  "ui:title": "Mounth Path"
+                },
+                "readOnly": {
+                  "ui:title": "Read Only"
+                }
+              }
+            },
+            "command": {
+              "ui:title": "Commands",
+              "items": {
+                "ui:title": "Command"
+              }
+            },
+            "imagePullPolicy": {
+              "ui:title": "Image Pull Policy"
+            }
+          }
+        },
+        "securityContext": {
+          "ui:title": "Security Context",
+          "runAsNonRoot": {
+            "ui:title": "Run as Non Root"
+          }
+        },
+        "serviceAccountName": {
+          "ui:title": "Service Account Name"
+        },
+        "volumes": {
+          "ui:title": "Volumes",
+          "items": {
+            "emptyDir": {
+              "ui:title": "Empty Dir"
+            },
+            "name": {
+              "ui:title": "Name"
+            },
+            "hostPath": {
+              "ui:title": "Host Path",
+              "path": {
+                "ui:title": "Path"
+              }
+            }
+          }
+        },
+        "terminationGracePeriodSeconds": {
+          "ui:title": "Termination Grace Period Seconds"
+        },
+        "imagePullSecrets": {
+          "ui:title": "Image Pull Secrets",
+          "items": {
+            "name": {
+              "ui:title": "Name"
+            }
+          }
+        }
+      }
+    }
+  }
+}

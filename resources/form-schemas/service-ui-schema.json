@@ -1,0 +1,55 @@
+{
+  "ui:title": "Service Properties",
+  "spec": {
+    "ui:title": "Object specs",
+    "selector": {
+      "ui:title": "Selector"
+    },
+    "type": {
+      "ui:title": "Type"
+    },
+    "externalName": {
+      "ui:title": "External Name"
+    },
+    "ports": {
+      "ui:title": "Ports",
+      "items": {
+        "name": {
+          "ui:title": "Name"
+        },
+        "protocol": {
+          "ui:title": "Protocol"
+        },
+        "port": {
+          "ui:title": "Port"
+        },
+        "targetPort": {
+          "ui:title": "Target Port"
+        },
+        "nodePort": {
+          "ui:title": "Node Port"
+        }
+      }
+    },
+    "clusterIP": {
+      "ui:title": "Cluster IP"
+    },
+    "externalIPs": {
+      "ui:title": "External IP"
+    }
+  },
+  "status": {
+    "ui:title": "Status",
+    "loadBalancer": {
+      "ui:title": "Load Balancer",
+      "ingress": {
+        "ui:title": "Ingress",
+        "items": {
+          "ip": {
+            "ui:title": "IP"
+          }
+        }
+      }
+    }
+  }
+}

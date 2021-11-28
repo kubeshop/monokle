@@ -1,0 +1,217 @@
+{
+  "properties": {
+    "spec": {
+      "type": "object",
+      "properties": {
+        "selector": {
+          "type": "object",
+          "properties": {
+            "matchLabels": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "replicas": {
+          "type": "number"
+        },
+        "strategy": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["Recreate", "RollingUpdate"]
+            }
+          }
+        },
+        "template": {
+          "type": "object",
+          "properties": {
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "spec": {
+              "type": "object",
+              "properties": {
+                "containers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "ports": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "containerPort": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      },
+                      "resources": {
+                        "type": "object",
+                        "properties": {
+                          "limits": {
+                            "type": "object",
+                            "properties": {
+                              "memory": {
+                                "type": "string"
+                              },
+                              "cpu": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "requests": {
+                            "type": "object",
+                            "properties": {
+                              "memory": {
+                                "type": "string"
+                              },
+                              "cpu": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "env": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "value": {
+                              "type": "string"
+                            },
+                            "valueFrom": {
+                              "type": ["object"],
+                              "default": null,
+                              "properties": {
+                                "secretKeyRef": {
+                                  "type": ["object"],
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "key": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "volumeMounts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "mountPath": {
+                              "type": "string"
+                            },
+                            "readOnly": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      },
+                      "command": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "imagePullPolicy": {
+                        "type": "string",
+                        "enum": ["Always", "IfNotPresent", "Never"]
+                      }
+                    }
+                  }
+                },
+                "securityContext": {
+                  "type": "object",
+                  "properties": {
+                    "runAsNonRoot": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "serviceAccountName": {
+                  "type": "string"
+                },
+                "volumes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "emptyDir": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "hostPath": {
+                        "type": ["object", "null"],
+                        "properties": {
+                          "path": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "terminationGracePeriodSeconds": {
+                  "type": "number"
+                },
+                "imagePullSecrets": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object"
+}

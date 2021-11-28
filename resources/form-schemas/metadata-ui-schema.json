@@ -7,7 +7,8 @@
     },
     "namespace": {
       "ui:title": "Namespace",
-      "ui:help": "(defines the namespace in within this object must be unique, empty = default)"
+      "ui:help": "(defines the namespace in within this object must be unique, empty = default)",
+      "ui:widget": "namespaceSelection"
     },
     "labels": {
       "ui:title": "Labels",
