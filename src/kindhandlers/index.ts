@@ -57,8 +57,10 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
 const HandlerByResourceKind = Object.fromEntries(
   ResourceKindHandlers.map(kindHandler => ({
     ...kindHandler,
-    formSchema: getFormSchema(kindHandler.kind),
-    formUiSchema: getUiSchema(kindHandler.kind),
+    formEditorOptions: {
+      editorSchema: getFormSchema(kindHandler.kind),
+      editorUiSchema: getUiSchema(kindHandler.kind),
+    },
   })).map(kindHandler => [kindHandler.kind, kindHandler])
 );
 

@@ -126,10 +126,6 @@ interface ResourceKindHandler {
   }[];
 
   validationSchemaPrefix?: string;
-
-  formSchema?: any;
-
-  formUiSchema?: any;
 }
 
 export type {ResourceKindHandler, RefMapper, SymbolMatcher};

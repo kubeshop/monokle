@@ -249,8 +249,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   useEffect(() => {
     if (
       (key === 'metadataForm' || key === 'form') &&
-      (!selectedResourceId ||
-        !(resourceKindHandler && resourceKindHandler.formSchema && resourceKindHandler.formUiSchema))
+      (!selectedResourceId || !(resourceKindHandler && resourceKindHandler.formEditorOptions))
     ) {
       setKey('source');
     }
@@ -392,8 +391,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
             {selectedResource &&
               resourceKindHandler &&
-              resourceKindHandler.formSchema &&
-              resourceKindHandler.formUiSchema && (
+              resourceKindHandler.formEditorOptions &&
+              resourceKindHandler.formEditorOptions.editorSchema &&
+              resourceKindHandler.formEditorOptions.editorUiSchema && (
                 <TabPane
                   tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
                   disabled={!selectedResourceId}
@@ -404,8 +404,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   ) : (
                     <FormEditor
                       contentHeight={contentHeight}
-                      formSchema={resourceKindHandler.formSchema}
-                      formUiSchema={resourceKindHandler.formUiSchema}
+                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                     />
                   )}
                 </TabPane>
