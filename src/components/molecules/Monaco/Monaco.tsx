@@ -20,14 +20,20 @@ import {Document, ParsedNode, isMap, parseAllDocuments} from 'yaml';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {ResourceRef} from '@models/k8sresource';
+import {NewResourceWizardInput} from '@models/ui';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
+import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
+
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';
@@ -98,7 +104,31 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     }
   };
 
-  useCodeIntel(editor, code, selectedResourceId, resourceMap, fileMap, isEditorMounted, selectResource, selectFilePath);
+  const createResource = (outoingRef: ResourceRef, namespace?: string, targetFolder?: string) => {
+    if (outoingRef.target?.type === 'resource' && outoingRef.target.resourceKind) {
+      const input: NewResourceWizardInput = {
+        name: outoingRef.name,
+        namespace,
+        apiVersion: getResourceKindHandler(outoingRef.target.resourceKind)?.clusterApiVersion,
+        kind: outoingRef.target?.resourceKind,
+        targetFolder,
+      };
+
+      dispatch(openNewResourceWizard({defaultInput: input}));
+    }
+  };
+
+  useCodeIntel(
+    editor,
+    selectedResource,
+    code,
+    resourceMap,
+    fileMap,
+    isEditorMounted,
+    selectResource,
+    selectFilePath,
+    createResource
+  );
   const {registerStaticActions} = useEditorKeybindings(
     editor,
     hiddenInputRef,

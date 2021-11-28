@@ -6,6 +6,7 @@ export type NewResourceWizardInput = {
   apiVersion?: string;
   namespace?: string;
   selectedResourceId?: string;
+  targetFolder?: string;
 };
 
 export type MonacoRange = {

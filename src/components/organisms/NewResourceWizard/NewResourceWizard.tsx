@@ -62,6 +62,12 @@ const NewResourceWizard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resourceMap]);
 
+  useEffect(() => {
+    if (defaultInput?.targetFolder && fileMap[ROOT_FILE_ENTRY]) {
+      setSelectedFolder(defaultInput.targetFolder);
+    }
+  }, [defaultInput]);
+
   const closeWizard = () => {
     dispatch(closeNewResourceWizard());
   };

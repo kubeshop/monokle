@@ -1,69 +1,74 @@
 import {useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
+import {useDebounce} from 'react-use';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
+import {K8sResource, ResourceRef} from '@models/k8sresource';
 
 import codeIntel from './codeIntel';
 import {clearDecorations, setDecorations} from './editorHelpers';
 
 function useCodeIntel(
   editor: monaco.editor.IStandaloneCodeEditor | null,
-  code: string,
-  selectedResourceId: string | undefined,
+  selectedResource: K8sResource | undefined,
+  code: string | undefined,
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   isEditorMounted: boolean,
   selectResource: (resourceId: string) => void,
-  selectFilePath: (filePath: string) => void
+  selectFilePath: (filePath: string) => void,
+  createResource: (outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void
 ) {
   const idsOfDecorationsRef = useRef<string[]>([]);
-  const hoverDisposablesRef = useRef<monaco.IDisposable[]>([]);
-  const commandDisposablesRef = useRef<monaco.IDisposable[]>([]);
-  const linkDisposablesRef = useRef<monaco.IDisposable[]>([]);
+  const disposablesRef = useRef<monaco.IDisposable[]>([]);
   const completionDisposableRef = useRef<monaco.IDisposable | null>(null);
 
   const clearCodeIntel = () => {
     if (editor) {
       clearDecorations(editor, idsOfDecorationsRef.current);
+      idsOfDecorationsRef.current = [];
     }
-    hoverDisposablesRef.current.forEach(hoverDisposable => hoverDisposable.dispose());
-    commandDisposablesRef.current.forEach(commandDisposable => commandDisposable.dispose());
-    linkDisposablesRef.current.forEach(linkDisposable => linkDisposable.dispose());
+    disposablesRef.current.forEach(disposable => disposable.dispose());
+    disposablesRef.current = [];
   };
 
   const applyCodeIntel = () => {
-    if (editor && selectedResourceId && resourceMap[selectedResourceId]) {
-      const resource = resourceMap[selectedResourceId];
-      const {newDecorations, newHoverDisposables, newCommandDisposables, newLinkDisposables} =
-        codeIntel.applyForResource(resource, selectResource, selectFilePath, resourceMap, fileMap);
-      const idsOfNewDecorations = setDecorations(editor, newDecorations, idsOfDecorationsRef.current);
-      idsOfDecorationsRef.current = idsOfNewDecorations;
-      hoverDisposablesRef.current = newHoverDisposables;
-      commandDisposablesRef.current = newCommandDisposables;
-      linkDisposablesRef.current = newLinkDisposables;
+    if (editor && selectedResource) {
+      const {newDecorations, newDisposables} = codeIntel.applyForResource(
+        selectedResource,
+        selectResource,
+        selectFilePath,
+        createResource,
+        resourceMap,
+        fileMap
+      );
+      idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
+      disposablesRef.current = newDisposables;
     }
   };
 
-  useEffect(() => {
-    clearCodeIntel();
-    applyCodeIntel();
-
-    return () => {
+  useDebounce(
+    () => {
       clearCodeIntel();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEditorMounted, code, selectedResourceId, resourceMap]);
+      applyCodeIntel();
+
+      return () => {
+        clearCodeIntel();
+      };
+    },
+    200,
+    [code, isEditorMounted, selectedResource, resourceMap, editor]
+  );
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {
       completionDisposableRef.current.dispose();
     }
     if (editor) {
-      const newCompletionDisposable = codeIntel.applyAutocomplete(resourceMap);
-      completionDisposableRef.current = newCompletionDisposable;
+      completionDisposableRef.current = codeIntel.applyAutocomplete(resourceMap);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResourceId, resourceMap]);
+  }, [selectedResource, resourceMap, editor]);
 }
 
 export default useCodeIntel;
