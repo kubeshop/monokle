@@ -1,5 +1,6 @@
 import {ipcRenderer} from 'electron';
 
+import {debounce} from 'lodash';
 import {AnyAction} from 'redux';
 
 import store from './store';
@@ -19,7 +20,10 @@ ipcRenderer.on('redux-subscribe', (_, webContentsId: number) => {
     return;
   }
   storeSubscribers.push(webContentsId);
-  store.subscribe(() => {
+  const sendTrigger = debounce(() => {
     ipcRenderer.send('redux-subscribe-triggered', {webContentsId, storeState: store.getState()});
+  }, 500);
+  store.subscribe(() => {
+    sendTrigger();
   });
 });
