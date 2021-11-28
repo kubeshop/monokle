@@ -16,7 +16,7 @@ import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/serv
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
-import {extractK8sResources, reprocessResources} from './resource';
+import {extractK8sResources, isPreviewResource, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: K8sResource[];
@@ -504,7 +504,9 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
   }
 
   reprocessResources(
-    Object.values(state.resourceMap).map(r => r.id),
+    Object.values(state.resourceMap)
+      .filter(r => !isPreviewResource(r))
+      .map(r => r.id),
     state.resourceMap,
     state.fileMap,
     state.resourceRefsProcessingOptions,
