@@ -146,11 +146,25 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK, () => {
-    dispatch(selectFromHistory({direction: 'left'}));
+    selectFromHistory(
+      'left',
+      mainState.currentSelectionHistoryIndex,
+      mainState.selectionHistory,
+      mainState.resourceMap,
+      mainState.fileMap,
+      dispatch
+    );
   });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD, () => {
-    dispatch(selectFromHistory({direction: 'right'}));
+    selectFromHistory(
+      'right',
+      mainState.currentSelectionHistoryIndex,
+      mainState.selectionHistory,
+      mainState.resourceMap,
+      mainState.fileMap,
+      dispatch
+    );
   });
 
   useHotkeys(

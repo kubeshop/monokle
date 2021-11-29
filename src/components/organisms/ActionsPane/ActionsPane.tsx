@@ -181,11 +181,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
     currentSelectionHistoryIndex < selectionHistory.length - 1;
 
   const onClickLeftArrow = () => {
-    dispatch(selectFromHistory({direction: 'left'}));
+    selectFromHistory('left', currentSelectionHistoryIndex, selectionHistory, resourceMap, fileMap, dispatch);
   };
 
   const onClickRightArrow = () => {
-    dispatch(selectFromHistory({direction: 'right'}));
+    selectFromHistory('right', currentSelectionHistoryIndex, selectionHistory, resourceMap, fileMap, dispatch);
   };
 
   const applySelection = useCallback(() => {

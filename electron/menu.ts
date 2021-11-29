@@ -17,6 +17,7 @@ import {
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {RootState} from '@redux/store';
+import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {openDocumentation, openGitHub} from '@utils/shell';
 
@@ -236,22 +237,32 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'Previous Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_BACK,
-        enabled: false,
-        // enabled: Boolean(isPreviousResourceEnabled),
-        // click: async () => {
-        //   const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
-        //   dispatch(selectFromHistory({direction: 'left'}));
-        // },
+        enabled: Boolean(isPreviousResourceEnabled),
+        click: () => {
+          selectFromHistory(
+            'left',
+            state.main.currentSelectionHistoryIndex,
+            state.main.selectionHistory,
+            state.main.resourceMap,
+            state.main.fileMap,
+            dispatch
+          );
+        },
       },
       {
         label: 'Next Resource',
         accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD,
-        enabled: false,
-        // enabled: Boolean(isNextResourceEnabled),
-        // click: async () => {
-        //   const {selectFromHistory} = await import('@redux/thunks/selectionHistory'); // Temporary fix until refactor
-        //   dispatch(selectFromHistory({direction: 'right'}));
-        // },
+        enabled: Boolean(isNextResourceEnabled),
+        click: () => {
+          selectFromHistory(
+            'right',
+            state.main.currentSelectionHistoryIndex,
+            state.main.selectionHistory,
+            state.main.resourceMap,
+            state.main.fileMap,
+            dispatch
+          );
+        },
       },
       {type: 'separator'},
       {

@@ -21,6 +21,7 @@ import {
   HelmValuesMapType,
   ResourceFilterType,
   ResourceMapType,
+  SelectionHistoryEntry,
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
@@ -32,7 +33,6 @@ import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
@@ -444,6 +444,13 @@ export const mainSlice = createSlice({
     reloadClusterDiff: (state: Draft<AppState>) => {
       state.clusterDiff.shouldReload = true;
     },
+    setSelectionHistory: (
+      state: Draft<AppState>,
+      action: PayloadAction<{nextSelectionHistoryIndex?: number; newSelectionHistory: SelectionHistoryEntry[]}>
+    ) => {
+      state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
+      state.selectionHistory = action.payload.newSelectionHistory;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -564,11 +571,6 @@ export const mainSlice = createSlice({
     builder.addCase(performResourceDiff.fulfilled, (state, action) => {
       state.diffResourceId = action.payload.diffResourceId;
       state.diffContent = action.payload.diffContent;
-    });
-
-    builder.addCase(selectFromHistory.fulfilled, (state, action) => {
-      state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
-      state.selectionHistory = action.payload.newSelectionHistory;
     });
 
     builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
@@ -872,5 +874,6 @@ export const {
   unselectAllClusterDiffMatches,
   reloadClusterDiff,
   reprocessAllResources,
+  setSelectionHistory,
 } = mainSlice.actions;
 export default mainSlice.reducer;
