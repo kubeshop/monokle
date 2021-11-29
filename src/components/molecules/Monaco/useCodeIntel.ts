@@ -57,7 +57,7 @@ function useCodeIntel(
   const debouncedUpdate = debounce(() => {
     clearCodeIntel();
     applyCodeIntel();
-  }, 200);
+  }, 100);
 
   useEffect(() => {
     debouncedUpdate();
