@@ -37,13 +37,11 @@ export const setRootFolder = createAsyncThunk<
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
 
-  //  console.log(`setting root folder from process type ${process?.type}`);
-
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
 
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
   const readFilesPromise = new Promise<string[]>(resolve => {
-    process.nextTick(() => {
+    setImmediate(() => {
       resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
     });
   });

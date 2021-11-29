@@ -21,8 +21,8 @@ import {RootState} from '@redux/store';
 import {openDocumentation, openGitHub} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
+import {MainDispatch} from './ipcMainRedux';
 import {openApplication} from './main';
-import {MainDispatch} from './redux';
 
 const isMac = process.platform === 'darwin';
 
@@ -92,7 +92,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Browse Folder',
         toolTip: BrowseFolderTooltip,
         enabled: !isInPreviewModeSelector(state),
-        click: async () => {
+        click: () => {
           dispatch(openFolderExplorer());
         },
       },
@@ -100,7 +100,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Refresh Folder',
         enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         toolTip: ReloadFolderTooltip,
-        click: async () => {
+        click: () => {
           setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
         },
       },
@@ -109,7 +109,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Recent Folders',
         submenu: state.config.recentFolders.map((folder: string) => ({
           label: folder,
-          click: async () => {
+          click: () => {
             setRootFolderInRendererThread(folder);
           },
         })),

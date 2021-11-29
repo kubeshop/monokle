@@ -42,7 +42,7 @@ import {setAppRehydrating} from '@redux/reducers/main';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './redux';
+import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
 import { RootState } from '@redux/store';
 
 Object.assign(console, ElectronLog.functions);
