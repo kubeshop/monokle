@@ -1,6 +1,7 @@
 import {ipcRenderer} from 'electron';
 
 import {debounce} from 'lodash';
+import log from 'loglevel';
 import {AnyAction} from 'redux';
 
 import store from './store';
@@ -17,6 +18,9 @@ ipcRenderer.on('redux-get-state', (_, webContentsId: number) => {
 
 ipcRenderer.on('redux-subscribe', (_, webContentsId: number) => {
   if (storeSubscribers.includes(webContentsId)) {
+    log.warn(
+      `[ipcRendererRedux]: A redux store subscription for the webContents with id ${webContentsId} already exists.`
+    );
     return;
   }
   storeSubscribers.push(webContentsId);
