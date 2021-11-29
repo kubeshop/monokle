@@ -391,10 +391,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   ) : (
                     <FormEditor
                       contentHeight={contentHeight}
-                      // formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                      // formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                      formSchema={getFormSchema(resourceKindHandler.kind)}
-                      formUiSchema={getUiSchema(resourceKindHandler.kind)}
+                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                     />
                   )}
                 </TabPane>

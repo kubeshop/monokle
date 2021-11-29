@@ -213,7 +213,8 @@
                     "type": "object",
                     "properties": {
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "secretType": "PullSecret"
                       }
                     }
                   }
