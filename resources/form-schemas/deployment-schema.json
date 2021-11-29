@@ -102,28 +102,39 @@
                           "properties": {
                             "name": {
                               "type": "string"
-                            },
-                            "value": {
-                              "type": "string"
-                            },
-                            "valueFrom": {
-                              "type": ["object"],
-                              "default": null,
+                            }
+                          },
+                          "anyOf": [
+                            {
+                              "title": "Default",
                               "properties": {
-                                "secretKeyRef": {
-                                  "type": ["object"],
+                                "value": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            {
+                              "title": "From secret",
+                              "properties": {
+                                "valueFrom": {
+                                  "type": "object",
                                   "properties": {
-                                    "name": {
-                                      "type": "string"
-                                    },
-                                    "key": {
-                                      "type": "string"
+                                    "secretKeyRef": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "key": {
+                                          "type": "string"
+                                        }
+                                      }
                                     }
                                   }
                                 }
                               }
                             }
-                          }
+                          ]
                         }
                       },
                       "volumeMounts": {

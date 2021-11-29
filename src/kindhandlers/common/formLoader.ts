@@ -5,9 +5,9 @@ const uiformSchemaCache = new Map<string, any>();
 
 export function getFormSchema(kind: string) {
   try {
-    if (!formSchemaCache.has(kind)) {
-      formSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`)));
-    }
+    // if (!formSchemaCache.has(kind)) {
+    formSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`)));
+    // }
 
     return formSchemaCache.get(kind);
   } catch (error) {
@@ -17,9 +17,9 @@ export function getFormSchema(kind: string) {
 
 export function getUiSchema(kind: string) {
   try {
-    if (!uiformSchemaCache.has(kind)) {
-      uiformSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`)));
-    }
+    // if (!uiformSchemaCache.has(kind)) {
+    uiformSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`)));
+    // }
 
     return uiformSchemaCache.get(kind);
   } catch (error) {

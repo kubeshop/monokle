@@ -375,19 +375,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 )
               )}
             </TabPane>
-            {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
-              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
-                {uiState.isFolderLoading || previewLoader.isLoading ? (
-                  <S.Skeleton active />
-                ) : (
-                  <FormEditor
-                    contentHeight={contentHeight}
-                    formSchema={getFormSchema('metadata')}
-                    formUiSchema={getUiSchema('metadata')}
-                  />
-                )}
-              </TabPane>
-            )}
 
             {selectedResource &&
               resourceKindHandler &&
@@ -404,12 +391,27 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   ) : (
                     <FormEditor
                       contentHeight={contentHeight}
-                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                      // formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                      // formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                      formSchema={getFormSchema(resourceKindHandler.kind)}
+                      formUiSchema={getUiSchema(resourceKindHandler.kind)}
                     />
                   )}
                 </TabPane>
               )}
+            {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
+              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
+                {uiState.isFolderLoading || previewLoader.isLoading ? (
+                  <S.Skeleton active />
+                ) : (
+                  <FormEditor
+                    contentHeight={contentHeight}
+                    formSchema={getFormSchema('metadata')}
+                    formUiSchema={getUiSchema('metadata')}
+                  />
+                )}
+              </TabPane>
+            )}
           </S.Tabs>
         </S.TabsContainer>
         {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}

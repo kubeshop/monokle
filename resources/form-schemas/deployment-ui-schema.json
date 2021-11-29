@@ -77,9 +77,11 @@
                   "ui:title": "Value"
                 },
                 "valueFrom": {
-                  "ui:title": "Value From",
+                  "ui:label": false,
+                  "ui:title": false,
                   "secretKeyRef": {
-                    "ui:title": "Secret Key Ref",
+                    "ui:label": false,
+                    "ui:title": false,
                     "name": {
                       "ui:title": "Name"
                     },
