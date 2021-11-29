@@ -69,11 +69,19 @@ const appMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorO
   };
 };
 
-// need this for now to avoid set-root-folder being run in the main thread
+// need this because we cannot dispatch thunks from main
 function setRootFolderInRendererThread(folder: string) {
   const window = BrowserWindow.getFocusedWindow();
   if (window) {
     window.webContents.send('set-root-folder', folder);
+  }
+}
+
+// need this because we cannot dispatch thunks from main
+function performResourceDiff(resourceId: string) {
+  const window = BrowserWindow.getFocusedWindow();
+  if (window) {
+    window.webContents.send('perform-resource-diff', resourceId);
   }
 }
 
@@ -187,23 +195,24 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       },
       {type: 'separator'},
       {
-        enabled: isMonacoActionEnabled,
         label: 'Apply',
         accelerator: hotkeys.APPLY_SELECTION,
+        enabled: Boolean(state.main.selectedResourceId),
         click: () => {
           dispatch(setMonacoEditor({apply: true}));
         },
       },
-      // TODO: we need a way to trigger the diff by dispatching a simple action instead of a thunk
-      // {
-      //   enabled: isMonacoActionEnabled,
-      //   label: 'Diff',
-      //   accelerator: hotkeys.DIFF_RESOURCE,
-      //   click: async () => {
-      //     const {performResourceDiff} = await import('@redux/thunks/diffResource');
-      //     dispatch(performResourceDiff(<string>mainState.selectedResourceId));
-      //   },
-      // },
+      {
+        label: 'Diff',
+        accelerator: hotkeys.DIFF_RESOURCE,
+        enabled: Boolean(state.main.selectedResourceId),
+        click: () => {
+          if (!state.main.selectedResourceId) {
+            return;
+          }
+          performResourceDiff(state.main.selectedResourceId);
+        },
+      },
     ],
   };
 };
