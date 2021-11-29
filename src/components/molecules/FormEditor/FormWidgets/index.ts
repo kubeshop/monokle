@@ -1,3 +1,4 @@
 import {NamespaceSelection} from './NamespaceSelection';
+import {SecretKindSelection} from './SecretKindSelection';
 
-export {NamespaceSelection};
+export {NamespaceSelection, SecretKindSelection};

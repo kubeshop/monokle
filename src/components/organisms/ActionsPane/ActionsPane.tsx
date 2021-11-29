@@ -399,19 +399,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 )
               )}
             </TabPane>
-            {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
-              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
-                {uiState.isFolderLoading || previewLoader.isLoading ? (
-                  <S.Skeleton active />
-                ) : (
-                  <FormEditor
-                    contentHeight={contentHeight}
-                    formSchema={getFormSchema('metadata')}
-                    formUiSchema={getUiSchema('metadata')}
-                  />
-                )}
-              </TabPane>
-            )}
 
             {selectedResource &&
               resourceKindHandler &&
@@ -434,6 +421,19 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   )}
                 </TabPane>
               )}
+            {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
+              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
+                {uiState.isFolderLoading || previewLoader.isLoading ? (
+                  <S.Skeleton active />
+                ) : (
+                  <FormEditor
+                    contentHeight={contentHeight}
+                    formSchema={getFormSchema('metadata')}
+                    formUiSchema={getUiSchema('metadata')}
+                  />
+                )}
+              </TabPane>
+            )}
           </S.Tabs>
         </S.TabsContainer>
         {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}

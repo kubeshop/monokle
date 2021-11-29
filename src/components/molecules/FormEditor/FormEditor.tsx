@@ -16,7 +16,7 @@ import {updateResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
 import {mergeManifests} from '@redux/services/manifest-utils';
 
-import {NamespaceSelection} from './FormWidgets';
+import {NamespaceSelection, SecretKindSelection} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
 
@@ -167,6 +167,9 @@ const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema
         onChange={onFormUpdate}
         widgets={{
           namespaceSelection: NamespaceSelection,
+        }}
+        fields={{
+          secretKindSelection: SecretKindSelection,
         }}
         disabled={isInPreviewMode}
       >
