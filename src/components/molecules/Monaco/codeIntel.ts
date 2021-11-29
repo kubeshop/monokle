@@ -187,11 +187,14 @@ function addLabelFilterLink(
   if (label) {
     const value = label.substring(symbol.name.length + 1).trim();
 
-    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(`Filter on label [${label}]`, () => {
-      const labels: Record<string, string | null> = {};
-      labels[symbol.name] = value;
-      filterResources({labels, annotations: {}});
-    });
+    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+      `Add label [${label}] to current filter`,
+      () => {
+        const labels: Record<string, string | null> = {};
+        labels[symbol.name] = value;
+        filterResources({labels, annotations: {}});
+      }
+    );
     newDisposables.push(commandDisposable);
 
     const hoverDisposable = createHoverProvider(symbol.range, [
@@ -213,7 +216,7 @@ function addAnnotationFilterLink(
     const value = annotation.substring(symbol.name.length + 1).trim();
 
     const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-      `Filter on annotation [${annotation}]`,
+      `Add annotation [${annotation}] to current filter`,
       () => {
         const annotations: Record<string, string | null> = {};
         annotations[symbol.name] = value;
