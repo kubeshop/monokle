@@ -121,6 +121,7 @@
                                   "properties": {
                                     "secretKeyRef": {
                                       "type": "object",
+                                      "secretType": "Opaque",
                                       "properties": {
                                         "name": {
                                           "type": "string"

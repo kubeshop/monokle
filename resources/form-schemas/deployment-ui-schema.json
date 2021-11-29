@@ -82,12 +82,7 @@
                   "secretKeyRef": {
                     "ui:label": false,
                     "ui:title": false,
-                    "name": {
-                      "ui:title": "Name"
-                    },
-                    "key": {
-                      "ui:title": "Key"
-                    }
+                    "ui:field": "secretKindSelection"
                   }
                 }
               }
