@@ -1,6 +1,8 @@
 import {useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
 
+import {debounce} from 'lodash';
+
 import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
@@ -52,11 +54,16 @@ function useCodeIntel(
     }
   };
 
-  useEffect(() => {
+  const debouncedUpdate = debounce(() => {
     clearCodeIntel();
     applyCodeIntel();
+  }, 200);
+
+  useEffect(() => {
+    debouncedUpdate();
 
     return () => {
+      debouncedUpdate.cancel();
       clearCodeIntel();
     };
   }, [code, isEditorMounted, selectedResource, resourceMap, editor]);
