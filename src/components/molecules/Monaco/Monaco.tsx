@@ -20,11 +20,12 @@ import {Document, ParsedNode, isMap, parseAllDocuments} from 'yaml';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {ResourceFilterType} from '@models/appstate';
 import {ResourceRef} from '@models/k8sresource';
 import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, selectK8sResource} from '@redux/reducers/main';
+import {extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
@@ -74,6 +75,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
   const [code, setCode] = useState('');
@@ -104,6 +106,10 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     }
   };
 
+  const filterResources = (filter: ResourceFilterType) => {
+    dispatch(extendResourceFilter(filter));
+  };
+
   const createResource = (outoingRef: ResourceRef, namespace?: string, targetFolder?: string) => {
     if (outoingRef.target?.type === 'resource' && outoingRef.target.resourceKind) {
       const input: NewResourceWizardInput = {
@@ -127,7 +133,8 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
     isEditorMounted,
     selectResource,
     selectFilePath,
-    createResource
+    isInPreviewMode ? undefined : createResource,
+    filterResources
   );
   const {registerStaticActions} = useEditorKeybindings(
     editor,

@@ -117,7 +117,7 @@ const isPositionAfterRange = (position: monaco.IPosition, range: monaco.IRange) 
   return position.column > range.startColumn && position.lineNumber >= range.startLineNumber;
 };
 
-const getSymbols = async (model: monaco.editor.IModel) => {
+export const getSymbols = async (model: monaco.editor.IModel) => {
   const symbols = await getDocumentSymbols(model, false, {
     isCancellationRequested: false,
     onCancellationRequested: () => {

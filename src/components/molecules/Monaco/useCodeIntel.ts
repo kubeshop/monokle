@@ -1,8 +1,9 @@
 import {useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
-import {useDebounce} from 'react-use';
 
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {debounce} from 'lodash';
+
+import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef} from '@models/k8sresource';
 
 import codeIntel from './codeIntel';
@@ -17,7 +18,8 @@ function useCodeIntel(
   isEditorMounted: boolean,
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void,
-  createResource: (outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void
+  createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined,
+  filterResources: (filter: ResourceFilterType) => void
 ) {
   const idsOfDecorationsRef = useRef<string[]>([]);
   const disposablesRef = useRef<monaco.IDisposable[]>([]);
@@ -34,31 +36,37 @@ function useCodeIntel(
 
   const applyCodeIntel = () => {
     if (editor && selectedResource) {
-      const {newDecorations, newDisposables} = codeIntel.applyForResource(
-        selectedResource,
-        selectResource,
-        selectFilePath,
-        createResource,
-        resourceMap,
-        fileMap
-      );
-      idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
-      disposablesRef.current = newDisposables;
+      codeIntel
+        .applyForResource(
+          selectedResource,
+          selectResource,
+          selectFilePath,
+          createResource,
+          filterResources,
+          resourceMap,
+          fileMap,
+          editor?.getModel()
+        )
+        .then(({newDecorations, newDisposables}) => {
+          idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
+          disposablesRef.current = newDisposables;
+        });
     }
   };
 
-  useDebounce(
-    () => {
-      clearCodeIntel();
-      applyCodeIntel();
+  const debouncedUpdate = debounce(() => {
+    clearCodeIntel();
+    applyCodeIntel();
+  }, 100);
 
-      return () => {
-        clearCodeIntel();
-      };
-    },
-    200,
-    [code, isEditorMounted, selectedResource, resourceMap, editor]
-  );
+  useEffect(() => {
+    debouncedUpdate();
+
+    return () => {
+      debouncedUpdate.cancel();
+      clearCodeIntel();
+    };
+  }, [code, isEditorMounted, selectedResource, resourceMap, editor]);
 
   useEffect(() => {
     if (completionDisposableRef.current && completionDisposableRef.current.dispose) {
