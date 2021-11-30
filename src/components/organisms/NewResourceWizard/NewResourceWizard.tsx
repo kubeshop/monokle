@@ -1,13 +1,14 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Form, Input, Modal, Select} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
-import Mousetrap from 'mousetrap';
 import path from 'path/posix';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
+import hotkeys from '@constants/hotkeys';
 
 import {K8sResource} from '@models/k8sresource';
 
@@ -203,15 +204,15 @@ const NewResourceWizard = () => {
     }
   };
 
-  useEffect(() => {
-    if (newResourceWizardState.isOpen) {
-      Mousetrap.bind('shift+enter', () => {
+  useHotkeys(
+    hotkeys.CREATE_NEW_RESOURCE,
+    () => {
+      if (newResourceWizardState.isOpen) {
         form.submit();
-      });
-    } else {
-      Mousetrap.unbind('shift+enter');
-    }
-  }, [newResourceWizardState.isOpen]);
+      }
+    },
+    [newResourceWizardState.isOpen]
+  );
 
   return (
     <Modal

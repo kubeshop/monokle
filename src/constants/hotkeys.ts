@@ -10,6 +10,7 @@ const hotkeys = {
   SELECT_FROM_HISTORY_BACK: 'alt+left',
   SELECT_FROM_HISTORY_FORWARD: 'alt+right',
   OPEN_NEW_RESOURCE_WIZARD: 'ctrl+n,cmd+n',
+  CREATE_NEW_RESOURCE: 'shift+enter',
   APPLY_SELECTION: 'ctrl+alt+s,cmd+alt+s',
   DIFF_RESOURCE: 'ctrl+alt+d,cmd+alt+d',
 };
