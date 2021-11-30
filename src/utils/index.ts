@@ -25,6 +25,7 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
           PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
           PATH: PROCESS_ENV.PATH,
         },
+        windowsHide: true,
       });
       return false;
     } catch (e: any) {

@@ -28,6 +28,7 @@ export const runKustomize = (folder: string, kustomizeCommand: KustomizeCommandT
         PATH: PROCESS_ENV.PATH,
       },
       maxBuffer: 1024 * 1024 * 10,
+      windowsHide: true
     });
 
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
@@ -107,6 +108,7 @@ export const runHelm = (args: any, event: Electron.IpcMainEvent) => {
         PATH: PROCESS_ENV.PATH,
       },
       maxBuffer: 1024 * 1024 * 10,
+      windowsHide: true
     });
 
     event.sender.send('helm-result', {stdout: stdout.toString()});
