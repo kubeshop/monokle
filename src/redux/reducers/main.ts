@@ -32,6 +32,7 @@ import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -78,6 +79,11 @@ export type UpdateResourcePayload = {
   content: string;
   preventSelectionAndHighlightsUpdate?: boolean;
 };
+
+export type UpdateManyResourcesPayload = {
+  resourceId: string;
+  content: string;
+}[];
 
 export type UpdateFileEntryPayload = {
   path: string;
@@ -265,43 +271,66 @@ export const mainSlice = createSlice({
     /**
      * Updates the content of the specified resource to the specified value
      */
-    updateResource: {
-      reducer: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
-        try {
-          const resource = state.resourceMap[action.payload.resourceId];
+    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
+      try {
+        const resource = state.resourceMap[action.payload.resourceId];
+        if (resource) {
+          if (isFileResource(resource)) {
+            const updatedFileText = saveResource(resource, action.payload.content, state.fileMap);
+            resource.text = updatedFileText;
+            resource.content = parseDocument(updatedFileText).toJS();
+            recalculateResourceRanges(resource, state);
+          } else {
+            resource.text = action.payload.content;
+            resource.content = parseDocument(action.payload.content).toJS();
+          }
+
+          let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
+
+          reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
+          if (!action.payload.preventSelectionAndHighlightsUpdate) {
+            resource.isSelected = false;
+            updateSelectionAndHighlights(state, resource);
+          }
+        }
+      } catch (e) {
+        log.error(e);
+        return original(state);
+      }
+    },
+    /**
+     * Updates the content of the specified resources to the specified values
+     */
+    updateManyResources: (state: Draft<AppState>, action: PayloadAction<UpdateManyResourcesPayload>) => {
+      try {
+        let resourceIdsToReprocess: string[] = [];
+        action.payload.forEach(({resourceId, content}) => {
+          const resource = state.resourceMap[resourceId];
           if (resource) {
             if (isFileResource(resource)) {
-              const updatedFileText = saveResource(resource, action.payload.content, state.fileMap);
+              const updatedFileText = saveResource(resource, content, state.fileMap);
               resource.text = updatedFileText;
               resource.content = parseDocument(updatedFileText).toJS();
               recalculateResourceRanges(resource, state);
             } else {
-              resource.text = action.payload.content;
-              resource.content = parseDocument(action.payload.content).toJS();
+              resource.text = content;
+              resource.content = parseDocument(content).toJS();
             }
 
-            let resources = findResourcesToReprocess(resource, state.resourceMap);
-
-            reprocessResources(resources, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
-            if (!action.payload.preventSelectionAndHighlightsUpdate) {
-              resource.isSelected = false;
-              updateSelectionAndHighlights(state, resource);
-            }
+            let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
+            resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
           }
-        } catch (e) {
-          log.error(e);
-          return original(state);
-        }
-      },
-      prepare: (payload: UpdateResourcePayload) => {
-        // only run this action in the renderer thread - to avoid sync issues when both threads are updating the same file
-        return {
-          payload,
-          meta: {
-            scope: 'local',
-          },
-        };
-      },
+        });
+        reprocessResources(
+          resourceIdsToReprocess,
+          state.resourceMap,
+          state.fileMap,
+          state.resourceRefsProcessingOptions
+        );
+      } catch (e) {
+        log.error(e);
+        return original(state);
+      }
     },
     removeResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const resourceId = action.payload;
@@ -771,6 +800,17 @@ export const mainSlice = createSlice({
       state.clusterDiff.selectedMatches = [];
     });
 
+    builder
+      .addCase(replaceSelectedResourceMatches.pending, state => {
+        state.clusterDiff.hasLoaded = false;
+      })
+      .addCase(replaceSelectedResourceMatches.fulfilled, state => {
+        state.clusterDiff.hasLoaded = true;
+      })
+      .addCase(replaceSelectedResourceMatches.rejected, state => {
+        state.clusterDiff.hasLoaded = true;
+      });
+
     builder.addMatcher(
       action => true,
       (state, action) => {
@@ -879,6 +919,7 @@ export const {
   setSelectingFile,
   setApplyingResource,
   updateResource,
+  updateManyResources,
   updateFileEntry,
   multiplePathsAdded,
   multipleFilesChanged,
