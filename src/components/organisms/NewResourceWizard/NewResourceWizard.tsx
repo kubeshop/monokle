@@ -4,6 +4,7 @@ import {Form, Input, Modal, Select} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
+import Mousetrap from 'mousetrap';
 import path from 'path/posix';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
@@ -26,6 +27,7 @@ import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 import {SaveToFolderWrapper, StyledCheckbox, StyledSelect} from './NewResourceWizard.styled';
 
 const SELECT_OPTION_NONE = '<none>';
+const NEW_ITEM = 'CREATE_NEW_ITEM';
 
 const {Option} = Select;
 
@@ -34,10 +36,12 @@ const NewResourceWizard = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
-  const namespaces = useNamespaces({extra: ['none', 'default']});
+  const [namespaces, setNamespaces] = useNamespaces({extra: ['none', 'default']});
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
   const [shouldSaveToFolder, setShouldSaveState] = useState(true);
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
+  const [isSubmitDisabled, setSubmitDisabled] = useState(true);
+  const [inputValue, setInputValue] = useState<string>(' ');
   const lastKindRef = useRef<string>();
   const defaultInput = newResourceWizardState.defaultInput;
   const defaultValues = defaultInput
@@ -69,6 +73,7 @@ const NewResourceWizard = () => {
   }, [defaultInput]);
 
   const closeWizard = () => {
+    setSubmitDisabled(true);
     dispatch(closeNewResourceWizard());
   };
 
@@ -191,15 +196,54 @@ const NewResourceWizard = () => {
     ));
   };
 
+  const onSelectChange = (value: string) => {
+    if (value.startsWith(NEW_ITEM)) {
+      setNamespaces([...namespaces, inputValue]);
+      form.setFieldsValue({namespace: inputValue});
+    }
+  };
+
+  useEffect(() => {
+    if (newResourceWizardState.isOpen) {
+      Mousetrap.bind('shift+enter', () => {
+        form.submit();
+      });
+    } else {
+      Mousetrap.unbind('shift+enter');
+    }
+  }, [newResourceWizardState.isOpen]);
+
   return (
-    <Modal title="Add New Resource" visible={newResourceWizardState.isOpen} onOk={onOk} onCancel={onCancel}>
-      <Form form={form} layout="vertical" onValuesChange={onFormValuesChange} onFinish={onFinish}>
+    <Modal
+      title="Add New Resource"
+      visible={newResourceWizardState.isOpen}
+      onOk={onOk}
+      onCancel={onCancel}
+      okButtonProps={{
+        disabled: isSubmitDisabled,
+      }}
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        onValuesChange={onFormValuesChange}
+        onFinish={onFinish}
+        onFieldsChange={(changedFields, allFields) => {
+          const neededFields = allFields.filter(
+            (field: any) => field.name[0] === 'name' || field.name[0] === 'kind' || field.name[0] === 'apiVersion'
+          );
+
+          const isFieldsValidated = neededFields.every(field => field.value);
+
+          setSubmitDisabled(!isFieldsValidated);
+        }}
+      >
         <Form.Item
           name="name"
-          label="Name"
+          label="Resource Name"
           rules={[
             {required: true, message: 'This field is required'},
-            {pattern: /^[a-z]$|^([a-z\-.])*[a-z]$/, message: 'Wrong pattern'},
+            {pattern: /^[a-z0-9]$|^([a-z0-9\-.])*[a-z0-9]$/, message: 'Wrong pattern'},
             {max: 63, type: 'string', message: 'Too long'},
           ]}
           tooltip={{
@@ -211,29 +255,29 @@ const NewResourceWizard = () => {
             icon: <InfoCircleOutlined />,
           }}
         >
-          <Input maxLength={63} />
+          <Input maxLength={63} placeholder="Enter resource name" />
         </Form.Item>
         <Form.Item
           name="kind"
-          label="Kind"
-          required
+          label="Resource Kind"
+          rules={[{required: true, message: 'This field is required'}]}
           tooltip={{title: 'Select the resource kind', icon: <InfoCircleOutlined />}}
         >
-          <Select showSearch>
+          <Select showSearch placeholder="Choose resource kind">
             {ResourceKindHandlers.map(kindHandler => (
-              <Select.Option key={kindHandler.kind} value={kindHandler.kind}>
+              <Option key={kindHandler.kind} value={kindHandler.kind}>
                 {kindHandler.kind}
-              </Select.Option>
+              </Option>
             ))}
           </Select>
         </Form.Item>
         <Form.Item
           name="apiVersion"
           label="API Version"
-          required
+          rules={[{required: true, message: 'This field is required'}]}
           tooltip={{title: 'Enter the apiVersion', icon: <InfoCircleOutlined />}}
         >
-          <Input />
+          <Input placeholder="Enter api version" />
         </Form.Item>
         <Form.Item
           name="namespace"
@@ -248,12 +292,29 @@ const NewResourceWizard = () => {
           }}
           initialValue={NO_NAMESPACE}
         >
-          <Select>
-            {namespaces.map(namespace => (
-              <Select.Option key={namespace} value={namespace}>
-                {namespace}
-              </Select.Option>
-            ))}
+          <Select
+            showSearch
+            onSearch={(text: string) => {
+              setInputValue(text);
+            }}
+            onChange={onSelectChange}
+          >
+            {inputValue && namespaces.every(namespace => namespace !== inputValue) ? (
+              <Option key={inputValue} value={`${NEW_ITEM} - ${inputValue}`}>
+                create {`"${inputValue}"`}
+              </Option>
+            ) : null}
+            {namespaces.map(namespace => {
+              if (typeof namespace !== 'string') {
+                return null;
+              }
+
+              return (
+                <Option key={namespace} value={namespace}>
+                  {namespace}
+                </Option>
+              );
+            })}
           </Select>
         </Form.Item>
         <Form.Item
@@ -262,13 +323,13 @@ const NewResourceWizard = () => {
           initialValue={SELECT_OPTION_NONE}
         >
           <Select showSearch>
-            <Select.Option key={SELECT_OPTION_NONE} value={SELECT_OPTION_NONE}>
+            <Option key={SELECT_OPTION_NONE} value={SELECT_OPTION_NONE}>
               {SELECT_OPTION_NONE}
-            </Select.Option>
+            </Option>
             {filteredResources.map(resource => (
-              <Select.Option key={resource.id} value={resource.id}>
+              <Option key={resource.id} value={resource.id}>
                 {resource.name}
-              </Select.Option>
+              </Option>
             ))}
           </Select>
         </Form.Item>
