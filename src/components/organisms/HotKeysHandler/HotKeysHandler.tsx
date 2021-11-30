@@ -6,7 +6,13 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openNewResourceWizard, toggleLeftMenu, toggleRightMenu, toggleSettings} from '@redux/reducers/ui';
+import {
+  openNewResourceWizard,
+  setLeftMenuSelection,
+  toggleLeftMenu,
+  toggleRightMenu,
+  toggleSettings,
+} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
@@ -176,6 +182,22 @@ const HotKeysHandler = () => {
     },
     [mainState.fileMap[ROOT_FILE_ENTRY]]
   );
+
+  useHotkeys(hotkeys.OPEN_EXPLORER_TAB, () => {
+    dispatch(setLeftMenuSelection('file-explorer'));
+  });
+
+  useHotkeys(hotkeys.OPEN_CLUSTER_TAB, () => {
+    dispatch(setLeftMenuSelection('cluster-explorer'));
+  });
+
+  useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB, () => {
+    dispatch(setLeftMenuSelection('kustomize-pane'));
+  });
+
+  useHotkeys(hotkeys.OPEN_HELM_TAB, () => {
+    dispatch(setLeftMenuSelection('helm-pane'));
+  });
 
   return (
     <>
