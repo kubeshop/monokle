@@ -99,7 +99,7 @@
     "jsonpath-plus": "6.0.1",
     "lodash": "4.17.21",
     "loglevel": "1.7.1",
-    "luxon": "2.1.0",
+    "luxon": "2.1.1",
     "micromatch": "4.0.4",
     "module-alias": "2.2.2",
     "monaco-yaml": "3.2.1",
