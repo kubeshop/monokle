@@ -408,6 +408,30 @@ export const mainSlice = createSlice({
     updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       state.resourceFilter = action.payload;
     },
+    extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
+      const filter = action.payload;
+
+      let newFilter: ResourceFilterType = {
+        namespace: filter.namespace || state.resourceFilter.namespace,
+        kind: filter.kind || state.resourceFilter.kind,
+        name: state.resourceFilter.name,
+        labels: filter.labels,
+        annotations: filter.annotations,
+      };
+
+      Object.keys(state.resourceFilter.labels).forEach(key => {
+        if (!newFilter.labels[key]) {
+          newFilter.labels[key] = state.resourceFilter.labels[key];
+        }
+      });
+      Object.keys(state.resourceFilter.annotations).forEach(key => {
+        if (!newFilter.annotations[key]) {
+          newFilter.annotations[key] = state.resourceFilter.annotations[key];
+        }
+      });
+
+      state.resourceFilter = newFilter;
+    },
     setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = action.payload;
     },
@@ -866,6 +890,7 @@ export const {
   stopPreviewLoader,
   removeResource,
   updateResourceFilter,
+  extendResourceFilter,
   setDiffResourceInClusterDiff,
   setClusterDiffRefreshDiffResource,
   selectClusterDiffMatch,

@@ -27,6 +27,7 @@ export const runKustomize = (folder: string, kustomizeCommand: KustomizeCommandT
         PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
         PATH: PROCESS_ENV.PATH,
       },
+      maxBuffer: 1024 * 1024 * 10,
     });
 
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
@@ -105,6 +106,7 @@ export const runHelm = (args: any, event: Electron.IpcMainEvent) => {
         KUBECONFIG: args.kubeconfig,
         PATH: PROCESS_ENV.PATH,
       },
+      maxBuffer: 1024 * 1024 * 10,
     });
 
     event.sender.send('helm-result', {stdout: stdout.toString()});

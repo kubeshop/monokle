@@ -1,6 +1,6 @@
 import {monaco} from 'react-monaco-editor';
 
-import {FileMapType, ResourceMapType} from '@models/appstate';
+import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRef} from '@models/k8sresource';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
@@ -17,6 +17,7 @@ import {
   createInlineDecoration,
   createLinkProvider,
   createMarkdownString,
+  getSymbols,
   getSymbolsBeforePosition,
 } from './editorHelpers';
 
@@ -117,17 +118,176 @@ function areRefPosEqual(a: RefPosition, b: RefPosition) {
   return a.line === b.line && a.column === b.column && a.length === b.length;
 }
 
-export function applyForResource(
+function getSymbolValue(lines: string[], symbol: monaco.languages.DocumentSymbol, includeName?: boolean) {
+  const line = lines[symbol.range.startLineNumber - 1];
+  if (line) {
+    const str = line.substr(symbol.range.startColumn - 1, symbol.range.endColumn - symbol.range.startColumn);
+
+    if (includeName) {
+      return str;
+    }
+
+    const ix = str.indexOf(':', symbol.name.length);
+    return str.substring(ix + 1).trim();
+  }
+}
+
+function addNamespaceFilterLink(
+  lines: string[],
+  symbol: monaco.languages.DocumentSymbol,
+  filterResources: (filter: ResourceFilterType) => void,
+  newDisposables: monaco.IDisposable[]
+) {
+  const namespace = getSymbolValue(lines, symbol);
+  if (namespace) {
+    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+      `Filter on namespace [${namespace}]`,
+      () => {
+        filterResources({namespace, labels: {}, annotations: {}});
+      }
+    );
+    newDisposables.push(commandDisposable);
+
+    const hoverDisposable = createHoverProvider(symbol.range, [
+      createMarkdownString('Filter Resources'),
+      commandMarkdownLink,
+    ]);
+    newDisposables.push(hoverDisposable);
+  }
+}
+
+function addKindFilterLink(
+  lines: string[],
+  symbol: monaco.languages.DocumentSymbol,
+  filterResources: (filter: ResourceFilterType) => void,
+  newDisposables: monaco.IDisposable[]
+) {
+  const kind = getSymbolValue(lines, symbol);
+  if (kind) {
+    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(`Filter on kind [${kind}]`, () => {
+      filterResources({kind, labels: {}, annotations: {}});
+    });
+    newDisposables.push(commandDisposable);
+
+    const hoverDisposable = createHoverProvider(symbol.range, [
+      createMarkdownString('Filter Resources'),
+      commandMarkdownLink,
+    ]);
+    newDisposables.push(hoverDisposable);
+  }
+}
+
+function addLabelFilterLink(
+  lines: string[],
+  symbol: monaco.languages.DocumentSymbol,
+  filterResources: (filter: ResourceFilterType) => void,
+  newDisposables: monaco.IDisposable[]
+) {
+  const label = getSymbolValue(lines, symbol, true);
+  if (label) {
+    const value = label.substring(symbol.name.length + 1).trim();
+
+    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+      `Add label [${label}] to current filter`,
+      () => {
+        const labels: Record<string, string | null> = {};
+        labels[symbol.name] = value;
+        filterResources({labels, annotations: {}});
+      }
+    );
+    newDisposables.push(commandDisposable);
+
+    const hoverDisposable = createHoverProvider(symbol.range, [
+      createMarkdownString('Filter Resources'),
+      commandMarkdownLink,
+    ]);
+    newDisposables.push(hoverDisposable);
+  }
+}
+
+function addAnnotationFilterLink(
+  lines: string[],
+  symbol: monaco.languages.DocumentSymbol,
+  filterResources: (filter: ResourceFilterType) => void,
+  newDisposables: monaco.IDisposable[]
+) {
+  const annotation = getSymbolValue(lines, symbol, true);
+  if (annotation) {
+    const value = annotation.substring(symbol.name.length + 1).trim();
+
+    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+      `Add annotation [${annotation}] to current filter`,
+      () => {
+        const annotations: Record<string, string | null> = {};
+        annotations[symbol.name] = value;
+        filterResources({labels: {}, annotations});
+      }
+    );
+    newDisposables.push(commandDisposable);
+
+    const hoverDisposable = createHoverProvider(symbol.range, [
+      createMarkdownString('Filter Resources'),
+      commandMarkdownLink,
+    ]);
+    newDisposables.push(hoverDisposable);
+  }
+}
+
+function processSymbol(
+  symbol: monaco.languages.DocumentSymbol,
+  parents: monaco.languages.DocumentSymbol[],
+  lines: string[],
+  filterResources: (filter: ResourceFilterType) => void
+) {
+  const newDisposables: monaco.IDisposable[] = [];
+
+  if (symbol.children) {
+    symbol.children.forEach(child => {
+      newDisposables.push(...processSymbol(child, parents.concat(symbol), lines, filterResources));
+    });
+  }
+
+  if (symbol.name === 'namespace') {
+    addNamespaceFilterLink(lines, symbol, filterResources, newDisposables);
+  }
+
+  if (symbol.name === 'kind') {
+    addKindFilterLink(lines, symbol, filterResources, newDisposables);
+  }
+
+  if (parents.length > 0) {
+    const parentName = parents[parents.length - 1].name;
+
+    if (parentName === 'labels' || parentName === 'matchLabels') {
+      addLabelFilterLink(lines, symbol, filterResources, newDisposables);
+    } else if (parentName === 'annotations') {
+      addAnnotationFilterLink(lines, symbol, filterResources, newDisposables);
+    }
+  }
+
+  return newDisposables;
+}
+
+export async function applyForResource(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
   selectFilePath: (filePath: string) => void,
-  createResource: (outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void,
+  createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolderget?: string) => void) | undefined,
+  filterResources: (filter: ResourceFilterType) => void,
   resourceMap: ResourceMapType,
-  fileMap: FileMapType
+  fileMap: FileMapType,
+  model: monaco.editor.IModel | null
 ) {
   const refs = resource.refs;
   const newDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   const newDisposables: monaco.IDisposable[] = [];
+
+  if (model) {
+    const symbols: monaco.languages.DocumentSymbol[] = await getSymbols(model);
+    const lines = resource.text.split('\n');
+
+    newDisposables.push(...symbols.map(symbol => processSymbol(symbol, [], lines, filterResources)).flat());
+  }
 
   if (!refs || refs.length === 0) {
     return {newDecorations, newDisposables};
@@ -181,7 +341,7 @@ export function applyForResource(
       }
 
       // add command for creating resource from unsatisfied ref
-      if (isUnsatisfiedRef(outgoingRef.type)) {
+      if (createResource && isUnsatisfiedRef(outgoingRef.type)) {
         if (
           outgoingRef.target.type === 'resource' &&
           !outgoingRef.target.resourceId &&
@@ -244,20 +404,22 @@ export function applyForResource(
     // create default link if there is only one command
     if (outgoingRefs.length === 1) {
       const outgoingRef = outgoingRefs[0];
-      const linkDisposable = createLinkProvider(
-        inlineRange,
-        isUnsatisfiedRef(outgoingRef.type) ? 'Create resource' : 'Open resource',
-        () => {
-          if (isUnsatisfiedRef(outgoingRef.type)) {
-            createResource(outgoingRef, resource.namespace, getResourceFolder(resource));
-          } else if (outgoingRef.target?.type === 'resource' && outgoingRef.target.resourceId) {
-            selectResource(outgoingRef.target.resourceId);
-          } else if (outgoingRef.target?.type === 'file' && outgoingRef.target.filePath) {
-            selectFilePath(outgoingRef.target.filePath);
+      if (createResource || !isUnsatisfiedRef(outgoingRef.type)) {
+        const linkDisposable = createLinkProvider(
+          inlineRange,
+          isUnsatisfiedRef(outgoingRef.type) ? 'Create resource' : 'Open resource',
+          () => {
+            if (isUnsatisfiedRef(outgoingRef.type) && createResource) {
+              createResource(outgoingRef, resource.namespace, getResourceFolder(resource));
+            } else if (outgoingRef.target?.type === 'resource' && outgoingRef.target.resourceId) {
+              selectResource(outgoingRef.target.resourceId);
+            } else if (outgoingRef.target?.type === 'file' && outgoingRef.target.filePath) {
+              selectFilePath(outgoingRef.target.filePath);
+            }
           }
-        }
-      );
-      newDisposables.push(linkDisposable);
+        );
+        newDisposables.push(linkDisposable);
+      }
     }
   });
 
