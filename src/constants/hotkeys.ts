@@ -13,6 +13,10 @@ const hotkeys = {
   CREATE_NEW_RESOURCE: 'shift+enter',
   APPLY_SELECTION: 'ctrl+alt+s,cmd+alt+s',
   DIFF_RESOURCE: 'ctrl+alt+d,cmd+alt+d',
+  OPEN_EXPLORER_TAB: 'ctrl+shift+e, command+shift+e',
+  OPEN_KUSTOMIZATION_TAB: 'ctrl+shift+k, command+shift+k',
+  OPEN_HELM_TAB: 'ctrl+shift+h, command+shift+h',
+  OPEN_CLUSTER_TAB: 'ctrl+shift+c, command+shift+c',
 };
 
 export default hotkeys;
