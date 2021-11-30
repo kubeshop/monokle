@@ -13,14 +13,14 @@ function ResourceNamespaceFilter(props: {customNamespaces?: string[]}) {
   const {customNamespaces} = props;
   const dispatch = useAppDispatch();
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-  const allNamespaces = useNamespaces({extra: ['all', 'default']});
+  const [namespaces] = useNamespaces({extra: ['all', 'default']});
 
   const currentNamespaces = useMemo(() => {
     if (customNamespaces && customNamespaces.length > 0) {
       return customNamespaces;
     }
-    return allNamespaces;
-  }, [customNamespaces, allNamespaces]);
+    return namespaces;
+  }, [customNamespaces, namespaces]);
 
   const updateNamespace = (selectedNamespace: string) => {
     dispatch(
@@ -39,11 +39,17 @@ function ResourceNamespaceFilter(props: {customNamespaces?: string[]}) {
       onChange={updateNamespace}
       style={{width: '100%'}}
     >
-      {currentNamespaces.map(ns => (
-        <Select.Option key={ns} value={ns}>
-          {ns}
-        </Select.Option>
-      ))}
+      {currentNamespaces.map(namespace => {
+        if (typeof namespace !== 'string') {
+          return null;
+        }
+
+        return (
+          <Select.Option key={namespace} value={namespace}>
+            {namespace}
+          </Select.Option>
+        );
+      })}
     </Select>
   );
 }

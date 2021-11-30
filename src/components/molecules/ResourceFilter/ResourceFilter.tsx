@@ -48,6 +48,8 @@ const StyledTitleButton = styled(Button)`
   padding: 0;
 `;
 
+const {Option} = Select;
+
 const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
 const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
@@ -79,7 +81,7 @@ const ResourceFilter = () => {
   const [namespace, setNamespace] = useState<string>();
   const [labels, setLabels] = useState<Record<string, string | null>>({});
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
-  const allNamespaces = useNamespaces({extra: ['all', 'default']});
+  const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
 
@@ -204,13 +206,13 @@ const ResourceFilter = () => {
           onChange={updateKind}
           style={{width: '100%'}}
         >
-          <Select.Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
+          <Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
             {ALL_OPTIONS}
-          </Select.Option>
+          </Option>
           {allResourceKinds.map(resourceKind => (
-            <Select.Option key={resourceKind} value={resourceKind}>
+            <Option key={resourceKind} value={resourceKind}>
               {resourceKind}
-            </Select.Option>
+            </Option>
           ))}
         </Select>
       </FieldContainer>
@@ -223,11 +225,17 @@ const ResourceFilter = () => {
           onChange={updateNamespace}
           style={{width: '100%'}}
         >
-          {allNamespaces.map(ns => (
-            <Select.Option key={ns} value={ns}>
-              {ns}
-            </Select.Option>
-          ))}
+          {allNamespaces.map(ns => {
+            if (typeof ns !== 'string') {
+              return null;
+            }
+
+            return (
+              <Option key={ns} value={ns}>
+                {ns}
+              </Option>
+            );
+          })}
         </Select>
       </FieldContainer>
       <FieldContainer>
