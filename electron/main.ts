@@ -182,8 +182,13 @@ export const createWindow = (givenPath?: string) => {
     dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
   });
 
-  win.webContents.on('did-finish-load', async () => {
+  win.webContents.on('dom-ready', async () => {
     const dispatch = createDispatchForWindow(win);
+
+    subscribeToStoreStateChanges(win.webContents, (storeState) => {
+      createMenu(storeState, dispatch);
+      setWindowTitle(storeState, win);
+    });
 
     dispatch(setAppRehydrating(true));
     await checkNewVersion(dispatch, true);
@@ -208,10 +213,7 @@ export const createWindow = (givenPath?: string) => {
     }
     win.webContents.send('executed-from', {path: givenPath});
 
-    subscribeToStoreStateChanges(win.webContents, (storeState) => {
-      createMenu(storeState, dispatch);
-      setWindowTitle(storeState, win);
-    });
+
   });
 
   return win;
