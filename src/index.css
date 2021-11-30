@@ -40,20 +40,10 @@ code {
 }
 
 .monokleEditorAddRemoveFilterInlineClass {
-  text-decoration-color: orange !important;
+  text-decoration-color: #006d75 !important;
   text-decoration: underline;
   text-decoration-style: dotted;
 }
-
-.monokleEditorAddRemoveFilterGlyphClass {
-  background-color: orange !important;
-  border-radius: 50%;
-  max-height: 10px;
-  max-width: 10px;
-  margin-top: 5px;
-  margin-left: 15px;
-}
-
 
 .ant-menu-submenu-popup {
   max-height: 250px !important;

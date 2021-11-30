@@ -154,33 +154,18 @@ function addNamespaceFilterLink(
       commandMarkdownLink,
     ]);
     newDisposables.push(hoverDisposable);
-    addLinkDecorations(symbol, newDecorations, 'Add/Remove namespace filter');
+    addLinkDecoration(symbol, newDecorations);
   }
 }
 
-function addLinkDecorations(
+function addLinkDecoration(
   symbol: monaco.languages.DocumentSymbol,
-  newDecorations: monaco.editor.IModelDeltaDecoration[],
-  glyphHoverMessage: string
+  newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
-  // const glyphDecoration: monaco.editor.IModelDeltaDecoration = {
-  //   range: symbol.range,
-  //   options: {
-  //     glyphMarginClassName: 'monokleEditorAddRemoveFilterGlyphClass',
-  //     glyphMarginHoverMessage: {value: glyphHoverMessage},
-  //   },
-  // };
-  //
-  // newDecorations.push(glyphDecoration);
-
   const inlineDecoration: monaco.editor.IModelDeltaDecoration = {
     range: symbol.range,
     options: {
       inlineClassName: 'monokleEditorAddRemoveFilterInlineClass',
-      // overviewRuler: {
-      //   position: monaco.editor.OverviewRulerLane.Left,
-      //   color: 'orange',
-      // },
     },
   };
 
@@ -210,7 +195,7 @@ function addKindFilterLink(
     ]);
     newDisposables.push(hoverDisposable);
 
-    addLinkDecorations(symbol, newDecorations, 'Add/Remove kind filter');
+    addLinkDecoration(symbol, newDecorations);
   }
 }
 
@@ -241,7 +226,7 @@ function addLabelFilterLink(
     ]);
     newDisposables.push(hoverDisposable);
 
-    addLinkDecorations(symbol, newDecorations, 'Add/Remove label to filter');
+    addLinkDecoration(symbol, newDecorations);
   }
 }
 
@@ -272,7 +257,7 @@ function addAnnotationFilterLink(
     ]);
     newDisposables.push(hoverDisposable);
 
-    addLinkDecorations(symbol, newDecorations, 'Add/Remove annotation to filter');
+    addLinkDecoration(symbol, newDecorations);
   }
 }
 
