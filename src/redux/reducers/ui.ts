@@ -1,4 +1,4 @@
-import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
@@ -11,19 +11,6 @@ import initialState from '@redux/initialState';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
-
-export const resetLayout = createAsyncThunk('ui/resetLayout', async (_, thunkAPI) => {
-  thunkAPI.dispatch(uiSlice.actions.setLeftMenuIsActive(true));
-  thunkAPI.dispatch(uiSlice.actions.setRightMenuIsActive(false));
-  thunkAPI.dispatch(
-    uiSlice.actions.setPaneConfiguration({
-      leftWidth: 0.3333,
-      navWidth: 0.3333,
-      editWidth: 0.3333,
-      rightWidth: 0,
-    })
-  );
-});
 
 export const uiSlice = createSlice({
   name: 'ui',
@@ -174,6 +161,20 @@ export const uiSlice = createSlice({
         state.isActionsPaneFooterExpanded = true;
       }
     },
+    resetLayout: (state: Draft<UiState>) => {
+      state.leftMenu.isActive = true;
+      electronStore.set('ui.leftMenu.isActive', true);
+      state.rightMenu.isActive = false;
+      electronStore.set('ui.rightMenu.isActive', false);
+      const defaultPaneConfiguration = {
+        leftWidth: 0.3333,
+        navWidth: 0.3333,
+        editWidth: 0.3333,
+        rightWidth: 0,
+      };
+      state.paneConfiguration = defaultPaneConfiguration;
+      electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);
+    },
   },
   extraReducers: builder => {
     builder
@@ -228,5 +229,6 @@ export const {
   openCreateFolderModal,
   closeCreateFolderModal,
   toggleExpandActionsPaneFooter,
+  resetLayout,
 } = uiSlice.actions;
 export default uiSlice.reducer;

@@ -1,12 +1,12 @@
 import {FSWatcher, watch} from 'chokidar';
 import fs from 'fs';
+import {AnyAction} from 'redux';
 
-import {AppDispatch} from '@redux/store';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 let watcher: FSWatcher;
 
-export async function monitorKubeConfig(filePath: string, dispatch: AppDispatch) {
+export async function monitorKubeConfig(filePath: string, dispatch: (action: AnyAction) => void) {
   if (watcher) {
     watcher.close();
   }
@@ -24,10 +24,10 @@ export async function monitorKubeConfig(filePath: string, dispatch: AppDispatch)
       watcher.on('all', (type: string) => {
         if (type === 'unlink') {
           watcher.close();
-          dispatch(loadContexts(''));
+          loadContexts('', dispatch);
           return;
         }
-        dispatch(loadContexts(filePath));
+        loadContexts(filePath, dispatch);
       });
     }
   } catch (e) {

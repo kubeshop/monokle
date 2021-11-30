@@ -1,3 +1,5 @@
+import {ipcRenderer} from 'electron';
+
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 
 import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
@@ -179,11 +181,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
     currentSelectionHistoryIndex < selectionHistory.length - 1;
 
   const onClickLeftArrow = () => {
-    dispatch(selectFromHistory({direction: 'left'}));
+    selectFromHistory('left', currentSelectionHistoryIndex, selectionHistory, resourceMap, fileMap, dispatch);
   };
 
   const onClickRightArrow = () => {
-    dispatch(selectFromHistory({direction: 'right'}));
+    selectFromHistory('right', currentSelectionHistoryIndex, selectionHistory, resourceMap, fileMap, dispatch);
   };
 
   const applySelection = useCallback(() => {
@@ -232,11 +234,33 @@ const ActionsPane = (props: {contentHeight: string}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monacoEditor]);
 
+  const diffResource = useCallback(
+    resourceId => {
+      dispatch(performResourceDiff(resourceId));
+    },
+    [dispatch]
+  );
+
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
-      dispatch(performResourceDiff(selectedResourceId));
+      diffResource(selectedResourceId);
     }
-  }, [selectedResourceId, dispatch]);
+  }, [selectedResourceId, diffResource]);
+
+  const onPerformResourceDiff = useCallback(
+    (_: any, resourceId: string) => {
+      diffResource(resourceId);
+    },
+    [diffResource]
+  );
+
+  // called from main thread because thunks cannot be dispatched by main
+  useEffect(() => {
+    ipcRenderer.on('perform-resource-diff', onPerformResourceDiff);
+    return () => {
+      ipcRenderer.removeListener('perform-resource-diff', onPerformResourceDiff);
+    };
+  }, [onPerformResourceDiff]);
 
   useEffect(() => {
     if (selectedResourceId && resourceMap[selectedResourceId]) {

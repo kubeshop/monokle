@@ -739,7 +739,7 @@ const FileTreePane = () => {
     [loadLastFolderOnStartup, setFolder, recentFolders]
   );
 
-  // called from main thread to avoid running setRootFolder in main thread
+  // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {
     ipcRenderer.on('set-root-folder', onSelectRootFolderFromMainThread);
     return () => {

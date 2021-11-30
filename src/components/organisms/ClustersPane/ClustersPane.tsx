@@ -14,7 +14,7 @@ import {DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
 import {BrowseKubeconfigTooltip, ClusterModeTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCurrentContext, setKubeconfigPathValidity, updateKubeconfig} from '@redux/reducers/appConfig';
+import {setCurrentContext, updateKubeconfig, updateKubeconfigPathValidity} from '@redux/reducers/appConfig';
 import {closeFolderExplorer} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
@@ -91,9 +91,9 @@ const ClustersPane = () => {
 
         kc.loadFromFile(currentKubeConfig);
 
-        dispatch(setKubeconfigPathValidity(Boolean(kc.contexts) || false));
+        dispatch(updateKubeconfigPathValidity(Boolean(kc.contexts) || false));
       } catch (err) {
-        dispatch(setKubeconfigPathValidity(!currentKubeConfig.length));
+        dispatch(updateKubeconfigPathValidity(!currentKubeConfig.length));
       } finally {
         dispatch(updateKubeconfig(currentKubeConfig));
       }
@@ -172,7 +172,7 @@ const ClustersPane = () => {
 
   useEffect(() => {
     if (kubeconfigPath) {
-      dispatch(loadContexts(kubeconfigPath));
+      loadContexts(kubeconfigPath, dispatch);
     }
   }, [kubeconfigPath, dispatch]);
 

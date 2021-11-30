@@ -7,7 +7,6 @@ import {FileMapType} from '@models/appstate';
 
 import {useAppDispatch} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 function useEditorKeybindings(
   editor: monaco.editor.IStandaloneCodeEditor | null,
@@ -59,28 +58,6 @@ function useEditorKeybindings(
       keybindings: [monaco.KeyCode.Escape],
       run: () => {
         hiddenInputRef.current?.focus();
-      },
-    });
-
-    // register action to navigate back in the selection history
-    e.addAction({
-      id: 'monokle-navigate-back',
-      label: 'Navigate Back',
-      // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.LeftArrow],
-      run: () => {
-        dispatch(selectFromHistory({direction: 'left'}));
-      },
-    });
-
-    // register action to navigate forward in the selection history
-    e.addAction({
-      id: 'monokle-navigate-forward',
-      label: 'Navigate Forward',
-      // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.RightArrow],
-      run: () => {
-        dispatch(selectFromHistory({direction: 'right'}));
       },
     });
 

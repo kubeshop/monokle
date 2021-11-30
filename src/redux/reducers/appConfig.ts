@@ -1,116 +1,13 @@
-import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {AppConfig, Languages, NewVersionCode, TextSizes, Themes} from '@models/appconfig';
 import {KubeConfig} from '@models/kubeConfig';
 
-import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
 import {KustomizeCommandType} from '@redux/services/kustomize';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import electronStore from '@utils/electronStore';
 
 import initialState from '../initialState';
-
-export const updateStartupModalVisible = createAsyncThunk(
-  'config/updateStartupModalVisible',
-  async (startupModalVisible: boolean, thunkAPI) => {
-    electronStore.set('appConfig.startupModalVisible', startupModalVisible);
-    thunkAPI.dispatch(configSlice.actions.setStartupModalVisible(startupModalVisible));
-  }
-);
-
-export const updateKubeconfig = createAsyncThunk('config/updateKubeconfig', async (kubeconfig: string, thunkAPI) => {
-  monitorKubeConfig(kubeconfig, thunkAPI.dispatch);
-  electronStore.set('appConfig.kubeconfig', kubeconfig);
-  thunkAPI.dispatch(configSlice.actions.setKubeconfig(kubeconfig));
-});
-
-export const setKubeconfigPathValidity = createAsyncThunk(
-  'config/setKubeconfigPathValidity',
-  async (isKubeconfigPathValid: boolean, thunkAPI) => {
-    electronStore.set('appConfig.isKubeconfigPathValid', isKubeconfigPathValid);
-    thunkAPI.dispatch(configSlice.actions.setKubeconfigPathValidity(isKubeconfigPathValid));
-  }
-);
-
-export const updateScanExcludes = createAsyncThunk(
-  'config/updateScanExcludes',
-  async (scanExcludes: string[], thunkAPI) => {
-    electronStore.set('appConfig.scanExcludes', scanExcludes);
-    thunkAPI.dispatch(configSlice.actions.setScanExcludes(scanExcludes));
-  }
-);
-
-export const updateFileIncludes = createAsyncThunk(
-  'config/updateFileIncludes',
-  async (fileIncludes: string[], thunkAPI) => {
-    electronStore.set('appConfig.fileIncludes', fileIncludes);
-    thunkAPI.dispatch(configSlice.actions.setFileIncludes(fileIncludes));
-  }
-);
-
-export const updateHelmPreviewMode = createAsyncThunk(
-  'config/updateHelmPreviewMode',
-  async (helmPreviewMode: 'template' | 'install', thunkAPI) => {
-    electronStore.set('appConfig.settings.helmPreviewMode', helmPreviewMode);
-    thunkAPI.dispatch(configSlice.actions.setHelmPreviewMode(helmPreviewMode));
-  }
-);
-
-export const updateKustomizeCommand = createAsyncThunk(
-  'config/updateKustomizeCommand',
-  async (kustomizeCommand: KustomizeCommandType, thunkAPI) => {
-    electronStore.set('appConfig.settings.kustomizeCommand', kustomizeCommand);
-    thunkAPI.dispatch(configSlice.actions.setKustomizeCommand(kustomizeCommand));
-  }
-);
-
-export const updateLoadLastFolderOnStartup = createAsyncThunk(
-  'config/updateLoadLastFolderOnStartup',
-  async (autoLoad: boolean, thunkAPI) => {
-    electronStore.set('appConfig.settings.loadLastFolderOnStartup', autoLoad);
-    thunkAPI.dispatch(configSlice.actions.setLoadLastFolderOnStartup(autoLoad));
-  }
-);
-
-export const updateHideExcludedFilesInFileExplorer = createAsyncThunk(
-  'config/updateHideExcludedFilesInFileExplorer',
-  async (hideExcludedFiles: boolean, thunkAPI) => {
-    electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', hideExcludedFiles);
-    thunkAPI.dispatch(configSlice.actions.setHideExcludedFilesInFileExplorer(hideExcludedFiles));
-  }
-);
-
-export const updateTheme = createAsyncThunk('config/updateTheme', async (theme: Themes, thunkAPI) => {
-  electronStore.set('appConfig.settings.theme', theme);
-  thunkAPI.dispatch(configSlice.actions.setTheme(theme));
-});
-
-export const updateTextSize = createAsyncThunk('config/updateTextSize', async (textSize: TextSizes, thunkAPI) => {
-  electronStore.set('appConfig.settings.textSize', textSize);
-  thunkAPI.dispatch(configSlice.actions.setTextSize(textSize));
-});
-
-export const updateLanguage = createAsyncThunk('config/updateLanguage', async (language: Languages, thunkAPI) => {
-  electronStore.set('appConfig.settings.language', language);
-  thunkAPI.dispatch(configSlice.actions.setLanguage(language));
-});
-
-export const updateNewVersion = createAsyncThunk(
-  'config/updateNewVersion',
-  async (newVersion: {code: NewVersionCode; data: any}, thunkAPI) => {
-    electronStore.set('appConfig.newVersion', newVersion.code);
-    thunkAPI.dispatch(configSlice.actions.setNewVersion({code: newVersion.code, data: newVersion.data}));
-  }
-);
-
-export const updateFolderReadsMaxDepth = createAsyncThunk(
-  'config/folderReadsMaxDepth',
-  async (maxDepth: number, thunkAPI) => {
-    electronStore.set('appConfig.folderReadsMaxDepth', maxDepth);
-    thunkAPI.dispatch(configSlice.actions.setFolderReadsMaxDepth(maxDepth));
-  }
-);
 
 export const configSlice = createSlice({
   name: 'config',
@@ -122,53 +19,68 @@ export const configSlice = createSlice({
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
-    setKubeconfig: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+    updateKubeconfig: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      electronStore.set('appConfig.kubeconfig', action.payload);
       state.kubeconfigPath = action.payload;
     },
-    setKubeconfigPathValidity: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+    setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
+      state.recentFolders = action.payload;
+    },
+    updateKubeconfigPathValidity: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.isKubeconfigPathValid', action.payload);
       state.isKubeconfigPathValid = action.payload;
     },
-    setStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+    updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.startupModalVisible', action.payload);
       state.isStartupModalVisible = action.payload;
     },
-    setScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
+    updateScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
+      electronStore.set('appConfig.scanExcludes', action.payload);
       state.scanExcludes = action.payload;
     },
-    setFileIncludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
+    updateFileIncludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
+      electronStore.set('appConfig.fileIncludes', action.payload);
       state.fileIncludes = action.payload;
     },
-    setTheme: (state: Draft<AppConfig>, action: PayloadAction<Themes>) => {
+    updateTheme: (state: Draft<AppConfig>, action: PayloadAction<Themes>) => {
+      electronStore.set('appConfig.settings.theme', action.payload);
       state.settings.theme = action.payload;
     },
-    setTextSize: (state: Draft<AppConfig>, action: PayloadAction<TextSizes>) => {
+    updateTextSize: (state: Draft<AppConfig>, action: PayloadAction<TextSizes>) => {
+      electronStore.set('appConfig.settings.textSize', action.payload);
       state.settings.textSize = action.payload;
     },
-    setLanguage: (state: Draft<AppConfig>, action: PayloadAction<Languages>) => {
+    updateLanguage: (state: Draft<AppConfig>, action: PayloadAction<Languages>) => {
+      electronStore.set('appConfig.settings.language', action.payload);
       state.settings.language = action.payload;
     },
-    setHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
+    updateHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
+      electronStore.set('appConfig.settings.helmPreviewMode', action.payload);
       state.settings.helmPreviewMode = action.payload;
     },
-    setKustomizeCommand: (state: Draft<AppConfig>, action: PayloadAction<'kubectl' | 'kustomize'>) => {
+    updateKustomizeCommand: (state: Draft<AppConfig>, action: PayloadAction<KustomizeCommandType>) => {
+      electronStore.set('appConfig.settings.kustomizeCommand', action.payload);
       state.settings.kustomizeCommand = action.payload;
     },
-    setNewVersion: (state: Draft<AppConfig>, action: PayloadAction<{code: NewVersionCode; data: any}>) => {
+    updateNewVersion: (state: Draft<AppConfig>, action: PayloadAction<{code: NewVersionCode; data: any}>) => {
+      electronStore.set('appConfig.newVersion', action.payload.code);
       state.newVersion.code = action.payload.code;
       state.newVersion.data = {
         ...(state.newVersion.data || {}),
         ...action.payload.data,
       };
     },
-    setLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+    updateLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.settings.loadLastFolderOnStartup', action.payload);
       state.settings.loadLastFolderOnStartup = action.payload;
     },
-    setHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+    updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
       state.settings.hideExcludedFilesInFileExplorer = action.payload;
     },
-    setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
-      state.recentFolders = action.payload;
-    },
-    setFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
+
+    updateFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
+      electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
       state.folderReadsMaxDepth = action.payload;
     },
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
@@ -177,21 +89,31 @@ export const configSlice = createSlice({
     setScanExcludesStatus: (state: Draft<AppConfig>, action: PayloadAction<'outdated' | 'applied'>) => {
       state.isScanExcludesUpdated = action.payload;
     },
-  },
-  extraReducers: builder => {
-    builder
-      .addCase(loadContexts.fulfilled, (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
-        state.kubeConfig = action.payload;
-      })
-      .addCase(loadContexts.rejected, state => {
-        state.kubeConfig = {
-          contexts: [],
-          currentContext: undefined,
-        };
-      });
+    setContexts: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
+      state.kubeConfig = action.payload;
+    },
   },
 });
 
-export const {setFilterObjects, setAutoZoom, setKubeconfig, setCurrentContext, setScanExcludesStatus} =
-  configSlice.actions;
+export const {
+  setFilterObjects,
+  setAutoZoom,
+  setCurrentContext,
+  setScanExcludesStatus,
+  updateKubeconfig,
+  updateFolderReadsMaxDepth,
+  updateLanguage,
+  updateNewVersion,
+  updateFileIncludes,
+  updateHelmPreviewMode,
+  updateHideExcludedFilesInFileExplorer,
+  updateKubeconfigPathValidity,
+  updateKustomizeCommand,
+  updateLoadLastFolderOnStartup,
+  updateScanExcludes,
+  updateStartupModalVisible,
+  updateTextSize,
+  updateTheme,
+  setContexts,
+} = configSlice.actions;
 export default configSlice.reducer;

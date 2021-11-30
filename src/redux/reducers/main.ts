@@ -21,6 +21,7 @@ import {
   HelmValuesMapType,
   ResourceFilterType,
   ResourceMapType,
+  SelectionHistoryEntry,
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
@@ -32,7 +33,6 @@ import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
@@ -61,6 +61,7 @@ import {
   saveResource,
 } from '../services/resource';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
+import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
 export type SetRootFolderPayload = {
@@ -434,13 +435,6 @@ export const mainSlice = createSlice({
     setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = action.payload;
     },
-    addNotification: (state: Draft<AppState>, action: PayloadAction<AlertType>) => {
-      const notification: AlertType = action.payload;
-      notification.id = uuidv4();
-      notification.hasSeen = false;
-      notification.createdAt = new Date().getTime();
-      state.notifications = [notification, ...state.notifications];
-    },
     setDiffResourceInClusterDiff: (state: Draft<AppState>, action: PayloadAction<string | undefined>) => {
       state.clusterDiff.diffResourceId = action.payload;
     },
@@ -474,8 +468,23 @@ export const mainSlice = createSlice({
     reloadClusterDiff: (state: Draft<AppState>) => {
       state.clusterDiff.shouldReload = true;
     },
+    setSelectionHistory: (
+      state: Draft<AppState>,
+      action: PayloadAction<{nextSelectionHistoryIndex?: number; newSelectionHistory: SelectionHistoryEntry[]}>
+    ) => {
+      state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
+      state.selectionHistory = action.payload.newSelectionHistory;
+    },
   },
   extraReducers: builder => {
+    builder.addCase(setAlert, (state, action) => {
+      const notification: AlertType = action.payload;
+      notification.id = uuidv4();
+      notification.hasSeen = false;
+      notification.createdAt = new Date().getTime();
+      state.notifications = [notification, ...state.notifications];
+    });
+
     builder
       .addCase(previewKustomization.fulfilled, (state, action) => {
         setPreviewData(action.payload, state);
@@ -586,11 +595,6 @@ export const mainSlice = createSlice({
     builder.addCase(performResourceDiff.fulfilled, (state, action) => {
       state.diffResourceId = action.payload.diffResourceId;
       state.diffContent = action.payload.diffContent;
-    });
-
-    builder.addCase(selectFromHistory.fulfilled, (state, action) => {
-      state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
-      state.selectionHistory = action.payload.newSelectionHistory;
     });
 
     builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
@@ -887,7 +891,6 @@ export const {
   removeResource,
   updateResourceFilter,
   extendResourceFilter,
-  addNotification,
   setDiffResourceInClusterDiff,
   setClusterDiffRefreshDiffResource,
   selectClusterDiffMatch,
@@ -896,5 +899,6 @@ export const {
   unselectAllClusterDiffMatches,
   reloadClusterDiff,
   reprocessAllResources,
+  setSelectionHistory,
 } = mainSlice.actions;
 export default mainSlice.reducer;
