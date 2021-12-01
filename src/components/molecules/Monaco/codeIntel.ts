@@ -136,7 +136,8 @@ function addNamespaceFilterLink(
   lines: string[],
   symbol: monaco.languages.DocumentSymbol,
   filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[]
+  newDisposables: monaco.IDisposable[],
+  newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
   const namespace = getSymbolValue(lines, symbol);
   if (namespace) {
@@ -153,20 +154,39 @@ function addNamespaceFilterLink(
       commandMarkdownLink,
     ]);
     newDisposables.push(hoverDisposable);
+    addLinkDecoration(symbol, newDecorations);
   }
+}
+
+function addLinkDecoration(
+  symbol: monaco.languages.DocumentSymbol,
+  newDecorations: monaco.editor.IModelDeltaDecoration[]
+) {
+  const inlineDecoration: monaco.editor.IModelDeltaDecoration = {
+    range: symbol.range,
+    options: {
+      inlineClassName: 'monokleEditorAddRemoveFilterInlineClass',
+    },
+  };
+
+  newDecorations.push(inlineDecoration);
 }
 
 function addKindFilterLink(
   lines: string[],
   symbol: monaco.languages.DocumentSymbol,
   filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[]
+  newDisposables: monaco.IDisposable[],
+  newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
   const kind = getSymbolValue(lines, symbol);
   if (kind) {
-    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(`Filter on kind [${kind}]`, () => {
-      filterResources({kind, labels: {}, annotations: {}});
-    });
+    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
+      `Add/Remove filter on kind [${kind}]`,
+      () => {
+        filterResources({kind, labels: {}, annotations: {}});
+      }
+    );
     newDisposables.push(commandDisposable);
 
     const hoverDisposable = createHoverProvider(symbol.range, [
@@ -174,6 +194,8 @@ function addKindFilterLink(
       commandMarkdownLink,
     ]);
     newDisposables.push(hoverDisposable);
+
+    addLinkDecoration(symbol, newDecorations);
   }
 }
 
@@ -181,14 +203,15 @@ function addLabelFilterLink(
   lines: string[],
   symbol: monaco.languages.DocumentSymbol,
   filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[]
+  newDisposables: monaco.IDisposable[],
+  newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
   const label = getSymbolValue(lines, symbol, true);
   if (label) {
     const value = label.substring(symbol.name.length + 1).trim();
 
     const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-      `Add label [${label}] to current filter`,
+      `Add/Remove label [${label}] from/to current filter`,
       () => {
         const labels: Record<string, string | null> = {};
         labels[symbol.name] = value;
@@ -202,6 +225,8 @@ function addLabelFilterLink(
       commandMarkdownLink,
     ]);
     newDisposables.push(hoverDisposable);
+
+    addLinkDecoration(symbol, newDecorations);
   }
 }
 
@@ -209,14 +234,15 @@ function addAnnotationFilterLink(
   lines: string[],
   symbol: monaco.languages.DocumentSymbol,
   filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[]
+  newDisposables: monaco.IDisposable[],
+  newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
   const annotation = getSymbolValue(lines, symbol, true);
   if (annotation) {
     const value = annotation.substring(symbol.name.length + 1).trim();
 
     const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-      `Add annotation [${annotation}] to current filter`,
+      `Add/Remove annotation [${annotation}] to/from current filter`,
       () => {
         const annotations: Record<string, string | null> = {};
         annotations[symbol.name] = value;
@@ -230,6 +256,8 @@ function addAnnotationFilterLink(
       commandMarkdownLink,
     ]);
     newDisposables.push(hoverDisposable);
+
+    addLinkDecoration(symbol, newDecorations);
   }
 }
 
@@ -237,35 +265,33 @@ function processSymbol(
   symbol: monaco.languages.DocumentSymbol,
   parents: monaco.languages.DocumentSymbol[],
   lines: string[],
-  filterResources: (filter: ResourceFilterType) => void
+  filterResources: (filter: ResourceFilterType) => void,
+  newDisposables: monaco.IDisposable[],
+  newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
-  const newDisposables: monaco.IDisposable[] = [];
-
   if (symbol.children) {
     symbol.children.forEach(child => {
-      newDisposables.push(...processSymbol(child, parents.concat(symbol), lines, filterResources));
+      processSymbol(child, parents.concat(symbol), lines, filterResources, newDisposables, newDecorations);
     });
   }
 
   if (symbol.name === 'namespace') {
-    addNamespaceFilterLink(lines, symbol, filterResources, newDisposables);
+    addNamespaceFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
   }
 
   if (symbol.name === 'kind') {
-    addKindFilterLink(lines, symbol, filterResources, newDisposables);
+    addKindFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
   }
 
   if (parents.length > 0) {
     const parentName = parents[parents.length - 1].name;
 
     if (parentName === 'labels' || parentName === 'matchLabels') {
-      addLabelFilterLink(lines, symbol, filterResources, newDisposables);
+      addLabelFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
     } else if (parentName === 'annotations') {
-      addAnnotationFilterLink(lines, symbol, filterResources, newDisposables);
+      addAnnotationFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
     }
   }
-
-  return newDisposables;
 }
 
 export async function applyForResource(
@@ -286,7 +312,7 @@ export async function applyForResource(
     const symbols: monaco.languages.DocumentSymbol[] = await getSymbols(model);
     const lines = resource.text.split('\n');
 
-    newDisposables.push(...symbols.map(symbol => processSymbol(symbol, [], lines, filterResources)).flat());
+    symbols.forEach(symbol => processSymbol(symbol, [], lines, filterResources, newDisposables, newDecorations));
   }
 
   if (!refs || refs.length === 0) {
@@ -365,7 +391,7 @@ export async function applyForResource(
           return;
         }
         const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-          `${outgoingRefResource.kind}: ${outgoingRefResource.name}`,
+          `${outgoingRefResource.kind}: ${outgoingRefResource.name} in ${outgoingRefResource.filePath}`,
           () => {
             // @ts-ignore
             selectResource(outgoingRef.target?.resourceId);

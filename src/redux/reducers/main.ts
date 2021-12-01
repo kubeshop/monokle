@@ -459,25 +459,37 @@ export const mainSlice = createSlice({
     extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       const filter = action.payload;
 
+      // construct new filter
       let newFilter: ResourceFilterType = {
-        namespace: filter.namespace || state.resourceFilter.namespace,
-        kind: filter.kind || state.resourceFilter.kind,
+        namespace: filter.namespace
+          ? filter.namespace === state.resourceFilter.namespace
+            ? undefined
+            : filter.namespace
+          : state.resourceFilter.namespace,
+        kind: filter.kind
+          ? filter.kind === state.resourceFilter.kind
+            ? undefined
+            : filter.kind
+          : state.resourceFilter.kind,
         name: state.resourceFilter.name,
-        labels: filter.labels,
-        annotations: filter.annotations,
+        labels: state.resourceFilter.labels,
+        annotations: state.resourceFilter.annotations,
       };
 
-      Object.keys(state.resourceFilter.labels).forEach(key => {
-        if (!newFilter.labels[key]) {
-          newFilter.labels[key] = state.resourceFilter.labels[key];
+      Object.keys(filter.labels).forEach(key => {
+        if (newFilter.labels[key] === filter.labels[key]) {
+          delete newFilter.labels[key];
+        } else {
+          newFilter.labels[key] = filter.labels[key];
         }
       });
-      Object.keys(state.resourceFilter.annotations).forEach(key => {
-        if (!newFilter.annotations[key]) {
-          newFilter.annotations[key] = state.resourceFilter.annotations[key];
+      Object.keys(filter.annotations).forEach(key => {
+        if (newFilter.annotations[key] === filter.annotations[key]) {
+          delete newFilter.annotations[key];
+        } else {
+          newFilter.annotations[key] = filter.annotations[key];
         }
       });
-
       state.resourceFilter = newFilter;
     },
     setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {

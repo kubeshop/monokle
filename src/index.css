@@ -39,6 +39,12 @@ code {
   text-decoration: underline;
 }
 
+.monokleEditorAddRemoveFilterInlineClass {
+  text-decoration-color: #006d75 !important;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
 .ant-menu-submenu-popup {
   max-height: 250px !important;
   overflow-y: scroll !important;
