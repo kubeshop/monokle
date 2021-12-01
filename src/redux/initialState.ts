@@ -136,10 +136,7 @@ const initialUiState: UiState = {
   shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
-  clusterPaneIcon: {
-    highlighted: false,
-    highlightTime: 0,
-  },
+  clusterPaneIconHighlighted: false,
   clusterStatusHidden: electronStore.get('ui.clusterStatusHidden'),
 };
 

@@ -175,12 +175,8 @@ export const uiSlice = createSlice({
       state.paneConfiguration = defaultPaneConfiguration;
       electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);
     },
-    setClusterIconHighlightStatus: (
-      state: Draft<UiState>,
-      action: PayloadAction<{highlighted: boolean; highlightTime: number | null}>
-    ) => {
-      state.clusterPaneIcon.highlighted = action.payload.highlighted;
-      state.clusterPaneIcon.highlightTime = action.payload.highlightTime;
+    setClusterIconHighlightStatus: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.clusterPaneIconHighlighted = action.payload;
     },
     hideClusterStatus: (state: Draft<UiState>) => {
       state.clusterStatusHidden = true;

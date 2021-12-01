@@ -210,6 +210,7 @@ const PageHeader = () => {
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const kubeConfig = useAppSelector(state => state.config.kubeConfig);
   const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
+
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
   const [helmChart, setHelmChart] = useState<HelmChart>();
@@ -252,23 +253,24 @@ const PageHeader = () => {
   const handleClusterChange = ({key}: any) => dispatch(setCurrentContext(key));
 
   const handleClusterConfigure = () => {
-    dispatch(setClusterIconHighlightStatus({highlighted: true, highlightTime: 3000}));
+    dispatch(setClusterIconHighlightStatus(true));
     setTimeout(() => {
+      dispatch(setClusterIconHighlightStatus(false));
       dispatch(setLeftMenuSelection('cluster-explorer'));
     }, 3000);
   };
 
   const handleClusterHideClick = () => {
-    dispatch(setClusterIconHighlightStatus({highlighted: true, highlightTime: null}));
+    dispatch(setClusterIconHighlightStatus(true));
   };
 
   const handleClusterHideConfirm = () => {
-    dispatch(setClusterIconHighlightStatus({highlighted: false, highlightTime: null}));
+    dispatch(setClusterIconHighlightStatus(false));
     dispatch(hideClusterStatus());
   };
 
   const handleClusterHideCancel = () => {
-    dispatch(setClusterIconHighlightStatus({highlighted: false, highlightTime: null}));
+    dispatch(setClusterIconHighlightStatus(false));
   };
 
   const clusterMenu = (
@@ -330,7 +332,13 @@ const PageHeader = () => {
                   {!isKubeconfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
                 </CLusterStatusText>
                 {isKubeconfigPathValid && (
-                  <Dropdown overlay={clusterMenu} placement="bottomCenter" arrow trigger={['click']}>
+                  <Dropdown
+                    overlay={clusterMenu}
+                    placement="bottomCenter"
+                    arrow
+                    trigger={['click']}
+                    disabled={isInPreviewMode}
+                  >
                     <StyledClusterButton>
                       <span>{kubeConfig.currentContext}</span>
                       <DownOutlined style={{margin: 4}} />

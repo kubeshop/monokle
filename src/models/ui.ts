@@ -93,10 +93,7 @@ export type UiState = {
   paneConfiguration: PaneConfiguration;
   shouldExpandAllNodes: boolean;
   resetLayout: boolean;
-  clusterPaneIcon: {
-    highlighted: boolean;
-    highlightTime: number | null;
-  };
+  clusterPaneIconHighlighted: boolean;
   clusterStatusHidden: boolean;
 };
 
