@@ -3,7 +3,7 @@ import {ipcRenderer} from 'electron';
 import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Divider, Input, InputNumber, Select, Tooltip} from 'antd';
+import {Button, Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
 
 import styled from 'styled-components';
 
@@ -30,7 +30,7 @@ import {
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
-import {toggleSettings} from '@redux/reducers/ui';
+import {toggleClusterStatus, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
@@ -73,6 +73,7 @@ const SettingsDrawer = () => {
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
   const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
@@ -185,6 +186,10 @@ const SettingsDrawer = () => {
     ipcRenderer.send('quit-and-install');
   };
 
+  const toggleClusterSelector = () => {
+    dispatch(toggleClusterStatus());
+  };
+
   return (
     <Drawer
       width="400"
@@ -209,6 +214,11 @@ const SettingsDrawer = () => {
         <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
           Browse
         </StyledButton>
+        <StyledDiv style={{marginTop: 16}}>
+          <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
+            Show Cluster Selector
+          </Checkbox>
+        </StyledDiv>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </StyledDiv>
       <StyledDiv>
@@ -278,7 +288,6 @@ const SettingsDrawer = () => {
           Ignore optional unsatisfied links
         </Checkbox>
       </StyledDiv>
-      <Divider />
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
         <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>

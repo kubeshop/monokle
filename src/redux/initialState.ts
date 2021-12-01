@@ -136,6 +136,8 @@ const initialUiState: UiState = {
   shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
+  clusterPaneIconHighlighted: false,
+  clusterStatusHidden: electronStore.get('ui.clusterStatusHidden'),
 };
 
 const initialNavigatorState: NavigatorState = {

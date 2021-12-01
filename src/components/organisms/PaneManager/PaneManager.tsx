@@ -102,6 +102,7 @@ const PaneManager = () => {
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
+  const clusterPaneIconHighlighted = useAppSelector(state => state.ui.clusterPaneIconHighlighted);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
@@ -243,6 +244,7 @@ const PaneManager = () => {
               >
                 <Badge {...badgeChild} color={Colors.blue6}>
                   <MenuIcon
+                    className={clusterPaneIconHighlighted ? 'animated-highlight' : ''}
                     icon={ClusterOutlined}
                     active={leftActive}
                     isSelected={leftMenuSelection === 'cluster-explorer'}
