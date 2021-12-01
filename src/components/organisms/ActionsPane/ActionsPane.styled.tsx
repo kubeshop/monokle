@@ -71,4 +71,5 @@ export const RightArrowButton = styled(Button)`
 
 export const ExtraRightButton = styled(Button)`
   padding: 4px 0px;
+  margin-left: 10px;
 `;

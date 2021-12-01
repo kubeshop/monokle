@@ -286,6 +286,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
     return isUnsavedResource(selectedResource);
   }, [selectedResource]);
 
+  const shouldButtonBeWithoutText =
+    (resourceKindHandler?.formEditorOptions?.editorUiSchema &&
+      resourceKindHandler.kind &&
+      uiState.paneConfiguration.editWidth < 0.35) ||
+    uiState.paneConfiguration.editWidth < 0.3;
+
   return (
     <>
       <Row>
@@ -375,7 +381,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     type="link"
                     ghost
                   >
-                    See {selectedResource?.kind} documentation <BookOutlined />
+                    {shouldButtonBeWithoutText ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
                   </S.ExtraRightButton>
                 </Tooltip>
               ) : null
@@ -399,7 +405,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 )
               )}
             </TabPane>
-
             {selectedResource &&
               resourceKindHandler &&
               resourceKindHandler.formEditorOptions &&
