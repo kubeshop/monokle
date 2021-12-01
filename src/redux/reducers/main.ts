@@ -127,6 +127,18 @@ function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: b
   state.currentSelectionHistoryIndex = undefined;
 }
 
+const performResourceContentUpdate = (state: AppState, resource: K8sResource, newText: string) => {
+  if (isFileResource(resource)) {
+    const updatedFileText = saveResource(resource, newText, state.fileMap);
+    resource.text = updatedFileText;
+    resource.content = parseDocument(updatedFileText).toJS();
+    recalculateResourceRanges(resource, state);
+  } else {
+    resource.text = newText;
+    resource.content = parseDocument(newText).toJS();
+  }
+};
+
 export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
   async (shouldIgnore: boolean, thunkAPI) => {
@@ -275,18 +287,8 @@ export const mainSlice = createSlice({
       try {
         const resource = state.resourceMap[action.payload.resourceId];
         if (resource) {
-          if (isFileResource(resource)) {
-            const updatedFileText = saveResource(resource, action.payload.content, state.fileMap);
-            resource.text = updatedFileText;
-            resource.content = parseDocument(updatedFileText).toJS();
-            recalculateResourceRanges(resource, state);
-          } else {
-            resource.text = action.payload.content;
-            resource.content = parseDocument(action.payload.content).toJS();
-          }
-
+          performResourceContentUpdate(state, resource, action.payload.content);
           let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
-
           reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
           if (!action.payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
@@ -307,16 +309,7 @@ export const mainSlice = createSlice({
         action.payload.forEach(({resourceId, content}) => {
           const resource = state.resourceMap[resourceId];
           if (resource) {
-            if (isFileResource(resource)) {
-              const updatedFileText = saveResource(resource, content, state.fileMap);
-              resource.text = updatedFileText;
-              resource.content = parseDocument(updatedFileText).toJS();
-              recalculateResourceRanges(resource, state);
-            } else {
-              resource.text = content;
-              resource.content = parseDocument(content).toJS();
-            }
-
+            performResourceContentUpdate(state, resource, content);
             let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
             resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
           }
