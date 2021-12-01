@@ -126,6 +126,9 @@ const schema = {
           },
         },
       },
+      clusterStatusHidden: {
+        type: 'boolean',
+      },
     },
   },
   uiCoach: {
@@ -170,6 +173,7 @@ const defaults = {
       editWidth: 0.3333,
       rightWidth: 0,
     },
+    clusterStatusHidden: false,
   },
 };
 

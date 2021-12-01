@@ -175,8 +175,16 @@ export const uiSlice = createSlice({
       state.paneConfiguration = defaultPaneConfiguration;
       electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);
     },
-    setClusterHighlightStatus: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.isClusterPaneHighlighted = action.payload;
+    setClusterIconHighlightStatus: (
+      state: Draft<UiState>,
+      action: PayloadAction<{highlighted: boolean; highlightTime: number | null}>
+    ) => {
+      state.clusterPaneIcon.highlighted = action.payload.highlighted;
+      state.clusterPaneIcon.highlightTime = action.payload.highlightTime;
+    },
+    hideClusterStatus: (state: Draft<UiState>) => {
+      state.clusterStatusHidden = true;
+      electronStore.set('ui.clusterStatusHidden', true);
     },
   },
   extraReducers: builder => {
@@ -233,6 +241,7 @@ export const {
   closeCreateFolderModal,
   toggleExpandActionsPaneFooter,
   resetLayout,
-  setClusterHighlightStatus,
+  setClusterIconHighlightStatus,
+  hideClusterStatus,
 } = uiSlice.actions;
 export default uiSlice.reducer;

@@ -22,7 +22,7 @@ import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
-  setClusterHighlightStatus,
+  setClusterIconHighlightStatus,
   setLeftMenuSelection,
   setRightMenuSelection,
   toggleLeftMenu,
@@ -108,20 +108,20 @@ const PaneManager = () => {
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
-  const isClusterPaneHighlighted = useAppSelector(state => state.ui.isClusterPaneHighlighted);
+  const clusterPaneIcon = useAppSelector(state => state.ui.clusterPaneIcon);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
 
   useEffect(() => {
-    if (isClusterPaneHighlighted) {
+    if (clusterPaneIcon.highlighted && clusterPaneIcon.highlightTime) {
       setTimeout(() => {
-        dispatch(setClusterHighlightStatus(false));
-      }, 2000);
+        dispatch(setClusterIconHighlightStatus({...clusterPaneIcon, highlighted: false}));
+      }, clusterPaneIcon.highlightTime);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClusterPaneHighlighted]);
+  }, [clusterPaneIcon]);
 
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
@@ -259,7 +259,7 @@ const PaneManager = () => {
               >
                 <Badge {...badgeChild} color={Colors.blue6}>
                   <MenuIcon
-                    className={isClusterPaneHighlighted ? 'animated-highlight' : ''}
+                    className={clusterPaneIcon.highlighted ? 'animated-highlight' : ''}
                     icon={ClusterOutlined}
                     active={leftActive}
                     isSelected={leftMenuSelection === 'cluster-explorer'}

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Dropdown, Menu, Tooltip} from 'antd';
+import {Button, Dropdown, Menu, Popconfirm, Tooltip} from 'antd';
 
 import {
   BellOutlined,
@@ -22,7 +22,13 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {setClusterHighlightStatus, setLeftMenuSelection, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {
+  hideClusterStatus,
+  setClusterIconHighlightStatus,
+  setLeftMenuSelection,
+  toggleNotifications,
+  toggleSettings,
+} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
@@ -203,6 +209,7 @@ const PageHeader = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const kubeConfig = useAppSelector(state => state.config.kubeConfig);
+  const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
   const [helmChart, setHelmChart] = useState<HelmChart>();
@@ -245,13 +252,24 @@ const PageHeader = () => {
   const handleClusterChange = ({key}: any) => dispatch(setCurrentContext(key));
 
   const handleClusterConfigure = () => {
-    dispatch(setClusterHighlightStatus(true));
+    dispatch(setClusterIconHighlightStatus({highlighted: true, highlightTime: 3000}));
     setTimeout(() => {
       dispatch(setLeftMenuSelection('cluster-explorer'));
-    }, 2000);
+    }, 3000);
   };
 
-  const handleClusterHide = () => {};
+  const handleClusterHideClick = () => {
+    dispatch(setClusterIconHighlightStatus({highlighted: true, highlightTime: null}));
+  };
+
+  const handleClusterHideConfirm = () => {
+    dispatch(setClusterIconHighlightStatus({highlighted: false, highlightTime: null}));
+    dispatch(hideClusterStatus());
+  };
+
+  const handleClusterHideCancel = () => {
+    dispatch(setClusterIconHighlightStatus({highlighted: false, highlightTime: null}));
+  };
 
   const clusterMenu = (
     <Menu>
@@ -303,31 +321,43 @@ const PageHeader = () => {
           <LogoCol noborder="true">
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
-          <CLusterContainer>
-            <CLusterStatus>
-              <CLusterStatusText connected={isKubeconfigPathValid}>
-                <StyledClusterOutlined />
-                {isKubeconfigPathValid && <span>CONNECTED</span>}
-                {!isKubeconfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
-              </CLusterStatusText>
-              {isKubeconfigPathValid && (
-                <Dropdown overlay={clusterMenu} placement="bottomCenter" arrow trigger={['click']}>
-                  <StyledClusterButton>
-                    <span>{kubeConfig.currentContext}</span>
-                    <DownOutlined style={{margin: 4}} />
-                  </StyledClusterButton>
-                </Dropdown>
-              )}
-              {!isKubeconfigPathValid && (
-                <>
-                  <StyledClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
-                    Configure
-                  </StyledClusterActionButton>
-                  <StyledClusterActionButton onClick={handleClusterHide}>Hide</StyledClusterActionButton>
-                </>
-              )}
-            </CLusterStatus>
-          </CLusterContainer>
+          {!clusterStatusHidden && (
+            <CLusterContainer>
+              <CLusterStatus>
+                <CLusterStatusText connected={isKubeconfigPathValid}>
+                  <StyledClusterOutlined />
+                  {isKubeconfigPathValid && <span>CONNECTED</span>}
+                  {!isKubeconfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
+                </CLusterStatusText>
+                {isKubeconfigPathValid && (
+                  <Dropdown overlay={clusterMenu} placement="bottomCenter" arrow trigger={['click']}>
+                    <StyledClusterButton>
+                      <span>{kubeConfig.currentContext}</span>
+                      <DownOutlined style={{margin: 4}} />
+                    </StyledClusterButton>
+                  </Dropdown>
+                )}
+                {!isKubeconfigPathValid && (
+                  <>
+                    <StyledClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
+                      Configure
+                    </StyledClusterActionButton>
+                    <Popconfirm
+                      placement="bottom"
+                      title="If you want to configure later, use the cluster icon in the left rail."
+                      okText="Ok, hide"
+                      cancelText="Nevermind"
+                      onConfirm={handleClusterHideConfirm}
+                      onCancel={handleClusterHideCancel}
+                    >
+                      <StyledClusterActionButton onClick={handleClusterHideClick}>Hide</StyledClusterActionButton>
+                    </Popconfirm>
+                  </>
+                )}
+              </CLusterStatus>
+            </CLusterContainer>
+          )}
+
           <SettingsCol>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
               <IconContainerSpan>
