@@ -684,6 +684,7 @@ export const mainSlice = createSlice({
 
         const isInPreviewMode = Boolean(state.previewResourceId) || Boolean(state.previewValuesFileId);
 
+        // get the local resources from state.resourceMap
         let localResources: K8sResource[] = [];
         localResources = Object.values(state.resourceMap).filter(
           resource =>
@@ -692,10 +693,12 @@ export const mainSlice = createSlice({
             resource.kind !== KUSTOMIZATION_KIND
         );
 
+        // if we are in preview mode, localResources must contain only the preview resources
         if (isInPreviewMode) {
           localResources = localResources.filter(resource => resource.filePath.startsWith(PREVIEW_PREFIX));
         }
 
+        // this groups local resources by {name}{kind}{namespace}
         const groupedLocalResources = groupResourcesByIdentifier(
           localResources,
           makeResourceNameKindNamespaceIdentifier
@@ -707,22 +710,31 @@ export const mainSlice = createSlice({
           .forEach(r => delete state.resourceMap[r.id]);
         // add resources from cluster diff to the resource map
         Object.values(clusterResourceMap).forEach(r => {
-          state.resourceMap[r.id] = r;
+          // add prefix to the resource id to avoid replacing local resources that might have the same id
+          // this happens only if the local resource has it's metadata.uid defined
+          const clusterResourceId = `${CLUSTER_DIFF_PREFIX}${r.id}`;
+          r.id = clusterResourceId;
+          state.resourceMap[clusterResourceId] = r;
         });
 
         const clusterResources = Object.values(clusterResourceMap);
+        // this groups cluster resources by {name}{kind}{namespace}
+        // it's purpose is to allow us to find matches in the groupedLocalResources Record using the identifier
         const groupedClusterResources = groupResourcesByIdentifier(
           clusterResources,
           makeResourceNameKindNamespaceIdentifier
         );
 
         let clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[] = [];
+        // this keeps track of local resources that have already been matched
         const localResourceIdsAlreadyMatched: string[] = [];
 
         Object.entries(groupedClusterResources).forEach(([identifier, value]) => {
+          // the value should always be an array of length 1 so we take the first entry
           const currentClusterResource = value[0];
           const matchingLocalResources = groupedLocalResources[identifier];
           if (!matchingLocalResources || matchingLocalResources.length === 0) {
+            // if there are no matching resources, we create a cluster only match
             clusterToLocalResourcesMatches.push({
               id: identifier,
               clusterResourceId: currentClusterResource.id,
@@ -734,8 +746,8 @@ export const mainSlice = createSlice({
             const matchingLocalResourceIds = matchingLocalResources.map(r => r.id);
             clusterToLocalResourcesMatches.push({
               id: identifier,
-              clusterResourceId: currentClusterResource.id,
               localResourceIds: matchingLocalResourceIds,
+              clusterResourceId: currentClusterResource.id,
               resourceName: currentClusterResource.name,
               resourceKind: currentClusterResource.kind,
               resourceNamespace: currentClusterResource.namespace || 'default',
@@ -744,10 +756,12 @@ export const mainSlice = createSlice({
           }
         });
 
+        // optionally filter out all the cluster only matches
         if (state.clusterDiff.hideClusterOnlyResources) {
           clusterToLocalResourcesMatches = clusterToLocalResourcesMatches.filter(match => match.localResourceIds);
         }
 
+        // remove deduplicates if there are any
         const localResourceIdentifiersNotMatched = [
           ...new Set(
             localResources
@@ -756,6 +770,7 @@ export const mainSlice = createSlice({
           ),
         ];
 
+        // create local only matches
         localResourceIdentifiersNotMatched.forEach(identifier => {
           const currentLocalResources = groupedLocalResources[identifier];
           if (!currentLocalResources || currentLocalResources.length === 0) {
