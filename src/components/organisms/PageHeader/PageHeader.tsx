@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Tooltip} from 'antd';
+import {Button, Dropdown, Menu, Tooltip} from 'antd';
 
 import {
   BellOutlined,
   CloseCircleOutlined,
+  ClusterOutlined,
+  DownOutlined,
   GithubOutlined,
   QuestionCircleOutlined,
   SettingOutlined,
@@ -19,7 +21,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateStartupModalVisible} from '@redux/reducers/appConfig';
+import {setCurrentContext, updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
@@ -44,8 +46,15 @@ const StyledLogo = styled.img`
   margin-top: 11px;
 `;
 
+const StyledRow = styled(Row)`
+  display: flex;
+  justify-content: space-between;
+  flex-flow: inherit;
+`;
+
 const LogoCol = styled(Col)`
   padding-left: 4px;
+  flex: 1;
 `;
 
 const StyledHeader = styled(Header)`
@@ -62,6 +71,7 @@ const SettingsCol = styled(Col)`
   width: 100%;
   display: flex;
   flex-direction: row-reverse;
+  flex: 1;
 `;
 
 const StyledSettingsOutlined = styled(SettingOutlined)`
@@ -131,6 +141,47 @@ const StyledDot = styled.div`
   margin: 0 5px;
 `;
 
+const CLusterContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+`;
+
+const CLusterStatus = styled.div`
+  border: 1px solid ${Colors.grey3};
+  border-radius: 4px;
+  padding: 0px 8px;
+`;
+
+const CLusterStatusText = styled.span<{connected: Boolean}>`
+  font-size: 10px;
+  font-weight: 600;
+  margin-right: 8px;
+  border-right: 1px solid ${Colors.grey3};
+  padding-right: 8px;
+  ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.whitePure}`}
+`;
+
+const StyledClusterOutlined = styled(ClusterOutlined)`
+  font-size: 12px;
+  margin-right: 4px;
+`;
+
+const StyledClusterButton = styled(Button)`
+  border: none;
+  outline: none;
+  padding: 0px;
+`;
+
+const StyledClusterActionButton = styled(Button)`
+  border: none;
+  outline: none;
+  padding: 0px;
+  color: ${Colors.blue6};
+  font-size: 12px;
+`;
+
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;
   return (
@@ -150,6 +201,8 @@ const PageHeader = () => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewType = useAppSelector(state => state.main.previewType);
+  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
+  const kubeConfig = useAppSelector(state => state.config.kubeConfig);
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
   const [helmChart, setHelmChart] = useState<HelmChart>();
@@ -189,6 +242,22 @@ const PageHeader = () => {
     stopPreview(dispatch);
   };
 
+  const handleClusterChange = ({key}: any) => dispatch(setCurrentContext(key));
+
+  const handleClusterConfigure = () => {};
+
+  const handleClusterHide = () => {};
+
+  const clusterMenu = (
+    <Menu>
+      {kubeConfig.contexts.map((context: any) => (
+        <Menu.Item key={context.cluster} onClick={handleClusterChange}>
+          {context.cluster}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
   return (
     <>
       {isInPreviewMode && previewType === 'kustomization' && (
@@ -225,11 +294,36 @@ const PageHeader = () => {
         </PreviewRow>
       )}
       <StyledHeader noborder="true">
-        <Row noborder="true">
-          <LogoCol span={12} noborder="true">
+        <StyledRow noborder="true">
+          <LogoCol noborder="true">
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
-          <SettingsCol span={12}>
+          <CLusterContainer>
+            <CLusterStatus>
+              <CLusterStatusText connected={isKubeconfigPathValid}>
+                <StyledClusterOutlined />
+                {isKubeconfigPathValid && <span>CONNECTED</span>}
+                {!isKubeconfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
+              </CLusterStatusText>
+              {isKubeconfigPathValid && (
+                <Dropdown overlay={clusterMenu} placement="bottomCenter" arrow trigger={['click']}>
+                  <StyledClusterButton>
+                    <span>{kubeConfig.currentContext}</span>
+                    <DownOutlined style={{margin: 4}} />
+                  </StyledClusterButton>
+                </Dropdown>
+              )}
+              {!isKubeconfigPathValid && (
+                <>
+                  <StyledClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
+                    Configure
+                  </StyledClusterActionButton>
+                  <StyledClusterActionButton onClick={handleClusterHide}>Hide</StyledClusterActionButton>
+                </>
+              )}
+            </CLusterStatus>
+          </CLusterContainer>
+          <SettingsCol>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
               <IconContainerSpan>
                 <QuestionCircleOutlined size={24} onClick={openDocumentation} />
@@ -256,7 +350,7 @@ const PageHeader = () => {
               </IconContainerSpan>
             </Tooltip>
           </SettingsCol>
-        </Row>
+        </StyledRow>
       </StyledHeader>
     </>
   );
