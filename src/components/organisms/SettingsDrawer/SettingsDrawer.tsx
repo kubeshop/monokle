@@ -30,7 +30,7 @@ import {
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
-import {toggleSettings} from '@redux/reducers/ui';
+import {toggleClusterStatus, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
@@ -73,6 +73,7 @@ const SettingsDrawer = () => {
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
   const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
@@ -185,6 +186,10 @@ const SettingsDrawer = () => {
     ipcRenderer.send('quit-and-install');
   };
 
+  const toggleClusterSelector = () => {
+    dispatch(toggleClusterStatus());
+  };
+
   return (
     <Drawer
       width="400"
@@ -279,6 +284,12 @@ const SettingsDrawer = () => {
         </Checkbox>
       </StyledDiv>
       <Divider />
+      <StyledDiv>
+        <StyledSpan>Cluster Selector Visibility</StyledSpan>
+        <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
+          Show Cluster Selector
+        </Checkbox>
+      </StyledDiv>
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
         <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>

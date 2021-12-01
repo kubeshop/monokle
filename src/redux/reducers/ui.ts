@@ -178,9 +178,9 @@ export const uiSlice = createSlice({
     setClusterIconHighlightStatus: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.clusterPaneIconHighlighted = action.payload;
     },
-    hideClusterStatus: (state: Draft<UiState>) => {
-      state.clusterStatusHidden = true;
-      electronStore.set('ui.clusterStatusHidden', true);
+    toggleClusterStatus: (state: Draft<UiState>) => {
+      state.clusterStatusHidden = !state.clusterStatusHidden;
+      electronStore.set('ui.clusterStatusHidden', state.clusterStatusHidden);
     },
   },
   extraReducers: builder => {
@@ -238,6 +238,6 @@ export const {
   toggleExpandActionsPaneFooter,
   resetLayout,
   setClusterIconHighlightStatus,
-  hideClusterStatus,
+  toggleClusterStatus,
 } = uiSlice.actions;
 export default uiSlice.reducer;

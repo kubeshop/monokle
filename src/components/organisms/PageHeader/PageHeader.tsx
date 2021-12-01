@@ -23,9 +23,9 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {
-  hideClusterStatus,
   setClusterIconHighlightStatus,
   setLeftMenuSelection,
+  toggleClusterStatus,
   toggleNotifications,
   toggleSettings,
 } from '@redux/reducers/ui';
@@ -266,7 +266,7 @@ const PageHeader = () => {
 
   const handleClusterHideConfirm = () => {
     dispatch(setClusterIconHighlightStatus(false));
-    dispatch(hideClusterStatus());
+    dispatch(toggleClusterStatus());
   };
 
   const handleClusterHideCancel = () => {
@@ -352,7 +352,12 @@ const PageHeader = () => {
                     </StyledClusterActionButton>
                     <Popconfirm
                       placement="bottom"
-                      title="If you want to configure later, use the cluster icon in the left rail."
+                      title={() => (
+                        <>
+                          <p>If you want to configure later, use the cluster icon in the left rail.</p>
+                          <p style={{margin: 0}}>You can re-enable the Cluster Selector in the Settings Panel</p>
+                        </>
+                      )}
                       okText="Ok, hide"
                       cancelText="Nevermind"
                       onConfirm={handleClusterHideConfirm}
