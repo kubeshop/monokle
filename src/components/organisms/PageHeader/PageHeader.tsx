@@ -151,7 +151,7 @@ const CLusterContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  flex: 4;
 `;
 
 const CLusterStatus = styled.div`
