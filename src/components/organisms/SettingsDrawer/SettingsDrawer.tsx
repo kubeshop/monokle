@@ -3,7 +3,7 @@ import {ipcRenderer} from 'electron';
 import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Divider, Input, InputNumber, Select, Tooltip} from 'antd';
+import {Button, Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
 
 import styled from 'styled-components';
 
@@ -214,6 +214,11 @@ const SettingsDrawer = () => {
         <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
           Browse
         </StyledButton>
+        <StyledDiv style={{marginTop: 16}}>
+          <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
+            Show Cluster Selector
+          </Checkbox>
+        </StyledDiv>
         <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
       </StyledDiv>
       <StyledDiv>
@@ -281,13 +286,6 @@ const SettingsDrawer = () => {
           onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
         >
           Ignore optional unsatisfied links
-        </Checkbox>
-      </StyledDiv>
-      <Divider />
-      <StyledDiv>
-        <StyledSpan>Cluster Selector Visibility</StyledSpan>
-        <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
-          Show Cluster Selector
         </Checkbox>
       </StyledDiv>
       {/* <StyledDiv>
