@@ -22,7 +22,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {setClusterHighlightStatus, setLeftMenuSelection, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
@@ -244,7 +244,12 @@ const PageHeader = () => {
 
   const handleClusterChange = ({key}: any) => dispatch(setCurrentContext(key));
 
-  const handleClusterConfigure = () => {};
+  const handleClusterConfigure = () => {
+    dispatch(setClusterHighlightStatus(true));
+    setTimeout(() => {
+      dispatch(setLeftMenuSelection('cluster-explorer'));
+    }, 2000);
+  };
 
   const handleClusterHide = () => {};
 

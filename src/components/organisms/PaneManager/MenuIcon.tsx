@@ -12,8 +12,9 @@ const MenuIcon = (props: {
   active: boolean;
   isSelected: boolean;
   style?: React.CSSProperties;
+  className?: string;
 }) => {
-  const {icon: IconComponent, iconName, active, isSelected, style: customStyle = {}} = props;
+  const {icon: IconComponent, iconName, active, isSelected, className, style: customStyle = {}} = props;
   const {color = Colors.grey7} = customStyle;
 
   if (!IconComponent && !iconName) {
@@ -31,7 +32,7 @@ const MenuIcon = (props: {
   }
 
   if (IconComponent) {
-    return <IconComponent style={style} />;
+    return <IconComponent className={className} style={style} />;
   }
 
   if (iconName) {

@@ -11,7 +11,7 @@ code {
 }
 
 .monokleEditorUnsatisfiedRefGlyphClass {
-  background-image: url("./assets/MonokleWarning.svg");
+  background-image: url('./assets/MonokleWarning.svg');
   background-repeat: no-repeat;
   background-size: cover;
   max-height: 12px;
@@ -26,7 +26,7 @@ code {
 }
 
 .monokleEditorSatisfiedRefGlyphClass {
-  background-color: #3C8618;
+  background-color: #3c8618;
   border-radius: 50%;
   max-height: 10px;
   max-width: 10px;
@@ -35,11 +35,46 @@ code {
 }
 
 .monokleEditorSatisfiedRefInlineClass {
-  color: #1890FF !important;
+  color: #1890ff !important;
   text-decoration: underline;
 }
 
 .ant-menu-submenu-popup {
   max-height: 250px !important;
   overflow-y: scroll !important;
+}
+
+.animated-highlight {
+  background-color: #d89614;
+  position: relative;
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+}
+
+.animated-highlight::after {
+  position: absolute;
+  display: block;
+  height: 30px;
+  width: 30px;
+  background: #594214bb;
+  content: ' ';
+  top: 0;
+  left: 0;
+  /* z-index: -1; */
+  border-radius: 100%;
+  animation: highlight 1s infinite;
+}
+
+@keyframes highlight {
+  0% {
+    transform: scale(1.3);
+  }
+  10% {
+    transform: scale(1.6);
+  }
+  100% {
+    transform: scale(1.3);
+  }
 }

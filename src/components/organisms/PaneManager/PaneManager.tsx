@@ -1,4 +1,4 @@
-import React, {useContext, useMemo} from 'react';
+import React, {useContext, useEffect, useMemo} from 'react';
 
 import {Badge, Button, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
@@ -21,7 +21,13 @@ import {ClusterExplorerTooltips, FileExplorerTooltip, PluginManagerTooltip} from
 import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
+import {
+  setClusterHighlightStatus,
+  setLeftMenuSelection,
+  setRightMenuSelection,
+  toggleLeftMenu,
+  toggleRightMenu,
+} from '@redux/reducers/ui';
 import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 
 import {
@@ -102,10 +108,20 @@ const PaneManager = () => {
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
+  const isClusterPaneHighlighted = useAppSelector(state => state.ui.isClusterPaneHighlighted);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
+
+  useEffect(() => {
+    if (isClusterPaneHighlighted) {
+      setTimeout(() => {
+        dispatch(setClusterHighlightStatus(false));
+      }, 2000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isClusterPaneHighlighted]);
 
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
@@ -243,6 +259,7 @@ const PaneManager = () => {
               >
                 <Badge {...badgeChild} color={Colors.blue6}>
                   <MenuIcon
+                    className={isClusterPaneHighlighted ? 'animated-highlight' : ''}
                     icon={ClusterOutlined}
                     active={leftActive}
                     isSelected={leftMenuSelection === 'cluster-explorer'}

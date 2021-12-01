@@ -136,6 +136,7 @@ const initialUiState: UiState = {
   shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
+  isClusterPaneHighlighted: false,
 };
 
 const initialNavigatorState: NavigatorState = {

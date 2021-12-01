@@ -20,6 +20,7 @@ type IconProps = {
   name: IconNames;
   color?: Colors;
   style?: React.CSSProperties;
+  className?: string;
   onMouseEnter?: React.MouseEventHandler;
   onMouseLeave?: React.MouseEventHandler;
 };
@@ -36,7 +37,7 @@ const icons: Record<IconNames, React.ComponentType<any>> = {
 };
 
 const Icon: React.FC<IconProps> = props => {
-  const {name, style, color, onMouseEnter, onMouseLeave} = props;
+  const {name, style, color, onMouseEnter, onMouseLeave, className} = props;
 
   const finalStyle: React.CSSProperties = useMemo(() => {
     const customStyle = style || {};
@@ -48,7 +49,13 @@ const Icon: React.FC<IconProps> = props => {
   }, [style, color]);
 
   return (
-    <AntdIcon component={icons[name]} style={finalStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} />
+    <AntdIcon
+      className={className}
+      component={icons[name]}
+      style={finalStyle}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    />
   );
 };
 
