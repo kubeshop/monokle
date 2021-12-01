@@ -142,7 +142,7 @@ function addNamespaceFilterLink(
   const namespace = getSymbolValue(lines, symbol);
   if (namespace) {
     const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-      `Filter on namespace [${namespace}]`,
+      `Add/Remove filter on namespace [${namespace}]`,
       () => {
         filterResources({namespace, labels: {}, annotations: {}});
       }

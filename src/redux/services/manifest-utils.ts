@@ -78,6 +78,15 @@ export function mergeManifests(template: string, values: string) {
     },
   });
 
+  // cleanup
+  visit(templateDoc, {
+    Pair(key, node, path) {
+      if ((isMap(node.value) || isSeq(node.value)) && node.value.items.length === 0) {
+        return visit.REMOVE;
+      }
+    },
+  });
+
   return templateDoc.toString().trim();
 }
 
