@@ -21,7 +21,7 @@ import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
 
-import {getDependentResourceKinds} from '@src/kindhandlers';
+import {getDependentResourceKinds, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
 import {processRefs} from './resourceRefs';
 import {validateResource} from './validation';
@@ -452,16 +452,26 @@ export function reprocessResources(
 export function processParsedResources(
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
-  options?: {resourceIds?: string[]; resourceKinds?: string[]}
+  options?: {resourceIds?: string[]; resourceKinds?: string[]; skipValidation?: boolean}
 ) {
-  if (options && options.resourceIds && options.resourceIds.length > 0) {
-    Object.values(resourceMap)
-      .filter(r => options.resourceIds?.includes(r.id))
-      .forEach(resource => validateResource(resource));
-  } else {
-    Object.values(resourceMap).forEach(resource => {
-      validateResource(resource);
-    });
+  if (!options?.skipValidation) {
+    if (options && options.resourceIds && options.resourceIds.length > 0) {
+      Object.values(resourceMap)
+        .filter(r => options.resourceIds?.includes(r.id))
+        .forEach(resource => validateResource(resource));
+    }
+
+    if (options && options.resourceKinds && options.resourceKinds.length > 0) {
+      Object.values(resourceMap)
+        .filter(r => options.resourceKinds?.includes(r.kind))
+        .forEach(resource => validateResource(resource));
+    }
+
+    if (!options || (!options.resourceIds && !options.resourceKinds)) {
+      Object.values(resourceMap).forEach(resource => {
+        validateResource(resource);
+      });
+    }
   }
   processRefs(resourceMap, processingOptions, options);
   clearResourcesTemporaryObjects(resourceMap);
@@ -659,4 +669,25 @@ export function getLinkedResources(resource: K8sResource) {
     });
 
   return linkedResourceIds;
+}
+
+/**
+ * Returns all resource kinds that could potentially link to the specified resource
+ */
+
+const targetResourceKindCache = new Map<string, string[]>();
+
+export function getResourceKindsWithTargetingRefs(resource: K8sResource) {
+  if (!targetResourceKindCache.has(resource.kind)) {
+    const resourceKinds = getKnownResourceKinds().filter(kind => {
+      const handler = getResourceKindHandler(kind);
+      if (handler && handler.outgoingRefMappers) {
+        return handler.outgoingRefMappers.some(mapper => mapper.target.kind === resource.kind);
+      }
+      return false;
+    });
+
+    targetResourceKindCache.set(resource.kind, resourceKinds);
+  }
+  return targetResourceKindCache.get(resource.kind);
 }

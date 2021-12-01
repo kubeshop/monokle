@@ -39,7 +39,7 @@ import electronStore from '@utils/electronStore';
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 
-import {getResourceKindHandler} from '@src/kindhandlers';
+import {getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
 import initialState from '../initialState';
 import {
@@ -53,8 +53,10 @@ import {
 } from '../services/fileEntry';
 import {
   extractK8sResources,
+  getResourceKindsWithTargetingRefs,
   isFileResource,
   isUnsavedResource,
+  processParsedResources,
   recalculateResourceRanges,
   removeResourceFromFile,
   reprocessResources,
@@ -126,7 +128,7 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   async (shouldIgnore: boolean, thunkAPI) => {
     electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
     thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
-    thunkAPI.dispatch(mainSlice.actions.reprocessAllResources());
+    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinks());
   }
 );
 
@@ -258,10 +260,34 @@ export const mainSlice = createSlice({
     /**
      * Reprocess all resources - called when changing processing-related options
      */
-    reprocessAllResources: (state: Draft<AppState>) => {
-      const resourceIds = Object.values(state.resourceMap).map(r => r.id);
-      reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
+    reprocessResourcesForOptionalLinks: (state: Draft<AppState>) => {
+      // find all resourceKinds with optional refmappers
+      const resourceKindsWithOptionalRefs = getKnownResourceKinds().filter(kind => {
+        const handler = getResourceKindHandler(kind);
+        if (handler && handler.outgoingRefMappers) {
+          return handler.outgoingRefMappers.some(mapper => mapper.source.hasOptionalSibling);
+        }
+        return false;
+      });
+
+      processParsedResources(state.resourceMap, state.resourceRefsProcessingOptions, {
+        resourceKinds: resourceKindsWithOptionalRefs,
+        skipValidation: true,
+      });
     },
+    /**
+     * Reprocess all resources - called when changing processing-related options
+     */
+    reprocessNewResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+      const resource = action.payload;
+      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+      processParsedResources(state.resourceMap, state.resourceRefsProcessingOptions, {
+        resourceIds: [resource.id],
+        resourceKinds,
+      });
+    },
+    /**
     /**
      * Updates the content of the specified resource to the specified value
      */
@@ -898,7 +924,7 @@ export const {
   unselectClusterDiffMatch,
   unselectAllClusterDiffMatches,
   reloadClusterDiff,
-  reprocessAllResources,
   setSelectionHistory,
+  reprocessNewResource,
 } = mainSlice.actions;
 export default mainSlice.reducer;

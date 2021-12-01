@@ -21,10 +21,10 @@ export const SecretKindSelection = ({schema, onChange, formData, disabled, ...ar
   const [refs, setRefs] = useState<string[]>([]);
   const [properties, setProperties] = useState<string[]>([]);
   const [selectedRef, setSelectedRef] = useState<string | undefined>(
-    secretType === 'Opaque' ? formData.name : formData
+    secretType === 'Opaque' ? formData?.name : formData
   );
   const [selectedProperty, setSelectedProperty] = useState<string | undefined>(
-    secretType === 'Opaque' ? formData.key : undefined
+    secretType === 'Opaque' ? formData?.key : undefined
   );
   let allowedScretTypes: string[] = [];
   if (secretType === 'Opaque') {

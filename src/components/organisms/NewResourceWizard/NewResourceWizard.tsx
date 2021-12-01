@@ -13,7 +13,7 @@ import hotkeys from '@constants/hotkeys';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {reprocessAllResources} from '@redux/reducers/main';
+import {reprocessNewResource} from '@redux/reducers/main';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
@@ -52,6 +52,7 @@ const NewResourceWizard = () => {
         selectedResourceId: defaultInput.selectedResourceId || SELECT_OPTION_NONE,
       }
     : undefined;
+
   const [form] = Form.useForm();
   lastKindRef.current = form.getFieldValue('kind');
 
@@ -71,6 +72,8 @@ const NewResourceWizard = () => {
     if (defaultInput?.targetFolder && fileMap[ROOT_FILE_ENTRY]) {
       setSelectedFolder(defaultInput.targetFolder);
     }
+
+    setSubmitDisabled(!defaultValues?.name && !defaultValues?.kind && !defaultValues?.apiVersion);
   }, [defaultInput]);
 
   const closeWizard = () => {
@@ -164,7 +167,7 @@ const NewResourceWizard = () => {
     const fullFileName = getFullFileName(formValues.name);
 
     // validate and update any possible broking incoming links that are now fixed
-    dispatch(reprocessAllResources());
+    dispatch(reprocessNewResource(newResource));
 
     if (shouldSaveToFolder) {
       dispatch(

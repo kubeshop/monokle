@@ -466,14 +466,23 @@ export function processRefs(
   filter?: {resourceIds?: string[]; resourceKinds?: string[]}
 ) {
   // select which resources to process based on optional filter
-  const resources =
-    filter?.resourceIds && filter?.resourceIds.length > 0
-      ? filter.resourceIds.map(id => resourceMap[id])
-      : filter?.resourceKinds && filter?.resourceKinds.length > 0
-      ? Object.values(resourceMap).filter(resource => filter?.resourceKinds?.includes(resource.kind))
-      : Object.values(resourceMap).filter(
-          resource => !isKustomizationResource(resource) && !isKustomizationPatch(resource)
-        );
+  const resources: K8sResource[] = [];
+
+  if (filter && filter.resourceIds) {
+    resources.push(...filter.resourceIds.map(id => resourceMap[id]));
+  }
+
+  if (filter && filter.resourceKinds) {
+    resources.push(...Object.values(resourceMap).filter(resource => filter?.resourceKinds?.includes(resource.kind)));
+  }
+
+  if (!filter?.resourceIds && !filter?.resourceKinds) {
+    resources.push(
+      ...Object.values(resourceMap).filter(
+        resource => !isKustomizationResource(resource) && !isKustomizationPatch(resource)
+      )
+    );
+  }
 
   // prep for processing
   let processedResourceIds = new Set<string>();

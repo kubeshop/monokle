@@ -64,6 +64,10 @@ const HandlerByResourceKind = Object.fromEntries(
   })).map(kindHandler => [kindHandler.kind, kindHandler])
 );
 
+export const getKnownResourceKinds = () => {
+  return ResourceKindHandlers.map(handler => handler.kind);
+};
+
 export const getResourceKindHandler = (resourceKind: string): ResourceKindHandler | undefined => {
   return HandlerByResourceKind[resourceKind];
 };
