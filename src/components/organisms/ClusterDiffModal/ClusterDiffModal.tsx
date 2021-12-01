@@ -14,6 +14,7 @@ import {closeClusterDiff} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {applySelectedMatchesWithConfirm} from '@redux/services/applySelectedMatchesWithConfirm';
 import {getClusterResourceText} from '@redux/services/clusterResource';
+import {replaceSelectedMatchesWithConfirm} from '@redux/services/replaceSelectedMatchesWithConfirm';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
 import {ClusterDiff, ResourceDiff} from '@molecules';
@@ -53,6 +54,12 @@ const StyledModal = styled(Modal)<{previewing: boolean}>`
   `}
 `;
 
+const StyledButtonsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 type ResourceDiffState = {
   isLoading: boolean;
   localResource?: K8sResource;
@@ -74,7 +81,14 @@ function ClusterDiffModal() {
   const diffResourceId = useAppSelector(state => state.main.clusterDiff.diffResourceId);
   const refreshDiffResource = useAppSelector(state => state.main.clusterDiff.refreshDiffResource);
   const shouldReload = useAppSelector(state => state.main.clusterDiff.shouldReload);
-  const selectedMatchesLength = useAppSelector(state => state.main.clusterDiff.selectedMatches.length);
+
+  const selectedMatches = useAppSelector(state => state.main.clusterDiff.selectedMatches);
+  const canReplaceSelectedMatches = useAppSelector(state => {
+    return selectedMatches.every(matchId => {
+      const currentMatch = state.main.clusterDiff.clusterToLocalResourcesMatches.find(m => m.id === matchId);
+      return Boolean(currentMatch?.clusterResourceId) && Boolean(currentMatch?.localResourceIds?.length);
+    });
+  });
 
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
@@ -207,7 +221,14 @@ function ClusterDiffModal() {
     if (!currentContext) {
       return;
     }
-    applySelectedMatchesWithConfirm(selectedMatchesLength, currentContext, dispatch);
+    applySelectedMatchesWithConfirm(selectedMatches.length, currentContext, dispatch);
+  };
+
+  const onClickReplaceSelected = () => {
+    if (!currentContext) {
+      return;
+    }
+    replaceSelectedMatchesWithConfirm(selectedMatches.length, currentContext, dispatch);
   };
 
   const onCancel = () => {
@@ -226,20 +247,32 @@ function ClusterDiffModal() {
       style={{maxWidth: 1000}}
       onCancel={onCancel}
       footer={
-        <>
+        <StyledButtonsContainer>
           <Button
             type="primary"
             ghost
             style={{float: 'left'}}
             icon={<Icon name="kubernetes" />}
-            disabled={selectedMatchesLength === 0 || !currentContext}
+            disabled={selectedMatches.length === 0 || !currentContext}
             onClick={onClickDeploySelected}
           >
-            Deploy selected resources ({selectedMatchesLength}) to cluster
+            Deploy selected local resources ({selectedMatches.length}) to cluster
             <ArrowRightOutlined />
           </Button>
-          <Button onClick={closeModal}>Close</Button>
-        </>
+          <div>
+            <Button
+              type="primary"
+              ghost
+              style={{float: 'left'}}
+              disabled={selectedMatches.length === 0 || !canReplaceSelectedMatches || !currentContext}
+              onClick={onClickReplaceSelected}
+            >
+              <ArrowLeftOutlined />
+              Replace selected local resources ({selectedMatches.length}) with cluster resources
+            </Button>
+            <Button onClick={closeModal}>Close</Button>
+          </div>
+        </StyledButtonsContainer>
       }
       centered
       previewing={isInPreviewMode}

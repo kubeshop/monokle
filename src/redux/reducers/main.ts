@@ -32,6 +32,7 @@ import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -81,6 +82,11 @@ export type UpdateResourcePayload = {
   preventSelectionAndHighlightsUpdate?: boolean;
 };
 
+export type UpdateManyResourcesPayload = {
+  resourceId: string;
+  content: string;
+}[];
+
 export type UpdateFileEntryPayload = {
   path: string;
   content: string;
@@ -122,6 +128,18 @@ function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: b
   }
   state.currentSelectionHistoryIndex = undefined;
 }
+
+const performResourceContentUpdate = (state: AppState, resource: K8sResource, newText: string) => {
+  if (isFileResource(resource)) {
+    const updatedFileText = saveResource(resource, newText, state.fileMap);
+    resource.text = updatedFileText;
+    resource.content = parseDocument(updatedFileText).toJS();
+    recalculateResourceRanges(resource, state);
+  } else {
+    resource.text = newText;
+    resource.content = parseDocument(newText).toJS();
+  }
+};
 
 export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
@@ -291,43 +309,47 @@ export const mainSlice = createSlice({
     /**
      * Updates the content of the specified resource to the specified value
      */
-    updateResource: {
-      reducer: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
-        try {
-          const resource = state.resourceMap[action.payload.resourceId];
-          if (resource) {
-            if (isFileResource(resource)) {
-              const updatedFileText = saveResource(resource, action.payload.content, state.fileMap);
-              resource.text = updatedFileText;
-              resource.content = parseDocument(updatedFileText).toJS();
-              recalculateResourceRanges(resource, state);
-            } else {
-              resource.text = action.payload.content;
-              resource.content = parseDocument(action.payload.content).toJS();
-            }
-
-            let resources = findResourcesToReprocess(resource, state.resourceMap);
-
-            reprocessResources(resources, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
-            if (!action.payload.preventSelectionAndHighlightsUpdate) {
-              resource.isSelected = false;
-              updateSelectionAndHighlights(state, resource);
-            }
+    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
+      try {
+        const resource = state.resourceMap[action.payload.resourceId];
+        if (resource) {
+          performResourceContentUpdate(state, resource, action.payload.content);
+          let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
+          reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
+          if (!action.payload.preventSelectionAndHighlightsUpdate) {
+            resource.isSelected = false;
+            updateSelectionAndHighlights(state, resource);
           }
-        } catch (e) {
-          log.error(e);
-          return original(state);
         }
-      },
-      prepare: (payload: UpdateResourcePayload) => {
-        // only run this action in the renderer thread - to avoid sync issues when both threads are updating the same file
-        return {
-          payload,
-          meta: {
-            scope: 'local',
-          },
-        };
-      },
+      } catch (e) {
+        log.error(e);
+        return original(state);
+      }
+    },
+    /**
+     * Updates the content of the specified resources to the specified values
+     */
+    updateManyResources: (state: Draft<AppState>, action: PayloadAction<UpdateManyResourcesPayload>) => {
+      try {
+        let resourceIdsToReprocess: string[] = [];
+        action.payload.forEach(({resourceId, content}) => {
+          const resource = state.resourceMap[resourceId];
+          if (resource) {
+            performResourceContentUpdate(state, resource, content);
+            let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
+            resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
+          }
+        });
+        reprocessResources(
+          resourceIdsToReprocess,
+          state.resourceMap,
+          state.fileMap,
+          state.resourceRefsProcessingOptions
+        );
+      } catch (e) {
+        log.error(e);
+        return original(state);
+      }
     },
     removeResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const resourceId = action.payload;
@@ -688,6 +710,7 @@ export const mainSlice = createSlice({
 
         const isInPreviewMode = Boolean(state.previewResourceId) || Boolean(state.previewValuesFileId);
 
+        // get the local resources from state.resourceMap
         let localResources: K8sResource[] = [];
         localResources = Object.values(state.resourceMap).filter(
           resource =>
@@ -696,10 +719,12 @@ export const mainSlice = createSlice({
             resource.kind !== KUSTOMIZATION_KIND
         );
 
+        // if we are in preview mode, localResources must contain only the preview resources
         if (isInPreviewMode) {
           localResources = localResources.filter(resource => resource.filePath.startsWith(PREVIEW_PREFIX));
         }
 
+        // this groups local resources by {name}{kind}{namespace}
         const groupedLocalResources = groupResourcesByIdentifier(
           localResources,
           makeResourceNameKindNamespaceIdentifier
@@ -711,22 +736,31 @@ export const mainSlice = createSlice({
           .forEach(r => delete state.resourceMap[r.id]);
         // add resources from cluster diff to the resource map
         Object.values(clusterResourceMap).forEach(r => {
-          state.resourceMap[r.id] = r;
+          // add prefix to the resource id to avoid replacing local resources that might have the same id
+          // this happens only if the local resource has it's metadata.uid defined
+          const clusterResourceId = `${CLUSTER_DIFF_PREFIX}${r.id}`;
+          r.id = clusterResourceId;
+          state.resourceMap[clusterResourceId] = r;
         });
 
         const clusterResources = Object.values(clusterResourceMap);
+        // this groups cluster resources by {name}{kind}{namespace}
+        // it's purpose is to allow us to find matches in the groupedLocalResources Record using the identifier
         const groupedClusterResources = groupResourcesByIdentifier(
           clusterResources,
           makeResourceNameKindNamespaceIdentifier
         );
 
         let clusterToLocalResourcesMatches: ClusterToLocalResourcesMatch[] = [];
+        // this keeps track of local resources that have already been matched
         const localResourceIdsAlreadyMatched: string[] = [];
 
         Object.entries(groupedClusterResources).forEach(([identifier, value]) => {
+          // the value should always be an array of length 1 so we take the first entry
           const currentClusterResource = value[0];
           const matchingLocalResources = groupedLocalResources[identifier];
           if (!matchingLocalResources || matchingLocalResources.length === 0) {
+            // if there are no matching resources, we create a cluster only match
             clusterToLocalResourcesMatches.push({
               id: identifier,
               clusterResourceId: currentClusterResource.id,
@@ -738,8 +772,8 @@ export const mainSlice = createSlice({
             const matchingLocalResourceIds = matchingLocalResources.map(r => r.id);
             clusterToLocalResourcesMatches.push({
               id: identifier,
-              clusterResourceId: currentClusterResource.id,
               localResourceIds: matchingLocalResourceIds,
+              clusterResourceId: currentClusterResource.id,
               resourceName: currentClusterResource.name,
               resourceKind: currentClusterResource.kind,
               resourceNamespace: currentClusterResource.namespace || 'default',
@@ -748,10 +782,12 @@ export const mainSlice = createSlice({
           }
         });
 
+        // optionally filter out all the cluster only matches
         if (state.clusterDiff.hideClusterOnlyResources) {
           clusterToLocalResourcesMatches = clusterToLocalResourcesMatches.filter(match => match.localResourceIds);
         }
 
+        // remove deduplicates if there are any
         const localResourceIdentifiersNotMatched = [
           ...new Set(
             localResources
@@ -760,6 +796,7 @@ export const mainSlice = createSlice({
           ),
         ];
 
+        // create local only matches
         localResourceIdentifiersNotMatched.forEach(identifier => {
           const currentLocalResources = groupedLocalResources[identifier];
           if (!currentLocalResources || currentLocalResources.length === 0) {
@@ -796,6 +833,17 @@ export const mainSlice = createSlice({
       state.clusterDiff.shouldReload = undefined;
       state.clusterDiff.selectedMatches = [];
     });
+
+    builder
+      .addCase(replaceSelectedResourceMatches.pending, state => {
+        state.clusterDiff.hasLoaded = false;
+      })
+      .addCase(replaceSelectedResourceMatches.fulfilled, state => {
+        state.clusterDiff.hasLoaded = true;
+      })
+      .addCase(replaceSelectedResourceMatches.rejected, state => {
+        state.clusterDiff.hasLoaded = true;
+      });
 
     builder.addMatcher(
       action => true,
@@ -905,6 +953,7 @@ export const {
   setSelectingFile,
   setApplyingResource,
   updateResource,
+  updateManyResources,
   updateFileEntry,
   multiplePathsAdded,
   multipleFilesChanged,
