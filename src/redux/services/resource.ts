@@ -16,7 +16,7 @@ import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} f
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
-import {isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
@@ -424,7 +424,12 @@ export function reprocessResources(
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
     if (resource) {
+      const isPatch = isKustomizationPatch(resource);
       resource.name = createResourceName(resource.filePath, resource.content, resource.kind);
+      if (isPatch) {
+        resource.name = `Patch: ${resource.name}`;
+      }
+
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
       resource.namespace = resource.content.metadata?.namespace;
