@@ -111,6 +111,10 @@ metadata:
   finalizers: []
   name: argo-rollouts-notification-configmap
   namespace: test
+  volumes:
+  - emptyDir: {}
+    hostPath: {}
+    name: static-files
 apiVersion: v1
 kind: ConfigMap
 immutable: false`;
@@ -120,6 +124,8 @@ kind: ConfigMap
 metadata:
   name: argo-rollouts-notification-configmap
   namespace: test
+  volumes:
+    - name: static-files
 immutable: false`;
 
   const result = mergeManifests(orgYaml, newYaml);
