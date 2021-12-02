@@ -683,7 +683,6 @@ export const mainSlice = createSlice({
             rootFileEntry.children = [childFileName];
           }
         } else {
-          console.log('parentPath', parentPath);
           const parentPathFileEntry = state.fileMap[parentPath];
           if (parentPathFileEntry) {
             if (parentPathFileEntry.children !== undefined) {
