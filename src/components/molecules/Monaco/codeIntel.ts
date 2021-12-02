@@ -4,6 +4,7 @@ import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate
 import {K8sResource, RefPosition, ResourceRef} from '@models/k8sresource';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
+import {isPreviewResource} from '@redux/services/resource';
 import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {ResourceKindHandlers, getIncomingRefMappers} from '@src/kindhandlers';
@@ -390,13 +391,16 @@ export async function applyForResource(
         if (!outgoingRefResource) {
           return;
         }
-        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-          `${outgoingRefResource.kind}: ${outgoingRefResource.name} in ${outgoingRefResource.filePath}`,
-          () => {
-            // @ts-ignore
-            selectResource(outgoingRef.target?.resourceId);
-          }
-        );
+
+        let text = `${outgoingRefResource.kind}: ${outgoingRefResource.name}`;
+        if (!isPreviewResource(outgoingRefResource)) {
+          text += ` in ${outgoingRefResource.filePath}`;
+        }
+
+        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(text, () => {
+          // @ts-ignore
+          selectResource(outgoingRef.target?.resourceId);
+        });
         commandMarkdownLinkList.push(commandMarkdownLink);
         newDisposables.push(commandDisposable);
       }

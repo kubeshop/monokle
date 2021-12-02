@@ -42,7 +42,7 @@ const NewResourceWizard = () => {
   const [shouldSaveToFolder, setShouldSaveState] = useState(true);
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [isSubmitDisabled, setSubmitDisabled] = useState(true);
-  const [inputValue, setInputValue] = useState<string>(' ');
+  const [inputValue, setInputValue] = useState<string>('');
   const lastKindRef = useRef<string>();
   const defaultInput = newResourceWizardState.defaultInput;
   const defaultValues = defaultInput
