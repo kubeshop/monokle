@@ -182,9 +182,6 @@ export const uiSlice = createSlice({
       state.clusterStatusHidden = !state.clusterStatusHidden;
       electronStore.set('ui.clusterStatusHidden', state.clusterStatusHidden);
     },
-    setReloadFileTree: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.reloadFileTree = action.payload;
-    },
   },
   extraReducers: builder => {
     builder
@@ -242,6 +239,5 @@ export const {
   resetLayout,
   setClusterIconHighlightStatus,
   toggleClusterStatus,
-  setReloadFileTree,
 } = uiSlice.actions;
 export default uiSlice.reducer;

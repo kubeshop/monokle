@@ -65,7 +65,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
-import {closeClusterDiff, uiSlice} from './ui';
+import {closeClusterDiff} from './ui';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -147,14 +147,6 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
     electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
     thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
     thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinks());
-  }
-);
-
-export const updateMultiplePaths = createAsyncThunk(
-  'main/updateMultiplePaths',
-  async ({paths, appConfig}: any, thunkAPI) => {
-    thunkAPI.dispatch(mainSlice.actions.multiplePathsAdded({paths, appConfig}));
-    thunkAPI.dispatch(uiSlice.actions.setReloadFileTree(true));
   }
 );
 
@@ -680,8 +672,8 @@ export const mainSlice = createSlice({
         const newFileEntry = createFileEntry(relativeFilePath);
         newFileEntry.timestamp = action.payload.fileTimestamp;
         state.fileMap[relativeFilePath] = newFileEntry;
-        const parentPath = path.join(path.sep, path.basename(path.dirname(relativeFilePath))).trim();
         const childFileName = path.basename(relativeFilePath);
+        const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
         if (parentPath === path.sep) {
           const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
           if (rootFileEntry.children) {
@@ -691,6 +683,7 @@ export const mainSlice = createSlice({
             rootFileEntry.children = [childFileName];
           }
         } else {
+          console.log('parentPath', parentPath);
           const parentPathFileEntry = state.fileMap[parentPath];
           if (parentPathFileEntry) {
             if (parentPathFileEntry.children !== undefined) {

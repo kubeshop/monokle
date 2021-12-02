@@ -95,7 +95,6 @@ export type UiState = {
   resetLayout: boolean;
   clusterPaneIconHighlighted: boolean;
   clusterStatusHidden: boolean;
-  reloadFileTree: boolean;
 };
 
 export type PaneConfiguration = {

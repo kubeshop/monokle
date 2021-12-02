@@ -27,7 +27,6 @@ import {
   openCreateFolderModal,
   openNewResourceWizard,
   openRenameEntityModal,
-  setReloadFileTree,
   setShouldExpandAllNodes,
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -543,7 +542,6 @@ const FileTreePane = () => {
   const scanExcludes = useAppSelector(state => state.config.scanExcludes);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
-  const reloadFileTree = useAppSelector(state => state.ui.reloadFileTree);
   const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
   const [tree, setTree] = useState<TreeNode | null>(null);
   const [expandedKeys, setExpandedKeys] = useState<Array<React.Key>>([]);
@@ -589,19 +587,7 @@ const FileTreePane = () => {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
       dispatch(setShouldExpandAllNodes(false));
     }
-    if (reloadFileTree) {
-      refreshFolder();
-      setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
-      dispatch(setReloadFileTree(false));
-    }
-  }, [resourceMap, fileMap, shouldExpandAllNodes, hideExcludedFilesInFileExplorer, dispatch, reloadFileTree]);
-
-  // useEffect(() => {
-  //   if (reloadFileTree) {
-  //     refreshFolder();
-  //     dispatch(setReloadFileTree(false));
-  //   }
-  // }, [reloadFileTree]);
+  }, [resourceMap, fileMap, shouldExpandAllNodes, hideExcludedFilesInFileExplorer, dispatch]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
