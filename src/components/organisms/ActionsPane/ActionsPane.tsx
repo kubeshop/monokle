@@ -66,7 +66,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
+  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET - 5;
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);

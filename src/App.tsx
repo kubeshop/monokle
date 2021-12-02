@@ -1,5 +1,7 @@
 import 'antd/dist/antd.less';
 
+import styled from 'styled-components';
+
 import {Size} from '@models/window';
 
 import {
@@ -16,8 +18,6 @@ import {
   StartupModal,
 } from '@organisms';
 
-import {Layout} from '@atoms';
-
 import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import {ClusterDiffModal} from '@components/organisms';
 import CreateFolderModal from '@components/organisms/CreateFolderModal';
@@ -28,22 +28,31 @@ import {useWindowSize} from '@utils/hooks';
 
 import AppContext from './AppContext';
 
+const AppContainer = styled.div<{$height: number; $width: number}>`
+  ${props => (props.$height ? `height: ${props.$height}px;` : `height: 100%;`)}
+  ${props => (props.$width ? `width: ${props.$width}px;` : `width: 100%;`)}
+  overflow: hidden;
+`;
+
+const MainContainer = styled.div`
+  height: 100%;
+  width: 100%;
+`;
+
 const App = () => {
   const size: Size = useWindowSize();
 
-  const mainHeight = `${size.height}px`;
-
   return (
     <AppContext.Provider value={{windowSize: size}}>
-      <div style={{overflowY: 'hidden'}}>
+      <AppContainer $height={size.height} $width={size.width}>
         <MessageBox />
-        <Layout style={{height: mainHeight}}>
+        <MainContainer>
           <PageHeader />
           <SettingsDrawer />
           <NotificationsDrawer />
           <PaneManager />
           <PageFooter />
-        </Layout>
+        </MainContainer>
         <DiffModal />
         <StartupModal />
         <NewResourceWizard />
@@ -54,7 +63,7 @@ const App = () => {
         <ClusterDiffModal />
         <RenameEntityModal />
         <CreateFolderModal />
-      </div>
+      </AppContainer>
     </AppContext.Provider>
   );
 };
