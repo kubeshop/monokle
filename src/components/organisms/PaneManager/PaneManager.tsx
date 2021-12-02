@@ -36,7 +36,7 @@ import {
 
 import {GraphView, LogViewer} from '@molecules';
 
-import {Col, Content, Row, SplitView} from '@atoms';
+import {Col, SplitView} from '@atoms';
 
 import electronStore from '@utils/electronStore';
 
@@ -52,7 +52,7 @@ import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSecti
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
 
-const StyledRow = styled(Row)`
+const StyledRow = styled.div`
   background-color: ${BackgroundColors.darkThemeBackground};
   width: 100%;
   padding: 0px;
@@ -82,10 +82,6 @@ const StyledColumnRightMenu = styled(Col)`
   padding: 0px;
   margin: 0px;
   border-left: ${AppBorders.pageDivider};
-`;
-
-const StyledContent = styled(Content)`
-  overflow-y: clip;
 `;
 
 const iconMenuWidth = 45;
@@ -187,159 +183,148 @@ const PaneManager = () => {
   const clusterExplorerTooltipText = getClusterExplorerTooltipText();
 
   return (
-    <StyledContent style={{height: contentHeight}}>
-      <StyledRow style={{height: contentHeight + 4}}>
-        <StyledColumnLeftMenu>
-          <Space direction="vertical" style={{width: 43}}>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
-              <MenuButton
+    <StyledRow style={{height: contentHeight}}>
+      <StyledColumnLeftMenu>
+        <Space direction="vertical" style={{width: 43}}>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
+            <MenuButton
+              isSelected={leftMenuSelection === 'file-explorer'}
+              isActive={leftActive}
+              shouldWatchSelectedPath
+              onClick={() => setLeftActiveMenu('file-explorer')}
+            >
+              <MenuIcon
+                style={{marginLeft: 4}}
+                icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
+                active={leftActive}
                 isSelected={leftMenuSelection === 'file-explorer'}
-                isActive={leftActive}
-                shouldWatchSelectedPath
-                onClick={() => setLeftActiveMenu('file-explorer')}
-              >
+              />
+            </MenuButton>
+          </Tooltip>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
+            <MenuButton
+              isSelected={leftMenuSelection === 'kustomize-pane'}
+              isActive={leftActive}
+              onClick={() => setLeftActiveMenu('kustomize-pane')}
+              sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
+            >
+              <MenuIcon iconName="kustomize" active={leftActive} isSelected={leftMenuSelection === 'kustomize-pane'} />
+            </MenuButton>
+          </Tooltip>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
+            <MenuButton
+              isSelected={leftMenuSelection === 'helm-pane'}
+              isActive={leftActive}
+              onClick={() => setLeftActiveMenu('helm-pane')}
+              sectionNames={[HELM_CHART_SECTION_NAME]}
+            >
+              <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
+            </MenuButton>
+          </Tooltip>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
+            <MenuButton
+              isSelected={leftMenuSelection === 'cluster-explorer'}
+              isActive={leftActive}
+              onClick={async () => {
+                setLeftActiveMenu('cluster-explorer');
+                electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
+                if (!hasUserPerformedClickOnClusterIcon) {
+                  dispatch(onUserPerformedClickOnClusterIcon());
+                }
+              }}
+            >
+              <Badge {...badgeChild} color={Colors.blue6}>
                 <MenuIcon
-                  style={{marginLeft: 4}}
-                  icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
+                  className={clusterPaneIconHighlighted ? 'animated-highlight' : ''}
+                  icon={ClusterOutlined}
                   active={leftActive}
-                  isSelected={leftMenuSelection === 'file-explorer'}
+                  isSelected={leftMenuSelection === 'cluster-explorer'}
                 />
-              </MenuButton>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
+              </Badge>
+            </MenuButton>
+          </Tooltip>
+          {featureJson.PluginManager && (
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
               <MenuButton
-                isSelected={leftMenuSelection === 'kustomize-pane'}
+                isSelected={leftMenuSelection === 'plugin-manager'}
                 isActive={leftActive}
-                onClick={() => setLeftActiveMenu('kustomize-pane')}
-                sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
+                onClick={() => setLeftActiveMenu('plugin-manager')}
               >
-                <MenuIcon
-                  iconName="kustomize"
-                  active={leftActive}
-                  isSelected={leftMenuSelection === 'kustomize-pane'}
-                />
+                <MenuIcon icon={ApiOutlined} active={leftActive} isSelected={leftMenuSelection === 'plugin-manager'} />
               </MenuButton>
             </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
-              <MenuButton
-                isSelected={leftMenuSelection === 'helm-pane'}
-                isActive={leftActive}
-                onClick={() => setLeftActiveMenu('helm-pane')}
-                sectionNames={[HELM_CHART_SECTION_NAME]}
-              >
-                <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
-              </MenuButton>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
-              <MenuButton
-                isSelected={leftMenuSelection === 'cluster-explorer'}
-                isActive={leftActive}
-                onClick={async () => {
-                  setLeftActiveMenu('cluster-explorer');
-                  electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
-                  if (!hasUserPerformedClickOnClusterIcon) {
-                    dispatch(onUserPerformedClickOnClusterIcon());
-                  }
+          )}
+        </Space>
+      </StyledColumnLeftMenu>
+
+      <StyledColumnPanes style={{width: contentWidth}}>
+        <SplitView
+          contentWidth={contentWidth}
+          left={
+            <>
+              <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
+                <FileTreePane />
+              </div>
+              <div
+                style={{
+                  display: featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
                 }}
               >
-                <Badge {...badgeChild} color={Colors.blue6}>
-                  <MenuIcon
-                    className={clusterPaneIconHighlighted ? 'animated-highlight' : ''}
-                    icon={ClusterOutlined}
-                    active={leftActive}
-                    isSelected={leftMenuSelection === 'cluster-explorer'}
-                  />
-                </Badge>
-              </MenuButton>
-            </Tooltip>
-            {featureJson.PluginManager && (
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
-                <MenuButton
-                  isSelected={leftMenuSelection === 'plugin-manager'}
-                  isActive={leftActive}
-                  onClick={() => setLeftActiveMenu('plugin-manager')}
-                >
-                  <MenuIcon
-                    icon={ApiOutlined}
-                    active={leftActive}
-                    isSelected={leftMenuSelection === 'plugin-manager'}
-                  />
-                </MenuButton>
-              </Tooltip>
-            )}
-          </Space>
-        </StyledColumnLeftMenu>
+                <ClustersPane />
+              </div>
+              <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
+                <KustomizePane />
+              </div>
+              <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
+                <HelmPane />
+              </div>
+              <div
+                style={{
+                  display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                }}
+              >
+                <PluginManagerPane />
+              </div>
+            </>
+          }
+          hideLeft={!leftActive}
+          nav={<NavigatorPane />}
+          editor={<ActionsPane contentHeight={contentHeight} />}
+          right={
+            <>
+              {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
+                <GraphView editorHeight={contentHeight} />
+              ) : undefined}
+              <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
+                <LogViewer editorHeight={contentHeight} />
+              </div>
+            </>
+          }
+          hideRight={!rightActive}
+        />
+      </StyledColumnPanes>
 
-        <StyledColumnPanes style={{width: contentWidth}}>
-          <SplitView
-            contentWidth={contentWidth}
-            left={
-              <>
-                <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
-                  <FileTreePane />
-                </div>
-                <div
-                  style={{
-                    display:
-                      featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
-                  }}
-                >
-                  <ClustersPane />
-                </div>
-                <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
-                  <KustomizePane />
-                </div>
-                <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
-                  <HelmPane />
-                </div>
-                <div
-                  style={{
-                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
-                  }}
-                >
-                  <PluginManagerPane />
-                </div>
-              </>
+      <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
+        <Space direction="vertical" style={{width: 43}}>
+          <Button
+            size="large"
+            type="text"
+            onClick={() => setRightActiveMenu('graph')}
+            icon={
+              <MenuIcon icon={ApartmentOutlined} active={rightActive} isSelected={rightMenuSelection === 'graph'} />
             }
-            hideLeft={!leftActive}
-            nav={<NavigatorPane />}
-            editor={<ActionsPane contentHeight={contentHeight} />}
-            right={
-              <>
-                {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                  <GraphView editorHeight={contentHeight} />
-                ) : undefined}
-                <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
-                  <LogViewer editorHeight={contentHeight} />
-                </div>
-              </>
-            }
-            hideRight={!rightActive}
+            style={{display: featureJson.ShowGraphView ? 'inline' : 'none'}}
           />
-        </StyledColumnPanes>
 
-        <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
-          <Space direction="vertical" style={{width: 43}}>
-            <Button
-              size="large"
-              type="text"
-              onClick={() => setRightActiveMenu('graph')}
-              icon={
-                <MenuIcon icon={ApartmentOutlined} active={rightActive} isSelected={rightMenuSelection === 'graph'} />
-              }
-              style={{display: featureJson.ShowGraphView ? 'inline' : 'none'}}
-            />
-
-            <Button
-              size="large"
-              type="text"
-              onClick={() => setRightActiveMenu('logs')}
-              icon={<MenuIcon icon={CodeOutlined} active={rightActive} isSelected={rightMenuSelection === 'logs'} />}
-            />
-          </Space>
-        </StyledColumnRightMenu>
-      </StyledRow>
-    </StyledContent>
+          <Button
+            size="large"
+            type="text"
+            onClick={() => setRightActiveMenu('logs')}
+            icon={<MenuIcon icon={CodeOutlined} active={rightActive} isSelected={rightMenuSelection === 'logs'} />}
+          />
+        </Space>
+      </StyledColumnRightMenu>
+    </StyledRow>
   );
 };
 
