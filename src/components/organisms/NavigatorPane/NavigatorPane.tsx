@@ -34,7 +34,7 @@ const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET + 15;
+  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
