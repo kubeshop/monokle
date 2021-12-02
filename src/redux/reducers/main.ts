@@ -672,8 +672,8 @@ export const mainSlice = createSlice({
         const newFileEntry = createFileEntry(relativeFilePath);
         newFileEntry.timestamp = action.payload.fileTimestamp;
         state.fileMap[relativeFilePath] = newFileEntry;
-        const parentPath = path.join(path.sep, path.basename(path.dirname(relativeFilePath))).trim();
         const childFileName = path.basename(relativeFilePath);
+        const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
         if (parentPath === path.sep) {
           const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
           if (rootFileEntry.children) {

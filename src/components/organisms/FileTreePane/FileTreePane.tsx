@@ -25,6 +25,7 @@ import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
   openCreateFolderModal,
+  openNewResourceWizard,
   openRenameEntityModal,
   setShouldExpandAllNodes,
 } from '@redux/reducers/ui';
@@ -321,6 +322,7 @@ interface TreeItemProps {
   onExcludeFromProcessing: (relativePath: string) => void;
   onIncludeToProcessing: (relativePath: string) => void;
   onCreateFolder: (absolutePath: string) => void;
+  onCreateResource: (targetFolder: string) => void;
   isExcluded?: Boolean;
   isFolder?: Boolean;
 }
@@ -352,6 +354,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onExcludeFromProcessing,
     onIncludeToProcessing,
     onCreateFolder,
+    onCreateResource,
     isFolder,
   } = props;
 
@@ -372,6 +375,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     ? fileMap[ROOT_FILE_ENTRY].filePath
     : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
 
+  const targetFolder = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
+
   const platformFilemanagerNames: {[name: string]: string} = {
     darwin: 'Finder',
   };
@@ -381,16 +386,29 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const menu = (
     <Menu>
       {isFolder ? (
-        <Menu.Item
-          onClick={e => {
-            e.domEvent.stopPropagation();
+        <>
+          <Menu.Item
+            onClick={e => {
+              e.domEvent.stopPropagation();
 
-            onCreateFolder(absolutePath);
-          }}
-          key="create_directory"
-        >
-          New Folder
-        </Menu.Item>
+              onCreateFolder(absolutePath);
+            }}
+            key="create_directory"
+          >
+            New Folder
+          </Menu.Item>
+
+          <Menu.Item
+            onClick={e => {
+              e.domEvent.stopPropagation();
+
+              onCreateResource(targetFolder);
+            }}
+            key="create_resource"
+          >
+            New Resource
+          </Menu.Item>
+        </>
       ) : null}
       <Menu.Item
         onClick={e => {
@@ -790,6 +808,10 @@ const FileTreePane = () => {
     dispatch(openCreateFolderModal(absolutePath));
   };
 
+  const onCreateResource = (targetFolder: string) => {
+    dispatch(openNewResourceWizard({defaultInput: {targetFolder}}));
+  };
+
   return (
     <FileTreeContainer>
       <Row>
@@ -867,6 +889,7 @@ const FileTreePane = () => {
                 onExcludeFromProcessing={onExcludeFromProcessing}
                 onIncludeToProcessing={onIncludeToProcessing}
                 onCreateFolder={onCreateFolder}
+                onCreateResource={onCreateResource}
                 {...event}
               />
             );

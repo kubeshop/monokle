@@ -210,6 +210,7 @@ const PageHeader = () => {
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const kubeConfig = useAppSelector(state => state.config.kubeConfig);
   const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
 
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
@@ -337,7 +338,7 @@ const PageHeader = () => {
                     placement="bottomCenter"
                     arrow
                     trigger={['click']}
-                    disabled={isInPreviewMode}
+                    disabled={previewLoader.isLoading || isInPreviewMode}
                   >
                     <StyledClusterButton>
                       <span>{kubeConfig.currentContext}</span>
