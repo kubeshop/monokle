@@ -65,7 +65,7 @@ import {
 } from '../services/resource';
 import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
-import {closeClusterDiff} from './ui';
+import {closeClusterDiff, uiSlice} from './ui';
 
 export type SetRootFolderPayload = {
   appConfig: AppConfig;
@@ -147,6 +147,14 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
     electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
     thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
     thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinks());
+  }
+);
+
+export const updateMultiplePaths = createAsyncThunk(
+  'main/updateMultiplePaths',
+  async ({paths, appConfig}: any, thunkAPI) => {
+    thunkAPI.dispatch(mainSlice.actions.multiplePathsAdded({paths, appConfig}));
+    thunkAPI.dispatch(uiSlice.actions.setReloadFileTree(true));
   }
 );
 
