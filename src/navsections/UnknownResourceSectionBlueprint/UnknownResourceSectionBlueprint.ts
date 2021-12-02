@@ -11,6 +11,8 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
+import ResourceKindPrefix from '../K8sResourceSectionBlueprint/ResourceKindPrefix';
+import ResourceKindSuffix from '../K8sResourceSectionBlueprint/ResourceKindSuffix';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 
 export type UnknownResourceScopeType = {
@@ -54,6 +56,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       const unknownResources = Object.values(scope.resourceMap).filter(
         resource =>
           !KnownResourceKinds.includes(resource.kind) &&
+          !resource.name.startsWith('Patch:') &&
           (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
       );
       const unknownResourcesByKind: Record<string, K8sResource[]> = unknownResources.reduce<
@@ -101,6 +104,14 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
         dispatch(selectK8sResource({resourceId: itemInstance.id}));
+      },
+    },
+    customization: {
+      prefix: {
+        component: ResourceKindPrefix,
+      },
+      suffix: {
+        component: ResourceKindSuffix,
       },
     },
   },
