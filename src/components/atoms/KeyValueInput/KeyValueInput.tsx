@@ -171,11 +171,12 @@ function KeyValueInput(props: KeyValueInputProps) {
               <Select.Option key={ANY_VALUE} value={ANY_VALUE}>
                 {ANY_VALUE}
               </Select.Option>
-              {data[entry.key].map((value: string) => (
-                <Select.Option key={value} value={value}>
-                  {value}
-                </Select.Option>
-              ))}
+              {data[entry.key] &&
+                data[entry.key].map((value: string) => (
+                  <Select.Option key={value} value={value}>
+                    {value}
+                  </Select.Option>
+                ))}
             </Select>
           )}
           <StyledRemoveButton
