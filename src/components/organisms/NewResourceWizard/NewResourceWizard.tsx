@@ -200,11 +200,8 @@ const NewResourceWizard = () => {
     ));
   };
 
-  const onSelectChange = (value: string) => {
-    if (value.startsWith(NEW_ITEM)) {
-      setNamespaces([...namespaces, inputValue]);
-      form.setFieldsValue({namespace: inputValue});
-    }
+  const onSelectChange = () => {
+    setInputValue('');
   };
 
   useHotkeys(
@@ -298,14 +295,14 @@ const NewResourceWizard = () => {
         >
           <Select
             showSearch
-            onSearch={(text: string) => {
+            onSearch={text => {
               setInputValue(text);
             }}
             onChange={onSelectChange}
           >
             {inputValue && namespaces.every(namespace => namespace !== inputValue) ? (
-              <Option key={inputValue} value={`${NEW_ITEM} - ${inputValue}`}>
-                create {`"${inputValue}"`}
+              <Option key={inputValue} value={inputValue}>
+                {inputValue}
               </Option>
             ) : null}
             {namespaces.map(namespace => {
