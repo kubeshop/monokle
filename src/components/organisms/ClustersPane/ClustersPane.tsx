@@ -187,7 +187,7 @@ const ClustersPane = () => {
           </Row>
         </MonoPaneTitleCol>
       </TitleRow>
-      <PaneContainer>
+      <PaneContainer style={{height: 'inherit'}}>
         <ClustersContainer>
           <StyledDiv>
             <StyledHeading>
