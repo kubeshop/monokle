@@ -12,6 +12,7 @@ import {
   ACTIONS_PANE_FOOTER_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   NAVIGATOR_HEIGHT_OFFSET,
+  PREVIEW_PREFIX,
   TOOLTIP_DELAY,
 } from '@constants/constants';
 import {
@@ -88,6 +89,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
+  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const [key, setKey] = useState('source');
   const dispatch = useAppDispatch();
 
@@ -254,6 +256,20 @@ const ActionsPane = (props: {contentHeight: string}) => {
     [diffResource]
   );
 
+  const isDiffButtonDisabled = useMemo(() => {
+    if (!selectedResource) {
+      return true;
+    }
+    if (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)) {
+      return true;
+    }
+    // if the resource is from the cluster preview
+    if (selectedResource.filePath === PREVIEW_PREFIX + kubeconfigPath) {
+      return true;
+    }
+    return false;
+  }, [selectedResource, kubeconfigPath]);
+
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {
     ipcRenderer.on('perform-resource-diff', onPerformResourceDiff);
@@ -353,11 +369,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     type="primary"
                     ghost
                     onClick={diffSelectedResource}
-                    disabled={
-                      !selectedResourceId ||
-                      (selectedResource &&
-                        (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)))
-                    }
+                    disabled={isDiffButtonDisabled}
                   >
                     Diff
                   </S.DiffButton>
