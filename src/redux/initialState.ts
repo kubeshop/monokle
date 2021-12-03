@@ -41,6 +41,7 @@ const initialAppState: AppState = {
     selectedMatches: [],
   },
   notifications: [],
+  shouldEditorReloadSelectedPath: false,
 };
 
 const initialAppConfigState: AppConfig = {
