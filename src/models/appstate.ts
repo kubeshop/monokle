@@ -138,6 +138,8 @@ interface AppState {
     selectedMatches: string[];
   };
   notifications: AlertType[];
+  /** whether or not the editor should read the selectedPath file again - used when the file is updated externally */
+  shouldEditorReloadSelectedPath: boolean;
 }
 
 export type {

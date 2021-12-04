@@ -5,6 +5,7 @@ import {useSelector} from 'react-redux';
 import {useMeasure} from 'react-use';
 
 import fs from 'fs';
+import log from 'loglevel';
 import 'monaco-editor';
 // @ts-ignore
 import {languages} from 'monaco-editor/esm/vs/editor/editor.api';
@@ -25,7 +26,7 @@ import {ResourceRef} from '@models/k8sresource';
 import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
+import {editorHasReloadedSelectedPath, extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
@@ -74,6 +75,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
+  const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
@@ -226,6 +228,25 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPath, selectedResourceId]);
+
+  useEffect(() => {
+    if (!selectedPath || !shouldEditorReloadSelectedPath) {
+      return;
+    }
+    log.info('[Monaco]: selected file was updated outside Monokle - reading file...');
+    const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
+    const fileStats = getFileStats(filePath);
+    if (fileStats && fileStats.isFile()) {
+      const newCode = fs.readFileSync(filePath, 'utf8');
+      setCode(newCode);
+      setOrgCode(newCode);
+      setDirty(false);
+      dispatch(editorHasReloadedSelectedPath());
+    } else {
+      log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldEditorReloadSelectedPath]);
 
   useEffect(() => {
     if (selectedResource && selectedResource.text !== code) {

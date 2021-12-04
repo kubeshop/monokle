@@ -12,7 +12,11 @@ import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
-import {clearResourceSelections, updateSelectionAndHighlights} from '@redux/services/selection';
+import {
+  clearResourceSelections,
+  highlightChildrenResources,
+  updateSelectionAndHighlights,
+} from '@redux/services/selection';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
@@ -329,19 +333,22 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
   if (!fileEntry.timestamp || (absolutePathTimestamp && absolutePathTimestamp > fileEntry.timestamp)) {
     fileEntry.timestamp = absolutePathTimestamp;
 
+    let wasFileSelected = state.selectedPath === fileEntry.filePath;
+
     const resourcesInFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
-    let wasSelected = false;
+    let wasAnyResourceSelected = false;
 
     resourcesInFile.forEach(resource => {
       if (state.selectedResourceId === resource.id) {
         updateSelectionAndHighlights(state, resource);
-        wasSelected = true;
+        wasAnyResourceSelected = true;
       }
       delete state.resourceMap[resource.id];
     });
 
     if (state.selectedPath === fileEntry.filePath) {
       state.selectedPath = undefined;
+      state.selectedResourceId = undefined;
       clearResourceSelections(state.resourceMap);
     }
 
@@ -357,8 +364,19 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
       state.resourceRefsProcessingOptions
     );
 
-    if (resourcesInFile.length === 1 && resourcesFromFile.length === 1 && wasSelected) {
-      updateSelectionAndHighlights(state, resourcesFromFile[0]);
+    if (wasAnyResourceSelected) {
+      if (resourcesInFile.length === 1 && resourcesFromFile.length === 1) {
+        updateSelectionAndHighlights(state, resourcesFromFile[0]);
+      } else {
+        state.selectedPath = undefined;
+        state.selectedResourceId = undefined;
+        clearResourceSelections(state.resourceMap);
+      }
+    }
+
+    if (wasFileSelected) {
+      selectFilePath(fileEntry.filePath, state);
+      state.shouldEditorReloadSelectedPath = true;
     }
   } else {
     log.info(`ignoring changed file ${absolutePath} because of timestamp`);
@@ -523,4 +541,31 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
       resourceKinds: removalSideEffect.removedResources.map(r => r.kind),
     }
   );
+}
+
+/**
+ * Selects the specified filePath - used by several reducers
+ */
+
+export function selectFilePath(filePath: string, state: AppState) {
+  const entries = getAllFileEntriesForPath(filePath, state.fileMap);
+  clearResourceSelections(state.resourceMap);
+
+  if (entries.length > 0) {
+    const parent = entries[entries.length - 1];
+    getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
+      r.isHighlighted = true;
+    });
+
+    if (parent.children) {
+      highlightChildrenResources(parent, state.resourceMap, state.fileMap);
+    }
+
+    Object.values(state.helmValuesMap).forEach(valuesFile => {
+      valuesFile.isSelected = valuesFile.filePath === filePath;
+    });
+  }
+
+  state.selectedResourceId = undefined;
+  state.selectedPath = filePath;
 }

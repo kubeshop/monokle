@@ -46,11 +46,11 @@ import initialState from '../initialState';
 import {
   addPath,
   createFileEntry,
-  getAllFileEntriesForPath,
   getFileEntryForAbsolutePath,
   getResourcesForPath,
   reloadFile,
   removePath,
+  selectFilePath,
 } from '../services/fileEntry';
 import {
   extractK8sResources,
@@ -63,7 +63,7 @@ import {
   reprocessResources,
   saveResource,
 } from '../services/resource';
-import {clearResourceSelections, highlightChildrenResources, updateSelectionAndHighlights} from '../services/selection';
+import {clearResourceSelections, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
@@ -535,6 +535,9 @@ export const mainSlice = createSlice({
       state.currentSelectionHistoryIndex = action.payload.nextSelectionHistoryIndex;
       state.selectionHistory = action.payload.newSelectionHistory;
     },
+    editorHasReloadedSelectedPath: (state: Draft<AppState>) => {
+      state.shouldEditorReloadSelectedPath = false;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -930,33 +933,6 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
   }
 }
 
-/**
- * Selects the specified filePath - used by several reducers
- */
-
-function selectFilePath(filePath: string, state: AppState) {
-  const entries = getAllFileEntriesForPath(filePath, state.fileMap);
-  clearResourceSelections(state.resourceMap);
-
-  if (entries.length > 0) {
-    const parent = entries[entries.length - 1];
-    getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
-      r.isHighlighted = true;
-    });
-
-    if (parent.children) {
-      highlightChildrenResources(parent, state.resourceMap, state.fileMap);
-    }
-
-    Object.values(state.helmValuesMap).forEach(valuesFile => {
-      valuesFile.isSelected = valuesFile.filePath === filePath;
-    });
-  }
-
-  state.selectedResourceId = undefined;
-  state.selectedPath = filePath;
-}
-
 export const {
   setAppRehydrating,
   addResource,
@@ -987,5 +963,6 @@ export const {
   reloadClusterDiff,
   setSelectionHistory,
   reprocessNewResource,
+  editorHasReloadedSelectedPath,
 } = mainSlice.actions;
 export default mainSlice.reducer;
