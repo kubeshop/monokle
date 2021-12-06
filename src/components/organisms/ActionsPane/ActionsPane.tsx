@@ -91,16 +91,16 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const [key, setKey] = useState('source');
-  const [isButtonShrinked, setButtonCollapsedState] = useState<boolean>();
+  const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>();
 
   const dispatch = useAppDispatch();
 
   // Could not get the ref of Tabs Component
-  const tabsList = document.getElementsByClassName('ant-tabs-nav-list')[0];
+  const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
   const extraButton = useRef<any>();
 
-  const getDistanceBetweenComponents = () => {
-    const tabsListEl = document.getElementsByClassName('ant-tabs-nav-list')[0].getBoundingClientRect();
+  const getDistanceBetweenTwoComponents = () => {
+    const tabsListEl = tabsList[0].getBoundingClientRect();
     const extraButtonEl = extraButton.current.getBoundingClientRect();
 
     const distance = extraButtonEl.left - tabsListEl.right;
@@ -108,13 +108,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (isButtonShrinked) {
       // 230px = approx width of not collapsed button
       if (distance > 230) {
-        setButtonCollapsedState(false);
+        setButtonShrinkedState(false);
       }
     }
 
     // The button has 10px margin-left
     if (!isButtonShrinked && distance < 10) {
-      setButtonCollapsedState(true);
+      setButtonShrinkedState(true);
     }
   };
 
@@ -328,8 +328,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResource]);
 
   useEffect(() => {
-    if (tabsList && extraButton.current) {
-      getDistanceBetweenComponents();
+    if (tabsList && tabsList.length && extraButton.current) {
+      getDistanceBetweenTwoComponents();
     }
   }, [tabsList, extraButton.current, uiState.paneConfiguration, windowSize]);
 
