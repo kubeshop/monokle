@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 
@@ -91,7 +91,32 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const [key, setKey] = useState('source');
+  const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
+
   const dispatch = useAppDispatch();
+
+  // Could not get the ref of Tabs Component
+  const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
+  const extraButton = useRef<any>();
+
+  const getDistanceBetweenTwoComponents = () => {
+    const tabsListEl = tabsList[0].getBoundingClientRect();
+    const extraButtonEl = extraButton.current.getBoundingClientRect();
+
+    const distance = extraButtonEl.left - tabsListEl.right;
+
+    if (isButtonShrinked) {
+      // 230px = approx width of not collapsed button
+      if (distance > 230) {
+        setButtonShrinkedState(false);
+      }
+    }
+
+    // The button has 10px margin-left
+    if (!isButtonShrinked && distance < 10) {
+      setButtonShrinkedState(true);
+    }
+  };
 
   const editorTabPaneHeight = useMemo(() => {
     let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
@@ -302,11 +327,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
     return isUnsavedResource(selectedResource);
   }, [selectedResource]);
 
-  const shouldButtonBeWithoutText =
-    (resourceKindHandler?.formEditorOptions?.editorUiSchema &&
-      resourceKindHandler.kind &&
-      uiState.paneConfiguration.editWidth < 0.35) ||
-    uiState.paneConfiguration.editWidth < 0.3;
+  useEffect(() => {
+    if (tabsList && tabsList.length && extraButton.current) {
+      getDistanceBetweenTwoComponents();
+    }
+  }, [tabsList, extraButton.current, uiState.paneConfiguration, windowSize, selectedResource]);
 
   return (
     <>
@@ -392,8 +417,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
                     type="link"
                     ghost
+                    ref={extraButton}
                   >
-                    {shouldButtonBeWithoutText ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
+                    {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
                   </S.ExtraRightButton>
                 </Tooltip>
               ) : null
