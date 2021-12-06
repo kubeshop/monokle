@@ -91,7 +91,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const [key, setKey] = useState('source');
-  const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>();
+  const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
 
   const dispatch = useAppDispatch();
 
@@ -331,7 +331,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (tabsList && tabsList.length && extraButton.current) {
       getDistanceBetweenTwoComponents();
     }
-  }, [tabsList, extraButton.current, uiState.paneConfiguration, windowSize]);
+  }, [tabsList, extraButton.current, uiState.paneConfiguration, windowSize, selectedResource]);
 
   return (
     <>
