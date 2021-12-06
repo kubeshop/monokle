@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/kubeshop/monokle/compare/v1.3.4-20211202.0...v1.4.0) (2021-12-06)
+
+
+### Bug Fixes
+
+* changes due to comments in PR ([4247b98](https://github.com/kubeshop/monokle/commit/4247b9805024fb19d47662a67dd527d253cfad24))
+* default namespace value typo and removed path from preview resources hint ([77efc0f](https://github.com/kubeshop/monokle/commit/77efc0fa9803f45c01f58b52a84ddc7c9a97467a))
+* disable diff button for cluster resources ([ec7c655](https://github.com/kubeshop/monokle/commit/ec7c655b8aca526972a3467886761f0790ba580d))
+* fixed behavior when NavTab had ellipsis under conditions ([ff9e257](https://github.com/kubeshop/monokle/commit/ff9e2576af886e27d222640961441cc797150f07))
+* fixed behavior when the user could add new namespace to the list of namespaces ([7242a31](https://github.com/kubeshop/monokle/commit/7242a3179006a48860910f7a1106621a56abc444))
+* resource filter crashing ([15c19b0](https://github.com/kubeshop/monokle/commit/15c19b08ce467216e2f8a28cb7f811c55dd33304))
+* selections & editor content on file changes ([4758884](https://github.com/kubeshop/monokle/commit/475888406238865d2be992d078d24b44f1611fc2))
+* set clusterpane height to inherit ([2aefca5](https://github.com/kubeshop/monokle/commit/2aefca5ec6b50f1918adb62540af4a0493d1ab9b))
+* set initial state of shrinkedButton to true, updated useEffect ([b70d151](https://github.com/kubeshop/monokle/commit/b70d151f6f30367f7c551441684825f6700e2ab6))
+
 ### [1.3.3](https://github.com/kubeshop/monokle/compare/v1.3.3-20211120.0...v1.3.3) (2021-11-23)
 
 
