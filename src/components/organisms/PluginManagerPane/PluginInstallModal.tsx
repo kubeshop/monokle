@@ -8,6 +8,9 @@ import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 
 import {MonoklePlugin} from '@models/plugin';
 
+import {useAppDispatch} from '@redux/hooks';
+import {addPlugin} from '@redux/reducers/main';
+
 const downloadPlugin = (pluginUrl: string) => {
   return new Promise<MonoklePlugin>((resolve, reject) => {
     const downloadPluginResult = (_: any, result: any) => {
@@ -22,6 +25,7 @@ const downloadPlugin = (pluginUrl: string) => {
 };
 
 function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
+  const dispatch = useAppDispatch();
   const {isVisible, onClose} = props;
   const [pluginUrl, setPluginUrl] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -30,7 +34,8 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   const onClickDownload = async () => {
     try {
       setIsDownloading(true);
-      await downloadPlugin(pluginUrl);
+      const plugin = await downloadPlugin(pluginUrl);
+      dispatch(addPlugin(plugin));
       setIsDownloading(false);
       close();
     } catch (err) {
