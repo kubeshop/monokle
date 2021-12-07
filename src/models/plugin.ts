@@ -9,25 +9,59 @@ type PackageJsonMonoklePlugin = Merge<
   }
 >;
 
-interface MonoklePluginRepositoryLatestRelease {
+interface GitRepositoryLatestRelease {
   commitHash: string;
   tagName: string;
   tarballUrl: string;
 }
 
-interface MonoklePluginRepository {
+interface GitRepository {
   owner: string;
   name: string;
   url: string;
-  latestRelease: MonoklePluginRepositoryLatestRelease;
+  latestRelease: GitRepositoryLatestRelease;
 }
 
-interface MonoklePluginModule {
-  id: string;
-  type: string;
-  source: string;
-  description?: string;
+interface TemplateForm {
+  name: string;
+  description: string;
+  schema: string;
+  uiSchema: string;
 }
+
+interface TemplateManifest {
+  filePath: string;
+  fileRenameRule: string;
+}
+
+interface VanillaTemplatePluginModule {
+  type: 'templates/vanilla';
+  id: string;
+  forms: TemplateForm[];
+  manifests: TemplateManifest[];
+}
+
+interface BundledHelmChartTemplatePluginModule {
+  type: 'templates/helm-chart';
+  isReferenced?: false;
+  id: string;
+  forms: TemplateForm[];
+}
+
+interface ReferencedHelmChartTemplatePluginModule {
+  type: 'templates/helm-chart';
+  isReferenced: true;
+  id: string;
+  forms: TemplateForm[];
+  chartName: string;
+  chartVersion: string;
+  chartRepo: string;
+  helpUrl: string;
+}
+
+type HelmChartTemplatePluginModule = BundledHelmChartTemplatePluginModule | ReferencedHelmChartTemplatePluginModule;
+
+type MonoklePluginModule = VanillaTemplatePluginModule | HelmChartTemplatePluginModule;
 
 interface MonoklePlugin {
   name: string;
@@ -35,16 +69,10 @@ interface MonoklePlugin {
   author: string;
   description?: string;
   location: string;
-  repository: MonoklePluginRepository;
+  repository: GitRepository;
   isActive: boolean;
   isInstalled: boolean;
   modules: MonoklePluginModule[];
 }
 
-export type {
-  MonoklePlugin,
-  MonoklePluginModule,
-  MonoklePluginRepository,
-  MonoklePluginRepositoryLatestRelease,
-  PackageJsonMonoklePlugin,
-};
+export type {MonoklePlugin, MonoklePluginModule, GitRepository, GitRepositoryLatestRelease, PackageJsonMonoklePlugin};
