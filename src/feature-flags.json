@@ -3,5 +3,6 @@
   "ShowClusterView": true,
   "ShowRightMenu": false,
   "PluginManager": false,
+  "TemplatesPane": false,
   "ActionsPaneFooter": false
 }

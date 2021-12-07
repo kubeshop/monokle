@@ -10,6 +10,7 @@ import {
   CodeOutlined,
   FolderOpenOutlined,
   FolderOutlined,
+  FormatPainterOutlined,
   WarningFilled,
 } from '@ant-design/icons';
 
@@ -32,6 +33,7 @@ import {
   KustomizePane,
   NavigatorPane,
   PluginManagerPane,
+  TemplatesPane,
 } from '@organisms';
 
 import {GraphView, LogViewer} from '@molecules';
@@ -243,6 +245,21 @@ const PaneManager = () => {
               </Badge>
             </MenuButton>
           </Tooltip>
+          {featureJson.TemplatesPane && (
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+              <MenuButton
+                isSelected={leftMenuSelection === 'templates-pane'}
+                isActive={leftActive}
+                onClick={() => setLeftActiveMenu('templates-pane')}
+              >
+                <MenuIcon
+                  icon={FormatPainterOutlined}
+                  active={leftActive}
+                  isSelected={leftMenuSelection === 'templates-pane'}
+                />
+              </MenuButton>
+            </Tooltip>
+          )}
           {featureJson.PluginManager && (
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
               <MenuButton
@@ -277,6 +294,13 @@ const PaneManager = () => {
               </div>
               <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
                 <HelmPane />
+              </div>
+              <div
+                style={{
+                  display: featureJson.TemplatesPane && leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
+                }}
+              >
+                <TemplatesPane />
               </div>
               <div
                 style={{
