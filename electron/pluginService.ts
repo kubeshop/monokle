@@ -1,7 +1,9 @@
 import fs from 'fs';
+import log from 'loglevel';
 import fetch from 'node-fetch';
 import path from 'path';
 import tar from 'tar';
+import {PackageJson} from 'type-fest';
 import util from 'util';
 
 import {MonoklePlugin, PackageJsonMonoklePlugin} from '@models/plugin';
@@ -9,9 +11,11 @@ import {MonoklePlugin, PackageJsonMonoklePlugin} from '@models/plugin';
 import {downloadFile} from '@utils/http';
 
 const fsExistsPromise = util.promisify(fs.exists);
+const fsReadFilePromise = util.promisify(fs.readFile);
 const fsMkdirPromise = util.promisify(fs.mkdir);
 const fsUnlinkPromise = util.promisify(fs.unlink);
 const fsRmPromise = util.promisify(fs.rm);
+const fsReadDirPromise = util.promisify(fs.readdir);
 
 const GITHUB_URL = 'https://github.com';
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
@@ -90,7 +94,7 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
     author: typeof pluginInfo.author === 'string' ? pluginInfo.author : pluginInfo.author.name,
     version: pluginInfo.version,
     description: pluginInfo.description,
-    isActive: true,
+    isActive: false,
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
@@ -100,4 +104,59 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
   };
 
   return plugin;
+}
+
+const getSubfolders = async (folderPath: string) => {
+  const subfolders = await fsReadDirPromise(folderPath, {withFileTypes: true});
+  return subfolders.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
+};
+
+async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promise<MonoklePlugin | undefined> {
+  const pluginFolderPath = path.join(pluginsDir, pluginFolderName);
+  const packageJsonFilePath = path.join(pluginFolderPath, 'package.json');
+  const doesPackageJsonFileExist = await fsExistsPromise(packageJsonFilePath);
+  if (!doesPackageJsonFileExist) {
+    log.warn(`[Plugins]: Missing package.json for plugin ${pluginFolderPath}`);
+    return;
+  }
+  const packageJsonRaw = await fsReadFilePromise(packageJsonFilePath, 'utf8');
+  const packageJson = JSON.parse(packageJsonRaw) as PackageJson;
+  const pluginInfo = extractInfoFromPackageJson(packageJson);
+
+  if (!packageJson.repository) {
+    log.warn(`[Plugins]: Missing 'repository' property in ${packageJsonFilePath}`);
+    return;
+  }
+
+  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(
+    typeof packageJson.repository === 'string' ? packageJson.repository : packageJson.repository.url
+  );
+
+  return {
+    name: pluginInfo.name,
+    author: typeof pluginInfo.author === 'string' ? pluginInfo.author : pluginInfo.author.name,
+    version: pluginInfo.version,
+    description: pluginInfo.description,
+    isActive: false,
+    repository: {
+      owner: repositoryOwner,
+      name: repositoryName,
+      branch: 'main', // TODO: handle the branch name
+    },
+    modules: pluginInfo.monoklePlugin.modules,
+  };
+}
+
+export async function loadPlugins(pluginsDir: string) {
+  const pluginFolders = await getSubfolders(pluginsDir);
+
+  const pluginsParsingResults = await Promise.allSettled(
+    pluginFolders.map(pluginFolderName => parsePlugin(pluginsDir, pluginFolderName))
+  );
+
+  const plugins = pluginsParsingResults
+    .filter((r): r is {status: 'fulfilled'; value: MonoklePlugin} => r.status === 'fulfilled' && r.value !== undefined)
+    .map(r => r.value);
+
+  return plugins;
 }

@@ -42,7 +42,7 @@ function PluginManagerPane() {
               <>
                 <h2>Active plugins</h2>
                 {activePlugins.map(activePlugin => (
-                  <PluginInformation plugin={activePlugin} />
+                  <PluginInformation key={activePlugin.name} plugin={activePlugin} />
                 ))}
               </>
             )}
@@ -50,7 +50,7 @@ function PluginManagerPane() {
               <>
                 <h2>Inactive plugins</h2>
                 {inactivePlugins.map(inactivePlugin => (
-                  <PluginInformation plugin={inactivePlugin} />
+                  <PluginInformation key={inactivePlugin.name} plugin={inactivePlugin} />
                 ))}
               </>
             )}
