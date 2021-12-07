@@ -4,7 +4,7 @@ import path from 'path';
 import tar from 'tar';
 import util from 'util';
 
-import {PackageJsonMonoklePlugin} from '@models/plugin';
+import {MonoklePlugin, PackageJsonMonoklePlugin} from '@models/plugin';
 
 import {downloadFile} from '@utils/http';
 
@@ -84,4 +84,20 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
     cwd: pluginFolderPath,
     strip: 1,
   });
+
+  const plugin: MonoklePlugin = {
+    name: pluginInfo.name,
+    author: typeof pluginInfo.author === 'string' ? pluginInfo.author : pluginInfo.author.name,
+    version: pluginInfo.version,
+    description: pluginInfo.description,
+    isActive: true,
+    repository: {
+      owner: repositoryOwner,
+      name: repositoryName,
+      branch: repositoryBranch,
+    },
+    modules: pluginInfo.monoklePlugin.modules,
+  };
+
+  return plugin;
 }

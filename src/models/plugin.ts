@@ -9,17 +9,10 @@ type PackageJsonMonoklePlugin = Merge<
   }
 >;
 
-interface GitRepositoryLatestRelease {
-  commitHash: string;
-  tagName: string;
-  tarballUrl: string;
-}
-
 interface GitRepository {
   owner: string;
   name: string;
-  url: string;
-  latestRelease: GitRepositoryLatestRelease;
+  branch: string;
 }
 
 interface TemplateForm {
@@ -68,11 +61,9 @@ interface MonoklePlugin {
   version: string;
   author: string;
   description?: string;
-  location: string;
   repository: GitRepository;
   isActive: boolean;
-  isInstalled: boolean;
   modules: MonoklePluginModule[];
 }
 
-export type {MonoklePlugin, MonoklePluginModule, GitRepository, GitRepositoryLatestRelease, PackageJsonMonoklePlugin};
+export type {MonoklePlugin, MonoklePluginModule, GitRepository, PackageJsonMonoklePlugin};
