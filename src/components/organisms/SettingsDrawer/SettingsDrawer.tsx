@@ -1,3 +1,5 @@
+import * as k8s from '@kubernetes/client-node';
+
 import {ipcRenderer} from 'electron';
 
 import React, {useEffect, useRef, useState} from 'react';
@@ -5,13 +7,16 @@ import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
 
+import {WarningOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
-import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE} from '@constants/constants';
+import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
   AutoLoadLastFolderTooltip,
+  BrowseKubeconfigTooltip,
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
   KustomizeCommandTooltip,
@@ -25,6 +30,7 @@ import {
   updateHelmPreviewMode,
   updateHideExcludedFilesInFileExplorer,
   updateKubeconfig,
+  updateKubeconfigPathValidity,
   updateKustomizeCommand,
   updateLoadLastFolderOnStartup,
   updateScanExcludes,
@@ -39,6 +45,8 @@ import FilePatternList from '@molecules/FilePatternList';
 import Drawer from '@components/atoms/Drawer';
 
 import {useFocus} from '@utils/hooks';
+
+import Colors from '@styles/Colors';
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -63,6 +71,27 @@ const StyledSelect = styled(Select)`
   width: 100%;
 `;
 
+const StyledWarningOutlined = styled(WarningOutlined)<{
+  isKubeconfigPathValid: boolean;
+  clusterPaneIconHighlighted: boolean;
+}>`
+  ${props =>
+    `color: ${
+      props.clusterPaneIconHighlighted
+        ? Colors.whitePure
+        : !props.isKubeconfigPathValid
+        ? Colors.redError
+        : Colors.yellowWarning
+    }`};
+  ${props => `margin-left: ${props.clusterPaneIconHighlighted ? '10px' : '5px'}`};
+  ${props => `padding-top: ${props.clusterPaneIconHighlighted ? '5px' : '0px'}`};
+`;
+
+const StyledHeading = styled.h2`
+  font-size: 16px;
+  margin-bottom: 7px;
+`;
+
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
 
@@ -70,7 +99,10 @@ const SettingsDrawer = () => {
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const appConfig = useAppSelector(state => state.config);
   const uiState = useAppSelector(state => state.ui);
-  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeconfig = useAppSelector(state => state.config.kubeConfig);
+  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
+
   const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
@@ -78,6 +110,11 @@ const SettingsDrawer = () => {
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
   const [inputRef, focusInput] = useFocus<Input>();
+  const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
+  const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
+  const clusterPaneIconHighlighted = useAppSelector(state => state.ui.clusterPaneIconHighlighted);
+
+  const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
 
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
 
@@ -146,17 +183,34 @@ const SettingsDrawer = () => {
   };
 
   useEffect(() => {
-    setCurrentKubeConfig(kubeconfig);
-  }, [kubeconfig]);
+    setCurrentKubeConfig(kubeconfigPath);
+  }, [kubeconfigPath]);
 
+  // useDebounce(
+  //   () => {
+  //     if (currentKubeConfig !== kubeconfigPath) {
+  //       dispatch(updateKubeconfig(currentKubeConfig));
+  //     }
+  //   },
+  //   DEFAULT_KUBECONFIG_DEBOUNCE,
+  //   [currentKubeConfig]
+  // );
   useDebounce(
     () => {
-      if (currentKubeConfig !== kubeconfig) {
+      try {
+        const kc = new k8s.KubeConfig();
+
+        kc.loadFromFile(currentKubeConfig);
+
+        dispatch(updateKubeconfigPathValidity(Boolean(kc.contexts) || false));
+      } catch (err) {
+        dispatch(updateKubeconfigPathValidity(!currentKubeConfig.length));
+      } finally {
         dispatch(updateKubeconfig(currentKubeConfig));
       }
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
-    [currentKubeConfig]
+    [currentKubeConfig, kubeconfigPath]
   );
 
   const onUpdateKubeconfig = (e: any) => {
@@ -201,7 +255,16 @@ const SettingsDrawer = () => {
       visible={isSettingsOpened}
     >
       <StyledDiv>
-        <StyledSpan>KUBECONFIG</StyledSpan>
+        <StyledHeading>
+          KUBECONFIG
+          {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated && (
+            <StyledWarningOutlined
+              className={clusterPaneIconHighlighted ? 'animated-highlight' : ''}
+              isKubeconfigPathValid={isKubeconfigPathValid}
+              clusterPaneIconHighlighted={clusterPaneIconHighlighted}
+            />
+          )}
+        </StyledHeading>
         <Tooltip title={KubeconfigPathTooltip}>
           <Input
             ref={inputRef}
@@ -211,9 +274,11 @@ const SettingsDrawer = () => {
             onClick={() => focusInput()}
           />
         </Tooltip>
-        <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
-          Browse
-        </StyledButton>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
+          <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
+            Browse
+          </StyledButton>
+        </Tooltip>
         <StyledDiv style={{marginTop: 16}}>
           <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
             Show Cluster Selector

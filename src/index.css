@@ -53,7 +53,6 @@ code {
 .animated-highlight {
   background-color: #d89614;
   position: relative;
-  display: block;
   width: 30px;
   height: 30px;
   border-radius: 100%;
@@ -61,7 +60,6 @@ code {
 
 .animated-highlight::after {
   position: absolute;
-  display: block;
   height: 30px;
   width: 30px;
   background: #594214bb;

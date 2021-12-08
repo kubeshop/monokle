@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Button, Dropdown, Menu, Popconfirm, Tooltip} from 'antd';
@@ -9,6 +9,7 @@ import {
   ClusterOutlined,
   DownOutlined,
   GithubOutlined,
+  LoadingOutlined,
   QuestionCircleOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
@@ -16,6 +17,7 @@ import {
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
+import {ClusterModeTooltip} from '@constants/tooltips';
 
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
@@ -24,13 +26,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {
   setClusterIconHighlightStatus,
-  setLeftMenuSelection,
   toggleClusterStatus,
   toggleNotifications,
   toggleSettings,
 } from '@redux/reducers/ui';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
-import {stopPreview} from '@redux/services/preview';
+import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
@@ -135,6 +136,20 @@ const StyledExitButton = styled.span`
   }
 `;
 
+const StyledButton = styled(Button)`
+  border-left: 1px solid ${Colors.grey3};
+  padding: 0;
+  padding-left: 8px;
+  margin: 0;
+  color: ${Colors.blue6};
+  &:hover {
+    color: color: ${Colors.blue6};
+    opacity: 0.8;
+  }
+`;
+
+const StyledDropdown = styled(Dropdown)``;
+
 const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
   margin-right: 5px;
 `;
@@ -163,7 +178,6 @@ const CLusterStatus = styled.div`
 const CLusterStatusText = styled.span<{connected: Boolean}>`
   font-size: 10px;
   font-weight: 600;
-  margin-right: 8px;
   border-right: 1px solid ${Colors.grey3};
   padding-right: 8px;
   ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.whitePure}`}
@@ -177,7 +191,7 @@ const StyledClusterOutlined = styled(ClusterOutlined)`
 const StyledClusterButton = styled(Button)`
   border: none;
   outline: none;
-  padding: 0px;
+  padding: 0px 8px;
 `;
 
 const StyledClusterActionButton = styled(Button)`
@@ -211,12 +225,16 @@ const PageHeader = () => {
   const kubeConfig = useAppSelector(state => state.config.kubeConfig);
   const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInClusterMode = useSelector(isInClusterModeSelector);
+  const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
 
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
   const [helmChart, setHelmChart] = useState<HelmChart>();
   const dispatch = useAppDispatch();
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -255,9 +273,9 @@ const PageHeader = () => {
 
   const handleClusterConfigure = () => {
     dispatch(setClusterIconHighlightStatus(true));
+    dispatch(toggleSettings());
     setTimeout(() => {
       dispatch(setClusterIconHighlightStatus(false));
-      dispatch(setLeftMenuSelection('cluster-explorer'));
     }, 3000);
   };
 
@@ -273,6 +291,42 @@ const PageHeader = () => {
   const handleClusterHideCancel = () => {
     dispatch(setClusterIconHighlightStatus(false));
   };
+
+  const connectToCluster = () => {
+    if (isInPreviewMode && previewResource && previewResource.id !== kubeconfigPath) {
+      stopPreview(dispatch);
+    }
+    startPreview(kubeconfigPath, 'cluster', dispatch);
+  };
+
+  const reconnectToCluster = () => {
+    if (isInPreviewMode && previewResource && previewResource.id !== kubeconfigPath) {
+      stopPreview(dispatch);
+    }
+    restartPreview(kubeconfigPath, 'cluster', dispatch);
+  };
+
+  const handleLoadCluster = () => {
+    if (isClusterActionDisabled && Boolean(previewType === 'cluster' && previewLoader.isLoading)) {
+      return;
+    }
+
+    if (isInClusterMode) {
+      reconnectToCluster();
+    } else {
+      connectToCluster();
+    }
+  };
+
+  const createClusterObjectsLabel = useCallback(() => {
+    if (isInClusterMode) {
+      return <span>Reload</span>;
+    }
+    if (previewType === 'cluster' && previewLoader.isLoading) {
+      return <LoadingOutlined />;
+    }
+    return <span>Show</span>;
+  }, [previewType, previewLoader, isInClusterMode]);
 
   const clusterMenu = (
     <Menu>
@@ -333,7 +387,7 @@ const PageHeader = () => {
                   {!isKubeconfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
                 </CLusterStatusText>
                 {isKubeconfigPathValid && (
-                  <Dropdown
+                  <StyledDropdown
                     overlay={clusterMenu}
                     placement="bottomCenter"
                     arrow
@@ -344,9 +398,22 @@ const PageHeader = () => {
                       <span>{kubeConfig.currentContext}</span>
                       <DownOutlined style={{margin: 4}} />
                     </StyledClusterButton>
-                  </Dropdown>
+                  </StyledDropdown>
                 )}
-                {!isKubeconfigPathValid && (
+                {isKubeconfigPathValid ? (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
+                    <StyledButton
+                      disabled={
+                        Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled
+                      }
+                      type="link"
+                      ghost
+                      onClick={handleLoadCluster}
+                    >
+                      {createClusterObjectsLabel()}
+                    </StyledButton>
+                  </Tooltip>
+                ) : (
                   <>
                     <StyledClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
                       Configure

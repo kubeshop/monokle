@@ -1,12 +1,11 @@
 import React, {useContext, useMemo} from 'react';
 
-import {Badge, Button, Space, Tooltip} from 'antd';
+import {Button, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
 
 import {
   ApartmentOutlined,
   ApiOutlined,
-  ClusterOutlined,
   CodeOutlined,
   FolderOpenOutlined,
   FolderOutlined,
@@ -22,23 +21,12 @@ import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
-import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 
-import {
-  ActionsPane,
-  ClustersPane,
-  FileTreePane,
-  HelmPane,
-  KustomizePane,
-  NavigatorPane,
-  PluginManagerPane,
-} from '@organisms';
+import {ActionsPane, FileTreePane, HelmPane, KustomizePane, NavigatorPane, PluginManagerPane} from '@organisms';
 
 import {GraphView, LogViewer} from '@molecules';
 
 import {Col, SplitView} from '@atoms';
-
-import electronStore from '@utils/electronStore';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -221,7 +209,7 @@ const PaneManager = () => {
               <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
             </MenuButton>
           </Tooltip>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
+          {/* <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
             <MenuButton
               isSelected={leftMenuSelection === 'cluster-explorer'}
               isActive={leftActive}
@@ -242,7 +230,7 @@ const PaneManager = () => {
                 />
               </Badge>
             </MenuButton>
-          </Tooltip>
+          </Tooltip> */}
           {featureJson.PluginManager && (
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
               <MenuButton
@@ -265,13 +253,13 @@ const PaneManager = () => {
               <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
                 <FileTreePane />
               </div>
-              <div
+              {/* <div
                 style={{
                   display: featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
                 }}
               >
                 <ClustersPane />
-              </div>
+              </div> */}
               <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
                 <KustomizePane />
               </div>
