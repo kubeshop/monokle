@@ -33,12 +33,13 @@ const S = {
 function K8sResourceSectionNameSuffix() {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const kubeConfig = useAppSelector(state => state.config.kubeConfig);
 
   if (isInPreviewMode) {
     return (
       <S.Container>
         {isInClusterMode ? (
-          <S.ClusterOutputTag>Cluster Preview Output</S.ClusterOutputTag>
+          <S.ClusterOutputTag>Showing {kubeConfig.currentContext}</S.ClusterOutputTag>
         ) : (
           <S.PreviewOutputTag>Preview Output</S.PreviewOutputTag>
         )}

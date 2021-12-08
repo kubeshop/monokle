@@ -1,12 +1,11 @@
 import React, {useContext, useMemo} from 'react';
 
-import {Badge, Button, Space, Tooltip} from 'antd';
+import {Button, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
 
 import {
   ApartmentOutlined,
   ApiOutlined,
-  ClusterOutlined,
   CodeOutlined,
   FolderOpenOutlined,
   FolderOutlined,
@@ -23,11 +22,9 @@ import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
-import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 
 import {
   ActionsPane,
-  ClustersPane,
   FileTreePane,
   HelmPane,
   KustomizePane,
@@ -39,8 +36,6 @@ import {
 import {GraphView, LogViewer} from '@molecules';
 
 import {Col, SplitView} from '@atoms';
-
-import electronStore from '@utils/electronStore';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -223,28 +218,6 @@ const PaneManager = () => {
               <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
             </MenuButton>
           </Tooltip>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
-            <MenuButton
-              isSelected={leftMenuSelection === 'cluster-explorer'}
-              isActive={leftActive}
-              onClick={async () => {
-                setLeftActiveMenu('cluster-explorer');
-                electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
-                if (!hasUserPerformedClickOnClusterIcon) {
-                  dispatch(onUserPerformedClickOnClusterIcon());
-                }
-              }}
-            >
-              <Badge {...badgeChild} color={Colors.blue6}>
-                <MenuIcon
-                  className={clusterPaneIconHighlighted ? 'animated-highlight' : ''}
-                  icon={ClusterOutlined}
-                  active={leftActive}
-                  isSelected={leftMenuSelection === 'cluster-explorer'}
-                />
-              </Badge>
-            </MenuButton>
-          </Tooltip>
           {featureJson.TemplatesPane && (
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
               <MenuButton
@@ -281,13 +254,6 @@ const PaneManager = () => {
             <>
               <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
                 <FileTreePane />
-              </div>
-              <div
-                style={{
-                  display: featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
-                }}
-              >
-                <ClustersPane />
               </div>
               <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
                 <KustomizePane />
