@@ -11,6 +11,7 @@ export const ClusterExplorerTooltips = {
   notValidKubeconfigPath: 'The specified Kubeconfig path is not valid',
 };
 export const PluginManagerTooltip = 'Show/hide Plugin Manager';
+export const TemplatesPaneTooltip = 'Show/hide Templates Explorer';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
 export const ClusterDiffDisabledInClusterPreviewTooltip =

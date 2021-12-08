@@ -9,6 +9,7 @@ import {
   CodeOutlined,
   FolderOpenOutlined,
   FolderOutlined,
+  FormatPainterOutlined,
   WarningFilled,
 } from '@ant-design/icons';
 
@@ -22,7 +23,15 @@ import {LeftMenuSelection} from '@models/ui';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
 
-import {ActionsPane, FileTreePane, HelmPane, KustomizePane, NavigatorPane, PluginManagerPane} from '@organisms';
+import {
+  ActionsPane,
+  FileTreePane,
+  HelmPane,
+  KustomizePane,
+  NavigatorPane,
+  PluginManagerPane,
+  TemplatesPane,
+} from '@organisms';
 
 import {GraphView, LogViewer} from '@molecules';
 
@@ -209,6 +218,21 @@ const PaneManager = () => {
               <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
             </MenuButton>
           </Tooltip>
+          {featureJson.TemplatesPane && (
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+              <MenuButton
+                isSelected={leftMenuSelection === 'templates-pane'}
+                isActive={leftActive}
+                onClick={() => setLeftActiveMenu('templates-pane')}
+              >
+                <MenuIcon
+                  icon={FormatPainterOutlined}
+                  active={leftActive}
+                  isSelected={leftMenuSelection === 'templates-pane'}
+                />
+              </MenuButton>
+            </Tooltip>
+          )}
           {featureJson.PluginManager && (
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
               <MenuButton
@@ -236,6 +260,13 @@ const PaneManager = () => {
               </div>
               <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
                 <HelmPane />
+              </div>
+              <div
+                style={{
+                  display: featureJson.TemplatesPane && leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
+                }}
+              >
+                <TemplatesPane />
               </div>
               <div
                 style={{

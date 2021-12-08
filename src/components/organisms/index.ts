@@ -17,3 +17,4 @@ export {default as NotificationsDrawer} from './NotificationsDrawer';
 export {default as RenameEntityModal} from './RenameEntityModal';
 export {default as HelmPane} from './HelmPane';
 export {default as KustomizePane} from './KustomizePane';
+export {default as TemplatesPane} from './TemplatesPane';
