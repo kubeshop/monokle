@@ -216,6 +216,27 @@ function cleanResourceRefs(resources: K8sResource[]) {
 }
 
 /**
+ * Removes all refs to the specified resource from other resources
+ */
+
+export function removeReferringRefs(resource: K8sResource, resourceMap: ResourceMapType) {
+  // find all resources with outgoing refs to this resource and remove that ref
+  resource.refs
+    // find outgoing refs that point to a valid resource
+    ?.filter(ref => ref.target?.type === 'resource' && ref.target.resourceId && resourceMap[ref.target.resourceId])
+    // get the target resource for each of those refs
+    // @ts-ignore
+    .map(ref => resourceMap[ref.target.resourceId])
+    // make sure it has refs (it should)
+    .filter(r => r.refs)
+    // remove incoming refs pointing to the removed resource
+    .forEach(r => {
+      // @ts-ignore
+      r.refs = r.refs.filter(ref => ref.target?.type !== 'resource' || ref.target.resourceId !== resource.id);
+    });
+}
+
+/**
  * Creates resource refs from a specified resource to target resources using the specified refMapper
  */
 
