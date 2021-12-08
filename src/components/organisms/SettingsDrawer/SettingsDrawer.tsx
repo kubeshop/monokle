@@ -38,6 +38,7 @@ import {
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {toggleClusterStatus, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
+import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
 import FilePatternList from '@molecules/FilePatternList';
@@ -71,10 +72,11 @@ const StyledSelect = styled(Select)`
   width: 100%;
 `;
 
-const StyledWarningOutlined = styled(WarningOutlined)<{
-  isKubeconfigPathValid: boolean;
-  clusterPaneIconHighlighted: boolean;
-}>`
+const StyledWarningOutlined = styled(
+  (props: {isKubeconfigPathValid: boolean; clusterPaneIconHighlighted: boolean; className: string}) => (
+    <WarningOutlined className={props.className} />
+  )
+)`
   ${props =>
     `color: ${
       props.clusterPaneIconHighlighted
@@ -212,6 +214,12 @@ const SettingsDrawer = () => {
     DEFAULT_KUBECONFIG_DEBOUNCE,
     [currentKubeConfig, kubeconfigPath]
   );
+
+  useEffect(() => {
+    if (kubeconfigPath) {
+      loadContexts(kubeconfigPath, dispatch);
+    }
+  }, [kubeconfigPath, dispatch]);
 
   const onUpdateKubeconfig = (e: any) => {
     if (isEditingDisabled) {

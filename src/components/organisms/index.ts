@@ -12,7 +12,6 @@ export {default as NewResourceWizard} from './NewResourceWizard';
 export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as NavigatorPane} from './NavigatorPane';
 export {default as PluginManagerPane} from './PluginManagerPane';
-export {default as ClustersPane} from './ClustersPane';
 export {default as ClusterDiffModal} from './ClusterDiffModal';
 export {default as NotificationsDrawer} from './NotificationsDrawer';
 export {default as RenameEntityModal} from './RenameEntityModal';

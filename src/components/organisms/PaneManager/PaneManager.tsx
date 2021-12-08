@@ -209,28 +209,6 @@ const PaneManager = () => {
               <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
             </MenuButton>
           </Tooltip>
-          {/* <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={clusterExplorerTooltipText} placement="right">
-            <MenuButton
-              isSelected={leftMenuSelection === 'cluster-explorer'}
-              isActive={leftActive}
-              onClick={async () => {
-                setLeftActiveMenu('cluster-explorer');
-                electronStore.set('appConfig.hasUserPerformedClickOnClusterIcon', true);
-                if (!hasUserPerformedClickOnClusterIcon) {
-                  dispatch(onUserPerformedClickOnClusterIcon());
-                }
-              }}
-            >
-              <Badge {...badgeChild} color={Colors.blue6}>
-                <MenuIcon
-                  className={clusterPaneIconHighlighted ? 'animated-highlight' : ''}
-                  icon={ClusterOutlined}
-                  active={leftActive}
-                  isSelected={leftMenuSelection === 'cluster-explorer'}
-                />
-              </Badge>
-            </MenuButton>
-          </Tooltip> */}
           {featureJson.PluginManager && (
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
               <MenuButton
@@ -253,13 +231,6 @@ const PaneManager = () => {
               <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
                 <FileTreePane />
               </div>
-              {/* <div
-                style={{
-                  display: featureJson.ShowClusterView && leftMenuSelection === 'cluster-explorer' ? 'inline' : 'none',
-                }}
-              >
-                <ClustersPane />
-              </div> */}
               <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
                 <KustomizePane />
               </div>
