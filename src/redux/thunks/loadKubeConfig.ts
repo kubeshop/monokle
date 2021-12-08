@@ -17,7 +17,6 @@ export const loadContexts = async (configPath: string, dispatch: (action: AnyAct
 
     if (stats.isFile()) {
       try {
-        console.log('configPath', configPath);
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
 
