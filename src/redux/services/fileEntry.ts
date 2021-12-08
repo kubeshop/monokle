@@ -12,7 +12,7 @@ import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
-import {removeReferringRefs} from '@redux/services/resourceRefs';
+import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {
   clearResourceSelections,
   highlightChildrenResources,
@@ -532,7 +532,7 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
   }
 
   // clear refs
-  removalSideEffect.removedResources.forEach(r => removeReferringRefs(r, state.resourceMap));
+  removalSideEffect.removedResources.forEach(r => updateReferringRefsOnDelete(r, state.resourceMap));
 }
 
 /**

@@ -25,7 +25,7 @@ import {
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
-import {findResourcesToReprocess, removeReferringRefs} from '@redux/services/resourceRefs';
+import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -358,7 +358,7 @@ export const mainSlice = createSlice({
         return;
       }
 
-      removeReferringRefs(resource, state.resourceMap);
+      updateReferringRefsOnDelete(resource, state.resourceMap);
 
       if (state.selectedResourceId === resourceId) {
         clearResourceSelections(state.resourceMap);

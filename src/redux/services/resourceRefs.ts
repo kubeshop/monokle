@@ -219,20 +219,32 @@ function cleanResourceRefs(resources: K8sResource[]) {
  * Removes all refs to the specified resource from other resources
  */
 
-export function removeReferringRefs(resource: K8sResource, resourceMap: ResourceMapType) {
-  // find all resources with outgoing refs to this resource and remove that ref
-  resource.refs
-    // find outgoing refs that point to a valid resource
-    ?.filter(ref => ref.target?.type === 'resource' && ref.target.resourceId && resourceMap[ref.target.resourceId])
-    // get the target resource for each of those refs
+export function updateReferringRefsOnDelete(resource: K8sResource, resourceMap: ResourceMapType) {
+  if (!resource.refs) {
+    return;
+  }
+
+  // get ids of all valid resources this resource refers to
+  const ids: string[] = resource.refs
+    .filter(ref => ref.target?.type === 'resource' && ref.target.resourceId && resourceMap[ref.target.resourceId])
     // @ts-ignore
-    .map(ref => resourceMap[ref.target.resourceId])
-    // make sure it has refs (it should)
-    .filter(r => r.refs)
-    // remove incoming refs pointing to the removed resource
+    .map(ref => ref.target.resourceId);
+
+  // make unique array to avoid processing the same resource twice
+  [...new Set(ids)]
+    .map(id => resourceMap[id])
     .forEach(r => {
-      // @ts-ignore
-      r.refs = r.refs.filter(ref => ref.target?.type !== 'resource' || ref.target.resourceId !== resource.id);
+      r.refs = r.refs
+        ?.map(ref => {
+          // change outgoing refs to the deleted resource to unsatisfied
+          if (isOutgoingRef(ref.type) && ref.target?.type === 'resource' && ref.target?.resourceId === resource.id) {
+            ref.type = ResourceRefType.Unsatisfied;
+            ref.target.resourceId = undefined;
+          }
+          return ref;
+        })
+        // discard all resource refs still referring to the deleted resource
+        .filter(ref => ref.target?.type !== 'resource' || ref.target.resourceId !== resource.id);
     });
 }
 
