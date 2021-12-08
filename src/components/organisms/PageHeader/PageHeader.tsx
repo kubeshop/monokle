@@ -325,7 +325,7 @@ const PageHeader = () => {
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
     }
-    return <span>Show</span>;
+    return <span>Load</span>;
   }, [previewType, previewLoader, isInClusterMode]);
 
   const clusterMenu = (
