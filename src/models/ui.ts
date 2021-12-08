@@ -46,7 +46,8 @@ export type LeftMenuSelection =
   | 'helm-pane'
   | 'kustomize-pane'
   | 'cluster-explorer'
-  | 'plugin-manager';
+  | 'plugin-manager'
+  | 'templates-pane';
 
 export type UiState = {
   isSettingsOpen: boolean;

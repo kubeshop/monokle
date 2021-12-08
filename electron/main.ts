@@ -34,11 +34,11 @@ import {PROCESS_ENV} from '@utils/env';
 import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
 import terminal from '../cli/terminal';
-import {downloadPlugin} from './pluginService';
+import {downloadPlugin, loadPlugins} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
-import {setAppRehydrating} from '@redux/reducers/main';
+import {setAppRehydrating, setPlugins} from '@redux/reducers/main';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
@@ -62,8 +62,8 @@ ipcMain.on('get-user-home-dir', event => {
 
 ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   try {
-    await downloadPlugin(pluginUrl, pluginsDir);
-    event.sender.send(DOWNLOAD_PLUGIN_RESULT);
+    const plugin = await downloadPlugin(pluginUrl, pluginsDir);
+    event.sender.send(DOWNLOAD_PLUGIN_RESULT, plugin);
   } catch (err) {
     if (err instanceof Error) {
       event.sender.send(DOWNLOAD_PLUGIN_RESULT, err);
@@ -213,7 +213,9 @@ export const createWindow = (givenPath?: string) => {
     }
     win.webContents.send('executed-from', {path: givenPath});
 
-
+    loadPlugins(pluginsDir).then(plugins => {
+      dispatch(setPlugins(plugins));
+    });
   });
 
   return win;

@@ -6,7 +6,9 @@ function PluginInformation(props: {plugin: MonoklePlugin}) {
   const {plugin} = props;
   return (
     <div>
-      <p>{plugin.name}</p>
+      <p>
+        {plugin.name} - {plugin.version}
+      </p>
     </div>
   );
 }
