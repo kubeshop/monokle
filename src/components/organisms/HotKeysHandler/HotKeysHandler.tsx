@@ -187,10 +187,6 @@ const HotKeysHandler = () => {
     dispatch(setLeftMenuSelection('file-explorer'));
   });
 
-  useHotkeys(hotkeys.OPEN_CLUSTER_TAB, () => {
-    dispatch(setLeftMenuSelection('cluster-explorer'));
-  });
-
   useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB, () => {
     dispatch(setLeftMenuSelection('kustomize-pane'));
   });
