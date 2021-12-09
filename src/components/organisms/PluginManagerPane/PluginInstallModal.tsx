@@ -36,17 +36,18 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
       setIsDownloading(true);
       const plugin = await downloadPlugin(pluginUrl);
       dispatch(addPlugin(plugin));
-      setIsDownloading(false);
       close();
     } catch (err) {
       if (err instanceof Error) {
         setErrorMessage(err.message);
       }
     }
+    setIsDownloading(false);
   };
 
   const close = () => {
     setPluginUrl('');
+    setIsDownloading(false);
     onClose();
   };
 

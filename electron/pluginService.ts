@@ -6,7 +6,7 @@ import tar from 'tar';
 import util from 'util';
 
 import {MonoklePlugin} from '@models/plugin';
-import {isPackageJsonMonoklePlugin} from '@models/plugin.guard';
+import {isPackageJsonMonoklePlugin, isTemplatePluginModule} from '@models/plugin.guard';
 
 import {downloadFile} from '@utils/http';
 
@@ -90,7 +90,7 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
     author: typeof packageJson.author === 'string' ? packageJson.author : packageJson.author.name,
     version: packageJson.version,
     description: packageJson.description,
-    isActive: false,
+    isActive: packageJson.monoklePlugin.modules.every(module => isTemplatePluginModule(module)),
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
@@ -136,7 +136,7 @@ async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promis
     author: typeof packageJson.author === 'string' ? packageJson.author : packageJson.author.name,
     version: packageJson.version,
     description: packageJson.description,
-    isActive: false,
+    isActive: packageJson.monoklePlugin.modules.every(module => isTemplatePluginModule(module)),
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
