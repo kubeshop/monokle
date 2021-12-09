@@ -16,6 +16,9 @@ export const uiSlice = createSlice({
   name: 'ui',
   initialState: initialState.ui,
   reducers: {
+    toggleResourceFilters: (state: Draft<UiState>) => {
+      state.isResourceFiltersOpen = !state.isResourceFiltersOpen;
+    },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
       electronStore.set('ui.isSettingsOpen', state.isSettingsOpen);
@@ -208,6 +211,7 @@ export const uiSlice = createSlice({
 });
 
 export const {
+  toggleResourceFilters,
   toggleSettings,
   openClusterDiff,
   closeClusterDiff,

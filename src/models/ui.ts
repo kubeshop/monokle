@@ -50,6 +50,7 @@ export type LeftMenuSelection =
   | 'templates-pane';
 
 export type UiState = {
+  isResourceFiltersOpen: boolean;
   isSettingsOpen: boolean;
   isClusterDiffVisible: boolean;
   isNotificationsOpen: boolean;
