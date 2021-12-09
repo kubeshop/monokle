@@ -87,6 +87,7 @@ const initialLogsState: LogsState = {
 const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 
 const initialUiState: UiState = {
+  isResourceFiltersOpen: false,
   isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
   isClusterDiffVisible: false,
   isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
