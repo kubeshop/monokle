@@ -216,7 +216,8 @@ function cleanResourceRefs(resources: K8sResource[]) {
 }
 
 /**
- * Removes all refs to the specified resource from other resources
+ * Updates all refs to the specified deleted resource from other resources - outgoing links to the
+ * deleted resource are either made unsatisifed or removed (if they were optional)
  */
 
 export function updateReferringRefsOnDelete(resource: K8sResource, resourceMap: ResourceMapType) {
