@@ -66,4 +66,13 @@ interface MonoklePlugin {
   modules: MonoklePluginModule[];
 }
 
-export type {MonoklePlugin, MonoklePluginModule, GitRepository, PackageJsonMonoklePlugin};
+export type {
+  MonoklePlugin,
+  MonoklePluginModule,
+  GitRepository,
+  PackageJsonMonoklePlugin,
+  TemplateForm,
+  TemplateManifest,
+  VanillaTemplatePluginModule,
+  HelmChartTemplatePluginModule,
+};
