@@ -1,9 +1,11 @@
 import {useContext, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Badge} from 'antd';
+import {Badge, Button, Divider} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
+
+import styled from 'styled-components';
 
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -11,12 +13,11 @@ import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openNewResourceWizard} from '@redux/reducers/ui';
+import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
-import IconWithPopover from '@components/molecules/IconWithPopover';
 
 import Colors from '@styles/Colors';
 
@@ -30,6 +31,16 @@ import ClusterCompareButton from './ClusterCompareButton';
 import * as S from './NavigatorPane.styled';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
+const FiltersContainer = styled.div`
+  padding: 10px 16px;
+  max-height: 500px;
+  overflow-y: auto;
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+`;
+
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const {windowSize} = useContext(AppContext);
@@ -39,6 +50,8 @@ const NavPane: React.FC = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
   const activeResources = useAppSelector(activeResourcesSelector);
+
+  const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
@@ -59,6 +72,10 @@ const NavPane: React.FC = () => {
     dispatch(openNewResourceWizard());
   };
 
+  const resourceFilterButtonHandler = () => {
+    dispatch(toggleResourceFilters());
+  };
+
   return (
     <>
       <S.TitleBar>
@@ -74,17 +91,27 @@ const NavPane: React.FC = () => {
             icon={<PlusOutlined />}
           />
           <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-            <IconWithPopover
-              popoverContent={<ResourceFilter />}
-              popoverTrigger="click"
-              iconComponent={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-              isDisabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+            <Button
+              disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+              type="link"
+              size="small"
+              icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+              onClick={resourceFilterButtonHandler}
             />
           </Badge>
           <ClusterCompareButton />
         </S.TitleBarRightButtons>
       </S.TitleBar>
       <S.List height={navigatorHeight}>
+        {isResourceFiltersOpen && (
+          <>
+            <FiltersContainer>
+              <ResourceFilter />
+            </FiltersContainer>
+            <Divider style={{margin: 0, marginBottom: 12}} />
+          </>
+        )}
+
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}
