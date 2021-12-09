@@ -26,7 +26,7 @@ import {
 import {K8sResource} from '@models/k8sresource';
 import {MonoklePlugin} from '@models/plugin';
 
-import {findResourcesToReprocess} from '@redux/services/resourceRefs';
+import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -358,6 +358,9 @@ export const mainSlice = createSlice({
       if (!resource) {
         return;
       }
+
+      updateReferringRefsOnDelete(resource, state.resourceMap);
+
       if (state.selectedResourceId === resourceId) {
         clearResourceSelections(state.resourceMap);
         state.selectedResourceId = undefined;

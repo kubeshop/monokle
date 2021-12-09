@@ -69,6 +69,7 @@ type RefTargetResource = {
   type: 'resource';
   resourceId?: string;
   resourceKind?: string;
+  isOptional?: boolean; // set true for satisfied refs that were optional
 };
 type RefTargetFile = {
   type: 'file';
