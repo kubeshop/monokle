@@ -181,7 +181,8 @@ export function createResourceRef(
   refType: ResourceRefType,
   refNode?: NodeWrapper,
   targetResourceId?: string,
-  targetResourceKind?: string
+  targetResourceKind?: string,
+  isOptional?: boolean
 ) {
   if (refNode || targetResourceId) {
     resource.refs = resource.refs || [];
@@ -206,6 +207,7 @@ export function createResourceRef(
           type: 'resource',
           resourceId: targetResourceId,
           resourceKind: targetResourceKind,
+          isOptional,
         },
       });
     }
@@ -222,10 +224,11 @@ export function linkResources(
   source: K8sResource,
   target: K8sResource,
   sourceRef: NodeWrapper,
-  targetRef?: NodeWrapper
+  targetRef?: NodeWrapper,
+  isOptional?: boolean
 ) {
-  createResourceRef(source, ResourceRefType.Outgoing, sourceRef, target.id, target.kind);
-  createResourceRef(target, ResourceRefType.Incoming, targetRef, source.id, source.kind);
+  createResourceRef(source, ResourceRefType.Outgoing, sourceRef, target.id, target.kind, isOptional);
+  createResourceRef(target, ResourceRefType.Incoming, targetRef, source.id, source.kind, isOptional);
 }
 
 /**
