@@ -21,7 +21,7 @@ import {ResourceKindHandlers} from '@src/kindhandlers';
 const ALL_OPTIONS = '<all>';
 
 const BaseContainer = styled.div`
-  min-width: 400px;
+  min-width: 250px;
 `;
 
 const FieldContainer = styled.div`

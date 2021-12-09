@@ -11,7 +11,6 @@ import {v4 as uuidv4} from 'uuid';
 import Colors from '@styles/Colors';
 
 const Container = styled.div`
-  min-width: 600px;
   max-height: 800px;
   overflow-y: auto;
 `;
@@ -24,13 +23,21 @@ const TitleContainer = styled.div`
 const TitleLabel = styled.span``;
 
 const KeyValueContainer = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-gap: 8px;
   align-items: center;
   margin: 10px 0;
 `;
 
+const KeyValueRemoveButtonContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  grid-gap: 8px;
+  align-items: center;
+`;
+
 const StyledRemoveButton = styled(Button)`
-  margin-left: 8px;
   min-width: 24px;
 `;
 
@@ -146,46 +153,38 @@ function KeyValueInput(props: KeyValueInputProps) {
         </Button>
       </TitleContainer>
       {entries.map(entry => (
-        <KeyValueContainer key={entry.id}>
-          <Select
-            value={entry.key}
-            onChange={newKey => updateEntryKey(entry.id, newKey)}
-            style={{width: '100%'}}
-            showSearch
-          >
-            {Object.keys(data)
-              .filter(key => key === entry.key || !entries.some(e => e.key === key))
-              .map(key => (
-                <Select.Option key={key} value={key}>
-                  {key}
-                </Select.Option>
-              ))}
-          </Select>
-          {entry.key && (
-            <Select
-              value={entry.value}
-              onChange={newValue => updateEntryValue(entry.id, newValue)}
-              style={{width: '100%', marginLeft: 8}}
-              showSearch
-            >
-              <Select.Option key={ANY_VALUE} value={ANY_VALUE}>
-                {ANY_VALUE}
-              </Select.Option>
-              {data[entry.key] &&
-                data[entry.key].map((value: string) => (
-                  <Select.Option key={value} value={value}>
-                    {value}
+        <KeyValueRemoveButtonContainer>
+          <KeyValueContainer key={entry.id}>
+            <Select value={entry.key} onChange={newKey => updateEntryKey(entry.id, newKey)} showSearch>
+              {Object.keys(data)
+                .filter(key => key === entry.key || !entries.some(e => e.key === key))
+                .map(key => (
+                  <Select.Option key={key} value={key}>
+                    {key}
                   </Select.Option>
                 ))}
             </Select>
-          )}
+            {entry.key && (
+              <Select value={entry.value} onChange={newValue => updateEntryValue(entry.id, newValue)} showSearch>
+                <Select.Option key={ANY_VALUE} value={ANY_VALUE}>
+                  {ANY_VALUE}
+                </Select.Option>
+                {data[entry.key] &&
+                  data[entry.key].map((value: string) => (
+                    <Select.Option key={value} value={value}>
+                      {value}
+                    </Select.Option>
+                  ))}
+              </Select>
+            )}
+          </KeyValueContainer>
           <StyledRemoveButton
             onClick={() => removeEntry(entry.id)}
             color={Colors.redError}
             size="small"
             icon={<MinusOutlined />}
           />
-        </KeyValueContainer>
+        </KeyValueRemoveButtonContainer>
       ))}
     </Container>
   );

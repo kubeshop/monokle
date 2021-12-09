@@ -33,7 +33,7 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const FiltersContainer = styled.div`
   padding: 10px 16px;
-  max-height: 500px;
+  max-height: 30vh;
   overflow-y: auto;
   ::-webkit-scrollbar {
     width: 0;
