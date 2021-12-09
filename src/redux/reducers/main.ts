@@ -544,6 +544,7 @@ export const mainSlice = createSlice({
     },
     setPlugins: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin[]>) => {
       state.plugins = action.payload;
+      state.isLoadingExistingPlugins = false;
     },
   },
   extraReducers: builder => {

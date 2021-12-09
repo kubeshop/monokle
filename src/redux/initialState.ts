@@ -27,6 +27,7 @@ const initialAppState: AppState = {
   },
   isSelectingFile: false,
   isApplyingResource: false,
+  isLoadingExistingPlugins: true,
   plugins: [],
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(

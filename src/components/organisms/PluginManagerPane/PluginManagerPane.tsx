@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 
-import {Button} from 'antd';
+import {Button, Skeleton} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
@@ -15,6 +15,7 @@ import * as S from './styled';
 
 function PluginManagerPane() {
   const plugins = useAppSelector(state => state.main.plugins);
+  const isLoadingExistingPlugins = useAppSelector(state => state.main.isLoadingExistingPlugins);
 
   const activePlugins = useMemo(() => plugins.filter(p => p.isActive), [plugins]);
   const inactivePlugins = useMemo(() => plugins.filter(p => !p.isActive), [plugins]);
@@ -35,7 +36,7 @@ function PluginManagerPane() {
       </TitleBar>
       <S.Container>
         {plugins.length === 0 ? (
-          <p>No plugins installed yet.</p>
+          <>{isLoadingExistingPlugins ? <Skeleton /> : <p>No plugins installed yet.</p>}</>
         ) : (
           <>
             {activePlugins.length > 0 && (

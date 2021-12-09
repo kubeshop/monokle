@@ -125,6 +125,7 @@ interface AppState {
   diffResourceId?: string;
   /** the diff content for the resource being diffed */
   diffContent?: string;
+  isLoadingExistingPlugins: boolean;
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
   clusterDiff: {
