@@ -1,12 +1,15 @@
-import {Merge, PackageJson} from 'type-fest';
+import {Merge, PackageJson, SetRequired} from 'type-fest';
 
-type PackageJsonMonoklePlugin = Merge<
-  PackageJson,
-  {
-    monoklePlugin?: {
-      modules: MonoklePluginModule[];
-    };
-  }
+type PackageJsonMonoklePlugin = SetRequired<
+  Merge<
+    PackageJson,
+    {
+      monoklePlugin: {
+        modules: MonoklePluginModule[];
+      };
+    }
+  >,
+  'name' | 'author' | 'version'
 >;
 
 interface GitRepository {

@@ -3,10 +3,10 @@ import log from 'loglevel';
 import fetch from 'node-fetch';
 import path from 'path';
 import tar from 'tar';
-import {PackageJson} from 'type-fest';
 import util from 'util';
 
-import {MonoklePlugin, PackageJsonMonoklePlugin} from '@models/plugin';
+import {MonoklePlugin} from '@models/plugin';
+import {isPackageJsonMonoklePlugin} from '@models/plugin.guard';
 
 import {downloadFile} from '@utils/http';
 
@@ -37,14 +37,6 @@ function extractRepositoryOwnerAndName(pluginUrl: string) {
   };
 }
 
-function extractInfoFromPackageJson(packageJson: PackageJsonMonoklePlugin) {
-  const {name, version, author, description, monoklePlugin} = packageJson;
-  if (name === undefined || version === undefined || author === undefined || monoklePlugin === undefined) {
-    throw new Error('Invalid plugin package.json');
-  }
-  return {name, version, author, description, monoklePlugin};
-}
-
 async function fetchPackageJson(repositoryOwner: string, repositoryName: string, targetCommitish: string) {
   const packageJsonUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/${targetCommitish}/package.json`;
   const packageJsonResponse = await fetch(packageJsonUrl);
@@ -52,14 +44,18 @@ async function fetchPackageJson(repositoryOwner: string, repositoryName: string,
     throw new Error("Couldn't find package.json file in the repository");
   }
   const packageJson = await packageJsonResponse.json();
-  return packageJson as PackageJsonMonoklePlugin;
+  return packageJson;
 }
 
 export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(pluginUrl);
   const repositoryBranch = 'main'; // TODO: allow input of branch name
   const packageJson = await fetchPackageJson(repositoryOwner, repositoryName, repositoryBranch);
-  const pluginInfo = extractInfoFromPackageJson(packageJson);
+
+  if (!isPackageJsonMonoklePlugin(packageJson)) {
+    throw new Error('The package.json file is not valid');
+  }
+
   const doesPluginsDirExist = await fsExistsPromise(pluginsDir);
   if (!doesPluginsDirExist) {
     await fsMkdirPromise(pluginsDir);
@@ -67,7 +63,7 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
 
   const pluginTarballFilePath = path.join(
     pluginsDir,
-    `${repositoryOwner}-${repositoryName}-${pluginInfo.version.replace('.', '-')}.tgz`
+    `${repositoryOwner}-${repositoryName}-${packageJson.version.replace('.', '-')}.tgz`
   );
   if (fs.existsSync(pluginTarballFilePath)) {
     await fsUnlinkPromise(pluginTarballFilePath);
@@ -90,17 +86,17 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
   });
 
   const plugin: MonoklePlugin = {
-    name: pluginInfo.name,
-    author: typeof pluginInfo.author === 'string' ? pluginInfo.author : pluginInfo.author.name,
-    version: pluginInfo.version,
-    description: pluginInfo.description,
+    name: packageJson.name,
+    author: typeof packageJson.author === 'string' ? packageJson.author : packageJson.author.name,
+    version: packageJson.version,
+    description: packageJson.description,
     isActive: false,
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
       branch: repositoryBranch,
     },
-    modules: pluginInfo.monoklePlugin.modules,
+    modules: packageJson.monoklePlugin.modules,
   };
 
   return plugin;
@@ -120,8 +116,11 @@ async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promis
     return;
   }
   const packageJsonRaw = await fsReadFilePromise(packageJsonFilePath, 'utf8');
-  const packageJson = JSON.parse(packageJsonRaw) as PackageJson;
-  const pluginInfo = extractInfoFromPackageJson(packageJson);
+  const packageJson = JSON.parse(packageJsonRaw);
+
+  if (!isPackageJsonMonoklePlugin(packageJson)) {
+    throw new Error('The package.json file is not valid.');
+  }
 
   if (!packageJson.repository) {
     log.warn(`[Plugins]: Missing 'repository' property in ${packageJsonFilePath}`);
@@ -133,17 +132,17 @@ async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promis
   );
 
   return {
-    name: pluginInfo.name,
-    author: typeof pluginInfo.author === 'string' ? pluginInfo.author : pluginInfo.author.name,
-    version: pluginInfo.version,
-    description: pluginInfo.description,
+    name: packageJson.name,
+    author: typeof packageJson.author === 'string' ? packageJson.author : packageJson.author.name,
+    version: packageJson.version,
+    description: packageJson.description,
     isActive: false,
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
       branch: 'main', // TODO: handle the branch name
     },
-    modules: pluginInfo.monoklePlugin.modules,
+    modules: packageJson.monoklePlugin.modules,
   };
 }
 
