@@ -5,7 +5,7 @@ import path from 'path';
 import tar from 'tar';
 import util from 'util';
 
-import {MonoklePlugin} from '@models/plugin';
+import {MonoklePlugin, MonoklePluginModule} from '@models/plugin';
 import {isPackageJsonMonoklePlugin, isTemplatePluginModule} from '@models/plugin.guard';
 
 import {downloadFile} from '@utils/http';
@@ -46,6 +46,22 @@ async function fetchPackageJson(repositoryOwner: string, repositoryName: string,
   const packageJson = await packageJsonResponse.json();
   return packageJson;
 }
+
+const parsePluginModule = (module: MonoklePluginModule, pluginFolderPath: string): MonoklePluginModule => {
+  if (isTemplatePluginModule(module)) {
+    return {
+      ...module,
+      forms: module.forms.map(form => {
+        return {
+          ...form,
+          schema: path.join(pluginFolderPath, form.schema),
+          uiSchema: path.join(pluginFolderPath, form.uiSchema),
+        };
+      }),
+    };
+  }
+  return module;
+};
 
 export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(pluginUrl);
@@ -96,7 +112,7 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
       name: repositoryName,
       branch: repositoryBranch,
     },
-    modules: packageJson.monoklePlugin.modules,
+    modules: packageJson.monoklePlugin.modules.map(module => parsePluginModule(module, pluginFolderPath)),
   };
 
   return plugin;
@@ -142,7 +158,7 @@ async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promis
       name: repositoryName,
       branch: 'main', // TODO: handle the branch name
     },
-    modules: packageJson.monoklePlugin.modules,
+    modules: packageJson.monoklePlugin.modules.map(module => parsePluginModule(module, pluginFolderPath)),
   };
 }
 
