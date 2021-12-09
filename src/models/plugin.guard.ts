@@ -4,9 +4,11 @@ import {
   GitRepository,
   HelmChartTemplatePluginModule,
   MonoklePlugin,
+  MonoklePluginModule,
   PackageJsonMonoklePlugin,
   TemplateForm,
   TemplateManifest,
+  TemplatePluginModule,
   VanillaTemplatePluginModule,
 } from './plugin';
 
@@ -75,8 +77,12 @@ export function isHelmChartTemplatePuginModule(obj: any): obj is HelmChartTempla
   return isBundledHelmChartTemplatePluginModule(obj) || isReferencedHelmChartTemplatePluginModule(obj);
 }
 
-export function isMonoklePluginModule(obj: any) {
+export function isTemplatePluginModule(obj: any): obj is TemplatePluginModule {
   return isVanillaTemplatePluginModule(obj) || isHelmChartTemplatePuginModule(obj);
+}
+
+export function isMonoklePluginModule(obj: any): obj is MonoklePluginModule {
+  return isTemplatePluginModule(obj);
 }
 
 export function isMonoklePlugin(obj: any): obj is MonoklePlugin {

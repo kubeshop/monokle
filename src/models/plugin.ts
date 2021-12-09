@@ -57,7 +57,9 @@ interface ReferencedHelmChartTemplatePluginModule {
 
 type HelmChartTemplatePluginModule = BundledHelmChartTemplatePluginModule | ReferencedHelmChartTemplatePluginModule;
 
-type MonoklePluginModule = VanillaTemplatePluginModule | HelmChartTemplatePluginModule;
+type TemplatePluginModule = VanillaTemplatePluginModule | HelmChartTemplatePluginModule;
+
+type MonoklePluginModule = TemplatePluginModule; // this will get extended by other types of plugins that we'll support
 
 interface MonoklePlugin {
   name: string;
@@ -76,6 +78,7 @@ export type {
   PackageJsonMonoklePlugin,
   TemplateForm,
   TemplateManifest,
+  TemplatePluginModule,
   VanillaTemplatePluginModule,
   HelmChartTemplatePluginModule,
 };
