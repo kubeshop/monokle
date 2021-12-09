@@ -4,6 +4,7 @@ import {
   GitRepository,
   HelmChartTemplatePluginModule,
   MonoklePlugin,
+  PackageJsonMonoklePlugin,
   TemplateForm,
   TemplateManifest,
   VanillaTemplatePluginModule,
@@ -22,9 +23,9 @@ export function isTemplateForm(obj: any): obj is TemplateForm {
   return (
     typeof obj === 'object' &&
     typeof obj.name === 'string' &&
-    obj.description === 'string' &&
-    obj.schema === 'string' &&
-    obj.uiSchema === 'string'
+    typeof obj.description === 'string' &&
+    typeof obj.schema === 'string' &&
+    typeof obj.uiSchema === 'string'
   );
 }
 
@@ -90,4 +91,24 @@ export function isMonoklePlugin(obj: any): obj is MonoklePlugin {
     _.isArray(obj.modules) &&
     obj.modules.every((module: any) => isMonoklePluginModule(module))
   );
+}
+
+export function isPackageJsonMonoklePlugin(obj: any): obj is PackageJsonMonoklePlugin {
+  if (typeof obj !== 'object') {
+    return false;
+  }
+  const {name, version, author, monoklePlugin} = obj;
+  const arePackageJsonPropertiesValid =
+    typeof name === 'string' &&
+    typeof version === 'string' &&
+    typeof author === 'string' &&
+    typeof monoklePlugin === 'object';
+  if (!arePackageJsonPropertiesValid) {
+    return false;
+  }
+  const isMonoklePluginPropertyValid =
+    Boolean(monoklePlugin) &&
+    Boolean(_.isArray(monoklePlugin.modules)) &&
+    Boolean(monoklePlugin.modules.every((module: any) => isMonoklePluginModule(module)));
+  return isMonoklePluginPropertyValid;
 }
