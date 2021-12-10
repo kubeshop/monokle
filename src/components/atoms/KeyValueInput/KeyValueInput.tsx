@@ -153,8 +153,8 @@ function KeyValueInput(props: KeyValueInputProps) {
         </Button>
       </TitleContainer>
       {entries.map(entry => (
-        <KeyValueRemoveButtonContainer>
-          <KeyValueContainer key={entry.id}>
+        <KeyValueRemoveButtonContainer key={entry.id}>
+          <KeyValueContainer>
             <Select value={entry.key} onChange={newKey => updateEntryKey(entry.id, newKey)} showSearch>
               {Object.keys(data)
                 .filter(key => key === entry.key || !entries.some(e => e.key === key))
