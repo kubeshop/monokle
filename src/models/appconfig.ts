@@ -62,6 +62,9 @@ interface AppConfig {
   };
   kubeConfig: KubeConfig;
   osPlatform: NodeJS.Platform;
+  userHomeDir?: string;
+  userDataDir?: string;
+  userTempDir?: string;
 }
 
 export type {AppConfig};

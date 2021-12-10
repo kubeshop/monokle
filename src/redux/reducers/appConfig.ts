@@ -92,6 +92,15 @@ export const configSlice = createSlice({
     setContexts: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = action.payload;
     },
+    setUserDirs: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string}>
+    ) => {
+      const {homeDir, tempDir, dataDir} = action.payload;
+      state.userHomeDir = homeDir;
+      state.userTempDir = tempDir;
+      state.userDataDir = dataDir;
+    },
   },
 });
 
@@ -115,5 +124,6 @@ export const {
   updateTextSize,
   updateTheme,
   setContexts,
+  setUserDirs,
 } = configSlice.actions;
 export default configSlice.reducer;

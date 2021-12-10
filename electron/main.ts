@@ -23,7 +23,7 @@ import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constan
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
-import {updateNewVersion} from '@redux/reducers/appConfig';
+import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -53,6 +53,7 @@ const isDev = PROCESS_ENV.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
+const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
@@ -191,6 +192,11 @@ export const createWindow = (givenPath?: string) => {
     });
 
     dispatch(setAppRehydrating(true));
+    dispatch(setUserDirs({
+      homeDir: userHomeDir,
+      tempDir: userTempDir,
+      dataDir: userDataDir
+    }));
     await checkNewVersion(dispatch, true);
     initKubeconfig(dispatch, userHomeDir);
     dispatch(setAppRehydrating(false));
