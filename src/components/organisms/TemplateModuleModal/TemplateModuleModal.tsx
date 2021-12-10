@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 
-import {Button, Modal} from 'antd';
+import {Button, Input, Modal} from 'antd';
+
+import styled from 'styled-components';
 
 import {TemplatePluginModule} from '@models/plugin';
 import {isReferencedHelmChartTemplatePluginModule} from '@models/plugin.guard';
@@ -10,7 +12,17 @@ import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmC
 
 import {TemplateFormRenderer} from '@components/molecules';
 
+const {TextArea} = Input;
+
 type TemplateFormModalProps = {isVisible: boolean; template?: TemplatePluginModule; onClose: () => void};
+
+const StyledTextArea = styled(TextArea)`
+  margin-top: 20px;
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+`;
 
 const TemplateFormModal: React.FC<TemplateFormModalProps> = props => {
   const {isVisible, template, onClose} = props;
@@ -69,7 +81,7 @@ const TemplateFormModal: React.FC<TemplateFormModalProps> = props => {
       onCancel={close}
     >
       {message ? (
-        <p>{message}</p>
+        <StyledTextArea rows={16} value={message} readOnly />
       ) : (
         <TemplateFormRenderer formData={formData} onFormDataChange={setFormData} template={template} />
       )}
