@@ -216,6 +216,46 @@ function cleanResourceRefs(resources: K8sResource[]) {
 }
 
 /**
+ * Updates all refs to the specified deleted resource from other resources - outgoing links to the
+ * deleted resource are either made unsatisifed or removed (if they were optional)
+ */
+
+export function updateReferringRefsOnDelete(resource: K8sResource, resourceMap: ResourceMapType) {
+  if (!resource.refs) {
+    return;
+  }
+
+  // get ids of all valid resources this resource refers to
+  const ids: string[] = resource.refs
+    .filter(ref => ref.target?.type === 'resource' && ref.target.resourceId && resourceMap[ref.target.resourceId])
+    // @ts-ignore
+    .map(ref => ref.target.resourceId);
+
+  // make unique array to avoid processing the same resource twice
+  [...new Set(ids)].forEach(id => {
+    const res = resourceMap[id];
+    if (res?.refs) {
+      res.refs.forEach(ref => {
+        // change outgoing refs to the deleted resource to unsatisfied
+        if (
+          isOutgoingRef(ref.type) &&
+          ref.target &&
+          ref.target.type === 'resource' &&
+          ref.target.resourceId === resource.id &&
+          !ref.target.isOptional
+        ) {
+          ref.type = ResourceRefType.Unsatisfied;
+          ref.target.resourceId = undefined;
+        }
+      });
+
+      // discard all resource refs still referring to the deleted resource
+      res.refs = res.refs.filter(ref => ref.target?.type !== 'resource' || ref.target.resourceId !== resource.id);
+    }
+  });
+}
+
+/**
  * Creates resource refs from a specified resource to target resources using the specified refMapper
  */
 
@@ -278,7 +318,8 @@ function handleRefMappingByParentKey(
               sourceResource,
               targetResource,
               new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-              new NodeWrapper(targetNode.scalar, targetResource.lineCounter)
+              new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
+              isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
             );
           }
         });
@@ -367,6 +408,29 @@ function shouldCreateSatisifedRef(
 }
 
 /**
+ * Checks if the specified ref has an optional property set to true
+ */
+
+function isOptional(
+  sourceResource: K8sResource,
+  sourceRefNode: RefNode,
+  outgoingRefMapper: RefMapper
+): boolean | undefined {
+  if (outgoingRefMapper.source.hasOptionalSibling) {
+    const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
+    const optionalSiblingRefNode = sourceResource.refNodesByPath
+      ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
+          refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
+        )
+      : undefined;
+
+    return Boolean(optionalSiblingRefNode?.scalar.value);
+  }
+
+  return false;
+}
+
+/**
  * Creates resource refs from a specified resource to target resources using the specified refMapper
  */
 
@@ -394,7 +458,8 @@ function handleRefMappingByKey(
           ResourceRefType.Unsatisfied,
           new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
           undefined,
-          outgoingRefMapper.target.kind
+          outgoingRefMapper.target.kind,
+          isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
         );
       }
     } else {
@@ -413,7 +478,8 @@ function handleRefMappingByKey(
               sourceResource,
               targetResource,
               new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-              new NodeWrapper(targetNode.scalar, targetResource.lineCounter)
+              new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
+              isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
             );
           }
         });
@@ -428,7 +494,8 @@ function handleRefMappingByKey(
           ResourceRefType.Unsatisfied,
           new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
           undefined,
-          outgoingRefMapper.target.kind
+          outgoingRefMapper.target.kind,
+          isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
         );
       }
     }
