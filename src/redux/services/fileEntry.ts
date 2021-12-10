@@ -12,6 +12,7 @@ import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
+import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {
   clearResourceSelections,
   highlightChildrenResources,
@@ -20,7 +21,7 @@ import {
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
-import {extractK8sResources, isPreviewResource, reprocessResources} from './resource';
+import {extractK8sResources, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: K8sResource[];
@@ -530,17 +531,8 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
     }
   }
 
-  reprocessResources(
-    Object.values(state.resourceMap)
-      .filter(r => !isPreviewResource(r))
-      .map(r => r.id),
-    state.resourceMap,
-    state.fileMap,
-    state.resourceRefsProcessingOptions,
-    {
-      resourceKinds: removalSideEffect.removedResources.map(r => r.kind),
-    }
-  );
+  // clear refs
+  removalSideEffect.removedResources.forEach(r => updateReferringRefsOnDelete(r, state.resourceMap));
 }
 
 /**

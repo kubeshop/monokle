@@ -7,6 +7,8 @@ import {getResourceFolder} from '@redux/services/fileEntry';
 import {isPreviewResource} from '@redux/services/resource';
 import {isIncomingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
+import {processSymbols} from '@molecules/Monaco/symbolProcessing';
+
 import {ResourceKindHandlers, getIncomingRefMappers} from '@src/kindhandlers';
 
 import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
@@ -18,7 +20,6 @@ import {
   createInlineDecoration,
   createLinkProvider,
   createMarkdownString,
-  getSymbols,
   getSymbolsBeforePosition,
 } from './editorHelpers';
 
@@ -119,182 +120,6 @@ function areRefPosEqual(a: RefPosition, b: RefPosition) {
   return a.line === b.line && a.column === b.column && a.length === b.length;
 }
 
-function getSymbolValue(lines: string[], symbol: monaco.languages.DocumentSymbol, includeName?: boolean) {
-  const line = lines[symbol.range.startLineNumber - 1];
-  if (line) {
-    const str = line.substr(symbol.range.startColumn - 1, symbol.range.endColumn - symbol.range.startColumn);
-
-    if (includeName) {
-      return str;
-    }
-
-    const ix = str.indexOf(':', symbol.name.length);
-    return str.substring(ix + 1).trim();
-  }
-}
-
-function addNamespaceFilterLink(
-  lines: string[],
-  symbol: monaco.languages.DocumentSymbol,
-  filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[],
-  newDecorations: monaco.editor.IModelDeltaDecoration[]
-) {
-  const namespace = getSymbolValue(lines, symbol);
-  if (namespace) {
-    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-      `Add/Remove filter on namespace [${namespace}]`,
-      () => {
-        filterResources({namespace, labels: {}, annotations: {}});
-      }
-    );
-    newDisposables.push(commandDisposable);
-
-    const hoverDisposable = createHoverProvider(symbol.range, [
-      createMarkdownString('Filter Resources'),
-      commandMarkdownLink,
-    ]);
-    newDisposables.push(hoverDisposable);
-    addLinkDecoration(symbol, newDecorations);
-  }
-}
-
-function addLinkDecoration(
-  symbol: monaco.languages.DocumentSymbol,
-  newDecorations: monaco.editor.IModelDeltaDecoration[]
-) {
-  const inlineDecoration: monaco.editor.IModelDeltaDecoration = {
-    range: symbol.range,
-    options: {
-      inlineClassName: 'monokleEditorAddRemoveFilterInlineClass',
-    },
-  };
-
-  newDecorations.push(inlineDecoration);
-}
-
-function addKindFilterLink(
-  lines: string[],
-  symbol: monaco.languages.DocumentSymbol,
-  filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[],
-  newDecorations: monaco.editor.IModelDeltaDecoration[]
-) {
-  const kind = getSymbolValue(lines, symbol);
-  if (kind) {
-    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-      `Add/Remove filter on kind [${kind}]`,
-      () => {
-        filterResources({kind, labels: {}, annotations: {}});
-      }
-    );
-    newDisposables.push(commandDisposable);
-
-    const hoverDisposable = createHoverProvider(symbol.range, [
-      createMarkdownString('Filter Resources'),
-      commandMarkdownLink,
-    ]);
-    newDisposables.push(hoverDisposable);
-
-    addLinkDecoration(symbol, newDecorations);
-  }
-}
-
-function addLabelFilterLink(
-  lines: string[],
-  symbol: monaco.languages.DocumentSymbol,
-  filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[],
-  newDecorations: monaco.editor.IModelDeltaDecoration[]
-) {
-  const label = getSymbolValue(lines, symbol, true);
-  if (label) {
-    const value = label.substring(symbol.name.length + 1).trim();
-
-    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-      `Add/Remove label [${label}] from/to current filter`,
-      () => {
-        const labels: Record<string, string | null> = {};
-        labels[symbol.name] = value;
-        filterResources({labels, annotations: {}});
-      }
-    );
-    newDisposables.push(commandDisposable);
-
-    const hoverDisposable = createHoverProvider(symbol.range, [
-      createMarkdownString('Filter Resources'),
-      commandMarkdownLink,
-    ]);
-    newDisposables.push(hoverDisposable);
-
-    addLinkDecoration(symbol, newDecorations);
-  }
-}
-
-function addAnnotationFilterLink(
-  lines: string[],
-  symbol: monaco.languages.DocumentSymbol,
-  filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[],
-  newDecorations: monaco.editor.IModelDeltaDecoration[]
-) {
-  const annotation = getSymbolValue(lines, symbol, true);
-  if (annotation) {
-    const value = annotation.substring(symbol.name.length + 1).trim();
-
-    const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-      `Add/Remove annotation [${annotation}] to/from current filter`,
-      () => {
-        const annotations: Record<string, string | null> = {};
-        annotations[symbol.name] = value;
-        filterResources({labels: {}, annotations});
-      }
-    );
-    newDisposables.push(commandDisposable);
-
-    const hoverDisposable = createHoverProvider(symbol.range, [
-      createMarkdownString('Filter Resources'),
-      commandMarkdownLink,
-    ]);
-    newDisposables.push(hoverDisposable);
-
-    addLinkDecoration(symbol, newDecorations);
-  }
-}
-
-function processSymbol(
-  symbol: monaco.languages.DocumentSymbol,
-  parents: monaco.languages.DocumentSymbol[],
-  lines: string[],
-  filterResources: (filter: ResourceFilterType) => void,
-  newDisposables: monaco.IDisposable[],
-  newDecorations: monaco.editor.IModelDeltaDecoration[]
-) {
-  if (symbol.children) {
-    symbol.children.forEach(child => {
-      processSymbol(child, parents.concat(symbol), lines, filterResources, newDisposables, newDecorations);
-    });
-  }
-
-  if (symbol.name === 'namespace') {
-    addNamespaceFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
-  }
-
-  if (symbol.name === 'kind') {
-    addKindFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
-  }
-
-  if (parents.length > 0) {
-    const parentName = parents[parents.length - 1].name;
-
-    if (parentName === 'labels' || parentName === 'matchLabels') {
-      addLabelFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
-    } else if (parentName === 'annotations') {
-      addAnnotationFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
-    }
-  }
-}
-
 export async function applyForResource(
   resource: K8sResource,
   selectResource: (resourceId: string) => void,
@@ -310,10 +135,7 @@ export async function applyForResource(
   const newDisposables: monaco.IDisposable[] = [];
 
   if (model) {
-    const symbols: monaco.languages.DocumentSymbol[] = await getSymbols(model);
-    const lines = resource.text.split('\n');
-
-    symbols.forEach(symbol => processSymbol(symbol, [], lines, filterResources, newDisposables, newDecorations));
+    await processSymbols(model, resource, filterResources, newDisposables, newDecorations);
   }
 
   if (!refs || refs.length === 0) {
@@ -375,7 +197,8 @@ export async function applyForResource(
           outgoingRef.target.resourceKind
         ) {
           const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-            `Create ${outgoingRef.target.resourceKind} Resource`,
+            `Create ${outgoingRef.target.resourceKind}`,
+            'Create Resource',
             () => {
               // @ts-ignore
               createResource(outgoingRef, resource.namespace, getResourceFolder(resource));
@@ -397,7 +220,7 @@ export async function applyForResource(
           text += ` in ${outgoingRefResource.filePath}`;
         }
 
-        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(text, () => {
+        const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(text, 'Select resource', () => {
           // @ts-ignore
           selectResource(outgoingRef.target?.resourceId);
         });
@@ -411,7 +234,8 @@ export async function applyForResource(
           return;
         }
         const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
-          `File: ${outgoingRefFile.name}`,
+          `${outgoingRefFile.name}`,
+          'Select file',
           () => {
             // @ts-ignore
             selectFilePath(outgoingRef.target?.filePath);
