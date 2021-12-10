@@ -322,7 +322,7 @@ interface TreeItemProps {
   onExcludeFromProcessing: (relativePath: string) => void;
   onIncludeToProcessing: (relativePath: string) => void;
   onCreateFolder: (absolutePath: string) => void;
-  onCreateResource: (targetFolder: string) => void;
+  onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
   isExcluded?: Boolean;
   isFolder?: Boolean;
 }
@@ -375,7 +375,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     ? fileMap[ROOT_FILE_ENTRY].filePath
     : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
 
-  const targetFolder = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
+  const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
 
   const platformFilemanagerNames: {[name: string]: string} = {
     darwin: 'Finder',
@@ -397,17 +397,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           >
             New Folder
           </Menu.Item>
-
-          <Menu.Item
-            onClick={e => {
-              e.domEvent.stopPropagation();
-
-              onCreateResource(targetFolder);
-            }}
-            key="create_resource"
-          >
-            New Resource
-          </Menu.Item>
         </>
       ) : null}
       <Menu.Item
@@ -419,6 +408,17 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         key="reveal_in_finder"
       >
         Reveal in {platformFilemanagerName}
+      </Menu.Item>
+      <ContextMenuDivider />
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+
+          onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
+        }}
+        key="create_resource"
+      >
+        New Resource
       </Menu.Item>
       <ContextMenuDivider />
       <Menu.Item
@@ -808,8 +808,13 @@ const FileTreePane = () => {
     dispatch(openCreateFolderModal(absolutePath));
   };
 
-  const onCreateResource = (targetFolder: string) => {
-    dispatch(openNewResourceWizard({defaultInput: {targetFolder}}));
+  const onCreateResource = ({targetFolder, targetFile}: {targetFolder?: string; targetFile?: string}) => {
+    if (targetFolder) {
+      dispatch(openNewResourceWizard({defaultInput: {targetFolder}}));
+    }
+    if (targetFile) {
+      dispatch(openNewResourceWizard({defaultInput: {targetFile}}));
+    }
   };
 
   return (

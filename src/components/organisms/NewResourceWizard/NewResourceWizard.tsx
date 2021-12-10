@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
@@ -25,7 +26,7 @@ import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-import {SaveToFolderWrapper, StyledCheckbox, StyledSelect} from './NewResourceWizard.styled';
+import {SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
 const SELECT_OPTION_NONE = '<none>';
 const NEW_ITEM = 'CREATE_NEW_ITEM';
@@ -40,7 +41,9 @@ const NewResourceWizard = () => {
   const [namespaces, setNamespaces] = useNamespaces({extra: ['none', 'default']});
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
   const [shouldSaveToFolder, setShouldSaveState] = useState(true);
+  const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
+  const [selectedFile, setSelectedFile] = useState<string | undefined>();
   const [isSubmitDisabled, setSubmitDisabled] = useState(true);
   const [inputValue, setInputValue] = useState<string>('');
   const lastKindRef = useRef<string>();
@@ -70,7 +73,12 @@ const NewResourceWizard = () => {
 
   useEffect(() => {
     if (defaultInput?.targetFolder && fileMap[ROOT_FILE_ENTRY]) {
+      setSavingDestination('saveToFolder');
       setSelectedFolder(defaultInput.targetFolder);
+    }
+    if (defaultInput?.targetFile && fileMap[ROOT_FILE_ENTRY]) {
+      setSavingDestination('saveToFile');
+      setSelectedFile(defaultInput.targetFile);
     }
 
     setSubmitDisabled(!defaultValues?.name && !defaultValues?.kind && !defaultValues?.apiVersion);
@@ -164,23 +172,28 @@ const NewResourceWizard = () => {
       jsonTemplate
     );
 
-    const fullFileName = getFullFileName(formValues.name);
-
     // validate and update any possible broking incoming links that are now fixed
     dispatch(reprocessNewResource(newResource));
 
-    if (shouldSaveToFolder) {
-      dispatch(
-        saveUnsavedResource({
-          resource: newResource,
-          absolutePath:
-            selectedFolder === ROOT_FILE_ENTRY
-              ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName)
-              : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, path.sep, fullFileName),
-        })
-      );
+    if (savingDestination !== 'doNotSave') {
+      let absolutePath;
+
+      const fullFileName = getFullFileName(formValues.name);
+      if (savingDestination === 'saveToFolder' && selectedFolder) {
+        absolutePath =
+          selectedFolder === ROOT_FILE_ENTRY
+            ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName)
+            : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, path.sep, fullFileName);
+      } else if (savingDestination === 'saveToFile' && selectedFile) {
+        absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFile);
+      } else {
+        absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName);
+      }
+
+      dispatch(saveUnsavedResource({resource: newResource, absolutePath}));
     }
 
+    setSavingDestination('doNotSave');
     closeWizard();
   };
 
@@ -192,7 +205,15 @@ const NewResourceWizard = () => {
     [fileMap]
   );
 
-  const renderSelectOptions = () => {
+  const fileList = useMemo(
+    () =>
+      Object.entries(fileMap)
+        .map(([key, value]) => ({fileName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
+        .filter(file => !file.isFolder),
+    [fileMap]
+  );
+
+  const renderFolderSelectOptions = () => {
     return foldersList.map(folder => (
       <Option key={folder.folderName} value={folder.folderName}>
         {folder.folderName}
@@ -200,9 +221,19 @@ const NewResourceWizard = () => {
     ));
   };
 
+  const renderFileSelectOptions = () => {
+    return fileList.map(folder => (
+      <Option key={folder.fileName} value={folder.fileName}>
+        {folder.fileName}
+      </Option>
+    ));
+  };
+
   const onSelectChange = () => {
     setInputValue('');
   };
+
+  const handleSavingDestinationChange = (value: any) => setSavingDestination(value);
 
   useHotkeys(
     hotkeys.CREATE_NEW_RESOURCE,
@@ -334,21 +365,29 @@ const NewResourceWizard = () => {
             ))}
           </Select>
         </Form.Item>
-        {fileMap[ROOT_FILE_ENTRY] ? (
-          <SaveToFolderWrapper>
-            <StyledCheckbox onChange={e => setShouldSaveState(e.target.checked)} checked={shouldSaveToFolder}>
-              Save to folder
-            </StyledCheckbox>
+
+        <SaveDestinationWrapper compact>
+          <StyledSelect value={savingDestination} onChange={handleSavingDestinationChange}>
+            <Option value="saveToFolder">Save to folder</Option>
+            <Option value="saveToFile">Save to file</Option>
+            <Option value="doNotSave">Don't save</Option>
+          </StyledSelect>
+          {savingDestination === 'saveToFolder' && (
+            <StyledSelect showSearch onChange={(value: any) => setSelectedFolder(value)} value={selectedFolder}>
+              {renderFolderSelectOptions()}
+            </StyledSelect>
+          )}
+          {savingDestination === 'saveToFile' && (
             <StyledSelect
               showSearch
-              disabled={!shouldSaveToFolder}
-              onChange={(value: any) => setSelectedFolder(value)}
-              value={selectedFolder}
+              onChange={(value: any) => setSelectedFile(value)}
+              value={selectedFile}
+              placeholder="Select a destination file"
             >
-              {renderSelectOptions()}
+              {renderFileSelectOptions()}
             </StyledSelect>
-          </SaveToFolderWrapper>
-        ) : null}
+          )}
+        </SaveDestinationWrapper>
       </Form>
     </Modal>
   );
