@@ -1,9 +1,10 @@
+import parseTemplateString from 'es6-template-strings';
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {promisify} from 'util';
 import {v4 as uuidv4} from 'uuid';
-import {LineCounter, parseAllDocuments, stringify} from 'yaml';
+import {LineCounter, parseAllDocuments} from 'yaml';
 
 import {AppDispatch} from '@redux/store';
 
@@ -12,6 +13,7 @@ import {runHelm} from '@utils/helm';
 import {createUnsavedResource} from './unsavedResource';
 
 const fsWriteFilePromise = promisify(fs.writeFile);
+const fsReadFilePromise = promisify(fs.readFile);
 
 interface PossibleResource {
   apiVersion: string;
@@ -51,19 +53,21 @@ export const previewReferencedHelmChart = async (
   chartName: string,
   chartVersion: string,
   chartRepo: string,
-  valuesObject: any,
+  valuesFilePath: string,
+  formsData: any[],
   kubeconfigPath: string,
   kubeconfigContext: string,
   userTempDir: string,
   dispatch: AppDispatch
 ) => {
-  const valuesYaml = stringify(valuesObject);
-  const valuesTempFilePath = path.join(userTempDir, uuidv4());
+  const valuesFileContent = await fsReadFilePromise(valuesFilePath, 'utf8');
+  const newTempValuesFilePath = path.join(userTempDir, uuidv4());
+  const parsedValuesFileContent: string = parseTemplateString(valuesFileContent, {forms: formsData});
 
-  await fsWriteFilePromise(valuesTempFilePath, valuesYaml);
+  await fsWriteFilePromise(newTempValuesFilePath, parsedValuesFileContent);
 
   const helmArgs = {
-    helmCommand: `helm install --kube-context ${kubeconfigContext} -f ${valuesTempFilePath} --repo ${chartRepo} ${chartName} --version ${chartVersion} --generate-name --dry-run`,
+    helmCommand: `helm install --kube-context ${kubeconfigContext} -f ${newTempValuesFilePath} --repo ${chartRepo} ${chartName} --version ${chartVersion} --generate-name --dry-run`,
     kubeconfig: kubeconfigPath,
   };
 

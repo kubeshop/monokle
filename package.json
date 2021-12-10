@@ -92,6 +92,7 @@
     "electron-log": "4.4.1",
     "electron-store": "8.0.1",
     "electron-updater": "4.6.2",
+    "es6-template-strings": "^2.0.1",
     "es6-tween": "5.5.11",
     "execa": "5.1.1",
     "fast-deep-equal": "3.1.3",

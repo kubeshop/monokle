@@ -6,7 +6,7 @@ import tar from 'tar';
 import util from 'util';
 
 import {MonoklePlugin, MonoklePluginModule} from '@models/plugin';
-import {isPackageJsonMonoklePlugin, isTemplatePluginModule} from '@models/plugin.guard';
+import {isHelmChartTemplatePuginModule, isPackageJsonMonoklePlugin, isTemplatePluginModule} from '@models/plugin.guard';
 
 import {downloadFile} from '@utils/http';
 
@@ -49,7 +49,7 @@ async function fetchPackageJson(repositoryOwner: string, repositoryName: string,
 
 const parsePluginModule = (module: MonoklePluginModule, pluginFolderPath: string): MonoklePluginModule => {
   if (isTemplatePluginModule(module)) {
-    return {
+    const updatedModule = {
       ...module,
       forms: module.forms.map(form => {
         return {
@@ -59,6 +59,13 @@ const parsePluginModule = (module: MonoklePluginModule, pluginFolderPath: string
         };
       }),
     };
+    if (isHelmChartTemplatePuginModule(updatedModule)) {
+      return {
+        ...updatedModule,
+        valuesFilePath: path.join(pluginFolderPath, updatedModule.valuesFilePath),
+      };
+    }
+    return updatedModule;
   }
   return module;
 };

@@ -56,7 +56,8 @@ export function isBundledHelmChartTemplatePluginModule(obj: any): obj is Bundled
     !obj.isReferenced &&
     typeof obj.id === 'string' &&
     _.isArray(obj.forms) &&
-    obj.forms.every((form: any) => isTemplateForm(form))
+    obj.forms.every((form: any) => isTemplateForm(form)) &&
+    typeof obj.valuesFilePath === 'string'
   );
 }
 
@@ -68,6 +69,7 @@ export function isReferencedHelmChartTemplatePluginModule(obj: any): obj is Refe
     typeof obj.id === 'string' &&
     _.isArray(obj.forms) &&
     obj.forms.every((form: any) => isTemplateForm(form)) &&
+    typeof obj.valuesFilePath === 'string' &&
     typeof obj.chartName === 'string' &&
     typeof obj.chartVersion === 'string' &&
     typeof obj.chartRepo === 'string' &&

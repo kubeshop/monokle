@@ -1,1 +1,1 @@
-declare module 'react-folder-tree';
+declare module 'es6-template-strings';

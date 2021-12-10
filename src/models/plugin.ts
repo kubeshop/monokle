@@ -42,6 +42,7 @@ interface BundledHelmChartTemplatePluginModule {
   isReferenced?: false;
   id: string;
   forms: TemplateForm[];
+  valuesFilePath: string;
 }
 
 interface ReferencedHelmChartTemplatePluginModule {
@@ -49,6 +50,7 @@ interface ReferencedHelmChartTemplatePluginModule {
   isReferenced: true;
   id: string;
   forms: TemplateForm[];
+  valuesFilePath: string;
   chartName: string;
   chartVersion: string;
   chartRepo: string;
