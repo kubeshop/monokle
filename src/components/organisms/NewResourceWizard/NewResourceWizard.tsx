@@ -369,11 +369,16 @@ const NewResourceWizard = () => {
         <SaveDestinationWrapper compact>
           <StyledSelect value={savingDestination} onChange={handleSavingDestinationChange}>
             <Option value="saveToFolder">Save to folder</Option>
-            <Option value="saveToFile">Add to existing file</Option>
+            <Option value="saveToFile">Add to file</Option>
             <Option value="doNotSave">Don't save</Option>
           </StyledSelect>
           {savingDestination === 'saveToFolder' && (
-            <StyledSelect showSearch onChange={(value: any) => setSelectedFolder(value)} value={selectedFolder}>
+            <StyledSelect
+              showSearch
+              onChange={(value: any) => setSelectedFolder(value)}
+              value={selectedFolder}
+              style={{flex: 2}}
+            >
               {renderFolderSelectOptions()}
             </StyledSelect>
           )}
@@ -383,6 +388,7 @@ const NewResourceWizard = () => {
               onChange={(value: any) => setSelectedFile(value)}
               value={selectedFile}
               placeholder="Select a destination file"
+              style={{flex: 3}}
             >
               {renderFileSelectOptions()}
             </StyledSelect>
