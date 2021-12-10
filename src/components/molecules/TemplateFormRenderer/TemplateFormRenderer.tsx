@@ -19,8 +19,12 @@ const readTemplateFormSchemas = (templateForm: TemplateForm) => {
   return {schema, uiSchema};
 };
 
-const TemplateFormRenderer: React.FC<{template: TemplatePluginModule}> = props => {
-  const {template} = props;
+const TemplateFormRenderer: React.FC<{
+  template: TemplatePluginModule;
+  formData: any;
+  onFormDataChange: (formData: any) => void;
+}> = props => {
+  const {template, formData, onFormDataChange} = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -57,7 +61,7 @@ const TemplateFormRenderer: React.FC<{template: TemplatePluginModule}> = props =
       <h1>{template.forms[0].name}</h1>
       <p>{template.forms[0].description}</p>
       <Divider />
-      <Form schema={schema} uiSchema={uiSchema}>
+      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={e => onFormDataChange(e.formData)}>
         <div />
       </Form>
     </>

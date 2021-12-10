@@ -1,11 +1,13 @@
 import _ from 'lodash';
 
 import {
+  BundledHelmChartTemplatePluginModule,
   GitRepository,
   HelmChartTemplatePluginModule,
   MonoklePlugin,
   MonoklePluginModule,
   PackageJsonMonoklePlugin,
+  ReferencedHelmChartTemplatePluginModule,
   TemplateForm,
   TemplateManifest,
   TemplatePluginModule,
@@ -47,7 +49,7 @@ export function isVanillaTemplatePluginModule(obj: any): obj is VanillaTemplateP
   );
 }
 
-export function isBundledHelmChartTemplatePluginModule(obj: any): obj is HelmChartTemplatePluginModule {
+export function isBundledHelmChartTemplatePluginModule(obj: any): obj is BundledHelmChartTemplatePluginModule {
   return (
     typeof obj === 'object' &&
     obj.type === 'templates/helm-chart' &&
@@ -58,7 +60,7 @@ export function isBundledHelmChartTemplatePluginModule(obj: any): obj is HelmCha
   );
 }
 
-export function isReferencedHelmChartTemplatePluginModule(obj: any): obj is HelmChartTemplatePluginModule {
+export function isReferencedHelmChartTemplatePluginModule(obj: any): obj is ReferencedHelmChartTemplatePluginModule {
   return (
     typeof obj === 'object' &&
     obj.type === 'templates/helm-chart' &&

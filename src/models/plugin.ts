@@ -81,4 +81,6 @@ export type {
   TemplatePluginModule,
   VanillaTemplatePluginModule,
   HelmChartTemplatePluginModule,
+  ReferencedHelmChartTemplatePluginModule,
+  BundledHelmChartTemplatePluginModule,
 };
