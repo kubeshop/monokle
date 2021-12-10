@@ -1,5 +1,6 @@
 import {useContext, useMemo} from 'react';
 import {useSelector} from 'react-redux';
+import {useMeasure} from 'react-use';
 
 import {Badge, Button, Divider} from 'antd';
 
@@ -33,6 +34,7 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const FiltersContainer = styled.div`
   padding: 10px 16px;
+  min-height: 350px;
   max-height: 30vh;
   overflow-y: auto;
   ::-webkit-scrollbar {
@@ -46,6 +48,7 @@ const NavPane: React.FC = () => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
+  const [filtersContainerRef, {height}] = useMeasure<HTMLDivElement>();
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
@@ -102,16 +105,18 @@ const NavPane: React.FC = () => {
           <ClusterCompareButton />
         </S.TitleBarRightButtons>
       </S.TitleBar>
-      <S.List height={navigatorHeight}>
-        {isResourceFiltersOpen && (
-          <>
-            <FiltersContainer>
-              <ResourceFilter />
-            </FiltersContainer>
-            <Divider style={{margin: 0, marginBottom: 12}} />
-          </>
-        )}
 
+      {isResourceFiltersOpen && (
+        <>
+          <FiltersContainer ref={filtersContainerRef}>
+            <ResourceFilter />
+          </FiltersContainer>
+          <Divider style={{margin: 0, marginBottom: 12}} />
+        </>
+      )}
+
+      {/* 20 - FiltersContainer padding & 15 - Divider height */}
+      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 20 + 15 : 0)}>
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}
