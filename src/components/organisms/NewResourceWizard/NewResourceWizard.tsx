@@ -369,7 +369,7 @@ const NewResourceWizard = () => {
         <SaveDestinationWrapper compact>
           <StyledSelect value={savingDestination} onChange={handleSavingDestinationChange}>
             <Option value="saveToFolder">Save to folder</Option>
-            <Option value="saveToFile">Save to file</Option>
+            <Option value="saveToFile">Add to existing file</Option>
             <Option value="doNotSave">Don't save</Option>
           </StyledSelect>
           {savingDestination === 'saveToFolder' && (

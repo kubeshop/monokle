@@ -418,7 +418,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         }}
         key="create_resource"
       >
-        New Resource
+        {isFolder ? 'New Resource' : 'Add Resource'}
       </Menu.Item>
       <ContextMenuDivider />
       <Menu.Item

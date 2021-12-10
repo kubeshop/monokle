@@ -16,4 +16,5 @@ export const SaveDestinationWrapper = styled(Input.Group)`
 // Comment the width and check the behavior. Maybe you can find other solution without this width: 1px
 export const StyledSelect = styled(Select)`
   flex: 1;
+  overflow: hidden;
 `;
