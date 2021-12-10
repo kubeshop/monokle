@@ -183,6 +183,11 @@ const CLusterStatusText = styled.span<{connected: Boolean}>`
   ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.whitePure}`}
 `;
 
+const CLusterActionText = styled.span`
+  font-size: 11px;
+  font-weight: 600;
+`;
+
 const StyledClusterOutlined = styled(ClusterOutlined)`
   font-size: 12px;
   margin-right: 4px;
@@ -320,12 +325,12 @@ const PageHeader = () => {
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <span>Reload</span>;
+      return <CLusterActionText>RELOAD</CLusterActionText>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
     }
-    return <span>Load</span>;
+    return <CLusterActionText>LOAD</CLusterActionText>;
   }, [previewType, previewLoader, isInClusterMode]);
 
   const clusterMenu = (
