@@ -22,7 +22,7 @@ function K8sResourceSectionEmptyDisplay() {
         <p>No resources found in the current folder.</p>
       ) : (
         <p>
-          No resources match the active filters. <a onClick={resetFilters}>[Reset Filters]</a>{' '}
+          No resources match the active filters. <a onClick={resetFilters}>[Reset Filters]</a>
         </p>
       )}
     </>
