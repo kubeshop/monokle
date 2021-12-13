@@ -302,7 +302,7 @@ function ClusterDiffModal() {
         width={984}
         height={containerRef.current?.offsetHeight || 0}
         minConstraints={[984, containerRef.current?.offsetHeight || 0]}
-        maxConstraints={[window.innerWidth - 32, containerRef.current?.offsetHeight || 0]}
+        maxConstraints={[window.innerWidth - 64, containerRef.current?.offsetHeight || 0]}
         axis="x"
         resizeHandles={['w', 'e']}
         handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
