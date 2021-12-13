@@ -217,6 +217,12 @@ function ClusterDiffModal() {
     }
   }, [hasClusterDiffFailed, closeModal]);
 
+  const resizableBoxWidth = useMemo(() => {
+    const vwValue = window.innerWidth < 1200 ? 95 : 80;
+
+    return window.innerWidth * (vwValue / 100); // 80vw in px
+  }, [window.innerWidth]);
+
   const title = useMemo(() => {
     if (isResourceDiffVisible) {
       return (
@@ -299,9 +305,9 @@ function ClusterDiffModal() {
       previewing={isInPreviewMode}
     >
       <ResizableBox
-        width={984}
+        width={resizableBoxWidth}
         height={containerRef.current?.offsetHeight || 0}
-        minConstraints={[984, containerRef.current?.offsetHeight || 0]}
+        minConstraints={[900, containerRef.current?.offsetHeight || 0]}
         maxConstraints={[window.innerWidth - 64, containerRef.current?.offsetHeight || 0]}
         axis="x"
         resizeHandles={['w', 'e']}
