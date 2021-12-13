@@ -1,4 +1,5 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {LegacyRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {ResizableBox} from 'react-resizable';
 
 import {Button, Modal, Skeleton, message} from 'antd';
 
@@ -20,6 +21,8 @@ import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {ClusterDiff, ResourceDiff} from '@molecules';
 
 import Icon from '@components/atoms/Icon';
+
+import {useWindowSize} from '@utils/hooks';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
 
@@ -52,6 +55,24 @@ const StyledModal = styled(Modal)<{previewing: boolean}>`
       color: ${Colors.blackPure} !important;
     }
   `}
+
+  & .custom-modal-handle {
+    position: absolute;
+    top: 50%;
+    height: 100%;
+    width: 10px;
+    background-color: transparent;
+    cursor: col-resize;
+    transform: translateY(-50%);
+  }
+
+  & .custom-modal-handle-e {
+    right: -5px;
+  }
+
+  & .custom-modal-handle-w {
+    left: -5px;
+  }
 `;
 
 const StyledButtonsContainer = styled.div`
@@ -95,6 +116,16 @@ function ClusterDiffModal() {
 
   const [hasAppliedResource, setHasAppliedResource] = useState<boolean>(false);
   const [resourceDiffState, setResourceDiffState] = useState<ResourceDiffState>({isLoading: false});
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const windowSize = useWindowSize();
+
+  const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
+  const resizableBoxWidth = useMemo(() => {
+    const vwValue = windowSize.width < 1200 ? 95 : 80;
+    return windowSize.width * (vwValue / 100);
+  }, [windowSize.width]);
 
   const isResourceDiffVisible = useMemo(() => {
     return Boolean(diffResourceId);
@@ -243,8 +274,7 @@ function ClusterDiffModal() {
     <StyledModal
       title={title}
       visible={isClusterDiffVisible}
-      width="90vw"
-      style={{maxWidth: 1000}}
+      width="min-content"
       onCancel={onCancel}
       footer={
         <StyledButtonsContainer>
@@ -259,6 +289,7 @@ function ClusterDiffModal() {
             Deploy selected local resources ({selectedMatches.length}) to cluster
             <ArrowRightOutlined />
           </Button>
+
           <div>
             <Button
               type="primary"
@@ -277,36 +308,48 @@ function ClusterDiffModal() {
       centered
       previewing={isInPreviewMode}
     >
-      <Container>
-        {!hasClusterDiffLoaded ? (
-          <SkeletonContainer>
-            <Skeleton active />
-          </SkeletonContainer>
-        ) : isResourceDiffVisible ? (
-          resourceDiffState.isLoading ? (
+      <ResizableBox
+        width={resizableBoxWidth}
+        height={resizableBoxHeight}
+        minConstraints={[900, resizableBoxHeight]}
+        maxConstraints={[windowSize.width - 64, resizableBoxHeight]}
+        axis="x"
+        resizeHandles={['w', 'e']}
+        handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+          <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
+        )}
+      >
+        <Container ref={containerRef}>
+          {!hasClusterDiffLoaded ? (
             <SkeletonContainer>
               <Skeleton active />
             </SkeletonContainer>
-          ) : (
-            resourceDiffState.localResource &&
-            resourceDiffState.clusterResourceText && (
-              <>
-                <div style={{display: 'flex', justifyContent: 'center', margin: '8px 0'}}>
-                  <span style={{fontWeight: 600}}>Resource Diff on {resourceDiffState.localResource?.name}</span>
-                </div>
-                <ResourceDiff
-                  localResource={resourceDiffState.localResource}
-                  clusterResourceText={resourceDiffState.clusterResourceText}
-                  isInClusterDiff
-                  onApply={() => setHasAppliedResource(true)}
-                />
-              </>
+          ) : isResourceDiffVisible ? (
+            resourceDiffState.isLoading ? (
+              <SkeletonContainer>
+                <Skeleton active />
+              </SkeletonContainer>
+            ) : (
+              resourceDiffState.localResource &&
+              resourceDiffState.clusterResourceText && (
+                <>
+                  <div style={{display: 'flex', justifyContent: 'center', margin: '8px 0'}}>
+                    <span style={{fontWeight: 600}}>Resource Diff on {resourceDiffState.localResource?.name}</span>
+                  </div>
+                  <ResourceDiff
+                    localResource={resourceDiffState.localResource}
+                    clusterResourceText={resourceDiffState.clusterResourceText}
+                    isInClusterDiff
+                    onApply={() => setHasAppliedResource(true)}
+                  />
+                </>
+              )
             )
-          )
-        ) : (
-          <ClusterDiff />
-        )}
-      </Container>
+          ) : (
+            <ClusterDiff />
+          )}
+        </Container>
+      </ResizableBox>
     </StyledModal>
   );
 }

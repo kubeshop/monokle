@@ -1,5 +1,6 @@
 import {useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
+import {useMeasure} from 'react-use';
 
 import {Button, Switch, Tag} from 'antd';
 
@@ -91,6 +92,8 @@ const ResourceDiff = (props: {
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
+  const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
+
   useResourceYamlSchema(yaml, resourceMap, localResource.id);
 
   const options = {
@@ -150,7 +153,7 @@ const ResourceDiff = (props: {
 
   return (
     <>
-      <MonacoDiffContainer width={monacoDiffContainerWidth} height="58vh">
+      <MonacoDiffContainer width="100%" height="58vh" ref={containerRef}>
         <MonacoDiffEditor
           key={monacoDiffContainerWidth}
           language="yaml"
@@ -158,6 +161,8 @@ const ResourceDiff = (props: {
           value={cleanClusterResourceText}
           options={options}
           theme={KUBESHOP_MONACO_THEME}
+          width={containerWidth}
+          height={containerHeight}
         />
       </MonacoDiffContainer>
       <TagsContainer>

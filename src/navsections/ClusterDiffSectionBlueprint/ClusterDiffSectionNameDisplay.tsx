@@ -15,13 +15,14 @@ import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {PreviewDropdown} from '@components/molecules';
 
 const NameDisplayContainer = styled.div`
+  width: 100%;
   margin-left: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  margin-right: 18px;
 `;
 
 const TagsContainer = styled.div`
-  width: 900px;
   display: flex;
   justify-content: space-between;
   margin-left: 8px;
@@ -94,7 +95,9 @@ function ResourceDiffSectionNameDisplay() {
           )}
           <PreviewDropdown btnStyle={{maxWidth: '285px'}} />
         </TagWrapper>
+
         <Spacing />
+
         <TagWrapper style={{paddingLeft: 45}}>
           <StyledTitle>Cluster Resources</StyledTitle>
           <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} type="primary" ghost>
@@ -102,6 +105,7 @@ function ResourceDiffSectionNameDisplay() {
           </ReloadButton>
         </TagWrapper>
       </TagsContainer>
+
       <CheckboxWrapper onClick={onClickSelectAll}>
         <Checkbox checked={areAllMatchesSelected} />
         <CheckboxLabel>{areAllMatchesSelected ? 'Deselect all' : 'Select all'}</CheckboxLabel>

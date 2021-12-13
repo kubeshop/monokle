@@ -31,7 +31,7 @@ import {
 import Colors from '@styles/Colors';
 
 const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
-  width: 900px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   margin-left: -24px;
@@ -174,15 +174,18 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       onMouseLeave={() => setIsHovered(false)}
       highlightdiff={areResourcesDifferent}
     >
-      <Checkbox checked={isMatchSelected} onChange={onCheckboxChange} />
-      <Label disabled={!firstLocalResource}>
-        {!resourceFilterNamespace && (
-          <Tag color={areResourcesDifferent ? 'yellow' : 'default'}>
-            {firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}
-          </Tag>
-        )}
-        {itemInstance.name}
-      </Label>
+      <span style={{width: '400px'}}>
+        <Checkbox checked={isMatchSelected} onChange={onCheckboxChange} style={{marginRight: '20px'}} />
+        <Label disabled={!firstLocalResource}>
+          {!resourceFilterNamespace && (
+            <Tag color={areResourcesDifferent ? 'yellow' : 'default'}>
+              {firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}
+            </Tag>
+          )}
+          {itemInstance.name}
+        </Label>
+      </span>
+
       <IconsContainer>
         {firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffApplyTooltip}>
@@ -202,6 +205,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
           </Tooltip>
         )}
       </IconsContainer>
+
       <Label disabled={!clusterResource}>
         {!resourceFilterNamespace && (
           <Tag color={areResourcesDifferent ? 'yellow' : !clusterResource ? 'rgba(58, 67, 68, 0.3)' : 'default'}>
