@@ -295,7 +295,7 @@ export const mainSlice = createSlice({
       });
     },
     /**
-     * Reprocess all resources - called when changing processing-related options
+     * Reprocess a newly created resource
      */
     reprocessNewResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;

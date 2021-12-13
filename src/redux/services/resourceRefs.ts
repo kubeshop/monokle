@@ -9,7 +9,7 @@ import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kus
 import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
 
 import {traverseDocument} from './manifest-utils';
-import {NodeWrapper, createResourceRef, getParsedDoc, linkResources} from './resource';
+import {NodeWrapper, createResourceRef, getLineCounter, getParsedDoc, linkResources} from './resource';
 
 export function isIncomingRef(refType: ResourceRefType) {
   return refType === ResourceRefType.Incoming;
@@ -124,24 +124,36 @@ function pathEqualsPath(pathParts: string[], path2Parts: string[]) {
   return true;
 }
 
+export function clearRefNodesCache(resource: K8sResource) {
+  resourceRefNodesCache.delete(resource.id);
+}
+
 /**
  * Creates all refNodes for a resource for further processing
  */
 
-export function processResourceRefNodes(resource: K8sResource) {
+const resourceRefNodesCache = new Map<string, Record<string, RefNode[]>>();
+
+export function getResourceRefNodes(resource: K8sResource) {
+  if (resourceRefNodesCache.has(resource.id)) {
+    return resourceRefNodesCache.get(resource.id);
+  }
+
   const refMappers = getRefMappers(resource);
   if (refMappers.length === 0) {
     return;
   }
 
   const parsedDoc = getParsedDoc(resource);
+  if (!parsedDoc) {
+    return;
+  }
+
+  const refNodes: Record<string, RefNode[]> = {};
+  resourceRefNodesCache.set(resource.id, refNodes);
 
   traverseDocument(parsedDoc, (parentKeyPathParts, keyPathParts, key, scalar) => {
     refMappers.forEach(refMapper => {
-      if (!resource.refNodesByPath) {
-        resource.refNodesByPath = {};
-      }
-
       const refNode = {scalar, key, parentKeyPath: joinPathParts(parentKeyPathParts)};
 
       if (refMapper.matchPairs) {
@@ -149,22 +161,22 @@ export function processResourceRefNodes(resource: K8sResource) {
           pathEqualsPath(refMapper.source.pathParts, parentKeyPathParts) ||
           pathEqualsPath(refMapper.target.pathParts, parentKeyPathParts)
         ) {
-          addRefNodeAtPath(refNode, joinPathParts(keyPathParts), resource.refNodesByPath);
+          addRefNodeAtPath(refNode, joinPathParts(keyPathParts), refNodes);
         }
       } else {
         if (pathEndsWithPath(keyPathParts, refMapper.source.pathParts)) {
-          addRefNodeAtPath(refNode, joinPathParts(refMapper.source.pathParts), resource.refNodesByPath);
+          addRefNodeAtPath(refNode, joinPathParts(refMapper.source.pathParts), refNodes);
         }
 
         if (pathEndsWithPath(keyPathParts, refMapper.target.pathParts)) {
-          addRefNodeAtPath(refNode, joinPathParts(refMapper.target.pathParts), resource.refNodesByPath);
+          addRefNodeAtPath(refNode, joinPathParts(refMapper.target.pathParts), refNodes);
         }
       }
 
       if (refMapper.source.hasOptionalSibling) {
         const optionalPathParts = [...refMapper.source.pathParts.slice(0, -1), 'optional'];
         if (pathEndsWithPath(keyPathParts, optionalPathParts)) {
-          addRefNodeAtPath(refNode, joinPathParts(optionalPathParts), resource.refNodesByPath);
+          addRefNodeAtPath(refNode, joinPathParts(optionalPathParts), refNodes);
         }
       }
 
@@ -172,11 +184,13 @@ export function processResourceRefNodes(resource: K8sResource) {
         const namespacePropertyName = refMapper.source.namespaceProperty || 'namespace';
         const namespacePathParts = [...refMapper.source.pathParts.slice(0, -1), namespacePropertyName];
         if (pathEndsWithPath(keyPathParts, namespacePathParts)) {
-          addRefNodeAtPath(refNode, joinPathParts(namespacePathParts), resource.refNodesByPath);
+          addRefNodeAtPath(refNode, joinPathParts(namespacePathParts), refNodes);
         }
       }
     });
   });
+
+  return refNodes;
 }
 
 /**
@@ -265,11 +279,12 @@ function handleRefMappingByParentKey(
   outgoingRefMapper: RefMapper
 ) {
   const sourceRefNodes: RefNode[] = [];
-  if (!sourceResource.refNodesByPath) {
+  const refNodes = getResourceRefNodes(sourceResource);
+  if (!refNodes) {
     return;
   }
 
-  Object.values(sourceResource.refNodesByPath)
+  Object.values(refNodes)
     .flat()
     .forEach(({scalar, key, parentKeyPath}) => {
       const outgoingRefMapperSourcePath = joinPathParts(outgoingRefMapper.source.pathParts);
@@ -284,7 +299,7 @@ function handleRefMappingByParentKey(
       createResourceRef(
         sourceResource,
         ResourceRefType.Unsatisfied,
-        new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+        new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
         undefined,
         outgoingRefMapper.target.kind
       );
@@ -297,10 +312,11 @@ function handleRefMappingByParentKey(
 
       targetResources.forEach(targetResource => {
         const targetNodes: RefNode[] = [];
-        if (!targetResource.refNodesByPath) {
+        const targetRefNodes = getResourceRefNodes(targetResource);
+        if (!targetRefNodes) {
           return;
         }
-        Object.values(targetResource.refNodesByPath)
+        Object.values(targetRefNodes)
           .flat()
           .forEach(({scalar, key, parentKeyPath}) => {
             const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
@@ -317,8 +333,8 @@ function handleRefMappingByParentKey(
             linkResources(
               sourceResource,
               targetResource,
-              new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-              new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
+              new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
+              new NodeWrapper(targetNode.scalar, getLineCounter(targetResource)),
               isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
             );
           }
@@ -330,7 +346,7 @@ function handleRefMappingByParentKey(
         createResourceRef(
           sourceResource,
           ResourceRefType.Unsatisfied,
-          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+          new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
           undefined,
           outgoingRefMapper.target.kind
         );
@@ -351,8 +367,9 @@ function shouldCreateUnsatisfiedRef(
 ) {
   if (outgoingRefMapper.source.hasOptionalSibling && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
     const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
-    const optionalSiblingRefNode = sourceResource.refNodesByPath
-      ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
+    const sourceRefNodes = getResourceRefNodes(sourceResource);
+    const optionalSiblingRefNode = sourceRefNodes
+      ? sourceRefNodes[optionalSiblingPath]?.find(refNode =>
           refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
         )
       : undefined;
@@ -378,6 +395,8 @@ function shouldCreateSatisifedRef(
     return false;
   }
 
+  const sourceRefNodes = getResourceRefNodes(sourceResource);
+
   switch (outgoingRefMapper.source.namespaceRef) {
     case NamespaceRefTypeEnum.Implicit:
       return sourceResource.namespace === targetResource.namespace;
@@ -388,9 +407,7 @@ function shouldCreateSatisifedRef(
         ...outgoingRefMapper.source.pathParts.slice(0, -1),
         namespacePropertyName,
       ]);
-      const namespaceSiblingRefNodes = sourceResource.refNodesByPath
-        ? sourceResource.refNodesByPath[namespaceSiblingPath]
-        : undefined;
+      const namespaceSiblingRefNodes = sourceRefNodes ? sourceRefNodes[namespaceSiblingPath] : undefined;
 
       return namespaceSiblingRefNodes
         ? namespaceSiblingRefNodes.some(
@@ -418,8 +435,9 @@ function isOptional(
 ): boolean | undefined {
   if (outgoingRefMapper.source.hasOptionalSibling) {
     const optionalSiblingPath = joinPathParts([...outgoingRefMapper.source.pathParts.slice(0, -1), 'optional']);
-    const optionalSiblingRefNode = sourceResource.refNodesByPath
-      ? sourceResource.refNodesByPath[optionalSiblingPath]?.find(refNode =>
+    const sourceRefNodes = getResourceRefNodes(sourceResource);
+    const optionalSiblingRefNode = sourceRefNodes
+      ? sourceRefNodes[optionalSiblingPath]?.find(refNode =>
           refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
         )
       : undefined;
@@ -441,9 +459,8 @@ function handleRefMappingByKey(
   processingOptions: ResourceRefsProcessingOptions
 ) {
   const outgoingRefMapperSourcePath = joinPathParts(outgoingRefMapper.source.pathParts);
-  const sourceRefNodes = sourceResource.refNodesByPath
-    ? sourceResource.refNodesByPath[outgoingRefMapperSourcePath]
-    : undefined;
+  const refNodes = getResourceRefNodes(sourceResource);
+  const sourceRefNodes = refNodes ? refNodes[outgoingRefMapperSourcePath] : undefined;
 
   if (!sourceRefNodes) {
     return;
@@ -456,7 +473,7 @@ function handleRefMappingByKey(
         createResourceRef(
           sourceResource,
           ResourceRefType.Unsatisfied,
-          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+          new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
           undefined,
           outgoingRefMapper.target.kind,
           isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
@@ -467,9 +484,8 @@ function handleRefMappingByKey(
 
       targetResources.forEach(targetResource => {
         const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
-        const targetNodes = targetResource.refNodesByPath
-          ? targetResource.refNodesByPath[outgoingRefMapperTargetPath]
-          : undefined;
+        const targetRefNodes = getResourceRefNodes(targetResource);
+        const targetNodes = targetRefNodes ? targetRefNodes[outgoingRefMapperTargetPath] : undefined;
 
         targetNodes?.forEach(targetNode => {
           if (shouldCreateSatisifedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)) {
@@ -477,8 +493,8 @@ function handleRefMappingByKey(
             linkResources(
               sourceResource,
               targetResource,
-              new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
-              new NodeWrapper(targetNode.scalar, targetResource.lineCounter),
+              new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
+              new NodeWrapper(targetNode.scalar, getLineCounter(targetResource)),
               isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
             );
           }
@@ -492,7 +508,7 @@ function handleRefMappingByKey(
         createResourceRef(
           sourceResource,
           ResourceRefType.Unsatisfied,
-          new NodeWrapper(sourceRefNode.scalar, sourceResource.lineCounter),
+          new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
           undefined,
           outgoingRefMapper.target.kind,
           isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
@@ -552,27 +568,19 @@ export function processRefs(
   }
 
   // prep for processing
-  let processedResourceIds = new Set<string>();
   const k8sResources = Object.values(resourceMap);
 
   resources.forEach(sourceResource => {
     clearResourceRefs(sourceResource, resourceMap);
-    processResourceRefNodes(sourceResource);
-    if (sourceResource.refNodesByPath && Object.values(sourceResource.refNodesByPath).length > 0) {
+    const sourceRefNodes = getResourceRefNodes(sourceResource);
+
+    if (sourceRefNodes && Object.values(sourceRefNodes).length > 0) {
       const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
       if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
         resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
           const targetResources = k8sResources.filter(targetResource =>
             resourceMatchesRefMapper(targetResource, outgoingRefMapper)
           );
-
-          targetResources
-            // make sure we don't process the same resource twice
-            .filter(resource => !processedResourceIds.has(resource.id))
-            .forEach(resource => {
-              processResourceRefNodes(resource);
-              processedResourceIds.add(resource.id);
-            });
 
           if (outgoingRefMapper.matchPairs) {
             handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);

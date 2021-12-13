@@ -2,7 +2,7 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {LineCounter, Scalar, YAMLSeq, parseAllDocuments, parseDocument} from 'yaml';
+import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq, parseAllDocuments, parseDocument} from 'yaml';
 
 import {
   CLUSTER_DIFF_PREFIX,
@@ -17,7 +17,7 @@ import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
 
@@ -36,14 +36,29 @@ export function doesTextStartWithYamlDocumentDelimiter(text: string) {
   });
 }
 
+type ParsedDocCacheEntry = {
+  parsedDoc: Document.Parsed<ParsedNode>;
+  lineCounter: LineCounter;
+};
+
+const parsedDocCache = new Map<string, ParsedDocCacheEntry>();
+
 export function getParsedDoc(resource: K8sResource) {
-  if (!resource.parsedDoc) {
+  if (!parsedDocCache.has(resource.id)) {
     const lineCounter = new LineCounter();
-    resource.parsedDoc = parseDocument(resource.text, {lineCounter});
-    resource.lineCounter = lineCounter;
+    const parsedDoc = parseDocument(resource.text, {lineCounter});
+    parsedDocCache.set(resource.id, {parsedDoc, lineCounter});
   }
 
-  return resource.parsedDoc;
+  const cacheEntry = parsedDocCache.get(resource.id);
+  return cacheEntry ? cacheEntry.parsedDoc : undefined;
+}
+
+export function getLineCounter(resource: K8sResource) {
+  if (getParsedDoc(resource)) {
+    const cacheEntry = parsedDocCache.get(resource.id);
+    return cacheEntry ? cacheEntry.lineCounter : undefined;
+  }
 }
 
 /**
@@ -66,7 +81,7 @@ export function getScalarNode(resource: K8sResource, nodePath: string) {
   }
 
   if (parent instanceof Scalar) {
-    return new NodeWrapper(parent, resource.lineCounter);
+    return new NodeWrapper(parent, getLineCounter(resource));
   }
 
   log.warn(`node at ${nodePath} is not a Scalar`);
@@ -114,9 +129,9 @@ export function getScalarNodes(resource: K8sResource, nodePath: string) {
   let results: NodeWrapper[] = [];
   parents.forEach(parent => {
     if (parent instanceof YAMLSeq) {
-      results = results.concat(parent.items.map(node => new NodeWrapper(node, resource.lineCounter)));
+      results = results.concat(parent.items.map(node => new NodeWrapper(node, getLineCounter(resource))));
     } else if (parent instanceof Scalar) {
-      results.push(new NodeWrapper(parent, resource.lineCounter));
+      results.push(new NodeWrapper(parent, getLineCounter(resource)));
     }
   });
 
@@ -364,20 +379,6 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
 }
 
 /**
- * This needs to be called to remove temporary objects used during processing which are not serializable
- */
-
-export function clearResourcesTemporaryObjects(resourceMap: ResourceMapType) {
-  Object.values(resourceMap).forEach(r => {
-    r.parsedDoc = undefined;
-    r.lineCounter = undefined;
-    r.refNodesByPath = undefined;
-  });
-
-  return resourceMap;
-}
-
-/**
  * Reprocess kustomization-specific references for all kustomizations
  */
 
@@ -389,7 +390,6 @@ function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapT
     });
 
   processKustomizations(resourceMap, fileMap);
-  clearResourcesTemporaryObjects(resourceMap);
 }
 
 /**
@@ -441,6 +441,10 @@ export function reprocessResources(
         hasKustomizations = true;
       }
     }
+
+    // clear caches
+    parsedDocCache.delete(resource.id);
+    clearRefNodesCache(resource);
   });
 
   processParsedResources(resourceMap, processingOptions, {
@@ -482,7 +486,6 @@ export function processParsedResources(
     }
   }
   processRefs(resourceMap, processingOptions, options);
-  clearResourcesTemporaryObjects(resourceMap);
 }
 
 /**
@@ -620,8 +623,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
           if (documents.length === 1) {
-            resource.parsedDoc = doc;
-            resource.lineCounter = lineCounter;
+            parsedDocCache.set(resource.id, {parsedDoc: doc, lineCounter});
           } else {
             // for multi-resource files we just save the range - the parsedDoc and lineCounter will
             // be created on demand (since they are incorrect in this context)
@@ -650,9 +652,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           };
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
-          resource.parsedDoc = doc;
-          resource.lineCounter = lineCounter;
-
+          parsedDocCache.set(resource.id, {parsedDoc: doc, lineCounter});
           result.push(resource);
         }
       }
