@@ -22,6 +22,8 @@ import {ClusterDiff, ResourceDiff} from '@molecules';
 
 import Icon from '@components/atoms/Icon';
 
+import {useWindowSize} from '@utils/hooks';
+
 import Colors, {BackgroundColors} from '@styles/Colors';
 
 const Container = styled.div`
@@ -116,6 +118,10 @@ function ClusterDiffModal() {
   const [resourceDiffState, setResourceDiffState] = useState<ResourceDiffState>({isLoading: false});
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const windowSize = useWindowSize();
+  const resizableBoxHeight = windowSize.height * (75 / 100);
+  const resizableBoxWidth = windowSize.width * ((windowSize.width < 1200 ? 95 : 80) / 100);
 
   const isResourceDiffVisible = useMemo(() => {
     return Boolean(diffResourceId);
@@ -217,12 +223,6 @@ function ClusterDiffModal() {
     }
   }, [hasClusterDiffFailed, closeModal]);
 
-  const resizableBoxWidth = useMemo(() => {
-    const vwValue = window.innerWidth < 1200 ? 95 : 80;
-
-    return window.innerWidth * (vwValue / 100); // vw in px
-  }, [window.innerWidth]);
-
   const title = useMemo(() => {
     if (isResourceDiffVisible) {
       return (
@@ -306,9 +306,9 @@ function ClusterDiffModal() {
     >
       <ResizableBox
         width={resizableBoxWidth}
-        height={containerRef.current?.offsetHeight || 0}
-        minConstraints={[900, containerRef.current?.offsetHeight || 0]}
-        maxConstraints={[window.innerWidth - 64, containerRef.current?.offsetHeight || 0]}
+        height={resizableBoxHeight}
+        minConstraints={[900, resizableBoxHeight]}
+        maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
         axis="x"
         resizeHandles={['w', 'e']}
         handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
