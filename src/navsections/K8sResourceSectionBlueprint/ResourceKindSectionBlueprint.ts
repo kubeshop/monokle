@@ -13,6 +13,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindPrefix from './ResourceKindPrefix';
+import ResourceKindSectionNameSuffix from './ResourceKindSectionNameSuffix';
 import ResourceKindSuffix from './ResourceKindSuffix';
 
 export type ResourceKindScopeType = {
@@ -50,10 +51,21 @@ export function makeResourceKindNavSection(
           .filter(r => r.kind === kindHandler.kind)
           .sort((a, b) => a.name.localeCompare(b.name));
       },
+      getMeta: () => {
+        return {resourceKind: kindHandler.kind};
+      },
       isInitialized: scope => {
         return scope.activeResources.length > 0;
       },
       shouldBeVisibleBeforeInitialized: true,
+    },
+    customization: {
+      nameSuffix: {
+        component: ResourceKindSectionNameSuffix,
+        options: {
+          isVisibleOnHover: true,
+        },
+      },
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,

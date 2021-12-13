@@ -185,6 +185,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
         collapseSection={collapseSection}
         CustomNameDisplay={NameDisplay ? NameDisplay.Component : undefined}
         CustomNameSuffix={NameSuffix ? NameSuffix.Component : undefined}
+        isCustomNameSuffixVisibleOnHover={Boolean(NameSuffix?.options?.isVisibleOnHover)}
         disableHoverStyle={Boolean(sectionBlueprint.customization?.disableHoverStyle)}
       />
       {sectionInstance &&

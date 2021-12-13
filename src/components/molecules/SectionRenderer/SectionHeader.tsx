@@ -25,6 +25,7 @@ interface SectionHeaderProps {
   collapseSection: () => void;
   CustomNameDisplay?: SectionCustomComponent;
   CustomNameSuffix?: SectionCustomComponent;
+  isCustomNameSuffixVisibleOnHover: boolean;
   disableHoverStyle: boolean;
 }
 
@@ -46,6 +47,7 @@ function SectionHeader(props: SectionHeaderProps) {
     collapseSection,
     CustomNameDisplay,
     CustomNameSuffix,
+    isCustomNameSuffixVisibleOnHover,
     disableHoverStyle,
   } = props;
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -80,13 +82,16 @@ function SectionHeader(props: SectionHeaderProps) {
             isSelected={isSectionSelected && isCollapsed}
             isHighlighted={isSectionSelected && isCollapsed}
             level={level}
-            onClick={toggleCollapse}
           >
-            {name}
+            <span style={{cursor: 'pointer'}} onClick={toggleCollapse}>
+              {name}
+            </span>
             {itemsLength > 0 && (
               <S.ItemsLength selected={isSectionSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
             )}
-            {CustomNameSuffix && <CustomNameSuffix sectionInstance={sectionInstance} />}
+            {CustomNameSuffix && (isCustomNameSuffixVisibleOnHover ? isHovered : true) && (
+              <CustomNameSuffix sectionInstance={sectionInstance} />
+            )}
           </S.Name>
           <S.BlankSpace level={level} onClick={toggleCollapse} />
           {isHovered && isSectionInitialized && (
