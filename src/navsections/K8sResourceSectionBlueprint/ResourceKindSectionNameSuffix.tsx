@@ -27,6 +27,10 @@ const ButtonContainer = styled.span`
   align-items: center;
   padding: 0 4px;
   margin-right: 2px;
+  & .ant-btn-sm {
+    height: 20px;
+    width: 20px;
+  }
 `;
 
 const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props => {
