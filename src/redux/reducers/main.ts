@@ -542,6 +542,14 @@ export const mainSlice = createSlice({
     editorHasReloadedSelectedPath: (state: Draft<AppState>) => {
       state.shouldEditorReloadSelectedPath = false;
     },
+    checkResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      if (!state.checkedResourceIds.includes(action.payload)) {
+        state.checkedResourceIds.push(action.payload);
+      }
+    },
+    uncheckResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => action.payload !== resourceId);
+    },
     addPlugin: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin>) => {
       state.plugins.push(action.payload);
     },
@@ -974,6 +982,8 @@ export const {
   setSelectionHistory,
   reprocessNewResource,
   editorHasReloadedSelectedPath,
+  checkResourceId,
+  uncheckResourceId,
   addPlugin,
   setPlugins,
 } = mainSlice.actions;

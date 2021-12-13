@@ -1,3 +1,5 @@
+import {Checkbox as RawCheckbox} from 'antd';
+
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -12,7 +14,7 @@ type ItemContainerProps = {
   hasOnClick: boolean;
 };
 
-export const ItemContainer = styled.li<ItemContainerProps>`
+export const ItemContainer = styled.span<ItemContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
@@ -105,4 +107,8 @@ export const ContextMenuContainer = styled.span`
 export const BlankSpace = styled.span`
   flex-grow: 1;
   height: 20px;
+`;
+
+export const Checkbox = styled(RawCheckbox)<{$level: number}>`
+  ${props => props.$level && `margin-left: -${props.$level * 8.5}px;`}
 `;

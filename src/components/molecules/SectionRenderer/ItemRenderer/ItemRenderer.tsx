@@ -1,14 +1,10 @@
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
-
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {ItemBlueprint} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import ScrollIntoView, {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
-
-import AppContext from '@src/AppContext';
 
 import {useItemCustomization} from './useItemCustomization';
 
@@ -30,9 +26,6 @@ export type ItemRendererProps<ItemType, ScopeType> = {
 };
 
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
-  const {windowSize} = useContext(AppContext);
-  const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
   const {itemId, blueprint, level, isLastItem, options} = props;
   const dispatch = useAppDispatch();
 
@@ -58,6 +51,12 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
     }
   }, [instanceHandler, itemInstance, dispatch]);
 
+  const onCheck = useCallback(() => {
+    if (instanceHandler && instanceHandler.onCheck && !itemInstance.isDisabled) {
+      instanceHandler.onCheck(itemInstance, dispatch);
+    }
+  }, [instanceHandler, itemInstance, dispatch]);
+
   return (
     <ScrollIntoView id={itemInstance.id} ref={scrollContainer}>
       <S.ItemContainer
@@ -71,6 +70,12 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         isLastItem={isLastItem}
         hasOnClick={Boolean(instanceHandler?.onClick)}
       >
+        {itemInstance.isCheckable &&
+          (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
+            <span>
+              <S.Checkbox disabled={itemInstance.isDisabled} onChange={() => onCheck()} $level={level} />
+            </span>
+          )}
         <S.PrefixContainer>
           {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
             <Prefix.Component itemInstance={itemInstance} options={Prefix.options} />
