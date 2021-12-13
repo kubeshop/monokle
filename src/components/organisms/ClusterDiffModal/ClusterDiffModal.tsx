@@ -120,8 +120,12 @@ function ClusterDiffModal() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const windowSize = useWindowSize();
-  const resizableBoxHeight = windowSize.height * (75 / 100);
-  const resizableBoxWidth = windowSize.width * ((windowSize.width < 1200 ? 95 : 80) / 100);
+
+  const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
+  const resizableBoxWidth = useMemo(() => {
+    const vwValue = windowSize.width < 1200 ? 95 : 80;
+    return windowSize.width * (vwValue / 100);
+  }, [windowSize.width]);
 
   const isResourceDiffVisible = useMemo(() => {
     return Boolean(diffResourceId);
@@ -308,7 +312,7 @@ function ClusterDiffModal() {
         width={resizableBoxWidth}
         height={resizableBoxHeight}
         minConstraints={[900, resizableBoxHeight]}
-        maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
+        maxConstraints={[windowSize.width - 64, resizableBoxHeight]}
         axis="x"
         resizeHandles={['w', 'e']}
         handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
