@@ -220,7 +220,7 @@ function ClusterDiffModal() {
   const resizableBoxWidth = useMemo(() => {
     const vwValue = window.innerWidth < 1200 ? 95 : 80;
 
-    return window.innerWidth * (vwValue / 100); // 80vw in px
+    return window.innerWidth * (vwValue / 100); // vw in px
   }, [window.innerWidth]);
 
   const title = useMemo(() => {
