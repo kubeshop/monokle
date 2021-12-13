@@ -73,7 +73,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         {itemInstance.isCheckable &&
           (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
             <span>
-              <S.Checkbox onChange={() => onCheck()} $level={level} />
+              <S.Checkbox disabled={itemInstance.isDisabled} onChange={() => onCheck()} $level={level} />
             </span>
           )}
         <S.PrefixContainer>
