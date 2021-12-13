@@ -77,23 +77,21 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
           </S.PrefixContainer>
         )}
 
-        <S.ItemName
-          level={level}
-          isSelected={itemInstance.isSelected}
-          isDirty={itemInstance.isDirty}
-          isHighlighted={itemInstance.isHighlighted}
-          isDisabled={itemInstance.isDisabled}
-          onClick={onClick}
-        >
-          {NameDisplay.Component ? (
-            <NameDisplay.Component itemInstance={itemInstance} />
-          ) : (
-            <>
-              {itemInstance.name}
-              {itemInstance.isDirty && <span>*</span>}
-            </>
-          )}
-        </S.ItemName>
+        {NameDisplay.Component ? (
+          <NameDisplay.Component itemInstance={itemInstance} />
+        ) : (
+          <S.ItemName
+            level={level}
+            isSelected={itemInstance.isSelected}
+            isDirty={itemInstance.isDirty}
+            isHighlighted={itemInstance.isHighlighted}
+            isDisabled={itemInstance.isDisabled}
+            onClick={onClick}
+          >
+            {itemInstance.name}
+            {itemInstance.isDirty && <span>*</span>}
+          </S.ItemName>
+        )}
 
         {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
           <S.SuffixContainer>
