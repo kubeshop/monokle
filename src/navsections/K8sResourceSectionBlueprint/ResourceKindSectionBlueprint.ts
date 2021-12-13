@@ -6,7 +6,7 @@ import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {selectK8sResource} from '@redux/reducers/main';
+import {checkResourceId, selectK8sResource, uncheckResourceId} from '@redux/reducers/main';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -21,6 +21,7 @@ export type ResourceKindScopeType = {
   resourceFilter: ResourceFilterType;
   selectedResourceId: string | undefined;
   selectedPath: string | undefined;
+  checkedResourceIds: string[];
 };
 
 export function makeResourceKindNavSection(
@@ -43,6 +44,7 @@ export function makeResourceKindNavSection(
         resourceFilter: state.main.resourceFilter,
         selectedResourceId: state.main.selectedResourceId,
         selectedPath: state.main.selectedPath,
+        checkedResourceIds: state.main.checkedResourceIds,
       };
     },
     builder: {
@@ -78,16 +80,28 @@ export function makeResourceKindNavSection(
           const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
           return isPassingFilter;
         },
+        isCheckable: () => true,
+        isChecked: (itemInstance, scope) => {
+          return scope.checkedResourceIds.includes(itemInstance.id);
+        },
       },
       instanceHandler: {
         onClick: (itemInstance, dispatch) => {
           dispatch(selectK8sResource({resourceId: itemInstance.id}));
+        },
+        onCheck: (itemIstance, dispatch) => {
+          if (itemIstance.isChecked) {
+            dispatch(uncheckResourceId(itemIstance.id));
+          } else {
+            dispatch(checkResourceId(itemIstance.id));
+          }
         },
       },
       customization: {
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
         contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
+        isCheckVisibleOnHover: true,
       },
     },
   };

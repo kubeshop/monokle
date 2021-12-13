@@ -35,6 +35,7 @@ export interface ItemCustomization {
     options?: ItemCustomComponentOptions;
   };
   disableHoverStyle?: boolean;
+  isCheckVisibleOnHover?: boolean;
 }
 
 export type SectionCustomComponentProps = {
@@ -69,10 +70,13 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
     isVisible?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isDirty?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isDisabled?: (rawItem: RawItemType, scope: ScopeType) => boolean;
+    isCheckable?: (rawItem: RawItemType, scope: ScopeType) => boolean;
+    isChecked?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     getMeta?: (rawItem: RawItemType, scope: ScopeType) => any;
   };
   instanceHandler?: {
     onClick?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
+    onCheck?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
   };
   customization?: ItemCustomization;
 }
@@ -118,6 +122,8 @@ export interface ItemInstance {
   isVisible: boolean;
   isDirty: boolean;
   isDisabled: boolean;
+  isCheckable: boolean;
+  isChecked: boolean;
   shouldScrollIntoView?: boolean;
   meta?: any;
 }

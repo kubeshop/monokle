@@ -42,6 +42,7 @@ const initialAppState: AppState = {
   },
   notifications: [],
   shouldEditorReloadSelectedPath: false,
+  checkedResourceIds: [],
 };
 
 const initialAppConfigState: AppConfig = {
