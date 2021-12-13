@@ -58,13 +58,14 @@ export const NameContainer = styled.li<NameContainerProps>`
 
 export const Name = styled.span<{isSelected?: boolean; isHighlighted?: boolean; level: number}>`
   padding: 2px 16px;
+  padding-right: 0px;
+  margin-right: 4px;
   font-size: ${props => {
     return `${24 - 4 * props.level}px;`;
   }};
   margin-left: ${props => {
     return `${8 * props.level}px`;
   }};
-  cursor: pointer;
   ${props => {
     if (props.isSelected) {
       return `font-weight: 700;`;

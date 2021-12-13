@@ -90,6 +90,7 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   builder?: {
     getRawItems?: (scope: ScopeType) => RawItemType[];
     getGroups?: (scope: ScopeType) => ItemGroupBlueprint[];
+    getMeta?: (scope: ScopeType, items: RawItemType[]) => any;
     isLoading?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
@@ -135,6 +136,7 @@ export interface SectionInstance {
   isHighlighted: boolean;
   isEmpty: boolean;
   shouldExpand: boolean;
+  meta?: any;
 }
 
 export interface NavigatorInstanceState {

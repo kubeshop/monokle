@@ -80,9 +80,10 @@ function SectionHeader(props: SectionHeaderProps) {
             isSelected={isSectionSelected && isCollapsed}
             isHighlighted={isSectionSelected && isCollapsed}
             level={level}
-            onClick={toggleCollapse}
           >
-            {name}
+            <span style={{cursor: 'pointer'}} onClick={toggleCollapse}>
+              {name}
+            </span>
             {itemsLength > 0 && (
               <S.ItemsLength selected={isSectionSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
             )}

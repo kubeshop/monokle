@@ -250,6 +250,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
       isEmpty: isSectionEmpty,
+      meta: sectionBuilder?.getMeta ? sectionBuilder.getMeta(sectionScope, rawItems) : undefined,
       shouldExpand: Boolean(
         itemInstances?.some(itemInstance => itemInstance.isVisible && itemInstance.shouldScrollIntoView)
       ),
