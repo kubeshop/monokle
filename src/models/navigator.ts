@@ -49,6 +49,9 @@ export interface SectionCustomization {
   };
   nameSuffix?: {
     component: SectionCustomComponent;
+    options?: {
+      isVisibleOnHover: boolean;
+    };
   };
   emptyDisplay?: {
     component: SectionCustomComponent;

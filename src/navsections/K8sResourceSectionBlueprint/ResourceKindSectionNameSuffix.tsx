@@ -18,9 +18,15 @@ import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
+const SuffixContainer = styled.span`
+  display: inline-block;
+`;
+
 const ButtonContainer = styled.span`
-  padding: 0px 8;
-  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  margin-right: 2px;
 `;
 
 const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props => {
@@ -49,9 +55,11 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
     return null;
   }
   return (
-    <ButtonContainer>
-      <Button icon={<PlusOutlined />} type="link" onClick={createResource} size="small" />
-    </ButtonContainer>
+    <SuffixContainer>
+      <ButtonContainer>
+        <Button icon={<PlusOutlined />} type="link" onClick={createResource} size="small" />
+      </ButtonContainer>
+    </SuffixContainer>
   );
 };
 
