@@ -550,6 +550,16 @@ export const mainSlice = createSlice({
     uncheckResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => action.payload !== resourceId);
     },
+    checkMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      action.payload.forEach(resourceId => {
+        if (!state.checkedResourceIds.includes(resourceId)) {
+          state.checkedResourceIds.push(resourceId);
+        }
+      });
+    },
+    uncheckMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
+    },
     addPlugin: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin>) => {
       state.plugins.push(action.payload);
     },
@@ -984,6 +994,8 @@ export const {
   editorHasReloadedSelectedPath,
   checkResourceId,
   uncheckResourceId,
+  checkMultipleResourceIds,
+  uncheckMultipleResourceIds,
   addPlugin,
   setPlugins,
 } = mainSlice.actions;

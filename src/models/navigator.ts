@@ -59,6 +59,7 @@ export interface SectionCustomization {
   };
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
+  isCheckVisibleOnHover?: boolean;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
@@ -102,7 +103,12 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isEmpty?: (scope: ScopeType, items: RawItemType[], itemInstances?: ItemInstance[]) => boolean;
+    isCheckable?: (scope: ScopeType, rawItems: RawItemType[], itemInstances?: ItemInstance[]) => boolean;
+    isChecked?: (scope: ScopeType, rawItems: RawItemType[], itemInstances?: ItemInstance[]) => boolean | 'partial';
     shouldBeVisibleBeforeInitialized?: boolean;
+  };
+  instanceHandler?: {
+    onCheck?: (sectionInstance: SectionInstance, dispatch: AppDispatch, itemInstances?: ItemInstance[]) => void;
   };
   customization?: SectionCustomization;
   itemBlueprint?: ItemBlueprint<RawItemType, ScopeType>;
@@ -144,6 +150,8 @@ export interface SectionInstance {
   isSelected: boolean;
   isHighlighted: boolean;
   isEmpty: boolean;
+  isCheckable: boolean;
+  isChecked: boolean | 'partial';
   shouldExpand: boolean;
   meta?: any;
 }

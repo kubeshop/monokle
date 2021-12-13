@@ -31,7 +31,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
 
   const dispatch = useAppDispatch();
 
-  const {NameDisplay, EmptyDisplay, NameSuffix} = useSectionCustomization(sectionBlueprint.customization);
+  const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
 
   const collapsedSectionIds = useAppSelector(state => state.navigator.collapsedSectionIds);
 
@@ -171,22 +171,13 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
       <SectionHeader
         name={sectionName}
         sectionInstance={sectionInstance}
-        isSectionSelected={Boolean(sectionInstance?.isSelected)}
+        sectionBlueprint={sectionBlueprint}
         isCollapsed={isCollapsed}
         isCollapsedMode={isCollapsedMode}
-        isSectionHighlighted={Boolean(sectionInstance?.isHighlighted)}
         isLastSection={isLastSection}
-        hasChildSections={Boolean(sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0)}
-        isSectionInitialized={Boolean(sectionInstance?.isInitialized)}
-        isSectionVisible={Boolean(sectionInstance?.isVisible)}
         level={level}
-        itemsLength={sectionInstance?.visibleDescendantItemsCount || 0}
         expandSection={expandSection}
         collapseSection={collapseSection}
-        CustomNameDisplay={NameDisplay ? NameDisplay.Component : undefined}
-        CustomNameSuffix={NameSuffix ? NameSuffix.Component : undefined}
-        isCustomNameSuffixVisibleOnHover={Boolean(NameSuffix?.options?.isVisibleOnHover)}
-        disableHoverStyle={Boolean(sectionBlueprint.customization?.disableHoverStyle)}
       />
       {sectionInstance &&
         sectionInstance.isVisible &&

@@ -6,7 +6,13 @@ import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {checkResourceId, selectK8sResource, uncheckResourceId} from '@redux/reducers/main';
+import {
+  checkMultipleResourceIds,
+  checkResourceId,
+  selectK8sResource,
+  uncheckMultipleResourceIds,
+  uncheckResourceId,
+} from '@redux/reducers/main';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -59,7 +65,46 @@ export function makeResourceKindNavSection(
       isInitialized: scope => {
         return scope.activeResources.length > 0;
       },
+      isCheckable: () => true,
+      isChecked: (_, __, itemInstances) => {
+        if (!itemInstances) {
+          return false;
+        }
+        let nrOfCheckedItems = 0;
+        let nrOfVisilbeItems = 0;
+        itemInstances.forEach(itemInstance => {
+          if (itemInstance.isChecked) {
+            nrOfCheckedItems += 1;
+          }
+          if (itemInstance.isVisible) {
+            nrOfVisilbeItems += 1;
+          }
+        });
+        if (nrOfCheckedItems === 0) {
+          return false;
+        }
+        if (nrOfCheckedItems < nrOfVisilbeItems) {
+          return 'partial';
+        }
+        if (nrOfCheckedItems === nrOfVisilbeItems) {
+          return true;
+        }
+        return true;
+      },
       shouldBeVisibleBeforeInitialized: true,
+    },
+    instanceHandler: {
+      onCheck: (sectionInstance, dispatch, itemInstances) => {
+        if (!itemInstances) {
+          return;
+        }
+        const visibleItemIds = itemInstances.filter(i => i.isVisible).map(i => i.id);
+        if (!sectionInstance.isChecked || sectionInstance.isChecked === 'partial') {
+          dispatch(checkMultipleResourceIds(visibleItemIds));
+          return;
+        }
+        dispatch(uncheckMultipleResourceIds(visibleItemIds));
+      },
     },
     customization: {
       nameSuffix: {

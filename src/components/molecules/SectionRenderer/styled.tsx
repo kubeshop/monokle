@@ -1,4 +1,4 @@
-import {Skeleton as RawSkeleton} from 'antd';
+import {Checkbox as RawCheckbox, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
@@ -117,3 +117,5 @@ export const BlankSpace = styled.span<{level?: number}>`
   cursor: pointer;
   ${props => props.level && `height: ${32 - props.level * 8}px;`}
 `;
+
+export const Checkbox = styled(RawCheckbox)<{$level: number}>``;
