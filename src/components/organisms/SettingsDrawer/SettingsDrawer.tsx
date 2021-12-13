@@ -314,6 +314,14 @@ const SettingsDrawer = () => {
         />
       </StyledDiv>
       <StyledDiv>
+        <Checkbox
+          checked={appConfig.settings.hideExcludedFilesInFileExplorer}
+          onChange={onChangeHideExcludedFilesInFileExplorer}
+        >
+          Hide excluded files
+        </Checkbox>
+      </StyledDiv>
+      <StyledDiv>
         <StyledSpan>Helm Preview Mode</StyledSpan>
         <Tooltip title={HelmPreviewModeTooltip}>
           <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
@@ -338,15 +346,6 @@ const SettingsDrawer = () => {
             Automatically load last folder
           </Checkbox>
         </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>File Explorer</StyledSpan>
-        <Checkbox
-          checked={appConfig.settings.hideExcludedFilesInFileExplorer}
-          onChange={onChangeHideExcludedFilesInFileExplorer}
-        >
-          Hide excluded files
-        </Checkbox>
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Maximum folder read recursion depth</StyledSpan>
