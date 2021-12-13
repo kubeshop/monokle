@@ -55,6 +55,7 @@ type ItemNameProps = {
 };
 
 export const ItemName = styled.span<ItemNameProps>`
+  width: 100%;
   padding: 2px 0;
   font-size: 12px;
   overflow: hidden;

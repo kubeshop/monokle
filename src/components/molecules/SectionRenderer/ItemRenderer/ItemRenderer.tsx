@@ -71,11 +71,12 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         isLastItem={isLastItem}
         hasOnClick={Boolean(instanceHandler?.onClick)}
       >
-        <S.PrefixContainer>
-          {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
+        {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
+          <S.PrefixContainer>
             <Prefix.Component itemInstance={itemInstance} options={Prefix.options} />
-          )}
-        </S.PrefixContainer>
+          </S.PrefixContainer>
+        )}
+
         <S.ItemName
           level={level}
           isSelected={itemInstance.isSelected}
@@ -93,12 +94,15 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
             </>
           )}
         </S.ItemName>
+
         {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
           <S.SuffixContainer>
             <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
           </S.SuffixContainer>
         )}
+
         <S.BlankSpace onClick={onClick} />
+
         {QuickAction.Component &&
           !options?.disableQuickAction &&
           (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (
@@ -106,6 +110,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
               <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
             </S.QuickActionContainer>
           )}
+
         {ContextMenu.Component &&
           !options?.disableContextMenu &&
           (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
