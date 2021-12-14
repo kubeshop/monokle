@@ -54,8 +54,8 @@ function SectionHeader(props: SectionHeaderProps) {
   }, [isCollapsed, expandSection, collapseSection]);
 
   const itemsLength = useMemo(() => {
-    return sectionInstance?.visibleDescendantItemsCount || 0;
-  }, [sectionInstance.visibleDescendantItemsCount]);
+    return sectionInstance?.visibleDescendantItemIds?.length || 0;
+  }, [sectionInstance.visibleDescendantItemIds]);
 
   const onCheck = useCallback(() => {
     if (sectionBlueprint.instanceHandler?.onCheck) {

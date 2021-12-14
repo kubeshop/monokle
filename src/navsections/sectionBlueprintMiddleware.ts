@@ -83,20 +83,17 @@ function computeItemScrollIntoView(sectionInstance: SectionInstance, itemInstanc
 function computeSectionVisibility(
   sectionInstance: SectionInstance,
   sectionInstanceMap: Record<string, SectionInstance>
-): [boolean, string[] | undefined, number | undefined] {
+): [boolean, string[] | undefined, string[] | undefined] {
   const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
-  let visibleDescendantItemsCount = 0;
+  let visibleDescendantItemIds: string[] = [];
 
   if (sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0) {
     const childSectionVisibilityMap: Record<string, boolean> = {};
 
     sectionBlueprint.childSectionIds.forEach(childSectionId => {
       const childSectionInstance = sectionInstanceMap[childSectionId];
-      const [
-        isChildSectionVisible,
-        visibleDescendantSectionIdsOfChildSection,
-        visibleDescendantItemsCountOfChildSection,
-      ] = computeSectionVisibility(childSectionInstance, sectionInstanceMap);
+      const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection, visibleDescendantItemIdsOfChildSection] =
+        computeSectionVisibility(childSectionInstance, sectionInstanceMap);
 
       if (visibleDescendantSectionIdsOfChildSection) {
         if (sectionInstance.visibleDescendantSectionIds) {
@@ -106,8 +103,8 @@ function computeSectionVisibility(
         }
       }
 
-      if (visibleDescendantItemsCountOfChildSection) {
-        visibleDescendantItemsCount += visibleDescendantItemsCountOfChildSection;
+      if (visibleDescendantItemIdsOfChildSection) {
+        visibleDescendantItemIds.push(...visibleDescendantItemIdsOfChildSection);
       }
 
       childSectionVisibilityMap[childSectionId] = isChildSectionVisible;
@@ -134,14 +131,14 @@ function computeSectionVisibility(
   }
 
   if (sectionInstance.visibleItemIds) {
-    visibleDescendantItemsCount += sectionInstance.visibleItemIds.length;
+    visibleDescendantItemIds.push(...sectionInstance.visibleItemIds);
   }
 
-  sectionInstance.visibleDescendantItemsCount = visibleDescendantItemsCount;
+  sectionInstance.visibleDescendantItemIds = visibleDescendantItemIds;
   return [
     sectionInstance.isVisible,
     sectionInstance.visibleDescendantSectionIds,
-    sectionInstance.visibleDescendantItemsCount,
+    sectionInstance.visibleDescendantItemIds,
   ];
 }
 /**
