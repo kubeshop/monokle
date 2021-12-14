@@ -4,6 +4,9 @@ import {Menu} from 'antd';
 
 import styled from 'styled-components';
 
+import {useAppDispatch} from '@redux/hooks';
+import {uncheckAllResourceIds} from '@redux/reducers/main';
+
 import Colors from '@styles/Colors';
 
 const StyledMenu = styled(Menu)`
@@ -12,13 +15,15 @@ const StyledMenu = styled(Menu)`
 `;
 
 const ResourceMultipleSelectActionsMenu: React.FC = () => {
+  const dispatch = useAppDispatch();
+
   return (
     <StyledMenu mode="horizontal">
       <Menu.Item style={{color: Colors.red7}} key="delete">
         Delete
       </Menu.Item>
 
-      <Menu.Item style={{marginLeft: 'auto'}} key="deselect">
+      <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={() => dispatch(uncheckAllResourceIds())}>
         Deselect
       </Menu.Item>
     </StyledMenu>

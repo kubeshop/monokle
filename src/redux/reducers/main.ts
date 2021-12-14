@@ -557,6 +557,9 @@ export const mainSlice = createSlice({
         }
       });
     },
+    uncheckAllResourceIds: (state: Draft<AppState>) => {
+      state.checkedResourceIds = [];
+    },
     uncheckMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
       state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
     },
@@ -993,6 +996,7 @@ export const {
   reprocessNewResource,
   editorHasReloadedSelectedPath,
   checkResourceId,
+  uncheckAllResourceIds,
   uncheckResourceId,
   checkMultipleResourceIds,
   uncheckMultipleResourceIds,
