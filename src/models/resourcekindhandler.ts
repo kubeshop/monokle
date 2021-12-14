@@ -22,9 +22,10 @@ interface RefMapper {
   };
   target: {
     kind: string;
-    pathParts: string[];
+    pathParts?: string[];
   };
-  matchPairs?: boolean;
+
+  type: 'path' | 'name' | 'pairs';
 }
 
 export type ResourceKind = string;

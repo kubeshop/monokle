@@ -31,8 +31,8 @@ const PersistentVolumeClaimHandler: ResourceKindHandler = {
       },
       target: {
         kind: 'PersistentVolume',
-        pathParts: ['metadata', 'name'],
       },
+      type: 'name',
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/#expanding-persistent-volumes-claims',

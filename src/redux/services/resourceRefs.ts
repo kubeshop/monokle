@@ -156,10 +156,10 @@ export function getResourceRefNodes(resource: K8sResource) {
     refMappers.forEach(refMapper => {
       const refNode = {scalar, key, parentKeyPath: joinPathParts(parentKeyPathParts)};
 
-      if (refMapper.matchPairs) {
+      if (refMapper.type === 'pairs') {
         if (
           pathEqualsPath(refMapper.source.pathParts, parentKeyPathParts) ||
-          pathEqualsPath(refMapper.target.pathParts, parentKeyPathParts)
+          (refMapper.target.pathParts && pathEqualsPath(refMapper.target.pathParts, parentKeyPathParts))
         ) {
           addRefNodeAtPath(refNode, joinPathParts(keyPathParts), refNodes);
         }
@@ -168,7 +168,11 @@ export function getResourceRefNodes(resource: K8sResource) {
           addRefNodeAtPath(refNode, joinPathParts(refMapper.source.pathParts), refNodes);
         }
 
-        if (pathEndsWithPath(keyPathParts, refMapper.target.pathParts)) {
+        if (
+          refMapper.type === 'path' &&
+          refMapper.target.pathParts &&
+          pathEndsWithPath(keyPathParts, refMapper.target.pathParts)
+        ) {
           addRefNodeAtPath(refNode, joinPathParts(refMapper.target.pathParts), refNodes);
         }
       }
@@ -319,9 +323,11 @@ function handleRefMappingByParentKey(
         Object.values(targetRefNodes)
           .flat()
           .forEach(({scalar, key, parentKeyPath}) => {
-            const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
-            if (outgoingRefMapperTargetPath === parentKeyPath) {
-              targetNodes.push({scalar, key, parentKeyPath});
+            if (outgoingRefMapper.target.pathParts) {
+              const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
+              if (outgoingRefMapperTargetPath === parentKeyPath) {
+                targetNodes.push({scalar, key, parentKeyPath});
+              }
             }
           });
         targetNodes.forEach(targetNode => {
@@ -386,16 +392,14 @@ function shouldCreateUnsatisfiedRef(
 
 function shouldCreateSatisifedRef(
   sourceRefNode: RefNode,
-  targetNode: RefNode,
+  targetNode: RefNode | undefined,
   sourceResource: K8sResource,
   targetResource: K8sResource,
   outgoingRefMapper: RefMapper
 ) {
-  if (sourceRefNode.scalar.value !== targetNode.scalar.value) {
+  if (targetNode && sourceRefNode.scalar.value !== targetNode.scalar.value) {
     return false;
   }
-
-  const sourceRefNodes = getResourceRefNodes(sourceResource);
 
   switch (outgoingRefMapper.source.namespaceRef) {
     case NamespaceRefTypeEnum.Implicit:
@@ -407,6 +411,7 @@ function shouldCreateSatisifedRef(
         ...outgoingRefMapper.source.pathParts.slice(0, -1),
         namespacePropertyName,
       ]);
+      const sourceRefNodes = getResourceRefNodes(sourceResource);
       const namespaceSiblingRefNodes = sourceRefNodes ? sourceRefNodes[namespaceSiblingPath] : undefined;
 
       return namespaceSiblingRefNodes
@@ -448,6 +453,23 @@ function isOptional(
   return false;
 }
 
+const resourceNameMap = new Map<string, string[]>();
+
+function getResourceNameMap(resourceMap: ResourceMapType) {
+  if (resourceNameMap.size === 0) {
+    Object.values(resourceMap).forEach(r => {
+      const ids = resourceNameMap.get(r.name);
+      if (ids) {
+        ids.push(r.id);
+      } else {
+        resourceNameMap.set(r.name, [r.id]);
+      }
+    });
+  }
+
+  return resourceNameMap;
+}
+
 /**
  * Creates resource refs from a specified resource to target resources using the specified refMapper
  */
@@ -456,7 +478,8 @@ function handleRefMappingByKey(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
   outgoingRefMapper: RefMapper,
-  processingOptions: ResourceRefsProcessingOptions
+  processingOptions: ResourceRefsProcessingOptions,
+  resourceMap: ResourceMapType
 ) {
   const outgoingRefMapperSourcePath = joinPathParts(outgoingRefMapper.source.pathParts);
   const refNodes = getResourceRefNodes(sourceResource);
@@ -483,22 +506,39 @@ function handleRefMappingByKey(
       let hasSatisfiedRefs = false;
 
       targetResources.forEach(targetResource => {
-        const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
-        const targetRefNodes = getResourceRefNodes(targetResource);
-        const targetNodes = targetRefNodes ? targetRefNodes[outgoingRefMapperTargetPath] : undefined;
-
-        targetNodes?.forEach(targetNode => {
-          if (shouldCreateSatisifedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)) {
-            hasSatisfiedRefs = true;
-            linkResources(
-              sourceResource,
-              targetResource,
-              new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
-              new NodeWrapper(targetNode.scalar, getLineCounter(targetResource)),
-              isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
-            );
+        if (outgoingRefMapper.type === 'name') {
+          if (targetResource.name === sourceRefNode.scalar.value) {
+            if (shouldCreateSatisifedRef(sourceRefNode, undefined, sourceResource, targetResource, outgoingRefMapper)) {
+              hasSatisfiedRefs = true;
+              linkResources(
+                sourceResource,
+                targetResource,
+                new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
+                undefined,
+                isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
+              );
+            }
           }
-        });
+        } else if (outgoingRefMapper.type === 'path' && outgoingRefMapper.target.pathParts) {
+          const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
+          const targetRefNodes = getResourceRefNodes(targetResource);
+          const targetNodes = targetRefNodes ? targetRefNodes[outgoingRefMapperTargetPath] : undefined;
+
+          targetNodes?.forEach(targetNode => {
+            if (
+              shouldCreateSatisifedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)
+            ) {
+              hasSatisfiedRefs = true;
+              linkResources(
+                sourceResource,
+                targetResource,
+                new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
+                new NodeWrapper(targetNode.scalar, getLineCounter(targetResource)),
+                isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
+              );
+            }
+          });
+        }
       });
 
       if (
@@ -582,10 +622,10 @@ export function processRefs(
             resourceMatchesRefMapper(targetResource, outgoingRefMapper)
           );
 
-          if (outgoingRefMapper.matchPairs) {
+          if (outgoingRefMapper.type === 'pairs') {
             handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
           } else {
-            handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
+            handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions, resourceMap);
           }
         });
       }

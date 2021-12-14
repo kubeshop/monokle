@@ -29,7 +29,10 @@ const SecretHandler: ResourceKindHandler = {
       source: {
         pathParts: ['metadata', 'annotations', 'kubernetes.io/service-account.name'],
       },
-      target: {kind: 'ServiceAccount', pathParts: ['metadata', 'name']},
+      target: {
+        kind: 'ServiceAccount',
+      },
+      type: 'name',
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/configuration/secret/',

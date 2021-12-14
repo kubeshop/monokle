@@ -31,7 +31,10 @@ const PersistentVolumeHandler: ResourceKindHandler = {
       source: {
         pathParts: ['spec', 'claimRef', 'name'],
       },
-      target: {kind: 'PersistentVolumeClaim', pathParts: ['metadata', 'name']},
+      target: {
+        kind: 'PersistentVolumeClaim',
+      },
+      type: 'name',
     },
     {
       // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core
@@ -39,6 +42,7 @@ const PersistentVolumeHandler: ResourceKindHandler = {
         pathParts: ['secretRef', 'name'],
         namespaceRef: NamespaceRefTypeEnum.Explicit,
       },
+      type: 'name',
       ...SecretTarget,
     },
     {
@@ -48,6 +52,7 @@ const PersistentVolumeHandler: ResourceKindHandler = {
         namespaceRef: NamespaceRefTypeEnum.Explicit,
         namespaceProperty: 'secretNamespace',
       },
+      type: 'name',
       ...SecretTarget,
     },
     {
@@ -55,6 +60,7 @@ const PersistentVolumeHandler: ResourceKindHandler = {
       source: {
         pathParts: ['volumes', '*', 'azureFile', 'secretName'],
       },
+      type: 'name',
       ...SecretTarget,
     },
   ],
