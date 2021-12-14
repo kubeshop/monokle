@@ -54,6 +54,7 @@ import {
   selectFilePath,
 } from '../services/fileEntry';
 import {
+  deleteResource,
   extractK8sResources,
   getResourceKindsWithTargetingRefs,
   isFileResource,
@@ -243,7 +244,7 @@ export const mainSlice = createSlice({
             fileEntry.timestamp = getFileTimestamp(filePath);
 
             getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
-              delete state.resourceMap[r.id];
+              deleteResource(r, state.resourceMap);
             });
 
             const extractedResources = extractK8sResources(
@@ -366,7 +367,7 @@ export const mainSlice = createSlice({
         state.selectedResourceId = undefined;
       }
       if (isUnsavedResource(resource)) {
-        delete state.resourceMap[resource.id];
+        deleteResource(resource, state.resourceMap);
         return;
       }
       if (isFileResource(resource)) {
@@ -382,7 +383,7 @@ export const mainSlice = createSlice({
           const kindHandler = getResourceKindHandler(resource.kind);
           if (kindHandler?.deleteResourceInCluster) {
             kindHandler.deleteResourceInCluster(kubeConfig, resource.name, resource.namespace);
-            delete state.resourceMap[resource.id];
+            deleteResource(resource, state.resourceMap);
           }
         } catch (err) {
           log.error(err);
@@ -766,7 +767,7 @@ export const mainSlice = createSlice({
         // remove previous cluster diff resources
         Object.values(state.resourceMap)
           .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
-          .forEach(r => delete state.resourceMap[r.id]);
+          .forEach(r => deleteResource(r, state.resourceMap));
         // add resources from cluster diff to the resource map
         Object.values(clusterResourceMap).forEach(r => {
           // add prefix to the resource id to avoid replacing local resources that might have the same id
@@ -857,7 +858,7 @@ export const mainSlice = createSlice({
       // remove previous cluster diff resources
       Object.values(state.resourceMap)
         .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
-        .forEach(r => delete state.resourceMap[r.id]);
+        .forEach(r => deleteResource(r, state.resourceMap));
       state.clusterDiff.clusterToLocalResourcesMatches = [];
       state.clusterDiff.hasLoaded = false;
       state.clusterDiff.hasFailed = false;
@@ -942,7 +943,7 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
   // remove previous preview resources
   Object.values(state.resourceMap)
     .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
-    .forEach(r => delete state.resourceMap[r.id]);
+    .forEach(r => deleteResource(r, state.resourceMap));
 
   if (payload.previewResourceId && payload.previewResources) {
     Object.values(payload.previewResources).forEach(r => {

@@ -444,7 +444,7 @@ export function reprocessResources(
 
     // clear caches
     parsedDocCache.delete(resource.id);
-    clearRefNodesCache(resource);
+    clearRefNodesCache(resource.id);
   });
 
   processParsedResources(resourceMap, processingOptions, {
@@ -585,7 +585,7 @@ export function removeResourceFromFile(
       content.substr(removedResource.range.start + removedResource.range.length)
   );
   fileEntry.timestamp = getFileTimestamp(absoluteFilePath);
-  delete resourceMap[removedResource.id];
+  deleteResource(removedResource, resourceMap);
 }
 
 /**
@@ -660,6 +660,16 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
     });
   }
   return result;
+}
+
+/**
+ * Deletes the specified resource from internal caches and the specified resourceMap
+ */
+
+export function deleteResource(resource: K8sResource, resourceMap: ResourceMapType) {
+  parsedDocCache.delete(resource.id);
+  clearRefNodesCache(resource.id);
+  delete resourceMap[resource.id];
 }
 
 /**

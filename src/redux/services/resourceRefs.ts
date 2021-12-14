@@ -124,8 +124,8 @@ function pathEqualsPath(pathParts: string[], path2Parts: string[]) {
   return true;
 }
 
-export function clearRefNodesCache(resource: K8sResource) {
-  resourceRefNodesCache.delete(resource.id);
+export function clearRefNodesCache(resourceId: string) {
+  resourceRefNodesCache.delete(resourceId);
 }
 
 /**
