@@ -22,11 +22,12 @@ export type ItemRendererProps<ItemType, ScopeType> = {
   blueprint: ItemBlueprint<ItemType, ScopeType>;
   level: number;
   isLastItem: boolean;
+  isSectionCheckable: boolean;
   options?: ItemRendererOptions;
 };
 
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
-  const {itemId, blueprint, level, isLastItem, options} = props;
+  const {itemId, blueprint, level, isLastItem, isSectionCheckable, options} = props;
   const dispatch = useAppDispatch();
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -69,6 +70,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         level={level}
         isLastItem={isLastItem}
         hasOnClick={Boolean(instanceHandler?.onClick)}
+        $isSectionCheckable={isSectionCheckable}
       >
         {itemInstance.isCheckable &&
           (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (

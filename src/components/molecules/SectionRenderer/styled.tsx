@@ -71,7 +71,7 @@ export const Name = styled.span<NameProps>`
     return `font-size: ${24 - 4 * props.$level}px;`;
   }}
   ${props => {
-    return `margin-left: ${8 * props.$level - (props.$isCheckable ? 24 : 0)}px;`;
+    return `margin-left: ${8 * props.$level - (props.$isCheckable ? 10 : 0)}px;`;
   }}
   ${props => {
     if (props.$isSelected) {
@@ -130,5 +130,5 @@ export const Checkbox = styled(RawCheckbox)<{$level: number}>`
 `;
 
 export const CheckboxPlaceholder = styled.span<{$level: number}>`
-  ${props => `width: ${props.$level * 8 + 8}px;`}
+  width: 24px;
 `;
