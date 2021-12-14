@@ -36,6 +36,8 @@ enum Colors {
   blue6 = '#1890FF', // Daybreak Blue
   blue10 = '#B7E3FA',
 
+  red7 = '#E84748', // Dust Red
+
   highlightGreen = '#33BCB7',
 
   selectionGradient = 'linear-gradient(90deg, #3C9AE8 0%, #84E2D8 100%)',

@@ -45,6 +45,7 @@ type KeyValueEntry = {id: string; key?: string; value?: string};
 type KeyValue = Record<string, string | null>;
 
 type KeyValueInputProps = {
+  disabled?: boolean;
   label: string;
   labelStyle?: React.CSSProperties;
   data: Record<string, string[]>;
@@ -70,7 +71,7 @@ function makeKeyValueFromEntries(keyValueEntries: KeyValueEntry[]): KeyValue {
 }
 
 function KeyValueInput(props: KeyValueInputProps) {
-  const {label, labelStyle, data, value: keyValue, onChange} = props;
+  const {disabled = false, label, labelStyle, data, value: keyValue, onChange} = props;
   const [entries, setEntries] = useState<KeyValueEntry[]>([]);
   const [currentKeyValue, setCurrentKeyValue] = useState<KeyValue>(keyValue);
 
@@ -148,14 +149,19 @@ function KeyValueInput(props: KeyValueInputProps) {
     <Container>
       <TitleContainer>
         <TitleLabel style={labelStyle}>{label}</TitleLabel>
-        <Button onClick={createEntry} type="link" icon={<PlusOutlined />}>
+        <Button onClick={createEntry} type="link" icon={<PlusOutlined />} disabled={disabled}>
           Add
         </Button>
       </TitleContainer>
       {entries.map(entry => (
         <KeyValueRemoveButtonContainer key={entry.id}>
           <KeyValueContainer>
-            <Select value={entry.key} onChange={newKey => updateEntryKey(entry.id, newKey)} showSearch>
+            <Select
+              value={entry.key}
+              onChange={newKey => updateEntryKey(entry.id, newKey)}
+              showSearch
+              disabled={disabled}
+            >
               {Object.keys(data)
                 .filter(key => key === entry.key || !entries.some(e => e.key === key))
                 .map(key => (
@@ -164,8 +170,14 @@ function KeyValueInput(props: KeyValueInputProps) {
                   </Select.Option>
                 ))}
             </Select>
+
             {entry.key && (
-              <Select value={entry.value} onChange={newValue => updateEntryValue(entry.id, newValue)} showSearch>
+              <Select
+                value={entry.value}
+                onChange={newValue => updateEntryValue(entry.id, newValue)}
+                showSearch
+                disabled={disabled}
+              >
                 <Select.Option key={ANY_VALUE} value={ANY_VALUE}>
                   {ANY_VALUE}
                 </Select.Option>
@@ -178,7 +190,9 @@ function KeyValueInput(props: KeyValueInputProps) {
               </Select>
             )}
           </KeyValueContainer>
+
           <StyledRemoveButton
+            disabled={disabled}
             onClick={() => removeEntry(entry.id)}
             color={Colors.redError}
             size="small"

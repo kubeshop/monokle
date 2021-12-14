@@ -20,6 +20,7 @@ import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelecto
 
 import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
+import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
@@ -37,8 +38,8 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const FiltersContainer = styled.div`
   position: relative;
-  margin-bottom: 7px;
-  padding-top: 2px;
+  padding: 0px 16px;
+  margin-bottom: 10px;
 
   & .react-resizable {
     padding: 10px 16px;
@@ -70,6 +71,7 @@ const NavPane: React.FC = () => {
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
   const activeResources = useAppSelector(activeResourcesSelector);
 
+  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
   const isInClusterMode = useSelector(isInClusterModeSelector);
@@ -140,7 +142,10 @@ const NavPane: React.FC = () => {
         </>
       )}
 
-      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 11 : 0)}>
+      {checkedResourceIds.length ? <CheckedResourcesActionsMenu /> : null}
+
+      {/* 20 - FiltersContainer padding & 15 - Divider height */}
+      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 20 + 15 : 0)}>
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}

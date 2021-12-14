@@ -12,6 +12,7 @@ type ItemContainerProps = {
   level: number;
   isLastItem: boolean;
   hasOnClick: boolean;
+  $isSectionCheckable: boolean;
 };
 
 export const ItemContainer = styled.span<ItemContainerProps>`
@@ -45,7 +46,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
       return `background: ${Colors.blackPearl};`;
     }
   }};
-  padding-left: ${props => `${(props.level + 1) * 8 + 1}px;`};
+  padding-left: ${props => `${(props.level + 1) * 8 + 1 + (props.$isSectionCheckable ? 24 : 0)}px;`};
 `;
 
 type ItemNameProps = {
@@ -110,5 +111,5 @@ export const BlankSpace = styled.span`
 `;
 
 export const Checkbox = styled(RawCheckbox)<{$level: number}>`
-  ${props => props.$level && `margin-left: -${props.$level * 8.5}px;`}
+  ${props => props.$level && `margin-left: -${props.$level * 8 + 24}px;`}
 `;

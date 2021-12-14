@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
+
 import {AppDispatch, RootState} from '@redux/store';
 
 export type ItemCustomComponentProps = {
@@ -59,6 +61,7 @@ export interface SectionCustomization {
   };
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
+  isCheckVisibleOnHover?: boolean;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
@@ -102,6 +105,11 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isEmpty?: (scope: ScopeType, items: RawItemType[], itemInstances?: ItemInstance[]) => boolean;
+    makeCheckable?: (scope: ScopeType) => {
+      checkedItemIds: string[];
+      checkItemsActionCreator: ActionCreatorWithPayload<string[]>;
+      uncheckItemsActionCreator: ActionCreatorWithPayload<string[]>;
+    };
     shouldBeVisibleBeforeInitialized?: boolean;
   };
   customization?: SectionCustomization;
@@ -137,13 +145,18 @@ export interface SectionInstance {
   visibleGroupIds: string[];
   visibleChildSectionIds?: string[];
   visibleDescendantSectionIds?: string[];
-  visibleDescendantItemsCount?: number;
+  visibleDescendantItemIds?: string[];
   isLoading: boolean;
   isVisible: boolean;
   isInitialized: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
   isEmpty: boolean;
+  checkable?: {
+    value: 'unchecked' | 'partial' | 'checked';
+    checkItemsAction: AnyAction;
+    uncheckItemsAction: AnyAction;
+  };
   shouldExpand: boolean;
   meta?: any;
 }

@@ -6,7 +6,13 @@ import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {checkResourceId, selectK8sResource, uncheckResourceId} from '@redux/reducers/main';
+import {
+  checkMultipleResourceIds,
+  checkResourceId,
+  selectK8sResource,
+  uncheckMultipleResourceIds,
+  uncheckResourceId,
+} from '@redux/reducers/main';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -59,6 +65,13 @@ export function makeResourceKindNavSection(
       isInitialized: scope => {
         return scope.activeResources.length > 0;
       },
+      makeCheckable: scope => {
+        return {
+          checkedItemIds: scope.checkedResourceIds,
+          checkItemsActionCreator: checkMultipleResourceIds,
+          uncheckItemsActionCreator: uncheckMultipleResourceIds,
+        };
+      },
       shouldBeVisibleBeforeInitialized: true,
     },
     customization: {
@@ -68,6 +81,7 @@ export function makeResourceKindNavSection(
           isVisibleOnHover: true,
         },
       },
+      isCheckVisibleOnHover: true,
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,

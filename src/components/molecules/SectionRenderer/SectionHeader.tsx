@@ -1,56 +1,49 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 
-import {SectionCustomComponent, SectionInstance} from '@models/navigator';
+import {SectionBlueprint, SectionInstance} from '@models/navigator';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import Colors from '@styles/Colors';
+
+import {useSectionCustomization} from './useSectionCustomization';
 
 import * as S from './styled';
 
 interface SectionHeaderProps {
   name: string;
   sectionInstance: SectionInstance;
-  isSectionSelected: boolean;
+  sectionBlueprint: SectionBlueprint<any>;
   isCollapsed: boolean;
-  isSectionHighlighted: boolean;
-  isLastSection: boolean;
-  hasChildSections: boolean;
-  isSectionInitialized: boolean;
-  isSectionVisible: boolean;
   isCollapsedMode: 'collapsed' | 'expanded' | 'mixed';
+  isLastSection: boolean;
   level: number;
-  itemsLength: number;
   expandSection: () => void;
   collapseSection: () => void;
-  CustomNameDisplay?: SectionCustomComponent;
-  CustomNameSuffix?: SectionCustomComponent;
-  isCustomNameSuffixVisibleOnHover: boolean;
-  disableHoverStyle: boolean;
 }
 
 function SectionHeader(props: SectionHeaderProps) {
   const {
     name,
     sectionInstance,
-    isSectionSelected,
+    sectionBlueprint,
     isCollapsed,
-    isSectionHighlighted,
     isLastSection,
-    hasChildSections,
-    isSectionInitialized,
-    isSectionVisible,
     isCollapsedMode,
     level,
-    itemsLength,
     expandSection,
     collapseSection,
-    CustomNameDisplay,
-    CustomNameSuffix,
-    isCustomNameSuffixVisibleOnHover,
-    disableHoverStyle,
   } = props;
+  const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  const {NameDisplay, NameSuffix} = useSectionCustomization(sectionBlueprint.customization);
+
+  const itemInstances = useAppSelector(state =>
+    sectionInstance.itemIds.map(itemId => state.navigator.itemInstanceMap[itemId])
+  );
 
   const toggleCollapse = useCallback(() => {
     if (isCollapsed) {
@@ -60,45 +53,80 @@ function SectionHeader(props: SectionHeaderProps) {
     }
   }, [isCollapsed, expandSection, collapseSection]);
 
+  const itemsLength = useMemo(() => {
+    return sectionInstance?.visibleDescendantItemIds?.length || 0;
+  }, [sectionInstance.visibleDescendantItemIds]);
+
+  const onCheck = useCallback(() => {
+    if (!sectionInstance.checkable || !sectionInstance.visibleDescendantItemIds) {
+      return;
+    }
+    if (sectionInstance.checkable.value === 'unchecked' || sectionInstance.checkable.value === 'partial') {
+      dispatch(sectionInstance.checkable.checkItemsAction);
+      return;
+    }
+    if (sectionInstance.checkable.value === 'checked') {
+      dispatch(sectionInstance.checkable.uncheckItemsAction);
+    }
+  }, [sectionInstance, dispatch]);
+
   return (
     <S.NameContainer
       isHovered={isHovered}
-      isSelected={isSectionSelected && isCollapsed}
-      isHighlighted={isSectionHighlighted && isCollapsed}
+      hasChildSections={Boolean(sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0)}
+      disableHoverStyle={Boolean(sectionBlueprint.customization?.disableHoverStyle)}
+      isSelected={Boolean(sectionInstance.isSelected && isCollapsed)}
+      isHighlighted={Boolean(sectionInstance.isHighlighted && isCollapsed)}
+      isInitialized={Boolean(sectionInstance.isInitialized)}
+      isVisible={Boolean(sectionInstance.isVisible)}
       isLastSection={isLastSection}
-      hasChildSections={hasChildSections}
       isCollapsed={isCollapsed}
-      isInitialized={isSectionInitialized}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      isVisible={isSectionVisible}
-      disableHoverStyle={disableHoverStyle}
     >
-      {CustomNameDisplay ? (
-        <CustomNameDisplay sectionInstance={sectionInstance} />
+      {sectionInstance.checkable &&
+        (sectionBlueprint.customization?.isCheckVisibleOnHover
+          ? sectionInstance.checkable.value === 'partial' || sectionInstance.checkable.value === 'checked' || isHovered
+          : true) && (
+          <span>
+            <S.Checkbox
+              checked={sectionInstance.checkable.value === 'checked'}
+              indeterminate={sectionInstance.checkable.value === 'partial'}
+              onChange={() => onCheck()}
+              $level={level}
+            />
+          </span>
+        )}
+      {sectionInstance.checkable &&
+        sectionBlueprint.customization?.isCheckVisibleOnHover &&
+        sectionInstance.checkable.value === 'unchecked' &&
+        !isHovered && <S.CheckboxPlaceholder $level={level} />}
+      {NameDisplay.Component ? (
+        <NameDisplay.Component sectionInstance={sectionInstance} />
       ) : (
         <>
           <S.Name
-            isSelected={isSectionSelected && isCollapsed}
-            isHighlighted={isSectionSelected && isCollapsed}
-            level={level}
+            $isSelected={sectionInstance.isSelected && isCollapsed}
+            $isHighlighted={sectionInstance.isSelected && isCollapsed}
+            $isCheckable={Boolean(sectionInstance.checkable)}
+            $level={level}
           >
             <span style={{cursor: 'pointer'}} onClick={toggleCollapse}>
               {name}
             </span>
             {itemsLength > 0 && (
-              <S.ItemsLength selected={isSectionSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
+              <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
             )}
-            {CustomNameSuffix && (isCustomNameSuffixVisibleOnHover ? isHovered : true) && (
-              <CustomNameSuffix sectionInstance={sectionInstance} />
+            {NameSuffix.Component && (NameSuffix.options?.isVisibleOnHover ? isHovered : true) && (
+              <NameSuffix.Component sectionInstance={sectionInstance} />
             )}
           </S.Name>
           <S.BlankSpace level={level} onClick={toggleCollapse} />
-          {isHovered && isSectionInitialized && (
+          {isHovered && sectionInstance.isInitialized && (
             <S.Collapsible>
               {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
                 <PlusSquareOutlined
-                  style={{color: isSectionSelected ? Colors.blackPure : undefined}}
+                  style={{color: sectionInstance.isSelected ? Colors.blackPure : undefined}}
                   onClick={expandSection}
                 />
               )}
