@@ -20,6 +20,7 @@ import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelecto
 
 import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
+import ResourceMultipleSelectActionsMenu from '@components/molecules/ResourceMultipleSelectActionsMenu';
 
 import Colors from '@styles/Colors';
 
@@ -70,6 +71,7 @@ const NavPane: React.FC = () => {
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
   const activeResources = useAppSelector(activeResourcesSelector);
 
+  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
   const isInClusterMode = useSelector(isInClusterModeSelector);
@@ -139,6 +141,8 @@ const NavPane: React.FC = () => {
           </FiltersContainer>
         </>
       )}
+
+      {checkedResourceIds.length ? <ResourceMultipleSelectActionsMenu /> : null}
 
       {/* 20 - FiltersContainer padding & 15 - Divider height */}
       <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 20 + 15 : 0)}>
