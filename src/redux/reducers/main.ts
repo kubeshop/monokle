@@ -161,6 +161,10 @@ const clearSelectedResourceOnPreviewExit = (state: AppState) => {
   }
 };
 
+/**
+ * Returns a resourceMap containing only active resources depending if we are in preview mode
+ */
+
 function getActiveResources(state: Draft<AppState>) {
   if (state.previewResourceId || state.previewValuesFileId) {
     let activeResources: ResourceMapType = {};
@@ -174,6 +178,10 @@ function getActiveResources(state: Draft<AppState>) {
   }
   return state.resourceMap;
 }
+
+/**
+ * The main reducer slice
+ */
 
 export const mainSlice = createSlice({
   name: 'main',
