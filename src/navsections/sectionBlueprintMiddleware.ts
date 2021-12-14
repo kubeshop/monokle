@@ -6,7 +6,7 @@ import {Middleware} from 'redux';
 
 import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
 
-import {ItemInstance, NavigatorInstanceState, SectionInstance} from '@models/navigator';
+import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance} from '@models/navigator';
 
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
 import {AppDispatch, RootState} from '@redux/store';
@@ -56,8 +56,8 @@ function isScrolledIntoView(elementId: string) {
 }
 
 function computeItemScrollIntoView(sectionInstance: SectionInstance, itemInstanceMap: Record<string, ItemInstance>) {
-  const allDescendantVisibleItems = Object.values(itemInstanceMap).filter(
-    i => i.rootSectionId === sectionInstance.id && i.isVisible
+  const allDescendantVisibleItems: ItemInstance[] = (sectionInstance.visibleDescendantItemIds || []).map(
+    itemId => itemInstanceMap[itemId]
   );
 
   const selectedItem = allDescendantVisibleItems.find(i => i.isSelected);
@@ -74,6 +74,40 @@ function computeItemScrollIntoView(sectionInstance: SectionInstance, itemInstanc
   if (highlightedItems.length > 0 && !isAnyHighlightedItemInView) {
     highlightedItems[0].shouldScrollIntoView = true;
   }
+}
+
+function computeSectionCheckable(
+  sectionBlueprint: SectionBlueprint<any>,
+  sectionInstance: SectionInstance,
+  sectionScope: Record<string, any>
+) {
+  if (!sectionBlueprint.builder?.makeCheckable || !sectionInstance.visibleDescendantItemIds) {
+    sectionInstance.checkable = undefined;
+    return;
+  }
+
+  const {checkedItemIds, checkItemsActionCreator, uncheckItemsActionCreator} =
+    sectionBlueprint.builder.makeCheckable(sectionScope);
+  let nrOfCheckedItems = 0;
+
+  sectionInstance.visibleDescendantItemIds.forEach(itemId => {
+    if (checkedItemIds.includes(itemId)) {
+      nrOfCheckedItems += 1;
+    }
+  });
+
+  const isChecked =
+    nrOfCheckedItems === 0
+      ? 'unchecked'
+      : nrOfCheckedItems < sectionInstance.visibleDescendantItemIds.length
+      ? 'partial'
+      : 'checked';
+
+  sectionInstance.checkable = {
+    value: isChecked,
+    checkItemsAction: checkItemsActionCreator(sectionInstance.visibleDescendantItemIds),
+    uncheckItemsAction: uncheckItemsActionCreator(sectionInstance.visibleDescendantItemIds),
+  };
 }
 
 /**
@@ -249,10 +283,6 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
       isEmpty: isSectionEmpty,
-      isCheckable: Boolean(
-        sectionBuilder?.isCheckable ? sectionBuilder.isCheckable(sectionScope, rawItems, itemInstances) : false
-      ),
-      isChecked: sectionBuilder?.isChecked ? sectionBuilder.isChecked(sectionScope, rawItems, itemInstances) : false,
       meta: sectionBuilder?.getMeta ? sectionBuilder.getMeta(sectionScope, rawItems) : undefined,
       shouldExpand: Boolean(
         itemInstances?.some(itemInstance => itemInstance.isVisible && itemInstance.shouldScrollIntoView)
@@ -271,9 +301,17 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     computeSectionVisibility(sectionInstanceRoot, sectionInstanceMap)
   );
 
+  // this has to run after the `computeSectionVisibility` because it depends on the `section.visibleDescendantItemIds`
   asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
     computeItemScrollIntoView(sectionInstanceRoot, itemInstanceMap)
   );
+
+  // this has to run after the `computeSectionVisibility` because it depends on the `section.visibleDescendantItemIds`
+  asyncLib.each(Object.values(sectionInstanceMap), async sectionInstance => {
+    const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
+    const sectionScope = pickPartialRecord(fullScope, scopeKeysBySectionId[sectionBlueprint.id]);
+    computeSectionCheckable(sectionBlueprint, sectionInstance, sectionScope);
+  });
 
   if (Object.keys(itemInstanceMap).length === 0 && Object.keys(sectionInstanceMap).length === 0) {
     return;

@@ -69,6 +69,7 @@ export type K8sResourceScopeType = {
   isPreviewLoading: boolean;
   activeResources: K8sResource[];
   resourceFilter: ResourceFilterType;
+  checkedResourceIds: string[];
 };
 
 export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
@@ -89,6 +90,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
           r.filePath.startsWith(PREVIEW_PREFIX)
       ),
       resourceFilter: state.main.resourceFilter,
+      checkedResourceIds: state.main.checkedResourceIds,
     };
   },
   builder: {
