@@ -545,14 +545,29 @@ function handleRefMappingByKey(
   removes all outgoing refs on the specified resource and
   removes all incoming refs from the specified resource on all the other resources
 */
-function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) {
-  resource.refs = resource.refs?.filter(ref => ref.type === 'incoming');
-  Object.values(resourceMap).forEach(currentResource => {
-    currentResource.refs = currentResource.refs?.filter(
-      ref => ref.type !== 'incoming' || !isResourceRefTo(ref, resource.id)
-    );
+
+function clearOutgoingResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) {
+  if (!resource.refs) {
+    return;
+  }
+
+  resource.refs.forEach(ref => {
+    if (ref.type === 'outgoing' && ref.target?.type === 'resource' && ref.target.resourceId) {
+      const targetResource = resourceMap[ref.target.resourceId];
+      if (targetResource) {
+        targetResource.refs = targetResource.refs?.filter(
+          resourceRef => resourceRef.type !== 'incoming' || !isResourceRefTo(resourceRef, resource.id)
+        );
+      }
+    }
   });
+
+  resource.refs = resource.refs?.filter(ref => ref.type === 'incoming');
 }
+
+/**
+ * Gets a map of resource kinds to resource ids
+ */
 
 function getResourcesByKindMap(resourceMap: ResourceMapType) {
   const resourcesByKindMap = new Map<string, K8sResource[]>();
@@ -599,7 +614,7 @@ export function processRefs(
   const resourcesByKindMap = getResourcesByKindMap(resourceMap);
 
   resources.forEach(sourceResource => {
-    clearResourceRefs(sourceResource, resourceMap);
+    clearOutgoingResourceRefs(sourceResource, resourceMap);
     const sourceRefNodes = getResourceRefNodes(sourceResource);
 
     if (sourceRefNodes && Object.values(sourceRefNodes).length > 0) {

@@ -470,13 +470,19 @@ export function processParsedResources(
     if (options && options.resourceIds && options.resourceIds.length > 0) {
       Object.values(resourceMap)
         .filter(r => options.resourceIds?.includes(r.id))
-        .forEach(resource => validateResource(resource));
+        .forEach(resource => {
+          validateResource(resource);
+        });
     }
 
     if (options && options.resourceKinds && options.resourceKinds.length > 0) {
       Object.values(resourceMap)
         .filter(r => options.resourceKinds?.includes(r.kind))
-        .forEach(resource => validateResource(resource));
+        .forEach(resource => {
+          if (!options.resourceIds || !options.resourceIds.includes(resource.id)) {
+            validateResource(resource);
+          }
+        });
     }
 
     if (!options || (!options.resourceIds && !options.resourceKinds)) {
