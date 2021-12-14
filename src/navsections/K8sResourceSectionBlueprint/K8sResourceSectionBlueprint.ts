@@ -6,6 +6,8 @@ import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
+
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
@@ -38,7 +40,7 @@ const childSections = childSectionNames.map(childSectionName => {
 
   kindHandlerSections.forEach(k => sectionBlueprintMap.register(k));
 
-  const subsection: SectionBlueprint<K8sResource, {activeResourcesLength: number}> = {
+  const subsection: SectionBlueprint<K8sResource, {activeResourcesLength: number; checkedResourceIds: string[]}> = {
     name: childSectionName,
     id: childSectionName,
     rootSectionId: navSectionNames.K8S_RESOURCES,
@@ -49,13 +51,23 @@ const childSections = childSectionNames.map(childSectionName => {
           (state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
           r.filePath.startsWith(PREVIEW_PREFIX)
       );
-      return {activeResourcesLength: activeResources.length};
+      return {activeResourcesLength: activeResources.length, checkedResourceIds: state.main.checkedResourceIds};
     },
     builder: {
       isInitialized: scope => {
         return scope.activeResourcesLength > 0;
       },
+      makeCheckable: scope => {
+        return {
+          checkedItemIds: scope.checkedResourceIds,
+          checkItemsActionCreator: checkMultipleResourceIds,
+          uncheckItemsActionCreator: uncheckMultipleResourceIds,
+        };
+      },
       shouldBeVisibleBeforeInitialized: true,
+    },
+    customization: {
+      isCheckVisibleOnHover: true,
     },
   };
   return subsection;
@@ -69,6 +81,7 @@ export type K8sResourceScopeType = {
   isPreviewLoading: boolean;
   activeResources: K8sResource[];
   resourceFilter: ResourceFilterType;
+  checkedResourceIds: string[];
 };
 
 export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
@@ -89,6 +102,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
           r.filePath.startsWith(PREVIEW_PREFIX)
       ),
       resourceFilter: state.main.resourceFilter,
+      checkedResourceIds: state.main.checkedResourceIds,
     };
   },
   builder: {
@@ -105,6 +119,13 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
           scope.activeResources.every(resource => !isResourcePassingFilter(resource, scope.resourceFilter)))
       );
     },
+    makeCheckable: scope => {
+      return {
+        checkedItemIds: scope.checkedResourceIds,
+        checkItemsActionCreator: checkMultipleResourceIds,
+        uncheckItemsActionCreator: uncheckMultipleResourceIds,
+      };
+    },
     shouldBeVisibleBeforeInitialized: true,
   },
   customization: {
@@ -114,6 +135,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
     nameSuffix: {
       component: K8sResourceSectionNameSuffix,
     },
+    isCheckVisibleOnHover: true,
   },
 };
 

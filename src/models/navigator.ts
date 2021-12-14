@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
+
 import {AppDispatch, RootState} from '@redux/store';
 
 export type ItemCustomComponentProps = {
@@ -103,12 +105,12 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isEmpty?: (scope: ScopeType, items: RawItemType[], itemInstances?: ItemInstance[]) => boolean;
-    isCheckable?: (scope: ScopeType, rawItems: RawItemType[], itemInstances?: ItemInstance[]) => boolean;
-    isChecked?: (scope: ScopeType, rawItems: RawItemType[], itemInstances?: ItemInstance[]) => boolean | 'partial';
+    makeCheckable?: (scope: ScopeType) => {
+      checkedItemIds: string[];
+      checkItemsActionCreator: ActionCreatorWithPayload<string[]>;
+      uncheckItemsActionCreator: ActionCreatorWithPayload<string[]>;
+    };
     shouldBeVisibleBeforeInitialized?: boolean;
-  };
-  instanceHandler?: {
-    onCheck?: (sectionInstance: SectionInstance, dispatch: AppDispatch, itemInstances?: ItemInstance[]) => void;
   };
   customization?: SectionCustomization;
   itemBlueprint?: ItemBlueprint<RawItemType, ScopeType>;
@@ -143,15 +145,18 @@ export interface SectionInstance {
   visibleGroupIds: string[];
   visibleChildSectionIds?: string[];
   visibleDescendantSectionIds?: string[];
-  visibleDescendantItemsCount?: number;
+  visibleDescendantItemIds?: string[];
   isLoading: boolean;
   isVisible: boolean;
   isInitialized: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
   isEmpty: boolean;
-  isCheckable: boolean;
-  isChecked: boolean | 'partial';
+  checkable?: {
+    value: 'unchecked' | 'partial' | 'checked';
+    checkItemsAction: AnyAction;
+    uncheckItemsAction: AnyAction;
+  };
   shouldExpand: boolean;
   meta?: any;
 }

@@ -54,14 +54,21 @@ function SectionHeader(props: SectionHeaderProps) {
   }, [isCollapsed, expandSection, collapseSection]);
 
   const itemsLength = useMemo(() => {
-    return sectionInstance?.visibleDescendantItemsCount || 0;
-  }, [sectionInstance.visibleDescendantItemsCount]);
+    return sectionInstance?.visibleDescendantItemIds?.length || 0;
+  }, [sectionInstance.visibleDescendantItemIds]);
 
   const onCheck = useCallback(() => {
-    if (sectionBlueprint.instanceHandler?.onCheck) {
-      sectionBlueprint.instanceHandler.onCheck(sectionInstance, dispatch, itemInstances);
+    if (!sectionInstance.checkable || !sectionInstance.visibleDescendantItemIds) {
+      return;
     }
-  }, [sectionBlueprint.instanceHandler, sectionInstance, itemInstances, dispatch]);
+    if (sectionInstance.checkable.value === 'unchecked' || sectionInstance.checkable.value === 'partial') {
+      dispatch(sectionInstance.checkable.checkItemsAction);
+      return;
+    }
+    if (sectionInstance.checkable.value === 'checked') {
+      dispatch(sectionInstance.checkable.uncheckItemsAction);
+    }
+  }, [sectionInstance, dispatch]);
 
   return (
     <S.NameContainer
@@ -77,20 +84,32 @@ function SectionHeader(props: SectionHeaderProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {sectionInstance.isCheckable &&
-        (sectionBlueprint.customization?.isCheckVisibleOnHover ? sectionInstance.isChecked || isHovered : true) && (
+      {sectionInstance.checkable &&
+        (sectionBlueprint.customization?.isCheckVisibleOnHover
+          ? sectionInstance.checkable.value === 'partial' || sectionInstance.checkable.value === 'checked' || isHovered
+          : true) && (
           <span>
-            <S.Checkbox onChange={() => onCheck()} $level={level} />
+            <S.Checkbox
+              checked={sectionInstance.checkable.value === 'checked'}
+              indeterminate={sectionInstance.checkable.value === 'partial'}
+              onChange={() => onCheck()}
+              $level={level}
+            />
           </span>
         )}
+      {sectionInstance.checkable &&
+        sectionBlueprint.customization?.isCheckVisibleOnHover &&
+        sectionInstance.checkable.value === 'unchecked' &&
+        !isHovered && <S.CheckboxPlaceholder $level={level} />}
       {NameDisplay.Component ? (
         <NameDisplay.Component sectionInstance={sectionInstance} />
       ) : (
         <>
           <S.Name
-            isSelected={sectionInstance.isSelected && isCollapsed}
-            isHighlighted={sectionInstance.isSelected && isCollapsed}
-            level={level}
+            $isSelected={sectionInstance.isSelected && isCollapsed}
+            $isHighlighted={sectionInstance.isSelected && isCollapsed}
+            $isCheckable={Boolean(sectionInstance.checkable)}
+            $level={level}
           >
             <span style={{cursor: 'pointer'}} onClick={toggleCollapse}>
               {name}
