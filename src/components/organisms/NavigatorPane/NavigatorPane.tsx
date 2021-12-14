@@ -21,6 +21,8 @@ import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelecto
 import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import Colors from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
@@ -35,23 +37,21 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const FiltersContainer = styled.div`
   position: relative;
-  padding: 0px 16px;
-  margin-bottom: 20px;
+  margin-bottom: 7px;
+  padding-top: 2px;
 
   & .react-resizable {
-    padding: 10px 0px;
+    padding: 10px 16px;
     overflow-y: auto;
-    ::-webkit-scrollbar {
-      width: 0;
-      background: transparent;
-    }
+
+    ${GlobalScrollbarStyle}
   }
 
   & .custom-handle {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -8px;
+    bottom: -4px;
     height: 3px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     cursor: row-resize;
@@ -140,8 +140,7 @@ const NavPane: React.FC = () => {
         </>
       )}
 
-      {/* 20 - FiltersContainer padding & 15 - Divider height */}
-      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 20 + 15 : 0)}>
+      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 11 : 0)}>
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}

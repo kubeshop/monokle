@@ -14,6 +14,8 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {Icon} from '@atoms';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import Colors from '@styles/Colors';
 
 const Container = styled.span`
@@ -40,10 +42,7 @@ const Label = styled.span`
 const StyledMenu = styled(Menu)`
   max-height: 400px;
   overflow-y: scroll;
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
+  ${GlobalScrollbarStyle}
   padding: 4px 0;
 `;
 
