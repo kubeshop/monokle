@@ -161,6 +161,20 @@ const clearSelectedResourceOnPreviewExit = (state: AppState) => {
   }
 };
 
+function getActiveResources(state: Draft<AppState>) {
+  if (state.previewResourceId || state.previewValuesFileId) {
+    let activeResources: ResourceMapType = {};
+    Object.values(state.resourceMap)
+      .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
+      .forEach(r => {
+        activeResources[r.id] = r;
+      });
+
+    return activeResources;
+  }
+  return state.resourceMap;
+}
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
@@ -290,7 +304,7 @@ export const mainSlice = createSlice({
         return false;
       });
 
-      processParsedResources(state.resourceMap, state.resourceRefsProcessingOptions, {
+      processParsedResources(getActiveResources(state), state.resourceRefsProcessingOptions, {
         resourceKinds: resourceKindsWithOptionalRefs,
         skipValidation: true,
       });
@@ -302,7 +316,7 @@ export const mainSlice = createSlice({
       const resource = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-      processParsedResources(state.resourceMap, state.resourceRefsProcessingOptions, {
+      processParsedResources(getActiveResources(state), state.resourceRefsProcessingOptions, {
         resourceIds: [resource.id],
         resourceKinds,
       });
@@ -313,15 +327,18 @@ export const mainSlice = createSlice({
      */
     updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
       try {
-        const resource = state.resourceMap[action.payload.resourceId];
+        const activeResources = getActiveResources(state);
+        const resource = activeResources[action.payload.resourceId];
         if (resource) {
           performResourceContentUpdate(state, resource, action.payload.content);
-          let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
-          reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
+          let resourceIds = findResourcesToReprocess(resource, activeResources);
+          reprocessResources(resourceIds, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
           if (!action.payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
             updateSelectionAndHighlights(state, resource);
           }
+        } else {
+          console.warn('Failed to find updated resource in active resources');
         }
       } catch (e) {
         log.error(e);
@@ -334,20 +351,17 @@ export const mainSlice = createSlice({
     updateManyResources: (state: Draft<AppState>, action: PayloadAction<UpdateManyResourcesPayload>) => {
       try {
         let resourceIdsToReprocess: string[] = [];
+        const activeResources = getActiveResources(state);
+
         action.payload.forEach(({resourceId, content}) => {
-          const resource = state.resourceMap[resourceId];
+          const resource = activeResources[resourceId];
           if (resource) {
             performResourceContentUpdate(state, resource, content);
             let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
             resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
           }
         });
-        reprocessResources(
-          resourceIdsToReprocess,
-          state.resourceMap,
-          state.fileMap,
-          state.resourceRefsProcessingOptions
-        );
+        reprocessResources(resourceIdsToReprocess, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
       } catch (e) {
         log.error(e);
         return original(state);
