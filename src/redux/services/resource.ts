@@ -440,11 +440,11 @@ export function reprocessResources(
       if (isKustomizationResource(resource)) {
         hasKustomizations = true;
       }
-    }
 
-    // clear caches
-    parsedDocCache.delete(resource.id);
-    clearRefNodesCache(resource.id);
+      // clear caches
+      parsedDocCache.delete(resource.id);
+      clearRefNodesCache(resource.id);
+    }
   });
 
   processParsedResources(resourceMap, processingOptions, {
@@ -485,7 +485,9 @@ export function processParsedResources(
       });
     }
   }
+  const timestamp = Date.now();
   processRefs(resourceMap, processingOptions, options);
+  console.log(`processing refs took ${Date.now() - timestamp}`, options);
 }
 
 /**

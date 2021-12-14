@@ -453,23 +453,6 @@ function isOptional(
   return false;
 }
 
-const resourceNameMap = new Map<string, string[]>();
-
-function getResourceNameMap(resourceMap: ResourceMapType) {
-  if (resourceNameMap.size === 0) {
-    Object.values(resourceMap).forEach(r => {
-      const ids = resourceNameMap.get(r.name);
-      if (ids) {
-        ids.push(r.id);
-      } else {
-        resourceNameMap.set(r.name, [r.id]);
-      }
-    });
-  }
-
-  return resourceNameMap;
-}
-
 /**
  * Creates resource refs from a specified resource to target resources using the specified refMapper
  */
@@ -571,12 +554,17 @@ function clearResourceRefs(resource: K8sResource, resourceMap: ResourceMapType) 
   });
 }
 
-/**
- * Checks if the specified targetResource matches the refMapper
- */
-
-function resourceMatchesRefMapper(targetResource: K8sResource, outgoingRefMapper: RefMapper) {
-  return targetResource.kind === outgoingRefMapper.target.kind && !isKustomizationPatch(targetResource);
+function getResourcesByKindMap(resourceMap: ResourceMapType) {
+  const resourcesByKindMap = new Map<string, K8sResource[]>();
+  Object.values(resourceMap).forEach(r => {
+    const resourcesByKind = resourcesByKindMap.get(r.kind);
+    if (resourcesByKind) {
+      resourcesByKind.push(r);
+    } else {
+      resourcesByKindMap.set(r.kind, [r]);
+    }
+  });
+  return resourcesByKindMap;
 }
 
 /**
@@ -608,7 +596,7 @@ export function processRefs(
   }
 
   // prep for processing
-  const k8sResources = Object.values(resourceMap);
+  const resourcesByKindMap = getResourcesByKindMap(resourceMap);
 
   resources.forEach(sourceResource => {
     clearResourceRefs(sourceResource, resourceMap);
@@ -618,14 +606,13 @@ export function processRefs(
       const resourceKindHandler = getResourceKindHandler(sourceResource.kind);
       if (resourceKindHandler?.outgoingRefMappers && resourceKindHandler.outgoingRefMappers.length > 0) {
         resourceKindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-          const targetResources = k8sResources.filter(targetResource =>
-            resourceMatchesRefMapper(targetResource, outgoingRefMapper)
-          );
-
-          if (outgoingRefMapper.type === 'pairs') {
-            handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
-          } else {
-            handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions, resourceMap);
+          const targetResources = resourcesByKindMap.get(outgoingRefMapper.target.kind);
+          if (targetResources) {
+            if (outgoingRefMapper.type === 'pairs') {
+              handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
+            } else {
+              handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions, resourceMap);
+            }
           }
         });
       }
