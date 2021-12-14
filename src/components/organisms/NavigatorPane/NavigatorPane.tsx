@@ -22,6 +22,8 @@ import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import Colors from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
@@ -40,19 +42,17 @@ const FiltersContainer = styled.div`
   margin-bottom: 10px;
 
   & .react-resizable {
-    padding: 10px 0px;
+    padding: 10px 16px;
     overflow-y: auto;
-    ::-webkit-scrollbar {
-      width: 0;
-      background: transparent;
-    }
+
+    ${GlobalScrollbarStyle}
   }
 
   & .custom-handle {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -8px;
+    bottom: -4px;
     height: 3px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     cursor: row-resize;

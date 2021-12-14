@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import {AppBorders} from '@styles/Borders';
 import {BackgroundColors} from '@styles/Colors';
 
@@ -27,10 +29,7 @@ export const List = styled.ol<{height: number}>`
   list-style-type: none;
   padding: 0;
   overflow-y: auto;
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
+  ${GlobalScrollbarStyle}
   ${props => `height: ${props.height}px;`}
   padding-bottom: 20px;
 `;

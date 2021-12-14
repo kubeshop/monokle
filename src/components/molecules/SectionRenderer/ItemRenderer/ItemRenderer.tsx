@@ -83,34 +83,37 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
               />
             </span>
           )}
-        <S.PrefixContainer>
-          {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
+
+        {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
+          <S.PrefixContainer>
             <Prefix.Component itemInstance={itemInstance} options={Prefix.options} />
-          )}
-        </S.PrefixContainer>
-        <S.ItemName
-          level={level}
-          isSelected={itemInstance.isSelected}
-          isDirty={itemInstance.isDirty}
-          isHighlighted={itemInstance.isHighlighted}
-          isDisabled={itemInstance.isDisabled}
-          onClick={onClick}
-        >
-          {NameDisplay.Component ? (
-            <NameDisplay.Component itemInstance={itemInstance} />
-          ) : (
-            <>
-              {itemInstance.name}
-              {itemInstance.isDirty && <span>*</span>}
-            </>
-          )}
-        </S.ItemName>
+          </S.PrefixContainer>
+        )}
+
+        {NameDisplay.Component ? (
+          <NameDisplay.Component itemInstance={itemInstance} />
+        ) : (
+          <S.ItemName
+            level={level}
+            isSelected={itemInstance.isSelected}
+            isDirty={itemInstance.isDirty}
+            isHighlighted={itemInstance.isHighlighted}
+            isDisabled={itemInstance.isDisabled}
+            onClick={onClick}
+          >
+            {itemInstance.name}
+            {itemInstance.isDirty && <span>*</span>}
+          </S.ItemName>
+        )}
+
         {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
           <S.SuffixContainer>
             <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
           </S.SuffixContainer>
         )}
+
         <S.BlankSpace onClick={onClick} />
+
         {QuickAction.Component &&
           !options?.disableQuickAction &&
           (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (
@@ -118,6 +121,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
               <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
             </S.QuickActionContainer>
           )}
+
         {ContextMenu.Component &&
           !options?.disableContextMenu &&
           (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
