@@ -255,9 +255,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
       isCheckable: Boolean(
         sectionBuilder?.isCheckable ? sectionBuilder.isCheckable(sectionScope, rawItems, itemInstances) : false
       ),
-      isChecked: Boolean(
-        sectionBuilder?.isChecked ? sectionBuilder.isChecked(sectionScope, rawItems, itemInstances) : false
-      ),
+      isChecked: sectionBuilder?.isChecked ? sectionBuilder.isChecked(sectionScope, rawItems, itemInstances) : false,
       meta: sectionBuilder?.getMeta ? sectionBuilder.getMeta(sectionScope, rawItems) : undefined,
       shouldExpand: Boolean(
         itemInstances?.some(itemInstance => itemInstance.isVisible && itemInstance.shouldScrollIntoView)

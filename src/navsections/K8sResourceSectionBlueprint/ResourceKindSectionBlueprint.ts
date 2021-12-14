@@ -113,6 +113,7 @@ export function makeResourceKindNavSection(
           isVisibleOnHover: true,
         },
       },
+      isCheckVisibleOnHover: true,
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,

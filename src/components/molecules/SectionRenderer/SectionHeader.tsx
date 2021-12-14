@@ -80,17 +80,27 @@ function SectionHeader(props: SectionHeaderProps) {
       {sectionInstance.isCheckable &&
         (sectionBlueprint.customization?.isCheckVisibleOnHover ? sectionInstance.isChecked || isHovered : true) && (
           <span>
-            <S.Checkbox onChange={() => onCheck()} $level={level} />
+            <S.Checkbox
+              checked={sectionInstance.isChecked === true}
+              indeterminate={sectionInstance.isChecked === 'partial'}
+              onChange={() => onCheck()}
+              $level={level}
+            />
           </span>
         )}
+      {sectionInstance.isCheckable &&
+        sectionBlueprint.customization?.isCheckVisibleOnHover &&
+        !sectionInstance.isChecked &&
+        !isHovered && <S.CheckboxPlaceholder $level={level} />}
       {NameDisplay.Component ? (
         <NameDisplay.Component sectionInstance={sectionInstance} />
       ) : (
         <>
           <S.Name
-            isSelected={sectionInstance.isSelected && isCollapsed}
-            isHighlighted={sectionInstance.isSelected && isCollapsed}
-            level={level}
+            $isSelected={sectionInstance.isSelected && isCollapsed}
+            $isHighlighted={sectionInstance.isSelected && isCollapsed}
+            $isCheckable={Boolean(sectionInstance.isCheckable)}
+            $level={level}
           >
             <span style={{cursor: 'pointer'}} onClick={toggleCollapse}>
               {name}
