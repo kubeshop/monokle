@@ -148,6 +148,17 @@ const FileTreeContainer = styled.div`
     line-height: 22px;
     color: ${FontColors.darkThemeMainFont};
   }
+  & .ant-tree-list-scrollbar {
+    width: 8px;
+    background: ${Colors.grey1000};
+    border-radius: 0;
+  }
+
+  & .ant-tree-list-scrollbar-thumb {
+    background: ${Colors.grey4} !important;
+    border-radius: 0 !important;
+  }
+
   & .ant-tree-treenode {
     margin-left: 8px;
     background: transparent;

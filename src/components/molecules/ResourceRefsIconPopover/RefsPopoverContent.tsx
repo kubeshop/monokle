@@ -15,21 +15,20 @@ import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {areRefPosEqual} from '@redux/services/resource';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import RefLink from './RefLink';
 
 const {Text} = Typography;
 
 const Container = styled.div`
   margin: 0;
-  padding: 0;
+  padding: 0 8px;
   height: 100%;
   width: 100%;
   max-height: 350px;
   overflow-y: auto;
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
+  ${GlobalScrollbarStyle}
 `;
 
 const PopoverTitle = styled(Text)`

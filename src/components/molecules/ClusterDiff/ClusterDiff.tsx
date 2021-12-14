@@ -8,6 +8,8 @@ import {ClusterToLocalResourcesMatch} from '@models/appstate';
 
 import {ResourceFilterIconWithPopover, SectionRenderer} from '@components/molecules';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
 
 import * as S from './ClusterDiff.styled';
@@ -29,10 +31,7 @@ const FilterContainer = styled.span`
 const ListContainer = styled.div`
   overflow-y: scroll;
   height: 70vh;
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
+  ${GlobalScrollbarStyle}
 `;
 
 function ClusterDiff() {
