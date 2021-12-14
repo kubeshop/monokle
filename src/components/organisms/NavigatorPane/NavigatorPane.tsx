@@ -20,7 +20,7 @@ import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelecto
 
 import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
-import ResourceMultipleSelectActionsMenu from '@components/molecules/ResourceMultipleSelectActionsMenu';
+import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
 
 import Colors from '@styles/Colors';
 
@@ -142,7 +142,7 @@ const NavPane: React.FC = () => {
         </>
       )}
 
-      {checkedResourceIds.length ? <ResourceMultipleSelectActionsMenu /> : null}
+      {checkedResourceIds.length ? <CheckedResourcesActionsMenu /> : null}
 
       {/* 20 - FiltersContainer padding & 15 - Divider height */}
       <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 20 + 15 : 0)}>

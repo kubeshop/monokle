@@ -90,7 +90,7 @@ const ResourceFilter = () => {
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
-  const disableFiltersActions = useMemo(() => Boolean(checkedResourceIds.length), [checkedResourceIds]);
+  const areFiltersDisabled = useMemo(() => Boolean(checkedResourceIds.length), [checkedResourceIds]);
 
   const allResourceKinds = useMemo(() => {
     return [
@@ -188,7 +188,7 @@ const ResourceFilter = () => {
     <BaseContainer>
       <StyledTitleContainer>
         <StyledTitleLabel>Filter resources by:</StyledTitleLabel>
-        <StyledTitleButton type="link" onClick={resetFilters} disabled={disableFiltersActions}>
+        <StyledTitleButton type="link" onClick={resetFilters} disabled={areFiltersDisabled}>
           Reset all
         </StyledTitleButton>
       </StyledTitleContainer>
@@ -196,7 +196,7 @@ const ResourceFilter = () => {
         <FieldLabel>Name:</FieldLabel>
         <Input
           autoFocus
-          disabled={disableFiltersActions}
+          disabled={areFiltersDisabled}
           placeholder="All or part of name..."
           defaultValue={name}
           value={name}
@@ -207,7 +207,7 @@ const ResourceFilter = () => {
         <FieldLabel>Kind:</FieldLabel>
         <Select
           showSearch
-          disabled={disableFiltersActions}
+          disabled={areFiltersDisabled}
           defaultValue={ALL_OPTIONS}
           value={kind || ALL_OPTIONS}
           onChange={updateKind}
@@ -227,7 +227,7 @@ const ResourceFilter = () => {
         <FieldLabel>Namespace:</FieldLabel>
         <Select
           showSearch
-          disabled={disableFiltersActions}
+          disabled={areFiltersDisabled}
           defaultValue={ALL_OPTIONS}
           value={namespace || ALL_OPTIONS}
           onChange={updateNamespace}
@@ -252,12 +252,12 @@ const ResourceFilter = () => {
           data={allLabels}
           value={labels}
           onChange={updateLabels}
-          disabled={disableFiltersActions}
+          disabled={areFiltersDisabled}
         />
       </FieldContainer>
       <FieldContainer>
         <KeyValueInput
-          disabled={disableFiltersActions}
+          disabled={areFiltersDisabled}
           label="Annotations:"
           data={allAnnotations}
           value={annotations}

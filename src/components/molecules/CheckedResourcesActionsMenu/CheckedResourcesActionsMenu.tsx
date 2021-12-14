@@ -14,7 +14,7 @@ const StyledMenu = styled(Menu)`
   color: ${Colors.blue6};
 `;
 
-const ResourceMultipleSelectActionsMenu: React.FC = () => {
+const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
 
   return (
@@ -30,4 +30,4 @@ const ResourceMultipleSelectActionsMenu: React.FC = () => {
   );
 };
 
-export default ResourceMultipleSelectActionsMenu;
+export default CheckedResourcesActionsMenu;
