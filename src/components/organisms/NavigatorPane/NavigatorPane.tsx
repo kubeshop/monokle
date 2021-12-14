@@ -37,7 +37,7 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 const FiltersContainer = styled.div`
   position: relative;
   padding: 0px 16px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 
   & .react-resizable {
     padding: 10px 0px;
