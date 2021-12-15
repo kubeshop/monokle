@@ -851,7 +851,6 @@ const FileTreePane = () => {
                     onClick={refreshFolder}
                     icon={<ReloadOutlined />}
                     type="link"
-                    ghost
                     disabled={isButtonDisabled}
                   />
                 </Tooltip>
@@ -860,7 +859,6 @@ const FileTreePane = () => {
                     icon={<Icon name="collapse" />}
                     onClick={onToggleTree}
                     type="link"
-                    ghost
                     size="small"
                     disabled={isButtonDisabled}
                   />
