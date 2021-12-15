@@ -85,6 +85,7 @@ function SectionHeader(props: SectionHeaderProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       {sectionInstance.checkable &&
+        sectionInstance.isInitialized &&
         (sectionBlueprint.customization?.isCheckVisibleOnHover
           ? sectionInstance.checkable.value === 'partial' || sectionInstance.checkable.value === 'checked' || isHovered
           : true) && (
@@ -98,6 +99,7 @@ function SectionHeader(props: SectionHeaderProps) {
           </span>
         )}
       {sectionInstance.checkable &&
+        sectionInstance.isInitialized &&
         sectionBlueprint.customization?.isCheckVisibleOnHover &&
         sectionInstance.checkable.value === 'unchecked' &&
         !isHovered && <S.CheckboxPlaceholder $level={level} />}
