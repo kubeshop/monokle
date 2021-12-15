@@ -4,7 +4,7 @@ import {Button, Input, Modal} from 'antd';
 
 import styled from 'styled-components';
 
-import {MonokleTemplate, isReferencedHelmChartTemplate} from '@models/template';
+import {AnyTemplate, isReferencedHelmChartTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmChart';
@@ -13,7 +13,7 @@ import {TemplateFormRenderer} from '@components/molecules';
 
 const {TextArea} = Input;
 
-type TemplateModalProps = {isVisible: boolean; template?: MonokleTemplate; onClose: () => void};
+type TemplateModalProps = {isVisible: boolean; template?: AnyTemplate; onClose: () => void};
 
 const StyledTextArea = styled(TextArea)`
   margin-top: 20px;

@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react';
 
 import {Button, Divider} from 'antd';
 
-import {MonokleTemplate} from '@models/template';
+import {AnyTemplate} from '@models/template';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -14,7 +14,7 @@ import * as S from './styled';
 
 const TemplatesPane: React.FC = () => {
   const [isTemplateModalVisible, setIsTemplateModalVisible] = useState<boolean>(false);
-  const [visibleTemplate, setVisibleTemplate] = useState<MonokleTemplate>();
+  const [visibleTemplate, setVisibleTemplate] = useState<AnyTemplate>();
 
   const templates = useAppSelector(state => state.contrib.templates);
 
@@ -22,7 +22,7 @@ const TemplatesPane: React.FC = () => {
     setIsTemplateModalVisible(!isTemplateModalVisible);
   }, [isTemplateModalVisible]);
 
-  const onClickOpenTemplate = (template: MonokleTemplate) => {
+  const onClickOpenTemplate = (template: AnyTemplate) => {
     setVisibleTemplate(template);
     setIsTemplateModalVisible(true);
   };

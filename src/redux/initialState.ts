@@ -158,6 +158,7 @@ const initialContribState: ContribState = {
   isLoadingExistingTemplates: true,
   plugins: [],
   templates: [],
+  templateDiscoveries: [],
 };
 
 export default {

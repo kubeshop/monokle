@@ -1,9 +1,10 @@
 import {MonoklePlugin} from './plugin';
-import {MonokleTemplate} from './template';
+import {AnyTemplate, TemplateDiscovery} from './template';
 
 export interface ContribState {
   isLoadingExistingPlugins: boolean;
   plugins: MonoklePlugin[];
   isLoadingExistingTemplates: boolean;
-  templates: MonokleTemplate[];
+  templates: AnyTemplate[];
+  templateDiscoveries: TemplateDiscovery[];
 }

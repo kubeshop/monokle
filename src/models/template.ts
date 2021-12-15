@@ -48,15 +48,15 @@ const ReferencedHelmChartTemplateRuntype = TemplateBaseRuntype.extend({
 
 const HelmChartTemplateRuntype = Rt.Union(BundledHelmChartTemplateRuntype, ReferencedHelmChartTemplateRuntype);
 
-const MonokleTemplateRuntype = Rt.Union(VanillaTemplateRuntype, HelmChartTemplateRuntype);
+const AnyTemplateRuntype = Rt.Union(VanillaTemplateRuntype, HelmChartTemplateRuntype);
 
-const MonokleTemplateRepositoryRuntype = Rt.Record({
+const TemplatePreviewRuntype = TemplateBaseRuntype.extend({
+  path: Rt.String,
+});
+
+const TemplateDiscoveryRuntype = Rt.Record({
   name: Rt.String,
-  templates: Rt.Array(
-    TemplateBaseRuntype.extend({
-      path: Rt.String,
-    })
-  ),
+  templates: Rt.Array(TemplatePreviewRuntype),
 });
 
 export const isTemplateForm = TemplateFormRuntype.guard;
@@ -65,8 +65,9 @@ export const isVanillaTemplate = VanillaTemplateRuntype.guard;
 export const isBundledHelmChartTemplate = BundledHelmChartTemplateRuntype.guard;
 export const isReferencedHelmChartTemplate = ReferencedHelmChartTemplateRuntype.guard;
 export const isHelmChartTemplate = HelmChartTemplateRuntype.guard;
-export const isTemplate = MonokleTemplateRuntype.guard;
-export const isTemplateRepository = MonokleTemplateRepositoryRuntype.guard;
+export const isAnyTemplate = AnyTemplateRuntype.guard;
+export const isTemplatePreview = TemplatePreviewRuntype.guard;
+export const isTemplateDiscovery = TemplateDiscoveryRuntype.guard;
 
 export type TemplateForm = Rt.Static<typeof TemplateFormRuntype>;
 export type TemplateManifest = Rt.Static<typeof TemplateManifestRuntype>;
@@ -74,5 +75,6 @@ export type VanillaTemplate = Rt.Static<typeof VanillaTemplateRuntype>;
 export type BundledHelmChartTemplate = Rt.Static<typeof BundledHelmChartTemplateRuntype>;
 export type ReferencedHelmChartTemplate = Rt.Static<typeof ReferencedHelmChartTemplateRuntype>;
 export type HelmChartTemplate = Rt.Static<typeof HelmChartTemplateRuntype>;
-export type MonokleTemplate = Rt.Static<typeof MonokleTemplateRuntype>;
-export type MonokleTemplateRepository = Rt.Static<typeof MonokleTemplateRepositoryRuntype>;
+export type AnyTemplate = Rt.Static<typeof AnyTemplateRuntype>;
+export type TemplatePreview = Rt.Static<typeof TemplatePreviewRuntype>;
+export type TemplateDiscovery = Rt.Static<typeof TemplateDiscoveryRuntype>;
