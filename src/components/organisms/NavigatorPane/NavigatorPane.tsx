@@ -99,30 +99,34 @@ const NavPane: React.FC = () => {
 
   return (
     <>
-      <S.TitleBar>
-        <MonoPaneTitle>
-          Navigator <WarningsAndErrorsDisplay />
-        </MonoPaneTitle>
-        <S.TitleBarRightButtons>
-          <S.PlusButton
-            disabled={!isFolderOpen || isInClusterMode || isInPreviewMode}
-            onClick={onClickNewResource}
-            type="link"
-            size="small"
-            icon={<PlusOutlined />}
-          />
-          <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-            <Button
-              disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+      {checkedResourceIds.length ? (
+        <CheckedResourcesActionsMenu />
+      ) : (
+        <S.TitleBar>
+          <MonoPaneTitle>
+            Navigator <WarningsAndErrorsDisplay />
+          </MonoPaneTitle>
+          <S.TitleBarRightButtons>
+            <S.PlusButton
+              disabled={!isFolderOpen || isInClusterMode || isInPreviewMode}
+              onClick={onClickNewResource}
               type="link"
               size="small"
-              icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-              onClick={resourceFilterButtonHandler}
+              icon={<PlusOutlined />}
             />
-          </Badge>
-          <ClusterCompareButton />
-        </S.TitleBarRightButtons>
-      </S.TitleBar>
+            <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+              <Button
+                disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+                type="link"
+                size="small"
+                icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+                onClick={resourceFilterButtonHandler}
+              />
+            </Badge>
+            <ClusterCompareButton />
+          </S.TitleBarRightButtons>
+        </S.TitleBar>
+      )}
 
       {isResourceFiltersOpen && (
         <>
@@ -141,8 +145,6 @@ const NavPane: React.FC = () => {
           </FiltersContainer>
         </>
       )}
-
-      {checkedResourceIds.length ? <CheckedResourcesActionsMenu /> : null}
 
       {/* 20 - FiltersContainer padding & 15 - Divider height */}
       <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 20 + 15 : 0)}>
