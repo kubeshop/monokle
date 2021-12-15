@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
-import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
+import applyCheckedResourcesWithConfirm from '@redux/services/applyCheckedResourcesWithConfirm';
 
 import Colors from '@styles/Colors';
 
@@ -40,14 +40,18 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  console.log(isInClusterMode);
 
-  const deployHandler = () => {
-    dispatch(applyCheckedResources());
+  const onClickDeployChecked = () => {
+    if (!currentContext) {
+      return;
+    }
+
+    applyCheckedResourcesWithConfirm(checkedResourceIds.length, currentContext, dispatch);
   };
 
-  const deselectHandler = () => {
+  const onClickDeselectChecked = () => {
     dispatch(uncheckAllResourceIds());
   };
 
@@ -60,12 +64,12 @@ const CheckedResourcesActionsMenu: React.FC = () => {
         Delete
       </Menu.Item>
       {!isInClusterMode && (
-        <Menu.Item key="deploy" onClick={deployHandler}>
+        <Menu.Item key="deploy" onClick={onClickDeployChecked}>
           Deploy
         </Menu.Item>
       )}
 
-      <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={deselectHandler}>
+      <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickDeselectChecked}>
         <CloseOutlined />
       </Menu.Item>
     </StyledMenu>
