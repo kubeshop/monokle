@@ -612,6 +612,7 @@ export const mainSlice = createSlice({
         state.selectedPath = undefined;
         state.selectedValuesFileId = undefined;
         state.clusterDiff.shouldReload = true;
+        state.checkedResourceIds = [];
       })
       .addCase(previewKustomization.rejected, state => {
         state.previewLoader.isLoading = false;
@@ -627,6 +628,7 @@ export const mainSlice = createSlice({
         state.currentSelectionHistoryIndex = undefined;
         resetSelectionHistory(state);
         state.selectedResourceId = undefined;
+        state.checkedResourceIds = [];
         if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
           selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
         }
@@ -647,6 +649,7 @@ export const mainSlice = createSlice({
         state.selectedResourceId = undefined;
         state.selectedPath = undefined;
         state.selectedValuesFileId = undefined;
+        state.checkedResourceIds = [];
         Object.values(state.resourceMap).forEach(resource => {
           resource.isSelected = false;
           resource.isHighlighted = false;

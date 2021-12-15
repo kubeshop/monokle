@@ -1,5 +1,4 @@
 import log from 'loglevel';
-import {ThunkDispatch} from 'redux-thunk';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
@@ -8,6 +7,7 @@ import {AppConfig} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
+import {AppDispatch} from '@redux/store';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
 import {doesTextStartWithYamlDocumentDelimiter} from './resource';
@@ -15,7 +15,7 @@ import {doesTextStartWithYamlDocumentDelimiter} from './resource';
 const applyMultipleResources = (
   stateConfig: AppConfig,
   resourcesToApply: K8sResource[],
-  dispatch: ThunkDispatch<any, any, any>,
+  dispatch: AppDispatch,
   onSuccessCallback?: () => void
 ) => {
   const kubeconfigPath = stateConfig.kubeconfigPath;

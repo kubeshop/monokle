@@ -67,11 +67,12 @@ const NavPane: React.FC = () => {
 
   const [filtersContainerRef, {height, width}] = useMeasure<HTMLDivElement>();
 
-  const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
-  const activeResources = useAppSelector(activeResourcesSelector);
 
+  const activeResources = useAppSelector(activeResourcesSelector);
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
   const isInClusterMode = useSelector(isInClusterModeSelector);
@@ -99,7 +100,7 @@ const NavPane: React.FC = () => {
 
   return (
     <>
-      {checkedResourceIds.length ? (
+      {checkedResourceIds.length && !isPreviewLoading ? (
         <CheckedResourcesActionsMenu />
       ) : (
         <S.TitleBar>
