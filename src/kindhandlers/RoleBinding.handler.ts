@@ -31,8 +31,8 @@ const RoleBindingHandler: ResourceKindHandler = {
       },
       target: {
         kind: 'ClusterRoleBinding',
-        pathParts: ['metadata', 'name'],
       },
+      type: 'name',
     },
     {
       source: {
@@ -40,8 +40,8 @@ const RoleBindingHandler: ResourceKindHandler = {
       },
       target: {
         kind: 'Role',
-        pathParts: ['metadata', 'name'],
       },
+      type: 'name',
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding',

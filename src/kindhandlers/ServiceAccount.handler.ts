@@ -27,7 +27,8 @@ const ServiceAccountHandler: ResourceKindHandler = {
   outgoingRefMappers: [
     {
       source: {pathParts: ['secrets']},
-      target: {kind: 'Secret', pathParts: ['metadata', 'name']},
+      target: {kind: 'Secret'},
+      type: 'name',
     },
   ],
   helpLink: 'https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/',

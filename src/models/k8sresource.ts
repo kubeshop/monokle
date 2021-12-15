@@ -1,4 +1,4 @@
-import {Document, LineCounter, ParsedNode, Scalar} from 'yaml';
+import {Scalar} from 'yaml';
 
 export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 
@@ -50,13 +50,6 @@ interface K8sResource {
   };
   /** result of schema validation */
   validation?: ResourceValidation;
-
-  /** temporary object used for parsing refs */
-  parsedDoc?: Document.Parsed<ParsedNode>;
-  /** temporary object used for ref positioning */
-  lineCounter?: LineCounter;
-  /** temporary object used for parsing refs */
-  refNodesByPath?: Record<string, RefNode[]>;
 }
 
 export enum ResourceRefType {

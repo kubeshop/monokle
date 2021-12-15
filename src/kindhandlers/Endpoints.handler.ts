@@ -31,8 +31,8 @@ const EndpointsHandler: ResourceKindHandler = {
       },
       target: {
         kind: 'Service',
-        pathParts: ['metadata', 'name'],
       },
+      type: 'name',
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#endpoints-v1-core',
