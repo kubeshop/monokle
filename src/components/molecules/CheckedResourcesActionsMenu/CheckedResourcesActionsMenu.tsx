@@ -8,6 +8,8 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
+import {isInClusterModeSelector} from '@redux/selectors';
+import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 
 import Colors from '@styles/Colors';
 
@@ -38,6 +40,12 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  console.log(isInClusterMode);
+
+  const deployHandler = () => {
+    dispatch(applyCheckedResources());
+  };
 
   const deselectHandler = () => {
     dispatch(uncheckAllResourceIds());
@@ -51,7 +59,11 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       <Menu.Item style={{color: Colors.red7}} key="delete">
         Delete
       </Menu.Item>
-      <Menu.Item key="deploy">Deploy</Menu.Item>
+      {!isInClusterMode && (
+        <Menu.Item key="deploy" onClick={deployHandler}>
+          Deploy
+        </Menu.Item>
+      )}
 
       <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={deselectHandler}>
         <CloseOutlined />
