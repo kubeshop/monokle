@@ -31,8 +31,8 @@ const IngressHandler: ResourceKindHandler = {
       },
       target: {
         kind: 'Service',
-        pathParts: ['metadata', 'name'],
       },
+      type: 'name',
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/services-networking/ingress/',

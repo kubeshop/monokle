@@ -34,6 +34,7 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
         namespaceRef: NamespaceRefTypeEnum.Explicit,
         namespaceProperty: 'secretNamespace',
       },
+      type: 'name',
       ...SecretTarget,
     },
     {
@@ -42,6 +43,7 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
         pathParts: ['secretRef', 'name'],
         namespaceRef: NamespaceRefTypeEnum.Explicit,
       },
+      type: 'name',
       ...SecretTarget,
     },
     {
@@ -51,6 +53,7 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
         namespaceRef: NamespaceRefTypeEnum.Explicit,
         namespaceProperty: 'secretNamespace',
       },
+      type: 'name',
       ...SecretTarget,
     },
   ],
