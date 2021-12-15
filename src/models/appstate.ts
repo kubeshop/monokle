@@ -104,6 +104,8 @@ interface AppState {
   selectionHistory: SelectionHistoryEntry[];
   /** the id of the currently selected resource */
   selectedResourceId?: string;
+  /** a list of checked resources for multi-resource actions */
+  checkedResourceIds: string[];
   /** the currently selected path */
   selectedPath?: string;
   /** the currently selected values file */

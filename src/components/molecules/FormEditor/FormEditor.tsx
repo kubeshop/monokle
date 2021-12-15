@@ -16,6 +16,8 @@ import {updateResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
 import {mergeManifests} from '@redux/services/manifest-utils';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import {NamespaceSelection, SecretKindSelection} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
@@ -35,10 +37,7 @@ const FormContainer = styled.div<{contentHeight: string}>`
   height: ${props => props.contentHeight};
   padding-bottom: 100px;
 
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
+  ${GlobalScrollbarStyle}
 
   .ant-input[disabled] {
     color: grey;

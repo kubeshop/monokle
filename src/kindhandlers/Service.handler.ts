@@ -2,9 +2,9 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
-function createSelectorOutgoingRefMappers(targetResourceKind: string) {
+function createSelectorOutgoingRefMappers(targetResourceKind: string): RefMapper {
   return {
     source: {
       pathParts: ['spec', 'selector'],
@@ -13,7 +13,7 @@ function createSelectorOutgoingRefMappers(targetResourceKind: string) {
       kind: targetResourceKind,
       pathParts: ['spec', 'template', 'metadata', 'labels'],
     },
-    matchPairs: true,
+    type: 'pairs',
   };
 }
 
@@ -46,7 +46,7 @@ const ServiceHandler: ResourceKindHandler = {
         kind: 'Pod',
         pathParts: ['metadata', 'labels'],
       },
-      matchPairs: true,
+      type: 'pairs',
     },
     createSelectorOutgoingRefMappers('DaemonSet'),
     createSelectorOutgoingRefMappers('Deployment'),

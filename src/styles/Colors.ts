@@ -10,6 +10,7 @@ enum Colors {
   grey200 = '#F3F5F4',
   grey100 = '#F9FAFA',
   grey7 = '#7D7D7D', // gray, gray 7 https://www.figma.com/file/3UVW3KVNob7QjgvH62blGU/add-left-and-right-toolbars?node-id=3%3A5926
+  grey4 = '#303030', // gray, gray 4
   grey3 = '#262626', // gray, gray 3
 
   // Notifications
@@ -34,6 +35,8 @@ enum Colors {
 
   blue6 = '#1890FF', // Daybreak Blue
   blue10 = '#B7E3FA',
+
+  red7 = '#E84748', // Dust Red
 
   highlightGreen = '#33BCB7',
 

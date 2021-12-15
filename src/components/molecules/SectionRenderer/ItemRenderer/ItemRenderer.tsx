@@ -1,14 +1,10 @@
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
-
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {ItemBlueprint} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import ScrollIntoView, {ScrollContainerRef} from '@components/molecules/ScrollIntoView';
-
-import AppContext from '@src/AppContext';
 
 import {useItemCustomization} from './useItemCustomization';
 
@@ -26,14 +22,12 @@ export type ItemRendererProps<ItemType, ScopeType> = {
   blueprint: ItemBlueprint<ItemType, ScopeType>;
   level: number;
   isLastItem: boolean;
+  isSectionCheckable: boolean;
   options?: ItemRendererOptions;
 };
 
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
-  const {windowSize} = useContext(AppContext);
-  const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
-  const {itemId, blueprint, level, isLastItem, options} = props;
+  const {itemId, blueprint, level, isLastItem, isSectionCheckable, options} = props;
   const dispatch = useAppDispatch();
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -58,6 +52,12 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
     }
   }, [instanceHandler, itemInstance, dispatch]);
 
+  const onCheck = useCallback(() => {
+    if (instanceHandler && instanceHandler.onCheck && !itemInstance.isDisabled) {
+      instanceHandler.onCheck(itemInstance, dispatch);
+    }
+  }, [instanceHandler, itemInstance, dispatch]);
+
   return (
     <ScrollIntoView id={itemInstance.id} ref={scrollContainer}>
       <S.ItemContainer
@@ -70,35 +70,50 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         level={level}
         isLastItem={isLastItem}
         hasOnClick={Boolean(instanceHandler?.onClick)}
+        $isSectionCheckable={isSectionCheckable}
       >
-        <S.PrefixContainer>
-          {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
+        {itemInstance.isCheckable &&
+          (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
+            <span>
+              <S.Checkbox
+                checked={itemInstance.isChecked}
+                disabled={itemInstance.isDisabled}
+                onChange={() => onCheck()}
+                $level={level}
+              />
+            </span>
+          )}
+
+        {Prefix.Component && !options?.disablePrefix && (Prefix.options?.isVisibleOnHover ? isHovered : true) && (
+          <S.PrefixContainer>
             <Prefix.Component itemInstance={itemInstance} options={Prefix.options} />
-          )}
-        </S.PrefixContainer>
-        <S.ItemName
-          level={level}
-          isSelected={itemInstance.isSelected}
-          isDirty={itemInstance.isDirty}
-          isHighlighted={itemInstance.isHighlighted}
-          isDisabled={itemInstance.isDisabled}
-          onClick={onClick}
-        >
-          {NameDisplay.Component ? (
-            <NameDisplay.Component itemInstance={itemInstance} />
-          ) : (
-            <>
-              {itemInstance.name}
-              {itemInstance.isDirty && <span>*</span>}
-            </>
-          )}
-        </S.ItemName>
+          </S.PrefixContainer>
+        )}
+
+        {NameDisplay.Component ? (
+          <NameDisplay.Component itemInstance={itemInstance} />
+        ) : (
+          <S.ItemName
+            level={level}
+            isSelected={itemInstance.isSelected}
+            isDirty={itemInstance.isDirty}
+            isHighlighted={itemInstance.isHighlighted}
+            isDisabled={itemInstance.isDisabled}
+            onClick={onClick}
+          >
+            {itemInstance.name}
+            {itemInstance.isDirty && <span>*</span>}
+          </S.ItemName>
+        )}
+
         {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
           <S.SuffixContainer>
             <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
           </S.SuffixContainer>
         )}
+
         <S.BlankSpace onClick={onClick} />
+
         {QuickAction.Component &&
           !options?.disableQuickAction &&
           (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (
@@ -106,6 +121,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
               <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
             </S.QuickActionContainer>
           )}
+
         {ContextMenu.Component &&
           !options?.disableContextMenu &&
           (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (

@@ -3,28 +3,24 @@ import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
 export const ConfigMapTarget = {
   target: {
     kind: 'ConfigMap',
-    pathParts: ['metadata', 'name'],
   },
 };
 
 export const SecretTarget = {
   target: {
     kind: 'Secret',
-    pathParts: ['metadata', 'name'],
   },
 };
 
 export const ServiceAccountTarget = {
   target: {
     kind: 'ServiceAccount',
-    pathParts: ['metadata', 'name'],
   },
 };
 
 export const PersistentVolumeClaimTarget = {
   target: {
     kind: 'PersistentVolumeClaim',
-    pathParts: ['metadata', 'name'],
   },
 };
 
@@ -34,6 +30,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['configMapRef', 'name'],
       hasOptionalSibling: true,
     },
+    type: 'name',
     ...ConfigMapTarget,
   },
   {
@@ -41,12 +38,14 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['configMapKeyRef', 'name'],
       hasOptionalSibling: true,
     },
+    type: 'name',
     ...ConfigMapTarget,
   },
   {
     source: {
       pathParts: ['configMap', 'name'],
     },
+    type: 'name',
     ...ConfigMapTarget,
   },
   {
@@ -55,6 +54,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['volumes', '*', 'secret', 'secretName'],
       hasOptionalSibling: true,
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
@@ -63,6 +63,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['sources', '*', 'secret', 'name'],
       hasOptionalSibling: true,
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
@@ -73,6 +74,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['secretRef', 'name'],
       namespaceRef: NamespaceRefTypeEnum.OptionalExplicit, // secretRefs can be either
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
@@ -81,6 +83,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['controllerExpandSecretRef', 'name'],
       namespaceRef: NamespaceRefTypeEnum.Explicit,
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
@@ -89,6 +92,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['controllerPublishSecretRef', 'name'],
       namespaceRef: NamespaceRefTypeEnum.Explicit,
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
@@ -97,6 +101,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['nodePublishSecretRef', 'name'],
       namespaceRef: NamespaceRefTypeEnum.Explicit,
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
@@ -105,6 +110,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['nodeStageSecretRef', 'name'],
       namespaceRef: NamespaceRefTypeEnum.Explicit,
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
@@ -112,6 +118,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['secretKeyRef', 'name'],
       hasOptionalSibling: true,
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
@@ -119,12 +126,14 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['imagePullSecrets', '*', 'name'],
       namespaceRef: NamespaceRefTypeEnum.Implicit,
     },
+    type: 'name',
     ...SecretTarget,
   },
   {
     source: {
       pathParts: ['serviceAccountName'],
     },
+    type: 'name',
     ...ServiceAccountTarget,
   },
   {
@@ -133,6 +142,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
       pathParts: ['persistentVolumeClaim', 'claimName'],
       namespaceRef: NamespaceRefTypeEnum.Implicit,
     },
+    type: 'name',
     ...PersistentVolumeClaimTarget,
   },
 ];

@@ -4,7 +4,13 @@ import {SectionCustomization} from '@models/navigator';
 
 export function useSectionCustomization(customization: SectionCustomization = {}) {
   const NameDisplay = useMemo(() => ({Component: customization.nameDisplay?.component}), [customization.nameDisplay]);
-  const NameSuffix = useMemo(() => ({Component: customization.nameSuffix?.component}), [customization.nameSuffix]);
+  const NameSuffix = useMemo(
+    () => ({
+      Component: customization.nameSuffix?.component,
+      options: customization.nameSuffix?.options,
+    }),
+    [customization.nameSuffix]
+  );
   const EmptyDisplay = useMemo(
     () => ({Component: customization.emptyDisplay?.component}),
     [customization.emptyDisplay]

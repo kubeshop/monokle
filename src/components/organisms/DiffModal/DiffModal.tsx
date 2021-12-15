@@ -1,5 +1,7 @@
-import {useEffect, useMemo, useState} from 'react';
+import {LegacyRef, useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
+import {ResizableBox} from 'react-resizable';
+import {useMeasure} from 'react-use';
 
 import {Button, Modal, Switch, Tag} from 'antd';
 
@@ -17,6 +19,7 @@ import {performResourceDiff} from '@redux/thunks/diffResource';
 
 import Icon from '@components/atoms/Icon';
 
+import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
@@ -39,6 +42,24 @@ const StyledModal = styled(Modal)`
     border-top: 1px solid ${Colors.grey900};
     padding: 8px;
   }
+
+  & .custom-modal-handle {
+    position: absolute;
+    top: 50%;
+    height: 100%;
+    width: 10px;
+    background-color: transparent;
+    cursor: col-resize;
+    transform: translateY(-50%);
+  }
+
+  & .custom-modal-handle-e {
+    right: -5px;
+  }
+
+  & .custom-modal-handle-w {
+    left: -5px;
+  }
 `;
 
 const ButtonContainer = styled.div`
@@ -47,7 +68,11 @@ const ButtonContainer = styled.div`
   padding: 12px;
 `;
 
-const MonacoDiffContainer = styled.div`
+const MonacoDiffContainer = styled.div<{height: string; width: string}>`
+  ${props => `
+    height: ${props.height};
+    width: ${props.width};
+  `}
   padding: 8px;
   & .monaco-editor .monaco-editor-background {
     background-color: ${Colors.grey1000} !important;
@@ -101,6 +126,16 @@ const DiffModal = () => {
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const [isVisible, setVisible] = useState(false);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
+
+  const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
+
+  const windowSize = useWindowSize();
+
+  const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
+  const resizableBoxWidth = useMemo(() => {
+    const vwValue = windowSize.width < 1200 ? 95 : 80;
+    return windowSize.width * (vwValue / 100);
+  }, [windowSize.width]);
 
   const options = {
     readOnly: true,
@@ -188,52 +223,65 @@ const DiffModal = () => {
       title={`Resource Diff on ${diffResource ? diffResource.name : ''}`}
       visible={isVisible}
       centered
-      width={1000}
+      width="min-content"
       onCancel={handleOk}
       footer={null}
     >
-      <MonacoDiffContainer>
-        <MonacoDiffEditor
-          width="980"
-          height="600"
-          language="yaml"
-          original={resourceContent}
-          value={cleanDiffContent}
-          options={options}
-          theme={KUBESHOP_MONACO_THEME}
-        />
-      </MonacoDiffContainer>
-      <TagsContainer>
-        <StyledTag>Local</StyledTag>
-        <Button
-          type="primary"
-          ghost
-          onClick={handleApply}
-          icon={<Icon name="kubernetes" />}
-          disabled={!areResourcesDifferent}
-        >
-          Deploy local resource to cluster <ArrowRightOutlined />
-        </Button>
-        <Button
-          type="primary"
-          ghost
-          onClick={handleReplace}
-          disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}
-        >
-          <ArrowLeftOutlined /> Replace local resource with cluster resource
-        </Button>
-        <StyledTag>Cluster</StyledTag>
-      </TagsContainer>
-      <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-        <Switch checked={shouldDiffIgnorePaths} />
-        <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
-      </SwitchContainer>
-      <ButtonContainer>
-        <Button onClick={handleRefresh}>Refresh</Button>
-        <Button onClick={handleOk} style={{marginLeft: 12}}>
-          Close
-        </Button>
-      </ButtonContainer>
+      <ResizableBox
+        width={resizableBoxWidth}
+        height={resizableBoxHeight}
+        minConstraints={[800, resizableBoxHeight]}
+        maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
+        axis="x"
+        resizeHandles={['w', 'e']}
+        handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+          <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
+        )}
+      >
+        <MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
+          <MonacoDiffEditor
+            width={containerWidth}
+            height={containerHeight}
+            language="yaml"
+            original={resourceContent}
+            value={cleanDiffContent}
+            options={options}
+            theme={KUBESHOP_MONACO_THEME}
+          />
+        </MonacoDiffContainer>
+
+        <TagsContainer>
+          <StyledTag>Local</StyledTag>
+          <Button
+            type="primary"
+            ghost
+            onClick={handleApply}
+            icon={<Icon name="kubernetes" />}
+            disabled={!areResourcesDifferent}
+          >
+            Deploy local resource to cluster <ArrowRightOutlined />
+          </Button>
+          <Button
+            type="primary"
+            ghost
+            onClick={handleReplace}
+            disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}
+          >
+            <ArrowLeftOutlined /> Replace local resource with cluster resource
+          </Button>
+          <StyledTag>Cluster</StyledTag>
+        </TagsContainer>
+        <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+          <Switch checked={shouldDiffIgnorePaths} />
+          <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
+        </SwitchContainer>
+        <ButtonContainer>
+          <Button onClick={handleRefresh}>Refresh</Button>
+          <Button onClick={handleOk} style={{marginLeft: 12}}>
+            Close
+          </Button>
+        </ButtonContainer>
+      </ResizableBox>
     </StyledModal>
   );
 };

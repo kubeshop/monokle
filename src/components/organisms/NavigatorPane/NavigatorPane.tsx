@@ -1,7 +1,9 @@
-import {useContext, useMemo} from 'react';
+import {LegacyRef, useContext, useMemo} from 'react';
 import {useSelector} from 'react-redux';
+import {ResizableBox} from 'react-resizable';
+import {useMeasure} from 'react-use';
 
-import {Badge, Button, Divider} from 'antd';
+import {Badge, Button} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
@@ -18,6 +20,9 @@ import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelecto
 
 import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
+import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
+
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import Colors from '@styles/Colors';
 
@@ -32,12 +37,25 @@ import * as S from './NavigatorPane.styled';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const FiltersContainer = styled.div`
-  padding: 10px 16px;
-  max-height: 30vh;
-  overflow-y: auto;
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
+  position: relative;
+  padding: 0px 16px;
+  margin-bottom: 10px;
+
+  & .react-resizable {
+    padding: 10px 16px;
+    overflow-y: auto;
+
+    ${GlobalScrollbarStyle}
+  }
+
+  & .custom-handle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 3px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: row-resize;
   }
 `;
 
@@ -47,10 +65,13 @@ const NavPane: React.FC = () => {
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
+  const [filtersContainerRef, {height, width}] = useMeasure<HTMLDivElement>();
+
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
   const activeResources = useAppSelector(activeResourcesSelector);
 
+  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
   const isInClusterMode = useSelector(isInClusterModeSelector);
@@ -102,16 +123,29 @@ const NavPane: React.FC = () => {
           <ClusterCompareButton />
         </S.TitleBarRightButtons>
       </S.TitleBar>
-      <S.List height={navigatorHeight}>
-        {isResourceFiltersOpen && (
-          <>
-            <FiltersContainer>
-              <ResourceFilter />
-            </FiltersContainer>
-            <Divider style={{margin: 0, marginBottom: 12}} />
-          </>
-        )}
 
+      {isResourceFiltersOpen && (
+        <>
+          <FiltersContainer ref={filtersContainerRef}>
+            <ResizableBox
+              width={width}
+              height={height || 350}
+              axis="y"
+              resizeHandles={['s']}
+              minConstraints={[100, 200]}
+              maxConstraints={[width, navigatorHeight - 200]}
+              handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-handle" ref={ref} />}
+            >
+              <ResourceFilter />
+            </ResizableBox>
+          </FiltersContainer>
+        </>
+      )}
+
+      {checkedResourceIds.length ? <CheckedResourcesActionsMenu /> : null}
+
+      {/* 20 - FiltersContainer padding & 15 - Divider height */}
+      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 20 + 15 : 0)}>
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}

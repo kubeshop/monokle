@@ -53,6 +53,7 @@ import {
   selectFilePath,
 } from '../services/fileEntry';
 import {
+  deleteResource,
   extractK8sResources,
   getResourceKindsWithTargetingRefs,
   isFileResource,
@@ -159,6 +160,28 @@ const clearSelectedResourceOnPreviewExit = (state: AppState) => {
   }
 };
 
+/**
+ * Returns a resourceMap containing only active resources depending if we are in preview mode
+ */
+
+function getActiveResources(state: Draft<AppState>) {
+  if (state.previewResourceId || state.previewValuesFileId) {
+    let activeResources: ResourceMapType = {};
+    Object.values(state.resourceMap)
+      .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
+      .forEach(r => {
+        activeResources[r.id] = r;
+      });
+
+    return activeResources;
+  }
+  return state.resourceMap;
+}
+
+/**
+ * The main reducer slice
+ */
+
 export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
@@ -242,7 +265,7 @@ export const mainSlice = createSlice({
             fileEntry.timestamp = getFileTimestamp(filePath);
 
             getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
-              delete state.resourceMap[r.id];
+              deleteResource(r, state.resourceMap);
             });
 
             const extractedResources = extractK8sResources(
@@ -288,19 +311,19 @@ export const mainSlice = createSlice({
         return false;
       });
 
-      processParsedResources(state.resourceMap, state.resourceRefsProcessingOptions, {
+      processParsedResources(getActiveResources(state), state.resourceRefsProcessingOptions, {
         resourceKinds: resourceKindsWithOptionalRefs,
         skipValidation: true,
       });
     },
     /**
-     * Reprocess all resources - called when changing processing-related options
+     * Reprocess a newly created resource
      */
     reprocessNewResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-      processParsedResources(state.resourceMap, state.resourceRefsProcessingOptions, {
+      processParsedResources(getActiveResources(state), state.resourceRefsProcessingOptions, {
         resourceIds: [resource.id],
         resourceKinds,
       });
@@ -311,15 +334,18 @@ export const mainSlice = createSlice({
      */
     updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
       try {
-        const resource = state.resourceMap[action.payload.resourceId];
+        const activeResources = getActiveResources(state);
+        const resource = activeResources[action.payload.resourceId];
         if (resource) {
           performResourceContentUpdate(state, resource, action.payload.content);
-          let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
-          reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions);
+          let resourceIds = findResourcesToReprocess(resource, activeResources);
+          reprocessResources(resourceIds, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
           if (!action.payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
             updateSelectionAndHighlights(state, resource);
           }
+        } else {
+          console.warn('Failed to find updated resource in active resources');
         }
       } catch (e) {
         log.error(e);
@@ -332,20 +358,17 @@ export const mainSlice = createSlice({
     updateManyResources: (state: Draft<AppState>, action: PayloadAction<UpdateManyResourcesPayload>) => {
       try {
         let resourceIdsToReprocess: string[] = [];
+        const activeResources = getActiveResources(state);
+
         action.payload.forEach(({resourceId, content}) => {
-          const resource = state.resourceMap[resourceId];
+          const resource = activeResources[resourceId];
           if (resource) {
             performResourceContentUpdate(state, resource, content);
             let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
             resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
           }
         });
-        reprocessResources(
-          resourceIdsToReprocess,
-          state.resourceMap,
-          state.fileMap,
-          state.resourceRefsProcessingOptions
-        );
+        reprocessResources(resourceIdsToReprocess, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
       } catch (e) {
         log.error(e);
         return original(state);
@@ -365,7 +388,7 @@ export const mainSlice = createSlice({
         state.selectedResourceId = undefined;
       }
       if (isUnsavedResource(resource)) {
-        delete state.resourceMap[resource.id];
+        deleteResource(resource, state.resourceMap);
         return;
       }
       if (isFileResource(resource)) {
@@ -381,7 +404,7 @@ export const mainSlice = createSlice({
           const kindHandler = getResourceKindHandler(resource.kind);
           if (kindHandler?.deleteResourceInCluster) {
             kindHandler.deleteResourceInCluster(kubeConfig, resource.name, resource.namespace);
-            delete state.resourceMap[resource.id];
+            deleteResource(resource, state.resourceMap);
           }
         } catch (err) {
           log.error(err);
@@ -540,6 +563,27 @@ export const mainSlice = createSlice({
     },
     editorHasReloadedSelectedPath: (state: Draft<AppState>) => {
       state.shouldEditorReloadSelectedPath = false;
+    },
+    checkResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      if (!state.checkedResourceIds.includes(action.payload)) {
+        state.checkedResourceIds.push(action.payload);
+      }
+    },
+    uncheckResourceId: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => action.payload !== resourceId);
+    },
+    checkMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      action.payload.forEach(resourceId => {
+        if (!state.checkedResourceIds.includes(resourceId)) {
+          state.checkedResourceIds.push(resourceId);
+        }
+      });
+    },
+    uncheckAllResourceIds: (state: Draft<AppState>) => {
+      state.checkedResourceIds = [];
+    },
+    uncheckMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
     },
   },
   extraReducers: builder => {
@@ -751,7 +795,7 @@ export const mainSlice = createSlice({
         // remove previous cluster diff resources
         Object.values(state.resourceMap)
           .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
-          .forEach(r => delete state.resourceMap[r.id]);
+          .forEach(r => deleteResource(r, state.resourceMap));
         // add resources from cluster diff to the resource map
         Object.values(clusterResourceMap).forEach(r => {
           // add prefix to the resource id to avoid replacing local resources that might have the same id
@@ -842,7 +886,7 @@ export const mainSlice = createSlice({
       // remove previous cluster diff resources
       Object.values(state.resourceMap)
         .filter(r => r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
-        .forEach(r => delete state.resourceMap[r.id]);
+        .forEach(r => deleteResource(r, state.resourceMap));
       state.clusterDiff.clusterToLocalResourcesMatches = [];
       state.clusterDiff.hasLoaded = false;
       state.clusterDiff.hasFailed = false;
@@ -927,7 +971,7 @@ function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) 
   // remove previous preview resources
   Object.values(state.resourceMap)
     .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
-    .forEach(r => delete state.resourceMap[r.id]);
+    .forEach(r => deleteResource(r, state.resourceMap));
 
   if (payload.previewResourceId && payload.previewResources) {
     Object.values(payload.previewResources).forEach(r => {
@@ -967,5 +1011,10 @@ export const {
   setSelectionHistory,
   reprocessNewResource,
   editorHasReloadedSelectedPath,
+  checkResourceId,
+  uncheckAllResourceIds,
+  uncheckResourceId,
+  checkMultipleResourceIds,
+  uncheckMultipleResourceIds,
 } = mainSlice.actions;
 export default mainSlice.reducer;

@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 export const TitleBar = styled.div`
   display: flex;
   align-items: center;
@@ -21,10 +23,8 @@ export const List = styled.ol<{height?: number}>`
   list-style-type: none;
   padding: 0;
   overflow-y: auto;
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
+  ${GlobalScrollbarStyle}
+
   ${props => props.height && `height: ${props.height}px;`}
   padding-bottom: 20px;
 `;

@@ -1,4 +1,4 @@
-import {Skeleton as RawSkeleton} from 'antd';
+import {Checkbox as RawCheckbox, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
@@ -56,29 +56,37 @@ export const NameContainer = styled.li<NameContainerProps>`
   }};
 `;
 
-export const Name = styled.span<{isSelected?: boolean; isHighlighted?: boolean; level: number}>`
+type NameProps = {
+  $isSelected?: boolean;
+  $isHighlighted?: boolean;
+  $isCheckable?: boolean;
+  $level: number;
+};
+
+export const Name = styled.span<NameProps>`
   padding: 2px 16px;
-  font-size: ${props => {
-    return `${24 - 4 * props.level}px;`;
-  }};
-  margin-left: ${props => {
-    return `${8 * props.level}px`;
-  }};
-  cursor: pointer;
+  padding-right: 0px;
+  margin-right: 4px;
   ${props => {
-    if (props.isSelected) {
+    return `font-size: ${24 - 4 * props.$level}px;`;
+  }}
+  ${props => {
+    return `margin-left: ${8 * props.$level - (props.$isCheckable ? 10 : 0)}px;`;
+  }}
+  ${props => {
+    if (props.$isSelected) {
       return `font-weight: 700;`;
     }
-    if (props.isHighlighted) {
+    if (props.$isHighlighted) {
       return `font-weight: 500;`;
     }
-  }};
+  }}
   ${props => {
-    if (props.isSelected) {
+    if (props.$isSelected) {
       return `color: ${Colors.blackPure};`;
     }
     return `color: ${Colors.whitePure};`;
-  }};
+  }}
 `;
 
 export const Collapsible = styled.span`
@@ -115,4 +123,12 @@ export const BlankSpace = styled.span<{level?: number}>`
   height: 32px;
   cursor: pointer;
   ${props => props.level && `height: ${32 - props.level * 8}px;`}
+`;
+
+export const Checkbox = styled(RawCheckbox)<{$level: number}>`
+  margin-left: 8px;
+`;
+
+export const CheckboxPlaceholder = styled.span<{$level: number}>`
+  width: 24px;
 `;

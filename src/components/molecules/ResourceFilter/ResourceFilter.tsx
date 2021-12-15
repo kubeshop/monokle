@@ -76,16 +76,21 @@ const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (curren
 
 const ResourceFilter = () => {
   const dispatch = useAppDispatch();
-  const [name, setName] = useState<string>();
-  const [kind, setKind] = useState<string>();
-  const [namespace, setNamespace] = useState<string>();
-  const [labels, setLabels] = useState<Record<string, string | null>>({});
-  const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
-  const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const filtersMap = useAppSelector(state => state.main.resourceFilter);
 
+  const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
+  const [labels, setLabels] = useState<Record<string, string | null>>({});
+  const [kind, setKind] = useState<string>();
+  const [name, setName] = useState<string>();
+  const [namespace, setNamespace] = useState<string>();
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
+
+  const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
+
+  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const filtersMap = useAppSelector(state => state.main.resourceFilter);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+
+  const areFiltersDisabled = useMemo(() => Boolean(checkedResourceIds.length), [checkedResourceIds]);
 
   const allResourceKinds = useMemo(() => {
     return [
@@ -183,7 +188,7 @@ const ResourceFilter = () => {
     <BaseContainer>
       <StyledTitleContainer>
         <StyledTitleLabel>Filter resources by:</StyledTitleLabel>
-        <StyledTitleButton type="link" onClick={resetFilters}>
+        <StyledTitleButton type="link" onClick={resetFilters} disabled={areFiltersDisabled}>
           Reset all
         </StyledTitleButton>
       </StyledTitleContainer>
@@ -191,6 +196,7 @@ const ResourceFilter = () => {
         <FieldLabel>Name:</FieldLabel>
         <Input
           autoFocus
+          disabled={areFiltersDisabled}
           placeholder="All or part of name..."
           defaultValue={name}
           value={name}
@@ -201,6 +207,7 @@ const ResourceFilter = () => {
         <FieldLabel>Kind:</FieldLabel>
         <Select
           showSearch
+          disabled={areFiltersDisabled}
           defaultValue={ALL_OPTIONS}
           value={kind || ALL_OPTIONS}
           onChange={updateKind}
@@ -220,6 +227,7 @@ const ResourceFilter = () => {
         <FieldLabel>Namespace:</FieldLabel>
         <Select
           showSearch
+          disabled={areFiltersDisabled}
           defaultValue={ALL_OPTIONS}
           value={namespace || ALL_OPTIONS}
           onChange={updateNamespace}
@@ -239,10 +247,22 @@ const ResourceFilter = () => {
         </Select>
       </FieldContainer>
       <FieldContainer>
-        <KeyValueInput label="Labels:" data={allLabels} value={labels} onChange={updateLabels} />
+        <KeyValueInput
+          label="Labels:"
+          data={allLabels}
+          value={labels}
+          onChange={updateLabels}
+          disabled={areFiltersDisabled}
+        />
       </FieldContainer>
       <FieldContainer>
-        <KeyValueInput label="Annotations:" data={allAnnotations} value={annotations} onChange={updateAnnotations} />
+        <KeyValueInput
+          disabled={areFiltersDisabled}
+          label="Annotations:"
+          data={allAnnotations}
+          value={annotations}
+          onChange={updateAnnotations}
+        />
       </FieldContainer>
     </BaseContainer>
   );

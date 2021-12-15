@@ -21,7 +21,7 @@ import {
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
-import {extractK8sResources, reprocessResources} from './resource';
+import {deleteResource, extractK8sResources, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: K8sResource[];
@@ -344,7 +344,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
         updateSelectionAndHighlights(state, resource);
         wasAnyResourceSelected = true;
       }
-      delete state.resourceMap[resource.id];
+      deleteResource(resource, state.resourceMap);
     });
 
     if (state.selectedPath === fileEntry.filePath) {
@@ -474,7 +474,7 @@ export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEff
     if (removalSideEffect) {
       removalSideEffect.removedResources.push(resource);
     }
-    delete state.resourceMap[resource.id];
+    deleteResource(resource, state.resourceMap);
   });
 }
 

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
+
 import {AppDispatch, RootState} from '@redux/store';
 
 export type ItemCustomComponentProps = {
@@ -35,6 +37,7 @@ export interface ItemCustomization {
     options?: ItemCustomComponentOptions;
   };
   disableHoverStyle?: boolean;
+  isCheckVisibleOnHover?: boolean;
 }
 
 export type SectionCustomComponentProps = {
@@ -49,12 +52,16 @@ export interface SectionCustomization {
   };
   nameSuffix?: {
     component: SectionCustomComponent;
+    options?: {
+      isVisibleOnHover: boolean;
+    };
   };
   emptyDisplay?: {
     component: SectionCustomComponent;
   };
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
+  isCheckVisibleOnHover?: boolean;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {
@@ -66,10 +73,13 @@ export interface ItemBlueprint<RawItemType, ScopeType> {
     isVisible?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isDirty?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     isDisabled?: (rawItem: RawItemType, scope: ScopeType) => boolean;
+    isCheckable?: (rawItem: RawItemType, scope: ScopeType) => boolean;
+    isChecked?: (rawItem: RawItemType, scope: ScopeType) => boolean;
     getMeta?: (rawItem: RawItemType, scope: ScopeType) => any;
   };
   instanceHandler?: {
     onClick?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
+    onCheck?: (itemInstance: ItemInstance, dispatch: AppDispatch) => void;
   };
   customization?: ItemCustomization;
 }
@@ -90,10 +100,16 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   builder?: {
     getRawItems?: (scope: ScopeType) => RawItemType[];
     getGroups?: (scope: ScopeType) => ItemGroupBlueprint[];
+    getMeta?: (scope: ScopeType, items: RawItemType[]) => any;
     isLoading?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isVisible?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isInitialized?: (scope: ScopeType, items: RawItemType[]) => boolean;
     isEmpty?: (scope: ScopeType, items: RawItemType[], itemInstances?: ItemInstance[]) => boolean;
+    makeCheckable?: (scope: ScopeType) => {
+      checkedItemIds: string[];
+      checkItemsActionCreator: ActionCreatorWithPayload<string[]>;
+      uncheckItemsActionCreator: ActionCreatorWithPayload<string[]>;
+    };
     shouldBeVisibleBeforeInitialized?: boolean;
   };
   customization?: SectionCustomization;
@@ -114,6 +130,8 @@ export interface ItemInstance {
   isVisible: boolean;
   isDirty: boolean;
   isDisabled: boolean;
+  isCheckable: boolean;
+  isChecked: boolean;
   shouldScrollIntoView?: boolean;
   meta?: any;
 }
@@ -127,14 +145,20 @@ export interface SectionInstance {
   visibleGroupIds: string[];
   visibleChildSectionIds?: string[];
   visibleDescendantSectionIds?: string[];
-  visibleDescendantItemsCount?: number;
+  visibleDescendantItemIds?: string[];
   isLoading: boolean;
   isVisible: boolean;
   isInitialized: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
   isEmpty: boolean;
+  checkable?: {
+    value: 'unchecked' | 'partial' | 'checked';
+    checkItemsAction: AnyAction;
+    uncheckItemsAction: AnyAction;
+  };
   shouldExpand: boolean;
+  meta?: any;
 }
 
 export interface NavigatorInstanceState {
