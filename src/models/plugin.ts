@@ -1,69 +1,45 @@
-import {Merge, PackageJson, SetRequired} from 'type-fest';
+import * as Rt from 'runtypes';
 
-type PackageJsonMonoklePlugin = SetRequired<
-  Merge<
-    PackageJson,
-    {
-      monoklePlugin: {
-        modules: MonoklePluginModule[];
-      };
-    }
-  >,
-  'name' | 'author' | 'version'
->;
+import {GitRepository} from './repository';
 
-interface GitRepository {
-  owner: string;
-  name: string;
-  branch: string;
-}
+const ReferencedTemplatePluginModuleRuntype = Rt.Record({
+  type: Rt.Literal('template'),
+  url: Rt.String,
+});
 
-interface TemplateForm {
-  name: string;
-  description: string;
-  schema: string;
-  uiSchema: string;
-}
+const BundledTemplatePluginModuleRuntype = Rt.Record({
+  type: Rt.Literal('template'),
+  path: Rt.String,
+});
 
-interface TemplateManifest {
-  filePath: string;
-  fileRenameRule: string;
-}
+const TemplatePluginModuleRuntype = Rt.Union(BundledTemplatePluginModuleRuntype, ReferencedTemplatePluginModuleRuntype);
 
-interface VanillaTemplatePluginModule {
-  type: 'templates/vanilla';
-  id: string;
-  forms: TemplateForm[];
-  manifests: TemplateManifest[];
-}
+const MonoklePluginModuleRuntype = TemplatePluginModuleRuntype;
 
-interface BundledHelmChartTemplatePluginModule {
-  type: 'templates/helm-chart';
-  isReferenced?: false;
-  id: string;
-  forms: TemplateForm[];
-  valuesFilePath: string;
-}
+const PluginPackageJsonRuntype = Rt.Record({
+  name: Rt.String,
+  author: Rt.String,
+  version: Rt.String,
+  repository: Rt.String,
+  description: Rt.Optional(Rt.String),
+  monoklePlugin: Rt.Record({
+    modules: Rt.Array(MonoklePluginModuleRuntype),
+  }),
+}).And(Rt.Dictionary(Rt.Unknown));
 
-interface ReferencedHelmChartTemplatePluginModule {
-  type: 'templates/helm-chart';
-  isReferenced: true;
-  id: string;
-  forms: TemplateForm[];
-  valuesFilePath: string;
-  chartName: string;
-  chartVersion: string;
-  chartRepo: string;
-  helpUrl: string;
-}
+export type PluginPackageJson = Rt.Static<typeof PluginPackageJsonRuntype>;
+export type ReferencedTemplatePluginModule = Rt.Static<typeof ReferencedTemplatePluginModuleRuntype>;
+export type BundledTemplatePluginModule = Rt.Static<typeof BundledTemplatePluginModuleRuntype>;
+export type TemplatePluginModule = Rt.Static<typeof TemplatePluginModuleRuntype>;
+export type MonoklePluginModule = Rt.Static<typeof MonoklePluginModuleRuntype>;
 
-type HelmChartTemplatePluginModule = BundledHelmChartTemplatePluginModule | ReferencedHelmChartTemplatePluginModule;
+export const isPluginPackageJson = PluginPackageJsonRuntype.guard;
+export const isTemplatePluginModule = TemplatePluginModuleRuntype.guard;
+export const isReferencedTemplatePluginModule = ReferencedTemplatePluginModuleRuntype.guard;
+export const isBundledTemplatePluginModule = BundledTemplatePluginModuleRuntype.guard;
+export const isMonoklePluginModule = MonoklePluginModuleRuntype.guard;
 
-type TemplatePluginModule = VanillaTemplatePluginModule | HelmChartTemplatePluginModule;
-
-type MonoklePluginModule = TemplatePluginModule; // this will get extended by other types of plugins that we'll support
-
-interface MonoklePlugin {
+export interface MonoklePlugin {
   name: string;
   version: string;
   author: string;
@@ -72,17 +48,3 @@ interface MonoklePlugin {
   isActive: boolean;
   modules: MonoklePluginModule[];
 }
-
-export type {
-  MonoklePlugin,
-  MonoklePluginModule,
-  GitRepository,
-  PackageJsonMonoklePlugin,
-  TemplateForm,
-  TemplateManifest,
-  TemplatePluginModule,
-  VanillaTemplatePluginModule,
-  HelmChartTemplatePluginModule,
-  ReferencedHelmChartTemplatePluginModule,
-  BundledHelmChartTemplatePluginModule,
-};

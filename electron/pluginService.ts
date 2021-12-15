@@ -5,8 +5,7 @@ import path from 'path';
 import tar from 'tar';
 import util from 'util';
 
-import {MonoklePlugin, MonoklePluginModule} from '@models/plugin';
-import {isHelmChartTemplatePuginModule, isPackageJsonMonoklePlugin, isTemplatePluginModule} from '@models/plugin.guard';
+import {MonoklePlugin, isPluginPackageJson, isTemplatePluginModule} from '@models/plugin';
 
 import {downloadFile} from '@utils/http';
 
@@ -47,35 +46,12 @@ async function fetchPackageJson(repositoryOwner: string, repositoryName: string,
   return packageJson;
 }
 
-const parsePluginModule = (module: MonoklePluginModule, pluginFolderPath: string): MonoklePluginModule => {
-  if (isTemplatePluginModule(module)) {
-    const updatedModule = {
-      ...module,
-      forms: module.forms.map(form => {
-        return {
-          ...form,
-          schema: path.join(pluginFolderPath, form.schema),
-          uiSchema: path.join(pluginFolderPath, form.uiSchema),
-        };
-      }),
-    };
-    if (isHelmChartTemplatePuginModule(updatedModule)) {
-      return {
-        ...updatedModule,
-        valuesFilePath: path.join(pluginFolderPath, updatedModule.valuesFilePath),
-      };
-    }
-    return updatedModule;
-  }
-  return module;
-};
-
 export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(pluginUrl);
   const repositoryBranch = 'main'; // TODO: allow input of branch name
   const packageJson = await fetchPackageJson(repositoryOwner, repositoryName, repositoryBranch);
 
-  if (!isPackageJsonMonoklePlugin(packageJson)) {
+  if (!isPluginPackageJson(packageJson)) {
     throw new Error('The package.json file is not valid');
   }
 
@@ -110,7 +86,7 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
 
   const plugin: MonoklePlugin = {
     name: packageJson.name,
-    author: typeof packageJson.author === 'string' ? packageJson.author : packageJson.author.name,
+    author: packageJson.author,
     version: packageJson.version,
     description: packageJson.description,
     isActive: packageJson.monoklePlugin.modules.every(module => isTemplatePluginModule(module)),
@@ -119,7 +95,7 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
       name: repositoryName,
       branch: repositoryBranch,
     },
-    modules: packageJson.monoklePlugin.modules.map(module => parsePluginModule(module, pluginFolderPath)),
+    modules: packageJson.monoklePlugin.modules,
   };
 
   return plugin;
@@ -141,7 +117,7 @@ async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promis
   const packageJsonRaw = await fsReadFilePromise(packageJsonFilePath, 'utf8');
   const packageJson = JSON.parse(packageJsonRaw);
 
-  if (!isPackageJsonMonoklePlugin(packageJson)) {
+  if (!isPluginPackageJson(packageJson)) {
     throw new Error('The package.json file is not valid.');
   }
 
@@ -150,13 +126,11 @@ async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promis
     return;
   }
 
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(
-    typeof packageJson.repository === 'string' ? packageJson.repository : packageJson.repository.url
-  );
+  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(packageJson.repository);
 
   return {
     name: packageJson.name,
-    author: typeof packageJson.author === 'string' ? packageJson.author : packageJson.author.name,
+    author: packageJson.author,
     version: packageJson.version,
     description: packageJson.description,
     isActive: packageJson.monoklePlugin.modules.every(module => isTemplatePluginModule(module)),
@@ -165,7 +139,7 @@ async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promis
       name: repositoryName,
       branch: 'main', // TODO: handle the branch name
     },
-    modules: packageJson.monoklePlugin.modules.map(module => parsePluginModule(module, pluginFolderPath)),
+    modules: packageJson.monoklePlugin.modules,
   };
 }
 
