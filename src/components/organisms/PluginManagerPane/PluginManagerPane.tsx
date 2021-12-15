@@ -14,8 +14,8 @@ import PluginInstallModal from './PluginInstallModal';
 import * as S from './styled';
 
 function PluginManagerPane() {
-  const plugins = useAppSelector(state => state.main.plugins);
-  const isLoadingExistingPlugins = useAppSelector(state => state.main.isLoadingExistingPlugins);
+  const plugins = useAppSelector(state => state.contrib.plugins);
+  const isLoadingExistingPlugins = useAppSelector(state => state.contrib.isLoadingExistingPlugins);
 
   const activePlugins = useMemo(() => plugins.filter(p => p.isActive), [plugins]);
   const inactivePlugins = useMemo(() => plugins.filter(p => !p.isActive), [plugins]);

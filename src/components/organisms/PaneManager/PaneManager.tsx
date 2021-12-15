@@ -30,7 +30,7 @@ import {
   KustomizePane,
   NavigatorPane,
   PluginManagerPane,
-  TemplatesPane,
+  TemplateExplorerPane,
 } from '@organisms';
 
 import {GraphView, LogViewer} from '@molecules';
@@ -218,7 +218,7 @@ const PaneManager = () => {
               <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
             </MenuButton>
           </Tooltip>
-          {featureJson.TemplatesPane && (
+          {featureJson.TemplateExplorerPane && (
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
               <MenuButton
                 isSelected={leftMenuSelection === 'templates-pane'}
@@ -263,10 +263,11 @@ const PaneManager = () => {
               </div>
               <div
                 style={{
-                  display: featureJson.TemplatesPane && leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
+                  display:
+                    featureJson.TemplateExplorerPane && leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
                 }}
               >
-                <TemplatesPane />
+                <TemplateExplorerPane />
               </div>
               <div
                 style={{

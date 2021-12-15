@@ -8,8 +8,7 @@ import {withTheme} from '@rjsf/core';
 
 import fs from 'fs';
 
-import {TemplateForm, TemplatePluginModule} from '@models/plugin';
-import {isReferencedHelmChartTemplatePluginModule} from '@models/plugin.guard';
+import {TemplateForm} from '@models/template';
 
 const Form = withTheme(AntDTheme);
 
@@ -20,11 +19,11 @@ const readTemplateFormSchemas = (templateForm: TemplateForm) => {
 };
 
 const TemplateFormRenderer: React.FC<{
-  template: TemplatePluginModule;
+  templateForm: TemplateForm;
   formData: any;
   onFormDataChange: (formData: any) => void;
 }> = props => {
-  const {template, formData, onFormDataChange} = props;
+  const {templateForm, formData, onFormDataChange} = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -33,7 +32,7 @@ const TemplateFormRenderer: React.FC<{
 
   useEffect(() => {
     try {
-      const schemas = readTemplateFormSchemas(template.forms[0]);
+      const schemas = readTemplateFormSchemas(templateForm);
       setSchema(JSON.parse(schemas.schema));
       setUiSchema(JSON.parse(schemas.uiSchema));
       setErrorMessage(null);
@@ -43,10 +42,6 @@ const TemplateFormRenderer: React.FC<{
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  if (!isReferencedHelmChartTemplatePluginModule(template)) {
-    return <p>This type of template is not supported yet.</p>;
-  }
 
   if (isLoading) {
     return <Skeleton />;
@@ -58,8 +53,8 @@ const TemplateFormRenderer: React.FC<{
 
   return (
     <>
-      <h1>{template.forms[0].name}</h1>
-      <p>{template.forms[0].description}</p>
+      <h1>{templateForm.name}</h1>
+      <p>{templateForm.description}</p>
       <Divider />
       <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={e => onFormDataChange(e.formData)}>
         <div />

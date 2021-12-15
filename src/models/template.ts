@@ -48,9 +48,9 @@ const ReferencedHelmChartTemplateRuntype = TemplateBaseRuntype.extend({
 
 const HelmChartTemplateRuntype = Rt.Union(BundledHelmChartTemplateRuntype, ReferencedHelmChartTemplateRuntype);
 
-const TemplateRuntype = Rt.Union(VanillaTemplateRuntype, HelmChartTemplateRuntype);
+const MonokleTemplateRuntype = Rt.Union(VanillaTemplateRuntype, HelmChartTemplateRuntype);
 
-const TemplateRepositoryRuntype = Rt.Record({
+const MonokleTemplateRepositoryRuntype = Rt.Record({
   name: Rt.String,
   templates: Rt.Array(
     TemplateBaseRuntype.extend({
@@ -65,8 +65,8 @@ export const isVanillaTemplate = VanillaTemplateRuntype.guard;
 export const isBundledHelmChartTemplate = BundledHelmChartTemplateRuntype.guard;
 export const isReferencedHelmChartTemplate = ReferencedHelmChartTemplateRuntype.guard;
 export const isHelmChartTemplate = HelmChartTemplateRuntype.guard;
-export const isTemplate = TemplateRuntype.guard;
-export const isTemplateRepository = TemplateRepositoryRuntype.guard;
+export const isTemplate = MonokleTemplateRuntype.guard;
+export const isTemplateRepository = MonokleTemplateRepositoryRuntype.guard;
 
 export type TemplateForm = Rt.Static<typeof TemplateFormRuntype>;
 export type TemplateManifest = Rt.Static<typeof TemplateManifestRuntype>;
@@ -74,5 +74,5 @@ export type VanillaTemplate = Rt.Static<typeof VanillaTemplateRuntype>;
 export type BundledHelmChartTemplate = Rt.Static<typeof BundledHelmChartTemplateRuntype>;
 export type ReferencedHelmChartTemplate = Rt.Static<typeof ReferencedHelmChartTemplateRuntype>;
 export type HelmChartTemplate = Rt.Static<typeof HelmChartTemplateRuntype>;
-export type Template = Rt.Static<typeof TemplateRuntype>;
-export type TemplateRepository = Rt.Static<typeof TemplateRepositoryRuntype>;
+export type MonokleTemplate = Rt.Static<typeof MonokleTemplateRuntype>;
+export type MonokleTemplateRepository = Rt.Static<typeof MonokleTemplateRepositoryRuntype>;

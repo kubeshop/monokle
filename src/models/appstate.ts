@@ -3,7 +3,6 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
-import {MonoklePlugin} from './plugin';
 
 /**
  * Maps uuid:s to K8sResources
@@ -125,8 +124,6 @@ interface AppState {
   diffResourceId?: string;
   /** the diff content for the resource being diffed */
   diffContent?: string;
-  isLoadingExistingPlugins: boolean;
-  plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
   clusterDiff: {
     hasLoaded: boolean;

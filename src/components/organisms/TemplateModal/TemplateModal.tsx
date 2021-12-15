@@ -4,8 +4,7 @@ import {Button, Input, Modal} from 'antd';
 
 import styled from 'styled-components';
 
-import {TemplatePluginModule} from '@models/plugin';
-import {isReferencedHelmChartTemplatePluginModule} from '@models/plugin.guard';
+import {MonokleTemplate, isReferencedHelmChartTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmChart';
@@ -14,7 +13,7 @@ import {TemplateFormRenderer} from '@components/molecules';
 
 const {TextArea} = Input;
 
-type TemplateFormModalProps = {isVisible: boolean; template?: TemplatePluginModule; onClose: () => void};
+type TemplateModalProps = {isVisible: boolean; template?: MonokleTemplate; onClose: () => void};
 
 const StyledTextArea = styled(TextArea)`
   margin-top: 20px;
@@ -24,7 +23,7 @@ const StyledTextArea = styled(TextArea)`
   }
 `;
 
-const TemplateFormModal: React.FC<TemplateFormModalProps> = props => {
+const TemplateModal: React.FC<TemplateModalProps> = props => {
   const {isVisible, template, onClose} = props;
   const dispatch = useAppDispatch();
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
@@ -35,7 +34,7 @@ const TemplateFormModal: React.FC<TemplateFormModalProps> = props => {
   const [message, setMessage] = useState<string>();
 
   const onClickSubmit = () => {
-    if (!isReferencedHelmChartTemplatePluginModule(template) || !userTempDir || !kubeconfigPath || !kubeconfigContext) {
+    if (!isReferencedHelmChartTemplate(template) || !userTempDir || !kubeconfigPath || !kubeconfigContext) {
       return;
     }
     setIsLoading(true);
@@ -84,10 +83,10 @@ const TemplateFormModal: React.FC<TemplateFormModalProps> = props => {
       {message ? (
         <StyledTextArea rows={16} value={message} readOnly />
       ) : (
-        <TemplateFormRenderer formData={formData} onFormDataChange={setFormData} template={template} />
+        <TemplateFormRenderer formData={formData} onFormDataChange={setFormData} templateForm={template.forms[0]} />
       )}
     </Modal>
   );
 };
 
-export default TemplateFormModal;
+export default TemplateModal;

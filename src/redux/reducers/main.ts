@@ -24,7 +24,6 @@ import {
   SelectionHistoryEntry,
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {MonoklePlugin} from '@models/plugin';
 
 import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
@@ -542,13 +541,6 @@ export const mainSlice = createSlice({
     editorHasReloadedSelectedPath: (state: Draft<AppState>) => {
       state.shouldEditorReloadSelectedPath = false;
     },
-    addPlugin: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin>) => {
-      state.plugins.push(action.payload);
-    },
-    setPlugins: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin[]>) => {
-      state.plugins = action.payload;
-      state.isLoadingExistingPlugins = false;
-    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -975,7 +967,5 @@ export const {
   setSelectionHistory,
   reprocessNewResource,
   editorHasReloadedSelectedPath,
-  addPlugin,
-  setPlugins,
 } = mainSlice.actions;
 export default mainSlice.reducer;

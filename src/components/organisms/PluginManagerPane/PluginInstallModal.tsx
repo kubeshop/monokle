@@ -9,7 +9,7 @@ import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 import {MonoklePlugin} from '@models/plugin';
 
 import {useAppDispatch} from '@redux/hooks';
-import {addPlugin} from '@redux/reducers/main';
+import {addPlugin} from '@redux/reducers/contrib';
 
 const downloadPlugin = (pluginUrl: string) => {
   return new Promise<MonoklePlugin>((resolve, reject) => {

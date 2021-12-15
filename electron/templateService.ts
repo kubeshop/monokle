@@ -1,8 +1,8 @@
 import path from 'path';
 
-import {Template, isHelmChartTemplate} from '@models/template';
+import {MonokleTemplate, isHelmChartTemplate} from '@models/template';
 
-const parseTemplate = (template: Template, templateFolderPath: string): Template => {
+const parseTemplate = (template: MonokleTemplate, templateFolderPath: string): MonokleTemplate => {
   const updatedTemplate = {
     ...template,
     forms: template.forms.map(form => {
