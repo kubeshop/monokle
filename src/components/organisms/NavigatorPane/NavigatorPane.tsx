@@ -38,11 +38,11 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const FiltersContainer = styled.div`
   position: relative;
-  padding: 0px 16px;
+  padding: 6px 0 3px 0;
   margin-bottom: 10px;
 
   & .react-resizable {
-    padding: 10px 16px;
+    padding: 8px 16px;
     overflow-y: auto;
 
     ${GlobalScrollbarStyle}
@@ -146,8 +146,8 @@ const NavPane: React.FC = () => {
         </>
       )}
 
-      {/* 20 - FiltersContainer padding & 15 - Divider height */}
-      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 20 + 15 : 0)}>
+      {/* 15 - Divider height */}
+      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 15 : 0)}>
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}
