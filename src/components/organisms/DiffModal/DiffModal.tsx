@@ -238,49 +238,51 @@ const DiffModal = () => {
           <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
         )}
       >
-        <MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
-          <MonacoDiffEditor
-            width={containerWidth}
-            height={containerHeight}
-            language="yaml"
-            original={resourceContent}
-            value={cleanDiffContent}
-            options={options}
-            theme={KUBESHOP_MONACO_THEME}
-          />
-        </MonacoDiffContainer>
+        <>
+          <MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
+            <MonacoDiffEditor
+              width={containerWidth}
+              height={containerHeight}
+              language="yaml"
+              original={resourceContent}
+              value={cleanDiffContent}
+              options={options}
+              theme={KUBESHOP_MONACO_THEME}
+            />
+          </MonacoDiffContainer>
 
-        <TagsContainer>
-          <StyledTag>Local</StyledTag>
-          <Button
-            type="primary"
-            ghost
-            onClick={handleApply}
-            icon={<Icon name="kubernetes" />}
-            disabled={!areResourcesDifferent}
-          >
-            Deploy local resource to cluster <ArrowRightOutlined />
-          </Button>
-          <Button
-            type="primary"
-            ghost
-            onClick={handleReplace}
-            disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}
-          >
-            <ArrowLeftOutlined /> Replace local resource with cluster resource
-          </Button>
-          <StyledTag>Cluster</StyledTag>
-        </TagsContainer>
-        <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-          <Switch checked={shouldDiffIgnorePaths} />
-          <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
-        </SwitchContainer>
-        <ButtonContainer>
-          <Button onClick={handleRefresh}>Refresh</Button>
-          <Button onClick={handleOk} style={{marginLeft: 12}}>
-            Close
-          </Button>
-        </ButtonContainer>
+          <TagsContainer>
+            <StyledTag>Local</StyledTag>
+            <Button
+              type="primary"
+              ghost
+              onClick={handleApply}
+              icon={<Icon name="kubernetes" />}
+              disabled={!areResourcesDifferent}
+            >
+              Deploy local resource to cluster <ArrowRightOutlined />
+            </Button>
+            <Button
+              type="primary"
+              ghost
+              onClick={handleReplace}
+              disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}
+            >
+              <ArrowLeftOutlined /> Replace local resource with cluster resource
+            </Button>
+            <StyledTag>Cluster</StyledTag>
+          </TagsContainer>
+          <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+            <Switch checked={shouldDiffIgnorePaths} />
+            <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
+          </SwitchContainer>
+          <ButtonContainer>
+            <Button onClick={handleRefresh}>Refresh</Button>
+            <Button onClick={handleOk} style={{marginLeft: 12}}>
+              Close
+            </Button>
+          </ButtonContainer>
+        </>
       </ResizableBox>
     </StyledModal>
   );

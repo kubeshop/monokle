@@ -13,6 +13,7 @@ import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -38,6 +39,7 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
   const dispatch = useAppDispatch();
 
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
 
   const resourceKind = useMemo(() => {
     return sectionInstance.meta?.resourceKind;
@@ -61,7 +63,7 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
   return (
     <SuffixContainer>
       <ButtonContainer>
-        <Button icon={<PlusOutlined />} type="link" onClick={createResource} size="small" />
+        <Button icon={<PlusOutlined />} type="link" onClick={createResource} size="small" disabled={isInPreviewMode} />
       </ButtonContainer>
     </SuffixContainer>
   );

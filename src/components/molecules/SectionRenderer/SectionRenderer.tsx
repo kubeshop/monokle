@@ -13,14 +13,14 @@ import {useSectionCustomization} from './useSectionCustomization';
 
 import * as S from './styled';
 
-type SectionRendererProps<ItemType, ScopeType> = {
-  sectionBlueprint: SectionBlueprint<ItemType, ScopeType>;
+type SectionRendererProps = {
+  sectionBlueprint: SectionBlueprint<any>;
   level: number;
   isLastSection: boolean;
   itemRendererOptions?: ItemRendererOptions;
 };
 
-function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemType, ScopeType>) {
+function SectionRenderer(props: SectionRendererProps) {
   const {sectionBlueprint, level, isLastSection, itemRendererOptions} = props;
 
   const {itemBlueprint, name: sectionName, id: sectionId} = sectionBlueprint;
@@ -185,7 +185,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
         itemBlueprint &&
         sectionInstance.groups.length === 0 &&
         sectionInstance.visibleItemIds.map(itemId => (
-          <ItemRenderer<ItemType, ScopeType>
+          <ItemRenderer
             key={itemId}
             itemId={itemId}
             blueprint={itemBlueprint}
@@ -210,7 +210,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
                 </S.Name>
               </S.NameContainer>
               {group.visibleItemIds.map(itemId => (
-                <ItemRenderer<ItemType, ScopeType>
+                <ItemRenderer
                   key={itemId}
                   itemId={itemId}
                   blueprint={itemBlueprint}
@@ -227,7 +227,7 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
         sectionBlueprint.childSectionIds
           .map(childSectionId => navSectionMap.getById(childSectionId))
           .map(child => (
-            <SectionRenderer<ItemType, ScopeType>
+            <SectionRenderer
               key={child.name}
               sectionBlueprint={child}
               level={level + 1}
@@ -238,4 +238,4 @@ function SectionRenderer<ItemType, ScopeType>(props: SectionRendererProps<ItemTy
   );
 }
 
-export default SectionRenderer;
+export default React.memo(SectionRenderer);
