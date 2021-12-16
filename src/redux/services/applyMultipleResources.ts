@@ -13,13 +13,13 @@ import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {doesTextStartWithYamlDocumentDelimiter} from './resource';
 
 const applyMultipleResources = (
-  stateConfig: AppConfig,
+  config: AppConfig,
   resourcesToApply: K8sResource[],
   dispatch: AppDispatch,
   onSuccessCallback?: () => void
 ) => {
-  const kubeconfigPath = stateConfig.kubeconfigPath;
-  const context = stateConfig.kubeConfig.currentContext;
+  const kubeconfigPath = config.kubeconfigPath;
+  const context = config.kubeConfig.currentContext;
 
   if (!kubeconfigPath || !context || !resourcesToApply.length) {
     return;

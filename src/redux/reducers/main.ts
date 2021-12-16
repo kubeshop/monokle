@@ -696,6 +696,7 @@ export const mainSlice = createSlice({
         isLoading: false,
         targetResourceId: undefined,
       };
+      state.checkedResourceIds = [];
       state.diffResourceId = undefined;
       state.diffContent = undefined;
       state.isSelectingFile = false;

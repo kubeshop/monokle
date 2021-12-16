@@ -84,7 +84,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     applyCheckedResourcesWithConfirm(checkedResourceIds.length, currentContext, dispatch);
   };
 
-  const onClickDeselectChecked = () => {
+  const onClickUncheckAll = () => {
     dispatch(uncheckAllResourceIds());
   };
 
@@ -105,7 +105,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
         </Menu.Item>
       )}
 
-      <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickDeselectChecked}>
+      <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickUncheckAll}>
         <CloseOutlined />
       </Menu.Item>
     </StyledMenu>

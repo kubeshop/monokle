@@ -62,8 +62,6 @@ const FiltersContainer = styled.div`
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const {windowSize} = useContext(AppContext);
-  const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   const [filtersContainerRef, {height, width}] = useMeasure<HTMLDivElement>();
 
@@ -78,6 +76,9 @@ const NavPane: React.FC = () => {
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
+  const windowHeight = windowSize.height;
+  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
+
   const appliedFilters = useMemo(() => {
     return Object.entries(resourceFilters)
       .map(([key, value]) => {
@@ -89,6 +90,14 @@ const NavPane: React.FC = () => {
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
+
+  const sectionListHeight = useMemo(() => {
+    if (isResourceFiltersOpen && height) {
+      return navigatorHeight - (height + 24);
+    }
+
+    return navigatorHeight;
+  }, [height, isResourceFiltersOpen, navigatorHeight]);
 
   const onClickNewResource = () => {
     dispatch(openNewResourceWizard());
@@ -147,8 +156,7 @@ const NavPane: React.FC = () => {
         </>
       )}
 
-      {/* 15 - Divider height */}
-      <S.List height={navigatorHeight - (isResourceFiltersOpen && height ? height + 15 : 0)}>
+      <S.List height={sectionListHeight}>
         <SectionRenderer<K8sResource, K8sResourceScopeType>
           sectionBlueprint={K8sResourceSectionBlueprint}
           level={0}
