@@ -123,6 +123,11 @@ function ClusterDiffModal() {
 
   const windowSize = useWindowSize();
 
+  const confirmModalTitle = useMemo(
+    () => `Deploy selected resources (${selectedMatches.length}) to cluster [${currentContext || ''}]?`,
+    [selectedMatches, currentContext]
+  );
+
   const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
   const resizableBoxWidth = useMemo(() => {
     const vwValue = windowSize.width < 1200 ? 95 : 80;
@@ -254,7 +259,7 @@ function ClusterDiffModal() {
     setIsModalVisible(true);
   };
 
-  const onClickApplySelectedResourceMatchesModalOk = () => {
+  const onClickApplySelectedResourceMatches = () => {
     dispatch(applySelectedResourceMatches());
     setIsModalVisible(false);
   };
@@ -309,10 +314,9 @@ function ClusterDiffModal() {
           </div>
 
           <ModalConfirmWithNamespaceSelect
-            context={currentContext || ''}
             isModalVisible={isModalVisible}
-            onOk={onClickApplySelectedResourceMatchesModalOk}
-            selectedMatchesLength={selectedMatches.length}
+            title={confirmModalTitle}
+            onOk={onClickApplySelectedResourceMatches}
             setIsModalVisible={value => setIsModalVisible(value)}
           />
         </StyledButtonsContainer>

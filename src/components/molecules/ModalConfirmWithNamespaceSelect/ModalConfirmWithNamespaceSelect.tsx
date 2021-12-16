@@ -25,9 +25,8 @@ const TitleContainer = styled.div`
 `;
 
 interface IProps {
-  context: string;
   isModalVisible: boolean;
-  selectedMatchesLength: number;
+  title: string;
   onOk: () => void;
   setIsModalVisible: (value: boolean) => void;
 }
@@ -35,14 +34,12 @@ interface IProps {
 const ALL_OPTIONS = '<all>';
 
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
-  const {context, selectedMatchesLength, isModalVisible} = props;
+  const {isModalVisible, title} = props;
   const {onOk, setIsModalVisible} = props;
 
   const [namespaces] = useNamespaces({extra: ['all', 'default']});
 
   const [selectedNamespace, setSelectedNamespace] = useState(ALL_OPTIONS);
-
-  const title = `Deploy selected resources (${selectedMatchesLength}) to cluster [${context}]?`;
 
   return (
     <Modal

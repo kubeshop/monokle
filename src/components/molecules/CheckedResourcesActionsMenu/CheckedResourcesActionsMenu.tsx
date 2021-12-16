@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 
 import {Menu, Modal} from 'antd';
 
@@ -72,6 +72,11 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const confirmModalTitle = useMemo(
+    () => `Deploy selected resources (${checkedResourceIds.length}) to cluster [${currentContext || ''}]?`,
+    [checkedResourceIds, currentContext]
+  );
+
   const onClickDelete = () => {
     const resourcesToDelete = checkedResourceIds
       .map(resource => resourceMap[resource])
@@ -84,7 +89,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const onClickApplyCheckedResourcesModalOk = () => {
+  const onClickApplyCheckedResources = () => {
     dispatch(applyCheckedResources());
     setIsModalVisible(false);
   };
@@ -115,10 +120,9 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       </Menu.Item>
 
       <ModalConfirmWithNamespaceSelect
-        context={currentContext || ''}
         isModalVisible={isModalVisible}
-        onOk={onClickApplyCheckedResourcesModalOk}
-        selectedMatchesLength={checkedResourceIds.length}
+        title={confirmModalTitle}
+        onOk={onClickApplyCheckedResources}
         setIsModalVisible={value => setIsModalVisible(value)}
       />
     </StyledMenu>
