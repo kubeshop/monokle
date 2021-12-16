@@ -10,7 +10,7 @@ import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@redux/services/re
 
 import {Icon} from '@atoms';
 
-import {FontColors} from '@styles/Colors';
+import Colors, {FontColors} from '@styles/Colors';
 
 const StyledRefText = styled.span<{isUnsatisfied: boolean; isDisabled: boolean}>`
   ${props => {
@@ -58,7 +58,7 @@ const RefIcon = React.memo((props: {resourceRef: ResourceRef; style: React.CSSPr
     return <Icon name="incomingRefs" style={style} />;
   }
   if (isUnsatisfiedRef(resourceRef.type)) {
-    return <Icon name="warning" style={style} />;
+    return <Icon name="warning" style={style} color={Colors.yellowWarning} />;
   }
   return null;
 });
