@@ -1,20 +1,19 @@
 import fs from 'fs';
-import log from 'loglevel';
 import fetch from 'node-fetch';
 import path from 'path';
 import tar from 'tar';
 import util from 'util';
 
-import {MonoklePlugin, isPluginPackageJson, isTemplatePluginModule} from '@models/plugin';
+import {MonoklePlugin, PluginPackageJson, isPluginPackageJson, isTemplatePluginModule} from '@models/plugin';
 
 import {downloadFile} from '@utils/http';
 
+import loadMultipleExtensions from './extensions/loadMultipleExtensions';
+
 const fsExistsPromise = util.promisify(fs.exists);
-const fsReadFilePromise = util.promisify(fs.readFile);
 const fsMkdirPromise = util.promisify(fs.mkdir);
 const fsUnlinkPromise = util.promisify(fs.unlink);
 const fsRmPromise = util.promisify(fs.rm);
-const fsReadDirPromise = util.promisify(fs.readdir);
 
 const GITHUB_URL = 'https://github.com';
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
@@ -101,58 +100,28 @@ export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
   return plugin;
 }
 
-const getSubfolders = async (folderPath: string) => {
-  const subfolders = await fsReadDirPromise(folderPath, {withFileTypes: true});
-  return subfolders.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
-};
-
-async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promise<MonoklePlugin | undefined> {
-  const pluginFolderPath = path.join(pluginsDir, pluginFolderName);
-  const packageJsonFilePath = path.join(pluginFolderPath, 'package.json');
-  const doesPackageJsonFileExist = await fsExistsPromise(packageJsonFilePath);
-  if (!doesPackageJsonFileExist) {
-    log.warn(`[Plugins]: Missing package.json for plugin ${pluginFolderPath}`);
-    return;
-  }
-  const packageJsonRaw = await fsReadFilePromise(packageJsonFilePath, 'utf8');
-  const packageJson = JSON.parse(packageJsonRaw);
-
-  if (!isPluginPackageJson(packageJson)) {
-    throw new Error('The package.json file is not valid.');
-  }
-
-  if (!packageJson.repository) {
-    log.warn(`[Plugins]: Missing 'repository' property in ${packageJsonFilePath}`);
-    return;
-  }
-
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(packageJson.repository);
-
-  return {
-    name: packageJson.name,
-    author: packageJson.author,
-    version: packageJson.version,
-    description: packageJson.description,
-    isActive: packageJson.monoklePlugin.modules.every(module => isTemplatePluginModule(module)),
-    repository: {
-      owner: repositoryOwner,
-      name: repositoryName,
-      branch: 'main', // TODO: handle the branch name
-    },
-    modules: packageJson.monoklePlugin.modules,
-  };
-}
-
 export async function loadPlugins(pluginsDir: string) {
-  const pluginFolders = await getSubfolders(pluginsDir);
-
-  const pluginsParsingResults = await Promise.allSettled(
-    pluginFolders.map(pluginFolderName => parsePlugin(pluginsDir, pluginFolderName))
-  );
-
-  const plugins = pluginsParsingResults
-    .filter((r): r is {status: 'fulfilled'; value: MonoklePlugin} => r.status === 'fulfilled' && r.value !== undefined)
-    .map(r => r.value);
-
+  const plugins: MonoklePlugin[] = await loadMultipleExtensions<PluginPackageJson, MonoklePlugin>({
+    folderPath: pluginsDir,
+    targetFileName: 'package.json',
+    parseFileContent: JSON.parse,
+    isFileContentValid: isPluginPackageJson,
+    transformFileContentToExtension: packageJson => {
+      const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(packageJson.repository);
+      return {
+        name: packageJson.name,
+        author: packageJson.author,
+        version: packageJson.version,
+        description: packageJson.description,
+        isActive: packageJson.monoklePlugin.modules.every(module => isTemplatePluginModule(module)),
+        repository: {
+          owner: repositoryOwner,
+          name: repositoryName,
+          branch: 'main', // TODO: handle the branch name
+        },
+        modules: packageJson.monoklePlugin.modules,
+      };
+    },
+  });
   return plugins;
 }
