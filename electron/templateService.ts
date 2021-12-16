@@ -1,19 +1,10 @@
 import path from 'path';
 
-import {AnyTemplate, isHelmChartTemplate, isTemplateDiscovery} from '@models/template';
+import {AnyTemplate, TemplateDiscovery, isHelmChartTemplate, isTemplateDiscovery} from '@models/template';
 
-async function fetchTemplateDiscovery(repositoryOwner: string, repositoryName: string, targetCommitish: string) {
-  const templateDiscoveryUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/${targetCommitish}/monokle-templates.json`;
-  const templateDiscoveryResponse = await fetch(templateDiscoveryUrl);
-  if (!templateDiscoveryResponse.ok) {
-    throw new Error("Couldn't find monokle-templates.json file in the repository");
-  }
-  const templateDiscovery = await templateDiscoveryResponse.json();
-  if (!isTemplateDiscovery(templateDiscovery)) {
-    throw new Error('The monokle-templates.json file is not valid.');
-  }
-  return templateDiscovery;
-}
+import downloadExtension from './extensions/downloadExtension';
+import downloadExtensionEntry from './extensions/downloadExtensionEntry';
+import {extractRepositoryOwnerAndNameFromUrl} from './utils';
 
 const parseTemplate = (template: AnyTemplate, templateFolderPath: string): AnyTemplate => {
   const updatedTemplate = {
@@ -34,3 +25,52 @@ const parseTemplate = (template: AnyTemplate, templateFolderPath: string): AnyTe
   }
   return updatedTemplate;
 };
+
+const parseTemplateDiscovery = (
+  templateDiscovery: TemplateDiscovery,
+  templateDiscoveryFolderPath: string
+): TemplateDiscovery => {
+  return {
+    ...templateDiscovery,
+    templates: templateDiscovery.templates.map(templatePreview => {
+      return {
+        ...templatePreview,
+        path: path.join(templateDiscoveryFolderPath, templatePreview.path),
+      };
+    }),
+  };
+};
+
+export async function downloadTemplateDiscoveryEntry(repositoryUrl: string, templatesDir: string) {
+  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
+  const templateDiscoveryUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/monokle-templates.json`;
+  const templateDiscovery: TemplateDiscovery = await downloadExtensionEntry<TemplateDiscovery>({
+    entryFileName: 'monokle-templates.json',
+    entryFileUrl: templateDiscoveryUrl,
+    isEntryFileContentValid: isTemplateDiscovery,
+    parseEntryFileContent: JSON.parse,
+    makeExtensionFolderPath: () => {
+      return path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
+    },
+  });
+  return templateDiscovery;
+}
+
+export async function downloadTemplateDiscovery(repositoryUrl: string, templatesDir: string) {
+  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
+  const templateDiscoveryUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/monokle-templates.json`;
+  const templateDiscoveryTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
+  const templateDiscoveryFolderPath = path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
+  const templateDiscovery: TemplateDiscovery = await downloadExtension<TemplateDiscovery, TemplateDiscovery>({
+    extensionTarballUrl: templateDiscoveryTarballUrl,
+    entryFileName: 'monokle-templates.json',
+    entryFileUrl: templateDiscoveryUrl,
+    isEntryFileContentValid: isTemplateDiscovery,
+    parseEntryFileContent: JSON.parse,
+    makeExtensionFolderPath: () => {
+      return templateDiscoveryFolderPath;
+    },
+    transformEntryFileContentToExtension: td => parseTemplateDiscovery(td, templateDiscoveryFolderPath),
+  });
+  return templateDiscovery;
+}
