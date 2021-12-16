@@ -12,7 +12,6 @@ import styled from 'styled-components';
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
@@ -27,10 +26,8 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import Colors from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
-import K8sResourceSectionBlueprint, {K8sResourceScopeType} from '@src/navsections/K8sResourceSectionBlueprint';
-import UnknownResourceSectionBlueprint, {
-  UnknownResourceScopeType,
-} from '@src/navsections/UnknownResourceSectionBlueprint';
+import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
+import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
 import ClusterCompareButton from './ClusterCompareButton';
 import * as S from './NavigatorPane.styled';
@@ -157,16 +154,8 @@ const NavPane: React.FC = () => {
       )}
 
       <S.List height={sectionListHeight}>
-        <SectionRenderer<K8sResource, K8sResourceScopeType>
-          sectionBlueprint={K8sResourceSectionBlueprint}
-          level={0}
-          isLastSection={false}
-        />
-        <SectionRenderer<K8sResource, UnknownResourceScopeType>
-          sectionBlueprint={UnknownResourceSectionBlueprint}
-          level={0}
-          isLastSection={false}
-        />
+        <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
+        <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
       </S.List>
     </>
   );
