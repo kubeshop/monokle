@@ -1,7 +1,26 @@
-export type LoadExtensionOptions<FileContentType, ExtensionType> = {
+interface ExtensionEntryOptions<ExtensionEntryType> {
+  entryFileName: string;
+  parseEntryFileContent: (content: string) => any;
+  isEntryFileContentValid: (x: any) => x is ExtensionEntryType;
+}
+
+interface ExtensionOptions<ExtensionEntryType, ExtensionType> {
+  transformEntryFileContentToExtension: (f: ExtensionEntryType) => ExtensionType;
+}
+
+export interface LoadExtensionOptions<ExtensionEntryType, ExtensionType>
+  extends ExtensionEntryOptions<ExtensionEntryType>,
+    ExtensionOptions<ExtensionEntryType, ExtensionType> {
   folderPath: string;
-  targetFileName: string;
-  parseFileContent: (content: string) => any;
-  isFileContentValid: (x: any) => x is FileContentType;
-  transformFileContentToExtension: (f: FileContentType) => ExtensionType;
-};
+}
+
+export interface DownloadExtensionEntryOptions<ExtensionEntryType> extends ExtensionEntryOptions<ExtensionEntryType> {
+  makeExtensionFolderPath: (entry: ExtensionEntryType) => string;
+  entryFileUrl: string;
+}
+
+export interface DownloadExtensionOptions<ExtensionEntryType, ExtensionType>
+  extends DownloadExtensionEntryOptions<ExtensionEntryType>,
+    ExtensionOptions<ExtensionEntryType, ExtensionType> {
+  extensionTarballUrl: string;
+}

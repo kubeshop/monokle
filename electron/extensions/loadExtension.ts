@@ -1,30 +1,32 @@
-import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
-import util from 'util';
 
+import {doesPathExist, readFile} from './fileSystem';
 import {LoadExtensionOptions} from './types';
 
-const fsReadFilePromise = util.promisify(fs.readFile);
-const fsExistsPromise = util.promisify(fs.exists);
-
-async function loadExtension<FileContentType, ExtensionType>(
-  options: LoadExtensionOptions<FileContentType, ExtensionType>
+async function loadExtension<ExtensionEntryType, ExtensionType>(
+  options: LoadExtensionOptions<ExtensionEntryType, ExtensionType>
 ): Promise<ExtensionType | undefined> {
-  const {folderPath, targetFileName, parseFileContent, isFileContentValid, transformFileContentToExtension} = options;
-  const targetFilePath = path.join(folderPath, targetFileName);
-  const doesTargetFileExist = await fsExistsPromise(targetFilePath);
-  if (!doesTargetFileExist) {
-    log.warn(`[LoadExtension]: Missing ${targetFileName} in ${folderPath}`);
+  const {
+    folderPath,
+    entryFileName,
+    parseEntryFileContent,
+    isEntryFileContentValid,
+    transformEntryFileContentToExtension,
+  } = options;
+  const entryFilePath = path.join(folderPath, entryFileName);
+  const doesEntryFileExist = await doesPathExist(entryFilePath);
+  if (!doesEntryFileExist) {
+    log.warn(`[LoadExtension]: Missing ${entryFileName} in ${folderPath}`);
     return;
   }
-  const targetFileContent = await fsReadFilePromise(targetFilePath, 'utf8');
-  const parsedTargetFileContent = parseFileContent(targetFileContent);
-  if (!isFileContentValid(parsedTargetFileContent)) {
-    log.warn(`[LoadExtension]: Invalid ${targetFileName} in ${folderPath}`);
+  const entryFileContent = await readFile(entryFilePath);
+  const parsedEntryFileContent = parseEntryFileContent(entryFileContent);
+  if (!isEntryFileContentValid(parsedEntryFileContent)) {
+    log.warn(`[LoadExtension]: Invalid ${entryFileName} in ${folderPath}`);
     return;
   }
-  const extension = transformFileContentToExtension(parsedTargetFileContent);
+  const extension = transformEntryFileContentToExtension(parsedEntryFileContent);
   return extension;
 }
 
