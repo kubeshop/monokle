@@ -2,6 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import {monaco} from 'react-monaco-editor';
 
+import {K8sResource} from '@models/k8sresource';
+
 interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
 }
@@ -52,7 +54,7 @@ interface ResourceKindHandler {
    * A user friendly description of this resource type
    */
 
-  description: string;
+  description?: string;
 
   /**
    * An external link to documentation
@@ -64,7 +66,7 @@ interface ResourceKindHandler {
    * Retrieve the specified resource of this type using the provided kubeconfig
    */
 
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any>;
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any>;
 
   /**
    * Get all resources of this type using the provided kubeconfig
@@ -72,7 +74,11 @@ interface ResourceKindHandler {
 
   listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]>;
 
-  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, name: string, namespace?: string) => Promise<void>;
+  /**
+   * Delete the specified resource from the cluster
+   */
+
+  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, resource: K8sResource) => Promise<void>;
 
   /**
    * optional outgoing RefMappers to use for resolving refs in resources of this type

@@ -404,7 +404,7 @@ export const mainSlice = createSlice({
 
           const kindHandler = getResourceKindHandler(resource.kind);
           if (kindHandler?.deleteResourceInCluster) {
-            kindHandler.deleteResourceInCluster(kubeConfig, resource.name, resource.namespace);
+            kindHandler.deleteResourceInCluster(kubeConfig, resource);
             deleteResource(resource, state.resourceMap);
           }
         } catch (err) {

@@ -15,7 +15,7 @@ import {extractK8sResources, processParsedResources} from '@redux/services/resou
 import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
-import {ResourceKindHandlers} from '@src/kindhandlers';
+import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
@@ -55,7 +55,7 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
 
     // if the cluster contains CRDs we need to check if there any corresponding resources also
     const customResourceDefinitions = Object.values(previewResult.previewResources).filter(
-      r => r.kind === 'CustomResourceDefinition'
+      r => r.kind === 'CustomResourceDefinition' && !getResourceKindHandler(r.content.spec?.names?.kind)
     );
     if (customResourceDefinitions.length > 0) {
       const customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions);
@@ -127,8 +127,8 @@ export const repreviewCluster = createAsyncThunk<
 
 const crdVersionRegex = /(v)(\d*)(alpha|beta)?(\d*)?/;
 
-function findDefaultVersion(r: K8sResource) {
-  const versionNames: string[] = r.content.spec.versions.map((v: any) => v.name);
+export function findDefaultVersion(crd: any) {
+  const versionNames: string[] = crd.spec.versions.map((v: any) => v.name);
 
   versionNames.sort((a, b) => {
     const m1 = crdVersionRegex.exec(a);
@@ -181,7 +181,11 @@ async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitio
       // retrieve objects using latest version name
       // @ts-ignore
       k8sApi
-        .listClusterCustomObject(r.content.spec.group, findDefaultVersion(r) || 'v1', r.content.spec.names.plural)
+        .listClusterCustomObject(
+          r.content.spec.group,
+          findDefaultVersion(r.content) || 'v1',
+          r.content.spec.names.plural
+        )
         .then(response =>
           // @ts-ignore
           getK8sObjectsAsYaml(response.body.items)

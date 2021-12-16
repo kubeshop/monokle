@@ -1,6 +1,7 @@
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
+import VirtualServiceHandler from '@src/kindhandlers/istio/VirtualService.handler';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -52,6 +53,7 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceAccountHandler,
   StatefulSetHandler,
   VolumeAttachmentHandler,
+  VirtualServiceHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(

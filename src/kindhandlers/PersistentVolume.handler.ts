@@ -2,6 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
+import {K8sResource} from '@models/k8sresource';
 import {NamespaceRefTypeEnum, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
@@ -13,18 +14,18 @@ const PersistentVolumeHandler: ResourceKindHandler = {
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
   description: '',
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    return k8sCoreV1Api.readPersistentVolume(name);
+    return k8sCoreV1Api.readPersistentVolume(resource.name);
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = await k8sCoreV1Api.listPersistentVolume();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    await k8sCoreV1Api.deletePersistentVolume(name);
+    await k8sCoreV1Api.deletePersistentVolume(resource.name);
   },
   outgoingRefMappers: [
     {
