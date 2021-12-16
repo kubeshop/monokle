@@ -116,7 +116,7 @@ function ClusterDiffModal() {
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
 
   const [hasAppliedResource, setHasAppliedResource] = useState<boolean>(false);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState<boolean>(false);
   const [resourceDiffState, setResourceDiffState] = useState<ResourceDiffState>({isLoading: false});
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -256,12 +256,12 @@ function ClusterDiffModal() {
   }, [previewResource, previewValuesFile, currentContext, isResourceDiffVisible, closeResourceDiff]);
 
   const onClickDeploySelected = () => {
-    setIsModalVisible(true);
+    setIsApplyModalVisible(true);
   };
 
   const onClickApplySelectedResourceMatches = () => {
     dispatch(applySelectedResourceMatches());
-    setIsModalVisible(false);
+    setIsApplyModalVisible(false);
   };
 
   const onClickReplaceSelected = () => {
@@ -314,10 +314,10 @@ function ClusterDiffModal() {
           </div>
 
           <ModalConfirmWithNamespaceSelect
-            isModalVisible={isModalVisible}
+            isModalVisible={isApplyModalVisible}
             title={confirmModalTitle}
             onOk={onClickApplySelectedResourceMatches}
-            setIsModalVisible={value => setIsModalVisible(value)}
+            onCancel={() => setIsApplyModalVisible(false)}
           />
         </StyledButtonsContainer>
       }

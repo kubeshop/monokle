@@ -28,18 +28,16 @@ interface IProps {
   isModalVisible: boolean;
   title: string;
   onOk: () => void;
-  setIsModalVisible: (value: boolean) => void;
+  onCancel: () => void;
 }
-
-const ALL_OPTIONS = '<all>';
 
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isModalVisible, title} = props;
-  const {onOk, setIsModalVisible} = props;
+  const {onOk, onCancel} = props;
 
-  const [namespaces] = useNamespaces({extra: ['all', 'default']});
+  const [namespaces] = useNamespaces({extra: ['default']});
 
-  const [selectedNamespace, setSelectedNamespace] = useState(ALL_OPTIONS);
+  const [selectedNamespace, setSelectedNamespace] = useState('default');
 
   return (
     <Modal
@@ -52,14 +50,14 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         </TitleContainer>
       }
       onOk={onOk}
-      onCancel={() => setIsModalVisible(false)}
+      onCancel={onCancel}
     >
       <NamespaceSelectContainer>
         <NamespaceSelectLabel>Namespace:</NamespaceSelectLabel>
         <Select
           value={selectedNamespace}
           showSearch
-          defaultValue={ALL_OPTIONS}
+          defaultValue="default"
           style={{width: '100%'}}
           onChange={value => setSelectedNamespace(value)}
         >

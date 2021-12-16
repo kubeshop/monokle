@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
@@ -15,13 +15,16 @@ import {
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
+import {applyResource} from '@redux/thunks/applyResource';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import FileExplorer from '@atoms/FileExplorer';
+
+import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -33,6 +36,8 @@ const HotKeysHandler = () => {
   const configState = useAppSelector(state => state.config);
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -70,16 +75,7 @@ const HotKeysHandler = () => {
     }
     const selectedResource = mainState.resourceMap[mainState.selectedResourceId];
     if (selectedResource) {
-      const isClusterPreview = mainState.previewType === 'cluster';
-      applyResourceWithConfirm(
-        selectedResource,
-        mainState.resourceMap,
-        mainState.fileMap,
-        dispatch,
-        configState.kubeconfigPath,
-        configState.kubeConfig.currentContext || '',
-        {isClusterPreview, kustomizeCommand: configState.settings.kustomizeCommand}
-      );
+      setIsApplyModalVisible(true);
     } else if (mainState.selectedPath) {
       applyFileWithConfirm(
         mainState.selectedPath,
@@ -100,6 +96,49 @@ const HotKeysHandler = () => {
     mainState.previewType,
     dispatch,
   ]);
+
+  const onClickApplyResource = () => {
+    if (!mainState.selectedResourceId) {
+      setIsApplyModalVisible(false);
+      return;
+    }
+    const selectedResource = mainState.resourceMap[mainState.selectedResourceId];
+
+    if (!selectedResource) {
+      setIsApplyModalVisible(false);
+      return;
+    }
+
+    const isClusterPreview = mainState.previewType === 'cluster';
+    applyResource(
+      selectedResource.id,
+      mainState.resourceMap,
+      mainState.fileMap,
+      dispatch,
+      configState.kubeconfigPath,
+      configState.kubeConfig.currentContext || '',
+      {
+        isClusterPreview,
+        kustomizeCommand: configState.settings.kustomizeCommand,
+      }
+    );
+    setIsApplyModalVisible(false);
+  };
+
+  const confirmModalTitle = useMemo(() => {
+    if (!mainState.selectedResourceId) {
+      return '';
+    }
+    const selectedResource = mainState.resourceMap[mainState.selectedResourceId];
+
+    if (!selectedResource) {
+      return '';
+    }
+
+    return isKustomizationResource(selectedResource)
+      ? `Deploy ${selectedResource.name} kustomization to cluster [${configState.kubeConfig.currentContext || ''}]?`
+      : `Deploy ${selectedResource.name} to cluster [${configState.kubeConfig.currentContext || ''}]?`;
+  }, [mainState.selectedResourceId, configState.kubeConfig.currentContext]);
 
   useHotkeys(
     hotkeys.APPLY_SELECTION,
@@ -198,6 +237,13 @@ const HotKeysHandler = () => {
   return (
     <>
       <FileExplorer {...fileExplorerProps} />
+
+      <ModalConfirmWithNamespaceSelect
+        isModalVisible={isApplyModalVisible}
+        title={confirmModalTitle}
+        onOk={onClickApplyResource}
+        onCancel={() => setIsApplyModalVisible(false)}
+      />
     </>
   );
 };

@@ -31,10 +31,10 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
+import {applyResource} from '@redux/thunks/applyResource';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -47,6 +47,7 @@ import TabHeader from '@atoms/TabHeader';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
+import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -74,7 +75,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
-  const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -90,8 +90,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-  const [key, setKey] = useState('source');
+
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
+  const [key, setKey] = useState('source');
+  const [selectedResource, setSelectedResource] = useState<K8sResource>();
 
   const dispatch = useAppDispatch();
 
@@ -229,11 +232,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
         );
       }
     } else if (selectedResource) {
-      const isClusterPreview = previewType === 'cluster';
-      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
-        isClusterPreview,
-        kustomizeCommand,
-      });
+      setIsApplyModalVisible(true);
     } else if (selectedPath) {
       applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig, kubeconfigContext || '');
     }
@@ -294,6 +293,29 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
     return false;
   }, [selectedResource, kubeconfigPath]);
+
+  const onClickApplyResource = () => {
+    if (!selectedResource) {
+      setIsApplyModalVisible(false);
+      return;
+    }
+    const isClusterPreview = previewType === 'cluster';
+    applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfigPath, kubeconfigContext || '', {
+      isClusterPreview,
+      kustomizeCommand,
+    });
+    setIsApplyModalVisible(false);
+  };
+
+  const confirmModalTitle = useMemo(() => {
+    if (!selectedResource) {
+      return '';
+    }
+
+    return isKustomizationResource(selectedResource)
+      ? `Deploy ${selectedResource.name} kustomization to cluster [${kubeconfigContext || ''}]?`
+      : `Deploy ${selectedResource.name} to cluster [${kubeconfigContext || ''}]?`;
+  }, [selectedResource, kubeconfigContext]);
 
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {
@@ -480,6 +502,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
         </S.TabsContainer>
         {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}
       </S.ActionsPaneContainer>
+
+      <ModalConfirmWithNamespaceSelect
+        isModalVisible={isApplyModalVisible}
+        title={confirmModalTitle}
+        onOk={onClickApplyResource}
+        onCancel={() => setIsApplyModalVisible(false)}
+      />
     </>
   );
 };

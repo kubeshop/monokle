@@ -16,7 +16,8 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {isKustomizationResource} from '@redux/services/kustomize';
+import {applyResource} from '@redux/thunks/applyResource';
 
 import Icon from '@components/atoms/Icon';
 
@@ -27,6 +28,8 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
+
+import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 
 // @ts-ignore
 const {yaml} = languages || {};
@@ -94,6 +97,8 @@ const ResourceDiff = (props: {
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
+
   useResourceYamlSchema(yaml, resourceMap, localResource.id);
 
   const options = {
@@ -104,6 +109,14 @@ const ResourceDiff = (props: {
     },
     readOnly: true,
   };
+
+  const confirmModalTitle = useMemo(
+    () =>
+      isKustomizationResource(localResource)
+        ? `Deploy ${localResource.name} kustomization to cluster [${kubeconfigContext || ''}]?`
+        : `Deploy ${localResource.name} to cluster [${kubeconfigContext || ''}]?`,
+    [localResource, kubeconfigContext]
+  );
 
   const localResourceText = useMemo(() => {
     return stringify(localResource.content, {sortMapEntries: true});
@@ -128,14 +141,7 @@ const ResourceDiff = (props: {
   }, [windowSize.width]);
 
   const handleApply = () => {
-    if (onApply) {
-      onApply();
-    }
-    applyResourceWithConfirm(localResource, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
-      isClusterPreview: previewType === 'cluster',
-      shouldPerformDiff: true,
-      isInClusterDiff,
-    });
+    setIsApplyModalVisible(true);
   };
 
   const handleReplace = () => {
@@ -149,6 +155,19 @@ const ResourceDiff = (props: {
         preventSelectionAndHighlightsUpdate: true,
       })
     );
+  };
+
+  const onClickApplyResource = () => {
+    if (onApply) {
+      onApply();
+    }
+
+    applyResource(localResource.id, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
+      isClusterPreview: previewType === 'cluster',
+      shouldPerformDiff: true,
+      isInClusterDiff,
+    });
+    setIsApplyModalVisible(false);
   };
 
   return (
@@ -165,6 +184,7 @@ const ResourceDiff = (props: {
           height={containerHeight}
         />
       </MonacoDiffContainer>
+
       <TagsContainer>
         <StyledTag>Local</StyledTag>
         <Button
@@ -188,10 +208,18 @@ const ResourceDiff = (props: {
         </Button>
         <StyledTag>Cluster</StyledTag>
       </TagsContainer>
+
       <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
         <Switch checked={shouldDiffIgnorePaths} />
         <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
       </SwitchContainer>
+
+      <ModalConfirmWithNamespaceSelect
+        isModalVisible={isApplyModalVisible}
+        title={confirmModalTitle}
+        onOk={onClickApplyResource}
+        onCancel={() => setIsApplyModalVisible(false)}
+      />
     </>
   );
 };

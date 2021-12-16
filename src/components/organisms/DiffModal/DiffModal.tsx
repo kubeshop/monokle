@@ -14,10 +14,12 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {isKustomizationResource} from '@redux/services/kustomize';
+import {applyResource} from '@redux/thunks/applyResource';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 
 import Icon from '@components/atoms/Icon';
+import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
@@ -117,17 +119,19 @@ const DiffModal = () => {
   const diffContent = useAppSelector(state => state.main.diffContent);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const diffResourceId = useAppSelector(state => state.main.diffResourceId);
-  // this is the local resource
-  const [diffResource, setDiffResource] = useState<K8sResource>();
-  const [resourceContent, setResourceContent] = useState<string>();
   const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const [isVisible, setVisible] = useState(false);
-  const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
+
+  // this is the local resource
+  const [diffResource, setDiffResource] = useState<K8sResource>();
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
+  const [isVisible, setVisible] = useState(false);
+  const [resourceContent, setResourceContent] = useState<string>();
+  const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
   const windowSize = useWindowSize();
 
@@ -144,6 +148,13 @@ const DiffModal = () => {
       enabled: false,
     },
   };
+
+  const confirmModalTitle = useMemo(() => {
+    const resource = resourceMap[diffResourceId || ''];
+    return isKustomizationResource(resource)
+      ? `Deploy ${resource?.name} kustomization to cluster [${kubeconfigContext || ''}]?`
+      : `Deploy ${resource?.name} to cluster [${kubeconfigContext || ''}]?`;
+  }, [diffResourceId, kubeconfigContext]);
 
   useEffect(() => {
     if (!diffResourceId) {
@@ -185,13 +196,7 @@ const DiffModal = () => {
 
   const handleApply = () => {
     if (diffResourceId) {
-      const resource = resourceMap[diffResourceId];
-      if (resource) {
-        applyResourceWithConfirm(resource, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
-          isClusterPreview: previewType === 'cluster',
-          shouldPerformDiff: true,
-        });
-      }
+      setIsApplyModalVisible(true);
     }
   };
 
@@ -216,6 +221,19 @@ const DiffModal = () => {
 
   const handleOk = () => {
     dispatch(performResourceDiff(''));
+  };
+
+  const onClickApplyResource = () => {
+    if (diffResourceId) {
+      const resource = resourceMap[diffResourceId];
+      if (resource) {
+        applyResource(resource.id, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
+          isClusterPreview: previewType === 'cluster',
+          shouldPerformDiff: true,
+        });
+      }
+    }
+    setIsApplyModalVisible(false);
   };
 
   return (
@@ -282,6 +300,13 @@ const DiffModal = () => {
               Close
             </Button>
           </ButtonContainer>
+
+          <ModalConfirmWithNamespaceSelect
+            isModalVisible={isApplyModalVisible}
+            title={confirmModalTitle}
+            onOk={onClickApplyResource}
+            onCancel={() => setIsApplyModalVisible(false)}
+          />
         </>
       </ResizableBox>
     </StyledModal>

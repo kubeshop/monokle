@@ -70,7 +70,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
   const confirmModalTitle = useMemo(
     () => `Deploy selected resources (${checkedResourceIds.length}) to cluster [${currentContext || ''}]?`,
@@ -86,12 +86,12 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   };
 
   const onClickDeployChecked = () => {
-    setIsModalVisible(true);
+    setIsApplyModalVisible(true);
   };
 
   const onClickApplyCheckedResources = () => {
     dispatch(applyCheckedResources());
-    setIsModalVisible(false);
+    setIsApplyModalVisible(false);
   };
 
   const onClickUncheckAll = () => {
@@ -120,10 +120,10 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       </Menu.Item>
 
       <ModalConfirmWithNamespaceSelect
-        isModalVisible={isModalVisible}
+        isModalVisible={isApplyModalVisible}
         title={confirmModalTitle}
         onOk={onClickApplyCheckedResources}
-        setIsModalVisible={value => setIsModalVisible(value)}
+        onCancel={() => setIsApplyModalVisible(false)}
       />
     </StyledMenu>
   );
