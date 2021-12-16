@@ -13,7 +13,6 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setClusterDiffRefreshDiffResource, setDiffResourceInClusterDiff} from '@redux/reducers/main';
 import {closeClusterDiff} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {applySelectedMatchesWithConfirm} from '@redux/services/applySelectedMatchesWithConfirm';
 import {getClusterResourceText} from '@redux/services/clusterResource';
 import {replaceSelectedMatchesWithConfirm} from '@redux/services/replaceSelectedMatchesWithConfirm';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -21,6 +20,7 @@ import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {ClusterDiff, ResourceDiff} from '@molecules';
 
 import Icon from '@components/atoms/Icon';
+import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';
 
@@ -115,6 +115,7 @@ function ClusterDiffModal() {
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
 
   const [hasAppliedResource, setHasAppliedResource] = useState<boolean>(false);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [resourceDiffState, setResourceDiffState] = useState<ResourceDiffState>({isLoading: false});
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -249,10 +250,7 @@ function ClusterDiffModal() {
   }, [previewResource, previewValuesFile, currentContext, isResourceDiffVisible, closeResourceDiff]);
 
   const onClickDeploySelected = () => {
-    if (!currentContext) {
-      return;
-    }
-    applySelectedMatchesWithConfirm(selectedMatches.length, currentContext, dispatch);
+    setIsModalVisible(true);
   };
 
   const onClickReplaceSelected = () => {
@@ -303,6 +301,13 @@ function ClusterDiffModal() {
             </Button>
             <Button onClick={closeModal}>Close</Button>
           </div>
+
+          <ModalConfirmWithNamespaceSelect
+            context={currentContext || ''}
+            isModalVisible={isModalVisible}
+            selectedMatchesLength={selectedMatches.length}
+            setIsModalVisible={value => setIsModalVisible(value)}
+          />
         </StyledButtonsContainer>
       }
       centered
