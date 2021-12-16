@@ -15,6 +15,7 @@ import {closeClusterDiff} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getClusterResourceText} from '@redux/services/clusterResource';
 import {replaceSelectedMatchesWithConfirm} from '@redux/services/replaceSelectedMatchesWithConfirm';
+import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
 import {ClusterDiff, ResourceDiff} from '@molecules';
@@ -253,6 +254,11 @@ function ClusterDiffModal() {
     setIsModalVisible(true);
   };
 
+  const onClickApplySelectedResourceMatchesModalOk = () => {
+    dispatch(applySelectedResourceMatches());
+    setIsModalVisible(false);
+  };
+
   const onClickReplaceSelected = () => {
     if (!currentContext) {
       return;
@@ -305,6 +311,7 @@ function ClusterDiffModal() {
           <ModalConfirmWithNamespaceSelect
             context={currentContext || ''}
             isModalVisible={isModalVisible}
+            onOk={onClickApplySelectedResourceMatchesModalOk}
             selectedMatchesLength={selectedMatches.length}
             setIsModalVisible={value => setIsModalVisible(value)}
           />

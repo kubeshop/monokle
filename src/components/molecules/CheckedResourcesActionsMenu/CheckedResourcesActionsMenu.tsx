@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import {Menu, Modal} from 'antd';
 
@@ -11,10 +11,12 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
-import applyCheckedResourcesWithConfirm from '@redux/services/applyCheckedResourcesWithConfirm';
 import {AppDispatch} from '@redux/store';
+import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 
 import Colors from '@styles/Colors';
+
+import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 
 const StyledMenu = styled(Menu)`
   background: linear-gradient(90deg, #112a45 0%, #111d2c 100%);
@@ -68,6 +70,8 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const onClickDelete = () => {
     const resourcesToDelete = checkedResourceIds
       .map(resource => resourceMap[resource])
@@ -77,11 +81,12 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   };
 
   const onClickDeployChecked = () => {
-    if (!currentContext) {
-      return;
-    }
+    setIsModalVisible(true);
+  };
 
-    applyCheckedResourcesWithConfirm(checkedResourceIds.length, currentContext, dispatch);
+  const onClickApplyCheckedResourcesModalOk = () => {
+    dispatch(applyCheckedResources());
+    setIsModalVisible(false);
   };
 
   const onClickUncheckAll = () => {
@@ -108,6 +113,14 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickUncheckAll}>
         <CloseOutlined />
       </Menu.Item>
+
+      <ModalConfirmWithNamespaceSelect
+        context={currentContext || ''}
+        isModalVisible={isModalVisible}
+        onOk={onClickApplyCheckedResourcesModalOk}
+        selectedMatchesLength={checkedResourceIds.length}
+        setIsModalVisible={value => setIsModalVisible(value)}
+      />
     </StyledMenu>
   );
 };

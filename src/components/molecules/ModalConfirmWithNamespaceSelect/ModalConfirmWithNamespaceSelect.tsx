@@ -6,9 +6,6 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {useAppDispatch} from '@redux/hooks';
-import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
-
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import Colors from '@styles/Colors';
@@ -31,6 +28,7 @@ interface IProps {
   context: string;
   isModalVisible: boolean;
   selectedMatchesLength: number;
+  onOk: () => void;
   setIsModalVisible: (value: boolean) => void;
 }
 
@@ -38,19 +36,13 @@ const ALL_OPTIONS = '<all>';
 
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {context, selectedMatchesLength, isModalVisible} = props;
-  const {setIsModalVisible} = props;
+  const {onOk, setIsModalVisible} = props;
 
-  const dispatch = useAppDispatch();
   const [namespaces] = useNamespaces({extra: ['all', 'default']});
 
   const [selectedNamespace, setSelectedNamespace] = useState(ALL_OPTIONS);
 
   const title = `Deploy selected resources (${selectedMatchesLength}) to cluster [${context}]?`;
-
-  const onClickOk = () => {
-    dispatch(applySelectedResourceMatches());
-    setIsModalVisible(false);
-  };
 
   return (
     <Modal
@@ -62,7 +54,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           {title}
         </TitleContainer>
       }
-      onOk={onClickOk}
+      onOk={onOk}
       onCancel={() => setIsModalVisible(false)}
     >
       <NamespaceSelectContainer>
