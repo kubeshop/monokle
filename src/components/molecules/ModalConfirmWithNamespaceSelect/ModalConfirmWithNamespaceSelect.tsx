@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 
 import {Modal, Select} from 'antd';
 
@@ -100,4 +100,4 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   );
 };
 
-export default ModalConfirmWithNamespaceSelect;
+export default React.memo(ModalConfirmWithNamespaceSelect);
