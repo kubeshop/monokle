@@ -102,3 +102,22 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
     cleanClusterResourceContent,
   };
 }
+
+export function getDefaultNamespace(resources: K8sResource[]) {
+  let namespace = 'default';
+
+  resources.forEach(resource => {
+    if (resource.namespace) {
+      if (resource.namespace !== namespace) {
+        if (namespace !== 'default') {
+          namespace = 'default';
+          return namespace;
+        }
+
+        namespace = resource.namespace;
+      }
+    }
+  });
+
+  return namespace;
+}

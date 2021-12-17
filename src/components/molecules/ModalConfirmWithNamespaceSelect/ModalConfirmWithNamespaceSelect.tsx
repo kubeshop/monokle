@@ -10,6 +10,8 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
+import {getDefaultNamespace} from '@utils/resources';
+
 import Colors from '@styles/Colors';
 
 const NamespaceSelectContainer = styled.div`
@@ -33,25 +35,6 @@ interface IProps {
   onOk: (selectedNamspace: string) => void;
   onCancel: () => void;
 }
-
-const getDefaultNamespace = (resources: K8sResource[]) => {
-  let namespace = 'default';
-
-  resources.forEach(resource => {
-    if (resource.namespace) {
-      if (resource.namespace !== namespace) {
-        if (namespace !== 'default') {
-          namespace = 'default';
-          return namespace;
-        }
-
-        namespace = resource.namespace;
-      }
-    }
-  });
-
-  return namespace;
-};
 
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isModalVisible, resources = [], title, onCancel, onOk} = props;
