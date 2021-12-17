@@ -97,6 +97,14 @@ const HotKeysHandler = () => {
     dispatch,
   ]);
 
+  const applySelectedResource = useMemo(() => {
+    if (!mainState.selectedResourceId) {
+      return [];
+    }
+    const resource = mainState.resourceMap[mainState.selectedResourceId];
+    return resource ? [resource] : [];
+  }, [mainState.selectedResourceId]);
+
   const onClickApplyResource = (namespace: string) => {
     if (!mainState.selectedResourceId) {
       setIsApplyModalVisible(false);
@@ -238,12 +246,15 @@ const HotKeysHandler = () => {
     <>
       <FileExplorer {...fileExplorerProps} />
 
-      <ModalConfirmWithNamespaceSelect
-        isModalVisible={isApplyModalVisible}
-        title={confirmModalTitle}
-        onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
-        onCancel={() => setIsApplyModalVisible(false)}
-      />
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          isModalVisible={isApplyModalVisible}
+          resources={applySelectedResource}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
     </>
   );
 };

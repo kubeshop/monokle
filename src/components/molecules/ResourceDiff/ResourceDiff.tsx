@@ -214,12 +214,15 @@ const ResourceDiff = (props: {
         <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
       </SwitchContainer>
 
-      <ModalConfirmWithNamespaceSelect
-        isModalVisible={isApplyModalVisible}
-        title={confirmModalTitle}
-        onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
-        onCancel={() => setIsApplyModalVisible(false)}
-      />
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          isModalVisible={isApplyModalVisible}
+          resources={[localResource]}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
     </>
   );
 };

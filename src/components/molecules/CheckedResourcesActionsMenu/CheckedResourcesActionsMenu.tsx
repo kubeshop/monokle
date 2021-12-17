@@ -72,6 +72,11 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
+  const checkedResources = useMemo(
+    () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
+    [checkedResourceIds]
+  );
+
   const confirmModalTitle = useMemo(
     () => `Deploy selected resources (${checkedResourceIds.length}) to cluster [${currentContext || ''}]?`,
     [checkedResourceIds, currentContext]
@@ -119,15 +124,15 @@ const CheckedResourcesActionsMenu: React.FC = () => {
         <CloseOutlined />
       </Menu.Item>
 
-      <ModalConfirmWithNamespaceSelect
-        resources={checkedResourceIds
-          .map(resource => resourceMap[resource])
-          .filter((r): r is K8sResource => r !== undefined)}
-        isModalVisible={isApplyModalVisible}
-        title={confirmModalTitle}
-        onOk={selectedNamespace => onClickApplyCheckedResources(selectedNamespace)}
-        onCancel={() => setIsApplyModalVisible(false)}
-      />
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          resources={checkedResources}
+          isModalVisible={isApplyModalVisible}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyCheckedResources(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
     </StyledMenu>
   );
 };

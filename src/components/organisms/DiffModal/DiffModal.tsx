@@ -301,12 +301,15 @@ const DiffModal = () => {
             </Button>
           </ButtonContainer>
 
-          <ModalConfirmWithNamespaceSelect
-            isModalVisible={isApplyModalVisible}
-            title={confirmModalTitle}
-            onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
-            onCancel={() => setIsApplyModalVisible(false)}
-          />
+          {isApplyModalVisible && (
+            <ModalConfirmWithNamespaceSelect
+              isModalVisible={isApplyModalVisible}
+              resources={diffResourceId && resourceMap[diffResourceId] ? [resourceMap[diffResourceId]] : []}
+              title={confirmModalTitle}
+              onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+              onCancel={() => setIsApplyModalVisible(false)}
+            />
+          )}
         </>
       </ResizableBox>
     </StyledModal>

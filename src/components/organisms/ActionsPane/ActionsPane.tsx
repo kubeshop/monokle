@@ -503,12 +503,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
         {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}
       </S.ActionsPaneContainer>
 
-      <ModalConfirmWithNamespaceSelect
-        isModalVisible={isApplyModalVisible}
-        title={confirmModalTitle}
-        onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
-        onCancel={() => setIsApplyModalVisible(false)}
-      />
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          isModalVisible={isApplyModalVisible}
+          resources={selectedResource ? [selectedResource] : []}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
     </>
   );
 };

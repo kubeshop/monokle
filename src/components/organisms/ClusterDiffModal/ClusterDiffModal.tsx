@@ -104,6 +104,7 @@ function ClusterDiffModal() {
   const refreshDiffResource = useAppSelector(state => state.main.clusterDiff.refreshDiffResource);
   const shouldReload = useAppSelector(state => state.main.clusterDiff.shouldReload);
 
+  const matches = useAppSelector(state => state.main.clusterDiff.clusterToLocalResourcesMatches);
   const selectedMatches = useAppSelector(state => state.main.clusterDiff.selectedMatches);
   const canReplaceSelectedMatches = useAppSelector(state => {
     return selectedMatches.every(matchId => {
@@ -126,6 +127,19 @@ function ClusterDiffModal() {
   const confirmModalTitle = useMemo(
     () => `Deploy selected resources (${selectedMatches.length}) to cluster [${currentContext || ''}]?`,
     [selectedMatches, currentContext]
+  );
+
+  const selectedResources = useMemo(
+    () =>
+      matches
+        .filter(match => selectedMatches.includes(match.id))
+        .map(match =>
+          match.localResourceIds && match.localResourceIds.length > 0
+            ? resourceMap[match.localResourceIds[0]]
+            : undefined
+        )
+        .filter((r): r is K8sResource => r !== undefined),
+    [matches, selectedMatches]
   );
 
   const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
@@ -313,12 +327,15 @@ function ClusterDiffModal() {
             <Button onClick={closeModal}>Close</Button>
           </div>
 
-          <ModalConfirmWithNamespaceSelect
-            isModalVisible={isApplyModalVisible}
-            title={confirmModalTitle}
-            onOk={selectedNamespace => onClickApplySelectedResourceMatches(selectedNamespace)}
-            onCancel={() => setIsApplyModalVisible(false)}
-          />
+          {isApplyModalVisible && (
+            <ModalConfirmWithNamespaceSelect
+              isModalVisible={isApplyModalVisible}
+              resources={selectedResources}
+              title={confirmModalTitle}
+              onOk={selectedNamespace => onClickApplySelectedResourceMatches(selectedNamespace)}
+              onCancel={() => setIsApplyModalVisible(false)}
+            />
+          )}
         </StyledButtonsContainer>
       }
       centered

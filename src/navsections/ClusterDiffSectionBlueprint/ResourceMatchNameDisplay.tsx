@@ -232,12 +232,15 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
         {itemInstance.name}
       </Label>
 
-      <ModalConfirmWithNamespaceSelect
-        isModalVisible={isApplyModalVisible}
-        title={confirmModalTitle}
-        onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
-        onCancel={() => setIsApplyModalVisible(false)}
-      />
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          isModalVisible={isApplyModalVisible}
+          resources={firstLocalResource ? [firstLocalResource] : []}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
     </Container>
   );
 }
