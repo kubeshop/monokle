@@ -94,8 +94,8 @@ export interface SectionBlueprint<RawItemType, ScopeType = any> {
   name: string;
   id: string;
   getScope: (state: RootState) => ScopeType;
+  containerElementId: string;
   rootSectionId: string;
-  parentSectionId?: string;
   childSectionIds?: string[];
   builder?: {
     getRawItems?: (scope: ScopeType) => RawItemType[];

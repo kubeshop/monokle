@@ -37,6 +37,7 @@ export function makeResourceKindNavSection(
   const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
+    containerElementId: 'navigator-sections-container',
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       return {

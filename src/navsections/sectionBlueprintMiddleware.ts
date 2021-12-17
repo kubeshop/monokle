@@ -4,8 +4,6 @@ import asyncLib from 'async';
 import log from 'loglevel';
 import {Middleware} from 'redux';
 
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
-
 import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance} from '@models/navigator';
 
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
@@ -13,13 +11,36 @@ import {AppDispatch, RootState} from '@redux/store';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
 
-const fullScopeCache: Record<string, any> = {};
-
-let paneHeight: number = window.innerHeight - NAVIGATOR_HEIGHT_OFFSET;
-
-window.addEventListener('resize', () => {
-  paneHeight = window.innerHeight - NAVIGATOR_HEIGHT_OFFSET;
+const heightByContainerElementId: Record<string, number> = {};
+const resizeObserver = new window.ResizeObserver(entries => {
+  entries.forEach(entry => {
+    const elementId = entry.target.id;
+    const {height} = entry.contentRect;
+    heightByContainerElementId[elementId] = height;
+  });
 });
+sectionBlueprintMap.getAll().forEach(sectionBlueprint => {
+  const element = document.getElementById(sectionBlueprint.containerElementId);
+  if (!element) {
+    throw new Error(
+      `[SectionBlueprint]: Couldn't find container element with id ${sectionBlueprint.containerElementId}`
+    );
+  }
+  resizeObserver.observe(element);
+});
+const getContainerElementHeight = (containerElementId: string) => {
+  if (heightByContainerElementId[containerElementId]) {
+    return heightByContainerElementId[containerElementId];
+  }
+  const element = document.getElementById(containerElementId);
+  if (!element) {
+    return window.innerHeight;
+  }
+  resizeObserver.observe(element);
+  return element.getBoundingClientRect().height;
+};
+
+const fullScopeCache: Record<string, any> = {};
 
 const pickPartialRecord = (record: Record<string, any>, keys: string[]) => {
   return Object.entries(record)
@@ -44,7 +65,7 @@ const hasNavigatorInstanceStateChanged = (
   );
 };
 
-function isScrolledIntoView(elementId: string) {
+function isScrolledIntoView(elementId: string, containerElementHeight: number) {
   const element = document.getElementById(elementId);
   const boundingClientRect = element?.getBoundingClientRect();
   if (!boundingClientRect) {
@@ -52,10 +73,13 @@ function isScrolledIntoView(elementId: string) {
   }
   const elementTop = boundingClientRect.top;
   const elementBottom = boundingClientRect.bottom;
-  return elementTop < paneHeight && elementBottom >= 0;
+  return elementTop < containerElementHeight && elementBottom >= 0;
 }
 
 function computeItemScrollIntoView(sectionInstance: SectionInstance, itemInstanceMap: Record<string, ItemInstance>) {
+  const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
+  const containerElementHeight = getContainerElementHeight(sectionBlueprint.containerElementId);
+
   const allDescendantVisibleItems: ItemInstance[] = (sectionInstance.visibleDescendantItemIds || []).map(
     itemId => itemInstanceMap[itemId]
   );
@@ -63,14 +87,14 @@ function computeItemScrollIntoView(sectionInstance: SectionInstance, itemInstanc
   const selectedItem = allDescendantVisibleItems.find(i => i.isSelected);
 
   if (selectedItem) {
-    if (!isScrolledIntoView(selectedItem.id)) {
+    if (!isScrolledIntoView(selectedItem.id, containerElementHeight)) {
       selectedItem.shouldScrollIntoView = true;
     }
     return;
   }
 
   const highlightedItems = allDescendantVisibleItems.filter(i => i.isHighlighted);
-  const isAnyHighlightedItemInView = highlightedItems.some(i => isScrolledIntoView(i.id));
+  const isAnyHighlightedItemInView = highlightedItems.some(i => isScrolledIntoView(i.id, containerElementHeight));
   if (highlightedItems.length > 0 && !isAnyHighlightedItemInView) {
     highlightedItems[0].shouldScrollIntoView = true;
   }
@@ -293,9 +317,10 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     sectionInstanceMap[sectionBlueprint.id] = sectionInstance;
   });
 
-  const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(
-    sectionInstance => !sectionBlueprintMap.getById(sectionInstance.id).parentSectionId
-  );
+  const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(sectionInstance => {
+    const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
+    return sectionBlueprint.rootSectionId === sectionBlueprint.id;
+  });
 
   asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
     computeSectionVisibility(sectionInstanceRoot, sectionInstanceMap)
