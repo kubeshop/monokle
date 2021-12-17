@@ -294,7 +294,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     return false;
   }, [selectedResource, kubeconfigPath]);
 
-  const onClickApplyResource = () => {
+  const onClickApplyResource = (namespace: string) => {
     if (!selectedResource) {
       setIsApplyModalVisible(false);
       return;
@@ -506,7 +506,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
       <ModalConfirmWithNamespaceSelect
         isModalVisible={isApplyModalVisible}
         title={confirmModalTitle}
-        onOk={onClickApplyResource}
+        onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
         onCancel={() => setIsApplyModalVisible(false)}
       />
     </>

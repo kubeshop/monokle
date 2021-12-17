@@ -89,7 +89,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     setIsApplyModalVisible(true);
   };
 
-  const onClickApplyCheckedResources = () => {
+  const onClickApplyCheckedResources = (namespace: string) => {
     dispatch(applyCheckedResources());
     setIsApplyModalVisible(false);
   };
@@ -120,9 +120,12 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       </Menu.Item>
 
       <ModalConfirmWithNamespaceSelect
+        resources={checkedResourceIds
+          .map(resource => resourceMap[resource])
+          .filter((r): r is K8sResource => r !== undefined)}
         isModalVisible={isApplyModalVisible}
         title={confirmModalTitle}
-        onOk={onClickApplyCheckedResources}
+        onOk={selectedNamespace => onClickApplyCheckedResources(selectedNamespace)}
         onCancel={() => setIsApplyModalVisible(false)}
       />
     </StyledMenu>

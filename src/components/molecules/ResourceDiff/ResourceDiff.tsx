@@ -157,7 +157,7 @@ const ResourceDiff = (props: {
     );
   };
 
-  const onClickApplyResource = () => {
+  const onClickApplyResource = (namespace: string) => {
     if (onApply) {
       onApply();
     }
@@ -217,7 +217,7 @@ const ResourceDiff = (props: {
       <ModalConfirmWithNamespaceSelect
         isModalVisible={isApplyModalVisible}
         title={confirmModalTitle}
-        onOk={onClickApplyResource}
+        onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
         onCancel={() => setIsApplyModalVisible(false)}
       />
     </>

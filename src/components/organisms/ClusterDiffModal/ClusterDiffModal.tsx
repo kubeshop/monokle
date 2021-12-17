@@ -259,7 +259,7 @@ function ClusterDiffModal() {
     setIsApplyModalVisible(true);
   };
 
-  const onClickApplySelectedResourceMatches = () => {
+  const onClickApplySelectedResourceMatches = (namespace: string) => {
     dispatch(applySelectedResourceMatches());
     setIsApplyModalVisible(false);
   };
@@ -316,7 +316,7 @@ function ClusterDiffModal() {
           <ModalConfirmWithNamespaceSelect
             isModalVisible={isApplyModalVisible}
             title={confirmModalTitle}
-            onOk={onClickApplySelectedResourceMatches}
+            onOk={selectedNamespace => onClickApplySelectedResourceMatches(selectedNamespace)}
             onCancel={() => setIsApplyModalVisible(false)}
           />
         </StyledButtonsContainer>

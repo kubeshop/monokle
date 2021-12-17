@@ -97,7 +97,7 @@ const HotKeysHandler = () => {
     dispatch,
   ]);
 
-  const onClickApplyResource = () => {
+  const onClickApplyResource = (namespace: string) => {
     if (!mainState.selectedResourceId) {
       setIsApplyModalVisible(false);
       return;
@@ -241,7 +241,7 @@ const HotKeysHandler = () => {
       <ModalConfirmWithNamespaceSelect
         isModalVisible={isApplyModalVisible}
         title={confirmModalTitle}
-        onOk={onClickApplyResource}
+        onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
         onCancel={() => setIsApplyModalVisible(false)}
       />
     </>

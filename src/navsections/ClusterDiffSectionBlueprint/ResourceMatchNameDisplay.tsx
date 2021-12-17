@@ -126,7 +126,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     setIsApplyModalVisible(true);
   };
 
-  const onClickApplyResource = () => {
+  const onClickApplyResource = (namespace: string) => {
     if (!firstLocalResource) {
       setIsApplyModalVisible(false);
       return;
@@ -235,7 +235,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       <ModalConfirmWithNamespaceSelect
         isModalVisible={isApplyModalVisible}
         title={confirmModalTitle}
-        onOk={onClickApplyResource}
+        onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
         onCancel={() => setIsApplyModalVisible(false)}
       />
     </Container>

@@ -6,6 +6,8 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {K8sResource} from '@models/k8sresource';
+
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import Colors from '@styles/Colors';
@@ -26,18 +28,38 @@ const TitleContainer = styled.div`
 
 interface IProps {
   isModalVisible: boolean;
+  resources?: K8sResource[];
   title: string;
-  onOk: () => void;
+  onOk: (selectedNamspace: string) => void;
   onCancel: () => void;
 }
 
+const getDefaultNamespace = (resources: K8sResource[]) => {
+  let namespace = 'default';
+
+  resources.forEach(resource => {
+    if (resource.namespace) {
+      if (resource.namespace !== namespace) {
+        if (namespace !== 'default') {
+          namespace = 'default';
+          return namespace;
+        }
+
+        namespace = resource.namespace;
+      }
+    }
+  });
+
+  return namespace;
+};
+
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
-  const {isModalVisible, title} = props;
-  const {onOk, onCancel} = props;
+  const {isModalVisible, resources = [], title, onCancel, onOk} = props;
 
   const [namespaces] = useNamespaces({extra: ['default']});
+  const defaultNamespace = getDefaultNamespace(resources);
 
-  const [selectedNamespace, setSelectedNamespace] = useState('default');
+  const [selectedNamespace, setSelectedNamespace] = useState(defaultNamespace);
 
   return (
     <Modal
@@ -49,7 +71,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           {title}
         </TitleContainer>
       }
-      onOk={onOk}
+      onOk={() => onOk(selectedNamespace)}
       onCancel={onCancel}
     >
       <NamespaceSelectContainer>
@@ -57,7 +79,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         <Select
           value={selectedNamespace}
           showSearch
-          defaultValue="default"
+          defaultValue={defaultNamespace}
           style={{width: '100%'}}
           onChange={value => setSelectedNamespace(value)}
         >

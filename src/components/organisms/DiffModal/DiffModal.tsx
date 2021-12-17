@@ -223,7 +223,7 @@ const DiffModal = () => {
     dispatch(performResourceDiff(''));
   };
 
-  const onClickApplyResource = () => {
+  const onClickApplyResource = (namespace: string) => {
     if (diffResourceId) {
       const resource = resourceMap[diffResourceId];
       if (resource) {
@@ -304,7 +304,7 @@ const DiffModal = () => {
           <ModalConfirmWithNamespaceSelect
             isModalVisible={isApplyModalVisible}
             title={confirmModalTitle}
-            onOk={onClickApplyResource}
+            onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
             onCancel={() => setIsApplyModalVisible(false)}
           />
         </>
