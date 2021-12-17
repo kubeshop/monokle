@@ -20,7 +20,7 @@ const HelmPane: React.FC = () => {
       <S.TitleBar>
         <MonoPaneTitle>Helm</MonoPaneTitle>
       </S.TitleBar>
-      <S.List height={navigatorHeight}>
+      <S.List id="helm-sections-container" height={navigatorHeight}>
         <SectionRenderer sectionBlueprint={HelmChartSectionBlueprint} level={0} isLastSection={false} />
       </S.List>
     </>

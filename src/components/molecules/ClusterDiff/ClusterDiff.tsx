@@ -46,7 +46,7 @@ function ClusterDiff() {
         </S.TitleBar>
         <Divider style={{margin: '8px 0'}} />
         <ListContainer>
-          <S.List>
+          <S.List id="cluster-diff-sections-container">
             <SectionRenderer sectionBlueprint={ClusterDiffSectionBlueprint} level={0} isLastSection={false} />
           </S.List>
         </ListContainer>
