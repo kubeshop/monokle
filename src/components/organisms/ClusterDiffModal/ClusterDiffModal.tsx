@@ -274,7 +274,7 @@ function ClusterDiffModal() {
   };
 
   const onClickApplySelectedResourceMatches = (namespace: string) => {
-    dispatch(applySelectedResourceMatches());
+    dispatch(applySelectedResourceMatches(namespace));
     setIsApplyModalVisible(false);
   };
 

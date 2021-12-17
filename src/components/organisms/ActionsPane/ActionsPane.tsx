@@ -300,10 +300,19 @@ const ActionsPane = (props: {contentHeight: string}) => {
       return;
     }
     const isClusterPreview = previewType === 'cluster';
-    applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeconfigPath, kubeconfigContext || '', {
-      isClusterPreview,
-      kustomizeCommand,
-    });
+    applyResource(
+      selectedResource.id,
+      resourceMap,
+      fileMap,
+      dispatch,
+      kubeconfigPath,
+      kubeconfigContext || '',
+      namespace,
+      {
+        isClusterPreview,
+        kustomizeCommand,
+      }
+    );
     setIsApplyModalVisible(false);
   };
 

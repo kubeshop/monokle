@@ -227,7 +227,7 @@ const DiffModal = () => {
     if (diffResourceId) {
       const resource = resourceMap[diffResourceId];
       if (resource) {
-        applyResource(resource.id, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
+        applyResource(resource.id, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', namespace, {
           isClusterPreview: previewType === 'cluster',
           shouldPerformDiff: true,
         });

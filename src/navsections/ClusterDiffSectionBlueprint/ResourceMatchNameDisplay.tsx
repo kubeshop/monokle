@@ -132,7 +132,15 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       return;
     }
 
-    applyResource(firstLocalResource.id, resourceMap, fileMap, dispatch, kubeconfigPath, kubeconfigContext || '');
+    applyResource(
+      firstLocalResource.id,
+      resourceMap,
+      fileMap,
+      dispatch,
+      kubeconfigPath,
+      kubeconfigContext || '',
+      namespace
+    );
     setIsApplyModalVisible(false);
   };
 

@@ -125,6 +125,7 @@ const HotKeysHandler = () => {
       dispatch,
       configState.kubeconfigPath,
       configState.kubeConfig.currentContext || '',
+      namespace,
       {
         isClusterPreview,
         kustomizeCommand: configState.settings.kustomizeCommand,

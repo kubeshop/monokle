@@ -5,9 +5,9 @@ import {K8sResource} from '@models/k8sresource';
 import applyMultipleResources from '@redux/services/applyMultipleResources';
 import {AppDispatch, RootState} from '@redux/store';
 
-export const applyCheckedResources = createAsyncThunk<void, undefined, {dispatch: AppDispatch; state: RootState}>(
+export const applyCheckedResources = createAsyncThunk<void, string, {dispatch: AppDispatch; state: RootState}>(
   'main/applyCheckedResources',
-  async (_, thunkAPI) => {
+  async (namespace, thunkAPI) => {
     const state = thunkAPI.getState();
 
     const checkedResources = state.main.checkedResourceIds;
@@ -17,6 +17,6 @@ export const applyCheckedResources = createAsyncThunk<void, undefined, {dispatch
       .map(resource => resourceMap[resource])
       .filter((r): r is K8sResource => r !== undefined);
 
-    applyMultipleResources(state.config, resourcesToApply, thunkAPI.dispatch);
+    applyMultipleResources(state.config, resourcesToApply, thunkAPI.dispatch, namespace);
   }
 );

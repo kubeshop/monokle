@@ -95,7 +95,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   };
 
   const onClickApplyCheckedResources = (namespace: string) => {
-    dispatch(applyCheckedResources());
+    dispatch(applyCheckedResources(namespace));
     setIsApplyModalVisible(false);
   };
 

@@ -162,7 +162,7 @@ const ResourceDiff = (props: {
       onApply();
     }
 
-    applyResource(localResource.id, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
+    applyResource(localResource.id, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', namespace, {
       isClusterPreview: previewType === 'cluster',
       shouldPerformDiff: true,
       isInClusterDiff,
