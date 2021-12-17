@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import {K8sResource} from '@models/k8sresource';
 
-import {useNamespaces} from '@hooks/useNamespaces';
+import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
 import {getDefaultNamespace} from '@utils/resources';
 
@@ -39,8 +39,8 @@ interface IProps {
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isModalVisible, resources = [], title, onCancel, onOk} = props;
 
-  const [namespaces] = useNamespaces({extra: ['default']});
   const defaultNamespace = getDefaultNamespace(resources);
+  const [namespaces] = useTargetClusterNamespaces({});
 
   const [selectedNamespace, setSelectedNamespace] = useState(defaultNamespace);
 

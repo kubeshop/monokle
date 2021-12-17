@@ -263,6 +263,19 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
+export function getTargetClusterNamespaces(namespaces: any[]) {
+  const ns: string[] = [];
+  Object.values(namespaces).forEach(namespace => {
+    const namespaceName = namespace.metadata?.name;
+
+    if (namespaceName && !ns.includes(namespaceName)) {
+      ns.push(namespaceName);
+    }
+  });
+
+  return ns;
+}
+
 /**
  * Creates a UI friendly resource name
  */
