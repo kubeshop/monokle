@@ -11,7 +11,6 @@ const SecretHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CONFIGURATION, 'Secrets'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
-  description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespacedSecret(resource.name, resource.namespace || 'default', 'true');

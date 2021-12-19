@@ -51,12 +51,6 @@ interface ResourceKindHandler {
   clusterApiVersion: string;
 
   /**
-   * A user friendly description of this resource type
-   */
-
-  description?: string;
-
-  /**
    * An external link to documentation
    */
 
@@ -111,26 +105,6 @@ interface ResourceKindHandler {
     editorSchema: any;
     editorUiSchema: any;
   };
-
-  /**
-   * optional additional editors/views to show in the actionspane
-   */
-
-  actionTabs?: {
-    name: string;
-    description: string;
-    component: React.ComponentType;
-  }[];
-
-  /**
-   * An optional list of templates presented to users when creating a new resource of this kind.
-   */
-
-  templates?: {
-    name: string;
-    description: string;
-    content: string;
-  }[];
 
   validationSchemaPrefix?: string;
 }

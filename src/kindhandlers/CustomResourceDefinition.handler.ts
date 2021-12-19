@@ -11,7 +11,6 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CUSTOM, 'Custom Resources'],
   clusterApiVersion: 'apiextensions.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1',
-  description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
     return k8sCoreV1Api.readCustomResourceDefinition(resource.name);

@@ -13,7 +13,6 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.STORAGE, 'VolumeAttachments'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'storage.k8s.io.v1',
-  description: '',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sStorageApi = kubeconfig.makeApiClient(k8s.StorageV1Api);
     return k8sStorageApi.readVolumeAttachment(resource.name);
