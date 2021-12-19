@@ -9,7 +9,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 
 const k8sSchema = JSON.parse(loadResource('schemas/k8sschemas.json'));
 const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
-const schemaCache = new Map<string, any>();
+const schemaCache = new Map<string, any | undefined>();
 
 /**
  * Returns a JSON Schema for the specified resource kind
@@ -44,8 +44,10 @@ export function getResourceSchema(resource: K8sResource) {
     if (schemaCache.has(schemaKey)) {
       return schemaCache.get(schemaKey);
     }
+  } else if (!schemaCache.has(resource.kind)) {
+    log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
+    schemaCache.set(resource.kind, undefined);
   }
 
-  log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
-  return undefined;
+  return schemaCache.get(resource.kind);
 }
