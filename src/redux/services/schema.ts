@@ -8,6 +8,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 const k8sSchema = JSON.parse(loadResource('schemas/k8sschemas.json'));
+const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.json'));
 const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
 const schemaCache = new Map<string, any | undefined>();
 
@@ -46,8 +47,31 @@ export function getResourceSchema(resource: K8sResource) {
     }
   } else if (!schemaCache.has(resource.kind)) {
     log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
-    schemaCache.set(resource.kind, undefined);
+    //    schemaCache.set(resource.kind, undefined);
   }
 
   return schemaCache.get(resource.kind);
+}
+
+export function loadCustomSchema(schemaPath: string, resourceKind: string): any | undefined {
+  try {
+    const schema = JSON.parse(loadResource(`schemas/${schemaPath}`));
+    if (schema) {
+      if (!schema.properties?.apiVersion) {
+        schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
+      }
+      if (!schema.properties?.kind) {
+        schema.properties['kind'] = objectMetadataSchema.properties.kind;
+      }
+      if (!schema.properties?.metadata) {
+        schema.properties['metadata'] = objectMetadataSchema.properties.metadata;
+      }
+
+      schemaCache.set(resourceKind, schema);
+      return schema;
+    }
+  } catch (e) {
+    log.warn(`Failed to load custom schema from ${schemaPath}`);
+    schemaCache.set(resourceKind, undefined);
+  }
 }

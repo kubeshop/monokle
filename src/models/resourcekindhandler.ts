@@ -89,7 +89,7 @@ interface ResourceKindHandler {
   navigatorPath: [navigatorName: string, sectionName: string, subsectionName: string];
 
   /**
-   * optional JSON Schema and symbol-matchers to pass to the source editor
+   * optional JSON Schema for validation and symbol-matchers to pass to the source editor
    */
 
   sourceEditorOptions?: {
@@ -105,6 +105,11 @@ interface ResourceKindHandler {
     editorSchema: any;
     editorUiSchema: any;
   };
+
+  /**
+   * Only set for native kubernetes resources - used for extracting the corresponding resource schema from
+   * file containing all schemas
+   */
 
   validationSchemaPrefix?: string;
 }
