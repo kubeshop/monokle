@@ -8,12 +8,12 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const CustomResourceDefinitionHandler: ResourceKindHandler = {
   kind: 'CustomResourceDefinition',
   apiVersionMatcher: '**',
-  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CUSTOM, 'Custom Resources'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CUSTOM, 'Definitions'],
   clusterApiVersion: 'apiextensions.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
-    return k8sCoreV1Api.readCustomResourceDefinition(resource.name);
+    const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
+    return k8sExtensionsV1Api.readCustomResourceDefinition(resource.name);
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);

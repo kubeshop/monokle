@@ -8,7 +8,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',
   apiVersionMatcher: '**',
-  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.ACCESS_CONTROL, 'Service Accounts'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.ACCESS_CONTROL, 'ServiceAccounts'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {

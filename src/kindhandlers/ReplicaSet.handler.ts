@@ -14,8 +14,8 @@ const ReplicaSetHandler: ResourceKindHandler = {
   clusterApiVersion: 'apps/v1',
   validationSchemaPrefix: 'io.k8s.api.apps.v1',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
-    return k8sCoreV1Api.readNamespacedReplicaSet(resource.name, resource.namespace || 'default', 'true');
+    const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    return k8sAppV1Api.readNamespacedReplicaSet(resource.name, resource.namespace || 'default', 'true');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);

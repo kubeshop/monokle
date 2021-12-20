@@ -128,6 +128,10 @@ export const repreviewCluster = createAsyncThunk<
 const crdVersionRegex = /(v)(\d*)(alpha|beta)?(\d*)?/;
 
 export function findDefaultVersion(crd: any) {
+  if (!crd.spec.versions) {
+    return undefined;
+  }
+
   const versionNames: string[] = crd.spec.versions.map((v: any) => v.name);
 
   versionNames.sort((a, b) => {
@@ -177,20 +181,22 @@ async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitio
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
   try {
-    const customObjects = customResourceDefinitions.map(r =>
-      // retrieve objects using latest version name
-      // @ts-ignore
-      k8sApi
-        .listClusterCustomObject(
-          r.content.spec.group,
-          findDefaultVersion(r.content) || 'v1',
-          r.content.spec.names.plural
-        )
-        .then(response =>
-          // @ts-ignore
-          getK8sObjectsAsYaml(response.body.items)
-        )
-    );
+    const customObjects = customResourceDefinitions
+      .filter(r => r.content.spec)
+      .map(r =>
+        // retrieve objects using latest version name
+        // @ts-ignore
+        k8sApi
+          .listClusterCustomObject(
+            r.content.spec.group,
+            findDefaultVersion(r.content) || 'v1',
+            r.content.spec.names.plural
+          )
+          .then(response =>
+            // @ts-ignore
+            getK8sObjectsAsYaml(response.body.items)
+          )
+      );
 
     const customResults = await Promise.allSettled(customObjects);
     // @ts-ignore

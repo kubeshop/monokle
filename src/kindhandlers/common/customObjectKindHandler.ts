@@ -1,10 +1,25 @@
 import * as k8s from '@kubernetes/client-node';
 
+import log from 'loglevel';
+
+import navSectionNames from '@constants/navSectionNames';
+
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {loadCustomSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
+
+/**
+ * extract the version from the apiVersion string of the specified resource
+ */
+
+function extractResourceVersion(resource: K8sResource, kindVersion: string, kindGroup: string) {
+  const ix = resource.version.lastIndexOf('/');
+  const version = ix > 0 ? resource.version.substring(ix + 1) : kindVersion;
+  const group = ix > 0 ? resource.version.substring(0, ix) : kindGroup;
+  return {version, group};
+}
 
 export const createCustomObjectKindHandler = (
   kind: string,
@@ -18,7 +33,7 @@ export const createCustomObjectKindHandler = (
   return {
     kind,
     apiVersionMatcher: '**',
-    navigatorPath: ['K8s Resources', subsectionName, kindSectionName],
+    navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     sourceEditorOptions: pathToSchemaResource
       ? {
@@ -26,9 +41,7 @@ export const createCustomObjectKindHandler = (
         }
       : undefined,
     getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
-      const ix = resource.version.lastIndexOf('/');
-      const version = ix > 0 ? resource.version.substring(ix + 1) : kindVersion;
-      const group = ix > 0 ? resource.version.substring(0, ix) : kindGroup;
+      const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
       return customObjectsApi.getNamespacedCustomObject(
@@ -51,7 +64,7 @@ export const createCustomObjectKindHandler = (
             return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
           reason => {
-            console.log(`Failed to get CRD for ${crdName}, using version ${kindVersion}`, reason);
+            log.warn(`Failed to get CRD for ${crdName}, using version ${kindVersion}`, reason);
             return customObjectsApi.listClusterCustomObject(kindGroup, kindVersion, kindPlural);
           }
         );
@@ -59,14 +72,12 @@ export const createCustomObjectKindHandler = (
         // @ts-ignore
         return result.body?.items || [];
       } catch (e) {
-        console.log(`error retrieving ${kindSectionName}`, e);
+        log.warn(`error retrieving ${kindSectionName}`, e);
         return [];
       }
     },
     async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
-      const ix = resource.version.lastIndexOf('/');
-      const version = ix > 0 ? resource.version.substring(ix + 1) : kindVersion;
-      const group = ix > 0 ? resource.version.substring(0, ix) : kindGroup;
+      const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
       await customObjectsApi.deleteNamespacedCustomObject(

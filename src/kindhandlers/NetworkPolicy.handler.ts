@@ -12,8 +12,8 @@ const NetworkPolicyHandler: ResourceKindHandler = {
   clusterApiVersion: 'networking.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.networking.v1',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
-    return k8sCoreV1Api.readNamespacedNetworkPolicy(resource.name, resource.namespace || 'default');
+    const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+    return k8sNetworkingV1Api.readNamespacedNetworkPolicy(resource.name, resource.namespace || 'default');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);

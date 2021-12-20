@@ -12,8 +12,8 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
   clusterApiVersion: 'rbac.authorization.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.rbac.v1',
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
-    return k8sCoreV1Api.readClusterRoleBinding(resource.name);
+    const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
+    return k8sRbacV1Api.readClusterRoleBinding(resource.name);
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
