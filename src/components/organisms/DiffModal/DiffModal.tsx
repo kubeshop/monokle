@@ -153,9 +153,10 @@ const DiffModal = () => {
 
   const confirmModalTitle = useMemo(() => {
     const resource = resourceMap[diffResourceId || ''];
+
     return isKustomizationResource(resource)
-      ? makeApplyKustomizationText(resource?.name, kubeconfigContext || '')
-      : makeApplyResourceText(resource?.name, kubeconfigContext || '');
+      ? makeApplyKustomizationText(resource?.name, kubeconfigContext)
+      : makeApplyResourceText(resource?.name, kubeconfigContext);
   }, [diffResourceId, kubeconfigContext, resourceMap]);
 
   useEffect(() => {

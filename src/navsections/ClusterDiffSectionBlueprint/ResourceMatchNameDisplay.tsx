@@ -112,8 +112,8 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     }
 
     return isKustomizationResource(firstLocalResource)
-      ? makeApplyKustomizationText(firstLocalResource.name, kubeconfigContext || '')
-      : makeApplyResourceText(firstLocalResource.name, kubeconfigContext || '');
+      ? makeApplyKustomizationText(firstLocalResource.name, kubeconfigContext)
+      : makeApplyResourceText(firstLocalResource.name, kubeconfigContext);
   }, [firstLocalResource, kubeconfigContext]);
 
   const onClickDiff = () => {

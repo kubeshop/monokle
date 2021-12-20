@@ -114,8 +114,8 @@ const ResourceDiff = (props: {
   const confirmModalTitle = useMemo(
     () =>
       isKustomizationResource(localResource)
-        ? makeApplyKustomizationText(localResource.name, kubeconfigContext || '')
-        : makeApplyResourceText(localResource.name, kubeconfigContext || ''),
+        ? makeApplyKustomizationText(localResource.name, kubeconfigContext)
+        : makeApplyResourceText(localResource.name, kubeconfigContext),
     [localResource, kubeconfigContext]
   );
 

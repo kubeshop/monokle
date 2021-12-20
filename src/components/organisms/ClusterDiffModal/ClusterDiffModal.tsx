@@ -127,7 +127,7 @@ function ClusterDiffModal() {
   const windowSize = useWindowSize();
 
   const confirmModalTitle = useMemo(
-    () => makeApplyMultipleResourcesText(selectedMatches.length, currentContext || ''),
+    () => makeApplyMultipleResourcesText(selectedMatches.length, currentContext),
     [selectedMatches, currentContext]
   );
 

@@ -146,8 +146,8 @@ const HotKeysHandler = () => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, configState.kubeConfig.currentContext || '')
-      : makeApplyResourceText(selectedResource.name, configState.kubeConfig.currentContext || '');
+      ? makeApplyKustomizationText(selectedResource.name, configState.kubeConfig.currentContext)
+      : makeApplyResourceText(selectedResource.name, configState.kubeConfig.currentContext);
   }, [mainState.resourceMap, mainState.selectedResourceId, configState.kubeConfig.currentContext]);
 
   useHotkeys(

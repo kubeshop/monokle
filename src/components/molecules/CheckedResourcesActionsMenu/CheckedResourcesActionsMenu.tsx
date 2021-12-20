@@ -80,7 +80,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   );
 
   const confirmModalTitle = useMemo(
-    () => makeApplyMultipleResourcesText(checkedResources.length, currentContext || ''),
+    () => makeApplyMultipleResourcesText(checkedResources.length, currentContext),
     [checkedResources, currentContext]
   );
 

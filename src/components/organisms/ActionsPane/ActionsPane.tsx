@@ -323,8 +323,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeconfigContext || '')
-      : makeApplyResourceText(selectedResource.name, kubeconfigContext || '');
+      ? makeApplyKustomizationText(selectedResource.name, kubeconfigContext)
+      : makeApplyResourceText(selectedResource.name, kubeconfigContext);
   }, [selectedResource, kubeconfigContext]);
 
   // called from main thread because thunks cannot be dispatched by main
