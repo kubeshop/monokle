@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import {stringify} from 'yaml';
 
 import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
+import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
@@ -111,8 +112,8 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     }
 
     return isKustomizationResource(firstLocalResource)
-      ? `Deploy ${firstLocalResource.name} kustomization to cluster [${kubeconfigContext || ''}]?`
-      : `Deploy ${firstLocalResource.name} to cluster [${kubeconfigContext || ''}]?`;
+      ? makeApplyKustomizationText(firstLocalResource.name, kubeconfigContext || '')
+      : makeApplyResourceText(firstLocalResource.name, kubeconfigContext || '');
   }, [firstLocalResource, kubeconfigContext]);
 
   const onClickDiff = () => {
@@ -242,7 +243,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
-          isModalVisible={isApplyModalVisible}
+          isVisible={isApplyModalVisible}
           resources={firstLocalResource ? [firstLocalResource] : []}
           title={confirmModalTitle}
           onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}

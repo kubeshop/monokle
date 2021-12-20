@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import {parse, stringify} from 'yaml';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
+import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {K8sResource} from '@models/k8sresource';
 
@@ -113,8 +114,8 @@ const ResourceDiff = (props: {
   const confirmModalTitle = useMemo(
     () =>
       isKustomizationResource(localResource)
-        ? `Deploy ${localResource.name} kustomization to cluster [${kubeconfigContext || ''}]?`
-        : `Deploy ${localResource.name} to cluster [${kubeconfigContext || ''}]?`,
+        ? makeApplyKustomizationText(localResource.name, kubeconfigContext || '')
+        : makeApplyResourceText(localResource.name, kubeconfigContext || ''),
     [localResource, kubeconfigContext]
   );
 
@@ -216,7 +217,7 @@ const ResourceDiff = (props: {
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
-          isModalVisible={isApplyModalVisible}
+          isVisible={isApplyModalVisible}
           resources={[localResource]}
           title={confirmModalTitle}
           onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}

@@ -7,6 +7,8 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -125,7 +127,7 @@ function ClusterDiffModal() {
   const windowSize = useWindowSize();
 
   const confirmModalTitle = useMemo(
-    () => `Deploy selected resources (${selectedMatches.length}) to cluster [${currentContext || ''}]?`,
+    () => makeApplyMultipleResourcesText(selectedMatches.length, currentContext || ''),
     [selectedMatches, currentContext]
   );
 
@@ -139,7 +141,7 @@ function ClusterDiffModal() {
             : undefined
         )
         .filter((r): r is K8sResource => r !== undefined),
-    [matches, selectedMatches]
+    [matches, selectedMatches, resourceMap]
   );
 
   const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
@@ -329,7 +331,7 @@ function ClusterDiffModal() {
 
           {isApplyModalVisible && (
             <ModalConfirmWithNamespaceSelect
-              isModalVisible={isApplyModalVisible}
+              isVisible={isApplyModalVisible}
               resources={selectedResources}
               title={confirmModalTitle}
               onOk={selectedNamespace => onClickApplySelectedResourceMatches(selectedNamespace)}

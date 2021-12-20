@@ -16,7 +16,7 @@ import {setAlert} from '@redux/reducers/alert';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
-import {getDefaultNamespace} from '@utils/resources';
+import {getDefaultNamespaceForApply} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
@@ -39,7 +39,7 @@ const TitleContainer = styled.div`
 `;
 
 interface IProps {
-  isModalVisible: boolean;
+  isVisible: boolean;
   resources?: K8sResource[];
   title: string;
   onOk: (selectedNamspace: string) => void;
@@ -47,14 +47,14 @@ interface IProps {
 }
 
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
-  const {isModalVisible, resources = [], title, onCancel, onOk} = props;
+  const {isVisible, resources = [], title, onCancel, onOk} = props;
 
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
 
-  const defaultNamespace = getDefaultNamespace(resources);
-  const [namespaces] = useTargetClusterNamespaces({});
+  const defaultNamespace = getDefaultNamespaceForApply(resources);
+  const [namespaces] = useTargetClusterNamespaces();
 
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
   const [errorMessage, setErrorMessage] = useState('');
@@ -95,7 +95,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (selectedOption === 'existing') {
       onOk(selectedNamespace);
     }
-  }, [createNamespaceName, selectedNamespace, selectedOption]);
+  }, [currentContext, createNamespaceName, dispatch, kubeconfigPath, selectedNamespace, selectedOption, onOk]);
 
   useEffect(() => {
     if (!namespaces.includes(defaultNamespace)) {
@@ -107,7 +107,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setSelectedNamespace(defaultNamespace);
       setCreateNamespaceName('');
     }
-  }, [namespaces]);
+  }, [defaultNamespace, namespaces]);
 
   if (!selectedOption) {
     return null;
@@ -116,7 +116,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   return (
     <Modal
       centered
-      visible={isModalVisible}
+      visible={isVisible}
       title={
         <TitleContainer>
           <ExclamationCircleOutlined style={{marginRight: '10px', color: Colors.yellowWarning}} />
@@ -149,17 +149,13 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
               defaultValue={defaultNamespace}
               onChange={value => setSelectedNamespace(value)}
             >
-              {namespaces.map(namespace => {
-                if (typeof namespace !== 'string') {
-                  return null;
-                }
-
-                return (
+              {namespaces
+                .filter(n => typeof n === 'string')
+                .map(namespace => (
                   <Select.Option key={namespace} value={namespace}>
                     {namespace}
                   </Select.Option>
-                );
-              })}
+                ))}
             </Select>
           </NamespaceContainer>
         ) : (

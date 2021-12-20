@@ -6,6 +6,8 @@ import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -78,8 +80,8 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   );
 
   const confirmModalTitle = useMemo(
-    () => `Deploy selected resources (${checkedResourceIds.length}) to cluster [${currentContext || ''}]?`,
-    [checkedResourceIds, currentContext]
+    () => makeApplyMultipleResourcesText(checkedResources.length, currentContext || ''),
+    [checkedResources, currentContext]
   );
 
   const onClickDelete = () => {
@@ -127,7 +129,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
           resources={checkedResources}
-          isModalVisible={isApplyModalVisible}
+          isVisible={isApplyModalVisible}
           title={confirmModalTitle}
           onOk={selectedNamespace => onClickApplyCheckedResources(selectedNamespace)}
           onCancel={() => setIsApplyModalVisible(false)}

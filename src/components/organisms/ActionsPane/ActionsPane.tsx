@@ -15,6 +15,7 @@ import {
   PREVIEW_PREFIX,
   TOOLTIP_DELAY,
 } from '@constants/constants';
+import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
   AddResourceToExistingFileTooltip,
   ApplyFileTooltip,
@@ -93,7 +94,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
-  const [key, setKey] = useState('source');
+  const [activeTabKey, setActiveTabKey] = useState('source');
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
 
   const dispatch = useAppDispatch();
@@ -322,8 +323,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? `Deploy ${selectedResource.name} kustomization to cluster [${kubeconfigContext || ''}]?`
-      : `Deploy ${selectedResource.name} to cluster [${kubeconfigContext || ''}]?`;
+      ? makeApplyKustomizationText(selectedResource.name, kubeconfigContext || '')
+      : makeApplyResourceText(selectedResource.name, kubeconfigContext || '');
   }, [selectedResource, kubeconfigContext]);
 
   // called from main thread because thunks cannot be dispatched by main
@@ -344,12 +345,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   useEffect(() => {
     if (
-      (key === 'metadataForm' || key === 'form') &&
+      (activeTabKey === 'metadataForm' || activeTabKey === 'form') &&
       (!selectedResourceId || !(resourceKindHandler && resourceKindHandler.formEditorOptions))
     ) {
-      setKey('source');
+      setActiveTabKey('source');
     }
-  }, [selectedResourceId, selectedResource, key, resourceKindHandler]);
+  }, [selectedResourceId, selectedResource, activeTabKey, resourceKindHandler]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
@@ -439,8 +440,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
         <S.TabsContainer>
           <S.Tabs
             defaultActiveKey="source"
-            activeKey={key}
-            onChange={k => setKey(k)}
+            activeKey={activeTabKey}
+            onChange={k => setActiveTabKey(k)}
             tabBarExtraContent={
               selectedResource && resourceKindHandler?.helpLink ? (
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
@@ -514,7 +515,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
-          isModalVisible={isApplyModalVisible}
+          isVisible={isApplyModalVisible}
           resources={selectedResource ? [selectedResource] : []}
           title={confirmModalTitle}
           onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}

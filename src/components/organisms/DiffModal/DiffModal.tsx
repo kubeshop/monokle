@@ -10,6 +10,8 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 import {parse, stringify} from 'yaml';
 
+import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -152,9 +154,9 @@ const DiffModal = () => {
   const confirmModalTitle = useMemo(() => {
     const resource = resourceMap[diffResourceId || ''];
     return isKustomizationResource(resource)
-      ? `Deploy ${resource?.name} kustomization to cluster [${kubeconfigContext || ''}]?`
-      : `Deploy ${resource?.name} to cluster [${kubeconfigContext || ''}]?`;
-  }, [diffResourceId, kubeconfigContext]);
+      ? makeApplyKustomizationText(resource?.name, kubeconfigContext || '')
+      : makeApplyResourceText(resource?.name, kubeconfigContext || '');
+  }, [diffResourceId, kubeconfigContext, resourceMap]);
 
   useEffect(() => {
     if (!diffResourceId) {
@@ -303,7 +305,7 @@ const DiffModal = () => {
 
           {isApplyModalVisible && (
             <ModalConfirmWithNamespaceSelect
-              isModalVisible={isApplyModalVisible}
+              isVisible={isApplyModalVisible}
               resources={diffResourceId && resourceMap[diffResourceId] ? [resourceMap[diffResourceId]] : []}
               title={confirmModalTitle}
               onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}

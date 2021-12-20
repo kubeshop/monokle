@@ -4,6 +4,7 @@ import {useSelector} from 'react-redux';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
+import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -103,7 +104,7 @@ const HotKeysHandler = () => {
     }
     const resource = mainState.resourceMap[mainState.selectedResourceId];
     return resource ? [resource] : [];
-  }, [mainState.selectedResourceId]);
+  }, [mainState.resourceMap, mainState.selectedResourceId]);
 
   const onClickApplyResource = (namespace: string) => {
     if (!mainState.selectedResourceId) {
@@ -145,9 +146,9 @@ const HotKeysHandler = () => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? `Deploy ${selectedResource.name} kustomization to cluster [${configState.kubeConfig.currentContext || ''}]?`
-      : `Deploy ${selectedResource.name} to cluster [${configState.kubeConfig.currentContext || ''}]?`;
-  }, [mainState.selectedResourceId, configState.kubeConfig.currentContext]);
+      ? makeApplyKustomizationText(selectedResource.name, configState.kubeConfig.currentContext || '')
+      : makeApplyResourceText(selectedResource.name, configState.kubeConfig.currentContext || '');
+  }, [mainState.resourceMap, mainState.selectedResourceId, configState.kubeConfig.currentContext]);
 
   useHotkeys(
     hotkeys.APPLY_SELECTION,
@@ -249,7 +250,7 @@ const HotKeysHandler = () => {
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
-          isModalVisible={isApplyModalVisible}
+          isVisible={isApplyModalVisible}
           resources={applySelectedResource}
           title={confirmModalTitle}
           onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}

@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
 import {getTargetClusterNamespaces} from '@redux/services/resource';
@@ -6,33 +6,27 @@ import {getTargetClusterNamespaces} from '@redux/services/resource';
 export const ALL_NAMESPACES = '<all>';
 export const NO_NAMESPACE = '<none>';
 
-export function useTargetClusterNamespaces(options: {
-  extra?: ('all' | 'none' | 'default')[];
-}): [string[], Dispatch<SetStateAction<string[]>>] {
+export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction<string[]>>] {
   const context = useAppSelector(state => state.config.kubeConfig.currentContext);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-
-  const optionsExtra = useRef<string[]>([]);
-  optionsExtra.current = options.extra || [];
 
   const [namespaces, setNamespaces] = useState<string[]>([]);
 
   useEffect(() => {
     const setClusterNamespaces = async () => {
-      setNamespaces([
-        ...new Set([
-          ...optionsExtra.current.map(opt => {
-            if (opt === 'all') {
-              return ALL_NAMESPACES;
-            }
-            if (opt === 'none') {
-              return NO_NAMESPACE;
-            }
-            return opt;
-          }),
-          ...(await getTargetClusterNamespaces(kubeconfigPath, context || '')),
-        ]),
-      ]);
+      let clusterNamespaces = await getTargetClusterNamespaces(kubeconfigPath, context || '');
+      clusterNamespaces.sort((a, b) => {
+        if (a === 'default') {
+          return -1;
+        }
+        if (b === 'default') {
+          return 1;
+        }
+
+        return a.toLowerCase() > b.toLowerCase() ? 1 : b.toLowerCase() > a.toLowerCase() ? -1 : 0;
+      });
+
+      setNamespaces(clusterNamespaces);
     };
 
     setClusterNamespaces();

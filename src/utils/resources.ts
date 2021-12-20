@@ -103,19 +103,21 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
   };
 }
 
-export function getDefaultNamespace(resources: K8sResource[]) {
+export function getDefaultNamespaceForApply(resources: K8sResource[]) {
   let namespace = 'default';
 
   resources.forEach(resource => {
-    if (resource.namespace) {
-      if (resource.namespace !== namespace) {
-        if (namespace !== 'default') {
-          namespace = 'default';
-          return namespace;
-        }
+    if (!resource.namespace) {
+      return;
+    }
 
-        namespace = resource.namespace;
+    if (resource.namespace !== namespace) {
+      if (namespace !== 'default') {
+        namespace = 'default';
+        return namespace;
       }
+
+      namespace = resource.namespace;
     }
   });
 
