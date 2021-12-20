@@ -163,6 +163,15 @@ const FileTreeContainer = styled.div`
     margin-left: 8px;
     background: transparent;
   }
+
+  & .ant-tree-switcher-leaf-line::before {
+    border-right: 1px solid #434343;
+  }
+
+  & .ant-tree-switcher-leaf-line::after {
+    border-bottom: 1px solid #434343;
+  }
+
   & .ant-tree-treenode-selected {
     vertical-align: center;
     margin-left: 0px !important;
@@ -915,8 +924,8 @@ const FileTreePane = () => {
             return node.highlight;
           }}
           disabled={isInPreviewMode || previewLoader.isLoading}
-          showLine
-          showIcon={false}
+          showIcon
+          showLine={{showLeafIcon: false}}
         />
       ) : (
         <NoFilesContainer>
