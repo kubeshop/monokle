@@ -74,7 +74,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const checkedResources = useMemo(
     () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
-    [checkedResourceIds]
+    [checkedResourceIds, resourceMap]
   );
 
   const confirmModalTitle = useMemo(
