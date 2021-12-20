@@ -1,11 +1,7 @@
-import * as k8s from '@kubernetes/client-node';
-
 import {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
 import {getTargetClusterNamespaces} from '@redux/services/resource';
-
-import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
 export const ALL_NAMESPACES = '<all>';
 export const NO_NAMESPACE = '<none>';
@@ -23,12 +19,6 @@ export function useTargetClusterNamespaces(options: {
 
   useEffect(() => {
     const setClusterNamespaces = async () => {
-      const kc = new k8s.KubeConfig();
-      kc.loadFromFile(kubeconfigPath);
-      kc.setCurrentContext(context || '');
-
-      const ns = await NamespaceHandler.listResourcesInCluster(kc);
-
       setNamespaces([
         ...new Set([
           ...optionsExtra.current.map(opt => {
@@ -40,7 +30,7 @@ export function useTargetClusterNamespaces(options: {
             }
             return opt;
           }),
-          ...getTargetClusterNamespaces(ns),
+          ...(await getTargetClusterNamespaces(kubeconfigPath, context || '')),
         ]),
       ]);
     };

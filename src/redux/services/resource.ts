@@ -1,3 +1,5 @@
+import * as k8s from '@kubernetes/client-node';
+
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
@@ -22,6 +24,7 @@ import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs
 import {getFileTimestamp} from '@utils/files';
 
 import {getDependentResourceKinds, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
+import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
 import {processRefs} from './resourceRefs';
 import {validateResource} from './validation';
@@ -263,9 +266,15 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
-export function getTargetClusterNamespaces(namespaces: any[]) {
+export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string) {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromFile(kubeconfigPath);
+  kc.setCurrentContext(context);
+
+  const namespaces = await NamespaceHandler.listResourcesInCluster(kc);
+
   const ns: string[] = [];
-  Object.values(namespaces).forEach(namespace => {
+  namespaces.forEach(namespace => {
     const namespaceName = namespace.metadata?.name;
 
     if (namespaceName && !ns.includes(namespaceName)) {
