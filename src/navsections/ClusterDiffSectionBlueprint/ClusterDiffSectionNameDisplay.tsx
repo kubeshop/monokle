@@ -1,13 +1,18 @@
 import React from 'react';
 
-import {Button, Checkbox} from 'antd';
+import {Button, Checkbox, Switch} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectAllClusterDiffMatches, unselectAllClusterDiffMatches} from '@redux/reducers/main';
+import {
+  clusterDiffToggleClusterOnlyResources,
+  reloadClusterDiff,
+  selectAllClusterDiffMatches,
+  unselectAllClusterDiffMatches,
+} from '@redux/reducers/main';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -22,14 +27,15 @@ const NameDisplayContainer = styled.div`
   margin-right: 18px;
 `;
 
-const TagsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
+const TitlesRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr max-content 1fr;
+  grid-column-gap: 50px;
   margin-left: 8px;
   font-size: 16px;
 `;
 
-const TagWrapper = styled.div`
+const TitleContainer = styled.div`
   width: 400px;
 `;
 
@@ -58,10 +64,19 @@ const CheckboxLabel = styled.span`
 
 const ReloadButton = styled(Button)``;
 
+const SwitchContainer = styled.span`
+  margin-left: 8px;
+  cursor: pointer;
+`;
+
+const SwitchLabel = styled.span`
+  margin-left: 4px;
+`;
+
 function ResourceDiffSectionNameDisplay() {
   const dispatch = useAppDispatch();
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-
+  const hideClusterOnlyResources = useAppSelector(state => state.main.clusterDiff.hideClusterOnlyResources);
   const areAllMatchesSelected = useAppSelector(
     state =>
       state.main.clusterDiff.selectedMatches.length === state.main.clusterDiff.clusterToLocalResourcesMatches.length
@@ -83,10 +98,15 @@ function ResourceDiffSectionNameDisplay() {
     }
   };
 
+  const onClickShowAllClusterResources = () => {
+    dispatch(clusterDiffToggleClusterOnlyResources());
+    dispatch(reloadClusterDiff());
+  };
+
   return (
     <NameDisplayContainer>
-      <TagsContainer>
-        <TagWrapper>
+      <TitlesRow>
+        <TitleContainer>
           <StyledTitle>Local Resources</StyledTitle>
           {isInPreviewMode && (
             <Button type="primary" ghost onClick={onClickExitPreview} style={{marginRight: 8}}>
@@ -94,17 +114,21 @@ function ResourceDiffSectionNameDisplay() {
             </Button>
           )}
           <PreviewDropdown btnStyle={{maxWidth: '285px'}} />
-        </TagWrapper>
+        </TitleContainer>
 
         <Spacing />
 
-        <TagWrapper style={{paddingLeft: 45}}>
+        <TitleContainer style={{paddingLeft: 18}}>
           <StyledTitle>Cluster Resources</StyledTitle>
           <ReloadButton icon={<ReloadOutlined />} onClick={onClickReload} type="primary" ghost>
             Reload
           </ReloadButton>
-        </TagWrapper>
-      </TagsContainer>
+          <SwitchContainer onClick={onClickShowAllClusterResources}>
+            <Switch checked={!hideClusterOnlyResources} />
+            <SwitchLabel>Show all</SwitchLabel>
+          </SwitchContainer>
+        </TitleContainer>
+      </TitlesRow>
 
       <CheckboxWrapper onClick={onClickSelectAll}>
         <Checkbox checked={areAllMatchesSelected} />

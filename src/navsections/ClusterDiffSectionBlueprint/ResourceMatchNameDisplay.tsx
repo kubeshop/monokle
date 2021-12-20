@@ -32,8 +32,9 @@ import Colors from '@styles/Colors';
 
 const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
   width: 100%;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr max-content 1fr;
+  grid-column-gap: 50px;
   margin-left: -24px;
   padding-left: 24px;
   ${props => props.highlightdiff && `background: ${Colors.diffBackground}; color: ${Colors.yellow10} !important;`}
@@ -41,10 +42,14 @@ const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
   ${props => props.highlightdiff && props.hovered && `background: ${Colors.diffBackgroundHover}`}
 `;
 
-const Label = styled.span<{disabled?: boolean}>`
-  width: 350px;
+const LabelContainer = styled.span<{disabled?: boolean}>`
   ${props => props.disabled && `color: ${Colors.grey800};`}
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `;
+
+const Label = styled.span``;
 
 const StyledDiffSpan = styled.span`
   font-weight: 600;
@@ -52,12 +57,16 @@ const StyledDiffSpan = styled.span`
   margin: 0 8px;
 `;
 
-const IconsContainer = styled.div`
-  width: 80px;
+const IconsContainer = styled.div<{$clusterOnly: boolean}>`
+  width: 100px;
   display: flex;
-  justify-content: space-between;
+  ${props => (props.$clusterOnly ? 'justify-content: flex-end;' : 'justify-content: space-between;')}
   align-items: center;
   font-size: 14px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-left: 1px solid ${Colors.grey900};
+  border-right: 1px solid ${Colors.grey900};
 `;
 
 function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
@@ -174,19 +183,17 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       onMouseLeave={() => setIsHovered(false)}
       highlightdiff={areResourcesDifferent}
     >
-      <span style={{width: '400px'}}>
+      <LabelContainer disabled={!firstLocalResource}>
         <Checkbox checked={isMatchSelected} onChange={onCheckboxChange} style={{marginRight: '20px'}} />
-        <Label disabled={!firstLocalResource}>
-          {!resourceFilterNamespace && (
-            <Tag color={areResourcesDifferent ? 'yellow' : 'default'}>
-              {firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}
-            </Tag>
-          )}
-          {itemInstance.name}
-        </Label>
-      </span>
+        {!resourceFilterNamespace && (
+          <Tag color={areResourcesDifferent ? 'yellow' : 'default'}>
+            {firstLocalResource?.namespace ? firstLocalResource.namespace : 'default'}
+          </Tag>
+        )}
+        <Label>{itemInstance.name}</Label>
+      </LabelContainer>
 
-      <IconsContainer>
+      <IconsContainer $clusterOnly={Boolean(clusterResource && !firstLocalResource)}>
         {firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffApplyTooltip}>
             <ArrowRightOutlined style={{color: Colors.blue6}} onClick={onClickApply} />
@@ -206,16 +213,16 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
         )}
       </IconsContainer>
 
-      <Label disabled={!clusterResource}>
+      <LabelContainer disabled={!clusterResource}>
         {!resourceFilterNamespace && (
           <Tag color={areResourcesDifferent ? 'yellow' : !clusterResource ? 'rgba(58, 67, 68, 0.3)' : 'default'}>
-            <span style={{color: !clusterResource ? '#686868' : undefined}}>
+            <span style={{color: !clusterResource ? '#686868' : undefined, textOverflow: 'ellipsis'}}>
               {clusterResource?.namespace ? clusterResource.namespace : 'default'}
             </span>
           </Tag>
         )}
-        {itemInstance.name}
-      </Label>
+        <Label>{itemInstance.name}</Label>
+      </LabelContainer>
     </Container>
   );
 }

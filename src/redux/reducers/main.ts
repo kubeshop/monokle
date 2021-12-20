@@ -592,6 +592,9 @@ export const mainSlice = createSlice({
     setPlugins: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin[]>) => {
       state.plugins = action.payload;
     },
+    clusterDiffToggleClusterOnlyResources: (state: Draft<AppState>) => {
+      state.clusterDiff.hideClusterOnlyResources = !state.clusterDiff.hideClusterOnlyResources;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1019,6 +1022,7 @@ export const {
   unselectClusterDiffMatch,
   unselectAllClusterDiffMatches,
   reloadClusterDiff,
+  clusterDiffToggleClusterOnlyResources,
   setSelectionHistory,
   reprocessNewResource,
   editorHasReloadedSelectedPath,
