@@ -5,14 +5,14 @@ import {
   ISTIO_SUBSECTION_NAME,
 } from '@src/kindhandlers/istio/constants';
 
-const VirtualServiceHandler = createCustomObjectKindHandler(
-  'VirtualService',
+const DestinationRuleHandler = createCustomObjectKindHandler(
+  'DestinationRule',
   ISTIO_SUBSECTION_NAME,
-  'VirtualServices',
+  'DestinationRules',
   ISTIO_RESOURCE_GROUP,
   ISTIO_DEFAULT_RESOURCE_VERSION,
-  'virtualservices',
-  'istio/virtualservice.json'
+  'destinationrules',
+  'istio/destinationrule.json'
 );
 
-export default VirtualServiceHandler;
+export default DestinationRuleHandler;

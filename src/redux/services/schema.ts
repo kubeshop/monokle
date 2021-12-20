@@ -47,7 +47,7 @@ export function getResourceSchema(resource: K8sResource) {
     }
   } else if (!schemaCache.has(resource.kind)) {
     log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
-    //    schemaCache.set(resource.kind, undefined);
+    schemaCache.set(resource.kind, undefined);
   }
 
   return schemaCache.get(resource.kind);
