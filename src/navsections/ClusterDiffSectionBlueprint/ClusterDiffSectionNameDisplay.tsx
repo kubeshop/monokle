@@ -8,9 +8,9 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
-  clusterDiffToggleClusterOnlyResources,
   reloadClusterDiff,
   selectAllClusterDiffMatches,
+  toggleClusterOnlyResourcesInClusterDiff,
   unselectAllClusterDiffMatches,
 } from '@redux/reducers/main';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -35,9 +35,7 @@ const TitlesRow = styled.div`
   font-size: 16px;
 `;
 
-const TitleContainer = styled.div`
-  width: 400px;
-`;
+const TitleContainer = styled.div``;
 
 const Spacing = styled.div`
   width: 60px;
@@ -99,7 +97,7 @@ function ResourceDiffSectionNameDisplay() {
   };
 
   const onClickShowAllClusterResources = () => {
-    dispatch(clusterDiffToggleClusterOnlyResources());
+    dispatch(toggleClusterOnlyResourcesInClusterDiff());
     dispatch(reloadClusterDiff());
   };
 
