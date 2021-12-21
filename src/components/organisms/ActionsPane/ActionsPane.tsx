@@ -31,10 +31,10 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
-import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
 import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
+import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 import {performResourceDiff} from '@redux/thunks/diffResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
@@ -48,6 +48,7 @@ import TabHeader from '@atoms/TabHeader';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
+import HelmChartModalConfirmWithNamespaceSelect from '@components/molecules/HelmChartModalConfirmWithNamespaceSelect';
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
@@ -92,9 +93,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
 
+  const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
-  const [activeTabKey, setActiveTabKey] = useState('source');
+  const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
 
   const dispatch = useAppDispatch();
@@ -223,14 +225,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (selectedValuesFileId && (!selectedResourceId || selectedValuesFileId === selectedResourceId)) {
       const helmValuesFile = helmValuesMap[selectedValuesFileId];
       if (helmValuesFile) {
-        applyHelmChartWithConfirm(
-          helmValuesFile,
-          helmChartMap[helmValuesFile.helmChartId],
-          fileMap,
-          dispatch,
-          kubeconfig,
-          kubeconfigContext || ''
-        );
+        setIsHelmChartApplyModalVisible(true);
       }
     } else if (selectedResource) {
       setIsApplyModalVisible(true);
@@ -295,27 +290,52 @@ const ActionsPane = (props: {contentHeight: string}) => {
     return false;
   }, [selectedResource, kubeconfigPath]);
 
-  const onClickApplyResource = (namespace: string) => {
-    if (!selectedResource) {
-      setIsApplyModalVisible(false);
-      return;
-    }
-    const isClusterPreview = previewType === 'cluster';
-    applyResource(
-      selectedResource.id,
-      resourceMap,
-      fileMap,
-      dispatch,
-      kubeconfigPath,
-      kubeconfigContext || '',
-      namespace,
-      {
-        isClusterPreview,
-        kustomizeCommand,
+  const onClickApplyResource = useCallback(
+    (namespace: string) => {
+      if (!selectedResource) {
+        setIsApplyModalVisible(false);
+        return;
       }
-    );
-    setIsApplyModalVisible(false);
-  };
+      const isClusterPreview = previewType === 'cluster';
+      applyResource(
+        selectedResource.id,
+        resourceMap,
+        fileMap,
+        dispatch,
+        kubeconfigPath,
+        kubeconfigContext || '',
+        namespace,
+        {
+          isClusterPreview,
+          kustomizeCommand,
+        }
+      );
+      setIsApplyModalVisible(false);
+    },
+    [dispatch, fileMap, kubeconfigContext, kubeconfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
+  );
+
+  const onClickApplyHelmChart = useCallback(
+    (namespace: string, shouldCreateNamespace: boolean) => {
+      if (!selectedValuesFileId) {
+        setIsHelmChartApplyModalVisible(false);
+        return;
+      }
+
+      const helmValuesFile = helmValuesMap[selectedValuesFileId];
+      applyHelmChart(
+        helmValuesFile,
+        helmChartMap[helmValuesFile.helmChartId],
+        fileMap,
+        dispatch,
+        kubeconfig,
+        kubeconfigContext || '',
+        namespace,
+        shouldCreateNamespace
+      );
+    },
+    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeconfig, kubeconfigContext, selectedValuesFileId]
+  );
 
   const confirmModalTitle = useMemo(() => {
     if (!selectedResource) {
@@ -326,6 +346,18 @@ const ActionsPane = (props: {contentHeight: string}) => {
       ? makeApplyKustomizationText(selectedResource.name, kubeconfigContext)
       : makeApplyResourceText(selectedResource.name, kubeconfigContext);
   }, [selectedResource, kubeconfigContext]);
+
+  const helmChartConfirmModalTitle = useMemo(() => {
+    if (!selectedValuesFileId) {
+      return '';
+    }
+
+    const helmValuesFile = helmValuesMap[selectedValuesFileId];
+
+    return `Install the ${helmChartMap[helmValuesFile.helmChartId].name} Chart using ${
+      helmValuesFile.name
+    } in cluster [${kubeconfigContext || ''}]?`;
+  }, [helmChartMap, helmValuesMap, kubeconfigContext, selectedValuesFileId]);
 
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {
@@ -520,6 +552,17 @@ const ActionsPane = (props: {contentHeight: string}) => {
           title={confirmModalTitle}
           onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
           onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
+
+      {isHelmChartApplyModalVisible && (
+        <HelmChartModalConfirmWithNamespaceSelect
+          isVisible={isHelmChartApplyModalVisible}
+          title={helmChartConfirmModalTitle}
+          onCancel={() => setIsHelmChartApplyModalVisible(false)}
+          onOk={(selectedNamespace, shouldCreateNamespace) =>
+            onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace || false)
+          }
         />
       )}
     </>

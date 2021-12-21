@@ -23,30 +23,36 @@ function applyHelmChartToCluster(
   helmChart: HelmChart,
   fileMap: FileMapType,
   kubeconfig: string,
-  context: string
+  context: string,
+  namespace: string,
+  shouldCreateNamespace?: boolean
 ) {
   const chartPath = path.dirname(getAbsoluteHelmChartPath(helmChart, fileMap));
 
-  const child = spawn(
-    'helm',
-    [
-      '--kube-context',
-      context,
-      'install',
-      '-f',
-      getAbsoluteValuesFilePath(valuesFile, fileMap),
-      helmChart.name,
-      chartPath,
-    ],
-    {
-      env: {
-        NODE_ENV: PROCESS_ENV.NODE_ENV,
-        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-        PATH: getShellPath(),
-        KUBECONFIG: kubeconfig,
-      },
-    }
-  );
+  let helmArgs = [
+    '--kube-context',
+    context,
+    '-n',
+    namespace,
+    'install',
+    '-f',
+    getAbsoluteValuesFilePath(valuesFile, fileMap),
+    helmChart.name,
+    chartPath,
+  ];
+
+  if (shouldCreateNamespace) {
+    helmArgs.unshift('--create-namespace');
+  }
+
+  const child = spawn('helm', helmArgs, {
+    env: {
+      NODE_ENV: PROCESS_ENV.NODE_ENV,
+      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
+      PATH: getShellPath(),
+      KUBECONFIG: kubeconfig,
+    },
+  });
 
   return child;
 }
@@ -63,13 +69,23 @@ export async function applyHelmChart(
   fileMap: FileMapType,
   dispatch: AppDispatch,
   kubeconfig: string,
-  context: string
+  context: string,
+  namespace: string,
+  shouldCreateNamespace?: boolean
 ) {
   try {
     dispatch(setApplyingResource(true));
 
     try {
-      const child = applyHelmChartToCluster(valuesFile, helmChart, fileMap, kubeconfig, context);
+      const child = applyHelmChartToCluster(
+        valuesFile,
+        helmChart,
+        fileMap,
+        kubeconfig,
+        context,
+        namespace,
+        shouldCreateNamespace
+      );
 
       child.on('exit', (code, signal) => {
         log.info(`Helm exited with code ${code} and signal ${signal}`);

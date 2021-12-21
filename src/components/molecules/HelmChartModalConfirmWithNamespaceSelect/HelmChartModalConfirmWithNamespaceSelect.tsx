@@ -1,6 +1,4 @@
-import * as k8s from '@kubernetes/client-node';
-
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
@@ -8,15 +6,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {AlertEnum, AlertType} from '@models/alert';
-import {K8sResource} from '@models/k8sresource';
-
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAlert} from '@redux/reducers/alert';
-
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
-
-import {getDefaultNamespaceForApply} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
@@ -45,26 +35,20 @@ const TitleIcon = styled(ExclamationCircleOutlined)`
 
 interface IProps {
   isVisible: boolean;
-  resources?: K8sResource[];
   title: string;
-  onOk: (selectedNamespace: string) => void;
   onCancel: () => void;
+  onOk: (selectedNamespace: string, shouldCreateNamespace?: boolean) => void;
 }
 
-const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
-  const {isVisible, resources = [], title, onCancel, onOk} = props;
+const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
+  const {isVisible, title, onCancel, onOk} = props;
 
-  const dispatch = useAppDispatch();
-  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-
-  const defaultNamespace = getDefaultNamespaceForApply(resources);
   const [namespaces] = useTargetClusterNamespaces();
 
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
   const [errorMessage, setErrorMessage] = useState('');
-  const [selectedNamespace, setSelectedNamespace] = useState(defaultNamespace);
-  const [selectedOption, setSelectedOption] = useState<string>();
+  const [selectedNamespace, setSelectedNamespace] = useState('default');
+  const [selectedOption, setSelectedOption] = useState<string>('existing');
 
   const onClickOk = useCallback(() => {
     if (selectedOption === 'create') {
@@ -72,64 +56,25 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         setErrorMessage('Namespace name must not be empty!');
         return;
       }
-      const kc = new k8s.KubeConfig();
-      kc.loadFromFile(kubeconfigPath);
-      kc.setCurrentContext(currentContext || '');
 
-      const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
-
-      k8sCoreV1Api
-        .createNamespace({metadata: {name: createNamespaceName}})
-        .then(() => {
-          const alert: AlertType = {
-            type: AlertEnum.Success,
-            title: `Created ${createNamespaceName} namespace to cluster ${currentContext} successfully`,
-            message: '',
-          };
-
-          dispatch(setAlert(alert));
-          onOk(createNamespaceName);
-        })
-        .catch(err => {
-          if (err.statusCode === 409) {
-            setErrorMessage('Namespace already exists in the cluster!');
-          } else {
-            setErrorMessage(err.message);
-          }
-        });
+      onOk(createNamespaceName, true);
     } else if (selectedOption === 'existing') {
       onOk(selectedNamespace);
     }
-  }, [currentContext, createNamespaceName, dispatch, kubeconfigPath, selectedNamespace, selectedOption, onOk]);
-
-  useEffect(() => {
-    if (!namespaces.includes(defaultNamespace)) {
-      setSelectedOption('create');
-      setSelectedNamespace('default');
-      setCreateNamespaceName(defaultNamespace);
-    } else {
-      setSelectedOption('existing');
-      setSelectedNamespace(defaultNamespace);
-      setCreateNamespaceName('');
-    }
-  }, [defaultNamespace, namespaces]);
-
-  if (!selectedOption) {
-    return null;
-  }
+  }, [selectedOption]);
 
   return (
     <Modal
       centered
-      visible={isVisible}
       title={
         <TitleContainer>
           <TitleIcon style={{marginRight: '10px', color: Colors.yellowWarning}} />
           {title}
         </TitleContainer>
       }
-      onOk={onClickOk}
+      visible={isVisible}
       onCancel={onCancel}
+      onOk={onClickOk}
     >
       <>
         <Radio.Group
@@ -151,7 +96,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
             <Select
               value={selectedNamespace}
               showSearch
-              defaultValue={defaultNamespace}
+              defaultValue="default"
               onChange={value => setSelectedNamespace(value)}
             >
               {namespaces
@@ -189,4 +134,4 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   );
 };
 
-export default React.memo(ModalConfirmWithNamespaceSelect);
+export default HelmChartModalConfirmWithNamespaceSelect;
