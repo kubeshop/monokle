@@ -12,6 +12,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {K8sResource} from '@models/k8sresource';
+import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {reprocessNewResource} from '@redux/reducers/main';
@@ -19,7 +20,7 @@ import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 
-import {NO_NAMESPACE, useNamespaces} from '@hooks/useNamespaces';
+import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useResetFormOnCloseModal} from '@utils/hooks';
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
@@ -34,11 +35,8 @@ const NEW_ITEM = 'CREATE_NEW_ITEM';
 const {Option} = Select;
 
 const NewResourceWizard = () => {
-  const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const [namespaces, setNamespaces] = useNamespaces({extra: ['none', 'default']});
+
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
   const [shouldSaveToFolder, setShouldSaveState] = useState(true);
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
@@ -46,15 +44,29 @@ const NewResourceWizard = () => {
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
   const [isSubmitDisabled, setSubmitDisabled] = useState(true);
   const [inputValue, setInputValue] = useState<string>('');
+
   const lastKindRef = useRef<string>();
+
+  const dispatch = useAppDispatch();
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
+  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+
   const defaultInput = newResourceWizardState.defaultInput;
-  const defaultValues = defaultInput
-    ? {
-        ...defaultInput,
-        namespace: defaultInput.namespace || SELECT_OPTION_NONE,
-        selectedResourceId: defaultInput.selectedResourceId || SELECT_OPTION_NONE,
-      }
-    : undefined;
+  const defaultValues = useMemo(
+    () =>
+      defaultInput
+        ? {
+            ...defaultInput,
+            namespace: resourceFilterNamespace || defaultInput.namespace || SELECT_OPTION_NONE,
+            selectedResourceId: defaultInput.selectedResourceId || SELECT_OPTION_NONE,
+          }
+        : resourceFilterNamespace
+        ? ({namespace: resourceFilterNamespace} as NewResourceWizardInput)
+        : ({namespace: SELECT_OPTION_NONE} as NewResourceWizardInput),
+    [defaultInput, resourceFilterNamespace]
+  );
 
   const [form] = Form.useForm();
   lastKindRef.current = form.getFieldValue('kind');
@@ -75,10 +87,11 @@ const NewResourceWizard = () => {
     if (defaultInput?.targetFolder && fileMap[ROOT_FILE_ENTRY]) {
       setSavingDestination('saveToFolder');
       setSelectedFolder(defaultInput.targetFolder);
-    }
-    if (defaultInput?.targetFile && fileMap[ROOT_FILE_ENTRY]) {
+    } else if (defaultInput?.targetFile && fileMap[ROOT_FILE_ENTRY]) {
       setSavingDestination('saveToFile');
       setSelectedFile(defaultInput.targetFile);
+    } else {
+      setSavingDestination('doNotSave');
     }
 
     setSubmitDisabled(!defaultValues?.name && !defaultValues?.kind && !defaultValues?.apiVersion);
@@ -165,7 +178,7 @@ const NewResourceWizard = () => {
       {
         name: formValues.name,
         kind: formValues.kind,
-        namespace: formValues.namespace === NO_NAMESPACE ? undefined : formValues.namespace,
+        namespace: formValues.namespace === SELECT_OPTION_NONE ? undefined : formValues.namespace,
         apiVersion: formValues.apiVersion,
       },
       dispatch,
@@ -322,7 +335,7 @@ const NewResourceWizard = () => {
             ),
             icon: <InfoCircleOutlined />,
           }}
-          initialValue={NO_NAMESPACE}
+          initialValue={resourceFilterNamespace || SELECT_OPTION_NONE}
         >
           <Select
             showSearch
@@ -336,17 +349,14 @@ const NewResourceWizard = () => {
                 {inputValue}
               </Option>
             ) : null}
-            {namespaces.map(namespace => {
-              if (typeof namespace !== 'string') {
-                return null;
-              }
 
-              return (
+            {namespaces
+              .filter(ns => typeof ns === 'string')
+              .map(namespace => (
                 <Option key={namespace} value={namespace}>
                   {namespace}
                 </Option>
-              );
-            })}
+              ))}
           </Select>
         </Form.Item>
         <Form.Item
