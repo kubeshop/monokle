@@ -1,6 +1,12 @@
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
+import AcmeChallengeHandler from '@src/kindhandlers/certmanager/AcmeChallenge.handler';
+import AcmeOrderHandler from '@src/kindhandlers/certmanager/AcmeOrder.handler';
+import CertificateHandler from '@src/kindhandlers/certmanager/Certificate.handler';
+import CertificateRequestHandler from '@src/kindhandlers/certmanager/CertificateRequest.handler';
+import ClusterIssuerHandler from '@src/kindhandlers/certmanager/ClusterIssuer.handler';
+import IssuerHandler from '@src/kindhandlers/certmanager/Issuer.handler';
 import DestinationRuleHandler from '@src/kindhandlers/istio/DestinationRule.handler';
 import EnvoyFilterHandler from '@src/kindhandlers/istio/EnvoyFilter.handler';
 import GatewayHandler from '@src/kindhandlers/istio/Gateway.handler';
@@ -69,6 +75,13 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceEntryHandler,
   WorkloadGroupHandler,
   WorkloadEntryHandler,
+  // CertManager
+  CertificateRequestHandler,
+  IssuerHandler,
+  CertificateHandler,
+  ClusterIssuerHandler,
+  AcmeOrderHandler,
+  AcmeChallengeHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(

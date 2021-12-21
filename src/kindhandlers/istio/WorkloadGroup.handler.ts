@@ -1,7 +1,7 @@
-import {createCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {ISTIO_NETWORKING_RESOURCE_GROUP, ISTIO_SUBSECTION_NAME} from '@src/kindhandlers/istio/constants';
 
-const WorkloadGroupHandler = createCustomObjectKindHandler(
+const WorkloadGroupHandler = createNamespacedCustomObjectKindHandler(
   'WorkloadGroup',
   ISTIO_SUBSECTION_NAME,
   'WorkloadGroups',
