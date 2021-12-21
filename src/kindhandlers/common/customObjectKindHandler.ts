@@ -5,7 +5,7 @@ import log from 'loglevel';
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {loadCustomSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
@@ -28,13 +28,17 @@ export const createCustomObjectKindHandler = (
   kindGroup: string,
   kindVersion: string,
   kindPlural: string,
-  pathToSchemaResource?: string
+  pathToSchemaResource?: string,
+  helpLink?: string,
+  outgoingRefMappers?: RefMapper[]
 ): ResourceKindHandler => {
   return {
     kind,
     apiVersionMatcher: '**',
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
+    helpLink,
+    outgoingRefMappers,
     sourceEditorOptions: pathToSchemaResource
       ? {
           editorSchema: loadCustomSchema(pathToSchemaResource, kind),

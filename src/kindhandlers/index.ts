@@ -2,6 +2,7 @@ import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import DestinationRuleHandler from '@src/kindhandlers/istio/DestinationRule.handler';
+import GatewayHandler from '@src/kindhandlers/istio/Gateway.handler';
 import VirtualServiceHandler from '@src/kindhandlers/istio/VirtualService.handler';
 
 import ClusterRoleHandler from './ClusterRole.handler';
@@ -57,6 +58,7 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   // Istio resources
   VirtualServiceHandler,
   DestinationRuleHandler,
+  GatewayHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(

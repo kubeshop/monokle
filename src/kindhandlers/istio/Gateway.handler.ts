@@ -5,26 +5,27 @@ import {
   ISTIO_SUBSECTION_NAME,
 } from '@src/kindhandlers/istio/constants';
 
-const VirtualServiceHandler = createCustomObjectKindHandler(
-  'VirtualService',
+const GatewayHandler = createCustomObjectKindHandler(
+  'Gateway',
   ISTIO_SUBSECTION_NAME,
-  'VirtualServices',
+  'Gateways',
   ISTIO_RESOURCE_GROUP,
   ISTIO_DEFAULT_RESOURCE_VERSION,
-  'virtualservices',
-  'istio/virtualservice.json',
-  'https://istio.io/latest/docs/reference/config/networking/virtual-service/',
+  'gateways',
+  'istio/gateway.json',
+  'https://istio.io/latest/docs/reference/config/networking/gateway/',
   [
     {
       source: {
-        pathParts: ['spec', 'gateways', '*'],
+        pathParts: ['spec', 'selector'],
       },
-      type: 'name',
       target: {
-        kind: 'Gateway',
+        kind: 'Pod',
+        pathParts: ['metadata', 'labels'],
       },
+      type: 'pairs',
     },
   ]
 );
 
-export default VirtualServiceHandler;
+export default GatewayHandler;

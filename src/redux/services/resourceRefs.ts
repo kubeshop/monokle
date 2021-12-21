@@ -6,7 +6,7 @@ import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
 
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-import {getIncomingRefMappers, getResourceKindHandler} from '@src/kindhandlers';
+import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
 import {traverseDocument} from './manifest-utils';
 import {NodeWrapper, createResourceRef, getLineCounter, getParsedDoc, linkResources} from './resource';
@@ -155,7 +155,6 @@ export function getResourceRefNodes(resource: K8sResource) {
   traverseDocument(parsedDoc, (parentKeyPathParts, keyPathParts, key, scalar) => {
     refMappers.forEach(refMapper => {
       const refNode = {scalar, key, parentKeyPath: joinPathParts(parentKeyPathParts)};
-
       if (refMapper.type === 'pairs') {
         if (
           pathEqualsPath(refMapper.source.pathParts, parentKeyPathParts) ||
@@ -571,6 +570,8 @@ function clearOutgoingResourceRefs(resource: K8sResource, resourceMap: ResourceM
 
 function getResourcesByKindMap(resourceMap: ResourceMapType) {
   const resourcesByKindMap = new Map<string, K8sResource[]>();
+  getKnownResourceKinds().forEach(kind => resourcesByKindMap.set(kind, []));
+
   Object.values(resourceMap).forEach(r => {
     const resourcesByKind = resourcesByKindMap.get(r.kind);
     if (resourcesByKind) {
