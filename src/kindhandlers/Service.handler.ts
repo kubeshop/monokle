@@ -5,7 +5,7 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
-function createSelectorOutgoingRefMappers(targetResourceKind: string): RefMapper {
+export function createSelectorOutgoingRefMappers(targetResourceKind: string): RefMapper {
   return {
     source: {
       pathParts: ['spec', 'selector'],
