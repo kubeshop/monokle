@@ -36,6 +36,7 @@ export function createFileEntry(fileEntryPath: string) {
     name: fileEntryPath.substr(fileEntryPath.lastIndexOf(path.sep) + 1),
     filePath: fileEntryPath,
     isExcluded: false,
+    isSupported: false,
   };
   return fileEntry;
 }
@@ -111,6 +112,9 @@ function processHelmChartFolder(
 
       helmValuesMap[helmValues.id] = helmValues;
       helmChart.valueFileIds.push(helmValues.id);
+      fileEntry.isSupported = true;
+    } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+      fileEntry.isSupported = true;
     }
 
     fileMap[fileEntry.filePath] = fileEntry;
@@ -199,6 +203,8 @@ export function readFiles(
         } catch (e) {
           log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
         }
+
+        fileEntry.isSupported = true;
       }
 
       fileMap[fileEntry.filePath] = fileEntry;
