@@ -82,3 +82,7 @@ code {
     transform: scale(1.3);
   }
 }
+
+.resource-prefix-popover-overlay .ant-popover-inner-content {
+  padding: 0 16px;
+}

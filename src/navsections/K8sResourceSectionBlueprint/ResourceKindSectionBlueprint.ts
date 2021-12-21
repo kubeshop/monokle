@@ -58,7 +58,18 @@ export function makeResourceKindNavSection(
       getRawItems: scope => {
         return scope.activeResources
           .filter(r => r.kind === kindHandler.kind)
-          .sort((a, b) => a.name.localeCompare(b.name));
+          .sort((a, b) => {
+            if (a.namespace && !b.namespace) {
+              return -1;
+            }
+            if (!a.namespace && b.namespace) {
+              return 1;
+            }
+            if (a.namespace && b.namespace) {
+              return a.namespace.localeCompare(b.namespace);
+            }
+            return a.name.localeCompare(b.name);
+          });
       },
       getMeta: () => {
         return {resourceKind: kindHandler.kind};
