@@ -1,3 +1,5 @@
+import {NamespaceRefTypeEnum} from '@models/resourcekindhandler';
+
 import {createSelectorOutgoingRefMappers} from '@src/kindhandlers/Service.handler';
 import {createCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {
@@ -6,19 +8,29 @@ import {
   ISTIO_SUBSECTION_NAME,
 } from '@src/kindhandlers/istio/constants';
 
-const GatewayHandler = createCustomObjectKindHandler(
-  'Gateway',
+const WorkloadEntryHandler = createCustomObjectKindHandler(
+  'WorkloadEntry',
   ISTIO_SUBSECTION_NAME,
-  'Gateways',
+  'WorkloadEntries',
   ISTIO_NETWORKING_RESOURCE_GROUP,
   ISTIO_DEFAULT_RESOURCE_VERSION,
-  'gateways',
-  'istio/gateway.json',
-  'https://istio.io/latest/docs/reference/config/networking/gateway/',
+  'workloadentries',
+  'istio/workloadentry.json',
+  'https://istio.io/latest/docs/reference/config/networking/workload-entry/',
   [
     {
       source: {
-        pathParts: ['spec', 'selector'],
+        pathParts: ['spec', 'serviceAccount'],
+        namespaceRef: NamespaceRefTypeEnum.Implicit,
+      },
+      target: {
+        kind: 'ServiceAccount',
+      },
+      type: 'name',
+    },
+    {
+      source: {
+        pathParts: ['spec', 'workloadSelector', 'labels'],
       },
       target: {
         kind: 'Pod',
@@ -35,4 +47,4 @@ const GatewayHandler = createCustomObjectKindHandler(
   ]
 );
 
-export default GatewayHandler;
+export default WorkloadEntryHandler;

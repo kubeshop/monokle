@@ -6,19 +6,19 @@ import {
   ISTIO_SUBSECTION_NAME,
 } from '@src/kindhandlers/istio/constants';
 
-const GatewayHandler = createCustomObjectKindHandler(
-  'Gateway',
+const ServiceEntryHandler = createCustomObjectKindHandler(
+  'ServiceEntry',
   ISTIO_SUBSECTION_NAME,
-  'Gateways',
+  'ServiceEntries',
   ISTIO_NETWORKING_RESOURCE_GROUP,
   ISTIO_DEFAULT_RESOURCE_VERSION,
-  'gateways',
-  'istio/gateway.json',
-  'https://istio.io/latest/docs/reference/config/networking/gateway/',
+  'serviceentries',
+  'istio/serviceentry.json',
+  'https://istio.io/latest/docs/reference/config/networking/service-entry/',
   [
     {
       source: {
-        pathParts: ['spec', 'selector'],
+        pathParts: ['spec', 'workloadSelector', 'labels'],
       },
       target: {
         kind: 'Pod',
@@ -35,4 +35,4 @@ const GatewayHandler = createCustomObjectKindHandler(
   ]
 );
 
-export default GatewayHandler;
+export default ServiceEntryHandler;

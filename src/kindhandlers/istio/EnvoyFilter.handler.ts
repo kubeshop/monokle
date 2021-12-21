@@ -1,24 +1,20 @@
 import {createSelectorOutgoingRefMappers} from '@src/kindhandlers/Service.handler';
 import {createCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
-import {
-  ISTIO_DEFAULT_RESOURCE_VERSION,
-  ISTIO_NETWORKING_RESOURCE_GROUP,
-  ISTIO_SUBSECTION_NAME,
-} from '@src/kindhandlers/istio/constants';
+import {ISTIO_NETWORKING_RESOURCE_GROUP, ISTIO_SUBSECTION_NAME} from '@src/kindhandlers/istio/constants';
 
-const GatewayHandler = createCustomObjectKindHandler(
-  'Gateway',
+const EnvoyFilterHandler = createCustomObjectKindHandler(
+  'EnvoyFilter',
   ISTIO_SUBSECTION_NAME,
-  'Gateways',
+  'EnvoyFilters',
   ISTIO_NETWORKING_RESOURCE_GROUP,
-  ISTIO_DEFAULT_RESOURCE_VERSION,
-  'gateways',
-  'istio/gateway.json',
-  'https://istio.io/latest/docs/reference/config/networking/gateway/',
+  'v1alpha3',
+  'envoyfilters',
+  'istio/envoyfilter.json',
+  'https://istio.io/latest/docs/reference/config/networking/envoy-filter/',
   [
     {
       source: {
-        pathParts: ['spec', 'selector'],
+        pathParts: ['spec', 'workloadSelector', 'labels'],
       },
       target: {
         kind: 'Pod',
@@ -35,4 +31,4 @@ const GatewayHandler = createCustomObjectKindHandler(
   ]
 );
 
-export default GatewayHandler;
+export default EnvoyFilterHandler;
