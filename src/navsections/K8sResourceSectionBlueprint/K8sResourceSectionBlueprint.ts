@@ -26,6 +26,10 @@ ResourceKindHandlers.forEach(kindHandler => {
     return;
   }
   const subsectionName = kindHandler.navigatorPath[1];
+  if (!childSectionNames.includes(subsectionName)) {
+    childSectionNames.push(subsectionName);
+  }
+
   if (kindHandlersBySubsectionName[subsectionName]) {
     kindHandlersBySubsectionName[subsectionName].push(kindHandler);
   } else {

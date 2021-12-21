@@ -161,7 +161,7 @@ export function traverseDocument(
           if (isScalar(item)) {
             const scalarSeqKey = seqPair.key as Scalar;
             const keyPathParts = [...parentKeyPathParts.concat([scalarSeqKey.value as string]), String(ix)];
-            callback(parentKeyPathParts, keyPathParts, item.value as string, scalarSeqKey);
+            callback(parentKeyPathParts, keyPathParts, item.value as string, item);
           }
         });
       }

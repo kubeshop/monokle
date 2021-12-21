@@ -29,7 +29,7 @@ interface K8sResource {
   name: string;
   /** k8s resource kind */
   kind: string;
-  /** k8s resource version */
+  /** k8s resource apiVersion value */
   version: string;
   /** k8s namespace is specified (for filtering) */
   namespace?: string;

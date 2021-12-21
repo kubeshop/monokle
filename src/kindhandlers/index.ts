@@ -1,6 +1,14 @@
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
+import DestinationRuleHandler from '@src/kindhandlers/istio/DestinationRule.handler';
+import EnvoyFilterHandler from '@src/kindhandlers/istio/EnvoyFilter.handler';
+import GatewayHandler from '@src/kindhandlers/istio/Gateway.handler';
+import ServiceEntryHandler from '@src/kindhandlers/istio/ServiceEntry.handler';
+import SidecarHandler from '@src/kindhandlers/istio/Sidecar.handler';
+import VirtualServiceHandler from '@src/kindhandlers/istio/VirtualService.handler';
+import WorkloadEntryHandler from '@src/kindhandlers/istio/WorkloadEntry.handler';
+import WorkloadGroupHandler from '@src/kindhandlers/istio/WorkloadGroup.handler';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -52,6 +60,15 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceAccountHandler,
   StatefulSetHandler,
   VolumeAttachmentHandler,
+  // Istio resources
+  VirtualServiceHandler,
+  DestinationRuleHandler,
+  GatewayHandler,
+  SidecarHandler,
+  EnvoyFilterHandler,
+  ServiceEntryHandler,
+  WorkloadGroupHandler,
+  WorkloadEntryHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(
