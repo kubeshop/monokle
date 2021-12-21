@@ -47,6 +47,7 @@ const childSections = childSectionNames.map(childSectionName => {
   const subsection: SectionBlueprint<K8sResource, {activeResourcesLength: number; checkedResourceIds: string[]}> = {
     name: childSectionName,
     id: childSectionName,
+    containerElementId: 'navigator-sections-container',
     rootSectionId: navSectionNames.K8S_RESOURCES,
     childSectionIds: kindHandlerSections.map(k => k.name),
     getScope: state => {
@@ -93,6 +94,7 @@ export const K8S_RESOURCE_SECTION_NAME = navSectionNames.K8S_RESOURCES;
 const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScopeType> = {
   name: navSectionNames.K8S_RESOURCES,
   id: navSectionNames.K8S_RESOURCES,
+  containerElementId: 'navigator-sections-container',
   rootSectionId: navSectionNames.K8S_RESOURCES,
   childSectionIds: childSectionNames,
   getScope: state => {

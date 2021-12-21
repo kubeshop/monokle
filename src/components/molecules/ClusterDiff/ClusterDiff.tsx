@@ -4,13 +4,11 @@ import {Divider} from 'antd';
 
 import styled from 'styled-components';
 
-import {ClusterToLocalResourcesMatch} from '@models/appstate';
-
 import {ResourceFilterIconWithPopover, SectionRenderer} from '@components/molecules';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
-import ClusterDiffSectionBlueprint, {ClusterDiffScopeType} from '@src/navsections/ClusterDiffSectionBlueprint';
+import ClusterDiffSectionBlueprint from '@src/navsections/ClusterDiffSectionBlueprint';
 
 import * as S from './ClusterDiff.styled';
 import ClusterDiffNamespaceFilter from './ClusterDiffNamespaceFilter';
@@ -48,12 +46,8 @@ function ClusterDiff() {
         </S.TitleBar>
         <Divider style={{margin: '8px 0'}} />
         <ListContainer>
-          <S.List>
-            <SectionRenderer<ClusterToLocalResourcesMatch, ClusterDiffScopeType>
-              sectionBlueprint={ClusterDiffSectionBlueprint}
-              level={0}
-              isLastSection={false}
-            />
+          <S.List id="cluster-diff-sections-container">
+            <SectionRenderer sectionBlueprint={ClusterDiffSectionBlueprint} level={0} isLastSection={false} />
           </S.List>
         </ListContainer>
       </LeftPane>

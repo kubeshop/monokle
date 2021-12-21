@@ -31,6 +31,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
   name: KUSTOMIZATION_SECTION_NAME,
   id: KUSTOMIZATION_SECTION_NAME,
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
+  containerElementId: 'kustomize-sections-container',
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,

@@ -412,7 +412,6 @@ const PageHeader = () => {
                         Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled
                       }
                       type="link"
-                      ghost
                       onClick={handleLoadCluster}
                     >
                       {createClusterObjectsLabel()}

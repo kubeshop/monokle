@@ -416,7 +416,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   <S.ExtraRightButton
                     onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
                     type="link"
-                    ghost
                     ref={extraButton}
                   >
                     {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />

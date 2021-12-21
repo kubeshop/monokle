@@ -26,6 +26,7 @@ export const HELM_CHART_SECTION_NAME = 'Helm Charts' as const;
 const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScopeType> = {
   name: HELM_CHART_SECTION_NAME,
   id: HELM_CHART_SECTION_NAME,
+  containerElementId: 'helm-sections-container',
   rootSectionId: HELM_CHART_SECTION_NAME,
   getScope: state => {
     return {
