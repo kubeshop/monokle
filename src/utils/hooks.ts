@@ -54,5 +54,5 @@ export const useResetFormOnCloseModal = ({
     if (visible && defaultValues) {
       form.setFieldsValue(defaultValues);
     }
-  }, [visible]);
+  }, [defaultValues, form, visible]);
 };
