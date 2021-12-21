@@ -128,7 +128,7 @@ export const repreviewCluster = createAsyncThunk<
 const crdVersionRegex = /(v)(\d*)(alpha|beta)?(\d*)?/;
 
 export function findDefaultVersion(crd: any) {
-  if (!crd.spec.versions) {
+  if (!crd?.spec?.versions) {
     return undefined;
   }
 
