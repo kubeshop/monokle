@@ -30,22 +30,24 @@ function applyHelmChartToCluster(
   const chartPath = path.dirname(getAbsoluteHelmChartPath(helmChart, fileMap));
 
   let helmArgs = [
-    '--kube-context',
-    context,
     'install',
     '-f',
     getAbsoluteValuesFilePath(valuesFile, fileMap),
     helmChart.name,
     chartPath,
+    '--kube-context',
+    context,
   ];
 
   if (namespace) {
-    helmArgs.unshift(...['-n', namespace]);
+    helmArgs.push(...['--namespace', namespace]);
 
     if (shouldCreateNamespace) {
-      helmArgs.unshift('--create-namespace');
+      helmArgs.push('--create-namespace');
     }
   }
+
+  console.log(helmArgs);
 
   const child = spawn('helm', helmArgs, {
     env: {

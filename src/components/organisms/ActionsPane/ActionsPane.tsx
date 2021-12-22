@@ -333,6 +333,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
         namespace,
         shouldCreateNamespace
       );
+      setIsHelmChartApplyModalVisible(false);
     },
     [dispatch, fileMap, helmChartMap, helmValuesMap, kubeconfig, kubeconfigContext, selectedValuesFileId]
   );
