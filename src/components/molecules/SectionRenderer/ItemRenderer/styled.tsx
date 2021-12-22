@@ -49,7 +49,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
       return `background: ${Colors.blackPearl};`;
     }
   }};
-
+  ${props => !props.isHovered && 'padding-right: 46px;'}
 `;
 
 type ItemNameProps = {
