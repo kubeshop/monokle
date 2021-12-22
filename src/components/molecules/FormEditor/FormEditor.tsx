@@ -127,7 +127,7 @@ const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema
         const content = mergeManifests(selectedResource.text, formString);
 
         if (content.trim() !== selectedResource.text.trim()) {
-         dispatch(updateResource({resourceId: selectedResource.id, content}));
+          dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
       }
     },
