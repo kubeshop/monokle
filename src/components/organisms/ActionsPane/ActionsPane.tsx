@@ -442,27 +442,23 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 )
               )}
             </TabPane>
-            {selectedResource &&
-              resourceKindHandler &&
-              resourceKindHandler.formEditorOptions &&
-              resourceKindHandler.formEditorOptions.editorSchema &&
-              resourceKindHandler.formEditorOptions.editorUiSchema && (
-                <TabPane
-                  tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
-                  disabled={!selectedResourceId}
-                  key="form"
-                >
-                  {uiState.isFolderLoading || previewLoader.isLoading ? (
-                    <S.Skeleton active />
-                  ) : (
-                    <FormEditor
-                      contentHeight={contentHeight}
-                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                    />
-                  )}
-                </TabPane>
-              )}
+            {selectedResource && resourceKindHandler?.formEditorOptions?.editorSchema && (
+              <TabPane
+                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
+                disabled={!selectedResourceId}
+                key="form"
+              >
+                {uiState.isFolderLoading || previewLoader.isLoading ? (
+                  <S.Skeleton active />
+                ) : (
+                  <FormEditor
+                    contentHeight={contentHeight}
+                    formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                    formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                  />
+                )}
+              </TabPane>
+            )}
             {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
               <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
                 {uiState.isFolderLoading || previewLoader.isLoading ? (

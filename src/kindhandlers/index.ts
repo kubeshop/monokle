@@ -85,13 +85,18 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
 ];
 
 const HandlerByResourceKind = Object.fromEntries(
-  ResourceKindHandlers.map(kindHandler => ({
-    ...kindHandler,
-    formEditorOptions: {
-      editorSchema: getFormSchema(kindHandler.kind),
-      editorUiSchema: getUiSchema(kindHandler.kind),
-    },
-  })).map(kindHandler => [kindHandler.kind, kindHandler])
+  ResourceKindHandlers.map(kindHandler => {
+    if (kindHandler.isCustom) {
+      return kindHandler;
+    }
+    return {
+      ...kindHandler,
+      formEditorOptions: {
+        editorSchema: getFormSchema(kindHandler.kind),
+        editorUiSchema: getUiSchema(kindHandler.kind),
+      },
+    };
+  }).map(kindHandler => [kindHandler.kind, kindHandler])
 );
 
 export const getKnownResourceKinds = () => {
