@@ -18,7 +18,7 @@ import {mergeManifests} from '@redux/services/manifest-utils';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
-import {NamespaceSelection, SecretKindSelection} from './FormWidgets';
+import {NamespaceSelection, SecretKindResourceForm, SecretKindSelection} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
 
@@ -169,6 +169,7 @@ const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema
         }}
         fields={{
           secretKindSelection: SecretKindSelection,
+          secretKindForm: SecretKindResourceForm,
         }}
         disabled={isInPreviewMode}
       >
