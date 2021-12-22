@@ -632,7 +632,8 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`
+          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
+          documents[docIndex]
         );
       } else {
         const content = doc.toJS();

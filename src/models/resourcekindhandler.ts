@@ -2,6 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import {monaco} from 'react-monaco-editor';
 
+import {K8sResource} from '@models/k8sresource';
+
 interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
 }
@@ -49,12 +51,6 @@ interface ResourceKindHandler {
   clusterApiVersion: string;
 
   /**
-   * A user friendly description of this resource type
-   */
-
-  description: string;
-
-  /**
    * An external link to documentation
    */
 
@@ -64,7 +60,7 @@ interface ResourceKindHandler {
    * Retrieve the specified resource of this type using the provided kubeconfig
    */
 
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any>;
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any>;
 
   /**
    * Get all resources of this type using the provided kubeconfig
@@ -72,7 +68,11 @@ interface ResourceKindHandler {
 
   listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]>;
 
-  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, name: string, namespace?: string) => Promise<void>;
+  /**
+   * Delete the specified resource from the cluster
+   */
+
+  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, resource: K8sResource) => Promise<void>;
 
   /**
    * optional outgoing RefMappers to use for resolving refs in resources of this type
@@ -89,7 +89,7 @@ interface ResourceKindHandler {
   navigatorPath: [navigatorName: string, sectionName: string, subsectionName: string];
 
   /**
-   * optional JSON Schema and symbol-matchers to pass to the source editor
+   * optional JSON Schema for validation and symbol-matchers to pass to the source editor
    */
 
   sourceEditorOptions?: {
@@ -107,24 +107,9 @@ interface ResourceKindHandler {
   };
 
   /**
-   * optional additional editors/views to show in the actionspane
+   * Only set for native kubernetes resources - used for extracting the corresponding resource schema from
+   * file containing all schemas
    */
-
-  actionTabs?: {
-    name: string;
-    description: string;
-    component: React.ComponentType;
-  }[];
-
-  /**
-   * An optional list of templates presented to users when creating a new resource of this kind.
-   */
-
-  templates?: {
-    name: string;
-    description: string;
-    content: string;
-  }[];
 
   validationSchemaPrefix?: string;
 }

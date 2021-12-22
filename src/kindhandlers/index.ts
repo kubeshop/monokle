@@ -1,6 +1,20 @@
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
+import AcmeChallengeHandler from '@src/kindhandlers/certmanager/AcmeChallenge.handler';
+import AcmeOrderHandler from '@src/kindhandlers/certmanager/AcmeOrder.handler';
+import CertificateHandler from '@src/kindhandlers/certmanager/Certificate.handler';
+import CertificateRequestHandler from '@src/kindhandlers/certmanager/CertificateRequest.handler';
+import ClusterIssuerHandler from '@src/kindhandlers/certmanager/ClusterIssuer.handler';
+import IssuerHandler from '@src/kindhandlers/certmanager/Issuer.handler';
+import DestinationRuleHandler from '@src/kindhandlers/istio/DestinationRule.handler';
+import EnvoyFilterHandler from '@src/kindhandlers/istio/EnvoyFilter.handler';
+import GatewayHandler from '@src/kindhandlers/istio/Gateway.handler';
+import ServiceEntryHandler from '@src/kindhandlers/istio/ServiceEntry.handler';
+import SidecarHandler from '@src/kindhandlers/istio/Sidecar.handler';
+import VirtualServiceHandler from '@src/kindhandlers/istio/VirtualService.handler';
+import WorkloadEntryHandler from '@src/kindhandlers/istio/WorkloadEntry.handler';
+import WorkloadGroupHandler from '@src/kindhandlers/istio/WorkloadGroup.handler';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -52,6 +66,22 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceAccountHandler,
   StatefulSetHandler,
   VolumeAttachmentHandler,
+  // Istio resources
+  VirtualServiceHandler,
+  DestinationRuleHandler,
+  GatewayHandler,
+  SidecarHandler,
+  EnvoyFilterHandler,
+  ServiceEntryHandler,
+  WorkloadGroupHandler,
+  WorkloadEntryHandler,
+  // CertManager
+  CertificateRequestHandler,
+  IssuerHandler,
+  CertificateHandler,
+  ClusterIssuerHandler,
+  AcmeOrderHandler,
+  AcmeChallengeHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(

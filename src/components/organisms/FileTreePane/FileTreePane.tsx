@@ -93,7 +93,15 @@ const createNode = (
     title: (
       <NodeContainer>
         <NodeTitleContainer>
-          <span className={fileEntry.isExcluded ? 'excluded-file-entry-name' : 'file-entry-name'}>
+          <span
+            className={
+              fileEntry.isExcluded
+                ? 'excluded-file-entry-name'
+                : fileEntry.isSupported || fileEntry.children
+                ? 'file-entry-name'
+                : 'not-supported-file-entry-name'
+            }
+          >
             {fileEntry.name}
           </span>
           {resources.length > 0 ? (
@@ -163,6 +171,15 @@ const FileTreeContainer = styled.div`
     margin-left: 8px;
     background: transparent;
   }
+
+  & .ant-tree-switcher-leaf-line::before {
+    border-right: 1px solid #434343;
+  }
+
+  & .ant-tree-switcher-leaf-line::after {
+    border-bottom: 1px solid #434343;
+  }
+
   & .ant-tree-treenode-selected {
     vertical-align: center;
     margin-left: 0px !important;
@@ -221,6 +238,11 @@ const FileTreeContainer = styled.div`
   }
 
   & .excluded-file-entry-name {
+    color: ${Colors.grey800};
+    font-style: italic;
+  }
+
+  & .not-supported-file-entry-name {
     color: ${Colors.grey800};
   }
 `;
@@ -915,8 +937,8 @@ const FileTreePane = () => {
             return node.highlight;
           }}
           disabled={isInPreviewMode || previewLoader.isLoading}
-          showLine
-          showIcon={false}
+          showIcon
+          showLine={{showLeafIcon: false}}
         />
       ) : (
         <NoFilesContainer>

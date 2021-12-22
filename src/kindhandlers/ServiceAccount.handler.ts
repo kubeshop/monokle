@@ -2,27 +2,27 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
+import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',
   apiVersionMatcher: '**',
-  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.ACCESS_CONTROL, 'Service Accounts'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.ACCESS_CONTROL, 'ServiceAccounts'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
-  description: '',
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    return k8sCoreV1Api.readNamespacedServiceAccount(name, namespace, 'true');
+    return k8sCoreV1Api.readNamespacedServiceAccount(resource.name, resource.namespace || 'default');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = await k8sCoreV1Api.listServiceAccountForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    await k8sCoreV1Api.deleteNamespacedServiceAccount(name, namespace || 'default');
+    await k8sCoreV1Api.deleteNamespacedServiceAccount(resource.name, resource.namespace || 'default');
   },
   outgoingRefMappers: [
     {

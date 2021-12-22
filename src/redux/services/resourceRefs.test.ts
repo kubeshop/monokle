@@ -2,7 +2,7 @@ import {ResourceMapType} from '@models/appstate';
 
 import {getTestResourcePath} from '@redux/services/__test__/utils';
 import {readManifests} from '@redux/services/fileEntry.test';
-import {isUnsatisfiedRef, processRefs} from '@redux/services/resourceRefs';
+import {isOutgoingRef, isUnsatisfiedRef, processRefs} from '@redux/services/resourceRefs';
 
 test('array-optional-resource-refs', () => {
   const {resourceMap, fileMap, files, helmChartMap, helmValuesMap} = readManifests(
@@ -58,3 +58,29 @@ test('namespaced-resource-refs', () => {
 function findResourceByName(resourceMap: ResourceMapType, name: string) {
   return Object.values(resourceMap).find(r => r.name === name);
 }
+
+test('custom-resource-refs', () => {
+  const {resourceMap, fileMap, files, helmChartMap, helmValuesMap} = readManifests(
+    getTestResourcePath('manifests/istio')
+  );
+
+  const resources = Object.values(resourceMap);
+  expect(resources.length).toBe(2);
+  const virtualService = findResourceByName(resourceMap, 'bookinfo');
+  expect(virtualService).toBeDefined();
+
+  processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
+
+  // @ts-ignore
+  expect(virtualService.refs?.length).toBe(1);
+  // @ts-ignore
+  expect(isOutgoingRef(virtualService.refs[0].type)).toBe(true);
+
+  const gateway = findResourceByName(resourceMap, 'bookinfo-gateway');
+  expect(gateway).toBeDefined();
+
+  // @ts-ignore
+  expect(gateway.refs?.length).toBe(2);
+  // @ts-ignore
+  expect(gateway.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
+});

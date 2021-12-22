@@ -2,6 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
+import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 const IngressHandler: ResourceKindHandler = {
@@ -10,19 +11,18 @@ const IngressHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'Ingresses'],
   clusterApiVersion: 'networking.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.networking.v1',
-  description: '',
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
-    return k8sNetworkingV1Api.readNamespacedIngress(name, namespace);
+    return k8sNetworkingV1Api.readNamespacedIngress(resource.name, resource.namespace || 'default');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     const response = await k8sNetworkingV1Api.listIngressForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
-    await k8sNetworkingV1Api.deleteNamespacedIngress(name, namespace || 'default');
+    await k8sNetworkingV1Api.deleteNamespacedIngress(resource.name, resource.namespace || 'default');
   },
   outgoingRefMappers: [
     {

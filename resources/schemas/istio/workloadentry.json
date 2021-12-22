@@ -1,0 +1,48 @@
+{
+  "properties": {
+    "spec": {
+      "additionalProperties": false,
+      "description": "Configuration affecting VMs onboarded into the mesh. See more details at: https://istio.io/docs/reference/config/networking/workload-entry.html",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "One or more labels associated with the endpoint.",
+          "type": "object"
+        },
+        "locality": {
+          "description": "The locality associated with the endpoint.",
+          "type": "string"
+        },
+        "network": {
+          "type": "string"
+        },
+        "ports": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "description": "Set of ports associated with the endpoint.",
+          "type": "object"
+        },
+        "serviceAccount": {
+          "type": "string"
+        },
+        "weight": {
+          "description": "The load balancing weight associated with the endpoint.",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "status": {
+      "type": "object",
+      "x-kubernetes-preserve-unknown-fields": true
+    }
+  },
+  "type": "object",
+  "additionalProperties": false
+}
