@@ -153,7 +153,7 @@ const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema
     return <div>Nothing selected...</div>;
   }
 
-  if (!formSchema || !formUiSchema) {
+  if (!formSchema) {
     return <div>Not supported resource type..</div>;
   }
 
