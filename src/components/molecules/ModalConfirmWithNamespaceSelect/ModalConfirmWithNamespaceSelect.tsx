@@ -25,12 +25,16 @@ const ErrorMessageLabel = styled.div`
   margin-top: 10px;
 `;
 
+const HeadlineLabel = styled.div`
+  margin-bottom: 16px;
+`;
+
 const NamespaceContainer = styled.div`
   display: grid;
   grid-template-columns: max-content 1fr;
   grid-column-gap: 10px;
   align-items: center;
-  margin-top: 16px;
+  margin-top: 24px;
 `;
 
 const TitleContainer = styled.div`
@@ -47,7 +51,7 @@ interface IProps {
   isVisible: boolean;
   resources?: K8sResource[];
   title: string;
-  onOk: (selectedNamespace: string) => void;
+  onOk: (selectedNamespace?: string) => void;
   onCancel: () => void;
 }
 
@@ -64,7 +68,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedNamespace, setSelectedNamespace] = useState(defaultNamespace);
-  const [selectedOption, setSelectedOption] = useState<string>();
+  const [selectedOption, setSelectedOption] = useState<'existing' | 'create' | 'none'>();
 
   const onClickOk = useCallback(() => {
     if (selectedOption === 'create') {
@@ -99,6 +103,8 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         });
     } else if (selectedOption === 'existing') {
       onOk(selectedNamespace);
+    } else if (selectedOption === 'none') {
+      onOk();
     }
   }, [currentContext, createNamespaceName, dispatch, kubeconfigPath, selectedNamespace, selectedOption, onOk]);
 
@@ -132,6 +138,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       onCancel={onCancel}
     >
       <>
+        <HeadlineLabel>Select namespace:</HeadlineLabel>
         <Radio.Group
           key={selectedOption}
           onChange={e => {
@@ -143,6 +150,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         >
           <Radio value="existing">Use existing namespace</Radio>
           <Radio value="create">Create namespace</Radio>
+          <Radio value="none">None</Radio>
         </Radio.Group>
 
         {selectedOption === 'existing' ? (
@@ -163,7 +171,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
                 ))}
             </Select>
           </NamespaceContainer>
-        ) : (
+        ) : selectedOption === 'create' ? (
           <>
             <NamespaceContainer>
               <span>Namespace name:</span>
@@ -183,7 +191,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
             </NamespaceContainer>
             {errorMessage && <ErrorMessageLabel>*{errorMessage}</ErrorMessageLabel>}
           </>
-        )}
+        ) : null}
       </>
     </Modal>
   );

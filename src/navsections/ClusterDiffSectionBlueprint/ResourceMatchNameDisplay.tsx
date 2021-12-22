@@ -127,7 +127,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     setIsApplyModalVisible(true);
   };
 
-  const onClickApplyResource = (namespace: string) => {
+  const onClickApplyResource = (namespace?: string) => {
     if (!firstLocalResource) {
       setIsApplyModalVisible(false);
       return;

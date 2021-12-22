@@ -16,7 +16,7 @@ const applyMultipleResources = (
   config: AppConfig,
   resourcesToApply: K8sResource[],
   dispatch: AppDispatch,
-  namespace: string,
+  namespace?: string,
   onSuccessCallback?: () => void
 ) => {
   const kubeconfigPath = config.kubeconfigPath;

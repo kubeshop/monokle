@@ -226,7 +226,7 @@ const DiffModal = () => {
     dispatch(performResourceDiff(''));
   };
 
-  const onClickApplyResource = (namespace: string) => {
+  const onClickApplyResource = (namespace?: string) => {
     if (diffResourceId) {
       const resource = resourceMap[diffResourceId];
       if (resource) {

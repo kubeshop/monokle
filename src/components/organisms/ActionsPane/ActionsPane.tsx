@@ -291,7 +291,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResource, kubeconfigPath]);
 
   const onClickApplyResource = useCallback(
-    (namespace: string) => {
+    (namespace?: string) => {
       if (!selectedResource) {
         setIsApplyModalVisible(false);
         return;
@@ -316,7 +316,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   );
 
   const onClickApplyHelmChart = useCallback(
-    (namespace: string, shouldCreateNamespace: boolean) => {
+    (namespace?: string, shouldCreateNamespace?: boolean) => {
       if (!selectedValuesFileId) {
         setIsHelmChartApplyModalVisible(false);
         return;
@@ -561,7 +561,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
           title={helmChartConfirmModalTitle}
           onCancel={() => setIsHelmChartApplyModalVisible(false)}
           onOk={(selectedNamespace, shouldCreateNamespace) =>
-            onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace || false)
+            onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace)
           }
         />
       )}

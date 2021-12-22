@@ -106,7 +106,7 @@ const HotKeysHandler = () => {
     return resource ? [resource] : [];
   }, [mainState.resourceMap, mainState.selectedResourceId]);
 
-  const onClickApplyResource = (namespace: string) => {
+  const onClickApplyResource = (namespace?: string) => {
     if (!mainState.selectedResourceId) {
       setIsApplyModalVisible(false);
       return;

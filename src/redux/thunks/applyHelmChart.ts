@@ -24,7 +24,7 @@ function applyHelmChartToCluster(
   fileMap: FileMapType,
   kubeconfig: string,
   context: string,
-  namespace: string,
+  namespace?: string,
   shouldCreateNamespace?: boolean
 ) {
   const chartPath = path.dirname(getAbsoluteHelmChartPath(helmChart, fileMap));
@@ -32,8 +32,6 @@ function applyHelmChartToCluster(
   let helmArgs = [
     '--kube-context',
     context,
-    '-n',
-    namespace,
     'install',
     '-f',
     getAbsoluteValuesFilePath(valuesFile, fileMap),
@@ -41,8 +39,12 @@ function applyHelmChartToCluster(
     chartPath,
   ];
 
-  if (shouldCreateNamespace) {
-    helmArgs.unshift('--create-namespace');
+  if (namespace) {
+    helmArgs.unshift(...['-n', namespace]);
+
+    if (shouldCreateNamespace) {
+      helmArgs.unshift('--create-namespace');
+    }
   }
 
   const child = spawn('helm', helmArgs, {
@@ -70,7 +72,7 @@ export async function applyHelmChart(
   dispatch: AppDispatch,
   kubeconfig: string,
   context: string,
-  namespace: string,
+  namespace?: string,
   shouldCreateNamespace?: boolean
 ) {
   try {

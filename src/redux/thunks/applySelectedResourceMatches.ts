@@ -8,7 +8,7 @@ import {AppDispatch, RootState} from '@redux/store';
 
 export const applySelectedResourceMatches = createAsyncThunk<
   void,
-  string,
+  string | undefined,
   {
     dispatch: AppDispatch;
     state: RootState;

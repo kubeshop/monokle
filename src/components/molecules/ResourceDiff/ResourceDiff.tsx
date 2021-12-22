@@ -158,7 +158,7 @@ const ResourceDiff = (props: {
     );
   };
 
-  const onClickApplyResource = (namespace: string) => {
+  const onClickApplyResource = (namespace?: string) => {
     if (onApply) {
       onApply();
     }

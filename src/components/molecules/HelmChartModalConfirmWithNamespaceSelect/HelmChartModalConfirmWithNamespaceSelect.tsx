@@ -15,12 +15,16 @@ const ErrorMessageLabel = styled.div`
   margin-top: 10px;
 `;
 
+const HeadlineLabel = styled.div`
+  margin-bottom: 16px;
+`;
+
 const NamespaceContainer = styled.div`
   display: grid;
   grid-template-columns: max-content 1fr;
   grid-column-gap: 10px;
   align-items: center;
-  margin-top: 16px;
+  margin-top: 24px;
 `;
 
 const TitleContainer = styled.div`
@@ -37,7 +41,7 @@ interface IProps {
   isVisible: boolean;
   title: string;
   onCancel: () => void;
-  onOk: (selectedNamespace: string, shouldCreateNamespace?: boolean) => void;
+  onOk: (selectedNamespace?: string, shouldCreateNamespace?: boolean) => void;
 }
 
 const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
@@ -48,7 +52,7 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedNamespace, setSelectedNamespace] = useState('default');
-  const [selectedOption, setSelectedOption] = useState<string>('existing');
+  const [selectedOption, setSelectedOption] = useState<'existing' | 'create' | 'none'>('existing');
 
   const onClickOk = useCallback(() => {
     if (selectedOption === 'create') {
@@ -60,6 +64,8 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       onOk(createNamespaceName, true);
     } else if (selectedOption === 'existing') {
       onOk(selectedNamespace);
+    } else if (selectedOption === 'none') {
+      onOk();
     }
   }, [selectedOption]);
 
@@ -77,6 +83,7 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       onOk={onClickOk}
     >
       <>
+        <HeadlineLabel>Select namespace:</HeadlineLabel>
         <Radio.Group
           key={selectedOption}
           onChange={e => {
@@ -88,6 +95,7 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         >
           <Radio value="existing">Use existing namespace</Radio>
           <Radio value="create">Create namespace</Radio>
+          <Radio value="none">None</Radio>
         </Radio.Group>
 
         {selectedOption === 'existing' ? (
@@ -108,7 +116,7 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
                 ))}
             </Select>
           </NamespaceContainer>
-        ) : (
+        ) : selectedOption === 'create' ? (
           <>
             <NamespaceContainer>
               <span>Namespace name:</span>
@@ -128,7 +136,7 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
             </NamespaceContainer>
             {errorMessage && <ErrorMessageLabel>*{errorMessage}</ErrorMessageLabel>}
           </>
-        )}
+        ) : null}
       </>
     </Modal>
   );
