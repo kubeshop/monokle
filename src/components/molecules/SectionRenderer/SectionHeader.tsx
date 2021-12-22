@@ -4,7 +4,7 @@ import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
 
 import {SectionBlueprint, SectionInstance} from '@models/navigator';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
 
 import Colors from '@styles/Colors';
 
@@ -41,10 +41,6 @@ function SectionHeader(props: SectionHeaderProps) {
 
   const {NameDisplay, NameSuffix} = useSectionCustomization(sectionBlueprint.customization);
 
-  const itemInstances = useAppSelector(state =>
-    sectionInstance.itemIds.map(itemId => state.navigator.itemInstanceMap[itemId])
-  );
-
   const toggleCollapse = useCallback(() => {
     if (isCollapsed) {
       expandSection();
@@ -79,6 +75,8 @@ function SectionHeader(props: SectionHeaderProps) {
       isHighlighted={Boolean(sectionInstance.isHighlighted && isCollapsed)}
       isInitialized={Boolean(sectionInstance.isInitialized)}
       isVisible={Boolean(sectionInstance.isVisible)}
+      isSectionCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
+      hasCustomNameDisplay={Boolean(NameDisplay.Component)}
       isLastSection={isLastSection}
       isCollapsed={isCollapsed}
       onMouseEnter={() => setIsHovered(true)}

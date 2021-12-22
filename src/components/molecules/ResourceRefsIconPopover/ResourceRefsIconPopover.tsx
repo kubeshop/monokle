@@ -57,7 +57,7 @@ const ResourceRefsIconPopover = (props: {
   }, [type]);
 
   if (!resourceRefs || resourceRefs.length === 0) {
-    return null;
+    return <span style={{minWidth: '20px'}} />;
   }
 
   if (isDisabled) {

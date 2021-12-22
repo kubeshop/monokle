@@ -27,7 +27,6 @@ import Colors from '@styles/Colors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
-  margin-right: 8px;
   padding: 8px;
   display: flex;
   align-items: center;
