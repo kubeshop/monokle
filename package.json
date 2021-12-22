@@ -127,7 +127,7 @@
     "web-vitals": "2.1.2",
     "worker-loader": "3.0.8",
     "yaml": "2.0.0-9",
-    "yargs": "17.2.1"
+    "yargs": "17.3.0"
   },
   "scripts": {
     "start": "craco start",
