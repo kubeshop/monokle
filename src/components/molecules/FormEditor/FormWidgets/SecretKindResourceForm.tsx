@@ -21,6 +21,17 @@ const FormContainer = styled.div`
 const StyledSpanTitle = styled.span`
   display: block;
   margin-bottom: 4px;
+  margin-top: 6px;
+`;
+
+const StyledSpanToggler = styled.span`
+  cursor: pointer;
+  text-decoration: underline;
+  float: right;
+  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: 700;
+  margin-top: 4px;
 `;
 
 const secretTypes = [
@@ -138,6 +149,14 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
     onChange({...formData, data: {[key]: value}, stringData: undefined});
   };
 
+  const handleTokenFormChange = (key: string, value: string) => {
+    onChange({...formData, data: {...formData.data, [key]: value}, stringData: undefined});
+  };
+
+  const handleTLSFormChange = (key: string, value: string) => {
+    onChange({...formData, data: {...formData.data, [key]: value}, stringData: undefined});
+  };
+
   return (
     <FormContainer>
       <div>
@@ -193,7 +212,13 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
             onChange={(value: string) => handleTextAreaFormChange('ssh-privatekey', value)}
           />
         )}
-        {/* {type === 'kubernetes.io/tls' && data && <TLSForm crt={data['tls.crt']} key={data['tls.key']} />} */}
+        {formData.type === 'kubernetes.io/tls' && (
+          <TLSForm
+            tlscrt={formData.data && formData.data['tls.crt']}
+            tlskey={formData.data && formData.data['tls.key']}
+            onChange={(key: string, value: string) => handleTLSFormChange(key, value)}
+          />
+        )}
         {formData.type === 'bootstrap.kubernetes.io/token' && (
           <TokenForm
             authExtraGroups={formData.data && formData.data['auth-extra-groups']}
@@ -202,6 +227,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
             tokenSecret={formData.data && formData.data['token-secret']}
             usageBootstrapAuthentication={formData.data && formData.data['usage-bootstrap-authentication']}
             usageBootstrapSigning={formData.data && formData.data['usage-bootstrap-signing']}
+            onChange={(key: string, value: string) => handleTokenFormChange(key, value)}
           />
         )}
       </div>
@@ -259,16 +285,66 @@ const KeyValuePairForm = ({
 };
 
 const TextAreaForm = ({value, onChange}: {value: string; onChange: Function}) => {
+  const [localValue, setLocalValue] = useState<string | undefined>(value);
+  const [plainValue, setPlainValue] = useState(value ? Buffer.from(value, 'base64').toString('utf-8') : '');
+  const [isEncoded, setIsEncoded] = useState(false);
+
   const handleValueChange = (propertyValue: string) => {
+    if (!isEncoded) {
+      setLocalValue(propertyValue ? Buffer.from(propertyValue).toString('base64') : undefined);
+    } else {
+      setLocalValue(propertyValue || undefined);
+    }
+  };
+
+  useEffect(() => {
+    if (_.isEqual(localValue, value)) {
+      return;
+    }
+
+    if (localValue) {
+      setPlainValue(Buffer.from(localValue, 'base64').toString('utf-8'));
+    } else {
+      setPlainValue('');
+    }
+
     if (onChange) {
-      onChange(propertyValue);
+      onChange(localValue);
+    }
+  }, [localValue]);
+
+  return (
+    <div style={{width: '100%', marginTop: '16px'}}>
+      <StyledSpanTitle>Data</StyledSpanTitle>
+      <Base64TextArea value={localValue} onChange={(emittedValue: string) => handleValueChange(emittedValue)} />
+    </div>
+  );
+};
+
+const TLSForm = ({tlscrt, tlskey, onChange}: {tlscrt: string; tlskey: string; onChange: Function}) => {
+  const handleValueChange = (key: string, value: string) => {
+    if (onChange) {
+      onChange(key, value);
     }
   };
 
   return (
     <div style={{width: '100%', marginTop: '16px'}}>
       <StyledSpanTitle>Data</StyledSpanTitle>
-      <TextArea rows={6} value={value} onChange={e => handleValueChange(e.target.value)} />
+      <div>
+        <StyledSpanTitle>CRT</StyledSpanTitle>
+        <Base64TextArea
+          value={tlscrt}
+          onChange={(emittedValue: string) => handleValueChange('tls.crt', emittedValue)}
+        />
+      </div>
+      <div>
+        <StyledSpanTitle>Key</StyledSpanTitle>
+        <Base64TextArea
+          value={tlskey}
+          onChange={(emittedValue: string) => handleValueChange('tls.key', emittedValue)}
+        />
+      </div>
     </div>
   );
 };
@@ -280,6 +356,7 @@ const TokenForm = ({
   tokenSecret,
   usageBootstrapAuthentication,
   usageBootstrapSigning,
+  onChange,
 }: {
   authExtraGroups: string;
   expiration: string;
@@ -287,33 +364,55 @@ const TokenForm = ({
   tokenSecret: string;
   usageBootstrapAuthentication: string;
   usageBootstrapSigning: string;
+  onChange: Function;
 }) => {
+  const handleValueChange = (key: string, value: string) => {
+    if (onChange) {
+      onChange(key, value);
+    }
+  };
+
   return (
     <div style={{width: '100%', marginTop: '16px'}}>
       <StyledSpanTitle>Data</StyledSpanTitle>
       <div>
-        <StyledSpanTitle>auth-extra-groups</StyledSpanTitle>
-        <Input value={authExtraGroups} />
+        <StyledSpanTitle>Auth Extra Groups</StyledSpanTitle>
+        <Base64Input
+          value={authExtraGroups}
+          onChange={(emittedValue: string) => handleValueChange('auth-extra-groups', emittedValue)}
+        />
       </div>
       <div>
-        <StyledSpanTitle>expiration</StyledSpanTitle>
-        <Input value={expiration} />
+        <StyledSpanTitle>Expiration</StyledSpanTitle>
+        <Base64Input
+          value={expiration}
+          onChange={(emittedValue: string) => handleValueChange('expiration', emittedValue)}
+        />
       </div>
       <div>
-        <StyledSpanTitle>tokenId</StyledSpanTitle>
-        <Input value={tokenId} />
+        <StyledSpanTitle>Token Id</StyledSpanTitle>
+        <Base64Input value={tokenId} onChange={(emittedValue: string) => handleValueChange('token-id', emittedValue)} />
       </div>
       <div>
-        <StyledSpanTitle>tokenSecret</StyledSpanTitle>
-        <Input value={tokenSecret} />
+        <StyledSpanTitle>Token Secret</StyledSpanTitle>
+        <Base64Input
+          value={tokenSecret}
+          onChange={(emittedValue: string) => handleValueChange('token-secret', emittedValue)}
+        />
       </div>
       <div>
-        <StyledSpanTitle>usageBootstrapAuthentication</StyledSpanTitle>
-        <Input value={usageBootstrapAuthentication} />
+        <StyledSpanTitle>Usage Bootstrap Authentication</StyledSpanTitle>
+        <Base64Input
+          value={usageBootstrapAuthentication}
+          onChange={(emittedValue: string) => handleValueChange('usage-bootstrap-authentication', emittedValue)}
+        />
       </div>
       <div>
-        <StyledSpanTitle>usageBootstrapSigning</StyledSpanTitle>
-        <Input value={usageBootstrapSigning} />
+        <StyledSpanTitle>Usage Bootstrap Signing</StyledSpanTitle>
+        <Base64Input
+          value={usageBootstrapSigning}
+          onChange={(emittedValue: string) => handleValueChange('usage-bootstrap-signing', emittedValue)}
+        />
       </div>
     </div>
   );
@@ -344,7 +443,7 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
     }
 
     if (property === 'VALUE') {
-      setLocalValue({id: localValue.id, key: localValue.key, value: propertyValue});
+      setLocalValue({id: localValue.id, key: localValue.key, value: propertyValue || undefined});
     }
   };
 
@@ -354,19 +453,15 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
     }
   };
 
-  useDebounce(
-    () => {
-      if (_.isEqual(localValue, value)) {
-        return;
-      }
+  useEffect(() => {
+    if (_.isEqual(localValue, value)) {
+      return;
+    }
 
-      if (onChange && (localValue.key || localValue.value)) {
-        onChange(localValue);
-      }
-    },
-    DEFAULT_EDITOR_DEBOUNCE,
-    [localValue]
-  );
+    if (onChange && (localValue.key || localValue.value)) {
+      onChange(localValue);
+    }
+  }, [localValue]);
 
   return (
     <div style={{display: 'flex', alignItems: 'space-between', width: '100%', marginTop: '16px'}}>
@@ -376,7 +471,10 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
       </div>
       <div style={{width: '40%', marginLeft: '0.33%'}}>
         <StyledSpanTitle>Value</StyledSpanTitle>
-        <Input value={localValue.value} onChange={event => handleValueChange('VALUE', event.target.value)} />
+        <Base64Input
+          value={localValue.value}
+          onChange={(emittedValue: string) => handleValueChange('VALUE', emittedValue)}
+        />
       </div>
       <div style={{width: '19%', marginLeft: '0.33%'}}>
         <StyledSpanTitle>&nbsp;</StyledSpanTitle>
@@ -387,5 +485,99 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
         </div>
       </div>
     </div>
+  );
+};
+
+export const Base64Input = ({value, onChange}: any) => {
+  const [localValue, setLocalValue] = useState<string | undefined>(value);
+  const [plainValue, setPlainValue] = useState(value ? Buffer.from(value, 'base64').toString('utf-8') : '');
+  const [isEncoded, setIsEncoded] = useState(false);
+
+  const handleValueChange = (propertyValue: string) => {
+    if (!isEncoded) {
+      setLocalValue(propertyValue ? Buffer.from(propertyValue).toString('base64') : undefined);
+    } else {
+      setLocalValue(propertyValue || undefined);
+    }
+  };
+
+  useDebounce(
+    () => {
+      if (_.isEqual(localValue, value)) {
+        return;
+      }
+
+      if (localValue) {
+        setPlainValue(Buffer.from(localValue, 'base64').toString('utf-8'));
+      } else {
+        setPlainValue('');
+      }
+
+      if (onChange) {
+        onChange(localValue);
+      }
+    },
+    DEFAULT_EDITOR_DEBOUNCE,
+    [localValue]
+  );
+
+  return (
+    <>
+      <Input value={isEncoded ? localValue : plainValue} onChange={event => handleValueChange(event.target.value)} />
+      {isEncoded ? (
+        <StyledSpanToggler onClick={() => setIsEncoded(false)}>Encoded</StyledSpanToggler>
+      ) : (
+        <StyledSpanToggler onClick={() => setIsEncoded(true)}>Decoded</StyledSpanToggler>
+      )}
+    </>
+  );
+};
+
+export const Base64TextArea = ({value, onChange}: any) => {
+  const [localValue, setLocalValue] = useState<string | undefined>(value);
+  const [plainValue, setPlainValue] = useState(value ? Buffer.from(value, 'base64').toString('utf-8') : '');
+  const [isEncoded, setIsEncoded] = useState(false);
+
+  const handleValueChange = (propertyValue: string) => {
+    if (!isEncoded) {
+      setLocalValue(propertyValue ? Buffer.from(propertyValue).toString('base64') : undefined);
+    } else {
+      setLocalValue(propertyValue || undefined);
+    }
+  };
+
+  useDebounce(
+    () => {
+      if (_.isEqual(localValue, value)) {
+        return;
+      }
+
+      if (localValue) {
+        setPlainValue(Buffer.from(localValue, 'base64').toString('utf-8'));
+      } else {
+        setPlainValue('');
+      }
+
+      if (onChange) {
+        onChange(localValue);
+      }
+    },
+    DEFAULT_EDITOR_DEBOUNCE,
+    [localValue]
+  );
+
+  return (
+    <>
+      <TextArea
+        rows={6}
+        value={isEncoded ? localValue : plainValue}
+        onChange={event => handleValueChange(event.target.value)}
+      />
+      {isEncoded ? (
+        <StyledSpanToggler onClick={() => setIsEncoded(false)}>Encoded</StyledSpanToggler>
+      ) : (
+        <StyledSpanToggler onClick={() => setIsEncoded(true)}>Decoded</StyledSpanToggler>
+      )}
+    </>
   );
 };
