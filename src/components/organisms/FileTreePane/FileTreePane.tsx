@@ -93,7 +93,15 @@ const createNode = (
     title: (
       <NodeContainer>
         <NodeTitleContainer>
-          <span className={fileEntry.isExcluded ? 'excluded-file-entry-name' : 'file-entry-name'}>
+          <span
+            className={
+              fileEntry.isExcluded
+                ? 'excluded-file-entry-name'
+                : fileEntry.isSupported || fileEntry.children
+                ? 'file-entry-name'
+                : 'not-supported-file-entry-name'
+            }
+          >
             {fileEntry.name}
           </span>
           {resources.length > 0 ? (
@@ -230,6 +238,11 @@ const FileTreeContainer = styled.div`
   }
 
   & .excluded-file-entry-name {
+    color: ${Colors.grey800};
+    font-style: italic;
+  }
+
+  & .not-supported-file-entry-name {
     color: ${Colors.grey800};
   }
 `;
