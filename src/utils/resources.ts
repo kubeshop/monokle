@@ -103,23 +103,25 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
   };
 }
 
-export function getDefaultNamespaceForApply(resources: K8sResource[]) {
+export function getDefaultNamespaceForApply(resources: K8sResource[]): {
+  defaultNamespace: string;
+  defaultOption?: string;
+} {
   let namespace = 'default';
 
-  resources.forEach(resource => {
-    if (!resource.namespace) {
-      return;
-    }
+  for (let i = 0; i < resources.length; i += 1) {
+    const resourceNamespace = resources[i].namespace;
 
-    if (resource.namespace !== namespace) {
-      if (namespace !== 'default') {
-        namespace = 'default';
-        return namespace;
+    if (resourceNamespace) {
+      if (resources[i].namespace !== namespace) {
+        if (namespace !== 'default') {
+          return {defaultNamespace: 'default', defaultOption: 'none'};
+        }
+
+        namespace = resourceNamespace;
       }
-
-      namespace = resource.namespace;
     }
-  });
+  }
 
-  return namespace;
+  return {defaultNamespace: namespace};
 }

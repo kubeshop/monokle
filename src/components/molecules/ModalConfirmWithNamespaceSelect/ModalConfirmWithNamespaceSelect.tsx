@@ -62,7 +62,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
 
-  const defaultNamespace = getDefaultNamespaceForApply(resources);
+  const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources);
   const [namespaces] = useTargetClusterNamespaces();
 
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
@@ -109,7 +109,11 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   }, [currentContext, createNamespaceName, dispatch, kubeconfigPath, selectedNamespace, selectedOption, onOk]);
 
   useEffect(() => {
-    if (!namespaces.includes(defaultNamespace)) {
+    if (defaultOption && defaultOption === 'none') {
+      setSelectedOption('none');
+      setSelectedNamespace('defualt');
+      setCreateNamespaceName('');
+    } else if (!namespaces.includes(defaultNamespace)) {
       setSelectedOption('create');
       setSelectedNamespace('default');
       setCreateNamespaceName(defaultNamespace);
