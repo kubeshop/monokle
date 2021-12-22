@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   reloadClusterDiff,
-  selectAllClusterDiffMatches,
+  selectMultipleClusterDiffMatches,
   toggleClusterOnlyResourcesInClusterDiff,
   unselectAllClusterDiffMatches,
 } from '@redux/reducers/main';
@@ -18,6 +18,8 @@ import {stopPreview} from '@redux/services/preview';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
 import {PreviewDropdown} from '@components/molecules';
+
+import {CLUSTER_DIFF_SECTION_NAME} from './ClusterDiffSectionBlueprint';
 
 const NameDisplayContainer = styled.div`
   width: 100%;
@@ -75,9 +77,13 @@ function ResourceDiffSectionNameDisplay() {
   const dispatch = useAppDispatch();
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const hideClusterOnlyResources = useAppSelector(state => state.main.clusterDiff.hideClusterOnlyResources);
+  // TODO: we should use the new makeCheckable handler from SectionBlueprint to implement the checkboxes in cluster diff
+  const clusterDiffSectionInstance = useAppSelector(
+    state => state.navigator.sectionInstanceMap[CLUSTER_DIFF_SECTION_NAME]
+  );
+  const selectedMatchesLength = useAppSelector(state => state.main.clusterDiff.selectedMatches.length);
   const areAllMatchesSelected = useAppSelector(
-    state =>
-      state.main.clusterDiff.selectedMatches.length === state.main.clusterDiff.clusterToLocalResourcesMatches.length
+    state => selectedMatchesLength === clusterDiffSectionInstance.visibleItemIds.length
   );
 
   const onClickReload = () => {
@@ -92,7 +98,7 @@ function ResourceDiffSectionNameDisplay() {
     if (areAllMatchesSelected) {
       dispatch(unselectAllClusterDiffMatches());
     } else {
-      dispatch(selectAllClusterDiffMatches());
+      dispatch(selectMultipleClusterDiffMatches(clusterDiffSectionInstance.visibleItemIds));
     }
   };
 
@@ -100,6 +106,10 @@ function ResourceDiffSectionNameDisplay() {
     dispatch(toggleClusterOnlyResourcesInClusterDiff());
     dispatch(reloadClusterDiff());
   };
+
+  if (!clusterDiffSectionInstance) {
+    return null;
+  }
 
   return (
     <NameDisplayContainer>
@@ -129,7 +139,7 @@ function ResourceDiffSectionNameDisplay() {
       </TitlesRow>
 
       <CheckboxWrapper onClick={onClickSelectAll}>
-        <Checkbox checked={areAllMatchesSelected} />
+        <Checkbox indeterminate={selectedMatchesLength > 0 && !areAllMatchesSelected} checked={areAllMatchesSelected} />
         <CheckboxLabel>{areAllMatchesSelected ? 'Deselect all' : 'Select all'}</CheckboxLabel>
       </CheckboxWrapper>
     </NameDisplayContainer>

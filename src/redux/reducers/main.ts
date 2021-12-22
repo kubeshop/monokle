@@ -534,14 +534,8 @@ export const mainSlice = createSlice({
         state.clusterDiff.selectedMatches.push(matchId);
       }
     },
-    selectAllClusterDiffMatches: (state: Draft<AppState>) => {
-      state.clusterDiff.selectedMatches = state.clusterDiff.clusterToLocalResourcesMatches.map(match =>
-        makeResourceNameKindNamespaceIdentifier({
-          name: match.resourceName,
-          kind: match.resourceKind,
-          namespace: match.resourceNamespace,
-        })
-      );
+    selectMultipleClusterDiffMatches: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      state.clusterDiff.selectedMatches = action.payload;
     },
     unselectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const matchId = action.payload;
@@ -1019,7 +1013,7 @@ export const {
   setDiffResourceInClusterDiff,
   setClusterDiffRefreshDiffResource,
   selectClusterDiffMatch,
-  selectAllClusterDiffMatches,
+  selectMultipleClusterDiffMatches,
   unselectClusterDiffMatch,
   unselectAllClusterDiffMatches,
   reloadClusterDiff,
