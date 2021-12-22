@@ -482,8 +482,6 @@ export const mainSlice = createSlice({
     },
     updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       state.resourceFilter = action.payload;
-      // clear checked resources from cluster diff
-      state.clusterDiff.selectedMatches = [];
     },
     extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       const filter = action.payload;
@@ -520,9 +518,6 @@ export const mainSlice = createSlice({
         }
       });
       state.resourceFilter = newFilter;
-
-      // clear checked resources from cluster diff
-      state.clusterDiff.selectedMatches = [];
     },
     setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = action.payload;
