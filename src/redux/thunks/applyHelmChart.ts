@@ -47,8 +47,6 @@ function applyHelmChartToCluster(
     }
   }
 
-  console.log(helmArgs);
-
   const child = spawn('helm', helmArgs, {
     env: {
       NODE_ENV: PROCESS_ENV.NODE_ENV,
