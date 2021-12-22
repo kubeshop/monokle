@@ -24,6 +24,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateStartupModalVisible} from '@redux/reducers/appConfig';
+import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {
   setClusterIconHighlightStatus,
   toggleClusterStatus,
@@ -271,6 +272,7 @@ const PageHeader = () => {
   };
 
   const onClickExit = () => {
+    dispatch(uncheckAllResourceIds());
     stopPreview(dispatch);
   };
 
