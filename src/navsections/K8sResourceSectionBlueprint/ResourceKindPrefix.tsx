@@ -22,14 +22,14 @@ const Container = styled.span`
 `;
 
 const StyledTag = styled(Tag)<{$isSelected: boolean}>`
-  margin-left: 4;
+  margin-left: 4px;
   color: ${props => (props.$isSelected ? Colors.blackPure : Colors.whitePure)};
   font-weight: ${props => (props.$isSelected ? 700 : undefined)};
-  font-size: '12px';
-  padding: '0 5px';
-  overflow: 'hidden';
-  text-overflow: 'ellipsis';
-  white-space: 'nowrap';
+  font-size: 12px;
+  padding: 0 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const Prefix = (props: ItemCustomComponentProps) => {
