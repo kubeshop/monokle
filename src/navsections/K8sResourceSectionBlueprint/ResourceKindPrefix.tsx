@@ -21,6 +21,17 @@ const Container = styled.span`
   }
 `;
 
+const StyledTag = styled(Tag)<{$isSelected: boolean}>`
+  margin-left: 4;
+  color: ${props => (props.$isSelected ? Colors.blackPure : Colors.whitePure)};
+  font-weight: ${props => (props.$isSelected ? 700 : undefined)};
+  font-size: '12px';
+  padding: '0 5px';
+  overflow: 'hidden';
+  text-overflow: 'ellipsis';
+  white-space: 'nowrap';
+`;
+
 const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
   const dispatch = useAppDispatch();
@@ -53,16 +64,9 @@ const Prefix = (props: ItemCustomComponentProps) => {
             </Button>
           }
         >
-          <Tag
-            style={{
-              marginLeft: 4,
-              color: itemInstance.isSelected ? Colors.blackPure : Colors.whitePure,
-              fontWeight: itemInstance.isSelected ? 600 : undefined,
-            }}
-            color="default"
-          >
+          <StyledTag $isSelected={itemInstance.isSelected} color="default">
             {resource.namespace}
-          </Tag>
+          </StyledTag>
         </Popover>
       )}
     </Container>

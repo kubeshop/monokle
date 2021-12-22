@@ -20,6 +20,9 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   align-items: center;
   width: 100%;
   user-select: none;
+  padding-left: ${props => (props.$isSectionCheckable ? '32px;' : '26px;')}
+  padding-right: 8px;
+  margin-bottom: 2px;
   ${props => props.hasOnClick && `cursor: pointer;`}
   ${props => {
     if (props.isLastItem) {
@@ -46,7 +49,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
       return `background: ${Colors.blackPearl};`;
     }
   }};
-  padding-left: ${props => `${(props.level + 1) * 8 + 1 + (props.$isSectionCheckable ? 24 : 0)}px;`};
+
 `;
 
 type ItemNameProps = {
@@ -63,6 +66,7 @@ export const ItemName = styled.span<ItemNameProps>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
   ${props => {
     if (props.isSelected) {
       return `font-weight: 700;`;
@@ -111,5 +115,5 @@ export const BlankSpace = styled.span`
 `;
 
 export const Checkbox = styled(RawCheckbox)<{$level: number}>`
-  ${props => props.$level && `margin-left: -${props.$level * 8 + 24}px;`}
+  margin-left: -24px;
 `;
