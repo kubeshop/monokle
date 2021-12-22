@@ -1,12 +1,12 @@
 import {createSelectorOutgoingRefMappers} from '@src/kindhandlers/Service.handler';
-import {createCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {
   ISTIO_DEFAULT_RESOURCE_VERSION,
   ISTIO_NETWORKING_RESOURCE_GROUP,
   ISTIO_SUBSECTION_NAME,
 } from '@src/kindhandlers/istio/constants';
 
-const ServiceEntryHandler = createCustomObjectKindHandler(
+const ServiceEntryHandler = createNamespacedCustomObjectKindHandler(
   'ServiceEntry',
   ISTIO_SUBSECTION_NAME,
   'ServiceEntries',
