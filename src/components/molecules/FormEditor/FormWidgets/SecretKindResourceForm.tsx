@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useDebounce} from 'react-use';
 
 import {Button, Input, Select} from 'antd';
 
@@ -7,6 +8,8 @@ import {DeleteOutlined} from '@ant-design/icons';
 import _ from 'lodash';
 import styled from 'styled-components';
 import {v4 as uuidv4} from 'uuid';
+
+import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 const Option = Select.Option;
 const {TextArea} = Input;
@@ -31,8 +34,6 @@ const secretTypes = [
   'bootstrap.kubernetes.io/token',
 ];
 
-const emptyObject: any = {};
-
 export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ...args}: any) => {
   const [dataKeyValuePairs, setDataKeyValuePairs] = useState<{id: string; key: string; value: string}[]>([]);
   const [stringDataKeyValuePairs, setStringDataKeyValuePairs] = useState<{id: string; key: string; value: string}[]>(
@@ -46,7 +47,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   };
 
   useEffect(() => {
-    if (formData.data && Array.isArray(formData.data)) {
+    if (formData.data && _.isObject(formData.data)) {
       setDataKeyValuePairs(Object.keys(formData.data).map(key => ({id: uuidv4(), key, value: formData.data[key]})));
     } else {
       setDataKeyValuePairs([]);
@@ -54,7 +55,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   }, [formData.data]);
 
   useEffect(() => {
-    if (formData.stringData && Array.isArray(formData.stringData)) {
+    if (formData.stringData && _.isObject(formData.stringData)) {
       setStringDataKeyValuePairs(
         Object.keys(formData.stringData).map(key => ({id: uuidv4(), key, value: formData.stringData[key]}))
       );
@@ -64,22 +65,20 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   }, [formData.stringData]);
 
   useEffect(() => {
-    console.log('dataKeyValuePairs', dataKeyValuePairs);
     if (dataKeyValuePairs.length === 0) {
       return;
     }
+    const emptyObject: any = {};
 
     const data = dataKeyValuePairs.reduce((object, value) => {
       object[value.key] = value.value;
       return object;
     }, emptyObject);
-
     if (!_.isEqual(formData.data, data)) {
-      console.log('data', data);
       onChange({
         ...formData,
         stringData: undefined,
-        data,
+        data: data || undefined,
       });
     }
   }, [dataKeyValuePairs]);
@@ -88,6 +87,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
     if (stringDataKeyValuePairs.length === 0) {
       return;
     }
+    const emptyObject: any = {};
 
     const stringData = stringDataKeyValuePairs.reduce((object, value) => {
       object[value.key] = value.value;
@@ -97,7 +97,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
       onChange({
         ...formData,
         data: undefined,
-        stringData,
+        stringData: stringData || undefined,
       });
     }
   }, [stringDataKeyValuePairs]);
@@ -354,15 +354,19 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
     }
   };
 
-  useEffect(() => {
-    if (_.isEqual(localValue, value)) {
-      return;
-    }
+  useDebounce(
+    () => {
+      if (_.isEqual(localValue, value)) {
+        return;
+      }
 
-    if (onChange && (localValue.key || localValue.value)) {
-      onChange(localValue);
-    }
-  }, [localValue]);
+      if (onChange && (localValue.key || localValue.value)) {
+        onChange(localValue);
+      }
+    },
+    DEFAULT_EDITOR_DEBOUNCE,
+    [localValue]
+  );
 
   return (
     <div style={{display: 'flex', alignItems: 'space-between', width: '100%', marginTop: '16px'}}>
