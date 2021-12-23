@@ -495,11 +495,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
               ) : (
                 !isClusterDiffVisible &&
                 (selectedResourceId || selectedPath || selectedValuesFileId) && (
-                  <Monaco
-                    editorHeight={`${parseInt(contentHeight, 10) - 120}`}
-                    applySelection={applySelection}
-                    diffSelectedResource={diffSelectedResource}
-                  />
+                  <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
                 )
               )}
             </TabPane>

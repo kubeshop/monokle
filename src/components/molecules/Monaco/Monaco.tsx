@@ -164,9 +164,6 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
     setEditor(e);
 
-    // @ts-ignore
-    monaco.editor.onDidChangeMarkers(onDidChangeMarkers);
-
     e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
