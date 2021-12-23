@@ -24,7 +24,6 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {
   setClusterIconHighlightStatus,
   toggleClusterStatus,
@@ -144,7 +143,7 @@ const StyledButton = styled(Button)`
   margin: 0;
   color: ${Colors.blue6};
   &:hover {
-    color: color: ${Colors.blue6};
+    color: ${Colors.blue6};
     opacity: 0.8;
   }
 `;
@@ -272,7 +271,6 @@ const PageHeader = () => {
   };
 
   const onClickExit = () => {
-    dispatch(uncheckAllResourceIds());
     stopPreview(dispatch);
   };
 

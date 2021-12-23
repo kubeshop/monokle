@@ -462,6 +462,7 @@ export const mainSlice = createSlice({
       clearSelectedResourceOnPreviewExit(state);
       setPreviewData({}, state);
       state.previewType = undefined;
+      state.checkedResourceIds = [];
     },
     clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
       clearSelectedResourceOnPreviewExit(state);
@@ -470,6 +471,7 @@ export const mainSlice = createSlice({
       state.currentSelectionHistoryIndex = undefined;
       state.selectionHistory = [];
       state.clusterDiff.shouldReload = true;
+      state.checkedResourceIds = [];
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;

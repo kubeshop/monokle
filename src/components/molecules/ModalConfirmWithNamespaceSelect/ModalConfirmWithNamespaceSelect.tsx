@@ -122,7 +122,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setSelectedNamespace(defaultNamespace);
       setCreateNamespaceName('');
     }
-  }, [defaultNamespace, namespaces]);
+  }, [defaultOption, defaultNamespace, namespaces]);
 
   if (!selectedOption) {
     return null;

@@ -67,7 +67,7 @@ const HelmChartModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (selectedOption === 'none') {
       onOk();
     }
-  }, [createNamespaceName, selectedOption]);
+  }, [createNamespaceName, selectedNamespace, selectedOption, onOk]);
 
   return (
     <Modal
