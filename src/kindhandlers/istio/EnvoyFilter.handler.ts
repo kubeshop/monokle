@@ -1,8 +1,8 @@
 import {createSelectorOutgoingRefMappers} from '@src/kindhandlers/Service.handler';
-import {createCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {ISTIO_NETWORKING_RESOURCE_GROUP, ISTIO_SUBSECTION_NAME} from '@src/kindhandlers/istio/constants';
 
-const EnvoyFilterHandler = createCustomObjectKindHandler(
+const EnvoyFilterHandler = createNamespacedCustomObjectKindHandler(
   'EnvoyFilter',
   ISTIO_SUBSECTION_NAME,
   'EnvoyFilters',

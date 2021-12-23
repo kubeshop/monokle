@@ -51,6 +51,12 @@ interface ResourceKindHandler {
   clusterApiVersion: string;
 
   /**
+   * tells if this kind is a custom resource
+   */
+
+  isCustom: boolean;
+
+  /**
    * An external link to documentation
    */
 
@@ -66,7 +72,7 @@ interface ResourceKindHandler {
    * Get all resources of this type using the provided kubeconfig
    */
 
-  listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]>;
+  listResourcesInCluster(kubeconfig: k8s.KubeConfig, crd?: K8sResource): Promise<any[]>;
 
   /**
    * Delete the specified resource from the cluster
@@ -93,7 +99,7 @@ interface ResourceKindHandler {
    */
 
   sourceEditorOptions?: {
-    editorSchema?: any;
+    editorSchema: any;
     symbolMatchers?: SymbolMatcher[];
   };
 
@@ -103,7 +109,7 @@ interface ResourceKindHandler {
 
   formEditorOptions?: {
     editorSchema: any;
-    editorUiSchema: any;
+    editorUiSchema?: any;
   };
 
   /**

@@ -11,6 +11,7 @@ const IngressHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'Ingresses'],
   clusterApiVersion: 'networking.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.networking.v1',
+  isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     return k8sNetworkingV1Api.readNamespacedIngress(resource.name, resource.namespace || 'default');

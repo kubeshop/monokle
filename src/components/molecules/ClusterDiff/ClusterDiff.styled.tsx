@@ -23,6 +23,7 @@ export const List = styled.ol<{height?: number}>`
   list-style-type: none;
   padding: 0;
   overflow-y: auto;
+  width: 100%;
   ${GlobalScrollbarStyle}
 
   ${props => props.height && `height: ${props.height}px;`}

@@ -13,6 +13,7 @@ const JobHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'Jobs'],
   clusterApiVersion: 'batch/v1',
   validationSchemaPrefix: 'io.k8s.api.batch.v1',
+  isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
     return k8sBatchV1Api.readNamespacedJob(resource.name, resource.namespace || 'default', 'true');

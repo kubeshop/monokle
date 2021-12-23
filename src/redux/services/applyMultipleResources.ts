@@ -16,6 +16,7 @@ const applyMultipleResources = (
   config: AppConfig,
   resourcesToApply: K8sResource[],
   dispatch: AppDispatch,
+  namespace?: string,
   onSuccessCallback?: () => void
 ) => {
   const kubeconfigPath = config.kubeconfigPath;
@@ -35,7 +36,7 @@ const applyMultipleResources = (
     }, '');
 
   try {
-    const child = applyYamlToCluster(yamlToApply, kubeconfigPath, context);
+    const child = applyYamlToCluster(yamlToApply, kubeconfigPath, context, namespace);
     child.on('exit', (code, signal) => {
       log.info(`kubectl exited with code ${code} and signal ${signal}`);
     });

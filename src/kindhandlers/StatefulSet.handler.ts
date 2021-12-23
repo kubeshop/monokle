@@ -13,6 +13,7 @@ const StatefulSetHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'StatefulSets'],
   clusterApiVersion: 'apps/v1',
   validationSchemaPrefix: 'io.k8s.api.apps.v1',
+  isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
     return k8sAppV1Api.readNamespacedStatefulSet(resource.name, resource.namespace || 'default');
