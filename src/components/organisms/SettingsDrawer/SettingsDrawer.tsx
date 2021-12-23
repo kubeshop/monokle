@@ -1,7 +1,5 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {ipcRenderer} from 'electron';
-
 import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
@@ -101,7 +99,6 @@ const SettingsDrawer = () => {
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const appConfig = useAppSelector(state => state.config);
   const uiState = useAppSelector(state => state.ui);
-  const kubeconfig = useAppSelector(state => state.config.kubeConfig);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
 
@@ -238,14 +235,6 @@ const SettingsDrawer = () => {
         dispatch(updateKubeconfig(path));
       }
     }
-  };
-
-  const checkUpdateAvailability = () => {
-    ipcRenderer.send('check-update-available');
-  };
-
-  const updateApplication = () => {
-    ipcRenderer.send('quit-and-install');
   };
 
   const toggleClusterSelector = () => {

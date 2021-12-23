@@ -102,7 +102,7 @@ const CreateFolderModal: React.FC = () => {
           name="folderName"
           rules={[
             ({getFieldValue}) => ({
-              validator: (rule, value) => {
+              validator: () => {
                 return new Promise((resolve: (value?: any) => void, reject) => {
                   const folderNameValue: string = getFieldValue('folderName').toLowerCase();
 

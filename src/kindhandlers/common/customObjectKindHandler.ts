@@ -76,7 +76,7 @@ export const createNamespacedCustomObjectKindHandler = (
             // use listClusterCustomObject to get objects in all namespaces
             return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
-          reason => {
+          () => {
             log.warn(`Failed to get CRD for ${crdName}, ignoring`);
             return [];
           }
@@ -151,7 +151,7 @@ export const createClusterCustomObjectKindHandler = (
             const defaultVersion = findDefaultVersion(response.body);
             return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
-          reason => {
+          () => {
             log.warn(`Failed to get CRD for ${crdName}, ignoring`);
             return [];
           }

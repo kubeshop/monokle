@@ -515,7 +515,7 @@ export function processParsedResources(
   }
   const timestamp = Date.now();
   processRefs(resourceMap, processingOptions, options);
-  console.log(`processing refs took ${Date.now() - timestamp}`, options);
+  log.info(`processing refs took ${Date.now() - timestamp}`, options);
 }
 
 /**

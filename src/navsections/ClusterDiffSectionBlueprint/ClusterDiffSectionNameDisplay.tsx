@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {Button, Checkbox, Switch} from 'antd';
 
@@ -82,8 +82,9 @@ function ResourceDiffSectionNameDisplay() {
     state => state.navigator.sectionInstanceMap[CLUSTER_DIFF_SECTION_NAME]
   );
   const selectedMatchesLength = useAppSelector(state => state.main.clusterDiff.selectedMatches.length);
-  const areAllMatchesSelected = useAppSelector(
-    state => selectedMatchesLength === clusterDiffSectionInstance.visibleItemIds.length
+  const areAllMatchesSelected = useMemo(
+    () => selectedMatchesLength === clusterDiffSectionInstance.visibleItemIds.length,
+    [selectedMatchesLength, clusterDiffSectionInstance.visibleItemIds.length]
   );
 
   const onClickReload = () => {
