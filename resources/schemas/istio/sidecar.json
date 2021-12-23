@@ -1,0 +1,153 @@
+{
+  "properties": {
+    "spec": {
+      "additionalProperties": false,
+      "description": "Configuration affecting network reachability of a sidecar. See more details at: https://istio.io/docs/reference/config/networking/sidecar.html",
+      "properties": {
+        "egress": {
+          "items": {
+            "properties": {
+              "bind": {
+                "type": "string"
+              },
+              "captureMode": {
+                "enum": [
+                  "DEFAULT",
+                  "IPTABLES",
+                  "NONE"
+                ],
+                "type": "string"
+              },
+              "hosts": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "port": {
+                "description": "The port associated with the listener.",
+                "properties": {
+                  "name": {
+                    "description": "Label assigned to the port.",
+                    "type": "string"
+                  },
+                  "number": {
+                    "description": "A valid non-negative integer port number.",
+                    "type": "integer"
+                  },
+                  "protocol": {
+                    "description": "The protocol exposed on the port.",
+                    "type": "string"
+                  },
+                  "targetPort": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "ingress": {
+          "items": {
+            "properties": {
+              "bind": {
+                "description": "The IP to which the listener should be bound.",
+                "type": "string"
+              },
+              "captureMode": {
+                "enum": [
+                  "DEFAULT",
+                  "IPTABLES",
+                  "NONE"
+                ],
+                "type": "string"
+              },
+              "defaultEndpoint": {
+                "type": "string"
+              },
+              "port": {
+                "description": "The port associated with the listener.",
+                "properties": {
+                  "name": {
+                    "description": "Label assigned to the port.",
+                    "type": "string"
+                  },
+                  "number": {
+                    "description": "A valid non-negative integer port number.",
+                    "type": "integer"
+                  },
+                  "protocol": {
+                    "description": "The protocol exposed on the port.",
+                    "type": "string"
+                  },
+                  "targetPort": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "outboundTrafficPolicy": {
+          "description": "Configuration for the outbound traffic policy.",
+          "properties": {
+            "egressProxy": {
+              "properties": {
+                "host": {
+                  "description": "The name of a service from the service registry.",
+                  "type": "string"
+                },
+                "port": {
+                  "description": "Specifies the port on the host that is being addressed.",
+                  "properties": {
+                    "number": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "subset": {
+                  "description": "The name of a subset within the service.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "mode": {
+              "enum": [
+                "REGISTRY_ONLY",
+                "ALLOW_ANY"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "workloadSelector": {
+          "properties": {
+            "labels": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "status": {
+      "type": "object",
+      "x-kubernetes-preserve-unknown-fields": true
+    }
+  },
+  "type": "object",
+  "additionalProperties": false
+}

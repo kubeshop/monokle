@@ -2,6 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
+import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 const EndpointsHandler: ResourceKindHandler = {
@@ -10,19 +11,19 @@ const EndpointsHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'Endpoints'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
-  description: '',
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
+  isCustom: false,
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    return k8sCoreV1Api.readNamespacedEndpoints(name, namespace, 'true');
+    return k8sCoreV1Api.readNamespacedEndpoints(resource.name, resource.namespace || 'default', 'true');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = await k8sCoreV1Api.listEndpointsForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    await k8sCoreV1Api.deleteNamespacedEndpoints(name, namespace || 'default');
+    await k8sCoreV1Api.deleteNamespacedEndpoints(resource.name, resource.namespace || 'default');
   },
   outgoingRefMappers: [
     {

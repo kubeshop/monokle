@@ -4,7 +4,7 @@ const CONFIGURATION = 'Configuration';
 const NETWORK = 'Network';
 const STORAGE = 'Storage';
 const ACCESS_CONTROL = 'Access Control';
-const CUSTOM = 'Custom';
+const CUSTOM = 'Custom Resources';
 
 /** stores the order of subsections for each section */
 const representation: Record<string, string[]> = {

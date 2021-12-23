@@ -9,6 +9,8 @@ interface FileEntry {
   filePath: string;
   /** if the file/folder is excluded from the navigator */
   isExcluded: boolean;
+  /** if the file is found in global inclusion config ( config.fileIncludes ) */
+  isSupported: boolean;
   /** child file names (for folders) */
   children?: string[];
   /** the timestamp of the last write - for discarding change notifications */

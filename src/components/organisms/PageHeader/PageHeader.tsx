@@ -143,7 +143,7 @@ const StyledButton = styled(Button)`
   margin: 0;
   color: ${Colors.blue6};
   &:hover {
-    color: color: ${Colors.blue6};
+    color: ${Colors.blue6};
     opacity: 0.8;
   }
 `;

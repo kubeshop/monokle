@@ -2,9 +2,10 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
+import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
-function createSelectorOutgoingRefMappers(targetResourceKind: string): RefMapper {
+export function createSelectorOutgoingRefMappers(targetResourceKind: string): RefMapper {
   return {
     source: {
       pathParts: ['spec', 'selector'],
@@ -23,19 +24,19 @@ const ServiceHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'Services'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
-  description: '',
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
+  isCustom: false,
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    return k8sCoreV1Api.readNamespacedService(name, namespace, 'true');
+    return k8sCoreV1Api.readNamespacedService(resource.name, resource.namespace || 'default');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = await k8sCoreV1Api.listServiceForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    await k8sCoreV1Api.deleteNamespacedService(name, namespace || 'default');
+    await k8sCoreV1Api.deleteNamespacedService(resource.name, resource.namespace || 'default');
   },
   outgoingRefMappers: [
     {

@@ -47,19 +47,12 @@ export const useResetFormOnCloseModal = ({
   visible: boolean;
   defaultValues?: any;
 }) => {
-  const prevVisibleRef = useRef<boolean>();
   useEffect(() => {
-    prevVisibleRef.current = visible;
-  }, [visible]);
-  const prevVisible = prevVisibleRef.current;
-
-  useEffect(() => {
-    if (!visible && prevVisible) {
+    if (!visible) {
       form.resetFields();
     }
-    if (visible && !prevVisible && defaultValues) {
+    if (visible && defaultValues) {
       form.setFieldsValue(defaultValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+  }, [defaultValues, form, visible]);
 };

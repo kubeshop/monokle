@@ -14,6 +14,8 @@ type NameContainerProps = {
   isVisible?: boolean;
   isInitialized?: boolean;
   disableHoverStyle?: boolean;
+  isSectionCheckable?: boolean;
+  hasCustomNameDisplay?: boolean;
 };
 
 export const NameContainer = styled.li<NameContainerProps>`
@@ -23,6 +25,8 @@ export const NameContainer = styled.li<NameContainerProps>`
   flex-wrap: wrap;
   width: 100%;
   user-select: none;
+  ${props =>
+    (!props.isSectionCheckable && !props.hasCustomNameDisplay) || !props.isInitialized ? 'padding-left: 16px;' : ''}
   ${props => {
     if (props.isVisible === false) {
       return 'visibility: hidden; height: 0;';
@@ -31,7 +35,7 @@ export const NameContainer = styled.li<NameContainerProps>`
   }}
   ${props => {
     if (props.isLastSection && (props.isCollapsed || !props.isInitialized) && !props.hasChildSections) {
-      return `margin-bottom: 12px;`;
+      return `margin-bottom: 16px;`;
     }
   }}
     ${props => {
@@ -64,15 +68,13 @@ type NameProps = {
 };
 
 export const Name = styled.span<NameProps>`
-  padding: 2px 16px;
+  padding: 2px 8px;
   padding-right: 0px;
   margin-right: 4px;
   ${props => {
     return `font-size: ${24 - 4 * props.$level}px;`;
   }}
-  ${props => {
-    return `margin-left: ${8 * props.$level - (props.$isCheckable ? 10 : 0)}px;`;
-  }}
+
   ${props => {
     if (props.$isSelected) {
       return `font-weight: 700;`;
@@ -106,16 +108,12 @@ export const ItemsLength = styled.span<{selected: boolean}>`
 `;
 
 export const EmptyDisplayContainer = styled.div<{level: number}>`
-  margin-left: ${props => {
-    return `${16 + 8 * props.level}px`;
-  }};
+  margin-left: 16px;
 `;
 
 export const BeforeInitializationContainer = styled.div<{level: number}>`
   padding-top: 16px;
-  margin-left: ${props => {
-    return `${16 + 8 * props.level}px`;
-  }};
+  margin-left: 16px;
 `;
 
 export const BlankSpace = styled.span<{level?: number}>`

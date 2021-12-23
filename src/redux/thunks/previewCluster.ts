@@ -15,7 +15,7 @@ import {extractK8sResources, processParsedResources} from '@redux/services/resou
 import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
-import {ResourceKindHandlers} from '@src/kindhandlers';
+import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
@@ -25,7 +25,7 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
     kc.setCurrentContext(thunkAPI.getState().config.kubeConfig.currentContext);
 
     const results = await Promise.allSettled(
-      ResourceKindHandlers.map(resourceKindHandler =>
+      ResourceKindHandlers.filter(handler => !handler.isCustom).map(resourceKindHandler =>
         resourceKindHandler
           .listResourcesInCluster(kc)
           .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
@@ -127,8 +127,12 @@ export const repreviewCluster = createAsyncThunk<
 
 const crdVersionRegex = /(v)(\d*)(alpha|beta)?(\d*)?/;
 
-function findDefaultVersion(r: K8sResource) {
-  const versionNames: string[] = r.content.spec.versions.map((v: any) => v.name);
+export function findDefaultVersion(crd: any) {
+  if (!crd?.spec?.versions) {
+    return undefined;
+  }
+
+  const versionNames: string[] = crd.spec.versions.map((v: any) => v.name);
 
   versionNames.sort((a, b) => {
     const m1 = crdVersionRegex.exec(a);
@@ -177,16 +181,31 @@ async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitio
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
   try {
-    const customObjects = customResourceDefinitions.map(r =>
-      // retrieve objects using latest version name
-      // @ts-ignore
-      k8sApi
-        .listClusterCustomObject(r.content.spec.group, findDefaultVersion(r) || 'v1', r.content.spec.names.plural)
-        .then(response =>
-          // @ts-ignore
-          getK8sObjectsAsYaml(response.body.items)
-        )
-    );
+    const customObjects = customResourceDefinitions
+      .filter(crd => crd.content.spec)
+      .map(crd => {
+        const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
+        if (kindHandler) {
+          log.info(`Getting custom resources for kind ${kindHandler.kind}`);
+          return kindHandler.listResourcesInCluster(kc, crd).then(response =>
+            // @ts-ignore
+            getK8sObjectsAsYaml(response.body.items)
+          );
+        }
+
+        // retrieve objects using latest version name
+        // @ts-ignore
+        return k8sApi
+          .listClusterCustomObject(
+            crd.content.spec.group,
+            findDefaultVersion(crd.content) || 'v1',
+            crd.content.spec.names.plural
+          )
+          .then(response =>
+            // @ts-ignore
+            getK8sObjectsAsYaml(response.body.items)
+          );
+      });
 
     const customResults = await Promise.allSettled(customObjects);
     // @ts-ignore

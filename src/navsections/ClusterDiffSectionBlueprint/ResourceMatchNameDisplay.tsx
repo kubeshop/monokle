@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import {stringify} from 'yaml';
 
 import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
+import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
@@ -20,7 +21,10 @@ import {
   unselectClusterDiffMatch,
   updateResource,
 } from '@redux/reducers/main';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
+import {isKustomizationResource} from '@redux/services/kustomize';
+import {applyResource} from '@redux/thunks/applyResource';
+
+import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {
   diffLocalToClusterResources,
@@ -98,6 +102,8 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
 
   const isMatchSelected = useAppSelector(state => state.main.clusterDiff.selectedMatches.includes(matchId));
 
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
+
   const firstLocalResource = useMemo(() => {
     return localResources && localResources.length > 0 ? localResources[0] : undefined;
   }, [localResources]);
@@ -109,6 +115,16 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     return diffLocalToClusterResources(firstLocalResource, clusterResource).areDifferent;
   }, [firstLocalResource, clusterResource]);
 
+  const confirmModalTitle = useMemo(() => {
+    if (!firstLocalResource) {
+      return '';
+    }
+
+    return isKustomizationResource(firstLocalResource)
+      ? makeApplyKustomizationText(firstLocalResource.name, kubeconfigContext)
+      : makeApplyResourceText(firstLocalResource.name, kubeconfigContext);
+  }, [firstLocalResource, kubeconfigContext]);
+
   const onClickDiff = () => {
     if (!firstLocalResource) {
       return;
@@ -117,17 +133,25 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   };
 
   const onClickApply = () => {
+    setIsApplyModalVisible(true);
+  };
+
+  const onClickApplyResource = (namespace?: string) => {
     if (!firstLocalResource) {
+      setIsApplyModalVisible(false);
       return;
     }
-    applyResourceWithConfirm(
-      firstLocalResource,
+
+    applyResource(
+      firstLocalResource.id,
       resourceMap,
       fileMap,
       dispatch,
       kubeconfigPath,
-      kubeconfigContext || ''
+      kubeconfigContext || '',
+      namespace
     );
+    setIsApplyModalVisible(false);
   };
 
   const saveClusterResourceToLocal = () => {
@@ -223,6 +247,16 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
         )}
         <Label>{itemInstance.name}</Label>
       </LabelContainer>
+
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          isVisible={isApplyModalVisible}
+          resources={firstLocalResource ? [firstLocalResource] : []}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
     </Container>
   );
 }

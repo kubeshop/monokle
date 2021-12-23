@@ -404,7 +404,7 @@ export const mainSlice = createSlice({
 
           const kindHandler = getResourceKindHandler(resource.kind);
           if (kindHandler?.deleteResourceInCluster) {
-            kindHandler.deleteResourceInCluster(kubeConfig, resource.name, resource.namespace);
+            kindHandler.deleteResourceInCluster(kubeConfig, resource);
             deleteResource(resource, state.resourceMap);
           }
         } catch (err) {
@@ -462,6 +462,7 @@ export const mainSlice = createSlice({
       clearSelectedResourceOnPreviewExit(state);
       setPreviewData({}, state);
       state.previewType = undefined;
+      state.checkedResourceIds = [];
     },
     clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
       clearSelectedResourceOnPreviewExit(state);
@@ -470,6 +471,7 @@ export const mainSlice = createSlice({
       state.currentSelectionHistoryIndex = undefined;
       state.selectionHistory = [];
       state.clusterDiff.shouldReload = true;
+      state.checkedResourceIds = [];
     },
     startPreviewLoader: (state: Draft<AppState>, action: PayloadAction<StartPreviewLoaderPayload>) => {
       state.previewLoader.isLoading = true;

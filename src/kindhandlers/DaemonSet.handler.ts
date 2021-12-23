@@ -2,6 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
+import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
@@ -12,19 +13,19 @@ const DaemonSetHandler: ResourceKindHandler = {
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'DaemonSets'],
   clusterApiVersion: 'apps/v1',
   validationSchemaPrefix: 'io.k8s.api.apps.v1',
-  description: '',
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any> {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
-    return k8sCoreV1Api.readNamespacedDaemonSet(name, namespace, 'true');
+  isCustom: false,
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+    const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    return k8sAppV1Api.readNamespacedDaemonSet(resource.name, resource.namespace || 'default', 'true');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
     const response = await k8sAppV1Api.listDaemonSetForAllNamespaces();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, name: string, namespace?: string) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
-    await k8sAppV1Api.deleteNamespacedDaemonSet(name, namespace || 'default');
+    await k8sAppV1Api.deleteNamespacedDaemonSet(resource.name, resource.namespace || 'default');
   },
   outgoingRefMappers: [...PodOutgoingRefMappers],
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/',

@@ -1,3 +1,5 @@
+import * as k8s from '@kubernetes/client-node';
+
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
@@ -22,6 +24,7 @@ import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs
 import {getFileTimestamp} from '@utils/files';
 
 import {getDependentResourceKinds, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
+import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
 import {processRefs} from './resourceRefs';
 import {validateResource} from './validation';
@@ -261,6 +264,25 @@ export function getNamespaces(resourceMap: ResourceMapType) {
     }
   });
   return namespaces;
+}
+
+export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string) {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromFile(kubeconfigPath);
+  kc.setCurrentContext(context);
+
+  const namespaces = await NamespaceHandler.listResourcesInCluster(kc);
+
+  const ns: string[] = [];
+  namespaces.forEach(namespace => {
+    const namespaceName = namespace.metadata?.name;
+
+    if (namespaceName && !ns.includes(namespaceName)) {
+      ns.push(namespaceName);
+    }
+  });
+
+  return ns;
 }
 
 /**
@@ -610,7 +632,8 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`
+          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
+          documents[docIndex]
         );
       } else {
         const content = doc.toJS();

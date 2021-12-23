@@ -7,20 +7,23 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setClusterDiffRefreshDiffResource, setDiffResourceInClusterDiff} from '@redux/reducers/main';
 import {closeClusterDiff} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {applySelectedMatchesWithConfirm} from '@redux/services/applySelectedMatchesWithConfirm';
 import {getClusterResourceText} from '@redux/services/clusterResource';
 import {replaceSelectedMatchesWithConfirm} from '@redux/services/replaceSelectedMatchesWithConfirm';
+import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
 import {ClusterDiff, ResourceDiff} from '@molecules';
 
 import Icon from '@components/atoms/Icon';
+import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';
 
@@ -103,6 +106,7 @@ function ClusterDiffModal() {
   const refreshDiffResource = useAppSelector(state => state.main.clusterDiff.refreshDiffResource);
   const shouldReload = useAppSelector(state => state.main.clusterDiff.shouldReload);
 
+  const matches = useAppSelector(state => state.main.clusterDiff.clusterToLocalResourcesMatches);
   const selectedMatches = useAppSelector(state => state.main.clusterDiff.selectedMatches);
   const [canDeploySelectedMatches, canReplaceSelectedMatches] = useAppSelector(state => {
     let canDeployMatchesCount = 0;
@@ -123,11 +127,30 @@ function ClusterDiffModal() {
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
 
   const [hasAppliedResource, setHasAppliedResource] = useState<boolean>(false);
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState<boolean>(false);
   const [resourceDiffState, setResourceDiffState] = useState<ResourceDiffState>({isLoading: false});
 
   const containerRef = useRef<HTMLDivElement>(null);
 
   const windowSize = useWindowSize();
+
+  const confirmModalTitle = useMemo(
+    () => makeApplyMultipleResourcesText(selectedMatches.length, currentContext),
+    [selectedMatches, currentContext]
+  );
+
+  const selectedResources = useMemo(
+    () =>
+      matches
+        .filter(match => selectedMatches.includes(match.id))
+        .map(match =>
+          match.localResourceIds && match.localResourceIds.length > 0
+            ? resourceMap[match.localResourceIds[0]]
+            : undefined
+        )
+        .filter((r): r is K8sResource => r !== undefined),
+    [matches, selectedMatches, resourceMap]
+  );
 
   const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
   const resizableBoxWidth = useMemo(() => {
@@ -257,10 +280,12 @@ function ClusterDiffModal() {
   }, [previewResource, previewValuesFile, currentContext, isResourceDiffVisible, closeResourceDiff]);
 
   const onClickDeploySelected = () => {
-    if (!currentContext) {
-      return;
-    }
-    applySelectedMatchesWithConfirm(selectedMatches.length, currentContext, dispatch);
+    setIsApplyModalVisible(true);
+  };
+
+  const onClickApplySelectedResourceMatches = (namespace?: string) => {
+    dispatch(applySelectedResourceMatches(namespace));
+    setIsApplyModalVisible(false);
   };
 
   const onClickReplaceSelected = () => {
@@ -311,6 +336,16 @@ function ClusterDiffModal() {
             </Button>
             <Button onClick={closeModal}>Close</Button>
           </div>
+
+          {isApplyModalVisible && (
+            <ModalConfirmWithNamespaceSelect
+              isVisible={isApplyModalVisible}
+              resources={selectedResources}
+              title={confirmModalTitle}
+              onOk={selectedNamespace => onClickApplySelectedResourceMatches(selectedNamespace)}
+              onCancel={() => setIsApplyModalVisible(false)}
+            />
+          )}
         </StyledButtonsContainer>
       }
       centered

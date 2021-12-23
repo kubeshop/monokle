@@ -23,8 +23,8 @@ import {performResourceDiff} from './diffResource';
  * Invokes kubectl for the content of the specified resource
  */
 
-function applyK8sResource(resource: K8sResource, kubeconfig: string, context: string) {
-  return applyYamlToCluster(resource.text, kubeconfig, context);
+function applyK8sResource(resource: K8sResource, kubeconfig: string, context: string, namespace?: string) {
+  return applyYamlToCluster(resource.text, kubeconfig, context, namespace);
 }
 
 /**
@@ -36,12 +36,23 @@ function applyKustomization(
   fileMap: FileMapType,
   kubeconfig: string,
   context: string,
-  kustomizeCommand: KustomizeCommandType
+  kustomizeCommand: KustomizeCommandType,
+  namespace?: string
 ) {
   const folder = getAbsoluteResourceFolder(resource, fileMap);
+
+  const args =
+    kustomizeCommand === 'kubectl'
+      ? namespace
+        ? `kubectl --context ${context} --namespace ${namespace} apply -k ${folder}`
+        : `kubectl --context ${context} apply -k ${folder}`
+      : namespace
+      ? `kustomize build ${folder} | kubectl --context ${context} --namespace ${namespace} apply -k -`
+      : `kustomize build ${folder} | kubectl --context ${context} apply -k -`;
+
   const child =
     kustomizeCommand === 'kubectl'
-      ? spawn(`kubectl --context ${context} apply -k ${folder}`, {
+      ? spawn(args, {
           shell: true,
           env: {
             NODE_ENV: PROCESS_ENV.NODE_ENV,
@@ -50,7 +61,7 @@ function applyKustomization(
             KUBECONFIG: kubeconfig,
           },
         })
-      : spawn(`kustomize build ${folder} | kubectl --context ${context} apply -k -`, {
+      : spawn(args, {
           shell: true,
           env: {
             NODE_ENV: PROCESS_ENV.NODE_ENV,
@@ -75,6 +86,7 @@ export async function applyResource(
   dispatch: AppDispatch,
   kubeconfig: string,
   context: string,
+  namespace?: string,
   options?: {
     isClusterPreview?: boolean;
     isInClusterDiff?: boolean;
@@ -94,9 +106,10 @@ export async function applyResource(
               fileMap,
               kubeconfig,
               context,
-              options && options.kustomizeCommand ? options.kustomizeCommand : 'kubectl'
+              options && options.kustomizeCommand ? options.kustomizeCommand : 'kubectl',
+              namespace
             )
-          : applyK8sResource(resource, kubeconfig, context);
+          : applyK8sResource(resource, kubeconfig, context, namespace);
 
         child.on('exit', (code, signal) => {
           log.info(`kubectl exited with code ${code} and signal ${signal}`);
