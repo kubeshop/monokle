@@ -25,6 +25,7 @@ const initialAppState: AppState = {
   previewLoader: {
     isLoading: false,
   },
+  resourceDiff: {},
   isSelectingFile: false,
   isApplyingResource: false,
   plugins: [],

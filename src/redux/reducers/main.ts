@@ -28,7 +28,6 @@ import {MonoklePlugin} from '@models/plugin';
 
 import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
-import {performResourceDiff} from '@redux/thunks/diffResource';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
@@ -594,6 +593,12 @@ export const mainSlice = createSlice({
     setPlugins: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin[]>) => {
       state.plugins = action.payload;
     },
+    openResourceDiffModal: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.resourceDiff.targetResourceId = action.payload;
+    },
+    closeResourceDiffModal: (state: Draft<AppState>) => {
+      state.resourceDiff.targetResourceId = undefined;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -699,8 +704,9 @@ export const mainSlice = createSlice({
         targetResourceId: undefined,
       };
       state.checkedResourceIds = [];
-      state.diffResourceId = undefined;
-      state.diffContent = undefined;
+      state.resourceDiff = {
+        targetResourceId: undefined,
+      };
       state.isSelectingFile = false;
       state.isApplyingResource = false;
       state.clusterDiff = {
@@ -713,11 +719,6 @@ export const mainSlice = createSlice({
         selectedMatches: [],
       };
       resetSelectionHistory(state);
-    });
-
-    builder.addCase(performResourceDiff.fulfilled, (state, action) => {
-      state.diffResourceId = action.payload.diffResourceId;
-      state.diffContent = action.payload.diffContent;
     });
 
     builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
@@ -1031,5 +1032,7 @@ export const {
   uncheckMultipleResourceIds,
   addPlugin,
   setPlugins,
+  closeResourceDiffModal,
+  openResourceDiffModal,
 } = mainSlice.actions;
 export default mainSlice.reducer;

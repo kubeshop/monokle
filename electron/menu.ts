@@ -7,7 +7,7 @@ import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
 import {NewVersionCode} from '@models/appconfig';
 
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {clearPreviewAndSelectionHistory, stopPreviewLoader} from '@redux/reducers/main';
+import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
 import {
   openFolderExplorer,
   openNewResourceWizard,
@@ -75,14 +75,6 @@ function setRootFolderInRendererThread(folder: string) {
   const window = BrowserWindow.getFocusedWindow();
   if (window) {
     window.webContents.send('set-root-folder', folder);
-  }
-}
-
-// need this because we cannot dispatch thunks from main
-function performResourceDiff(resourceId: string) {
-  const window = BrowserWindow.getFocusedWindow();
-  if (window) {
-    window.webContents.send('perform-resource-diff', resourceId);
   }
 }
 
@@ -211,7 +203,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
           if (!state.main.selectedResourceId) {
             return;
           }
-          performResourceDiff(state.main.selectedResourceId);
+          dispatch(openResourceDiffModal(state.main.selectedResourceId));
         },
       },
     ],

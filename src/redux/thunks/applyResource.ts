@@ -7,7 +7,12 @@ import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
-import {setApplyingResource, setClusterDiffRefreshDiffResource, updateResource} from '@redux/reducers/main';
+import {
+  openResourceDiffModal,
+  setApplyingResource,
+  setClusterDiffRefreshDiffResource,
+  updateResource,
+} from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kustomize';
 import {AppDispatch} from '@redux/store';
@@ -16,8 +21,6 @@ import {getResourceFromCluster} from '@redux/thunks/utils';
 
 import {PROCESS_ENV} from '@utils/env';
 import {getShellPath} from '@utils/shell';
-
-import {performResourceDiff} from './diffResource';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -133,14 +136,14 @@ export async function applyResource(
                 })
               );
               if (options?.shouldPerformDiff) {
-                dispatch(performResourceDiff(resource.id));
+                dispatch(openResourceDiffModal(resource.id));
               }
             });
           } else if (options?.shouldPerformDiff) {
             if (options?.isInClusterDiff) {
               dispatch(setClusterDiffRefreshDiffResource(true));
             } else {
-              dispatch(performResourceDiff(resource.id));
+              dispatch(openResourceDiffModal(resource.id));
             }
           }
           dispatch(setAlert(alert));

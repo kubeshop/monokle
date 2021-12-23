@@ -29,6 +29,7 @@ import {
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getRootFolder} from '@redux/services/fileEntry';
@@ -36,7 +37,6 @@ import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kus
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
-import {performResourceDiff} from '@redux/thunks/diffResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
@@ -256,24 +256,19 @@ const ActionsPane = (props: {contentHeight: string}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monacoEditor]);
 
-  const diffResource = useCallback(
-    resourceId => {
-      dispatch(performResourceDiff(resourceId));
-    },
-    [dispatch]
-  );
-
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
-      diffResource(selectedResourceId);
+      dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [selectedResourceId, diffResource]);
+  }, [dispatch, selectedResourceId]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
-      diffResource(resourceId);
+      if (resourceId) {
+        dispatch(openResourceDiffModal(resourceId));
+      }
     },
-    [diffResource]
+    [dispatch]
   );
 
   const isDiffButtonDisabled = useMemo(() => {

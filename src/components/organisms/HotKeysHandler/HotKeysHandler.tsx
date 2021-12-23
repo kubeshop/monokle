@@ -7,6 +7,7 @@ import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openResourceDiffModal} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
   setLeftMenuSelection,
@@ -19,7 +20,6 @@ import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {applyResource} from '@redux/thunks/applyResource';
-import {performResourceDiff} from '@redux/thunks/diffResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -160,7 +160,7 @@ const HotKeysHandler = () => {
 
   const diffSelectedResource = useCallback(() => {
     if (mainState.selectedResourceId) {
-      dispatch(performResourceDiff(mainState.selectedResourceId));
+      dispatch(openResourceDiffModal(mainState.selectedResourceId));
     }
   }, [mainState.selectedResourceId, dispatch]);
 
