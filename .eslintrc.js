@@ -90,7 +90,7 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react/jsx-filename-extension': [2, {extensions: ['.js', '.jsx', '.ts', '.tsx']}], // Make ESLint happy about JSX inside of tsx files
     'react/destructuring-assignment': ['warn', 'always', {ignoreClassFields: true}],
-    'react/boolean-prop-naming': ['error', {rule: '^(is|has|does|should)[A-Z]([A-Za-z0-9]?)+'}],
+    'react/boolean-prop-naming': ['warn', {rule: '^(is|should|has|can|did|will|does)[A-Z]([A-Za-z0-9]?)+'}],
     'react/no-array-index-key': 'warn',
     'react-hooks/rules-of-hooks': 'error', // Checks rules of Hooks
     'react-hooks/exhaustive-deps': 'warn', // Checks effect dependencies
