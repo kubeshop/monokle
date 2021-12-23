@@ -22,6 +22,7 @@ import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {
   ActionsPane,
@@ -88,18 +89,22 @@ const PaneManager = () => {
   const {windowSize} = useContext(AppContext);
 
   const contentWidth = windowSize.width - (featureJson.ShowRightMenu ? 2 : 1) * iconMenuWidth;
-  const contentHeight = `${windowSize.height - 75}px`;
 
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
-  const clusterPaneIconHighlighted = useAppSelector(state => state.ui.clusterPaneIconHighlighted);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
+
+  // TODO: refactor this to get the size of the page header dinamically
+  const contentHeight = useMemo(() => {
+    return isInPreviewMode ? `${windowSize.height - 100}px` : `${windowSize.height - 75}px`;
+  }, [isInPreviewMode, windowSize.height]);
 
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
