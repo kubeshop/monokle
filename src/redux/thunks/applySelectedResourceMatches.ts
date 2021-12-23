@@ -8,12 +8,12 @@ import {AppDispatch, RootState} from '@redux/store';
 
 export const applySelectedResourceMatches = createAsyncThunk<
   void,
-  undefined,
+  string | undefined,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/applySelectedResourceMatches', async (_, thunkAPI) => {
+>('main/applySelectedResourceMatches', async (namespace, thunkAPI) => {
   const state = thunkAPI.getState();
 
   const matches = state.main.clusterDiff.clusterToLocalResourcesMatches;
@@ -27,7 +27,7 @@ export const applySelectedResourceMatches = createAsyncThunk<
     )
     .filter((r): r is K8sResource => r !== undefined);
 
-  applyMultipleResources(state.config, resourcesToApply, thunkAPI.dispatch, () => {
+  applyMultipleResources(state.config, resourcesToApply, thunkAPI.dispatch, namespace, () => {
     thunkAPI.dispatch(reloadClusterDiff());
   });
 });
