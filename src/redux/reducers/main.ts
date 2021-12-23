@@ -346,7 +346,7 @@ export const mainSlice = createSlice({
             updateSelectionAndHighlights(state, resource);
           }
         } else {
-          console.warn('Failed to find updated resource in active resources');
+          log.warn('Failed to find updated resource in active resources');
         }
       } catch (e) {
         log.error(e);
@@ -634,7 +634,7 @@ export const mainSlice = createSlice({
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
       })
-      .addCase(previewHelmValuesFile.rejected, (state, action) => {
+      .addCase(previewHelmValuesFile.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         state.previewType = undefined;
@@ -919,7 +919,7 @@ export const mainSlice = createSlice({
       });
 
     builder.addMatcher(
-      action => true,
+      () => true,
       (state, action) => {
         if (action.payload?.alert) {
           const notification: AlertType = action.payload.alert;
@@ -953,7 +953,7 @@ function groupResourcesByIdentifier(
  * Sets/clears preview resources
  */
 
-function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) {
+function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
   state.previewResourceId = undefined;
   state.previewValuesFileId = undefined;
 

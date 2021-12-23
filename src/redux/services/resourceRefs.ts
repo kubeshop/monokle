@@ -460,8 +460,7 @@ function handleRefMappingByKey(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
   outgoingRefMapper: RefMapper,
-  processingOptions: ResourceRefsProcessingOptions,
-  resourceMap: ResourceMapType
+  processingOptions: ResourceRefsProcessingOptions
 ) {
   const outgoingRefMapperSourcePath = joinPathParts(outgoingRefMapper.source.pathParts);
   const refNodes = getResourceRefNodes(sourceResource);
@@ -627,7 +626,7 @@ export function processRefs(
             if (outgoingRefMapper.type === 'pairs') {
               handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
             } else {
-              handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions, resourceMap);
+              handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
             }
           }
         });

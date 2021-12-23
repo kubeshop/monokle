@@ -52,7 +52,7 @@ export const performResourceDiff = createAsyncThunk<
         );
       };
 
-      const handleRejection = (rej: any) => {
+      const handleRejection = () => {
         let message = `Failed to retrieve ${resource.content.kind} ${resource.content.metadata.name} from cluster [${config.kubeConfig.currentContext}]`;
         let title = 'Diff failed';
 
@@ -66,8 +66,8 @@ export const performResourceDiff = createAsyncThunk<
           config.kubeConfig.currentContext
         );
         return handleResource(resourceFromCluster);
-      } catch (err) {
-        return handleRejection(err);
+      } catch {
+        return handleRejection();
       }
     }
   } catch (e: any) {

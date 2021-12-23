@@ -106,7 +106,7 @@ const RenameEntityModal: React.FC = () => {
           name="newEntityName"
           rules={[
             ({getFieldValue}) => ({
-              validator: (rule, value) => {
+              validator: () => {
                 return new Promise((resolve: (value?: any) => void, reject) => {
                   const newEntityNameValue: string = getFieldValue('newEntityName').toLowerCase();
 

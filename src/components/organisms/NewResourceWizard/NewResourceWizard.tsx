@@ -30,15 +30,13 @@ import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 import {SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
 const SELECT_OPTION_NONE = '<none>';
-const NEW_ITEM = 'CREATE_NEW_ITEM';
 
 const {Option} = Select;
 
 const NewResourceWizard = () => {
-  const [namespaces, setNamespaces] = useNamespaces({extra: ['none', 'default']});
+  const [namespaces] = useNamespaces({extra: ['none', 'default']});
 
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
-  const [shouldSaveToFolder, setShouldSaveState] = useState(true);
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
@@ -52,6 +50,8 @@ const NewResourceWizard = () => {
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+
+  const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
   const defaultInput = newResourceWizardState.defaultInput;
   const defaultValues = useMemo(
@@ -84,10 +84,10 @@ const NewResourceWizard = () => {
   }, [resourceMap]);
 
   useEffect(() => {
-    if (defaultInput?.targetFolder && fileMap[ROOT_FILE_ENTRY]) {
+    if (defaultInput?.targetFolder && isFolderOpen) {
       setSavingDestination('saveToFolder');
       setSelectedFolder(defaultInput.targetFolder);
-    } else if (defaultInput?.targetFile && fileMap[ROOT_FILE_ENTRY]) {
+    } else if (defaultInput?.targetFile && isFolderOpen) {
       setSavingDestination('saveToFile');
       setSelectedFile(defaultInput.targetFile);
     } else {
@@ -95,7 +95,7 @@ const NewResourceWizard = () => {
     }
 
     setSubmitDisabled(!defaultValues?.name && !defaultValues?.kind && !defaultValues?.apiVersion);
-  }, [defaultInput]);
+  }, [defaultInput, defaultValues, isFolderOpen]);
 
   const closeWizard = () => {
     setSubmitDisabled(true);

@@ -6,7 +6,7 @@ const {getThemeVariables} = require('antd/dist/theme');
 module.exports = {
   webpack: {
     plugins: {add: [new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true})]},
-    configure: (webpackConfig, {env, paths}) => {
+    configure: webpackConfig => {
       webpackConfig.node.__dirname = false;
       webpackConfig.target = 'electron-renderer';
       return webpackConfig;
