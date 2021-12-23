@@ -14,7 +14,10 @@ import {stringify} from 'yaml';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
+import {AlertEnum, AlertType} from '@models/alert';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal, updateResource} from '@redux/reducers/main';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
@@ -246,6 +249,19 @@ const DiffModal = () => {
       const resourcesFromCluster =
         (await resourceKindHandler?.listResourcesInCluster(kc))?.filter(r => r.metadata.name === targetResource.name) ||
         [];
+
+      // matching resource was not found
+      if (!resourcesFromCluster.length) {
+        const alert: AlertType = {
+          type: AlertEnum.Error,
+          title: 'Diff failed',
+          message: `Failed to retrieve ${targetResource.content.kind} ${targetResource.content.metadata.name} from cluster [${currentContext}]`,
+        };
+
+        dispatch(setAlert(alert));
+        dispatch(closeResourceDiffModal());
+        return;
+      }
 
       setNamespaces(resourcesFromCluster.map(r => r.metadata.namespace));
       setMatchingResourcesById(
