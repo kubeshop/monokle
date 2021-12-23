@@ -286,26 +286,14 @@ const KeyValuePairForm = ({
 
 const TextAreaForm = ({value, onChange}: {value: string; onChange: Function}) => {
   const [localValue, setLocalValue] = useState<string | undefined>(value);
-  const [plainValue, setPlainValue] = useState(value ? Buffer.from(value, 'base64').toString('utf-8') : '');
-  const [isEncoded, setIsEncoded] = useState(false);
 
   const handleValueChange = (propertyValue: string) => {
-    if (!isEncoded) {
-      setLocalValue(propertyValue ? Buffer.from(propertyValue).toString('base64') : undefined);
-    } else {
-      setLocalValue(propertyValue || undefined);
-    }
+    setLocalValue(propertyValue || undefined);
   };
 
   useEffect(() => {
     if (_.isEqual(localValue, value)) {
       return;
-    }
-
-    if (localValue) {
-      setPlainValue(Buffer.from(localValue, 'base64').toString('utf-8'));
-    } else {
-      setPlainValue('');
     }
 
     if (onChange) {
@@ -439,11 +427,11 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
 
   const handleValueChange = (property: string, propertyValue: string) => {
     if (property === 'KEY') {
-      setLocalValue({id: localValue.id, key: propertyValue, value: localValue.value});
+      setLocalValue({...localValue, key: propertyValue || undefined});
     }
 
     if (property === 'VALUE') {
-      setLocalValue({id: localValue.id, key: localValue.key, value: propertyValue || undefined});
+      setLocalValue({...localValue, value: propertyValue || undefined});
     }
   };
 
@@ -453,15 +441,19 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
     }
   };
 
-  useEffect(() => {
-    if (_.isEqual(localValue, value)) {
-      return;
-    }
+  useDebounce(
+    () => {
+      if (_.isEqual(localValue, value)) {
+        return;
+      }
 
-    if (onChange && (localValue.key || localValue.value)) {
-      onChange(localValue);
-    }
-  }, [localValue]);
+      if (onChange && (localValue.key || localValue.value)) {
+        onChange(localValue);
+      }
+    },
+    DEFAULT_EDITOR_DEBOUNCE,
+    [localValue]
+  );
 
   return (
     <div style={{display: 'flex', alignItems: 'space-between', width: '100%', marginTop: '16px'}}>
@@ -493,12 +485,13 @@ export const Base64Input = ({value, onChange}: any) => {
   const [plainValue, setPlainValue] = useState(value ? Buffer.from(value, 'base64').toString('utf-8') : '');
   const [isEncoded, setIsEncoded] = useState(false);
 
-  const handleValueChange = (propertyValue: string) => {
-    if (!isEncoded) {
-      setLocalValue(propertyValue ? Buffer.from(propertyValue).toString('base64') : undefined);
-    } else {
-      setLocalValue(propertyValue || undefined);
-    }
+  const handleValueChange = (event: any) => {
+    console.log(event.target.value);
+    // if (!isEncoded) {
+    //   setLocalValue(event.target.value ? Buffer.from(event.target.value).toString('base64') : undefined);
+    // } else {
+    //   setLocalValue(event.target.value || undefined);
+    // }
   };
 
   useDebounce(
@@ -523,7 +516,11 @@ export const Base64Input = ({value, onChange}: any) => {
 
   return (
     <>
-      <Input value={isEncoded ? localValue : plainValue} onChange={event => handleValueChange(event.target.value)} />
+      <Input
+        value={isEncoded ? localValue : plainValue}
+        onChange={_.debounce(handleValueChange, 400, {maxWait: 2000})}
+        onPaste={_.debounce(handleValueChange, 400, {maxWait: 2000})}
+      />
       {isEncoded ? (
         <StyledSpanToggler onClick={() => setIsEncoded(false)}>Encoded</StyledSpanToggler>
       ) : (
@@ -534,45 +531,55 @@ export const Base64Input = ({value, onChange}: any) => {
 };
 
 export const Base64TextArea = ({value, onChange}: any) => {
-  const [localValue, setLocalValue] = useState<string | undefined>(value);
-  const [plainValue, setPlainValue] = useState(value ? Buffer.from(value, 'base64').toString('utf-8') : '');
+  const [inputValue, setInputValue] = useState<string | undefined>(value);
+  const [debouncedValue, setDebouncedValue] = useState<string | undefined>();
   const [isEncoded, setIsEncoded] = useState(false);
-
-  const handleValueChange = (propertyValue: string) => {
-    if (!isEncoded) {
-      setLocalValue(propertyValue ? Buffer.from(propertyValue).toString('base64') : undefined);
-    } else {
-      setLocalValue(propertyValue || undefined);
-    }
-  };
 
   useDebounce(
     () => {
-      if (_.isEqual(localValue, value)) {
-        return;
-      }
-
-      if (localValue) {
-        setPlainValue(Buffer.from(localValue, 'base64').toString('utf-8'));
+      if (inputValue) {
+        if (isEncoded) {
+          setDebouncedValue(inputValue);
+        } else {
+          setDebouncedValue(Buffer.from(inputValue).toString('base64'));
+        }
       } else {
-        setPlainValue('');
-      }
-
-      if (onChange) {
-        onChange(localValue);
+        setDebouncedValue(undefined);
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [localValue]
+    [inputValue]
   );
+
+  useEffect(() => {
+    if (isEncoded) {
+      setInputValue(value);
+    } else {
+      setInputValue(value ? Buffer.from(value, 'base64').toString('utf-8') : undefined);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (!isEncoded) {
+      setInputValue(inputValue ? Buffer.from(inputValue, 'base64').toString('utf-8') : undefined);
+    } else {
+      setInputValue(inputValue ? Buffer.from(inputValue).toString('base64') : undefined);
+    }
+  }, [isEncoded]);
+
+  useEffect(() => {
+    if (_.isEqual(debouncedValue, value)) {
+      return;
+    }
+
+    if (onChange) {
+      onChange(debouncedValue);
+    }
+  }, [debouncedValue]);
 
   return (
     <>
-      <TextArea
-        rows={6}
-        value={isEncoded ? localValue : plainValue}
-        onChange={event => handleValueChange(event.target.value)}
-      />
+      <TextArea rows={6} value={inputValue} onChange={e => setInputValue(e.target.value || undefined)} />
       {isEncoded ? (
         <StyledSpanToggler onClick={() => setIsEncoded(false)}>Encoded</StyledSpanToggler>
       ) : (
