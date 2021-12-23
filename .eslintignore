@@ -9,3 +9,8 @@ server.js
 build.js
 init.js
 site
+commitlint.config.js
+craco.config.js
+notarization
+resources
+.eslintrc.js
