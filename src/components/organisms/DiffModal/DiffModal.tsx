@@ -5,7 +5,7 @@ import {MonacoDiffEditor} from 'react-monaco-editor';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
-import {Button, Modal, Skeleton, Switch, Tag} from 'antd';
+import {Button, Modal, Select, Skeleton, Switch, Tag} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
@@ -112,6 +112,11 @@ const TagsContainer = styled.div`
   padding-bottom: 5px;
 `;
 
+const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const StyledTag = styled(Tag)`
   padding: 5px 10px;
   font-size: 14px;
@@ -137,6 +142,7 @@ const DiffModal = () => {
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
+  const [defaultNamespace, setDefaultNamespace] = useState<string>('');
   const [hasDiffModalLoaded, setHasDiffModalLoaded] = useState(false);
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [matchingResourcesById, setMatchingResourcesById] = useState<Record<string, any>>();
@@ -192,6 +198,7 @@ const DiffModal = () => {
   };
 
   const onCloseHandler = () => {
+    setHasDiffModalLoaded(false);
     dispatch(closeResourceDiffModal());
   };
 
@@ -216,7 +223,13 @@ const DiffModal = () => {
   };
 
   const cleanMatchingResourceText = useMemo(() => {
-    if (!matchingResourceText || !targetResource?.content || !selectedMatchingResourceId || !matchingResourcesById) {
+    if (
+      !matchingResourceText ||
+      !targetResource?.content ||
+      !selectedMatchingResourceId ||
+      !matchingResourcesById ||
+      !hasDiffModalLoaded
+    ) {
       return undefined;
     }
 
@@ -229,11 +242,26 @@ const DiffModal = () => {
     );
     const cleanDiffContentString = stringify(newDiffContentObject, {sortMapEntries: true});
     return cleanDiffContentString;
-  }, [matchingResourcesById, matchingResourceText, selectedMatchingResourceId, shouldDiffIgnorePaths, targetResource]);
+  }, [
+    hasDiffModalLoaded,
+    matchingResourcesById,
+    matchingResourceText,
+    selectedMatchingResourceId,
+    shouldDiffIgnorePaths,
+    targetResource,
+  ]);
 
   const areResourcesDifferent = useMemo(() => {
     return targetResourceText !== cleanMatchingResourceText;
   }, [targetResourceText, cleanMatchingResourceText]);
+
+  const onNamespaceSelectHandler = (ns: string) => {
+    if (matchingResourcesById) {
+      setSelectedMathingResourceId(
+        Object.values(matchingResourcesById).find(r => r.metadata.namespace === ns).metadata.uid
+      );
+    }
+  };
 
   useEffect(() => {
     if (!targetResource || !resourceMap) {
@@ -260,6 +288,7 @@ const DiffModal = () => {
 
         dispatch(setAlert(alert));
         dispatch(closeResourceDiffModal());
+        setHasDiffModalLoaded(false);
         return;
       }
 
@@ -285,7 +314,12 @@ const DiffModal = () => {
         );
         if (foundResourceFromCluster) {
           setSelectedMathingResourceId(foundResourceFromCluster.metadata.uid);
+          setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
           setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
+        } else {
+          setSelectedMathingResourceId(resourcesFromCluster[0].metadata.uid);
+          setDefaultNamespace(resourcesFromCluster[0].metadata.namespace);
+          setMatchingResourceText(stringify(resourcesFromCluster[0], {sortMapEntries: true}));
         }
       } else if (resourceFilter.namespace) {
         const foundResourceFromCluster = resourcesFromCluster.find(
@@ -293,10 +327,16 @@ const DiffModal = () => {
         );
         if (foundResourceFromCluster) {
           setSelectedMathingResourceId(foundResourceFromCluster.metadata.uid);
+          setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
           setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
+        } else {
+          setSelectedMathingResourceId(resourcesFromCluster[0].metadata.uid);
+          setDefaultNamespace(resourcesFromCluster[0].metadata.namespace);
+          setMatchingResourceText(stringify(resourcesFromCluster[0], {sortMapEntries: true}));
         }
       } else {
         setSelectedMathingResourceId(resourcesFromCluster[0].metadata.uid);
+        setDefaultNamespace(resourcesFromCluster[0].metadata.namespace);
         setMatchingResourceText(stringify(resourcesFromCluster[0], {sortMapEntries: true}));
       }
 
@@ -306,7 +346,7 @@ const DiffModal = () => {
     setTargetResourceText(stringify(targetResource.content, {sortMapEntries: true}));
 
     getClusterResources();
-  }, [currentContext, kubeconfigPath, resourceMap, resourceFilter.namespace, targetResource]);
+  }, [currentContext, dispatch, kubeconfigPath, resourceMap, resourceFilter.namespace, targetResource]);
 
   useEffect(() => {
     if (!isDiffModalVisible) {
@@ -316,7 +356,27 @@ const DiffModal = () => {
 
   return (
     <StyledModal
-      title={`Resource Diff on ${targetResource ? targetResource.name : ''}`}
+      title={
+        <TitleContainer>
+          Resource Diff on ${targetResource ? targetResource.name : ''}
+          <Select
+            value={
+              matchingResourcesById && selectedMatchingResourceId
+                ? matchingResourcesById[selectedMatchingResourceId]?.metadata?.namespace
+                : defaultNamespace
+            }
+            defaultValue={defaultNamespace}
+            onChange={ns => onNamespaceSelectHandler(ns)}
+            style={{width: '300px', marginLeft: '16px'}}
+          >
+            {namespaces?.map(ns => (
+              <Select.Option key={ns} value={ns}>
+                {ns}
+              </Select.Option>
+            ))}
+          </Select>
+        </TitleContainer>
+      }
       visible={isDiffModalVisible}
       centered
       width="min-content"
