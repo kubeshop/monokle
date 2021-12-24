@@ -311,34 +311,32 @@ const DiffModal = () => {
         }, {})
       );
 
+      let hasClusterMatchingResource = false;
+
       // set default selected matching resource
       if (targetResource.namespace) {
         const foundResourceFromCluster = resourcesFromCluster.find(
           r => r.metadata.namespace === targetResource.namespace
         );
         if (foundResourceFromCluster) {
+          hasClusterMatchingResource = true;
           setSelectedMathingResourceId(foundResourceFromCluster.metadata.uid);
           setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
           setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
-        } else {
-          setSelectedMathingResourceId(resourcesFromCluster[0].metadata.uid);
-          setDefaultNamespace(resourcesFromCluster[0].metadata.namespace);
-          setMatchingResourceText(stringify(resourcesFromCluster[0], {sortMapEntries: true}));
         }
       } else if (resourceFilter.namespace) {
         const foundResourceFromCluster = resourcesFromCluster.find(
           r => r.metadata.namespace === resourceFilter.namespace
         );
         if (foundResourceFromCluster) {
+          hasClusterMatchingResource = true;
           setSelectedMathingResourceId(foundResourceFromCluster.metadata.uid);
           setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
           setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
-        } else {
-          setSelectedMathingResourceId(resourcesFromCluster[0].metadata.uid);
-          setDefaultNamespace(resourcesFromCluster[0].metadata.namespace);
-          setMatchingResourceText(stringify(resourcesFromCluster[0], {sortMapEntries: true}));
         }
-      } else {
+      }
+
+      if (!hasClusterMatchingResource) {
         setSelectedMathingResourceId(resourcesFromCluster[0].metadata.uid);
         setDefaultNamespace(resourcesFromCluster[0].metadata.namespace);
         setMatchingResourceText(stringify(resourcesFromCluster[0], {sortMapEntries: true}));
