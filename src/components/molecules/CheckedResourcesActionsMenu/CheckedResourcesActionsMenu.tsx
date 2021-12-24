@@ -13,7 +13,6 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
-import {AppDispatch} from '@redux/store';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 
 import Colors from '@styles/Colors';
@@ -47,7 +46,7 @@ const StyledMenu = styled(Menu)`
   }
 `;
 
-const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], dispatch: AppDispatch) => {
+const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[]) => {
   let title = `Are you sure you want to delete the selected resources (${checkedResources.length}) ?`;
 
   Modal.confirm({
@@ -89,7 +88,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       .map(resource => resourceMap[resource])
       .filter((r): r is K8sResource => r !== undefined);
 
-    deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
+    deleteCheckedResourcesWithConfirm(resourcesToDelete);
   };
 
   const onClickDeployChecked = () => {

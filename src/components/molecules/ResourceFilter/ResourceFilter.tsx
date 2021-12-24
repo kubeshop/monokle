@@ -86,11 +86,12 @@ const ResourceFilter = () => {
 
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
-  const areFiltersDisabled = useMemo(() => Boolean(checkedResourceIds.length), [checkedResourceIds]);
+  const areFiltersDisabled = useAppSelector(
+    state => Boolean(state.main.checkedResourceIds.length) || Boolean(state.main.clusterDiff.selectedMatches.length)
+  );
 
   const allResourceKinds = useMemo(() => {
     return [

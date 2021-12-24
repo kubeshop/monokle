@@ -345,7 +345,7 @@ export const mainSlice = createSlice({
             updateSelectionAndHighlights(state, resource);
           }
         } else {
-          console.warn('Failed to find updated resource in active resources');
+          log.warn('Failed to find updated resource in active resources');
         }
       } catch (e) {
         log.error(e);
@@ -535,14 +535,8 @@ export const mainSlice = createSlice({
         state.clusterDiff.selectedMatches.push(matchId);
       }
     },
-    selectAllClusterDiffMatches: (state: Draft<AppState>) => {
-      state.clusterDiff.selectedMatches = state.clusterDiff.clusterToLocalResourcesMatches.map(match =>
-        makeResourceNameKindNamespaceIdentifier({
-          name: match.resourceName,
-          kind: match.resourceKind,
-          namespace: match.resourceNamespace,
-        })
-      );
+    selectMultipleClusterDiffMatches: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      state.clusterDiff.selectedMatches = action.payload;
     },
     unselectClusterDiffMatch: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const matchId = action.payload;
@@ -599,6 +593,10 @@ export const mainSlice = createSlice({
     closeResourceDiffModal: (state: Draft<AppState>) => {
       state.resourceDiff.targetResourceId = undefined;
     },
+    toggleClusterOnlyResourcesInClusterDiff: (state: Draft<AppState>) => {
+      state.clusterDiff.hideClusterOnlyResources = !state.clusterDiff.hideClusterOnlyResources;
+      state.clusterDiff.selectedMatches = [];
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -641,7 +639,7 @@ export const mainSlice = createSlice({
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
       })
-      .addCase(previewHelmValuesFile.rejected, (state, action) => {
+      .addCase(previewHelmValuesFile.rejected, state => {
         state.previewLoader.isLoading = false;
         state.previewLoader.targetResourceId = undefined;
         state.previewType = undefined;
@@ -922,7 +920,7 @@ export const mainSlice = createSlice({
       });
 
     builder.addMatcher(
-      action => true,
+      () => true,
       (state, action) => {
         if (action.payload?.alert) {
           const notification: AlertType = action.payload.alert;
@@ -956,7 +954,7 @@ function groupResourcesByIdentifier(
  * Sets/clears preview resources
  */
 
-function setPreviewData<State>(payload: SetPreviewDataPayload, state: AppState) {
+function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
   state.previewResourceId = undefined;
   state.previewValuesFileId = undefined;
 
@@ -1018,10 +1016,11 @@ export const {
   setDiffResourceInClusterDiff,
   setClusterDiffRefreshDiffResource,
   selectClusterDiffMatch,
-  selectAllClusterDiffMatches,
+  selectMultipleClusterDiffMatches,
   unselectClusterDiffMatch,
   unselectAllClusterDiffMatches,
   reloadClusterDiff,
+  toggleClusterOnlyResourcesInClusterDiff,
   setSelectionHistory,
   reprocessNewResource,
   editorHasReloadedSelectedPath,

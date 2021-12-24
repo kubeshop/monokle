@@ -154,14 +154,6 @@ const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
   margin-right: 5px;
 `;
 
-const StyledDot = styled.div`
-  background-color: black;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  margin: 0 5px;
-`;
-
 const CLusterContainer = styled.div`
   display: flex;
   align-items: center;

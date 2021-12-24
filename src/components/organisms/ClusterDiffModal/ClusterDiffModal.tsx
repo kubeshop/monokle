@@ -108,11 +108,19 @@ function ClusterDiffModal() {
 
   const matches = useAppSelector(state => state.main.clusterDiff.clusterToLocalResourcesMatches);
   const selectedMatches = useAppSelector(state => state.main.clusterDiff.selectedMatches);
-  const canReplaceSelectedMatches = useAppSelector(state => {
-    return selectedMatches.every(matchId => {
+  const [canDeploySelectedMatches, canReplaceSelectedMatches] = useAppSelector(state => {
+    let canDeployMatchesCount = 0;
+    let canReplaceMatchesCount = 0;
+    selectedMatches.forEach(matchId => {
       const currentMatch = state.main.clusterDiff.clusterToLocalResourcesMatches.find(m => m.id === matchId);
-      return Boolean(currentMatch?.clusterResourceId) && Boolean(currentMatch?.localResourceIds?.length);
+      if (currentMatch?.localResourceIds?.length) {
+        canDeployMatchesCount += 1;
+      }
+      if (currentMatch?.clusterResourceId && currentMatch?.localResourceIds?.length) {
+        canReplaceMatchesCount += 1;
+      }
     });
+    return [selectedMatches.length === canDeployMatchesCount, selectedMatches.length === canReplaceMatchesCount];
   });
 
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
@@ -308,7 +316,7 @@ function ClusterDiffModal() {
             ghost
             style={{float: 'left'}}
             icon={<Icon name="kubernetes" />}
-            disabled={selectedMatches.length === 0 || !currentContext}
+            disabled={selectedMatches.length === 0 || !canDeploySelectedMatches || !currentContext}
             onClick={onClickDeploySelected}
           >
             Deploy selected local resources ({selectedMatches.length}) to cluster

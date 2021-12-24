@@ -31,6 +31,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
@@ -70,7 +71,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
@@ -92,6 +92,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
+  const navigatorHeight = useMemo(
+    () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
+    [windowHeight, isInPreviewMode]
+  );
 
   const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
@@ -105,7 +111,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
   const extraButton = useRef<any>();
 
-  const getDistanceBetweenTwoComponents = () => {
+  const getDistanceBetweenTwoComponents = useCallback(() => {
     const tabsListEl = tabsList[0].getBoundingClientRect();
     const extraButtonEl = extraButton.current.getBoundingClientRect();
 
@@ -122,7 +128,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (!isButtonShrinked && distance < 10) {
       setButtonShrinkedState(true);
     }
-  };
+  }, [isButtonShrinked, tabsList]);
 
   const editorTabPaneHeight = useMemo(() => {
     let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
@@ -234,17 +240,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   }, [
     selectedResource,
-    resourceMap,
     fileMap,
     kubeconfig,
     selectedPath,
     dispatch,
-    previewType,
-    helmChartMap,
     helmValuesMap,
     selectedValuesFileId,
     kubeconfigContext,
-    kustomizeCommand,
     selectedResourceId,
   ]);
 
@@ -391,7 +393,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (tabsList && tabsList.length && extraButton.current) {
       getDistanceBetweenTwoComponents();
     }
-  }, [tabsList, extraButton.current, uiState.paneConfiguration, windowSize, selectedResource]);
+  }, [tabsList, uiState.paneConfiguration, windowSize, selectedResource, getDistanceBetweenTwoComponents]);
 
   return (
     <>
@@ -494,11 +496,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
               ) : (
                 !isClusterDiffVisible &&
                 (selectedResourceId || selectedPath || selectedValuesFileId) && (
-                  <Monaco
-                    editorHeight={`${parseInt(contentHeight, 10) - 120}`}
-                    applySelection={applySelection}
-                    diffSelectedResource={diffSelectedResource}
-                  />
+                  <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
                 )
               )}
             </TabPane>

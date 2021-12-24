@@ -10,18 +10,18 @@ import {
   FolderOpenOutlined,
   FolderOutlined,
   FormatPainterOutlined,
-  WarningFilled,
 } from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {ClusterExplorerTooltips, FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
+import {FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 
 import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {
   ActionsPane,
@@ -33,12 +33,12 @@ import {
   TemplatesPane,
 } from '@organisms';
 
-import {GraphView, LogViewer} from '@molecules';
+import {GraphView} from '@molecules';
 
 import {Col, SplitView} from '@atoms';
 
 import {AppBorders} from '@styles/Borders';
-import Colors, {BackgroundColors} from '@styles/Colors';
+import {BackgroundColors} from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
 import featureJson from '@src/feature-flags.json';
@@ -88,18 +88,18 @@ const PaneManager = () => {
   const {windowSize} = useContext(AppContext);
 
   const contentWidth = windowSize.width - (featureJson.ShowRightMenu ? 2 : 1) * iconMenuWidth;
-  const contentHeight = `${windowSize.height - 75}px`;
 
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
-  const clusterPaneIconHighlighted = useAppSelector(state => state.ui.clusterPaneIconHighlighted);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
-  const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
+
+  // TODO: refactor this to get the size of the page header dinamically
+  const contentHeight = useMemo(() => {
+    return isInPreviewMode ? `${windowSize.height - 100}px` : `${windowSize.height - 75}px`;
+  }, [isInPreviewMode, windowSize.height]);
 
   const isFolderOpen = useMemo(() => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
@@ -128,56 +128,6 @@ const PaneManager = () => {
       }
     }
   };
-
-  const getBadgeChild = () => {
-    if (!wasRehydrated) {
-      return;
-    }
-
-    if (!hasUserPerformedClickOnClusterIcon) {
-      return {dot: true};
-    }
-
-    if (!kubeconfigPath || !isKubeconfigPathValid) {
-      const color = !isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning;
-
-      return {
-        count: (
-          <WarningFilled
-            style={{
-              color,
-            }}
-          />
-        ),
-      };
-    }
-
-    return {count: 0}; // Badge is not shown if count is 0;
-  };
-
-  const badgeChild = getBadgeChild();
-
-  const getClusterExplorerTooltipText = () => {
-    if (!wasRehydrated) {
-      return;
-    }
-
-    if (!hasUserPerformedClickOnClusterIcon) {
-      return ClusterExplorerTooltips.firstTimeSeeing;
-    }
-
-    if (!kubeconfigPath) {
-      return ClusterExplorerTooltips.noKubeconfigPath;
-    }
-
-    if (!isKubeconfigPathValid) {
-      return ClusterExplorerTooltips.notValidKubeconfigPath;
-    }
-
-    return ClusterExplorerTooltips.default;
-  };
-
-  const clusterExplorerTooltipText = getClusterExplorerTooltipText();
 
   return (
     <StyledRow style={{height: contentHeight}}>
@@ -285,9 +235,6 @@ const PaneManager = () => {
               {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
                 <GraphView editorHeight={contentHeight} />
               ) : undefined}
-              <div style={{display: rightMenuSelection === 'logs' ? 'inline' : 'none'}}>
-                <LogViewer editorHeight={contentHeight} />
-              </div>
             </>
           }
           hideRight={!rightActive}

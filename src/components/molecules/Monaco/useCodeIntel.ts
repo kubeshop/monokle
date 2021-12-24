@@ -66,6 +66,7 @@ function useCodeIntel(
       debouncedUpdate.cancel();
       clearCodeIntel();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code, isEditorMounted, selectedResource, resourceMap, editor]);
 
   useEffect(() => {

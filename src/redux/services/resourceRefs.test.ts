@@ -5,9 +5,7 @@ import {readManifests} from '@redux/services/fileEntry.test';
 import {isOutgoingRef, isUnsatisfiedRef, processRefs} from '@redux/services/resourceRefs';
 
 test('array-optional-resource-refs', () => {
-  const {resourceMap, fileMap, files, helmChartMap, helmValuesMap} = readManifests(
-    getTestResourcePath('manifests/arrayOptionalResourceRefs')
-  );
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/arrayOptionalResourceRefs'));
 
   const resources = Object.values(resourceMap);
   expect(resources.length).toBe(2);
@@ -30,9 +28,7 @@ test('array-optional-resource-refs', () => {
 });
 
 test('namespaced-resource-refs', () => {
-  const {resourceMap, fileMap, files, helmChartMap, helmValuesMap} = readManifests(
-    getTestResourcePath('manifests/resourceRefsWithNamespaces')
-  );
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/resourceRefsWithNamespaces'));
 
   const resources = Object.values(resourceMap);
   expect(resources.length).toBe(5);
@@ -60,9 +56,7 @@ function findResourceByName(resourceMap: ResourceMapType, name: string) {
 }
 
 test('custom-resource-refs', () => {
-  const {resourceMap, fileMap, files, helmChartMap, helmValuesMap} = readManifests(
-    getTestResourcePath('manifests/istio')
-  );
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/istio'));
 
   const resources = Object.values(resourceMap);
   expect(resources.length).toBe(2);
