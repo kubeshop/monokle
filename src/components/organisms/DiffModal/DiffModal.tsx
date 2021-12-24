@@ -123,6 +123,10 @@ const StyledTag = styled(Tag)`
   font-weight: 600;
 `;
 
+const NamespaceSelectContainer = styled.div`
+  margin: 0 auto;
+`;
+
 const DiffModal = () => {
   const dispatch = useAppDispatch();
 
@@ -359,22 +363,25 @@ const DiffModal = () => {
       title={
         <TitleContainer>
           Resource Diff on ${targetResource ? targetResource.name : ''}
-          <Select
-            value={
-              matchingResourcesById && selectedMatchingResourceId
-                ? matchingResourcesById[selectedMatchingResourceId]?.metadata?.namespace
-                : defaultNamespace
-            }
-            defaultValue={defaultNamespace}
-            onChange={ns => onNamespaceSelectHandler(ns)}
-            style={{width: '300px', marginLeft: '16px'}}
-          >
-            {namespaces?.map(ns => (
-              <Select.Option key={ns} value={ns}>
-                {ns}
-              </Select.Option>
-            ))}
-          </Select>
+          <NamespaceSelectContainer>
+            Namespace:
+            <Select
+              value={
+                matchingResourcesById && selectedMatchingResourceId
+                  ? matchingResourcesById[selectedMatchingResourceId]?.metadata?.namespace
+                  : defaultNamespace
+              }
+              defaultValue={defaultNamespace}
+              onChange={ns => onNamespaceSelectHandler(ns)}
+              style={{width: '300px', marginLeft: '16px'}}
+            >
+              {namespaces?.map(ns => (
+                <Select.Option key={ns} value={ns}>
+                  {ns}
+                </Select.Option>
+              ))}
+            </Select>
+          </NamespaceSelectContainer>
         </TitleContainer>
       }
       visible={isDiffModalVisible}
