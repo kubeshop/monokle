@@ -240,10 +240,11 @@ const PageHeader = () => {
       setPreviewResource(undefined);
     }
 
-    if (previewValuesFileId && helmValuesMap[previewValuesFileId]) {
-      const valuesFile = helmValuesMap[previewValuesFileId];
+    const valuesFile = previewValuesFileId ? helmValuesMap[previewValuesFileId] : undefined;
+    const chart = valuesFile ? helmChartMap[valuesFile.helmChartId] : undefined;
+    if (valuesFile && chart) {
       setPreviewValuesFile(valuesFile);
-      setHelmChart(helmChartMap[valuesFile.helmChartId]);
+      setHelmChart(chart);
     } else {
       setPreviewValuesFile(undefined);
       setHelmChart(undefined);

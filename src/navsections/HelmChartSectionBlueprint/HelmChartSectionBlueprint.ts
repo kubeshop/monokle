@@ -50,7 +50,8 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
       return Object.values(scope.helmChartMap)
         .map(helmChart => {
           const helmValuesFiles = helmChart.valueFileIds
-            .map(valuesFile => scope.helmValuesMap[valuesFile])
+            .map(valuesFileId => scope.helmValuesMap[valuesFileId])
+            .filter((valuesFile): valuesFile is HelmValuesFile => Boolean(valuesFile))
             .sort((a, b) => a.name.localeCompare(b.name));
           return {id: helmChart.id, name: helmChart.name, itemIds: helmValuesFiles.map(vf => vf.id)};
         })

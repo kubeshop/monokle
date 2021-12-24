@@ -222,7 +222,11 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   };
 
   const onTouchStartLeftNav = (evt: TouchEvent<HTMLElement>): any => {
-    setSeparatorLeftNavXPosition(evt.touches[0].clientX);
+    let clientX = evt.touches[0]?.clientX;
+    if (!clientX) {
+      return;
+    }
+    setSeparatorLeftNavXPosition(clientX);
     setDraggingLeftNav(true);
   };
 
@@ -232,7 +236,11 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   };
 
   const onTouchStartNavEdit = (evt: TouchEvent<HTMLElement>): any => {
-    setSeparatorNavEditXPosition(evt.touches[0].clientX);
+    let clientX = evt.touches[0]?.clientX;
+    if (!clientX) {
+      return;
+    }
+    setSeparatorNavEditXPosition(clientX);
     setDraggingNavEdit(true);
   };
 
@@ -242,7 +250,11 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   };
 
   const onTouchStartEditRight = (evt: TouchEvent<HTMLElement>): any => {
-    setSeparatorEditRightXPosition(evt.touches[0].clientX);
+    let clientX = evt.touches[0]?.clientX;
+    if (!clientX) {
+      return;
+    }
+    setSeparatorEditRightXPosition(clientX);
     setDraggingEditRight(true);
   };
 
@@ -252,7 +264,11 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   };
 
   const onTouchMove = (evt: TouchEvent<HTMLElement>): any => {
-    onMove(evt.touches[0].clientX);
+    let clientX = evt.touches[0]?.clientX;
+    if (!clientX) {
+      return;
+    }
+    onMove(clientX);
   };
 
   const onMouseUp = () => {

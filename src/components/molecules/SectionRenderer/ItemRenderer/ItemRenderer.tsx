@@ -40,23 +40,27 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const scrollContainer = useRef<ScrollContainerRef>(null);
 
   useEffect(() => {
-    if (!itemInstance.shouldScrollIntoView) {
+    if (!itemInstance?.shouldScrollIntoView) {
       return;
     }
     scrollContainer.current?.scrollIntoView();
-  }, [itemInstance.shouldScrollIntoView]);
+  }, [itemInstance?.shouldScrollIntoView]);
 
   const onClick = useCallback(() => {
-    if (instanceHandler && instanceHandler.onClick && !itemInstance.isDisabled) {
+    if (instanceHandler?.onClick && itemInstance?.isDisabled === false) {
       instanceHandler.onClick(itemInstance, dispatch);
     }
   }, [instanceHandler, itemInstance, dispatch]);
 
   const onCheck = useCallback(() => {
-    if (instanceHandler && instanceHandler.onCheck && !itemInstance.isDisabled) {
+    if (instanceHandler?.onCheck && itemInstance?.isDisabled === false) {
       instanceHandler.onCheck(itemInstance, dispatch);
     }
   }, [instanceHandler, itemInstance, dispatch]);
+
+  if (!itemInstance) {
+    return null;
+  }
 
   return (
     <ScrollIntoView id={itemInstance.id} ref={scrollContainer}>
@@ -71,6 +75,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         isLastItem={isLastItem}
         hasOnClick={Boolean(instanceHandler?.onClick)}
         $isSectionCheckable={isSectionCheckable}
+        $hasContextMenu={Boolean(ContextMenu.Component)}
       >
         {itemInstance.isCheckable &&
           (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (

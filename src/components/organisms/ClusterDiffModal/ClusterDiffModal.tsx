@@ -143,11 +143,13 @@ function ClusterDiffModal() {
     () =>
       matches
         .filter(match => selectedMatches.includes(match.id))
-        .map(match =>
-          match.localResourceIds && match.localResourceIds.length > 0
-            ? resourceMap[match.localResourceIds[0]]
-            : undefined
-        )
+        .map(match => {
+          const firstLocalResourceId = match.localResourceIds?.[0];
+          if (!firstLocalResourceId) {
+            return undefined;
+          }
+          return resourceMap[firstLocalResourceId];
+        })
         .filter((r): r is K8sResource => r !== undefined),
     [matches, selectedMatches, resourceMap]
   );

@@ -372,6 +372,9 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
 
   if (isFileResource(resource)) {
     const fileEntry = fileMap[resource.filePath];
+    if (!fileEntry) {
+      throw new Error('[saveResource]: fileEntry is undefined');
+    }
 
     let absoluteResourcePath = getAbsoluteResourcePath(resource, fileMap);
     if (resource.range) {
@@ -435,10 +438,10 @@ export function reprocessResources(
 
   let resourceKinds = resourceIds
     .map(resId => resourceMap[resId])
-    .filter(res => res !== undefined)
+    .filter((res): res is K8sResource => res !== undefined)
     .map(res => res.kind);
 
-  if (options && options.resourceKinds) {
+  if (options?.resourceKinds) {
     resourceKinds = [...resourceKinds, ...options.resourceKinds];
   }
   const dependentResourceKinds = getDependentResourceKinds(resourceKinds);
@@ -544,8 +547,8 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
         while (resourceIndex < resourceIds.length - 1) {
           resourceIndex += 1;
           let rid = resourceIds[resourceIndex];
-          const r = state.resourceMap[rid];
-          if (r && r.range) {
+          const r = rid ? state.resourceMap[rid] : undefined;
+          if (r?.range) {
             r.range.start += diff;
           } else {
             throw new Error(`Failed to find resource ${rid} in fileEntry resourceIds for ${fileEntry.name}`);
@@ -594,6 +597,9 @@ export function removeResourceFromFile(
   let passedRemovedResource = false;
   resourceIds.forEach(resourceId => {
     const resource = resourceMap[resourceId];
+    if (!resource) {
+      return;
+    }
     if (resourceId === removedResource.id) {
       passedRemovedResource = true;
       newRangeStart = resource.range?.start || newRangeStart;

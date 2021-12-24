@@ -57,7 +57,7 @@ const joinPathParts = (pathParts: string[]) => {
 
 const addRefNodeAtPath = (refNode: RefNode, path: string, refNodesByPath: Record<string, RefNode[]>) => {
   if (refNodesByPath[path]) {
-    refNodesByPath[path].push(refNode);
+    refNodesByPath[path]!.push(refNode);
   } else {
     refNodesByPath[path] = [refNode];
   }
@@ -594,12 +594,12 @@ export function processRefs(
   // select which resources to process based on optional filter
   const resources: K8sResource[] = [];
 
-  if (filter && filter.resourceIds) {
-    resources.push(...filter.resourceIds.map(id => resourceMap[id]));
+  if (filter?.resourceIds) {
+    resources.push(...filter.resourceIds.map(id => resourceMap[id]).filter((r): r is K8sResource => Boolean(r)));
   }
 
-  if (filter && filter.resourceKinds) {
-    resources.push(...Object.values(resourceMap).filter(resource => filter?.resourceKinds?.includes(resource.kind)));
+  if (filter?.resourceKinds) {
+    resources.push(...Object.values(resourceMap).filter(resource => filter.resourceKinds?.includes(resource.kind)));
   }
 
   if (!filter?.resourceIds && !filter?.resourceKinds) {

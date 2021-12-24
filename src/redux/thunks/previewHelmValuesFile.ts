@@ -30,10 +30,20 @@ export const previewHelmValuesFile = createAsyncThunk<
   const kubeconfigContext = thunkAPI.getState().config.kubeConfig.currentContext;
   const valuesFile = state.helmValuesMap[valuesFileId];
 
-  if (valuesFile && valuesFile.filePath) {
-    const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  if (!kubeconfigContext) {
+    return createRejectionWithAlert(thunkAPI, 'Helm Error', 'Missing Kubeconfig context');
+  }
+
+  if (valuesFile?.filePath) {
+    const rootFolder = state.fileMap[ROOT_FILE_ENTRY]?.filePath;
+    if (!rootFolder) {
+      return createRejectionWithAlert(thunkAPI, 'Helm Error', 'Missing root folder');
+    }
     const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
     const chart = state.helmChartMap[valuesFile.helmChartId];
+    if (!chart) {
+      return createRejectionWithAlert(thunkAPI, 'Helm Error', 'Missing Helm Chart');
+    }
 
     // sanity check
     if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {

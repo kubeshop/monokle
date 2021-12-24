@@ -64,7 +64,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
         Record<string, K8sResource[]>
       >((acc, resource) => {
         if (acc[resource.kind]) {
-          acc[resource.kind].push(resource);
+          acc[resource.kind]!.push(resource);
         } else {
           acc[resource.kind] = [resource];
         }

@@ -77,6 +77,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const previewType = useAppSelector(state => state.main.previewType);
   const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const rootFileEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -198,10 +199,10 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
         newCode = resource.text;
         editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
       }
-    } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
-      const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
+    } else if (selectedPath && rootFileEntry && selectedPath !== rootFileEntry.filePath) {
+      const filePath = path.join(rootFileEntry.filePath, selectedPath);
       const fileStats = getFileStats(filePath);
-      if (fileStats && fileStats.isFile()) {
+      if (fileStats?.isFile()) {
         newCode = fs.readFileSync(filePath, 'utf8');
       }
     }
@@ -214,13 +215,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   }, [selectedPath, selectedResourceId]);
 
   useEffect(() => {
-    if (!selectedPath || !shouldEditorReloadSelectedPath) {
+    if (!selectedPath || !shouldEditorReloadSelectedPath || !rootFileEntry) {
       return;
     }
     log.info('[Monaco]: selected file was updated outside Monokle - reading file...');
-    const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
+    const filePath = path.join(rootFileEntry.filePath, selectedPath);
     const fileStats = getFileStats(filePath);
-    if (fileStats && fileStats.isFile()) {
+    if (fileStats?.isFile()) {
       const newCode = fs.readFileSync(filePath, 'utf8');
       setCode(newCode);
       setOrgCode(newCode);

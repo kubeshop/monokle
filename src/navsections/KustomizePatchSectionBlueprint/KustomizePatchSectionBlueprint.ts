@@ -45,7 +45,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
       const patcheResourcesByKind: Record<string, K8sResource[]> = patchResources.reduce<Record<string, K8sResource[]>>(
         (acc, resource) => {
           if (acc[resource.kind]) {
-            acc[resource.kind].push(resource);
+            acc[resource.kind]!.push(resource);
           } else {
             acc[resource.kind] = [resource];
           }

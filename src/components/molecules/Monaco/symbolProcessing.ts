@@ -211,7 +211,11 @@ function processSymbol(
   }
 
   if (parents.length > 0) {
-    const parentName = parents[parents.length - 1].name;
+    const lastParent = parents[parents.length - 1];
+    if (!lastParent) {
+      return;
+    }
+    const parentName = lastParent.name;
 
     if (parentName === 'labels' || parentName === 'matchLabels') {
       addLabelFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);

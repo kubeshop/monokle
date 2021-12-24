@@ -38,9 +38,10 @@ const StyledPositionText = styled.span`
 `;
 
 const getRefTargetName = (ref: ResourceRef, resourceMap: ResourceMapType) => {
-  if (ref.target?.type === 'resource') {
-    if (ref.target.resourceId && resourceMap[ref.target.resourceId]) {
-      return resourceMap[ref.target.resourceId].name;
+  if (ref.target?.type === 'resource' && ref.target.resourceId) {
+    const targetResource = resourceMap[ref.target.resourceId];
+    if (ref.target.resourceId && targetResource) {
+      return targetResource.name;
     }
   }
   if (ref.target?.type === 'file') {
@@ -80,7 +81,7 @@ const ResourceRefLink = (props: {
     if (resourceRef.target.resourceKind) {
       linkText = `${resourceRef.target.resourceKind}: ${targetName}`;
     } else if (resourceRef.target.resourceId) {
-      const resourceKind = resourceMap[resourceRef.target.resourceId].kind;
+      const resourceKind = resourceMap[resourceRef.target.resourceId]?.kind;
       linkText = `${resourceKind}: ${targetName}`;
     }
   }

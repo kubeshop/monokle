@@ -39,12 +39,12 @@ const FilePatternList = (props: FilePatternListProps) => {
 
   const dispatch = useAppDispatch();
 
-  const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
+  const [isAddingPattern, setIsAddingPattern] = useState<boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<Input>();
   const filePatternInputRef = useRef<any>();
   const appConfig = useAppSelector(state => state.config);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootFileEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
   useOnClickOutside(filePatternInputRef, () => {
     setIsAddingPattern(false);
@@ -93,6 +93,10 @@ const FilePatternList = (props: FilePatternListProps) => {
     }
   }, [isSettingsOpened]);
 
+  if (!rootFileEntry) {
+    return null;
+  }
+
   return (
     <div>
       <StyledUl>
@@ -128,7 +132,7 @@ const FilePatternList = (props: FilePatternListProps) => {
             <Button
               onClick={() => {
                 dispatch(setScanExcludesStatus('applied'));
-                dispatch(setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath));
+                dispatch(setRootFolder(rootFileEntry.filePath));
               }}
             >
               Apply changes

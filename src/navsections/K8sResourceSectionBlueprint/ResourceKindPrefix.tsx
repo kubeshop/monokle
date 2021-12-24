@@ -39,6 +39,9 @@ const Prefix = (props: ItemCustomComponentProps) => {
   const filterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
 
   const applyNamespaceFilter = useCallback(() => {
+    if (!resource) {
+      return;
+    }
     dispatch(extendResourceFilter({namespace: resource.namespace, labels: {}, annotations: {}}));
   }, [resource, dispatch]);
 

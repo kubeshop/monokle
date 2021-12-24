@@ -13,6 +13,7 @@ type ItemContainerProps = {
   isLastItem: boolean;
   hasOnClick: boolean;
   $isSectionCheckable: boolean;
+  $hasContextMenu: boolean;
 };
 
 export const ItemContainer = styled.span<ItemContainerProps>`
@@ -49,7 +50,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
       return `background: ${Colors.blackPearl};`;
     }
   }};
-  ${props => !props.isHovered && 'padding-right: 46px;'}
+  ${props => props.$hasContextMenu && !props.isHovered && 'padding-right: 46px;'}
 `;
 
 type ItemNameProps = {

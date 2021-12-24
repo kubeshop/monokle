@@ -28,7 +28,7 @@ export function clearResourceSelections(resourceMap: ResourceMapType, excludeIte
 export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: ResourceMapType, fileMap: FileMapType) {
   fileEntry.children
     ?.map(e => fileMap[getChildFilePath(e, fileEntry, fileMap)])
-    .filter(child => child)
+    .filter((child): child is FileEntry => Boolean(child))
     .forEach(child => {
       getResourcesForPath(child.filePath, resourceMap).forEach(e => {
         e.isHighlighted = true;

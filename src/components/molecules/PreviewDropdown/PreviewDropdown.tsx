@@ -10,6 +10,8 @@ import styled from 'styled-components';
 
 import {KUSTOMIZATION_KIND} from '@constants/constants';
 
+import {HelmValuesFile} from '@models/helm';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
@@ -87,7 +89,9 @@ const PreviewDropdown = (props: {btnStyle?: React.CSSProperties}) => {
   const helmCharts: HelmChartMenuItem[] = useAppSelector(state => {
     const helmValuesMap = state.main.helmValuesMap;
     return Object.values(state.main.helmChartMap).map(helmChart => {
-      const valuesFiles = helmChart.valueFileIds.map(valuesFileId => helmValuesMap[valuesFileId]);
+      const valuesFiles = helmChart.valueFileIds
+        .map(valuesFileId => helmValuesMap[valuesFileId])
+        .filter((v): v is HelmValuesFile => Boolean(v));
       return {
         id: helmChart.id,
         name: helmChart.name,
@@ -152,6 +156,10 @@ const PreviewDropdown = (props: {btnStyle?: React.CSSProperties}) => {
 
   const onMenuItemClick = ({key}: {key: string}) => {
     const [type, id] = key.split('__');
+
+    if (!id) {
+      return;
+    }
 
     if (type === 'kustomization') {
       selectAndPreviewKustomization(id);

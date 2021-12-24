@@ -83,8 +83,8 @@ function ResourceDiffSectionNameDisplay() {
   );
   const selectedMatchesLength = useAppSelector(state => state.main.clusterDiff.selectedMatches.length);
   const areAllMatchesSelected = useMemo(
-    () => selectedMatchesLength === clusterDiffSectionInstance.visibleItemIds.length,
-    [selectedMatchesLength, clusterDiffSectionInstance.visibleItemIds.length]
+    () => selectedMatchesLength === clusterDiffSectionInstance?.visibleItemIds.length,
+    [selectedMatchesLength, clusterDiffSectionInstance?.visibleItemIds.length]
   );
 
   const onClickReload = () => {
@@ -99,7 +99,7 @@ function ResourceDiffSectionNameDisplay() {
     if (areAllMatchesSelected) {
       dispatch(unselectAllClusterDiffMatches());
     } else {
-      dispatch(selectMultipleClusterDiffMatches(clusterDiffSectionInstance.visibleItemIds));
+      dispatch(selectMultipleClusterDiffMatches(clusterDiffSectionInstance?.visibleItemIds || []));
     }
   };
 

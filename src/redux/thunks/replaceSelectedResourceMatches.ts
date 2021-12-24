@@ -30,11 +30,14 @@ export const replaceSelectedResourceMatches = createAsyncThunk<
       const updateManyResourcesPayload: UpdateManyResourcesPayload = selectedMatches
         .map(matchId => {
           const currentMatch = clusterToLocalResourcesMatches.find(m => m.id === matchId);
-          if (!currentMatch?.localResourceIds?.length || !currentMatch?.clusterResourceId) {
+          if (!currentMatch?.localResourceIds?.length || !currentMatch.clusterResourceId) {
             return undefined;
           }
 
           const clusterResource = resourceMap[currentMatch.clusterResourceId];
+          if (!clusterResource) {
+            return undefined;
+          }
 
           const originalClusterResourceContent = parse(clusterResource.text);
           const cleanClusterResourceContent = removeIgnoredPathsFromResourceContent(originalClusterResourceContent);
@@ -46,7 +49,7 @@ export const replaceSelectedResourceMatches = createAsyncThunk<
             content: cleanClusterResourceText,
           };
         })
-        .filter((id): id is {resourceId: string; content: string} => Boolean(id) === true);
+        .filter((id): id is {resourceId: string; content: string} => Boolean(id));
 
       thunkAPI.dispatch(updateManyResources(updateManyResourcesPayload));
       thunkAPI.dispatch(reloadClusterDiff());

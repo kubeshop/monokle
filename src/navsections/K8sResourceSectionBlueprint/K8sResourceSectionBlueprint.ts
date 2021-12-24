@@ -22,7 +22,7 @@ const childSectionNames = navSectionNames.representation[navSectionNames.K8S_RES
 const kindHandlersBySubsectionName: Record<string, ResourceKindHandler[]> = {};
 ResourceKindHandlers.forEach(kindHandler => {
   const navSectionName = kindHandler.navigatorPath[0];
-  if (navSectionName !== navSectionNames.K8S_RESOURCES) {
+  if (navSectionName !== navSectionNames.K8S_RESOURCES || !childSectionNames) {
     return;
   }
   const subsectionName = kindHandler.navigatorPath[1];
@@ -31,13 +31,13 @@ ResourceKindHandlers.forEach(kindHandler => {
   }
 
   if (kindHandlersBySubsectionName[subsectionName]) {
-    kindHandlersBySubsectionName[subsectionName].push(kindHandler);
+    kindHandlersBySubsectionName[subsectionName]!.push(kindHandler);
   } else {
     kindHandlersBySubsectionName[subsectionName] = [kindHandler];
   }
 });
 
-const childSections = childSectionNames.map(childSectionName => {
+const childSections = childSectionNames?.map(childSectionName => {
   const kindHandlerSections = (kindHandlersBySubsectionName[childSectionName] || []).map(kindHandler =>
     makeResourceKindNavSection(kindHandler)
   );
@@ -78,7 +78,7 @@ const childSections = childSectionNames.map(childSectionName => {
   return subsection;
 });
 
-childSections.forEach(s => sectionBlueprintMap.register(s));
+childSections?.forEach(s => sectionBlueprintMap.register(s));
 
 export type K8sResourceScopeType = {
   isFolderLoading: boolean;

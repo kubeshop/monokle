@@ -5,6 +5,7 @@ import {Button, Select} from 'antd';
 import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
 
 import isDeepEqual from 'fast-deep-equal/es6/react';
+import _ from 'lodash';
 import styled from 'styled-components';
 import {v4 as uuidv4} from 'uuid';
 
@@ -137,10 +138,13 @@ function KeyValueInput(props: KeyValueInputProps) {
   const updateEntryValue = (entryId: string, value: string) => {
     const newEntries = Array.from(entries);
     const entryIndex = newEntries.findIndex(e => e.id === entryId);
-    newEntries[entryIndex] = {
-      ...newEntries[entryIndex],
-      value,
-    };
+    const currentEntry = newEntries[entryIndex];
+    if (currentEntry) {
+      newEntries[entryIndex] = {
+        ...currentEntry,
+        value,
+      };
+    }
     setEntries(newEntries);
     updateKeyValue(newEntries);
   };
@@ -181,12 +185,11 @@ function KeyValueInput(props: KeyValueInputProps) {
                 <Select.Option key={ANY_VALUE} value={ANY_VALUE}>
                   {ANY_VALUE}
                 </Select.Option>
-                {data[entry.key] &&
-                  data[entry.key].map((value: string) => (
-                    <Select.Option key={value} value={value}>
-                      {value}
-                    </Select.Option>
-                  ))}
+                {_.get(data, entry.key, []).map((value: string) => (
+                  <Select.Option key={value} value={value}>
+                    {value}
+                  </Select.Option>
+                ))}
               </Select>
             )}
           </KeyValueContainer>

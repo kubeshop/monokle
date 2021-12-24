@@ -43,7 +43,7 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
         Record<string, ClusterToLocalResourcesMatch[]>
       >((acc, match) => {
         if (acc[match.resourceKind]) {
-          acc[match.resourceKind].push(match);
+          acc[match.resourceKind]?.push(match);
         } else {
           acc[match.resourceKind] = [match];
         }
@@ -110,10 +110,8 @@ const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch
       },
       isVisible(rawItem, scope) {
         const clusterResource = rawItem.clusterResourceId ? scope.resourceMap[rawItem.clusterResourceId] : undefined;
-        const firstLocalResource =
-          rawItem.localResourceIds && rawItem.localResourceIds.length > 0
-            ? scope.resourceMap[rawItem.localResourceIds[0]]
-            : undefined;
+        const firstLocalResourceId = rawItem.localResourceIds?.[0];
+        const firstLocalResource = firstLocalResourceId ? scope.resourceMap[firstLocalResourceId] : undefined;
         if (clusterResource && isResourcePassingFilter(clusterResource, scope.resourceFilter)) {
           return true;
         }

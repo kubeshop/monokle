@@ -23,7 +23,7 @@ export const applySelectedResourceMatches = createAsyncThunk<
   const resourcesToApply = matches
     .filter(match => selectedMatches.includes(match.id))
     .map(match =>
-      match.localResourceIds && match.localResourceIds.length > 0 ? resourceMap[match.localResourceIds[0]] : undefined
+      match.localResourceIds && match.localResourceIds.length > 0 ? resourceMap[match.localResourceIds[0]!] : undefined
     )
     .filter((r): r is K8sResource => r !== undefined);
 

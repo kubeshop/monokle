@@ -94,12 +94,14 @@ function SectionRenderer(props: SectionRendererProps) {
   }, [sectionInstance?.shouldExpand, expandSection]);
 
   const groupInstanceById: Record<string, ItemGroupInstance> = useMemo(() => {
-    return sectionInstance?.groups
-      .map<[string, ItemGroupInstance]>(g => [g.id, g])
-      .reduce<Record<string, ItemGroupInstance>>((acc, [k, v]) => {
-        acc[k] = v;
-        return acc;
-      }, {});
+    return (
+      sectionInstance?.groups
+        .map<[string, ItemGroupInstance]>(g => [g.id, g])
+        .reduce<Record<string, ItemGroupInstance>>((acc, [k, v]) => {
+          acc[k] = v;
+          return acc;
+        }, {}) || {}
+    );
   }, [sectionInstance?.groups]);
 
   const lastVisibleChildSectionId = useMemo(() => {
@@ -146,12 +148,12 @@ function SectionRenderer(props: SectionRendererProps) {
     return null;
   }
 
-  if (sectionInstance?.isLoading) {
+  if (sectionInstance.isLoading) {
     return <S.Skeleton />;
   }
 
-  if (sectionInstance?.isEmpty) {
-    if (EmptyDisplay && EmptyDisplay.Component) {
+  if (sectionInstance.isEmpty) {
+    if (EmptyDisplay.Component) {
       return (
         <S.EmptyDisplayContainer level={level}>
           <EmptyDisplay.Component sectionInstance={sectionInstance} />
@@ -179,9 +181,7 @@ function SectionRenderer(props: SectionRendererProps) {
         expandSection={expandSection}
         collapseSection={collapseSection}
       />
-      {sectionInstance &&
-        sectionInstance.isVisible &&
-        !isCollapsed &&
+      {!isCollapsed &&
         itemBlueprint &&
         sectionInstance.groups.length === 0 &&
         sectionInstance.visibleItemIds.map(itemId => (
@@ -195,12 +195,13 @@ function SectionRenderer(props: SectionRendererProps) {
             options={itemRendererOptions}
           />
         ))}
-      {sectionInstance?.isVisible &&
-        !isCollapsed &&
+      {!isCollapsed &&
         itemBlueprint &&
-        groupInstanceById &&
         sectionInstance.visibleGroupIds.map(groupId => {
           const group = groupInstanceById[groupId];
+          if (!group) {
+            return null;
+          }
           return (
             <React.Fragment key={group.id}>
               <S.NameContainer style={{color: 'red'}}>
@@ -223,17 +224,16 @@ function SectionRenderer(props: SectionRendererProps) {
             </React.Fragment>
           );
         })}
-      {sectionBlueprint.childSectionIds &&
-        sectionBlueprint.childSectionIds
-          .map(childSectionId => navSectionMap.getById(childSectionId))
-          .map(child => (
-            <SectionRenderer
-              key={child.name}
-              sectionBlueprint={child}
-              level={level + 1}
-              isLastSection={child.id === lastVisibleChildSectionId}
-            />
-          ))}
+      {sectionBlueprint.childSectionIds
+        ?.map(childSectionId => navSectionMap.getById(childSectionId))
+        .map(child => (
+          <SectionRenderer
+            key={child.name}
+            sectionBlueprint={child}
+            level={level + 1}
+            isLastSection={child.id === lastVisibleChildSectionId}
+          />
+        ))}
     </>
   );
 }

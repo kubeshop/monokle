@@ -59,8 +59,9 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.REFRESH_FOLDER,
     () => {
-      if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].filePath) {
-        dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
+      const rootFileEntry = mainState.fileMap[ROOT_FILE_ENTRY];
+      if (rootFileEntry) {
+        dispatch(setRootFolder(rootFileEntry.filePath));
       }
     },
     [mainState]

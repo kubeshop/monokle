@@ -15,7 +15,11 @@ export function applyFileWithConfirm(
   kubeconfig: string,
   context: string
 ) {
-  const title = `Deploy ${fileMap[selectedPath].name} to cluster [${context}]?`;
+  const fileEntry = fileMap[selectedPath];
+  if (!fileEntry) {
+    return;
+  }
+  const title = `Deploy ${fileEntry.name} to cluster [${context}]?`;
 
   Modal.confirm({
     title,

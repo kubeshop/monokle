@@ -74,10 +74,10 @@ export const selectFromHistory = async (
   }
 
   const selectionHistoryEntry = newSelectionHistory[nextSelectionHistoryIndex];
-  if (selectionHistoryEntry.type === 'resource') {
+  if (selectionHistoryEntry?.type === 'resource') {
     dispatch(selectK8sResource({resourceId: selectionHistoryEntry.selectedResourceId, isVirtualSelection: true}));
   }
-  if (selectionHistoryEntry.type === 'path') {
+  if (selectionHistoryEntry?.type === 'path') {
     dispatch(selectFile({filePath: selectionHistoryEntry.selectedPath, isVirtualSelection: true}));
   }
 

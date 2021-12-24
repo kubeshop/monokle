@@ -129,7 +129,7 @@ function processHelmChartFolder(
  */
 
 export function getRootFolder(fileMap: FileMapType) {
-  return fileMap && fileMap[ROOT_FILE_ENTRY] ? fileMap[ROOT_FILE_ENTRY].filePath : undefined;
+  return fileMap[ROOT_FILE_ENTRY] ? fileMap[ROOT_FILE_ENTRY]!.filePath : undefined;
 }
 
 /**
@@ -146,7 +146,7 @@ export function readFiles(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
-  depth: number = 1
+  depth = 1
 ) {
   const files = fs.readdirSync(folder);
   const result: string[] = [];
@@ -156,7 +156,7 @@ export function readFiles(
     fileMap[ROOT_FILE_ENTRY] = createFileEntry(folder);
   }
 
-  const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
+  const rootFolder = fileMap[ROOT_FILE_ENTRY]!.filePath;
 
   // is this a helm chart folder?
   if (isHelmChartFolder(files)) {
@@ -230,7 +230,7 @@ export function getResourcesForPath(filePath: string, resourceMap: ResourceMapTy
 
 export function getAbsoluteResourceFolder(resource: K8sResource, fileMap: FileMapType) {
   return path.join(
-    fileMap[ROOT_FILE_ENTRY].filePath,
+    fileMap[ROOT_FILE_ENTRY]?.filePath || '',
     resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep))
   );
 }
@@ -249,7 +249,11 @@ export function getResourceFolder(resource: K8sResource) {
  */
 
 export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapType) {
-  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, resource.filePath);
+  const rootFileEntry = fileMap[ROOT_FILE_ENTRY];
+  if (!rootFileEntry) {
+    throw new Error('rootFileEntry is undefined');
+  }
+  return path.join(rootFileEntry.filePath, resource.filePath);
 }
 
 /**
@@ -257,7 +261,11 @@ export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapT
  */
 
 export function getAbsoluteFileEntryPath(fileEntry: FileEntry, fileMap: FileMapType) {
-  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, fileEntry.filePath);
+  const rootFileEntry = fileMap[ROOT_FILE_ENTRY];
+  if (!rootFileEntry) {
+    throw new Error('rootFileEntry is undefined');
+  }
+  return path.join(rootFileEntry.filePath, fileEntry.filePath);
 }
 
 /**
@@ -265,7 +273,11 @@ export function getAbsoluteFileEntryPath(fileEntry: FileEntry, fileMap: FileMapT
  */
 
 export function getAbsoluteHelmChartPath(helmChart: HelmChart, fileMap: FileMapType) {
-  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, helmChart.filePath);
+  const rootFileEntry = fileMap[ROOT_FILE_ENTRY];
+  if (!rootFileEntry) {
+    throw new Error('rootFileEntry is undefined');
+  }
+  return path.join(rootFileEntry.filePath, helmChart.filePath);
 }
 
 /**
@@ -273,7 +285,11 @@ export function getAbsoluteHelmChartPath(helmChart: HelmChart, fileMap: FileMapT
  */
 
 export function getAbsoluteValuesFilePath(helmValuesFile: HelmValuesFile, fileMap: FileMapType) {
-  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, helmValuesFile.filePath);
+  const rootFileEntry = fileMap[ROOT_FILE_ENTRY];
+  if (!rootFileEntry) {
+    throw new Error('rootFileEntry is undefined');
+  }
+  return path.join(rootFileEntry.filePath, helmValuesFile.filePath);
 }
 
 /**
@@ -291,8 +307,12 @@ export function extractK8sResourcesFromFile(filePath: string, fileMap: FileMapTy
  */
 
 export function getAllFileEntriesForPath(filePath: string, fileMap: FileMapType) {
-  let parent = fileMap[ROOT_FILE_ENTRY];
+  const rootFileEntry = fileMap[ROOT_FILE_ENTRY];
+  if (!rootFileEntry) {
+    throw new Error('rootFileEntry is undefined');
+  }
   const result: FileEntry[] = [];
+  let parent = rootFileEntry;
   filePath.split(path.sep).forEach(pathSegment => {
     if (parent.children?.includes(pathSegment)) {
       const child = fileMap[getChildFilePath(pathSegment, parent, fileMap)];
@@ -323,7 +343,7 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
     return undefined;
   }
 
-  const rootFolder = fileMap[ROOT_FILE_ENTRY].filePath;
+  const rootFolder = fileMap[ROOT_FILE_ENTRY]!.filePath;
   if (filePath === rootFolder) {
     return fileMap[ROOT_FILE_ENTRY];
   }
@@ -373,7 +393,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
     if (wasAnyResourceSelected) {
       if (resourcesInFile.length === 1 && resourcesFromFile.length === 1) {
-        updateSelectionAndHighlights(state, resourcesFromFile[0]);
+        updateSelectionAndHighlights(state, resourcesFromFile[0]!);
       } else {
         state.selectedPath = undefined;
         state.selectedResourceId = undefined;
@@ -396,7 +416,10 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
 function addFile(absolutePath: string, state: AppState) {
   log.info(`adding file ${absolutePath}`);
-  let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  let rootFolder = state.fileMap[ROOT_FILE_ENTRY]?.filePath;
+  if (!rootFolder) {
+    throw new Error('rootFolder is undefined');
+  }
   const fileEntry = createFileEntry(absolutePath.substr(rootFolder.length));
   const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
   resourcesFromFile.forEach(resource => {
@@ -418,7 +441,10 @@ function addFile(absolutePath: string, state: AppState) {
 
 function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) {
   log.info(`adding folder ${absolutePath}`);
-  const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  const rootFolder = state.fileMap[ROOT_FILE_ENTRY]?.filePath;
+  if (!rootFolder) {
+    throw new Error('rootFolder is undefined');
+  }
   if (absolutePath.startsWith(rootFolder)) {
     const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
     folderEntry.children = readFiles(
@@ -550,7 +576,7 @@ export function selectFilePath(filePath: string, state: AppState) {
   clearResourceSelections(state.resourceMap);
 
   if (entries.length > 0) {
-    const parent = entries[entries.length - 1];
+    const parent = entries[entries.length - 1]!;
     getResourcesForPath(parent.filePath, state.resourceMap).forEach(r => {
       r.isHighlighted = true;
     });

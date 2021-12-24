@@ -49,16 +49,15 @@ const SymbolsToResourceKindMatchers = ResourceKindHandlers.map(resourceKindHandl
 }).flat();
 
 const getResourceKindFromSymbols = (symbols: monaco.languages.DocumentSymbol[]) => {
-  for (let i = 0; i < SymbolsToResourceKindMatchers.length; i += 1) {
-    const matcher = SymbolsToResourceKindMatchers[i];
-    if (matcher.symbolsPaths && matcher.symbolsPaths.length > 0) {
+  SymbolsToResourceKindMatchers.forEach(matcher => {
+    if (matcher.symbolsPaths.length) {
       const isMatch = matcher.symbolsPaths.some(symbolsPath => {
-        const sliceIndex = matcher.symbolsPaths ? -symbolsPath.length : 0;
+        const sliceIndex = matcher.symbolsPaths.length ? -symbolsPath.length : 0;
         const slicedSymbols = symbols.slice(sliceIndex);
         if (symbolsPath.length === slicedSymbols.length) {
           let areEqual = true;
           symbolsPath.forEach((symbol, index) => {
-            if (symbol !== slicedSymbols[index].name) {
+            if (symbol !== slicedSymbols[index]?.name) {
               areEqual = false;
             }
           });
@@ -70,7 +69,8 @@ const getResourceKindFromSymbols = (symbols: monaco.languages.DocumentSymbol[]) 
         return matcher.resourceKind;
       }
     }
-  }
+  });
+
   return null;
 };
 
@@ -155,7 +155,7 @@ export async function applyForResource(
           outgoingRefs: [ref],
         });
       } else {
-        listOfOutgoingRefsByEqualPos[refsByEqualPosIndex].outgoingRefs.push(ref);
+        listOfOutgoingRefsByEqualPos[refsByEqualPosIndex]?.outgoingRefs.push(ref);
       }
     }
   });
@@ -258,7 +258,7 @@ export async function applyForResource(
     // create default link if there is only one command
     if (outgoingRefs.length === 1) {
       const outgoingRef = outgoingRefs[0];
-      if (createResource || !isUnsatisfiedRef(outgoingRef.type)) {
+      if (outgoingRef && (createResource || !isUnsatisfiedRef(outgoingRef.type))) {
         const linkDisposable = createLinkProvider(
           inlineRange,
           isUnsatisfiedRef(outgoingRef.type) ? 'Create resource' : 'Open resource',

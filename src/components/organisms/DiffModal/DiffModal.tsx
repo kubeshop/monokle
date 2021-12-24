@@ -7,6 +7,7 @@ import {Button, Modal, Switch, Tag} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
+import _ from 'lodash';
 import styled from 'styled-components';
 import {parse, stringify} from 'yaml';
 
@@ -153,10 +154,12 @@ const DiffModal = () => {
 
   const confirmModalTitle = useMemo(() => {
     const resource = resourceMap[diffResourceId || ''];
-
+    if (!resource) {
+      return '';
+    }
     return isKustomizationResource(resource)
-      ? makeApplyKustomizationText(resource?.name, kubeconfigContext)
-      : makeApplyResourceText(resource?.name, kubeconfigContext);
+      ? makeApplyKustomizationText(resource.name, kubeconfigContext)
+      : makeApplyResourceText(resource.name, kubeconfigContext);
   }, [diffResourceId, kubeconfigContext, resourceMap]);
 
   useEffect(() => {
@@ -307,7 +310,9 @@ const DiffModal = () => {
           {isApplyModalVisible && (
             <ModalConfirmWithNamespaceSelect
               isVisible={isApplyModalVisible}
-              resources={diffResourceId && resourceMap[diffResourceId] ? [resourceMap[diffResourceId]] : []}
+              resources={
+                diffResourceId && _.has(resourceMap, diffResourceId) ? [_.get(resourceMap, diffResourceId)] : []
+              }
               title={confirmModalTitle}
               onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
               onCancel={() => setIsApplyModalVisible(false)}

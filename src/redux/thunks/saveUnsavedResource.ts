@@ -91,13 +91,13 @@ export const saveUnsavedResource = createAsyncThunk<
       }
 
       const fileContent = await readFilePromise(absolutePath, 'utf-8');
-      const relativeFilePath = absolutePath.substr(mainState.fileMap[ROOT_FILE_ENTRY].filePath.length);
+      const relativeFilePath = absolutePath.substr(rootFileEntry.filePath.length);
       const resourcesFromFile = getResourcesForPath(relativeFilePath, mainState.resourceMap);
 
       if (resourcesFromFile.length === 1) {
         thunkAPI.dispatch(
           addResource({
-            ...resourcesFromFile[0],
+            ...resourcesFromFile[0]!,
             range: {
               start: 0,
               length: fileContent.length,

@@ -38,7 +38,7 @@ function linkParentKustomization(
  */
 
 export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === KUSTOMIZATION_KIND;
+  return Boolean(r && r.kind === KUSTOMIZATION_KIND);
 }
 
 /**
@@ -79,7 +79,7 @@ function processKustomizationResourceRef(
       // resource is folder -> find contained kustomizations and link...
       fileEntry.children
         .map(child => fileMap[path.join(fileEntry.filePath, child)])
-        .filter(childFileEntry => childFileEntry)
+        .filter((childFileEntry): childFileEntry is FileEntry => Boolean(childFileEntry))
         .filter(childFileEntry => isKustomizationFile(childFileEntry, resourceMap))
         .forEach(childFileEntry => {
           linkParentKustomization(childFileEntry, kustomization, resourceMap, refNode);

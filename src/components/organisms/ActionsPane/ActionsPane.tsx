@@ -112,7 +112,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const extraButton = useRef<any>();
 
   const getDistanceBetweenTwoComponents = useCallback(() => {
-    const tabsListEl = tabsList[0].getBoundingClientRect();
+    const firstTab = tabsList[0];
+    if (!firstTab) {
+      return;
+    }
+    const tabsListEl = firstTab.getBoundingClientRect();
     const extraButtonEl = extraButton.current.getBoundingClientRect();
 
     const distance = extraButtonEl.left - tabsListEl.right;
@@ -325,9 +329,16 @@ const ActionsPane = (props: {contentHeight: string}) => {
       }
 
       const helmValuesFile = helmValuesMap[selectedValuesFileId];
+      if (!helmValuesFile) {
+        return;
+      }
+      const helmChart = helmChartMap[helmValuesFile.helmChartId];
+      if (!helmChart) {
+        return;
+      }
       applyHelmChart(
         helmValuesFile,
-        helmChartMap[helmValuesFile.helmChartId],
+        helmChart,
         fileMap,
         dispatch,
         kubeconfig,
@@ -354,12 +365,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (!selectedValuesFileId) {
       return '';
     }
-
     const helmValuesFile = helmValuesMap[selectedValuesFileId];
-
-    return `Install the ${helmChartMap[helmValuesFile.helmChartId].name} Chart using ${
-      helmValuesFile.name
-    } in cluster [${kubeconfigContext || ''}]?`;
+    if (!helmValuesFile) {
+      return '';
+    }
+    const helmChart = helmChartMap[helmValuesFile.helmChartId];
+    if (!helmChart) {
+      return '';
+    }
+    return `Install the ${helmChart.name} Chart using ${helmValuesFile.name} in cluster [${kubeconfigContext || ''}]?`;
   }, [helmChartMap, helmValuesMap, kubeconfigContext, selectedValuesFileId]);
 
   // called from main thread because thunks cannot be dispatched by main
@@ -381,7 +395,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   useEffect(() => {
     if (
       (activeTabKey === 'metadataForm' || activeTabKey === 'form') &&
-      (!selectedResourceId || !(resourceKindHandler && resourceKindHandler.formEditorOptions))
+      (!selectedResourceId || !resourceKindHandler?.formEditorOptions)
     ) {
       setActiveTabKey('source');
     }

@@ -257,8 +257,8 @@ export const mainSlice = createSlice({
     updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
       try {
         const fileEntry = state.fileMap[action.payload.path];
-        if (fileEntry) {
-          let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+        let rootFolder = state.fileMap[ROOT_FILE_ENTRY]?.filePath;
+        if (fileEntry && rootFolder) {
           const filePath = path.join(rootFolder, action.payload.path);
 
           if (getFileStats(filePath)?.isDirectory() === false) {
@@ -437,9 +437,13 @@ export const mainSlice = createSlice({
       Object.values(state.helmValuesMap).forEach(values => {
         values.isSelected = values.id === valuesFileId;
       });
-
-      state.selectedValuesFileId = state.helmValuesMap[valuesFileId].isSelected ? valuesFileId : undefined;
-      selectFilePath(state.helmValuesMap[valuesFileId].filePath, state);
+      const valuesFile = state.helmValuesMap[valuesFileId];
+      if (!valuesFile) {
+        log.warn('[selectHelmValuesFile]: valuesFile is undefined');
+        return;
+      }
+      state.selectedValuesFileId = valuesFile.isSelected ? valuesFileId : undefined;
+      selectFilePath(valuesFile.filePath, state);
       updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
     },
     /**
@@ -509,14 +513,14 @@ export const mainSlice = createSlice({
         if (newFilter.labels[key] === filter.labels[key]) {
           delete newFilter.labels[key];
         } else {
-          newFilter.labels[key] = filter.labels[key];
+          newFilter.labels[key] = filter.labels[key] || null;
         }
       });
       Object.keys(filter.annotations).forEach(key => {
         if (newFilter.annotations[key] === filter.annotations[key]) {
           delete newFilter.annotations[key];
         } else {
-          newFilter.annotations[key] = filter.annotations[key];
+          newFilter.annotations[key] = filter.annotations[key] || null;
         }
       });
       state.resourceFilter = newFilter;
@@ -630,7 +634,7 @@ export const mainSlice = createSlice({
         state.selectedResourceId = undefined;
         state.checkedResourceIds = [];
         if (action.payload.previewResourceId && state.helmValuesMap[action.payload.previewResourceId]) {
-          selectFilePath(state.helmValuesMap[action.payload.previewResourceId].filePath, state);
+          selectFilePath(state.helmValuesMap[action.payload.previewResourceId]!.filePath, state);
         }
         state.selectedValuesFileId = action.payload.previewResourceId;
       })
@@ -719,7 +723,12 @@ export const mainSlice = createSlice({
     });
 
     builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
-      const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+      const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
+      const rootFolder = rootFileEntry?.filePath;
+      if (!rootFileEntry || !rootFolder) {
+        log.warn('[saveUnsavedResource.fulfilled]: rootFileEntry is undefined');
+        return;
+      }
       const resource = state.resourceMap[action.payload.resourceId];
       const relativeFilePath = action.payload.resourceFilePath.substr(rootFolder.length);
       const resourceFileEntry = state.fileMap[relativeFilePath];
@@ -736,7 +745,6 @@ export const mainSlice = createSlice({
         const childFileName = path.basename(relativeFilePath);
         const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
         if (parentPath === path.sep) {
-          const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
           if (rootFileEntry.children) {
             rootFileEntry.children.push(childFileName);
             rootFileEntry.children.sort();
@@ -831,6 +839,9 @@ export const mainSlice = createSlice({
         Object.entries(groupedClusterResources).forEach(([identifier, value]) => {
           // the value should always be an array of length 1 so we take the first entry
           const currentClusterResource = value[0];
+          if (!currentClusterResource) {
+            return;
+          }
           const matchingLocalResources = groupedLocalResources[identifier];
           if (!matchingLocalResources || matchingLocalResources.length === 0) {
             // if there are no matching resources, we create a cluster only match
@@ -872,15 +883,15 @@ export const mainSlice = createSlice({
         // create local only matches
         localResourceIdentifiersNotMatched.forEach(identifier => {
           const currentLocalResources = groupedLocalResources[identifier];
-          if (!currentLocalResources || currentLocalResources.length === 0) {
+          if (!currentLocalResources?.length) {
             return;
           }
           clusterToLocalResourcesMatches.push({
             id: identifier,
             localResourceIds: currentLocalResources.map(r => r.id),
-            resourceName: currentLocalResources[0].name,
-            resourceKind: currentLocalResources[0].kind,
-            resourceNamespace: currentLocalResources[0].namespace || 'default',
+            resourceName: currentLocalResources[0]!.name,
+            resourceKind: currentLocalResources[0]!.kind,
+            resourceNamespace: currentLocalResources[0]!.namespace || 'default',
           });
         });
 
@@ -941,7 +952,7 @@ function groupResourcesByIdentifier(
   resources.forEach(resource => {
     const identifier = makeIdentifier(resource);
     if (groupedResources[identifier]) {
-      groupedResources[identifier].push(resource);
+      groupedResources[identifier]!.push(resource);
     } else {
       groupedResources[identifier] = [resource];
     }

@@ -28,8 +28,11 @@ export const previewKustomization = createAsyncThunk<
   const state = thunkAPI.getState().main;
   const appConfig = thunkAPI.getState().config;
   const resource = state.resourceMap[resourceId];
-  if (resource && resource.filePath) {
-    const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  if (resource?.filePath) {
+    const rootFolder = state.fileMap[ROOT_FILE_ENTRY]?.filePath;
+    if (!rootFolder) {
+      return createRejectionWithAlert(thunkAPI, 'Kustomize Error', 'Missing root folder');
+    }
     const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
 
     log.info(`previewing ${resource.id} in folder ${folder}`);

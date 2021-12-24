@@ -61,9 +61,10 @@ const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (curren
         if (typeof value !== 'string') {
           return;
         }
-        if (keyValues[key]) {
-          if (!keyValues[key].includes(value)) {
-            keyValues[key].push(value);
+        const currentKeyValues = keyValues[key];
+        if (currentKeyValues) {
+          if (!currentKeyValues.includes(value)) {
+            currentKeyValues.push(value);
           }
         } else {
           keyValues[key] = [value];

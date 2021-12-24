@@ -6,6 +6,7 @@ import {Form, Input, Modal, Select} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
+import log from 'loglevel';
 import path from 'path/posix';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
@@ -190,17 +191,22 @@ const NewResourceWizard = () => {
 
     if (savingDestination !== 'doNotSave') {
       let absolutePath;
+      const rootFileEntry = fileMap[ROOT_FILE_ENTRY];
+      if (!rootFileEntry) {
+        log.warn('rootFileEntry is undefined');
+        return;
+      }
 
       const fullFileName = getFullFileName(formValues.name);
       if (savingDestination === 'saveToFolder' && selectedFolder) {
         absolutePath =
           selectedFolder === ROOT_FILE_ENTRY
-            ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName)
-            : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, path.sep, fullFileName);
+            ? path.join(rootFileEntry.filePath, path.sep, fullFileName)
+            : path.join(rootFileEntry.filePath, selectedFolder, path.sep, fullFileName);
       } else if (savingDestination === 'saveToFile' && selectedFile) {
-        absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFile);
+        absolutePath = path.join(rootFileEntry.filePath, selectedFile);
       } else {
-        absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName);
+        absolutePath = path.join(rootFileEntry.filePath, path.sep, fullFileName);
       }
 
       dispatch(saveUnsavedResource({resource: newResource, absolutePath}));

@@ -123,7 +123,7 @@ const createNode = (
     if (fileEntry.children.length) {
       node.children = fileEntry.children
         .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
-        .filter(childEntry => childEntry)
+        .filter((childEntry): childEntry is FileEntry => Boolean(childEntry))
         .map(childEntry => createNode(childEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer))
         .filter(childEntry => {
           if (!hideExcludedFilesInFileExplorer) {
@@ -391,22 +391,23 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     isFolder,
   } = props;
 
-  const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const [isTitleHovered, setTitleHoverState] = useState(false);
-
+  const rootFileEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const isFileSelected = useMemo(() => {
     return treeKey === selectedPath;
   }, [treeKey, selectedPath]);
 
+  if (!rootFileEntry) {
+    return null;
+  }
+
   const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
 
-  const isRoot = fileMap[ROOT_FILE_ENTRY].filePath === treeKey;
+  const isRoot = rootFileEntry.filePath === treeKey;
   const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
-  const absolutePath = isRoot
-    ? fileMap[ROOT_FILE_ENTRY].filePath
-    : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
+  const absolutePath = isRoot ? rootFileEntry.filePath : path.join(rootFileEntry.filePath, treeKey);
 
   const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
 
@@ -474,7 +475,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         Copy Relative Path
       </Menu.Item>
-      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
+      {rootFileEntry?.filePath !== treeKey ? (
         <>
           <Menu.Item
             onClick={e => {
@@ -607,13 +608,20 @@ const FileTreePane = () => {
   );
 
   const refreshFolder = useCallback(() => {
-    setFolder(fileMap[ROOT_FILE_ENTRY].filePath);
+    const rootEntry = fileMap[ROOT_FILE_ENTRY];
+    if (!rootEntry) {
+      return;
+    }
+    setFolder(rootEntry.filePath);
   }, [fileMap, setFolder]);
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
     const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer);
 
+    if (!treeData) {
+      return;
+    }
     setTree(treeData);
 
     if (shouldExpandAllNodes) {
