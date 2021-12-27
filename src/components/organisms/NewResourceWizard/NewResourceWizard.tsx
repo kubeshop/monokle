@@ -23,7 +23,6 @@ import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
-import {useResetFormOnCloseModal} from '@utils/hooks';
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
 import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
@@ -95,7 +94,28 @@ const NewResourceWizard = () => {
   const [resourceKindOptions, setResourceKindOptions] =
     useState<Record<string, ResourceKindHandler[]>>(kindsByApiVersion);
 
-  useResetFormOnCloseModal({form, visible: newResourceWizardState.isOpen, defaultValues});
+  useEffect(() => {
+    const visible = newResourceWizardState.isOpen;
+
+    if (!visible) {
+      form.resetFields();
+    }
+    if (visible && defaultValues) {
+      form.setFieldsValue(defaultValues);
+
+      if (defaultValues.kind) {
+        const kindHandler = getResourceKindHandler(defaultValues.kind);
+
+        if (kindHandler) {
+          setResourceKindOptions({[kindHandler.clusterApiVersion]: kindsByApiVersion[kindHandler.clusterApiVersion]});
+          const newFilteredResources = Object.values(resourceMap).filter(
+            resource => resource.kind === defaultValues.kind
+          );
+          setFilteredResources(newFilteredResources);
+        }
+      }
+    }
+  }, [defaultValues, form, kindsByApiVersion, newResourceWizardState.isOpen, resourceMap]);
 
   useEffect(() => {
     const currentKind = form.getFieldValue('kind');
@@ -123,6 +143,8 @@ const NewResourceWizard = () => {
 
   const closeWizard = () => {
     setSubmitDisabled(true);
+    setResourceKindOptions(kindsByApiVersion);
+    setFilteredResources(Object.values(resourceMap));
     dispatch(closeNewResourceWizard());
   };
 
@@ -136,6 +158,17 @@ const NewResourceWizard = () => {
 
   const onFormValuesChange = (data: any) => {
     let shouldFilterResources = false;
+
+    if (data.kind && data.kind !== lastKindRef.current) {
+      // set api version when selecting kind
+      const kindHandler = getResourceKindHandler(data.kind);
+
+      if (kindHandler) {
+        form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion});
+      }
+
+      shouldFilterResources = true;
+    }
 
     if (data.apiVersion && data.apiVersion !== lastApiVersionRef.current && resourceKindOptions) {
       const kindOptionsByApiVersion = kindsByApiVersion[data.apiVersion];
@@ -152,6 +185,7 @@ const NewResourceWizard = () => {
         if (kindHandler && kindHandler.clusterApiVersion !== data.apiVersion) {
           if (kindOptionsByApiVersion && kindOptionsByApiVersion.length > 0) {
             form.setFieldsValue({kind: kindOptionsByApiVersion[0].kind});
+            shouldFilterResources = true;
           } else {
             form.setFieldsValue({kind: ''});
           }
@@ -159,25 +193,20 @@ const NewResourceWizard = () => {
       }
     }
 
-    if (data.kind && data.kind !== lastKindRef.current) {
-      // set api version when selecting kind
-      const kindHandler = getResourceKindHandler(data.kind);
-
-      if (kindHandler) {
-        form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion});
-      }
-
-      shouldFilterResources = true;
-    }
-
     if (data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE && !data.kind) {
       const selectedResource = resourceMap[data.selectedResourceId];
 
       if (selectedResource && lastKindRef.current !== selectedResource.kind) {
-        form.setFieldsValue({kind: selectedResource.kind});
-      }
+        const kindHandler = getResourceKindHandler(selectedResource.kind);
 
-      shouldFilterResources = true;
+        if (kindHandler) {
+          form.setFieldsValue({kind: selectedResource.kind});
+          form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion});
+          setResourceKindOptions({[kindHandler.clusterApiVersion]: kindsByApiVersion[kindHandler.clusterApiVersion]});
+
+          shouldFilterResources = true;
+        }
+      }
     }
 
     if (shouldFilterResources) {
