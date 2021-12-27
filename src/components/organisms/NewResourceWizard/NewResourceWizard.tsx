@@ -32,7 +32,7 @@ import {SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
 const SELECT_OPTION_NONE = '<none>';
 
-const {Option} = Select;
+const {Option, OptGroup} = Select;
 
 const NewResourceWizard = () => {
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
@@ -43,7 +43,6 @@ const NewResourceWizard = () => {
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
-  const [resourceKindOptions, setResourceKindOptions] = useState<ResourceKindHandler[]>(ResourceKindHandlers);
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -78,16 +77,23 @@ const NewResourceWizard = () => {
   const kindsByApiVersion = useMemo(
     () =>
       ResourceKindHandlers.reduce((result, resource) => {
-        if (result[resource.clusterApiVersion] && result[resource.clusterApiVersion]) {
-          result[resource.clusterApiVersion].push(resource.kind);
-        } else {
-          result[resource.clusterApiVersion] = [resource.kind];
+        const foundResourceKindHandler = getResourceKindHandler(resource.kind);
+
+        if (foundResourceKindHandler) {
+          if (result[resource.clusterApiVersion] && result[resource.clusterApiVersion]) {
+            result[resource.clusterApiVersion].push(foundResourceKindHandler);
+          } else {
+            result[resource.clusterApiVersion] = [foundResourceKindHandler];
+          }
         }
 
         return result;
-      }, {} as Record<string, string[]>),
+      }, {} as Record<string, ResourceKindHandler[]>),
     []
   );
+
+  const [resourceKindOptions, setResourceKindOptions] =
+    useState<Record<string, ResourceKindHandler[]>>(kindsByApiVersion);
 
   useResetFormOnCloseModal({form, visible: newResourceWizardState.isOpen, defaultValues});
 
@@ -131,22 +137,12 @@ const NewResourceWizard = () => {
   const onFormValuesChange = (data: any) => {
     let shouldFilterResources = false;
 
-    if (data.apiVersion && data.apiVersion !== lastApiVersionRef.current) {
+    if (data.apiVersion && data.apiVersion !== lastApiVersionRef.current && resourceKindOptions) {
       const kindOptionsByApiVersion = kindsByApiVersion[data.apiVersion];
 
       // filter resource kind dropdown options
       if (kindOptionsByApiVersion) {
-        const filteredResourceKindHandler: ResourceKindHandler[] = [];
-
-        kindOptionsByApiVersion.forEach(option => {
-          const foundResourceKindHandler = ResourceKindHandlers.find(kindHandler => kindHandler.kind === option);
-
-          if (foundResourceKindHandler) {
-            filteredResourceKindHandler.push(foundResourceKindHandler);
-          }
-        });
-
-        setResourceKindOptions(filteredResourceKindHandler);
+        setResourceKindOptions({[data.apiVersion]: kindOptionsByApiVersion});
       }
 
       // change kind option if its api version is different than the selected one
@@ -155,7 +151,7 @@ const NewResourceWizard = () => {
 
         if (kindHandler && kindHandler.clusterApiVersion !== data.apiVersion) {
           if (kindOptionsByApiVersion && kindOptionsByApiVersion.length > 0) {
-            form.setFieldsValue({kind: kindsByApiVersion[data.apiVersion][0]});
+            form.setFieldsValue({kind: kindOptionsByApiVersion[0].kind});
           } else {
             form.setFieldsValue({kind: ''});
           }
@@ -365,11 +361,17 @@ const NewResourceWizard = () => {
           tooltip={{title: 'Select the resource kind', icon: <InfoCircleOutlined />}}
         >
           <Select showSearch placeholder="Choose resource kind">
-            {resourceKindOptions.map(option => (
-              <Option key={option.kind} value={option.kind}>
-                {option.kind}
-              </Option>
-            ))}
+            {Object.entries(resourceKindOptions).map(([apiVersion, kindOptions]) => {
+              return (
+                <OptGroup label={apiVersion} key={apiVersion}>
+                  {kindOptions.map(option => (
+                    <Option key={option.kind} value={option.kind}>
+                      {option.kind}
+                    </Option>
+                  ))}
+                </OptGroup>
+              );
+            })}
           </Select>
         </Form.Item>
 
@@ -387,6 +389,7 @@ const NewResourceWizard = () => {
             ))}
           </Select>
         </Form.Item>
+
         <Form.Item
           name="namespace"
           label="Namespace"
@@ -422,6 +425,7 @@ const NewResourceWizard = () => {
               ))}
           </Select>
         </Form.Item>
+
         <Form.Item
           name="selectedResourceId"
           label="Select existing resource as template"
