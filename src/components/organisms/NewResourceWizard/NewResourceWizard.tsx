@@ -12,6 +12,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 
 import {K8sResource} from '@models/k8sresource';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -42,6 +43,7 @@ const NewResourceWizard = () => {
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
+  const [resourceKindOptions, setResourceKindOptions] = useState<ResourceKindHandler[]>(ResourceKindHandlers);
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -129,12 +131,30 @@ const NewResourceWizard = () => {
   const onFormValuesChange = (data: any) => {
     let shouldFilterResources = false;
 
-    if (data.apiVersion && data.apiVerison !== lastApiVersionRef.current) {
+    if (data.apiVersion && data.apiVersion !== lastApiVersionRef.current) {
+      const kindOptionsByApiVersion = kindsByApiVersion[data.apiVersion];
+
+      // filter resource kind dropdown options
+      if (kindOptionsByApiVersion) {
+        const filteredResourceKindHandler: ResourceKindHandler[] = [];
+
+        kindOptionsByApiVersion.forEach(option => {
+          const foundResourceKindHandler = ResourceKindHandlers.find(kindHandler => kindHandler.kind === option);
+
+          if (foundResourceKindHandler) {
+            filteredResourceKindHandler.push(foundResourceKindHandler);
+          }
+        });
+
+        setResourceKindOptions(filteredResourceKindHandler);
+      }
+
+      // change kind option if its api version is different than the selected one
       if (lastKindRef.current) {
         const kindHandler = getResourceKindHandler(lastKindRef.current);
 
         if (kindHandler && kindHandler.clusterApiVersion !== data.apiVersion) {
-          if (kindsByApiVersion[data.apiVersion] && kindsByApiVersion[data.apiVersion].length > 0) {
+          if (kindOptionsByApiVersion && kindOptionsByApiVersion.length > 0) {
             form.setFieldsValue({kind: kindsByApiVersion[data.apiVersion][0]});
           } else {
             form.setFieldsValue({kind: ''});
@@ -337,6 +357,7 @@ const NewResourceWizard = () => {
         >
           <Input maxLength={63} placeholder="Enter resource name" />
         </Form.Item>
+
         <Form.Item
           name="kind"
           label="Resource Kind"
@@ -344,13 +365,14 @@ const NewResourceWizard = () => {
           tooltip={{title: 'Select the resource kind', icon: <InfoCircleOutlined />}}
         >
           <Select showSearch placeholder="Choose resource kind">
-            {ResourceKindHandlers.map(kindHandler => (
-              <Option key={kindHandler.kind} value={kindHandler.kind}>
-                {kindHandler.kind}
+            {resourceKindOptions.map(option => (
+              <Option key={option.kind} value={option.kind}>
+                {option.kind}
               </Option>
             ))}
           </Select>
         </Form.Item>
+
         <Form.Item
           name="apiVersion"
           label="API Version"
