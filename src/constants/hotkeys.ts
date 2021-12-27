@@ -16,6 +16,7 @@ const hotkeys = {
   OPEN_EXPLORER_TAB: 'ctrl+shift+e, command+shift+e',
   OPEN_KUSTOMIZATION_TAB: 'ctrl+shift+k, command+shift+k',
   OPEN_HELM_TAB: 'ctrl+shift+h, command+shift+h',
+  RESET_RESOURCE_FILTERS: 'ctrl+alt+r, command+alt+r',
 };
 
 export default hotkeys;
