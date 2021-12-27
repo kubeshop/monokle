@@ -37,13 +37,18 @@ const NewResourceWizard = () => {
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
 
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [isSubmitDisabled, setSubmitDisabled] = useState(true);
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
-  const [isSubmitDisabled, setSubmitDisabled] = useState(true);
-  const [inputValue, setInputValue] = useState<string>('');
 
+  const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
+
+  const [form] = Form.useForm();
+  lastKindRef.current = form.getFieldValue('kind');
+  lastApiVersionRef.current = form.getFieldValue('apiVersion');
 
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -68,8 +73,19 @@ const NewResourceWizard = () => {
     [defaultInput, resourceFilterNamespace]
   );
 
-  const [form] = Form.useForm();
-  lastKindRef.current = form.getFieldValue('kind');
+  const kindsByApiVersion = useMemo(
+    () =>
+      ResourceKindHandlers.reduce((result, resource) => {
+        if (result[resource.clusterApiVersion] && result[resource.clusterApiVersion]) {
+          result[resource.clusterApiVersion].push(resource.kind);
+        } else {
+          result[resource.clusterApiVersion] = [resource.kind];
+        }
+
+        return result;
+      }, {} as Record<string, string[]>),
+    []
+  );
 
   useResetFormOnCloseModal({form, visible: newResourceWizardState.isOpen, defaultValues});
 
@@ -112,37 +128,56 @@ const NewResourceWizard = () => {
 
   const onFormValuesChange = (data: any) => {
     let shouldFilterResources = false;
-    if (data.kind && data.kind !== lastKindRef.current) {
-      const kindHandler = getResourceKindHandler(data.kind);
-      if (kindHandler) {
-        form.setFieldsValue({
-          apiVersion: kindHandler.clusterApiVersion,
-        });
+
+    if (data.apiVersion && data.apiVerison !== lastApiVersionRef.current) {
+      if (lastKindRef.current) {
+        const kindHandler = getResourceKindHandler(lastKindRef.current);
+
+        if (kindHandler && kindHandler.clusterApiVersion !== data.apiVersion) {
+          if (kindsByApiVersion[data.apiVersion] && kindsByApiVersion[data.apiVersion].length > 0) {
+            form.setFieldsValue({kind: kindsByApiVersion[data.apiVersion][0]});
+          } else {
+            form.setFieldsValue({kind: ''});
+          }
+        }
       }
+    }
+
+    if (data.kind && data.kind !== lastKindRef.current) {
+      // set api version when selecting kind
+      const kindHandler = getResourceKindHandler(data.kind);
+
+      if (kindHandler) {
+        form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion});
+      }
+
       shouldFilterResources = true;
     }
+
     if (data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE && !data.kind) {
       const selectedResource = resourceMap[data.selectedResourceId];
+
       if (selectedResource && lastKindRef.current !== selectedResource.kind) {
-        form.setFieldsValue({
-          kind: selectedResource.kind,
-        });
+        form.setFieldsValue({kind: selectedResource.kind});
       }
+
       shouldFilterResources = true;
     }
+
     if (shouldFilterResources) {
       const currentKind = form.getFieldValue('kind');
+
       if (!currentKind) {
         setFilteredResources(Object.values(resourceMap));
         return;
       }
+
       const newFilteredResources = Object.values(resourceMap).filter(resource => resource.kind === currentKind);
       setFilteredResources(newFilteredResources);
       const currentSelectedResourceId = form.getFieldValue('selectedResourceId');
+
       if (currentSelectedResourceId && !newFilteredResources.some(res => res.id === currentSelectedResourceId)) {
-        form.setFieldsValue({
-          selectedResourceId: SELECT_OPTION_NONE,
-        });
+        form.setFieldsValue({selectedResourceId: SELECT_OPTION_NONE});
       }
     }
   };
@@ -322,7 +357,13 @@ const NewResourceWizard = () => {
           rules={[{required: true, message: 'This field is required'}]}
           tooltip={{title: 'Enter the apiVersion', icon: <InfoCircleOutlined />}}
         >
-          <Input placeholder="Enter api version" />
+          <Select showSearch placeholder="Choose api version">
+            {Object.keys(kindsByApiVersion).map(version => (
+              <Option key={version} value={version}>
+                {version}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
         <Form.Item
           name="namespace"
