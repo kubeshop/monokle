@@ -425,7 +425,7 @@ function getSiblingValue(
   const siblingRefNodes = matchingRefNodes?.filter(refNode =>
     refNode.parentKeyPath.startsWith(sourceRefNode.parentKeyPath)
   );
-  return siblingRefNodes ? siblingRefNodes[0].scalar.value : undefined;
+  return siblingRefNodes && siblingRefNodes.length > 0 ? siblingRefNodes[0].scalar.value : undefined;
 }
 
 /*

@@ -1,9 +1,17 @@
 import {K8sResource} from '@models/k8sresource';
 import {RefMapper} from '@models/resourcekindhandler';
 
+/**
+ * Matcher that ensures the source and target namespace are the same
+ */
+
 export function implicitNamespaceMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
   return targetResource.namespace === sourceResource.namespace;
 }
+
+/**
+ * Matcher the ensures that the target resource has an optionally specified namespace
+ */
 
 export function optionalExplicitNamespaceMatcher(
   sourceResource: K8sResource,
@@ -16,6 +24,10 @@ export function optionalExplicitNamespaceMatcher(
 
   return targetResource.namespace === sourceResource.namespace;
 }
+
+/**
+ * Matcher the ensures that the target resource has the specified namespace
+ */
 
 export function explicitNamespaceMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
   return targetResource.namespace === value;
@@ -64,7 +76,8 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   },
   {
     source: {
-      pathParts: ['configMap', 'name'],
+      pathParts: ['volumes', '*', 'configMap', 'name'],
+      isOptional: true,
     },
     type: 'name',
     ...ConfigMapTarget,
@@ -197,12 +210,9 @@ export function createSelectorOutgoingRefMappers(targetResourceKind: string, sel
 
 export function createPodSelectorOutgoingRefMappers(selectorPathParts?: string[]): RefMapper[] {
   return [
-    createSelectorOutgoingRefMappers('Pod', selectorPathParts),
-    createSelectorOutgoingRefMappers('DaemonSet', selectorPathParts),
-    createSelectorOutgoingRefMappers('Deployment', selectorPathParts),
-    createSelectorOutgoingRefMappers('Job', selectorPathParts),
-    createSelectorOutgoingRefMappers('ReplicaSet', selectorPathParts),
-    createSelectorOutgoingRefMappers('ReplicationController', selectorPathParts),
-    createSelectorOutgoingRefMappers('StatefulSet', selectorPathParts),
+    createSelectorOutgoingRefMappers(
+      '$(Pod|DaemonSet|Deployment|Job|ReplicaSet|ReplicationController|StatefulSet)',
+      selectorPathParts
+    ),
   ];
 }
