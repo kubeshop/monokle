@@ -3,6 +3,7 @@ import {useDebounce} from 'react-use';
 
 import {Button, Input, Select} from 'antd';
 
+import path from 'path/posix';
 import styled from 'styled-components';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
@@ -78,6 +79,7 @@ const ResourceFilter = () => {
   const dispatch = useAppDispatch();
 
   const [annotations, setAnnotations] = useState<Record<string, string | null>>({});
+  const [fileOrFolderContainedIn, setFileOrFolderContainedIn] = useState<string>();
   const [labels, setLabels] = useState<Record<string, string | null>>({});
   const [kind, setKind] = useState<string>();
   const [name, setName] = useState<string>();
@@ -86,12 +88,12 @@ const ResourceFilter = () => {
 
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
-  const filtersMap = useAppSelector(state => state.main.resourceFilter);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-
   const areFiltersDisabled = useAppSelector(
     state => Boolean(state.main.checkedResourceIds.length) || Boolean(state.main.clusterDiff.selectedMatches.length)
   );
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const filtersMap = useAppSelector(state => state.main.resourceFilter);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const allResourceKinds = useMemo(() => {
     return [
@@ -111,6 +113,16 @@ const ResourceFilter = () => {
   const allAnnotations = useMemo<Record<string, string[]>>(() => {
     return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.annotations);
   }, [resourceMap]);
+
+  const fileOrFolderContainedInOptions = useMemo(() => {
+    return Object.keys(fileMap)
+      .map(key => key.replace(path.sep, ''))
+      .map(option => (
+        <Option key={option} value={option}>
+          {option}
+        </Option>
+      ));
+  }, [fileMap]);
 
   const resetFilters = () => {
     setWasLocalUpdate(true);
@@ -150,6 +162,15 @@ const ResourceFilter = () => {
       setNamespace(undefined);
     } else {
       setNamespace(selectedNamespace);
+    }
+  };
+
+  const updateFileOrFolderContainedIn = (selectedFileOrFolder: string) => {
+    setWasLocalUpdate(true);
+    if (selectedFileOrFolder === ALL_OPTIONS) {
+      setFileOrFolderContainedIn(undefined);
+    } else {
+      setFileOrFolderContainedIn(selectedFileOrFolder);
     }
   };
 
@@ -204,6 +225,7 @@ const ResourceFilter = () => {
           onChange={e => updateName(e.target.value)}
         />
       </FieldContainer>
+
       <FieldContainer>
         <FieldLabel>Kind:</FieldLabel>
         <Select
@@ -224,6 +246,7 @@ const ResourceFilter = () => {
           ))}
         </Select>
       </FieldContainer>
+
       <FieldContainer>
         <FieldLabel>Namespace:</FieldLabel>
         <Select
@@ -247,6 +270,21 @@ const ResourceFilter = () => {
           })}
         </Select>
       </FieldContainer>
+
+      <FieldContainer>
+        <FieldLabel>Contained in:</FieldLabel>
+        <Select
+          defaultValue={ALL_OPTIONS}
+          disabled={areFiltersDisabled}
+          showSearch
+          style={{width: '100%'}}
+          value={fileOrFolderContainedIn || ALL_OPTIONS}
+          onChange={updateFileOrFolderContainedIn}
+        >
+          {fileOrFolderContainedInOptions}
+        </Select>
+      </FieldContainer>
+
       <FieldContainer>
         <KeyValueInput
           label="Labels:"
