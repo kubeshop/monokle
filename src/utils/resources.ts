@@ -36,6 +36,9 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
       return false;
     }
   }
+  if (filters.fileOrFolderContainedIn && !resource.filePath.startsWith(filters.fileOrFolderContainedIn)) {
+    return false;
+  }
   if (filters.labels && Object.keys(filters.labels).length > 0) {
     const resourceLabels = resource.content?.metadata?.labels;
     if (!resourceLabels) {

@@ -20,6 +20,7 @@ import Colors from '@styles/Colors';
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const ALL_OPTIONS = '<all>';
+const ROOT_OPTIONS = '<root>';
 
 const BaseContainer = styled.div`
   min-width: 250px;
@@ -180,14 +181,16 @@ const ResourceFilter = () => {
       if (!wasLocalUpdate) {
         return;
       }
+
       const updatedFilter = {
         name,
         kind: kind === ALL_OPTIONS ? undefined : kind,
         namespace: namespace === ALL_OPTIONS ? undefined : namespace,
         labels,
         annotations,
-        fileOrFolderContainedIn: fileOrFolderContainedIn === ALL_OPTIONS ? undefined : fileOrFolderContainedIn,
+        fileOrFolderContainedIn: fileOrFolderContainedIn === ROOT_OPTIONS ? undefined : fileOrFolderContainedIn,
       };
+
       dispatch(updateResourceFilter(updatedFilter));
     },
     DEFAULT_EDITOR_DEBOUNCE,
@@ -277,16 +280,13 @@ const ResourceFilter = () => {
       <FieldContainer>
         <FieldLabel>Contained in:</FieldLabel>
         <Select
-          defaultValue={ALL_OPTIONS}
+          defaultValue={ROOT_OPTIONS}
           disabled={areFiltersDisabled}
           showSearch
           style={{width: '100%'}}
-          value={fileOrFolderContainedIn || ALL_OPTIONS}
+          value={fileOrFolderContainedIn || ROOT_OPTIONS}
           onChange={updateFileOrFolderContainedIn}
         >
-          <Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
-            {ALL_OPTIONS}
-          </Option>
           {fileOrFolderContainedInOptions}
         </Select>
       </FieldContainer>
