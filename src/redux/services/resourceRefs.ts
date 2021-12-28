@@ -112,22 +112,8 @@ function pathEndsWithPath(pathParts: string[], endPathParts: string[]) {
 }
 
 /**
- * Checks if a node path equals a refMapper path
+ * clears the cache of refNodes for the specified resourceId
  */
-
-function pathEqualsPath(pathParts: string[], path2Parts: string[]) {
-  if (pathParts.length !== path2Parts.length) {
-    return false;
-  }
-
-  for (let c = 0; c < pathParts.length; c += 1) {
-    if (pathParts[c] !== '*' && path2Parts[c] !== '*' && pathParts[c] !== path2Parts[c]) {
-      return false;
-    }
-  }
-
-  return true;
-}
 
 export function clearRefNodesCache(resourceId: string) {
   resourceRefNodesCache.delete(resourceId);
@@ -162,8 +148,8 @@ export function getResourceRefNodes(resource: K8sResource) {
       const refNode = {scalar, key, parentKeyPath: joinPathParts(parentKeyPathParts)};
       if (refMapper.type === 'pairs') {
         if (
-          pathEqualsPath(refMapper.source.pathParts, parentKeyPathParts) ||
-          (refMapper.target.pathParts && pathEqualsPath(refMapper.target.pathParts, parentKeyPathParts))
+          pathEndsWithPath(parentKeyPathParts, refMapper.source.pathParts) ||
+          (refMapper.target.pathParts && pathEndsWithPath(parentKeyPathParts, refMapper.target.pathParts))
         ) {
           addRefNodeAtPath(refNode, joinPathParts(keyPathParts), refNodes);
         }
@@ -275,10 +261,10 @@ export function updateReferringRefsOnDelete(resource: K8sResource, resourceMap: 
 }
 
 /**
- * Creates resource refs from a specified resource to target resources using the specified refMapper
+ * Creates pair resource refs from a specified resource to target resources using the specified refMapper (i.e. selectors)
  */
 
-function handleRefMappingByParentKey(
+function handlePairRefMapping(
   sourceResource: K8sResource,
   targetResources: K8sResource[],
   outgoingRefMapper: RefMapper
@@ -293,7 +279,7 @@ function handleRefMappingByParentKey(
     .flat()
     .forEach(({scalar, key, parentKeyPath}) => {
       const outgoingRefMapperSourcePath = joinPathParts(outgoingRefMapper.source.pathParts);
-      if (outgoingRefMapperSourcePath === parentKeyPath) {
+      if (parentKeyPath.endsWith(outgoingRefMapperSourcePath)) {
         sourceRefNodes.push({scalar, key, parentKeyPath});
       }
     });
@@ -643,7 +629,7 @@ export function processRefs(
 
           if (targetResources) {
             if (outgoingRefMapper.type === 'pairs') {
-              handleRefMappingByParentKey(sourceResource, targetResources, outgoingRefMapper);
+              handlePairRefMapping(sourceResource, targetResources, outgoingRefMapper);
             } else {
               handleRefMappingByKey(sourceResource, targetResources, outgoingRefMapper, processingOptions);
             }

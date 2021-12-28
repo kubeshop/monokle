@@ -1,6 +1,9 @@
 import {createSelectorOutgoingRefMappers} from '@src/kindhandlers/Service.handler';
+import {NamespaceRefTypeEnum} from '@models/resourcekindhandler';
+
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {implicitNamespaceMatcher} from '@src/kindhandlers/common/outgoingRefMappers';
+import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 import {
   ISTIO_DEFAULT_RESOURCE_VERSION,
   ISTIO_NETWORKING_RESOURCE_GROUP,
@@ -29,22 +32,7 @@ const WorkloadEntryHandler = createNamespacedCustomObjectKindHandler(
       },
       type: 'name',
     },
-    {
-      source: {
-        pathParts: ['spec', 'workloadSelector', 'labels'],
-      },
-      target: {
-        kind: 'Pod',
-        pathParts: ['metadata', 'labels'],
-      },
-      type: 'pairs',
-    },
-    createSelectorOutgoingRefMappers('DaemonSet'),
-    createSelectorOutgoingRefMappers('Deployment'),
-    createSelectorOutgoingRefMappers('Job'),
-    createSelectorOutgoingRefMappers('ReplicaSet'),
-    createSelectorOutgoingRefMappers('ReplicationController'),
-    createSelectorOutgoingRefMappers('StatefulSet'),
+    ...createPodSelectorOutgoingRefMappers(['spec', 'workloadSelector', 'labels']),
   ]
 );
 

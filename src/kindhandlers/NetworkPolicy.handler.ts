@@ -5,6 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
+
 const NetworkPolicyHandler: ResourceKindHandler = {
   kind: 'NetworkPolicy',
   apiVersionMatcher: '**',
@@ -26,6 +28,7 @@ const NetworkPolicyHandler: ResourceKindHandler = {
     await k8sNetworkingV1Api.deleteNamespacedNetworkPolicy(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/concepts/services-networking/network-policies/',
+  outgoingRefMappers: createPodSelectorOutgoingRefMappers(['podSelector', 'matchLabels']),
 };
 
 export default NetworkPolicyHandler;
