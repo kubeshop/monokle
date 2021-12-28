@@ -132,7 +132,7 @@ const ResourceFilter = () => {
     setNamespace(ALL_OPTIONS);
     setLabels({});
     setAnnotations({});
-    setFileOrFolderContainedIn(ALL_OPTIONS);
+    setFileOrFolderContainedIn(ROOT_OPTIONS);
   };
 
   const updateName = (newName: string) => {

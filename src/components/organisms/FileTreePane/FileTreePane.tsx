@@ -21,7 +21,7 @@ import {FileEntry} from '@models/fileentry';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
-import {selectFile, setSelectingFile} from '@redux/reducers/main';
+import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
   openCreateFolderModal,
@@ -356,6 +356,7 @@ interface TreeItemProps {
   onIncludeToProcessing: (relativePath: string) => void;
   onCreateFolder: (absolutePath: string) => void;
   onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
+  onFilterByFileOrFolder: (relativePath: string) => void;
   isExcluded?: Boolean;
   isFolder?: Boolean;
 }
@@ -388,13 +389,15 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onIncludeToProcessing,
     onCreateFolder,
     onCreateResource,
+    onFilterByFileOrFolder,
     isFolder,
   } = props;
+
+  const [isTitleHovered, setTitleHoverState] = useState(false);
 
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const [isTitleHovered, setTitleHoverState] = useState(false);
 
   const isFileSelected = useMemo(() => {
     return treeKey === selectedPath;
@@ -452,6 +455,17 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         key="create_resource"
       >
         {isFolder ? 'New Resource' : 'Add Resource'}
+      </Menu.Item>
+      <ContextMenuDivider />
+      <Menu.Item
+        key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
+        onClick={e => {
+          e.domEvent.stopPropagation();
+
+          onFilterByFileOrFolder(relativePath);
+        }}
+      >
+        Filter on this {isFolder ? 'folder' : 'file'}
       </Menu.Item>
       <ContextMenuDivider />
       <Menu.Item
@@ -556,35 +570,38 @@ const FileTreePane = () => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
 
-  const dispatch = useAppDispatch();
-
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const uiState = useAppSelector(state => state.ui);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
-  const hideExcludedFilesInFileExplorer = useAppSelector(
-    state => state.config.settings.hideExcludedFilesInFileExplorer
-  );
-  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
-  const recentFolders = useAppSelector(state => state.config.recentFolders);
-  const fileIncludes = useAppSelector(state => state.config.fileIncludes);
-  const scanExcludes = useAppSelector(state => state.config.scanExcludes);
-  const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
-  const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
-  const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
-  const [tree, setTree] = useState<TreeNode | null>(null);
+  const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [expandedKeys, setExpandedKeys] = useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
-  const [autoExpandParent, setAutoExpandParent] = useState(true);
-  const treeRef = useRef<any>();
   const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({
     processingEntityID: undefined,
     processingType: undefined,
   });
+  const [tree, setTree] = useState<TreeNode | null>(null);
+
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+
+  const dispatch = useAppDispatch();
+  const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
+  const fileIncludes = useAppSelector(state => state.config.fileIncludes);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const hideExcludedFilesInFileExplorer = useAppSelector(
+    state => state.config.settings.hideExcludedFilesInFileExplorer
+  );
+  const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
+  const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
+  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const recentFolders = useAppSelector(state => state.config.recentFolders);
+  const resourceFilter = useAppSelector(state => state.main.resourceFilter);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const scanExcludes = useAppSelector(state => state.config.scanExcludes);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
+  const uiState = useAppSelector(state => state.ui);
+
+  const treeRef = useRef<any>();
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
@@ -850,6 +867,10 @@ const FileTreePane = () => {
     }
   };
 
+  const onFilterByFileOrFolder = (relativePath: string) => {
+    dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath || '<root>'}));
+  };
+
   return (
     <FileTreeContainer>
       <Row>
@@ -930,6 +951,7 @@ const FileTreePane = () => {
                 onIncludeToProcessing={onIncludeToProcessing}
                 onCreateFolder={onCreateFolder}
                 onCreateResource={onCreateResource}
+                onFilterByFileOrFolder={onFilterByFileOrFolder}
                 {...event}
               />
             );
