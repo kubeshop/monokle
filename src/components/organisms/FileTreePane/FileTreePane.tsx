@@ -356,7 +356,7 @@ interface TreeItemProps {
   onIncludeToProcessing: (relativePath: string) => void;
   onCreateFolder: (absolutePath: string) => void;
   onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
-  onFilterByFileOrFolder: (relativePath: string) => void;
+  onFilterByFileOrFolder: (relativePath: string | undefined) => void;
   isExcluded?: Boolean;
   isFolder?: Boolean;
 }
@@ -462,7 +462,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          onFilterByFileOrFolder(relativePath);
+          onFilterByFileOrFolder(isRoot ? undefined : relativePath);
         }}
       >
         Filter on this {isFolder ? 'folder' : 'file'}
@@ -867,8 +867,8 @@ const FileTreePane = () => {
     }
   };
 
-  const onFilterByFileOrFolder = (relativePath: string) => {
-    dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath || '<root>'}));
+  const onFilterByFileOrFolder = (relativePath: string | undefined) => {
+    dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
   return (
