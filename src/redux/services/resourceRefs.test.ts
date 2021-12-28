@@ -78,3 +78,23 @@ test('custom-resource-refs', () => {
   // @ts-ignore
   expect(gateway.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
 });
+
+test('sibling-matchers', () => {
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/siblingMatchers'));
+
+  const resources = Object.values(resourceMap);
+  expect(resources.length).toBe(3);
+  const crb = findResourceByName(resourceMap, 'argocd-application-controller-cluster-role-binding');
+  expect(crb).toBeDefined();
+
+  processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
+
+  // @ts-ignore
+  expect(crb.refs?.length).toBe(2);
+
+  // @ts-ignore
+  expect(isUnsatisfiedRef(crb.refs[0].type)).toBe(true);
+
+  // @ts-ignore
+  expect(isOutgoingRef(crb.refs[1].type)).toBe(true);
+});

@@ -26,12 +26,44 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
     await k8sRbacV1Api.deleteClusterRoleBinding(resource.name);
   },
   outgoingRefMappers: [
+    // see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#roleref-v1-rbac-authorization-k8s-io
     {
       source: {
         pathParts: ['roleRef', 'name'],
+        siblingMatchers: {
+          kind: (sourceResource: K8sResource, targetResource, value) => {
+            return targetResource.kind === value;
+          },
+          apiGroup: (sourceResource: K8sResource, targetResource, value) => {
+            return targetResource.version.startsWith(value);
+          },
+        },
       },
       target: {
-        kind: 'ClusterRole',
+        kind: '$.*',
+      },
+      type: 'name',
+    },
+    // see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#subject-v1-rbac-authorization-k8s-io
+    {
+      source: {
+        pathParts: ['subjects', '*', 'name'],
+        siblingMatchers: {
+          kind: (sourceResource: K8sResource, targetResource, value) => {
+            return ['User', 'Group', 'ServiceAccount'].includes(value) && targetResource.kind === value;
+          },
+          apiGroup: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
+            const apiGroup =
+              value || ['User', 'Group'].includes(siblingValues['kind']) ? 'rbac.authorization.k8s.io' : '';
+            return targetResource.version.startsWith(apiGroup);
+          },
+          namespace: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
+            return ['User', 'Group'].includes(siblingValues['kind']) ? !value : targetResource.namespace === value;
+          },
+        },
+      },
+      target: {
+        kind: '$(User|Group|ServiceAccount)',
       },
       type: 'name',
     },
