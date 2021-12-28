@@ -78,3 +78,19 @@ test('custom-resource-refs', () => {
   // @ts-ignore
   expect(gateway.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
 });
+
+test('networkpolicy-resource-refs', () => {
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/networkpolicy'));
+
+  const resources = Object.values(resourceMap);
+  expect(resources.length).toBe(1);
+  const networkPolicy = findResourceByName(resourceMap, 'argocd-dex-server-network-policy');
+  expect(networkPolicy).toBeDefined();
+
+  processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
+
+  // @ts-ignore
+  expect(networkPolicy.refs?.length).toBe(1);
+  // @ts-ignore
+  expect(isUnsatisfiedRef(networkPolicy.refs[0].type)).toBe(true);
+});
