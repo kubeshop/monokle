@@ -131,6 +131,7 @@ const ResourceFilter = () => {
     setNamespace(ALL_OPTIONS);
     setLabels({});
     setAnnotations({});
+    setFileOrFolderContainedIn(ALL_OPTIONS);
   };
 
   const updateName = (newName: string) => {
@@ -185,11 +186,12 @@ const ResourceFilter = () => {
         namespace: namespace === ALL_OPTIONS ? undefined : namespace,
         labels,
         annotations,
+        fileOrFolderContainedIn: fileOrFolderContainedIn === ALL_OPTIONS ? undefined : fileOrFolderContainedIn,
       };
       dispatch(updateResourceFilter(updatedFilter));
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [name, kind, namespace, labels, annotations]
+    [name, kind, namespace, labels, annotations, fileOrFolderContainedIn]
   );
 
   useEffect(() => {
@@ -199,6 +201,7 @@ const ResourceFilter = () => {
       setNamespace(filtersMap.namespace);
       setLabels(filtersMap.labels);
       setAnnotations(filtersMap.annotations);
+      setFileOrFolderContainedIn(filtersMap.fileOrFolderContainedIn);
     }
   }, [wasLocalUpdate, filtersMap]);
 
@@ -281,6 +284,9 @@ const ResourceFilter = () => {
           value={fileOrFolderContainedIn || ALL_OPTIONS}
           onChange={updateFileOrFolderContainedIn}
         >
+          <Option key={ALL_OPTIONS} value={ALL_OPTIONS}>
+            {ALL_OPTIONS}
+          </Option>
           {fileOrFolderContainedInOptions}
         </Select>
       </FieldContainer>

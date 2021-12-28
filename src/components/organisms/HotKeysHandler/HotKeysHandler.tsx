@@ -243,7 +243,16 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
-    dispatch(updateResourceFilter({name: '', namespace: undefined, kind: undefined, labels: {}, annotations: {}}));
+    dispatch(
+      updateResourceFilter({
+        name: '',
+        namespace: undefined,
+        kind: undefined,
+        labels: {},
+        annotations: {},
+        fileOrFolderContainedIn: undefined,
+      })
+    );
   });
 
   return (
