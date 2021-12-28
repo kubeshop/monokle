@@ -3,7 +3,7 @@ import {useDebounce} from 'react-use';
 
 import {Button, Input, Select} from 'antd';
 
-import path from 'path/posix';
+import path from 'path';
 import styled from 'styled-components';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
