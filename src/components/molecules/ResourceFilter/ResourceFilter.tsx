@@ -3,7 +3,6 @@ import {useDebounce} from 'react-use';
 
 import {Button, Input, Select} from 'antd';
 
-import path from 'path';
 import styled from 'styled-components';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
@@ -116,13 +115,11 @@ const ResourceFilter = () => {
   }, [resourceMap]);
 
   const fileOrFolderContainedInOptions = useMemo(() => {
-    return Object.keys(fileMap)
-      .map(key => key.replace(path.sep, ''))
-      .map(option => (
-        <Option key={option} value={option}>
-          {option}
-        </Option>
-      ));
+    return Object.keys(fileMap).map(option => (
+      <Option key={option} value={option}>
+        {option}
+      </Option>
+    ));
   }, [fileMap]);
 
   const resetFilters = () => {
@@ -278,7 +275,27 @@ const ResourceFilter = () => {
       </FieldContainer>
 
       <FieldContainer>
-        <FieldLabel>Contained in:</FieldLabel>
+        <KeyValueInput
+          label="Labels:"
+          data={allLabels}
+          value={labels}
+          onChange={updateLabels}
+          disabled={areFiltersDisabled}
+        />
+      </FieldContainer>
+
+      <FieldContainer>
+        <KeyValueInput
+          disabled={areFiltersDisabled}
+          label="Annotations:"
+          data={allAnnotations}
+          value={annotations}
+          onChange={updateAnnotations}
+        />
+      </FieldContainer>
+
+      <FieldContainer>
+        <FieldLabel>Contained in file/folder:</FieldLabel>
         <Select
           defaultValue={ROOT_OPTIONS}
           disabled={areFiltersDisabled}
@@ -289,25 +306,6 @@ const ResourceFilter = () => {
         >
           {fileOrFolderContainedInOptions}
         </Select>
-      </FieldContainer>
-
-      <FieldContainer>
-        <KeyValueInput
-          label="Labels:"
-          data={allLabels}
-          value={labels}
-          onChange={updateLabels}
-          disabled={areFiltersDisabled}
-        />
-      </FieldContainer>
-      <FieldContainer>
-        <KeyValueInput
-          disabled={areFiltersDisabled}
-          label="Annotations:"
-          data={allAnnotations}
-          value={annotations}
-          onChange={updateAnnotations}
-        />
       </FieldContainer>
     </BaseContainer>
   );
