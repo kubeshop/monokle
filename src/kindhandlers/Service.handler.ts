@@ -3,20 +3,9 @@ import * as k8s from '@kubernetes/client-node';
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-export function createSelectorOutgoingRefMappers(targetResourceKind: string): RefMapper {
-  return {
-    source: {
-      pathParts: ['spec', 'selector'],
-    },
-    target: {
-      kind: targetResourceKind,
-      pathParts: ['spec', 'template', 'metadata', 'labels'],
-    },
-    type: 'pairs',
-  };
-}
+import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
 const ServiceHandler: ResourceKindHandler = {
   kind: 'Service',
@@ -38,24 +27,7 @@ const ServiceHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     await k8sCoreV1Api.deleteNamespacedService(resource.name, resource.namespace || 'default');
   },
-  outgoingRefMappers: [
-    {
-      source: {
-        pathParts: ['spec', 'selector'],
-      },
-      target: {
-        kind: 'Pod',
-        pathParts: ['metadata', 'labels'],
-      },
-      type: 'pairs',
-    },
-    createSelectorOutgoingRefMappers('DaemonSet'),
-    createSelectorOutgoingRefMappers('Deployment'),
-    createSelectorOutgoingRefMappers('Job'),
-    createSelectorOutgoingRefMappers('ReplicaSet'),
-    createSelectorOutgoingRefMappers('ReplicationController'),
-    createSelectorOutgoingRefMappers('StatefulSet'),
-  ],
+  outgoingRefMappers: createPodSelectorOutgoingRefMappers(),
   helpLink: 'https://kubernetes.io/docs/concepts/services-networking/service/',
 };
 

@@ -146,3 +146,28 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     ...PersistentVolumeClaimTarget,
   },
 ];
+
+export function createSelectorOutgoingRefMappers(targetResourceKind: string, selectorPathParts?: string[]): RefMapper {
+  return {
+    source: {
+      pathParts: selectorPathParts || ['spec', 'selector'],
+    },
+    target: {
+      kind: targetResourceKind,
+      pathParts: ['spec', 'template', 'metadata', 'labels'],
+    },
+    type: 'pairs',
+  };
+}
+
+export function createPodSelectorOutgoingRefMappers(selectorPathParts?: string[]): RefMapper[] {
+  return [
+    createSelectorOutgoingRefMappers('Pod', selectorPathParts),
+    createSelectorOutgoingRefMappers('DaemonSet', selectorPathParts),
+    createSelectorOutgoingRefMappers('Deployment', selectorPathParts),
+    createSelectorOutgoingRefMappers('Job', selectorPathParts),
+    createSelectorOutgoingRefMappers('ReplicaSet', selectorPathParts),
+    createSelectorOutgoingRefMappers('ReplicationController', selectorPathParts),
+    createSelectorOutgoingRefMappers('StatefulSet', selectorPathParts),
+  ];
+}
