@@ -395,40 +395,6 @@ function shouldCreateSatisfiedRef(
     return false;
   }
 
-  /*
-
-  switch (outgoingRefMapper.source.namespaceRefType) {
-    // for implicit namespace refs the namespace of the source resource has to match the namespace of the target resources
-    case NamespaceRefTypeEnum.Implicit:
-      if (sourceResource.namespace !== targetResource.namespace) {
-        return false;
-      }
-      break;
-    case NamespaceRefTypeEnum.Explicit:
-    case NamespaceRefTypeEnum.OptionalExplicit: {
-      const namespacePropertyName = outgoingRefMapper.source.namespaceProperty || 'namespace';
-      const namespaceValue = getSiblingValue(namespacePropertyName, outgoingRefMapper, sourceResource, sourceRefNode);
-
-      // did the namespace sibling exist in the source document?
-      if (namespaceValue) {
-        if (namespaceValue !== targetResource.namespace) {
-          return false;
-        }
-      } else if (
-        outgoingRefMapper.source.namespaceRefType === NamespaceRefTypeEnum.Explicit ||
-        sourceResource.namespace !== targetResource.namespace
-      ) {
-        return false;
-      }
-      break;
-    }
-
-    default:
-      break;
-  }
-
-   */
-
   // check with existing sibling matchers
   if (outgoingRefMapper.source.siblingMatchers) {
     // first collect all sibling values so we can pass them to each matcher
