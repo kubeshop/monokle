@@ -7,7 +7,6 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {loadCustomSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
 
 /**
@@ -28,12 +27,10 @@ export const createNamespacedCustomObjectKindHandler = (
   kindGroup: string,
   kindVersion: string,
   kindPlural: string,
-  pathToSchemaResource?: string,
+  editorSchema?: any,
   helpLink?: string,
   outgoingRefMappers?: RefMapper[]
 ): ResourceKindHandler => {
-  const editorSchema = pathToSchemaResource ? loadCustomSchema(pathToSchemaResource, kind) : undefined;
-
   return {
     kind,
     apiVersionMatcher: '**',
@@ -111,12 +108,10 @@ export const createClusterCustomObjectKindHandler = (
   kindGroup: string,
   kindVersion: string,
   kindPlural: string,
-  pathToSchemaResource?: string,
+  editorSchema?: any,
   helpLink?: string,
   outgoingRefMappers?: RefMapper[]
 ): ResourceKindHandler => {
-  const editorSchema = pathToSchemaResource ? loadCustomSchema(pathToSchemaResource, kind) : undefined;
-
   return {
     kind,
     apiVersionMatcher: '**',

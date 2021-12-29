@@ -1,3 +1,5 @@
+import {loadCustomSchema} from '@redux/services/schema';
+
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 import {ISTIO_NETWORKING_RESOURCE_GROUP, ISTIO_SUBSECTION_NAME} from '@src/kindhandlers/istio/constants';
@@ -9,7 +11,7 @@ const EnvoyFilterHandler = createNamespacedCustomObjectKindHandler(
   ISTIO_NETWORKING_RESOURCE_GROUP,
   'v1alpha3',
   'envoyfilters',
-  'istio/envoyfilter.json',
+  loadCustomSchema('istio/envoyfilter.json', 'EnvoyFilter'),
   'https://istio.io/latest/docs/reference/config/networking/envoy-filter/',
   createPodSelectorOutgoingRefMappers(['spec', 'workloadSelector', 'labels'])
 );

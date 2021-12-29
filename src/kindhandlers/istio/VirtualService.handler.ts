@@ -1,3 +1,5 @@
+import {loadCustomSchema} from '@redux/services/schema';
+
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {
   ISTIO_DEFAULT_RESOURCE_VERSION,
@@ -12,7 +14,7 @@ const VirtualServiceHandler = createNamespacedCustomObjectKindHandler(
   ISTIO_NETWORKING_RESOURCE_GROUP,
   ISTIO_DEFAULT_RESOURCE_VERSION,
   'virtualservices',
-  'istio/virtualservice.json',
+  loadCustomSchema('istio/virtualservice.json', 'VirtualService'),
   'https://istio.io/latest/docs/reference/config/networking/virtual-service/',
   [
     {

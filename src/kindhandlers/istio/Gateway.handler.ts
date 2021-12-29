@@ -1,3 +1,5 @@
+import {loadCustomSchema} from '@redux/services/schema';
+
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 import {
@@ -13,7 +15,7 @@ const GatewayHandler = createNamespacedCustomObjectKindHandler(
   ISTIO_NETWORKING_RESOURCE_GROUP,
   ISTIO_DEFAULT_RESOURCE_VERSION,
   'gateways',
-  'istio/gateway.json',
+  loadCustomSchema('istio/gateway.json', 'Gateway'),
   'https://istio.io/latest/docs/reference/config/networking/gateway/',
   createPodSelectorOutgoingRefMappers()
 );

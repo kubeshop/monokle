@@ -1,3 +1,5 @@
+import {loadCustomSchema} from '@redux/services/schema';
+
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 import {
@@ -13,7 +15,7 @@ const SidecarHandler = createNamespacedCustomObjectKindHandler(
   ISTIO_NETWORKING_RESOURCE_GROUP,
   ISTIO_DEFAULT_RESOURCE_VERSION,
   'sidecars',
-  'istio/sidecar.json',
+  loadCustomSchema('istio/sidecar.json', 'Sidecar'),
   'https://istio.io/latest/docs/reference/config/networking/sidecar/',
   createPodSelectorOutgoingRefMappers(['spec', 'workloadSelector', 'labels'])
 );

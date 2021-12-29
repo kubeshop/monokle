@@ -1,3 +1,5 @@
+import {loadCustomSchema} from '@redux/services/schema';
+
 import {
   CERT_MANAGER_ACME_RESOURCE_GROUP,
   CERT_MANAGER_DEFAULT_RESOURCE_VERSION,
@@ -12,7 +14,7 @@ const AcmeOrderHandler = createNamespacedCustomObjectKindHandler(
   CERT_MANAGER_ACME_RESOURCE_GROUP,
   CERT_MANAGER_DEFAULT_RESOURCE_VERSION,
   'orders',
-  'certmanager/acmeorder.json',
+  loadCustomSchema('certmanager/acmeorder.json', 'Order'),
   'https://cert-manager.io/docs/concepts/acme-orders-challenges/',
   [
     {

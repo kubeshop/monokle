@@ -1,3 +1,5 @@
+import {loadCustomSchema} from '@redux/services/schema';
+
 import {
   CERT_MANAGER_DEFAULT_RESOURCE_VERSION,
   CERT_MANAGER_RESOURCE_GROUP,
@@ -12,7 +14,7 @@ const CertificateRequestHandler = createNamespacedCustomObjectKindHandler(
   CERT_MANAGER_RESOURCE_GROUP,
   CERT_MANAGER_DEFAULT_RESOURCE_VERSION,
   'certificaterequests',
-  'certmanager/certificaterequest.json',
+  loadCustomSchema('certmanager/certificaterequest.json', 'CertificateRequest'),
   'https://cert-manager.io/docs/concepts/certificaterequest/',
   [
     {

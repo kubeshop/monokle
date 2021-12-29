@@ -1,3 +1,5 @@
+import {loadCustomSchema} from '@redux/services/schema';
+
 import {
   CERT_MANAGER_DEFAULT_RESOURCE_VERSION,
   CERT_MANAGER_RESOURCE_GROUP,
@@ -12,7 +14,7 @@ const IssuerHandler = createNamespacedCustomObjectKindHandler(
   CERT_MANAGER_RESOURCE_GROUP,
   CERT_MANAGER_DEFAULT_RESOURCE_VERSION,
   'issuers',
-  'certmanager/issuer.json',
+  loadCustomSchema('certmanager/issuer.json', 'Issuer'),
   'https://cert-manager.io/docs/concepts/issuer/'
 );
 

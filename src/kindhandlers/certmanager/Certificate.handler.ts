@@ -1,5 +1,7 @@
 import {NamespaceRefTypeEnum} from '@models/resourcekindhandler';
 
+import {loadCustomSchema} from '@redux/services/schema';
+
 import {
   CERT_MANAGER_DEFAULT_RESOURCE_VERSION,
   CERT_MANAGER_RESOURCE_GROUP,
@@ -14,7 +16,7 @@ const CertificateHandler = createNamespacedCustomObjectKindHandler(
   CERT_MANAGER_RESOURCE_GROUP,
   CERT_MANAGER_DEFAULT_RESOURCE_VERSION,
   'certificates',
-  'certmanager/certificate.json',
+  loadCustomSchema('certmanager/certificate.json', 'Certificate'),
   'https://cert-manager.io/docs/concepts/certificate/',
   [
     {
