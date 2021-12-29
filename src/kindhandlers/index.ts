@@ -108,9 +108,12 @@ export function registerKindHandler(kindHandler: ResourceKindHandler, replace: b
     log.info(`Adding KindHandler for ${kindHandler.kind}`);
     HandlerByResourceKind[kindHandler.kind] = kindHandler;
 
-    if (!ResourceKindHandlers.some(handler => handler.kind === kindHandler.kind)) {
-      ResourceKindHandlers.push(kindHandler);
+    const ix = ResourceKindHandlers.findIndex(handler => handler.kind === kindHandler.kind);
+    if (ix >= 0) {
+      ResourceKindHandlers.splice(ix, 1);
     }
+
+    ResourceKindHandlers.push(kindHandler);
   }
 }
 
@@ -257,7 +260,7 @@ export function extractKindHandler(crd: any) {
   }
 }
 
-export function readCrdKindHandlers() {
+function readCrdKindHandlers() {
   const crds = findFiles(getStaticResourcePath('kindhandlers/crds'), '.yaml');
   crds.forEach(crdPath => {
     try {
