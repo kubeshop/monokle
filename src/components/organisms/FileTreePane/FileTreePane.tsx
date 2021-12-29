@@ -656,6 +656,7 @@ const FileTreePane = () => {
   useEffect(() => {
     if (selectedResourceId && tree) {
       const resource = resourceMap[selectedResourceId];
+
       if (resource) {
         const filePath = resource.filePath;
         highlightFilePath(filePath);
@@ -668,7 +669,14 @@ const FileTreePane = () => {
     // removes any highlight when a file is selected
     if (selectedPath && highlightNode) {
       highlightNode.highlight = false;
+      treeRef?.current?.scrollTo({key: selectedPath});
+      return;
     }
+
+    if (selectedPath) {
+      treeRef?.current?.scrollTo({key: selectedPath});
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightNode, selectedPath]);
 
