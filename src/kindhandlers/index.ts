@@ -220,7 +220,6 @@ export function extractKindHandler(crd: any) {
             });
 
             refMappers = handler.refMappers;
-            log.info('custom refMappers', refMappers);
           }
         }
       }
