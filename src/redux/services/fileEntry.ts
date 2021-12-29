@@ -114,6 +114,14 @@ function processHelmChartFolder(
       helmChart.valueFileIds.push(helmValues.id);
       fileEntry.isSupported = true;
     } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+      try {
+        extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+          resourceMap[resource.id] = resource;
+        });
+      } catch (e) {
+        log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
+      }
+
       fileEntry.isSupported = true;
     }
 

@@ -89,12 +89,10 @@ export function extractSchema(crd: any, versionName: string) {
   const version = versions.find((v: any) => v.name === versionName);
   const schema = version?.schema?.openAPIV3Schema ? version.schema.openAPIV3Schema : undefined;
   if (schema) {
-    if (schema['x-kubernetes-preserve-unknown-fields'] !== true) {
-      schema.additionalProperties = false;
-    }
-
     if (!schema.properties) {
       schema.properties = {};
+    } else if (schema['x-kubernetes-preserve-unknown-fields'] !== true) {
+      schema.additionalProperties = false;
     }
 
     schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
