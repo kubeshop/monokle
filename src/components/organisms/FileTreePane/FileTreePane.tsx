@@ -84,7 +84,8 @@ const createNode = (
   fileEntry: FileEntry,
   fileMap: FileMapType,
   resourceMap: ResourceMapType,
-  hideExcludedFilesInFileExplorer: boolean
+  hideExcludedFilesInFileExplorer: boolean,
+  fileOrFolderContainedInFilter: string | undefined
 ): TreeNode => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
@@ -97,7 +98,8 @@ const createNode = (
             className={
               fileEntry.isExcluded
                 ? 'excluded-file-entry-name'
-                : fileEntry.isSupported || fileEntry.children
+                : (fileEntry.isSupported || fileEntry.children) &&
+                  (fileOrFolderContainedInFilter ? fileEntry.filePath.startsWith(fileOrFolderContainedInFilter) : true)
                 ? 'file-entry-name'
                 : 'not-supported-file-entry-name'
             }
@@ -124,7 +126,9 @@ const createNode = (
       node.children = fileEntry.children
         .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
         .filter(childEntry => childEntry)
-        .map(childEntry => createNode(childEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer))
+        .map(childEntry =>
+          createNode(childEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter)
+        )
         .filter(childEntry => {
           if (!hideExcludedFilesInFileExplorer) {
             return childEntry;
@@ -585,6 +589,7 @@ const FileTreePane = () => {
   const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const hideExcludedFilesInFileExplorer = useAppSelector(
     state => state.config.settings.hideExcludedFilesInFileExplorer
   );
@@ -629,7 +634,9 @@ const FileTreePane = () => {
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
-    const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer);
+    const treeData =
+      rootEntry &&
+      createNode(rootEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter);
 
     setTree(treeData);
 
@@ -637,7 +644,14 @@ const FileTreePane = () => {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
       dispatch(setShouldExpandAllNodes(false));
     }
-  }, [resourceMap, fileMap, shouldExpandAllNodes, hideExcludedFilesInFileExplorer, dispatch]);
+  }, [
+    resourceMap,
+    fileMap,
+    shouldExpandAllNodes,
+    hideExcludedFilesInFileExplorer,
+    fileOrFolderContainedInFilter,
+    dispatch,
+  ]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
