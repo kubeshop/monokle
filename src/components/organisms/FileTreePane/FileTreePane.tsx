@@ -399,6 +399,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const [isTitleHovered, setTitleHoverState] = useState(false);
 
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
@@ -466,10 +467,16 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         onClick={e => {
           e.domEvent.stopPropagation();
 
-          onFilterByFileOrFolder(isRoot ? undefined : relativePath);
+          if (isRoot || (fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter)) {
+            onFilterByFileOrFolder(undefined);
+          } else {
+            onFilterByFileOrFolder(relativePath);
+          }
         }}
       >
-        Filter on this {isFolder ? 'folder' : 'file'}
+        {fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : `Filter on this ${isFolder ? 'folder' : 'file'}`}
       </Menu.Item>
       <ContextMenuDivider />
       <Menu.Item
