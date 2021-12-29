@@ -89,18 +89,23 @@ export function extractSchema(crd: any, versionName: string) {
   const version = versions.find((v: any) => v.name === versionName);
   const schema = version?.schema?.openAPIV3Schema ? version.schema.openAPIV3Schema : undefined;
   if (schema) {
-    schema.additionalProperties = false;
-    if (schema.properties) {
-      schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
-      schema.properties['kind'] = objectMetadataSchema.properties.kind;
-      schema.properties['metadata'] = objectMetadataSchema.properties.metadata;
-
-      Object.values(schema.properties).forEach((prop: any) => {
-        if (prop.type && prop.type === 'object') {
-          prop.additionalProperties = false;
-        }
-      });
+    if (schema['x-kubernetes-preserve-unknown-fields'] !== true) {
+      schema.additionalProperties = false;
     }
+
+    if (!schema.properties) {
+      schema.properties = {};
+    }
+
+    schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
+    schema.properties['kind'] = objectMetadataSchema.properties.kind;
+    schema.properties['metadata'] = objectMetadataSchema.properties.metadata;
+
+    Object.values(schema.properties).forEach((prop: any) => {
+      if (prop.type && prop.type === 'object') {
+        prop.additionalProperties = false;
+      }
+    });
   }
   return schema;
 }
