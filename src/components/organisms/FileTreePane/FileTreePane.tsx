@@ -670,7 +670,7 @@ const FileTreePane = () => {
       highlightNode.highlight = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPath]);
+  }, [highlightNode, selectedPath]);
 
   const onDelete = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
     const {isDirectory, name, err} = args;

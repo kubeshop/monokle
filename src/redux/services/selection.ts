@@ -63,6 +63,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
     state.selectedResourceId = resource.id;
 
     if (isKustomizationResource(resource)) {
+      state.selectedPath = resource.filePath;
       getKustomizationRefs(state.resourceMap, resource.id, true).forEach(resourceId => {
         highlightResource(state.resourceMap, resourceId);
       });
