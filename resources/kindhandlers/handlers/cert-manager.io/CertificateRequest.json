@@ -11,7 +11,7 @@
       },
       "type": "name",
       "target": {
-        "kind": "ClusterIssuer"
+        "kind": "$(Issuer|ClusterIssuer)"
       }
     }
  ]

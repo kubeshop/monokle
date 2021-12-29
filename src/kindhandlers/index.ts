@@ -105,7 +105,7 @@ const HandlerByResourceKind = Object.fromEntries(
 
 export function registerKindHandler(kindHandler: ResourceKindHandler, replace: boolean) {
   if (replace || !HandlerByResourceKind[kindHandler.kind]) {
-    log.info(`Adding KindHandler for ${kindHandler.kind}`);
+    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`);
     HandlerByResourceKind[kindHandler.kind] = kindHandler;
 
     const ix = ResourceKindHandlers.findIndex(handler => handler.kind === kindHandler.kind);
@@ -266,7 +266,7 @@ function readCrdKindHandlers() {
     try {
       const crdContent = fs.readFileSync(crdPath, 'utf-8');
       if (crdContent) {
-        const documents = parseAllDocuments(crdContent, {prettyErrors: true, strict: false});
+        const documents = parseAllDocuments(crdContent, {prettyErrors: true});
         documents.forEach(doc => {
           const crd = doc.toJS({maxAliasCount: -1});
           if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {

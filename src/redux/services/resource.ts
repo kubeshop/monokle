@@ -680,7 +680,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           }
 
           // set the namespace if available
-          if (content.metadata?.namespace) {
+          if (content.metadata?.namespace && typeof content.metadata.namespace === 'string') {
             resource.namespace = content.metadata.namespace;
           }
 
