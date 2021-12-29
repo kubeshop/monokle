@@ -6,7 +6,10 @@ const uiformSchemaCache = new Map<string, any>();
 export function getFormSchema(kind: string) {
   try {
     if (!formSchemaCache.has(kind)) {
-      formSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`)));
+      const formSchema = loadResource(`form-schemas/${kind.toLowerCase()}-schema.json`);
+      if (formSchema) {
+        formSchemaCache.set(kind, JSON.parse(formSchema));
+      }
     }
 
     return formSchemaCache.get(kind);
@@ -18,7 +21,10 @@ export function getFormSchema(kind: string) {
 export function getUiSchema(kind: string) {
   try {
     if (!uiformSchemaCache.has(kind)) {
-      uiformSchemaCache.set(kind, JSON.parse(loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`)));
+      const uiSchema = loadResource(`form-schemas/${kind.toLowerCase()}-ui-schema.json`);
+      if (uiSchema) {
+        uiformSchemaCache.set(kind, JSON.parse(uiSchema));
+      }
     }
 
     return uiformSchemaCache.get(kind);

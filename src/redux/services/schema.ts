@@ -7,8 +7,11 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+// @ts-ignore
 const k8sSchema = JSON.parse(loadResource('schemas/k8sschemas.json'));
+// @ts-ignore
 const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.json'));
+// @ts-ignore
 const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
 const schemaCache = new Map<string, any | undefined>();
 
@@ -59,7 +62,8 @@ export function getResourceSchema(resource: K8sResource) {
 
 export function loadCustomSchema(schemaPath: string, resourceKind: string): any | undefined {
   try {
-    const schema = JSON.parse(loadResource(`schemas/${schemaPath}`));
+    const schemaText = loadResource(`schemas/${schemaPath}`);
+    const schema = schemaText ? JSON.parse(schemaText) : undefined;
     if (schema) {
       if (!schema.properties?.apiVersion) {
         schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;

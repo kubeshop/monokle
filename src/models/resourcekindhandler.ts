@@ -8,13 +8,6 @@ interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
 }
 
-export enum NamespaceRefTypeEnum {
-  None, // ignore namespaces for this ref
-  Implicit, // use the namespace of the containing resource
-  Explicit, // target namespace property expected
-  OptionalExplicit, // if no namespace is provided then use the namespace of the containing resource
-}
-
 interface RefMapper {
   source: {
     pathParts: string[];

@@ -24,10 +24,12 @@ import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs
 import {getFileTimestamp} from '@utils/files';
 
 import {
+  extractKindHandler,
   getDependentResourceKinds,
   getKnownResourceKinds,
   getResourceKindHandler,
   refMapperMatchesKind,
+  registerKindHandler,
 } from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
@@ -659,7 +661,10 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
           if (resource.kind === 'CustomResourceDefinition') {
             try {
-              extractKindHandler(resource.content);
+              const kindHandler = extractKindHandler(resource.content);
+              if (kindHandler) {
+                registerKindHandler(kindHandler, false);
+              }
             } catch (e) {
               log.warn('Failed to register custom kindhandler', e);
             }

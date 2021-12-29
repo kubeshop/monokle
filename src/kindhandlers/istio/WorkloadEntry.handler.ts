@@ -1,5 +1,3 @@
-import {NamespaceRefTypeEnum} from '@models/resourcekindhandler';
-
 import {loadCustomSchema} from '@redux/services/schema';
 
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
