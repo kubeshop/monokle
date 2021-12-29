@@ -149,7 +149,7 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
       return;
     }
     kindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-      if (resourceKinds.includes(outgoingRefMapper.target.kind)) {
+      if (resourceKinds.some(kind => refMapperMatchesKind(outgoingRefMapper, kind))) {
         dependentResourceKinds.push(kindHandler.kind);
       }
     });
@@ -257,4 +257,12 @@ export function readCrdKindHandlers() {
       log.warn(`Failed to parse kindhandler CRD at ${crdPath}`, e);
     }
   });
+}
+
+export function refMapperMatchesKind(refMapper: RefMapper, kind: string) {
+  if (refMapper.target.kind.startsWith('$')) {
+    return kind.match(refMapper.target.kind.substring(1)) !== null;
+  }
+
+  return refMapper.target.kind === kind;
 }

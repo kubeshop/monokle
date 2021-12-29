@@ -3,7 +3,10 @@ import {NamespaceRefTypeEnum} from '@models/resourcekindhandler';
 import {loadCustomSchema} from '@redux/services/schema';
 
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
-import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
+import {
+  createPodSelectorOutgoingRefMappers,
+  implicitNamespaceMatcher,
+} from '@src/kindhandlers/common/outgoingRefMappers';
 import {
   ISTIO_DEFAULT_RESOURCE_VERSION,
   ISTIO_NETWORKING_RESOURCE_GROUP,
@@ -23,7 +26,9 @@ const WorkloadEntryHandler = createNamespacedCustomObjectKindHandler(
     {
       source: {
         pathParts: ['spec', 'serviceAccount'],
-        namespaceRef: NamespaceRefTypeEnum.Implicit,
+        siblingMatchers: {
+          namespace: implicitNamespaceMatcher,
+        },
       },
       target: {
         kind: 'ServiceAccount',

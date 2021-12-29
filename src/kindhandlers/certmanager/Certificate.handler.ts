@@ -8,6 +8,7 @@ import {
   CERT_MANAGER_SUBSECTION_NAME,
 } from '@src/kindhandlers/certmanager/constants';
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+import {implicitNamespaceMatcher} from '@src/kindhandlers/common/outgoingRefMappers';
 
 const CertificateHandler = createNamespacedCustomObjectKindHandler(
   'Certificate',
@@ -22,7 +23,9 @@ const CertificateHandler = createNamespacedCustomObjectKindHandler(
     {
       source: {
         pathParts: ['spec', 'secretName'],
-        namespaceRef: NamespaceRefTypeEnum.Implicit,
+        siblingMatchers: {
+          namespace: implicitNamespaceMatcher,
+        },
       },
       type: 'name',
       target: {

@@ -18,9 +18,24 @@ export enum NamespaceRefTypeEnum {
 interface RefMapper {
   source: {
     pathParts: string[];
-    hasOptionalSibling?: boolean;
-    namespaceRef?: NamespaceRefTypeEnum;
-    namespaceProperty?: string; // default to "namespace"
+
+    // sibling matchers that will be used to validate this ref
+    siblingMatchers?: Record<
+      string,
+      (
+        sourceResource: K8sResource,
+        targetResource: K8sResource,
+        value: string,
+        siblingValues: Record<string, string>
+      ) => boolean
+    >;
+
+    // optionally checks for a 'optional' sibling to validate ref
+    isOptional?: boolean;
+
+    // namespace-ref specific properties
+    // namespaceRefType?: NamespaceRefTypeEnum;
+    // namespaceProperty?: string; // default to "namespace"
   };
   target: {
     kind: string;

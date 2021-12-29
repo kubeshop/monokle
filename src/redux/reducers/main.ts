@@ -306,7 +306,7 @@ export const mainSlice = createSlice({
       const resourceKindsWithOptionalRefs = getKnownResourceKinds().filter(kind => {
         const handler = getResourceKindHandler(kind);
         if (handler && handler.outgoingRefMappers) {
-          return handler.outgoingRefMappers.some(mapper => mapper.source.hasOptionalSibling);
+          return handler.outgoingRefMappers.some(mapper => mapper.source.isOptional);
         }
         return false;
       });

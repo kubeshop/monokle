@@ -24,10 +24,10 @@ import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs
 import {getFileTimestamp} from '@utils/files';
 
 import {
-  extractKindHandler,
   getDependentResourceKinds,
   getKnownResourceKinds,
   getResourceKindHandler,
+  refMapperMatchesKind,
 } from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
@@ -229,7 +229,7 @@ export function createResourceRef(
         target: {
           type: 'resource',
           resourceId: targetResourceId,
-          resourceKind: targetResourceKind,
+          resourceKind: targetResourceKind?.startsWith('$') ? undefined : targetResourceKind,
           isOptional,
         },
       });
@@ -744,7 +744,7 @@ export function getResourceKindsWithTargetingRefs(resource: K8sResource) {
     const resourceKinds = getKnownResourceKinds().filter(kind => {
       const handler = getResourceKindHandler(kind);
       if (handler && handler.outgoingRefMappers) {
-        return handler.outgoingRefMappers.some(mapper => mapper.target.kind === resource.kind);
+        return handler.outgoingRefMappers.some(mapper => refMapperMatchesKind(mapper, resource.kind));
       }
       return false;
     });
