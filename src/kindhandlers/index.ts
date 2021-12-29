@@ -1,12 +1,18 @@
+import fs from 'fs';
+import log from 'loglevel';
+import {parseAllDocuments} from 'yaml';
+
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {getStaticResourcePath} from '@redux/services';
+import {extractSchema} from '@redux/services/schema';
+import {findDefaultVersion} from '@redux/thunks/previewCluster';
+
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
-import AcmeChallengeHandler from '@src/kindhandlers/certmanager/AcmeChallenge.handler';
-import AcmeOrderHandler from '@src/kindhandlers/certmanager/AcmeOrder.handler';
-import CertificateHandler from '@src/kindhandlers/certmanager/Certificate.handler';
-import CertificateRequestHandler from '@src/kindhandlers/certmanager/CertificateRequest.handler';
-import ClusterIssuerHandler from '@src/kindhandlers/certmanager/ClusterIssuer.handler';
-import IssuerHandler from '@src/kindhandlers/certmanager/Issuer.handler';
+import {
+  createClusterCustomObjectKindHandler,
+  createNamespacedCustomObjectKindHandler,
+} from '@src/kindhandlers/common/customObjectKindHandler';
 import DestinationRuleHandler from '@src/kindhandlers/istio/DestinationRule.handler';
 import EnvoyFilterHandler from '@src/kindhandlers/istio/EnvoyFilter.handler';
 import GatewayHandler from '@src/kindhandlers/istio/Gateway.handler';
@@ -76,12 +82,14 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   WorkloadGroupHandler,
   WorkloadEntryHandler,
   // CertManager
+  /*
   CertificateRequestHandler,
   IssuerHandler,
   CertificateHandler,
   ClusterIssuerHandler,
   AcmeOrderHandler,
   AcmeChallengeHandler,
+*/
 ];
 
 const HandlerByResourceKind = Object.fromEntries(
@@ -98,6 +106,16 @@ const HandlerByResourceKind = Object.fromEntries(
     };
   }).map(kindHandler => [kindHandler.kind, kindHandler])
 );
+
+export function addKindHandler(kindHandler: ResourceKindHandler, overwrite: boolean) {
+  if (overwrite || !HandlerByResourceKind[kindHandler.kind]) {
+    log.info(`Adding KindHandler for ${kindHandler.kind}`);
+    HandlerByResourceKind[kindHandler.kind] = kindHandler;
+    ResourceKindHandlers.push(kindHandler);
+  }
+}
+
+readCrdKindHandlers();
 
 export const getKnownResourceKinds = () => {
   return ResourceKindHandlers.map(handler => handler.kind);
@@ -138,3 +156,105 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
   });
   return [...new Set(dependentResourceKinds)];
 };
+
+function findFiles(dir: string, ext: string) {
+  let results: string[] = [];
+  let list = fs.readdirSync(dir);
+  list.forEach(file => {
+    file = `${dir}/${file}`;
+    let stat = fs.statSync(file);
+    if (stat && stat.isDirectory()) {
+      results = results.concat(findFiles(file, ext));
+    } else if (file.endsWith(ext)) {
+      results.push(file);
+    }
+  });
+  return results;
+}
+
+export function extractKindHandler(crd: any, handlers?: string[]) {
+  const spec = crd.spec;
+  const kind = spec.names.kind;
+  let subsectionName = spec.group;
+  const kindSectionName = spec.names.plural;
+  const kindGroup = spec.group;
+  const kindVersion = findDefaultVersion(crd);
+
+  if (kindVersion) {
+    const kindPlural = spec.names.plural;
+    const editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
+    let kindHandler: ResourceKindHandler | undefined;
+    let helpLink: string | undefined;
+    let refMappers: any[] | undefined;
+
+    const handlerPath = handlers ? handlers.find(file => file.endsWith(`${kindGroup}.${kind}.json`)) : undefined;
+    if (handlerPath) {
+      log.info(`found handler ${handlerPath}`);
+      try {
+        const handlerContent = fs.readFileSync(handlerPath, 'utf-8');
+        if (handlerContent) {
+          const handler = JSON.parse(handlerContent);
+          if (handler) {
+            helpLink = handler.helpLink;
+            subsectionName = handler.sectionName;
+            refMappers = handler.refMappers;
+          }
+        }
+      } catch (e) {
+        log.warn(`Failed to parse kindhandler ${handlerPath}`, e);
+      }
+    }
+
+    if (spec.scope === 'Namespaced') {
+      kindHandler = createNamespacedCustomObjectKindHandler(
+        kind,
+        subsectionName,
+        kindSectionName,
+        kindGroup,
+        kindVersion,
+        kindPlural,
+        editorSchema,
+        helpLink,
+        refMappers
+      );
+    } else if (spec.scope === 'Cluster') {
+      kindHandler = createClusterCustomObjectKindHandler(
+        kind,
+        subsectionName,
+        kindSectionName,
+        kindGroup,
+        kindVersion,
+        kindPlural,
+        editorSchema,
+        helpLink,
+        refMappers
+      );
+    }
+
+    if (kindHandler) {
+      addKindHandler(kindHandler, true);
+    }
+  }
+}
+
+export function readCrdKindHandlers() {
+  const handlers = findFiles(getStaticResourcePath('kindhandlers/handlers'), '.json');
+  log.info('found handlers', handlers);
+  const crds = findFiles(getStaticResourcePath('kindhandlers/crds'), '.yaml');
+  crds.forEach(crdPath => {
+    try {
+      const crdContent = fs.readFileSync(crdPath, 'utf-8');
+      if (crdContent) {
+        const documents = parseAllDocuments(crdContent, {prettyErrors: true, strict: false});
+        documents.forEach(doc => {
+          const crd = doc.toJS({maxAliasCount: -1});
+          if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
+            extractKindHandler(crd, handlers);
+          }
+        });
+      }
+    } catch (e) {
+      log.warn(`Failed to parse kindhandler CRD at ${crdPath}`, e);
+    }
+  });
+}

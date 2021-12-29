@@ -1,0 +1,18 @@
+{
+  "sectionName": "CertMananger",
+  "helpLink": "https://cert-manager.io/docs/concepts/acme-orders-challenges/",
+  "refMappers":
+  [
+    {
+      "source": {
+        "pathParts": [
+          "spec", "issuerRef", "name"
+        ]
+      },
+      "type": "name",
+      "target": {
+        "kind": "ClusterIssuer"
+      }
+    }
+ ]
+}

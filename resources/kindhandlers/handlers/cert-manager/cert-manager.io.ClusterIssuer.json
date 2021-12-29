@@ -1,0 +1,18 @@
+{
+  "sectionName": "CertMananger",
+  "helpLink": "https://cert-manager.io/docs/concepts/issuer/",
+  "refMappers":
+  [
+    {
+      "source": {
+        "pathParts": [
+          "spec", "acme", "privateKeySecretRef", "name"
+        ]
+      },
+      "type": "name",
+      "target": {
+        "kind": "Secret"
+      }
+    }
+ ]
+}

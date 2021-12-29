@@ -1,0 +1,28 @@
+{
+  "sectionName": "CertMananger",
+  "helpLink": "https://cert-manager.io/docs/concepts/certificate/",
+  "refMappers":
+  [
+    {
+      "source": {
+        "pathParts": ["spec", "secretName"],
+        "namespaceRef": "Implicit"
+      },
+      "type": "name",
+      "target": {
+        "kind": "Secret"
+      }
+    },
+    {
+      "source": {
+        "pathParts": [
+          "spec", "issuerRef", "name"
+        ]
+      },
+      "type": "name",
+      "target": {
+        "kind": "ClusterIssuer"
+      }
+    }
+ ]
+}

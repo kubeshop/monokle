@@ -46,8 +46,12 @@ export function getResourceSchema(resource: K8sResource) {
       return schemaCache.get(schemaKey);
     }
   } else if (!schemaCache.has(resource.kind)) {
-    log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
-    schemaCache.set(resource.kind, undefined);
+    if (resourceKindHandler?.sourceEditorOptions?.editorSchema) {
+      schemaCache.set(resource.kind, resourceKindHandler?.sourceEditorOptions?.editorSchema);
+    } else {
+      log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
+      schemaCache.set(resource.kind, undefined);
+    }
   }
 
   return schemaCache.get(resource.kind);
@@ -74,4 +78,25 @@ export function loadCustomSchema(schemaPath: string, resourceKind: string): any 
     log.warn(`Failed to load custom schema from ${schemaPath}`);
     schemaCache.set(resourceKind, undefined);
   }
+}
+
+export function extractSchema(crd: any, versionName: string) {
+  const versions: any[] = crd.spec.versions;
+  const version = versions.find((v: any) => v.name === versionName);
+  const schema = version?.schema?.openAPIV3Schema ? version.schema.openAPIV3Schema : undefined;
+  if (schema) {
+    schema.additionalProperties = false;
+    if (schema.properties) {
+      schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
+      schema.properties['kind'] = objectMetadataSchema.properties.kind;
+      schema.properties['metadata'] = objectMetadataSchema.properties.metadata;
+
+      Object.values(schema.properties).forEach((prop: any) => {
+        if (prop.type && prop.type === 'object') {
+          prop.additionalProperties = false;
+        }
+      });
+    }
+  }
+  return schema;
 }

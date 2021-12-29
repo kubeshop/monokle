@@ -23,7 +23,12 @@ import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs
 
 import {getFileTimestamp} from '@utils/files';
 
-import {getDependentResourceKinds, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
+import {
+  extractKindHandler,
+  getDependentResourceKinds,
+  getKnownResourceKinds,
+  getResourceKindHandler,
+} from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 
 import {processRefs} from './resourceRefs';
@@ -651,6 +656,14 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             content,
             text,
           };
+
+          if (resource.kind === 'CustomResourceDefinition') {
+            try {
+              extractKindHandler(resource.content);
+            } catch (e) {
+              log.warn('Failed to register custom kindhandler', e);
+            }
+          }
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
           if (documents.length === 1) {
