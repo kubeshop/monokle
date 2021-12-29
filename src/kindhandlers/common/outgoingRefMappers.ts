@@ -198,7 +198,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
 export function createSelectorOutgoingRefMappers(targetResourceKind: string, selectorPathParts?: string[]): RefMapper {
   return {
     source: {
-      pathParts: selectorPathParts || ['spec', 'selector'],
+      pathParts: selectorPathParts && selectorPathParts.length > 0 ? selectorPathParts : ['spec', 'selector'],
     },
     target: {
       kind: targetResourceKind,

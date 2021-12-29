@@ -1,5 +1,6 @@
 {
   "sectionName": "CertMananger",
+  "kindSectionName": "Certificates",
   "helpLink": "https://cert-manager.io/docs/concepts/certificate/",
   "refMappers":
   [

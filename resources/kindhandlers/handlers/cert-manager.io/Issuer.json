@@ -1,4 +1,5 @@
 {
   "sectionName": "CertMananger",
+  "kindSectionName": "Issuers",
   "helpLink": "https://cert-manager.io/docs/concepts/issuer/"
 }

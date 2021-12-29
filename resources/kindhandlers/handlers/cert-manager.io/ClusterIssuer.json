@@ -1,5 +1,6 @@
 {
   "sectionName": "CertMananger",
+  "kindSectionName": "ClusterIssuers",
   "helpLink": "https://cert-manager.io/docs/concepts/issuer/",
   "refMappers":
   [

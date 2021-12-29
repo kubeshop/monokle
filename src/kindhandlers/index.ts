@@ -14,18 +14,11 @@ import {
   createNamespacedCustomObjectKindHandler,
 } from '@src/kindhandlers/common/customObjectKindHandler';
 import {
+  createPodSelectorOutgoingRefMappers,
   explicitNamespaceMatcher,
   implicitNamespaceMatcher,
   optionalExplicitNamespaceMatcher,
 } from '@src/kindhandlers/common/outgoingRefMappers';
-import DestinationRuleHandler from '@src/kindhandlers/istio/DestinationRule.handler';
-import EnvoyFilterHandler from '@src/kindhandlers/istio/EnvoyFilter.handler';
-import GatewayHandler from '@src/kindhandlers/istio/Gateway.handler';
-import ServiceEntryHandler from '@src/kindhandlers/istio/ServiceEntry.handler';
-import SidecarHandler from '@src/kindhandlers/istio/Sidecar.handler';
-import VirtualServiceHandler from '@src/kindhandlers/istio/VirtualService.handler';
-import WorkloadEntryHandler from '@src/kindhandlers/istio/WorkloadEntry.handler';
-import WorkloadGroupHandler from '@src/kindhandlers/istio/WorkloadGroup.handler';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -52,6 +45,10 @@ import ServiceAccountHandler from './ServiceAccount.handler';
 import StatefulSetHandler from './StatefulSet.handler';
 import {getFormSchema, getUiSchema} from './common/formLoader';
 
+/**
+ * Initialize native ResourceKindHandlers
+ */
+
 export const ResourceKindHandlers: ResourceKindHandler[] = [
   ClusterRoleHandler,
   ClusterRoleBindingHandler,
@@ -77,15 +74,6 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceAccountHandler,
   StatefulSetHandler,
   VolumeAttachmentHandler,
-  // Istio resources
-  VirtualServiceHandler,
-  DestinationRuleHandler,
-  GatewayHandler,
-  SidecarHandler,
-  EnvoyFilterHandler,
-  ServiceEntryHandler,
-  WorkloadGroupHandler,
-  WorkloadEntryHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(
@@ -177,8 +165,6 @@ function findFiles(dir: string, ext: string) {
 export function extractKindHandler(crd: any) {
   const spec = crd.spec;
   const kind = spec.names.kind;
-  let subsectionName = spec.group;
-  const kindSectionName = spec.names.plural;
   const kindGroup = spec.group;
   const kindVersion = findDefaultVersion(crd);
 
@@ -187,7 +173,9 @@ export function extractKindHandler(crd: any) {
     const editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
     let kindHandler: ResourceKindHandler | undefined;
     let helpLink: string | undefined;
-    let refMappers: any[] | undefined;
+    let refMappers: any[] = [];
+    let subsectionName = spec.group;
+    let kindSectionName = spec.names.plural;
 
     try {
       const handlerContent = loadResource(`kindhandlers/handlers/${kindGroup}/${kind}.json`);
@@ -196,7 +184,8 @@ export function extractKindHandler(crd: any) {
         const handler = JSON.parse(handlerContent);
         if (handler) {
           helpLink = handler.helpLink;
-          subsectionName = handler.sectionName;
+          subsectionName = handler.sectionName || subsectionName;
+          kindSectionName = handler.kindSectionName || kindSectionName;
 
           if (handler.refMappers) {
             handler.refMappers.forEach((refMapper: any) => {
@@ -220,9 +209,15 @@ export function extractKindHandler(crd: any) {
                   default:
                 }
               }
-            });
 
-            refMappers = handler.refMappers;
+              refMappers.push(refMapper);
+            });
+          }
+
+          if (handler.podSelectors) {
+            handler.podSelectors.forEach((selector: string[]) => {
+              refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
+            });
           }
         }
       }
@@ -272,7 +267,7 @@ function readCrdKindHandlers() {
           if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
             const kindHandler = extractKindHandler(crd);
             if (kindHandler) {
-              registerKindHandler(kindHandler, true);
+              registerKindHandler(kindHandler, false);
             }
           }
         });

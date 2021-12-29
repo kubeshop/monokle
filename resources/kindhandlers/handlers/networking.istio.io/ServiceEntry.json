@@ -1,0 +1,8 @@
+{
+  "sectionName": "Istio",
+  "kindSectionName": "ServiceEntries",
+  "helpLink": "https://istio.io/latest/docs/reference/config/networking/service-entry/",
+  "podSelectors": [
+    ["spec", "workloadSelector", "labels"]
+  ]
+}
