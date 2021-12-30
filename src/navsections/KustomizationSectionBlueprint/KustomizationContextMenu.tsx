@@ -41,9 +41,9 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     const resource = resourceMap[itemInstance.id];
 
     if (resource) {
-      dispatch(setLeftMenuSelection('file-explorer'));
       dispatch(setSelectingFile(true));
       dispatch(selectFile({filePath: resource.filePath}));
+      dispatch(setLeftMenuSelection('file-explorer'));
     }
   };
 
