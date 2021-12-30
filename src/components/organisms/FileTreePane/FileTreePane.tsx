@@ -558,6 +558,7 @@ const FileTreePane = () => {
 
   const dispatch = useAppDispatch();
 
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
@@ -664,21 +665,6 @@ const FileTreePane = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResourceId, tree]);
-
-  useEffect(() => {
-    // removes any highlight when a file is selected
-    if (selectedPath && highlightNode) {
-      highlightNode.highlight = false;
-      treeRef?.current?.scrollTo({key: selectedPath});
-      return;
-    }
-
-    if (selectedPath) {
-      treeRef?.current?.scrollTo({key: selectedPath});
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [highlightNode, selectedPath]);
 
   const onDelete = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
     const {isDirectory, name, err} = args;
@@ -857,6 +843,32 @@ const FileTreePane = () => {
       dispatch(openNewResourceWizard({defaultInput: {targetFile}}));
     }
   };
+
+  useEffect(() => {
+    // removes any highlight when a file is selected
+    if (selectedPath && highlightNode) {
+      highlightNode.highlight = false;
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightNode]);
+
+  useEffect(() => {
+    if (leftMenuSelection !== 'file-explorer') {
+      return;
+    }
+
+    if (selectedPath) {
+      treeRef?.current?.scrollTo({key: selectedPath});
+      return;
+    }
+
+    if (highlightNode) {
+      treeRef?.current?.scrollTo({key: highlightNode.key});
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leftMenuSelection]);
 
   return (
     <FileTreeContainer>

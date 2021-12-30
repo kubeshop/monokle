@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile} from '@redux/reducers/main';
+import {selectFile, setSelectingFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
@@ -39,16 +39,18 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
 
   const onClickShowFile = () => {
     const resource = resourceMap[itemInstance.id];
+
     if (resource) {
-      dispatch(selectFile({filePath: resource.filePath}));
       dispatch(setLeftMenuSelection('file-explorer'));
+      dispatch(setSelectingFile(true));
+      dispatch(selectFile({filePath: resource.filePath}));
     }
   };
 
   const menu = (
     <Menu>
       <Menu.Item disabled={isInPreviewMode} key="show_file" onClick={onClickShowFile}>
-        Show file
+        Go to file
       </Menu.Item>
     </Menu>
   );
