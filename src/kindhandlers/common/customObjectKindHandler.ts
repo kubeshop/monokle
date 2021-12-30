@@ -20,6 +20,18 @@ function extractResourceVersion(resource: K8sResource, kindVersion: string, kind
   return {version, group};
 }
 
+function extractFormSchema(editorSchema: any) {
+  const schema: any = JSON.parse(JSON.stringify(editorSchema));
+  if (schema && schema.properties) {
+    // remove common object properties since these are shown in a separate form
+    delete schema.properties['apiVersion'];
+    delete schema.properties['kind'];
+    delete schema.properties['metadata'];
+  }
+
+  return schema;
+}
+
 export const createNamespacedCustomObjectKindHandler = (
   kind: string,
   subsectionName: string,
@@ -40,7 +52,7 @@ export const createNamespacedCustomObjectKindHandler = (
     helpLink,
     outgoingRefMappers,
     sourceEditorOptions: editorSchema ? {editorSchema} : undefined,
-    formEditorOptions: editorSchema ? {editorSchema} : undefined,
+    formEditorOptions: editorSchema ? {editorSchema: extractFormSchema(editorSchema)} : undefined,
     getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
@@ -121,7 +133,7 @@ export const createClusterCustomObjectKindHandler = (
     outgoingRefMappers,
     isCustom: true,
     sourceEditorOptions: editorSchema ? {editorSchema} : undefined,
-    formEditorOptions: editorSchema ? {editorSchema} : undefined,
+    formEditorOptions: editorSchema ? {editorSchema: extractFormSchema(editorSchema)} : undefined,
     getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
