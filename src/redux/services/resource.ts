@@ -19,19 +19,18 @@ import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
 
 import {
-  extractKindHandler,
   getDependentResourceKinds,
   getKnownResourceKinds,
   getResourceKindHandler,
-  refMapperMatchesKind,
   registerKindHandler,
 } from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
+import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {processRefs} from './resourceRefs';
 import {validateResource} from './validation';

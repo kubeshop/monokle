@@ -1,24 +1,15 @@
 import fs from 'fs';
 import log from 'loglevel';
+import path from 'path';
 import {parseAllDocuments} from 'yaml';
 
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {getStaticResourcePath, loadResource} from '@redux/services';
-import {extractSchema} from '@redux/services/schema';
-import {findDefaultVersion} from '@redux/thunks/previewCluster';
+import {getStaticResourcePath} from '@redux/services';
+import {refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
-import {
-  createClusterCustomObjectKindHandler,
-  createNamespacedCustomObjectKindHandler,
-} from '@src/kindhandlers/common/customObjectKindHandler';
-import {
-  createPodSelectorOutgoingRefMappers,
-  explicitNamespaceMatcher,
-  implicitNamespaceMatcher,
-  optionalExplicitNamespaceMatcher,
-} from '@src/kindhandlers/common/outgoingRefMappers';
+import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -105,7 +96,7 @@ export function registerKindHandler(kindHandler: ResourceKindHandler, replace: b
   }
 }
 
-readCrdKindHandlers();
+readBundledCrdKindHandlers();
 
 export const getKnownResourceKinds = () => {
   return ResourceKindHandlers.map(handler => handler.kind);
@@ -147,6 +138,29 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
   return [...new Set(dependentResourceKinds)];
 };
 
+function readBundledCrdKindHandlers() {
+  const crds = findFiles(getStaticResourcePath(`kindhandlers${path.sep}crds`), '.yaml');
+  crds.forEach(crdPath => {
+    try {
+      const crdContent = fs.readFileSync(crdPath, 'utf-8');
+      if (crdContent) {
+        const documents = parseAllDocuments(crdContent, {prettyErrors: true});
+        documents.forEach(doc => {
+          const crd = doc.toJS({maxAliasCount: -1});
+          if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
+            const kindHandler = extractKindHandler(crd, `kindhandlers${path.sep}handlers`);
+            if (kindHandler) {
+              registerKindHandler(kindHandler, false);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      log.warn(`Failed to parse kindhandler CRD at ${crdPath}`, e);
+    }
+  });
+}
+
 function findFiles(dir: string, ext: string) {
   let results: string[] = [];
   let list = fs.readdirSync(dir);
@@ -160,128 +174,4 @@ function findFiles(dir: string, ext: string) {
     }
   });
   return results;
-}
-
-export function extractKindHandler(crd: any) {
-  const spec = crd.spec;
-  const kind = spec.names.kind;
-  const kindGroup = spec.group;
-  const kindVersion = findDefaultVersion(crd);
-
-  if (kindVersion) {
-    const kindPlural = spec.names.plural;
-    const editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
-    let kindHandler: ResourceKindHandler | undefined;
-    let helpLink: string | undefined;
-    let refMappers: any[] = [];
-    let subsectionName = spec.group;
-    let kindSectionName = spec.names.plural;
-
-    try {
-      const handlerContent = loadResource(`kindhandlers/handlers/${kindGroup}/${kind}.json`);
-
-      if (handlerContent) {
-        const handler = JSON.parse(handlerContent);
-        if (handler) {
-          helpLink = handler.helpLink;
-          subsectionName = handler.sectionName || subsectionName;
-          kindSectionName = handler.kindSectionName || kindSectionName;
-
-          if (handler.refMappers) {
-            handler.refMappers.forEach((refMapper: any) => {
-              if (refMapper.source?.namespaceRef) {
-                switch (refMapper.source?.namespaceRef) {
-                  case 'Implicit':
-                    refMapper.source.siblingMatchers = {
-                      namespace: implicitNamespaceMatcher,
-                    };
-                    break;
-                  case 'Explicit':
-                    refMapper.source.siblingMatchers = {
-                      namespace: explicitNamespaceMatcher,
-                    };
-                    break;
-                  case 'OptionalExplicit':
-                    refMapper.source.siblingMatchers = {
-                      namespace: optionalExplicitNamespaceMatcher,
-                    };
-                    break;
-                  default:
-                }
-              }
-
-              refMappers.push(refMapper);
-            });
-          }
-
-          if (handler.podSelectors) {
-            handler.podSelectors.forEach((selector: string[]) => {
-              refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
-            });
-          }
-        }
-      }
-    } catch (e) {
-      log.warn(`Failed to parse kindhandler`, e);
-    }
-
-    if (spec.scope === 'Namespaced') {
-      kindHandler = createNamespacedCustomObjectKindHandler(
-        kind,
-        subsectionName,
-        kindSectionName,
-        kindGroup,
-        kindVersion,
-        kindPlural,
-        editorSchema,
-        helpLink,
-        refMappers
-      );
-    } else if (spec.scope === 'Cluster') {
-      kindHandler = createClusterCustomObjectKindHandler(
-        kind,
-        subsectionName,
-        kindSectionName,
-        kindGroup,
-        kindVersion,
-        kindPlural,
-        editorSchema,
-        helpLink,
-        refMappers
-      );
-    }
-
-    return kindHandler;
-  }
-}
-
-function readCrdKindHandlers() {
-  const crds = findFiles(getStaticResourcePath('kindhandlers/crds'), '.yaml');
-  crds.forEach(crdPath => {
-    try {
-      const crdContent = fs.readFileSync(crdPath, 'utf-8');
-      if (crdContent) {
-        const documents = parseAllDocuments(crdContent, {prettyErrors: true});
-        documents.forEach(doc => {
-          const crd = doc.toJS({maxAliasCount: -1});
-          if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
-            const kindHandler = extractKindHandler(crd);
-            if (kindHandler) {
-              registerKindHandler(kindHandler, false);
-            }
-          }
-        });
-      }
-    } catch (e) {
-      log.warn(`Failed to parse kindhandler CRD at ${crdPath}`, e);
-    }
-  });
-}
-
-export function refMapperMatchesKind(refMapper: RefMapper, kind: string) {
-  if (refMapper.target.kind.startsWith('$')) {
-    return kind.match(refMapper.target.kind.substring(1)) !== null;
-  }
-
-  return refMapper.target.kind === kind;
 }

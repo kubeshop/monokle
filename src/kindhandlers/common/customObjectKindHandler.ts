@@ -1,13 +1,23 @@
 import * as k8s from '@kubernetes/client-node';
 
 import log from 'loglevel';
+import path from 'path';
 
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {loadResource} from '@redux/services';
+import {extractSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
+
+import {
+  createPodSelectorOutgoingRefMappers,
+  explicitNamespaceMatcher,
+  implicitNamespaceMatcher,
+  optionalExplicitNamespaceMatcher,
+} from '@src/kindhandlers/common/outgoingRefMappers';
 
 /**
  * extract the version from the apiVersion string of the specified resource
@@ -32,7 +42,102 @@ function extractFormSchema(editorSchema: any) {
   return schema;
 }
 
-export const createNamespacedCustomObjectKindHandler = (
+export function extractKindHandler(crd: any, handlerPath?: string) {
+  const spec = crd.spec;
+  const kind = spec.names.kind;
+  const kindGroup = spec.group;
+  const kindVersion = findDefaultVersion(crd);
+
+  if (kindVersion) {
+    const kindPlural = spec.names.plural;
+    const editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
+    let kindHandler: ResourceKindHandler | undefined;
+    let helpLink: string | undefined;
+    let refMappers: any[] = [];
+    let subsectionName = spec.group;
+    let kindSectionName = spec.names.plural;
+
+    if (handlerPath) {
+      try {
+        const handlerContent = loadResource(`${handlerPath}${path.sep}${kindGroup}${path.sep}${kind}.json`);
+
+        if (handlerContent) {
+          const handler = JSON.parse(handlerContent);
+          if (handler) {
+            helpLink = handler.helpLink;
+            subsectionName = handler.sectionName || subsectionName;
+            kindSectionName = handler.kindSectionName || kindSectionName;
+
+            if (handler.refMappers) {
+              handler.refMappers.forEach((refMapper: any) => {
+                if (refMapper.source?.namespaceRef) {
+                  switch (refMapper.source?.namespaceRef) {
+                    case 'Implicit':
+                      refMapper.source.siblingMatchers = {
+                        namespace: implicitNamespaceMatcher,
+                      };
+                      break;
+                    case 'Explicit':
+                      refMapper.source.siblingMatchers = {
+                        namespace: explicitNamespaceMatcher,
+                      };
+                      break;
+                    case 'OptionalExplicit':
+                      refMapper.source.siblingMatchers = {
+                        namespace: optionalExplicitNamespaceMatcher,
+                      };
+                      break;
+                    default:
+                  }
+                }
+
+                refMappers.push(refMapper);
+              });
+            }
+
+            if (handler.podSelectors) {
+              handler.podSelectors.forEach((selector: string[]) => {
+                refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
+              });
+            }
+          }
+        }
+      } catch (e) {
+        log.warn(`Failed to parse kindhandler`, e);
+      }
+    }
+
+    if (spec.scope === 'Namespaced') {
+      kindHandler = createNamespacedCustomObjectKindHandler(
+        kind,
+        subsectionName,
+        kindSectionName,
+        kindGroup,
+        kindVersion,
+        kindPlural,
+        editorSchema,
+        helpLink,
+        refMappers
+      );
+    } else if (spec.scope === 'Cluster') {
+      kindHandler = createClusterCustomObjectKindHandler(
+        kind,
+        subsectionName,
+        kindSectionName,
+        kindGroup,
+        kindVersion,
+        kindPlural,
+        editorSchema,
+        helpLink,
+        refMappers
+      );
+    }
+
+    return kindHandler;
+  }
+}
+
+const createNamespacedCustomObjectKindHandler = (
   kind: string,
   subsectionName: string,
   kindSectionName: string,
@@ -113,7 +218,7 @@ export const createNamespacedCustomObjectKindHandler = (
   };
 };
 
-export const createClusterCustomObjectKindHandler = (
+const createClusterCustomObjectKindHandler = (
   kind: string,
   subsectionName: string,
   kindSectionName: string,

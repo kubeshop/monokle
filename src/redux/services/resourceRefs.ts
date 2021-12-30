@@ -6,12 +6,7 @@ import {RefMapper} from '@models/resourcekindhandler';
 
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-import {
-  getIncomingRefMappers,
-  getKnownResourceKinds,
-  getResourceKindHandler,
-  refMapperMatchesKind,
-} from '@src/kindhandlers';
+import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
 import {traverseDocument} from './manifest-utils';
 import {NodeWrapper, createResourceRef, getLineCounter, getParsedDoc, linkResources} from './resource';
@@ -67,6 +62,14 @@ const addRefNodeAtPath = (refNode: RefNode, path: string, refNodesByPath: Record
     refNodesByPath[path] = [refNode];
   }
 };
+
+export function refMapperMatchesKind(refMapper: RefMapper, kind: string) {
+  if (refMapper.target.kind.startsWith('$')) {
+    return kind.match(refMapper.target.kind.substring(1)) !== null;
+  }
+
+  return refMapper.target.kind === kind;
+}
 
 /**
  * Cache of refMappers for a specific resource kind
