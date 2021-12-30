@@ -1,4 +1,37 @@
-import {NamespaceRefTypeEnum, RefMapper} from '@models/resourcekindhandler';
+import {K8sResource} from '@models/k8sresource';
+import {RefMapper} from '@models/resourcekindhandler';
+
+/**
+ * Matcher that ensures the source and target namespace are the same
+ */
+
+export function implicitNamespaceMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
+  return targetResource.namespace === sourceResource.namespace;
+}
+
+/**
+ * Matcher the ensures that the target resource has an optionally specified namespace
+ */
+
+export function optionalExplicitNamespaceMatcher(
+  sourceResource: K8sResource,
+  targetResource: K8sResource,
+  value: string
+) {
+  if (value) {
+    return targetResource.namespace === value;
+  }
+
+  return targetResource.namespace === sourceResource.namespace;
+}
+
+/**
+ * Matcher the ensures that the target resource has the specified namespace
+ */
+
+export function explicitNamespaceMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
+  return targetResource.namespace === value;
+}
 
 export const ConfigMapTarget = {
   target: {
@@ -28,7 +61,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['configMapRef', 'name'],
-      hasOptionalSibling: true,
+      isOptional: true,
     },
     type: 'name',
     ...ConfigMapTarget,
@@ -36,14 +69,15 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['configMapKeyRef', 'name'],
-      hasOptionalSibling: true,
+      isOptional: true,
     },
     type: 'name',
     ...ConfigMapTarget,
   },
   {
     source: {
-      pathParts: ['configMap', 'name'],
+      pathParts: ['volumes', '*', 'configMap', 'name'],
+      isOptional: true,
     },
     type: 'name',
     ...ConfigMapTarget,
@@ -52,7 +86,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretvolumesource-v1-core
     source: {
       pathParts: ['volumes', '*', 'secret', 'secretName'],
-      hasOptionalSibling: true,
+      isOptional: true,
     },
     type: 'name',
     ...SecretTarget,
@@ -61,7 +95,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretprojection-v1-core
     source: {
       pathParts: ['sources', '*', 'secret', 'name'],
-      hasOptionalSibling: true,
+      isOptional: true,
     },
     type: 'name',
     ...SecretTarget,
@@ -72,7 +106,9 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // or https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#localobjectreference-v1-core (without namespace)
     source: {
       pathParts: ['secretRef', 'name'],
-      namespaceRef: NamespaceRefTypeEnum.OptionalExplicit, // secretRefs can be either
+      siblingMatchers: {
+        namespace: optionalExplicitNamespaceMatcher,
+      },
     },
     type: 'name',
     ...SecretTarget,
@@ -81,7 +117,9 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core (with namespace)
     source: {
       pathParts: ['controllerExpandSecretRef', 'name'],
-      namespaceRef: NamespaceRefTypeEnum.Explicit,
+      siblingMatchers: {
+        namespace: explicitNamespaceMatcher,
+      },
     },
     type: 'name',
     ...SecretTarget,
@@ -90,7 +128,9 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core (with namespace)
     source: {
       pathParts: ['controllerPublishSecretRef', 'name'],
-      namespaceRef: NamespaceRefTypeEnum.Explicit,
+      siblingMatchers: {
+        namespace: explicitNamespaceMatcher,
+      },
     },
     type: 'name',
     ...SecretTarget,
@@ -99,7 +139,9 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core (with namespace)
     source: {
       pathParts: ['nodePublishSecretRef', 'name'],
-      namespaceRef: NamespaceRefTypeEnum.Explicit,
+      siblingMatchers: {
+        namespace: explicitNamespaceMatcher,
+      },
     },
     type: 'name',
     ...SecretTarget,
@@ -108,7 +150,9 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core (with namespace)
     source: {
       pathParts: ['nodeStageSecretRef', 'name'],
-      namespaceRef: NamespaceRefTypeEnum.Explicit,
+      siblingMatchers: {
+        namespace: explicitNamespaceMatcher,
+      },
     },
     type: 'name',
     ...SecretTarget,
@@ -116,7 +160,7 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['secretKeyRef', 'name'],
-      hasOptionalSibling: true,
+      isOptional: true,
     },
     type: 'name',
     ...SecretTarget,
@@ -124,7 +168,9 @@ export const PodOutgoingRefMappers: RefMapper[] = [
   {
     source: {
       pathParts: ['imagePullSecrets', '*', 'name'],
-      namespaceRef: NamespaceRefTypeEnum.Implicit,
+      siblingMatchers: {
+        namespace: implicitNamespaceMatcher,
+      },
     },
     type: 'name',
     ...SecretTarget,
@@ -140,7 +186,9 @@ export const PodOutgoingRefMappers: RefMapper[] = [
     // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#persistentvolumeclaimvolumesource-v1-core
     source: {
       pathParts: ['persistentVolumeClaim', 'claimName'],
-      namespaceRef: NamespaceRefTypeEnum.Implicit,
+      siblingMatchers: {
+        namespace: implicitNamespaceMatcher,
+      },
     },
     type: 'name',
     ...PersistentVolumeClaimTarget,
@@ -162,12 +210,9 @@ export function createSelectorOutgoingRefMappers(targetResourceKind: string, sel
 
 export function createPodSelectorOutgoingRefMappers(selectorPathParts?: string[]): RefMapper[] {
   return [
-    createSelectorOutgoingRefMappers('Pod', selectorPathParts),
-    createSelectorOutgoingRefMappers('DaemonSet', selectorPathParts),
-    createSelectorOutgoingRefMappers('Deployment', selectorPathParts),
-    createSelectorOutgoingRefMappers('Job', selectorPathParts),
-    createSelectorOutgoingRefMappers('ReplicaSet', selectorPathParts),
-    createSelectorOutgoingRefMappers('ReplicationController', selectorPathParts),
-    createSelectorOutgoingRefMappers('StatefulSet', selectorPathParts),
+    createSelectorOutgoingRefMappers(
+      '$(Pod|DaemonSet|Deployment|Job|ReplicaSet|ReplicationController|StatefulSet)',
+      selectorPathParts
+    ),
   ];
 }

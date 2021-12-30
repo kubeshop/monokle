@@ -3,9 +3,9 @@ import * as k8s from '@kubernetes/client-node';
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
-import {NamespaceRefTypeEnum, ResourceKindHandler} from '@models/resourcekindhandler';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
+import {SecretTarget, explicitNamespaceMatcher} from '@src/kindhandlers/common/outgoingRefMappers';
 
 const PersistentVolumeHandler: ResourceKindHandler = {
   kind: 'PersistentVolume',
@@ -41,7 +41,9 @@ const PersistentVolumeHandler: ResourceKindHandler = {
       // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core
       source: {
         pathParts: ['secretRef', 'name'],
-        namespaceRef: NamespaceRefTypeEnum.Explicit,
+        siblingMatchers: {
+          namespace: explicitNamespaceMatcher,
+        },
       },
       type: 'name',
       ...SecretTarget,
@@ -50,8 +52,9 @@ const PersistentVolumeHandler: ResourceKindHandler = {
       // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
       source: {
         pathParts: ['spec', 'azureFile', 'secretName'],
-        namespaceRef: NamespaceRefTypeEnum.Explicit,
-        namespaceProperty: 'secretNamespace',
+        siblingMatchers: {
+          secretNamespace: explicitNamespaceMatcher,
+        },
       },
       type: 'name',
       ...SecretTarget,
@@ -63,6 +66,29 @@ const PersistentVolumeHandler: ResourceKindHandler = {
       },
       type: 'name',
       ...SecretTarget,
+    },
+    {
+      source: {
+        pathParts: ['spec', 'claimRef'],
+        siblingMatchers: {
+          kind: (sourceResource, targetResource, value) => {
+            return value === undefined || targetResource.kind === value;
+          },
+          apiVersion: (sourceResource, targetResource, value) => {
+            return value === undefined || targetResource.version.startsWith(value);
+          },
+          namespace: (sourceResource, targetResource, value) => {
+            return value === undefined || targetResource.namespace === value;
+          },
+          uid: (sourceResource, targetResource, value) => {
+            return value === undefined || targetResource.id === value;
+          },
+        },
+      },
+      target: {
+        kind: 'PersistentVolumeClaim',
+      },
+      type: 'name',
     },
   ],
   helpLink: 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/',

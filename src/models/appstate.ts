@@ -62,6 +62,7 @@ type ResourceFilterType = {
   namespace?: string;
   labels: Record<string, string | null>;
   annotations: Record<string, string | null>;
+  fileOrFolderContainedIn?: string;
 };
 
 type ResourceRefsProcessingOptions = {
