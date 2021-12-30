@@ -499,6 +499,11 @@ export const mainSlice = createSlice({
             ? undefined
             : filter.kind
           : state.resourceFilter.kind,
+        fileOrFolderContainedIn: filter.fileOrFolderContainedIn
+          ? filter.fileOrFolderContainedIn === state.resourceFilter.fileOrFolderContainedIn
+            ? undefined
+            : filter.fileOrFolderContainedIn
+          : state.resourceFilter.fileOrFolderContainedIn,
         name: state.resourceFilter.name,
         labels: state.resourceFilter.labels,
         annotations: state.resourceFilter.annotations,
