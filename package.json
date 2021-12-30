@@ -83,7 +83,7 @@
     "@trodi/electron-splashscreen": "1.0.2",
     "@types/async": "3.2.10",
     "@types/flat": "5.0.2",
-    "@types/lodash": "4.14.177",
+    "@types/lodash": "4.14.178",
     "ajv": "6.12.6",
     "antd": "4.17.3",
     "async": "3.2.2",
