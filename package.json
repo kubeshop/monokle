@@ -77,7 +77,7 @@
   "dependencies": {
     "@ant-design/icons": "4.7.0",
     "@kubernetes/client-node": "0.16.1",
-    "@reduxjs/toolkit": "1.6.2",
+    "@reduxjs/toolkit": "1.7.0",
     "@rjsf/antd": "3.2.1",
     "@rjsf/core": "3.2.1",
     "@trodi/electron-splashscreen": "1.0.2",
