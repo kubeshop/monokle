@@ -1,6 +1,7 @@
 import fs from 'fs';
+import {readdir} from 'fs/promises';
 import log from 'loglevel';
-import path from 'path';
+import path, {resolve} from 'path';
 import {parseAllDocuments} from 'yaml';
 
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
@@ -138,9 +139,9 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
   return [...new Set(dependentResourceKinds)];
 };
 
-function readBundledCrdKindHandlers() {
-  const crds = findFiles(getStaticResourcePath(`kindhandlers${path.sep}crds`), '.yaml');
-  crds.forEach(crdPath => {
+async function readBundledCrdKindHandlers() {
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const crdPath of findFiles(getStaticResourcePath(`kindhandlers${path.sep}crds`), '.yaml')) {
     try {
       const crdContent = fs.readFileSync(crdPath, 'utf-8');
       if (crdContent) {
@@ -158,20 +159,23 @@ function readBundledCrdKindHandlers() {
     } catch (e) {
       log.warn(`Failed to parse kindhandler CRD at ${crdPath}`, e);
     }
-  });
+  }
 }
 
-function findFiles(dir: string, ext: string) {
-  let results: string[] = [];
-  let list = fs.readdirSync(dir);
-  list.forEach(file => {
-    file = `${dir}/${file}`;
-    let stat = fs.statSync(file);
-    if (stat && stat.isDirectory()) {
-      results = results.concat(findFiles(file, ext));
-    } else if (file.endsWith(ext)) {
-      results.push(file);
+/**
+ * inspired by https://stackoverflow.com/a/45130990/249414
+ */
+
+async function* findFiles(dir: string, ext: string): any {
+  const dirents = await readdir(dir, {withFileTypes: true});
+
+  for (let i = 0; i < dirents.length; i += 1) {
+    const dirent = dirents[i];
+    const res = resolve(dir, dirent.name);
+    if (dirent.isDirectory()) {
+      yield* findFiles(res, ext);
+    } else if (res.endsWith(ext)) {
+      yield res;
     }
-  });
-  return results;
+  }
 }
