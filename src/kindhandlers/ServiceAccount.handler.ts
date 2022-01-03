@@ -46,6 +46,7 @@ const ServiceAccountHandler: ResourceKindHandler = {
             return value === undefined || targetResource.id === value;
           },
         },
+        isOptional: true,
       },
       target: {
         kind: 'Secret',

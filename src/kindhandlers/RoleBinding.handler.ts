@@ -56,7 +56,9 @@ const RoleBindingHandler: ResourceKindHandler = {
             return targetResource.version.startsWith(apiGroup);
           },
           namespace: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
-            return ['User', 'Group'].includes(siblingValues['kind']) ? !value : targetResource.namespace === value;
+            return ['User', 'Group'].includes(siblingValues['kind'])
+              ? !value
+              : targetResource.namespace === (value || sourceResource.namespace);
           },
         },
       },

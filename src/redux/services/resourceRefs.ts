@@ -361,7 +361,8 @@ function shouldCreateUnsatisfiedRef(
   sourceRefNode: RefNode
 ) {
   if (outgoingRefMapper.source.isOptional && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
-    if (getSiblingValue('optional', outgoingRefMapper, sourceResource, sourceRefNode)) {
+    const optionalValue = getSiblingValue('optional', outgoingRefMapper, sourceResource, sourceRefNode);
+    if (optionalValue !== false) {
       return false;
     }
   }
