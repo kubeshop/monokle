@@ -5,6 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
+
 const ClusterRoleBindingHandler: ResourceKindHandler = {
   kind: 'ClusterRoleBinding',
   apiVersionMatcher: '**',
@@ -31,12 +33,8 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
       source: {
         pathParts: ['roleRef', 'name'],
         siblingMatchers: {
-          kind: (sourceResource: K8sResource, targetResource, value) => {
-            return targetResource.kind === value;
-          },
-          apiGroup: (sourceResource: K8sResource, targetResource, value) => {
-            return targetResource.version.startsWith(value);
-          },
+          kind: targetKindMatcher,
+          apiGroup: targetGroupMatcher,
         },
       },
       target: {

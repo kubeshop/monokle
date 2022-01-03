@@ -13,11 +13,13 @@ import {extractSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
 
 import {
-  createPodSelectorOutgoingRefMappers,
   explicitNamespaceMatcher,
   implicitNamespaceMatcher,
   optionalExplicitNamespaceMatcher,
-} from '@src/kindhandlers/common/outgoingRefMappers';
+  targetGroupMatcher,
+  targetKindMatcher,
+} from '@src/kindhandlers/common/customMatchers';
+import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
 /**
  * extract the version from the apiVersion string of the specified resource
@@ -89,6 +91,25 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
                       break;
                     default:
                   }
+                }
+
+                if (refMapper.source?.matchers) {
+                  if (!refMapper.source.siblingMatchers) {
+                    refMapper.source.siblingMatchers = {};
+                  }
+
+                  refMapper.source.matchers.forEach((m: any) => {
+                    switch (m) {
+                      case 'kindMatcher':
+                        refMapper.source.siblingMatchers['kind'] = targetKindMatcher;
+                        break;
+                      case 'groupMatcher':
+                        refMapper.source.siblingMatchers['group'] = targetGroupMatcher;
+                        break;
+                      default:
+                        break;
+                    }
+                  });
                 }
 
                 refMappers.push(refMapper);

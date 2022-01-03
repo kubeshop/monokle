@@ -8,6 +8,10 @@
       "source": {
         "pathParts": [
           "spec", "issuerRef", "name"
+        ],
+        "matchers": [
+          "kindMatcher",
+          "groupMatcher"
         ]
       },
       "type": "name",
