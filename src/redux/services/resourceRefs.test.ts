@@ -80,7 +80,7 @@ test('custom-resource-refs', async () => {
   expect(gateway.refs?.length).toBe(2);
   // @ts-ignore
   expect(gateway.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
-});
+}, 10000);
 
 test('sibling-matchers', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/siblingMatchers'));
