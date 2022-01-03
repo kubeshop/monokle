@@ -114,8 +114,8 @@ export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
       resourceKind,
       ResourceKindHandlers.map(
         resourceKindHandler =>
-          resourceKindHandler.outgoingRefMappers?.filter(
-            outgoingRefMapper => outgoingRefMapper.target.kind === resourceKind
+          resourceKindHandler.outgoingRefMappers?.filter(outgoingRefMapper =>
+            refMapperMatchesKind(outgoingRefMapper, resourceKind)
           ) || []
       ).flat()
     );

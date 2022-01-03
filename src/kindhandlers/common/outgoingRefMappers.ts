@@ -175,7 +175,7 @@ export function createSelectorOutgoingRefMappers(targetResourceKind: string, sel
     },
     target: {
       kind: targetResourceKind,
-      pathParts: ['spec', 'template', 'metadata', 'labels'],
+      pathParts: ['metadata', 'labels'],
     },
     type: 'pairs',
   };

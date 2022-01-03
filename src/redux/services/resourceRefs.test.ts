@@ -114,3 +114,19 @@ test('networkpolicy-resource-refs', () => {
   // @ts-ignore
   expect(isUnsatisfiedRef(networkPolicy.refs[0].type)).toBe(true);
 });
+
+test('pair-refs', () => {
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/pairRefs'));
+
+  const resources = Object.values(resourceMap);
+  expect(resources.length).toBe(2);
+  const service = findResourceByName(resourceMap, 'argo-rollouts-dashboard');
+  expect(service).toBeDefined();
+
+  processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
+
+  // @ts-ignore
+  expect(service.refs?.length).toBe(1);
+  // @ts-ignore
+  expect(isOutgoingRef(service.refs[0].type)).toBe(true);
+});

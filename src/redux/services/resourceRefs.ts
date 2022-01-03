@@ -307,34 +307,33 @@ function handlePairRefMapping(
       targetResources.forEach(targetResource => {
         const targetNodes: RefNode[] = [];
         const targetRefNodes = getResourceRefNodes(targetResource);
-        if (!targetRefNodes) {
-          return;
-        }
-        Object.values(targetRefNodes)
-          .flat()
-          .forEach(({scalar, key, parentKeyPath}) => {
-            if (outgoingRefMapper.target.pathParts) {
-              const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
-              if (outgoingRefMapperTargetPath === parentKeyPath) {
-                targetNodes.push({scalar, key, parentKeyPath});
+        if (targetRefNodes) {
+          Object.values(targetRefNodes)
+            .flat()
+            .forEach(({scalar, key, parentKeyPath}) => {
+              if (outgoingRefMapper.target.pathParts) {
+                const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
+                if (outgoingRefMapperTargetPath === parentKeyPath) {
+                  targetNodes.push({scalar, key, parentKeyPath});
+                }
               }
+            });
+          targetNodes.forEach(targetNode => {
+            if (
+              sourceRefNode.key === targetNode.key &&
+              shouldCreateSatisfiedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)
+            ) {
+              foundMatchByTargetResourceId[targetResource.id] = true;
+              linkResources(
+                sourceResource,
+                targetResource,
+                new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
+                new NodeWrapper(targetNode.scalar, getLineCounter(targetResource)),
+                isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
+              );
             }
           });
-        targetNodes.forEach(targetNode => {
-          if (
-            sourceRefNode.key === targetNode.key &&
-            shouldCreateSatisfiedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)
-          ) {
-            foundMatchByTargetResourceId[targetResource.id] = true;
-            linkResources(
-              sourceResource,
-              targetResource,
-              new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
-              new NodeWrapper(targetNode.scalar, getLineCounter(targetResource)),
-              isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
-            );
-          }
-        });
+        }
       });
 
       // if this sourceRefNode did not link to any target resource, mark the node as unsatisfied
