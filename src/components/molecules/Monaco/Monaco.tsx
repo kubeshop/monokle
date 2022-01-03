@@ -112,11 +112,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   };
 
   const createResource = (outoingRef: ResourceRef, namespace?: string, targetFolder?: string) => {
-    if (outoingRef.target?.type === 'resource' && outoingRef.target.resourceKind) {
+    if (outoingRef.target?.type === 'resource') {
       const input: NewResourceWizardInput = {
         name: outoingRef.name,
         namespace,
-        apiVersion: getResourceKindHandler(outoingRef.target.resourceKind)?.clusterApiVersion,
+        apiVersion: outoingRef.target?.resourceKind
+          ? getResourceKindHandler(outoingRef.target.resourceKind)?.clusterApiVersion
+          : undefined,
         kind: outoingRef.target?.resourceKind,
         targetFolder,
       };
