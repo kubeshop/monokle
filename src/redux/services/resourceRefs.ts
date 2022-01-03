@@ -448,15 +448,6 @@ function getSiblingValue(
   return siblingRefNodes && siblingRefNodes.length > 0 ? siblingRefNodes[0].scalar.value : undefined;
 }
 
-/*
-const siblingMatchers: Record<
-  string,
-  (targetResource: K8sResource, value: string, siblingValues: Record<string, string>) => boolean
-> = {
-  kind: (targetResource, value) => targetResource.kind === value,
-  apiGroup: (targetResource, value) => targetResource.version.startsWith(value),
-}; */
-
 /**
  * Checks if the specified ref has an optional property set to true
  */
