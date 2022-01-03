@@ -93,6 +93,9 @@ const initialUiState: UiState = {
   isClusterDiffVisible: false,
   isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
   isFolderLoading: false,
+  quickSearchActionsPopup: {
+    isOpen: false,
+  },
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
   },

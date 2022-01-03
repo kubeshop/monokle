@@ -142,6 +142,12 @@ export const uiSlice = createSlice({
         errors: [],
       };
     },
+    openQuickSearchActionsPopup: (state: Draft<UiState>) => {
+      state.quickSearchActionsPopup.isOpen = true;
+    },
+    closeQuickSearchActionsPopup: (state: Draft<UiState>) => {
+      state.quickSearchActionsPopup.isOpen = false;
+    },
     openFolderExplorer: (state: Draft<UiState>) => {
       state.folderExplorer = {isOpen: true};
     },
@@ -243,5 +249,7 @@ export const {
   resetLayout,
   setClusterIconHighlightStatus,
   toggleClusterStatus,
+  openQuickSearchActionsPopup,
+  closeQuickSearchActionsPopup,
 } = uiSlice.actions;
 export default uiSlice.reducer;

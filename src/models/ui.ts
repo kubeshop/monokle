@@ -77,6 +77,9 @@ export type UiState = {
     selection: string;
     isActive: boolean;
   };
+  quickSearchActionsPopup: {
+    isOpen: boolean;
+  };
   rightMenu: {
     selection?: string;
     isActive: boolean;
