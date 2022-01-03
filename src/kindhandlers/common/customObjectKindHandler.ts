@@ -44,7 +44,51 @@ function extractFormSchema(editorSchema: any) {
   return schema;
 }
 
+function extractNamespaceMatchers(refMapper: any) {
+  switch (refMapper.source?.namespaceRef) {
+    case 'Implicit':
+      refMapper.source.siblingMatchers = {
+        namespace: implicitNamespaceMatcher,
+      };
+      break;
+    case 'Explicit':
+      refMapper.source.siblingMatchers = {
+        namespace: explicitNamespaceMatcher,
+      };
+      break;
+    case 'OptionalExplicit':
+      refMapper.source.siblingMatchers = {
+        namespace: optionalExplicitNamespaceMatcher,
+      };
+      break;
+    default:
+  }
+}
+
+function extractSiblingMatchers(refMapper: any) {
+  if (!refMapper.source.siblingMatchers) {
+    refMapper.source.siblingMatchers = {};
+  }
+
+  refMapper.source.matchers.forEach((m: any) => {
+    switch (m) {
+      case 'kindMatcher':
+        refMapper.source.siblingMatchers['kind'] = targetKindMatcher;
+        break;
+      case 'groupMatcher':
+        refMapper.source.siblingMatchers['group'] = targetGroupMatcher;
+        break;
+      default:
+        break;
+    }
+  });
+}
+
 export function extractKindHandler(crd: any, handlerPath?: string) {
+  if (!crd?.spec) {
+    return;
+  }
+
   const spec = crd.spec;
   const kind = spec.names.kind;
   const kindGroup = spec.group;
@@ -73,43 +117,11 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
             if (handler.refMappers) {
               handler.refMappers.forEach((refMapper: any) => {
                 if (refMapper.source?.namespaceRef) {
-                  switch (refMapper.source?.namespaceRef) {
-                    case 'Implicit':
-                      refMapper.source.siblingMatchers = {
-                        namespace: implicitNamespaceMatcher,
-                      };
-                      break;
-                    case 'Explicit':
-                      refMapper.source.siblingMatchers = {
-                        namespace: explicitNamespaceMatcher,
-                      };
-                      break;
-                    case 'OptionalExplicit':
-                      refMapper.source.siblingMatchers = {
-                        namespace: optionalExplicitNamespaceMatcher,
-                      };
-                      break;
-                    default:
-                  }
+                  extractNamespaceMatchers(refMapper);
                 }
 
                 if (refMapper.source?.matchers) {
-                  if (!refMapper.source.siblingMatchers) {
-                    refMapper.source.siblingMatchers = {};
-                  }
-
-                  refMapper.source.matchers.forEach((m: any) => {
-                    switch (m) {
-                      case 'kindMatcher':
-                        refMapper.source.siblingMatchers['kind'] = targetKindMatcher;
-                        break;
-                      case 'groupMatcher':
-                        refMapper.source.siblingMatchers['group'] = targetGroupMatcher;
-                        break;
-                      default:
-                        break;
-                    }
-                  });
+                  extractSiblingMatchers(refMapper);
                 }
 
                 refMappers.push(refMapper);

@@ -85,33 +85,35 @@ export function loadCustomSchema(schemaPath: string, resourceKind: string): any 
 }
 
 export function extractSchema(crd: any, versionName: string) {
-  const versions: any[] = crd.spec.versions;
+  const versions: any[] = crd?.spec?.versions || [];
   const version = versions.find((v: any) => v.name === versionName);
-  const schema = version?.schema?.openAPIV3Schema ? version.schema.openAPIV3Schema : undefined;
-  if (schema) {
-    if (!schema.properties) {
-      schema.properties = {};
-    } else if (schema['x-kubernetes-preserve-unknown-fields'] !== true) {
-      schema.additionalProperties = false;
-    }
+  const schema = version?.schema?.openAPIV3Schema;
 
-    schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
-    schema.properties['kind'] = objectMetadataSchema.properties.kind;
-    schema.properties['metadata'] = objectMetadataSchema.properties.metadata;
-
-    Object.values(schema.properties).forEach((prop: any) => {
-      if (prop.type && prop.type === 'object') {
-        try {
-          if (prop.additionalProperties) {
-            delete prop['additionalProperties'];
-          }
-
-          prop['additionalProperties'] = false;
-        } catch (e) {
-          // this could fail - ignore
-        }
-      }
-    });
+  if (!schema) {
+    return;
   }
-  return schema;
+
+  if (!schema.properties) {
+    schema.properties = {};
+  } else if (schema['x-kubernetes-preserve-unknown-fields'] !== true) {
+    schema.additionalProperties = false;
+  }
+
+  schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
+  schema.properties['kind'] = objectMetadataSchema.properties.kind;
+  schema.properties['metadata'] = objectMetadataSchema.properties.metadata;
+
+  Object.values(schema.properties).forEach((prop: any) => {
+    if (prop.type && prop.type === 'object') {
+      try {
+        if (prop.additionalProperties) {
+          delete prop['additionalProperties'];
+        }
+
+        prop['additionalProperties'] = false;
+      } catch (e) {
+        // this could fail - ignore
+      }
+    }
+  });
 }

@@ -82,8 +82,8 @@ const HandlerByResourceKind = Object.fromEntries(
   }).map(kindHandler => [kindHandler.kind, kindHandler])
 );
 
-export function registerKindHandler(kindHandler: ResourceKindHandler, replace: boolean) {
-  if (replace || !HandlerByResourceKind[kindHandler.kind]) {
+export function registerKindHandler(kindHandler: ResourceKindHandler, shouldReplace: boolean) {
+  if (shouldReplace || !HandlerByResourceKind[kindHandler.kind]) {
     log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`);
     HandlerByResourceKind[kindHandler.kind] = kindHandler;
 

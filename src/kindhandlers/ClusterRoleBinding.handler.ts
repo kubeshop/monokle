@@ -68,7 +68,7 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
       type: 'name',
 
       // ignore refs to Users or Groups
-      validateUnsatisfiedRef: (refMapper, sourceResource, values) => {
+      shouldCreateUnsatisfiedRef: (refMapper, sourceResource, values) => {
         const kind = values['kind'];
         return kind !== 'User' && kind !== 'Group';
       },

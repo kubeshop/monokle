@@ -34,7 +34,7 @@ interface RefMapper {
   type: 'path' | 'name' | 'pairs';
 
   // called to validate if an unsatisfied ref should be created for this mapper
-  validateUnsatisfiedRef?: (
+  shouldCreateUnsatisfiedRef?: (
     refMapper: RefMapper,
     sourceResource: K8sResource,
     siblingValues: Record<string, string>

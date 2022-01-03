@@ -368,8 +368,8 @@ function shouldCreateUnsatisfiedRef(
   }
 
   if (
-    outgoingRefMapper.validateUnsatisfiedRef &&
-    !outgoingRefMapper.validateUnsatisfiedRef(
+    outgoingRefMapper.shouldCreateUnsatisfiedRef &&
+    !outgoingRefMapper.shouldCreateUnsatisfiedRef(
       outgoingRefMapper,
       sourceResource,
       getSiblingValues(outgoingRefMapper, sourceResource, sourceRefNode)
@@ -382,13 +382,11 @@ function shouldCreateUnsatisfiedRef(
 }
 
 function getSiblingValues(outgoingRefMapper: RefMapper, sourceResource: K8sResource, sourceRefNode: RefNode) {
-  const siblingValues: Record<string, string> = {};
+  const siblingValues: Record<string, any> = {};
   if (outgoingRefMapper.source.siblingMatchers) {
     Object.keys(outgoingRefMapper.source.siblingMatchers).forEach(key => {
       const value = getSiblingValue(key, outgoingRefMapper, sourceResource, sourceRefNode);
-      if (typeof value === 'string') {
-        siblingValues[key] = value;
-      }
+      siblingValues[key] = value;
     });
   }
   return siblingValues;
