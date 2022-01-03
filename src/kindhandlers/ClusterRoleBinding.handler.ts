@@ -64,6 +64,12 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
         kind: '$(User|Group|ServiceAccount)',
       },
       type: 'name',
+
+      // ignore refs to Users or Groups
+      validateUnsatisfiedRef: (refMapper, sourceResource, values) => {
+        const kind = values['kind'];
+        return kind !== 'User' && kind !== 'Group';
+      },
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding',

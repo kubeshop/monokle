@@ -366,7 +366,32 @@ function shouldCreateUnsatisfiedRef(
       return false;
     }
   }
+
+  if (
+    outgoingRefMapper.validateUnsatisfiedRef &&
+    !outgoingRefMapper.validateUnsatisfiedRef(
+      outgoingRefMapper,
+      sourceResource,
+      getSiblingValues(outgoingRefMapper, sourceResource, sourceRefNode)
+    )
+  ) {
+    return false;
+  }
+
   return true;
+}
+
+function getSiblingValues(outgoingRefMapper: RefMapper, sourceResource: K8sResource, sourceRefNode: RefNode) {
+  const siblingValues: Record<string, string> = {};
+  if (outgoingRefMapper.source.siblingMatchers) {
+    Object.keys(outgoingRefMapper.source.siblingMatchers).forEach(key => {
+      const value = getSiblingValue(key, outgoingRefMapper, sourceResource, sourceRefNode);
+      if (typeof value === 'string') {
+        siblingValues[key] = value;
+      }
+    });
+  }
+  return siblingValues;
 }
 
 /**
@@ -387,13 +412,7 @@ function shouldCreateSatisfiedRef(
   // check with existing sibling matchers
   if (outgoingRefMapper.source.siblingMatchers) {
     // first collect all sibling values so we can pass them to each matcher
-    const siblingValues: Record<string, string> = {};
-    Object.keys(outgoingRefMapper.source.siblingMatchers).forEach(key => {
-      const value = getSiblingValue(key, outgoingRefMapper, sourceResource, sourceRefNode);
-      if (typeof value === 'string') {
-        siblingValues[key] = value;
-      }
-    });
+    const siblingValues = getSiblingValues(outgoingRefMapper, sourceResource, sourceRefNode);
 
     // now query each sibling matcher with all found sibling values
     if (
