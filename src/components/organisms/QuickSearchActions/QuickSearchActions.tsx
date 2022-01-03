@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal} from 'antd';
 
@@ -10,6 +10,8 @@ import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import Colors from '@styles/Colors';
+
+import {ResourceKindHandlers} from '@src/kindhandlers';
 
 import {LabelTypes, optionsTypes} from './LabelMapper';
 import QuickSearchActionsOptionsGroup from './QuickSearchActionsOptionsGroup';
@@ -33,31 +35,63 @@ const OptionsContainer = styled.div`
   margin-top: 12px;
 `;
 
+const GROUP_OPTIONS_LIMIT = 4;
+
+const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
+
 const QuickSearchActions: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const [namespaces] = useNamespaces({extra: ['default']});
 
   const [filteredOptions, setFilteredOptions] = useState<{namespace: string[]; kind: string[]}>();
+  const [searchingValue, setSearchingValue] = useState<string>('');
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchedValue = e.target.value;
-
-    if (!searchedValue) {
-      setFilteredOptions(undefined);
-      return;
-    }
-
-    const filteredNamespaces = namespaces.filter(ns => ns.startsWith(e.target.value));
-
-    setFilteredOptions({namespace: filteredNamespaces, kind: []});
-  };
+  const allResourceKinds = useMemo(() => {
+    return [
+      ...new Set([
+        ...KnownResourceKinds,
+        ...Object.values(resourceMap)
+          .filter(r => !KnownResourceKinds.includes(r.kind))
+          .map(r => r.kind),
+      ]),
+    ].sort();
+  }, [resourceMap]);
 
   const foundOptions = useMemo(
     () => (filteredOptions ? Object.values(filteredOptions).some(options => options.length > 0) : false),
     [filteredOptions]
   );
+
+  useEffect(() => {
+    if (!searchingValue && !filteredOptions) {
+      return;
+    }
+
+    if (!searchingValue && filteredOptions) {
+      setFilteredOptions(undefined);
+      return;
+    }
+
+    const filteredKinds = allResourceKinds
+      .filter(kind => kind.toLowerCase().startsWith(searchingValue))
+      .slice(0, GROUP_OPTIONS_LIMIT);
+    const filteredNamespaces = namespaces
+      .filter(ns => ns.toLowerCase().startsWith(searchingValue))
+      .slice(0, GROUP_OPTIONS_LIMIT);
+
+    setFilteredOptions({namespace: filteredNamespaces, kind: filteredKinds});
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchingValue]);
+
+  const onOptionClick = () => {
+    setFilteredOptions(undefined);
+    setSearchingValue('');
+    dispatch(closeQuickSearchActionsPopup());
+  };
 
   return (
     <Modal
@@ -68,7 +102,12 @@ const QuickSearchActions: React.FC = () => {
       bodyStyle={{padding: '0px'}}
     >
       <MainContainer>
-        <Search placeholder="Search by namespace, kind and resource" onChange={onChange} style={{padding: '0px 8px'}} />
+        <Search
+          placeholder="Search by namespace, kind and resource"
+          style={{padding: '0px 8px'}}
+          value={searchingValue}
+          onChange={e => setSearchingValue(e.target.value.toLowerCase())}
+        />
 
         {filteredOptions ? (
           foundOptions ? (
@@ -76,7 +115,7 @@ const QuickSearchActions: React.FC = () => {
               {Object.entries(filteredOptions)
                 .filter((entry): entry is [LabelTypes, string[]] => optionsTypes.includes(entry[0]))
                 .map(([key, value]) => (
-                  <QuickSearchActionsOptionsGroup key={key} type={key} options={value} />
+                  <QuickSearchActionsOptionsGroup key={key} type={key} options={value} onOptionClick={onOptionClick} />
                 ))}
             </OptionsContainer>
           ) : (
