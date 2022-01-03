@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Input, Modal} from 'antd';
 
@@ -49,6 +49,8 @@ const QuickSearchActions: React.FC = () => {
   const [filteredOptions, setFilteredOptions] = useState<{namespace: string[]; kind: string[]}>();
   const [searchingValue, setSearchingValue] = useState<string>('');
 
+  const searchInputRef = useRef<any>();
+
   const allResourceKinds = useMemo(() => {
     return [
       ...new Set([
@@ -64,6 +66,12 @@ const QuickSearchActions: React.FC = () => {
     () => (filteredOptions ? Object.values(filteredOptions).some(options => options.length > 0) : false),
     [filteredOptions]
   );
+
+  const onOptionClick = () => {
+    setFilteredOptions(undefined);
+    setSearchingValue('');
+    dispatch(closeQuickSearchActionsPopup());
+  };
 
   useEffect(() => {
     if (!searchingValue && !filteredOptions) {
@@ -87,11 +95,11 @@ const QuickSearchActions: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchingValue]);
 
-  const onOptionClick = () => {
-    setFilteredOptions(undefined);
-    setSearchingValue('');
-    dispatch(closeQuickSearchActionsPopup());
-  };
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => searchInputRef.current.focus(), 0);
+    }
+  }, [isOpen]);
 
   return (
     <Modal
@@ -103,6 +111,7 @@ const QuickSearchActions: React.FC = () => {
     >
       <MainContainer>
         <Search
+          ref={searchInputRef}
           placeholder="Search by namespace, kind and resource"
           style={{padding: '0px 8px'}}
           value={searchingValue}
