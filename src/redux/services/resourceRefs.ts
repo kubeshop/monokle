@@ -313,7 +313,7 @@ function handlePairRefMapping(
             .forEach(({scalar, key, parentKeyPath}) => {
               if (outgoingRefMapper.target.pathParts) {
                 const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
-                if (outgoingRefMapperTargetPath === parentKeyPath) {
+                if (parentKeyPath.endsWith(outgoingRefMapperTargetPath)) {
                   targetNodes.push({scalar, key, parentKeyPath});
                 }
               }
