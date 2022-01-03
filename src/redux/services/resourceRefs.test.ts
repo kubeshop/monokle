@@ -57,7 +57,7 @@ function findResourceByName(resourceMap: ResourceMapType, name: string) {
 
 test('custom-resource-refs', async () => {
   // wait a while for async loading of kindhandlers
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise(resolve => setTimeout(resolve, 5000));
 
   const {resourceMap} = readManifests(getTestResourcePath('manifests/istio'));
 
