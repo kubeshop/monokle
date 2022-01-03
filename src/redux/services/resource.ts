@@ -658,14 +658,18 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             text,
           };
 
-          if (resource.kind === 'CustomResourceDefinition') {
+          if (
+            resource.kind === 'CustomResourceDefinition' &&
+            resource.content?.spec?.kind &&
+            !getResourceKindHandler(resource.content.spec.kind)
+          ) {
             try {
               const kindHandler = extractKindHandler(resource.content);
               if (kindHandler) {
                 registerKindHandler(kindHandler, false);
               }
             } catch (e) {
-              log.warn('Failed to register custom kindhandler', e);
+              log.warn('Failed to register custom kindhandler', resource, e);
             }
           }
 

@@ -101,7 +101,15 @@ export function extractSchema(crd: any, versionName: string) {
 
     Object.values(schema.properties).forEach((prop: any) => {
       if (prop.type && prop.type === 'object') {
-        prop.additionalProperties = false;
+        try {
+          if (prop.additionalProperties) {
+            delete prop['additionalProperties'];
+          }
+
+          prop['additionalProperties'] = false;
+        } catch (e) {
+          // this could fail - ignore
+        }
       }
     });
   }
