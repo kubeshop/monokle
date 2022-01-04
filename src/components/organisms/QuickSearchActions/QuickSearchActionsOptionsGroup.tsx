@@ -2,9 +2,6 @@ import {useCallback, useEffect} from 'react';
 
 import styled from 'styled-components';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateResourceFilter} from '@redux/reducers/main';
-
 import Colors from '@styles/Colors';
 
 import LabelMapper, {LabelTypes} from './LabelMapper';
@@ -13,7 +10,7 @@ interface IProps {
   options: string[];
   searchingValue: string;
   type: LabelTypes;
-  onOptionClick: () => void;
+  onOptionClick: (type: string, option: string) => void;
 }
 
 const GroupContainer = styled.div`
@@ -46,28 +43,15 @@ const OptionLabel = styled.span`
 const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
   const {type, options, searchingValue, onOptionClick} = props;
 
-  const dispatch = useAppDispatch();
-  const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-
-  const onClick = (option: string) => {
-    if (type === 'namespace' && (!resourceFilter.namespace || resourceFilter.namespace !== option)) {
-      dispatch(updateResourceFilter({...resourceFilter, namespace: option}));
-    } else if (type === 'kind' && (!resourceFilter.kind || resourceFilter.kind !== option)) {
-      dispatch(updateResourceFilter({...resourceFilter, kind: option}));
-    }
-
-    onOptionClick();
-  };
-
   const colorMatchingCharacters = useCallback(() => {
     if (!options || !options.length || !searchingValue) {
       return;
     }
 
     options.forEach(option => {
-      const domOption = document.getElementById(option) as HTMLSpanElement;
+      const element = document.getElementById(option) as HTMLSpanElement;
 
-      const optionValue = domOption.textContent;
+      const optionValue = element.textContent;
 
       let newValue = '';
 
@@ -81,7 +65,7 @@ const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
         }
       }
 
-      domOption.innerHTML = newValue;
+      element.innerHTML = newValue;
     });
   }, [options, searchingValue]);
 
@@ -101,7 +85,7 @@ const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
     <GroupContainer>
       <GroupLabel>{LabelMapper[type]}</GroupLabel>
       {options.map(option => (
-        <OptionLabel onClick={() => onClick(option)} key={option} id={option}>
+        <OptionLabel onClick={() => onOptionClick(type, option)} key={option} id={option}>
           {option}
         </OptionLabel>
       ))}

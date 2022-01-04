@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Input, Modal} from 'antd';
 
@@ -7,6 +7,7 @@ import {SearchOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
 
 import {useNamespaces} from '@hooks/useNamespaces';
@@ -70,6 +71,7 @@ const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.k
 const QuickSearchActions: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
+  const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const [namespaces] = useNamespaces({extra: ['default']});
@@ -95,11 +97,39 @@ const QuickSearchActions: React.FC = () => {
     [filteredOptions]
   );
 
-  const closeModalHandler = () => {
+  const applyOption = useCallback(
+    (type: string, option: string) => {
+      if (type === 'namespace' && (!resourceFilter.namespace || resourceFilter.namespace !== option)) {
+        dispatch(updateResourceFilter({...resourceFilter, namespace: option}));
+      } else if (type === 'kind' && (!resourceFilter.kind || resourceFilter.kind !== option)) {
+        dispatch(updateResourceFilter({...resourceFilter, kind: option}));
+      }
+    },
+    [dispatch, resourceFilter]
+  );
+
+  const closeModalHandler = useCallback(() => {
     setFilteredOptions(undefined);
     setSearchingValue('');
     dispatch(closeQuickSearchActionsPopup());
-  };
+  }, [dispatch]);
+
+  const onReturnHandler = useCallback(() => {
+    if (!filteredOptions) {
+      return;
+    }
+
+    const options = Object.entries(filteredOptions).filter(entry => entry[1].length === 1);
+
+    if (options.length !== 1) {
+      return;
+    }
+
+    const [type, value] = options[0];
+
+    applyOption(type, value[0]);
+    closeModalHandler();
+  }, [applyOption, closeModalHandler, filteredOptions]);
 
   useEffect(() => {
     if (!searchingValue && !filteredOptions) {
@@ -139,6 +169,7 @@ const QuickSearchActions: React.FC = () => {
             suffix={<SearchOutlined />}
             value={searchingValue}
             onChange={e => setSearchingValue(e.target.value.toLowerCase())}
+            onPressEnter={onReturnHandler}
           />
         </InputContainer>
 
@@ -153,7 +184,10 @@ const QuickSearchActions: React.FC = () => {
                     type={key}
                     options={value}
                     searchingValue={searchingValue}
-                    onOptionClick={closeModalHandler}
+                    onOptionClick={(type, option) => {
+                      applyOption(type, option);
+                      closeModalHandler();
+                    }}
                   />
                 ))}
             </OptionsContainer>
