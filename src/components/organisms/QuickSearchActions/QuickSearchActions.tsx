@@ -142,10 +142,10 @@ const QuickSearchActions: React.FC = () => {
     }
 
     const filteredKinds = allResourceKinds
-      .filter(kind => kind.toLowerCase().startsWith(searchingValue))
+      .filter(kind => kind.toLowerCase().includes(searchingValue.toLowerCase()))
       .slice(0, GROUP_OPTIONS_LIMIT);
     const filteredNamespaces = namespaces
-      .filter(ns => ns.toLowerCase().startsWith(searchingValue))
+      .filter(ns => ns.toLowerCase().includes(searchingValue.toLowerCase()))
       .slice(0, GROUP_OPTIONS_LIMIT);
 
     setFilteredOptions({namespace: filteredNamespaces, kind: filteredKinds});
@@ -168,7 +168,7 @@ const QuickSearchActions: React.FC = () => {
             ref={searchInputRef}
             suffix={<SearchOutlined />}
             value={searchingValue}
-            onChange={e => setSearchingValue(e.target.value.toLowerCase())}
+            onChange={e => setSearchingValue(e.target.value)}
             onPressEnter={onReturnHandler}
           />
         </InputContainer>
@@ -183,7 +183,7 @@ const QuickSearchActions: React.FC = () => {
                     key={key}
                     type={key}
                     options={value}
-                    searchingValue={searchingValue}
+                    searchingValue={searchingValue.toLowerCase()}
                     onOptionClick={(type, option) => {
                       applyOption(type, option);
                       closeModalHandler();
