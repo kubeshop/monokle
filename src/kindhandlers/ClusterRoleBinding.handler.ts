@@ -56,9 +56,14 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
             return targetResource.version.startsWith(apiGroup);
           },
           namespace: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
-            return ['User', 'Group'].includes(siblingValues['kind'])
-              ? !value
-              : targetResource.namespace === (value || sourceResource.namespace);
+            // namespace should not be specified for User/Group kinds
+            if (['User', 'Group'].includes(siblingValues['kind'])) {
+              return !value;
+            }
+
+            return value === 'default' || !value
+              ? !targetResource.namespace || targetResource.namespace === 'default'
+              : targetResource.namespace === value;
           },
         },
       },
