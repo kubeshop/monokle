@@ -4,6 +4,8 @@ import {getTestResourcePath} from '@redux/services/__test__/utils';
 import {readManifests} from '@redux/services/fileEntry.test';
 import {isOutgoingRef, isUnsatisfiedRef, processRefs} from '@redux/services/resourceRefs';
 
+import {awaitKindHandlersLoading} from '@src/kindhandlers';
+
 test('array-optional-resource-refs', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/arrayOptionalResourceRefs'));
 
@@ -56,8 +58,7 @@ function findResourceByName(resourceMap: ResourceMapType, name: string) {
 }
 
 test('custom-resource-refs', async () => {
-  // wait a while for async loading of kindhandlers
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  await awaitKindHandlersLoading;
 
   const {resourceMap} = readManifests(getTestResourcePath('manifests/istio'));
 
@@ -80,7 +81,7 @@ test('custom-resource-refs', async () => {
   expect(gateway.refs?.length).toBe(2);
   // @ts-ignore
   expect(gateway.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
-}, 10000);
+}, 30000);
 
 test('sibling-matchers', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/siblingMatchers'));

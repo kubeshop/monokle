@@ -1,7 +1,8 @@
+import EventEmitter from 'events';
 import fs from 'fs';
 import {readdir} from 'fs/promises';
 import log from 'loglevel';
-import path, {resolve} from 'path';
+import path from 'path';
 import {parseAllDocuments} from 'yaml';
 
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
@@ -97,8 +98,6 @@ export function registerKindHandler(kindHandler: ResourceKindHandler, shouldRepl
   }
 }
 
-readBundledCrdKindHandlers();
-
 export const getKnownResourceKinds = () => {
   return ResourceKindHandlers.map(handler => handler.kind);
 };
@@ -108,6 +107,10 @@ export const getResourceKindHandler = (resourceKind: string): ResourceKindHandle
 };
 
 const incomingRefMappersCache = new Map<string, RefMapper[]>();
+
+/**
+ * Gets all incoming refMappers for the specified resource kind
+ */
 
 export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
   if (!incomingRefMappersCache.has(resourceKind)) {
@@ -124,6 +127,10 @@ export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
   return incomingRefMappersCache.get(resourceKind) || [];
 };
 
+/**
+ * Finds all resource kinds that depend on the specified resource kind(s) via refMappers
+ */
+
 export const getDependentResourceKinds = (resourceKinds: string[]) => {
   const dependentResourceKinds: string[] = [];
   ResourceKindHandlers.forEach(kindHandler => {
@@ -138,6 +145,13 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
   });
   return [...new Set(dependentResourceKinds)];
 };
+
+/**
+ * Read bundled kindhandlers and emit event to notify when finished (used in tests)
+ */
+
+const KindHandlersEventEmitter = new EventEmitter();
+readBundledCrdKindHandlers();
 
 async function readBundledCrdKindHandlers() {
   // eslint-disable-next-line no-restricted-syntax
@@ -160,7 +174,15 @@ async function readBundledCrdKindHandlers() {
       log.warn(`Failed to parse kindhandler CRD at ${crdPath}`, e);
     }
   }
+
+  KindHandlersEventEmitter.emit('loadedKindHandlers');
 }
+
+export const awaitKindHandlersLoading = new Promise<void>(resolve => {
+  KindHandlersEventEmitter.once('loadedKindHandlers', () => {
+    resolve();
+  });
+});
 
 /**
  * inspired by https://stackoverflow.com/a/45130990/249414
@@ -171,7 +193,7 @@ async function* findFiles(dir: string, ext: string): any {
 
   for (let i = 0; i < dirents.length; i += 1) {
     const dirent = dirents[i];
-    const res = resolve(dir, dirent.name);
+    const res = path.resolve(dir, dirent.name);
     if (dirent.isDirectory()) {
       yield* findFiles(res, ext);
     } else if (res.endsWith(ext)) {
