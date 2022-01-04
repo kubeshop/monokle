@@ -152,6 +152,7 @@ const QuickSearchActions: React.FC = () => {
                     key={key}
                     type={key}
                     options={value}
+                    searchingValue={searchingValue}
                     onOptionClick={closeModalHandler}
                   />
                 ))}

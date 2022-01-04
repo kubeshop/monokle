@@ -1,3 +1,5 @@
+import {useCallback, useEffect} from 'react';
+
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -9,6 +11,7 @@ import LabelMapper, {LabelTypes} from './LabelMapper';
 
 interface IProps {
   options: string[];
+  searchingValue: string;
   type: LabelTypes;
   onOptionClick: () => void;
 }
@@ -34,10 +37,14 @@ const OptionLabel = styled.span`
   &:hover {
     background: ${Colors.grey3};
   }
+
+  & .matchingCharacter {
+    color: ${Colors.cyan7};
+  }
 `;
 
 const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
-  const {type, options, onOptionClick} = props;
+  const {type, options, searchingValue, onOptionClick} = props;
 
   const dispatch = useAppDispatch();
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
@@ -52,7 +59,41 @@ const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
     onOptionClick();
   };
 
-  if (!options.length) {
+  const colorMatchingCharacters = useCallback(() => {
+    if (!options || !options.length || !searchingValue) {
+      return;
+    }
+
+    options.forEach(option => {
+      const domOption = document.getElementById(option) as HTMLSpanElement;
+
+      const optionValue = domOption.textContent;
+
+      let newValue = '';
+
+      if (optionValue) {
+        for (let i = 0; i < optionValue.length; i += 1) {
+          if (searchingValue[i] === optionValue[i].toLowerCase()) {
+            newValue += `<span class='matchingCharacter'>${optionValue[i]}</span>`;
+          } else {
+            newValue += optionValue[i];
+          }
+        }
+      }
+
+      domOption.innerHTML = newValue;
+    });
+  }, [options, searchingValue]);
+
+  useEffect(() => {
+    document.addEventListener('keyup', colorMatchingCharacters);
+
+    return () => {
+      document.removeEventListener('keyup', colorMatchingCharacters);
+    };
+  }, [colorMatchingCharacters]);
+
+  if (!options || !options.length) {
     return null;
   }
 
@@ -60,7 +101,7 @@ const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
     <GroupContainer>
       <GroupLabel>{LabelMapper[type]}</GroupLabel>
       {options.map(option => (
-        <OptionLabel onClick={() => onClick(option)} key={option}>
+        <OptionLabel onClick={() => onClick(option)} key={option} id={option}>
           {option}
         </OptionLabel>
       ))}
