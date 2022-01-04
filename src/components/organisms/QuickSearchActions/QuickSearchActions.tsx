@@ -2,6 +2,8 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Input, Modal} from 'antd';
 
+import {SearchOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -15,8 +17,6 @@ import {ResourceKindHandlers} from '@src/kindhandlers';
 
 import {LabelTypes, optionsTypes} from './LabelMapper';
 import QuickSearchActionsOptionsGroup from './QuickSearchActionsOptionsGroup';
-
-const {Search} = Input;
 
 const MainContainer = styled.div`
   padding: 8px 0px;
@@ -33,6 +33,34 @@ const NotFoundLabel = styled.div`
 
 const OptionsContainer = styled.div`
   margin-top: 12px;
+`;
+
+const InputContainer = styled.div`
+  padding: 0 8px;
+
+  & .ant-input-suffix {
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  & .ant-input-affix-wrapper:hover .ant-input-suffix {
+    border-color: #165996;
+  }
+
+  & .ant-input-affix-wrapper-focused .ant-input-suffix {
+    border-left-color: #177ddc;
+  }
+`;
+
+const StyledInput = styled(Input)`
+  padding: 0px 0px 0px 12px;
+
+  & .ant-input-suffix {
+    color: ${Colors.grey450};
+    font-size: 16px;
+    border-left: 1px solid #434343;
+    padding: 7px;
+  }
 `;
 
 const GROUP_OPTIONS_LIMIT = 4;
@@ -67,7 +95,7 @@ const QuickSearchActions: React.FC = () => {
     [filteredOptions]
   );
 
-  const onOptionClick = () => {
+  const closeModalHandler = () => {
     setFilteredOptions(undefined);
     setSearchingValue('');
     dispatch(closeQuickSearchActionsPopup());
@@ -102,21 +130,17 @@ const QuickSearchActions: React.FC = () => {
   }, [isOpen]);
 
   return (
-    <Modal
-      visible={isOpen}
-      onCancel={() => dispatch(closeQuickSearchActionsPopup())}
-      footer={null}
-      closable={false}
-      bodyStyle={{padding: '0px'}}
-    >
+    <Modal footer={null} bodyStyle={{padding: '0px'}} closable={false} visible={isOpen} onCancel={closeModalHandler}>
       <MainContainer>
-        <Search
-          ref={searchInputRef}
-          placeholder="Search by namespace, kind and resource"
-          style={{padding: '0px 8px'}}
-          value={searchingValue}
-          onChange={e => setSearchingValue(e.target.value.toLowerCase())}
-        />
+        <InputContainer>
+          <StyledInput
+            placeholder="Search by namespace, kind and resource"
+            ref={searchInputRef}
+            suffix={<SearchOutlined />}
+            value={searchingValue}
+            onChange={e => setSearchingValue(e.target.value.toLowerCase())}
+          />
+        </InputContainer>
 
         {filteredOptions ? (
           foundOptions ? (
@@ -124,7 +148,12 @@ const QuickSearchActions: React.FC = () => {
               {Object.entries(filteredOptions)
                 .filter((entry): entry is [LabelTypes, string[]] => optionsTypes.includes(entry[0]))
                 .map(([key, value]) => (
-                  <QuickSearchActionsOptionsGroup key={key} type={key} options={value} onOptionClick={onOptionClick} />
+                  <QuickSearchActionsOptionsGroup
+                    key={key}
+                    type={key}
+                    options={value}
+                    onOptionClick={closeModalHandler}
+                  />
                 ))}
             </OptionsContainer>
           ) : (
