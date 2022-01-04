@@ -7,7 +7,7 @@ import {SearchOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateResourceFilter} from '@redux/reducers/main';
+import {selectK8sResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
 
 import {useNamespaces} from '@hooks/useNamespaces';
@@ -73,6 +73,7 @@ const QuickSearchActions: React.FC = () => {
   const isOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
   const [namespaces] = useNamespaces({extra: ['default']});
 
@@ -103,9 +104,11 @@ const QuickSearchActions: React.FC = () => {
         dispatch(updateResourceFilter({...resourceFilter, namespace: option}));
       } else if (type === 'kind' && (!resourceFilter.kind || resourceFilter.kind !== option)) {
         dispatch(updateResourceFilter({...resourceFilter, kind: option}));
+      } else if (type === 'resource' && selectedResourceId !== option) {
+        dispatch(selectK8sResource({resourceId: option}));
       }
     },
-    [dispatch, resourceFilter]
+    [dispatch, resourceFilter, selectedResourceId]
   );
 
   const closeModalHandler = useCallback(() => {

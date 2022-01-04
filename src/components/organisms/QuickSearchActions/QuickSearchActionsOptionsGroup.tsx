@@ -65,24 +65,33 @@ const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
         const parts = option.split(regex);
 
         return (
-          <OptionLabel onClick={() => onOptionClick(type, option)} key={labelKey} id={option}>
+          <OptionLabel
+            onClick={() => onOptionClick(type, type === 'resource' ? opt : option)}
+            key={labelKey}
+            id={option}
+          >
             {type === 'resource' && resourceMap[opt].namespace && <Tag>{resourceMap[opt].namespace}</Tag>}
-            {parts.map((part, i) => {
-              const key = `${labelKey}-${part}-${i}`;
+            <span>
+              {parts.map((part, i) => {
+                const key = `${labelKey}-${part}-${i}`;
 
-              if (part) {
-                if (part.toLowerCase() === searchingValue) {
-                  return (
-                    <span key={key} className="matchingCharacter">
-                      {part}
-                    </span>
-                  );
+                if (part) {
+                  if (part.toLowerCase() === searchingValue) {
+                    return (
+                      <span key={key} className="matchingCharacter">
+                        {part}
+                      </span>
+                    );
+                  }
+                  return part;
                 }
-                return part;
-              }
 
-              return '';
-            })}
+                return '';
+              })}
+            </span>
+            {type === 'resource' && resourceMap[opt].kind && (
+              <Tag style={{marginLeft: '8px'}}>{resourceMap[opt].kind}</Tag>
+            )}
           </OptionLabel>
         );
       })}
