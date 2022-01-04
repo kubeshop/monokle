@@ -693,6 +693,7 @@ export const mainSlice = createSlice({
       state.previewLoader.isLoading = false;
       state.previewLoader.targetResourceId = undefined;
       state.selectedResourceId = undefined;
+      state.selectedValuesFileId = undefined;
       state.selectedPath = undefined;
       state.previewResourceId = undefined;
       state.previewType = undefined;
