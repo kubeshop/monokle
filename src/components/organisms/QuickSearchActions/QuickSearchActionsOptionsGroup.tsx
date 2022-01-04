@@ -1,4 +1,8 @@
+import {Tag} from 'antd';
+
 import styled from 'styled-components';
+
+import {useAppSelector} from '@redux/hooks';
 
 import Colors from '@styles/Colors';
 
@@ -26,7 +30,7 @@ const GroupLabel = styled.span`
 
 const OptionLabel = styled.span`
   cursor: pointer;
-  padding: 0px 20px;
+  padding: 1px 20px;
   color: ${Colors.whitePure};
 
   &:hover {
@@ -41,6 +45,8 @@ const OptionLabel = styled.span`
 const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
   const {type, options, searchingValue, onOptionClick} = props;
 
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+
   if (!options || !options.length) {
     return null;
   }
@@ -49,14 +55,20 @@ const QuickSearchActionsOptionsGroup: React.FC<IProps> = props => {
     <GroupContainer>
       <GroupLabel>{LabelMapper[type]}</GroupLabel>
 
-      {options.map((option, index) => {
-        const regex = new RegExp(`(${searchingValue})`, 'gi');
+      {options.map((opt, index) => {
+        const option = type === 'resource' ? resourceMap[opt].name : opt;
+
+        const labelKey = `${option}-${index}`;
+
+        const inputValue = searchingValue.replaceAll('\\', '\\\\');
+        const regex = new RegExp(`(${inputValue})`, 'gi');
         const parts = option.split(regex);
 
         return (
-          <OptionLabel onClick={() => onOptionClick(type, option)} key={option} id={option}>
+          <OptionLabel onClick={() => onOptionClick(type, option)} key={labelKey} id={option}>
+            {type === 'resource' && resourceMap[opt].namespace && <Tag>{resourceMap[opt].namespace}</Tag>}
             {parts.map((part, i) => {
-              const key = `${option}-${index}-${part}-${i}`;
+              const key = `${labelKey}-${part}-${i}`;
 
               if (part) {
                 if (part.toLowerCase() === searchingValue) {

@@ -64,7 +64,7 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const GROUP_OPTIONS_LIMIT = 4;
+const GROUP_OPTIONS_LIMIT = 5;
 
 const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
@@ -76,7 +76,7 @@ const QuickSearchActions: React.FC = () => {
 
   const [namespaces] = useNamespaces({extra: ['default']});
 
-  const [filteredOptions, setFilteredOptions] = useState<{namespace: string[]; kind: string[]}>();
+  const [filteredOptions, setFilteredOptions] = useState<{namespace: string[]; kind: string[]; resource: string[]}>();
   const [searchingValue, setSearchingValue] = useState<string>('');
 
   const searchInputRef = useRef<any>();
@@ -148,7 +148,12 @@ const QuickSearchActions: React.FC = () => {
       .filter(ns => ns.toLowerCase().includes(searchingValue.toLowerCase()))
       .slice(0, GROUP_OPTIONS_LIMIT);
 
-    setFilteredOptions({namespace: filteredNamespaces, kind: filteredKinds});
+    const filteredResources = Object.entries(resourceMap)
+      .filter(([, value]) => value.name.toLowerCase().includes(searchingValue.toLowerCase()))
+      .map(([key]) => key)
+      .slice(0, GROUP_OPTIONS_LIMIT);
+
+    setFilteredOptions({namespace: filteredNamespaces, kind: filteredKinds, resource: filteredResources});
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchingValue]);
