@@ -105,6 +105,7 @@ const QuickSearchActions: React.FC = () => {
       } else if (type === 'kind' && (!resourceFilter.kind || resourceFilter.kind !== option)) {
         dispatch(updateResourceFilter({...resourceFilter, kind: option}));
       } else if (type === 'resource' && selectedResourceId !== option) {
+        dispatch(updateResourceFilter({labels: {}, annotations: {}}));
         dispatch(selectK8sResource({resourceId: option}));
       }
     },
@@ -116,6 +117,25 @@ const QuickSearchActions: React.FC = () => {
     setSearchingValue('');
     dispatch(closeQuickSearchActionsPopup());
   }, [dispatch]);
+
+  // useEffect(() => {
+  //   if (!filteredOptions) {
+  //     return;
+  //   }
+
+  //   const options = Object.entries(filteredOptions).filter(entry => entry[1].length === 1);
+  //   console.log(options);
+
+  //   if (options.length !== 1) {
+  //     return;
+  //   }
+
+  //   const [type, value] = options[0];
+
+  //   const option = type === 'resource' ? resourceMap[value[0]].name : value[0];
+
+  //   document.getElementById(`${option}-0`)?.focus();
+  // }, [filteredOptions, resourceMap]);
 
   const onReturnHandler = useCallback(() => {
     if (!filteredOptions) {
@@ -172,18 +192,29 @@ const QuickSearchActions: React.FC = () => {
       <MainContainer>
         <InputContainer>
           <StyledInput
+            id="quick-search-input"
             placeholder="Search by namespace, kind and resource"
             ref={searchInputRef}
             suffix={<SearchOutlined />}
             value={searchingValue}
             onChange={e => setSearchingValue(e.target.value)}
             onPressEnter={onReturnHandler}
+            onKeyDown={e => {
+              if (!filteredOptions || !foundOptions) {
+                return;
+              }
+
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                document.getElementById('options-container')?.getElementsByTagName('li')[0].focus();
+              }
+            }}
           />
         </InputContainer>
 
         {filteredOptions ? (
           foundOptions ? (
-            <OptionsContainer>
+            <OptionsContainer id="options-container">
               {Object.entries(filteredOptions)
                 .filter((entry): entry is [LabelTypes, string[]] => optionsTypes.includes(entry[0]))
                 .map(([key, value]) => (
