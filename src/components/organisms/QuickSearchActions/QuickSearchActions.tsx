@@ -39,6 +39,11 @@ const StyledModal = styled(Modal)`
   }
 `;
 
+const QuickSearchContainer = styled.div`
+  padding: 8px;
+  position: relative;
+`;
+
 const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
 const QuickSearchActionsV3: React.FC = () => {
@@ -130,11 +135,13 @@ const QuickSearchActionsV3: React.FC = () => {
     }, [] as {value: string; label: JSX.Element}[]);
 
     const resourceOptions = Object.entries(resourceMap).reduce((filteredOpt, resourceEntry) => {
-      if (resourceEntry[1].name.toLowerCase().includes(searchingValue.toLowerCase())) {
+      const resourceName = resourceEntry[1].name;
+
+      if (!resourceName.startsWith('Patch:') && resourceName.toLowerCase().includes(searchingValue.toLowerCase())) {
         const optionLabel = (
           <div>
             {resourceEntry[1].namespace && <Tag>{resourceEntry[1].namespace}</Tag>}
-            <span>{matchingCharactersLabel(resourceEntry[1].name, 'resource')}</span>
+            <span>{matchingCharactersLabel(resourceName, 'resource')}</span>
             {resourceEntry[1].kind && (
               <span style={{fontStyle: 'italic', marginLeft: '8px', color: Colors.grey6}}>{resourceEntry[1].kind}</span>
             )}
@@ -169,29 +176,32 @@ const QuickSearchActionsV3: React.FC = () => {
       visible={isOpen}
       onCancel={closeModalHandler}
     >
-      <AutoComplete
-        id="quick-search-input"
-        autoFocus
-        defaultOpen
-        options={options}
-        style={{width: '100%'}}
-        value={searchingValue}
-        onSearch={value => setSearchingValue(value)}
-        onSelect={value => {
-          // options are of type : `type:value`
-          applyOption(value.split(':')[0], value.split(':')[1]);
-          closeModalHandler();
-        }}
-        filterOption={(inputValue, opt) => {
-          if (opt?.options?.length) {
-            return true;
-          }
+      <QuickSearchContainer>
+        <AutoComplete
+          id="quick-search-input"
+          autoFocus
+          defaultOpen
+          listHeight={500}
+          options={options}
+          style={{width: '100%'}}
+          value={searchingValue}
+          onSearch={value => setSearchingValue(value)}
+          onSelect={value => {
+            // options are of type : `type:value`
+            applyOption(value.split(':')[0], value.split(':')[1]);
+            closeModalHandler();
+          }}
+          filterOption={(inputValue, opt) => {
+            if (opt?.options?.length) {
+              return true;
+            }
 
-          return false;
-        }}
-      >
-        <Input.Search placeholder="Search by namespace, kind and resource" />
-      </AutoComplete>
+            return false;
+          }}
+        >
+          <Input.Search placeholder="Search by namespace, kind and resource" />
+        </AutoComplete>
+      </QuickSearchContainer>
     </StyledModal>
   );
 };
