@@ -178,13 +178,13 @@ const NewResourceWizard = () => {
         setResourceKindOptions({[data.apiVersion]: kindOptionsByApiVersion});
       }
 
-      // change kind option if its api version is different than the selected one
+      // deselect kind option if its api version is different than the selected one
       if (lastKindRef.current) {
         const kindHandler = getResourceKindHandler(lastKindRef.current);
 
         if (kindHandler && kindHandler.clusterApiVersion !== data.apiVersion) {
           if (kindOptionsByApiVersion && kindOptionsByApiVersion.length > 0) {
-            form.setFieldsValue({kind: kindOptionsByApiVersion[0].kind});
+            form.setFieldsValue({kind: undefined});
             shouldFilterResources = true;
           } else {
             form.setFieldsValue({kind: ''});
