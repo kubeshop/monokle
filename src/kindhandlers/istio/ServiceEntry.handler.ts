@@ -1,5 +1,5 @@
-import {createSelectorOutgoingRefMappers} from '@src/kindhandlers/Service.handler';
 import {createNamespacedCustomObjectKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 import {
   ISTIO_DEFAULT_RESOURCE_VERSION,
   ISTIO_NETWORKING_RESOURCE_GROUP,
@@ -15,24 +15,7 @@ const ServiceEntryHandler = createNamespacedCustomObjectKindHandler(
   'serviceentries',
   'istio/serviceentry.json',
   'https://istio.io/latest/docs/reference/config/networking/service-entry/',
-  [
-    {
-      source: {
-        pathParts: ['spec', 'workloadSelector', 'labels'],
-      },
-      target: {
-        kind: 'Pod',
-        pathParts: ['metadata', 'labels'],
-      },
-      type: 'pairs',
-    },
-    createSelectorOutgoingRefMappers('DaemonSet'),
-    createSelectorOutgoingRefMappers('Deployment'),
-    createSelectorOutgoingRefMappers('Job'),
-    createSelectorOutgoingRefMappers('ReplicaSet'),
-    createSelectorOutgoingRefMappers('ReplicationController'),
-    createSelectorOutgoingRefMappers('StatefulSet'),
-  ]
+  createPodSelectorOutgoingRefMappers(['spec', 'workloadSelector', 'labels'])
 );
 
 export default ServiceEntryHandler;

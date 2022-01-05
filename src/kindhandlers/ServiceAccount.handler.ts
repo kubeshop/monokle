@@ -5,6 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {SecretTarget, implicitNamespaceMatcher} from '@src/kindhandlers/common/outgoingRefMappers';
+
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',
   apiVersionMatcher: '**',
@@ -27,9 +29,37 @@ const ServiceAccountHandler: ResourceKindHandler = {
   },
   outgoingRefMappers: [
     {
-      source: {pathParts: ['secrets']},
-      target: {kind: 'Secret'},
+      source: {
+        pathParts: ['secrets', '*', 'name'],
+        siblingMatchers: {
+          kind: (sourceResource, targetResource, value) => {
+            return value === undefined || targetResource.kind === value;
+          },
+          apiVersion: (sourceResource, targetResource, value) => {
+            return value === undefined || targetResource.version.startsWith(value);
+          },
+          namespace: (sourceResource, targetResource, value) => {
+            return value === undefined || targetResource.namespace === value;
+          },
+          uid: (sourceResource, targetResource, value) => {
+            return value === undefined || targetResource.id === value;
+          },
+        },
+      },
+      target: {
+        kind: 'Secret',
+      },
       type: 'name',
+    },
+    {
+      source: {
+        pathParts: ['imagePullSecrets', '*', 'name'],
+        siblingMatchers: {
+          namespace: implicitNamespaceMatcher,
+        },
+      },
+      type: 'name',
+      ...SecretTarget,
     },
   ],
   helpLink: 'https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/',

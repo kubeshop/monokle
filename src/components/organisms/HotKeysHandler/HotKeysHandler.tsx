@@ -7,7 +7,7 @@ import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openResourceDiffModal} from '@redux/reducers/main';
+import {openResourceDiffModal, updateResourceFilter} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
   setLeftMenuSelection,
@@ -240,6 +240,10 @@ const HotKeysHandler = () => {
 
   useHotkeys(hotkeys.OPEN_HELM_TAB, () => {
     dispatch(setLeftMenuSelection('helm-pane'));
+  });
+
+  useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
+    dispatch(updateResourceFilter({labels: {}, annotations: {}}));
   });
 
   return (
