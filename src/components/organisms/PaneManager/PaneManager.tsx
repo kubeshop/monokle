@@ -23,22 +23,20 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
-import {
-  ActionsPane,
-  FileTreePane,
-  HelmPane,
-  KustomizePane,
-  NavigatorPane,
-  PluginManagerPane,
-  TemplatesPane,
-} from '@organisms';
-
-import {GraphView} from '@molecules';
-
-import {Col, SplitView} from '@atoms';
+// import {
+//   ActionsPane,
+//   FileTreePane,
+//   HelmPane,
+//   KustomizePane,
+//   NavigatorPane,
+//   PluginManagerPane,
+//   TemplatesPane,
+// } from '@organisms';
+// import {GraphView} from '@molecules';
+import {Col} from '@atoms';
 
 import {AppBorders} from '@styles/Borders';
-import {BackgroundColors} from '@styles/Colors';
+import Colors, {BackgroundColors} from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
 import featureJson from '@src/feature-flags.json';
@@ -46,6 +44,8 @@ import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprin
 import {KUSTOMIZATION_SECTION_NAME} from '@src/navsections/KustomizationSectionBlueprint';
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSectionBlueprint';
 
+import RecentProjectsPane from '../RecentProjectsPane';
+import StartProjectPane from '../StartProjectPane';
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
 
@@ -198,6 +198,17 @@ const PaneManager = () => {
       </StyledColumnLeftMenu>
 
       <StyledColumnPanes style={{width: contentWidth}}>
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', height: '100%'}}>
+          <div style={{flex: 3, height: '100%'}}>
+            <StartProjectPane />
+          </div>
+          <div style={{flex: 1, height: '100%', borderLeft: `1px solid ${Colors.grey3}`}}>
+            <RecentProjectsPane />
+          </div>
+        </div>
+      </StyledColumnPanes>
+
+      {/* <StyledColumnPanes style={{width: contentWidth}}>
         <SplitView
           contentWidth={contentWidth}
           left={
@@ -239,7 +250,7 @@ const PaneManager = () => {
           }
           hideRight={!rightActive}
         />
-      </StyledColumnPanes>
+      </StyledColumnPanes> */}
 
       <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
         <Space direction="vertical" style={{width: 43}}>
