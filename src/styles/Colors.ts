@@ -11,6 +11,7 @@ enum Colors {
   grey100 = '#F9FAFA',
   grey8 = '#ACACAC', // gray, gray 8
   grey7 = '#7D7D7D', // gray, gray 7 https://www.figma.com/file/3UVW3KVNob7QjgvH62blGU/add-left-and-right-toolbars?node-id=3%3A5926
+  grey6 = '#5A5A5A', // gray, gray 6
   grey4 = '#303030', // gray, gray 4
   grey3 = '#262626', // gray, gray 3
 

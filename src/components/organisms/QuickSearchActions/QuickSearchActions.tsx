@@ -1,8 +1,6 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Input, Modal} from 'antd';
-
-import {SearchOutlined} from '@ant-design/icons';
+import {AutoComplete, Input, Modal, Tag} from 'antd';
 
 import styled from 'styled-components';
 
@@ -16,59 +14,34 @@ import Colors from '@styles/Colors';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
-import {LabelTypes, optionsTypes} from './LabelMapper';
-import QuickSearchActionsOptionsGroup from './QuickSearchActionsOptionsGroup';
+import LabelMapper from './LabelMapper';
 
-const MainContainer = styled.div`
-  padding: 8px 0px;
+const StyledModal = styled(Modal)`
+  & .ant-input {
+    height: 34px;
+  }
+
+  & .ant-input:focus {
+    box-shadow: none !important;
+  }
+
+  & .ant-input-search-button {
+    border: 0px !important;
+  }
 
   & .ant-input-group-addon {
-    background: transparent;
-  }
-`;
-
-const NotFoundLabel = styled.div`
-  padding: 12px 20px 4px 20px;
-  color: ${Colors.grey7};
-`;
-
-const OptionsContainer = styled.div`
-  margin-top: 12px;
-`;
-
-const InputContainer = styled.div`
-  padding: 0 8px;
-
-  & .ant-input-suffix {
-    transition: all 0.3s;
-    cursor: pointer;
+    border: 1px solid rgb(67, 67, 67) !important;
   }
 
-  & .ant-input-affix-wrapper:hover .ant-input-suffix {
-    border-color: #165996;
-  }
-
-  & .ant-input-affix-wrapper-focused .ant-input-suffix {
-    border-left-color: #177ddc;
+  & .ant-select-focused .ant-input-group-addon {
+    border: 1px solid #165996 !important;
+    border-left-width: 0px !important;
   }
 `;
-
-const StyledInput = styled(Input)`
-  padding: 0px 0px 0px 12px;
-
-  & .ant-input-suffix {
-    color: ${Colors.grey450};
-    font-size: 16px;
-    border-left: 1px solid #434343;
-    padding: 7px;
-  }
-`;
-
-const GROUP_OPTIONS_LIMIT = 5;
 
 const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
-const QuickSearchActions: React.FC = () => {
+const QuickSearchActionsV3: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
@@ -77,10 +50,7 @@ const QuickSearchActions: React.FC = () => {
 
   const [namespaces] = useNamespaces({extra: ['default']});
 
-  const [filteredOptions, setFilteredOptions] = useState<{namespace: string[]; kind: string[]; resource: string[]}>();
   const [searchingValue, setSearchingValue] = useState<string>('');
-
-  const searchInputRef = useRef<any>();
 
   const allResourceKinds = useMemo(() => {
     return [
@@ -92,11 +62,6 @@ const QuickSearchActions: React.FC = () => {
       ]),
     ].sort();
   }, [resourceMap]);
-
-  const foundOptions = useMemo(
-    () => (filteredOptions ? Object.values(filteredOptions).some(options => options.length > 0) : false),
-    [filteredOptions]
-  );
 
   const applyOption = useCallback(
     (type: string, option: string) => {
@@ -113,130 +78,122 @@ const QuickSearchActions: React.FC = () => {
   );
 
   const closeModalHandler = useCallback(() => {
-    setFilteredOptions(undefined);
     setSearchingValue('');
     dispatch(closeQuickSearchActionsPopup());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (!filteredOptions) {
-  //     return;
-  //   }
+  const matchingCharactersLabel = useCallback(
+    (label: string, type: string) => {
+      const inputValue = searchingValue.replaceAll('\\', '\\\\');
+      const regex = new RegExp(`(${inputValue})`, 'gi');
+      const parts = label.split(regex);
 
-  //   const options = Object.entries(filteredOptions).filter(entry => entry[1].length === 1);
-  //   console.log(options);
+      return parts.map((part, index) => {
+        const key = `${type}-${label}-${index}`;
 
-  //   if (options.length !== 1) {
-  //     return;
-  //   }
+        if (part) {
+          if (part.toLowerCase() === searchingValue) {
+            return (
+              <span key={key} style={{color: Colors.cyan7}}>
+                {part}
+              </span>
+            );
+          }
+          return part;
+        }
 
-  //   const [type, value] = options[0];
+        return '';
+      });
+    },
+    [searchingValue]
+  );
 
-  //   const option = type === 'resource' ? resourceMap[value[0]].name : value[0];
+  const options = useMemo(() => {
+    const namespaceOptions = namespaces.reduce((filteredOpt, ns) => {
+      if (ns.toLowerCase().includes(searchingValue.toLowerCase())) {
+        const optionLabel = <span>{matchingCharactersLabel(ns, 'namespace')}</span>;
 
-  //   document.getElementById(`${option}-0`)?.focus();
-  // }, [filteredOptions, resourceMap]);
+        filteredOpt.push({value: `namespace:${ns}`, label: optionLabel});
+      }
 
-  const onReturnHandler = useCallback(() => {
-    if (!filteredOptions) {
-      return;
-    }
+      return filteredOpt;
+    }, [] as {value: string; label: JSX.Element}[]);
 
-    const options = Object.entries(filteredOptions).filter(entry => entry[1].length === 1);
+    const kindOptions = allResourceKinds.reduce((filteredOpt, kind) => {
+      if (kind.toLowerCase().includes(searchingValue.toLowerCase())) {
+        const optionLabel = <span>{matchingCharactersLabel(kind, 'kind')}</span>;
 
-    if (options.length !== 1) {
-      return;
-    }
+        filteredOpt.push({value: `kind:${kind}`, label: optionLabel});
+      }
 
-    const [type, value] = options[0];
+      return filteredOpt;
+    }, [] as {value: string; label: JSX.Element}[]);
 
-    applyOption(type, value[0]);
-    closeModalHandler();
-  }, [applyOption, closeModalHandler, filteredOptions]);
+    const resourceOptions = Object.entries(resourceMap).reduce((filteredOpt, resourceEntry) => {
+      if (resourceEntry[1].name.toLowerCase().includes(searchingValue.toLowerCase())) {
+        const optionLabel = (
+          <div>
+            {resourceEntry[1].namespace && <Tag>{resourceEntry[1].namespace}</Tag>}
+            <span>{matchingCharactersLabel(resourceEntry[1].name, 'resource')}</span>
+            {resourceEntry[1].kind && (
+              <span style={{fontStyle: 'italic', marginLeft: '8px', color: Colors.grey6}}>{resourceEntry[1].kind}</span>
+            )}
+          </div>
+        );
 
-  useEffect(() => {
-    if (!searchingValue && !filteredOptions) {
-      return;
-    }
+        filteredOpt.push({value: `resource:${resourceEntry[0]}`, label: optionLabel});
+      }
 
-    if (!searchingValue && filteredOptions) {
-      setFilteredOptions(undefined);
-      return;
-    }
+      return filteredOpt;
+    }, [] as {value: string; label: JSX.Element}[]);
 
-    const filteredKinds = allResourceKinds
-      .filter(kind => kind.toLowerCase().includes(searchingValue.toLowerCase()))
-      .slice(0, GROUP_OPTIONS_LIMIT);
-    const filteredNamespaces = namespaces
-      .filter(ns => ns.toLowerCase().includes(searchingValue.toLowerCase()))
-      .slice(0, GROUP_OPTIONS_LIMIT);
-
-    const filteredResources = Object.entries(resourceMap)
-      .filter(([, value]) => value.name.toLowerCase().includes(searchingValue.toLowerCase()))
-      .map(([key]) => key)
-      .slice(0, GROUP_OPTIONS_LIMIT);
-
-    setFilteredOptions({namespace: filteredNamespaces, kind: filteredKinds, resource: filteredResources});
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchingValue]);
+    return [
+      {label: LabelMapper['kind'], options: kindOptions},
+      {label: LabelMapper['namespace'], options: namespaceOptions},
+      {label: LabelMapper['resource'], options: resourceOptions},
+    ];
+  }, [allResourceKinds, matchingCharactersLabel, namespaces, resourceMap, searchingValue]);
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => searchInputRef.current.focus(), 0);
+      document.getElementById('quick-search-input')?.focus();
     }
   }, [isOpen]);
 
   return (
-    <Modal footer={null} bodyStyle={{padding: '0px'}} closable={false} visible={isOpen} onCancel={closeModalHandler}>
-      <MainContainer>
-        <InputContainer>
-          <StyledInput
-            id="quick-search-input"
-            placeholder="Search by namespace, kind and resource"
-            ref={searchInputRef}
-            suffix={<SearchOutlined />}
-            value={searchingValue}
-            onChange={e => setSearchingValue(e.target.value)}
-            onPressEnter={onReturnHandler}
-            onKeyDown={e => {
-              if (!filteredOptions || !foundOptions) {
-                return;
-              }
+    <StyledModal
+      bodyStyle={{padding: '0px'}}
+      closable={false}
+      destroyOnClose
+      footer={null}
+      visible={isOpen}
+      onCancel={closeModalHandler}
+    >
+      <AutoComplete
+        id="quick-search-input"
+        autoFocus
+        defaultOpen
+        options={options}
+        style={{width: '100%'}}
+        value={searchingValue}
+        onSearch={value => setSearchingValue(value)}
+        onSelect={value => {
+          // options are of type : `type:value`
+          applyOption(value.split(':')[0], value.split(':')[1]);
+          closeModalHandler();
+        }}
+        filterOption={(inputValue, opt) => {
+          if (opt?.options?.length) {
+            return true;
+          }
 
-              if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                document.getElementById('options-container')?.getElementsByTagName('li')[0].focus();
-              }
-            }}
-          />
-        </InputContainer>
-
-        {filteredOptions ? (
-          foundOptions ? (
-            <OptionsContainer id="options-container">
-              {Object.entries(filteredOptions)
-                .filter((entry): entry is [LabelTypes, string[]] => optionsTypes.includes(entry[0]))
-                .map(([key, value]) => (
-                  <QuickSearchActionsOptionsGroup
-                    key={key}
-                    type={key}
-                    options={value}
-                    searchingValue={searchingValue.toLowerCase()}
-                    onOptionClick={(type, option) => {
-                      applyOption(type, option);
-                      closeModalHandler();
-                    }}
-                  />
-                ))}
-            </OptionsContainer>
-          ) : (
-            <NotFoundLabel>No namespace, kind or resource found.</NotFoundLabel>
-          )
-        ) : null}
-      </MainContainer>
-    </Modal>
+          return false;
+        }}
+      >
+        <Input.Search placeholder="Search by namespace, kind and resource" />
+      </AutoComplete>
+    </StyledModal>
   );
 };
 
-export default QuickSearchActions;
+export default QuickSearchActionsV3;
