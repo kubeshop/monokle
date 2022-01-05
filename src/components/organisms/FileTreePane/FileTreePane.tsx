@@ -450,7 +450,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         Reveal in {platformFilemanagerName}
       </Menu.Item>
-      <ContextMenuDivider />
+
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
@@ -461,7 +461,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         {isFolder ? 'New Resource' : 'Add Resource'}
       </Menu.Item>
-      <ContextMenuDivider />
+
       <Menu.Item
         key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
         onClick={e => {
@@ -478,7 +478,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           ? 'Remove from filter'
           : `Filter on this ${isFolder ? 'folder' : 'file'}`}
       </Menu.Item>
-      <ContextMenuDivider />
+
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
