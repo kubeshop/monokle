@@ -1,25 +1,26 @@
-import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import {AppConfig, KubeConfig, Languages, NewVersionCode, Project, TextSizes, Themes} from '@models/appconfig';
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
+import {AppDispatch} from '@redux/store';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
 
 import initialState from '../initialState';
 
-// export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI) => {
-//   // electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', project);
-//   thunkAPI.dispatch(configSlice.actions.createProject(project));
-//   thunkAPI.dispatch(openProject(project.rootFolder));
-// });
+export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI) => {
+  thunkAPI.dispatch(configSlice.actions.createProject(project));
+  thunkAPI.dispatch(openProject(project.rootFolder));
+});
 
-// export const openProject = createAsyncThunk(
-//   'config/openProject',
-//   async (projectRootPath: string, thunkAPI: {dispatch: AppDispatch}) => {
-//     thunkAPI.dispatch(setRootFolder(projectRootPath));
-//   }
-// );
+export const openProject = createAsyncThunk(
+  'config/openProject',
+  async (projectRootPath: string, thunkAPI: {dispatch: AppDispatch}) => {
+    thunkAPI.dispatch(setRootFolder(projectRootPath));
+  }
+);
 
 export const configSlice = createSlice({
   name: 'config',

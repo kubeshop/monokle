@@ -121,7 +121,3 @@ const StartProjectPane = () => {
 };
 
 export default StartProjectPane;
-
-function createProject(folderPath: string): any {
-  throw new Error('Function not implemented.');
-}
