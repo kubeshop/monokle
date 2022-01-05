@@ -19,7 +19,7 @@ import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
 
@@ -27,9 +27,10 @@ import {
   getDependentResourceKinds,
   getKnownResourceKinds,
   getResourceKindHandler,
-  refMapperMatchesKind,
+  registerKindHandler,
 } from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
+import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {processRefs} from './resourceRefs';
 import {validateResource} from './validation';
@@ -657,6 +658,21 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             text,
           };
 
+          if (
+            resource.kind === 'CustomResourceDefinition' &&
+            resource.content?.spec?.kind &&
+            !getResourceKindHandler(resource.content.spec.kind)
+          ) {
+            try {
+              const kindHandler = extractKindHandler(resource.content);
+              if (kindHandler) {
+                registerKindHandler(kindHandler, false);
+              }
+            } catch (e) {
+              log.warn('Failed to register custom kindhandler', resource, e);
+            }
+          }
+
           // if this is a single-resource file we can save the parsedDoc and lineCounter
           if (documents.length === 1) {
             parsedDocCache.set(resource.id, {parsedDoc: doc, lineCounter});
@@ -667,7 +683,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           }
 
           // set the namespace if available
-          if (content.metadata?.namespace) {
+          if (content.metadata?.namespace && typeof content.metadata.namespace === 'string') {
             resource.namespace = content.metadata.namespace;
           }
 

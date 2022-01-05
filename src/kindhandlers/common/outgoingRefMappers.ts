@@ -1,37 +1,10 @@
-import {K8sResource} from '@models/k8sresource';
 import {RefMapper} from '@models/resourcekindhandler';
 
-/**
- * Matcher that ensures the source and target namespace are the same
- */
-
-export function implicitNamespaceMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
-  return targetResource.namespace === sourceResource.namespace;
-}
-
-/**
- * Matcher the ensures that the target resource has an optionally specified namespace
- */
-
-export function optionalExplicitNamespaceMatcher(
-  sourceResource: K8sResource,
-  targetResource: K8sResource,
-  value: string
-) {
-  if (value) {
-    return targetResource.namespace === value;
-  }
-
-  return targetResource.namespace === sourceResource.namespace;
-}
-
-/**
- * Matcher the ensures that the target resource has the specified namespace
- */
-
-export function explicitNamespaceMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
-  return targetResource.namespace === value;
-}
+import {
+  explicitNamespaceMatcher,
+  implicitNamespaceMatcher,
+  optionalExplicitNamespaceMatcher,
+} from '@src/kindhandlers/common/customMatchers';
 
 export const ConfigMapTarget = {
   target: {
@@ -198,11 +171,11 @@ export const PodOutgoingRefMappers: RefMapper[] = [
 export function createSelectorOutgoingRefMappers(targetResourceKind: string, selectorPathParts?: string[]): RefMapper {
   return {
     source: {
-      pathParts: selectorPathParts || ['spec', 'selector'],
+      pathParts: selectorPathParts && selectorPathParts.length > 0 ? selectorPathParts : ['spec', 'selector'],
     },
     target: {
       kind: targetResourceKind,
-      pathParts: ['spec', 'template', 'metadata', 'labels'],
+      pathParts: ['metadata', 'labels'],
     },
     type: 'pairs',
   };

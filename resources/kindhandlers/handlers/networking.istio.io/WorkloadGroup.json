@@ -1,0 +1,5 @@
+{
+  "sectionName": "Istio",
+  "kindSectionName": "WorkloadGroups",
+  "helpLink": "https://istio.io/latest/docs/reference/config/networking/workload-group/"
+}

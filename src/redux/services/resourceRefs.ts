@@ -6,12 +6,7 @@ import {RefMapper} from '@models/resourcekindhandler';
 
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-import {
-  getIncomingRefMappers,
-  getKnownResourceKinds,
-  getResourceKindHandler,
-  refMapperMatchesKind,
-} from '@src/kindhandlers';
+import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
 import {traverseDocument} from './manifest-utils';
 import {NodeWrapper, createResourceRef, getLineCounter, getParsedDoc, linkResources} from './resource';
@@ -67,6 +62,14 @@ const addRefNodeAtPath = (refNode: RefNode, path: string, refNodesByPath: Record
     refNodesByPath[path] = [refNode];
   }
 };
+
+export function refMapperMatchesKind(refMapper: RefMapper, kind: string) {
+  if (refMapper.target.kind.startsWith('$')) {
+    return kind.match(refMapper.target.kind.substring(1)) !== null;
+  }
+
+  return refMapper.target.kind === kind;
+}
 
 /**
  * Cache of refMappers for a specific resource kind
@@ -304,34 +307,33 @@ function handlePairRefMapping(
       targetResources.forEach(targetResource => {
         const targetNodes: RefNode[] = [];
         const targetRefNodes = getResourceRefNodes(targetResource);
-        if (!targetRefNodes) {
-          return;
-        }
-        Object.values(targetRefNodes)
-          .flat()
-          .forEach(({scalar, key, parentKeyPath}) => {
-            if (outgoingRefMapper.target.pathParts) {
-              const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
-              if (outgoingRefMapperTargetPath === parentKeyPath) {
-                targetNodes.push({scalar, key, parentKeyPath});
+        if (targetRefNodes) {
+          Object.values(targetRefNodes)
+            .flat()
+            .forEach(({scalar, key, parentKeyPath}) => {
+              if (outgoingRefMapper.target.pathParts) {
+                const outgoingRefMapperTargetPath = joinPathParts(outgoingRefMapper.target.pathParts);
+                if (parentKeyPath.endsWith(outgoingRefMapperTargetPath)) {
+                  targetNodes.push({scalar, key, parentKeyPath});
+                }
               }
+            });
+          targetNodes.forEach(targetNode => {
+            if (
+              sourceRefNode.key === targetNode.key &&
+              shouldCreateSatisfiedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)
+            ) {
+              foundMatchByTargetResourceId[targetResource.id] = true;
+              linkResources(
+                sourceResource,
+                targetResource,
+                new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
+                new NodeWrapper(targetNode.scalar, getLineCounter(targetResource)),
+                isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
+              );
             }
           });
-        targetNodes.forEach(targetNode => {
-          if (
-            sourceRefNode.key === targetNode.key &&
-            shouldCreateSatisfiedRef(sourceRefNode, targetNode, sourceResource, targetResource, outgoingRefMapper)
-          ) {
-            foundMatchByTargetResourceId[targetResource.id] = true;
-            linkResources(
-              sourceResource,
-              targetResource,
-              new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
-              new NodeWrapper(targetNode.scalar, getLineCounter(targetResource)),
-              isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
-            );
-          }
-        });
+        }
       });
 
       // if this sourceRefNode did not link to any target resource, mark the node as unsatisfied
@@ -359,11 +361,35 @@ function shouldCreateUnsatisfiedRef(
   sourceRefNode: RefNode
 ) {
   if (outgoingRefMapper.source.isOptional && processingOptions.shouldIgnoreOptionalUnsatisfiedRefs) {
-    if (getSiblingValue('optional', outgoingRefMapper, sourceResource, sourceRefNode)) {
+    const optionalValue = getSiblingValue('optional', outgoingRefMapper, sourceResource, sourceRefNode);
+    if (optionalValue !== false) {
       return false;
     }
   }
+
+  if (
+    outgoingRefMapper.shouldCreateUnsatisfiedRef &&
+    !outgoingRefMapper.shouldCreateUnsatisfiedRef(
+      outgoingRefMapper,
+      sourceResource,
+      getSiblingValues(outgoingRefMapper, sourceResource, sourceRefNode)
+    )
+  ) {
+    return false;
+  }
+
   return true;
+}
+
+function getSiblingValues(outgoingRefMapper: RefMapper, sourceResource: K8sResource, sourceRefNode: RefNode) {
+  const siblingValues: Record<string, any> = {};
+  if (outgoingRefMapper.source.siblingMatchers) {
+    Object.keys(outgoingRefMapper.source.siblingMatchers).forEach(key => {
+      const value = getSiblingValue(key, outgoingRefMapper, sourceResource, sourceRefNode);
+      siblingValues[key] = value;
+    });
+  }
+  return siblingValues;
 }
 
 /**
@@ -384,13 +410,7 @@ function shouldCreateSatisfiedRef(
   // check with existing sibling matchers
   if (outgoingRefMapper.source.siblingMatchers) {
     // first collect all sibling values so we can pass them to each matcher
-    const siblingValues: Record<string, string> = {};
-    Object.keys(outgoingRefMapper.source.siblingMatchers).forEach(key => {
-      const value = getSiblingValue(key, outgoingRefMapper, sourceResource, sourceRefNode);
-      if (typeof value === 'string') {
-        siblingValues[key] = value;
-      }
-    });
+    const siblingValues = getSiblingValues(outgoingRefMapper, sourceResource, sourceRefNode);
 
     // now query each sibling matcher with all found sibling values
     if (
@@ -427,15 +447,6 @@ function getSiblingValue(
   );
   return siblingRefNodes && siblingRefNodes.length > 0 ? siblingRefNodes[0].scalar.value : undefined;
 }
-
-/*
-const siblingMatchers: Record<
-  string,
-  (targetResource: K8sResource, value: string, siblingValues: Record<string, string>) => boolean
-> = {
-  kind: (targetResource, value) => targetResource.kind === value,
-  apiGroup: (targetResource, value) => targetResource.version.startsWith(value),
-}; */
 
 /**
  * Checks if the specified ref has an optional property set to true

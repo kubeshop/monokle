@@ -8,13 +8,6 @@ interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
 }
 
-export enum NamespaceRefTypeEnum {
-  None, // ignore namespaces for this ref
-  Implicit, // use the namespace of the containing resource
-  Explicit, // target namespace property expected
-  OptionalExplicit, // if no namespace is provided then use the namespace of the containing resource
-}
-
 interface RefMapper {
   source: {
     pathParts: string[];
@@ -30,12 +23,8 @@ interface RefMapper {
       ) => boolean
     >;
 
-    // optionally checks for a 'optional' sibling to validate ref
+    // optionally checks for an 'optional' sibling to validate ref
     isOptional?: boolean;
-
-    // namespace-ref specific properties
-    // namespaceRefType?: NamespaceRefTypeEnum;
-    // namespaceProperty?: string; // default to "namespace"
   };
   target: {
     kind: string;
@@ -43,6 +32,13 @@ interface RefMapper {
   };
 
   type: 'path' | 'name' | 'pairs';
+
+  // called to validate if an unsatisfied ref should be created for this mapper
+  shouldCreateUnsatisfiedRef?: (
+    refMapper: RefMapper,
+    sourceResource: K8sResource,
+    siblingValues: Record<string, string>
+  ) => boolean;
 }
 
 export type ResourceKind = string;
