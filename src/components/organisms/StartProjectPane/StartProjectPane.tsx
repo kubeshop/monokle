@@ -6,7 +6,12 @@ import {FolderAddOutlined, FolderOpenOutlined, FormatPainterOutlined} from '@ant
 
 import styled from 'styled-components';
 
+import {useAppDispatch} from '@redux/hooks';
+
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import FileExplorer from '@atoms/FileExplorer';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import Colors from '@styles/Colors';
 
@@ -69,6 +74,17 @@ const StyledContainer = styled.div`
 `;
 
 const StartProjectPane = () => {
+  const dispatch = useAppDispatch();
+
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (folderPath) {
+        // dispatch(setCreateProject({rootFolder: folderPath}));
+      }
+    },
+    {isDirectoryExplorer: true}
+  );
+
   return (
     <div style={{height: '100%'}}>
       <Row style={{height: '100%'}}>
@@ -83,13 +99,13 @@ const StartProjectPane = () => {
           <div style={{height: '500px'}}>
             <StyledActionTitle>How would you like to begin?</StyledActionTitle>
             <div style={{display: 'flex'}}>
-              <StyledActionContainer>
+              <StyledActionContainer onClick={openFileExplorer}>
                 <StyledFolderOpenOutlined />
                 <StyledActionText>Select an existing folder</StyledActionText>
               </StyledActionContainer>
               <StyledActionContainer>
                 <StyledFolderAddOutlined />
-                <StyledActionText>Create an empth project</StyledActionText>
+                <StyledActionText>Create an empty project</StyledActionText>
               </StyledActionContainer>
               <StyledActionContainer>
                 <StyledFormatPainterOutlined />
@@ -98,9 +114,14 @@ const StartProjectPane = () => {
             </div>
           </div>
         </StyledContainer>
+        <FileExplorer {...fileExplorerProps} />
       </Row>
     </div>
   );
 };
 
 export default StartProjectPane;
+
+function createProject(folderPath: string): any {
+  throw new Error('Function not implemented.');
+}

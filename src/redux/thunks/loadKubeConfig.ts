@@ -6,7 +6,7 @@ import fs from 'fs';
 import log from 'loglevel';
 
 import {AlertEnum} from '@models/alert';
-import {KubeConfig, KubeConfigContext} from '@models/kubeConfig';
+import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
 import {setContexts} from '@redux/reducers/appConfig';

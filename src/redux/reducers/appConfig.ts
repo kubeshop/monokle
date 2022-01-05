@@ -1,13 +1,25 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {AppConfig, Languages, NewVersionCode, TextSizes, Themes} from '@models/appconfig';
-import {KubeConfig} from '@models/kubeConfig';
+import {AppConfig, KubeConfig, Languages, NewVersionCode, Project, TextSizes, Themes} from '@models/appconfig';
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
 
 import electronStore from '@utils/electronStore';
 
 import initialState from '../initialState';
+
+// export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI) => {
+//   // electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', project);
+//   thunkAPI.dispatch(configSlice.actions.createProject(project));
+//   thunkAPI.dispatch(openProject(project.rootFolder));
+// });
+
+// export const openProject = createAsyncThunk(
+//   'config/openProject',
+//   async (projectRootPath: string, thunkAPI: {dispatch: AppDispatch}) => {
+//     thunkAPI.dispatch(setRootFolder(projectRootPath));
+//   }
+// );
 
 export const configSlice = createSlice({
   name: 'config',
@@ -78,7 +90,6 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
       state.settings.hideExcludedFilesInFileExplorer = action.payload;
     },
-
     updateFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
       state.folderReadsMaxDepth = action.payload;
@@ -91,6 +102,16 @@ export const configSlice = createSlice({
     },
     setContexts: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = action.payload;
+    },
+    createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
+      const project: Project = action.payload;
+
+      if (!project.name) {
+        project.name = 'Unnamed';
+      }
+
+      state.projects = [project, ...state.projects];
+      state.selectedProjectRootFolder = project.rootFolder;
     },
   },
 });

@@ -1,7 +1,5 @@
 import {KustomizeCommandType} from '@redux/services/kustomize';
 
-import {KubeConfig} from './kubeConfig';
-
 export enum Themes {
   Dark = 'dark',
   Light = 'light',
@@ -25,6 +23,27 @@ export enum NewVersionCode {
   Available = 2,
   Downloading = 3,
   Downloaded = 4,
+}
+
+export type KubeConfigContext = {
+  cluster: string;
+  name: string;
+  user: string | null;
+  namespace: string | null;
+};
+
+export type KubeConfig = {
+  contexts: Array<KubeConfigContext>;
+  currentContext: string | undefined;
+};
+
+export interface Project {
+  name?: string;
+  rootFolder: string;
+  kubeconfig?: KubeConfig;
+  preferences?: any;
+  k8sVersion?: string;
+  lastOpened?: Date;
 }
 
 interface AppConfig {
@@ -62,6 +81,8 @@ interface AppConfig {
   };
   kubeConfig: KubeConfig;
   osPlatform: NodeJS.Platform;
+  projects: Project[];
+  selectedProjectRootFolder: string | null;
 }
 
 export type {AppConfig};

@@ -317,12 +317,12 @@ const PageHeader = () => {
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <CLusterActionText>RELOAD</CLusterActionText>;
+      return <CLusterActionText>Reconnect</CLusterActionText>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
     }
-    return <CLusterActionText>LOAD</CLusterActionText>;
+    return <CLusterActionText>Connect</CLusterActionText>;
   }, [previewType, previewLoader, isInClusterMode]);
 
   const clusterMenu = (

@@ -77,6 +77,8 @@ const initialAppConfigState: AppConfig = {
     currentContext: undefined,
   },
   osPlatform: os.platform(),
+  projects: [],
+  selectedProjectRootFolder: null,
 };
 
 const initialAlertState: AlertState = {};
