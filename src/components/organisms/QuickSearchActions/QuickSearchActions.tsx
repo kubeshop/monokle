@@ -46,11 +46,6 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-const QuickSearchContainer = styled.div`
-  padding: 8px;
-  position: relative;
-`;
-
 const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
 const applyFilterWithConfirm = (
@@ -177,15 +172,17 @@ const QuickSearchActionsV3: React.FC = () => {
   );
 
   const options = useMemo(() => {
-    const namespaceOptions = namespaces.reduce((filteredOpt, ns) => {
-      if (ns.toLowerCase().includes(searchingValue.toLowerCase())) {
-        const optionLabel = <span>{matchingCharactersLabel(ns, 'namespace')}</span>;
+    const namespaceOptions = namespaces
+      .sort((a, b) => a.localeCompare(b))
+      .reduce((filteredOpt, ns) => {
+        if (ns.toLowerCase().includes(searchingValue.toLowerCase())) {
+          const optionLabel = <span>{matchingCharactersLabel(ns, 'namespace')}</span>;
 
-        filteredOpt.push({value: `namespace:${ns}`, label: optionLabel});
-      }
+          filteredOpt.push({value: `namespace:${ns}`, label: optionLabel});
+        }
 
-      return filteredOpt;
-    }, [] as {value: string; label: JSX.Element}[]);
+        return filteredOpt;
+      }, [] as {value: string; label: JSX.Element}[]);
 
     const kindOptions = allResourceKinds.reduce((filteredOpt, kind) => {
       if (kind.toLowerCase().includes(searchingValue.toLowerCase())) {
@@ -197,25 +194,29 @@ const QuickSearchActionsV3: React.FC = () => {
       return filteredOpt;
     }, [] as {value: string; label: JSX.Element}[]);
 
-    const resourceOptions = Object.entries(resourceMap).reduce((filteredOpt, resourceEntry) => {
-      const resourceName = resourceEntry[1].name;
+    const resourceOptions = Object.entries(resourceMap)
+      .sort((a, b) => a[1].name.localeCompare(b[1].name))
+      .reduce((filteredOpt, resourceEntry) => {
+        const resourceName = resourceEntry[1].name;
 
-      if (!resourceName.startsWith('Patch:') && resourceName.toLowerCase().includes(searchingValue.toLowerCase())) {
-        const optionLabel = (
-          <div>
-            {resourceEntry[1].namespace && <Tag>{resourceEntry[1].namespace}</Tag>}
-            <span>{matchingCharactersLabel(resourceName, 'resource')}</span>
-            {resourceEntry[1].kind && (
-              <span style={{fontStyle: 'italic', marginLeft: '8px', color: Colors.grey6}}>{resourceEntry[1].kind}</span>
-            )}
-          </div>
-        );
+        if (!resourceName.startsWith('Patch:') && resourceName.toLowerCase().includes(searchingValue.toLowerCase())) {
+          const optionLabel = (
+            <div>
+              {resourceEntry[1].namespace && <Tag>{resourceEntry[1].namespace}</Tag>}
+              <span>{matchingCharactersLabel(resourceName, 'resource')}</span>
+              {resourceEntry[1].kind && (
+                <span style={{fontStyle: 'italic', marginLeft: '8px', color: Colors.grey6}}>
+                  {resourceEntry[1].kind}
+                </span>
+              )}
+            </div>
+          );
 
-        filteredOpt.push({value: `resource:${resourceEntry[0]}`, label: optionLabel});
-      }
+          filteredOpt.push({value: `resource:${resourceEntry[0]}`, label: optionLabel});
+        }
 
-      return filteredOpt;
-    }, [] as {value: string; label: JSX.Element}[]);
+        return filteredOpt;
+      }, [] as {value: string; label: JSX.Element}[]);
 
     return [
       {label: LabelMapper['kind'], options: kindOptions},
@@ -240,32 +241,31 @@ const QuickSearchActionsV3: React.FC = () => {
       visible={isOpen}
       onCancel={() => dispatch(closeQuickSearchActionsPopup())}
     >
-      <QuickSearchContainer>
-        <AutoComplete
-          id="quick-search-input"
-          autoFocus
-          defaultOpen
-          listHeight={500}
-          options={options}
-          notFoundContent="Kind, namespace or resource not found."
-          style={{width: '100%'}}
-          value={searchingValue}
-          onSearch={value => setSearchingValue(value)}
-          onSelect={value => {
-            // options are of type : `type:value`
-            applyOption(value.split(':')[0], value.split(':')[1]);
-          }}
-          filterOption={(inputValue, opt) => {
-            if (opt?.options?.length) {
-              return true;
-            }
+      <AutoComplete
+        id="quick-search-input"
+        autoFocus
+        defaultOpen
+        listHeight={500}
+        options={options}
+        showAction={['focus']}
+        notFoundContent="Kind, namespace or resource not found."
+        style={{width: '100%'}}
+        value={searchingValue}
+        onSearch={value => setSearchingValue(value)}
+        onSelect={value => {
+          // options are of type : `type:value`
+          applyOption(value.split(':')[0], value.split(':')[1]);
+        }}
+        filterOption={(inputValue, opt) => {
+          if (opt?.options?.length) {
+            return true;
+          }
 
-            return false;
-          }}
-        >
-          <Input.Search placeholder="Search by namespace, kind and resource" />
-        </AutoComplete>
-      </QuickSearchContainer>
+          return false;
+        }}
+      >
+        <Input.Search placeholder="Search by namespace, kind and resource" />
+      </AutoComplete>
     </StyledModal>
   );
 };
