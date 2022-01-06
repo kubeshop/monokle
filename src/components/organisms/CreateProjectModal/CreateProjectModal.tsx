@@ -8,7 +8,12 @@ import {QuestionCircleOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setCreateProject} from '@redux/reducers/appConfig';
 import {closeCreateProjectModal} from '@redux/reducers/ui';
+
+import FileExplorer from '@components/atoms/FileExplorer';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFocus} from '@utils/hooks';
 
@@ -29,16 +34,30 @@ const CreateProjectModal: React.FC = () => {
   const [createProjectForm] = useForm();
   const [inputRef, focus] = useFocus<any>();
   const [formStep, setFormStep] = useState(1);
-  const [formValues, setFormValues] = useState({projectName: 'sdfgsdfg', location: ''});
+  const [formValues, setFormValues] = useState({projectName: '', location: ''});
+
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (folderPath) {
+        createProjectForm.setFieldsValue({location: folderPath});
+      }
+    },
+    {isDirectoryExplorer: true}
+  );
 
   const onFinish = (values: {projectName: string; location: string}) => {
     setFormValues(values);
     if (uiState.fromTemplate && formStep === 1) {
       setFormStep(2);
-    } else {
-      console.log('formValues', formValues);
     }
   };
+
+  useEffect(() => {
+    if (!uiState.fromTemplate && formValues.location && formValues.projectName) {
+      dispatch(setCreateProject({rootFolder: formValues.location, name: formValues.projectName}));
+      dispatch(closeCreateProjectModal());
+    }
+  }, [formValues]);
 
   useEffect(() => {
     if (uiState.isOpen) {
@@ -85,17 +104,7 @@ const CreateProjectModal: React.FC = () => {
             Back
           </Button>
         ),
-        <Button
-          key="submit"
-          type="primary"
-          onClick={() => {
-            if (uiState.fromTemplate && formStep === 2) {
-              console.log('formValues', formValues);
-            } else {
-              createProjectForm.submit();
-            }
-          }}
-        >
+        <Button key="submit" type="primary" onClick={() => createProjectForm.submit()}>
           {uiState.fromTemplate && formStep === 1 ? 'Next: Select a Template' : 'Create Project'}
         </Button>,
       ]}
@@ -110,13 +119,21 @@ const CreateProjectModal: React.FC = () => {
           >
             <Input ref={inputRef} />
           </Form.Item>
-          <Form.Item name="location" label="Location" required tooltip="The local path where your project will live.">
-            <Input />
+          <Form.Item label="Location" required tooltip="The local path where your project will live.">
+            <Input.Group compact>
+              <Form.Item name="location" noStyle>
+                <Input style={{width: 'calc(100% - 100px)'}} />
+              </Form.Item>
+              <Button style={{width: '100px'}} onClick={openFileExplorer}>
+                Browse
+              </Button>
+            </Input.Group>
           </Form.Item>
         </Form>
       )}
 
       {formStep === 2 && <div>[TEMPLATE EXPLORER GOES HERE]</div>}
+      <FileExplorer {...fileExplorerProps} />
     </Modal>
   );
 };
