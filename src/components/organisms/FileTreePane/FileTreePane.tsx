@@ -31,7 +31,9 @@ import {
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
-import {stopPreview} from '@redux/services/preview';
+import {getHelmValuesFile} from '@redux/services/helm';
+import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
+import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
@@ -361,6 +363,7 @@ interface TreeItemProps {
   onCreateFolder: (absolutePath: string) => void;
   onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
   onFilterByFileOrFolder: (relativePath: string | undefined) => void;
+  onPreview: (relativePath: string) => void;
   isExcluded?: Boolean;
   isFolder?: Boolean;
 }
@@ -394,6 +397,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onCreateFolder,
     onCreateResource,
     onFilterByFileOrFolder,
+    onPreview,
     isFolder,
   } = props;
 
@@ -403,6 +407,8 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
 
   const isFileSelected = useMemo(() => {
     return treeKey === selectedPath;
@@ -424,14 +430,38 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
 
+  const canPreview = useCallback(
+    (entryPath: string): boolean => {
+      const fileEntry = fileMap[entryPath];
+      return (
+        fileEntry &&
+        (isKustomizationFile(fileEntry, resourceMap) || getHelmValuesFile(fileEntry, helmValuesMap) !== undefined)
+      );
+    },
+    [fileMap, resourceMap, helmValuesMap]
+  );
+
   const menu = (
     <Menu>
+      {canPreview(relativePath) ? (
+        <>
+          <Menu.Item
+            onClick={e => {
+              e.domEvent.stopPropagation();
+              onPreview(relativePath);
+            }}
+            key="preview"
+          >
+            Preview
+          </Menu.Item>
+          <ContextMenuDivider />
+        </>
+      ) : null}
       {isFolder ? (
         <>
           <Menu.Item
             onClick={e => {
               e.domEvent.stopPropagation();
-
               onCreateFolder(absolutePath);
             }}
             key="create_directory"
@@ -440,16 +470,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           </Menu.Item>
         </>
       ) : null}
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
-          showItemInFolder(absolutePath);
-        }}
-        key="reveal_in_finder"
-      >
-        Reveal in {platformFilemanagerName}
-      </Menu.Item>
 
       <Menu.Item
         onClick={e => {
@@ -461,7 +481,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         {isFolder ? 'New Resource' : 'Add Resource'}
       </Menu.Item>
-
+      <ContextMenuDivider />
       <Menu.Item
         key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
         onClick={e => {
@@ -544,6 +564,17 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           </Menu.Item>
         </>
       ) : null}
+      <ContextMenuDivider />
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+
+          showItemInFolder(absolutePath);
+        }}
+        key="reveal_in_finder"
+      >
+        Reveal in {platformFilemanagerName}
+      </Menu.Item>
     </Menu>
   );
 
@@ -608,6 +639,7 @@ const FileTreePane = () => {
   const recentFolders = useAppSelector(state => state.config.recentFolders);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const scanExcludes = useAppSelector(state => state.config.scanExcludes);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
@@ -873,6 +905,21 @@ const FileTreePane = () => {
     dispatch(openCreateFolderModal(absolutePath));
   };
 
+  const onPreview = (relativePath: string) => {
+    const resources = getResourcesForPath(relativePath, resourceMap);
+    if (resources && resources.length === 1 && isKustomizationResource(resources[0])) {
+      startPreview(resources[0].id, 'kustomization', dispatch);
+    } else {
+      const fileEntry = fileMap[relativePath];
+      if (fileEntry) {
+        const valuesFile = getHelmValuesFile(fileEntry, helmValuesMap);
+        if (valuesFile) {
+          startPreview(valuesFile.id, 'helm', dispatch);
+        }
+      }
+    }
+  };
+
   const onCreateResource = ({targetFolder, targetFile}: {targetFolder?: string; targetFile?: string}) => {
     if (targetFolder) {
       dispatch(openNewResourceWizard({defaultInput: {targetFolder}}));
@@ -993,6 +1040,7 @@ const FileTreePane = () => {
                 onCreateFolder={onCreateFolder}
                 onCreateResource={onCreateResource}
                 onFilterByFileOrFolder={onFilterByFileOrFolder}
+                onPreview={onPreview}
                 {...event}
               />
             );
