@@ -32,6 +32,10 @@ const StyledModal = styled(Modal)`
     box-shadow: none !important;
   }
 
+  & .ant-input:hover + .ant-input-group-addon {
+    border: 1px solid #165996 !important;
+  }
+
   & .ant-input-search-button {
     border: 0px !important;
   }
@@ -42,7 +46,6 @@ const StyledModal = styled(Modal)`
 
   & .ant-select-focused .ant-input-group-addon {
     border: 1px solid #165996 !important;
-    border-left-width: 0px !important;
   }
 `;
 
