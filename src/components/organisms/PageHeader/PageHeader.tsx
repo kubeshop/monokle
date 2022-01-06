@@ -8,6 +8,7 @@ import {
   CloseCircleOutlined,
   ClusterOutlined,
   DownOutlined,
+  FolderOpenOutlined,
   GithubOutlined,
   LoadingOutlined,
   QuestionCircleOutlined,
@@ -19,11 +20,17 @@ import styled from 'styled-components';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterModeTooltip} from '@constants/tooltips';
 
+import {Project} from '@models/appconfig';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCurrentContext, updateStartupModalVisible} from '@redux/reducers/appConfig';
+import {
+  setCurrentContext,
+  setOpenProject,
+  setSelectedProjectRootFolder,
+  updateStartupModalVisible,
+} from '@redux/reducers/appConfig';
 import {
   setClusterIconHighlightStatus,
   toggleClusterStatus,
@@ -155,6 +162,8 @@ const StyledButton = styled(Button)`
 
 const StyledDropdown = styled(Dropdown)``;
 
+const StyledProjectsDropdown = styled(Dropdown)``;
+
 const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
   margin-right: 5px;
 `;
@@ -204,6 +213,18 @@ const StyledClusterActionButton = styled(Button)`
   font-size: 12px;
 `;
 
+const StyledProjectButton = styled(Button)`
+  border: none;
+  outline: none;
+  padding: 0px 8px;
+  color: ${Colors.whitePure};
+  text-transform: uppercase;
+`;
+
+const StyledFolderOpenOutlined = styled(FolderOpenOutlined)`
+  color: ${Colors.whitePure};
+`;
+
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;
   return (
@@ -228,6 +249,7 @@ const PageHeader = () => {
   const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const projects: Project[] = useAppSelector(state => state.config.projects);
 
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
@@ -295,6 +317,14 @@ const PageHeader = () => {
     dispatch(setClusterIconHighlightStatus(false));
   };
 
+  const handleProjectChange = ({key}: any) => {
+    if (key === 'NEW') {
+      dispatch(setSelectedProjectRootFolder(null));
+      return;
+    }
+    dispatch(setOpenProject(key));
+  };
+
   const connectToCluster = () => {
     if (isInPreviewMode && previewResource && previewResource.id !== kubeconfigPath) {
       stopPreview(dispatch);
@@ -323,12 +353,12 @@ const PageHeader = () => {
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <CLusterActionText>Reconnect</CLusterActionText>;
+      return <CLusterActionText>Reload</CLusterActionText>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
     }
-    return <CLusterActionText>Connect</CLusterActionText>;
+    return <CLusterActionText>Load</CLusterActionText>;
   }, [previewType, previewLoader, isInClusterMode]);
 
   const clusterMenu = (
@@ -336,6 +366,19 @@ const PageHeader = () => {
       {kubeConfig.contexts.map((context: any) => (
         <Menu.Item key={context.cluster} onClick={handleClusterChange}>
           {context.cluster}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  const projectsMenu = (
+    <Menu>
+      <Menu.Item key="NEW" onClick={handleProjectChange}>
+        New Project
+      </Menu.Item>
+      {projects.map((project: Project) => (
+        <Menu.Item key={project.rootFolder} onClick={handleProjectChange}>
+          {project.name}
         </Menu.Item>
       ))}
     </Menu>
@@ -384,6 +427,14 @@ const PageHeader = () => {
           {activeProject && !clusterStatusHidden && (
             <CLusterContainer>
               <CLusterStatus>
+                <StyledProjectsDropdown overlay={projectsMenu} placement="bottomCenter" arrow trigger={['click']}>
+                  <StyledProjectButton>
+                    <StyledFolderOpenOutlined />
+                    <span>{activeProject.name}</span>
+                    <DownOutlined style={{margin: 4}} />
+                  </StyledProjectButton>
+                </StyledProjectsDropdown>
+
                 <CLusterStatusText connected={isKubeconfigPathValid}>
                   <StyledClusterOutlined />
                   {isKubeconfigPathValid && <span>CONNECTED</span>}

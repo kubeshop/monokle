@@ -124,6 +124,9 @@ export const configSlice = createSlice({
         project.lastOpened = new Date().toISOString();
       }
     },
+    setSelectedProjectRootFolder: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
+      state.selectedProjectRootFolder = action.payload;
+    },
   },
 });
 
@@ -147,5 +150,6 @@ export const {
   updateTextSize,
   updateTheme,
   setContexts,
+  setSelectedProjectRootFolder,
 } = configSlice.actions;
 export default configSlice.reducer;
