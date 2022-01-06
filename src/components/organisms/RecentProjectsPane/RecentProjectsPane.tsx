@@ -2,6 +2,7 @@ import React from 'react';
 
 import {Row} from 'antd';
 
+import _ from 'lodash';
 import {DateTime} from 'luxon';
 import styled from 'styled-components';
 
@@ -41,6 +42,7 @@ const ProjectName = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: auto;
 
   &:hover {
     text-decoration: underline;
@@ -54,6 +56,7 @@ const ProjectPath = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: auto;
 `;
 
 const ProjectLastOpened = styled.div`
@@ -62,6 +65,7 @@ const ProjectLastOpened = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: auto;
 `;
 
 const RecentProjectsPane = () => {
@@ -92,13 +96,15 @@ const RecentProjectsPane = () => {
       </Row>
       <Row>
         <ProjectsContainer>
-          {projects.map(project => (
-            <ProjectItem>
-              <ProjectName onClick={() => openProject(project)}>{project.name}</ProjectName>
-              <ProjectPath>{project.rootFolder}</ProjectPath>
-              <ProjectLastOpened>last opened {getRelativeDate(project.lastOpened)}</ProjectLastOpened>
-            </ProjectItem>
-          ))}
+          {_.sortBy(projects, (p: Project) => p.lastOpened)
+            .reverse()
+            .map((project: Project) => (
+              <ProjectItem key={project.rootFolder}>
+                <ProjectName onClick={() => openProject(project)}>{project.name}</ProjectName>
+                <ProjectPath>{project.rootFolder}</ProjectPath>
+                <ProjectLastOpened>last opened {getRelativeDate(project.lastOpened)}</ProjectLastOpened>
+              </ProjectItem>
+            ))}
         </ProjectsContainer>
       </Row>
     </div>

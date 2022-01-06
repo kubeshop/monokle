@@ -102,6 +102,9 @@ const initialUiState: UiState = {
     isOpen: false,
     rootDir: '',
   },
+  createProjectModal: {
+    isOpen: false,
+  },
   renameResourceModal: {
     isOpen: false,
     resourceId: '',

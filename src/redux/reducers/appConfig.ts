@@ -1,5 +1,7 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import path from 'path';
+
 import {AppConfig, KubeConfig, Languages, NewVersionCode, Project, TextSizes, Themes} from '@models/appconfig';
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
@@ -107,9 +109,17 @@ export const configSlice = createSlice({
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       const project: Project = action.payload;
+      const existingProject: Project | undefined = state.projects.find(
+        (p: Project) => p.rootFolder === project.rootFolder
+      );
+
+      if (existingProject) {
+        return;
+      }
 
       if (!project.name) {
-        project.name = 'Unnamed';
+        const folderNames: string[] = project.rootFolder.split(path.sep);
+        project.name = folderNames[folderNames.length - 1];
       }
 
       state.projects = [project, ...state.projects];

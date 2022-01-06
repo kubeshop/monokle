@@ -162,7 +162,9 @@ const StyledButton = styled(Button)`
 
 const StyledDropdown = styled(Dropdown)``;
 
-const StyledProjectsDropdown = styled(Dropdown)``;
+const StyledProjectsDropdown = styled(Dropdown)`
+  margin-right: 20px;
+`;
 
 const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
   margin-right: 5px;
@@ -186,17 +188,22 @@ const CLusterStatusText = styled.span<{connected: Boolean}>`
   font-weight: 600;
   border-right: 1px solid ${Colors.grey3};
   padding-right: 8px;
-  ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.whitePure}`}
+  text-transform: uppercase;
+  ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.whitePure}`};
 `;
 
 const CLusterActionText = styled.span`
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  line-height: 20px;
 `;
 
 const StyledClusterOutlined = styled(ClusterOutlined)`
-  font-size: 12px;
+  font-size: 10px;
   margin-right: 4px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  line-height: 20px;
+  text-transform: uppercase;
 `;
 
 const StyledClusterButton = styled(Button)`
@@ -219,6 +226,9 @@ const StyledProjectButton = styled(Button)`
   padding: 0px 8px;
   color: ${Colors.whitePure};
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 10px;
+  line-height: 20px;
 `;
 
 const StyledFolderOpenOutlined = styled(FolderOpenOutlined)`
@@ -353,12 +363,12 @@ const PageHeader = () => {
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <CLusterActionText>Reload</CLusterActionText>;
+      return <CLusterActionText>RELOAD</CLusterActionText>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
     }
-    return <CLusterActionText>Load</CLusterActionText>;
+    return <CLusterActionText>LOAD</CLusterActionText>;
   }, [previewType, previewLoader, isInClusterMode]);
 
   const clusterMenu = (
@@ -437,8 +447,8 @@ const PageHeader = () => {
 
                 <CLusterStatusText connected={isKubeconfigPathValid}>
                   <StyledClusterOutlined />
-                  {isKubeconfigPathValid && <span>CONNECTED</span>}
-                  {!isKubeconfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
+                  {isKubeconfigPathValid && <span>Configured</span>}
+                  {!isKubeconfigPathValid && <span>No Cluster Configured</span>}
                 </CLusterStatusText>
                 {isKubeconfigPathValid && (
                   <StyledDropdown

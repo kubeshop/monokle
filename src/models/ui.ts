@@ -63,6 +63,9 @@ export type UiState = {
     isOpen: boolean;
     rootDir: string;
   };
+  createProjectModal: {
+    isOpen: boolean;
+  };
   renameResourceModal?: {
     isOpen: boolean;
     resourceId: string;

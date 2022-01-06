@@ -113,6 +113,16 @@ export const uiSlice = createSlice({
         rootDir: '',
       };
     },
+    openCreateProjectModal: (state: Draft<UiState>) => {
+      state.createProjectModal = {
+        isOpen: true,
+      };
+    },
+    closeCreateProjectModal: (state: Draft<UiState>) => {
+      state.createProjectModal = {
+        isOpen: false,
+      };
+    },
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
@@ -239,6 +249,8 @@ export const {
   closeRenameEntityModal,
   openCreateFolderModal,
   closeCreateFolderModal,
+  openCreateProjectModal,
+  closeCreateProjectModal,
   toggleExpandActionsPaneFooter,
   resetLayout,
   setClusterIconHighlightStatus,

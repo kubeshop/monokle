@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
+import {openCreateProjectModal} from '@redux/reducers/ui';
 
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import FileExplorer from '@atoms/FileExplorer';
@@ -86,6 +87,10 @@ const StartProjectPane = () => {
     {isDirectoryExplorer: true}
   );
 
+  const handleCreateProject = () => {
+    dispatch(openCreateProjectModal());
+  };
+
   return (
     <div style={{height: '100%'}}>
       <Row style={{height: '100%'}}>
@@ -104,11 +109,11 @@ const StartProjectPane = () => {
                 <StyledFolderOpenOutlined />
                 <StyledActionText>Select an existing folder</StyledActionText>
               </StyledActionContainer>
-              <StyledActionContainer>
+              <StyledActionContainer onClick={handleCreateProject}>
                 <StyledFolderAddOutlined />
                 <StyledActionText>Create an empty project</StyledActionText>
               </StyledActionContainer>
-              <StyledActionContainer>
+              <StyledActionContainer onClick={handleCreateProject}>
                 <StyledFormatPainterOutlined />
                 <StyledActionText>Start from a template</StyledActionText>
               </StyledActionContainer>
