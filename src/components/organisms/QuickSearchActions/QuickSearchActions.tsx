@@ -2,11 +2,16 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {AutoComplete, Input, Modal, Tag} from 'antd';
 
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
+
+import {ResourceFilterType} from '@models/appstate';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectK8sResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
+import {AppDispatch} from '@redux/store';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
@@ -46,6 +51,30 @@ const QuickSearchContainer = styled.div`
 
 const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
+const applyFilterWithConfirm = (
+  option: string,
+  type: 'namespace' | 'kind',
+  resourceFilter: ResourceFilterType,
+  dispatch: AppDispatch
+) => {
+  let title = `Are you sure you want apply ${option} ${type} filter? It will replace the currently applied ${resourceFilter[type]} ${type} filter.`;
+
+  Modal.confirm({
+    title,
+    icon: <ExclamationCircleOutlined />,
+    onOk() {
+      return new Promise(resolve => {
+        dispatch(updateResourceFilter({...resourceFilter, [type]: option}));
+        dispatch(closeQuickSearchActionsPopup());
+        resolve({});
+      });
+    },
+    onCancel() {
+      document.getElementById('quick-search-input')?.focus();
+    },
+  });
+};
+
 const QuickSearchActionsV3: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
@@ -70,10 +99,15 @@ const QuickSearchActionsV3: React.FC = () => {
 
   const applyOption = useCallback(
     (type: string, option: string) => {
-      if (type === 'namespace' && (!resourceFilter.namespace || resourceFilter.namespace !== option)) {
-        dispatch(updateResourceFilter({...resourceFilter, namespace: option}));
-      } else if (type === 'kind' && (!resourceFilter.kind || resourceFilter.kind !== option)) {
-        dispatch(updateResourceFilter({...resourceFilter, kind: option}));
+      if (type === 'namespace' || type === 'kind') {
+        if (resourceFilter[type]) {
+          if (resourceFilter[type] !== option) {
+            applyFilterWithConfirm(option, type, resourceFilter, dispatch);
+          }
+        } else {
+          dispatch(updateResourceFilter({...resourceFilter, [type]: option}));
+          dispatch(closeQuickSearchActionsPopup());
+        }
       } else if (type === 'resource' && selectedResourceId !== option) {
         dispatch(updateResourceFilter({labels: {}, annotations: {}}));
         dispatch(selectK8sResource({resourceId: option}));
@@ -81,11 +115,6 @@ const QuickSearchActionsV3: React.FC = () => {
     },
     [dispatch, resourceFilter, selectedResourceId]
   );
-
-  const closeModalHandler = useCallback(() => {
-    setSearchingValue('');
-    dispatch(closeQuickSearchActionsPopup());
-  }, [dispatch]);
 
   const matchingCharactersLabel = useCallback(
     (label: string, type: string) => {
@@ -164,6 +193,7 @@ const QuickSearchActionsV3: React.FC = () => {
   useEffect(() => {
     if (isOpen) {
       document.getElementById('quick-search-input')?.focus();
+      setSearchingValue('');
     }
   }, [isOpen]);
 
@@ -174,7 +204,7 @@ const QuickSearchActionsV3: React.FC = () => {
       destroyOnClose
       footer={null}
       visible={isOpen}
-      onCancel={closeModalHandler}
+      onCancel={() => dispatch(closeQuickSearchActionsPopup())}
     >
       <QuickSearchContainer>
         <AutoComplete
@@ -183,13 +213,13 @@ const QuickSearchActionsV3: React.FC = () => {
           defaultOpen
           listHeight={500}
           options={options}
+          notFoundContent="Kind, namespace or resource not found."
           style={{width: '100%'}}
           value={searchingValue}
           onSearch={value => setSearchingValue(value)}
           onSelect={value => {
             // options are of type : `type:value`
             applyOption(value.split(':')[0], value.split(':')[1]);
-            closeModalHandler();
           }}
           filterOption={(inputValue, opt) => {
             if (opt?.options?.length) {
