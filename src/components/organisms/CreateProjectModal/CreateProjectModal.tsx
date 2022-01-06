@@ -19,15 +19,6 @@ import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
 
-const StyledQuestionCircleOutlined = styled(QuestionCircleOutlined)`
-  color: ${Colors.grey7};
-  margin: 0 6px;
-`;
-
-type FieldLabelProps = {
-  title: string;
-};
-
 const CreateProjectModal: React.FC = () => {
   const uiState = useAppSelector(state => state.ui.createProjectModal);
   const dispatch = useAppDispatch();
@@ -55,7 +46,7 @@ const CreateProjectModal: React.FC = () => {
   useEffect(() => {
     if (!uiState.fromTemplate && formValues.location && formValues.projectName) {
       dispatch(setCreateProject({rootFolder: formValues.location, name: formValues.projectName}));
-      dispatch(closeCreateProjectModal());
+      closeModal();
     }
   }, [formValues]);
 
@@ -67,6 +58,13 @@ const CreateProjectModal: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiState]);
+
+  const closeModal = () => {
+    setFormValues({projectName: '', location: ''});
+    createProjectForm.resetFields();
+    setFormStep(1);
+    dispatch(closeCreateProjectModal());
+  };
 
   if (!uiState.isOpen) {
     return null;
@@ -85,18 +83,9 @@ const CreateProjectModal: React.FC = () => {
         )
       }
       visible={uiState?.isOpen}
-      onCancel={() => {
-        setFormStep(1);
-        dispatch(closeCreateProjectModal());
-      }}
+      onCancel={closeModal}
       footer={[
-        <Button
-          key="cancel"
-          onClick={() => {
-            setFormStep(1);
-            dispatch(closeCreateProjectModal());
-          }}
-        >
+        <Button key="cancel" onClick={closeModal}>
           Discard
         </Button>,
         uiState.fromTemplate && formStep === 2 && (
@@ -109,30 +98,34 @@ const CreateProjectModal: React.FC = () => {
         </Button>,
       ]}
     >
-      {formStep === 1 && (
-        <Form layout="vertical" form={createProjectForm} initialValues={formValues} onFinish={onFinish}>
-          <Form.Item
-            name="projectName"
-            label="Project Name"
-            required
-            tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
-          >
-            <Input ref={inputRef} />
-          </Form.Item>
-          <Form.Item label="Location" required tooltip="The local path where your project will live.">
-            <Input.Group compact>
-              <Form.Item name="location" noStyle>
-                <Input style={{width: 'calc(100% - 100px)'}} />
-              </Form.Item>
-              <Button style={{width: '100px'}} onClick={openFileExplorer}>
-                Browse
-              </Button>
-            </Input.Group>
-          </Form.Item>
-        </Form>
-      )}
+      <Form
+        layout="vertical"
+        form={createProjectForm}
+        onFinish={onFinish}
+        initialValues={formValues}
+        style={{display: formStep === 1 ? 'block' : 'none'}}
+      >
+        <Form.Item
+          name="projectName"
+          label="Project Name"
+          required
+          tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
+        >
+          <Input ref={inputRef} />
+        </Form.Item>
+        <Form.Item label="Location" required tooltip="The local path where your project will live.">
+          <Input.Group compact>
+            <Form.Item name="location" noStyle>
+              <Input required style={{width: 'calc(100% - 100px)'}} />
+            </Form.Item>
+            <Button style={{width: '100px'}} onClick={openFileExplorer}>
+              Browse
+            </Button>
+          </Input.Group>
+        </Form.Item>
+      </Form>
 
-      {formStep === 2 && <div>[TEMPLATE EXPLORER GOES HERE]</div>}
+      <div style={{display: formStep === 2 ? 'block' : 'none'}}>[TEMPLATE EXPLORER GOES HERE]</div>
       <FileExplorer {...fileExplorerProps} />
     </Modal>
   );
