@@ -11,8 +11,9 @@ import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {uncheckAllResourceIds} from '@redux/reducers/main';
+import {removeResource, uncheckAllResourceIds} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {AppDispatch} from '@redux/store';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 
 import Colors from '@styles/Colors';
@@ -46,7 +47,7 @@ const StyledMenu = styled(Menu)`
   }
 `;
 
-const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[]) => {
+const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], dispatch: AppDispatch) => {
   let title = `Are you sure you want to delete the selected resources (${checkedResources.length}) ?`;
 
   Modal.confirm({
@@ -55,6 +56,9 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[]) => {
     centered: true,
     onOk() {
       return new Promise(resolve => {
+        checkedResources.forEach(resource => {
+          dispatch(removeResource(resource.id));
+        });
         resolve({});
       });
     },
@@ -64,7 +68,6 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[]) => {
 
 const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
-
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
@@ -88,7 +91,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       .map(resource => resourceMap[resource])
       .filter((r): r is K8sResource => r !== undefined);
 
-    deleteCheckedResourcesWithConfirm(resourcesToDelete);
+    deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
   };
 
   const onClickDeployChecked = () => {
@@ -109,7 +112,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       <Menu.Item disabled key="resources-selected">
         {checkedResourceIds.length} Selected
       </Menu.Item>
-      {!isInPreviewMode && (
+      {(!isInPreviewMode || isInClusterMode) && (
         <Menu.Item style={{color: Colors.red7}} key="delete" onClick={onClickDelete}>
           Delete
         </Menu.Item>
