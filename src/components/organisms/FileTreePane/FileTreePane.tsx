@@ -409,6 +409,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const isFileSelected = useMemo(() => {
     return treeKey === selectedPath;
@@ -472,9 +473,9 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       ) : null}
 
       <Menu.Item
+        disabled={isInPreviewMode}
         onClick={e => {
           e.domEvent.stopPropagation();
-
           onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
         }}
         key="create_resource"
@@ -484,6 +485,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       <ContextMenuDivider />
       <Menu.Item
         key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
+        disabled={isInPreviewMode}
         onClick={e => {
           e.domEvent.stopPropagation();
 
@@ -502,7 +504,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
-
           navigator.clipboard.writeText(absolutePath);
         }}
         key="copy_full_path"
@@ -522,6 +523,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
         <>
           <Menu.Item
+            disabled={isInPreviewMode}
             onClick={e => {
               e.domEvent.stopPropagation();
               if (isExcluded) {
@@ -536,9 +538,9 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           </Menu.Item>
           <ContextMenuDivider />
           <Menu.Item
+            disabled={isInPreviewMode}
             onClick={e => {
               e.domEvent.stopPropagation();
-
               onRename(absolutePath, osPlatform);
             }}
             key="rename_entity"
@@ -546,10 +548,10 @@ const TreeItem: React.FC<TreeItemProps> = props => {
             Rename
           </Menu.Item>
           <Menu.Item
+            disabled={isInPreviewMode}
             key="delete_entity"
             onClick={e => {
               e.domEvent.stopPropagation();
-
               deleteEntityWizard(
                 {entityAbsolutePath: absolutePath},
                 () => {
@@ -568,7 +570,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
-
           showItemInFolder(absolutePath);
         }}
         key="reveal_in_finder"
