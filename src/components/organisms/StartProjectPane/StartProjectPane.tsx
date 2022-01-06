@@ -7,6 +7,7 @@ import {FolderAddOutlined, FolderOpenOutlined, FormatPainterOutlined} from '@ant
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
+import {setCreateProject} from '@redux/reducers/appConfig';
 
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import FileExplorer from '@atoms/FileExplorer';
@@ -79,7 +80,7 @@ const StartProjectPane = () => {
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
       if (folderPath) {
-        // dispatch(setCreateProject({rootFolder: folderPath}));
+        dispatch(setCreateProject({rootFolder: folderPath}));
       }
     },
     {isDirectoryExplorer: true}

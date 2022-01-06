@@ -30,7 +30,12 @@ import {
   toggleNotifications,
   toggleSettings,
 } from '@redux/reducers/ui';
-import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {
+  activeProjectSelector,
+  activeResourcesSelector,
+  isInClusterModeSelector,
+  isInPreviewModeSelector,
+} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import Col from '@components/atoms/Col';
@@ -232,6 +237,7 @@ const PageHeader = () => {
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
   const [helmChart, setHelmChart] = useState<HelmChart>();
   const dispatch = useAppDispatch();
+  const activeProject = useSelector(activeProjectSelector);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -375,7 +381,7 @@ const PageHeader = () => {
           <LogoCol noborder="true">
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
-          {!clusterStatusHidden && (
+          {activeProject && !clusterStatusHidden && (
             <CLusterContainer>
               <CLusterStatus>
                 <CLusterStatusText connected={isKubeconfigPathValid}>

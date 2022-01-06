@@ -2,9 +2,17 @@ import React from 'react';
 
 import {Row} from 'antd';
 
+import {DateTime} from 'luxon';
 import styled from 'styled-components';
 
+import {Project} from '@models/appconfig';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setOpenProject} from '@redux/reducers/appConfig';
+
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+
+import Colors from '@styles/Colors';
 
 const TitleBarContainer = styled.div`
   display: flex;
@@ -19,7 +27,58 @@ const Title = styled.span`
   padding-right: 10px;
 `;
 
+const ProjectsContainer = styled.div`
+  padding: 16px 12px;
+`;
+
+const ProjectItem = styled.div`
+  margin-bottom: 16px;
+`;
+
+const ProjectName = styled.div`
+  color: ${Colors.whitePure};
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+`;
+
+const ProjectPath = styled.div`
+  color: ${Colors.grey7};
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const ProjectLastOpened = styled.div`
+  color: ${Colors.grey5};
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
 const RecentProjectsPane = () => {
+  const dispatch = useAppDispatch();
+
+  const projects: Project[] = useAppSelector(state => state.config.projects);
+
+  const openProject = (project: Project) => {
+    dispatch(setOpenProject(project.rootFolder));
+  };
+
+  const getRelativeDate = (isoDate: string | undefined) => {
+    if (isoDate) {
+      return DateTime.fromISO(isoDate).toRelative();
+    }
+    return '';
+  };
   return (
     <div>
       <Row>
@@ -30,6 +89,17 @@ const RecentProjectsPane = () => {
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
+      </Row>
+      <Row>
+        <ProjectsContainer>
+          {projects.map(project => (
+            <ProjectItem>
+              <ProjectName onClick={() => openProject(project)}>{project.name}</ProjectName>
+              <ProjectPath>{project.rootFolder}</ProjectPath>
+              <ProjectLastOpened>last opened {getRelativeDate(project.lastOpened)}</ProjectLastOpened>
+            </ProjectItem>
+          ))}
+        </ProjectsContainer>
       </Row>
     </div>
   );

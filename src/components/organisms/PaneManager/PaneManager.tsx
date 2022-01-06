@@ -1,4 +1,5 @@
 import React, {useContext, useMemo} from 'react';
+import {useSelector} from 'react-redux';
 
 import {Button, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
@@ -21,19 +22,21 @@ import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
 
-// import {
-//   ActionsPane,
-//   FileTreePane,
-//   HelmPane,
-//   KustomizePane,
-//   NavigatorPane,
-//   PluginManagerPane,
-//   TemplatesPane,
-// } from '@organisms';
-// import {GraphView} from '@molecules';
-import {Col} from '@atoms';
+import {
+  ActionsPane,
+  FileTreePane,
+  HelmPane,
+  KustomizePane,
+  NavigatorPane,
+  PluginManagerPane,
+  TemplatesPane,
+} from '@organisms';
+
+import {GraphView} from '@molecules';
+
+import {Col, SplitView} from '@atoms';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -95,6 +98,7 @@ const PaneManager = () => {
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
+  const activeProject = useSelector(activeProjectSelector);
 
   // TODO: refactor this to get the size of the page header dinamically
   const contentHeight = useMemo(() => {
@@ -197,60 +201,62 @@ const PaneManager = () => {
         </Space>
       </StyledColumnLeftMenu>
 
-      <StyledColumnPanes style={{width: contentWidth}}>
-        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', height: '100%'}}>
-          <div style={{flex: 3, height: '100%'}}>
-            <StartProjectPane />
+      {activeProject ? (
+        <StyledColumnPanes style={{width: contentWidth}}>
+          <SplitView
+            contentWidth={contentWidth}
+            left={
+              <>
+                <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
+                  <FileTreePane />
+                </div>
+                <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
+                  <KustomizePane />
+                </div>
+                <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
+                  <HelmPane />
+                </div>
+                <div
+                  style={{
+                    display: featureJson.TemplatesPane && leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
+                  }}
+                >
+                  <TemplatesPane />
+                </div>
+                <div
+                  style={{
+                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                  }}
+                >
+                  <PluginManagerPane />
+                </div>
+              </>
+            }
+            hideLeft={!leftActive}
+            nav={<NavigatorPane />}
+            editor={<ActionsPane contentHeight={contentHeight} />}
+            right={
+              <>
+                {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
+                  <GraphView editorHeight={contentHeight} />
+                ) : undefined}
+              </>
+            }
+            hideRight={!rightActive}
+          />
+        </StyledColumnPanes>
+      ) : (
+        <StyledColumnPanes style={{width: contentWidth}}>
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', height: '100%'}}>
+            <div style={{flex: 3, height: '100%'}}>
+              <StartProjectPane />
+            </div>
+            <div style={{flex: 1, height: '100%', borderLeft: `1px solid ${Colors.grey3}`}}>
+              <RecentProjectsPane />
+            </div>
           </div>
-          <div style={{flex: 1, height: '100%', borderLeft: `1px solid ${Colors.grey3}`}}>
-            <RecentProjectsPane />
-          </div>
-        </div>
-      </StyledColumnPanes>
-
-      {/* <StyledColumnPanes style={{width: contentWidth}}>
-        <SplitView
-          contentWidth={contentWidth}
-          left={
-            <>
-              <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
-                <FileTreePane />
-              </div>
-              <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
-                <KustomizePane />
-              </div>
-              <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
-                <HelmPane />
-              </div>
-              <div
-                style={{
-                  display: featureJson.TemplatesPane && leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
-                }}
-              >
-                <TemplatesPane />
-              </div>
-              <div
-                style={{
-                  display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
-                }}
-              >
-                <PluginManagerPane />
-              </div>
-            </>
-          }
-          hideLeft={!leftActive}
-          nav={<NavigatorPane />}
-          editor={<ActionsPane contentHeight={contentHeight} />}
-          right={
-            <>
-              {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                <GraphView editorHeight={contentHeight} />
-              ) : undefined}
-            </>
-          }
-          hideRight={!rightActive}
-        />
-      </StyledColumnPanes> */}
+        </StyledColumnPanes>
+      )}
 
       <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
         <Space direction="vertical" style={{width: 43}}>

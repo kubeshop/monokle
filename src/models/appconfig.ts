@@ -43,7 +43,7 @@ export interface Project {
   kubeconfig?: KubeConfig;
   preferences?: any;
   k8sVersion?: string;
-  lastOpened?: Date;
+  lastOpened?: string;
 }
 
 interface AppConfig {

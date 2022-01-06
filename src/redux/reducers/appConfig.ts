@@ -12,12 +12,13 @@ import initialState from '../initialState';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI) => {
   thunkAPI.dispatch(configSlice.actions.createProject(project));
-  thunkAPI.dispatch(openProject(project.rootFolder));
+  thunkAPI.dispatch(setOpenProject(project.rootFolder));
 });
 
-export const openProject = createAsyncThunk(
+export const setOpenProject = createAsyncThunk(
   'config/openProject',
   async (projectRootPath: string, thunkAPI: {dispatch: AppDispatch}) => {
+    thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     thunkAPI.dispatch(setRootFolder(projectRootPath));
   }
 );
@@ -113,6 +114,15 @@ export const configSlice = createSlice({
 
       state.projects = [project, ...state.projects];
       state.selectedProjectRootFolder = project.rootFolder;
+    },
+    openProject: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      const projectRootPath: string = action.payload;
+      const project: Project | undefined = state.projects.find((p: Project) => p.rootFolder === projectRootPath);
+
+      if (project) {
+        state.selectedProjectRootFolder = projectRootPath;
+        project.lastOpened = new Date().toISOString();
+      }
     },
   },
 });
