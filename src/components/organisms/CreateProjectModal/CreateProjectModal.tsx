@@ -23,36 +23,21 @@ type FieldLabelProps = {
   title: string;
 };
 
-const FieldLabel: React.FC<FieldLabelProps> = ({title}) => {
-  return (
-    <div
-      style={{
-        width: '240px',
-        fontSize: '16px',
-        lineHeight: '24px',
-        color: `${Colors.grey700}`,
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
-      <span style={{color: `${Colors.red7}`, marginRight: '4px'}}>*</span>
-      <span>{title}</span>
-      <StyledQuestionCircleOutlined />
-      <span>:</span>
-    </div>
-  );
-};
-
 const CreateProjectModal: React.FC = () => {
   const uiState = useAppSelector(state => state.ui.createProjectModal);
   const dispatch = useAppDispatch();
   const [createProjectForm] = useForm();
   const [inputRef, focus] = useFocus<any>();
   const [formStep, setFormStep] = useState(1);
+  const [formValues, setFormValues] = useState({projectName: 'sdfgsdfg', location: ''});
 
   const onFinish = (values: {projectName: string; location: string}) => {
-    const {projectName, location} = values;
-    console.log('values', projectName, location);
+    setFormValues(values);
+    if (uiState.fromTemplate && formStep === 1) {
+      setFormStep(2);
+    } else {
+      console.log('formValues', formValues);
+    }
   };
 
   useEffect(() => {
@@ -82,12 +67,14 @@ const CreateProjectModal: React.FC = () => {
       }
       visible={uiState?.isOpen}
       onCancel={() => {
+        setFormStep(1);
         dispatch(closeCreateProjectModal());
       }}
       footer={[
         <Button
           key="cancel"
           onClick={() => {
+            setFormStep(1);
             dispatch(closeCreateProjectModal());
           }}
         >
@@ -102,64 +89,29 @@ const CreateProjectModal: React.FC = () => {
           key="submit"
           type="primary"
           onClick={() => {
-            if (uiState.fromTemplate && formStep === 1) {
-              setFormStep(2);
+            if (uiState.fromTemplate && formStep === 2) {
+              console.log('formValues', formValues);
             } else {
               createProjectForm.submit();
             }
           }}
         >
-          {uiState.fromTemplate ? 'Next: Select a Template' : 'Create Project'}
+          {uiState.fromTemplate && formStep === 1 ? 'Next: Select a Template' : 'Create Project'}
         </Button>,
       ]}
     >
       {formStep === 1 && (
-        <Form layout="vertical" form={createProjectForm} initialValues={{projectName: ''}} onFinish={onFinish}>
+        <Form layout="vertical" form={createProjectForm} initialValues={formValues} onFinish={onFinish}>
           <Form.Item
             name="projectName"
-            rules={[
-              ({getFieldValue}) => ({
-                validator: () => {
-                  return new Promise((resolve: (value?: any) => void, reject) => {
-                    const projectNameValue: string = getFieldValue('projectName');
-
-                    if (!projectNameValue) {
-                      reject(new Error("This field can't be empty"));
-                    }
-
-                    resolve();
-                  });
-                },
-              }),
-            ]}
+            label="Project Name"
+            required
+            tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
           >
-            <div style={{display: 'flex'}}>
-              <FieldLabel title="Project Name" />
-              <Input ref={inputRef} />
-            </div>
+            <Input ref={inputRef} />
           </Form.Item>
-          <Form.Item
-            name="location"
-            rules={[
-              ({getFieldValue}) => ({
-                validator: () => {
-                  return new Promise((resolve: (value?: any) => void, reject) => {
-                    const locationValue: string = getFieldValue('location');
-
-                    if (!locationValue) {
-                      reject(new Error("This field can't be empty"));
-                    }
-
-                    resolve();
-                  });
-                },
-              }),
-            ]}
-          >
-            <div style={{display: 'flex'}}>
-              <FieldLabel title="Location" />
-              <Input />
-            </div>
+          <Form.Item name="location" label="Location" required tooltip="The local path where your project will live.">
+            <Input />
           </Form.Item>
         </Form>
       )}
