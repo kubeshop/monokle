@@ -3,6 +3,7 @@ import React from 'react';
 interface ScrollIntoViewProps {
   children: React.ReactNode;
   id: string;
+  parentContainerElementId: string;
 }
 
 export type ScrollContainerRef = {
@@ -10,12 +11,22 @@ export type ScrollContainerRef = {
   getBoundingClientRect: () => DOMRect | undefined;
 };
 
-const ScrollIntoView = React.forwardRef(({children, id}: ScrollIntoViewProps, ref) => {
+const ScrollIntoView = React.forwardRef(({children, id, parentContainerElementId}: ScrollIntoViewProps, ref) => {
   const containerRef = React.useRef<HTMLLIElement>(null);
   React.useImperativeHandle(ref, () => {
     return {
       scrollIntoView: () => {
-        containerRef.current?.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
+        // containerRef.current?.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
+        const parentContainer = document.getElementById(parentContainerElementId);
+        const itemOffsetTop = containerRef.current?.offsetTop;
+        if (parentContainer && itemOffsetTop) {
+          const scrollOffset = itemOffsetTop - parentContainer.scrollTop;
+          parentContainer.scrollTo({
+            left: 0,
+            top: scrollOffset,
+            behavior: 'smooth',
+          });
+        }
       },
       getBoundingClientRect: () => {
         return containerRef.current?.getBoundingClientRect();
