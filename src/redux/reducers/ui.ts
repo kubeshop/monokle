@@ -113,14 +113,16 @@ export const uiSlice = createSlice({
         rootDir: '',
       };
     },
-    openCreateProjectModal: (state: Draft<UiState>) => {
+    openCreateProjectModal: (state: Draft<UiState>, action: PayloadAction<{fromTemplate: boolean}>) => {
       state.createProjectModal = {
         isOpen: true,
+        fromTemplate: action.payload.fromTemplate,
       };
     },
     closeCreateProjectModal: (state: Draft<UiState>) => {
       state.createProjectModal = {
         isOpen: false,
+        fromTemplate: false,
       };
     },
     closeRenameResourceModal: (state: Draft<UiState>) => {

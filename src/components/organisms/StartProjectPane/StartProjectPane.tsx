@@ -87,8 +87,8 @@ const StartProjectPane = () => {
     {isDirectoryExplorer: true}
   );
 
-  const handleCreateProject = () => {
-    dispatch(openCreateProjectModal());
+  const handleCreateProject = (fromTemplate: boolean) => {
+    dispatch(openCreateProjectModal({fromTemplate}));
   };
 
   return (
@@ -109,11 +109,11 @@ const StartProjectPane = () => {
                 <StyledFolderOpenOutlined />
                 <StyledActionText>Select an existing folder</StyledActionText>
               </StyledActionContainer>
-              <StyledActionContainer onClick={handleCreateProject}>
+              <StyledActionContainer onClick={() => handleCreateProject(false)}>
                 <StyledFolderAddOutlined />
                 <StyledActionText>Create an empty project</StyledActionText>
               </StyledActionContainer>
-              <StyledActionContainer onClick={handleCreateProject}>
+              <StyledActionContainer onClick={() => handleCreateProject(true)}>
                 <StyledFormatPainterOutlined />
                 <StyledActionText>Start from a template</StyledActionText>
               </StyledActionContainer>

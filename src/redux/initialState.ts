@@ -104,6 +104,7 @@ const initialUiState: UiState = {
   },
   createProjectModal: {
     isOpen: false,
+    fromTemplate: false,
   },
   renameResourceModal: {
     isOpen: false,

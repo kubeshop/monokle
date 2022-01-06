@@ -65,6 +65,7 @@ export type UiState = {
   };
   createProjectModal: {
     isOpen: boolean;
+    fromTemplate: boolean;
   };
   renameResourceModal?: {
     isOpen: boolean;
