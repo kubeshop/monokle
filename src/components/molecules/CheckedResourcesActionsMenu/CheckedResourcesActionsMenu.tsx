@@ -1,16 +1,21 @@
-import React, {useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 
-import {Menu, Modal} from 'antd';
+import {Input, Menu, Modal, Select} from 'antd';
 
 import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
+import fs from 'fs';
+import path from 'path';
 import styled from 'styled-components';
 
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
+import {AlertEnum} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {removeResource, uncheckAllResourceIds} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {AppDispatch} from '@redux/store';
@@ -19,6 +24,17 @@ import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import Colors from '@styles/Colors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
+
+const {Option} = Select;
+
+const ErrorMessageLabel = styled.div`
+  color: ${Colors.redError};
+  margin-top: 10px;
+`;
+
+export const SaveDestinationWrapper = styled(Input.Group)`
+  display: flex !important;
+`;
 
 const StyledMenu = styled(Menu)`
   background: linear-gradient(90deg, #112a45 0%, #111d2c 100%);
@@ -47,6 +63,11 @@ const StyledMenu = styled(Menu)`
   }
 `;
 
+const StyledSelect = styled(Select)`
+  flex: 1;
+  overflow-x: hidden;
+`;
+
 const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], dispatch: AppDispatch) => {
   let title = `Are you sure you want to delete the selected resources (${checkedResources.length}) ?`;
 
@@ -55,10 +76,17 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], disp
     icon: <ExclamationCircleOutlined />,
     centered: true,
     onOk() {
+      let deletedResources = '';
       return new Promise(resolve => {
         checkedResources.forEach(resource => {
           dispatch(removeResource(resource.id));
+          deletedResources += `${resource.name}\n`;
         });
+        dispatch(uncheckAllResourceIds());
+
+        dispatch(
+          setAlert({type: AlertEnum.Success, title: 'Successfully deleted resources', message: deletedResources})
+        );
         resolve({});
       });
     },
@@ -66,15 +94,29 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], disp
   });
 };
 
+const getFullFileName = (filename: string) => {
+  if (filename.endsWith('.yaml') || filename.endsWith('.yml')) {
+    return filename;
+  }
+
+  return `${filename}.yaml`;
+};
+
 const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
+  const [errorMessage, setErrorMessage] = useState('');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
+  const [isSaveToFileFolderModalVisible, setIsSaveToFileFolderModalVisible] = useState(false);
+  const [savingDestination, setSavingDestination] = useState<string>('saveToFile');
+  const [selectedFile, setSelectedFile] = useState<string | undefined>();
+  const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
 
   const checkedResources = useMemo(
     () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
@@ -85,6 +127,38 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     () => makeApplyMultipleResourcesText(checkedResources.length, currentContext),
     [checkedResources, currentContext]
   );
+
+  const foldersList = useMemo(
+    () =>
+      Object.entries(fileMap)
+        .map(([key, value]) => ({folderName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
+        .filter(file => file.isFolder),
+    [fileMap]
+  );
+
+  const fileList = useMemo(
+    () =>
+      Object.entries(fileMap)
+        .map(([key, value]) => ({fileName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
+        .filter(file => !file.isFolder),
+    [fileMap]
+  );
+
+  const renderFileSelectOptions = useCallback(() => {
+    return fileList.map(folder => (
+      <Option key={folder.fileName} value={folder.fileName}>
+        {folder.fileName}
+      </Option>
+    ));
+  }, [fileList]);
+
+  const renderFolderSelectOptions = useCallback(() => {
+    return foldersList.map(folder => (
+      <Option key={folder.folderName} value={folder.folderName}>
+        {folder.folderName}
+      </Option>
+    ));
+  }, [foldersList]);
 
   const onClickDelete = () => {
     const resourcesToDelete = checkedResourceIds
@@ -107,9 +181,44 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     dispatch(uncheckAllResourceIds());
   };
 
+  const saveCheckedResourcesToFileFolder = () => {
+    if (!checkedResourceIds || !checkedResourceIds.length) {
+      return;
+    }
+
+    if (savingDestination === 'saveToFile') {
+      if (!selectedFile) {
+        setErrorMessage('Select file');
+        return;
+      }
+    }
+
+    checkedResourceIds.forEach(resourceId => {
+      const resource = resourceMap[resourceId];
+
+      let absolutePath;
+
+      const fullFileName = getFullFileName(resource.name);
+      if (savingDestination === 'saveToFolder' && selectedFolder) {
+        absolutePath =
+          selectedFolder === ROOT_FILE_ENTRY
+            ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName)
+            : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, fullFileName);
+      } else if (savingDestination === 'saveToFile' && selectedFile) {
+        absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFile);
+      } else {
+        absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName);
+      }
+
+      fs.writeFileSync(absolutePath, resource.text);
+    });
+
+    setIsSaveToFileFolderModalVisible(false);
+  };
+
   return (
     <StyledMenu mode="horizontal">
-      <Menu.Item disabled key="resources-selected">
+      <Menu.Item disabled key="selected_resources">
         {checkedResourceIds.length} Selected
       </Menu.Item>
       {(!isInPreviewMode || isInClusterMode) && (
@@ -121,6 +230,12 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       {!isInClusterMode && (
         <Menu.Item key="deploy" onClick={onClickDeployChecked}>
           Deploy
+        </Menu.Item>
+      )}
+
+      {(isInPreviewMode || isInClusterMode) && (
+        <Menu.Item key="save_to_file_folder" onClick={() => setIsSaveToFileFolderModalVisible(true)}>
+          Save to file/folder
         </Menu.Item>
       )}
 
@@ -136,6 +251,60 @@ const CheckedResourcesActionsMenu: React.FC = () => {
           onOk={selectedNamespace => onClickApplyCheckedResources(selectedNamespace)}
           onCancel={() => setIsApplyModalVisible(false)}
         />
+      )}
+
+      {isSaveToFileFolderModalVisible && (
+        <Modal
+          title={`Save resources (${checkedResourceIds.length}) to file/folder`}
+          visible={isSaveToFileFolderModalVisible}
+          onCancel={() => setIsSaveToFileFolderModalVisible(false)}
+          onOk={saveCheckedResourcesToFileFolder}
+        >
+          <SaveDestinationWrapper compact>
+            <StyledSelect
+              style={{flex: 1}}
+              value={savingDestination}
+              onChange={value => {
+                setSavingDestination(value as string);
+
+                if (errorMessage) {
+                  setErrorMessage('');
+                }
+              }}
+            >
+              <Option value="saveToFolder">Save to folder</Option>
+              <Option value="saveToFile">Add to file</Option>
+            </StyledSelect>
+            {savingDestination === 'saveToFolder' && (
+              <Select
+                showSearch
+                onChange={(value: any) => setSelectedFolder(value)}
+                value={selectedFolder}
+                style={{flex: 2}}
+              >
+                {renderFolderSelectOptions()}
+              </Select>
+            )}
+            {savingDestination === 'saveToFile' && (
+              <StyledSelect
+                showSearch
+                onChange={(value: any) => {
+                  setSelectedFile(value);
+
+                  if (errorMessage) {
+                    setErrorMessage('');
+                  }
+                }}
+                value={selectedFile}
+                placeholder="Select a destination file"
+                style={{flex: 3}}
+              >
+                {renderFileSelectOptions()}
+              </StyledSelect>
+            )}
+          </SaveDestinationWrapper>
+          {errorMessage && <ErrorMessageLabel>*{errorMessage}</ErrorMessageLabel>}
+        </Modal>
       )}
     </StyledMenu>
   );
