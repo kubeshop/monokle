@@ -905,20 +905,23 @@ const FileTreePane = () => {
     dispatch(openCreateFolderModal(absolutePath));
   };
 
-  const onPreview = (relativePath: string) => {
-    const resources = getResourcesForPath(relativePath, resourceMap);
-    if (resources && resources.length === 1 && isKustomizationResource(resources[0])) {
-      startPreview(resources[0].id, 'kustomization', dispatch);
-    } else {
-      const fileEntry = fileMap[relativePath];
-      if (fileEntry) {
-        const valuesFile = getHelmValuesFile(fileEntry, helmValuesMap);
-        if (valuesFile) {
-          startPreview(valuesFile.id, 'helm', dispatch);
+  const onPreview = useCallback(
+    (relativePath: string) => {
+      const resources = getResourcesForPath(relativePath, resourceMap);
+      if (resources && resources.length === 1 && isKustomizationResource(resources[0])) {
+        startPreview(resources[0].id, 'kustomization', dispatch);
+      } else {
+        const fileEntry = fileMap[relativePath];
+        if (fileEntry) {
+          const valuesFile = getHelmValuesFile(fileEntry, helmValuesMap);
+          if (valuesFile) {
+            startPreview(valuesFile.id, 'helm', dispatch);
+          }
         }
       }
-    }
-  };
+    },
+    [resourceMap, fileMap, helmValuesMap]
+  );
 
   const onCreateResource = ({targetFolder, targetFile}: {targetFolder?: string; targetFile?: string}) => {
     if (targetFolder) {
