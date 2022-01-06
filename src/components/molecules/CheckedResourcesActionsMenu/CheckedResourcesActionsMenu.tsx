@@ -76,17 +76,15 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], disp
     icon: <ExclamationCircleOutlined />,
     centered: true,
     onOk() {
-      let deletedResources = '';
+      let alertMessage = '';
       return new Promise(resolve => {
         checkedResources.forEach(resource => {
           dispatch(removeResource(resource.id));
-          deletedResources += `${resource.name}\n`;
+          alertMessage += `${alertMessage && ' | '}${resource.name}\n`;
         });
         dispatch(uncheckAllResourceIds());
 
-        dispatch(
-          setAlert({type: AlertEnum.Success, title: 'Successfully deleted resources', message: deletedResources})
-        );
+        dispatch(setAlert({type: AlertEnum.Success, title: 'Successfully deleted resources', message: alertMessage}));
         resolve({});
       });
     },
