@@ -461,6 +461,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       {isFolder ? (
         <>
           <Menu.Item
+            disabled={isInPreviewMode}
             onClick={e => {
               e.domEvent.stopPropagation();
               onCreateFolder(absolutePath);
@@ -500,7 +501,25 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           ? 'Remove from filter'
           : `Filter on this ${isFolder ? 'folder' : 'file'}`}
       </Menu.Item>
-
+      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
+        <>
+          <Menu.Item
+            disabled={isInPreviewMode}
+            onClick={e => {
+              e.domEvent.stopPropagation();
+              if (isExcluded) {
+                onIncludeToProcessing(relativePath);
+              } else {
+                onExcludeFromProcessing(relativePath);
+              }
+            }}
+            key="add_to_files_exclude"
+          >
+            {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
+          </Menu.Item>
+        </>
+      ) : null}
+      <ContextMenuDivider />
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
@@ -522,20 +541,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       </Menu.Item>
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
         <>
-          <Menu.Item
-            disabled={isInPreviewMode}
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              if (isExcluded) {
-                onIncludeToProcessing(relativePath);
-              } else {
-                onExcludeFromProcessing(relativePath);
-              }
-            }}
-            key="add_to_files_exclude"
-          >
-            {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
-          </Menu.Item>
           <ContextMenuDivider />
           <Menu.Item
             disabled={isInPreviewMode}
