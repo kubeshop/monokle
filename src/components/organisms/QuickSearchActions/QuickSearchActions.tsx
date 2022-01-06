@@ -15,6 +15,8 @@ import {AppDispatch} from '@redux/store';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
+import {isResourcePassingFilter} from '@utils/resources';
+
 import Colors from '@styles/Colors';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
@@ -75,6 +77,26 @@ const applyFilterWithConfirm = (
   });
 };
 
+const selectK8sResourceWithConfirm = (resourceId: string, resourceName: string, dispatch: AppDispatch) => {
+  let title = `Are you sure you want to select ${resourceName}? It will reset the currently applied filters.`;
+
+  Modal.confirm({
+    title,
+    icon: <ExclamationCircleOutlined />,
+    onOk() {
+      return new Promise(resolve => {
+        dispatch(updateResourceFilter({labels: {}, annotations: {}}));
+        dispatch(selectK8sResource({resourceId}));
+        dispatch(closeQuickSearchActionsPopup());
+        resolve({});
+      });
+    },
+    onCancel() {
+      document.getElementById('quick-search-input')?.focus();
+    },
+  });
+};
+
 const QuickSearchActionsV3: React.FC = () => {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
@@ -97,6 +119,14 @@ const QuickSearchActionsV3: React.FC = () => {
     ].sort();
   }, [resourceMap]);
 
+  const filteredResources = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(resourceMap).filter(([, resource]) => isResourcePassingFilter(resource, resourceFilter))
+      ),
+    [resourceFilter, resourceMap]
+  );
+
   const applyOption = useCallback(
     (type: string, option: string) => {
       if (type === 'namespace' || type === 'kind') {
@@ -108,12 +138,16 @@ const QuickSearchActionsV3: React.FC = () => {
           dispatch(updateResourceFilter({...resourceFilter, [type]: option}));
           dispatch(closeQuickSearchActionsPopup());
         }
-      } else if (type === 'resource' && selectedResourceId !== option) {
-        dispatch(updateResourceFilter({labels: {}, annotations: {}}));
-        dispatch(selectK8sResource({resourceId: option}));
+      } else if (type === 'resource') {
+        if (!filteredResources[option]) {
+          selectK8sResourceWithConfirm(option, resourceMap[option].name, dispatch);
+        } else if (selectedResourceId !== option) {
+          dispatch(selectK8sResource({resourceId: option}));
+          dispatch(closeQuickSearchActionsPopup());
+        }
       }
     },
-    [dispatch, resourceFilter, selectedResourceId]
+    [dispatch, filteredResources, resourceFilter, resourceMap, selectedResourceId]
   );
 
   const matchingCharactersLabel = useCallback(
