@@ -128,7 +128,7 @@ function findJsonPointerNode(valuesDoc: Document.Parsed<ParsedNode>, path: strin
       } else {
         return valueNode;
       }
-    }
+    } else break;
   }
 
   return valueNode;

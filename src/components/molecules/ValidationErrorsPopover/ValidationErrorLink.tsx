@@ -2,7 +2,7 @@ import React from 'react';
 
 import styled from 'styled-components';
 
-import {K8sResource, ResourceValidationError} from '@models/k8sresource';
+import {ResourceValidationError} from '@models/k8sresource';
 
 import Colors, {FontColors} from '@styles/Colors';
 
@@ -24,12 +24,8 @@ const StyledErrorMessage = styled.span`
   color: ${Colors.redError};
 `;
 
-const ValidationErrorLink = (props: {
-  resource: K8sResource;
-  validationError: ResourceValidationError;
-  onClick?: () => void;
-}) => {
-  const {resource, validationError, onClick} = props;
+const ValidationErrorLink = (props: {validationError: ResourceValidationError; onClick?: () => void}) => {
+  const {validationError, onClick} = props;
 
   const linkText = validationError.property;
 
