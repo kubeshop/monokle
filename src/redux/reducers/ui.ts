@@ -4,7 +4,6 @@ import path from 'path';
 
 import {KUSTOMIZATION_KIND} from '@constants/constants';
 
-import {ResourceValidationError} from '@models/k8sresource';
 import {LeftMenuSelection, MonacoUiState, NewResourceWizardInput, PaneConfiguration, UiState} from '@models/ui';
 
 import initialState from '@redux/initialState';
@@ -130,18 +129,6 @@ export const uiSlice = createSlice({
         );
       }
     },
-    showValidationErrorsModal: (state: Draft<UiState>, action: PayloadAction<ResourceValidationError[]>) => {
-      state.validationErrorsModal = {
-        isVisible: true,
-        errors: action.payload,
-      };
-    },
-    hideValidationErrorsModal: (state: Draft<UiState>) => {
-      state.validationErrorsModal = {
-        isVisible: false,
-        errors: [],
-      };
-    },
     openFolderExplorer: (state: Draft<UiState>) => {
       state.folderExplorer = {isOpen: true};
     },
@@ -226,8 +213,6 @@ export const {
   closeRenameResourceModal,
   collapseNavSections,
   expandNavSections,
-  showValidationErrorsModal,
-  hideValidationErrorsModal,
   openFolderExplorer,
   closeFolderExplorer,
   setMonacoEditor,

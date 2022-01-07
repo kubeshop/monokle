@@ -213,7 +213,7 @@ function processSymbol(
   if (parents.length > 0) {
     const parentName = parents[parents.length - 1].name;
 
-    if (parentName === 'labels' || parentName === 'matchLabels') {
+    if (parentName === 'labels' || parentName === 'matchLabels' || parentName === 'selector') {
       addLabelFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
     } else if (parentName === 'annotations') {
       addAnnotationFilterLink(lines, symbol, filterResources, newDisposables, newDecorations);
