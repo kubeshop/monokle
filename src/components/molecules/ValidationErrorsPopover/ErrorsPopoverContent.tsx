@@ -42,8 +42,9 @@ const StyledRefDiv = styled.div`
   margin: 5px 0;
 `;
 
-const StyledDescription = styled.span`
+const StyledDescription = styled.div`
   display: block;
+  width: 600px;
   color: ${Colors.grey7};
 `;
 
