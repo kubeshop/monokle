@@ -260,6 +260,7 @@ const QuickSearchActionsV3: React.FC = () => {
         value={searchingValue}
         onKeyDown={e => {
           if (e.code === 'Escape') {
+            e.preventDefault();
             dispatch(closeQuickSearchActionsPopup());
           }
         }}
