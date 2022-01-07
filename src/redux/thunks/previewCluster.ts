@@ -186,7 +186,6 @@ async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitio
       .map(crd => {
         const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
         if (kindHandler) {
-          log.info(`Getting custom resources for kind ${kindHandler.kind}`);
           return kindHandler.listResourcesInCluster(kc, crd).then(response =>
             // @ts-ignore
             getK8sObjectsAsYaml(response.body.items)

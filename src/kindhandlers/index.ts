@@ -1,20 +1,17 @@
+import EventEmitter from 'events';
+import fs from 'fs';
+import {readdir} from 'fs/promises';
+import log from 'loglevel';
+import path from 'path';
+import {parseAllDocuments} from 'yaml';
+
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {getStaticResourcePath} from '@redux/services';
+import {refMapperMatchesKind} from '@redux/services/resourceRefs';
+
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
-import AcmeChallengeHandler from '@src/kindhandlers/certmanager/AcmeChallenge.handler';
-import AcmeOrderHandler from '@src/kindhandlers/certmanager/AcmeOrder.handler';
-import CertificateHandler from '@src/kindhandlers/certmanager/Certificate.handler';
-import CertificateRequestHandler from '@src/kindhandlers/certmanager/CertificateRequest.handler';
-import ClusterIssuerHandler from '@src/kindhandlers/certmanager/ClusterIssuer.handler';
-import IssuerHandler from '@src/kindhandlers/certmanager/Issuer.handler';
-import DestinationRuleHandler from '@src/kindhandlers/istio/DestinationRule.handler';
-import EnvoyFilterHandler from '@src/kindhandlers/istio/EnvoyFilter.handler';
-import GatewayHandler from '@src/kindhandlers/istio/Gateway.handler';
-import ServiceEntryHandler from '@src/kindhandlers/istio/ServiceEntry.handler';
-import SidecarHandler from '@src/kindhandlers/istio/Sidecar.handler';
-import VirtualServiceHandler from '@src/kindhandlers/istio/VirtualService.handler';
-import WorkloadEntryHandler from '@src/kindhandlers/istio/WorkloadEntry.handler';
-import WorkloadGroupHandler from '@src/kindhandlers/istio/WorkloadGroup.handler';
+import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
@@ -41,6 +38,10 @@ import ServiceAccountHandler from './ServiceAccount.handler';
 import StatefulSetHandler from './StatefulSet.handler';
 import {getFormSchema, getUiSchema} from './common/formLoader';
 
+/**
+ * Initialize native ResourceKindHandlers
+ */
+
 export const ResourceKindHandlers: ResourceKindHandler[] = [
   ClusterRoleHandler,
   ClusterRoleBindingHandler,
@@ -66,22 +67,6 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ServiceAccountHandler,
   StatefulSetHandler,
   VolumeAttachmentHandler,
-  // Istio resources
-  VirtualServiceHandler,
-  DestinationRuleHandler,
-  GatewayHandler,
-  SidecarHandler,
-  EnvoyFilterHandler,
-  ServiceEntryHandler,
-  WorkloadGroupHandler,
-  WorkloadEntryHandler,
-  // CertManager
-  CertificateRequestHandler,
-  IssuerHandler,
-  CertificateHandler,
-  ClusterIssuerHandler,
-  AcmeOrderHandler,
-  AcmeChallengeHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(
@@ -99,6 +84,20 @@ const HandlerByResourceKind = Object.fromEntries(
   }).map(kindHandler => [kindHandler.kind, kindHandler])
 );
 
+export function registerKindHandler(kindHandler: ResourceKindHandler, shouldReplace: boolean) {
+  if (shouldReplace || !HandlerByResourceKind[kindHandler.kind]) {
+    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`);
+    HandlerByResourceKind[kindHandler.kind] = kindHandler;
+
+    const ix = ResourceKindHandlers.findIndex(handler => handler.kind === kindHandler.kind);
+    if (ix >= 0) {
+      ResourceKindHandlers.splice(ix, 1);
+    }
+
+    ResourceKindHandlers.push(kindHandler);
+  }
+}
+
 export const getKnownResourceKinds = () => {
   return ResourceKindHandlers.map(handler => handler.kind);
 };
@@ -109,20 +108,28 @@ export const getResourceKindHandler = (resourceKind: string): ResourceKindHandle
 
 const incomingRefMappersCache = new Map<string, RefMapper[]>();
 
+/**
+ * Gets all incoming refMappers for the specified resource kind
+ */
+
 export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
   if (!incomingRefMappersCache.has(resourceKind)) {
     incomingRefMappersCache.set(
       resourceKind,
       ResourceKindHandlers.map(
         resourceKindHandler =>
-          resourceKindHandler.outgoingRefMappers?.filter(
-            outgoingRefMapper => outgoingRefMapper.target.kind === resourceKind
+          resourceKindHandler.outgoingRefMappers?.filter(outgoingRefMapper =>
+            refMapperMatchesKind(outgoingRefMapper, resourceKind)
           ) || []
       ).flat()
     );
   }
   return incomingRefMappersCache.get(resourceKind) || [];
 };
+
+/**
+ * Finds all resource kinds that depend on the specified resource kind(s) via refMappers
+ */
 
 export const getDependentResourceKinds = (resourceKinds: string[]) => {
   const dependentResourceKinds: string[] = [];
@@ -139,10 +146,58 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
   return [...new Set(dependentResourceKinds)];
 };
 
-export function refMapperMatchesKind(refMapper: RefMapper, kind: string) {
-  if (refMapper.target.kind.startsWith('$')) {
-    return kind.match(refMapper.target.kind.substring(1)) !== null;
+/**
+ * Read bundled kindhandlers and emit event to notify when finished (used in tests)
+ */
+
+const KindHandlersEventEmitter = new EventEmitter();
+readBundledCrdKindHandlers();
+
+async function readBundledCrdKindHandlers() {
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const crdPath of findFiles(getStaticResourcePath(`kindhandlers${path.sep}crds`), '.yaml')) {
+    try {
+      const crdContent = fs.readFileSync(crdPath, 'utf-8');
+      if (crdContent) {
+        const documents = parseAllDocuments(crdContent, {prettyErrors: true});
+        documents.forEach(doc => {
+          const crd = doc.toJS({maxAliasCount: -1});
+          if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
+            const kindHandler = extractKindHandler(crd, `kindhandlers${path.sep}handlers`);
+            if (kindHandler) {
+              registerKindHandler(kindHandler, false);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      log.warn(`Failed to parse kindhandler CRD at ${crdPath}`, e);
+    }
   }
 
-  return refMapper.target.kind === kind;
+  KindHandlersEventEmitter.emit('loadedKindHandlers');
+}
+
+export const awaitKindHandlersLoading = new Promise<void>(resolve => {
+  KindHandlersEventEmitter.once('loadedKindHandlers', () => {
+    resolve();
+  });
+});
+
+/**
+ * inspired by https://stackoverflow.com/a/45130990/249414
+ */
+
+async function* findFiles(dir: string, ext: string): any {
+  const dirents = await readdir(dir, {withFileTypes: true});
+
+  for (let i = 0; i < dirents.length; i += 1) {
+    const dirent = dirents[i];
+    const res = path.resolve(dir, dirent.name);
+    if (dirent.isDirectory()) {
+      yield* findFiles(res, ext);
+    } else if (res.endsWith(ext)) {
+      yield res;
+    }
+  }
 }

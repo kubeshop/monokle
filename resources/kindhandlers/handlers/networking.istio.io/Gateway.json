@@ -1,0 +1,8 @@
+{
+  "sectionName": "Istio",
+  "kindSectionName": "Gateways",
+  "helpLink": "https://istio.io/latest/docs/reference/config/networking/gateway/",
+  "podSelectors": [
+    []
+  ]
+}

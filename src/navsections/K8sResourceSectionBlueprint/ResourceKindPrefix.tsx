@@ -22,7 +22,8 @@ const Container = styled.span`
 `;
 
 const StyledTag = styled(Tag)<{$isSelected: boolean}>`
-  margin-left: 4px;
+  margin-left: 0px;
+  margin-right: 5px;
   color: ${props => (props.$isSelected ? Colors.blackPure : Colors.whitePure)};
   font-weight: ${props => (props.$isSelected ? 700 : undefined)};
   font-size: 12px;

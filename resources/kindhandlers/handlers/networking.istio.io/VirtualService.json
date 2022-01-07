@@ -1,0 +1,17 @@
+{
+  "sectionName": "Istio",
+  "kindSectionName": "VirtualServices",
+  "helpLink": "https://istio.io/latest/docs/reference/config/networking/virtual-service/",
+  "refMappers":
+  [
+    {
+      "source": {
+        "pathParts": ["spec", "gateways", "*"]
+      },
+      "type": "name",
+      "target": {
+        "kind": "Gateway"
+      }
+    }
+  ]
+}

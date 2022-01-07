@@ -22,5 +22,6 @@ export function getStaticResourcePath(resourcePath: string) {
  */
 
 export function loadResource(resourcePath: string) {
-  return fs.readFileSync(getStaticResourcePath(resourcePath), 'utf8');
+  const staticResourcePath = getStaticResourcePath(resourcePath);
+  return fs.existsSync(staticResourcePath) ? fs.readFileSync(staticResourcePath, 'utf8') : undefined;
 }

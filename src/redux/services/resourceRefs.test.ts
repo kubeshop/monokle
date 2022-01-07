@@ -4,6 +4,8 @@ import {getTestResourcePath} from '@redux/services/__test__/utils';
 import {readManifests} from '@redux/services/fileEntry.test';
 import {isOutgoingRef, isUnsatisfiedRef, processRefs} from '@redux/services/resourceRefs';
 
+import {awaitKindHandlersLoading} from '@src/kindhandlers';
+
 test('array-optional-resource-refs', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/arrayOptionalResourceRefs'));
 
@@ -55,7 +57,9 @@ function findResourceByName(resourceMap: ResourceMapType, name: string) {
   return Object.values(resourceMap).find(r => r.name === name);
 }
 
-test('custom-resource-refs', () => {
+test('custom-resource-refs', async () => {
+  await awaitKindHandlersLoading;
+
   const {resourceMap} = readManifests(getTestResourcePath('manifests/istio'));
 
   const resources = Object.values(resourceMap);
@@ -77,7 +81,7 @@ test('custom-resource-refs', () => {
   expect(gateway.refs?.length).toBe(2);
   // @ts-ignore
   expect(gateway.refs?.filter(ref => isUnsatisfiedRef(ref.type)).length).toBe(1);
-});
+}, 30000);
 
 test('sibling-matchers', () => {
   const {resourceMap} = readManifests(getTestResourcePath('manifests/siblingMatchers'));
@@ -113,4 +117,20 @@ test('networkpolicy-resource-refs', () => {
   expect(networkPolicy.refs?.length).toBe(1);
   // @ts-ignore
   expect(isUnsatisfiedRef(networkPolicy.refs[0].type)).toBe(true);
+});
+
+test('pair-refs', () => {
+  const {resourceMap} = readManifests(getTestResourcePath('manifests/pairRefs'));
+
+  const resources = Object.values(resourceMap);
+  expect(resources.length).toBe(2);
+  const service = findResourceByName(resourceMap, 'argo-rollouts-dashboard');
+  expect(service).toBeDefined();
+
+  processRefs(resourceMap, {shouldIgnoreOptionalUnsatisfiedRefs: false});
+
+  // @ts-ignore
+  expect(service.refs?.length).toBe(1);
+  // @ts-ignore
+  expect(isOutgoingRef(service.refs[0].type)).toBe(true);
 });
