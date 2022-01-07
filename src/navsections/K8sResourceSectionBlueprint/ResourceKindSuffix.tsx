@@ -1,6 +1,7 @@
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppSelector} from '@redux/hooks';
+import {isOutgoingRef, isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {ValidationErrorsPopover} from '@molecules';
 
@@ -16,17 +17,21 @@ const Suffix = (props: ItemCustomComponentProps) => {
 
   return (
     <>
-      <ResourceRefsIconPopover
-        isSelected={itemInstance.isSelected}
-        isDisabled={itemInstance.isDisabled}
-        resource={resource}
-        type="outgoing"
-      />
-      <ValidationErrorsPopover
-        resource={resource}
-        isSelected={itemInstance.isSelected}
-        isDisabled={itemInstance.isDisabled}
-      />
+      {resource.refs?.some(ref => isOutgoingRef(ref.type) || isUnsatisfiedRef(ref.type)) && (
+        <ResourceRefsIconPopover
+          isSelected={itemInstance.isSelected}
+          isDisabled={itemInstance.isDisabled}
+          resource={resource}
+          type="outgoing"
+        />
+      )}
+      {resource.validation?.errors && (
+        <ValidationErrorsPopover
+          resource={resource}
+          isSelected={itemInstance.isSelected}
+          isDisabled={itemInstance.isDisabled}
+        />
+      )}
     </>
   );
 };
