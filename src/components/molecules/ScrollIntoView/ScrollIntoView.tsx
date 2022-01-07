@@ -20,7 +20,7 @@ const ScrollIntoView = React.forwardRef(({children, id, parentContainerElementId
         const parentContainer = document.getElementById(parentContainerElementId);
         const itemOffsetTop = containerRef.current?.offsetTop;
         if (parentContainer && itemOffsetTop) {
-          const scrollOffset = itemOffsetTop - parentContainer.scrollTop;
+          const scrollOffset = itemOffsetTop - parentContainer.offsetTop;
           parentContainer.scrollTo({
             left: 0,
             top: scrollOffset,

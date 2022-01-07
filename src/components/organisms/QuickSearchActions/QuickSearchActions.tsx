@@ -258,8 +258,8 @@ const QuickSearchActionsV3: React.FC = () => {
         showAction={['focus']}
         style={{width: '100%'}}
         value={searchingValue}
-        onDropdownVisibleChange={value => {
-          if (!value) {
+        onKeyDown={e => {
+          if (e.code === 'Escape') {
             dispatch(closeQuickSearchActionsPopup());
           }
         }}
