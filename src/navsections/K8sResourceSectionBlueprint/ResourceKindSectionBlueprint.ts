@@ -65,7 +65,7 @@ export function makeResourceKindNavSection(
             if (!a.namespace && b.namespace) {
               return 1;
             }
-            if (a.namespace && b.namespace) {
+            if (a.namespace && b.namespace && a.namespace !== b.namespace) {
               return a.namespace.localeCompare(b.namespace);
             }
             return a.name.localeCompare(b.name);

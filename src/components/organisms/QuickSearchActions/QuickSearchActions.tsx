@@ -198,12 +198,23 @@ const QuickSearchActionsV3: React.FC = () => {
     }, [] as {value: string; label: JSX.Element}[]);
 
     const resourceOptions = Object.entries(resourceMap)
-      .sort(
-        (a, b) =>
-          a[1].kind.localeCompare(b[1].kind) ||
-          (a[1].namespace || '').localeCompare(b[1].namespace || '') ||
-          a[1].name.localeCompare(b[1].name)
-      )
+      .sort((a, b) => {
+        const resA = a[1];
+        const resB = b[1];
+        if (resA.kind !== resB.kind) {
+          return resA.kind.localeCompare(resB.kind);
+        }
+        if (resA.namespace && !resB.namespace) {
+          return -1;
+        }
+        if (!resA.namespace && resB.namespace) {
+          return 1;
+        }
+        if (resA.namespace && resB.namespace && resA.namespace !== resB.namespace) {
+          return resA.namespace.localeCompare(resB.namespace);
+        }
+        return resA.name.localeCompare(resB.name);
+      })
       .reduce((filteredOpt, resourceEntry) => {
         const resourceName = resourceEntry[1].name;
 
