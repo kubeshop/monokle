@@ -7,7 +7,7 @@ import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem} from '@redux/reducers/ui';
+import {highlightItem, toggleSettings} from '@redux/reducers/ui';
 import {activeResourcesSelector} from '@redux/selectors';
 
 import Colors from '@styles/Colors';
@@ -32,14 +32,23 @@ const StyledLink = styled.div`
 function K8sResourceSectionEmptyDisplay() {
   const activeResources = useAppSelector(activeResourcesSelector);
   const dispatch = useAppDispatch();
+  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
 
   function resetFilters() {
     const emptyFilter: ResourceFilterType = {annotations: {}, labels: {}};
     dispatch(updateResourceFilter(emptyFilter));
   }
 
-  const handleCreateResourceClick = () => {
-    dispatch(highlightItem(HighlightItems.CREATE_RESOURCE));
+  const handleClick = (itemToHighlight: string) => {
+    dispatch(highlightItem(itemToHighlight));
+    setTimeout(() => {
+      dispatch(highlightItem(null));
+    }, 3000);
+  };
+
+  const handleClusterConfigure = () => {
+    dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
+    dispatch(toggleSettings());
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);
@@ -50,9 +59,13 @@ function K8sResourceSectionEmptyDisplay() {
       {activeResources.length === 0 ? (
         <StyledContainer>
           <StyledTitle>Get started:</StyledTitle>
-          <StyledLink onClick={handleCreateResourceClick}>Create a resource</StyledLink>
-          <StyledLink>Browse templates</StyledLink>
-          <StyledLink>Connect to a cluster</StyledLink>
+          <StyledLink onClick={() => handleClick(HighlightItems.CREATE_RESOURCE)}>Create a resource</StyledLink>
+          <StyledLink onClick={() => handleClick(HighlightItems.BROWSE_TEMPLATES)}>Browse templates</StyledLink>
+          {isKubeconfigPathValid ? (
+            <StyledLink onClick={() => handleClick(HighlightItems.CONNECT_TO_CLUSTER)}>Connect to a cluster</StyledLink>
+          ) : (
+            <StyledLink onClick={handleClusterConfigure}>Configure a cluster</StyledLink>
+          )}
         </StyledContainer>
       ) : (
         <>

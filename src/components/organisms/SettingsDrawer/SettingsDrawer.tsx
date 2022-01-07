@@ -71,20 +71,16 @@ const StyledSelect = styled(Select)`
 `;
 
 const StyledWarningOutlined = styled(
-  (props: {isKubeconfigPathValid: boolean; clusterPaneIconHighlighted: boolean; className: string}) => (
+  (props: {isKubeconfigPathValid: boolean; highlighted: boolean; className: string}) => (
     <WarningOutlined className={props.className} />
   )
 )`
   ${props =>
     `color: ${
-      props.clusterPaneIconHighlighted
-        ? Colors.whitePure
-        : !props.isKubeconfigPathValid
-        ? Colors.redError
-        : Colors.yellowWarning
+      props.highlighted ? Colors.whitePure : !props.isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning
     }`};
-  ${props => `margin-left: ${props.clusterPaneIconHighlighted ? '10px' : '5px'}`};
-  ${props => `padding-top: ${props.clusterPaneIconHighlighted ? '5px' : '0px'}`};
+  ${props => `margin-left: ${props.highlighted ? '10px' : '5px'}`};
+  ${props => `padding-top: ${props.highlighted ? '5px' : '0px'}`};
 `;
 
 const StyledHeading = styled.h2`
@@ -258,7 +254,7 @@ const SettingsDrawer = () => {
             <StyledWarningOutlined
               className={highlightedItems.clusterPaneIcon ? 'animated-highlight' : ''}
               isKubeconfigPathValid={isKubeconfigPathValid}
-              clusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
+              highlighted={highlightedItems.clusterPaneIcon}
             />
           )}
         </StyledHeading>

@@ -188,9 +188,11 @@ const CLusterStatusText = styled.span<{connected: Boolean}>`
   ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.whitePure}`};
 `;
 
-const CLusterActionText = styled.span`
+const CLusterActionText = styled((props: any) => <span className={props.className}>{props.children}</span>)`
   font-size: 12px;
-  line-height: 20px;
+  ${props => `font-size: ${props.highlighted ? '8px' : '12px'} !important`};
+  ${props => `line-height: ${props.highlighted ? '32px' : '20px'} !important`};
+  ${props => `color: ${props.highlighted ? Colors.whitePure : Colors.blue6} !important`};
 `;
 
 const StyledClusterOutlined = styled(ClusterOutlined)`
@@ -266,6 +268,7 @@ const PageHeader = () => {
   const [helmChart, setHelmChart] = useState<HelmChart>();
   const dispatch = useAppDispatch();
   const activeProject = useSelector(activeProjectSelector);
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -364,8 +367,15 @@ const PageHeader = () => {
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
     }
-    return <CLusterActionText>LOAD</CLusterActionText>;
-  }, [previewType, previewLoader, isInClusterMode]);
+    return (
+      <CLusterActionText
+        className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
+        highlighted={highlightedItems.connectToCluster}
+      >
+        LOAD
+      </CLusterActionText>
+    );
+  }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
   const clusterMenu = (
     <Menu>
