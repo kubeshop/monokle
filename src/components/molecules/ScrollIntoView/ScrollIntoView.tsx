@@ -20,7 +20,12 @@ const ScrollIntoView = React.forwardRef(({children, id, parentContainerElementId
         const parentContainer = document.getElementById(parentContainerElementId);
         const itemOffsetTop = containerRef.current?.offsetTop;
         if (parentContainer && itemOffsetTop) {
-          const scrollOffset = itemOffsetTop - parentContainer.offsetTop;
+          let scrollOffset = itemOffsetTop - parentContainer.offsetTop;
+          const parentContainerHalfHeight = parentContainer.offsetHeight / 2;
+          // this is needed for scrolling the item to the center
+          if (itemOffsetTop > parentContainerHalfHeight) {
+            scrollOffset -= parentContainerHalfHeight;
+          }
           parentContainer.scrollTo({
             left: 0,
             top: scrollOffset,
