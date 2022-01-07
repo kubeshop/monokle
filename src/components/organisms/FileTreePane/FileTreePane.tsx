@@ -254,10 +254,23 @@ const NoFilesContainer = styled.div`
   margin-top: 10px;
 `;
 
-const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
+const StyledTreeContainer = styled.div`
   margin-left: 2px;
   margin-top: 10px;
+`;
 
+const StyledRootFolderText = styled.div`
+  font-size: 12px;
+  line-height: 22px;
+  color: ${Colors.grey7};
+  margin-left: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
+  margin-top: 10px;
   .ant-tree-switcher svg {
     color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
   }
@@ -988,47 +1001,53 @@ const FileTreePane = () => {
       {uiState.isFolderLoading ? (
         <StyledSkeleton active />
       ) : tree ? (
-        <StyledTreeDirectoryTree
-          // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
-          height={
-            windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET
-              ? windowHeight - FILE_TREE_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0)
-              : 0
-          }
-          onSelect={onSelect}
-          treeData={[tree]}
-          ref={treeRef}
-          expandedKeys={expandedKeys}
-          onExpand={onExpand}
-          titleRender={event => {
-            return (
-              <TreeItem
-                treeKey={String(event.key)}
-                title={event.title}
-                processingEntity={processingEntity}
-                setProcessingEntity={setProcessingEntity}
-                onDelete={onDelete}
-                onRename={onRename}
-                onExcludeFromProcessing={onExcludeFromProcessing}
-                onIncludeToProcessing={onIncludeToProcessing}
-                onCreateFolder={onCreateFolder}
-                onCreateResource={onCreateResource}
-                onFilterByFileOrFolder={onFilterByFileOrFolder}
-                onPreview={onPreview}
-                {...event}
-              />
-            );
-          }}
-          autoExpandParent={autoExpandParent}
-          selectedKeys={[selectedPath || '-']}
-          filterTreeNode={node => {
-            // @ts-ignore
-            return node.highlight;
-          }}
-          disabled={isInPreviewMode || previewLoader.isLoading}
-          showIcon
-          showLine={{showLeafIcon: false}}
-        />
+        <StyledTreeContainer>
+          <StyledRootFolderText>
+            <div>{fileMap[ROOT_FILE_ENTRY].filePath}</div>
+            <div>{Object.values(fileMap).filter(f => !f.children).length} files</div>
+          </StyledRootFolderText>
+          <StyledTreeDirectoryTree
+            // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
+            height={
+              windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET
+                ? windowHeight - FILE_TREE_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0)
+                : 0
+            }
+            onSelect={onSelect}
+            treeData={[tree]}
+            ref={treeRef}
+            expandedKeys={expandedKeys}
+            onExpand={onExpand}
+            titleRender={event => {
+              return (
+                <TreeItem
+                  treeKey={String(event.key)}
+                  title={event.title}
+                  processingEntity={processingEntity}
+                  setProcessingEntity={setProcessingEntity}
+                  onDelete={onDelete}
+                  onRename={onRename}
+                  onExcludeFromProcessing={onExcludeFromProcessing}
+                  onIncludeToProcessing={onIncludeToProcessing}
+                  onCreateFolder={onCreateFolder}
+                  onCreateResource={onCreateResource}
+                  onFilterByFileOrFolder={onFilterByFileOrFolder}
+                  onPreview={onPreview}
+                  {...event}
+                />
+              );
+            }}
+            autoExpandParent={autoExpandParent}
+            selectedKeys={[selectedPath || '-']}
+            filterTreeNode={node => {
+              // @ts-ignore
+              return node.highlight;
+            }}
+            disabled={isInPreviewMode || previewLoader.isLoading}
+            showIcon
+            showLine={{showLeafIcon: false}}
+          />
+        </StyledTreeContainer>
       ) : (
         <NoFilesContainer>
           Get started by selecting a folder containing manifests, kustomizations or Helm Charts.

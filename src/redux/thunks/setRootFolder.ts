@@ -58,21 +58,21 @@ export const setRootFolder = createAsyncThunk<
     updateRecentFolders(thunkAPI, rootFolder);
   }
 
+  const generatedAlert = {
+    title: 'Folder Import',
+    message: `${Object.values(resourceMap).length} resources found in ${
+      Object.values(fileMap).filter(f => !f.children).length
+    } files`,
+    type: AlertEnum.Success,
+  };
+
   return {
     appConfig,
     fileMap,
     resourceMap,
     helmChartMap,
     helmValuesMap,
-    alert: rootFolder
-      ? {
-          title: 'Folder Import',
-          message: `${Object.values(resourceMap).length} resources found in ${
-            Object.values(fileMap).filter(f => !f.children).length
-          } files`,
-          type: AlertEnum.Success,
-        }
-      : undefined,
+    alert: rootFolder ? generatedAlert : undefined,
   };
 });
 
