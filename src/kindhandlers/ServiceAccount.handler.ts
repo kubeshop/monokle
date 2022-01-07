@@ -5,7 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {SecretTarget, implicitNamespaceMatcher} from '@src/kindhandlers/common/outgoingRefMappers';
+import {implicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
+import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',
@@ -45,6 +46,7 @@ const ServiceAccountHandler: ResourceKindHandler = {
             return value === undefined || targetResource.id === value;
           },
         },
+        isOptional: true,
       },
       target: {
         kind: 'Secret',

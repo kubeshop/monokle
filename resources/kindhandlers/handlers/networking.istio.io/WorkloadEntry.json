@@ -1,0 +1,21 @@
+{
+  "sectionName": "Istio",
+  "kindSectionName": "WorkloadEntries",
+  "helpLink": "https://istio.io/latest/docs/reference/config/networking/workload-entry/",
+  "refMappers":
+  [
+    {
+      "source": {
+        "pathParts": ["spec", "serviceAccount"],
+        "namespaceRef": "Implicit"
+      },
+      "type": "name",
+      "target": {
+        "kind": "ServiceAccount"
+      }
+    }
+  ],
+  "podSelectors": [
+    ["spec", "workloadSelector", "labels"]
+  ]
+}

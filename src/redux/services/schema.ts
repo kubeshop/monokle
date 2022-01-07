@@ -7,8 +7,11 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+// @ts-ignore
 const k8sSchema = JSON.parse(loadResource('schemas/k8sschemas.json'));
+// @ts-ignore
 const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.json'));
+// @ts-ignore
 const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
 const schemaCache = new Map<string, any | undefined>();
 
@@ -46,8 +49,12 @@ export function getResourceSchema(resource: K8sResource) {
       return schemaCache.get(schemaKey);
     }
   } else if (!schemaCache.has(resource.kind)) {
-    log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
-    schemaCache.set(resource.kind, undefined);
+    if (resourceKindHandler?.sourceEditorOptions?.editorSchema) {
+      schemaCache.set(resource.kind, resourceKindHandler?.sourceEditorOptions?.editorSchema);
+    } else {
+      log.warn(`Failed to find schema for resource of kind ${resource.kind}`);
+      schemaCache.set(resource.kind, undefined);
+    }
   }
 
   return schemaCache.get(resource.kind);
@@ -55,7 +62,8 @@ export function getResourceSchema(resource: K8sResource) {
 
 export function loadCustomSchema(schemaPath: string, resourceKind: string): any | undefined {
   try {
-    const schema = JSON.parse(loadResource(`schemas/${schemaPath}`));
+    const schemaText = loadResource(`schemas/${schemaPath}`);
+    const schema = schemaText ? JSON.parse(schemaText) : undefined;
     if (schema) {
       if (!schema.properties?.apiVersion) {
         schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
@@ -74,4 +82,38 @@ export function loadCustomSchema(schemaPath: string, resourceKind: string): any 
     log.warn(`Failed to load custom schema from ${schemaPath}`);
     schemaCache.set(resourceKind, undefined);
   }
+}
+
+export function extractSchema(crd: any, versionName: string) {
+  const versions: any[] = crd?.spec?.versions || [];
+  const version = versions.find((v: any) => v.name === versionName);
+  const schema = version?.schema?.openAPIV3Schema;
+
+  if (!schema) {
+    return;
+  }
+
+  if (!schema.properties) {
+    schema.properties = {};
+  } else if (schema['x-kubernetes-preserve-unknown-fields'] !== true) {
+    schema.additionalProperties = false;
+  }
+
+  schema.properties['apiVersion'] = objectMetadataSchema.properties.apiVersion;
+  schema.properties['kind'] = objectMetadataSchema.properties.kind;
+  schema.properties['metadata'] = objectMetadataSchema.properties.metadata;
+
+  Object.values(schema.properties).forEach((prop: any) => {
+    if (prop.type && prop.type === 'object') {
+      try {
+        if (prop.additionalProperties) {
+          delete prop['additionalProperties'];
+        }
+
+        prop['additionalProperties'] = false;
+      } catch (e) {
+        // this could fail - ignore
+      }
+    }
+  });
 }

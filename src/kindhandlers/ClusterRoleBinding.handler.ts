@@ -5,6 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
+
 const ClusterRoleBindingHandler: ResourceKindHandler = {
   kind: 'ClusterRoleBinding',
   apiVersionMatcher: '**',
@@ -31,12 +33,8 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
       source: {
         pathParts: ['roleRef', 'name'],
         siblingMatchers: {
-          kind: (sourceResource: K8sResource, targetResource, value) => {
-            return targetResource.kind === value;
-          },
-          apiGroup: (sourceResource: K8sResource, targetResource, value) => {
-            return targetResource.version.startsWith(value);
-          },
+          kind: targetKindMatcher,
+          apiGroup: targetGroupMatcher,
         },
       },
       target: {
@@ -58,7 +56,14 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
             return targetResource.version.startsWith(apiGroup);
           },
           namespace: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
-            return ['User', 'Group'].includes(siblingValues['kind']) ? !value : targetResource.namespace === value;
+            // namespace should not be specified for User/Group kinds
+            if (['User', 'Group'].includes(siblingValues['kind'])) {
+              return !value;
+            }
+
+            return value === 'default' || !value
+              ? !targetResource.namespace || targetResource.namespace === 'default'
+              : targetResource.namespace === value;
           },
         },
       },
@@ -66,6 +71,12 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
         kind: '$(User|Group|ServiceAccount)',
       },
       type: 'name',
+
+      // ignore refs to Users or Groups
+      shouldCreateUnsatisfiedRef: (refMapper, sourceResource, values) => {
+        const kind = values['kind'];
+        return kind !== 'User' && kind !== 'Group';
+      },
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding',

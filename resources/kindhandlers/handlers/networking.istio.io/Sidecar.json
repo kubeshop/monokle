@@ -1,0 +1,8 @@
+{
+  "sectionName": "Istio",
+  "kindSectionName": "Sidecars",
+  "helpLink": "https://istio.io/latest/docs/reference/config/networking/sidecar/",
+  "podSelectors": [
+    ["spec", "workloadSelector", "labels"]
+  ]
+}

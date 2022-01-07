@@ -5,7 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {SecretTarget, explicitNamespaceMatcher} from '@src/kindhandlers/common/outgoingRefMappers';
+import {explicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
+import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
 const VolumeAttachmentHandler: ResourceKindHandler = {
   kind: 'VolumeAttachment',
