@@ -7,8 +7,9 @@ import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import fs from 'fs';
 import path from 'path';
 import styled from 'styled-components';
+import {stringify} from 'yaml';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
 import {AlertEnum} from '@models/alert';
@@ -20,6 +21,8 @@ import {removeResource, uncheckAllResourceIds} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {AppDispatch} from '@redux/store';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
+
+import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
@@ -191,6 +194,8 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       }
     }
 
+    let writeAppendErrors = 0;
+
     checkedResourceIds.forEach(resourceId => {
       const resource = resourceMap[resourceId];
 
@@ -208,10 +213,44 @@ const CheckedResourcesActionsMenu: React.FC = () => {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName);
       }
 
-      fs.writeFileSync(absolutePath, resource.text);
+      const cleanResourceContent = removeIgnoredPathsFromResourceContent(resource.content);
+      let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
+
+      if (savingDestination === 'saveToFile') {
+        if (resourceText.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
+          resourceText = `\n${resourceText}`;
+        } else {
+          resourceText = `\n${YAML_DOCUMENT_DELIMITER}\n${resourceText}`;
+        }
+
+        fs.appendFileSync(absolutePath, resourceText);
+      } else if (savingDestination === 'saveToFolder') {
+        try {
+          fs.writeFileSync(absolutePath, resourceText);
+        } catch (err) {
+          writeAppendErrors += 1;
+          dispatch(
+            setAlert({
+              type: AlertEnum.Error,
+              title: `Could not save ${absolutePath}.`,
+              message: '',
+            })
+          );
+        }
+      }
     });
 
     setIsSaveToFileFolderModalVisible(false);
+    dispatch(uncheckAllResourceIds());
+    dispatch(
+      setAlert({
+        type: AlertEnum.Success,
+        title: `${savingDestination === 'saveToFolder' ? 'Saved' : 'Added'} ${
+          checkedResourceIds.length - writeAppendErrors
+        } resources succesfully`,
+        message: '',
+      })
+    );
   };
 
   return (
