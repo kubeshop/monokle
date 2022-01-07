@@ -99,9 +99,6 @@ export type UiState = {
     isVisible: boolean;
     errors: ResourceValidationError[];
   };
-  folderExplorer: {
-    isOpen: boolean;
-  };
   isActionsPaneFooterExpanded: boolean;
   monacoEditor: MonacoUiState;
   paneConfiguration: PaneConfiguration;

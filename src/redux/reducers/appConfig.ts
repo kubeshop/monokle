@@ -19,7 +19,7 @@ export const setCreateProject = createAsyncThunk('config/setCreateProject', asyn
 
 export const setOpenProject = createAsyncThunk(
   'config/openProject',
-  async (projectRootPath: string, thunkAPI: {dispatch: AppDispatch}) => {
+  async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch}) => {
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     thunkAPI.dispatch(setRootFolder(projectRootPath));
   }
@@ -125,17 +125,20 @@ export const configSlice = createSlice({
       state.projects = [project, ...state.projects];
       state.selectedProjectRootFolder = project.rootFolder;
     },
-    openProject: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      const projectRootPath: string = action.payload;
+    openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
+      const projectRootPath: string | null = action.payload;
+
+      if (!projectRootPath) {
+        state.selectedProjectRootFolder = null;
+        return;
+      }
+
       const project: Project | undefined = state.projects.find((p: Project) => p.rootFolder === projectRootPath);
 
       if (project) {
         state.selectedProjectRootFolder = projectRootPath;
         project.lastOpened = new Date().toISOString();
       }
-    },
-    setSelectedProjectRootFolder: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
-      state.selectedProjectRootFolder = action.payload;
     },
   },
 });
@@ -160,6 +163,5 @@ export const {
   updateTextSize,
   updateTheme,
   setContexts,
-  setSelectedProjectRootFolder,
 } = configSlice.actions;
 export default configSlice.reducer;

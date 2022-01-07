@@ -26,12 +26,7 @@ import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  setCurrentContext,
-  setOpenProject,
-  setSelectedProjectRootFolder,
-  updateStartupModalVisible,
-} from '@redux/reducers/appConfig';
+import {setCurrentContext, setOpenProject, updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {highlightItem, toggleClusterStatus, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
@@ -328,7 +323,7 @@ const PageHeader = () => {
 
   const handleProjectChange = ({key}: any) => {
     if (key === 'NEW') {
-      dispatch(setSelectedProjectRootFolder(null));
+      dispatch(setOpenProject(null));
       return;
     }
     dispatch(setOpenProject(key));

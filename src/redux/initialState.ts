@@ -123,9 +123,6 @@ const initialUiState: UiState = {
   rightMenu: {
     isActive: electronStore.get('ui.rightMenu.isActive'),
   },
-  folderExplorer: {
-    isOpen: false,
-  },
   monacoEditor: {
     focused: false,
     undo: false,

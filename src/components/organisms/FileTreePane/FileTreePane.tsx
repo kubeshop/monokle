@@ -5,14 +5,14 @@ import {useSelector} from 'react-redux';
 
 import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
 
-import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import micromatch from 'micromatch';
 import path from 'path';
 import styled from 'styled-components';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {BrowseFolderTooltip, FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
+import {FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
 import {FileMapType, ResourceMapType} from '@models/appstate';
@@ -23,7 +23,6 @@ import {setAlert} from '@redux/reducers/alert';
 import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
-  closeFolderExplorer,
   openCreateFolderModal,
   openNewResourceWizard,
   openRenameEntityModal,
@@ -37,13 +36,10 @@ import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
-import FileExplorer from '@atoms/FileExplorer';
 
 import Dots from '@components/atoms/Dots';
 import Icon from '@components/atoms/Icon';
 import ContextMenu from '@components/molecules/ContextMenu';
-
-import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {DeleteEntityCallback, deleteEntity, getFileStats} from '@utils/files';
 import {uniqueArr} from '@utils/index';
@@ -321,8 +317,6 @@ const StyledSkeleton = styled(Skeleton)`
 `;
 
 const ReloadButton = styled(Button)``;
-
-const BrowseButton = styled(Button)``;
 
 const SpinnerWrapper = styled.div`
   position: absolute;
@@ -656,16 +650,6 @@ const FileTreePane = () => {
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    ({folderPath}) => {
-      if (folderPath) {
-        setFolder(folderPath);
-      }
-      setAutoExpandParent(true);
-    },
-    {isDirectoryExplorer: true}
-  );
-
   const setFolder = useCallback(
     (folder: string) => {
       dispatch(setScanExcludesStatus('applied'));
@@ -827,13 +811,6 @@ const FileTreePane = () => {
       dispatch(setSelectingFile(false));
     }
   }, [isSelectingFile, dispatch]);
-
-  useEffect(() => {
-    if (uiState.leftMenu.selection === 'file-explorer' && uiState.folderExplorer.isOpen) {
-      openFileExplorer();
-      dispatch(closeFolderExplorer());
-    }
-  }, [uiState, dispatch, openFileExplorer]);
 
   const onExpand = (expandedKeysValue: React.Key[]) => {
     setExpandedKeys(expandedKeysValue);
@@ -1003,22 +980,10 @@ const FileTreePane = () => {
                     disabled={isButtonDisabled}
                   />
                 </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
-                  <BrowseButton
-                    icon={<FolderAddOutlined />}
-                    size="small"
-                    type="primary"
-                    ghost
-                    onClick={openFileExplorer}
-                  >
-                    {Number(uiState.paneConfiguration.leftWidth.toFixed(2)) < 0.2 ? '' : 'Browse'}
-                  </BrowseButton>
-                </Tooltip>
               </RightButtons>
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
-        <FileExplorer {...fileExplorerProps} />
       </Row>
       {uiState.isFolderLoading ? (
         <StyledSkeleton active />

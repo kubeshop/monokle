@@ -2,19 +2,13 @@ import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
-import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
+import {ReloadFolderTooltip} from '@constants/tooltips';
 
 import {NewVersionCode} from '@models/appconfig';
 
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
-import {
-  openFolderExplorer,
-  openNewResourceWizard,
-  resetLayout,
-  setMonacoEditor,
-  toggleLeftMenu,
-} from '@redux/reducers/ui';
+import {openNewResourceWizard, resetLayout, setMonacoEditor, toggleLeftMenu} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {RootState} from '@redux/store';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -90,30 +84,12 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       },
       {type: 'separator'},
       {
-        label: 'Browse Folder',
-        toolTip: BrowseFolderTooltip,
-        enabled: !isInPreviewModeSelector(state),
-        click: () => {
-          dispatch(openFolderExplorer());
-        },
-      },
-      {
         label: 'Refresh Folder',
         enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         toolTip: ReloadFolderTooltip,
         click: () => {
           setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
         },
-      },
-      {type: 'separator'},
-      {
-        label: 'Recent Folders',
-        submenu: state.config.recentFolders.map((folder: string) => ({
-          label: folder,
-          click: () => {
-            setRootFolderInRendererThread(folder);
-          },
-        })),
       },
       {type: 'separator'},
       {

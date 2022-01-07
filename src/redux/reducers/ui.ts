@@ -161,12 +161,6 @@ export const uiSlice = createSlice({
         errors: [],
       };
     },
-    openFolderExplorer: (state: Draft<UiState>) => {
-      state.folderExplorer = {isOpen: true};
-    },
-    closeFolderExplorer: (state: Draft<UiState>) => {
-      state.folderExplorer = {isOpen: false};
-    },
     setMonacoEditor: (state: Draft<UiState>, action: PayloadAction<Partial<MonacoUiState>>) => {
       state.monacoEditor = {
         ...state.monacoEditor,
@@ -250,8 +244,6 @@ export const {
   expandNavSections,
   showValidationErrorsModal,
   hideValidationErrorsModal,
-  openFolderExplorer,
-  closeFolderExplorer,
   setMonacoEditor,
   setShouldExpandAllNodes,
   setPaneConfiguration,

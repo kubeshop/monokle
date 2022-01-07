@@ -23,7 +23,7 @@ import {getFileStats} from '@utils/files';
 
 export const setRootFolder = createAsyncThunk<
   SetRootFolderPayload,
-  string,
+  string | null,
   {
     dispatch: AppDispatch;
     state: RootState;
@@ -32,28 +32,31 @@ export const setRootFolder = createAsyncThunk<
   const appConfig = thunkAPI.getState().config;
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const resourceMap: ResourceMapType = {};
-  const fileMap: FileMapType = {};
-  const rootEntry: FileEntry = createFileEntry(rootFolder);
+  let fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
 
-  fileMap[ROOT_FILE_ENTRY] = rootEntry;
+  if (rootFolder) {
+    const rootEntry: FileEntry = createFileEntry(rootFolder);
 
-  // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
-  const readFilesPromise = new Promise<string[]>(resolve => {
-    setImmediate(() => {
-      resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
+    fileMap[ROOT_FILE_ENTRY] = rootEntry;
+
+    // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
+    const readFilesPromise = new Promise<string[]>(resolve => {
+      setImmediate(() => {
+        resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
+      });
     });
-  });
-  const files = await readFilesPromise;
+    const files = await readFilesPromise;
 
-  rootEntry.children = files;
+    rootEntry.children = files;
 
-  processKustomizations(resourceMap, fileMap);
-  processParsedResources(resourceMap, resourceRefsProcessingOptions);
+    processKustomizations(resourceMap, fileMap);
+    processParsedResources(resourceMap, resourceRefsProcessingOptions);
 
-  monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
-  updateRecentFolders(thunkAPI, rootFolder);
+    monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
+    updateRecentFolders(thunkAPI, rootFolder);
+  }
 
   return {
     appConfig,
@@ -61,13 +64,15 @@ export const setRootFolder = createAsyncThunk<
     resourceMap,
     helmChartMap,
     helmValuesMap,
-    alert: {
-      title: 'Folder Import',
-      message: `${Object.values(resourceMap).length} resources found in ${
-        Object.values(fileMap).filter(f => !f.children).length
-      } files`,
-      type: AlertEnum.Success,
-    },
+    alert: rootFolder
+      ? {
+          title: 'Folder Import',
+          message: `${Object.values(resourceMap).length} resources found in ${
+            Object.values(fileMap).filter(f => !f.children).length
+          } files`,
+          type: AlertEnum.Success,
+        }
+      : undefined,
   };
 });
 
