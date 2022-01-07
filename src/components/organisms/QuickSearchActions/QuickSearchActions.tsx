@@ -213,7 +213,7 @@ const QuickSearchActionsV3: React.FC = () => {
               {resourceEntry[1].namespace && <Tag>{resourceEntry[1].namespace}</Tag>}
               <span>{matchingCharactersLabel(resourceName, 'resource')}</span>
               {resourceEntry[1].kind && (
-                <span style={{fontStyle: 'italic', marginLeft: '8px', color: Colors.grey6}}>
+                <span style={{fontStyle: 'italic', marginLeft: '8px', color: Colors.grey7}}>
                   {resourceEntry[1].kind}
                 </span>
               )}
