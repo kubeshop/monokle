@@ -43,6 +43,7 @@ const StyledSelect = styled(Select)`
 
 interface IProps {
   isVisible: boolean;
+  resourcesIds: string[];
   title: string;
   onCancel: () => void;
 }
@@ -56,10 +57,9 @@ const getFullFileName = (filename: string) => {
 };
 
 const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
-  const {isVisible, title, onCancel} = props;
+  const {isVisible, resourcesIds, title, onCancel} = props;
 
   const dispatch = useAppDispatch();
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
@@ -105,7 +105,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
   }, [foldersList]);
 
   const saveCheckedResourcesToFileFolder = () => {
-    if (!checkedResourceIds || !checkedResourceIds.length) {
+    if (!resourcesIds || !resourcesIds.length) {
       return;
     }
 
@@ -118,7 +118,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
 
     let writeAppendErrors = 0;
 
-    checkedResourceIds.forEach(resourceId => {
+    resourcesIds.forEach(resourceId => {
       const resource = resourceMap[resourceId];
 
       let absolutePath;
@@ -168,7 +168,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
       setAlert({
         type: AlertEnum.Success,
         title: `${savingDestination === 'saveToFolder' ? 'Saved' : 'Added'} ${
-          checkedResourceIds.length - writeAppendErrors
+          resourcesIds.length - writeAppendErrors
         } resources succesfully`,
         message: '',
       })
@@ -176,14 +176,14 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
   };
 
   useEffect(() => {
-    if (!checkedResourceIds || !checkedResourceIds.length) {
+    if (!resourcesIds || !resourcesIds.length) {
       return;
     }
 
     let filesToBeCreated: string[] = [];
     let filesToBeReplaced: string[] = [];
 
-    checkedResourceIds.forEach(resourceId => {
+    resourcesIds.forEach(resourceId => {
       const resource = resourceMap[resourceId];
 
       const fullFileName = getFullFileName(resource.name);
@@ -196,7 +196,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
     });
 
     setSaveToFolderPaths({create: filesToBeCreated, replace: filesToBeReplaced});
-  }, [checkedResourceIds, fileMap, resourceMap, selectedFolder]);
+  }, [fileMap, resourcesIds, resourceMap, selectedFolder]);
 
   return (
     <Modal title={title} visible={isVisible} onCancel={onCancel} onOk={saveCheckedResourcesToFileFolder}>

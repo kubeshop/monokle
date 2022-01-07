@@ -159,6 +159,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
       {isSaveToFileFolderModalVisible && (
         <SaveResourceToFileFolderModal
+          resourcesIds={checkedResourceIds}
           title={`Save resources (${checkedResourceIds.length})`}
           isVisible={isSaveToFileFolderModalVisible}
           onCancel={() => setIsSaveToFileFolderModalVisible(false)}
