@@ -3,10 +3,6 @@ import {useEffect, useState} from 'react';
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import {QuestionCircleOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {closeCreateProjectModal} from '@redux/reducers/ui';

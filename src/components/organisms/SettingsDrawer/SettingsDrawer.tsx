@@ -111,7 +111,7 @@ const SettingsDrawer = () => {
   const [inputRef, focusInput] = useFocus<Input>();
   const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
   const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
-  const clusterPaneIconHighlighted = useAppSelector(state => state.ui.clusterPaneIconHighlighted);
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
 
   const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
 
@@ -256,9 +256,9 @@ const SettingsDrawer = () => {
           KUBECONFIG
           {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated && (
             <StyledWarningOutlined
-              className={clusterPaneIconHighlighted ? 'animated-highlight' : ''}
+              className={highlightedItems.clusterPaneIcon ? 'animated-highlight' : ''}
               isKubeconfigPathValid={isKubeconfigPathValid}
-              clusterPaneIconHighlighted={clusterPaneIconHighlighted}
+              clusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
             />
           )}
         </StyledHeading>

@@ -23,6 +23,7 @@ import {ClusterModeTooltip} from '@constants/tooltips';
 import {Project} from '@models/appconfig';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
+import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -31,12 +32,7 @@ import {
   setSelectedProjectRootFolder,
   updateStartupModalVisible,
 } from '@redux/reducers/appConfig';
-import {
-  setClusterIconHighlightStatus,
-  toggleClusterStatus,
-  toggleNotifications,
-  toggleSettings,
-} from '@redux/reducers/ui';
+import {highlightItem, toggleClusterStatus, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   activeResourcesSelector,
@@ -307,24 +303,24 @@ const PageHeader = () => {
   const handleClusterChange = ({key}: any) => dispatch(setCurrentContext(key));
 
   const handleClusterConfigure = () => {
-    dispatch(setClusterIconHighlightStatus(true));
+    dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
     dispatch(toggleSettings());
     setTimeout(() => {
-      dispatch(setClusterIconHighlightStatus(false));
+      dispatch(highlightItem(null));
     }, 3000);
   };
 
   const handleClusterHideClick = () => {
-    dispatch(setClusterIconHighlightStatus(true));
+    dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
   };
 
   const handleClusterHideConfirm = () => {
-    dispatch(setClusterIconHighlightStatus(false));
+    dispatch(highlightItem(null));
     dispatch(toggleClusterStatus());
   };
 
   const handleClusterHideCancel = () => {
-    dispatch(setClusterIconHighlightStatus(false));
+    dispatch(highlightItem(null));
   };
 
   const handleProjectChange = ({key}: any) => {

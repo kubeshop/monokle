@@ -1,5 +1,12 @@
 import {ResourceValidationError} from './k8sresource';
 
+export enum HighlightItems {
+  CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
+  CREATE_RESOURCE = 'CREATE_RESOURCE',
+  BROWSE_TEMPLATES = 'BROWSE_TEMPLATES',
+  CONNECT_TO_CLUSTER = 'CONNECT_TO_CLUSTER',
+}
+
 export type NewResourceWizardInput = {
   name?: string;
   kind?: string;
@@ -100,7 +107,12 @@ export type UiState = {
   paneConfiguration: PaneConfiguration;
   shouldExpandAllNodes: boolean;
   resetLayout: boolean;
-  clusterPaneIconHighlighted: boolean;
+  highlightedItems: {
+    clusterPaneIcon: boolean;
+    createResource: boolean;
+    browseTemplates: boolean;
+    connectToCluster: boolean;
+  };
   clusterStatusHidden: boolean;
 };
 
