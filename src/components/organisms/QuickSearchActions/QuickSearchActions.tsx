@@ -198,7 +198,12 @@ const QuickSearchActionsV3: React.FC = () => {
     }, [] as {value: string; label: JSX.Element}[]);
 
     const resourceOptions = Object.entries(resourceMap)
-      .sort((a, b) => a[1].name.localeCompare(b[1].name))
+      .sort(
+        (a, b) =>
+          a[1].kind.localeCompare(b[1].kind) ||
+          (a[1].namespace || '').localeCompare(b[1].namespace || '') ||
+          a[1].name.localeCompare(b[1].name)
+      )
       .reduce((filteredOpt, resourceEntry) => {
         const resourceName = resourceEntry[1].name;
 
@@ -230,7 +235,6 @@ const QuickSearchActionsV3: React.FC = () => {
 
   useEffect(() => {
     if (isOpen) {
-      document.getElementById('quick-search-input')?.focus();
       setSearchingValue('');
     }
   }, [isOpen]);
@@ -247,13 +251,18 @@ const QuickSearchActionsV3: React.FC = () => {
       <AutoComplete
         id="quick-search-input"
         autoFocus
-        defaultOpen
+        defaultActiveFirstOption
         listHeight={500}
+        notFoundContent="Kind, namespace or resource not found."
         options={options}
         showAction={['focus']}
-        notFoundContent="Kind, namespace or resource not found."
         style={{width: '100%'}}
         value={searchingValue}
+        onDropdownVisibleChange={value => {
+          if (!value) {
+            dispatch(closeQuickSearchActionsPopup());
+          }
+        }}
         onSearch={value => setSearchingValue(value)}
         onSelect={value => {
           // options are of type : `type:value`
