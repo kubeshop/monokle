@@ -3,6 +3,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Input, Modal, Select} from 'antd';
 
 import fs from 'fs';
+import micromatch from 'micromatch';
 import path from 'path';
 import styled from 'styled-components';
 import {stringify} from 'yaml';
@@ -48,8 +49,8 @@ interface IProps {
   onCancel: () => void;
 }
 
-const getFullFileName = (filename: string) => {
-  if (filename.endsWith('.yaml') || filename.endsWith('.yml')) {
+const getFullFileName = (filename: string, fileIncludes: string[]) => {
+  if (fileIncludes.some(fileInclude => micromatch.isMatch(filename, fileInclude))) {
     return filename;
   }
 
@@ -60,6 +61,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
   const {isVisible, resourcesIds, title, onCancel} = props;
 
   const dispatch = useAppDispatch();
+  const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
@@ -72,34 +74,33 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
     replace: [],
   });
 
-  const foldersList = useMemo(
-    () =>
-      Object.entries(fileMap)
-        .map(([key, value]) => ({folderName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
-        .filter(file => file.isFolder),
-    [fileMap]
-  );
+  const [foldersList, filesList] = useMemo(() => {
+    const folders: string[] = [];
+    const files: string[] = [];
 
-  const fileList = useMemo(
-    () =>
-      Object.entries(fileMap)
-        .map(([key, value]) => ({fileName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
-        .filter(file => !file.isFolder),
-    [fileMap]
-  );
+    Object.entries(fileMap).forEach(([key, value]) => {
+      if (value.children) {
+        folders.push(key.replace(path.sep, ''));
+      } else {
+        files.push(key.replace(path.sep, ''));
+      }
+    });
+
+    return [folders, files];
+  }, [fileMap]);
 
   const renderFileSelectOptions = useCallback(() => {
-    return fileList.map(folder => (
-      <Option key={folder.fileName} value={folder.fileName}>
-        {folder.fileName}
+    return filesList.map(fileName => (
+      <Option key={fileName} value={fileName}>
+        {fileName}
       </Option>
     ));
-  }, [fileList]);
+  }, [filesList]);
 
   const renderFolderSelectOptions = useCallback(() => {
-    return foldersList.map(folder => (
-      <Option key={folder.folderName} value={folder.folderName}>
-        {folder.folderName}
+    return foldersList.map(folderName => (
+      <Option key={folderName} value={folderName}>
+        {folderName}
       </Option>
     ));
   }, [foldersList]);
@@ -123,7 +124,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
 
       let absolutePath;
 
-      const fullFileName = getFullFileName(resource.name);
+      const fullFileName = getFullFileName(resource.name, fileIncludes);
       if (savingDestination === 'saveToFolder' && selectedFolder) {
         absolutePath =
           selectedFolder === ROOT_FILE_ENTRY
@@ -185,8 +186,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
 
     resourcesIds.forEach(resourceId => {
       const resource = resourceMap[resourceId];
-
-      const fullFileName = getFullFileName(resource.name);
+      const fullFileName = getFullFileName(resource.name, fileIncludes);
 
       if (fileMap[`\\${path.join(selectedFolder, fullFileName)}`]) {
         filesToBeReplaced.push(fullFileName);
@@ -196,7 +196,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
     });
 
     setSaveToFolderPaths({create: filesToBeCreated, replace: filesToBeReplaced});
-  }, [fileMap, resourcesIds, resourceMap, selectedFolder]);
+  }, [fileIncludes, fileMap, resourcesIds, resourceMap, selectedFolder]);
 
   return (
     <Modal title={title} visible={isVisible} onCancel={onCancel} onOk={saveCheckedResourcesToFileFolder}>
