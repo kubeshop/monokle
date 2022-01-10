@@ -72,7 +72,11 @@ Monokle current supports the following keyboard shortcuts:
 - Open New Resource Wizard: Ctrl/Cmd N
 - Apply Resource or File to cluster: Ctrl/Cmd ALT S
 - Diff Resource: Ctrl/Cmd ALT D
+- Open File Explorer Tab: Ctrl/Cmd Shift E
+- Open Kustomization Tab: Ctrl/Cmd Shift K
+- Open Helm Tab: Ctrl/Cmd Shift H
 - Reset Resource Filters: Ctrl/Cmd ALT R
+- Open Quick Search: Ctrl/Cmd SHIFT P
 
 ## Auto-update
 

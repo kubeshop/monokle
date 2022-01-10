@@ -129,6 +129,24 @@ export const uiSlice = createSlice({
         );
       }
     },
+    showValidationErrorsModal: (state: Draft<UiState>, action: PayloadAction<ResourceValidationError[]>) => {
+      state.validationErrorsModal = {
+        isVisible: true,
+        errors: action.payload,
+      };
+    },
+    hideValidationErrorsModal: (state: Draft<UiState>) => {
+      state.validationErrorsModal = {
+        isVisible: false,
+        errors: [],
+      };
+    },
+    openQuickSearchActionsPopup: (state: Draft<UiState>) => {
+      state.quickSearchActionsPopup.isOpen = true;
+    },
+    closeQuickSearchActionsPopup: (state: Draft<UiState>) => {
+      state.quickSearchActionsPopup.isOpen = false;
+    },
     openFolderExplorer: (state: Draft<UiState>) => {
       state.folderExplorer = {isOpen: true};
     },
@@ -228,5 +246,7 @@ export const {
   resetLayout,
   setClusterIconHighlightStatus,
   toggleClusterStatus,
+  openQuickSearchActionsPopup,
+  closeQuickSearchActionsPopup,
 } = uiSlice.actions;
 export default uiSlice.reducer;
