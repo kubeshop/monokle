@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {AutoComplete, Input, Modal, Tag} from 'antd';
 
@@ -70,7 +70,7 @@ const applyFilterWithConfirm = (
       });
     },
     onCancel() {
-      document.getElementById('quick-search-input')?.focus();
+      document.getElementById('quick_search_input')?.focus();
     },
   });
 };
@@ -90,7 +90,7 @@ const selectK8sResourceWithConfirm = (resourceId: string, resourceName: string, 
       });
     },
     onCancel() {
-      document.getElementById('quick-search-input')?.focus();
+      document.getElementById('quick_search_input')?.focus();
     },
   });
 };
@@ -244,6 +244,8 @@ const QuickSearchActionsV3: React.FC = () => {
     ];
   }, [allResourceKinds, matchingCharactersLabel, namespaces, resourceMap, searchingValue]);
 
+  const previousInputListFirstChild = useRef<any>(null);
+
   useEffect(() => {
     if (isOpen) {
       setSearchingValue('');
@@ -260,15 +262,35 @@ const QuickSearchActionsV3: React.FC = () => {
       onCancel={() => dispatch(closeQuickSearchActionsPopup())}
     >
       <AutoComplete
-        id="quick-search-input"
+        id="quick_search_input"
         autoFocus
         defaultActiveFirstOption
         listHeight={500}
         notFoundContent="Kind, namespace or resource not found."
+        onDropdownVisibleChange={open => {
+          if (open) {
+            setImmediate(() => {
+              previousInputListFirstChild.current = document.getElementById('quick_search_input_list_0');
+            });
+          }
+        }}
         options={options}
         showAction={['focus']}
         style={{width: '100%'}}
         value={searchingValue}
+        onPopupScroll={e => {
+          const currentFirstInputListNode = document.getElementById('quick_search_input_list_0');
+          // check if the previous first element from the dropdown list is equal to the current first element
+          // if not, scroll to the top in order to show the label
+          if (
+            currentFirstInputListNode &&
+            !currentFirstInputListNode.isEqualNode(previousInputListFirstChild.current)
+          ) {
+            setTimeout(() => (e.target as HTMLDivElement).scrollTo({top: 0, left: 0}), 20);
+          }
+
+          previousInputListFirstChild.current = currentFirstInputListNode;
+        }}
         onKeyDown={e => {
           if (e.code === 'Escape') {
             e.preventDefault();
