@@ -18,7 +18,6 @@ import {
   StartupModal,
 } from '@organisms';
 
-import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import {ClusterDiffModal} from '@components/organisms';
 import CreateFolderModal from '@components/organisms/CreateFolderModal';
 import RenameEntityModal from '@components/organisms/RenameEntityModal';
@@ -58,7 +57,6 @@ const App = () => {
         <NewResourceWizard />
         <HotKeysHandler />
         <RenameResourceModal />
-        <ValidationErrorsModal />
         <UpdateModal />
         <ClusterDiffModal />
         <RenameEntityModal />
