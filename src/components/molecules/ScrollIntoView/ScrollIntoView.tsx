@@ -16,7 +16,6 @@ const ScrollIntoView = React.forwardRef(({children, id, parentContainerElementId
   React.useImperativeHandle(ref, () => {
     return {
       scrollIntoView: () => {
-        // containerRef.current?.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
         const parentContainer = document.getElementById(parentContainerElementId);
         const itemOffsetTop = containerRef.current?.offsetTop;
         if (parentContainer && itemOffsetTop) {
