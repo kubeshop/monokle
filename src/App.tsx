@@ -18,7 +18,6 @@ import {
   StartupModal,
 } from '@organisms';
 
-import ValidationErrorsModal from '@components/molecules/ValidationErrorsModal';
 import {ClusterDiffModal} from '@components/organisms';
 import CreateFolderModal from '@components/organisms/CreateFolderModal';
 import QuickSearchActions from '@components/organisms/QuickSearchActions';
@@ -60,7 +59,6 @@ const App = () => {
         <QuickSearchActions />
         <HotKeysHandler />
         <RenameResourceModal />
-        <ValidationErrorsModal />
         <UpdateModal />
         <ClusterDiffModal />
         <RenameEntityModal />

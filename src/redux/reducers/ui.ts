@@ -4,7 +4,6 @@ import path from 'path';
 
 import {KUSTOMIZATION_KIND} from '@constants/constants';
 
-import {ResourceValidationError} from '@models/k8sresource';
 import {LeftMenuSelection, MonacoUiState, NewResourceWizardInput, PaneConfiguration, UiState} from '@models/ui';
 
 import initialState from '@redux/initialState';
@@ -232,8 +231,6 @@ export const {
   closeRenameResourceModal,
   collapseNavSections,
   expandNavSections,
-  showValidationErrorsModal,
-  hideValidationErrorsModal,
   openFolderExplorer,
   closeFolderExplorer,
   setMonacoEditor,

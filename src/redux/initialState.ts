@@ -135,10 +135,6 @@ const initialUiState: UiState = {
   navPane: {
     collapsedNavSectionNames: [],
   },
-  validationErrorsModal: {
-    isVisible: false,
-    errors: [],
-  },
   paneConfiguration: electronStore.get('ui.paneConfiguration'),
   shouldExpandAllNodes: false,
   resetLayout: false,
