@@ -107,7 +107,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
 
   const menu = (
     <Menu>
-      {(isInClusterMode || isInPreviewMode) && (
+      {isInPreviewMode && (
         <>
           <Menu.Item onClick={() => setIsSaveToFileFolderModalVisible(true)} key="save_to_file_folder">
             Save to file/folder
