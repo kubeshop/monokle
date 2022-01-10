@@ -20,6 +20,7 @@ Check out the [Feature Overview](features.md) or watch the [Monokle 1.0 walkthro
 
 Check out the following blog-posts with Monokle-related content:
 
+- 1.4.0 - [Release blog-post](https://medium.com/kubeshop-i/monokle-1-4-0-4122e88742c5) - Dec 15, 2021
 - 1.3.0 - [Release blog-post](https://kubeshop.io/blog/monokle-1-3-0-cluster-compare) - Nov 15, 2021
 - 1.2.0 - [Release blog-post](https://medium.com/kubeshop-i/monokle-1-2-0-is-out-2492341f0874) - Oct 4, 2021
 - 1.1.0 - [Release blog-post](https://medium.com/kubeshop-i/monokle-1-1-0-93c5428b2967) - Sep 6, 2021
