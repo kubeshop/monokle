@@ -75,20 +75,16 @@ const NewResourceWizard = () => {
 
   const kindsByApiVersion = useMemo(
     () =>
-      ResourceKindHandlers.reduce((result, resource) => {
-        const foundResourceKindHandler = getResourceKindHandler(resource.kind);
-
-        if (foundResourceKindHandler) {
-          if (result[resource.clusterApiVersion] && result[resource.clusterApiVersion]) {
-            result[resource.clusterApiVersion].push(foundResourceKindHandler);
-          } else {
-            result[resource.clusterApiVersion] = [foundResourceKindHandler];
-          }
+      ResourceKindHandlers.reduce((result, resourcekindHandler) => {
+        if (result[resourcekindHandler.clusterApiVersion]) {
+          result[resourcekindHandler.clusterApiVersion].push(resourcekindHandler);
+        } else {
+          result[resourcekindHandler.clusterApiVersion] = [resourcekindHandler];
         }
 
         return result;
       }, {} as Record<string, ResourceKindHandler[]>),
-    []
+    [resourceMap]
   );
 
   const [resourceKindOptions, setResourceKindOptions] =
@@ -100,6 +96,7 @@ const NewResourceWizard = () => {
     if (!visible) {
       form.resetFields();
     }
+
     if (visible && defaultValues) {
       form.setFieldsValue(defaultValues);
 
@@ -113,7 +110,11 @@ const NewResourceWizard = () => {
           );
           setFilteredResources(newFilteredResources);
         }
+      } else {
+        setResourceKindOptions(kindsByApiVersion);
       }
+    } else if (visible && !defaultValues) {
+      setResourceKindOptions(kindsByApiVersion);
     }
   }, [defaultValues, form, kindsByApiVersion, newResourceWizardState.isOpen, resourceMap]);
 
