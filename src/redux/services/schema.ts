@@ -90,6 +90,7 @@ export function extractSchema(crd: any, versionName: string) {
   const schema = version?.schema?.openAPIV3Schema;
 
   if (!schema) {
+    log.warn(`Failed to extract schema for version ${versionName} from `, crd);
     return;
   }
 
@@ -116,4 +117,6 @@ export function extractSchema(crd: any, versionName: string) {
       }
     }
   });
+
+  return schema;
 }
