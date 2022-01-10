@@ -1,5 +1,3 @@
-import {ResourceValidationError} from './k8sresource';
-
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
   CREATE_RESOURCE = 'CREATE_RESOURCE',
@@ -88,6 +86,9 @@ export type UiState = {
     selection: string;
     isActive: boolean;
   };
+  quickSearchActionsPopup: {
+    isOpen: boolean;
+  };
   rightMenu: {
     selection?: string;
     isActive: boolean;
@@ -95,9 +96,8 @@ export type UiState = {
   navPane: {
     collapsedNavSectionNames: string[];
   };
-  validationErrorsModal: {
-    isVisible: boolean;
-    errors: ResourceValidationError[];
+  folderExplorer: {
+    isOpen: boolean;
   };
   isActionsPaneFooterExpanded: boolean;
   monacoEditor: MonacoUiState;
