@@ -84,6 +84,8 @@ const NewResourceWizard = () => {
 
         return result;
       }, {} as Record<string, ResourceKindHandler[]>),
+    // depend on resourceMap since newly loaded resources could have contained CRDs that resulted in dynamically
+    // created kindHandlers
     [resourceMap]
   );
 
