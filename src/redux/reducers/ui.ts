@@ -129,18 +129,6 @@ export const uiSlice = createSlice({
         );
       }
     },
-    showValidationErrorsModal: (state: Draft<UiState>, action: PayloadAction<ResourceValidationError[]>) => {
-      state.validationErrorsModal = {
-        isVisible: true,
-        errors: action.payload,
-      };
-    },
-    hideValidationErrorsModal: (state: Draft<UiState>) => {
-      state.validationErrorsModal = {
-        isVisible: false,
-        errors: [],
-      };
-    },
     openQuickSearchActionsPopup: (state: Draft<UiState>) => {
       state.quickSearchActionsPopup.isOpen = true;
     },
