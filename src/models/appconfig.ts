@@ -40,8 +40,6 @@ export type KubeConfig = {
 export interface Project {
   name?: string;
   rootFolder: string;
-  kubeconfig?: KubeConfig;
-  preferences?: any;
   k8sVersion?: string;
   lastOpened?: string;
 }

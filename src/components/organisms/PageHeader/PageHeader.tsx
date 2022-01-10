@@ -183,11 +183,16 @@ const CLusterStatusText = styled.span<{connected: Boolean}>`
   ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.whitePure}`};
 `;
 
-const CLusterActionText = styled((props: any) => <span className={props.className}>{props.children}</span>)`
+const CLusterActionText = styled(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ({className, children, highlighted}: {className?: string; children?: any; highlighted?: boolean}) => (
+    <span className={className}>{children}</span>
+  )
+)`
   font-size: 12px;
-  ${props => `font-size: ${props.highlighted ? '8px' : '12px'} !important`};
-  ${props => `line-height: ${props.highlighted ? '32px' : '20px'} !important`};
-  ${props => `color: ${props.highlighted ? Colors.whitePure : Colors.blue6} !important`};
+  ${({highlighted}) => `font-size: ${highlighted ? '8px' : '12px'} !important`};
+  ${({highlighted}) => `line-height: ${highlighted ? '32px' : '20px'} !important`};
+  ${({highlighted}) => `color: ${highlighted ? Colors.whitePure : Colors.blue6} !important`};
 `;
 
 const StyledClusterOutlined = styled(ClusterOutlined)`
@@ -385,7 +390,7 @@ const PageHeader = () => {
   const projectsMenu = (
     <Menu>
       <Menu.Item key="NEW" onClick={handleProjectChange}>
-        New Project
+        --- New Project ---
       </Menu.Item>
       {projects.map((project: Project) => (
         <Menu.Item key={project.rootFolder} onClick={handleProjectChange}>

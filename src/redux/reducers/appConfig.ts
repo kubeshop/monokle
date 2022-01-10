@@ -7,6 +7,7 @@ import {AppConfig, KubeConfig, Languages, NewVersionCode, Project, TextSizes, Th
 import {KustomizeCommandType} from '@redux/services/kustomize';
 import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import _ from 'lodash';
 
 import electronStore from '@utils/electronStore';
 
@@ -15,6 +16,8 @@ import initialState from '../initialState';
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI) => {
   thunkAPI.dispatch(configSlice.actions.createProject(project));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
+  const projects: Project[] = (<any>thunkAPI.getState()).config.projects;
+  electronStore.set('appConfig.projects', _.sortBy(projects, (p: Project) => p.lastOpened).reverse());
 });
 
 export const setOpenProject = createAsyncThunk(
@@ -139,6 +142,8 @@ export const configSlice = createSlice({
         state.selectedProjectRootFolder = projectRootPath;
         project.lastOpened = new Date().toISOString();
       }
+
+      state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
     },
   },
 });

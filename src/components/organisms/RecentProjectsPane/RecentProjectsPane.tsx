@@ -2,7 +2,6 @@ import React from 'react';
 
 import {Row} from 'antd';
 
-import _ from 'lodash';
 import {DateTime} from 'luxon';
 import styled from 'styled-components';
 
@@ -96,15 +95,13 @@ const RecentProjectsPane = () => {
       </Row>
       <Row>
         <ProjectsContainer>
-          {_.sortBy(projects, (p: Project) => p.lastOpened)
-            .reverse()
-            .map((project: Project) => (
-              <ProjectItem key={project.rootFolder}>
-                <ProjectName onClick={() => openProject(project)}>{project.name}</ProjectName>
-                <ProjectPath>{project.rootFolder}</ProjectPath>
-                <ProjectLastOpened>last opened {getRelativeDate(project.lastOpened)}</ProjectLastOpened>
-              </ProjectItem>
-            ))}
+          {projects.map((project: Project) => (
+            <ProjectItem key={project.rootFolder}>
+              <ProjectName onClick={() => openProject(project)}>{project.name}</ProjectName>
+              <ProjectPath>{project.rootFolder}</ProjectPath>
+              <ProjectLastOpened>last opened {getRelativeDate(project.lastOpened)}</ProjectLastOpened>
+            </ProjectItem>
+          ))}
         </ProjectsContainer>
       </Row>
     </div>

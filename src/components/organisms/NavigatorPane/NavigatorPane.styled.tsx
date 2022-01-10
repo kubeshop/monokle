@@ -1,4 +1,4 @@
-import {Button} from 'antd';
+import {Button, ButtonProps} from 'antd';
 
 import styled from 'styled-components';
 
@@ -42,13 +42,18 @@ export const FiltersNumber = styled.div`
   margin-left: 5px;
 `;
 
-export const PlusButton = styled((props: any) => <Button {...props} />)`
-  ${props => `border-radius: ${props.highlighted ? '100%' : 'inherit'} !important`};
-  ${props => `color: ${props.highlighted ? Colors.whitePure : Colors.blue6} !important`};
+interface PlusItem extends ButtonProps {
+  highlighted?: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const PlusButton = styled(({highlighted, ...rest}: PlusItem) => <Button {...rest} />)`
+  ${({highlighted}) => `border-radius: ${highlighted ? '100%' : 'inherit'} !important`};
+  ${({highlighted}) => `color: ${highlighted ? Colors.whitePure : Colors.blue6} !important`};
   &:after {
-    ${props => `height: ${props.highlighted ? '24px' : 'inherit'}`};
-    ${props => `width: ${props.highlighted ? '24px' : 'inherit'}`};
-    ${props => `top: ${props.highlighted ? '-1px' : 'inherit'}`};
-    ${props => `left: ${props.highlighted ? '-1px' : 'inherit'}`};
+    ${({highlighted}) => `height: ${highlighted ? '24px' : 'inherit'}`};
+    ${({highlighted}) => `width: ${highlighted ? '24px' : 'inherit'}`};
+    ${({highlighted}) => `top: ${highlighted ? '-1px' : 'inherit'}`};
+    ${({highlighted}) => `left: ${highlighted ? '-1px' : 'inherit'}`};
   }
 `;

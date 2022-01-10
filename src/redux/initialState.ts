@@ -77,7 +77,7 @@ const initialAppConfigState: AppConfig = {
     currentContext: undefined,
   },
   osPlatform: os.platform(),
-  projects: [],
+  projects: electronStore.get('appConfig.projects') || [],
   selectedProjectRootFolder: null,
 };
 

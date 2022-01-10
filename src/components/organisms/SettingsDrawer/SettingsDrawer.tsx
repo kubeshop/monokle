@@ -71,7 +71,7 @@ const StyledSelect = styled(Select)`
 `;
 
 const StyledWarningOutlined = styled(
-  (props: {isKubeconfigPathValid: boolean; highlighted: boolean; className: string}) => (
+  (props: {isKubeconfigPathValid: boolean; highlighted?: boolean; className: string}) => (
     <WarningOutlined className={props.className} />
   )
 )`
