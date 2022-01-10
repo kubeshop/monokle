@@ -10,6 +10,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal, updateResourceFilter} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
+  openQuickSearchActionsPopup,
   setLeftMenuSelection,
   toggleLeftMenu,
   toggleRightMenu,
@@ -245,6 +246,16 @@ const HotKeysHandler = () => {
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
     dispatch(updateResourceFilter({labels: {}, annotations: {}}));
   });
+
+  useHotkeys(
+    hotkeys.OPEN_QUICK_SEARCH,
+    () => {
+      if (!uiState.quickSearchActionsPopup.isOpen) {
+        dispatch(openQuickSearchActionsPopup());
+      }
+    },
+    [uiState.quickSearchActionsPopup.isOpen]
+  );
 
   return (
     <>

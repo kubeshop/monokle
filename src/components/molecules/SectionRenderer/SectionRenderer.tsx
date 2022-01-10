@@ -192,6 +192,7 @@ function SectionRenderer(props: SectionRendererProps) {
             level={level + 1}
             isLastItem={isLastVisibleItemId(itemId)}
             isSectionCheckable={Boolean(sectionInstance.checkable)}
+            sectionContainerElementId={sectionBlueprint.containerElementId}
             options={itemRendererOptions}
           />
         ))}
@@ -217,6 +218,7 @@ function SectionRenderer(props: SectionRendererProps) {
                   level={level + 2}
                   isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
                   isSectionCheckable={Boolean(sectionInstance.checkable)}
+                  sectionContainerElementId={sectionBlueprint.containerElementId}
                   options={itemRendererOptions}
                 />
               ))}

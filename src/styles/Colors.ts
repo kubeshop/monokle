@@ -9,8 +9,10 @@ enum Colors {
   grey400 = '#DBE0DE',
   grey200 = '#F3F5F4',
   grey100 = '#F9FAFA',
+  grey8 = '#ACACAC', // gray, gray 8
   grey7 = '#7D7D7D', // gray, gray 7 https://www.figma.com/file/3UVW3KVNob7QjgvH62blGU/add-left-and-right-toolbars?node-id=3%3A5926
-  grey5 = '#5A5A5A', // gray, gray 7 https://www.figma.com/file/3UVW3KVNob7QjgvH62blGU/add-left-and-right-toolbars?node-id=3%3A5926
+  grey6 = '#5A5A5A', // gray, gray 6
+  grey5 = '#5A5A5A', // gray, gray 5
   grey4 = '#303030', // gray, gray 4
   grey3 = '#262626', // gray, gray 3
 
