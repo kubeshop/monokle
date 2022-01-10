@@ -11,7 +11,7 @@ Left to right:
 - The Navigator in the center shows all resources found in the current folder or cluster. By default it shows all possible
   Resource sections and subsections - when selecting a folder or cluster only those sections that actually contain
   any resources will be shown.
-- The Editor section to the right contains editors/views/actions for the currently selected resource or file
+- The Editor section to the right contains editors/views/actions for the currently selected resource or file.
 
 The top right contains the following buttons
 
