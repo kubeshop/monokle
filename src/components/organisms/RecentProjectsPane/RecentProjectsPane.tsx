@@ -29,6 +29,8 @@ const Title = styled.span`
 
 const ProjectsContainer = styled.div`
   padding: 16px 12px;
+  height: calc(100vh - 112px);
+  overflow-y: scroll;
 `;
 
 const ProjectItem = styled.div`
@@ -83,7 +85,7 @@ const RecentProjectsPane = () => {
     return '';
   };
   return (
-    <div>
+    <>
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>
@@ -104,7 +106,7 @@ const RecentProjectsPane = () => {
           ))}
         </ProjectsContainer>
       </Row>
-    </div>
+    </>
   );
 };
 

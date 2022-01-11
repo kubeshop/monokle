@@ -69,10 +69,11 @@ const StyledActionTitle = styled.div`
 
 const StyledContainer = styled.div`
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 112px);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-bottom: 150px;
 `;
 
 const StartProjectPane = () => {
@@ -92,8 +93,8 @@ const StartProjectPane = () => {
   };
 
   return (
-    <div style={{height: '100%'}}>
-      <Row style={{height: '100%'}}>
+    <>
+      <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <TitleBarContainer>
@@ -101,8 +102,10 @@ const StartProjectPane = () => {
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
+      </Row>
+      <Row>
         <StyledContainer>
-          <div style={{height: '500px'}}>
+          <div>
             <StyledActionTitle>How would you like to begin?</StyledActionTitle>
             <div style={{display: 'flex'}}>
               <StyledActionContainer onClick={openFileExplorer}>
@@ -120,9 +123,9 @@ const StartProjectPane = () => {
             </div>
           </div>
         </StyledContainer>
-        <FileExplorer {...fileExplorerProps} />
       </Row>
-    </div>
+      <FileExplorer {...fileExplorerProps} />
+    </>
   );
 };
 
