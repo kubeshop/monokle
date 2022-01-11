@@ -26,16 +26,13 @@ const Form = withTheme(AntDTheme);
  * Load schemas every time for now - should be cached in the future...
  */
 
-const FormContainer = styled.div<{contentHeight: string}>`
+const FormContainer = styled.div`
+  height: 100%;
   width: 100%;
-  padding-left: 15px;
-  padding-right: 8px;
+  padding: 20px 15px 0px 15px;
   margin: 0px;
-  margin-top: 20px;
-  margin-bottom: 20px;
   overflow-y: scroll;
-  height: ${props => props.contentHeight};
-  padding-bottom: 100px;
+  overflow-x: hidden;
 
   ${GlobalScrollbarStyle}
 
@@ -109,8 +106,8 @@ const FormContainer = styled.div<{contentHeight: string}>`
   }
 `;
 
-const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema: any}) => {
-  const {contentHeight, formSchema, formUiSchema} = props;
+const FormEditor = (props: {formSchema: any; formUiSchema: any}) => {
+  const {formSchema, formUiSchema} = props;
   const selectedResource = useSelector(selectedResourceSelector);
   const [formData, setFormData] = useState<any>();
   const dispatch = useAppDispatch();
@@ -151,7 +148,7 @@ const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema
   }
 
   return (
-    <FormContainer contentHeight={contentHeight}>
+    <FormContainer>
       <Form
         schema={formSchema}
         uiSchema={formUiSchema}

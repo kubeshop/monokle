@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 
@@ -466,6 +466,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
+
       <S.ActionsPaneContainer $height={navigatorHeight}>
         <S.TabsContainer>
           <S.Tabs
@@ -487,9 +488,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
             }
           >
             <TabPane
-              style={{height: editorTabPaneHeight, width: '100%'}}
-              tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}
               key="source"
+              style={{height: editorTabPaneHeight}}
+              tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}
             >
               {uiState.isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
@@ -502,15 +503,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
             </TabPane>
             {selectedResource && resourceKindHandler?.formEditorOptions?.editorSchema && (
               <TabPane
-                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
                 disabled={!selectedResourceId}
                 key="form"
+                style={{height: editorTabPaneHeight}}
+                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
               >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : (
                   <FormEditor
-                    contentHeight={contentHeight}
                     formSchema={resourceKindHandler.formEditorOptions.editorSchema}
                     formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                   />
@@ -518,15 +519,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
               </TabPane>
             )}
             {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
-              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
+              <TabPane
+                key="metadataForm"
+                style={{height: editorTabPaneHeight}}
+                tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}
+              >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : (
-                  <FormEditor
-                    contentHeight={contentHeight}
-                    formSchema={getFormSchema('metadata')}
-                    formUiSchema={getUiSchema('metadata')}
-                  />
+                  <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
                 )}
               </TabPane>
             )}
