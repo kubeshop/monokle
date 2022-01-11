@@ -15,6 +15,18 @@ export enum Languages {
   English = 'en',
 }
 
+export type Settings = {
+  theme: Themes; // not used for now
+  textSize: TextSizes; // not used for now
+  language: Languages; // not used for now
+  filterObjectsOnSelection: boolean;
+  autoZoomGraphOnSelection: boolean;
+  helmPreviewMode: 'template' | 'install';
+  kustomizeCommand: KustomizeCommandType;
+  loadLastFolderOnStartup: boolean;
+  hideExcludedFilesInFileExplorer: boolean;
+};
+
 export enum NewVersionCode {
   Errored = -2,
   NotAvailable = -1,
@@ -33,8 +45,10 @@ export type KubeConfigContext = {
 };
 
 export type KubeConfig = {
-  contexts: Array<KubeConfigContext>;
-  currentContext: string | undefined;
+  path?: string; // It can be `undefined` until refactor
+  isPathValid?: boolean; // It can be `undefined` until refactor
+  contexts?: Array<KubeConfigContext>;
+  currentContext?: string;
 };
 
 export interface Project {
@@ -42,6 +56,12 @@ export interface Project {
   rootFolder: string;
   k8sVersion?: string;
   lastOpened?: string;
+  settings?: Settings;
+  kubeConfig?: KubeConfig;
+  scanExcludes?: string[];
+  isScanExcludesUpdated?: 'outdated' | 'applied';
+  fileIncludes?: string[];
+  folderReadsMaxDepth?: number;
 }
 
 interface AppConfig {
@@ -61,17 +81,7 @@ interface AppConfig {
   isKubeconfigPathValid: boolean;
   /** if the startup modal is visible */
   isStartupModalVisible: boolean;
-  settings: {
-    theme: Themes; // not used for now
-    textSize: TextSizes; // not used for now
-    language: Languages; // not used for now
-    filterObjectsOnSelection: boolean;
-    autoZoomGraphOnSelection: boolean;
-    helmPreviewMode: 'template' | 'install';
-    kustomizeCommand: KustomizeCommandType;
-    loadLastFolderOnStartup: boolean;
-    hideExcludedFilesInFileExplorer: boolean;
-  };
+  settings: Settings;
   recentFolders: string[];
   newVersion: {
     code: NewVersionCode;

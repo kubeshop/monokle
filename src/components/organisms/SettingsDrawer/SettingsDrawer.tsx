@@ -1,9 +1,10 @@
 import * as k8s from '@kubernetes/client-node';
 
 import React, {useEffect, useRef, useState} from 'react';
+import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
+import {Button, Checkbox, Collapse, Input, InputNumber, Select, Tooltip} from 'antd';
 
 import {WarningOutlined} from '@ant-design/icons';
 
@@ -20,6 +21,8 @@ import {
   KustomizeCommandTooltip,
 } from '@constants/tooltips';
 
+import {Project} from '@models/appconfig';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   setScanExcludesStatus,
@@ -35,7 +38,7 @@ import {
 } from '@redux/reducers/appConfig';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {toggleClusterStatus, toggleSettings} from '@redux/reducers/ui';
-import {isInClusterModeSelector} from '@redux/selectors';
+import {activeProjectSelector, isInClusterModeSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 // import {Themes, TextSizes, Languages} from '@models/appconfig';
@@ -46,6 +49,8 @@ import Drawer from '@components/atoms/Drawer';
 import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
+
+const {Panel} = Collapse;
 
 const StyledDiv = styled.div`
   margin-bottom: 20px;
@@ -112,6 +117,11 @@ const SettingsDrawer = () => {
   const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
 
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
+  const activeProject: Project | undefined = useSelector(activeProjectSelector);
+
+  useEffect(() => {
+    console.log('activeProject', activeProject);
+  }, [activeProject]);
 
   useEffect(() => {
     setCurrentFolderReadsMaxDepth(folderReadsMaxDepth);
@@ -246,105 +256,114 @@ const SettingsDrawer = () => {
       closable={false}
       onClose={toggleSettingsDrawer}
       visible={isSettingsOpened}
+      bodyStyle={{padding: 0}}
     >
-      <StyledDiv>
-        <StyledHeading>
-          KUBECONFIG
-          {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated && (
-            <StyledWarningOutlined
-              className={highlightedItems.clusterPaneIcon ? 'animated-highlight' : ''}
-              isKubeconfigPathValid={isKubeconfigPathValid}
-              highlighted={highlightedItems.clusterPaneIcon}
+      <Collapse>
+        <Panel header="Base Settings" key="1">
+          <StyledDiv>
+            <StyledHeading>
+              KUBECONFIG
+              {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated && (
+                <StyledWarningOutlined
+                  className={highlightedItems.clusterPaneIcon ? 'animated-highlight' : ''}
+                  isKubeconfigPathValid={isKubeconfigPathValid}
+                  highlighted={highlightedItems.clusterPaneIcon}
+                />
+              )}
+            </StyledHeading>
+            <Tooltip title={KubeconfigPathTooltip}>
+              <Input
+                ref={inputRef}
+                value={currentKubeConfig}
+                onChange={onUpdateKubeconfig}
+                disabled={isEditingDisabled}
+                onClick={() => focusInput()}
+              />
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
+              <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
+                Browse
+              </StyledButton>
+            </Tooltip>
+            <StyledDiv style={{marginTop: 16}}>
+              <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
+                Show Cluster Selector
+              </Checkbox>
+            </StyledDiv>
+            <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
+          </StyledDiv>
+          <StyledDiv>
+            <StyledSpan>Files: Include</StyledSpan>
+            <FilePatternList
+              value={appConfig.fileIncludes}
+              onChange={onChangeFileIncludes}
+              tooltip={AddInclusionPatternTooltip}
+              isSettingsOpened={isSettingsOpened}
             />
-          )}
-        </StyledHeading>
-        <Tooltip title={KubeconfigPathTooltip}>
-          <Input
-            ref={inputRef}
-            value={currentKubeConfig}
-            onChange={onUpdateKubeconfig}
-            disabled={isEditingDisabled}
-            onClick={() => focusInput()}
-          />
-        </Tooltip>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-          <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
-            Browse
-          </StyledButton>
-        </Tooltip>
-        <StyledDiv style={{marginTop: 16}}>
-          <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
-            Show Cluster Selector
-          </Checkbox>
-        </StyledDiv>
-        <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Files: Include</StyledSpan>
-        <FilePatternList
-          value={appConfig.fileIncludes}
-          onChange={onChangeFileIncludes}
-          tooltip={AddInclusionPatternTooltip}
-          isSettingsOpened={isSettingsOpened}
-        />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Files: Exclude</StyledSpan>
-        <FilePatternList
-          value={appConfig.scanExcludes}
-          onChange={onChangeScanExcludes}
-          tooltip={AddExclusionPatternTooltip}
-          isSettingsOpened={isSettingsOpened}
-          type="excludes"
-        />
-      </StyledDiv>
-      <StyledDiv>
-        <Checkbox
-          checked={appConfig.settings.hideExcludedFilesInFileExplorer}
-          onChange={onChangeHideExcludedFilesInFileExplorer}
-        >
-          Hide excluded files
-        </Checkbox>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Helm Preview Mode</StyledSpan>
-        <Tooltip title={HelmPreviewModeTooltip}>
-          <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
-            <Select.Option value="template">Template</Select.Option>
-            <Select.Option value="install">Install</Select.Option>
-          </StyledSelect>
-        </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Kustomize Command</StyledSpan>
-        <Tooltip title={KustomizeCommandTooltip}>
-          <StyledSelect value={appConfig.settings.kustomizeCommand} onChange={onChangeKustomizeCommand}>
-            <Select.Option value="kubectl">Use kubectl</Select.Option>
-            <Select.Option value="kustomize">Use kustomize</Select.Option>
-          </StyledSelect>
-        </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>On Startup</StyledSpan>
-        <Tooltip title={AutoLoadLastFolderTooltip}>
-          <Checkbox checked={appConfig.settings.loadLastFolderOnStartup} onChange={onChangeLoadLastFolderOnStartup}>
-            Automatically load last folder
-          </Checkbox>
-        </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Maximum folder read recursion depth</StyledSpan>
-        <InputNumber min={1} value={currentFolderReadsMaxDepth} onChange={setCurrentFolderReadsMaxDepth} />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Resource links processing</StyledSpan>
-        <Checkbox
-          checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
-          onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
-        >
-          Ignore optional unsatisfied links
-        </Checkbox>
-      </StyledDiv>
+          </StyledDiv>
+          <StyledDiv>
+            <StyledSpan>Files: Exclude</StyledSpan>
+            <FilePatternList
+              value={appConfig.scanExcludes}
+              onChange={onChangeScanExcludes}
+              tooltip={AddExclusionPatternTooltip}
+              isSettingsOpened={isSettingsOpened}
+              type="excludes"
+            />
+          </StyledDiv>
+          <StyledDiv>
+            <Checkbox
+              checked={appConfig.settings.hideExcludedFilesInFileExplorer}
+              onChange={onChangeHideExcludedFilesInFileExplorer}
+            >
+              Hide excluded files
+            </Checkbox>
+          </StyledDiv>
+          <StyledDiv>
+            <StyledSpan>Helm Preview Mode</StyledSpan>
+            <Tooltip title={HelmPreviewModeTooltip}>
+              <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
+                <Select.Option value="template">Template</Select.Option>
+                <Select.Option value="install">Install</Select.Option>
+              </StyledSelect>
+            </Tooltip>
+          </StyledDiv>
+          <StyledDiv>
+            <StyledSpan>Kustomize Command</StyledSpan>
+            <Tooltip title={KustomizeCommandTooltip}>
+              <StyledSelect value={appConfig.settings.kustomizeCommand} onChange={onChangeKustomizeCommand}>
+                <Select.Option value="kubectl">Use kubectl</Select.Option>
+                <Select.Option value="kustomize">Use kustomize</Select.Option>
+              </StyledSelect>
+            </Tooltip>
+          </StyledDiv>
+          <StyledDiv>
+            <StyledSpan>On Startup</StyledSpan>
+            <Tooltip title={AutoLoadLastFolderTooltip}>
+              <Checkbox checked={appConfig.settings.loadLastFolderOnStartup} onChange={onChangeLoadLastFolderOnStartup}>
+                Automatically load last folder
+              </Checkbox>
+            </Tooltip>
+          </StyledDiv>
+          <StyledDiv>
+            <StyledSpan>Maximum folder read recursion depth</StyledSpan>
+            <InputNumber min={1} value={currentFolderReadsMaxDepth} onChange={setCurrentFolderReadsMaxDepth} />
+          </StyledDiv>
+          <StyledDiv>
+            <StyledSpan>Resource links processing</StyledSpan>
+            <Checkbox
+              checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
+              onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
+            >
+              Ignore optional unsatisfied links
+            </Checkbox>
+          </StyledDiv>
+        </Panel>
+        <Panel header="Project Settings" key="2">
+          <p>Settings</p>
+        </Panel>
+      </Collapse>
+
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
         <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>

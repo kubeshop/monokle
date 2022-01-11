@@ -379,11 +379,13 @@ const PageHeader = () => {
 
   const clusterMenu = (
     <Menu>
-      {kubeConfig.contexts.map((context: any) => (
-        <Menu.Item key={context.cluster} onClick={handleClusterChange}>
-          {context.cluster}
-        </Menu.Item>
-      ))}
+      {kubeConfig &&
+        kubeConfig.contexts &&
+        kubeConfig.contexts.map((context: any) => (
+          <Menu.Item key={context.cluster} onClick={handleClusterChange}>
+            {context.cluster}
+          </Menu.Item>
+        ))}
     </Menu>
   );
 

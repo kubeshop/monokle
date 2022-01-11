@@ -1,5 +1,7 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import {readFileSync, writeFileSync} from 'fs';
+import _ from 'lodash';
 import path from 'path';
 
 import {AppConfig, KubeConfig, Languages, NewVersionCode, Project, TextSizes, Themes} from '@models/appconfig';
@@ -7,16 +9,18 @@ import {AppConfig, KubeConfig, Languages, NewVersionCode, Project, TextSizes, Th
 import {KustomizeCommandType} from '@redux/services/kustomize';
 import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import _ from 'lodash';
 
 import electronStore from '@utils/electronStore';
+import {getFileStats} from '@utils/files';
 
 import initialState from '../initialState';
 
-export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI) => {
+export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
+  const config: AppConfig = thunkAPI.getState().config;
+  const projects: Project[] = config.projects;
+
   thunkAPI.dispatch(configSlice.actions.createProject(project));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
-  const projects: Project[] = (<any>thunkAPI.getState()).config.projects;
   electronStore.set('appConfig.projects', _.sortBy(projects, (p: Project) => p.lastOpened).reverse());
 });
 
@@ -145,6 +149,58 @@ export const configSlice = createSlice({
 
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(setOpenProject.fulfilled, state => {
+      const selectedProject: Project | undefined = state.projects.find(
+        (p: Project) => p.rootFolder === state.selectedProjectRootFolder
+      );
+
+      if (!selectedProject) {
+        return;
+      }
+
+      const fileName = `.monokle`;
+      const absolutePath = path.join(selectedProject.rootFolder, fileName);
+
+      const pathStats = getFileStats(absolutePath);
+
+      if (pathStats === undefined) {
+        selectedProject.settings = state.settings;
+        selectedProject.kubeConfig = state.kubeConfig;
+        selectedProject.scanExcludes = state.scanExcludes;
+        selectedProject.isScanExcludesUpdated = state.isScanExcludesUpdated;
+        selectedProject.fileIncludes = state.fileIncludes;
+        selectedProject.folderReadsMaxDepth = state.folderReadsMaxDepth;
+        writeFileSync(
+          absolutePath,
+          JSON.stringify(
+            {
+              settings: state.settings,
+              scanExcludes: state.scanExcludes,
+              isScanExcludesUpdated: state.isScanExcludesUpdated,
+              fileIncludes: state.fileIncludes,
+              folderReadsMaxDepth: state.folderReadsMaxDepth,
+              kubeConfig: {
+                ...state.kubeConfig,
+                path: state.kubeconfigPath,
+                isPathValid: state.isKubeconfigPathValid,
+              },
+            },
+            null,
+            4
+          )
+        );
+      } else {
+        const fileContent: any = JSON.parse(readFileSync(absolutePath, 'utf8'));
+        selectedProject.settings = fileContent.settings;
+        selectedProject.kubeConfig = fileContent.kubeConfig;
+        selectedProject.scanExcludes = fileContent.scanExcludes;
+        selectedProject.isScanExcludesUpdated = fileContent.isScanExcludesUpdated;
+        selectedProject.fileIncludes = fileContent.fileIncludes;
+        selectedProject.folderReadsMaxDepth = fileContent.folderReadsMaxDepth;
+      }
+    });
   },
 });
 
