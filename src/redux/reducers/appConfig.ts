@@ -16,12 +16,8 @@ import {getFileStats} from '@utils/files';
 import initialState from '../initialState';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
-  const config: AppConfig = thunkAPI.getState().config;
-  const projects: Project[] = config.projects;
-
   thunkAPI.dispatch(configSlice.actions.createProject(project));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
-  electronStore.set('appConfig.projects', _.sortBy(projects, (p: Project) => p.lastOpened).reverse());
 });
 
 export const setOpenProject = createAsyncThunk(
@@ -148,6 +144,7 @@ export const configSlice = createSlice({
       }
 
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
+      electronStore.set('appConfig.projects', state.projects);
     },
   },
   extraReducers: builder => {
