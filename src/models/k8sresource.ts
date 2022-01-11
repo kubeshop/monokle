@@ -5,6 +5,8 @@ export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 type ResourceValidationError = {
   property: string;
   message: string;
+  errorPos?: RefPosition;
+  description?: string;
 };
 
 type ResourceValidation = {
@@ -29,7 +31,7 @@ interface K8sResource {
   name: string;
   /** k8s resource kind */
   kind: string;
-  /** k8s resource version */
+  /** k8s resource apiVersion value */
   version: string;
   /** k8s namespace is specified (for filtering) */
   namespace?: string;

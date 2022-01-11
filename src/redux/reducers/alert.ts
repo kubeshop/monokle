@@ -17,7 +17,7 @@ export const alertSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addMatcher(
-      action => true,
+      () => true,
       (state, action) => {
         if (action.payload?.alert) {
           state.alert = action.payload.alert;

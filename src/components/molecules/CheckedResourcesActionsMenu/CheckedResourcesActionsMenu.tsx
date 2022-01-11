@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo, useState} from 'react';
 
 import {Menu, Modal} from 'antd';
 
@@ -6,15 +6,18 @@ import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
-import applyCheckedResourcesWithConfirm from '@redux/services/applyCheckedResourcesWithConfirm';
-import {AppDispatch} from '@redux/store';
+import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 
 import Colors from '@styles/Colors';
+
+import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 
 const StyledMenu = styled(Menu)`
   background: linear-gradient(90deg, #112a45 0%, #111d2c 100%);
@@ -43,7 +46,7 @@ const StyledMenu = styled(Menu)`
   }
 `;
 
-const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], dispatch: AppDispatch) => {
+const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[]) => {
   let title = `Are you sure you want to delete the selected resources (${checkedResources.length}) ?`;
 
   Modal.confirm({
@@ -68,20 +71,33 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
+
+  const checkedResources = useMemo(
+    () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
+    [checkedResourceIds, resourceMap]
+  );
+
+  const confirmModalTitle = useMemo(
+    () => makeApplyMultipleResourcesText(checkedResources.length, currentContext),
+    [checkedResources, currentContext]
+  );
+
   const onClickDelete = () => {
     const resourcesToDelete = checkedResourceIds
       .map(resource => resourceMap[resource])
       .filter((r): r is K8sResource => r !== undefined);
 
-    deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
+    deleteCheckedResourcesWithConfirm(resourcesToDelete);
   };
 
   const onClickDeployChecked = () => {
-    if (!currentContext) {
-      return;
-    }
+    setIsApplyModalVisible(true);
+  };
 
-    applyCheckedResourcesWithConfirm(checkedResourceIds.length, currentContext, dispatch);
+  const onClickApplyCheckedResources = (namespace?: string) => {
+    dispatch(applyCheckedResources(namespace));
+    setIsApplyModalVisible(false);
   };
 
   const onClickUncheckAll = () => {
@@ -108,6 +124,16 @@ const CheckedResourcesActionsMenu: React.FC = () => {
       <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickUncheckAll}>
         <CloseOutlined />
       </Menu.Item>
+
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          resources={checkedResources}
+          isVisible={isApplyModalVisible}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyCheckedResources(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
     </StyledMenu>
   );
 };

@@ -36,6 +36,9 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
       return false;
     }
   }
+  if (filters.fileOrFolderContainedIn && !resource.filePath.startsWith(filters.fileOrFolderContainedIn)) {
+    return false;
+  }
   if (filters.labels && Object.keys(filters.labels).length > 0) {
     const resourceLabels = resource.content?.metadata?.labels;
     if (!resourceLabels) {
@@ -101,4 +104,27 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
     cleanLocalResourceContent,
     cleanClusterResourceContent,
   };
+}
+
+export function getDefaultNamespaceForApply(resources: K8sResource[]): {
+  defaultNamespace: string;
+  defaultOption?: string;
+} {
+  let namespace = 'default';
+
+  for (let i = 0; i < resources.length; i += 1) {
+    const resourceNamespace = resources[i].namespace;
+
+    if (resourceNamespace) {
+      if (resources[i].namespace !== namespace) {
+        if (namespace !== 'default') {
+          return {defaultNamespace: 'default', defaultOption: 'none'};
+        }
+
+        namespace = resourceNamespace;
+      }
+    }
+  }
+
+  return {defaultNamespace: namespace};
 }

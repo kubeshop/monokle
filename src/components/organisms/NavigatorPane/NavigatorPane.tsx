@@ -73,8 +73,9 @@ const NavPane: React.FC = () => {
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
+  const navigatorHeight = useMemo(() => {
+    return windowSize.height - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0);
+  }, [windowSize.height, isInPreviewMode]);
 
   const appliedFilters = useMemo(() => {
     return Object.entries(resourceFilters)
@@ -136,24 +137,22 @@ const NavPane: React.FC = () => {
       )}
 
       {isResourceFiltersOpen && (
-        <>
-          <FiltersContainer ref={filtersContainerRef}>
-            <ResizableBox
-              width={width}
-              height={height || 350}
-              axis="y"
-              resizeHandles={['s']}
-              minConstraints={[100, 200]}
-              maxConstraints={[width, navigatorHeight - 200]}
-              handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-handle" ref={ref} />}
-            >
-              <ResourceFilter />
-            </ResizableBox>
-          </FiltersContainer>
-        </>
+        <FiltersContainer ref={filtersContainerRef}>
+          <ResizableBox
+            width={width}
+            height={height || 350}
+            axis="y"
+            resizeHandles={['s']}
+            minConstraints={[100, 200]}
+            maxConstraints={[width, navigatorHeight - 200]}
+            handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-handle" ref={ref} />}
+          >
+            <ResourceFilter />
+          </ResizableBox>
+        </FiltersContainer>
       )}
 
-      <S.List height={sectionListHeight}>
+      <S.List id="navigator-sections-container" height={sectionListHeight}>
         <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
         <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
       </S.List>

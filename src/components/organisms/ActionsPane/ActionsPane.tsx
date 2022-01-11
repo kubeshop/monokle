@@ -15,6 +15,7 @@ import {
   PREVIEW_PREFIX,
   TOOLTIP_DELAY,
 } from '@constants/constants';
+import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
   AddResourceToExistingFileTooltip,
   ApplyFileTooltip,
@@ -28,14 +29,15 @@ import {
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
-import {applyHelmChartWithConfirm} from '@redux/services/applyHelmChartWithConfirm';
-import {applyResourceWithConfirm} from '@redux/services/applyResourceWithConfirm';
 import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
-import {performResourceDiff} from '@redux/thunks/diffResource';
+import {applyHelmChart} from '@redux/thunks/applyHelmChart';
+import {applyResource} from '@redux/thunks/applyResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
@@ -47,6 +49,8 @@ import TabHeader from '@atoms/TabHeader';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
+import HelmChartModalConfirmWithNamespaceSelect from '@components/molecules/HelmChartModalConfirmWithNamespaceSelect';
+import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -67,14 +71,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
-  const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -90,8 +92,18 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-  const [key, setKey] = useState('source');
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
+  const navigatorHeight = useMemo(
+    () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
+    [windowHeight, isInPreviewMode]
+  );
+
+  const [activeTabKey, setActiveTabKey] = useState('source');
+  const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
+  const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
+  const [selectedResource, setSelectedResource] = useState<K8sResource>();
 
   const dispatch = useAppDispatch();
 
@@ -99,7 +111,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
   const extraButton = useRef<any>();
 
-  const getDistanceBetweenTwoComponents = () => {
+  const getDistanceBetweenTwoComponents = useCallback(() => {
     const tabsListEl = tabsList[0].getBoundingClientRect();
     const extraButtonEl = extraButton.current.getBoundingClientRect();
 
@@ -116,7 +128,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (!isButtonShrinked && distance < 10) {
       setButtonShrinkedState(true);
     }
-  };
+  }, [isButtonShrinked, tabsList]);
 
   const editorTabPaneHeight = useMemo(() => {
     let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
@@ -219,37 +231,22 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (selectedValuesFileId && (!selectedResourceId || selectedValuesFileId === selectedResourceId)) {
       const helmValuesFile = helmValuesMap[selectedValuesFileId];
       if (helmValuesFile) {
-        applyHelmChartWithConfirm(
-          helmValuesFile,
-          helmChartMap[helmValuesFile.helmChartId],
-          fileMap,
-          dispatch,
-          kubeconfig,
-          kubeconfigContext || ''
-        );
+        setIsHelmChartApplyModalVisible(true);
       }
     } else if (selectedResource) {
-      const isClusterPreview = previewType === 'cluster';
-      applyResourceWithConfirm(selectedResource, resourceMap, fileMap, dispatch, kubeconfig, kubeconfigContext || '', {
-        isClusterPreview,
-        kustomizeCommand,
-      });
+      setIsApplyModalVisible(true);
     } else if (selectedPath) {
       applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig, kubeconfigContext || '');
     }
   }, [
     selectedResource,
-    resourceMap,
     fileMap,
     kubeconfig,
     selectedPath,
     dispatch,
-    previewType,
-    helmChartMap,
     helmValuesMap,
     selectedValuesFileId,
     kubeconfigContext,
-    kustomizeCommand,
     selectedResourceId,
   ]);
 
@@ -261,24 +258,19 @@ const ActionsPane = (props: {contentHeight: string}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monacoEditor]);
 
-  const diffResource = useCallback(
-    resourceId => {
-      dispatch(performResourceDiff(resourceId));
-    },
-    [dispatch]
-  );
-
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
-      diffResource(selectedResourceId);
+      dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [selectedResourceId, diffResource]);
+  }, [dispatch, selectedResourceId]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
-      diffResource(resourceId);
+      if (resourceId) {
+        dispatch(openResourceDiffModal(resourceId));
+      }
     },
-    [diffResource]
+    [dispatch]
   );
 
   const isDiffButtonDisabled = useMemo(() => {
@@ -294,6 +286,76 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
     return false;
   }, [selectedResource, kubeconfigPath]);
+
+  const onClickApplyResource = useCallback(
+    (namespace?: string) => {
+      if (!selectedResource) {
+        setIsApplyModalVisible(false);
+        return;
+      }
+      const isClusterPreview = previewType === 'cluster';
+      applyResource(
+        selectedResource.id,
+        resourceMap,
+        fileMap,
+        dispatch,
+        kubeconfigPath,
+        kubeconfigContext || '',
+        namespace,
+        {
+          isClusterPreview,
+          kustomizeCommand,
+        }
+      );
+      setIsApplyModalVisible(false);
+    },
+    [dispatch, fileMap, kubeconfigContext, kubeconfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
+  );
+
+  const onClickApplyHelmChart = useCallback(
+    (namespace?: string, shouldCreateNamespace?: boolean) => {
+      if (!selectedValuesFileId) {
+        setIsHelmChartApplyModalVisible(false);
+        return;
+      }
+
+      const helmValuesFile = helmValuesMap[selectedValuesFileId];
+      applyHelmChart(
+        helmValuesFile,
+        helmChartMap[helmValuesFile.helmChartId],
+        fileMap,
+        dispatch,
+        kubeconfig,
+        kubeconfigContext || '',
+        namespace,
+        shouldCreateNamespace
+      );
+      setIsHelmChartApplyModalVisible(false);
+    },
+    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeconfig, kubeconfigContext, selectedValuesFileId]
+  );
+
+  const confirmModalTitle = useMemo(() => {
+    if (!selectedResource) {
+      return '';
+    }
+
+    return isKustomizationResource(selectedResource)
+      ? makeApplyKustomizationText(selectedResource.name, kubeconfigContext)
+      : makeApplyResourceText(selectedResource.name, kubeconfigContext);
+  }, [selectedResource, kubeconfigContext]);
+
+  const helmChartConfirmModalTitle = useMemo(() => {
+    if (!selectedValuesFileId) {
+      return '';
+    }
+
+    const helmValuesFile = helmValuesMap[selectedValuesFileId];
+
+    return `Install the ${helmChartMap[helmValuesFile.helmChartId].name} Chart using ${
+      helmValuesFile.name
+    } in cluster [${kubeconfigContext || ''}]?`;
+  }, [helmChartMap, helmValuesMap, kubeconfigContext, selectedValuesFileId]);
 
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {
@@ -313,12 +375,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   useEffect(() => {
     if (
-      (key === 'metadataForm' || key === 'form') &&
+      (activeTabKey === 'metadataForm' || activeTabKey === 'form') &&
       (!selectedResourceId || !(resourceKindHandler && resourceKindHandler.formEditorOptions))
     ) {
-      setKey('source');
+      setActiveTabKey('source');
     }
-  }, [selectedResourceId, selectedResource, key, resourceKindHandler]);
+  }, [selectedResourceId, selectedResource, activeTabKey, resourceKindHandler]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
@@ -331,7 +393,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (tabsList && tabsList.length && extraButton.current) {
       getDistanceBetweenTwoComponents();
     }
-  }, [tabsList, extraButton.current, uiState.paneConfiguration, windowSize, selectedResource]);
+  }, [tabsList, uiState.paneConfiguration, windowSize, selectedResource, getDistanceBetweenTwoComponents]);
 
   return (
     <>
@@ -408,8 +470,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
         <S.TabsContainer>
           <S.Tabs
             defaultActiveKey="source"
-            activeKey={key}
-            onChange={k => setKey(k)}
+            activeKey={activeTabKey}
+            onChange={k => setActiveTabKey(k)}
             tabBarExtraContent={
               selectedResource && resourceKindHandler?.helpLink ? (
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
@@ -434,35 +496,27 @@ const ActionsPane = (props: {contentHeight: string}) => {
               ) : (
                 !isClusterDiffVisible &&
                 (selectedResourceId || selectedPath || selectedValuesFileId) && (
-                  <Monaco
-                    editorHeight={`${parseInt(contentHeight, 10) - 120}`}
-                    applySelection={applySelection}
-                    diffSelectedResource={diffSelectedResource}
-                  />
+                  <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
                 )
               )}
             </TabPane>
-            {selectedResource &&
-              resourceKindHandler &&
-              resourceKindHandler.formEditorOptions &&
-              resourceKindHandler.formEditorOptions.editorSchema &&
-              resourceKindHandler.formEditorOptions.editorUiSchema && (
-                <TabPane
-                  tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
-                  disabled={!selectedResourceId}
-                  key="form"
-                >
-                  {uiState.isFolderLoading || previewLoader.isLoading ? (
-                    <S.Skeleton active />
-                  ) : (
-                    <FormEditor
-                      contentHeight={contentHeight}
-                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                    />
-                  )}
-                </TabPane>
-              )}
+            {selectedResource && resourceKindHandler?.formEditorOptions?.editorSchema && (
+              <TabPane
+                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
+                disabled={!selectedResourceId}
+                key="form"
+              >
+                {uiState.isFolderLoading || previewLoader.isLoading ? (
+                  <S.Skeleton active />
+                ) : (
+                  <FormEditor
+                    contentHeight={contentHeight}
+                    formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                    formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                  />
+                )}
+              </TabPane>
+            )}
             {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
               <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
@@ -480,6 +534,27 @@ const ActionsPane = (props: {contentHeight: string}) => {
         </S.TabsContainer>
         {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}
       </S.ActionsPaneContainer>
+
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          isVisible={isApplyModalVisible}
+          resources={selectedResource ? [selectedResource] : []}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
+
+      {isHelmChartApplyModalVisible && (
+        <HelmChartModalConfirmWithNamespaceSelect
+          isVisible={isHelmChartApplyModalVisible}
+          title={helmChartConfirmModalTitle}
+          onCancel={() => setIsHelmChartApplyModalVisible(false)}
+          onOk={(selectedNamespace, shouldCreateNamespace) =>
+            onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace)
+          }
+        />
+      )}
     </>
   );
 };

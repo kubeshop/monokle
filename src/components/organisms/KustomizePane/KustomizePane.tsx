@@ -21,7 +21,7 @@ const HelmPane: React.FC = () => {
       <S.TitleBar>
         <MonoPaneTitle>Kustomize</MonoPaneTitle>
       </S.TitleBar>
-      <S.List height={navigatorHeight}>
+      <S.List id="kustomize-sections-container" height={navigatorHeight}>
         <SectionRenderer sectionBlueprint={KustomizationSectionBlueprint} level={0} isLastSection={false} />
         <SectionRenderer sectionBlueprint={KustomizePatchSectionBlueprint} level={0} isLastSection={false} />
       </S.List>

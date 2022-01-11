@@ -3,9 +3,6 @@ import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
-import {isUnsavedResource} from '@redux/services/resource';
-
-import {isResourcePassingFilter} from '@utils/resources';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizePatchPrefix from './KustomizePatchPrefix';
@@ -27,6 +24,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
   name: KUSTOMIZE_PATCH_SECTION_NAME,
   id: KUSTOMIZE_PATCH_SECTION_NAME,
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
+  containerElementId: 'kustomize-sections-container',
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
@@ -69,7 +67,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
       return rawItems.length > 0;
     },
     isLoading: scope => {
-      return scope.isPreviewLoading || scope.isFolderLoading;
+      return scope.isFolderLoading;
     },
     isInitialized: (_, rawItems) => {
       return rawItems.length > 0;
@@ -81,12 +79,6 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
     builder: {
       isSelected: rawItem => rawItem.isSelected,
       isHighlighted: rawItem => rawItem.isHighlighted,
-      isDirty: rawItem => isUnsavedResource(rawItem),
-      isVisible: (rawItem, scope) => {
-        const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
-        return isPassingFilter;
-      },
-      isDisabled: (_, scope) => scope.isInPreviewMode,
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {

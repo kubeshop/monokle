@@ -2,23 +2,29 @@ import * as k8s from '@kubernetes/client-node';
 
 import {monaco} from 'react-monaco-editor';
 
+import {K8sResource} from '@models/k8sresource';
+
 interface SymbolMatcher {
   isMatch?(symbols: monaco.languages.DocumentSymbol[]): boolean;
-}
-
-export enum NamespaceRefTypeEnum {
-  None, // ignore namespaces for this ref
-  Implicit, // use the namespace of the containing resource
-  Explicit, // target namespace property expected
-  OptionalExplicit, // if no namespace is provided then use the namespace of the containing resource
 }
 
 interface RefMapper {
   source: {
     pathParts: string[];
-    hasOptionalSibling?: boolean;
-    namespaceRef?: NamespaceRefTypeEnum;
-    namespaceProperty?: string; // default to "namespace"
+
+    // sibling matchers that will be used to validate this ref
+    siblingMatchers?: Record<
+      string,
+      (
+        sourceResource: K8sResource,
+        targetResource: K8sResource,
+        value: string,
+        siblingValues: Record<string, string>
+      ) => boolean
+    >;
+
+    // optionally checks for an 'optional' sibling to validate ref
+    isOptional?: boolean;
   };
   target: {
     kind: string;
@@ -26,6 +32,13 @@ interface RefMapper {
   };
 
   type: 'path' | 'name' | 'pairs';
+
+  // called to validate if an unsatisfied ref should be created for this mapper
+  shouldCreateUnsatisfiedRef?: (
+    refMapper: RefMapper,
+    sourceResource: K8sResource,
+    siblingValues: Record<string, string>
+  ) => boolean;
 }
 
 export type ResourceKind = string;
@@ -49,10 +62,10 @@ interface ResourceKindHandler {
   clusterApiVersion: string;
 
   /**
-   * A user friendly description of this resource type
+   * tells if this kind is a custom resource
    */
 
-  description: string;
+  isCustom: boolean;
 
   /**
    * An external link to documentation
@@ -64,15 +77,19 @@ interface ResourceKindHandler {
    * Retrieve the specified resource of this type using the provided kubeconfig
    */
 
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, name: string, namespace: string): Promise<any>;
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any>;
 
   /**
    * Get all resources of this type using the provided kubeconfig
    */
 
-  listResourcesInCluster(kubeconfig: k8s.KubeConfig): Promise<any[]>;
+  listResourcesInCluster(kubeconfig: k8s.KubeConfig, crd?: K8sResource): Promise<any[]>;
 
-  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, name: string, namespace?: string) => Promise<void>;
+  /**
+   * Delete the specified resource from the cluster
+   */
+
+  deleteResourceInCluster: (kubeconfig: k8s.KubeConfig, resource: K8sResource) => Promise<void>;
 
   /**
    * optional outgoing RefMappers to use for resolving refs in resources of this type
@@ -89,11 +106,11 @@ interface ResourceKindHandler {
   navigatorPath: [navigatorName: string, sectionName: string, subsectionName: string];
 
   /**
-   * optional JSON Schema and symbol-matchers to pass to the source editor
+   * optional JSON Schema for validation and symbol-matchers to pass to the source editor
    */
 
   sourceEditorOptions?: {
-    editorSchema?: any;
+    editorSchema: any;
     symbolMatchers?: SymbolMatcher[];
   };
 
@@ -103,28 +120,13 @@ interface ResourceKindHandler {
 
   formEditorOptions?: {
     editorSchema: any;
-    editorUiSchema: any;
+    editorUiSchema?: any;
   };
 
   /**
-   * optional additional editors/views to show in the actionspane
+   * Only set for native kubernetes resources - used for extracting the corresponding resource schema from
+   * file containing all schemas
    */
-
-  actionTabs?: {
-    name: string;
-    description: string;
-    component: React.ComponentType;
-  }[];
-
-  /**
-   * An optional list of templates presented to users when creating a new resource of this kind.
-   */
-
-  templates?: {
-    name: string;
-    description: string;
-    content: string;
-  }[];
 
   validationSchemaPrefix?: string;
 }

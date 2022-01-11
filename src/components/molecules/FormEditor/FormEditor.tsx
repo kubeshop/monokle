@@ -127,13 +127,6 @@ const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema
         const content = mergeManifests(selectedResource.text, formString);
 
         if (content.trim() !== selectedResource.text.trim()) {
-          /*
-          console.log('Replacing resource content');
-          console.log(selectedResource.text);
-          console.log('with');
-          console.log(content);
-*/
-
           dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
       }
@@ -153,7 +146,7 @@ const FormEditor = (props: {contentHeight: string; formSchema: any; formUiSchema
     return <div>Nothing selected...</div>;
   }
 
-  if (!formSchema || !formUiSchema) {
+  if (!formSchema) {
     return <div>Not supported resource type..</div>;
   }
 

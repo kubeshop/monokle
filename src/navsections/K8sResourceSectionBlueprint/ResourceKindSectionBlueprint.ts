@@ -37,6 +37,7 @@ export function makeResourceKindNavSection(
   const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
+    containerElementId: 'navigator-sections-container',
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       return {
@@ -57,7 +58,18 @@ export function makeResourceKindNavSection(
       getRawItems: scope => {
         return scope.activeResources
           .filter(r => r.kind === kindHandler.kind)
-          .sort((a, b) => a.name.localeCompare(b.name));
+          .sort((a, b) => {
+            if (a.namespace && !b.namespace) {
+              return -1;
+            }
+            if (!a.namespace && b.namespace) {
+              return 1;
+            }
+            if (a.namespace && b.namespace && a.namespace !== b.namespace) {
+              return a.namespace.localeCompare(b.namespace);
+            }
+            return a.name.localeCompare(b.name);
+          });
       },
       getMeta: () => {
         return {resourceKind: kindHandler.kind};

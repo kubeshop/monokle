@@ -308,8 +308,8 @@ test('traverse-document', () => {
     ],
     [['metadata', 'labels'], ['metadata', 'labels', 'app.kubernetes.io/name'], 'app.kubernetes.io/name', 'test'],
     [['metadata', 'labels'], ['metadata', 'labels', 'app.kubernetes.io/part-of'], 'app.kubernetes.io/part-of', 'test'],
-    [['metadata'], ['metadata', 'finalizers', '0'], 'test', 'finalizers'],
-    [['metadata'], ['metadata', 'finalizers', '1'], 'test2', 'finalizers'],
+    [['metadata'], ['metadata', 'finalizers', '0'], 'test', 'test'],
+    [['metadata'], ['metadata', 'finalizers', '1'], 'test2', 'test2'],
     [['metadata', 'finalizers', '2'], ['metadata', 'finalizers', '2', 'test3'], 'test3', 'value'],
     [
       ['metadata', 'finalizers', '3', 'test4', '0'],

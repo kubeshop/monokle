@@ -80,7 +80,7 @@ export function mergeManifests(template: string, values: string) {
 
   // cleanup
   visit(templateDoc, {
-    Pair(key, node, path) {
+    Pair(key, node) {
       if ((isMap(node.value) || isSeq(node.value)) && node.value.items.length === 0) {
         return visit.REMOVE;
       }
@@ -161,7 +161,7 @@ export function traverseDocument(
           if (isScalar(item)) {
             const scalarSeqKey = seqPair.key as Scalar;
             const keyPathParts = [...parentKeyPathParts.concat([scalarSeqKey.value as string]), String(ix)];
-            callback(parentKeyPathParts, keyPathParts, item.value as string, scalarSeqKey);
+            callback(parentKeyPathParts, keyPathParts, item.value as string, item);
           }
         });
       }

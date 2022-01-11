@@ -21,7 +21,7 @@ import {FileEntry} from '@models/fileentry';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
-import {selectFile, setSelectingFile} from '@redux/reducers/main';
+import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
   closeFolderExplorer,
   openCreateFolderModal,
@@ -31,7 +31,9 @@ import {
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
-import {stopPreview} from '@redux/services/preview';
+import {getHelmValuesFile} from '@redux/services/helm';
+import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
+import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
@@ -84,7 +86,8 @@ const createNode = (
   fileEntry: FileEntry,
   fileMap: FileMapType,
   resourceMap: ResourceMapType,
-  hideExcludedFilesInFileExplorer: boolean
+  hideExcludedFilesInFileExplorer: boolean,
+  fileOrFolderContainedInFilter: string | undefined
 ): TreeNode => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
@@ -93,7 +96,16 @@ const createNode = (
     title: (
       <NodeContainer>
         <NodeTitleContainer>
-          <span className={fileEntry.isExcluded ? 'excluded-file-entry-name' : 'file-entry-name'}>
+          <span
+            className={
+              fileEntry.isExcluded
+                ? 'excluded-file-entry-name'
+                : (fileEntry.isSupported || fileEntry.children) &&
+                  (fileOrFolderContainedInFilter ? fileEntry.filePath.startsWith(fileOrFolderContainedInFilter) : true)
+                ? 'file-entry-name'
+                : 'not-supported-file-entry-name'
+            }
+          >
             {fileEntry.name}
           </span>
           {resources.length > 0 ? (
@@ -116,7 +128,9 @@ const createNode = (
       node.children = fileEntry.children
         .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
         .filter(childEntry => childEntry)
-        .map(childEntry => createNode(childEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer))
+        .map(childEntry =>
+          createNode(childEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter)
+        )
         .filter(childEntry => {
           if (!hideExcludedFilesInFileExplorer) {
             return childEntry;
@@ -163,6 +177,15 @@ const FileTreeContainer = styled.div`
     margin-left: 8px;
     background: transparent;
   }
+
+  & .ant-tree-switcher-leaf-line::before {
+    border-right: 1px solid #434343;
+  }
+
+  & .ant-tree-switcher-leaf-line::after {
+    border-bottom: 1px solid #434343;
+  }
+
   & .ant-tree-treenode-selected {
     vertical-align: center;
     margin-left: 0px !important;
@@ -221,6 +244,11 @@ const FileTreeContainer = styled.div`
   }
 
   & .excluded-file-entry-name {
+    color: ${Colors.grey800};
+    font-style: italic;
+  }
+
+  & .not-supported-file-entry-name {
     color: ${Colors.grey800};
   }
 `;
@@ -334,6 +362,8 @@ interface TreeItemProps {
   onIncludeToProcessing: (relativePath: string) => void;
   onCreateFolder: (absolutePath: string) => void;
   onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
+  onFilterByFileOrFolder: (relativePath: string | undefined) => void;
+  onPreview: (relativePath: string) => void;
   isExcluded?: Boolean;
   isFolder?: Boolean;
 }
@@ -366,13 +396,20 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onIncludeToProcessing,
     onCreateFolder,
     onCreateResource,
+    onFilterByFileOrFolder,
+    onPreview,
     isFolder,
   } = props;
 
+  const [isTitleHovered, setTitleHoverState] = useState(false);
+
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const [isTitleHovered, setTitleHoverState] = useState(false);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const isFileSelected = useMemo(() => {
     return treeKey === selectedPath;
@@ -394,14 +431,39 @@ const TreeItem: React.FC<TreeItemProps> = props => {
 
   const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
 
+  const canPreview = useCallback(
+    (entryPath: string): boolean => {
+      const fileEntry = fileMap[entryPath];
+      return (
+        fileEntry &&
+        (isKustomizationFile(fileEntry, resourceMap) || getHelmValuesFile(fileEntry, helmValuesMap) !== undefined)
+      );
+    },
+    [fileMap, resourceMap, helmValuesMap]
+  );
+
   const menu = (
     <Menu>
-      {isFolder ? (
+      {canPreview(relativePath) ? (
         <>
           <Menu.Item
             onClick={e => {
               e.domEvent.stopPropagation();
-
+              onPreview(relativePath);
+            }}
+            key="preview"
+          >
+            Preview
+          </Menu.Item>
+          <ContextMenuDivider />
+        </>
+      ) : null}
+      {isFolder ? (
+        <>
+          <Menu.Item
+            disabled={isInPreviewMode}
+            onClick={e => {
+              e.domEvent.stopPropagation();
               onCreateFolder(absolutePath);
             }}
             key="create_directory"
@@ -410,21 +472,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           </Menu.Item>
         </>
       ) : null}
+
       <Menu.Item
+        disabled={isInPreviewMode}
         onClick={e => {
           e.domEvent.stopPropagation();
-
-          showItemInFolder(absolutePath);
-        }}
-        key="reveal_in_finder"
-      >
-        Reveal in {platformFilemanagerName}
-      </Menu.Item>
-      <ContextMenuDivider />
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
           onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
         }}
         key="create_resource"
@@ -433,9 +485,44 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       </Menu.Item>
       <ContextMenuDivider />
       <Menu.Item
+        key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
+        disabled={isInPreviewMode}
         onClick={e => {
           e.domEvent.stopPropagation();
 
+          if (isRoot || (fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter)) {
+            onFilterByFileOrFolder(undefined);
+          } else {
+            onFilterByFileOrFolder(relativePath);
+          }
+        }}
+      >
+        {fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : `Filter on this ${isFolder ? 'folder' : 'file'}`}
+      </Menu.Item>
+      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
+        <>
+          <Menu.Item
+            disabled={isInPreviewMode}
+            onClick={e => {
+              e.domEvent.stopPropagation();
+              if (isExcluded) {
+                onIncludeToProcessing(relativePath);
+              } else {
+                onExcludeFromProcessing(relativePath);
+              }
+            }}
+            key="add_to_files_exclude"
+          >
+            {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
+          </Menu.Item>
+        </>
+      ) : null}
+      <ContextMenuDivider />
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
           navigator.clipboard.writeText(absolutePath);
         }}
         key="copy_full_path"
@@ -454,24 +541,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       </Menu.Item>
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
         <>
-          <Menu.Item
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              if (isExcluded) {
-                onIncludeToProcessing(relativePath);
-              } else {
-                onExcludeFromProcessing(relativePath);
-              }
-            }}
-            key="add_to_files_exclude"
-          >
-            {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
-          </Menu.Item>
           <ContextMenuDivider />
           <Menu.Item
+            disabled={isInPreviewMode}
             onClick={e => {
               e.domEvent.stopPropagation();
-
               onRename(absolutePath, osPlatform);
             }}
             key="rename_entity"
@@ -479,10 +553,10 @@ const TreeItem: React.FC<TreeItemProps> = props => {
             Rename
           </Menu.Item>
           <Menu.Item
+            disabled={isInPreviewMode}
             key="delete_entity"
             onClick={e => {
               e.domEvent.stopPropagation();
-
               deleteEntityWizard(
                 {entityAbsolutePath: absolutePath},
                 () => {
@@ -497,6 +571,16 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           </Menu.Item>
         </>
       ) : null}
+      <ContextMenuDivider />
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+          showItemInFolder(absolutePath);
+        }}
+        key="reveal_in_finder"
+      >
+        Reveal in {platformFilemanagerName}
+      </Menu.Item>
     </Menu>
   );
 
@@ -534,35 +618,41 @@ const FileTreePane = () => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
 
-  const dispatch = useAppDispatch();
-
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-  const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const uiState = useAppSelector(state => state.ui);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
-  const hideExcludedFilesInFileExplorer = useAppSelector(
-    state => state.config.settings.hideExcludedFilesInFileExplorer
-  );
-  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
-  const recentFolders = useAppSelector(state => state.config.recentFolders);
-  const fileIncludes = useAppSelector(state => state.config.fileIncludes);
-  const scanExcludes = useAppSelector(state => state.config.scanExcludes);
-  const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
-  const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
-  const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
-  const [tree, setTree] = useState<TreeNode | null>(null);
+  const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [expandedKeys, setExpandedKeys] = useState<Array<React.Key>>([]);
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
-  const [autoExpandParent, setAutoExpandParent] = useState(true);
-  const treeRef = useRef<any>();
   const [processingEntity, setProcessingEntity] = useState<ProcessingEntity>({
     processingEntityID: undefined,
     processingType: undefined,
   });
+  const [tree, setTree] = useState<TreeNode | null>(null);
+
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+
+  const dispatch = useAppDispatch();
+  const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
+  const fileIncludes = useAppSelector(state => state.config.fileIncludes);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const hideExcludedFilesInFileExplorer = useAppSelector(
+    state => state.config.settings.hideExcludedFilesInFileExplorer
+  );
+  const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
+  const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
+  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const recentFolders = useAppSelector(state => state.config.recentFolders);
+  const resourceFilter = useAppSelector(state => state.main.resourceFilter);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const scanExcludes = useAppSelector(state => state.config.scanExcludes);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
+  const uiState = useAppSelector(state => state.ui);
+
+  const treeRef = useRef<any>();
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
@@ -590,7 +680,9 @@ const FileTreePane = () => {
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
-    const treeData = rootEntry && createNode(rootEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer);
+    const treeData =
+      rootEntry &&
+      createNode(rootEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter);
 
     setTree(treeData);
 
@@ -598,7 +690,14 @@ const FileTreePane = () => {
       setExpandedKeys(Object.keys(fileMap).filter(key => fileMap[key]?.children?.length));
       dispatch(setShouldExpandAllNodes(false));
     }
-  }, [resourceMap, fileMap, shouldExpandAllNodes, hideExcludedFilesInFileExplorer, dispatch]);
+  }, [
+    resourceMap,
+    fileMap,
+    shouldExpandAllNodes,
+    hideExcludedFilesInFileExplorer,
+    fileOrFolderContainedInFilter,
+    dispatch,
+  ]);
 
   /**
    * This useEffect ensures that the right treeNodes are expanded and highlighted
@@ -634,6 +733,7 @@ const FileTreePane = () => {
   useEffect(() => {
     if (selectedResourceId && tree) {
       const resource = resourceMap[selectedResourceId];
+
       if (resource) {
         const filePath = resource.filePath;
         highlightFilePath(filePath);
@@ -641,14 +741,6 @@ const FileTreePane = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResourceId, tree]);
-
-  useEffect(() => {
-    // removes any highlight when a file is selected
-    if (selectedPath && highlightNode) {
-      highlightNode.highlight = false;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPath]);
 
   const onDelete = (args: {isDirectory: boolean; name: string; err: NodeJS.ErrnoException | null}): void => {
     const {isDirectory, name, err} = args;
@@ -819,6 +911,24 @@ const FileTreePane = () => {
     dispatch(openCreateFolderModal(absolutePath));
   };
 
+  const onPreview = useCallback(
+    (relativePath: string) => {
+      const resources = getResourcesForPath(relativePath, resourceMap);
+      if (resources && resources.length === 1 && isKustomizationResource(resources[0])) {
+        startPreview(resources[0].id, 'kustomization', dispatch);
+      } else {
+        const fileEntry = fileMap[relativePath];
+        if (fileEntry) {
+          const valuesFile = getHelmValuesFile(fileEntry, helmValuesMap);
+          if (valuesFile) {
+            startPreview(valuesFile.id, 'helm', dispatch);
+          }
+        }
+      }
+    },
+    [resourceMap, fileMap, helmValuesMap]
+  );
+
   const onCreateResource = ({targetFolder, targetFile}: {targetFolder?: string; targetFile?: string}) => {
     if (targetFolder) {
       dispatch(openNewResourceWizard({defaultInput: {targetFolder}}));
@@ -826,6 +936,36 @@ const FileTreePane = () => {
     if (targetFile) {
       dispatch(openNewResourceWizard({defaultInput: {targetFile}}));
     }
+  };
+
+  useEffect(() => {
+    // removes any highlight when a file is selected
+    if (selectedPath && highlightNode) {
+      highlightNode.highlight = false;
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightNode]);
+
+  useEffect(() => {
+    if (leftMenuSelection !== 'file-explorer') {
+      return;
+    }
+
+    if (selectedPath) {
+      treeRef?.current?.scrollTo({key: selectedPath});
+      return;
+    }
+
+    if (highlightNode) {
+      treeRef?.current?.scrollTo({key: highlightNode.key});
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leftMenuSelection]);
+
+  const onFilterByFileOrFolder = (relativePath: string | undefined) => {
+    dispatch(updateResourceFilter({...resourceFilter, fileOrFolderContainedIn: relativePath}));
   };
 
   return (
@@ -885,7 +1025,11 @@ const FileTreePane = () => {
       ) : tree ? (
         <StyledTreeDirectoryTree
           // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
-          height={windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET ? windowHeight - FILE_TREE_HEIGHT_OFFSET : 0}
+          height={
+            windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET
+              ? windowHeight - FILE_TREE_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0)
+              : 0
+          }
           onSelect={onSelect}
           treeData={[tree]}
           ref={treeRef}
@@ -904,6 +1048,8 @@ const FileTreePane = () => {
                 onIncludeToProcessing={onIncludeToProcessing}
                 onCreateFolder={onCreateFolder}
                 onCreateResource={onCreateResource}
+                onFilterByFileOrFolder={onFilterByFileOrFolder}
+                onPreview={onPreview}
                 {...event}
               />
             );
@@ -915,8 +1061,8 @@ const FileTreePane = () => {
             return node.highlight;
           }}
           disabled={isInPreviewMode || previewLoader.isLoading}
-          showLine
-          showIcon={false}
+          showIcon
+          showLine={{showLeafIcon: false}}
         />
       ) : (
         <NoFilesContainer>

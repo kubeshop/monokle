@@ -22,6 +22,7 @@ export const CLUSTER_DIFF_SECTION_NAME = 'K8s Resources Diff' as const;
 const ClusterDiffSectionBlueprint: SectionBlueprint<ClusterToLocalResourcesMatch, ClusterDiffScopeType> = {
   name: CLUSTER_DIFF_SECTION_NAME,
   id: CLUSTER_DIFF_SECTION_NAME,
+  containerElementId: 'cluster-diff-sections-container',
   rootSectionId: CLUSTER_DIFF_SECTION_NAME,
   getScope(state) {
     return {

@@ -1,3 +1,5 @@
+import * as k8s from '@kubernetes/client-node';
+
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
@@ -17,11 +19,18 @@ import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {clearRefNodesCache, isUnsatisfiedRef} from '@redux/services/resourceRefs';
+import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
 
-import {getDependentResourceKinds, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
+import {
+  getDependentResourceKinds,
+  getKnownResourceKinds,
+  getResourceKindHandler,
+  registerKindHandler,
+} from '@src/kindhandlers';
+import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
+import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {processRefs} from './resourceRefs';
 import {validateResource} from './validation';
@@ -221,7 +230,7 @@ export function createResourceRef(
         target: {
           type: 'resource',
           resourceId: targetResourceId,
-          resourceKind: targetResourceKind,
+          resourceKind: targetResourceKind?.startsWith('$') ? undefined : targetResourceKind,
           isOptional,
         },
       });
@@ -261,6 +270,25 @@ export function getNamespaces(resourceMap: ResourceMapType) {
     }
   });
   return namespaces;
+}
+
+export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string) {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromFile(kubeconfigPath);
+  kc.setCurrentContext(context);
+
+  const namespaces = await NamespaceHandler.listResourcesInCluster(kc);
+
+  const ns: string[] = [];
+  namespaces.forEach(namespace => {
+    const namespaceName = namespace.metadata?.name;
+
+    if (namespaceName && !ns.includes(namespaceName)) {
+      ns.push(namespaceName);
+    }
+  });
+
+  return ns;
 }
 
 /**
@@ -493,7 +521,7 @@ export function processParsedResources(
   }
   const timestamp = Date.now();
   processRefs(resourceMap, processingOptions, options);
-  console.log(`processing refs took ${Date.now() - timestamp}`, options);
+  log.info(`processing refs took ${Date.now() - timestamp}`, options);
 }
 
 /**
@@ -610,7 +638,8 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
         log.warn(
-          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`
+          `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
+          documents[docIndex]
         );
       } else {
         const content = doc.toJS();
@@ -629,6 +658,21 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             text,
           };
 
+          if (
+            resource.kind === 'CustomResourceDefinition' &&
+            resource.content?.spec?.kind &&
+            !getResourceKindHandler(resource.content.spec.kind)
+          ) {
+            try {
+              const kindHandler = extractKindHandler(resource.content);
+              if (kindHandler) {
+                registerKindHandler(kindHandler, false);
+              }
+            } catch (e) {
+              log.warn('Failed to register custom kindhandler', resource, e);
+            }
+          }
+
           // if this is a single-resource file we can save the parsedDoc and lineCounter
           if (documents.length === 1) {
             parsedDocCache.set(resource.id, {parsedDoc: doc, lineCounter});
@@ -639,7 +683,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           }
 
           // set the namespace if available
-          if (content.metadata?.namespace) {
+          if (content.metadata?.namespace && typeof content.metadata.namespace === 'string') {
             resource.namespace = content.metadata.namespace;
           }
 
@@ -708,7 +752,7 @@ export function getResourceKindsWithTargetingRefs(resource: K8sResource) {
     const resourceKinds = getKnownResourceKinds().filter(kind => {
       const handler = getResourceKindHandler(kind);
       if (handler && handler.outgoingRefMappers) {
-        return handler.outgoingRefMappers.some(mapper => mapper.target.kind === resource.kind);
+        return handler.outgoingRefMappers.some(mapper => refMapperMatchesKind(mapper, resource.kind));
       }
       return false;
     });

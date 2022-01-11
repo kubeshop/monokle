@@ -8,6 +8,7 @@ import {selectK8sResource} from '@redux/reducers/main';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import KustomizationContextMenu from './KustomizationContextMenu';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationQuickAction from './KustomizationQuickAction';
 import KustomizationSectionEmptyDisplay from './KustomizationSectionEmptyDisplay';
@@ -31,6 +32,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
   name: KUSTOMIZATION_SECTION_NAME,
   id: KUSTOMIZATION_SECTION_NAME,
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
+  containerElementId: 'kustomize-sections-container',
   getScope: state => {
     return {
       resourceMap: state.main.resourceMap,
@@ -89,6 +91,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     customization: {
       prefix: {component: KustomizationPrefix},
       suffix: {component: KustomizationSuffix},
+      contextMenu: {component: KustomizationContextMenu, options: {isVisibleOnHover: true}},
       quickAction: {component: KustomizationQuickAction, options: {isVisibleOnHover: true}},
     },
   },

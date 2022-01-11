@@ -14,12 +14,7 @@ import * as S from './ClusterDiff.styled';
 import ClusterDiffNamespaceFilter from './ClusterDiffNamespaceFilter';
 
 const Container = styled.div<{height?: number}>`
-  display: flex;
   ${props => props.height && `height: ${props.height};`}
-`;
-
-const LeftPane = styled.div`
-  flex-grow: 1;
 `;
 
 const FilterContainer = styled.span`
@@ -30,27 +25,26 @@ const ListContainer = styled.div`
   overflow-y: scroll;
   height: 70vh;
   ${GlobalScrollbarStyle}
+  width: 100%;
 `;
 
 function ClusterDiff() {
   return (
     <Container>
-      <LeftPane>
-        <S.TitleBar>
-          <S.TitleBarRightButtons>
-            <ClusterDiffNamespaceFilter />
-            <FilterContainer>
-              <ResourceFilterIconWithPopover />
-            </FilterContainer>
-          </S.TitleBarRightButtons>
-        </S.TitleBar>
-        <Divider style={{margin: '8px 0'}} />
-        <ListContainer>
-          <S.List>
-            <SectionRenderer sectionBlueprint={ClusterDiffSectionBlueprint} level={0} isLastSection={false} />
-          </S.List>
-        </ListContainer>
-      </LeftPane>
+      <S.TitleBar>
+        <S.TitleBarRightButtons>
+          <ClusterDiffNamespaceFilter />
+          <FilterContainer>
+            <ResourceFilterIconWithPopover />
+          </FilterContainer>
+        </S.TitleBarRightButtons>
+      </S.TitleBar>
+      <Divider style={{margin: '8px 0'}} />
+      <ListContainer>
+        <S.List id="cluster-diff-sections-container">
+          <SectionRenderer sectionBlueprint={ClusterDiffSectionBlueprint} level={0} isLastSection={false} />
+        </S.List>
+      </ListContainer>
     </Container>
   );
 }

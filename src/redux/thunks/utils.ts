@@ -20,7 +20,8 @@ export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: st
   return items
     .map(item => {
       delete item.metadata?.managedFields;
-      if (kind && apiVersion) {
+
+      if (kind && apiVersion && !item.apiVersion && !item.kind) {
         return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
       }
 
@@ -85,11 +86,7 @@ export async function getResourceFromCluster(resource: K8sResource, kubeconfigPa
       kc.setCurrentContext(context);
     }
 
-    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(
-      kc,
-      resource.content.metadata.name,
-      resource.namespace ? resource.namespace : 'default'
-    );
+    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kc, resource);
     return resourceFromCluster;
   }
 }
