@@ -22,6 +22,7 @@
     "@commitlint/cli": "13.1.0",
     "@commitlint/config-conventional": "13.1.0",
     "@craco/craco": "6.3.0",
+    "@playwright/test": "1.17.2",
     "@testing-library/jest-dom": "5.14.1",
     "@testing-library/react": "12.0.0",
     "@testing-library/user-event": "13.2.1",
@@ -62,6 +63,7 @@
     "husky": "7.0.2",
     "lint-staged": "11.2.6",
     "monaco-editor-webpack-plugin": "4.2.0",
+    "playwright": "1.17.2",
     "prettier": "2.4.1",
     "react-scripts": "4.0.3",
     "redux-devtools-extension": "2.13.9",
@@ -86,6 +88,7 @@
     "@types/lodash": "4.14.178",
     "ajv": "6.12.6",
     "antd": "4.17.3",
+    "asar": "^3.1.0",
     "async": "3.2.2",
     "chokidar": "3.5.2",
     "dagre": "0.8.5",
@@ -150,7 +153,8 @@
     "prepare": "husky install",
     "release:patch": "standard-version --release-as patch",
     "release:minor": "standard-version --release-as minor",
-    "release:major": "standard-version --release-as major"
+    "release:major": "standard-version --release-as major",
+    "ui-test": "npx playwright test"
   },
   "build": {
     "appId": "io.kubeshop.monokle",
