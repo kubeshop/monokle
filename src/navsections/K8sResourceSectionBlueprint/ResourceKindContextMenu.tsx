@@ -13,7 +13,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {removeResource} from '@redux/reducers/main';
 import {openNewResourceWizard, openRenameResourceModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
 import {AppDispatch} from '@redux/store';
@@ -66,7 +66,6 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
 
   const dispatch = useAppDispatch();
 
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);

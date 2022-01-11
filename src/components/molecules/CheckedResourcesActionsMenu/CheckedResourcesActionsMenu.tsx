@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 
 import {Input, Menu, Modal} from 'antd';
 
@@ -99,13 +99,13 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     [checkedResources, currentContext]
   );
 
-  const onClickDelete = () => {
+  const onClickDelete = useCallback(() => {
     const resourcesToDelete = checkedResourceIds
       .map(resource => resourceMap[resource])
       .filter((r): r is K8sResource => r !== undefined);
 
     deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
-  };
+  }, [checkedResourceIds, dispatch, resourceMap]);
 
   const onClickDeployChecked = () => {
     setIsApplyModalVisible(true);
@@ -120,32 +120,38 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     dispatch(uncheckAllResourceIds());
   };
 
+  const onClickSaveToFileFolder = () => {
+    setIsSaveToFileFolderModalVisible(true);
+  };
+
   return (
-    <StyledMenu mode="horizontal">
-      <Menu.Item disabled key="selected_resources">
-        {checkedResourceIds.length} Selected
-      </Menu.Item>
-      {(!isInPreviewMode || isInClusterMode) && (
-        <Menu.Item style={{color: Colors.red7}} key="delete" onClick={onClickDelete}>
-          Delete
+    <>
+      <StyledMenu mode="horizontal">
+        <Menu.Item disabled key="selected_resources">
+          {checkedResourceIds.length} Selected
         </Menu.Item>
-      )}
+        {(!isInPreviewMode || isInClusterMode) && (
+          <Menu.Item style={{color: Colors.red7}} key="delete" onClick={onClickDelete}>
+            Delete
+          </Menu.Item>
+        )}
 
-      {!isInClusterMode && (
-        <Menu.Item key="deploy" onClick={onClickDeployChecked}>
-          Deploy
+        {!isInClusterMode && (
+          <Menu.Item key="deploy" onClick={onClickDeployChecked}>
+            Deploy
+          </Menu.Item>
+        )}
+
+        {isInPreviewMode && (
+          <Menu.Item key="save_to_file_folder" onClick={onClickSaveToFileFolder}>
+            Save to file/folder
+          </Menu.Item>
+        )}
+
+        <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickUncheckAll}>
+          <CloseOutlined />
         </Menu.Item>
-      )}
-
-      {(isInPreviewMode || isInClusterMode) && (
-        <Menu.Item key="save_to_file_folder" onClick={() => setIsSaveToFileFolderModalVisible(true)}>
-          Save to file/folder
-        </Menu.Item>
-      )}
-
-      <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickUncheckAll}>
-        <CloseOutlined />
-      </Menu.Item>
+      </StyledMenu>
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
@@ -165,7 +171,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
           onCancel={() => setIsSaveToFileFolderModalVisible(false)}
         />
       )}
-    </StyledMenu>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal, Select} from 'antd';
 
@@ -66,7 +66,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const [errorMessage, setErrorMessage] = useState('');
-  const [savingDestination, setSavingDestination] = useState<string>('saveToFile');
+  const [savingDestination, setSavingDestination] = useState<string>('saveToFolder');
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [saveToFolderPaths, setSaveToFolderPaths] = useState<Record<'create' | 'replace', string[]>>({
@@ -177,7 +177,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
   };
 
   useEffect(() => {
-    if (!resourcesIds || !resourcesIds.length) {
+    if (!resourcesIds || !resourcesIds.length || savingDestination === 'saveToFile') {
       return;
     }
 
@@ -196,7 +196,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
     });
 
     setSaveToFolderPaths({create: filesToBeCreated, replace: filesToBeReplaced});
-  }, [fileIncludes, fileMap, resourcesIds, resourceMap, selectedFolder]);
+  }, [fileIncludes, fileMap, savingDestination, resourcesIds, resourceMap, selectedFolder]);
 
   return (
     <Modal title={title} visible={isVisible} onCancel={onCancel} onOk={saveCheckedResourcesToFileFolder}>
@@ -213,8 +213,9 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
           }}
         >
           <Option value="saveToFolder">Save to folder</Option>
-          <Option value="saveToFile">Add to file</Option>
+          <Option value="saveToFile">Append to file</Option>
         </StyledSelect>
+
         {savingDestination === 'saveToFolder' && (
           <Select
             showSearch
@@ -225,6 +226,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
             {renderFolderSelectOptions()}
           </Select>
         )}
+
         {savingDestination === 'saveToFile' && (
           <StyledSelect
             showSearch
@@ -237,7 +239,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
             }}
             value={selectedFile}
             placeholder="Select a destination file"
-            style={{flex: 3}}
+            style={{flex: 2}}
           >
             {renderFileSelectOptions()}
           </StyledSelect>
@@ -250,17 +252,29 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
           {saveToFolderPaths.create.length ? (
             <>
               <FileCategoryLabel>Files to be created</FileCategoryLabel>
-              {saveToFolderPaths.create.map(p => (
-                <div style={{color: Colors.greenOkay}}>- {p}</div>
-              ))}
+              {saveToFolderPaths.create.map((p, i) => {
+                const key = `${p}-${i}`;
+
+                return (
+                  <div key={key} style={{color: Colors.greenOkay}}>
+                    - {p}
+                  </div>
+                );
+              })}
             </>
           ) : null}
           {saveToFolderPaths.replace.length ? (
             <>
               <FileCategoryLabel>Files to be replaced</FileCategoryLabel>
-              {saveToFolderPaths.replace.map(p => (
-                <div style={{color: Colors.yellow7}}>- {p}</div>
-              ))}
+              {saveToFolderPaths.replace.map((p, i) => {
+                const key = `${p}-${i}`;
+
+                return (
+                  <div key={key} style={{color: Colors.yellow7}}>
+                    - {p}
+                  </div>
+                );
+              })}
             </>
           ) : null}
         </div>
