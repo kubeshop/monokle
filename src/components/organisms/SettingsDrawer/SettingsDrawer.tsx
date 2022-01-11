@@ -21,7 +21,7 @@ const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const [activePanels, setActivePanels] = useState<number[]>([]);
+  const [activePanels, setActivePanels] = useState<number[]>([2]);
 
   const activeProject: Project | undefined = useSelector(activeProjectSelector);
 
@@ -62,8 +62,11 @@ const SettingsDrawer = () => {
           />
         </Panel>
         {activeProject && (
-          <Panel header="Project Settings" key="2">
-            <p>Settings</p>
+          <Panel header={`${activeProject.name} Settings`} key="2">
+            <Settings
+              isSettingsOpened={isSettingsOpened}
+              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
+            />
           </Panel>
         )}
       </Collapse>
