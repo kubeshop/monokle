@@ -26,6 +26,7 @@ import {
 import {K8sResource} from '@models/k8sresource';
 import {MonoklePlugin} from '@models/plugin';
 
+import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -345,7 +346,19 @@ export const mainSlice = createSlice({
             updateSelectionAndHighlights(state, resource);
           }
         } else {
-          log.warn('Failed to find updated resource in active resources');
+          const r = state.resourceMap[action.payload.resourceId];
+          // check if this was a kustomization resource updated during a kustomize preview
+          if (
+            r &&
+            (isKustomizationResource(r) || isKustomizationPatch(r)) &&
+            state.previewResourceId &&
+            isKustomizationResource(state.resourceMap[state.previewResourceId])
+          ) {
+            performResourceContentUpdate(state, r, action.payload.content);
+            processKustomizations(state.resourceMap, state.fileMap);
+          } else {
+            log.warn('Failed to find updated resource during preview', action.payload.resourceId);
+          }
         }
       } catch (e) {
         log.error(e);

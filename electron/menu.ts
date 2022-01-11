@@ -254,17 +254,19 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 };
 
 const windowMenu = (): MenuItemConstructorOptions => {
-  return {
-    label: 'Window',
-    submenu: [
-      {role: 'minimize'},
-      {role: 'zoom'},
-      {type: 'separator'},
-      {role: 'front'},
-      {type: 'separator'},
-      {role: 'window'},
-    ],
-  };
+  const submenu: MenuItemConstructorOptions[] = [
+    {role: 'minimize'},
+    {type: 'separator'},
+    {role: 'front'},
+    {type: 'separator'},
+    {role: 'window'},
+  ];
+
+  if (isMac) {
+    submenu.splice(1, 0, {role: 'zoom'});
+  }
+
+  return {label: 'Window', submenu};
 };
 
 const helpMenu = (

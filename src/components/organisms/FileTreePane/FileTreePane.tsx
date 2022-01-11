@@ -61,6 +61,7 @@ interface TreeNode {
   isLeaf?: boolean;
   icon?: React.ReactNode;
   isExcluded?: boolean;
+  isSupported?: boolean;
 }
 
 const StyledNumberOfResources = styled(Typography.Text)`
@@ -117,6 +118,7 @@ const createNode = (
     children: [],
     highlight: false,
     isExcluded: fileEntry.isExcluded,
+    isSupported: fileEntry.isSupported,
   };
 
   if (fileEntry.children) {
@@ -371,7 +373,8 @@ interface TreeItemProps {
   onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
   onFilterByFileOrFolder: (relativePath: string | undefined) => void;
   onPreview: (relativePath: string) => void;
-  isExcluded?: Boolean;
+  isExcluded?: boolean;
+  isSupported?: boolean;
   isFolder?: Boolean;
 }
 
@@ -391,12 +394,9 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
 }
 
 const TreeItem: React.FC<TreeItemProps> = props => {
+  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
   const {
-    title,
-    treeKey,
-    isExcluded,
     setProcessingEntity,
-    processingEntity,
     onDelete,
     onRename,
     onExcludeFromProcessing,
@@ -405,7 +405,6 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     onCreateResource,
     onFilterByFileOrFolder,
     onPreview,
-    isFolder,
   } = props;
 
   const [isTitleHovered, setTitleHoverState] = useState(false);
@@ -481,7 +480,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       ) : null}
 
       <Menu.Item
-        disabled={isInPreviewMode}
+        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
         onClick={e => {
           e.domEvent.stopPropagation();
           onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
@@ -493,7 +492,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       <ContextMenuDivider />
       <Menu.Item
         key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
-        disabled={isInPreviewMode}
+        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
         onClick={e => {
           e.domEvent.stopPropagation();
 
@@ -511,7 +510,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
         <>
           <Menu.Item
-            disabled={isInPreviewMode}
+            disabled={isInPreviewMode || (!isFolder && !isSupported && !isExcluded)}
             onClick={e => {
               e.domEvent.stopPropagation();
               if (isExcluded) {
@@ -916,7 +915,7 @@ const FileTreePane = () => {
         }
       }
     },
-    [resourceMap, fileMap, helmValuesMap]
+    [dispatch, fileMap, helmValuesMap, resourceMap]
   );
 
   const onCreateResource = ({targetFolder, targetFile}: {targetFolder?: string; targetFile?: string}) => {
