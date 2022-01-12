@@ -22,13 +22,6 @@ type SectionContainerProps = {
   hasCustomNameDisplay?: boolean;
 };
 
-export const NameLabel = styled.span`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding-left: 5px;
-`;
-
 export const NameContainer = styled.span<NameContainerProps>`
   display: flex;
   align-items: center;
@@ -87,11 +80,11 @@ type NameProps = {
 };
 
 export const Name = styled.span<NameProps>`
-  padding: 2px 8px;
-  padding-right: 0px;
-  margin-right: 4px;
-  display: flex;
-  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 5px;
+  cursor: pointer;
   ${props => {
     return `font-size: ${24 - 4 * props.$level}px;`;
   }}

@@ -101,9 +101,15 @@ function SectionHeader(props: SectionHeaderProps) {
           <NameDisplay.Component sectionInstance={sectionInstance} />
         ) : (
           <>
-              <S.NameLabel onClick={toggleCollapse}>
+              <S.Name
+                $isSelected={sectionInstance.isSelected && isCollapsed}
+                $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                $isCheckable={Boolean(sectionInstance.checkable)}
+                $level={level}
+                onClick={toggleCollapse}
+              >
                 {name}
-              </S.NameLabel>
+              </S.Name>
               {itemsLength > 0 && (
                 <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
               )}
