@@ -61,6 +61,9 @@ import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFormSchema, getUiSchema} from '@src/kindhandlers/common/formLoader';
 
+import { setAlert } from '@redux/reducers/alert';
+import { AlertEnum, AlertType } from '@models/alert';
+
 import * as S from './ActionsPane.styled';
 import ActionsPaneFooter from './ActionsPaneFooter';
 
@@ -259,10 +262,21 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
+    if (!kubeconfigContext || kubeconfigContext === '') {
+      const alert: AlertType = {
+        type: AlertEnum.Error,
+        title: 'Diff failed',
+        message: 'No Cluster Configured',
+      };
+
+      dispatch(setAlert(alert));
+      return;
+    }
+
     if (selectedResourceId) {
       dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [dispatch, selectedResourceId]);
+  }, [dispatch, selectedResourceId,kubeconfigContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
