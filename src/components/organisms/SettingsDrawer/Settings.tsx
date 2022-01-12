@@ -88,7 +88,7 @@ export const Settings = ({
   config,
   onConfigChange,
   isClusterPaneIconHighlighted,
-  showLoadLastProjectOnStartup = false,
+  showLoadLastProjectOnStartup,
 }: SettingsProps) => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));

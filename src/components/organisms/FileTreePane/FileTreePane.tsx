@@ -41,7 +41,7 @@ import Dots from '@components/atoms/Dots';
 import Icon from '@components/atoms/Icon';
 import ContextMenu from '@components/molecules/ContextMenu';
 
-import {DeleteEntityCallback, deleteEntity, getFileStats} from '@utils/files';
+import {DeleteEntityCallback, deleteEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';
 import {showItemInFolder} from '@utils/shell';
 
@@ -646,9 +646,7 @@ const FileTreePane = () => {
   );
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
-  const loadLastProjectOnStartup = useAppSelector(state => state.config.settings.loadLastProjectOnStartup);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const recentFolders = useAppSelector(state => state.config.recentFolders);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
@@ -844,17 +842,6 @@ const FileTreePane = () => {
     [setFolder]
   );
 
-  const onExecutedFrom = useCallback(
-    (_, data) => {
-      const folder = data.path || (loadLastProjectOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
-      if (folder && getFileStats(folder)?.isDirectory()) {
-        setFolder(folder);
-        setAutoExpandParent(true);
-      }
-    },
-    [loadLastProjectOnStartup, setFolder, recentFolders]
-  );
-
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {
     ipcRenderer.on('set-root-folder', onSelectRootFolderFromMainThread);
@@ -862,13 +849,6 @@ const FileTreePane = () => {
       ipcRenderer.removeListener('set-root-folder', onSelectRootFolderFromMainThread);
     };
   }, [onSelectRootFolderFromMainThread]);
-
-  useEffect(() => {
-    ipcRenderer.on('executed-from', onExecutedFrom);
-    return () => {
-      ipcRenderer.removeListener('executed-from', onExecutedFrom);
-    };
-  }, [onExecutedFrom]);
 
   const allTreeKeys = useMemo(() => {
     if (!tree) return [];

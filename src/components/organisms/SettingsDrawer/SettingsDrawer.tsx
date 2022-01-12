@@ -8,9 +8,9 @@ import _ from 'lodash';
 import {Project, ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {toggleClusterStatus, updateLoadLastProjectOnStartup, updateProjectConfig} from '@redux/reducers/appConfig';
 import {toggleSettings} from '@redux/reducers/ui';
-import {activeProjectSelector} from '@redux/selectors';
+import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
 import Drawer from '@components/atoms/Drawer';
 
@@ -25,7 +25,7 @@ const SettingsDrawer = () => {
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const [activePanels, setActivePanels] = useState<number[]>([2]);
   const appConfig = useAppSelector(state => state.config);
-  const projectConfig = useAppSelector(state => state.config.projectConfig);
+  const currentConfig = useAppSelector(currentConfigSelector);
 
   const activeProject: Project | undefined = useSelector(activeProjectSelector);
 
@@ -48,6 +48,15 @@ const SettingsDrawer = () => {
     dispatch(updateProjectConfig(config));
   };
 
+  const changeApplicationConfig = (config: ProjectConfig) => {
+    if (!_.isEqual(config.settings?.isClusterSelectorVisible, appConfig.settings.isClusterSelectorVisible)) {
+      dispatch(toggleClusterStatus());
+    }
+    if (!_.isEqual(config.settings?.loadLastProjectOnStartup, appConfig.settings.loadLastProjectOnStartup)) {
+      dispatch(updateLoadLastProjectOnStartup(Boolean(config.settings?.loadLastProjectOnStartup)));
+    }
+  };
+
   return (
     <Drawer
       width="400"
@@ -61,11 +70,11 @@ const SettingsDrawer = () => {
     >
       <Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
         <Panel header="Default Settings" key="1">
-          <Settings config={appConfig} showLoadLastProjectOnStartup />
+          <Settings config={appConfig} onConfigChange={changeApplicationConfig} showLoadLastProjectOnStartup />
         </Panel>
         {activeProject && (
           <Panel header={`${activeProject.name} Settings`} key="2">
-            <Settings config={projectConfig} onConfigChange={changeProjectConfig} />
+            <Settings config={currentConfig} onConfigChange={changeProjectConfig} />
           </Panel>
         )}
       </Collapse>

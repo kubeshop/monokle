@@ -15,6 +15,7 @@ import {
   Themes,
 } from '@models/appconfig';
 
+import {mergeConfigs} from '@redux/selectors';
 import {KustomizeCommandType} from '@redux/services/kustomize';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {AppDispatch} from '@redux/store';
@@ -34,8 +35,8 @@ export const setOpenProject = createAsyncThunk(
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     thunkAPI.dispatch(setRootFolder(projectRootPath));
-    const projectConfig: ProjectConfig = thunkAPI.getState().config.projectConfig;
-    monitorProjectConfigFile(thunkAPI.dispatch, projectConfig, projectRootPath);
+    thunkAPI.dispatch(configSlice.actions.setProjectConfig(null));
+    monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
   }
 );
 
@@ -157,14 +158,36 @@ export const configSlice = createSlice({
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
+    setProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
+      state.projectConfig = action.payload;
+    },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
+      const absolutePath = `${state.selectedProjectRootFolder}${sep}.monokle`;
+
+      delete action.payload?.settings?.loadLastProjectOnStartup;
+
+      const applicationConfig: ProjectConfig = {
+        scanExcludes: state.scanExcludes,
+        fileIncludes: state.fileIncludes,
+        folderReadsMaxDepth: state.folderReadsMaxDepth,
+      };
+      applicationConfig.settings = {
+        helmPreviewMode: state.settings.helmPreviewMode,
+        kustomizeCommand: state.settings.kustomizeCommand,
+        hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
+        isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
+      };
+
       if (!_.isEqual(state.projectConfig, action.payload)) {
+        const mergedConfigs = mergeConfigs(applicationConfig, action.payload);
+
+        if (mergedConfigs && !_.isEmpty(mergedConfigs)) {
+          writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
+        } else {
+          writeFileSync(absolutePath, ` `, 'utf-8');
+        }
+
         state.projectConfig = action.payload;
-        writeFileSync(
-          `${state.selectedProjectRootFolder}${sep}.monokle`,
-          JSON.stringify(state.projectConfig, null, 4),
-          'utf-8'
-        );
       }
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {
@@ -198,3 +221,57 @@ export const {
   toggleClusterStatus,
 } = configSlice.actions;
 export default configSlice.reducer;
+
+// const settings: Settings = {};
+
+// if (
+//   _.isString(action.payload?.settings?.helmPreviewMode) &&
+//   !_.isEqual(state.settings.helmPreviewMode, action.payload?.settings?.helmPreviewMode)
+// ) {
+//   settings.helmPreviewMode = action.payload?.settings?.helmPreviewMode;
+// }
+// if (
+//   _.isString(action.payload?.settings?.kustomizeCommand) &&
+//   !_.isEqual(state.settings.kustomizeCommand, action.payload?.settings?.kustomizeCommand)
+// ) {
+//   settings.kustomizeCommand = action.payload?.settings?.kustomizeCommand;
+// }
+// if (
+//   _.isBoolean(action.payload?.settings?.hideExcludedFilesInFileExplorer) &&
+//   !_.isEqual(state.settings.hideExcludedFilesInFileExplorer, action.payload?.settings?.hideExcludedFilesInFileExplorer)
+// ) {
+//   settings.hideExcludedFilesInFileExplorer = action.payload?.settings?.hideExcludedFilesInFileExplorer;
+// }
+// if (
+//   _.isBoolean(action.payload?.settings?.isClusterSelectorVisible) &&
+//   !_.isEqual(state.settings.isClusterSelectorVisible, action.payload?.settings?.isClusterSelectorVisible)
+// ) {
+//   settings.isClusterSelectorVisible = action.payload?.settings?.isClusterSelectorVisible;
+// }
+
+// const configToWrite: ProjectConfig = {};
+
+// if (!_.isEmpty(settings)) {
+//   configToWrite.settings = settings;
+// }
+
+// if (
+//   _.isArray(action.payload?.scanExcludes) &&
+//   !_.isEqual(_.sortBy(state.scanExcludes), _.sortBy(action.payload?.scanExcludes))
+// ) {
+//   configToWrite.scanExcludes = action.payload?.scanExcludes;
+// }
+
+// if (
+//   _.isArray(action.payload?.fileIncludes) &&
+//   !_.isEqual(_.sortBy(state.fileIncludes), _.sortBy(action.payload?.fileIncludes))
+// ) {
+//   configToWrite.fileIncludes = action.payload?.fileIncludes;
+// }
+
+// if (
+//   _.isNumber(action.payload?.folderReadsMaxDepth) &&
+//   !_.isEqual(state.folderReadsMaxDepth, action.payload?.folderReadsMaxDepth)
+// ) {
+//   configToWrite.folderReadsMaxDepth = action.payload?.folderReadsMaxDepth;
+// }

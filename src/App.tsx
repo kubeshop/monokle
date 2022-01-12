@@ -1,14 +1,17 @@
-import {useEffect} from 'react';
-import {useSelector} from 'react-redux';
+import {ipcRenderer} from 'electron';
+
+import {useCallback, useEffect} from 'react';
+import {useDispatch} from 'react-redux';
 
 import 'antd/dist/antd.less';
 
 import styled from 'styled-components';
 
-import {ProjectConfig} from '@models/appconfig';
+import {Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
-import {currentConfigSelector} from '@redux/selectors';
+import {useAppSelector} from '@redux/hooks';
+import {setOpenProject} from '@redux/reducers/appConfig';
 
 import {
   DiffModal,
@@ -31,6 +34,7 @@ import QuickSearchActions from '@components/organisms/QuickSearchActions';
 import RenameEntityModal from '@components/organisms/RenameEntityModal';
 import UpdateModal from '@components/organisms/UpdateModal';
 
+import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
 
 import AppContext from './AppContext';
@@ -48,11 +52,26 @@ const MainContainer = styled.div`
 
 const App = () => {
   const size: Size = useWindowSize();
-  const config: ProjectConfig = useSelector(currentConfigSelector);
+  const dispatch = useDispatch();
+  const loadLastProjectOnStartup = useAppSelector(state => state.config.settings.loadLastProjectOnStartup);
+  const projects: Project[] = useAppSelector(state => state.config.projects);
+
+  const onExecutedFrom = useCallback(
+    (_, data) => {
+      const project: Project = data.path || (loadLastProjectOnStartup && projects.length > 0 ? projects[0] : undefined);
+      if (project && getFileStats(project.rootFolder)?.isDirectory()) {
+        dispatch(setOpenProject(project.rootFolder));
+      }
+    },
+    [loadLastProjectOnStartup, projects]
+  );
 
   useEffect(() => {
-    console.log(config);
-  }, [config]);
+    ipcRenderer.on('executed-from', onExecutedFrom);
+    return () => {
+      ipcRenderer.removeListener('executed-from', onExecutedFrom);
+    };
+  }, [onExecutedFrom]);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>

@@ -36,6 +36,7 @@ import {highlightItem, toggleNotifications, toggleSettings} from '@redux/reducer
 import {
   activeProjectSelector,
   activeResourcesSelector,
+  currentConfigSelector,
   isInClusterModeSelector,
   isInPreviewModeSelector,
 } from '@redux/selectors';
@@ -273,7 +274,7 @@ const PageHeader = () => {
   const dispatch = useAppDispatch();
   const activeProject = useSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const projectConfig = useAppSelector(state => state.config.projectConfig);
+  const currentConfig = useAppSelector(currentConfigSelector);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -447,7 +448,7 @@ const PageHeader = () => {
           <LogoCol noborder="true">
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
-          {activeProject && projectConfig && projectConfig.settings && projectConfig.settings.isClusterSelectorVisible && (
+          {activeProject && currentConfig && currentConfig.settings && currentConfig.settings.isClusterSelectorVisible && (
             <CLusterContainer>
               <CLusterStatus>
                 <StyledProjectsDropdown overlay={projectsMenu} placement="bottomCenter" arrow trigger={['click']}>

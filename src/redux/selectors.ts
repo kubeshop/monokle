@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
@@ -76,42 +77,78 @@ export const currentConfigSelector = createSelector(
   (state: RootState) => state.config,
   config => {
     const applicationConfig: ProjectConfig = {
-      settings: {
-        ...config.settings,
-      },
       scanExcludes: config.scanExcludes,
       fileIncludes: config.fileIncludes,
       folderReadsMaxDepth: config.folderReadsMaxDepth,
     };
+    applicationConfig.settings = {
+      ...config.settings,
+    };
     const projectConfig: ProjectConfig | null | undefined = config.projectConfig;
 
-    if (!projectConfig) {
-      return applicationConfig;
-    }
-
-    const validConfig: ProjectConfig = {};
-
-    if (!projectConfig.settings) {
-      validConfig.settings = applicationConfig.settings;
-    } else {
-      validConfig.settings = {
-        helmPreviewMode: projectConfig.settings.helmPreviewMode && applicationConfig.settings?.helmPreviewMode,
-        kustomizeCommand: projectConfig.settings.kustomizeCommand && applicationConfig.settings?.kustomizeCommand,
-        loadLastProjectOnStartup: Boolean(
-          projectConfig.settings.loadLastProjectOnStartup && applicationConfig.settings?.loadLastProjectOnStartup
-        ),
-        hideExcludedFilesInFileExplorer: Boolean(
-          projectConfig.settings.hideExcludedFilesInFileExplorer &&
-            applicationConfig.settings?.hideExcludedFilesInFileExplorer
-        ),
-        isClusterSelectorVisible: Boolean(
-          projectConfig.settings.isClusterSelectorVisible && applicationConfig.settings?.isClusterSelectorVisible
-        ),
-      };
-    }
-    validConfig.scanExcludes = projectConfig.scanExcludes && applicationConfig.scanExcludes;
-    validConfig.fileIncludes = projectConfig.fileIncludes && applicationConfig.fileIncludes;
-    validConfig.folderReadsMaxDepth = projectConfig.folderReadsMaxDepth && applicationConfig.folderReadsMaxDepth;
-    return validConfig;
+    return mergeConfigs(applicationConfig, projectConfig);
   }
 );
+
+export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null) => {
+  if (!(baseConfig && baseConfig.settings)) {
+    throw Error('Base config must be set');
+  }
+
+  if (!config) {
+    return baseConfig;
+  }
+
+  if (
+    _.isString(config.settings?.helmPreviewMode) &&
+    !_.isEqual(config.settings?.helmPreviewMode, baseConfig.settings?.helmPreviewMode)
+  ) {
+    baseConfig.settings.helmPreviewMode = config.settings?.helmPreviewMode;
+  }
+
+  if (
+    _.isString(config.settings?.kustomizeCommand) &&
+    !_.isEqual(config.settings?.kustomizeCommand, baseConfig.settings?.kustomizeCommand)
+  ) {
+    baseConfig.settings.kustomizeCommand = config.settings?.kustomizeCommand;
+  }
+  if (
+    _.isBoolean(config.settings?.loadLastProjectOnStartup) &&
+    !_.isEqual(config.settings?.loadLastProjectOnStartup, baseConfig.settings?.loadLastProjectOnStartup)
+  ) {
+    baseConfig.settings.loadLastProjectOnStartup = config.settings?.loadLastProjectOnStartup;
+  }
+  if (
+    _.isBoolean(config.settings?.hideExcludedFilesInFileExplorer) &&
+    !_.isEqual(config.settings?.hideExcludedFilesInFileExplorer, baseConfig.settings?.hideExcludedFilesInFileExplorer)
+  ) {
+    baseConfig.settings.hideExcludedFilesInFileExplorer = config.settings?.hideExcludedFilesInFileExplorer;
+  }
+  if (
+    _.isBoolean(config.settings?.isClusterSelectorVisible) &&
+    !_.isEqual(config.settings?.isClusterSelectorVisible, baseConfig.settings?.isClusterSelectorVisible)
+  ) {
+    baseConfig.settings.isClusterSelectorVisible = config.settings?.isClusterSelectorVisible;
+  }
+
+  if (_.isEmpty(baseConfig.settings)) {
+    baseConfig.settings = undefined;
+  }
+
+  if (_.isArray(config.scanExcludes) && !_.isEqual(_.sortBy(config.scanExcludes), _.sortBy(baseConfig.scanExcludes))) {
+    baseConfig.scanExcludes = config.scanExcludes;
+  }
+
+  if (_.isArray(config.fileIncludes) && !_.isEqual(_.sortBy(config.fileIncludes), _.sortBy(baseConfig.fileIncludes))) {
+    baseConfig.fileIncludes = config.fileIncludes;
+  }
+
+  if (
+    _.isNumber(config.folderReadsMaxDepth) &&
+    !_.isEqual(config.folderReadsMaxDepth, baseConfig.folderReadsMaxDepth)
+  ) {
+    baseConfig.folderReadsMaxDepth = config.folderReadsMaxDepth;
+  }
+
+  return baseConfig;
+};

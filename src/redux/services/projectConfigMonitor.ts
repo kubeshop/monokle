@@ -1,6 +1,5 @@
 import {FSWatcher, watch} from 'chokidar';
 import {readFileSync} from 'fs';
-import _ from 'lodash';
 import {sep} from 'path';
 
 import {ProjectConfig} from '@models/appconfig';
@@ -14,11 +13,7 @@ let watcher: FSWatcher;
  * Creates a monitor for the specified folder and dispatches folder events using the specified dispatch
  */
 
-export function monitorProjectConfigFile(
-  dispatch: AppDispatch,
-  currentProjectConfig: ProjectConfig,
-  filePath?: string | null
-) {
+export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: string | null) {
   if (!filePath && watcher) {
     watcher.close();
     return;
@@ -37,13 +32,13 @@ export function monitorProjectConfigFile(
 
   watcher
     .on('add', () => {
-      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, currentProjectConfig, dispatch);
+      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, dispatch);
     })
     .on('change', () => {
-      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, currentProjectConfig, dispatch);
+      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, dispatch);
     })
     .on('unlink', () => {
-      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, currentProjectConfig, dispatch);
+      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, dispatch);
     });
 
   watcher
@@ -51,30 +46,26 @@ export function monitorProjectConfigFile(
     .on('error', error => console.log(`Watcher error: ${error}`));
 }
 
-const readApplicationConfigFileAndUpdateProjectSettings = (
-  absolutePath: string,
-  currentProjectConfig: ProjectConfig,
-  dispatch: AppDispatch
-) => {
+const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: string, dispatch: AppDispatch) => {
   try {
     const {settings, scanExcludes, fileIncludes, folderReadsMaxDepth}: ProjectConfig = JSON.parse(
       readFileSync(absolutePath, 'utf8')
     );
     const projectConfig: ProjectConfig = {};
-    projectConfig.settings = {
-      helmPreviewMode: settings ? settings.helmPreviewMode : undefined,
-      kustomizeCommand: settings ? settings.kustomizeCommand : undefined,
-      hideExcludedFilesInFileExplorer: settings ? settings.hideExcludedFilesInFileExplorer : undefined,
-      isClusterSelectorVisible: settings ? settings.isClusterSelectorVisible : undefined,
-    };
+    projectConfig.settings = settings
+      ? {
+          helmPreviewMode: settings.helmPreviewMode,
+          kustomizeCommand: settings.kustomizeCommand,
+          hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
+          isClusterSelectorVisible: settings.isClusterSelectorVisible,
+        }
+      : undefined;
 
     projectConfig.scanExcludes = scanExcludes;
     projectConfig.fileIncludes = fileIncludes;
     projectConfig.folderReadsMaxDepth = folderReadsMaxDepth;
 
-    if (!_.isEqual(projectConfig, currentProjectConfig)) {
-      dispatch(updateProjectConfig(projectConfig));
-    }
+    dispatch(updateProjectConfig(projectConfig));
   } catch (error) {
     dispatch(updateProjectConfig(null));
   }
