@@ -6,6 +6,8 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {KUSTOMIZATION_KIND} from '@constants/constants';
+
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
@@ -23,6 +25,8 @@ import {Dots} from '@atoms';
 import ContextMenu from '@components/molecules/ContextMenu';
 
 import Colors from '@styles/Colors';
+
+import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const ContextMenuDivider = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
@@ -59,6 +63,8 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
     onCancel() {},
   });
 }
+
+const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
 
 const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
@@ -119,9 +125,13 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
       <Menu.Item disabled={isInPreviewMode} onClick={onClickRename} key="rename">
         Rename
       </Menu.Item>
-      <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
-        Clone
-      </Menu.Item>
+
+      {KnownResourceKinds.includes(resource.kind) && (
+        <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
+          Clone
+        </Menu.Item>
+      )}
+
       <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={onClickDelete} key="delete">
         Delete
       </Menu.Item>
