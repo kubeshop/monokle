@@ -86,7 +86,7 @@ const HandlerByResourceKind = Object.fromEntries(
 
 export function registerKindHandler(kindHandler: ResourceKindHandler, shouldReplace: boolean) {
   if (shouldReplace || !HandlerByResourceKind[kindHandler.kind]) {
-    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`);
+    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`, kindHandler);
     HandlerByResourceKind[kindHandler.kind] = kindHandler;
 
     const ix = ResourceKindHandlers.findIndex(handler => handler.kind === kindHandler.kind);

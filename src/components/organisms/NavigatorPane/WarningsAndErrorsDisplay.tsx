@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 
 import {Dropdown, Menu} from 'antd';
 
+import {sortBy} from 'lodash';
 import styled from 'styled-components';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
@@ -86,7 +87,7 @@ function WarningsAndErrorsDisplay() {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
 
   const warnings: any[] = useMemo(() => {
-    return Object.values(resourceMap)
+    const warningsCollection = Object.values(resourceMap)
       .filter(resource =>
         isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
       )
@@ -106,6 +107,7 @@ function WarningsAndErrorsDisplay() {
         return null;
       })
       .filter(warning => warning);
+    return sortBy(warningsCollection, ['type', 'name']);
   }, [resourceMap, isInPreviewMode]);
 
   const errors: any[] = useMemo(() => {

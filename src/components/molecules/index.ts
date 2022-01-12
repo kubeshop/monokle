@@ -10,3 +10,4 @@ export {default as ResourceFilter} from './ResourceFilter';
 export {default as ResourceFilterIconWithPopover} from './ResourceFilterIconWithPopover';
 export {default as ResourceDiff} from './ResourceDiff';
 export {default as PreviewDropdown} from './PreviewDropdown';
+export {default as ValidationErrorsPopover} from './ValidationErrorsPopover';

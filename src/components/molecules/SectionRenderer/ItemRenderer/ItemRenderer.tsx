@@ -23,11 +23,12 @@ export type ItemRendererProps<ItemType, ScopeType> = {
   level: number;
   isLastItem: boolean;
   isSectionCheckable: boolean;
+  sectionContainerElementId: string;
   options?: ItemRendererOptions;
 };
 
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
-  const {itemId, blueprint, level, isLastItem, isSectionCheckable, options} = props;
+  const {itemId, blueprint, level, isLastItem, isSectionCheckable, sectionContainerElementId, options} = props;
   const dispatch = useAppDispatch();
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -38,7 +39,6 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   const {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay} = useItemCustomization(blueprint.customization);
 
   const scrollContainer = useRef<ScrollContainerRef>(null);
-
   useEffect(() => {
     if (!itemInstance.shouldScrollIntoView) {
       return;
@@ -59,7 +59,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   }, [instanceHandler, itemInstance, dispatch]);
 
   return (
-    <ScrollIntoView id={itemInstance.id} ref={scrollContainer}>
+    <ScrollIntoView id={itemInstance.id} ref={scrollContainer} parentContainerElementId={sectionContainerElementId}>
       <S.ItemContainer
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
