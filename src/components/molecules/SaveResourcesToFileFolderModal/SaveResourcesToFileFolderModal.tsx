@@ -41,7 +41,8 @@ const FileCategoryLabel = styled.div`
 `;
 
 const SaveDestinationWrapper = styled(Input.Group)`
-  display: flex !important;
+  display: grid !important;
+  grid-template-columns: max-content 1fr;
 `;
 
 const StyledDivider = styled.div`
@@ -49,7 +50,6 @@ const StyledDivider = styled.div`
 `;
 
 const StyledSelect = styled(Select)`
-  flex: 1;
   overflow-x: hidden;
 `;
 
@@ -202,6 +202,17 @@ const SaveResourceToFileFolderModal: React.FC = () => {
     let filesToBeCreated: string[] = [];
     let filesToBeReplaced: string[] = [];
 
+    if (selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
+      const currentFolder = selectedFolder.split(`${fileMap[ROOT_FILE_ENTRY].filePath}`).pop();
+
+      if (currentFolder) {
+        setSelectedFolder(currentFolder.slice(1));
+      } else {
+        setSelectedFolder(ROOT_FILE_ENTRY);
+      }
+      return;
+    }
+
     resourcesIds.forEach(resourceId => {
       const resource = resourceMap[resourceId];
       const fullFileName = getFullFileName(resource.name, fileIncludes);
@@ -229,9 +240,8 @@ const SaveResourceToFileFolderModal: React.FC = () => {
       onCancel={() => dispatch(closeSaveResourcesToFileFolderModal())}
       onOk={saveCheckedResourcesToFileFolder}
     >
-      <SaveDestinationWrapper compact>
+      <SaveDestinationWrapper>
         <StyledSelect
-          style={{flex: 1}}
           value={savingDestination}
           onChange={value => {
             setSavingDestination(value as string);
@@ -246,11 +256,10 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         </StyledSelect>
 
         {savingDestination === 'saveToFolder' && (
-          <Select
+          <StyledSelect
             showSearch
             onChange={(value: any) => setSelectedFolder(value)}
             value={selectedFolder}
-            style={{flex: 2}}
             dropdownRender={menu => (
               <>
                 <Button icon={<FolderAddOutlined />} type="link" onClick={openFileExplorer}>
@@ -264,7 +273,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
             )}
           >
             {renderFolderSelectOptions()}
-          </Select>
+          </StyledSelect>
         )}
 
         {savingDestination === 'saveToFile' && (
@@ -279,7 +288,6 @@ const SaveResourceToFileFolderModal: React.FC = () => {
             }}
             value={selectedFile}
             placeholder="Select a destination file"
-            style={{flex: 2}}
           >
             {renderFileSelectOptions()}
           </StyledSelect>
