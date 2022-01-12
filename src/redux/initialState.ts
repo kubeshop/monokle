@@ -89,15 +89,15 @@ const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
-  isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
+  isSettingsOpen: false,
   isClusterDiffVisible: false,
-  isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
+  isNotificationsOpen: false,
   isFolderLoading: false,
   quickSearchActionsPopup: {
     isOpen: false,
   },
   newResourceWizard: {
-    isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
+    isOpen: false,
   },
   createFolderModal: {
     isOpen: false,
