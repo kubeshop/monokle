@@ -1,19 +1,14 @@
 import path from 'path';
 
-import {
-  MonoklePlugin,
-  PluginPackageJson,
-  validatePluginPackageJson,
-  validateTemplatePluginModule,
-} from '@models/plugin';
+import {AnyPlugin, PluginPackageJson, validatePluginPackageJson, validateTemplatePluginModule} from '@models/plugin';
 
 import downloadExtension from './extensions/downloadExtension';
 import loadMultipleExtensions from './extensions/loadMultipleExtensions';
 import {extractRepositoryOwnerAndNameFromUrl} from './utils';
 
-function transformPackageJsonToMonoklePlugin(packageJson: PluginPackageJson): MonoklePlugin {
+function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson): AnyPlugin {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(packageJson.repository);
-  const plugin: MonoklePlugin = {
+  const plugin: AnyPlugin = {
     name: packageJson.name,
     author: packageJson.author,
     version: packageJson.version,
@@ -33,13 +28,13 @@ export async function downloadPlugin(pluginUrl: string, allPluginsFolderPath: st
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(pluginUrl);
   const packageJsonUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/package.json`;
   const pluginTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
-  const plugin: MonoklePlugin = await downloadExtension<PluginPackageJson, MonoklePlugin>({
+  const plugin: AnyPlugin = await downloadExtension<PluginPackageJson, AnyPlugin>({
     extensionTarballUrl: pluginTarballUrl,
     entryFileName: 'package.json',
     entryFileUrl: packageJsonUrl,
     parseEntryFileContent: JSON.parse,
     validateEntryFileContent: validatePluginPackageJson,
-    transformEntryFileContentToExtension: transformPackageJsonToMonoklePlugin,
+    transformEntryFileContentToExtension: transformPackageJsonToAnyPlugin,
     makeExtensionFolderPath: () => {
       return path.join(allPluginsFolderPath, `${repositoryOwner}-${repositoryName}`);
     },
@@ -48,12 +43,12 @@ export async function downloadPlugin(pluginUrl: string, allPluginsFolderPath: st
 }
 
 export async function loadPlugins(pluginsDir: string) {
-  const plugins: MonoklePlugin[] = await loadMultipleExtensions<PluginPackageJson, MonoklePlugin>({
+  const plugins: AnyPlugin[] = await loadMultipleExtensions<PluginPackageJson, AnyPlugin>({
     folderPath: pluginsDir,
     entryFileName: 'package.json',
     parseEntryFileContent: JSON.parse,
     validateEntryFileContent: validatePluginPackageJson,
-    transformEntryFileContentToExtension: transformPackageJsonToMonoklePlugin,
+    transformEntryFileContentToExtension: transformPackageJsonToAnyPlugin,
   });
   return plugins;
 }

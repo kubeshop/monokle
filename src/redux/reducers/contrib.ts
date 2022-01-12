@@ -1,7 +1,7 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {ContribState} from '@models/contrib';
-import {MonoklePlugin} from '@models/plugin';
+import {AnyPlugin} from '@models/plugin';
 
 import initialState from '@redux/initialState';
 
@@ -9,10 +9,10 @@ export const contribSlice = createSlice({
   name: 'contrib',
   initialState: initialState.contrib,
   reducers: {
-    addPlugin: (state: Draft<ContribState>, action: PayloadAction<MonoklePlugin>) => {
+    addPlugin: (state: Draft<ContribState>, action: PayloadAction<AnyPlugin>) => {
       state.plugins.push(action.payload);
     },
-    setPlugins: (state: Draft<ContribState>, action: PayloadAction<MonoklePlugin[]>) => {
+    setPlugins: (state: Draft<ContribState>, action: PayloadAction<AnyPlugin[]>) => {
       state.plugins = action.payload;
       state.isLoadingExistingPlugins = false;
     },

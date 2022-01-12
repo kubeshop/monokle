@@ -54,7 +54,7 @@ const TemplatePreviewRuntype = TemplateBaseRuntype.extend({
   path: Rt.String,
 });
 
-const TemplateDiscoveryRuntype = Rt.Record({
+const TemplatePackRuntype = Rt.Record({
   name: Rt.String,
   templates: Rt.Array(TemplatePreviewRuntype),
 });
@@ -67,7 +67,7 @@ export const isReferencedHelmChartTemplate = ReferencedHelmChartTemplateRuntype.
 export const isHelmChartTemplate = HelmChartTemplateRuntype.guard;
 export const isAnyTemplate = AnyTemplateRuntype.guard;
 export const isTemplatePreview = TemplatePreviewRuntype.guard;
-export const isTemplateDiscovery = TemplateDiscoveryRuntype.guard;
+export const isTemplatePack = TemplatePackRuntype.guard;
 
 export const validateTemplateForm = TemplateFormRuntype.check;
 export const validateTemplateManifest = TemplateManifestRuntype.check;
@@ -77,7 +77,7 @@ export const validateReferencedHelmChartTemplate = ReferencedHelmChartTemplateRu
 export const validateHelmChartTemplate = HelmChartTemplateRuntype.check;
 export const validateAnyTemplate = AnyTemplateRuntype.check;
 export const validateTemplatePreview = TemplatePreviewRuntype.check;
-export const validateTemplateDiscovery = TemplateDiscoveryRuntype.check;
+export const validateTemplatePack = TemplatePackRuntype.check;
 
 export type TemplateForm = Rt.Static<typeof TemplateFormRuntype>;
 export type TemplateManifest = Rt.Static<typeof TemplateManifestRuntype>;
@@ -87,4 +87,4 @@ export type ReferencedHelmChartTemplate = Rt.Static<typeof ReferencedHelmChartTe
 export type HelmChartTemplate = Rt.Static<typeof HelmChartTemplateRuntype>;
 export type AnyTemplate = Rt.Static<typeof AnyTemplateRuntype>;
 export type TemplatePreview = Rt.Static<typeof TemplatePreviewRuntype>;
-export type TemplateDiscovery = Rt.Static<typeof TemplateDiscoveryRuntype>;
+export type TemplatePack = Rt.Static<typeof TemplatePackRuntype>;

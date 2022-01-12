@@ -157,9 +157,10 @@ const initialUiCoachState: UiCoachState = {
 const initialContribState: ContribState = {
   isLoadingExistingPlugins: true,
   isLoadingExistingTemplates: true,
+  isLoadingExistingTemplatePacks: true,
   plugins: [],
   templates: [],
-  templateDiscoveries: [],
+  templatePacks: [],
 };
 
 export default {

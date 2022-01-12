@@ -14,7 +14,7 @@ const BundledTemplatePluginModuleRuntype = Rt.Record({
 
 const TemplatePluginModuleRuntype = Rt.Union(BundledTemplatePluginModuleRuntype, ReferencedTemplatePluginModuleRuntype);
 
-const MonoklePluginModuleRuntype = TemplatePluginModuleRuntype;
+const AnyPluginModuleRuntype = TemplatePluginModuleRuntype;
 
 const PluginPackageJsonRuntype = Rt.Record({
   name: Rt.String,
@@ -23,7 +23,7 @@ const PluginPackageJsonRuntype = Rt.Record({
   repository: Rt.String,
   description: Rt.Optional(Rt.String),
   monoklePlugin: Rt.Record({
-    modules: Rt.Array(MonoklePluginModuleRuntype),
+    modules: Rt.Array(AnyPluginModuleRuntype),
   }),
 }).And(Rt.Dictionary(Rt.Unknown));
 
@@ -31,26 +31,26 @@ export type PluginPackageJson = Rt.Static<typeof PluginPackageJsonRuntype>;
 export type ReferencedTemplatePluginModule = Rt.Static<typeof ReferencedTemplatePluginModuleRuntype>;
 export type BundledTemplatePluginModule = Rt.Static<typeof BundledTemplatePluginModuleRuntype>;
 export type TemplatePluginModule = Rt.Static<typeof TemplatePluginModuleRuntype>;
-export type MonoklePluginModule = Rt.Static<typeof MonoklePluginModuleRuntype>;
+export type AnyPluginModule = Rt.Static<typeof AnyPluginModuleRuntype>;
 
 export const isPluginPackageJson = PluginPackageJsonRuntype.guard;
 export const isTemplatePluginModule = TemplatePluginModuleRuntype.guard;
 export const isReferencedTemplatePluginModule = ReferencedTemplatePluginModuleRuntype.guard;
 export const isBundledTemplatePluginModule = BundledTemplatePluginModuleRuntype.guard;
-export const isMonoklePluginModule = MonoklePluginModuleRuntype.guard;
+export const isAnyPluginModule = AnyPluginModuleRuntype.guard;
 
 export const validatePluginPackageJson = PluginPackageJsonRuntype.check;
 export const validateTemplatePluginModule = TemplatePluginModuleRuntype.check;
 export const validateReferencedTemplatePluginModule = ReferencedTemplatePluginModuleRuntype.check;
 export const validateBundledTemplatePluginModule = BundledTemplatePluginModuleRuntype.check;
-export const validateMonoklePluginModule = MonoklePluginModuleRuntype.check;
+export const validateAnyPluginModule = AnyPluginModuleRuntype.check;
 
-export interface MonoklePlugin {
+export interface AnyPlugin {
   name: string;
   version: string;
   author: string;
   description?: string;
   repository: GitRepository;
   isActive: boolean;
-  modules: MonoklePluginModule[];
+  modules: AnyPluginModule[];
 }
