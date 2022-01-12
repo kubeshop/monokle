@@ -1,6 +1,8 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Input, Modal, Select} from 'antd';
+import {Button, Input, Modal, Select} from 'antd';
+
+import {FolderAddOutlined} from '@ant-design/icons';
 
 import fs from 'fs';
 import micromatch from 'micromatch';
@@ -15,6 +17,10 @@ import {AlertEnum} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
+
+import FileExplorer from '@components/atoms/FileExplorer';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
@@ -35,6 +41,10 @@ const FileCategoryLabel = styled.div`
 
 const SaveDestinationWrapper = styled(Input.Group)`
   display: flex !important;
+`;
+
+const StyledDivider = styled.div`
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 `;
 
 const StyledSelect = styled(Select)`
@@ -73,6 +83,15 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
     create: [],
     replace: [],
   });
+
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (folderPath) {
+        setSelectedFolder(folderPath);
+      }
+    },
+    {isDirectoryExplorer: true}
+  );
 
   const [foldersList, filesList] = useMemo(() => {
     const folders: string[] = [];
@@ -126,10 +145,14 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
 
       const fullFileName = getFullFileName(resource.name, fileIncludes);
       if (savingDestination === 'saveToFolder' && selectedFolder) {
-        absolutePath =
-          selectedFolder === ROOT_FILE_ENTRY
-            ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName)
-            : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, fullFileName);
+        if (foldersList.includes(selectedFolder)) {
+          absolutePath =
+            selectedFolder === ROOT_FILE_ENTRY
+              ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName)
+              : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, fullFileName);
+        } else {
+          absolutePath = path.join(selectedFolder, fullFileName);
+        }
       } else if (savingDestination === 'saveToFile' && selectedFile) {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFile);
       } else {
@@ -222,6 +245,17 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
             onChange={(value: any) => setSelectedFolder(value)}
             value={selectedFolder}
             style={{flex: 2}}
+            dropdownRender={menu => (
+              <>
+                <Button icon={<FolderAddOutlined />} type="link" onClick={openFileExplorer}>
+                  Browse
+                </Button>
+                <FileExplorer {...fileExplorerProps} />
+                <StyledDivider />
+
+                {menu}
+              </>
+            )}
           >
             {renderFolderSelectOptions()}
           </Select>
