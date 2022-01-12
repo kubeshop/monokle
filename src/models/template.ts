@@ -17,7 +17,7 @@ const TemplateBaseRuntype = Rt.Record({
   id: Rt.String,
   author: Rt.String,
   version: Rt.String,
-  description: Rt.Optional(Rt.String),
+  description: Rt.String,
   icon: Rt.Optional(Rt.String),
   tags: Rt.Optional(Rt.Array(Rt.String)),
   helpUrl: Rt.Optional(Rt.String),
@@ -50,13 +50,16 @@ const HelmChartTemplateRuntype = Rt.Union(BundledHelmChartTemplateRuntype, Refer
 
 const AnyTemplateRuntype = Rt.Union(VanillaTemplateRuntype, HelmChartTemplateRuntype);
 
-const TemplatePreviewRuntype = TemplateBaseRuntype.extend({
-  path: Rt.String,
-});
-
 const TemplatePackRuntype = Rt.Record({
   name: Rt.String,
-  templates: Rt.Array(TemplatePreviewRuntype),
+  author: Rt.String,
+  version: Rt.String,
+  description: Rt.String,
+  templates: Rt.Array(
+    Rt.Record({
+      path: Rt.String,
+    })
+  ),
 });
 
 export const isTemplateForm = TemplateFormRuntype.guard;
@@ -66,7 +69,6 @@ export const isBundledHelmChartTemplate = BundledHelmChartTemplateRuntype.guard;
 export const isReferencedHelmChartTemplate = ReferencedHelmChartTemplateRuntype.guard;
 export const isHelmChartTemplate = HelmChartTemplateRuntype.guard;
 export const isAnyTemplate = AnyTemplateRuntype.guard;
-export const isTemplatePreview = TemplatePreviewRuntype.guard;
 export const isTemplatePack = TemplatePackRuntype.guard;
 
 export const validateTemplateForm = TemplateFormRuntype.check;
@@ -76,7 +78,6 @@ export const validateBundledHelmChartTemplate = BundledHelmChartTemplateRuntype.
 export const validateReferencedHelmChartTemplate = ReferencedHelmChartTemplateRuntype.check;
 export const validateHelmChartTemplate = HelmChartTemplateRuntype.check;
 export const validateAnyTemplate = AnyTemplateRuntype.check;
-export const validateTemplatePreview = TemplatePreviewRuntype.check;
 export const validateTemplatePack = TemplatePackRuntype.check;
 
 export type TemplateForm = Rt.Static<typeof TemplateFormRuntype>;
@@ -86,5 +87,4 @@ export type BundledHelmChartTemplate = Rt.Static<typeof BundledHelmChartTemplate
 export type ReferencedHelmChartTemplate = Rt.Static<typeof ReferencedHelmChartTemplateRuntype>;
 export type HelmChartTemplate = Rt.Static<typeof HelmChartTemplateRuntype>;
 export type AnyTemplate = Rt.Static<typeof AnyTemplateRuntype>;
-export type TemplatePreview = Rt.Static<typeof TemplatePreviewRuntype>;
 export type TemplatePack = Rt.Static<typeof TemplatePackRuntype>;
