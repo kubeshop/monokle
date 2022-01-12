@@ -33,11 +33,66 @@ test('Validate title', async () => {
   const title = await appWindow.title();
   expect(title).toBe('Monokle');
 });
+
 test('Validate footer', async () => {
   const footer = appWindow.locator('footer');
   await expect(footer).toContainText('Monokle');
   await expect(footer).toContainText('kubeshop.io');
 });
+
+test('Validate logo', async () => {
+  // const img = appWindow.locator("img[alt= 'Monokle']");
+  const img = appWindow.locator("img[src='./static/media/MonokleKubeshopLogo.054ec477.svg']");
+  const count = await img.count();
+  expect(count).toBe(1);
+});
+
+test('Validate icons', async () => {
+  let span = appWindow.locator("span[aria-label='question-circle']");
+  let count = await span.count();
+  expect(count).toBe(1);
+  const img = appWindow.locator("img[src='./static/media/DiscordLogo.05a4fd1f.svg']");
+  count = await img.count();
+  expect(count).toBe(1);
+  span = appWindow.locator("span[aria-label='github']");
+  count = await span.count();
+  expect(count).toBe(1);
+  span = appWindow.locator("span[aria-label='bell']");
+  count = await span.count();
+  expect(count).toBe(1);
+  span = appWindow.locator("span[aria-label='setting']");
+  count = await span.count();
+  expect(count).toBe(1);
+});
+
+test('Validate main sections', async () => {
+  const navigator = appWindow.locator('text=Navigator');
+  let count = await navigator.count();
+  expect(count).toBe(1);
+  const fileExplorer = appWindow.locator('text="File Explorer"');
+  count = await fileExplorer.count();
+  expect(count).toBe(1);
+  const editor = appWindow.locator('text=Editor');
+  count = await editor.count();
+  expect(count).toBe(1);
+  const kustomize = appWindow.locator('text=Kustomize');
+  count = await kustomize.count();
+  expect(count).toBe(3);
+
+  const helm = appWindow.locator('text="Helm"');
+  count = await helm.count();
+  expect(count).toBe(1);
+});
+test('Validate clustercontainer', async () => {
+  const div = appWindow.locator("div[id='ClusterContainer']");
+  expect(await div.count()).toBe(1);
+});
+test('Validate toolbar actions', async () => {
+  const kubeConfig = appWindow.locator('text=KUBECONFIG');
+  expect(await kubeConfig.count()).toBe(1);
+
+  await appWindow.click("span[aria-label='setting']", {noWaitAfter: true});
+});
 test.afterAll(async () => {
-  await electronApp.close();
+  await appWindow.close();
 });
