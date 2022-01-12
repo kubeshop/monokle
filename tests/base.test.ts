@@ -1,7 +1,8 @@
 /* eslint-disable import/order */
 import {Page, _electron as electron} from 'playwright';
 
-import {findLatestBuild, parseElectronApp} from './helpers';
+import {findDrawer, isDrawerVisible} from './antdHelpers';
+import {findLatestBuild, parseElectronApp} from './electronHelpers';
 import {ElectronApplication, expect, test} from '@playwright/test';
 
 let electronApp: ElectronApplication;
@@ -41,8 +42,7 @@ test('Validate footer', async () => {
 });
 
 test('Validate logo', async () => {
-  // const img = appWindow.locator("img[alt= 'Monokle']");
-  const img = appWindow.locator("img[src='./static/media/MonokleKubeshopLogo.054ec477.svg']");
+  const img = appWindow.locator("img[src*='MonokleKubeshopLogo'][src$='.svg']");
   const count = await img.count();
   expect(count).toBe(1);
 });
@@ -51,7 +51,7 @@ test('Validate icons', async () => {
   let span = appWindow.locator("span[aria-label='question-circle']");
   let count = await span.count();
   expect(count).toBe(1);
-  const img = appWindow.locator("img[src='./static/media/DiscordLogo.05a4fd1f.svg']");
+  const img = appWindow.locator("img[src*='DiscordLogo'][src$='.svg']");
   count = await img.count();
   expect(count).toBe(1);
   span = appWindow.locator("span[aria-label='github']");
@@ -75,24 +75,36 @@ test('Validate main sections', async () => {
   const editor = appWindow.locator('text=Editor');
   count = await editor.count();
   expect(count).toBe(1);
-  const kustomize = appWindow.locator('text=Kustomize');
-  count = await kustomize.count();
-  expect(count).toBe(3);
-
-  const helm = appWindow.locator('text="Helm"');
-  count = await helm.count();
-  expect(count).toBe(1);
 });
+
 test('Validate clustercontainer', async () => {
   const div = appWindow.locator("div[id='ClusterContainer']");
   expect(await div.count()).toBe(1);
 });
-test('Validate toolbar actions', async () => {
-  const kubeConfig = appWindow.locator('text=KUBECONFIG');
-  expect(await kubeConfig.count()).toBe(1);
 
-  await appWindow.click("span[aria-label='setting']", {noWaitAfter: true});
+test('Validate toolbar actions', async () => {
+  let drawer = await findDrawer(appWindow, 'Settings');
+  expect(drawer).toBeFalsy();
+
+  const settingsIcon = appWindow.locator("span[aria-label='setting']");
+  expect(await settingsIcon.count()).toBe(1);
+
+  settingsIcon.click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  drawer = await findDrawer(appWindow, 'Settings');
+  expect(drawer).toBeTruthy();
+
+  // @ts-ignore
+  expect(await isDrawerVisible(drawer)).toBeTruthy();
+
+  appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  // @ts-ignore
+  expect(await isDrawerVisible(drawer)).toBeFalsy();
 });
+
 test.afterAll(async () => {
   await appWindow.close();
 });
