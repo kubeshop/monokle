@@ -30,10 +30,10 @@ async function downloadExtension<ExtensionEntryType, ExtensionType>(
     {skipEntryFileSave: true}
   );
 
-  const extension = transformEntryFileContentToExtension(extensionEntry);
-
   const extensionFolderPath = makeExtensionFolderPath(extensionEntry);
   await createOrRecreateFolder(extensionFolderPath);
+
+  const extension = transformEntryFileContentToExtension(extensionEntry, extensionFolderPath);
 
   const tarballFilePath = `${extensionFolderPath}.tgz`;
   const doesTarballFileExist = await doesPathExist(tarballFilePath);

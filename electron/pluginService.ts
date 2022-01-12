@@ -1,12 +1,20 @@
+import log from 'loglevel';
 import path from 'path';
 
-import {AnyPlugin, PluginPackageJson, validatePluginPackageJson, validateTemplatePluginModule} from '@models/plugin';
+import {
+  AnyPlugin,
+  PluginPackageJson,
+  isTemplatePluginModule,
+  validatePluginPackageJson,
+  validateTemplatePluginModule,
+} from '@models/plugin';
 
 import downloadExtension from './extensions/downloadExtension';
+import {createFolder, doesPathExist} from './extensions/fileSystem';
 import loadMultipleExtensions from './extensions/loadMultipleExtensions';
 import {extractRepositoryOwnerAndNameFromUrl} from './utils';
 
-function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson): AnyPlugin {
+function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderPath: string): AnyPlugin {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(packageJson.repository);
   const plugin: AnyPlugin = {
     name: packageJson.name,
@@ -19,7 +27,15 @@ function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson): AnyPlu
       name: repositoryName,
       branch: 'main', // TODO: handle the branch name
     },
-    modules: packageJson.monoklePlugin.modules,
+    modules: packageJson.monoklePlugin.modules.map(module => {
+      if (isTemplatePluginModule(module)) {
+        return {
+          ...module,
+          path: path.join(folderPath, module.path),
+        };
+      }
+      return module;
+    }),
   };
   return plugin;
 }
@@ -43,6 +59,17 @@ export async function downloadPlugin(pluginUrl: string, allPluginsFolderPath: st
 }
 
 export async function loadPlugins(pluginsDir: string) {
+  try {
+    const doesPluginsDirExist = await doesPathExist(pluginsDir);
+    if (!doesPluginsDirExist) {
+      await createFolder(pluginsDir);
+    }
+  } catch (e) {
+    if (e instanceof Error) {
+      log.warn(`[loadPlugins]: Couldn't load plugins: ${e.message}`);
+    }
+    return [];
+  }
   const plugins: AnyPlugin[] = await loadMultipleExtensions<PluginPackageJson, AnyPlugin>({
     folderPath: pluginsDir,
     entryFileName: 'package.json',

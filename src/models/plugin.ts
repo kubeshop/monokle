@@ -2,17 +2,12 @@ import * as Rt from 'runtypes';
 
 import {GitRepository} from './repository';
 
-const ReferencedTemplatePluginModuleRuntype = Rt.Record({
-  type: Rt.Literal('template'),
-  url: Rt.String,
-});
-
 const BundledTemplatePluginModuleRuntype = Rt.Record({
   type: Rt.Literal('template'),
   path: Rt.String,
 });
 
-const TemplatePluginModuleRuntype = Rt.Union(BundledTemplatePluginModuleRuntype, ReferencedTemplatePluginModuleRuntype);
+const TemplatePluginModuleRuntype = Rt.Union(BundledTemplatePluginModuleRuntype);
 
 const AnyPluginModuleRuntype = TemplatePluginModuleRuntype;
 
@@ -28,20 +23,17 @@ const PluginPackageJsonRuntype = Rt.Record({
 }).And(Rt.Dictionary(Rt.Unknown));
 
 export type PluginPackageJson = Rt.Static<typeof PluginPackageJsonRuntype>;
-export type ReferencedTemplatePluginModule = Rt.Static<typeof ReferencedTemplatePluginModuleRuntype>;
 export type BundledTemplatePluginModule = Rt.Static<typeof BundledTemplatePluginModuleRuntype>;
 export type TemplatePluginModule = Rt.Static<typeof TemplatePluginModuleRuntype>;
 export type AnyPluginModule = Rt.Static<typeof AnyPluginModuleRuntype>;
 
 export const isPluginPackageJson = PluginPackageJsonRuntype.guard;
 export const isTemplatePluginModule = TemplatePluginModuleRuntype.guard;
-export const isReferencedTemplatePluginModule = ReferencedTemplatePluginModuleRuntype.guard;
 export const isBundledTemplatePluginModule = BundledTemplatePluginModuleRuntype.guard;
 export const isAnyPluginModule = AnyPluginModuleRuntype.guard;
 
 export const validatePluginPackageJson = PluginPackageJsonRuntype.check;
 export const validateTemplatePluginModule = TemplatePluginModuleRuntype.check;
-export const validateReferencedTemplatePluginModule = ReferencedTemplatePluginModuleRuntype.check;
 export const validateBundledTemplatePluginModule = BundledTemplatePluginModuleRuntype.check;
 export const validateAnyPluginModule = AnyPluginModuleRuntype.check;
 

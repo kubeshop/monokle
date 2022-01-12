@@ -6,18 +6,18 @@ import {Button, Input, Modal} from 'antd';
 
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 
-import {MonoklePlugin} from '@models/plugin';
+import {AnyPlugin} from '@models/plugin';
 
 import {useAppDispatch} from '@redux/hooks';
 import {addPlugin} from '@redux/reducers/contrib';
 
 const downloadPlugin = (pluginUrl: string) => {
-  return new Promise<MonoklePlugin>((resolve, reject) => {
+  return new Promise<AnyPlugin>((resolve, reject) => {
     const downloadPluginResult = (_: any, result: any) => {
       if (result instanceof Error) {
         reject(result);
       }
-      resolve(result as MonoklePlugin);
+      resolve(result as AnyPlugin);
     };
     ipcRenderer.once(DOWNLOAD_PLUGIN_RESULT, downloadPluginResult);
     ipcRenderer.send(DOWNLOAD_PLUGIN, pluginUrl);

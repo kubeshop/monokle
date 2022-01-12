@@ -39,12 +39,13 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
 import {setAppRehydrating} from '@redux/reducers/main';
-import {setPlugins} from '@redux/reducers/contrib';
+import {setPlugins, setTemplatePacks, setTemplates} from '@redux/reducers/contrib';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
 import { RootState } from '@redux/store';
+import { loadTemplatePacks, loadTemplates } from './templateService';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -56,6 +57,8 @@ const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
 const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
+const templatesDir = path.join(userDataDir, 'monokleTemplates');
+const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
 ipcMain.on('get-user-home-dir', event => {
@@ -220,9 +223,12 @@ export const createWindow = (givenPath?: string) => {
     }
     win.webContents.send('executed-from', {path: givenPath});
 
-    loadPlugins(pluginsDir).then(plugins => {
-      dispatch(setPlugins(plugins));
-    });
+    const plugins = await loadPlugins(pluginsDir);
+    dispatch(setPlugins(plugins));
+    const templatePacks = await loadTemplatePacks(templatePacksDir);
+    dispatch(setTemplatePacks(templatePacks));
+    const templates = await loadTemplates(templatesDir, {plugins, templatePacks});
+    dispatch(setTemplates(templates));
   });
 
   return win;

@@ -1,6 +1,8 @@
+import asyncLib from 'async';
+import log from 'loglevel';
 import path from 'path';
 
-import {AnyPlugin} from '@models/plugin';
+import {AnyPlugin, isBundledTemplatePluginModule} from '@models/plugin';
 import {
   AnyTemplate,
   TemplatePack,
@@ -10,7 +12,13 @@ import {
 } from '@models/template';
 
 import downloadExtension from './extensions/downloadExtension';
+import {createFolder, doesPathExist} from './extensions/fileSystem';
+import loadExtension from './extensions/loadExtension';
+import loadMultipleExtensions from './extensions/loadMultipleExtensions';
 import {extractRepositoryOwnerAndNameFromUrl} from './utils';
+
+const TEMPLATE_PACK_ENTRY_FILE_NAME = 'monokle-template-pack.json';
+const TEMPLATE_ENTRY_FILE_NAME = 'monokle-template.json';
 
 const parseTemplate = (template: AnyTemplate, templateFolderPath: string): AnyTemplate => {
   const updatedTemplate = {
@@ -46,12 +54,12 @@ const parseTemplatePack = (templatePack: TemplatePack, templatePackFolderPath: s
 
 export async function downloadTemplatePack(repositoryUrl: string, templatesDir: string) {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
-  const templatePackUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/monokle-template-pack.json`;
+  const templatePackUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/${TEMPLATE_PACK_ENTRY_FILE_NAME}`;
   const templatePackTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
   const templatePackFolderPath = path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
   const templatePack: TemplatePack = await downloadExtension<TemplatePack, TemplatePack>({
     extensionTarballUrl: templatePackTarballUrl,
-    entryFileName: 'monokle-template-pack.json',
+    entryFileName: TEMPLATE_PACK_ENTRY_FILE_NAME,
     entryFileUrl: templatePackUrl,
     validateEntryFileContent: validateTemplatePack,
     parseEntryFileContent: JSON.parse,
@@ -65,12 +73,12 @@ export async function downloadTemplatePack(repositoryUrl: string, templatesDir: 
 
 export async function downloadTemplate(repositoryUrl: string, templatesDir: string) {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
-  const templateUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/monokle-template.json`;
+  const templateUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/${TEMPLATE_ENTRY_FILE_NAME}`;
   const templateTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
   const templateFolderPath = path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
   const template: AnyTemplate = await downloadExtension<AnyTemplate, AnyTemplate>({
     extensionTarballUrl: templateTarballUrl,
-    entryFileName: 'monokle-template.json',
+    entryFileName: TEMPLATE_ENTRY_FILE_NAME,
     entryFileUrl: templateUrl,
     validateEntryFileContent: validateAnyTemplate,
     parseEntryFileContent: JSON.parse,
@@ -82,8 +90,74 @@ export async function downloadTemplate(repositoryUrl: string, templatesDir: stri
   return template;
 }
 
+export async function loadTemplatePacks(templatePacksDir: string) {
+  try {
+    const doesTemplatePacksDirExist = await doesPathExist(templatePacksDir);
+    if (!doesTemplatePacksDirExist) {
+      await createFolder(templatePacksDir);
+    }
+  } catch (e) {
+    if (e instanceof Error) {
+      log.warn(`[loadTemplatePacks]: Couldn't load plugins: ${e.message}`);
+      return [];
+    }
+  }
+  const templatePacks: TemplatePack[] = await loadMultipleExtensions<TemplatePack, TemplatePack>({
+    folderPath: templatePacksDir,
+    entryFileName: TEMPLATE_PACK_ENTRY_FILE_NAME,
+    parseEntryFileContent: JSON.parse,
+    validateEntryFileContent: validateTemplatePack,
+    transformEntryFileContentToExtension: parseTemplatePack,
+  });
+  return templatePacks;
+}
+
+const makeLoadTemplateOptions = (folderPath: string) => {
+  return {
+    folderPath,
+    entryFileName: TEMPLATE_ENTRY_FILE_NAME,
+    parseEntryFileContent: JSON.parse,
+    validateEntryFileContent: validateAnyTemplate,
+    transformEntryFileContentToExtension: parseTemplate,
+  };
+};
+
 type LoadTemplatesOptions = {templatePacks: TemplatePack[]; plugins: AnyPlugin[]};
 export async function loadTemplates(templatesDir: string, options: LoadTemplatesOptions) {
-  // TODO: load templates from the templatesDir
-  // TODO: load templates from templatePacks and plugins
+  const {templatePacks, plugins} = options;
+
+  let standaloneTemplates: AnyTemplate[] = [];
+  try {
+    const doesTemplatesDirExist = await doesPathExist(templatesDir);
+    if (!doesTemplatesDirExist) {
+      await createFolder(templatesDir);
+    }
+    standaloneTemplates = await loadMultipleExtensions<AnyTemplate, AnyTemplate>(makeLoadTemplateOptions(templatesDir));
+  } catch (e) {
+    if (e instanceof Error) {
+      log.warn(`[loadTemplatePacks]: Couldn't load plugins: ${e.message}`);
+      return [];
+    }
+  }
+
+  const bundledTemplatePaths: string[] = [];
+  templatePacks.forEach(templatePack => {
+    templatePack.templates.forEach(t => {
+      bundledTemplatePaths.push(t.path);
+    });
+  });
+  plugins.forEach(plugin => {
+    plugin.modules.forEach(m => {
+      if (isBundledTemplatePluginModule(m)) {
+        bundledTemplatePaths.push(m.path);
+      }
+    });
+  });
+
+  const bundledTemplates: AnyTemplate[] = await asyncLib.map(bundledTemplatePaths, async templatePath => {
+    const template = await loadExtension(makeLoadTemplateOptions(templatePath));
+    return template;
+  });
+
+  return [...standaloneTemplates, ...bundledTemplates.filter((bt): bt is AnyTemplate => bt !== undefined)];
 }

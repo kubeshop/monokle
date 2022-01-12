@@ -30,7 +30,7 @@ async function loadExtension<ExtensionEntryType, ExtensionType>(
     }
     return undefined;
   }
-  const extension = transformEntryFileContentToExtension(parsedEntryFileContent);
+  const extension = transformEntryFileContentToExtension(parsedEntryFileContent, folderPath);
   return extension;
 }
 

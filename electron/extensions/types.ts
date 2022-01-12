@@ -5,7 +5,7 @@ interface ExtensionEntryOptions<ExtensionEntryType> {
 }
 
 interface ExtensionOptions<ExtensionEntryType, ExtensionType> {
-  transformEntryFileContentToExtension: (f: ExtensionEntryType) => ExtensionType;
+  transformEntryFileContentToExtension: (extensionEntry: ExtensionEntryType, folderPath: string) => ExtensionType;
 }
 
 export interface LoadExtensionOptions<ExtensionEntryType, ExtensionType>
