@@ -376,7 +376,7 @@ const PageHeader = () => {
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
           {!clusterStatusHidden && (
-            <CLusterContainer>
+            <CLusterContainer id="ClusterContainer">
               <CLusterStatus>
                 <CLusterStatusText connected={isKubeconfigPathValid}>
                   <StyledClusterOutlined />
