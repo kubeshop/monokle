@@ -29,13 +29,15 @@ test.beforeAll(async () => {
   appWindow = windows[0];
 });
 
-test('Validate main page', async () => {
-  await appWindow.waitForSelector('footer');
-  const footer = await appWindow.$eval('footer', el => el.textContent);
-  expect(footer).toBe('Monokle 1.4.0 - kubeshop.io 2021');
-
+test('Validate title', async () => {
   const title = await appWindow.title();
   expect(title).toBe('Monokle');
-
+});
+test('Validate footer', async () => {
+  const footer = appWindow.locator('footer');
+  await expect(footer).toContainText('Monokle');
+  await expect(footer).toContainText('kubeshop.io');
+});
+test.afterAll(async () => {
   await electronApp.close();
 });
