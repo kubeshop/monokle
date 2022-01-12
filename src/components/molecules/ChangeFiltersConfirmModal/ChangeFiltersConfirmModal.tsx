@@ -14,7 +14,7 @@ const ChangeFiltersConfirmModal: React.FC = () => {
   useEffect(() => {
     if (filtersToBeChanged) {
       Modal.confirm({
-        title: 'I understand that changing the filters will uncheck all my selected resources.',
+        title: 'Changing the filter will uncheck all selected resources',
         icon: <ExclamationCircleOutlined />,
         onOk() {
           return new Promise(resolve => {

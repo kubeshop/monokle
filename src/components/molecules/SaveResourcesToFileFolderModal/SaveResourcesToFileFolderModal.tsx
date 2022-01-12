@@ -8,6 +8,7 @@ import fs from 'fs';
 import micromatch from 'micromatch';
 import path from 'path';
 import styled from 'styled-components';
+import util from 'util';
 import {stringify} from 'yaml';
 
 import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
@@ -73,7 +74,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [savingDestination, setSavingDestination] = useState<string>('saveToFolder');
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
-  const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
+  const [selectedFolder, setSelectedFolder] = useState<string>();
   const [saveToFolderPaths, setSaveToFolderPaths] = useState<Record<'create' | 'replace', string[]>>({
     create: [],
     replace: [],
@@ -195,43 +196,64 @@ const SaveResourceToFileFolderModal: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!resourcesIds || !resourcesIds.length || savingDestination === 'saveToFile') {
+    if (!resourcesIds || !resourcesIds.length || !selectedFolder || savingDestination === 'saveToFile') {
       return;
     }
 
-    let filesToBeCreated: string[] = [];
-    let filesToBeReplaced: string[] = [];
+    const generateCreatedAndReplacedFiles = async () => {
+      let filesToBeCreated: string[] = [];
+      let filesToBeReplaced: string[] = [];
 
-    if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
-      const currentFolder = selectedFolder.split(`${fileMap[ROOT_FILE_ENTRY].filePath}`).pop();
+      if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
+        const currentFolder = selectedFolder.split(`${fileMap[ROOT_FILE_ENTRY].filePath}`).pop();
 
-      if (currentFolder) {
-        setSelectedFolder(currentFolder.slice(1));
-      } else {
-        setSelectedFolder(ROOT_FILE_ENTRY);
+        if (currentFolder) {
+          setSelectedFolder(currentFolder.slice(1));
+        } else {
+          setSelectedFolder(ROOT_FILE_ENTRY);
+        }
+        return;
       }
-      return;
-    }
 
-    resourcesIds.forEach(resourceId => {
-      const resource = resourceMap[resourceId];
-      const fullFileName = getFullFileName(resource.name, fileIncludes);
+      let subfolders: fs.Dirent[] = [];
 
-      if (fileMap[`\\${path.join(selectedFolder, fullFileName)}`]) {
-        filesToBeReplaced.push(fullFileName);
-      } else {
-        filesToBeCreated.push(fullFileName);
+      // check if there isn't a local folder selected or if the selected folder is not found in the filemap
+      if (!Object.keys(fileMap).length || !foldersList.find(folderName => folderName === selectedFolder)) {
+        const fsReaddirPromise = util.promisify(fs.readdir);
+        subfolders = await fsReaddirPromise(selectedFolder, {withFileTypes: true});
       }
-    });
 
-    setSaveToFolderPaths({create: filesToBeCreated, replace: filesToBeReplaced});
-  }, [fileIncludes, fileMap, savingDestination, resourcesIds, resourceMap, selectedFolder]);
+      resourcesIds.forEach(resourceId => {
+        const resource = resourceMap[resourceId];
+        const fullFileName = getFullFileName(resource.name, fileIncludes);
+
+        if (
+          (subfolders.length && subfolders.find(dirent => dirent.name === fullFileName)) ||
+          fileMap[`\\${path.join(selectedFolder, fullFileName)}`]
+        ) {
+          filesToBeReplaced.push(fullFileName);
+        } else {
+          filesToBeCreated.push(fullFileName);
+        }
+      });
+
+      setSaveToFolderPaths({create: filesToBeCreated, replace: filesToBeReplaced});
+    };
+
+    generateCreatedAndReplacedFiles();
+  }, [fileIncludes, fileMap, foldersList, savingDestination, resourcesIds, resourceMap, selectedFolder]);
 
   useEffect(() => {
     if (isVisible) {
-      setSelectedFolder(ROOT_FILE_ENTRY);
+      if (Object.keys(fileMap).length) {
+        setSelectedFolder(ROOT_FILE_ENTRY);
+        return;
+      }
+
+      setSelectedFolder(undefined);
+      setSaveToFolderPaths({create: [], replace: []});
     }
-  }, [isVisible]);
+  }, [fileMap, isVisible]);
 
   return (
     <Modal
@@ -257,6 +279,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
 
         {savingDestination === 'saveToFolder' && (
           <StyledSelect
+            placeholder="Select folder"
             showSearch
             onChange={(value: any) => setSelectedFolder(value)}
             value={selectedFolder}
