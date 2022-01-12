@@ -202,7 +202,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
     let filesToBeCreated: string[] = [];
     let filesToBeReplaced: string[] = [];
 
-    if (selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
+    if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
       const currentFolder = selectedFolder.split(`${fileMap[ROOT_FILE_ENTRY].filePath}`).pop();
 
       if (currentFolder) {
