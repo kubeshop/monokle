@@ -39,7 +39,7 @@ const PageFooter = () => {
 
   useEffect(() => {
     setFooterText(
-      `Monokle ${appVersion} - kubeshop.io 2021${
+      `Monokle ${appVersion} - kubeshop.io 2022${
         rootEntry && rootEntry.children ? ` - ${rootEntry.filePath} - ${nrOfFiles} files` : ''
       }`
     );
