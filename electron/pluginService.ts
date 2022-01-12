@@ -1,6 +1,11 @@
 import path from 'path';
 
-import {MonoklePlugin, PluginPackageJson, isPluginPackageJson, isTemplatePluginModule} from '@models/plugin';
+import {
+  MonoklePlugin,
+  PluginPackageJson,
+  validatePluginPackageJson,
+  validateTemplatePluginModule,
+} from '@models/plugin';
 
 import downloadExtension from './extensions/downloadExtension';
 import loadMultipleExtensions from './extensions/loadMultipleExtensions';
@@ -13,7 +18,7 @@ function transformPackageJsonToMonoklePlugin(packageJson: PluginPackageJson): Mo
     author: packageJson.author,
     version: packageJson.version,
     description: packageJson.description,
-    isActive: packageJson.monoklePlugin.modules.every(module => isTemplatePluginModule(module)),
+    isActive: packageJson.monoklePlugin.modules.every(module => validateTemplatePluginModule(module)),
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
@@ -28,12 +33,12 @@ export async function downloadPlugin(pluginUrl: string, allPluginsFolderPath: st
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(pluginUrl);
   const packageJsonUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/package.json`;
   const pluginTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
-  const plugin: MonoklePlugin = await downloadExtension({
+  const plugin: MonoklePlugin = await downloadExtension<PluginPackageJson, MonoklePlugin>({
     extensionTarballUrl: pluginTarballUrl,
     entryFileName: 'package.json',
     entryFileUrl: packageJsonUrl,
     parseEntryFileContent: JSON.parse,
-    isEntryFileContentValid: isPluginPackageJson,
+    validateEntryFileContent: validatePluginPackageJson,
     transformEntryFileContentToExtension: transformPackageJsonToMonoklePlugin,
     makeExtensionFolderPath: () => {
       return path.join(allPluginsFolderPath, `${repositoryOwner}-${repositoryName}`);
@@ -47,7 +52,7 @@ export async function loadPlugins(pluginsDir: string) {
     folderPath: pluginsDir,
     entryFileName: 'package.json',
     parseEntryFileContent: JSON.parse,
-    isEntryFileContentValid: isPluginPackageJson,
+    validateEntryFileContent: validatePluginPackageJson,
     transformEntryFileContentToExtension: transformPackageJsonToMonoklePlugin,
   });
   return plugins;

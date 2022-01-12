@@ -14,7 +14,7 @@ async function downloadExtension<ExtensionEntryType, ExtensionType>(
     entryFileUrl,
     entryFileName,
     parseEntryFileContent,
-    isEntryFileContentValid,
+    validateEntryFileContent,
     transformEntryFileContentToExtension,
     makeExtensionFolderPath,
   } = options;
@@ -24,7 +24,7 @@ async function downloadExtension<ExtensionEntryType, ExtensionType>(
       entryFileUrl,
       entryFileName,
       parseEntryFileContent,
-      isEntryFileContentValid,
+      validateEntryFileContent,
       makeExtensionFolderPath,
     },
     {skipEntryFileSave: true}

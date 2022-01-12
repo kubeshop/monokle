@@ -1,7 +1,7 @@
 interface ExtensionEntryOptions<ExtensionEntryType> {
   entryFileName: string;
   parseEntryFileContent: (content: string) => any;
-  isEntryFileContentValid: (x: any) => x is ExtensionEntryType;
+  validateEntryFileContent: (x: any) => ExtensionEntryType;
 }
 
 interface ExtensionOptions<ExtensionEntryType, ExtensionType> {

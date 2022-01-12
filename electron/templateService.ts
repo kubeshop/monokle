@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {AnyTemplate, TemplateDiscovery, isHelmChartTemplate, isTemplateDiscovery} from '@models/template';
+import {AnyTemplate, TemplateDiscovery, isHelmChartTemplate, validateTemplateDiscovery} from '@models/template';
 
 import downloadExtension from './extensions/downloadExtension';
 import downloadExtensionEntry from './extensions/downloadExtensionEntry';
@@ -47,7 +47,7 @@ export async function downloadTemplateDiscoveryEntry(repositoryUrl: string, temp
   const templateDiscovery: TemplateDiscovery = await downloadExtensionEntry<TemplateDiscovery>({
     entryFileName: 'monokle-templates.json',
     entryFileUrl: templateDiscoveryUrl,
-    isEntryFileContentValid: isTemplateDiscovery,
+    validateEntryFileContent: validateTemplateDiscovery,
     parseEntryFileContent: JSON.parse,
     makeExtensionFolderPath: () => {
       return path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
@@ -65,7 +65,7 @@ export async function downloadTemplateDiscovery(repositoryUrl: string, templates
     extensionTarballUrl: templateDiscoveryTarballUrl,
     entryFileName: 'monokle-templates.json',
     entryFileUrl: templateDiscoveryUrl,
-    isEntryFileContentValid: isTemplateDiscovery,
+    validateEntryFileContent: validateTemplateDiscovery,
     parseEntryFileContent: JSON.parse,
     makeExtensionFolderPath: () => {
       return templateDiscoveryFolderPath;

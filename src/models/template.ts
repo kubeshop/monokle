@@ -69,6 +69,16 @@ export const isAnyTemplate = AnyTemplateRuntype.guard;
 export const isTemplatePreview = TemplatePreviewRuntype.guard;
 export const isTemplateDiscovery = TemplateDiscoveryRuntype.guard;
 
+export const validateTemplateForm = TemplateFormRuntype.check;
+export const validateTemplateManifest = TemplateManifestRuntype.check;
+export const validateVanillaTemplate = VanillaTemplateRuntype.check;
+export const validateBundledHelmChartTemplate = BundledHelmChartTemplateRuntype.check;
+export const validateReferencedHelmChartTemplate = ReferencedHelmChartTemplateRuntype.check;
+export const validateHelmChartTemplate = HelmChartTemplateRuntype.check;
+export const validateAnyTemplate = AnyTemplateRuntype.check;
+export const validateTemplatePreview = TemplatePreviewRuntype.check;
+export const validateTemplateDiscovery = TemplateDiscoveryRuntype.check;
+
 export type TemplateForm = Rt.Static<typeof TemplateFormRuntype>;
 export type TemplateManifest = Rt.Static<typeof TemplateManifestRuntype>;
 export type VanillaTemplate = Rt.Static<typeof VanillaTemplateRuntype>;

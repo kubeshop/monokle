@@ -39,6 +39,12 @@ export const isReferencedTemplatePluginModule = ReferencedTemplatePluginModuleRu
 export const isBundledTemplatePluginModule = BundledTemplatePluginModuleRuntype.guard;
 export const isMonoklePluginModule = MonoklePluginModuleRuntype.guard;
 
+export const validatePluginPackageJson = PluginPackageJsonRuntype.check;
+export const validateTemplatePluginModule = TemplatePluginModuleRuntype.check;
+export const validateReferencedTemplatePluginModule = ReferencedTemplatePluginModuleRuntype.check;
+export const validateBundledTemplatePluginModule = BundledTemplatePluginModuleRuntype.check;
+export const validateMonoklePluginModule = MonoklePluginModuleRuntype.check;
+
 export interface MonoklePlugin {
   name: string;
   version: string;

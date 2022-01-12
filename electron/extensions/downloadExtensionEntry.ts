@@ -1,3 +1,4 @@
+import log from 'loglevel';
 import fetch from 'node-fetch';
 import path from 'path';
 
@@ -10,7 +11,7 @@ async function downloadExtensionEntry<ExtensionEntryType>(
     skipEntryFileSave: boolean;
   }
 ): Promise<ExtensionEntryType> {
-  const {entryFileUrl, entryFileName, parseEntryFileContent, isEntryFileContentValid, makeExtensionFolderPath} =
+  const {entryFileUrl, entryFileName, parseEntryFileContent, validateEntryFileContent, makeExtensionFolderPath} =
     options;
 
   const fetchEntryFileResponse = await fetch(entryFileUrl);
@@ -19,8 +20,14 @@ async function downloadExtensionEntry<ExtensionEntryType>(
   }
   const entryFileContent = await fetchEntryFileResponse.text();
   const parsedEntryFileContent = parseEntryFileContent(entryFileContent);
-  if (!isEntryFileContentValid(parsedEntryFileContent)) {
-    throw new Error(`The ${entryFileName} file is not valid.`);
+  try {
+    validateEntryFileContent(parsedEntryFileContent);
+  } catch (e) {
+    if (e instanceof Error) {
+      const customErrorMessage = `The ${entryFileName} file is not valid`;
+      log.warn(`${customErrorMessage}: ${e.message}`);
+      throw new Error(customErrorMessage);
+    }
   }
 
   if (additionalOptions?.skipEntryFileSave) {

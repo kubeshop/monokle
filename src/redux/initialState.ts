@@ -27,6 +27,7 @@ const initialAppState: AppState = {
     isLoading: false,
   },
   resourceDiff: {},
+  plugins: [],
   isSelectingFile: false,
   isApplyingResource: false,
   resourceRefsProcessingOptions: {
