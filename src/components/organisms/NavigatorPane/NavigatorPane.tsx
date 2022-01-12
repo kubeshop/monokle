@@ -74,9 +74,10 @@ const NavPane: React.FC = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
 
-  const navigatorHeight = useMemo(() => {
-    return windowSize.height - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0);
-  }, [windowSize.height, isInPreviewMode]);
+  const navigatorHeight = useMemo(
+    () => windowSize.height - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
+    [windowSize.height, isInPreviewMode]
+  );
 
   const appliedFilters = useMemo(() => {
     return Object.entries(resourceFilters)
