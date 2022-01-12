@@ -45,7 +45,7 @@ import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
 import { RootState } from '@redux/store';
-import { loadTemplatePacks, loadTemplates } from './templateService';
+import { loadTemplatePacks, loadTemplates, loadTemplatesFromPlugin } from './templateService';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -68,7 +68,8 @@ ipcMain.on('get-user-home-dir', event => {
 ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   try {
     const plugin = await downloadPlugin(pluginUrl, pluginsDir);
-    event.sender.send(DOWNLOAD_PLUGIN_RESULT, plugin);
+    const templates = await loadTemplatesFromPlugin(plugin);
+    event.sender.send(DOWNLOAD_PLUGIN_RESULT, {plugin, templates});
   } catch (err) {
     if (err instanceof Error) {
       event.sender.send(DOWNLOAD_PLUGIN_RESULT, err);

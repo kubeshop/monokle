@@ -122,6 +122,30 @@ const makeLoadTemplateOptions = (folderPath: string) => {
   };
 };
 
+async function loadTemplatesFromPaths(paths: string[]): Promise<AnyTemplate[]> {
+  const bundledTemplates: AnyTemplate[] = await asyncLib.map(paths, async templatePath => {
+    const template = await loadExtension(makeLoadTemplateOptions(templatePath));
+    return template;
+  });
+  return bundledTemplates.filter((bt): bt is AnyTemplate => bt !== undefined);
+}
+
+export function loadTemplatesFromPlugin(plugin: AnyPlugin): Promise<AnyTemplate[]> {
+  return loadTemplatesFromPaths(
+    plugin.modules.filter(isBundledTemplatePluginModule).map(m => {
+      return m.path;
+    })
+  );
+}
+
+export function loadTemplatesFromTemplatePack(templatePack: TemplatePack): Promise<AnyTemplate[]> {
+  return loadTemplatesFromPaths(
+    templatePack.templates.map(t => {
+      return t.path;
+    })
+  );
+}
+
 type LoadTemplatesOptions = {templatePacks: TemplatePack[]; plugins: AnyPlugin[]};
 export async function loadTemplates(templatesDir: string, options: LoadTemplatesOptions) {
   const {templatePacks, plugins} = options;
@@ -140,24 +164,16 @@ export async function loadTemplates(templatesDir: string, options: LoadTemplates
     }
   }
 
-  const bundledTemplatePaths: string[] = [];
-  templatePacks.forEach(templatePack => {
-    templatePack.templates.forEach(t => {
-      bundledTemplatePaths.push(t.path);
-    });
-  });
-  plugins.forEach(plugin => {
-    plugin.modules.forEach(m => {
-      if (isBundledTemplatePluginModule(m)) {
-        bundledTemplatePaths.push(m.path);
-      }
-    });
+  const templatePacksBundledTemplates: AnyTemplate[][] = await asyncLib.map(templatePacks, async templatePack => {
+    const bundledTemplates = await loadTemplatesFromTemplatePack(templatePack);
+    return bundledTemplates;
   });
 
-  const bundledTemplates: AnyTemplate[] = await asyncLib.map(bundledTemplatePaths, async templatePath => {
-    const template = await loadExtension(makeLoadTemplateOptions(templatePath));
-    return template;
+  const pluginsBundledTemplates: AnyTemplate[][] = await asyncLib.map(plugins, async plugin => {
+    const bundledTemplates = await loadTemplatesFromPlugin(plugin);
+    return bundledTemplates;
   });
 
-  return [...standaloneTemplates, ...bundledTemplates.filter((bt): bt is AnyTemplate => bt !== undefined)];
+  const bundledTemplates: AnyTemplate[] = [...templatePacksBundledTemplates.flat(), ...pluginsBundledTemplates.flat()];
+  return [...standaloneTemplates, ...bundledTemplates];
 }

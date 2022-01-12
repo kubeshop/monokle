@@ -20,6 +20,9 @@ export const contribSlice = createSlice({
     addTemplate: (state: Draft<ContribState>, action: PayloadAction<AnyTemplate>) => {
       state.templates.push(action.payload);
     },
+    addMultipleTemplates: (state: Draft<ContribState>, action: PayloadAction<AnyTemplate[]>) => {
+      state.templates.push(...action.payload);
+    },
     setTemplates: (state: Draft<ContribState>, action: PayloadAction<AnyTemplate[]>) => {
       state.templates = action.payload;
       state.isLoadingExistingTemplates = false;
@@ -34,6 +37,13 @@ export const contribSlice = createSlice({
   },
 });
 
-export const {addPlugin, setPlugins, addTemplate, setTemplates, addTemplatePack, setTemplatePacks} =
-  contribSlice.actions;
+export const {
+  addPlugin,
+  setPlugins,
+  addTemplate,
+  addMultipleTemplates,
+  setTemplates,
+  addTemplatePack,
+  setTemplatePacks,
+} = contribSlice.actions;
 export default contribSlice.reducer;
