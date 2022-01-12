@@ -13,7 +13,7 @@ import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} fro
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
-  AutoLoadLastFolderTooltip,
+  AutoLoadLastProjectTooltip,
   BrowseKubeconfigTooltip,
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
@@ -21,20 +21,8 @@ import {
 } from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  setScanExcludesStatus,
-  updateFileIncludes,
-  updateFolderReadsMaxDepth,
-  updateHelmPreviewMode,
-  updateHideExcludedFilesInFileExplorer,
-  updateKubeconfig,
-  updateKubeconfigPathValidity,
-  updateKustomizeCommand,
-  updateLoadLastFolderOnStartup,
-  updateScanExcludes,
-} from '@redux/reducers/appConfig';
+import {updateKubeconfig, updateKubeconfigPathValidity} from '@redux/reducers/appConfig';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
-import {toggleClusterStatus} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
@@ -86,25 +74,57 @@ const StyledHeading = styled.h2`
   margin-bottom: 7px;
 `;
 
-export const Settings = ({
-  isSettingsOpened,
-  isClusterPaneIconHighlighted,
-}: {
-  isSettingsOpened: boolean;
+type SettingsProps = {
   isClusterPaneIconHighlighted?: boolean;
-}) => {
+  isClusterSelectorVisible?: boolean;
+  onClusterSelectorVisibleChange?: Function;
+  fileIncludes?: string[];
+  onFileIncludesChange?: Function;
+  scanExcludes?: string[];
+  onScanExcludesChange?: Function;
+  helmPreviewMode?: string;
+  onHelmPreviewModeChange?: Function;
+  kustomizeCommand?: string;
+  onKustomizeCommandChange?: Function;
+  folderReadsMaxDepth?: number;
+  onFolderReadsMaxDepthChange?: Function;
+  hideExcludedFilesInFileExplorer?: boolean;
+  onHideExcludedFilesInFileExplorerChange?: Function;
+  showLoadLastProjectOnStartup?: boolean;
+  loadLastProjectOnStartup?: boolean;
+  onLoadLastProjectOnStartupChange?: Function;
+};
+
+export const Settings = ({
+  isClusterPaneIconHighlighted,
+  isClusterSelectorVisible,
+  onClusterSelectorVisibleChange,
+  fileIncludes = [],
+  onFileIncludesChange,
+  scanExcludes = [],
+  onScanExcludesChange,
+  helmPreviewMode,
+  onHelmPreviewModeChange,
+  kustomizeCommand,
+  onKustomizeCommandChange,
+  folderReadsMaxDepth,
+  onFolderReadsMaxDepthChange,
+  hideExcludedFilesInFileExplorer,
+  onHideExcludedFilesInFileExplorerChange,
+  loadLastProjectOnStartup,
+  onLoadLastProjectOnStartupChange,
+  showLoadLastProjectOnStartup = false,
+}: SettingsProps) => {
   const dispatch = useAppDispatch();
+  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
-  const appConfig = useAppSelector(state => state.config);
   const uiState = useAppSelector(state => state.ui);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
 
-  const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
-  const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
+  const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(folderReadsMaxDepth || 5);
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
   const [inputRef, focusInput] = useFocus<Input>();
@@ -115,14 +135,13 @@ export const Settings = ({
 
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
 
-  useEffect(() => {
-    setCurrentFolderReadsMaxDepth(folderReadsMaxDepth);
-  }, [folderReadsMaxDepth]);
-
   useDebounce(
     () => {
       if (currentFolderReadsMaxDepth !== folderReadsMaxDepth) {
-        dispatch(updateFolderReadsMaxDepth(currentFolderReadsMaxDepth));
+        // dispatch(updateFolderReadsMaxDepth(currentFolderReadsMaxDepth));
+        if (onFolderReadsMaxDepthChange) {
+          onFolderReadsMaxDepthChange(currentFolderReadsMaxDepth);
+        }
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
@@ -130,12 +149,18 @@ export const Settings = ({
   );
 
   const onChangeFileIncludes = (patterns: string[]) => {
-    dispatch(updateFileIncludes(patterns));
+    // dispatch(updateFileIncludes(patterns));
+    if (onFileIncludesChange) {
+      onFileIncludesChange(patterns);
+    }
   };
 
   const onChangeScanExcludes = (patterns: string[]) => {
-    dispatch(updateScanExcludes(patterns));
-    dispatch(setScanExcludesStatus('outdated'));
+    // dispatch(updateScanExcludes(patterns));
+    // dispatch(setScanExcludesStatus('outdated'));
+    if (onScanExcludesChange) {
+      onScanExcludesChange(patterns);
+    }
   };
 
   // const onChangeTheme = (e: RadioChangeEvent) => {
@@ -146,22 +171,33 @@ export const Settings = ({
 
   const onChangeHelmPreviewMode = (selectedHelmPreviewMode: any) => {
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
-      dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
+      // dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
+      if (onHelmPreviewModeChange) {
+        onHelmPreviewModeChange(selectedHelmPreviewMode);
+      }
     }
   };
 
   const onChangeHideExcludedFilesInFileExplorer = (e: any) => {
-    dispatch(updateHideExcludedFilesInFileExplorer(e.target.checked));
+    // dispatch(updateHideExcludedFilesInFileExplorer(e.target.checked));
+    if (onHideExcludedFilesInFileExplorerChange) {
+      onHideExcludedFilesInFileExplorerChange(e.target.checked);
+    }
   };
 
   const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
     if (selectedKustomizeCommand === 'kubectl' || selectedKustomizeCommand === 'kustomize') {
-      dispatch(updateKustomizeCommand(selectedKustomizeCommand));
+      // dispatch(updateKustomizeCommand(selectedKustomizeCommand));
+      if (onKustomizeCommandChange) {
+        onKustomizeCommandChange(selectedKustomizeCommand);
+      }
     }
   };
 
   const onChangeLoadLastFolderOnStartup = (e: any) => {
-    dispatch(updateLoadLastFolderOnStartup(e.target.checked));
+    if (onLoadLastProjectOnStartupChange) {
+      onLoadLastProjectOnStartupChange(e.target.checked);
+    }
   };
 
   const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
@@ -232,7 +268,10 @@ export const Settings = ({
   };
 
   const toggleClusterSelector = () => {
-    dispatch(toggleClusterStatus());
+    // dispatch(toggleClusterStatus());
+    if (onClusterSelectorVisibleChange) {
+      onClusterSelectorVisibleChange(!isClusterSelectorVisible);
+    }
   };
   return (
     <>
@@ -262,7 +301,7 @@ export const Settings = ({
           </StyledButton>
         </Tooltip>
         <StyledDiv style={{marginTop: 16}}>
-          <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
+          <Checkbox checked={isClusterSelectorVisible} onChange={toggleClusterSelector}>
             Show Cluster Selector
           </Checkbox>
         </StyledDiv>
@@ -271,7 +310,7 @@ export const Settings = ({
       <StyledDiv>
         <StyledSpan>Files: Include</StyledSpan>
         <FilePatternList
-          value={appConfig.fileIncludes}
+          value={fileIncludes}
           onChange={onChangeFileIncludes}
           tooltip={AddInclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
@@ -280,7 +319,7 @@ export const Settings = ({
       <StyledDiv>
         <StyledSpan>Files: Exclude</StyledSpan>
         <FilePatternList
-          value={appConfig.scanExcludes}
+          value={scanExcludes}
           onChange={onChangeScanExcludes}
           tooltip={AddExclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
@@ -288,17 +327,14 @@ export const Settings = ({
         />
       </StyledDiv>
       <StyledDiv>
-        <Checkbox
-          checked={appConfig.settings.hideExcludedFilesInFileExplorer}
-          onChange={onChangeHideExcludedFilesInFileExplorer}
-        >
+        <Checkbox checked={hideExcludedFilesInFileExplorer} onChange={onChangeHideExcludedFilesInFileExplorer}>
           Hide excluded files
         </Checkbox>
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Helm Preview Mode</StyledSpan>
         <Tooltip title={HelmPreviewModeTooltip}>
-          <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
+          <StyledSelect value={helmPreviewMode} onChange={onChangeHelmPreviewMode}>
             <Select.Option value="template">Template</Select.Option>
             <Select.Option value="install">Install</Select.Option>
           </StyledSelect>
@@ -307,20 +343,22 @@ export const Settings = ({
       <StyledDiv>
         <StyledSpan>Kustomize Command</StyledSpan>
         <Tooltip title={KustomizeCommandTooltip}>
-          <StyledSelect value={appConfig.settings.kustomizeCommand} onChange={onChangeKustomizeCommand}>
+          <StyledSelect value={kustomizeCommand} onChange={onChangeKustomizeCommand}>
             <Select.Option value="kubectl">Use kubectl</Select.Option>
             <Select.Option value="kustomize">Use kustomize</Select.Option>
           </StyledSelect>
         </Tooltip>
       </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>On Startup</StyledSpan>
-        <Tooltip title={AutoLoadLastFolderTooltip}>
-          <Checkbox checked={appConfig.settings.loadLastFolderOnStartup} onChange={onChangeLoadLastFolderOnStartup}>
-            Automatically load last folder
-          </Checkbox>
-        </Tooltip>
-      </StyledDiv>
+      {showLoadLastProjectOnStartup && (
+        <StyledDiv>
+          <StyledSpan>On Startup</StyledSpan>
+          <Tooltip title={AutoLoadLastProjectTooltip}>
+            <Checkbox checked={loadLastProjectOnStartup} onChange={onChangeLoadLastFolderOnStartup}>
+              Automatically load last project
+            </Checkbox>
+          </Tooltip>
+        </StyledDiv>
+      )}
       <StyledDiv>
         <StyledSpan>Maximum folder read recursion depth</StyledSpan>
         <InputNumber min={1} value={currentFolderReadsMaxDepth} onChange={setCurrentFolderReadsMaxDepth} />

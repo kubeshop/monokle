@@ -442,7 +442,7 @@ const PageHeader = () => {
           <LogoCol noborder="true">
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
-          {activeProject && !clusterStatusHidden && (
+          {activeProject && activeProject && activeProject.settings && activeProject.settings.isClusterSelectorVisible && (
             <CLusterContainer>
               <CLusterStatus>
                 <StyledProjectsDropdown overlay={projectsMenu} placement="bottomCenter" arrow trigger={['click']}>

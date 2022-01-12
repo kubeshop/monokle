@@ -1,12 +1,13 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import {readFileSync, writeFileSync} from 'fs';
+import {writeFileSync} from 'fs';
 import _ from 'lodash';
 import path from 'path';
 
 import {AppConfig, KubeConfig, Languages, NewVersionCode, Project, TextSizes, Themes} from '@models/appconfig';
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
+import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -25,6 +26,7 @@ export const setOpenProject = createAsyncThunk(
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch}) => {
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     thunkAPI.dispatch(setRootFolder(projectRootPath));
+    monitorProjectConfigFile(projectRootPath);
   }
 );
 
@@ -89,9 +91,9 @@ export const configSlice = createSlice({
         ...action.payload.data,
       };
     },
-    updateLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+    updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.settings.loadLastFolderOnStartup', action.payload);
-      state.settings.loadLastFolderOnStartup = action.payload;
+      state.settings.loadLastProjectOnStartup = action.payload;
     },
     updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
@@ -188,14 +190,6 @@ export const configSlice = createSlice({
             4
           )
         );
-      } else {
-        const fileContent: any = JSON.parse(readFileSync(absolutePath, 'utf8'));
-        selectedProject.settings = fileContent.settings;
-        selectedProject.kubeConfig = fileContent.kubeConfig;
-        selectedProject.scanExcludes = fileContent.scanExcludes;
-        selectedProject.isScanExcludesUpdated = fileContent.isScanExcludesUpdated;
-        selectedProject.fileIncludes = fileContent.fileIncludes;
-        selectedProject.folderReadsMaxDepth = fileContent.folderReadsMaxDepth;
       }
     });
   },
@@ -215,7 +209,7 @@ export const {
   updateHideExcludedFilesInFileExplorer,
   updateKubeconfigPathValidity,
   updateKustomizeCommand,
-  updateLoadLastFolderOnStartup,
+  updateLoadLastProjectOnStartup,
   updateScanExcludes,
   updateStartupModalVisible,
   updateTextSize,

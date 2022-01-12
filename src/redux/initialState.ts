@@ -58,7 +58,7 @@ const initialAppConfigState: AppConfig = {
     theme: electronStore.get('appConfig.settings.theme'),
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
-    loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
+    loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
     hideExcludedFilesInFileExplorer: false,
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],

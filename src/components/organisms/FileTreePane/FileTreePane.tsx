@@ -646,7 +646,7 @@ const FileTreePane = () => {
   );
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
-  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
+  const loadLastProjectOnStartup = useAppSelector(state => state.config.settings.loadLastProjectOnStartup);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const recentFolders = useAppSelector(state => state.config.recentFolders);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
@@ -840,13 +840,13 @@ const FileTreePane = () => {
 
   const onExecutedFrom = useCallback(
     (_, data) => {
-      const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
+      const folder = data.path || (loadLastProjectOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
       if (folder && getFileStats(folder)?.isDirectory()) {
         setFolder(folder);
         setAutoExpandParent(true);
       }
     },
-    [loadLastFolderOnStartup, setFolder, recentFolders]
+    [loadLastProjectOnStartup, setFolder, recentFolders]
   );
 
   // called from main thread because thunks cannot be dispatched by main

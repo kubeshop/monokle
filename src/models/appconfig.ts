@@ -23,8 +23,9 @@ export type Settings = {
   autoZoomGraphOnSelection: boolean;
   helmPreviewMode: 'template' | 'install';
   kustomizeCommand: KustomizeCommandType;
-  loadLastFolderOnStartup: boolean;
+  loadLastProjectOnStartup?: boolean;
   hideExcludedFilesInFileExplorer: boolean;
+  isClusterSelectorVisible?: boolean;
 };
 
 export enum NewVersionCode {
