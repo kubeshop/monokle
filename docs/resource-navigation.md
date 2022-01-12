@@ -2,30 +2,30 @@
 
 Resources can be loaded either from the file system or a configured cluster. 
 
-- Selecting the "Browse" button in the File Explorer prompts for a folder containing resource manifests
-- Selecting "Show Cluster Objects" in the Cluster Explorer loads available resources using the configured kubeconfig variable, see [Cluster Preview](cluster-integration.md) for more details
+- Selecting the "Browse" button in the File Explorer prompts for a folder containing resource manifests.
+- Selecting "Show Cluster Objects" in the Cluster Explorer loads available resources using the configured kubeconfig variable. See [Cluster Preview](cluster-integration.md) for more details.
 
-Once selecting a folder the File Explorer and Navigators will be populated accordingly. Monokle will attempt to synchronize 
+Once selected, a folder the File Explorer and Navigator will be populated accordingly. Monokle will attempt to synchronize 
 automatically with any external file/folder changes made in the selected folder, but the Refresh button next to the Browse button
-allows for manual reloading of the folder if needed.
+allows for manual reloading of the folder, if needed.
 
 ## File Explorer
 
-- The File Explorer now shows all files parsed in the specified folder
-  - excluded files are greyed out
-  - files containing resource manifests have a number displayed after them, showing the number of 
-    resources found in that file
+- The File Explorer now shows all files parsed in the specified folder:
+  - Excluded files are greyed out.
+  - Files containing resource manifests have a number displayed after them, showing the number of 
+    resources found in that file.
 
 Selecting a file will highlight contained resources in the Navigator and attempt to scroll them into view. The contents of the 
 file will be shown in the source editor to the right - allowing for direct editing of the file.
 
 ![File Explorer Navigation](img/resource-navigation-2.png)
 
-In this screenshot
+In this screenshot:
 
-- the argo-rollouts-aggregate-roles.yaml file is selected - the "3" after the filename indicates it contains 3 kubernetes resources
-- the 3 ClusterRole resources in thie file are highlighed in the Navigator in the middle
-- the contents of the file are shown in the editor to the right
+- The argo-rollouts-aggregate-roles.yaml file is selected - the "3" after the filename indicates it contains 3 kubernetes resources.
+- The 3 ClusterRole resources in thie file are highlighed in the Navigator in the middle.
+- The contents of the file are shown in the editor to the right.
 
 ## Resource Navigator
 
@@ -35,48 +35,48 @@ any other resourced linked to the selected one:
 
 ![Resource Navigation](img/resource-navigation-1.png)
 
-In this screenshot 
+In this screenshot: 
 
-- the `argo-rollouts-metrics` service is selected
-- the associated `argo-rollouts-metrics-service.yaml` file is highlighted to the left
-- the linked `argo-rollouts` Deployment (via the selector in the Service manifest) is highlighted 
-- the Service manifest is shown in the editor to the right (with highlighting of the link to the Deployment on line 16)
+- The `argo-rollouts-metrics` service is selected.
+- The associated `argo-rollouts-metrics-service.yaml` file is highlighted to the left.
+- The linked `argo-rollouts` Deployment (via the selector in the Service manifest) is highlighted. 
+- The Service manifest is shown in the editor to the right (with highlighting of the link to the Deployment on line 16).
 
 ## Resource Links
 
 Links between resources are indicated by link icons to the left and right each resource name:
 
-- Links to the left indicate there are incoming link to the resource, for example a ConfigMap might
-  have an incoming link from a Deployment
-- Links to the right indicate there are outgoing links from the resource, for example a Service might have a
-  selector that selects a Deployment
+- Links to the left indicate there are incoming links to the resource. For example, a ConfigMap might
+  have an incoming link from a Deployment.
+- Links to the right indicate there are outgoing links from the resource. For example, a Service might have a
+  selector that selects a Deployment.
 
 Hovering over a link icon will show a popup with all links (either incoming or outgoing) allowing you to click on 
 a link to take you to that resource in the navigator:
 
 ![Resource Links Popup](img/resource-links-popup.png)
 
-Here the popup shows the outgoing link from the `argo-rollouts-metrics` Service to the `argo-rollouts Deployment 
-(via the selector in the Service manifest)
+In the following image, the popup shows the outgoing link from the `argo-rollouts-metrics` Service to the `argo-rollouts Deployment 
+(via the selector in the Service manifest).
 
-If a link is "unfulfilled", i.e. not referring to any object currently in the navigator it is marked with a warning 
+If a link is "unfulfilled", i.e. not referring to any object currently in the navigator, it is marked with a warning 
 triangle - making it easy to identify broken resource-links in your manifests:
 
 ![Resource Navigator Broken Links](img/navigator-broken-links.png)
 
-In this screenshot the `argo-rollouts-role-binding` RoleBinding contains a reference to an `argo-rollouts-role` Role, which
+In this screenshot the `rollouts-demo-root` RoleBinding contains a reference to an `rollouts-demo` Role, which
 doesn't exist in the current manifests. Clicking on broken links will open the corresponding reference in the editor so you 
 can easily fix it.
 
 ## Resource Validation
 
-Monokle automatically validates all resources of the corresponding kubernetes 1.22.1 schemas. The resource which is not validated is shown with a red error icon in the navigator. You can click on the error information button to check the error details.
+Monokle automatically validates all resources of the corresponding kubernetes 1.22.1 schemas. A resource which is not validated is shown with a red error icon in the navigator. You can click on the error information button to check the error details.
 
 ![Resource Validation](img/resource-validation.png)
 
 ## Resource Filtering
 
-Resource filters allows you to filter the resources based on various properties such as:
+Resource filters allow you to filter the resources based on various properties such as:
 
 1. Name
 2. Kind
@@ -86,7 +86,7 @@ Resource filters allows you to filter the resources based on various properties 
 
 Click on the filter button on the top of the navigator to launch the dialog for configuration.
 
-![Resource Filtering](img/resource-filtering.png)
+![Resource Filtering](img/resource-filtering-1.4.0.png)
 
 ## Reload Folder On Startup
 
@@ -103,19 +103,19 @@ You can easily navigate back and forth between the selected resources with the h
 
 ## Expand/Collapse Sections
 
-In resource navigator, you can expand or collapse individual or all sections in the resource navigator.
+In the resource navigator, you can expand or collapse individual or all sections.
 
 ![Expand](img/expand.png)
 ## Recent Folders
 
-The recent Folders option has been added to the system menu to make it easy to switch between your favorite resource-manifest folders. 
+The Recent Folders option has been added to the system menu to make it easy to switch between your favorite resource-manifest folders. 
 
 **Action:** File > Recent Folders
 
-![Recent Folders](img/recent-folder.png)
+![Recent Folders](img/recent-folders-1.4.0.png)
 ## Supported Resource links
 
-Monokle currently finds and visualizes the following links between kubernetes resources - please let us know if
+Monokle currently finds and visualizes the following links between Kubernetes resources - please let us know if
 we missed something or got it wrong!
 
 | Resource Type | Outgoing Link(s) identified |
