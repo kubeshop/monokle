@@ -1,10 +1,15 @@
 import path from 'path';
 
 import {AnyPlugin} from '@models/plugin';
-import {AnyTemplate, TemplatePack, isHelmChartTemplate, validateTemplatePack} from '@models/template';
+import {
+  AnyTemplate,
+  TemplatePack,
+  isHelmChartTemplate,
+  validateAnyTemplate,
+  validateTemplatePack,
+} from '@models/template';
 
 import downloadExtension from './extensions/downloadExtension';
-import downloadExtensionEntry from './extensions/downloadExtensionEntry';
 import {extractRepositoryOwnerAndNameFromUrl} from './utils';
 
 const parseTemplate = (template: AnyTemplate, templateFolderPath: string): AnyTemplate => {
@@ -39,38 +44,42 @@ const parseTemplatePack = (templatePack: TemplatePack, templatePackFolderPath: s
   };
 };
 
-export async function downloadTemplateDiscoveryEntry(repositoryUrl: string, templatesDir: string) {
+export async function downloadTemplatePack(repositoryUrl: string, templatesDir: string) {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
-  const templateDiscoveryUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/monokle-templates.json`;
-  const templateDiscovery: TemplatePack = await downloadExtensionEntry<TemplatePack>({
-    entryFileName: 'monokle-templates.json',
-    entryFileUrl: templateDiscoveryUrl,
-    validateEntryFileContent: validateTemplatePack,
-    parseEntryFileContent: JSON.parse,
-    makeExtensionFolderPath: () => {
-      return path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
-    },
-  });
-  return templateDiscovery;
-}
-
-export async function downloadTemplateDiscovery(repositoryUrl: string, templatesDir: string) {
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
-  const templateDiscoveryUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/monokle-templates.json`;
-  const templateDiscoveryTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
+  const templatePackUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/monokle-template-pack.json`;
+  const templatePackTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
   const templatePackFolderPath = path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
-  const templateDiscovery: TemplatePack = await downloadExtension<TemplatePack, TemplatePack>({
-    extensionTarballUrl: templateDiscoveryTarballUrl,
-    entryFileName: 'monokle-templates.json',
-    entryFileUrl: templateDiscoveryUrl,
+  const templatePack: TemplatePack = await downloadExtension<TemplatePack, TemplatePack>({
+    extensionTarballUrl: templatePackTarballUrl,
+    entryFileName: 'monokle-template-pack.json',
+    entryFileUrl: templatePackUrl,
     validateEntryFileContent: validateTemplatePack,
     parseEntryFileContent: JSON.parse,
     makeExtensionFolderPath: () => {
       return templatePackFolderPath;
     },
-    transformEntryFileContentToExtension: td => parseTemplatePack(td, templatePackFolderPath),
+    transformEntryFileContentToExtension: tp => parseTemplatePack(tp, templatePackFolderPath),
   });
-  return templateDiscovery;
+  return templatePack;
+}
+
+export async function downloadTemplate(repositoryUrl: string, templatesDir: string) {
+  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
+  const templateUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/monokle-template.json`;
+  const templateTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
+  const templateFolderPath = path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
+  const template: AnyTemplate = await downloadExtension<AnyTemplate, AnyTemplate>({
+    extensionTarballUrl: templateTarballUrl,
+    entryFileName: 'monokle-template.json',
+    entryFileUrl: templateUrl,
+    validateEntryFileContent: validateAnyTemplate,
+    parseEntryFileContent: JSON.parse,
+    makeExtensionFolderPath: () => {
+      return templateFolderPath;
+    },
+    transformEntryFileContentToExtension: t => parseTemplate(t, templateFolderPath),
+  });
+  return template;
 }
 
 type LoadTemplatesOptions = {templatePacks: TemplatePack[]; plugins: AnyPlugin[]};
