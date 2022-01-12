@@ -19,6 +19,7 @@ import {
 } from '@organisms';
 
 import ChangeFiltersConfirmModal from '@components/molecules/ChangeFiltersConfirmModal/ChangeFiltersConfirmModal';
+import SaveResourceToFileFolderModal from '@components/molecules/SaveResourcesToFileFolderModal';
 import {ClusterDiffModal} from '@components/organisms';
 import CreateFolderModal from '@components/organisms/CreateFolderModal';
 import QuickSearchActions from '@components/organisms/QuickSearchActions';
@@ -60,6 +61,7 @@ const App = () => {
         <QuickSearchActions />
         <HotKeysHandler />
         <RenameResourceModal />
+        <SaveResourceToFileFolderModal />
         <ChangeFiltersConfirmModal />
         <UpdateModal />
         <ClusterDiffModal />

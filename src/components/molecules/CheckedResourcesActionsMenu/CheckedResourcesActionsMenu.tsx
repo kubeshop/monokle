@@ -14,6 +14,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {removeResource, uncheckAllResourceIds} from '@redux/reducers/main';
+import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {AppDispatch} from '@redux/store';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
@@ -21,7 +22,6 @@ import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import Colors from '@styles/Colors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
-import SaveResourceToFileFolderModal from '../SaveResourcesToFileFolderModal';
 
 export const SaveDestinationWrapper = styled(Input.Group)`
   display: flex !important;
@@ -87,7 +87,6 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
-  const [isSaveToFileFolderModalVisible, setIsSaveToFileFolderModalVisible] = useState(false);
 
   const checkedResources = useMemo(
     () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
@@ -121,7 +120,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   };
 
   const onClickSaveToFileFolder = () => {
-    setIsSaveToFileFolderModalVisible(true);
+    dispatch(openSaveResourcesToFileFolderModal(checkedResourceIds));
   };
 
   return (
@@ -160,15 +159,6 @@ const CheckedResourcesActionsMenu: React.FC = () => {
           title={confirmModalTitle}
           onOk={selectedNamespace => onClickApplyCheckedResources(selectedNamespace)}
           onCancel={() => setIsApplyModalVisible(false)}
-        />
-      )}
-
-      {isSaveToFileFolderModalVisible && (
-        <SaveResourceToFileFolderModal
-          resourcesIds={checkedResourceIds}
-          title={`Save resources (${checkedResourceIds.length})`}
-          isVisible={isSaveToFileFolderModalVisible}
-          onCancel={() => setIsSaveToFileFolderModalVisible(false)}
         />
       )}
     </>

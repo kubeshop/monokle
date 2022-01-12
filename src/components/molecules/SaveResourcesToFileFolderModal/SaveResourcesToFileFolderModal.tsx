@@ -17,6 +17,7 @@ import {AlertEnum} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
+import {closeSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -52,13 +53,6 @@ const StyledSelect = styled(Select)`
   overflow-x: hidden;
 `;
 
-interface IProps {
-  isVisible: boolean;
-  resourcesIds: string[];
-  title: string;
-  onCancel: () => void;
-}
-
 const getFullFileName = (filename: string, fileIncludes: string[]) => {
   if (fileIncludes.some(fileInclude => micromatch.isMatch(filename, fileInclude))) {
     return filename;
@@ -67,8 +61,9 @@ const getFullFileName = (filename: string, fileIncludes: string[]) => {
   return `${filename}.yaml`;
 };
 
-const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
-  const {isVisible, resourcesIds, title, onCancel} = props;
+const SaveResourceToFileFolderModal: React.FC = () => {
+  const isVisible = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.isOpen);
+  const resourcesIds = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIds);
 
   const dispatch = useAppDispatch();
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
@@ -186,7 +181,7 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
       }
     });
 
-    onCancel();
+    dispatch(closeSaveResourcesToFileFolderModal());
     dispatch(uncheckAllResourceIds());
     dispatch(
       setAlert({
@@ -221,8 +216,19 @@ const SaveResourceToFileFolderModal: React.FC<IProps> = props => {
     setSaveToFolderPaths({create: filesToBeCreated, replace: filesToBeReplaced});
   }, [fileIncludes, fileMap, savingDestination, resourcesIds, resourceMap, selectedFolder]);
 
+  useEffect(() => {
+    if (isVisible) {
+      setSelectedFolder(ROOT_FILE_ENTRY);
+    }
+  }, [isVisible]);
+
   return (
-    <Modal title={title} visible={isVisible} onCancel={onCancel} onOk={saveCheckedResourcesToFileFolder}>
+    <Modal
+      title={resourcesIds.length === 1 ? 'Save resource' : `Save resources (${resourcesIds.length})`}
+      visible={isVisible}
+      onCancel={() => dispatch(closeSaveResourcesToFileFolderModal())}
+      onOk={saveCheckedResourcesToFileFolder}
+    >
       <SaveDestinationWrapper compact>
         <StyledSelect
           style={{flex: 1}}

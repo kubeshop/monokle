@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 
 import {Menu, Modal} from 'antd';
 
@@ -12,7 +12,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {removeResource} from '@redux/reducers/main';
-import {openNewResourceWizard, openRenameResourceModal} from '@redux/reducers/ui';
+import {openNewResourceWizard, openRenameResourceModal, openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
@@ -21,7 +21,6 @@ import {AppDispatch} from '@redux/store';
 import {Dots} from '@atoms';
 
 import ContextMenu from '@components/molecules/ContextMenu';
-import SaveResourceToFileFolderModal from '@components/molecules/SaveResourcesToFileFolderModal';
 
 import Colors from '@styles/Colors';
 
@@ -72,8 +71,6 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 
-  const [isSaveToFileFolderModalVisible, setIsSaveToFileFolderModalVisible] = useState(false);
-
   const isResourceSelected = useMemo(() => {
     return itemInstance.id === selectedResourceId;
   }, [itemInstance, selectedResourceId]);
@@ -104,11 +101,15 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
     deleteResourceWithConfirm(resource, resourceMap, dispatch);
   };
 
+  const onClickSaveToFileFolder = () => {
+    dispatch(openSaveResourcesToFileFolderModal([itemInstance.id]));
+  };
+
   const menu = (
     <Menu>
       {isInPreviewMode && (
         <>
-          <Menu.Item onClick={() => setIsSaveToFileFolderModalVisible(true)} key="save_to_file_folder">
+          <Menu.Item onClick={onClickSaveToFileFolder} key="save_to_file_folder">
             Save to file/folder
           </Menu.Item>
           <ContextMenuDivider />
@@ -128,22 +129,11 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   );
 
   return (
-    <>
-      <ContextMenu overlay={menu}>
-        <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
-          <Dots color={isResourceSelected ? Colors.blackPure : undefined} />
-        </StyledActionsMenuIconContainer>
-      </ContextMenu>
-
-      {isSaveToFileFolderModalVisible && (
-        <SaveResourceToFileFolderModal
-          resourcesIds={[itemInstance.id]}
-          title="Save resource"
-          isVisible={isSaveToFileFolderModalVisible}
-          onCancel={() => setIsSaveToFileFolderModalVisible(false)}
-        />
-      )}
-    </>
+    <ContextMenu overlay={menu}>
+      <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
+        <Dots color={isResourceSelected ? Colors.blackPure : undefined} />
+      </StyledActionsMenuIconContainer>
+    </ContextMenu>
   );
 };
 
