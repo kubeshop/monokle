@@ -2,9 +2,18 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 
 import {writeFileSync} from 'fs';
 import _ from 'lodash';
-import path from 'path';
+import path, {sep} from 'path';
 
-import {AppConfig, KubeConfig, Languages, NewVersionCode, Project, TextSizes, Themes} from '@models/appconfig';
+import {
+  AppConfig,
+  KubeConfig,
+  Languages,
+  NewVersionCode,
+  Project,
+  ProjectConfig,
+  TextSizes,
+  Themes,
+} from '@models/appconfig';
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
@@ -12,7 +21,6 @@ import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
-import {getFileStats} from '@utils/files';
 
 import initialState from '../initialState';
 
@@ -23,10 +31,11 @@ export const setCreateProject = createAsyncThunk('config/setCreateProject', asyn
 
 export const setOpenProject = createAsyncThunk(
   'config/openProject',
-  async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch}) => {
+  async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     thunkAPI.dispatch(setRootFolder(projectRootPath));
-    monitorProjectConfigFile(projectRootPath);
+    const projectConfig: ProjectConfig = thunkAPI.getState().config.projectConfig;
+    monitorProjectConfigFile(thunkAPI.dispatch, projectConfig, projectRootPath);
   }
 );
 
@@ -148,50 +157,20 @@ export const configSlice = createSlice({
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
-  },
-  extraReducers: builder => {
-    builder.addCase(setOpenProject.fulfilled, state => {
-      const selectedProject: Project | undefined = state.projects.find(
-        (p: Project) => p.rootFolder === state.selectedProjectRootFolder
-      );
-
-      if (!selectedProject) {
-        return;
-      }
-
-      const fileName = `.monokle`;
-      const absolutePath = path.join(selectedProject.rootFolder, fileName);
-
-      const pathStats = getFileStats(absolutePath);
-
-      if (pathStats === undefined) {
-        selectedProject.settings = state.settings;
-        selectedProject.kubeConfig = state.kubeConfig;
-        selectedProject.scanExcludes = state.scanExcludes;
-        selectedProject.isScanExcludesUpdated = state.isScanExcludesUpdated;
-        selectedProject.fileIncludes = state.fileIncludes;
-        selectedProject.folderReadsMaxDepth = state.folderReadsMaxDepth;
+    updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
+      if (!_.isEqual(state.projectConfig, action.payload)) {
+        state.projectConfig = action.payload;
         writeFileSync(
-          absolutePath,
-          JSON.stringify(
-            {
-              settings: state.settings,
-              scanExcludes: state.scanExcludes,
-              isScanExcludesUpdated: state.isScanExcludesUpdated,
-              fileIncludes: state.fileIncludes,
-              folderReadsMaxDepth: state.folderReadsMaxDepth,
-              kubeConfig: {
-                ...state.kubeConfig,
-                path: state.kubeconfigPath,
-                isPathValid: state.isKubeconfigPathValid,
-              },
-            },
-            null,
-            4
-          )
+          `${state.selectedProjectRootFolder}${sep}.monokle`,
+          JSON.stringify(state.projectConfig, null, 4),
+          'utf-8'
         );
       }
-    });
+    },
+    toggleClusterStatus: (state: Draft<AppConfig>) => {
+      state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;
+      electronStore.set('ui.clusterStatusHidden', state.settings.isClusterSelectorVisible);
+    },
   },
 });
 
@@ -215,5 +194,7 @@ export const {
   updateTextSize,
   updateTheme,
   setContexts,
+  updateProjectConfig,
+  toggleClusterStatus,
 } = configSlice.actions;
 export default configSlice.reducer;

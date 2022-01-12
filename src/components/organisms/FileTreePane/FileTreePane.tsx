@@ -678,7 +678,13 @@ const FileTreePane = () => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
     const treeData =
       rootEntry &&
-      createNode(rootEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter);
+      createNode(
+        rootEntry,
+        fileMap,
+        resourceMap,
+        Boolean(hideExcludedFilesInFileExplorer),
+        fileOrFolderContainedInFilter
+      );
 
     setTree(treeData);
 

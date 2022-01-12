@@ -2,6 +2,7 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {ProjectConfig} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -69,4 +70,48 @@ export const logsSelector = createSelector(
 export const activeProjectSelector = createSelector(
   (state: RootState) => state.config,
   config => config.projects.find(p => p.rootFolder === config.selectedProjectRootFolder)
+);
+
+export const currentConfigSelector = createSelector(
+  (state: RootState) => state.config,
+  config => {
+    const applicationConfig: ProjectConfig = {
+      settings: {
+        ...config.settings,
+      },
+      scanExcludes: config.scanExcludes,
+      fileIncludes: config.fileIncludes,
+      folderReadsMaxDepth: config.folderReadsMaxDepth,
+    };
+    const projectConfig: ProjectConfig | null | undefined = config.projectConfig;
+
+    if (!projectConfig) {
+      return applicationConfig;
+    }
+
+    const validConfig: ProjectConfig = {};
+
+    if (!projectConfig.settings) {
+      validConfig.settings = applicationConfig.settings;
+    } else {
+      validConfig.settings = {
+        helmPreviewMode: projectConfig.settings.helmPreviewMode && applicationConfig.settings?.helmPreviewMode,
+        kustomizeCommand: projectConfig.settings.kustomizeCommand && applicationConfig.settings?.kustomizeCommand,
+        loadLastProjectOnStartup: Boolean(
+          projectConfig.settings.loadLastProjectOnStartup && applicationConfig.settings?.loadLastProjectOnStartup
+        ),
+        hideExcludedFilesInFileExplorer: Boolean(
+          projectConfig.settings.hideExcludedFilesInFileExplorer &&
+            applicationConfig.settings?.hideExcludedFilesInFileExplorer
+        ),
+        isClusterSelectorVisible: Boolean(
+          projectConfig.settings.isClusterSelectorVisible && applicationConfig.settings?.isClusterSelectorVisible
+        ),
+      };
+    }
+    validConfig.scanExcludes = projectConfig.scanExcludes && applicationConfig.scanExcludes;
+    validConfig.fileIncludes = projectConfig.fileIncludes && applicationConfig.fileIncludes;
+    validConfig.folderReadsMaxDepth = projectConfig.folderReadsMaxDepth && applicationConfig.folderReadsMaxDepth;
+    return validConfig;
+  }
 );

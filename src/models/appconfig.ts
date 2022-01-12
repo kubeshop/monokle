@@ -16,15 +16,15 @@ export enum Languages {
 }
 
 export type Settings = {
-  theme: Themes; // not used for now
-  textSize: TextSizes; // not used for now
-  language: Languages; // not used for now
-  filterObjectsOnSelection: boolean;
-  autoZoomGraphOnSelection: boolean;
-  helmPreviewMode: 'template' | 'install';
-  kustomizeCommand: KustomizeCommandType;
+  theme?: Themes; // not used for now
+  textSize?: TextSizes; // not used for now
+  language?: Languages; // not used for now
+  filterObjectsOnSelection?: boolean;
+  autoZoomGraphOnSelection?: boolean;
+  helmPreviewMode?: 'template' | 'install';
+  kustomizeCommand?: KustomizeCommandType;
   loadLastProjectOnStartup?: boolean;
-  hideExcludedFilesInFileExplorer: boolean;
+  hideExcludedFilesInFileExplorer?: boolean;
   isClusterSelectorVisible?: boolean;
 };
 
@@ -52,18 +52,20 @@ export type KubeConfig = {
   currentContext?: string;
 };
 
-export interface Project {
+export type Project = {
   name?: string;
   rootFolder: string;
   k8sVersion?: string;
   lastOpened?: string;
+};
+
+export type ProjectConfig = {
   settings?: Settings;
   kubeConfig?: KubeConfig;
   scanExcludes?: string[];
-  isScanExcludesUpdated?: 'outdated' | 'applied';
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
-}
+};
 
 interface AppConfig {
   /** a list of patterns to exclude when scanning the file system for resources */
@@ -92,6 +94,7 @@ interface AppConfig {
   osPlatform: NodeJS.Platform;
   projects: Project[];
   selectedProjectRootFolder: string | null;
+  projectConfig?: ProjectConfig | null;
 }
 
 export type {AppConfig};

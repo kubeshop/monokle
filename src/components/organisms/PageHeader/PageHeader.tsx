@@ -26,8 +26,13 @@ import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCurrentContext, setOpenProject, updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {highlightItem, toggleClusterStatus, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {
+  setCurrentContext,
+  setOpenProject,
+  toggleClusterStatus,
+  updateStartupModalVisible,
+} from '@redux/reducers/appConfig';
+import {highlightItem, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   activeResourcesSelector,
@@ -254,7 +259,6 @@ const PageHeader = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const kubeConfig = useAppSelector(state => state.config.kubeConfig);
-  const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const projects: Project[] = useAppSelector(state => state.config.projects);
@@ -269,6 +273,7 @@ const PageHeader = () => {
   const dispatch = useAppDispatch();
   const activeProject = useSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -442,7 +447,7 @@ const PageHeader = () => {
           <LogoCol noborder="true">
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
-          {activeProject && activeProject && activeProject.settings && activeProject.settings.isClusterSelectorVisible && (
+          {activeProject && projectConfig && projectConfig.settings && projectConfig.settings.isClusterSelectorVisible && (
             <CLusterContainer>
               <CLusterStatus>
                 <StyledProjectsDropdown overlay={projectsMenu} placement="bottomCenter" arrow trigger={['click']}>

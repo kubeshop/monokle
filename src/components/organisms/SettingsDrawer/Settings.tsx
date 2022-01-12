@@ -7,6 +7,7 @@ import {Button, Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
 
 import {WarningOutlined} from '@ant-design/icons';
 
+import _ from 'lodash';
 import styled from 'styled-components';
 
 import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
@@ -19,6 +20,8 @@ import {
   KubeconfigPathTooltip,
   KustomizeCommandTooltip,
 } from '@constants/tooltips';
+
+import {ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateKubeconfig, updateKubeconfigPathValidity} from '@redux/reducers/appConfig';
@@ -75,44 +78,16 @@ const StyledHeading = styled.h2`
 `;
 
 type SettingsProps = {
-  isClusterPaneIconHighlighted?: boolean;
-  isClusterSelectorVisible?: boolean;
-  onClusterSelectorVisibleChange?: Function;
-  fileIncludes?: string[];
-  onFileIncludesChange?: Function;
-  scanExcludes?: string[];
-  onScanExcludesChange?: Function;
-  helmPreviewMode?: string;
-  onHelmPreviewModeChange?: Function;
-  kustomizeCommand?: string;
-  onKustomizeCommandChange?: Function;
-  folderReadsMaxDepth?: number;
-  onFolderReadsMaxDepthChange?: Function;
-  hideExcludedFilesInFileExplorer?: boolean;
-  onHideExcludedFilesInFileExplorerChange?: Function;
-  showLoadLastProjectOnStartup?: boolean;
-  loadLastProjectOnStartup?: boolean;
-  onLoadLastProjectOnStartupChange?: Function;
+  config?: ProjectConfig | null;
+  onConfigChange?: Function;
+  isClusterPaneIconHighlighted?: boolean | null;
+  showLoadLastProjectOnStartup?: boolean | null;
 };
 
 export const Settings = ({
+  config,
+  onConfigChange,
   isClusterPaneIconHighlighted,
-  isClusterSelectorVisible,
-  onClusterSelectorVisibleChange,
-  fileIncludes = [],
-  onFileIncludesChange,
-  scanExcludes = [],
-  onScanExcludesChange,
-  helmPreviewMode,
-  onHelmPreviewModeChange,
-  kustomizeCommand,
-  onKustomizeCommandChange,
-  folderReadsMaxDepth,
-  onFolderReadsMaxDepthChange,
-  hideExcludedFilesInFileExplorer,
-  onHideExcludedFilesInFileExplorerChange,
-  loadLastProjectOnStartup,
-  onLoadLastProjectOnStartupChange,
   showLoadLastProjectOnStartup = false,
 }: SettingsProps) => {
   const dispatch = useAppDispatch();
@@ -124,43 +99,47 @@ export const Settings = ({
   const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(folderReadsMaxDepth || 5);
   const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
   const [inputRef, focusInput] = useFocus<Input>();
   const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
   const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
-
   const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
-
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
+
+  const [localConfig, setLocalConfig] = useState<ProjectConfig | null | undefined>(config);
+
+  const handleConfigChange = () => {
+    if (onConfigChange && !_.isEqual(localConfig, config)) {
+      onConfigChange(localConfig);
+    }
+  };
+
+  useEffect(() => {
+    setLocalConfig(config);
+  }, [config]);
+
+  useEffect(() => {
+    handleConfigChange();
+  }, [localConfig]);
 
   useDebounce(
     () => {
-      if (currentFolderReadsMaxDepth !== folderReadsMaxDepth) {
-        // dispatch(updateFolderReadsMaxDepth(currentFolderReadsMaxDepth));
-        if (onFolderReadsMaxDepthChange) {
-          onFolderReadsMaxDepthChange(currentFolderReadsMaxDepth);
-        }
-      }
+      handleConfigChange();
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [currentFolderReadsMaxDepth]
+    [localConfig?.folderReadsMaxDepth]
   );
 
   const onChangeFileIncludes = (patterns: string[]) => {
     // dispatch(updateFileIncludes(patterns));
-    if (onFileIncludesChange) {
-      onFileIncludesChange(patterns);
-    }
+    setLocalConfig({...localConfig, fileIncludes: patterns});
   };
 
   const onChangeScanExcludes = (patterns: string[]) => {
     // dispatch(updateScanExcludes(patterns));
     // dispatch(setScanExcludesStatus('outdated'));
-    if (onScanExcludesChange) {
-      onScanExcludesChange(patterns);
-    }
+    setLocalConfig({...localConfig, scanExcludes: patterns});
   };
 
   // const onChangeTheme = (e: RadioChangeEvent) => {
@@ -172,32 +151,33 @@ export const Settings = ({
   const onChangeHelmPreviewMode = (selectedHelmPreviewMode: any) => {
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
       // dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
-      if (onHelmPreviewModeChange) {
-        onHelmPreviewModeChange(selectedHelmPreviewMode);
-      }
+      setLocalConfig({...localConfig, settings: {...localConfig?.settings, helmPreviewMode: selectedHelmPreviewMode}});
     }
   };
 
   const onChangeHideExcludedFilesInFileExplorer = (e: any) => {
     // dispatch(updateHideExcludedFilesInFileExplorer(e.target.checked));
-    if (onHideExcludedFilesInFileExplorerChange) {
-      onHideExcludedFilesInFileExplorerChange(e.target.checked);
-    }
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, hideExcludedFilesInFileExplorer: e.target.checked},
+    });
   };
 
   const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
     if (selectedKustomizeCommand === 'kubectl' || selectedKustomizeCommand === 'kustomize') {
       // dispatch(updateKustomizeCommand(selectedKustomizeCommand));
-      if (onKustomizeCommandChange) {
-        onKustomizeCommandChange(selectedKustomizeCommand);
-      }
+      setLocalConfig({
+        ...localConfig,
+        settings: {...localConfig?.settings, kustomizeCommand: selectedKustomizeCommand},
+      });
     }
   };
 
   const onChangeLoadLastFolderOnStartup = (e: any) => {
-    if (onLoadLastProjectOnStartupChange) {
-      onLoadLastProjectOnStartupChange(e.target.checked);
-    }
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, loadLastProjectOnStartup: e.target.checked},
+    });
   };
 
   const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
@@ -269,9 +249,13 @@ export const Settings = ({
 
   const toggleClusterSelector = () => {
     // dispatch(toggleClusterStatus());
-    if (onClusterSelectorVisibleChange) {
-      onClusterSelectorVisibleChange(!isClusterSelectorVisible);
-    }
+    setLocalConfig({
+      ...localConfig,
+      settings: {
+        ...localConfig?.settings,
+        isClusterSelectorVisible: Boolean(!localConfig?.settings?.isClusterSelectorVisible),
+      },
+    });
   };
   return (
     <>
@@ -282,7 +266,7 @@ export const Settings = ({
             <StyledWarningOutlined
               className={isClusterPaneIconHighlighted ? 'animated-highlight' : ''}
               isKubeconfigPathValid={isKubeconfigPathValid}
-              highlighted={isClusterPaneIconHighlighted}
+              highlighted={Boolean(isClusterPaneIconHighlighted)}
             />
           )}
         </StyledHeading>
@@ -301,7 +285,7 @@ export const Settings = ({
           </StyledButton>
         </Tooltip>
         <StyledDiv style={{marginTop: 16}}>
-          <Checkbox checked={isClusterSelectorVisible} onChange={toggleClusterSelector}>
+          <Checkbox checked={Boolean(localConfig?.settings?.isClusterSelectorVisible)} onChange={toggleClusterSelector}>
             Show Cluster Selector
           </Checkbox>
         </StyledDiv>
@@ -310,7 +294,7 @@ export const Settings = ({
       <StyledDiv>
         <StyledSpan>Files: Include</StyledSpan>
         <FilePatternList
-          value={fileIncludes}
+          value={localConfig?.fileIncludes || []}
           onChange={onChangeFileIncludes}
           tooltip={AddInclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
@@ -319,7 +303,7 @@ export const Settings = ({
       <StyledDiv>
         <StyledSpan>Files: Exclude</StyledSpan>
         <FilePatternList
-          value={scanExcludes}
+          value={localConfig?.scanExcludes || []}
           onChange={onChangeScanExcludes}
           tooltip={AddExclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
@@ -327,14 +311,17 @@ export const Settings = ({
         />
       </StyledDiv>
       <StyledDiv>
-        <Checkbox checked={hideExcludedFilesInFileExplorer} onChange={onChangeHideExcludedFilesInFileExplorer}>
+        <Checkbox
+          checked={Boolean(localConfig?.settings?.hideExcludedFilesInFileExplorer)}
+          onChange={onChangeHideExcludedFilesInFileExplorer}
+        >
           Hide excluded files
         </Checkbox>
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Helm Preview Mode</StyledSpan>
         <Tooltip title={HelmPreviewModeTooltip}>
-          <StyledSelect value={helmPreviewMode} onChange={onChangeHelmPreviewMode}>
+          <StyledSelect value={localConfig?.settings?.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
             <Select.Option value="template">Template</Select.Option>
             <Select.Option value="install">Install</Select.Option>
           </StyledSelect>
@@ -343,7 +330,7 @@ export const Settings = ({
       <StyledDiv>
         <StyledSpan>Kustomize Command</StyledSpan>
         <Tooltip title={KustomizeCommandTooltip}>
-          <StyledSelect value={kustomizeCommand} onChange={onChangeKustomizeCommand}>
+          <StyledSelect value={localConfig?.settings?.kustomizeCommand} onChange={onChangeKustomizeCommand}>
             <Select.Option value="kubectl">Use kubectl</Select.Option>
             <Select.Option value="kustomize">Use kustomize</Select.Option>
           </StyledSelect>
@@ -353,7 +340,10 @@ export const Settings = ({
         <StyledDiv>
           <StyledSpan>On Startup</StyledSpan>
           <Tooltip title={AutoLoadLastProjectTooltip}>
-            <Checkbox checked={loadLastProjectOnStartup} onChange={onChangeLoadLastFolderOnStartup}>
+            <Checkbox
+              checked={Boolean(localConfig?.settings?.loadLastProjectOnStartup)}
+              onChange={onChangeLoadLastFolderOnStartup}
+            >
               Automatically load last project
             </Checkbox>
           </Tooltip>
@@ -361,7 +351,11 @@ export const Settings = ({
       )}
       <StyledDiv>
         <StyledSpan>Maximum folder read recursion depth</StyledSpan>
-        <InputNumber min={1} value={currentFolderReadsMaxDepth} onChange={setCurrentFolderReadsMaxDepth} />
+        <InputNumber
+          min={1}
+          value={localConfig?.folderReadsMaxDepth}
+          onChange={(value: number) => setLocalConfig({...localConfig, folderReadsMaxDepth: value})}
+        />
       </StyledDiv>
       <StyledDiv>
         <StyledSpan>Resource links processing</StyledSpan>

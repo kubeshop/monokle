@@ -196,10 +196,6 @@ export const uiSlice = createSlice({
       state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
       state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
     },
-    toggleClusterStatus: (state: Draft<UiState>) => {
-      state.clusterStatusHidden = !state.clusterStatusHidden;
-      electronStore.set('ui.clusterStatusHidden', state.clusterStatusHidden);
-    },
   },
   extraReducers: builder => {
     builder
@@ -257,7 +253,6 @@ export const {
   toggleExpandActionsPaneFooter,
   resetLayout,
   highlightItem,
-  toggleClusterStatus,
   openQuickSearchActionsPopup,
   closeQuickSearchActionsPopup,
 } = uiSlice.actions;

@@ -5,11 +5,11 @@ import {Collapse} from 'antd';
 
 import _ from 'lodash';
 
-import {Project} from '@models/appconfig';
+import {Project, ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateLoadLastProjectOnStartup} from '@redux/reducers/appConfig';
-import {toggleClusterStatus, toggleSettings} from '@redux/reducers/ui';
+import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {toggleSettings} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
 import Drawer from '@components/atoms/Drawer';
@@ -24,8 +24,8 @@ const SettingsDrawer = () => {
 
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const [activePanels, setActivePanels] = useState<number[]>([2]);
-  const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
   const appConfig = useAppSelector(state => state.config);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
 
   const activeProject: Project | undefined = useSelector(activeProjectSelector);
 
@@ -44,9 +44,8 @@ const SettingsDrawer = () => {
     dispatch(toggleSettings());
   };
 
-  const changeProjectSettings = (settings: any) => {
-    // if (activeProject) {
-    // }
+  const changeProjectConfig = (config: ProjectConfig) => {
+    dispatch(updateProjectConfig(config));
   };
 
   return (
@@ -62,42 +61,11 @@ const SettingsDrawer = () => {
     >
       <Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
         <Panel header="Default Settings" key="1">
-          <Settings
-            isClusterSelectorVisible={clusterStatusHidden}
-            fileIncludes={appConfig.fileIncludes}
-            scanExcludes={appConfig.scanExcludes}
-            helmPreviewMode={appConfig.settings.helmPreviewMode}
-            kustomizeCommand={appConfig.settings.kustomizeCommand}
-            folderReadsMaxDepth={appConfig.folderReadsMaxDepth}
-            hideExcludedFilesInFileExplorer={appConfig.settings.hideExcludedFilesInFileExplorer}
-            loadLastProjectOnStartup={appConfig.settings.loadLastProjectOnStartup}
-            onLoadLastProjectOnStartupChange={(value: boolean) => dispatch(updateLoadLastProjectOnStartup(value))}
-            showLoadLastProjectOnStartup
-            onClusterSelectorVisibleChange={() => dispatch(toggleClusterStatus())}
-          />
+          <Settings config={appConfig} showLoadLastProjectOnStartup />
         </Panel>
         {activeProject && (
           <Panel header={`${activeProject.name} Settings`} key="2">
-            <Settings
-              isClusterSelectorVisible={activeProject.settings && activeProject.settings.isClusterSelectorVisible}
-              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
-              fileIncludes={activeProject.fileIncludes}
-              scanExcludes={activeProject.scanExcludes}
-              helmPreviewMode={activeProject.settings && activeProject.settings.helmPreviewMode}
-              kustomizeCommand={activeProject.settings && activeProject.settings.kustomizeCommand}
-              folderReadsMaxDepth={activeProject.folderReadsMaxDepth}
-              hideExcludedFilesInFileExplorer={
-                activeProject.settings && activeProject.settings.hideExcludedFilesInFileExplorer
-              }
-              onClusterSelectorVisibleChange={() =>
-                changeProjectSettings({
-                  ...activeProject.settings,
-                  isClusterSelectorVisible: !(
-                    activeProject.settings && activeProject.settings.isClusterSelectorVisible
-                  ),
-                })
-              }
-            />
+            <Settings config={projectConfig} onConfigChange={changeProjectConfig} />
           </Panel>
         )}
       </Collapse>

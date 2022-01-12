@@ -110,7 +110,6 @@ export type UiState = {
     browseTemplates: boolean;
     connectToCluster: boolean;
   };
-  clusterStatusHidden: boolean;
 };
 
 export type PaneConfiguration = {

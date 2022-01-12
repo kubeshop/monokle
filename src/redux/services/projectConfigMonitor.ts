@@ -1,7 +1,12 @@
 import {FSWatcher, watch} from 'chokidar';
 import {readFileSync} from 'fs';
+import _ from 'lodash';
+import {sep} from 'path';
 
-// import {AppDispatch} from '@redux/store';
+import {ProjectConfig} from '@models/appconfig';
+
+import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {AppDispatch} from '@redux/store';
 
 let watcher: FSWatcher;
 
@@ -9,13 +14,20 @@ let watcher: FSWatcher;
  * Creates a monitor for the specified folder and dispatches folder events using the specified dispatch
  */
 
-export function monitorProjectConfigFile(filePath?: string | null) {
-  if (watcher || !filePath) {
+export function monitorProjectConfigFile(
+  dispatch: AppDispatch,
+  currentProjectConfig: ProjectConfig,
+  filePath?: string | null
+) {
+  if (!filePath && watcher) {
     watcher.close();
     return;
   }
+  if (watcher) {
+    watcher.close();
+  }
 
-  const absolutePath = `${filePath}/.monokle`;
+  const absolutePath = `${filePath}${sep}.monokle`;
 
   watcher = watch(absolutePath, {
     persistent: true,
@@ -25,13 +37,13 @@ export function monitorProjectConfigFile(filePath?: string | null) {
 
   watcher
     .on('add', () => {
-      readConfigFileAndUpdateProjectSettings(absolutePath);
+      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, currentProjectConfig, dispatch);
     })
     .on('change', () => {
-      readConfigFileAndUpdateProjectSettings(absolutePath);
+      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, currentProjectConfig, dispatch);
     })
     .on('unlink', () => {
-      readConfigFileAndUpdateProjectSettings(absolutePath);
+      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, currentProjectConfig, dispatch);
     });
 
   watcher
@@ -39,7 +51,31 @@ export function monitorProjectConfigFile(filePath?: string | null) {
     .on('error', error => console.log(`Watcher error: ${error}`));
 }
 
-const readConfigFileAndUpdateProjectSettings = (absolutePath: string) => {
-  const fileContent: any = JSON.parse(readFileSync(absolutePath, 'utf8'));
-  console.log(fileContent);
+const readApplicationConfigFileAndUpdateProjectSettings = (
+  absolutePath: string,
+  currentProjectConfig: ProjectConfig,
+  dispatch: AppDispatch
+) => {
+  try {
+    const {settings, scanExcludes, fileIncludes, folderReadsMaxDepth}: ProjectConfig = JSON.parse(
+      readFileSync(absolutePath, 'utf8')
+    );
+    const projectConfig: ProjectConfig = {};
+    projectConfig.settings = {
+      helmPreviewMode: settings ? settings.helmPreviewMode : undefined,
+      kustomizeCommand: settings ? settings.kustomizeCommand : undefined,
+      hideExcludedFilesInFileExplorer: settings ? settings.hideExcludedFilesInFileExplorer : undefined,
+      isClusterSelectorVisible: settings ? settings.isClusterSelectorVisible : undefined,
+    };
+
+    projectConfig.scanExcludes = scanExcludes;
+    projectConfig.fileIncludes = fileIncludes;
+    projectConfig.folderReadsMaxDepth = folderReadsMaxDepth;
+
+    if (!_.isEqual(projectConfig, currentProjectConfig)) {
+      dispatch(updateProjectConfig(projectConfig));
+    }
+  } catch (error) {
+    dispatch(updateProjectConfig(null));
+  }
 };

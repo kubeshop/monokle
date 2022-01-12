@@ -1,8 +1,14 @@
+import {useEffect} from 'react';
+import {useSelector} from 'react-redux';
+
 import 'antd/dist/antd.less';
 
 import styled from 'styled-components';
 
+import {ProjectConfig} from '@models/appconfig';
 import {Size} from '@models/window';
+
+import {currentConfigSelector} from '@redux/selectors';
 
 import {
   DiffModal,
@@ -42,6 +48,11 @@ const MainContainer = styled.div`
 
 const App = () => {
   const size: Size = useWindowSize();
+  const config: ProjectConfig = useSelector(currentConfigSelector);
+
+  useEffect(() => {
+    console.log(config);
+  }, [config]);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>

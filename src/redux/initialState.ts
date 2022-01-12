@@ -60,6 +60,7 @@ const initialAppConfigState: AppConfig = {
     language: electronStore.get('appConfig.settings.language'),
     loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
     hideExcludedFilesInFileExplorer: false,
+    isClusterSelectorVisible: electronStore.get('ui.clusterStatusHidden'),
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'outdated',
@@ -79,6 +80,7 @@ const initialAppConfigState: AppConfig = {
   osPlatform: os.platform(),
   projects: electronStore.get('appConfig.projects') || [],
   selectedProjectRootFolder: null,
+  projectConfig: null,
 };
 
 const initialAlertState: AlertState = {};
@@ -151,7 +153,6 @@ const initialUiState: UiState = {
     browseTemplates: false,
     connectToCluster: false,
   },
-  clusterStatusHidden: electronStore.get('ui.clusterStatusHidden'),
 };
 
 const initialNavigatorState: NavigatorState = {
