@@ -276,7 +276,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (selectedResourceId) {
       dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [dispatch, selectedResourceId,kubeconfigContext]);
+  }, [dispatch, selectedResourceId, kubeconfigContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
