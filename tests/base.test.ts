@@ -1,5 +1,4 @@
 /* eslint-disable import/order */
-import {not} from 'micromatch';
 import {Page, _electron as electron} from 'playwright';
 
 import {findDrawer, isDrawerVisible} from './antdHelpers';
@@ -29,6 +28,9 @@ test.beforeAll(async () => {
   const windows = electronApp.windows();
   expect(windows.length).toBe(1);
   appWindow = windows[0];
+
+  // Capture a screenshot.
+  await appWindow.screenshot({path: 'test-output/screenshots/welcome.png'});
 });
 
 test('Validate title', async () => {

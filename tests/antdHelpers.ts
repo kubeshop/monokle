@@ -14,14 +14,14 @@ export async function isDrawerVisible(drawer: Locator) {
 export async function findDrawer(page: Page, title: string) {
   const drawers = page.locator(`//div[contains(@class,'ant-drawer')]`);
   const count = await drawers.count();
-  console.log(`found ${count} drawers`);
 
   for (let c = 0; c < count; c += 1) {
     const drawer = drawers.nth(c);
     // eslint-disable-next-line no-await-in-loop
     const locator = await drawer.locator(`//div[contains(@class,'ant-drawer-title')][text()='${title}']`);
-    const count = await locator.count();
-    if (count === 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const cnt = await locator.count();
+    if (cnt === 1) {
       return drawer;
     }
   }
