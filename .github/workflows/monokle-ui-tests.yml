@@ -1,4 +1,4 @@
-name: monokle-build-nightly
+name: monokle-ui-tests
 
 on:
   workflow_dispatch:
