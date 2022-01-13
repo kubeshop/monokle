@@ -17,6 +17,7 @@ test.beforeAll(async () => {
   electronApp = await electron.launch({
     args: [appInfo.main],
     executablePath: appInfo.executable,
+    recordVideo: {dir: './test-output/videos', size: {width: 1200, height: 800}},
   });
 
   // wait for splash-screen to pass
@@ -29,6 +30,7 @@ test.beforeAll(async () => {
   const windows = electronApp.windows();
   expect(windows.length).toBe(1);
   appWindow = windows[0];
+  appWindow.on( 'console', console.log );
 
   // Capture a screenshot.
   await appWindow.screenshot({path: 'test-output/screenshots/initial-screen.png'});
@@ -111,6 +113,7 @@ test('Validate settings drawer', async () => {
   // @ts-ignore
   expect(await isDrawerVisible(drawer)).toBeFalsy();
 });
+
 test('Validate notifications drawer', async () => {
   let drawer = await findDrawer(appWindow, 'Notifications');
   expect(drawer).toBeFalsy();
@@ -133,6 +136,7 @@ test('Validate notifications drawer', async () => {
   // @ts-ignore
   expect(await isDrawerVisible(drawer)).toBeFalsy();
 });
+
 test('Validate github redirect', async () => {
   const githubIcon = appWindow.locator("span[aria-label='github']");
   expect(await githubIcon.count()).toBe(1);
@@ -212,5 +216,7 @@ test('Validate file browser', async () => {
 });
 
 test.afterAll(async () => {
+  await appWindow.screenshot({path: 'test-output/screenshots/final-screen.png'});
+  await appWindow.context().close();
   await appWindow.close();
 });
