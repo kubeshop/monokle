@@ -27,7 +27,9 @@ export const previewHelmValuesFile = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
-  const kubeconfigContext = thunkAPI.getState().config.kubeConfig.currentContext;
+  const currentContext =
+    thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
+    thunkAPI.getState().config.kubeConfig.currentContext;
   const valuesFile = state.helmValuesMap[valuesFileId];
 
   if (valuesFile && valuesFile.filePath) {
@@ -46,7 +48,7 @@ export const previewHelmValuesFile = createAsyncThunk<
         helmCommand:
           helmPreviewMode === 'template'
             ? `helm template -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder}`
-            : `helm install --kube-context ${kubeconfigContext} -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder} --dry-run`,
+            : `helm install --kube-context ${currentContext} -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder} --dry-run`,
         kubeconfig,
       };
 

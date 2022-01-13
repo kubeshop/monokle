@@ -27,17 +27,17 @@ export const loadClusterDiff = createAsyncThunk<
   }
 >('main/loadClusterDiff', async (_, thunkAPI) => {
   const state = thunkAPI.getState();
+  const currentContext =
+    state.config.projectConfig?.kubeConfig?.currentContext || state.config.kubeConfig?.currentContext;
   if (!state.ui.isClusterDiffVisible) {
     return;
   }
-  if (!state.config.kubeConfig.currentContext) {
+  if (!currentContext) {
     return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, 'Could not find current kubeconfig context.');
   }
   try {
     const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
-    const kubeConfigCurrentContext =
-      state.config.projectConfig?.kubeConfig?.currentContext || state.config.kubeConfig.currentContext;
-    return getClusterObjects(String(kubeConfigPath), kubeConfigCurrentContext).then(
+    return getClusterObjects(String(kubeConfigPath), currentContext).then(
       results => {
         const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 

@@ -131,13 +131,13 @@ const NamespaceSelectContainer = styled.div`
 const DiffModal = () => {
   const dispatch = useAppDispatch();
 
-  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isDiffModalVisible = useAppSelector(state => Boolean(state.main.resourceDiff.targetResourceId));
   const currentConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+
   const targetResource = useAppSelector(state =>
     state.main.resourceDiff.targetResourceId
       ? state.main.resourceMap[state.main.resourceDiff.targetResourceId]
@@ -284,7 +284,7 @@ const DiffModal = () => {
     const getClusterResources = async () => {
       const kc = new k8s.KubeConfig();
       kc.loadFromFile(String(currentConfig.kubeConfig?.path));
-      kc.setCurrentContext(currentContext || '');
+      kc.setCurrentContext(currentConfig.kubeConfig?.currentContext || '');
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const resourcesFromCluster =
@@ -357,7 +357,14 @@ const DiffModal = () => {
     setTargetResourceText(stringify(targetResource.content, {sortMapEntries: true}));
 
     getClusterResources();
-  }, [currentContext, dispatch, currentConfig.kubeConfig?.path, resourceMap, resourceFilter.namespace, targetResource]);
+  }, [
+    currentConfig.kubeConfig?.currentContext,
+    dispatch,
+    currentConfig.kubeConfig?.path,
+    resourceMap,
+    resourceFilter.namespace,
+    targetResource,
+  ]);
 
   useEffect(() => {
     if (!isDiffModalVisible) {

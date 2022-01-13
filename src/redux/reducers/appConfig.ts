@@ -15,7 +15,7 @@ import {
   Themes,
 } from '@models/appconfig';
 
-import {mergeConfigs} from '@redux/selectors';
+import {mergeConfigs, populateProjectConfig} from '@redux/selectors';
 import {KustomizeCommandType} from '@redux/services/kustomize';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {AppDispatch} from '@redux/store';
@@ -178,27 +178,9 @@ export const configSlice = createSlice({
         return;
       }
 
-      console.log('PATH', action.payload?.kubeConfig?.path);
-
       const absolutePath = `${state.selectedProjectRootFolder}${sep}.monokle`;
 
-      const applicationConfig: ProjectConfig = {
-        scanExcludes: state.scanExcludes,
-        fileIncludes: state.fileIncludes,
-        folderReadsMaxDepth: state.folderReadsMaxDepth,
-      };
-      applicationConfig.settings = {
-        helmPreviewMode: state.settings.helmPreviewMode,
-        kustomizeCommand: state.settings.kustomizeCommand,
-        hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
-        isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
-        loadLastProjectOnStartup: state.settings.loadLastProjectOnStartup,
-      };
-      applicationConfig.kubeConfig = {
-        path: state.kubeConfig.path,
-        isPathValid: state.kubeConfig.isPathValid,
-        contexts: state.kubeConfig.contexts,
-      };
+      const applicationConfig: ProjectConfig = populateProjectConfig(state);
       if (!_.isEqual(state.projectConfig, action.payload)) {
         const mergedConfigs = mergeConfigs(applicationConfig, action.payload);
         delete mergedConfigs?.settings?.loadLastProjectOnStartup;

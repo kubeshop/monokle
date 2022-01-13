@@ -3,7 +3,7 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
+import {AppConfig, ProjectConfig} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -81,29 +81,13 @@ export const activeProjectSelector = createSelector(
 export const currentConfigSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    const applicationConfig: ProjectConfig = {
-      scanExcludes: config.scanExcludes,
-      fileIncludes: config.fileIncludes,
-      folderReadsMaxDepth: config.folderReadsMaxDepth,
-    };
-    applicationConfig.settings = {
-      helmPreviewMode: config.settings.helmPreviewMode,
-      kustomizeCommand: config.settings.kustomizeCommand,
-      hideExcludedFilesInFileExplorer: config.settings.hideExcludedFilesInFileExplorer,
-      isClusterSelectorVisible: config.settings.isClusterSelectorVisible,
-      loadLastProjectOnStartup: config.settings.loadLastProjectOnStartup,
-    };
-    applicationConfig.kubeConfig = {
-      path: config.kubeConfig.path,
-      isPathValid: config.kubeConfig.isPathValid,
-      contexts: config.kubeConfig.contexts,
-    };
+    const applicationConfig: ProjectConfig = populateProjectConfig(config);
     const projectConfig: ProjectConfig | null | undefined = config.projectConfig;
-
     return mergeConfigs(applicationConfig, projectConfig);
   }
 );
 
+// Needs better way to do it!!
 export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null) => {
   if (!(baseConfig && baseConfig.settings && baseConfig.kubeConfig)) {
     throw Error('Base config must be set');
@@ -188,4 +172,25 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
   }
 
   return baseConfig;
+};
+
+export const populateProjectConfig = (state: AppConfig) => {
+  const applicationConfig: ProjectConfig = {
+    scanExcludes: state.scanExcludes,
+    fileIncludes: state.fileIncludes,
+    folderReadsMaxDepth: state.folderReadsMaxDepth,
+  };
+  applicationConfig.settings = {
+    helmPreviewMode: state.settings.helmPreviewMode,
+    kustomizeCommand: state.settings.kustomizeCommand,
+    hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
+    isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
+    loadLastProjectOnStartup: state.settings.loadLastProjectOnStartup,
+  };
+  applicationConfig.kubeConfig = {
+    path: state.kubeConfig.path,
+    isPathValid: state.kubeConfig.isPathValid,
+    contexts: state.kubeConfig.contexts,
+  };
+  return applicationConfig;
 };
