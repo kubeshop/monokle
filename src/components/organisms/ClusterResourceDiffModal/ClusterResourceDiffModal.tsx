@@ -3,7 +3,7 @@ import {MonacoDiffEditor} from 'react-monaco-editor';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure, useWindowSize} from 'react-use';
 
-import {Button, Skeleton, Switch} from 'antd';
+import {Button, Select, Skeleton, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
@@ -15,7 +15,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {closeResourceDiffModal} from '@redux/reducers/main';
+import {closeResourceDiffModal, updateResource} from '@redux/reducers/main';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
@@ -43,7 +43,6 @@ const ClusterResourceDiffModal = () => {
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
   const [hasDiffModalLoaded, setHasDiffModalLoaded] = useState(false);
-  const [matchingResourcesById, setMatchingResourcesById] = useState<Record<string, any>>();
   const [matchingResourceText, setMatchingResourceText] = useState<string>();
   const [selectedMatchingResourceId, setSelectedMatchingResourceId] = useState<string>();
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
@@ -79,63 +78,106 @@ const ClusterResourceDiffModal = () => {
     return cleanTargetResourceText !== matchingResourceText;
   }, [cleanTargetResourceText, matchingResourceText]);
 
-  useEffect(() => {
-    if (!targetResource || !resourceMap) {
+  const matchingLocalResources = useMemo(() => {
+    if (!targetResource) {
       return;
     }
 
-    const getLocalResources = () => {
-      let localResourceMap = Object.fromEntries(
-        Object.entries(resourceMap).filter(entry => {
-          const value = entry[1];
-          return (
-            !value.filePath.startsWith(PREVIEW_PREFIX) &&
-            !value.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-            value.name === targetResource.name
-          );
-        })
-      );
+    return Object.fromEntries(
+      Object.entries(resourceMap).filter(entry => {
+        const value = entry[1];
+        return (
+          !value.filePath.startsWith(PREVIEW_PREFIX) &&
+          !value.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+          value.name === targetResource.name
+        );
+      })
+    );
+  }, [resourceMap, targetResource]);
 
-      // matching resource was not found
-      if (!Object.values(localResourceMap).length) {
-        const alert: AlertType = {
-          type: AlertEnum.Error,
-          title: 'Diff failed',
-          message: `Failed to retrieve ${targetResource.content.kind} ${targetResource.content.metadata.name} from local`,
-        };
+  const onFileSelectHandler = (resourceId: string) => {
+    if (!matchingLocalResources) {
+      return;
+    }
 
-        dispatch(setAlert(alert));
-        dispatch(closeResourceDiffModal());
-        setHasDiffModalLoaded(false);
-        return;
-      }
+    setSelectedMatchingResourceId(resourceId);
+    setMatchingResourceText(stringify(matchingLocalResources[resourceId].content, {sortMapEntries: true}));
+  };
 
-      setMatchingResourcesById(localResourceMap);
+  const handleReplace = () => {
+    if (!shouldDiffIgnorePaths || !cleanTargetResourceText || !selectedMatchingResourceId) {
+      return;
+    }
 
-      // set default selected matching resource
-      const foundResourceWithNamespace = Object.values(localResourceMap).find(
-        r => r.namespace && r.namespace === targetResource.namespace
-      );
+    dispatch(
+      updateResource({
+        resourceId: selectedMatchingResourceId,
+        content: cleanTargetResourceText,
+        preventSelectionAndHighlightsUpdate: true,
+        isInClusterMode: true,
+      })
+    );
+  };
 
-      if (foundResourceWithNamespace) {
-        setSelectedMatchingResourceId(foundResourceWithNamespace.id);
-        setMatchingResourceText(stringify(foundResourceWithNamespace.content, {sortMapEntries: true}));
-      } else {
-        setSelectedMatchingResourceId(Object.keys(localResourceMap)[0]);
-        setMatchingResourceText(stringify(Object.values(localResourceMap)[0].content, {sortMapEntries: true}));
-      }
+  useEffect(() => {
+    if (!targetResource || !resourceMap || !matchingLocalResources) {
+      return;
+    }
 
-      setHasDiffModalLoaded(true);
-    };
+    // matching resource was not found
+    if (!Object.values(matchingLocalResources).length) {
+      const alert: AlertType = {
+        type: AlertEnum.Error,
+        title: 'Diff failed',
+        message: `Failed to retrieve ${targetResource.content.kind} ${targetResource.content.metadata.name} from local`,
+      };
 
-    getLocalResources();
-  }, [dispatch, resourceMap, targetResource]);
+      dispatch(setAlert(alert));
+      dispatch(closeResourceDiffModal());
+      setHasDiffModalLoaded(false);
+      return;
+    }
+
+    // set default selected matching resource
+    const foundResourceWithNamespace = Object.values(matchingLocalResources).find(
+      r => r.namespace && r.namespace === targetResource.namespace
+    );
+
+    if (foundResourceWithNamespace) {
+      setSelectedMatchingResourceId(foundResourceWithNamespace.id);
+      setMatchingResourceText(stringify(foundResourceWithNamespace.content, {sortMapEntries: true}));
+    } else {
+      setSelectedMatchingResourceId(Object.keys(matchingLocalResources)[0]);
+      setMatchingResourceText(stringify(Object.values(matchingLocalResources)[0].content, {sortMapEntries: true}));
+    }
+
+    setHasDiffModalLoaded(true);
+  }, [dispatch, matchingLocalResources, resourceMap, targetResource]);
 
   return (
     <S.StyledModal
       centered
       footer={null}
-      title={<S.TitleContainer> Resource Diff on ${targetResource ? targetResource.name : ''}</S.TitleContainer>}
+      title={
+        <S.TitleContainer>
+          Resource Diff on ${targetResource ? targetResource.name : ''}
+          <S.FileSelectContainer>
+            File:
+            <Select
+              value={selectedMatchingResourceId}
+              onChange={(id: string) => onFileSelectHandler(id)}
+              style={{width: '300px', marginLeft: '16px'}}
+            >
+              {matchingLocalResources &&
+                Object.entries(matchingLocalResources).map(([key, value]) => (
+                  <Select.Option key={key} value={key}>
+                    {value.filePath}
+                  </Select.Option>
+                ))}
+            </Select>
+          </S.FileSelectContainer>
+        </S.TitleContainer>
+      }
       visible={isDiffModalVisible}
       width="min-width"
       onCancel={onCloseHandler}
@@ -171,7 +213,7 @@ const ClusterResourceDiffModal = () => {
 
             <S.TagsContainer>
               <S.StyledTag>Cluster</S.StyledTag>
-              <Button type="primary" ghost disabled={!areResourcesDifferent}>
+              <Button disabled={!areResourcesDifferent} ghost type="primary" onClick={handleReplace}>
                 Replace local resource with cluster resource <ArrowRightOutlined />
               </Button>
               <Button type="primary" ghost disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}>

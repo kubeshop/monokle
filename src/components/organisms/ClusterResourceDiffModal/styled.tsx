@@ -41,6 +41,10 @@ export const StyledModal = styled(Modal)`
   }
 `;
 
+export const FileSelectContainer = styled.div`
+  margin: 0 auto;
+`;
+
 export const MonacoDiffContainer = styled.div<{height: string; width: string}>`
   ${props => `
     height: ${props.height};
