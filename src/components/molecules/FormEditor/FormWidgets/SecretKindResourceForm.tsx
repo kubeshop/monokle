@@ -70,7 +70,7 @@ const secretTypes = [
   'bootstrap.kubernetes.io/token',
 ];
 
-export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ...args}: any) => {
+export const SecretKindResourceForm = ({onChange, formData, disabled, ...args}: any) => {
   const [dataKeyValuePairs, setDataKeyValuePairs] = useState<{id: string; key: string; value: string}[]>([]);
   const [stringDataKeyValuePairs, setStringDataKeyValuePairs] = useState<{id: string; key: string; value: string}[]>(
     []
@@ -79,6 +79,8 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   const handleTypeChange = (value: any) => {
     if (formData.type !== value) {
       onChange({...formData, type: value, data: undefined, stringData: undefined});
+      setDataKeyValuePairs([]);
+      setStringDataKeyValuePairs([]);
     }
   };
 
@@ -204,7 +206,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
     <FormContainer>
       <div>
         <StyledSpanTitle>Type</StyledSpanTitle>
-        <Select value={formData.type} style={{width: '100%'}} onChange={handleTypeChange}>
+        <Select value={formData.type} style={{width: '100%'}} onChange={handleTypeChange} disabled={disabled}>
           {secretTypes.map(secretType => (
             <Option key={secretType} value={secretType}>
               {secretType}
@@ -218,24 +220,28 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
             values={dataKeyValuePairs}
             onChange={(value: {id: string; key: string; value: string}) => handleKeyValuePairFormChange('data', value)}
             onDelete={(value: {id: string; key: string; value: string}) => handleKeyValuePairFormDelete('data', value)}
+            disabled={disabled}
           />
         )}
         {formData.type === 'kubernetes.io/service-account-token' && (
           <TextAreaForm
             value={formData.data && formData.data['extra']}
             onChange={(value: string) => handleTextAreaFormChange('extra', value)}
+            disabled={disabled}
           />
         )}
         {formData.type === 'kubernetes.io/dockercfg' && (
           <TextAreaForm
             value={formData.data && formData.data['.dockercfg']}
             onChange={(value: string) => handleTextAreaFormChange('.dockercfg', value)}
+            disabled={disabled}
           />
         )}
         {formData.type === 'kubernetes.io/dockerconfigjson' && (
           <TextAreaForm
             value={formData.data && formData.data['.dockerconfigjson']}
             onChange={(value: string) => handleTextAreaFormChange('.dockerconfigjson', value)}
+            disabled={disabled}
           />
         )}
         {formData.type === 'kubernetes.io/basic-auth' && (
@@ -247,12 +253,14 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
             onDelete={(value: {id: string; key: string; value: string}) =>
               handleKeyValuePairFormDelete('stringData', value)
             }
+            disabled={disabled}
           />
         )}
         {formData.type === 'kubernetes.io/ssh-auth' && (
           <TextAreaForm
             value={formData.data && formData.data['ssh-privatekey']}
             onChange={(value: string) => handleTextAreaFormChange('ssh-privatekey', value)}
+            disabled={disabled}
           />
         )}
         {formData.type === 'kubernetes.io/tls' && (
@@ -260,6 +268,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
             tlscrt={formData.data && formData.data['tls.crt']}
             tlskey={formData.data && formData.data['tls.key']}
             onChange={(key: string, value: string) => handleTLSFormChange(key, value)}
+            disabled={disabled}
           />
         )}
         {formData.type === 'bootstrap.kubernetes.io/token' && (
@@ -271,6 +280,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
             usageBootstrapAuthentication={formData.data && formData.data['usage-bootstrap-authentication']}
             usageBootstrapSigning={formData.data && formData.data['usage-bootstrap-signing']}
             onChange={(key: string, value: string) => handleTokenFormChange(key, value)}
+            disabled={disabled}
           />
         )}
       </div>
@@ -282,8 +292,10 @@ const KeyValuePairForm = ({
   values,
   onChange,
   onDelete,
+  disabled,
 }: {
   values: {id: string; key: string; value: string}[];
+  disabled: boolean;
   onChange: Function;
   onDelete: Function;
 }) => {
@@ -318,16 +330,19 @@ const KeyValuePairForm = ({
           value={value}
           onChange={handleDynamicValueChange}
           onDelete={handleDynamicValueDelete}
+          disabled={disabled}
         />
       ))}
       <div style={{marginTop: '12px'}}>
-        <Button onClick={handleAddNewValue}>Add New</Button>
+        <Button onClick={handleAddNewValue} disabled={disabled}>
+          Add New
+        </Button>
       </div>
     </FormContainer>
   );
 };
 
-const TextAreaForm = ({value, onChange}: {value: string; onChange: Function}) => {
+const TextAreaForm = ({value, onChange, disabled}: {value: string; onChange: Function; disabled: boolean}) => {
   const [localValue, setLocalValue] = useState<string | undefined>(value);
 
   const handleValueChange = (propertyValue: string) => {
@@ -351,12 +366,23 @@ const TextAreaForm = ({value, onChange}: {value: string; onChange: Function}) =>
         type="TEXT_AREA"
         value={localValue}
         onChange={(emittedValue: string) => handleValueChange(emittedValue)}
+        disabled={disabled}
       />
     </FormContainer>
   );
 };
 
-const TLSForm = ({tlscrt, tlskey, onChange}: {tlscrt: string; tlskey: string; onChange: Function}) => {
+const TLSForm = ({
+  tlscrt,
+  tlskey,
+  onChange,
+  disabled,
+}: {
+  tlscrt: string;
+  tlskey: string;
+  onChange: Function;
+  disabled: boolean;
+}) => {
   const handleValueChange = (key: string, value: string) => {
     if (onChange) {
       onChange(key, value);
@@ -372,6 +398,7 @@ const TLSForm = ({tlscrt, tlskey, onChange}: {tlscrt: string; tlskey: string; on
           type="TEXT_AREA"
           value={tlscrt}
           onChange={(emittedValue: string) => handleValueChange('tls.crt', emittedValue)}
+          disabled={disabled}
         />
       </div>
       <div>
@@ -380,6 +407,7 @@ const TLSForm = ({tlscrt, tlskey, onChange}: {tlscrt: string; tlskey: string; on
           type="TEXT_AREA"
           value={tlskey}
           onChange={(emittedValue: string) => handleValueChange('tls.key', emittedValue)}
+          disabled={disabled}
         />
       </div>
     </FormContainer>
@@ -394,6 +422,7 @@ const TokenForm = ({
   usageBootstrapAuthentication,
   usageBootstrapSigning,
   onChange,
+  disabled,
 }: {
   authExtraGroups: string;
   expiration: string;
@@ -401,6 +430,7 @@ const TokenForm = ({
   tokenSecret: string;
   usageBootstrapAuthentication: string;
   usageBootstrapSigning: string;
+  disabled: boolean;
   onChange: Function;
 }) => {
   const handleValueChange = (key: string, value: string) => {
@@ -417,6 +447,7 @@ const TokenForm = ({
         <Base64Input
           value={authExtraGroups}
           onChange={(emittedValue: string) => handleValueChange('auth-extra-groups', emittedValue)}
+          disabled={disabled}
         />
       </div>
       <div>
@@ -424,17 +455,23 @@ const TokenForm = ({
         <Base64Input
           value={expiration}
           onChange={(emittedValue: string) => handleValueChange('expiration', emittedValue)}
+          disabled={disabled}
         />
       </div>
       <div>
         <StyledSpanTitle>Token Id</StyledSpanTitle>
-        <Base64Input value={tokenId} onChange={(emittedValue: string) => handleValueChange('token-id', emittedValue)} />
+        <Base64Input
+          value={tokenId}
+          onChange={(emittedValue: string) => handleValueChange('token-id', emittedValue)}
+          disabled={disabled}
+        />
       </div>
       <div>
         <StyledSpanTitle>Token Secret</StyledSpanTitle>
         <Base64Input
           value={tokenSecret}
           onChange={(emittedValue: string) => handleValueChange('token-secret', emittedValue)}
+          disabled={disabled}
         />
       </div>
       <div>
@@ -442,6 +479,7 @@ const TokenForm = ({
         <Base64Input
           value={usageBootstrapAuthentication}
           onChange={(emittedValue: string) => handleValueChange('usage-bootstrap-authentication', emittedValue)}
+          disabled={disabled}
         />
       </div>
       <div>
@@ -449,13 +487,14 @@ const TokenForm = ({
         <Base64Input
           value={usageBootstrapSigning}
           onChange={(emittedValue: string) => handleValueChange('usage-bootstrap-signing', emittedValue)}
+          disabled={disabled}
         />
       </div>
     </FormContainer>
   );
 };
 
-const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
+const DynamicKeyValue = ({value, onChange, onDelete, disabled}: any) => {
   const [localValue, setLocalValue] = useState<{
     id: string | undefined;
     key?: string | undefined;
@@ -508,19 +547,24 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
     <DynamicKeyValueContainer>
       <DynamicKeyValueItem>
         <StyledSpanTitle>Key</StyledSpanTitle>
-        <Input value={localValue.key} onChange={event => handleValueChange('KEY', event.target.value)} />
+        <Input
+          value={localValue.key}
+          onChange={event => handleValueChange('KEY', event.target.value)}
+          disabled={disabled}
+        />
       </DynamicKeyValueItem>
       <DynamicKeyValueItem>
         <StyledSpanTitle>Value</StyledSpanTitle>
         <Base64Input
           value={localValue.value}
           onChange={(emittedValue: string) => handleValueChange('VALUE', emittedValue)}
+          disabled={disabled}
         />
       </DynamicKeyValueItem>
       <DynamicKeyValueActionItem>
         <StyledSpanTitle>&nbsp;</StyledSpanTitle>
         <ButtonContainer>
-          <Button onClick={handleDeleteValue}>
+          <Button onClick={handleDeleteValue} disabled={disabled}>
             <DeleteOutlined />
           </Button>
         </ButtonContainer>
@@ -529,7 +573,7 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
   );
 };
 
-export const Base64Input = ({value, onChange, type = 'INPUT'}: any) => {
+export const Base64Input = ({value, onChange, type = 'INPUT', disabled}: any) => {
   const [inputValue, setInputValue] = useState<string | undefined>(
     value && isBase64(value) ? Buffer.from(value, 'base64').toString('utf-8') : value
   );
@@ -590,6 +634,7 @@ export const Base64Input = ({value, onChange, type = 'INPUT'}: any) => {
           value={inputValue}
           onChange={e => setInputValue(e.target.value || undefined)}
           onPaste={(e: any) => setInputValue(e.target.value || undefined)}
+          disabled={disabled}
         />
       ) : (
         <TextArea
@@ -597,6 +642,7 @@ export const Base64Input = ({value, onChange, type = 'INPUT'}: any) => {
           value={inputValue}
           onChange={e => setInputValue(e.target.value || undefined)}
           onPaste={(e: any) => setInputValue(e.target.value || undefined)}
+          disabled={disabled}
         />
       )}
 
