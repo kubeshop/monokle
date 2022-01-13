@@ -509,7 +509,7 @@ export const mainSlice = createSlice({
     extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       const filter = action.payload;
 
-      if (state.checkedResourceIds.length) {
+      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
         state.filtersToBeChanged = filter;
         return;
       }
