@@ -259,9 +259,7 @@ const PageHeader = () => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewType = useAppSelector(state => state.main.previewType);
-  const kubeConfig = useAppSelector(state => state.config.kubeConfig);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const projects: Project[] = useAppSelector(state => state.config.projects);
 
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
@@ -353,17 +351,21 @@ const PageHeader = () => {
   };
 
   const connectToCluster = () => {
-    if (isInPreviewMode && previewResource && previewResource.id !== kubeconfigPath) {
+    if (isInPreviewMode && previewResource && previewResource.id !== currentConfig.kubeConfig?.path) {
       stopPreview(dispatch);
     }
-    startPreview(kubeconfigPath, 'cluster', dispatch);
+    if (currentConfig.kubeConfig?.path) {
+      startPreview(currentConfig.kubeConfig?.path, 'cluster', dispatch);
+    }
   };
 
   const reconnectToCluster = () => {
-    if (isInPreviewMode && previewResource && previewResource.id !== kubeconfigPath) {
+    if (isInPreviewMode && previewResource && previewResource.id !== currentConfig.kubeConfig?.path) {
       stopPreview(dispatch);
     }
-    restartPreview(kubeconfigPath, 'cluster', dispatch);
+    if (currentConfig.kubeConfig?.path) {
+      restartPreview(currentConfig.kubeConfig?.path, 'cluster', dispatch);
+    }
   };
 
   const handleLoadCluster = () => {
@@ -397,9 +399,9 @@ const PageHeader = () => {
 
   const clusterMenu = (
     <Menu>
-      {kubeConfig &&
-        kubeConfig.contexts &&
-        kubeConfig.contexts.map((context: any) => (
+      {currentConfig.kubeConfig &&
+        currentConfig.kubeConfig?.contexts &&
+        currentConfig.kubeConfig?.contexts.map((context: any) => (
           <Menu.Item key={context.cluster} onClick={handleClusterChange}>
             {context.cluster}
           </Menu.Item>

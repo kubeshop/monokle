@@ -10,7 +10,7 @@ import 'antd/dist/antd.less';
 
 import styled from 'styled-components';
 
-import {DEFAULT_KUBECONFIG_DEBOUNCE} from '@constants/constants';
+import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {Project, ProjectConfig} from '@models/appconfig';
 import {Size} from '@models/window';
@@ -63,6 +63,7 @@ const App = () => {
   const currentConfig: ProjectConfig = useSelector(currentConfigSelector);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const projectConfig: ProjectConfig | null | undefined = useAppSelector(state => state.config.projectConfig);
+  const fileMap = useAppSelector(state => state.main.fileMap);
 
   const onExecutedFrom = useCallback(
     (_, data) => {
@@ -85,6 +86,7 @@ const App = () => {
 
   useDebounce(
     () => {
+      console.log('currentConfig', currentConfig);
       if (currentConfig && currentConfig.kubeConfig && currentConfig.kubeConfig.path) {
         try {
           const kc = new k8s.KubeConfig();
@@ -99,7 +101,7 @@ const App = () => {
               },
             })
           );
-          loadContexts(currentConfig.kubeConfig.path, dispatch, projectConfig?.kubeConfig?.currentContext);
+          loadContexts(currentConfig.kubeConfig.path, dispatch, currentConfig?.kubeConfig?.currentContext);
         } catch (err) {
           dispatch(
             updateProjectConfig({
@@ -111,7 +113,12 @@ const App = () => {
       }
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
-    [currentConfig?.kubeConfig?.path]
+    [
+      currentConfig.kubeConfig?.path,
+      dispatch,
+      projectConfig?.kubeConfig?.currentContext,
+      fileMap[ROOT_FILE_ENTRY]?.filePath,
+    ]
   );
 
   return (

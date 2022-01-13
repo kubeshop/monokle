@@ -19,6 +19,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal, updateResource} from '@redux/reducers/main';
+import {currentConfigSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -133,8 +134,7 @@ const DiffModal = () => {
   const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isDiffModalVisible = useAppSelector(state => Boolean(state.main.resourceDiff.targetResourceId));
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const currentConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -178,18 +178,27 @@ const DiffModal = () => {
     }
 
     return isKustomizationResource(targetResource)
-      ? makeApplyKustomizationText(targetResource.name, kubeconfigContext)
-      : makeApplyResourceText(targetResource.name, kubeconfigContext);
-  }, [targetResource, kubeconfigContext]);
+      ? makeApplyKustomizationText(targetResource.name, currentConfig.kubeConfig?.currentContext)
+      : makeApplyResourceText(targetResource.name, currentConfig.kubeConfig?.currentContext);
+  }, [targetResource, currentConfig.kubeConfig?.currentContext]);
 
   const onClickApplyResource = (namespace?: string) => {
     if (targetResource?.id) {
       const resource = resourceMap[targetResource.id];
       if (resource) {
-        applyResource(resource.id, resourceMap, fileMap, dispatch, kubeconfigPath, kubeconfigContext || '', namespace, {
-          isClusterPreview: previewType === 'cluster',
-          shouldPerformDiff: true,
-        });
+        applyResource(
+          resource.id,
+          resourceMap,
+          fileMap,
+          dispatch,
+          String(currentConfig.kubeConfig?.path),
+          currentConfig.kubeConfig?.currentContext || '',
+          namespace,
+          {
+            isClusterPreview: previewType === 'cluster',
+            shouldPerformDiff: true,
+          }
+        );
       }
     }
     setIsApplyModalVisible(false);
@@ -274,7 +283,7 @@ const DiffModal = () => {
 
     const getClusterResources = async () => {
       const kc = new k8s.KubeConfig();
-      kc.loadFromFile(kubeconfigPath);
+      kc.loadFromFile(String(currentConfig.kubeConfig?.path));
       kc.setCurrentContext(currentContext || '');
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
@@ -287,7 +296,7 @@ const DiffModal = () => {
         const alert: AlertType = {
           type: AlertEnum.Error,
           title: 'Diff failed',
-          message: `Failed to retrieve ${targetResource.content.kind} ${targetResource.content.metadata.name} from cluster [${currentContext}]`,
+          message: `Failed to retrieve ${targetResource.content.kind} ${targetResource.content.metadata.name} from cluster [${currentConfig.kubeConfig?.currentContext}]`,
         };
 
         dispatch(setAlert(alert));
@@ -348,7 +357,7 @@ const DiffModal = () => {
     setTargetResourceText(stringify(targetResource.content, {sortMapEntries: true}));
 
     getClusterResources();
-  }, [currentContext, dispatch, kubeconfigPath, resourceMap, resourceFilter.namespace, targetResource]);
+  }, [currentContext, dispatch, currentConfig.kubeConfig?.path, resourceMap, resourceFilter.namespace, targetResource]);
 
   useEffect(() => {
     if (!isDiffModalVisible) {

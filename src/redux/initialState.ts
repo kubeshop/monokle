@@ -48,8 +48,6 @@ const initialAppState: AppState = {
 
 const initialAppConfigState: AppConfig = {
   isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
-  kubeconfigPath: '',
-  isKubeconfigPathValid: false,
   settings: {
     filterObjectsOnSelection: false,
     autoZoomGraphOnSelection: true,

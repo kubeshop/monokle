@@ -1,6 +1,7 @@
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
+import {currentConfigSelector} from '@redux/selectors';
 import {getTargetClusterNamespaces} from '@redux/services/resource';
 
 export const ALL_NAMESPACES = '<all>';
@@ -8,13 +9,13 @@ export const NO_NAMESPACE = '<none>';
 
 export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction<string[]>>] {
   const context = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const currentConfig = useAppSelector(currentConfigSelector);
 
   const [namespaces, setNamespaces] = useState<string[]>([]);
 
   useEffect(() => {
     const setClusterNamespaces = async () => {
-      let clusterNamespaces = await getTargetClusterNamespaces(kubeconfigPath, context || '');
+      let clusterNamespaces = await getTargetClusterNamespaces(String(currentConfig.kubeConfig?.path), context || '');
       clusterNamespaces.sort((a, b) => {
         if (a === 'default') {
           return -1;
@@ -30,7 +31,7 @@ export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction
     };
 
     setClusterNamespaces();
-  }, [context, kubeconfigPath]);
+  }, [context, currentConfig.kubeConfig?.path]);
 
   return [namespaces, setNamespaces];
 }

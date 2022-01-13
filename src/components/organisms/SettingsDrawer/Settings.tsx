@@ -218,7 +218,7 @@ export const Settings = ({
       const file: any = fileInput.current.files[0];
       if (file.path) {
         const path = file.path;
-        setLocalConfig({...localConfig, kubeConfig: {path}});
+        setCurrentKubeConfig(path);
       }
     }
   };

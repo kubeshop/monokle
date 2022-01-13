@@ -102,14 +102,7 @@ const SettingsDrawer = () => {
     >
       <Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
         <Panel header="Default Settings" key="1">
-          <Settings
-            config={{
-              ...appConfig,
-              kubeConfig: {path: appConfig.kubeconfigPath, isPathValid: appConfig.isKubeconfigPathValid},
-            }}
-            onConfigChange={changeApplicationConfig}
-            showLoadLastProjectOnStartup
-          />
+          <Settings config={appConfig} onConfigChange={changeApplicationConfig} showLoadLastProjectOnStartup />
         </Panel>
         {activeProject && (
           <Panel header={`${activeProject.name} Settings`} key="2">

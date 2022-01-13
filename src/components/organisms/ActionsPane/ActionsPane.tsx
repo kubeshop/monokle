@@ -80,8 +80,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
-  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -90,7 +88,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const currentConfig = useAppSelector(currentConfigSelector);
 
@@ -236,17 +233,23 @@ const ActionsPane = (props: {contentHeight: string}) => {
     } else if (selectedResource) {
       setIsApplyModalVisible(true);
     } else if (selectedPath) {
-      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig, kubeconfigContext || '');
+      applyFileWithConfirm(
+        selectedPath,
+        fileMap,
+        dispatch,
+        String(currentConfig.kubeConfig?.path),
+        currentConfig.kubeConfig?.currentContext || ''
+      );
     }
   }, [
     selectedResource,
     fileMap,
-    kubeconfig,
+    currentConfig.kubeConfig?.path,
     selectedPath,
     dispatch,
     helmValuesMap,
     selectedValuesFileId,
-    kubeconfigContext,
+    currentConfig.kubeConfig?.currentContext,
     selectedResourceId,
   ]);
 
@@ -281,11 +284,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
       return true;
     }
     // if the resource is from the cluster preview
-    if (selectedResource.filePath === PREVIEW_PREFIX + kubeconfigPath) {
+    if (selectedResource.filePath === PREVIEW_PREFIX + String(currentConfig.kubeConfig?.path)) {
       return true;
     }
     return false;
-  }, [selectedResource, kubeconfigPath]);
+  }, [selectedResource, currentConfig.kubeConfig?.path]);
 
   const onClickApplyResource = useCallback(
     (namespace?: string) => {
@@ -299,8 +302,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
         resourceMap,
         fileMap,
         dispatch,
-        kubeconfigPath,
-        kubeconfigContext || '',
+        String(currentConfig.kubeConfig?.path),
+        currentConfig.kubeConfig?.currentContext || '',
         namespace,
         {
           isClusterPreview,
@@ -312,8 +315,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
     [
       dispatch,
       fileMap,
-      kubeconfigContext,
-      kubeconfigPath,
+      currentConfig.kubeConfig?.currentContext,
+      currentConfig.kubeConfig?.path,
       currentConfig?.settings?.kustomizeCommand,
       previewType,
       resourceMap,
@@ -334,14 +337,22 @@ const ActionsPane = (props: {contentHeight: string}) => {
         helmChartMap[helmValuesFile.helmChartId],
         fileMap,
         dispatch,
-        kubeconfig,
-        kubeconfigContext || '',
+        String(currentConfig.kubeConfig?.path),
+        currentConfig.kubeConfig?.currentContext || '',
         namespace,
         shouldCreateNamespace
       );
       setIsHelmChartApplyModalVisible(false);
     },
-    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeconfig, kubeconfigContext, selectedValuesFileId]
+    [
+      dispatch,
+      fileMap,
+      helmChartMap,
+      helmValuesMap,
+      currentConfig.kubeConfig?.path,
+      currentConfig.kubeConfig?.currentContext,
+      selectedValuesFileId,
+    ]
   );
 
   const confirmModalTitle = useMemo(() => {
@@ -350,9 +361,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeconfigContext)
-      : makeApplyResourceText(selectedResource.name, kubeconfigContext);
-  }, [selectedResource, kubeconfigContext]);
+      ? makeApplyKustomizationText(selectedResource.name, currentConfig.kubeConfig?.currentContext)
+      : makeApplyResourceText(selectedResource.name, currentConfig.kubeConfig?.currentContext);
+  }, [selectedResource, currentConfig.kubeConfig?.currentContext]);
 
   const helmChartConfirmModalTitle = useMemo(() => {
     if (!selectedValuesFileId) {
@@ -363,8 +374,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
     return `Install the ${helmChartMap[helmValuesFile.helmChartId].name} Chart using ${
       helmValuesFile.name
-    } in cluster [${kubeconfigContext || ''}]?`;
-  }, [helmChartMap, helmValuesMap, kubeconfigContext, selectedValuesFileId]);
+    } in cluster [${currentConfig.kubeConfig?.currentContext || ''}]?`;
+  }, [helmChartMap, helmValuesMap, currentConfig.kubeConfig?.currentContext, selectedValuesFileId]);
 
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {

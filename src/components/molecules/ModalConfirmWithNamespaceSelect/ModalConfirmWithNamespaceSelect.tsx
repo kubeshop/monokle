@@ -13,6 +13,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
+import {currentConfigSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -59,8 +60,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resources = [], title, onCancel, onOk} = props;
 
   const dispatch = useAppDispatch();
-  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const currentConfig = useAppSelector(currentConfigSelector);
 
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources);
   const [namespaces] = useTargetClusterNamespaces();
@@ -77,8 +77,8 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         return;
       }
       const kc = new k8s.KubeConfig();
-      kc.loadFromFile(kubeconfigPath);
-      kc.setCurrentContext(currentContext || '');
+      kc.loadFromFile(String(currentConfig.kubeConfig?.path));
+      kc.setCurrentContext(currentConfig.kubeConfig?.currentContext || '');
 
       const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
@@ -87,7 +87,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         .then(() => {
           const alert: AlertType = {
             type: AlertEnum.Success,
-            title: `Created ${createNamespaceName} namespace to cluster ${currentContext} successfully`,
+            title: `Created ${createNamespaceName} namespace to cluster ${currentConfig.kubeConfig?.currentContext} successfully`,
             message: '',
           };
 
@@ -106,7 +106,15 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (selectedOption === 'none') {
       onOk();
     }
-  }, [currentContext, createNamespaceName, dispatch, kubeconfigPath, selectedNamespace, selectedOption, onOk]);
+  }, [
+    currentConfig.kubeConfig?.currentContext,
+    createNamespaceName,
+    dispatch,
+    currentConfig.kubeConfig?.path,
+    selectedNamespace,
+    selectedOption,
+    onOk,
+  ]);
 
   useEffect(() => {
     if (defaultOption && defaultOption === 'none') {

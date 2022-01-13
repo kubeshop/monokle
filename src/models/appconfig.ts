@@ -78,10 +78,6 @@ interface AppConfig {
   fileIncludes: string[];
   /** maximum recursion depth when reading nested folders */
   folderReadsMaxDepth: number;
-  /** absolute kubeconfig path */
-  kubeconfigPath: string;
-  /** is kubeconfig path valid */
-  isKubeconfigPathValid: boolean;
   /** if the startup modal is visible */
   isStartupModalVisible: boolean;
   settings: Settings;

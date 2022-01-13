@@ -59,8 +59,13 @@ export const isInPreviewModeSelector = createSelector(
 
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
-  appState =>
-    Boolean(appState.main.previewResourceId && appState.main.previewResourceId.endsWith(appState.config.kubeconfigPath))
+  ({main, config}) => {
+    const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
+    if (kubeConfigPath) {
+      return Boolean(main.previewResourceId && main.previewResourceId.endsWith(kubeConfigPath));
+    }
+    return false;
+  }
 );
 
 export const logsSelector = createSelector(
@@ -82,11 +87,15 @@ export const currentConfigSelector = createSelector(
       folderReadsMaxDepth: config.folderReadsMaxDepth,
     };
     applicationConfig.settings = {
-      ...config.settings,
+      helmPreviewMode: config.settings.helmPreviewMode,
+      kustomizeCommand: config.settings.kustomizeCommand,
+      hideExcludedFilesInFileExplorer: config.settings.hideExcludedFilesInFileExplorer,
+      isClusterSelectorVisible: config.settings.isClusterSelectorVisible,
     };
     applicationConfig.kubeConfig = {
-      path: config.kubeconfigPath,
-      isPathValid: config.isKubeconfigPathValid,
+      path: config.kubeConfig.path,
+      isPathValid: config.kubeConfig.isPathValid,
+      contexts: config.kubeConfig.contexts,
     };
     const projectConfig: ProjectConfig | null | undefined = config.projectConfig;
 
@@ -134,6 +143,9 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
   ) {
     baseConfig.settings.isClusterSelectorVisible = config.settings?.isClusterSelectorVisible;
   }
+  if (_.isEmpty(baseConfig.settings)) {
+    baseConfig.settings = undefined;
+  }
   if (_.isString(config.kubeConfig?.path) && !_.isEqual(config.kubeConfig?.path, baseConfig.kubeConfig?.path)) {
     baseConfig.kubeConfig.path = config.kubeConfig?.path;
   }
@@ -149,9 +161,14 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
   ) {
     baseConfig.kubeConfig.currentContext = config.kubeConfig?.currentContext;
   }
-
-  if (_.isEmpty(baseConfig.settings)) {
-    baseConfig.settings = undefined;
+  if (
+    _.isArray(config.kubeConfig?.contexts) &&
+    !_.isEqual(_.sortBy(config.kubeConfig?.contexts), _.sortBy(baseConfig.kubeConfig?.contexts))
+  ) {
+    baseConfig.kubeConfig.contexts = config.kubeConfig?.contexts;
+  }
+  if (_.isEmpty(baseConfig.kubeConfig)) {
+    baseConfig.kubeConfig = undefined;
   }
 
   if (_.isArray(config.scanExcludes) && !_.isEqual(_.sortBy(config.scanExcludes), _.sortBy(baseConfig.scanExcludes))) {

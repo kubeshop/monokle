@@ -19,8 +19,8 @@ const applyMultipleResources = (
   namespace?: string,
   onSuccessCallback?: () => void
 ) => {
-  const kubeconfigPath = config.kubeconfigPath;
-  const context = config.kubeConfig.currentContext;
+  const kubeconfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
+  const context = config.projectConfig?.kubeConfig?.currentContext || config.kubeConfig.currentContext;
 
   if (!kubeconfigPath || !context || !resourcesToApply.length) {
     return;

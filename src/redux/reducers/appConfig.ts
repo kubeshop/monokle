@@ -1,6 +1,6 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import {writeFileSync} from 'fs';
+import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
 import path, {sep} from 'path';
 
@@ -40,6 +40,22 @@ export const setOpenProject = createAsyncThunk(
   }
 );
 
+export const updateProjectKubeConfig = createAsyncThunk(
+  'config/updateProjectKubeConfig',
+  async (kubeConfig: KubeConfig, thunkAPI: any) => {
+    const projectConfig: ProjectConfig | null = thunkAPI.getState().config.projectConfig;
+
+    if (!_.isEqual(projectConfig?.kubeConfig, kubeConfig)) {
+      thunkAPI.dispatch(
+        configSlice.actions.updateProjectConfig({
+          ...projectConfig,
+          kubeConfig: {...projectConfig?.kubeConfig, ...kubeConfig},
+        })
+      );
+    }
+  }
+);
+
 export const configSlice = createSlice({
   name: 'config',
   initialState: initialState.config,
@@ -50,16 +66,8 @@ export const configSlice = createSlice({
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
-    updateKubeconfig: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      electronStore.set('appConfig.kubeconfig', action.payload);
-      state.kubeconfigPath = action.payload;
-    },
     setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       state.recentFolders = action.payload;
-    },
-    updateKubeconfigPathValidity: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.isKubeconfigPathValid', action.payload);
-      state.isKubeconfigPathValid = action.payload;
     },
     updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.startupModalVisible', action.payload);
@@ -119,8 +127,8 @@ export const configSlice = createSlice({
     setScanExcludesStatus: (state: Draft<AppConfig>, action: PayloadAction<'outdated' | 'applied'>) => {
       state.isScanExcludesUpdated = action.payload;
     },
-    setContexts: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
-      state.kubeConfig = action.payload;
+    setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
+      state.kubeConfig = {...state.kubeConfig, ...action.payload};
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       const project: Project = action.payload;
@@ -165,6 +173,13 @@ export const configSlice = createSlice({
       if (!state.selectedProjectRootFolder) {
         return;
       }
+
+      if (_.isEqual(state.projectConfig, action.payload)) {
+        return;
+      }
+
+      console.log('PATH', action.payload?.kubeConfig?.path);
+
       const absolutePath = `${state.selectedProjectRootFolder}${sep}.monokle`;
 
       const applicationConfig: ProjectConfig = {
@@ -179,18 +194,24 @@ export const configSlice = createSlice({
         isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
       };
       applicationConfig.kubeConfig = {
-        path: state.kubeconfigPath,
-        isPathValid: state.isKubeconfigPathValid,
+        path: state.kubeConfig.path,
+        isPathValid: state.kubeConfig.isPathValid,
+        contexts: state.kubeConfig.contexts,
       };
-
       if (!_.isEqual(state.projectConfig, action.payload)) {
         const mergedConfigs = mergeConfigs(applicationConfig, action.payload);
-        // delete mergedConfigs?.settings?.loadLastProjectOnStartup;
-        // delete mergedConfigs?.kubeConfig?.isPathValid;
-        // delete mergedConfigs?.kubeConfig?.contexts;
-
+        delete mergedConfigs?.settings?.loadLastProjectOnStartup;
+        delete mergedConfigs?.kubeConfig?.isPathValid;
+        delete mergedConfigs?.kubeConfig?.contexts;
         if (mergedConfigs && !_.isEmpty(mergedConfigs)) {
-          writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
+          try {
+            const savedConfig: ProjectConfig = JSON.parse(readFileSync(absolutePath, 'utf8'));
+            if (!_.isEqual(savedConfig, mergedConfigs)) {
+              writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
+            }
+          } catch (error: any) {
+            writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
+          }
         } else {
           writeFileSync(absolutePath, ``, 'utf-8');
         }
@@ -210,21 +231,19 @@ export const {
   setAutoZoom,
   setCurrentContext,
   setScanExcludesStatus,
-  updateKubeconfig,
   updateFolderReadsMaxDepth,
   updateLanguage,
   updateNewVersion,
   updateFileIncludes,
   updateHelmPreviewMode,
   updateHideExcludedFilesInFileExplorer,
-  updateKubeconfigPathValidity,
   updateKustomizeCommand,
   updateLoadLastProjectOnStartup,
   updateScanExcludes,
   updateStartupModalVisible,
   updateTextSize,
   updateTheme,
-  setContexts,
+  setKubeConfig,
   updateProjectConfig,
   toggleClusterStatus,
 } = configSlice.actions;

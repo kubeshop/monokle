@@ -4,7 +4,7 @@ import {AnyAction} from 'redux';
 import {AlertEnum} from '@models/alert';
 
 import {setAlert} from '@redux/reducers/alert';
-import {updateKubeconfig, updateKubeconfigPathValidity} from '@redux/reducers/appConfig';
+import {setKubeConfig} from '@redux/reducers/appConfig';
 import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
 
@@ -15,7 +15,7 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
   if (PROCESS_ENV.KUBECONFIG) {
     const envKubeconfigParts = PROCESS_ENV.KUBECONFIG.split(path.delimiter);
     if (envKubeconfigParts.length > 1) {
-      dispatch(updateKubeconfig(envKubeconfigParts[0]));
+      dispatch(setKubeConfig({path: envKubeconfigParts[0]}));
       monitorKubeConfig(envKubeconfigParts[0], dispatch);
 
       dispatch(
@@ -26,7 +26,7 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
         })
       );
     } else {
-      dispatch(updateKubeconfig(PROCESS_ENV.KUBECONFIG));
+      dispatch(setKubeConfig({path: PROCESS_ENV.KUBECONFIG}));
       monitorKubeConfig(PROCESS_ENV.KUBECONFIG, dispatch);
     }
     return;
@@ -40,16 +40,14 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
   }
 
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
-    dispatch(updateKubeconfig(storedKubeconfig));
+    dispatch(setKubeConfig({path: storedKubeconfig, isPathValid: storedIsKubeconfigPathValid}));
     monitorKubeConfig(storedKubeconfig, dispatch);
-    dispatch(updateKubeconfigPathValidity(storedIsKubeconfigPathValid));
     return;
   }
 
   const possibleKubeconfig = path.join(userHomeDir, `${path.sep}.kube${path.sep}config`);
-  dispatch(updateKubeconfig(possibleKubeconfig));
+  dispatch(setKubeConfig({path: possibleKubeconfig, isPathValid: true}));
   monitorKubeConfig(possibleKubeconfig, dispatch);
-  dispatch(updateKubeconfigPathValidity(true));
 }
 
 export default initKubeconfig;

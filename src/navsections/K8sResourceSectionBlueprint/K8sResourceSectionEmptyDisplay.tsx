@@ -8,7 +8,7 @@ import {HighlightItems} from '@models/ui';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {highlightItem, toggleSettings} from '@redux/reducers/ui';
-import {activeResourcesSelector} from '@redux/selectors';
+import {activeResourcesSelector, currentConfigSelector} from '@redux/selectors';
 
 import Colors from '@styles/Colors';
 
@@ -32,7 +32,7 @@ const StyledLink = styled.div`
 function K8sResourceSectionEmptyDisplay() {
   const activeResources = useAppSelector(activeResourcesSelector);
   const dispatch = useAppDispatch();
-  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
+  const currentConfig = useAppSelector(currentConfigSelector);
 
   function resetFilters() {
     const emptyFilter: ResourceFilterType = {annotations: {}, labels: {}};
@@ -61,7 +61,7 @@ function K8sResourceSectionEmptyDisplay() {
           <StyledTitle>Get started:</StyledTitle>
           <StyledLink onClick={() => handleClick(HighlightItems.CREATE_RESOURCE)}>Create a resource</StyledLink>
           <StyledLink onClick={() => handleClick(HighlightItems.BROWSE_TEMPLATES)}>Browse templates</StyledLink>
-          {isKubeconfigPathValid ? (
+          {currentConfig.kubeConfig?.isPathValid ? (
             <StyledLink onClick={() => handleClick(HighlightItems.CONNECT_TO_CLUSTER)}>Connect to a cluster</StyledLink>
           ) : (
             <StyledLink onClick={handleClusterConfigure}>Configure a cluster</StyledLink>

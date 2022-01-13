@@ -16,7 +16,7 @@ import {
   toggleRightMenu,
   toggleSettings,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {currentConfigSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -35,9 +35,10 @@ import featureJson from '@src/feature-flags.json';
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
-  const configState = useAppSelector(state => state.config);
+  // const configState = useAppSelector(state => state.config);
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const currentConfig = useSelector(currentConfigSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -83,16 +84,16 @@ const HotKeysHandler = () => {
         mainState.selectedPath,
         mainState.fileMap,
         dispatch,
-        configState.kubeconfigPath,
-        configState.kubeConfig.currentContext || ''
+        String(currentConfig.kubeConfig?.path),
+        currentConfig.kubeConfig?.currentContext || ''
       );
     }
   }, [
     mainState.selectedResourceId,
     mainState.resourceMap,
     mainState.fileMap,
-    configState.kubeconfigPath,
-    configState.kubeConfig.currentContext,
+    currentConfig.kubeConfig?.path,
+    currentConfig.kubeConfig?.currentContext,
     mainState.selectedPath,
     dispatch,
   ]);
@@ -119,16 +120,15 @@ const HotKeysHandler = () => {
 
     const isClusterPreview = mainState.previewType === 'cluster';
 
-    const kustomizeCommand =
-      configState.projectConfig?.settings?.kustomizeCommand || configState.settings.kustomizeCommand;
+    const kustomizeCommand = currentConfig.settings?.kustomizeCommand;
 
     applyResource(
       selectedResource.id,
       mainState.resourceMap,
       mainState.fileMap,
       dispatch,
-      configState.kubeconfigPath,
-      configState.kubeConfig.currentContext || '',
+      String(currentConfig.kubeConfig?.path),
+      currentConfig.kubeConfig?.currentContext || '',
       namespace,
       {
         isClusterPreview,
@@ -149,9 +149,9 @@ const HotKeysHandler = () => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, configState.kubeConfig.currentContext)
-      : makeApplyResourceText(selectedResource.name, configState.kubeConfig.currentContext);
-  }, [mainState.resourceMap, mainState.selectedResourceId, configState.kubeConfig.currentContext]);
+      ? makeApplyKustomizationText(selectedResource.name, currentConfig.kubeConfig?.currentContext)
+      : makeApplyResourceText(selectedResource.name, currentConfig.kubeConfig?.currentContext);
+  }, [mainState.resourceMap, mainState.selectedResourceId, currentConfig.kubeConfig?.currentContext]);
 
   useHotkeys(
     hotkeys.APPLY_SELECTION,
@@ -178,9 +178,9 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.PREVIEW_CLUSTER,
     () => {
-      startPreview(configState.kubeconfigPath, 'cluster', dispatch);
+      startPreview(String(currentConfig.kubeConfig?.path), 'cluster', dispatch);
     },
-    [configState]
+    [currentConfig.kubeConfig]
   );
 
   useHotkeys(
