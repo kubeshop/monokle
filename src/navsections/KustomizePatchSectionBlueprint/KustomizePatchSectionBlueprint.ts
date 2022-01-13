@@ -13,7 +13,7 @@ export type KustomizePatchScopeType = {
   resourceFilter: ResourceFilterType;
   selectedPath?: string;
   selectedResourceId?: string;
-  isInPreviewMode: boolean;
+  isInClusterMode: boolean;
   isPreviewLoading: boolean;
   isFolderLoading: boolean;
 };
@@ -31,7 +31,9 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
       resourceFilter: state.main.resourceFilter,
       selectedPath: state.main.selectedPath,
       selectedResourceId: state.main.selectedResourceId,
-      isInPreviewMode: Boolean(state.main.previewResourceId) || Boolean(state.main.previewValuesFileId),
+      isInClusterMode: Boolean(
+        state.main.previewResourceId && state.main.previewResourceId.endsWith(state.config.kubeconfigPath)
+      ),
       isPreviewLoading: state.main.previewLoader.isLoading,
       isFolderLoading: state.ui.isFolderLoading,
     };
@@ -79,6 +81,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
     builder: {
       isSelected: rawItem => rawItem.isSelected,
       isHighlighted: rawItem => rawItem.isHighlighted,
+      isDisabled: (_, scope) => Boolean(scope.isInClusterMode),
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
