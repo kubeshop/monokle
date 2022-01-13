@@ -91,6 +91,7 @@ export const currentConfigSelector = createSelector(
       kustomizeCommand: config.settings.kustomizeCommand,
       hideExcludedFilesInFileExplorer: config.settings.hideExcludedFilesInFileExplorer,
       isClusterSelectorVisible: config.settings.isClusterSelectorVisible,
+      loadLastProjectOnStartup: config.settings.loadLastProjectOnStartup,
     };
     applicationConfig.kubeConfig = {
       path: config.kubeConfig.path,

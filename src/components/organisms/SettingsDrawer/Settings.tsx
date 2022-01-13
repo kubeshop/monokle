@@ -113,6 +113,7 @@ export const Settings = ({
 
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
+    setCurrentKubeConfig(config?.kubeConfig?.path);
   }, [config?.kubeConfig]);
 
   useEffect(() => {

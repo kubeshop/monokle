@@ -192,6 +192,7 @@ export const configSlice = createSlice({
         kustomizeCommand: state.settings.kustomizeCommand,
         hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
         isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
+        loadLastProjectOnStartup: state.settings.loadLastProjectOnStartup,
       };
       applicationConfig.kubeConfig = {
         path: state.kubeConfig.path,
