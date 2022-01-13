@@ -204,12 +204,12 @@ function SectionRenderer(props: SectionRendererProps) {
           const group = groupInstanceById[groupId];
           return (
             <React.Fragment key={group.id}>
-              <S.NameContainer style={{color: 'red'}}>
+              <S.SectionContainer style={{color: 'red'}}>
                 <S.Name $level={level + 1}>
                   {group.name}
                   <S.ItemsLength selected={false}>{group.visibleItemIds.length}</S.ItemsLength>
                 </S.Name>
-              </S.NameContainer>
+              </S.SectionContainer>
               {group.visibleItemIds.map(itemId => (
                 <ItemRenderer
                   key={itemId}
