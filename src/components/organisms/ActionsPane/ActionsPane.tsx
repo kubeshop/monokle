@@ -26,9 +26,11 @@ import {
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
+import {AlertEnum, AlertType} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {currentConfigSelector, isInPreviewModeSelector} from '@redux/selectors';
@@ -60,9 +62,6 @@ import AppContext from '@src/AppContext';
 import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFormSchema, getUiSchema} from '@src/kindhandlers/common/formLoader';
-
-import { setAlert } from '@redux/reducers/alert';
-import { AlertEnum, AlertType } from '@models/alert';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneFooter from './ActionsPaneFooter';
@@ -265,7 +264,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
-    if (!kubeconfigContext || kubeconfigContext === '') {
+    if (!currentConfig.kubeConfig?.currentContext || currentConfig.kubeConfig.currentContext === '') {
       const alert: AlertType = {
         type: AlertEnum.Error,
         title: 'Diff not available',
@@ -279,7 +278,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (selectedResourceId) {
       dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [dispatch, selectedResourceId, kubeconfigContext]);
+  }, [dispatch, selectedResourceId, currentConfig.kubeConfig?.currentContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
