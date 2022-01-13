@@ -265,7 +265,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (!kubeconfigContext || kubeconfigContext === '') {
       const alert: AlertType = {
         type: AlertEnum.Error,
-        title: 'Diff failed',
+        title: 'Diff not available',
         message: 'No Cluster Configured',
       };
 
