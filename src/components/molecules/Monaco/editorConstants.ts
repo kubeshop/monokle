@@ -3,6 +3,8 @@ import {monaco} from 'react-monaco-editor';
 export enum GlyphDecorationTypes {
   UnsatisfiedRef,
   SatisfiedRef,
+  IncomingRef,
+  OutgoingRef,
 }
 
 export enum InlineDecorationTypes {
@@ -18,6 +20,14 @@ const glyphDecorationOptionsByType: Record<GlyphDecorationTypes, monaco.editor.I
   [GlyphDecorationTypes.SatisfiedRef]: {
     glyphMarginClassName: 'monokleEditorSatisfiedRefGlyphClass',
     glyphMarginHoverMessage: {value: 'Satisfied link'},
+  },
+  [GlyphDecorationTypes.IncomingRef]: {
+    glyphMarginClassName: 'monokleEditorIncomingRefGlyphClass',
+    glyphMarginHoverMessage: {value: 'Incoming link'},
+  },
+  [GlyphDecorationTypes.OutgoingRef]: {
+    glyphMarginClassName: 'monokleEditorOutgoingRefGlyphClass',
+    glyphMarginHoverMessage: {value: 'Outgoing link'},
   },
 };
 
