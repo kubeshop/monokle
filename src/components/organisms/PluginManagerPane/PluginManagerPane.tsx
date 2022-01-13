@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 
-import {Button, Divider, Skeleton} from 'antd';
+import {Button, Skeleton} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
@@ -51,10 +51,7 @@ function PluginManagerPane() {
               <>
                 <h2>Inactive plugins</h2>
                 {inactivePlugins.map(inactivePlugin => (
-                  <>
-                    <PluginInformation key={inactivePlugin.name} plugin={inactivePlugin} />
-                    <Divider />
-                  </>
+                  <PluginInformation key={inactivePlugin.name} plugin={inactivePlugin} />
                 ))}
               </>
             )}

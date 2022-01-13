@@ -1,6 +1,6 @@
 import React, {useCallback, useState} from 'react';
 
-import {Button, Divider} from 'antd';
+import {Button} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
@@ -52,10 +52,11 @@ const TemplatesPane: React.FC = () => {
           <p>No templates available.</p>
         ) : (
           templates.map(template => (
-            <>
-              <TemplateInformation template={template} onClickOpenTemplate={() => onClickOpenTemplate(template)} />
-              <Divider />
-            </>
+            <TemplateInformation
+              key={template.id}
+              template={template}
+              onClickOpenTemplate={() => onClickOpenTemplate(template)}
+            />
           ))
         )}
       </S.Container>
