@@ -15,7 +15,32 @@ const Option = Select.Option;
 const {TextArea} = Input;
 
 const FormContainer = styled.div`
+  width: 100%;
   margin-top: 16px;
+`;
+
+const DynamicKeyValueContainer = styled.div`
+  display: flex;
+  align-items: space-between;
+  width: 100%;
+  margin-top: 16px;
+`;
+
+const DynamicKeyValueItem = styled.div`
+  width: 40%;
+  margin-left: 0.33%;
+`;
+
+const DynamicKeyValueActionItem = styled.div`
+  width: 19%;
+  margin-left: 0.33%;
+`;
+
+const ButtonContainer = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledSpanTitle = styled.span`
@@ -58,7 +83,6 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   };
 
   useEffect(() => {
-    console.log('formData', formData);
     if (formData.data && _.isObject(formData.data)) {
       const newDataKeyValuePairs = Object.keys(formData.data).map(key => ({
         key,
@@ -165,7 +189,6 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   };
 
   const handleTextAreaFormChange = (key: string, value: string) => {
-    console.log('key_value', key, value);
     onChange({...formData, data: {[key]: value}, stringData: undefined});
   };
 
@@ -287,7 +310,7 @@ const KeyValuePairForm = ({
   };
 
   return (
-    <div style={{width: '100%', marginTop: '16px'}}>
+    <FormContainer>
       <StyledSpanTitle>Data</StyledSpanTitle>
       {localValues.map(value => (
         <DynamicKeyValue
@@ -300,7 +323,7 @@ const KeyValuePairForm = ({
       <div style={{marginTop: '12px'}}>
         <Button onClick={handleAddNewValue}>Add New</Button>
       </div>
-    </div>
+    </FormContainer>
   );
 };
 
@@ -322,14 +345,14 @@ const TextAreaForm = ({value, onChange}: {value: string; onChange: Function}) =>
   }, [localValue]);
 
   return (
-    <div style={{width: '100%', marginTop: '16px'}}>
+    <FormContainer>
       <StyledSpanTitle>Data</StyledSpanTitle>
       <Base64Input
         type="TEXT_AREA"
         value={localValue}
         onChange={(emittedValue: string) => handleValueChange(emittedValue)}
       />
-    </div>
+    </FormContainer>
   );
 };
 
@@ -341,7 +364,7 @@ const TLSForm = ({tlscrt, tlskey, onChange}: {tlscrt: string; tlskey: string; on
   };
 
   return (
-    <div style={{width: '100%', marginTop: '16px'}}>
+    <FormContainer>
       <StyledSpanTitle>Data</StyledSpanTitle>
       <div>
         <StyledSpanTitle>CRT</StyledSpanTitle>
@@ -359,7 +382,7 @@ const TLSForm = ({tlscrt, tlskey, onChange}: {tlscrt: string; tlskey: string; on
           onChange={(emittedValue: string) => handleValueChange('tls.key', emittedValue)}
         />
       </div>
-    </div>
+    </FormContainer>
   );
 };
 
@@ -387,7 +410,7 @@ const TokenForm = ({
   };
 
   return (
-    <div style={{width: '100%', marginTop: '16px'}}>
+    <FormContainer>
       <StyledSpanTitle>Data</StyledSpanTitle>
       <div>
         <StyledSpanTitle>Auth Extra Groups</StyledSpanTitle>
@@ -428,7 +451,7 @@ const TokenForm = ({
           onChange={(emittedValue: string) => handleValueChange('usage-bootstrap-signing', emittedValue)}
         />
       </div>
-    </div>
+    </FormContainer>
   );
 };
 
@@ -482,27 +505,27 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
   );
 
   return (
-    <div style={{display: 'flex', alignItems: 'space-between', width: '100%', marginTop: '16px'}}>
-      <div style={{width: '40%', marginRight: '0.33%'}}>
+    <DynamicKeyValueContainer>
+      <DynamicKeyValueItem>
         <StyledSpanTitle>Key</StyledSpanTitle>
         <Input value={localValue.key} onChange={event => handleValueChange('KEY', event.target.value)} />
-      </div>
-      <div style={{width: '40%', marginLeft: '0.33%'}}>
+      </DynamicKeyValueItem>
+      <DynamicKeyValueItem>
         <StyledSpanTitle>Value</StyledSpanTitle>
         <Base64Input
           value={localValue.value}
           onChange={(emittedValue: string) => handleValueChange('VALUE', emittedValue)}
         />
-      </div>
-      <div style={{width: '19%', marginLeft: '0.33%'}}>
+      </DynamicKeyValueItem>
+      <DynamicKeyValueActionItem>
         <StyledSpanTitle>&nbsp;</StyledSpanTitle>
-        <div style={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <ButtonContainer>
           <Button onClick={handleDeleteValue}>
             <DeleteOutlined />
           </Button>
-        </div>
-      </div>
-    </div>
+        </ButtonContainer>
+      </DynamicKeyValueActionItem>
+    </DynamicKeyValueContainer>
   );
 };
 
@@ -513,11 +536,22 @@ export const Base64Input = ({value, onChange, type = 'INPUT'}: any) => {
   const [debouncedValue, setDebouncedValue] = useState<string | undefined>(
     value && !isBase64(value) ? Buffer.from(value).toString('base64') : value
   );
+  const [isEncoded, setIsEncoded] = useState(isBase64(inputValue));
+
+  useEffect(() => {
+    if (isEncoded) {
+      setInputValue(value && isBase64(value) ? value : Buffer.from(value).toString('base64'));
+    } else {
+      setInputValue(value && isBase64(value) ? Buffer.from(value, 'base64').toString('utf-8') : value);
+    }
+  }, [value]);
 
   useDebounce(
     () => {
       if (inputValue) {
-        if (isBase64(inputValue)) {
+        const encoded = isBase64(inputValue);
+        setIsEncoded(encoded);
+        if (encoded) {
           setDebouncedValue(inputValue);
         } else {
           setDebouncedValue(Buffer.from(inputValue).toString('base64'));
@@ -532,9 +566,11 @@ export const Base64Input = ({value, onChange, type = 'INPUT'}: any) => {
 
   const encode = () => {
     setInputValue(inputValue ? Buffer.from(inputValue).toString('base64') : undefined);
+    setIsEncoded(true);
   };
   const decode = () => {
     setInputValue(inputValue ? Buffer.from(inputValue, 'base64').toString('utf-8') : undefined);
+    setIsEncoded(false);
   };
 
   useEffect(() => {
@@ -564,7 +600,7 @@ export const Base64Input = ({value, onChange, type = 'INPUT'}: any) => {
         />
       )}
 
-      {!isBase64(inputValue) ? (
+      {!isEncoded ? (
         <StyledSpanToggler onClick={() => encode()}>Encode</StyledSpanToggler>
       ) : (
         <StyledSpanToggler onClick={() => decode()}>Decode</StyledSpanToggler>
@@ -575,9 +611,6 @@ export const Base64Input = ({value, onChange, type = 'INPUT'}: any) => {
 
 export const isBase64 = (str?: string | null) => {
   if (!str) {
-    return false;
-  }
-  if (str === '' || str.trim() === '') {
     return false;
   }
   try {
