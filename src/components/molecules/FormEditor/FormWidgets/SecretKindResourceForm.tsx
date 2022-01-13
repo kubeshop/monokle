@@ -58,27 +58,49 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   };
 
   useEffect(() => {
+    console.log('formData', formData);
     if (formData.data && _.isObject(formData.data)) {
-      setDataKeyValuePairs(Object.keys(formData.data).map(key => ({id: uuidv4(), key, value: formData.data[key]})));
-    } else {
-      setDataKeyValuePairs([]);
+      const newDataKeyValuePairs = Object.keys(formData.data).map(key => ({
+        key,
+        value: formData.data[key],
+      }));
+
+      if (
+        !_.isEqual(
+          _.sortBy(
+            dataKeyValuePairs.map(p => ({key: p.key, value: p.value})),
+            'key'
+          ),
+          _.sortBy(newDataKeyValuePairs, 'key')
+        )
+      ) {
+        setDataKeyValuePairs(newDataKeyValuePairs.map(p => ({...p, id: uuidv4()})));
+      }
     }
-  }, [formData.data]);
+  }, [formData.data, formData.metadata?.name]);
 
   useEffect(() => {
     if (formData.stringData && _.isObject(formData.stringData)) {
-      setStringDataKeyValuePairs(
-        Object.keys(formData.stringData).map(key => ({id: uuidv4(), key, value: formData.stringData[key]}))
-      );
-    } else {
-      setStringDataKeyValuePairs([]);
+      const newStringDataKeyValuePairs = Object.keys(formData.stringData).map(key => ({
+        key,
+        value: formData.stringData[key],
+      }));
+
+      if (
+        !_.isEqual(
+          _.sortBy(
+            stringDataKeyValuePairs.map(p => ({key: p.key, value: p.value})),
+            'key'
+          ),
+          _.sortBy(newStringDataKeyValuePairs, 'key')
+        )
+      ) {
+        setStringDataKeyValuePairs(newStringDataKeyValuePairs.map(p => ({...p, id: uuidv4()})));
+      }
     }
-  }, [formData.stringData]);
+  }, [formData.stringData, formData.metadata?.name]);
 
   useEffect(() => {
-    if (dataKeyValuePairs.length === 0) {
-      return;
-    }
     const emptyObject: any = {};
 
     const data = dataKeyValuePairs.reduce((object, value) => {
@@ -95,9 +117,6 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   }, [dataKeyValuePairs]);
 
   useEffect(() => {
-    if (stringDataKeyValuePairs.length === 0) {
-      return;
-    }
     const emptyObject: any = {};
 
     const stringData = stringDataKeyValuePairs.reduce((object, value) => {
@@ -146,6 +165,7 @@ export const SecretKindResourceForm = ({schema, onChange, formData, disabled, ..
   };
 
   const handleTextAreaFormChange = (key: string, value: string) => {
+    console.log('key_value', key, value);
     onChange({...formData, data: {[key]: value}, stringData: undefined});
   };
 
@@ -304,7 +324,11 @@ const TextAreaForm = ({value, onChange}: {value: string; onChange: Function}) =>
   return (
     <div style={{width: '100%', marginTop: '16px'}}>
       <StyledSpanTitle>Data</StyledSpanTitle>
-      <Base64TextArea value={localValue} onChange={(emittedValue: string) => handleValueChange(emittedValue)} />
+      <Base64Input
+        type="TEXT_AREA"
+        value={localValue}
+        onChange={(emittedValue: string) => handleValueChange(emittedValue)}
+      />
     </div>
   );
 };
@@ -321,14 +345,16 @@ const TLSForm = ({tlscrt, tlskey, onChange}: {tlscrt: string; tlskey: string; on
       <StyledSpanTitle>Data</StyledSpanTitle>
       <div>
         <StyledSpanTitle>CRT</StyledSpanTitle>
-        <Base64TextArea
+        <Base64Input
+          type="TEXT_AREA"
           value={tlscrt}
           onChange={(emittedValue: string) => handleValueChange('tls.crt', emittedValue)}
         />
       </div>
       <div>
         <StyledSpanTitle>Key</StyledSpanTitle>
-        <Base64TextArea
+        <Base64Input
+          type="TEXT_AREA"
           value={tlskey}
           onChange={(emittedValue: string) => handleValueChange('tls.key', emittedValue)}
         />
@@ -447,7 +473,7 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
         return;
       }
 
-      if (onChange && (localValue.key || localValue.value)) {
+      if (onChange && localValue.key && localValue.value) {
         onChange(localValue);
       }
     },
@@ -480,65 +506,18 @@ const DynamicKeyValue = ({value, onChange, onDelete}: any) => {
   );
 };
 
-export const Base64Input = ({value, onChange}: any) => {
-  const [localValue, setLocalValue] = useState<string | undefined>(value);
-  const [plainValue, setPlainValue] = useState(value ? Buffer.from(value, 'base64').toString('utf-8') : '');
-  const [isEncoded, setIsEncoded] = useState(false);
-
-  const handleValueChange = (event: any) => {
-    console.log(event.target.value);
-    // if (!isEncoded) {
-    //   setLocalValue(event.target.value ? Buffer.from(event.target.value).toString('base64') : undefined);
-    // } else {
-    //   setLocalValue(event.target.value || undefined);
-    // }
-  };
-
-  useDebounce(
-    () => {
-      if (_.isEqual(localValue, value)) {
-        return;
-      }
-
-      if (localValue) {
-        setPlainValue(Buffer.from(localValue, 'base64').toString('utf-8'));
-      } else {
-        setPlainValue('');
-      }
-
-      if (onChange) {
-        onChange(localValue);
-      }
-    },
-    DEFAULT_EDITOR_DEBOUNCE,
-    [localValue]
+export const Base64Input = ({value, onChange, type = 'INPUT'}: any) => {
+  const [inputValue, setInputValue] = useState<string | undefined>(
+    value && isBase64(value) ? Buffer.from(value, 'base64').toString('utf-8') : value
   );
-
-  return (
-    <>
-      <Input
-        value={isEncoded ? localValue : plainValue}
-        onChange={_.debounce(handleValueChange, 400, {maxWait: 2000})}
-        onPaste={_.debounce(handleValueChange, 400, {maxWait: 2000})}
-      />
-      {isEncoded ? (
-        <StyledSpanToggler onClick={() => setIsEncoded(false)}>Encoded</StyledSpanToggler>
-      ) : (
-        <StyledSpanToggler onClick={() => setIsEncoded(true)}>Decoded</StyledSpanToggler>
-      )}
-    </>
+  const [debouncedValue, setDebouncedValue] = useState<string | undefined>(
+    value && !isBase64(value) ? Buffer.from(value).toString('base64') : value
   );
-};
-
-export const Base64TextArea = ({value, onChange}: any) => {
-  const [inputValue, setInputValue] = useState<string | undefined>(value);
-  const [debouncedValue, setDebouncedValue] = useState<string | undefined>();
-  const [isEncoded, setIsEncoded] = useState(false);
 
   useDebounce(
     () => {
       if (inputValue) {
-        if (isEncoded) {
+        if (isBase64(inputValue)) {
           setDebouncedValue(inputValue);
         } else {
           setDebouncedValue(Buffer.from(inputValue).toString('base64'));
@@ -551,21 +530,12 @@ export const Base64TextArea = ({value, onChange}: any) => {
     [inputValue]
   );
 
-  useEffect(() => {
-    if (isEncoded) {
-      setInputValue(value);
-    } else {
-      setInputValue(value ? Buffer.from(value, 'base64').toString('utf-8') : undefined);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    if (!isEncoded) {
-      setInputValue(inputValue ? Buffer.from(inputValue, 'base64').toString('utf-8') : undefined);
-    } else {
-      setInputValue(inputValue ? Buffer.from(inputValue).toString('base64') : undefined);
-    }
-  }, [isEncoded]);
+  const encode = () => {
+    setInputValue(inputValue ? Buffer.from(inputValue).toString('base64') : undefined);
+  };
+  const decode = () => {
+    setInputValue(inputValue ? Buffer.from(inputValue, 'base64').toString('utf-8') : undefined);
+  };
 
   useEffect(() => {
     if (_.isEqual(debouncedValue, value)) {
@@ -579,12 +549,40 @@ export const Base64TextArea = ({value, onChange}: any) => {
 
   return (
     <>
-      <TextArea rows={6} value={inputValue} onChange={e => setInputValue(e.target.value || undefined)} />
-      {isEncoded ? (
-        <StyledSpanToggler onClick={() => setIsEncoded(false)}>Encoded</StyledSpanToggler>
+      {type === 'INPUT' ? (
+        <Input
+          value={inputValue}
+          onChange={e => setInputValue(e.target.value || undefined)}
+          onPaste={(e: any) => setInputValue(e.target.value || undefined)}
+        />
       ) : (
-        <StyledSpanToggler onClick={() => setIsEncoded(true)}>Decoded</StyledSpanToggler>
+        <TextArea
+          rows={6}
+          value={inputValue}
+          onChange={e => setInputValue(e.target.value || undefined)}
+          onPaste={(e: any) => setInputValue(e.target.value || undefined)}
+        />
+      )}
+
+      {!isBase64(inputValue) ? (
+        <StyledSpanToggler onClick={() => encode()}>Encode</StyledSpanToggler>
+      ) : (
+        <StyledSpanToggler onClick={() => decode()}>Decode</StyledSpanToggler>
       )}
     </>
   );
+};
+
+export const isBase64 = (str?: string | null) => {
+  if (!str) {
+    return false;
+  }
+  if (str === '' || str.trim() === '') {
+    return false;
+  }
+  try {
+    return Buffer.from(Buffer.from(str, 'base64').toString('utf-8')).toString('base64') === str;
+  } catch (err) {
+    return false;
+  }
 };
