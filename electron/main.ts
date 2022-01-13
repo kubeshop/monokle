@@ -20,7 +20,7 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
-import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
+import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
@@ -45,7 +45,7 @@ import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
 import { RootState } from '@redux/store';
-import { loadTemplatePacks, loadTemplates, loadTemplatesFromPlugin } from './templateService';
+import { downloadTemplate, downloadTemplatePack, loadTemplatePacks, loadTemplates, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack } from './templateService';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -73,6 +73,33 @@ ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   } catch (err) {
     if (err instanceof Error) {
       event.sender.send(DOWNLOAD_PLUGIN_RESULT, err);
+    } else {
+      log.warn(err);
+    }
+  }
+});
+
+ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
+  try {
+    const template = await downloadTemplate(templateUrl, templatesDir);
+    event.sender.send(DOWNLOAD_TEMPLATE_RESULT, {template});
+  } catch (err) {
+    if (err instanceof Error) {
+      event.sender.send(DOWNLOAD_TEMPLATE_RESULT, err);
+    } else {
+      log.warn(err);
+    }
+  }
+});
+
+ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event, templatePackUrl: string) => {
+  try {
+    const templatePack = await downloadTemplatePack(templatePackUrl, templatePacksDir);
+    const templates = await loadTemplatesFromTemplatePack(templatePack);
+    event.sender.send(DOWNLOAD_TEMPLATE_PACK_RESULT, {templatePack, templates});
+  } catch (err) {
+    if (err instanceof Error) {
+      event.sender.send(DOWNLOAD_TEMPLATE_PACK_RESULT, err);
     } else {
       log.warn(err);
     }

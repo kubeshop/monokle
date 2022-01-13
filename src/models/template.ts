@@ -51,6 +51,7 @@ const HelmChartTemplateRuntype = Rt.Union(BundledHelmChartTemplateRuntype, Refer
 const AnyTemplateRuntype = Rt.Union(VanillaTemplateRuntype, HelmChartTemplateRuntype);
 
 const TemplatePackRuntype = Rt.Record({
+  id: Rt.String,
   name: Rt.String,
   author: Rt.String,
   version: Rt.String,
