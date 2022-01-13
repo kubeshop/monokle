@@ -1,8 +1,10 @@
 import React from 'react';
 
+import {Button} from 'antd';
+
 import styled from 'styled-components';
 
-import {AnyPlugin} from '@models/plugin';
+import {AnyTemplate} from '@models/template';
 
 import Colors from '@styles/Colors';
 
@@ -42,22 +44,26 @@ const Version = styled.span`
   font-style: italic;
 `;
 
-function PluginInformation(props: {plugin: AnyPlugin}) {
-  const {plugin} = props;
+function TemplateInformation(props: {template: AnyTemplate; onClickOpenTemplate: () => void}) {
+  const {template, onClickOpenTemplate} = props;
   return (
     <Container>
       <IconContainer>
         <span />
       </IconContainer>
       <InfoContainer>
-        <Name>{plugin.name}</Name>
-        <Description>{plugin.description || 'No description'}</Description>
+        <Name>{template.name}</Name>
+        <span>Type: {template.type}</span>
+        <Description>{template.description}</Description>
         <Footer>
-          <Author>{plugin.author}</Author> <Version>{plugin.version}</Version>
+          <Author>{template.author}</Author> <Version>{template.version}</Version>
         </Footer>
+        <Button onClick={onClickOpenTemplate} type="primary" ghost size="small">
+          Open
+        </Button>
       </InfoContainer>
     </Container>
   );
 }
 
-export default PluginInformation;
+export default TemplateInformation;

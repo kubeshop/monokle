@@ -11,6 +11,7 @@ import {useAppSelector} from '@redux/hooks';
 import {TitleBar} from '@components/molecules';
 
 import TemplateModal from '../TemplateModal';
+import TemplateInformation from './TemplateInformation';
 import TemplateInstallModal from './TemplateInstallModal';
 
 import * as S from './styled';
@@ -51,14 +52,10 @@ const TemplatesPane: React.FC = () => {
           <p>No templates available.</p>
         ) : (
           templates.map(template => (
-            <div key={template.id}>
-              <p>{template.id}</p>
-              <p style={{fontStyle: 'italic'}}>{template.type}</p>
-              <Button onClick={() => onClickOpenTemplate(template)} type="primary" ghost size="small">
-                Open
-              </Button>
+            <>
+              <TemplateInformation template={template} onClickOpenTemplate={() => onClickOpenTemplate(template)} />
               <Divider />
-            </div>
+            </>
           ))
         )}
       </S.Container>
