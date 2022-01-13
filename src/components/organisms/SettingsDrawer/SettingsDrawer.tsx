@@ -9,6 +9,7 @@ import {Project, ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
+  setKubeConfig,
   setScanExcludesStatus,
   toggleClusterStatus,
   updateFileIncludes,
@@ -76,6 +77,9 @@ const SettingsDrawer = () => {
       !_.isEqual(config.settings?.hideExcludedFilesInFileExplorer, appConfig.settings.hideExcludedFilesInFileExplorer)
     ) {
       dispatch(updateHideExcludedFilesInFileExplorer(Boolean(config.settings?.hideExcludedFilesInFileExplorer)));
+    }
+    if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
+      dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
     }
     if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
       dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
