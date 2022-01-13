@@ -1,6 +1,10 @@
 name: monokle-ui-tests
 
 on:
+  push:
+    branches:
+      - olelensmar/test/playwright-baseline
+
   workflow_dispatch:
 
 jobs:
