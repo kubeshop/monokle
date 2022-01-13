@@ -19,8 +19,9 @@ export async function findDrawer(page: Page, title: string) {
   for (let c = 0; c < count; c += 1) {
     const drawer = drawers.nth(c);
     // eslint-disable-next-line no-await-in-loop
-    const elm = await drawer.locator(`//div[contains(@class,'ant-drawer-title')][text()='${title}']`).elementHandle();
-    if (elm) {
+    const locator = await drawer.locator(`//div[contains(@class,'ant-drawer-title')][text()='${title}']`);
+    const count = await locator.count();
+    if (count === 1) {
       return drawer;
     }
   }
