@@ -1,4 +1,5 @@
 /* eslint-disable import/order */
+import {not} from 'micromatch';
 import {Page, _electron as electron} from 'playwright';
 
 import {findDrawer, isDrawerVisible} from './antdHelpers';
@@ -82,7 +83,7 @@ test('Validate clustercontainer', async () => {
   expect(await div.count()).toBe(1);
 });
 
-test('Validate toolbar actions', async () => {
+test('Validate settings drawer', async () => {
   let drawer = await findDrawer(appWindow, 'Settings');
   expect(drawer).toBeFalsy();
 
@@ -103,6 +104,34 @@ test('Validate toolbar actions', async () => {
 
   // @ts-ignore
   expect(await isDrawerVisible(drawer)).toBeFalsy();
+});
+test('Validate notifications drawer', async () => {
+  let drawer = await findDrawer(appWindow, 'Notifications');
+  expect(drawer).toBeFalsy();
+
+  const notificationsIcon = appWindow.locator("span[aria-label='bell']");
+  expect(await notificationsIcon.count()).toBe(1);
+
+  notificationsIcon.click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  drawer = await findDrawer(appWindow, 'Notifications');
+  expect(drawer).toBeTruthy();
+
+  // @ts-ignore
+  expect(await isDrawerVisible(drawer)).toBeTruthy();
+
+  appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  // @ts-ignore
+  expect(await isDrawerVisible(drawer)).toBeFalsy();
+});
+test('Validate github redirect', async () => {
+  const githubIcon = appWindow.locator("span[aria-label='github']");
+  expect(await githubIcon.count()).toBe(1);
+
+  await githubIcon.click();
 });
 
 test.afterAll(async () => {
