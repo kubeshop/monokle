@@ -1,13 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Button, Input, Modal, Select} from 'antd';
+import {Button, Modal, Select} from 'antd';
 
 import {FolderAddOutlined} from '@ant-design/icons';
 
 import fs from 'fs';
 import micromatch from 'micromatch';
 import path from 'path';
-import styled from 'styled-components';
 import util from 'util';
 import {stringify} from 'yaml';
 
@@ -28,31 +27,9 @@ import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
+import * as S from './styled';
+
 const {Option} = Select;
-
-const ErrorMessageLabel = styled.div`
-  color: ${Colors.redError};
-  margin-top: 10px;
-`;
-
-const FileCategoryLabel = styled.div`
-  color: ${Colors.grey7};
-  margin-bottom: 6px;
-  margin-top: 16px;
-`;
-
-const SaveDestinationWrapper = styled(Input.Group)`
-  display: grid !important;
-  grid-template-columns: max-content 1fr;
-`;
-
-const StyledDivider = styled.div`
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-`;
-
-const StyledSelect = styled(Select)`
-  overflow-x: hidden;
-`;
 
 const getFullFileName = (filename: string, fileIncludes: string[]) => {
   if (fileIncludes.some(fileInclude => micromatch.isMatch(filename, fileInclude))) {
@@ -262,8 +239,8 @@ const SaveResourceToFileFolderModal: React.FC = () => {
       onCancel={() => dispatch(closeSaveResourcesToFileFolderModal())}
       onOk={saveCheckedResourcesToFileFolder}
     >
-      <SaveDestinationWrapper>
-        <StyledSelect
+      <S.SaveDestinationWrapper>
+        <S.Select
           value={savingDestination}
           onChange={value => {
             setSavingDestination(value as string);
@@ -275,10 +252,10 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         >
           <Option value="saveToFolder">Save to folder</Option>
           <Option value="saveToFile">Append to file</Option>
-        </StyledSelect>
+        </S.Select>
 
         {savingDestination === 'saveToFolder' && (
-          <StyledSelect
+          <S.Select
             placeholder="Select folder"
             showSearch
             onChange={(value: any) => setSelectedFolder(value)}
@@ -289,18 +266,18 @@ const SaveResourceToFileFolderModal: React.FC = () => {
                   Browse
                 </Button>
                 <FileExplorer {...fileExplorerProps} />
-                <StyledDivider />
+                <S.Divider />
 
                 {menu}
               </>
             )}
           >
             {renderFolderSelectOptions()}
-          </StyledSelect>
+          </S.Select>
         )}
 
         {savingDestination === 'saveToFile' && (
-          <StyledSelect
+          <S.Select
             showSearch
             onChange={(value: any) => {
               setSelectedFile(value);
@@ -313,16 +290,16 @@ const SaveResourceToFileFolderModal: React.FC = () => {
             placeholder="Select a destination file"
           >
             {renderFileSelectOptions()}
-          </StyledSelect>
+          </S.Select>
         )}
-      </SaveDestinationWrapper>
-      {errorMessage && <ErrorMessageLabel>*{errorMessage}</ErrorMessageLabel>}
+      </S.SaveDestinationWrapper>
+      {errorMessage && <S.ErrorMessageLabel>*{errorMessage}</S.ErrorMessageLabel>}
 
       {savingDestination === 'saveToFolder' && (
         <div style={{marginTop: '16px'}}>
           {saveToFolderPaths.create.length ? (
             <>
-              <FileCategoryLabel>Files to be created</FileCategoryLabel>
+              <S.FileCategoryLabel>Files to be created</S.FileCategoryLabel>
               {saveToFolderPaths.create.map((p, i) => {
                 const key = `${p}-${i}`;
 
@@ -336,7 +313,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
           ) : null}
           {saveToFolderPaths.replace.length ? (
             <>
-              <FileCategoryLabel>Files to be replaced</FileCategoryLabel>
+              <S.FileCategoryLabel>Files to be replaced</S.FileCategoryLabel>
               {saveToFolderPaths.replace.map((p, i) => {
                 const key = `${p}-${i}`;
 
