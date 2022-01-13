@@ -3,8 +3,9 @@ import * as k8s from '@kubernetes/client-node';
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
-import {NamespaceRefTypeEnum, ResourceKindHandler} from '@models/resourcekindhandler';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {explicitNamespaceMatcher} from '@src/kindhandlers/common/customMatchers';
 import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 
 const VolumeAttachmentHandler: ResourceKindHandler = {
@@ -32,8 +33,9 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
       // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
       source: {
         pathParts: ['inlineVolumeSpec', 'azureFile', 'secretName'],
-        namespaceRef: NamespaceRefTypeEnum.Explicit,
-        namespaceProperty: 'secretNamespace',
+        siblingMatchers: {
+          secretNamespace: explicitNamespaceMatcher,
+        },
       },
       type: 'name',
       ...SecretTarget,
@@ -42,7 +44,9 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
       // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#secretreference-v1-core
       source: {
         pathParts: ['secretRef', 'name'],
-        namespaceRef: NamespaceRefTypeEnum.Explicit,
+        siblingMatchers: {
+          namespace: explicitNamespaceMatcher,
+        },
       },
       type: 'name',
       ...SecretTarget,
@@ -51,8 +55,9 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
       // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#azurefilepersistentvolumesource-v1-core
       source: {
         pathParts: ['spec', 'azureFile', 'secretName'],
-        namespaceRef: NamespaceRefTypeEnum.Explicit,
-        namespaceProperty: 'secretNamespace',
+        siblingMatchers: {
+          secretNamespace: explicitNamespaceMatcher,
+        },
       },
       type: 'name',
       ...SecretTarget,

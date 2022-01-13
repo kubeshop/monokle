@@ -38,6 +38,10 @@ type PreviewLoaderType = {
   targetResourceId?: string;
 };
 
+type ResourceDiffType = {
+  targetResourceId?: string;
+};
+
 type ResourceSelectionHistoryEntry = {
   type: 'resource';
   selectedResourceId: string;
@@ -58,6 +62,7 @@ type ResourceFilterType = {
   namespace?: string;
   labels: Record<string, string | null>;
   annotations: Record<string, string | null>;
+  fileOrFolderContainedIn?: string;
 };
 
 type ResourceRefsProcessingOptions = {
@@ -124,9 +129,7 @@ interface AppState {
   /** the values file currently being previewed */
   previewValuesFileId?: string;
   /** the resource currently being diffed */
-  diffResourceId?: string;
-  /** the diff content for the resource being diffed */
-  diffContent?: string;
+  resourceDiff: ResourceDiffType;
   plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
   clusterDiff: {

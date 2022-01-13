@@ -1,0 +1,153 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  name: tests.tests.testkube.io
+spec:
+  group: tests.testkube.io
+  names:
+    kind: Test
+    listKind: TestList
+    plural: tests
+    singular: test
+  scope: Namespaced
+  versions:
+    - name: v1
+      schema:
+        openAPIV3Schema:
+          description: Test is the Schema for the tests API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: TestSpec defines the desired state of Test
+              properties:
+                after:
+                  description:
+                    After steps is list of scripts which will be sequentially
+                    orchestrated
+                  items:
+                    description:
+                      TestStepSpec will of particular type will have config
+                      for possible step types
+                    properties:
+                      delay:
+                        properties:
+                          duration:
+                            description:
+                              A Duration represents the elapsed time between
+                              two instants as an int64 nanosecond count. The representation
+                              limits the largest representable duration to approximately
+                              290 years.
+                            format: int64
+                            type: integer
+                        type: object
+                      execute:
+                        properties:
+                          name:
+                            type: string
+                          namespace:
+                            type: string
+                          stopOnFailure:
+                            type: boolean
+                        type: object
+                      type:
+                        type: string
+                    type: object
+                  type: array
+                before:
+                  description:
+                    Before steps is list of scripts which will be sequentially
+                    orchestrated
+                  items:
+                    description:
+                      TestStepSpec will of particular type will have config
+                      for possible step types
+                    properties:
+                      delay:
+                        properties:
+                          duration:
+                            description:
+                              A Duration represents the elapsed time between
+                              two instants as an int64 nanosecond count. The representation
+                              limits the largest representable duration to approximately
+                              290 years.
+                            format: int64
+                            type: integer
+                        type: object
+                      execute:
+                        properties:
+                          name:
+                            type: string
+                          namespace:
+                            type: string
+                          stopOnFailure:
+                            type: boolean
+                        type: object
+                      type:
+                        type: string
+                    type: object
+                  type: array
+                description:
+                  type: string
+                repeats:
+                  type: integer
+                steps:
+                  description: Steps is list of scripts which will be sequentially orchestrated
+                  items:
+                    description:
+                      TestStepSpec will of particular type will have config
+                      for possible step types
+                    properties:
+                      delay:
+                        properties:
+                          duration:
+                            description:
+                              A Duration represents the elapsed time between
+                              two instants as an int64 nanosecond count. The representation
+                              limits the largest representable duration to approximately
+                              290 years.
+                            format: int64
+                            type: integer
+                        type: object
+                      execute:
+                        properties:
+                          name:
+                            type: string
+                          namespace:
+                            type: string
+                          stopOnFailure:
+                            type: boolean
+                        type: object
+                      type:
+                        type: string
+                    type: object
+                  type: array
+              type: object
+            status:
+              description: TestStatus defines the observed state of Test
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

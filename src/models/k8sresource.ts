@@ -5,6 +5,8 @@ export type RefNode = {scalar: Scalar; key: string; parentKeyPath: string};
 type ResourceValidationError = {
   property: string;
   message: string;
+  errorPos?: RefPosition;
+  description?: string;
 };
 
 type ResourceValidation = {

@@ -29,6 +29,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath, extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {isKustomizationPatch} from '@redux/services/kustomize';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
@@ -64,8 +65,8 @@ function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
   );
 }
 
-const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; applySelection: () => void}) => {
-  const {editorHeight, diffSelectedResource, applySelection} = props;
+const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => void}) => {
+  const {diffSelectedResource, applySelection} = props;
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
@@ -83,7 +84,6 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   const [code, setCode] = useState('');
   const [orgCode, setOrgCode] = useState<string>('');
   const [isDirty, setDirty] = useState(false);
-  const [hasWarnings, setWarnings] = useState(false);
   const [isValid, setValid] = useState(true);
   const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
   const [isEditorMounted, setEditorMounted] = useState(false);
@@ -113,11 +113,13 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   };
 
   const createResource = (outoingRef: ResourceRef, namespace?: string, targetFolder?: string) => {
-    if (outoingRef.target?.type === 'resource' && outoingRef.target.resourceKind) {
+    if (outoingRef.target?.type === 'resource') {
       const input: NewResourceWizardInput = {
         name: outoingRef.name,
         namespace,
-        apiVersion: getResourceKindHandler(outoingRef.target.resourceKind)?.clusterApiVersion,
+        apiVersion: outoingRef.target?.resourceKind
+          ? getResourceKindHandler(outoingRef.target.resourceKind)?.clusterApiVersion
+          : undefined,
         kind: outoingRef.target?.resourceKind,
         targetFolder,
       };
@@ -159,28 +161,13 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   );
   useMonacoUiState(editor, selectedResourceId, selectedPath);
 
-  const onDidChangeMarkers = (e: monaco.Uri[]) => {
-    const flag = monaco.editor.getModelMarkers({}).length > 0;
-    setWarnings(flag);
-  };
-
-  const onChangeCursorSelection = (e: any) => {
-    // console.log(e);
-  };
-
   const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
     registerStaticActions(e);
-
-    // e.onDidFocusEditorText(onEditorFocus);
 
     editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
     setEditor(e);
 
-    // @ts-ignore
-    monaco.editor.onDidChangeMarkers(onDidChangeMarkers);
-
     e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
-    e.onDidChangeCursorSelection(onChangeCursorSelection);
     e.revealLineNearTop(1);
     e.setSelection(new monaco.Selection(0, 0, 0, 0));
     setEditorMounted(true);
@@ -266,7 +253,7 @@ const Monaco = (props: {editorHeight: string; diffSelectedResource: () => void; 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
   const isReadOnlyMode = useMemo(() => {
     if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
-      return true;
+      return previewType !== 'kustomization' || !isKustomizationPatch(selectedResource);
     }
     if (isInPreviewMode && selectedValuesFileId !== previewValuesFileId) {
       return true;

@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 
@@ -29,14 +29,15 @@ import {
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
-import {performResourceDiff} from '@redux/thunks/diffResource';
 import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
@@ -70,7 +71,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
@@ -92,6 +92,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
+  const navigatorHeight = useMemo(
+    () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
+    [windowHeight, isInPreviewMode]
+  );
 
   const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
@@ -105,7 +111,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
   const extraButton = useRef<any>();
 
-  const getDistanceBetweenTwoComponents = () => {
+  const getDistanceBetweenTwoComponents = useCallback(() => {
     const tabsListEl = tabsList[0].getBoundingClientRect();
     const extraButtonEl = extraButton.current.getBoundingClientRect();
 
@@ -122,7 +128,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (!isButtonShrinked && distance < 10) {
       setButtonShrinkedState(true);
     }
-  };
+  }, [isButtonShrinked, tabsList]);
 
   const editorTabPaneHeight = useMemo(() => {
     let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
@@ -234,17 +240,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   }, [
     selectedResource,
-    resourceMap,
     fileMap,
     kubeconfig,
     selectedPath,
     dispatch,
-    previewType,
-    helmChartMap,
     helmValuesMap,
     selectedValuesFileId,
     kubeconfigContext,
-    kustomizeCommand,
     selectedResourceId,
   ]);
 
@@ -256,24 +258,19 @@ const ActionsPane = (props: {contentHeight: string}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monacoEditor]);
 
-  const diffResource = useCallback(
-    resourceId => {
-      dispatch(performResourceDiff(resourceId));
-    },
-    [dispatch]
-  );
-
   const diffSelectedResource = useCallback(() => {
     if (selectedResourceId) {
-      diffResource(selectedResourceId);
+      dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [selectedResourceId, diffResource]);
+  }, [dispatch, selectedResourceId]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
-      diffResource(resourceId);
+      if (resourceId) {
+        dispatch(openResourceDiffModal(resourceId));
+      }
     },
-    [diffResource]
+    [dispatch]
   );
 
   const isDiffButtonDisabled = useMemo(() => {
@@ -396,7 +393,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (tabsList && tabsList.length && extraButton.current) {
       getDistanceBetweenTwoComponents();
     }
-  }, [tabsList, extraButton.current, uiState.paneConfiguration, windowSize, selectedResource]);
+  }, [tabsList, uiState.paneConfiguration, windowSize, selectedResource, getDistanceBetweenTwoComponents]);
 
   return (
     <>
@@ -469,6 +466,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
+
       <S.ActionsPaneContainer $height={navigatorHeight}>
         <S.TabsContainer>
           <S.Tabs
@@ -490,34 +488,30 @@ const ActionsPane = (props: {contentHeight: string}) => {
             }
           >
             <TabPane
-              style={{height: editorTabPaneHeight, width: '100%'}}
-              tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}
               key="source"
+              style={{height: editorTabPaneHeight}}
+              tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}
             >
               {uiState.isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
               ) : (
                 !isClusterDiffVisible &&
                 (selectedResourceId || selectedPath || selectedValuesFileId) && (
-                  <Monaco
-                    editorHeight={`${parseInt(contentHeight, 10) - 120}`}
-                    applySelection={applySelection}
-                    diffSelectedResource={diffSelectedResource}
-                  />
+                  <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
                 )
               )}
             </TabPane>
             {selectedResource && resourceKindHandler?.formEditorOptions?.editorSchema && (
               <TabPane
-                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
                 disabled={!selectedResourceId}
                 key="form"
+                style={{height: editorTabPaneHeight}}
+                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
               >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : (
                   <FormEditor
-                    contentHeight={contentHeight}
                     formSchema={resourceKindHandler.formEditorOptions.editorSchema}
                     formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                   />
@@ -525,15 +519,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
               </TabPane>
             )}
             {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
-              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
+              <TabPane
+                key="metadataForm"
+                style={{height: editorTabPaneHeight}}
+                tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}
+              >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : (
-                  <FormEditor
-                    contentHeight={contentHeight}
-                    formSchema={getFormSchema('metadata')}
-                    formUiSchema={getUiSchema('metadata')}
-                  />
+                  <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
                 )}
               </TabPane>
             )}

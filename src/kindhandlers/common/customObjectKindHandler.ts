@@ -1,14 +1,25 @@
 import * as k8s from '@kubernetes/client-node';
 
 import log from 'loglevel';
+import path from 'path';
 
 import navSectionNames from '@constants/navSectionNames';
 
 import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {loadCustomSchema} from '@redux/services/schema';
+import {loadResource} from '@redux/services';
+import {extractSchema} from '@redux/services/schema';
 import {findDefaultVersion} from '@redux/thunks/previewCluster';
+
+import {
+  explicitNamespaceMatcher,
+  implicitNamespaceMatcher,
+  optionalExplicitNamespaceMatcher,
+  targetGroupMatcher,
+  targetKindMatcher,
+} from '@src/kindhandlers/common/customMatchers';
+import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
 
 /**
  * extract the version from the apiVersion string of the specified resource
@@ -21,19 +32,155 @@ function extractResourceVersion(resource: K8sResource, kindVersion: string, kind
   return {version, group};
 }
 
-export const createNamespacedCustomObjectKindHandler = (
+function extractFormSchema(editorSchema: any) {
+  const schema: any = JSON.parse(JSON.stringify(editorSchema));
+  if (schema && schema.properties) {
+    // remove common object properties since these are shown in a separate form
+    delete schema.properties['apiVersion'];
+    delete schema.properties['kind'];
+    delete schema.properties['metadata'];
+  }
+
+  return schema;
+}
+
+function extractNamespaceMatchers(refMapper: any) {
+  switch (refMapper.source?.namespaceRef) {
+    case 'Implicit':
+      refMapper.source.siblingMatchers = {
+        namespace: implicitNamespaceMatcher,
+      };
+      break;
+    case 'Explicit':
+      refMapper.source.siblingMatchers = {
+        namespace: explicitNamespaceMatcher,
+      };
+      break;
+    case 'OptionalExplicit':
+      refMapper.source.siblingMatchers = {
+        namespace: optionalExplicitNamespaceMatcher,
+      };
+      break;
+    default:
+  }
+}
+
+function extractSiblingMatchers(refMapper: any) {
+  if (!refMapper.source.siblingMatchers) {
+    refMapper.source.siblingMatchers = {};
+  }
+
+  refMapper.source.matchers.forEach((m: any) => {
+    switch (m) {
+      case 'kindMatcher':
+        refMapper.source.siblingMatchers['kind'] = targetKindMatcher;
+        break;
+      case 'groupMatcher':
+        refMapper.source.siblingMatchers['group'] = targetGroupMatcher;
+        break;
+      default:
+        break;
+    }
+  });
+}
+
+export function extractKindHandler(crd: any, handlerPath?: string) {
+  if (!crd?.spec) {
+    return;
+  }
+
+  const spec = crd.spec;
+  const kind = spec.names.kind;
+  const kindGroup = spec.group;
+  const kindVersion = findDefaultVersion(crd);
+
+  if (kindVersion) {
+    const kindPlural = spec.names.plural;
+    const editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
+    let kindHandler: ResourceKindHandler | undefined;
+    let helpLink: string | undefined;
+    let refMappers: any[] = [];
+    let subsectionName = spec.group;
+    let kindSectionName = spec.names.plural;
+
+    if (handlerPath) {
+      try {
+        const handlerContent = loadResource(`${handlerPath}${path.sep}${kindGroup}${path.sep}${kind}.json`);
+
+        if (handlerContent) {
+          const handler = JSON.parse(handlerContent);
+          if (handler) {
+            helpLink = handler.helpLink;
+            subsectionName = handler.sectionName || subsectionName;
+            kindSectionName = handler.kindSectionName || kindSectionName;
+
+            if (handler.refMappers) {
+              handler.refMappers.forEach((refMapper: any) => {
+                if (refMapper.source?.namespaceRef) {
+                  extractNamespaceMatchers(refMapper);
+                }
+
+                if (refMapper.source?.matchers) {
+                  extractSiblingMatchers(refMapper);
+                }
+
+                refMappers.push(refMapper);
+              });
+            }
+
+            if (handler.podSelectors) {
+              handler.podSelectors.forEach((selector: string[]) => {
+                refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
+              });
+            }
+          }
+        }
+      } catch (e) {
+        log.warn(`Failed to parse kindhandler`, e);
+      }
+    }
+
+    if (spec.scope === 'Namespaced') {
+      kindHandler = createNamespacedCustomObjectKindHandler(
+        kind,
+        subsectionName,
+        kindSectionName,
+        kindGroup,
+        kindVersion,
+        kindPlural,
+        editorSchema,
+        helpLink,
+        refMappers
+      );
+    } else if (spec.scope === 'Cluster') {
+      kindHandler = createClusterCustomObjectKindHandler(
+        kind,
+        subsectionName,
+        kindSectionName,
+        kindGroup,
+        kindVersion,
+        kindPlural,
+        editorSchema,
+        helpLink,
+        refMappers
+      );
+    }
+
+    return kindHandler;
+  }
+}
+
+const createNamespacedCustomObjectKindHandler = (
   kind: string,
   subsectionName: string,
   kindSectionName: string,
   kindGroup: string,
   kindVersion: string,
   kindPlural: string,
-  pathToSchemaResource?: string,
+  editorSchema?: any,
   helpLink?: string,
   outgoingRefMappers?: RefMapper[]
 ): ResourceKindHandler => {
-  const editorSchema = pathToSchemaResource ? loadCustomSchema(pathToSchemaResource, kind) : undefined;
-
   return {
     kind,
     apiVersionMatcher: '**',
@@ -43,7 +190,7 @@ export const createNamespacedCustomObjectKindHandler = (
     helpLink,
     outgoingRefMappers,
     sourceEditorOptions: editorSchema ? {editorSchema} : undefined,
-    formEditorOptions: editorSchema ? {editorSchema} : undefined,
+    formEditorOptions: editorSchema ? {editorSchema: extractFormSchema(editorSchema)} : undefined,
     getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
@@ -76,7 +223,7 @@ export const createNamespacedCustomObjectKindHandler = (
             // use listClusterCustomObject to get objects in all namespaces
             return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
-          reason => {
+          () => {
             log.warn(`Failed to get CRD for ${crdName}, ignoring`);
             return [];
           }
@@ -104,19 +251,17 @@ export const createNamespacedCustomObjectKindHandler = (
   };
 };
 
-export const createClusterCustomObjectKindHandler = (
+const createClusterCustomObjectKindHandler = (
   kind: string,
   subsectionName: string,
   kindSectionName: string,
   kindGroup: string,
   kindVersion: string,
   kindPlural: string,
-  pathToSchemaResource?: string,
+  editorSchema?: any,
   helpLink?: string,
   outgoingRefMappers?: RefMapper[]
 ): ResourceKindHandler => {
-  const editorSchema = pathToSchemaResource ? loadCustomSchema(pathToSchemaResource, kind) : undefined;
-
   return {
     kind,
     apiVersionMatcher: '**',
@@ -126,7 +271,7 @@ export const createClusterCustomObjectKindHandler = (
     outgoingRefMappers,
     isCustom: true,
     sourceEditorOptions: editorSchema ? {editorSchema} : undefined,
-    formEditorOptions: editorSchema ? {editorSchema} : undefined,
+    formEditorOptions: editorSchema ? {editorSchema: extractFormSchema(editorSchema)} : undefined,
     getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
@@ -151,7 +296,7 @@ export const createClusterCustomObjectKindHandler = (
             const defaultVersion = findDefaultVersion(response.body);
             return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
-          reason => {
+          () => {
             log.warn(`Failed to get CRD for ${crdName}, ignoring`);
             return [];
           }

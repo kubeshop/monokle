@@ -8,7 +8,7 @@
 
 Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
-> Read the [1.3.0 Release blog-post](https://kubeshop.io/blog/monokle-1-3-0-cluster-compare)
+> Read the [1.4.0 Release blog-post](https://medium.com/kubeshop-i/monokle-1-4-0-4122e88742c5)
 
 ![Monokle Overview](docs/img/monokle-overview.gif)
 

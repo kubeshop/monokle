@@ -73,8 +73,10 @@ const NavPane: React.FC = () => {
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
-  const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
+  const navigatorHeight = useMemo(
+    () => windowSize.height - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
+    [windowSize.height, isInPreviewMode]
+  );
 
   const appliedFilters = useMemo(() => {
     return Object.entries(resourceFilters)

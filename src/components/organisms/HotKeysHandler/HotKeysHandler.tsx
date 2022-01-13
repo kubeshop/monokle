@@ -7,8 +7,10 @@ import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openResourceDiffModal, updateResourceFilter} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
+  openQuickSearchActionsPopup,
   setLeftMenuSelection,
   toggleLeftMenu,
   toggleRightMenu,
@@ -19,7 +21,6 @@ import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {applyResource} from '@redux/thunks/applyResource';
-import {performResourceDiff} from '@redux/thunks/diffResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -92,9 +93,7 @@ const HotKeysHandler = () => {
     mainState.fileMap,
     configState.kubeconfigPath,
     configState.kubeConfig.currentContext,
-    configState.settings.kustomizeCommand,
     mainState.selectedPath,
-    mainState.previewType,
     dispatch,
   ]);
 
@@ -160,7 +159,7 @@ const HotKeysHandler = () => {
 
   const diffSelectedResource = useCallback(() => {
     if (mainState.selectedResourceId) {
-      dispatch(performResourceDiff(mainState.selectedResourceId));
+      dispatch(openResourceDiffModal(mainState.selectedResourceId));
     }
   }, [mainState.selectedResourceId, dispatch]);
 
@@ -243,6 +242,20 @@ const HotKeysHandler = () => {
   useHotkeys(hotkeys.OPEN_HELM_TAB, () => {
     dispatch(setLeftMenuSelection('helm-pane'));
   });
+
+  useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
+    dispatch(updateResourceFilter({labels: {}, annotations: {}}));
+  });
+
+  useHotkeys(
+    hotkeys.OPEN_QUICK_SEARCH,
+    () => {
+      if (!uiState.quickSearchActionsPopup.isOpen) {
+        dispatch(openQuickSearchActionsPopup());
+      }
+    },
+    [uiState.quickSearchActionsPopup.isOpen]
+  );
 
   return (
     <>

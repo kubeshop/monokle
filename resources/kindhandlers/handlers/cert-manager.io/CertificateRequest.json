@@ -1,0 +1,23 @@
+{
+  "sectionName": "CertMananger",
+  "kindSectionName": "CertificateRequests",
+  "helpLink": "https://cert-manager.io/docs/concepts/certificaterequest/",
+  "refMappers":
+  [
+    {
+      "source": {
+        "pathParts": [
+          "spec", "issuerRef", "name"
+        ],
+        "matchers": [
+          "kindMatcher",
+          "groupMatcher"
+        ]
+      },
+      "type": "name",
+      "target": {
+        "kind": "$(Issuer|ClusterIssuer)"
+      }
+    }
+ ]
+}

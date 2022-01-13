@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import {Select} from 'antd';
 
@@ -15,7 +15,7 @@ const FormContainer = styled.div`
   margin-top: 16px;
 `;
 
-export const SecretKindSelection = ({schema, onChange, formData, disabled, ...args}: any) => {
+export const SecretKindSelection = ({schema, onChange, formData, disabled}: any) => {
   const {secretType} = schema;
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [refs, setRefs] = useState<string[]>([]);
@@ -26,27 +26,30 @@ export const SecretKindSelection = ({schema, onChange, formData, disabled, ...ar
   const [selectedProperty, setSelectedProperty] = useState<string | undefined>(
     secretType === 'Opaque' ? formData?.key : undefined
   );
-  let allowedScretTypes: string[] = [];
-  if (secretType === 'Opaque') {
-    allowedScretTypes = ['Opaque'];
-  }
-  if (secretType === 'PullSecret') {
-    allowedScretTypes = ['kubernetes.io/dockerconfigjson', 'kubernetes.io/dockercfg'];
-  }
+
+  const allowedSecretTypes = useMemo(() => {
+    if (secretType === 'Opaque') {
+      return ['Opaque'];
+    }
+    if (secretType === 'PullSecret') {
+      return ['kubernetes.io/dockerconfigjson', 'kubernetes.io/dockercfg'];
+    }
+    return [];
+  }, [secretType]);
 
   useEffect(() => {
     if (resourceMap) {
       setRefs(
         Object.values(resourceMap)
           .filter(
-            (resource: K8sResource) => resource.kind === 'Secret' && allowedScretTypes.includes(resource.content.type)
+            (resource: K8sResource) => resource.kind === 'Secret' && allowedSecretTypes.includes(resource.content.type)
           )
           .map((resource: K8sResource) => resource.name)
       );
     } else {
       setRefs([]);
     }
-  }, [resourceMap]);
+  }, [resourceMap, allowedSecretTypes]);
 
   useEffect(() => {
     if (secretType === 'Opaque' && resourceMap && selectedRef) {
@@ -57,7 +60,7 @@ export const SecretKindSelection = ({schema, onChange, formData, disabled, ...ar
     } else {
       setProperties([]);
     }
-  }, [selectedRef, resourceMap]);
+  }, [selectedRef, resourceMap, secretType]);
 
   useEffect(() => {
     if (secretType === 'Opaque') {

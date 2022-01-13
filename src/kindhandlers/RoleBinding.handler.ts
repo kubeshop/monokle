@@ -5,6 +5,8 @@ import navSectionNames from '@constants/navSectionNames';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
+import {targetGroupMatcher, targetKindMatcher} from '@src/kindhandlers/common/customMatchers';
+
 const RoleBindingHandler: ResourceKindHandler = {
   kind: 'RoleBinding',
   apiVersionMatcher: '**',
@@ -26,23 +28,55 @@ const RoleBindingHandler: ResourceKindHandler = {
     await k8sRbacV1Api.deleteNamespacedRoleBinding(resource.name, resource.namespace || 'default');
   },
   outgoingRefMappers: [
+    // see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#roleref-v1-rbac-authorization-k8s-io
     {
       source: {
         pathParts: ['roleRef', 'name'],
+        siblingMatchers: {
+          kind: targetKindMatcher,
+          apiGroup: targetGroupMatcher,
+        },
       },
       target: {
-        kind: 'ClusterRoleBinding',
+        kind: '$.*',
       },
       type: 'name',
     },
+    // see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#subject-v1-rbac-authorization-k8s-io
     {
       source: {
-        pathParts: ['roleRef', 'name'],
+        pathParts: ['subjects', '*', 'name'],
+        siblingMatchers: {
+          kind: (sourceResource: K8sResource, targetResource, value) => {
+            return ['User', 'Group', 'ServiceAccount'].includes(value) && targetResource.kind === value;
+          },
+          apiGroup: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
+            const apiGroup =
+              value || ['User', 'Group'].includes(siblingValues['kind']) ? 'rbac.authorization.k8s.io' : '';
+            return targetResource.version.startsWith(apiGroup);
+          },
+          namespace: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
+            // namespace should not be specified for User/Group kinds
+            if (['User', 'Group'].includes(siblingValues['kind'])) {
+              return !value;
+            }
+
+            return value === 'default' || !value
+              ? !targetResource.namespace || targetResource.namespace === 'default'
+              : targetResource.namespace === value;
+          },
+        },
       },
       target: {
-        kind: 'Role',
+        kind: '$(User|Group|ServiceAccount)',
       },
       type: 'name',
+
+      // ignore refs to Users or Groups
+      shouldCreateUnsatisfiedRef: (refMapper, sourceResource, values) => {
+        const kind = values['kind'];
+        return kind !== 'User' && kind !== 'Group';
+      },
     },
   ],
   helpLink: 'https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding',

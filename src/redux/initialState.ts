@@ -25,6 +25,7 @@ const initialAppState: AppState = {
   previewLoader: {
     isLoading: false,
   },
+  resourceDiff: {},
   isSelectingFile: false,
   isApplyingResource: false,
   plugins: [],
@@ -92,6 +93,9 @@ const initialUiState: UiState = {
   isClusterDiffVisible: false,
   isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
   isFolderLoading: false,
+  quickSearchActionsPopup: {
+    isOpen: false,
+  },
   newResourceWizard: {
     isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
   },
@@ -130,10 +134,6 @@ const initialUiState: UiState = {
   },
   navPane: {
     collapsedNavSectionNames: [],
-  },
-  validationErrorsModal: {
-    isVisible: false,
-    errors: [],
   },
   paneConfiguration: electronStore.get('ui.paneConfiguration'),
   shouldExpandAllNodes: false,

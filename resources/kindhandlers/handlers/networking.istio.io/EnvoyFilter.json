@@ -1,0 +1,10 @@
+{
+  "sectionName": "Istio",
+  "kindSectionName": "EnvoyFilters",
+  "helpLink": "https://istio.io/latest/docs/reference/config/networking/envoy-filter/",
+  "podSelectors": [
+    [
+      "spec", "workloadSelector", "labels"
+    ]
+  ]
+}

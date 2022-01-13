@@ -85,7 +85,6 @@ const GraphView = (props: {editorHeight: string}) => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const activeResources = useSelector(activeResourcesSelector);
-  const previewResource = useAppSelector(state => state.main.previewResourceId);
 
   const dispatch = useAppDispatch();
   const [reactFlow, setReactFlow] = useState();
