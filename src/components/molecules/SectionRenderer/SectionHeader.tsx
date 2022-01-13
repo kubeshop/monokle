@@ -53,6 +53,23 @@ function SectionHeader(props: SectionHeaderProps) {
     return sectionInstance?.visibleDescendantItemIds?.length || 0;
   }, [sectionInstance.visibleDescendantItemIds]);
 
+  const { shouldDisplayPlus, shouldDisplayContext } = useMemo(() => {
+    let _shouldDisplayPlus = false;
+    let _shouldDisplayContext = false;
+    if (NameSuffix.Component) {
+      if (NameSuffix.options?.isVisibleOnHover === undefined) {
+        _shouldDisplayContext = true;
+      } else {
+        _shouldDisplayPlus = NameSuffix.options?.isVisibleOnHover && isHovered;
+      }
+    }
+
+    return {
+      shouldDisplayPlus: _shouldDisplayPlus,
+      shouldDisplayContext: _shouldDisplayContext,
+    };
+  }, [NameSuffix.Component, NameSuffix.options, isHovered]);
+
   const onCheck = useCallback(() => {
     if (!sectionInstance.checkable || !sectionInstance.visibleDescendantItemIds) {
       return;
@@ -65,15 +82,6 @@ function SectionHeader(props: SectionHeaderProps) {
       dispatch(sectionInstance.checkable.uncheckItemsAction);
     }
   }, [sectionInstance, dispatch]);
-  let shouldDisplayPlus = false;
-  let shouldDisplayContext = false;
-  if (NameSuffix.Component) {
-    if (NameSuffix.options?.isVisibleOnHover === undefined) {
-      shouldDisplayContext = true;
-    } else {
-      shouldDisplayPlus = NameSuffix.options?.isVisibleOnHover && isHovered;
-    }
-  }
 
   return (
     <S.SectionContainer
