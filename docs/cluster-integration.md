@@ -21,7 +21,7 @@ Monokle is now in "Cluster Mode" (as indicated by the header at the top):
   - Resource links are shown as before with corresponding popups/links/etc.
 - Selecting "Exit" in the top right restores the contents of the Resource Navigator to the currently selected folder.
 
-You can also exit Cluster Mode by selecting the File Explorer in the left toolbar and selecting a new folder with the "Browse" button. 
+You can also exit Cluster Mode by selecting the File Explorer in the left toolbar and selecting a new folder with the "Browse" button: 
 
 
 ![Cluster Browse](img/file-manager-browse-cluster-1.4.0.png)
