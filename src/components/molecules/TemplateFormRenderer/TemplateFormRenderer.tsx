@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 
-import {Divider, Skeleton} from 'antd';
+import {Button, Divider, Skeleton} from 'antd';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
 
 import fs from 'fs';
+import {Primitive} from 'type-fest';
 
 import {TemplateForm} from '@models/template';
 
@@ -20,11 +21,12 @@ const readTemplateFormSchemas = (templateForm: TemplateForm) => {
 
 const TemplateFormRenderer: React.FC<{
   templateForm: TemplateForm;
-  formData: any;
-  onFormDataChange: (formData: any) => void;
+  isLastForm: boolean;
+  onSubmit: (formData: any) => void;
 }> = props => {
-  const {templateForm, formData, onFormDataChange} = props;
+  const {templateForm, isLastForm, onSubmit} = props;
 
+  const [formData, setFormData] = useState<Record<string, Primitive>>({});
   const [errorMessage, setErrorMessage] = useState<string | null>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [schema, setSchema] = useState<any>();
@@ -38,7 +40,7 @@ const TemplateFormRenderer: React.FC<{
       setErrorMessage(null);
       setIsLoading(false);
     } catch {
-      setErrorMessage("Couldn't read the schemas for this template.");
+      setErrorMessage("Couldn't read the schemas for this template form.");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -56,8 +58,19 @@ const TemplateFormRenderer: React.FC<{
       <h1>{templateForm.name}</h1>
       <p>{templateForm.description}</p>
       <Divider />
-      <Form schema={schema} uiSchema={uiSchema} formData={formData} onChange={e => onFormDataChange(e.formData)}>
-        <div />
+      <Form
+        onSubmit={e => onSubmit(e.formData)}
+        schema={schema}
+        uiSchema={uiSchema}
+        formData={formData}
+        onChange={e => setFormData(e.formData)}
+        noHtml5Validate
+      >
+        <div>
+          <Button htmlType="submit" type="primary">
+            {isLastForm ? 'Submit' : 'Next'}
+          </Button>
+        </div>
       </Form>
     </>
   );

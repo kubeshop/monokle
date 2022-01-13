@@ -17,19 +17,17 @@ import TemplateInstallModal from './TemplateInstallModal';
 import * as S from './styled';
 
 const TemplatesPane: React.FC = () => {
-  const [isTemplateModalVisible, setIsTemplateModalVisible] = useState<boolean>(false);
   const [isInstallModalVisible, setIsInstallModalVisible] = useState<boolean>(false);
-  const [visibleTemplate, setVisibleTemplate] = useState<AnyTemplate>();
+  const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
   const templates = useAppSelector(state => state.contrib.templates);
 
   const onTemplateModalClose = useCallback(() => {
-    setIsTemplateModalVisible(!isTemplateModalVisible);
-  }, [isTemplateModalVisible]);
+    setSelectedTemplate(undefined);
+  }, []);
 
   const onClickOpenTemplate = (template: AnyTemplate) => {
-    setVisibleTemplate(template);
-    setIsTemplateModalVisible(true);
+    setSelectedTemplate(template);
   };
 
   const openInstallModal = () => {
@@ -43,7 +41,7 @@ const TemplatesPane: React.FC = () => {
   return (
     <>
       <TemplateInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallModal} />
-      <TemplateModal isVisible={isTemplateModalVisible} template={visibleTemplate} onClose={onTemplateModalClose} />
+      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
       <TitleBar title="Templates">
         <Button onClick={openInstallModal} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
