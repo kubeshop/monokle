@@ -30,7 +30,9 @@ test.beforeAll(async () => {
   appWindow = windows[0];
 
   // Capture a screenshot.
-  await appWindow.screenshot({path: 'test-output/screenshots/welcome.png'});
+  await appWindow.screenshot({path: 'test-output/screenshots/initial-screen.png'});
+  await new Promise(f => setTimeout(f, 1000));
+  await appWindow.screenshot({path: 'test-output/screenshots/post-startup-screen.png'});
 });
 
 test('Validate title', async () => {
