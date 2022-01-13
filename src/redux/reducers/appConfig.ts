@@ -162,9 +162,10 @@ export const configSlice = createSlice({
       state.projectConfig = action.payload;
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
+      if (!state.selectedProjectRootFolder) {
+        return;
+      }
       const absolutePath = `${state.selectedProjectRootFolder}${sep}.monokle`;
-
-      delete action.payload?.settings?.loadLastProjectOnStartup;
 
       const applicationConfig: ProjectConfig = {
         scanExcludes: state.scanExcludes,
@@ -177,14 +178,21 @@ export const configSlice = createSlice({
         hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
         isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
       };
+      applicationConfig.kubeConfig = {
+        path: state.kubeconfigPath,
+        isPathValid: state.isKubeconfigPathValid,
+      };
 
       if (!_.isEqual(state.projectConfig, action.payload)) {
         const mergedConfigs = mergeConfigs(applicationConfig, action.payload);
+        // delete mergedConfigs?.settings?.loadLastProjectOnStartup;
+        // delete mergedConfigs?.kubeConfig?.isPathValid;
+        // delete mergedConfigs?.kubeConfig?.contexts;
 
         if (mergedConfigs && !_.isEmpty(mergedConfigs)) {
           writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
         } else {
-          writeFileSync(absolutePath, ` `, 'utf-8');
+          writeFileSync(absolutePath, ``, 'utf-8');
         }
 
         state.projectConfig = action.payload;

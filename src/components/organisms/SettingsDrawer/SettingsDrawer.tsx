@@ -9,12 +9,16 @@ import {Project, ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
+  setScanExcludesStatus,
   toggleClusterStatus,
+  updateFileIncludes,
+  updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
   updateHideExcludedFilesInFileExplorer,
   updateKustomizeCommand,
   updateLoadLastProjectOnStartup,
   updateProjectConfig,
+  updateScanExcludes,
 } from '@redux/reducers/appConfig';
 import {toggleSettings} from '@redux/reducers/ui';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
@@ -38,7 +42,7 @@ const SettingsDrawer = () => {
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
-      setActivePanels(_.uniq([...activePanels, 1]));
+      setActivePanels(_.uniq([...activePanels, 2]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedItems.clusterPaneIcon]);
@@ -73,6 +77,16 @@ const SettingsDrawer = () => {
     ) {
       dispatch(updateHideExcludedFilesInFileExplorer(Boolean(config.settings?.hideExcludedFilesInFileExplorer)));
     }
+    if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
+      dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
+    }
+    if (!_.isEqual(_.sortBy(config?.scanExcludes), _.sortBy(appConfig.scanExcludes))) {
+      dispatch(setScanExcludesStatus('outdated'));
+      dispatch(updateScanExcludes(config?.scanExcludes || []));
+    }
+    if (!_.isEqual(_.sortBy(config?.fileIncludes), _.sortBy(appConfig.fileIncludes))) {
+      dispatch(updateFileIncludes(config?.fileIncludes || []));
+    }
   };
 
   return (
@@ -88,11 +102,22 @@ const SettingsDrawer = () => {
     >
       <Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
         <Panel header="Default Settings" key="1">
-          <Settings config={appConfig} onConfigChange={changeApplicationConfig} showLoadLastProjectOnStartup />
+          <Settings
+            config={{
+              ...appConfig,
+              kubeConfig: {path: appConfig.kubeconfigPath, isPathValid: appConfig.isKubeconfigPathValid},
+            }}
+            onConfigChange={changeApplicationConfig}
+            showLoadLastProjectOnStartup
+          />
         </Panel>
         {activeProject && (
           <Panel header={`${activeProject.name} Settings`} key="2">
-            <Settings config={currentConfig} onConfigChange={changeProjectConfig} />
+            <Settings
+              config={currentConfig}
+              onConfigChange={changeProjectConfig}
+              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
+            />
           </Panel>
         )}
       </Collapse>

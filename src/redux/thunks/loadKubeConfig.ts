@@ -11,7 +11,11 @@ import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 import {setAlert} from '@redux/reducers/alert';
 import {setContexts} from '@redux/reducers/appConfig';
 
-export const loadContexts = async (configPath: string, dispatch: (action: AnyAction) => void) => {
+export const loadContexts = async (
+  configPath: string,
+  dispatch: (action: AnyAction) => void,
+  currentContext?: string
+) => {
   try {
     const stats = await fs.promises.stat(configPath);
 
@@ -20,10 +24,15 @@ export const loadContexts = async (configPath: string, dispatch: (action: AnyAct
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
 
+        if (currentContext && kc.contexts.length > 0) {
+          kc.setCurrentContext(currentContext);
+        }
+
         const kubeConfig: KubeConfig = {
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
         };
+
         dispatch(setContexts(kubeConfig));
       } catch (e: any) {
         dispatch(

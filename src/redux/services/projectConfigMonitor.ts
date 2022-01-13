@@ -48,7 +48,7 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
 
 const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: string, dispatch: AppDispatch) => {
   try {
-    const {settings, scanExcludes, fileIncludes, folderReadsMaxDepth}: ProjectConfig = JSON.parse(
+    const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth}: ProjectConfig = JSON.parse(
       readFileSync(absolutePath, 'utf8')
     );
     const projectConfig: ProjectConfig = {};
@@ -58,6 +58,13 @@ const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: string,
           kustomizeCommand: settings.kustomizeCommand,
           hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
           isClusterSelectorVisible: settings.isClusterSelectorVisible,
+        }
+      : undefined;
+    projectConfig.kubeConfig = kubeConfig
+      ? {
+          path: kubeConfig.path,
+          currentContext: kubeConfig.currentContext,
+          isPathValid: kubeConfig.isPathValid,
         }
       : undefined;
 

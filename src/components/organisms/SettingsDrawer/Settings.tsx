@@ -1,5 +1,3 @@
-import * as k8s from '@kubernetes/client-node';
-
 import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
@@ -24,10 +22,8 @@ import {
 import {ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateKubeconfig, updateKubeconfigPathValidity} from '@redux/reducers/appConfig';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import FilePatternList from '@molecules/FilePatternList';
 
@@ -95,16 +91,16 @@ export const Settings = ({
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const uiState = useAppSelector(state => state.ui);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
   const [inputRef, focusInput] = useFocus<Input>();
   const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
   const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
-  const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
+  const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
+    Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid)
+  );
+  const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
 
   const [localConfig, setLocalConfig] = useState<ProjectConfig | null | undefined>(config);
@@ -114,6 +110,10 @@ export const Settings = ({
       onConfigChange(localConfig);
     }
   };
+
+  useEffect(() => {
+    setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
+  }, [config?.kubeConfig]);
 
   useEffect(() => {
     setLocalConfig(config);
@@ -132,13 +132,10 @@ export const Settings = ({
   );
 
   const onChangeFileIncludes = (patterns: string[]) => {
-    // dispatch(updateFileIncludes(patterns));
     setLocalConfig({...localConfig, fileIncludes: patterns});
   };
 
   const onChangeScanExcludes = (patterns: string[]) => {
-    // dispatch(updateScanExcludes(patterns));
-    // dispatch(setScanExcludesStatus('outdated'));
     setLocalConfig({...localConfig, scanExcludes: patterns});
   };
 
@@ -150,13 +147,11 @@ export const Settings = ({
 
   const onChangeHelmPreviewMode = (selectedHelmPreviewMode: any) => {
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
-      // dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
       setLocalConfig({...localConfig, settings: {...localConfig?.settings, helmPreviewMode: selectedHelmPreviewMode}});
     }
   };
 
   const onChangeHideExcludedFilesInFileExplorer = (e: any) => {
-    // dispatch(updateHideExcludedFilesInFileExplorer(e.target.checked));
     setLocalConfig({
       ...localConfig,
       settings: {...localConfig?.settings, hideExcludedFilesInFileExplorer: e.target.checked},
@@ -165,7 +160,6 @@ export const Settings = ({
 
   const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
     if (selectedKustomizeCommand === 'kubectl' || selectedKustomizeCommand === 'kustomize') {
-      // dispatch(updateKustomizeCommand(selectedKustomizeCommand));
       setLocalConfig({
         ...localConfig,
         settings: {...localConfig?.settings, kustomizeCommand: selectedKustomizeCommand},
@@ -191,10 +185,6 @@ export const Settings = ({
     fileInput && fileInput.current?.click();
   };
 
-  useEffect(() => {
-    setCurrentKubeConfig(kubeconfigPath);
-  }, [kubeconfigPath]);
-
   // useDebounce(
   //   () => {
   //     if (currentKubeConfig !== kubeconfigPath) {
@@ -204,36 +194,22 @@ export const Settings = ({
   //   DEFAULT_KUBECONFIG_DEBOUNCE,
   //   [currentKubeConfig]
   // );
+
   useDebounce(
     () => {
-      try {
-        const kc = new k8s.KubeConfig();
-
-        kc.loadFromFile(currentKubeConfig);
-
-        dispatch(updateKubeconfigPathValidity(Boolean(kc.contexts) || false));
-      } catch (err) {
-        dispatch(updateKubeconfigPathValidity(!currentKubeConfig.length));
-      } finally {
-        dispatch(updateKubeconfig(currentKubeConfig));
+      if (currentKubeConfig !== localConfig?.kubeConfig?.path) {
+        setLocalConfig({...localConfig, kubeConfig: {path: currentKubeConfig}});
       }
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
-    [currentKubeConfig, kubeconfigPath]
+    [currentKubeConfig]
   );
-
-  useEffect(() => {
-    if (kubeconfigPath) {
-      loadContexts(kubeconfigPath, dispatch);
-    }
-  }, [kubeconfigPath, dispatch]);
 
   const onUpdateKubeconfig = (e: any) => {
     if (isEditingDisabled) {
       return;
     }
-    let value = e.target.value;
-    setCurrentKubeConfig(value);
+    setCurrentKubeConfig(e.target.value);
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
@@ -242,13 +218,12 @@ export const Settings = ({
       const file: any = fileInput.current.files[0];
       if (file.path) {
         const path = file.path;
-        dispatch(updateKubeconfig(path));
+        setLocalConfig({...localConfig, kubeConfig: {path}});
       }
     }
   };
 
   const toggleClusterSelector = () => {
-    // dispatch(toggleClusterStatus());
     setLocalConfig({
       ...localConfig,
       settings: {
@@ -265,7 +240,7 @@ export const Settings = ({
           {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated && (
             <StyledWarningOutlined
               className={isClusterPaneIconHighlighted ? 'animated-highlight' : ''}
-              isKubeconfigPathValid={isKubeconfigPathValid}
+              isKubeconfigPathValid={Boolean(config?.kubeConfig?.isPathValid)}
               highlighted={Boolean(isClusterPaneIconHighlighted)}
             />
           )}

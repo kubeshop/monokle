@@ -30,6 +30,7 @@ import {
   setCurrentContext,
   setOpenProject,
   toggleClusterStatus,
+  updateProjectConfig,
   updateStartupModalVisible,
 } from '@redux/reducers/appConfig';
 import {highlightItem, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
@@ -258,7 +259,6 @@ const PageHeader = () => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewType = useAppSelector(state => state.main.previewType);
-  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
   const kubeConfig = useAppSelector(state => state.config.kubeConfig);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
@@ -266,7 +266,6 @@ const PageHeader = () => {
 
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
-  const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
 
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
@@ -275,6 +274,16 @@ const PageHeader = () => {
   const activeProject = useSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const currentConfig = useAppSelector(currentConfigSelector);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
+  const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
+    Boolean(!currentConfig?.kubeConfig?.path) || Boolean(!currentConfig?.kubeConfig?.isPathValid)
+  );
+
+  useEffect(() => {
+    setIsClusterActionDisabled(
+      Boolean(!currentConfig?.kubeConfig?.path) || Boolean(!currentConfig?.kubeConfig?.isPathValid)
+    );
+  }, [currentConfig?.kubeConfig]);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -309,7 +318,10 @@ const PageHeader = () => {
     stopPreview(dispatch);
   };
 
-  const handleClusterChange = ({key}: any) => dispatch(setCurrentContext(key));
+  const handleClusterChange = ({key}: any) => {
+    dispatch(setCurrentContext(key));
+    dispatch(updateProjectConfig({...projectConfig, kubeConfig: {...projectConfig?.kubeConfig, currentContext: key}}));
+  };
 
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
@@ -459,12 +471,12 @@ const PageHeader = () => {
                   </StyledProjectButton>
                 </StyledProjectsDropdown>
 
-                <CLusterStatusText connected={isKubeconfigPathValid}>
+                <CLusterStatusText connected={Boolean(currentConfig.kubeConfig?.isPathValid)}>
                   <StyledClusterOutlined />
-                  {isKubeconfigPathValid && <span>Configured</span>}
-                  {!isKubeconfigPathValid && <span>No Cluster Configured</span>}
+                  {Boolean(currentConfig.kubeConfig?.isPathValid) && <span>Configured</span>}
+                  {Boolean(!currentConfig.kubeConfig?.isPathValid) && <span>No Cluster Configured</span>}
                 </CLusterStatusText>
-                {isKubeconfigPathValid && (
+                {Boolean(currentConfig.kubeConfig?.isPathValid) && (
                   <StyledDropdown
                     overlay={clusterMenu}
                     placement="bottomCenter"
@@ -473,12 +485,12 @@ const PageHeader = () => {
                     disabled={previewLoader.isLoading || isInPreviewMode}
                   >
                     <StyledClusterButton>
-                      <span>{kubeConfig.currentContext}</span>
+                      <span>{currentConfig.kubeConfig?.currentContext}</span>
                       <DownOutlined style={{margin: 4}} />
                     </StyledClusterButton>
                   </StyledDropdown>
                 )}
-                {isKubeconfigPathValid ? (
+                {currentConfig.kubeConfig?.isPathValid ? (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
                     <StyledButton
                       disabled={

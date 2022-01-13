@@ -672,7 +672,7 @@ const FileTreePane = () => {
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
-    console.log('SHOW', Boolean(currentConfig?.settings?.hideExcludedFilesInFileExplorer));
+
     const treeData =
       rootEntry &&
       createNode(

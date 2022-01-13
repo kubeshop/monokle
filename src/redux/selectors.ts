@@ -84,6 +84,10 @@ export const currentConfigSelector = createSelector(
     applicationConfig.settings = {
       ...config.settings,
     };
+    applicationConfig.kubeConfig = {
+      path: config.kubeconfigPath,
+      isPathValid: config.isKubeconfigPathValid,
+    };
     const projectConfig: ProjectConfig | null | undefined = config.projectConfig;
 
     return mergeConfigs(applicationConfig, projectConfig);
@@ -91,7 +95,7 @@ export const currentConfigSelector = createSelector(
 );
 
 export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null) => {
-  if (!(baseConfig && baseConfig.settings)) {
+  if (!(baseConfig && baseConfig.settings && baseConfig.kubeConfig)) {
     throw Error('Base config must be set');
   }
 
@@ -129,6 +133,21 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     !_.isEqual(config.settings?.isClusterSelectorVisible, baseConfig.settings?.isClusterSelectorVisible)
   ) {
     baseConfig.settings.isClusterSelectorVisible = config.settings?.isClusterSelectorVisible;
+  }
+  if (_.isString(config.kubeConfig?.path) && !_.isEqual(config.kubeConfig?.path, baseConfig.kubeConfig?.path)) {
+    baseConfig.kubeConfig.path = config.kubeConfig?.path;
+  }
+  if (
+    _.isBoolean(config.kubeConfig?.isPathValid) &&
+    !_.isEqual(config.kubeConfig?.isPathValid, baseConfig.kubeConfig?.isPathValid)
+  ) {
+    baseConfig.kubeConfig.isPathValid = config.kubeConfig?.isPathValid;
+  }
+  if (
+    _.isString(config.kubeConfig?.currentContext) &&
+    !_.isEqual(config.kubeConfig?.currentContext, baseConfig.kubeConfig?.currentContext)
+  ) {
+    baseConfig.kubeConfig.currentContext = config.kubeConfig?.currentContext;
   }
 
   if (_.isEmpty(baseConfig.settings)) {
