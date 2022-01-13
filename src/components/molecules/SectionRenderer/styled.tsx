@@ -144,3 +144,7 @@ export const Checkbox = styled(RawCheckbox)<{$level: number}>`
 export const CheckboxPlaceholder = styled.span<{$level: number}>`
   width: 24px;
 `;
+
+export const NameDisplayContainer = styled.span`
+  margin-left: 26px;
+`;

@@ -65,6 +65,15 @@ function SectionHeader(props: SectionHeaderProps) {
       dispatch(sectionInstance.checkable.uncheckItemsAction);
     }
   }, [sectionInstance, dispatch]);
+  let shouldDisplayPlus = false;
+  let shouldDisplayContext = false;
+  if (NameSuffix.Component) {
+    if (NameSuffix.options?.isVisibleOnHover === undefined) {
+      shouldDisplayContext = true;
+    } else {
+      shouldDisplayPlus = NameSuffix.options?.isVisibleOnHover && isHovered;
+    }
+  }
 
   return (
     <S.SectionContainer
@@ -101,21 +110,21 @@ function SectionHeader(props: SectionHeaderProps) {
           <NameDisplay.Component sectionInstance={sectionInstance} />
         ) : (
           <>
-              <S.Name
-                $isSelected={sectionInstance.isSelected && isCollapsed}
-                $isHighlighted={sectionInstance.isSelected && isCollapsed}
-                $isCheckable={Boolean(sectionInstance.checkable)}
-                $level={level}
-                onClick={toggleCollapse}
-              >
-                {name}
-              </S.Name>
-              {itemsLength > 0 && (
-                <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
-              )}
-              {NameSuffix.Component && (NameSuffix.options?.isVisibleOnHover ? isHovered : true) && (
-                <NameSuffix.Component sectionInstance={sectionInstance} />
-              )}
+            <S.Name
+              $isSelected={sectionInstance.isSelected && isCollapsed}
+              $isHighlighted={sectionInstance.isSelected && isCollapsed}
+              $isCheckable={Boolean(sectionInstance.checkable)}
+              $level={level}
+              onClick={toggleCollapse}
+            >
+              {name}
+            </S.Name>
+            {itemsLength > 0 && (
+              <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
+            )}
+            {shouldDisplayPlus && NameSuffix.Component && (
+              <NameSuffix.Component sectionInstance={sectionInstance} />
+            )}
             <S.BlankSpace level={level} onClick={toggleCollapse} />
             {isHovered && sectionInstance.isInitialized && (
               <S.Collapsible>
@@ -133,6 +142,11 @@ function SectionHeader(props: SectionHeaderProps) {
           </>
         )}
       </S.NameContainer>
+      <S.NameDisplayContainer>
+        {!NameDisplay.Component && NameSuffix.Component && shouldDisplayContext && (
+          <NameSuffix.Component sectionInstance={sectionInstance} />
+        )}
+      </S.NameDisplayContainer>
     </S.SectionContainer>
   );
 }
