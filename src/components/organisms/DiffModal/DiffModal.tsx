@@ -5,11 +5,10 @@ import {MonacoDiffEditor} from 'react-monaco-editor';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
-import {Button, Modal, Select, Skeleton, Switch, Tag} from 'antd';
+import {Button, Select, Skeleton, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
-import styled from 'styled-components';
 import {stringify} from 'yaml';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -29,103 +28,9 @@ import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
-import Colors from '@styles/Colors';
-
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-const StyledModal = styled(Modal)`
-  .ant-modal-close {
-    color: ${Colors.grey700};
-  }
-  .ant-modal-header {
-    background-color: ${Colors.grey1000};
-    border-bottom: 1px solid ${Colors.grey900};
-  }
-  .ant-modal-body {
-    background-color: ${Colors.grey1000};
-    padding: 0px;
-  }
-  .ant-modal-footer {
-    background-color: ${Colors.grey1000};
-    border-top: 1px solid ${Colors.grey900};
-    padding: 8px;
-  }
-
-  & .custom-modal-handle {
-    position: absolute;
-    top: 50%;
-    height: 100%;
-    width: 10px;
-    background-color: transparent;
-    cursor: col-resize;
-    transform: translateY(-50%);
-  }
-
-  & .custom-modal-handle-e {
-    right: -5px;
-  }
-
-  & .custom-modal-handle-w {
-    left: -5px;
-  }
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  padding: 12px;
-`;
-
-const MonacoDiffContainer = styled.div<{height: string; width: string}>`
-  ${props => `
-    height: ${props.height};
-    width: ${props.width};
-  `}
-  padding: 8px;
-  & .monaco-editor .monaco-editor-background {
-    background-color: ${Colors.grey1000} !important;
-  }
-  & .monaco-editor .margin {
-    background-color: ${Colors.grey1000} !important;
-  }
-  & .diffOverview {
-    background-color: ${Colors.grey1000} !important;
-  }
-`;
-
-const SwitchContainer = styled.span`
-  display: flex;
-  justify-content: center;
-  padding-top: 16px;
-  padding-bottom: 0;
-`;
-
-const StyledSwitchLabel = styled.span`
-  margin-left: 8px;
-  cursor: pointer;
-`;
-
-const TagsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 12px;
-  padding-bottom: 5px;
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const StyledTag = styled(Tag)`
-  padding: 5px 10px;
-  font-size: 14px;
-  font-weight: 600;
-`;
-
-const NamespaceSelectContainer = styled.div`
-  margin: 0 auto;
-`;
+import * as S from './styled';
 
 const DiffModal = () => {
   const dispatch = useAppDispatch();
@@ -346,7 +251,6 @@ const DiffModal = () => {
     };
 
     setTargetResourceText(stringify(targetResource.content, {sortMapEntries: true}));
-
     getClusterResources();
   }, [currentContext, dispatch, kubeconfigPath, resourceMap, resourceFilter.namespace, targetResource]);
 
@@ -357,11 +261,11 @@ const DiffModal = () => {
   }, [isDiffModalVisible]);
 
   return (
-    <StyledModal
+    <S.StyledModal
       title={
-        <TitleContainer>
+        <S.TitleContainer>
           Resource Diff on ${targetResource ? targetResource.name : ''}
-          <NamespaceSelectContainer>
+          <S.NamespaceSelectContainer>
             Namespace:
             <Select
               value={
@@ -379,8 +283,8 @@ const DiffModal = () => {
                 </Select.Option>
               ))}
             </Select>
-          </NamespaceSelectContainer>
-        </TitleContainer>
+          </S.NamespaceSelectContainer>
+        </S.TitleContainer>
       }
       visible={isDiffModalVisible}
       centered
@@ -405,7 +309,7 @@ const DiffModal = () => {
           </div>
         ) : (
           <>
-            <MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
+            <S.MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
               <MonacoDiffEditor
                 width={containerWidth}
                 height={containerHeight}
@@ -415,10 +319,10 @@ const DiffModal = () => {
                 options={options}
                 theme={KUBESHOP_MONACO_THEME}
               />
-            </MonacoDiffContainer>
+            </S.MonacoDiffContainer>
 
-            <TagsContainer>
-              <StyledTag>Local</StyledTag>
+            <S.TagsContainer>
+              <S.StyledTag>Local</S.StyledTag>
               <Button
                 type="primary"
                 ghost
@@ -436,18 +340,18 @@ const DiffModal = () => {
               >
                 <ArrowLeftOutlined /> Replace local resource with cluster resource
               </Button>
-              <StyledTag>Cluster</StyledTag>
-            </TagsContainer>
-            <SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+              <S.StyledTag>Cluster</S.StyledTag>
+            </S.TagsContainer>
+            <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
               <Switch checked={shouldDiffIgnorePaths} />
-              <StyledSwitchLabel>Hide ignored fields</StyledSwitchLabel>
-            </SwitchContainer>
-            <ButtonContainer>
+              <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+            </S.SwitchContainer>
+            <S.ButtonContainer>
               <Button onClick={handleRefresh}>Refresh</Button>
               <Button onClick={onCloseHandler} style={{marginLeft: 12}}>
                 Close
               </Button>
-            </ButtonContainer>
+            </S.ButtonContainer>
 
             {isApplyModalVisible && (
               <ModalConfirmWithNamespaceSelect
@@ -461,7 +365,7 @@ const DiffModal = () => {
           </>
         )}
       </ResizableBox>
-    </StyledModal>
+    </S.StyledModal>
   );
 };
 

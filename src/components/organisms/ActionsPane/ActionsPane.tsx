@@ -12,7 +12,6 @@ import {
   ACTIONS_PANE_FOOTER_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   NAVIGATOR_HEIGHT_OFFSET,
-  PREVIEW_PREFIX,
   TOOLTIP_DELAY,
 } from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -280,12 +279,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)) {
       return true;
     }
-    // if the resource is from the cluster preview
-    if (selectedResource.filePath === PREVIEW_PREFIX + kubeconfigPath) {
-      return true;
-    }
+
     return false;
-  }, [selectedResource, kubeconfigPath]);
+  }, [selectedResource]);
 
   const onClickApplyResource = useCallback(
     (namespace?: string) => {

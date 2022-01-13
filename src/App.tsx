@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import {Size} from '@models/window';
 
 import {
-  DiffModal,
   HotKeysHandler,
   MessageBox,
   NewResourceWizard,
@@ -19,6 +18,7 @@ import {
 } from '@organisms';
 
 import {ClusterDiffModal} from '@components/organisms';
+import ClusterResourceDiffModal from '@components/organisms/ClusterResourceDiffModal';
 import CreateFolderModal from '@components/organisms/CreateFolderModal';
 import QuickSearchActions from '@components/organisms/QuickSearchActions';
 import RenameEntityModal from '@components/organisms/RenameEntityModal';
@@ -53,7 +53,8 @@ const App = () => {
           <PaneManager />
           <PageFooter />
         </MainContainer>
-        <DiffModal />
+        {/* <DiffModal /> */}
+        <ClusterResourceDiffModal />
         <StartupModal />
         <NewResourceWizard />
         <QuickSearchActions />
