@@ -495,7 +495,7 @@ export const mainSlice = createSlice({
       state.previewLoader.targetResourceId = undefined;
     },
     updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
-      if (state.checkedResourceIds.length) {
+      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
         state.filtersToBeChanged = action.payload;
         return;
       }
