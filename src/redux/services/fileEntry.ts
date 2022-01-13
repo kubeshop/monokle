@@ -46,7 +46,8 @@ export function createFileEntry(fileEntryPath: string) {
  */
 
 export function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
-  return appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
+  const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
+  return scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
 }
 
 /**

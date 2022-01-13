@@ -18,8 +18,10 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
     watcher.close();
   }
 
+  const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
+
   watcher = watch(folder, {
-    ignored: appConfig.scanExcludes,
+    ignored: scanExcludes,
     ignoreInitial: true,
     persistent: true,
     usePolling: true,

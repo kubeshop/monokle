@@ -8,7 +8,14 @@ import _ from 'lodash';
 import {Project, ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {toggleClusterStatus, updateLoadLastProjectOnStartup, updateProjectConfig} from '@redux/reducers/appConfig';
+import {
+  toggleClusterStatus,
+  updateHelmPreviewMode,
+  updateHideExcludedFilesInFileExplorer,
+  updateKustomizeCommand,
+  updateLoadLastProjectOnStartup,
+  updateProjectConfig,
+} from '@redux/reducers/appConfig';
 import {toggleSettings} from '@redux/reducers/ui';
 import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
@@ -54,6 +61,17 @@ const SettingsDrawer = () => {
     }
     if (!_.isEqual(config.settings?.loadLastProjectOnStartup, appConfig.settings.loadLastProjectOnStartup)) {
       dispatch(updateLoadLastProjectOnStartup(Boolean(config.settings?.loadLastProjectOnStartup)));
+    }
+    if (!_.isEqual(config.settings?.helmPreviewMode, appConfig.settings.helmPreviewMode)) {
+      dispatch(updateHelmPreviewMode(config.settings?.helmPreviewMode || 'template'));
+    }
+    if (!_.isEqual(config.settings?.kustomizeCommand, appConfig.settings.kustomizeCommand)) {
+      dispatch(updateKustomizeCommand(config.settings?.kustomizeCommand || 'kubectl'));
+    }
+    if (
+      !_.isEqual(config.settings?.hideExcludedFilesInFileExplorer, appConfig.settings.hideExcludedFilesInFileExplorer)
+    ) {
+      dispatch(updateHideExcludedFilesInFileExplorer(Boolean(config.settings?.hideExcludedFilesInFileExplorer)));
     }
   };
 

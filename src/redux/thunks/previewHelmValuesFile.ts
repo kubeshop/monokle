@@ -39,9 +39,12 @@ export const previewHelmValuesFile = createAsyncThunk<
     if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
       log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
+      const helmPreviewMode =
+        configState.projectConfig?.settings?.helmPreviewMode || configState.settings.helmPreviewMode;
+
       const args = {
         helmCommand:
-          configState.settings.helmPreviewMode === 'template'
+          helmPreviewMode === 'template'
             ? `helm template -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder}`
             : `helm install --kube-context ${kubeconfigContext} -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder} --dry-run`,
         kubeconfig,

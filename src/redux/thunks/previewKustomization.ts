@@ -56,6 +56,7 @@ function runKustomize(folder: string, appConfig: AppConfig): any {
     ipcRenderer.once('kustomize-result', (event, arg) => {
       resolve(arg);
     });
-    ipcRenderer.send('run-kustomize', {folder, kustomizeCommand: appConfig.settings.kustomizeCommand});
+    const kustomizeCommand = appConfig.projectConfig?.settings?.kustomizeCommand || appConfig.settings.kustomizeCommand;
+    ipcRenderer.send('run-kustomize', {folder, kustomizeCommand});
   });
 }

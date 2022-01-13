@@ -118,6 +118,10 @@ const HotKeysHandler = () => {
     }
 
     const isClusterPreview = mainState.previewType === 'cluster';
+
+    const kustomizeCommand =
+      configState.projectConfig?.settings?.kustomizeCommand || configState.settings.kustomizeCommand;
+
     applyResource(
       selectedResource.id,
       mainState.resourceMap,
@@ -128,7 +132,7 @@ const HotKeysHandler = () => {
       namespace,
       {
         isClusterPreview,
-        kustomizeCommand: configState.settings.kustomizeCommand,
+        kustomizeCommand,
       }
     );
     setIsApplyModalVisible(false);

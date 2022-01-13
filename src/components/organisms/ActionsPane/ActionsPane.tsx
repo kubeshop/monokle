@@ -31,7 +31,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {currentConfigSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
@@ -82,7 +82,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const kustomizeCommand = useAppSelector(state => state.config.settings.kustomizeCommand);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -93,6 +92,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const currentConfig = useAppSelector(currentConfigSelector);
 
   const navigatorHeight = useMemo(
     () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
@@ -304,12 +304,21 @@ const ActionsPane = (props: {contentHeight: string}) => {
         namespace,
         {
           isClusterPreview,
-          kustomizeCommand,
+          kustomizeCommand: currentConfig.settings?.kustomizeCommand,
         }
       );
       setIsApplyModalVisible(false);
     },
-    [dispatch, fileMap, kubeconfigContext, kubeconfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
+    [
+      dispatch,
+      fileMap,
+      kubeconfigContext,
+      kubeconfigPath,
+      currentConfig?.settings?.kustomizeCommand,
+      previewType,
+      resourceMap,
+      selectedResource,
+    ]
   );
 
   const onClickApplyHelmChart = useCallback(

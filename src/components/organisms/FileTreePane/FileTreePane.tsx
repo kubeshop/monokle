@@ -15,12 +15,13 @@ import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constant
 import {FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
+import {ProjectConfig} from '@models/appconfig';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
+import {setScanExcludesStatus, updateProjectConfig} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
   openCreateFolderModal,
@@ -28,7 +29,7 @@ import {
   openRenameEntityModal,
   setShouldExpandAllNodes,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {currentConfigSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
@@ -637,24 +638,21 @@ const FileTreePane = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const dispatch = useAppDispatch();
-  const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
-  const hideExcludedFilesInFileExplorer = useAppSelector(
-    state => state.config.settings.hideExcludedFilesInFileExplorer
-  );
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const scanExcludes = useAppSelector(state => state.config.scanExcludes);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
   const uiState = useAppSelector(state => state.ui);
+  const configState = useAppSelector(state => state.config);
+  const currentConfig: ProjectConfig = useSelector(currentConfigSelector);
 
   const treeRef = useRef<any>();
 
@@ -674,13 +672,14 @@ const FileTreePane = () => {
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
+    console.log('SHOW', Boolean(currentConfig?.settings?.hideExcludedFilesInFileExplorer));
     const treeData =
       rootEntry &&
       createNode(
         rootEntry,
         fileMap,
         resourceMap,
-        Boolean(hideExcludedFilesInFileExplorer),
+        Boolean(currentConfig?.settings?.hideExcludedFilesInFileExplorer),
         fileOrFolderContainedInFilter
       );
 
@@ -694,7 +693,7 @@ const FileTreePane = () => {
     resourceMap,
     fileMap,
     shouldExpandAllNodes,
-    hideExcludedFilesInFileExplorer,
+    currentConfig?.settings?.hideExcludedFilesInFileExplorer,
     fileOrFolderContainedInFilter,
     dispatch,
   ]);
@@ -781,7 +780,11 @@ const FileTreePane = () => {
     if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(info.node.key), fileInclude))) {
       return;
     }
-    if (scanExcludes.some(scanExclude => micromatch.isMatch(path.basename(info.node.key), scanExclude))) {
+    if (
+      (currentConfig?.scanExcludes || []).some(scanExclude =>
+        micromatch.isMatch(path.basename(info.node.key), scanExclude)
+      )
+    ) {
       return;
     }
     if (info.node.key) {
@@ -809,16 +812,24 @@ const FileTreePane = () => {
   };
 
   const onExcludeFromProcessing = (relativePath: string) => {
-    dispatch(updateScanExcludes([...excludedFromScanFiles, relativePath]));
-
+    dispatch(
+      updateProjectConfig({
+        ...configState.projectConfig,
+        scanExcludes: [...(currentConfig?.scanExcludes || []), relativePath],
+      })
+    );
     openConfirmModal();
   };
 
   const onIncludeToProcessing = (relativePath: string) => {
     dispatch(
-      updateScanExcludes(excludedFromScanFiles.filter((_, index) => excludedFromScanFiles[index] !== relativePath))
+      updateProjectConfig({
+        ...configState.projectConfig,
+        scanExcludes: (currentConfig?.scanExcludes || []).filter(
+          (_, index) => (currentConfig?.scanExcludes || [])[index] !== relativePath
+        ),
+      })
     );
-
     openConfirmModal();
   };
 
