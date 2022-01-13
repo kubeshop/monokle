@@ -29,6 +29,9 @@ test.beforeAll(async () => {
   const windows = electronApp.windows();
   expect(windows.length).toBe(1);
   appWindow = windows[0];
+
+  // Capture a screenshot.
+  await appWindow.screenshot({path: 'test-output/screenshots/welcome.png'});
   appWindow.on('console', console.log);
 });
 

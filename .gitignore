@@ -9,6 +9,7 @@
 
 # testing
 /coverage
+/test-output
 
 # production
 /build
@@ -34,3 +35,4 @@ k8sdumps
 /site
 
 electron/env.ts
+

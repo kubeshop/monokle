@@ -16,6 +16,7 @@ export function findLatestBuild(): string {
   // list of files in the out directory
   const builds = fs.readdirSync(outDir);
   const platforms = ['win32', 'win', 'windows', 'darwin', 'mac', 'macos', 'osx', 'linux', 'ubuntu'];
+
   const latestBuild = builds
     // eslint-disable-next-line array-callback-return
     .map(fileName => {
@@ -32,6 +33,7 @@ export function findLatestBuild(): string {
         };
       }
     })
+    // @ts-ignore
     .sort((a, b) => b.time - a.time)
     // eslint-disable-next-line array-callback-return
     .map(file => {
@@ -68,7 +70,7 @@ export interface ElectronAppInfo {
  */
 export function parseElectronApp(buildDir: string): ElectronAppInfo {
   console.log(`Parsing Electron app in ${buildDir}`);
-  let platform: string;
+  let platform: string | undefined;
   if (buildDir.endsWith('.app')) {
     buildDir = path.dirname(buildDir);
     platform = 'darwin';
@@ -134,10 +136,12 @@ export function parseElectronApp(buildDir: string): ElectronAppInfo {
     const appBundle = list.find(fileName => {
       return fileName.endsWith('.app');
     });
+    // @ts-ignore
     const appDir = path.join(buildDir, appBundle, 'Contents', 'MacOS');
     const appName = fs.readdirSync(appDir)[0];
     executable = path.join(appDir, appName);
 
+    // @ts-ignore
     resourcesDir = path.join(buildDir, appBundle, 'Contents', 'Resources');
     const resourcesList = fs.readdirSync(resourcesDir);
     asar = resourcesList.includes('app.asar');
@@ -166,6 +170,7 @@ export function parseElectronApp(buildDir: string): ElectronAppInfo {
     const exe = list.find(fileName => {
       return fileName.endsWith('.exe');
     });
+    // @ts-ignore
     executable = path.join(buildDir, exe);
 
     resourcesDir = path.join(buildDir, 'resources');
@@ -194,6 +199,7 @@ export function parseElectronApp(buildDir: string): ElectronAppInfo {
     name,
     platform,
     resourcesDir,
+    // @ts-ignore
     arch,
   };
 }
