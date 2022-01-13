@@ -86,7 +86,6 @@ const App = () => {
 
   useDebounce(
     () => {
-      console.log('currentConfig', currentConfig);
       if (currentConfig && currentConfig.kubeConfig && currentConfig.kubeConfig.path) {
         try {
           const kc = new k8s.KubeConfig();

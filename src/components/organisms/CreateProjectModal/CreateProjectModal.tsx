@@ -40,6 +40,7 @@ const CreateProjectModal: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log('formValues', formValues);
     if (!uiState.fromTemplate && formValues.location && formValues.projectName) {
       dispatch(setCreateProject({rootFolder: formValues.location, name: formValues.projectName}));
       closeModal();
@@ -98,7 +99,7 @@ const CreateProjectModal: React.FC = () => {
         layout="vertical"
         form={createProjectForm}
         onFinish={onFinish}
-        initialValues={formValues}
+        initialValues={() => formValues}
         style={{display: formStep === 1 ? 'block' : 'none'}}
       >
         <Form.Item
