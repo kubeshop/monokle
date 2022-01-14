@@ -131,7 +131,7 @@ const PaneManager = () => {
 
   return (
     <StyledRow style={{height: contentHeight}}>
-      <StyledColumnLeftMenu>
+      <StyledColumnLeftMenu id="LeftToolbar">
         <Space direction="vertical" style={{width: 43}}>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
             <MenuButton

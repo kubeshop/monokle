@@ -16,14 +16,14 @@ const HelmPane: React.FC = () => {
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   return (
-    <>
+    <span id="HelmPane">
       <S.TitleBar>
         <MonoPaneTitle>Helm</MonoPaneTitle>
       </S.TitleBar>
       <S.List id="helm-sections-container" height={navigatorHeight}>
         <SectionRenderer sectionBlueprint={HelmChartSectionBlueprint} level={0} isLastSection={false} />
       </S.List>
-    </>
+    </span>
   );
 };
 
