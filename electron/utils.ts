@@ -1,3 +1,5 @@
+import path from 'path';
+
 const GITHUB_URL = 'https://github.com';
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -16,4 +18,16 @@ export function extractRepositoryOwnerAndNameFromUrl(pluginUrl: string) {
     repositoryOwner,
     repositoryName,
   };
+}
+
+export function makeExtensionDownloadData(
+  extensionRepositoryUrl: string,
+  extensionEntryFileName: string,
+  downloadPath: string
+) {
+  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(extensionRepositoryUrl);
+  const entryFileUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/${extensionEntryFileName}`;
+  const tarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
+  const folderPath = path.join(downloadPath, `${repositoryOwner}-${repositoryName}`);
+  return {entryFileUrl, tarballUrl, folderPath};
 }

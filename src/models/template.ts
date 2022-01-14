@@ -18,6 +18,7 @@ const TemplateBaseRuntype = Rt.Record({
   author: Rt.String,
   version: Rt.String,
   description: Rt.String,
+  repository: Rt.String,
   icon: Rt.Optional(Rt.String),
   tags: Rt.Optional(Rt.Array(Rt.String)),
   helpUrl: Rt.Optional(Rt.String),
@@ -56,6 +57,7 @@ const TemplatePackRuntype = Rt.Record({
   author: Rt.String,
   version: Rt.String,
   description: Rt.String,
+  repository: Rt.String,
   templates: Rt.Array(
     Rt.Record({
       path: Rt.String,

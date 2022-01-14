@@ -1,6 +1,7 @@
 import asyncLib from 'async';
 import log from 'loglevel';
 import path from 'path';
+import semver from 'semver';
 
 import {AnyPlugin, isBundledTemplatePluginModule} from '@models/plugin';
 import {
@@ -12,10 +13,11 @@ import {
 } from '@models/template';
 
 import downloadExtension from './extensions/downloadExtension';
+import downloadExtensionEntry from './extensions/downloadExtensionEntry';
 import {createFolder, doesPathExist} from './extensions/fileSystem';
 import loadExtension from './extensions/loadExtension';
 import loadMultipleExtensions from './extensions/loadMultipleExtensions';
-import {extractRepositoryOwnerAndNameFromUrl} from './utils';
+import {makeExtensionDownloadData} from './utils';
 
 const TEMPLATE_PACK_ENTRY_FILE_NAME = 'monokle-template-pack.json';
 const TEMPLATE_ENTRY_FILE_NAME = 'monokle-template.json';
@@ -52,40 +54,42 @@ const parseTemplatePack = (templatePack: TemplatePack, templatePackFolderPath: s
   };
 };
 
-export async function downloadTemplatePack(repositoryUrl: string, templatesDir: string) {
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
-  const templatePackUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/${TEMPLATE_PACK_ENTRY_FILE_NAME}`;
-  const templatePackTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
-  const templatePackFolderPath = path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
+export async function downloadTemplatePack(repositoryUrl: string, templatePacksDir: string) {
+  const {entryFileUrl, tarballUrl, folderPath} = makeExtensionDownloadData(
+    repositoryUrl,
+    TEMPLATE_PACK_ENTRY_FILE_NAME,
+    templatePacksDir
+  );
   const templatePack: TemplatePack = await downloadExtension<TemplatePack, TemplatePack>({
-    extensionTarballUrl: templatePackTarballUrl,
+    extensionTarballUrl: tarballUrl,
     entryFileName: TEMPLATE_PACK_ENTRY_FILE_NAME,
-    entryFileUrl: templatePackUrl,
+    entryFileUrl,
     validateEntryFileContent: validateTemplatePack,
     parseEntryFileContent: JSON.parse,
     makeExtensionFolderPath: () => {
-      return templatePackFolderPath;
+      return folderPath;
     },
-    transformEntryFileContentToExtension: tp => parseTemplatePack(tp, templatePackFolderPath),
+    transformEntryFileContentToExtension: tp => parseTemplatePack(tp, folderPath),
   });
   return templatePack;
 }
 
 export async function downloadTemplate(repositoryUrl: string, templatesDir: string) {
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(repositoryUrl);
-  const templateUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/${TEMPLATE_ENTRY_FILE_NAME}`;
-  const templateTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
-  const templateFolderPath = path.join(templatesDir, `${repositoryOwner}-${repositoryName}`);
+  const {entryFileUrl, tarballUrl, folderPath} = makeExtensionDownloadData(
+    repositoryUrl,
+    TEMPLATE_ENTRY_FILE_NAME,
+    templatesDir
+  );
   const template: AnyTemplate = await downloadExtension<AnyTemplate, AnyTemplate>({
-    extensionTarballUrl: templateTarballUrl,
+    extensionTarballUrl: tarballUrl,
     entryFileName: TEMPLATE_ENTRY_FILE_NAME,
-    entryFileUrl: templateUrl,
+    entryFileUrl,
     validateEntryFileContent: validateAnyTemplate,
     parseEntryFileContent: JSON.parse,
     makeExtensionFolderPath: () => {
-      return templateFolderPath;
+      return folderPath;
     },
-    transformEntryFileContentToExtension: t => parseTemplate(t, templateFolderPath),
+    transformEntryFileContentToExtension: t => parseTemplate(t, folderPath),
   });
   return template;
 }
@@ -176,4 +180,52 @@ export async function loadTemplates(templatesDir: string, options: LoadTemplates
 
   const bundledTemplates: AnyTemplate[] = [...templatePacksBundledTemplates.flat(), ...pluginsBundledTemplates.flat()];
   return [...standaloneTemplates, ...bundledTemplates];
+}
+
+export async function updateTemplate(
+  template: AnyTemplate,
+  templatesDir: string,
+  userTempDir: string
+): Promise<AnyTemplate | undefined> {
+  const {entryFileUrl, folderPath} = makeExtensionDownloadData(
+    template.repository,
+    TEMPLATE_ENTRY_FILE_NAME,
+    userTempDir
+  );
+  const tempTemplateEntry = await downloadExtensionEntry({
+    entryFileName: TEMPLATE_ENTRY_FILE_NAME,
+    entryFileUrl,
+    makeExtensionFolderPath: () => folderPath,
+    parseEntryFileContent: JSON.parse,
+    validateEntryFileContent: validateAnyTemplate,
+  });
+  if (semver.lt(template.version, tempTemplateEntry.version)) {
+    const newTemplate = await downloadTemplate(template.repository, templatesDir);
+    return newTemplate;
+  }
+  return undefined;
+}
+
+export async function updateTemplatePack(
+  template: AnyTemplate,
+  templatePacksDir: string,
+  userTempDir: string
+): Promise<TemplatePack | undefined> {
+  const {entryFileUrl, folderPath} = makeExtensionDownloadData(
+    template.repository,
+    TEMPLATE_ENTRY_FILE_NAME,
+    userTempDir
+  );
+  const tempTemplatePackEntry = await downloadExtensionEntry({
+    entryFileName: TEMPLATE_PACK_ENTRY_FILE_NAME,
+    entryFileUrl,
+    makeExtensionFolderPath: () => folderPath,
+    parseEntryFileContent: JSON.parse,
+    validateEntryFileContent: validateTemplatePack,
+  });
+  if (semver.lt(template.version, tempTemplatePackEntry.version)) {
+    const newTemplatePack = await downloadTemplatePack(template.repository, templatePacksDir);
+    return newTemplatePack;
+  }
+  return undefined;
 }
