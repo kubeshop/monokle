@@ -48,8 +48,17 @@ const inlineDecorationOptionsByType = {
   },
 };
 
-export function getGlyphDecorationOptions(glyphDecorationType: GlyphDecorationTypes) {
-  return glyphDecorationOptionsByType[glyphDecorationType];
+export function getGlyphDecorationOptions(
+  glyphDecorationType: GlyphDecorationTypes,
+  hoverMessage?: monaco.IMarkdownString[]
+) {
+  const glyphMarginHoverMessage =
+    hoverMessage || glyphDecorationOptionsByType[glyphDecorationType]?.glyphMarginHoverMessage;
+
+  return {
+    ...glyphDecorationOptionsByType[glyphDecorationType],
+    glyphMarginHoverMessage,
+  };
 }
 
 export function getInlineDecorationOptions(inlineDecorationType: InlineDecorationTypes) {

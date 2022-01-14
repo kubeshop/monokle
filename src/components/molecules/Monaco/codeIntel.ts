@@ -142,7 +142,8 @@ export async function applyForResource(
     return {newDecorations, newDisposables};
   }
 
-  const listOfMatchedRefsByEqualPos: {refType: ResourceRefType, position: RefPosition; matchedRefs: ResourceRef[]}[] = [];
+  const listOfMatchedRefsByEqualPos: {refType: ResourceRefType; position: RefPosition; matchedRefs: ResourceRef[]}[] =
+    [];
 
   // find refs that can be decorated
   refs.forEach(ref => {
@@ -171,20 +172,6 @@ export async function applyForResource(
       position.column + position.length
     );
 
-    // unsatisfied refs take precedence for decorations
-    const hasUnsatisfiedRef = matchedRefs.some(ref => isUnsatisfiedRef(ref.type));
-    const glyphDecoration = createGlyphDecoration(
-      position.line,
-      hasUnsatisfiedRef ? GlyphDecorationTypes.UnsatisfiedRef : refType === ResourceRefType.Outgoing ? GlyphDecorationTypes.OutgoingRef : GlyphDecorationTypes.IncomingRef
-    );
-    newDecorations.push(glyphDecoration);
-
-    const inlineDecoration = createInlineDecoration(
-      inlineRange,
-      hasUnsatisfiedRef ? InlineDecorationTypes.UnsatisfiedRef : InlineDecorationTypes.SatisfiedRef
-    );
-    newDecorations.push(inlineDecoration);
-
     const commandMarkdownLinkList: monaco.IMarkdownString[] = [];
     matchedRefs.forEach(matchRef => {
       if (!matchRef.target) {
@@ -193,16 +180,11 @@ export async function applyForResource(
 
       // add command for creating resource from unsatisfied ref
       if (createResource && isUnsatisfiedRef(matchRef.type)) {
-        if (
-          matchRef.target.type === 'resource' &&
-          !matchRef.target.resourceId &&
-          matchRef.target.resourceKind
-        ) {
+        if (matchRef.target.type === 'resource' && !matchRef.target.resourceId && matchRef.target.resourceKind) {
           const {commandMarkdownLink, commandDisposable} = createCommandMarkdownLink(
             `Create ${matchRef.target.resourceKind}`,
             'Create Resource',
             () => {
-              
               createResource(matchRef, resource.namespace, getResourceFolder(resource));
             }
           );
@@ -248,14 +230,40 @@ export async function applyForResource(
       }
     });
 
+    const hoverTitle =
+      refType === ResourceRefType.Outgoing
+        ? 'Outgoing Links'
+        : refType === ResourceRefType.Incoming
+        ? 'Incoming Links'
+        : 'Unsatisfied link';
+
+    const hoverCommandMarkdownLinkList = [createMarkdownString(hoverTitle), ...commandMarkdownLinkList];
+
     // aggregate commands into markdown
-    if (commandMarkdownLinkList.length > 0) {
-      const hoverDisposable = createHoverProvider(inlineRange, [
-        createMarkdownString( refType === ResourceRefType.Outgoing ? 'Outgoing Links' : 'Incoming Links'),
-        ...commandMarkdownLinkList,
-      ]);
+    if (hoverCommandMarkdownLinkList.length > 1) {
+      const hoverDisposable = createHoverProvider(inlineRange, hoverCommandMarkdownLinkList);
       newDisposables.push(hoverDisposable);
     }
+
+    // unsatisfied refs take precedence for decorations
+    const hasUnsatisfiedRef = matchedRefs.some(ref => isUnsatisfiedRef(ref.type));
+
+    const inlineDecoration = createInlineDecoration(
+      inlineRange,
+      hasUnsatisfiedRef ? InlineDecorationTypes.UnsatisfiedRef : InlineDecorationTypes.SatisfiedRef
+    );
+    newDecorations.push(inlineDecoration);
+
+    const glyphDecoration = createGlyphDecoration(
+      position.line,
+      hasUnsatisfiedRef
+        ? GlyphDecorationTypes.UnsatisfiedRef
+        : refType === ResourceRefType.Outgoing
+        ? GlyphDecorationTypes.OutgoingRef
+        : GlyphDecorationTypes.IncomingRef,
+      hoverCommandMarkdownLinkList
+    );
+    newDecorations.push(glyphDecoration);
 
     // create default link if there is only one command
     if (matchedRefs.length === 1) {
