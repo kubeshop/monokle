@@ -24,7 +24,7 @@ test.beforeAll(async () => {
   await electronApp.firstWindow();
   while (electronApp.windows().length === 2) {
     // eslint-disable-next-line no-await-in-loop
-    await new Promise(f => setTimeout(f, 100));
+    await pause(100);
   }
 
   const windows = electronApp.windows();
@@ -34,7 +34,7 @@ test.beforeAll(async () => {
 
   // Capture a screenshot.
   await appWindow.screenshot({path: 'test-output/screenshots/initial-screen.png'});
-  await new Promise(f => setTimeout(f, 1000));
+  await pause(1000);
   await appWindow.screenshot({path: 'test-output/screenshots/post-startup-screen.png'});
   appWindow.on('console', console.log);
 });
@@ -58,17 +58,17 @@ test('Validate logo', async () => {
 
 test('Validate icons', async () => {
   let span = appWindow.locator("span[aria-label='question-circle']");
-  let count = await span.count();
-  expect(count).toBe(1);
+  expect(await span.count()).toBe(1);
   const img = appWindow.locator("img[src*='DiscordLogo'][src$='.svg']");
-  count = await img.count();
-  expect(count).toBe(1);
+
+  // check for github icon
+  expect(await img.count()).toBe(1);
   span = appWindow.locator("span[aria-label='github']");
-  count = await span.count();
-  expect(count).toBe(1);
+
+  expect(await span.count()).toBe(1);
   span = appWindow.locator("span[aria-label='bell']");
-  count = await span.count();
-  expect(count).toBe(1);
+
+  expect(await span.count()).toBe(1);
   span = appWindow.locator("span[aria-label='setting']");
   count = await span.count();
   expect(count).toBe(1);
@@ -99,16 +99,16 @@ test('Validate settings drawer', async () => {
   expect(await settingsIcon.count()).toBe(1);
 
   settingsIcon.click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   drawer = await findDrawer(appWindow, 'Settings');
   expect(drawer).toBeTruthy();
 
   // @ts-ignore
   expect(await isDrawerVisible(drawer)).toBeTruthy();
-
+  // Clicking away from the settings drawer.
   appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   // @ts-ignore
   expect(await isDrawerVisible(drawer)).toBeFalsy();
@@ -122,7 +122,7 @@ test('Validate notifications drawer', async () => {
   expect(await notificationsIcon.count()).toBe(1);
 
   notificationsIcon.click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   drawer = await findDrawer(appWindow, 'Notifications');
   expect(drawer).toBeTruthy();
@@ -131,7 +131,7 @@ test('Validate notifications drawer', async () => {
   expect(await isDrawerVisible(drawer)).toBeTruthy();
 
   appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   // @ts-ignore
   expect(await isDrawerVisible(drawer)).toBeFalsy();
@@ -148,7 +148,7 @@ test('Validate monokle popup', async () => {
   expect(modal).toBeFalsy();
 
   appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   modal = await findModal(appWindow, 'WelcomeModal');
   expect(modal).toBeTruthy();
@@ -157,7 +157,7 @@ test('Validate monokle popup', async () => {
 
   const notificationsIcon = appWindow.locator("span[aria-label='bell']");
   notificationsIcon.click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   // @ts-ignore
   expect(await isModalVisible(modal)).toBeFalsy();
@@ -173,43 +173,40 @@ test('Validate left section tabs', async () => {
   expect(await isInvisible(fileExplorer)).toBeFalsy();
 
   buttons.nth(1).click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   const kustomize = appWindow.locator("div > span[id='KustomizePane']");
   expect(await kustomize.count()).toBe(1);
   expect(await isInvisible(kustomize)).toBeFalsy();
 
   buttons.nth(2).click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   const helm = appWindow.locator("div > span[id='HelmPane']");
   expect(await helm.count()).toBe(1);
   expect(await isInvisible(helm)).toBeFalsy();
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 
   const leftpane = appWindow.locator("div[id='LeftPane']");
   expect(await leftpane.count()).toBe(1);
   expect(await isInvisible(leftpane)).toBeTruthy();
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
+  await pause(500);
 });
 
 test('Validate file browser', async () => {
-  const filexp = appWindow.locator("span[aria-label='folder-add']");
-  //  await filexp.click({noWaitAfter: true, force: true});
-  await new Promise(f => setTimeout(f, 500));
   const folder = path.resolve(`tests${path.sep}argo-rollouts`);
   await electronApp.evaluate(async (app, f) => {
     app.webContents.getFocusedWebContents().send('set-root-folder', f);
   }, folder);
 
-  await new Promise(f => setTimeout(f, 5000));
+  await pause(5000);
 
   const footer = appWindow.locator('footer');
   await expect(footer).toContainText('26 files');
@@ -220,3 +217,7 @@ test.afterAll(async () => {
   await appWindow.context().close();
   await appWindow.close();
 });
+
+async function pause(ms: number) {
+  await new Promise(f => setTimeout(f, ms));
+}
