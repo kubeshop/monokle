@@ -20,7 +20,7 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
-import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT} from '@constants/ipcEvents';
+import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
@@ -34,18 +34,21 @@ import {PROCESS_ENV} from '@utils/env';
 import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
 import terminal from '../cli/terminal';
-import {downloadPlugin, loadPlugins} from './pluginService';
+import {downloadPlugin, loadPluginMap} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
 import {setAppRehydrating} from '@redux/reducers/main';
-import {setPlugins, setTemplatePacks, setTemplates} from '@redux/reducers/contrib';
+import {setPluginMap, setTemplatePackMap, setTemplateMap} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
 import { RootState } from '@redux/store';
-import { downloadTemplate, downloadTemplatePack, loadTemplatePacks, loadTemplates, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack } from './templateService';
+import { downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack } from './templateService';
+import { AnyTemplate, TemplatePack } from '@models/template';
+import { AnyPlugin } from '@models/plugin';
+import { DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult } from '@models/extension';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -67,9 +70,10 @@ ipcMain.on('get-user-home-dir', event => {
 
 ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   try {
-    const plugin = await downloadPlugin(pluginUrl, pluginsDir);
-    const templates = await loadTemplatesFromPlugin(plugin);
-    event.sender.send(DOWNLOAD_PLUGIN_RESULT, {plugin, templates});
+    const pluginExtension = await downloadPlugin(pluginUrl, pluginsDir);
+    const templateExtensions = await loadTemplatesFromPlugin(pluginExtension.extension);
+    const downloadPluginResult: DownloadPluginResult = {pluginExtension, templateExtensions};
+    event.sender.send(DOWNLOAD_PLUGIN_RESULT, downloadPluginResult);
   } catch (err) {
     if (err instanceof Error) {
       event.sender.send(DOWNLOAD_PLUGIN_RESULT, err);
@@ -81,8 +85,9 @@ ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
 
 ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
   try {
-    const template = await downloadTemplate(templateUrl, templatesDir);
-    event.sender.send(DOWNLOAD_TEMPLATE_RESULT, {template});
+    const templateExtension = await downloadTemplate(templateUrl, templatesDir);
+    const downloadTemplateResult: DownloadTemplateResult = {templateExtension};
+    event.sender.send(DOWNLOAD_TEMPLATE_RESULT, {downloadTemplateResult});
   } catch (err) {
     if (err instanceof Error) {
       event.sender.send(DOWNLOAD_TEMPLATE_RESULT, err);
@@ -94,9 +99,10 @@ ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
 
 ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event, templatePackUrl: string) => {
   try {
-    const templatePack = await downloadTemplatePack(templatePackUrl, templatePacksDir);
-    const templates = await loadTemplatesFromTemplatePack(templatePack);
-    event.sender.send(DOWNLOAD_TEMPLATE_PACK_RESULT, {templatePack, templates});
+    const templatePackExtension = await downloadTemplatePack(templatePackUrl, templatePacksDir);
+    const templateExtensions = await loadTemplatesFromTemplatePack(templatePackExtension.extension);
+    const downloadTemplatePackResult: DownloadTemplatePackResult = {templatePackExtension, templateExtensions};
+    event.sender.send(DOWNLOAD_TEMPLATE_PACK_RESULT, downloadTemplatePackResult);
   } catch (err) {
     if (err instanceof Error) {
       event.sender.send(DOWNLOAD_TEMPLATE_PACK_RESULT, err);
@@ -104,6 +110,15 @@ ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event, templatePackUrl: string) => {
       log.warn(err);
     }
   }
+});
+
+type UpdateExtensionsPayload = {
+  templates: AnyTemplate[];
+  templatePacks: TemplatePack[];
+  plugins: AnyPlugin[];
+}
+ipcMain.on(UPDATE_EXTENSIONS, async (event, {templates, templatePacks, plugins}: UpdateExtensionsPayload) => {
+  // TODO: implement update for all types of extensions
 });
 
 ipcMain.on('run-kustomize', (event, cmdOptions: any) => {
@@ -251,12 +266,12 @@ export const createWindow = (givenPath?: string) => {
     }
     win.webContents.send('executed-from', {path: givenPath});
 
-    const plugins = await loadPlugins(pluginsDir);
-    dispatch(setPlugins(plugins));
-    const templatePacks = await loadTemplatePacks(templatePacksDir);
-    dispatch(setTemplatePacks(templatePacks));
-    const templates = await loadTemplates(templatesDir, {plugins, templatePacks});
-    dispatch(setTemplates(templates));
+    const pluginMap = await loadPluginMap(pluginsDir);
+    dispatch(setPluginMap(pluginMap));
+    const templatePackMap = await loadTemplatePackMap(templatePacksDir);
+    dispatch(setTemplatePackMap(templatePackMap));
+    const templateMap = await loadTemplateMap(templatesDir, {plugins: Object.values(pluginMap), templatePacks: Object.values(templatePackMap)});
+    dispatch(setTemplateMap(templateMap));
   });
 
   return win;

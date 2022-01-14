@@ -1,12 +1,14 @@
 import log from 'loglevel';
 import path from 'path';
 
+import {AnyExtension} from '@models/extension';
+
 import {doesPathExist, readFile} from './fileSystem';
 import {LoadExtensionOptions} from './types';
 
 async function loadExtension<ExtensionEntryType, ExtensionType>(
   options: LoadExtensionOptions<ExtensionEntryType, ExtensionType>
-): Promise<ExtensionType | undefined> {
+): Promise<AnyExtension<ExtensionType> | undefined> {
   const {
     folderPath,
     entryFileName,
@@ -31,7 +33,7 @@ async function loadExtension<ExtensionEntryType, ExtensionType>(
     return undefined;
   }
   const extension = transformEntryFileContentToExtension(parsedEntryFileContent, folderPath);
-  return extension;
+  return {extension, folderPath};
 }
 
 export default loadExtension;

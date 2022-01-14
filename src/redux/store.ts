@@ -6,7 +6,7 @@ import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddl
 
 import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
-import {contribSlice} from './reducers/contrib';
+import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {mainSlice} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
@@ -33,7 +33,7 @@ const store = configureStore({
     ui: uiSlice.reducer,
     navigator: navigatorSlice.reducer,
     uiCoach: uiCoachSlice.reducer,
-    contrib: contribSlice.reducer,
+    extension: extensionSlice.reducer,
   },
   middleware: getDefaultMiddleware => [...getDefaultMiddleware().concat(middlewares), sectionBlueprintMiddleware],
 });

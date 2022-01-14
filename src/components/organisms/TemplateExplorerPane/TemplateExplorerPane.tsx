@@ -20,7 +20,7 @@ const TemplatesPane: React.FC = () => {
   const [isInstallModalVisible, setIsInstallModalVisible] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
-  const templates = useAppSelector(state => state.contrib.templates);
+  const templates = useAppSelector(state => Object.values(state.extension.templateMap));
 
   const onTemplateModalClose = useCallback(() => {
     setSelectedTemplate(undefined);

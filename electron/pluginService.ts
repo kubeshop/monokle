@@ -2,6 +2,7 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
+import {AnyExtension} from '@models/extension';
 import {
   AnyPlugin,
   PluginPackageJson,
@@ -15,7 +16,7 @@ import downloadExtension from './extensions/downloadExtension';
 import downloadExtensionEntry from './extensions/downloadExtensionEntry';
 import {createFolder, doesPathExist} from './extensions/fileSystem';
 import loadMultipleExtensions from './extensions/loadMultipleExtensions';
-import {extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from './utils';
+import {convertExtensionsToRecord, extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from './utils';
 
 const PLUGIN_ENTRY_FILE_NAME = 'package.json';
 
@@ -45,7 +46,10 @@ function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderP
   return plugin;
 }
 
-export async function downloadPlugin(pluginUrl: string, allPluginsFolderPath: string) {
+export async function downloadPlugin(
+  pluginUrl: string,
+  allPluginsFolderPath: string
+): Promise<AnyExtension<AnyPlugin>> {
   const {entryFileUrl, tarballUrl, folderPath} = makeExtensionDownloadData(
     pluginUrl,
     PLUGIN_ENTRY_FILE_NAME,
@@ -62,10 +66,10 @@ export async function downloadPlugin(pluginUrl: string, allPluginsFolderPath: st
       return folderPath;
     },
   });
-  return plugin;
+  return {extension: plugin, folderPath};
 }
 
-export async function loadPlugins(pluginsDir: string) {
+export async function loadPluginMap(pluginsDir: string): Promise<Record<string, AnyPlugin>> {
   try {
     const doesPluginsDirExist = await doesPathExist(pluginsDir);
     if (!doesPluginsDirExist) {
@@ -75,23 +79,23 @@ export async function loadPlugins(pluginsDir: string) {
     if (e instanceof Error) {
       log.warn(`[loadPlugins]: Couldn't load plugins: ${e.message}`);
     }
-    return [];
+    return {};
   }
-  const plugins: AnyPlugin[] = await loadMultipleExtensions<PluginPackageJson, AnyPlugin>({
+  const pluginExtensions: AnyExtension<AnyPlugin>[] = await loadMultipleExtensions<PluginPackageJson, AnyPlugin>({
     folderPath: pluginsDir,
     entryFileName: 'package.json',
     parseEntryFileContent: JSON.parse,
     validateEntryFileContent: validatePluginPackageJson,
     transformEntryFileContentToExtension: transformPackageJsonToAnyPlugin,
   });
-  return plugins;
+  return convertExtensionsToRecord(pluginExtensions);
 }
 
 export async function updatePlugin(
   plugin: AnyPlugin,
   pluginsDir: string,
   userTempDir: string
-): Promise<AnyPlugin | undefined> {
+): Promise<AnyExtension<AnyPlugin> | undefined> {
   const repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
   const {entryFileUrl, folderPath} = makeExtensionDownloadData(repositoryUrl, PLUGIN_ENTRY_FILE_NAME, userTempDir);
   const tempPluginEntry = await downloadExtensionEntry({
@@ -102,8 +106,8 @@ export async function updatePlugin(
     validateEntryFileContent: validateAnyPlugin,
   });
   if (semver.lt(plugin.version, tempPluginEntry.version)) {
-    const newPlugin = await downloadPlugin(repositoryUrl, pluginsDir);
-    return newPlugin;
+    const pluginExtension = await downloadPlugin(repositoryUrl, pluginsDir);
+    return pluginExtension;
   }
   return undefined;
 }

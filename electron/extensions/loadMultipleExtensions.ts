@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 
+import {AnyExtension} from '@models/extension';
+
 import loadExtension from './loadExtension';
 import {LoadExtensionOptions} from './types';
 
@@ -15,14 +17,14 @@ const getSubfolders = async (folderPath: string) => {
 
 async function loadMultipleExtensions<FileContentType, ExtensionType>(
   options: LoadExtensionOptions<FileContentType, ExtensionType>
-): Promise<ExtensionType[]> {
+): Promise<AnyExtension<ExtensionType>[]> {
   const {folderPath, ...restOptions} = options;
   const subfolders = await getSubfolders(folderPath);
-  const extensions: (ExtensionType | undefined)[] = await asyncLib.map(subfolders, async subfolder => {
+  const results: AnyExtension<ExtensionType>[] = await asyncLib.map(subfolders, async subfolder => {
     const extension = await loadExtension({folderPath: subfolder, ...restOptions});
     return extension;
   });
-  return extensions.filter((e): e is ExtensionType => e !== undefined);
+  return results.filter((r): r is AnyExtension<ExtensionType> => r !== undefined);
 }
 
 export default loadMultipleExtensions;

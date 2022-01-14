@@ -3,7 +3,7 @@ import os from 'os';
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
-import {ContribState} from '@models/contrib';
+import {ExtensionState} from '@models/extension';
 import {LogsState} from '@models/logs';
 import {NavigatorState} from '@models/navigator';
 import {UiState} from '@models/ui';
@@ -153,13 +153,13 @@ const initialUiCoachState: UiCoachState = {
   hasUserPerformedClickOnClusterIcon: false,
 };
 
-const initialContribState: ContribState = {
+const initialExtensionState: ExtensionState = {
   isLoadingExistingPlugins: true,
   isLoadingExistingTemplates: true,
   isLoadingExistingTemplatePacks: true,
-  plugins: [],
-  templates: [],
-  templatePacks: [],
+  pluginMap: {},
+  templateMap: {},
+  templatePackMap: {},
 };
 
 export default {
@@ -170,5 +170,5 @@ export default {
   ui: initialUiState,
   navigator: initialNavigatorState,
   uiCoach: initialUiCoachState,
-  contrib: initialContribState,
+  extension: initialExtensionState,
 };

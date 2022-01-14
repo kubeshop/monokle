@@ -11,19 +11,26 @@ import {
   DOWNLOAD_TEMPLATE_RESULT,
 } from '@constants/ipcEvents';
 
-import {AnyTemplate, TemplatePack, isAnyTemplate, isTemplatePack} from '@models/template';
+import {
+  DownloadTemplatePackResult,
+  DownloadTemplateResult,
+  isDownloadTemplatePackResult,
+  isDownloadTemplateResult,
+} from '@models/extension';
 
 import {useAppDispatch} from '@redux/hooks';
-import {addMultipleTemplates, addTemplate, addTemplatePack} from '@redux/reducers/contrib';
+import {addMultipleTemplates, addTemplate, addTemplatePack} from '@redux/reducers/extension';
 
 const downloadTemplate = (templateUrl: string) => {
-  return new Promise<{template: AnyTemplate}>((resolve, reject) => {
-    const downloadTemplateResult = (_: any, result: any) => {
+  return new Promise<DownloadTemplateResult>((resolve, reject) => {
+    const downloadTemplateResult = (_: any, result: DownloadTemplateResult | Error) => {
       if (result instanceof Error) {
         reject(result);
+        return;
       }
-      if (!isAnyTemplate(result.template)) {
+      if (!isDownloadTemplateResult(result)) {
         reject(new Error(`Failed Template installation.`));
+        return;
       }
       resolve(result);
     };
@@ -33,17 +40,19 @@ const downloadTemplate = (templateUrl: string) => {
 };
 
 const downloadTemplatePack = (templatePackUrl: string) => {
-  return new Promise<{templatePack: TemplatePack; templates: AnyTemplate[]}>((resolve, reject) => {
-    const downloadTemplatePackResult = (_: any, result: any) => {
+  return new Promise<DownloadTemplatePackResult>((resolve, reject) => {
+    const onDownloadTemplatePackResult = (_: any, result: DownloadTemplatePackResult | Error) => {
       if (result instanceof Error) {
         reject(result);
+        return;
       }
-      if (!isTemplatePack(result.templatePack)) {
-        reject(new Error(`Failed Template Pack installation.`));
+      if (!isDownloadTemplatePackResult(result)) {
+        reject(new Error(`Failed Template installation.`));
+        return;
       }
       resolve(result);
     };
-    ipcRenderer.once(DOWNLOAD_TEMPLATE_PACK_RESULT, downloadTemplatePackResult);
+    ipcRenderer.once(DOWNLOAD_TEMPLATE_PACK_RESULT, onDownloadTemplatePackResult);
     ipcRenderer.send(DOWNLOAD_TEMPLATE_PACK, templatePackUrl);
   });
 };
@@ -61,12 +70,14 @@ function TemplateInstallModal(props: {isVisible: boolean; onClose: () => void}) 
       setIsDownloading(true);
 
       if (selectedType === 'template') {
-        const {template} = await downloadTemplate(downloadUrl);
-        dispatch(addTemplate(template));
+        const downloadTemplateResult = await downloadTemplate(downloadUrl);
+        const {templateExtension} = downloadTemplateResult;
+        dispatch(addTemplate(templateExtension));
       } else if (selectedType === 'template-pack') {
-        const {templatePack, templates} = await downloadTemplatePack(downloadUrl);
-        dispatch(addTemplatePack(templatePack));
-        dispatch(addMultipleTemplates(templates));
+        const downloadTemplatePackResult = await downloadTemplatePack(downloadUrl);
+        const {templatePackExtension, templateExtensions} = downloadTemplatePackResult;
+        dispatch(addTemplatePack(templatePackExtension));
+        dispatch(addMultipleTemplates(templateExtensions));
       }
       close();
     } catch (err) {

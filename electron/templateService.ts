@@ -3,6 +3,7 @@ import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 
+import {AnyExtension} from '@models/extension';
 import {AnyPlugin, isBundledTemplatePluginModule} from '@models/plugin';
 import {
   AnyTemplate,
@@ -17,7 +18,7 @@ import downloadExtensionEntry from './extensions/downloadExtensionEntry';
 import {createFolder, doesPathExist} from './extensions/fileSystem';
 import loadExtension from './extensions/loadExtension';
 import loadMultipleExtensions from './extensions/loadMultipleExtensions';
-import {makeExtensionDownloadData} from './utils';
+import {convertExtensionsToRecord, makeExtensionDownloadData} from './utils';
 
 const TEMPLATE_PACK_ENTRY_FILE_NAME = 'monokle-template-pack.json';
 const TEMPLATE_ENTRY_FILE_NAME = 'monokle-template.json';
@@ -54,7 +55,10 @@ const parseTemplatePack = (templatePack: TemplatePack, templatePackFolderPath: s
   };
 };
 
-export async function downloadTemplatePack(repositoryUrl: string, templatePacksDir: string) {
+export async function downloadTemplatePack(
+  repositoryUrl: string,
+  templatePacksDir: string
+): Promise<AnyExtension<TemplatePack>> {
   const {entryFileUrl, tarballUrl, folderPath} = makeExtensionDownloadData(
     repositoryUrl,
     TEMPLATE_PACK_ENTRY_FILE_NAME,
@@ -71,10 +75,13 @@ export async function downloadTemplatePack(repositoryUrl: string, templatePacksD
     },
     transformEntryFileContentToExtension: tp => parseTemplatePack(tp, folderPath),
   });
-  return templatePack;
+  return {extension: templatePack, folderPath};
 }
 
-export async function downloadTemplate(repositoryUrl: string, templatesDir: string) {
+export async function downloadTemplate(
+  repositoryUrl: string,
+  templatesDir: string
+): Promise<AnyExtension<AnyTemplate>> {
   const {entryFileUrl, tarballUrl, folderPath} = makeExtensionDownloadData(
     repositoryUrl,
     TEMPLATE_ENTRY_FILE_NAME,
@@ -91,10 +98,10 @@ export async function downloadTemplate(repositoryUrl: string, templatesDir: stri
     },
     transformEntryFileContentToExtension: t => parseTemplate(t, folderPath),
   });
-  return template;
+  return {extension: template, folderPath};
 }
 
-export async function loadTemplatePacks(templatePacksDir: string) {
+export async function loadTemplatePackMap(templatePacksDir: string): Promise<Record<string, TemplatePack>> {
   try {
     const doesTemplatePacksDirExist = await doesPathExist(templatePacksDir);
     if (!doesTemplatePacksDirExist) {
@@ -103,17 +110,19 @@ export async function loadTemplatePacks(templatePacksDir: string) {
   } catch (e) {
     if (e instanceof Error) {
       log.warn(`[loadTemplatePacks]: Couldn't load plugins: ${e.message}`);
-      return [];
+      return {};
     }
   }
-  const templatePacks: TemplatePack[] = await loadMultipleExtensions<TemplatePack, TemplatePack>({
-    folderPath: templatePacksDir,
-    entryFileName: TEMPLATE_PACK_ENTRY_FILE_NAME,
-    parseEntryFileContent: JSON.parse,
-    validateEntryFileContent: validateTemplatePack,
-    transformEntryFileContentToExtension: parseTemplatePack,
-  });
-  return templatePacks;
+  const templatePackExtensions: AnyExtension<TemplatePack>[] = await loadMultipleExtensions<TemplatePack, TemplatePack>(
+    {
+      folderPath: templatePacksDir,
+      entryFileName: TEMPLATE_PACK_ENTRY_FILE_NAME,
+      parseEntryFileContent: JSON.parse,
+      validateEntryFileContent: validateTemplatePack,
+      transformEntryFileContentToExtension: parseTemplatePack,
+    }
+  );
+  return convertExtensionsToRecord(templatePackExtensions);
 }
 
 const makeLoadTemplateOptions = (folderPath: string) => {
@@ -126,15 +135,18 @@ const makeLoadTemplateOptions = (folderPath: string) => {
   };
 };
 
-async function loadTemplatesFromPaths(paths: string[]): Promise<AnyTemplate[]> {
-  const bundledTemplates: AnyTemplate[] = await asyncLib.map(paths, async templatePath => {
-    const template = await loadExtension(makeLoadTemplateOptions(templatePath));
-    return template;
-  });
-  return bundledTemplates.filter((bt): bt is AnyTemplate => bt !== undefined);
+async function loadTemplatesFromPaths(paths: string[]): Promise<AnyExtension<AnyTemplate>[]> {
+  const templateExtensions: (AnyExtension<AnyTemplate> | undefined)[] = await asyncLib.map(
+    paths,
+    async templatePath => {
+      const extension = await loadExtension(makeLoadTemplateOptions(templatePath));
+      return extension;
+    }
+  );
+  return templateExtensions.filter((r): r is AnyExtension<AnyTemplate> => r !== undefined);
 }
 
-export function loadTemplatesFromPlugin(plugin: AnyPlugin): Promise<AnyTemplate[]> {
+export function loadTemplatesFromPlugin(plugin: AnyPlugin): Promise<AnyExtension<AnyTemplate>[]> {
   return loadTemplatesFromPaths(
     plugin.modules.filter(isBundledTemplatePluginModule).map(m => {
       return m.path;
@@ -142,7 +154,7 @@ export function loadTemplatesFromPlugin(plugin: AnyPlugin): Promise<AnyTemplate[
   );
 }
 
-export function loadTemplatesFromTemplatePack(templatePack: TemplatePack): Promise<AnyTemplate[]> {
+export function loadTemplatesFromTemplatePack(templatePack: TemplatePack): Promise<AnyExtension<AnyTemplate>[]> {
   return loadTemplatesFromPaths(
     templatePack.templates.map(t => {
       return t.path;
@@ -151,42 +163,61 @@ export function loadTemplatesFromTemplatePack(templatePack: TemplatePack): Promi
 }
 
 type LoadTemplatesOptions = {templatePacks: TemplatePack[]; plugins: AnyPlugin[]};
-export async function loadTemplates(templatesDir: string, options: LoadTemplatesOptions) {
+export async function loadTemplateMap(
+  templatesDir: string,
+  options: LoadTemplatesOptions
+): Promise<Record<string, AnyTemplate>> {
   const {templatePacks, plugins} = options;
 
-  let standaloneTemplates: AnyTemplate[] = [];
+  const templateMap: Record<string, AnyTemplate> = {};
+
   try {
     const doesTemplatesDirExist = await doesPathExist(templatesDir);
     if (!doesTemplatesDirExist) {
       await createFolder(templatesDir);
     }
-    standaloneTemplates = await loadMultipleExtensions<AnyTemplate, AnyTemplate>(makeLoadTemplateOptions(templatesDir));
+    const loadStandaloneTemplateResults = await loadMultipleExtensions<AnyTemplate, AnyTemplate>(
+      makeLoadTemplateOptions(templatesDir)
+    );
+    loadStandaloneTemplateResults.forEach(result => {
+      templateMap[result.folderPath] = result.extension;
+    });
   } catch (e) {
     if (e instanceof Error) {
-      log.warn(`[loadTemplatePacks]: Couldn't load plugins: ${e.message}`);
-      return [];
+      log.warn(`[loadTemplatePacks]: Couldn't load standalone templates: ${e.message}`);
+      return {};
     }
   }
 
-  const templatePacksBundledTemplates: AnyTemplate[][] = await asyncLib.map(templatePacks, async templatePack => {
-    const bundledTemplates = await loadTemplatesFromTemplatePack(templatePack);
-    return bundledTemplates;
+  const templatePackExtensions: AnyExtension<AnyTemplate>[][] = await asyncLib.map(
+    templatePacks,
+    async templatePack => {
+      const results = await loadTemplatesFromTemplatePack(templatePack);
+      return results;
+    }
+  );
+
+  templatePackExtensions.flat().forEach(result => {
+    templateMap[result.folderPath] = result.extension;
   });
 
-  const pluginsBundledTemplates: AnyTemplate[][] = await asyncLib.map(plugins, async plugin => {
-    const bundledTemplates = await loadTemplatesFromPlugin(plugin);
-    return bundledTemplates;
+  const pluginExtensions: AnyExtension<AnyTemplate>[][] = await asyncLib.map(plugins, async plugin => {
+    const results = await loadTemplatesFromPlugin(plugin);
+    return results;
   });
 
-  const bundledTemplates: AnyTemplate[] = [...templatePacksBundledTemplates.flat(), ...pluginsBundledTemplates.flat()];
-  return [...standaloneTemplates, ...bundledTemplates];
+  pluginExtensions.flat().forEach(result => {
+    templateMap[result.folderPath] = result.extension;
+  });
+
+  return templateMap;
 }
 
 export async function updateTemplate(
   template: AnyTemplate,
   templatesDir: string,
   userTempDir: string
-): Promise<AnyTemplate | undefined> {
+): Promise<AnyExtension<AnyTemplate> | undefined> {
   const {entryFileUrl, folderPath} = makeExtensionDownloadData(
     template.repository,
     TEMPLATE_ENTRY_FILE_NAME,
@@ -200,8 +231,8 @@ export async function updateTemplate(
     validateEntryFileContent: validateAnyTemplate,
   });
   if (semver.lt(template.version, tempTemplateEntry.version)) {
-    const newTemplate = await downloadTemplate(template.repository, templatesDir);
-    return newTemplate;
+    const templateExtension = await downloadTemplate(template.repository, templatesDir);
+    return templateExtension;
   }
   return undefined;
 }
@@ -210,7 +241,7 @@ export async function updateTemplatePack(
   template: AnyTemplate,
   templatePacksDir: string,
   userTempDir: string
-): Promise<TemplatePack | undefined> {
+): Promise<AnyExtension<TemplatePack> | undefined> {
   const {entryFileUrl, folderPath} = makeExtensionDownloadData(
     template.repository,
     TEMPLATE_ENTRY_FILE_NAME,
@@ -224,8 +255,8 @@ export async function updateTemplatePack(
     validateEntryFileContent: validateTemplatePack,
   });
   if (semver.lt(template.version, tempTemplatePackEntry.version)) {
-    const newTemplatePack = await downloadTemplatePack(template.repository, templatePacksDir);
-    return newTemplatePack;
+    const templatePackExtension = await downloadTemplatePack(template.repository, templatePacksDir);
+    return templatePackExtension;
   }
   return undefined;
 }

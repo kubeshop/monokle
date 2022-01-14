@@ -1,5 +1,7 @@
 import path from 'path';
 
+import {AnyExtension} from '@models/extension';
+
 const GITHUB_URL = 'https://github.com';
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -30,4 +32,16 @@ export function makeExtensionDownloadData(
   const tarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
   const folderPath = path.join(downloadPath, `${repositoryOwner}-${repositoryName}`);
   return {entryFileUrl, tarballUrl, folderPath};
+}
+
+export function convertExtensionsToRecord<ExtensionType>(
+  extensions: AnyExtension<ExtensionType>[]
+): Record<string, ExtensionType> {
+  return extensions.reduce((acc: Record<string, ExtensionType>, current) => {
+    const {folderPath, extension} = current;
+    if (extension) {
+      acc[folderPath] = extension;
+    }
+    return acc;
+  }, {});
 }

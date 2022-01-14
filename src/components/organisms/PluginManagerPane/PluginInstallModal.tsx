@@ -6,20 +6,21 @@ import {Button, Input, Modal} from 'antd';
 
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 
-import {AnyPlugin, isAnyPlugin} from '@models/plugin';
-import {AnyTemplate} from '@models/template';
+import {DownloadPluginResult, isDownloadPluginResult} from '@models/extension';
 
 import {useAppDispatch} from '@redux/hooks';
-import {addMultipleTemplates, addPlugin} from '@redux/reducers/contrib';
+import {addMultipleTemplates, addPlugin} from '@redux/reducers/extension';
 
 const downloadPlugin = (pluginUrl: string) => {
-  return new Promise<{plugin: AnyPlugin; templates: AnyTemplate[]}>((resolve, reject) => {
-    const downloadPluginResult = (_: any, result: any) => {
+  return new Promise<DownloadPluginResult>((resolve, reject) => {
+    const downloadPluginResult = (_: any, result: DownloadPluginResult | Error) => {
       if (result instanceof Error) {
         reject(result);
+        return;
       }
-      if (!isAnyPlugin(result.plugin)) {
+      if (!isDownloadPluginResult(result)) {
         reject(new Error(`Failed Plugin installation.`));
+        return;
       }
       resolve(result);
     };
@@ -38,9 +39,10 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   const onClickDownload = async () => {
     try {
       setIsDownloading(true);
-      const {plugin, templates} = await downloadPlugin(pluginUrl);
-      dispatch(addPlugin(plugin));
-      dispatch(addMultipleTemplates(templates));
+      const downloadPluginResult = await downloadPlugin(pluginUrl);
+      const {pluginExtension, templateExtensions} = downloadPluginResult;
+      dispatch(addPlugin(pluginExtension));
+      dispatch(addMultipleTemplates(templateExtensions));
       close();
     } catch (err) {
       if (err instanceof Error) {
