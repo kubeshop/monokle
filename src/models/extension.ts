@@ -59,6 +59,12 @@ export type DownloadTemplatePackResult = {
   templateExtensions: AnyExtension<AnyTemplate>[];
 };
 
+export type UpdateExtensionsResult = {
+  pluginExtensions: AnyExtension<AnyPlugin>[];
+  templateExtensions: AnyExtension<AnyTemplate>[];
+  templatePackExtensions: AnyExtension<TemplatePack>[];
+};
+
 export function isDownloadPluginResult(obj: any): obj is DownloadPluginResult {
   if (!_.isObjectLike(obj)) {
     return false;

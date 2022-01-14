@@ -7,7 +7,6 @@ import {
   AnyPlugin,
   PluginPackageJson,
   isTemplatePluginModule,
-  validateAnyPlugin,
   validatePluginPackageJson,
   validateTemplatePluginModule,
 } from '@models/plugin';
@@ -98,16 +97,32 @@ export async function updatePlugin(
 ): Promise<AnyExtension<AnyPlugin> | undefined> {
   const repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
   const {entryFileUrl, folderPath} = makeExtensionDownloadData(repositoryUrl, PLUGIN_ENTRY_FILE_NAME, userTempDir);
-  const tempPluginEntry = await downloadExtensionEntry({
-    entryFileName: PLUGIN_ENTRY_FILE_NAME,
-    entryFileUrl,
-    makeExtensionFolderPath: () => folderPath,
-    parseEntryFileContent: JSON.parse,
-    validateEntryFileContent: validateAnyPlugin,
-  });
+  let tempPluginEntry: PluginPackageJson;
+  try {
+    tempPluginEntry = await downloadExtensionEntry({
+      entryFileName: PLUGIN_ENTRY_FILE_NAME,
+      entryFileUrl,
+      makeExtensionFolderPath: () => folderPath,
+      parseEntryFileContent: JSON.parse,
+      validateEntryFileContent: validatePluginPackageJson,
+    });
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new Error(`Failed to update plugin ${plugin.name} by ${plugin.author}`);
+    }
+    return;
+  }
   if (semver.lt(plugin.version, tempPluginEntry.version)) {
-    const pluginExtension = await downloadPlugin(repositoryUrl, pluginsDir);
-    return pluginExtension;
+    try {
+      const pluginExtension = await downloadPlugin(repositoryUrl, pluginsDir);
+      return pluginExtension;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(
+          `Failed to update plugin ${plugin.name} by ${plugin.author} from version ${plugin.version} to ${tempPluginEntry.version}`
+        );
+      }
+    }
   }
   return undefined;
 }

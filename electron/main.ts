@@ -20,7 +20,7 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
-import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS} from '@constants/ipcEvents';
+import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
@@ -30,11 +30,12 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
+import asyncLib from "async";
 
 import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
 import terminal from '../cli/terminal';
-import {downloadPlugin, loadPluginMap} from './pluginService';
+import {downloadPlugin, loadPluginMap, updatePlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
@@ -45,10 +46,10 @@ import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
 import { RootState } from '@redux/store';
-import { downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack } from './templateService';
+import { downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack, updateTemplate, updateTemplatePack } from './templateService';
 import { AnyTemplate, TemplatePack } from '@models/template';
 import { AnyPlugin } from '@models/plugin';
-import { DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult } from '@models/extension';
+import { AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult } from '@models/extension';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -113,12 +114,77 @@ ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event, templatePackUrl: string) => {
 });
 
 type UpdateExtensionsPayload = {
-  templates: AnyTemplate[];
-  templatePacks: TemplatePack[];
-  plugins: AnyPlugin[];
-}
-ipcMain.on(UPDATE_EXTENSIONS, async (event, {templates, templatePacks, plugins}: UpdateExtensionsPayload) => {
-  // TODO: implement update for all types of extensions
+  templateMap: Record<string, AnyTemplate>;
+  templatePackMap: Record<string, TemplatePack>;
+  pluginMap: Record<string, AnyPlugin>;
+};
+
+ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) => {
+  const {templateMap, pluginMap, templatePackMap} = payload;
+  let errorMessage = '';
+
+  const standaloneTemplates = Object.entries(templateMap).filter(
+    ([key]) => key.startsWith(templatesDir)
+  ).map(([_, value]) => value);
+
+  const updatedStandaloneTemplateExtensions: (AnyExtension<AnyTemplate> | undefined)[] = await asyncLib.map(standaloneTemplates, async (template) => {
+    try {
+      const templateExtension = await updateTemplate(template, templatesDir, userTempDir);
+      return templateExtension;
+    }
+    catch(e) {
+      if (e instanceof Error) {
+        errorMessage += `${e.message}\n`;
+      }
+    }
+  });
+
+  const updatedPluginExtensions: (AnyExtension<AnyPlugin> | undefined)[] = await asyncLib.map(Object.values(pluginMap), async (plugin) => {
+    try {
+      const pluginExtension = await updatePlugin(plugin, pluginsDir, userTempDir);
+      return pluginExtension;
+    } catch(e) {
+      if (e instanceof Error) {
+        errorMessage += `${e.message}\n`;
+      }
+    }
+  });
+
+  const updatedTemplatePackExtensions: (AnyExtension<TemplatePack> | undefined)[] = await asyncLib.map(Object.values(templatePackMap), async (templatePack) => {
+    try {
+      const templatePackExtension = await updateTemplatePack(templatePack, templatePacksDir, userTempDir);
+      return templatePackExtension;
+    } catch(e) {
+      if (e instanceof Error) {
+        errorMessage += `${e.message}\n`;
+      }
+    }
+  });
+
+  if (errorMessage.trim().length > 0) {
+    log.warn(errorMessage);
+  }
+
+  const updateExtensionsResult: UpdateExtensionsResult = {
+    pluginExtensions: updatedPluginExtensions.filter((x): x is AnyExtension<AnyPlugin> => x !== undefined),
+    templateExtensions: updatedStandaloneTemplateExtensions.filter((x): x is AnyExtension<AnyTemplate> => x !== undefined),
+    templatePackExtensions: updatedTemplatePackExtensions.filter((x): x is AnyExtension<TemplatePack> => x !== undefined),
+  };
+
+  const updatedTemplateExtensionsFromPlugins: AnyExtension<AnyTemplate>[][] = await asyncLib.map(updateExtensionsResult.pluginExtensions, async (pluginExtension) => {
+    const templateExtensions = await loadTemplatesFromPlugin(pluginExtension.extension);
+    return templateExtensions;
+  });
+
+  const updatedTemplateExtensionsFromTemplatePacks: AnyExtension<AnyTemplate>[][] = await asyncLib.map(updateExtensionsResult.templatePackExtensions, async (templatePackExtension) => {
+    const templateExtensions = await loadTemplatesFromTemplatePack(templatePackExtension.extension);
+    return templateExtensions;
+  });
+
+  updateExtensionsResult.templateExtensions.push(...updatedTemplateExtensionsFromPlugins.flat(), ...updatedTemplateExtensionsFromTemplatePacks.flat());
+
+  event.sender.send(UPDATE_EXTENSIONS_RESULT, updateExtensionsResult);
+
 });
 
 ipcMain.on('run-kustomize', (event, cmdOptions: any) => {

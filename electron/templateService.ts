@@ -223,40 +223,72 @@ export async function updateTemplate(
     TEMPLATE_ENTRY_FILE_NAME,
     userTempDir
   );
-  const tempTemplateEntry = await downloadExtensionEntry({
-    entryFileName: TEMPLATE_ENTRY_FILE_NAME,
-    entryFileUrl,
-    makeExtensionFolderPath: () => folderPath,
-    parseEntryFileContent: JSON.parse,
-    validateEntryFileContent: validateAnyTemplate,
-  });
+  let tempTemplateEntry: AnyTemplate | undefined;
+  try {
+    tempTemplateEntry = await downloadExtensionEntry({
+      entryFileName: TEMPLATE_ENTRY_FILE_NAME,
+      entryFileUrl,
+      makeExtensionFolderPath: () => folderPath,
+      parseEntryFileContent: JSON.parse,
+      validateEntryFileContent: validateAnyTemplate,
+    });
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new Error(`Failed to update template ${template.name} by ${template.author}.`);
+    }
+    return;
+  }
   if (semver.lt(template.version, tempTemplateEntry.version)) {
-    const templateExtension = await downloadTemplate(template.repository, templatesDir);
-    return templateExtension;
+    try {
+      const templateExtension = await downloadTemplate(template.repository, templatesDir);
+      return templateExtension;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(
+          `Failed to update template ${template.name} by ${template.author} from ${template.version} to ${tempTemplateEntry.version}`
+        );
+      }
+    }
   }
   return undefined;
 }
 
 export async function updateTemplatePack(
-  template: AnyTemplate,
+  templatePack: TemplatePack,
   templatePacksDir: string,
   userTempDir: string
 ): Promise<AnyExtension<TemplatePack> | undefined> {
   const {entryFileUrl, folderPath} = makeExtensionDownloadData(
-    template.repository,
+    templatePack.repository,
     TEMPLATE_ENTRY_FILE_NAME,
     userTempDir
   );
-  const tempTemplatePackEntry = await downloadExtensionEntry({
-    entryFileName: TEMPLATE_PACK_ENTRY_FILE_NAME,
-    entryFileUrl,
-    makeExtensionFolderPath: () => folderPath,
-    parseEntryFileContent: JSON.parse,
-    validateEntryFileContent: validateTemplatePack,
-  });
-  if (semver.lt(template.version, tempTemplatePackEntry.version)) {
-    const templatePackExtension = await downloadTemplatePack(template.repository, templatePacksDir);
-    return templatePackExtension;
+  let tempTemplatePackEntry: TemplatePack | undefined;
+  try {
+    tempTemplatePackEntry = await downloadExtensionEntry({
+      entryFileName: TEMPLATE_PACK_ENTRY_FILE_NAME,
+      entryFileUrl,
+      makeExtensionFolderPath: () => folderPath,
+      parseEntryFileContent: JSON.parse,
+      validateEntryFileContent: validateTemplatePack,
+    });
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new Error(`Failed to update template pack ${templatePack.name} by ${templatePack.author}.`);
+    }
+    return;
+  }
+  if (semver.lt(templatePack.version, tempTemplatePackEntry.version)) {
+    try {
+      const templatePackExtension = await downloadTemplatePack(templatePack.repository, templatePacksDir);
+      return templatePackExtension;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(
+          `Failed to update template pack ${templatePack.name} by ${templatePack.author} from ${templatePack.version} to ${tempTemplatePackEntry.version}`
+        );
+      }
+    }
   }
   return undefined;
 }
