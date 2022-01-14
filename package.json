@@ -74,7 +74,8 @@
     "stylelint-config-styled-components": "0.1.1",
     "stylelint-processor-styled-components": "1.10.0",
     "typescript": "4.3.5",
-    "wait-on": "6.0.0"
+    "wait-on": "6.0.0",
+    "xvfb-maybe": "^0.2.1"
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
@@ -154,7 +155,7 @@
     "release:patch": "standard-version --release-as patch",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
-    "ui-test": "npx playwright test"
+    "ui-test": "xvfb-maybe npx playwright test"
   },
   "build": {
     "appId": "io.kubeshop.monokle",

@@ -14,7 +14,6 @@ export async function isDrawerVisible(drawer: Locator) {
 export async function findDrawer(page: Page, title: string) {
   const drawers = page.locator(`//div[contains(@class,'ant-drawer')]`);
   const count = await drawers.count();
-  console.log(`found ${count} drawers`);
 
   for (let c = 0; c < count; c += 1) {
     const drawer = drawers.nth(c);
