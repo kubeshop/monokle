@@ -1,18 +1,23 @@
 import log from 'loglevel';
 import path from 'path';
+import semver from 'semver';
 
 import {
   AnyPlugin,
   PluginPackageJson,
   isTemplatePluginModule,
+  validateAnyPlugin,
   validatePluginPackageJson,
   validateTemplatePluginModule,
 } from '@models/plugin';
 
 import downloadExtension from './extensions/downloadExtension';
+import downloadExtensionEntry from './extensions/downloadExtensionEntry';
 import {createFolder, doesPathExist} from './extensions/fileSystem';
 import loadMultipleExtensions from './extensions/loadMultipleExtensions';
-import {extractRepositoryOwnerAndNameFromUrl} from './utils';
+import {extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from './utils';
+
+const PLUGIN_ENTRY_FILE_NAME = 'package.json';
 
 function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderPath: string): AnyPlugin {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(packageJson.repository);
@@ -41,18 +46,20 @@ function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderP
 }
 
 export async function downloadPlugin(pluginUrl: string, allPluginsFolderPath: string) {
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(pluginUrl);
-  const packageJsonUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/package.json`;
-  const pluginTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
+  const {entryFileUrl, tarballUrl, folderPath} = makeExtensionDownloadData(
+    pluginUrl,
+    PLUGIN_ENTRY_FILE_NAME,
+    allPluginsFolderPath
+  );
   const plugin: AnyPlugin = await downloadExtension<PluginPackageJson, AnyPlugin>({
-    extensionTarballUrl: pluginTarballUrl,
+    extensionTarballUrl: tarballUrl,
     entryFileName: 'package.json',
-    entryFileUrl: packageJsonUrl,
+    entryFileUrl,
     parseEntryFileContent: JSON.parse,
     validateEntryFileContent: validatePluginPackageJson,
     transformEntryFileContentToExtension: transformPackageJsonToAnyPlugin,
     makeExtensionFolderPath: () => {
-      return path.join(allPluginsFolderPath, `${repositoryOwner}-${repositoryName}`);
+      return folderPath;
     },
   });
   return plugin;
@@ -78,4 +85,25 @@ export async function loadPlugins(pluginsDir: string) {
     transformEntryFileContentToExtension: transformPackageJsonToAnyPlugin,
   });
   return plugins;
+}
+
+export async function updatePlugin(
+  plugin: AnyPlugin,
+  pluginsDir: string,
+  userTempDir: string
+): Promise<AnyPlugin | undefined> {
+  const repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
+  const {entryFileUrl, folderPath} = makeExtensionDownloadData(repositoryUrl, PLUGIN_ENTRY_FILE_NAME, userTempDir);
+  const tempPluginEntry = await downloadExtensionEntry({
+    entryFileName: PLUGIN_ENTRY_FILE_NAME,
+    entryFileUrl,
+    makeExtensionFolderPath: () => folderPath,
+    parseEntryFileContent: JSON.parse,
+    validateEntryFileContent: validateAnyPlugin,
+  });
+  if (semver.lt(plugin.version, tempPluginEntry.version)) {
+    const newPlugin = await downloadPlugin(repositoryUrl, pluginsDir);
+    return newPlugin;
+  }
+  return undefined;
 }
