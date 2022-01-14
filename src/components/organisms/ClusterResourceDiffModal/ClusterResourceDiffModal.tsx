@@ -139,14 +139,39 @@ const ClusterResourceDiffModal = () => {
     }
 
     // set default selected matching resource
-    const foundResourceWithNamespace = Object.values(matchingLocalResources).find(
-      r => r.namespace && r.namespace === targetResource.namespace
-    );
+    let hasLocalMatchingResource = false;
 
-    if (foundResourceWithNamespace) {
-      setSelectedMatchingResourceId(foundResourceWithNamespace.id);
-      setMatchingResourceText(stringify(foundResourceWithNamespace.content, {sortMapEntries: true}));
-    } else {
+    if (targetResource.namespace !== 'default') {
+      const foundResource = Object.values(matchingLocalResources).filter(
+        r => r.namespace && r.namespace === targetResource.namespace
+      )[0];
+
+      if (foundResource) {
+        hasLocalMatchingResource = true;
+        setSelectedMatchingResourceId(foundResource.id);
+        setMatchingResourceText(stringify(foundResource.content, {sortMapEntries: true}));
+      }
+    } else if (targetResource.namespace === 'default') {
+      const foundResource = Object.values(matchingLocalResources).filter(
+        r => r.namespace && r.namespace === targetResource.namespace
+      )[0];
+
+      if (foundResource) {
+        hasLocalMatchingResource = true;
+        setSelectedMatchingResourceId(foundResource.id);
+        setMatchingResourceText(stringify(foundResource.content, {sortMapEntries: true}));
+      } else {
+        const foundResourceWithoutNamespace = Object.values(matchingLocalResources).filter(r => !r.namespace)[0];
+
+        if (foundResourceWithoutNamespace) {
+          hasLocalMatchingResource = true;
+          setSelectedMatchingResourceId(foundResourceWithoutNamespace.id);
+          setMatchingResourceText(stringify(foundResourceWithoutNamespace.content, {sortMapEntries: true}));
+        }
+      }
+    }
+
+    if (!hasLocalMatchingResource) {
       setSelectedMatchingResourceId(Object.keys(matchingLocalResources)[0]);
       setMatchingResourceText(stringify(Object.values(matchingLocalResources)[0].content, {sortMapEntries: true}));
     }
