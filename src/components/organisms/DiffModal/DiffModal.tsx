@@ -38,8 +38,8 @@ const DiffModal = () => {
   const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isDiffModalVisible = useAppSelector(state => Boolean(state.main.resourceDiff.targetResourceId));
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -261,111 +261,113 @@ const DiffModal = () => {
   }, [isDiffModalVisible]);
 
   return (
-    <S.StyledModal
-      title={
-        <S.TitleContainer>
-          Resource Diff on ${targetResource ? targetResource.name : ''}
-          <S.NamespaceSelectContainer>
-            Namespace:
-            <Select
-              value={
-                matchingResourcesById && selectedMatchingResourceId
-                  ? matchingResourcesById[selectedMatchingResourceId]?.metadata?.namespace
-                  : defaultNamespace
-              }
-              defaultValue={defaultNamespace}
-              onChange={ns => onNamespaceSelectHandler(ns)}
-              style={{width: '300px', marginLeft: '16px'}}
-            >
-              {namespaces?.map(ns => (
-                <Select.Option key={ns} value={ns}>
-                  {ns}
-                </Select.Option>
-              ))}
-            </Select>
-          </S.NamespaceSelectContainer>
-        </S.TitleContainer>
-      }
-      visible={isDiffModalVisible}
-      centered
-      width="min-content"
-      onCancel={onCloseHandler}
-      footer={null}
-    >
-      <ResizableBox
-        width={resizableBoxWidth}
-        height={resizableBoxHeight}
-        minConstraints={[800, resizableBoxHeight]}
-        maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
-        axis="x"
-        resizeHandles={['w', 'e']}
-        handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
-          <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
-        )}
+    <>
+      <S.StyledModal
+        title={
+          <S.TitleContainer>
+            Resource Diff on ${targetResource ? targetResource.name : ''}
+            <S.NamespaceSelectContainer>
+              Namespace:
+              <Select
+                value={
+                  matchingResourcesById && selectedMatchingResourceId
+                    ? matchingResourcesById[selectedMatchingResourceId]?.metadata?.namespace
+                    : defaultNamespace
+                }
+                defaultValue={defaultNamespace}
+                onChange={ns => onNamespaceSelectHandler(ns)}
+                style={{width: '300px', marginLeft: '16px'}}
+              >
+                {namespaces?.map(ns => (
+                  <Select.Option key={ns} value={ns}>
+                    {ns}
+                  </Select.Option>
+                ))}
+              </Select>
+            </S.NamespaceSelectContainer>
+          </S.TitleContainer>
+        }
+        visible={isDiffModalVisible}
+        centered
+        width="min-content"
+        onCancel={onCloseHandler}
+        footer={null}
       >
-        {!hasDiffModalLoaded ? (
-          <div>
-            <Skeleton active />
-          </div>
-        ) : (
-          <>
-            <S.MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
-              <MonacoDiffEditor
-                width={containerWidth}
-                height={containerHeight}
-                language="yaml"
-                original={targetResourceText}
-                value={cleanMatchingResourceText}
-                options={options}
-                theme={KUBESHOP_MONACO_THEME}
-              />
-            </S.MonacoDiffContainer>
+        <ResizableBox
+          width={resizableBoxWidth}
+          height={resizableBoxHeight}
+          minConstraints={[800, resizableBoxHeight]}
+          maxConstraints={[window.innerWidth - 64, resizableBoxHeight]}
+          axis="x"
+          resizeHandles={['w', 'e']}
+          handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+            <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
+          )}
+        >
+          {!hasDiffModalLoaded ? (
+            <div>
+              <Skeleton active />
+            </div>
+          ) : (
+            <>
+              <S.MonacoDiffContainer width="100%" height="calc(100% - 140px)" ref={containerRef}>
+                <MonacoDiffEditor
+                  width={containerWidth}
+                  height={containerHeight}
+                  language="yaml"
+                  original={targetResourceText}
+                  value={cleanMatchingResourceText}
+                  options={options}
+                  theme={KUBESHOP_MONACO_THEME}
+                />
+              </S.MonacoDiffContainer>
 
-            <S.TagsContainer>
-              <S.StyledTag>Local</S.StyledTag>
-              <Button
-                type="primary"
-                ghost
-                onClick={handleApply}
-                icon={<Icon name="kubernetes" />}
-                disabled={!areResourcesDifferent}
-              >
-                Deploy local resource to cluster <ArrowRightOutlined />
-              </Button>
-              <Button
-                type="primary"
-                ghost
-                onClick={handleReplace}
-                disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}
-              >
-                <ArrowLeftOutlined /> Replace local resource with cluster resource
-              </Button>
-              <S.StyledTag>Cluster</S.StyledTag>
-            </S.TagsContainer>
-            <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-              <Switch checked={shouldDiffIgnorePaths} />
-              <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
-            </S.SwitchContainer>
-            <S.ButtonContainer>
-              <Button onClick={handleRefresh}>Refresh</Button>
-              <Button onClick={onCloseHandler} style={{marginLeft: 12}}>
-                Close
-              </Button>
-            </S.ButtonContainer>
+              <S.TagsContainer>
+                <S.StyledTag>Local</S.StyledTag>
+                <Button
+                  type="primary"
+                  ghost
+                  onClick={handleApply}
+                  icon={<Icon name="kubernetes" />}
+                  disabled={!areResourcesDifferent}
+                >
+                  Deploy local resource to cluster <ArrowRightOutlined />
+                </Button>
+                <Button
+                  type="primary"
+                  ghost
+                  onClick={handleReplace}
+                  disabled={!shouldDiffIgnorePaths || !areResourcesDifferent}
+                >
+                  <ArrowLeftOutlined /> Replace local resource with cluster resource
+                </Button>
+                <S.StyledTag>Cluster</S.StyledTag>
+              </S.TagsContainer>
+              <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+                <Switch checked={shouldDiffIgnorePaths} />
+                <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+              </S.SwitchContainer>
+              <S.ButtonContainer>
+                <Button onClick={handleRefresh}>Refresh</Button>
+                <Button onClick={onCloseHandler} style={{marginLeft: 12}}>
+                  Close
+                </Button>
+              </S.ButtonContainer>
+            </>
+          )}
+        </ResizableBox>
+      </S.StyledModal>
 
-            {isApplyModalVisible && (
-              <ModalConfirmWithNamespaceSelect
-                isVisible={isApplyModalVisible}
-                resources={targetResource ? [targetResource] : []}
-                title={confirmModalTitle}
-                onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
-                onCancel={() => setIsApplyModalVisible(false)}
-              />
-            )}
-          </>
-        )}
-      </ResizableBox>
-    </S.StyledModal>
+      {isApplyModalVisible && (
+        <ModalConfirmWithNamespaceSelect
+          isVisible={isApplyModalVisible}
+          resources={targetResource ? [targetResource] : []}
+          title={confirmModalTitle}
+          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onCancel={() => setIsApplyModalVisible(false)}
+        />
+      )}
+    </>
   );
 };
 

@@ -129,14 +129,17 @@ export async function applyResource(
             getResourceFromCluster(resource, kubeconfig, context).then(resourceFromCluster => {
               delete resourceFromCluster.body.metadata?.managedFields;
               const updatedResourceText = stringify(resourceFromCluster.body, {sortMapEntries: true});
-              dispatch(
-                updateResource({
-                  resourceId: resource.id,
-                  content: updatedResourceText,
-                })
-              );
+              if (resourceMap[resourceFromCluster.body.metadata?.uid]) {
+                dispatch(
+                  updateResource({
+                    resourceId: resourceFromCluster.body.metadata?.uid,
+                    content: updatedResourceText,
+                  })
+                );
+              }
+
               if (options?.shouldPerformDiff) {
-                dispatch(openResourceDiffModal(resource.id));
+                dispatch(openResourceDiffModal(resourceFromCluster.body.metadata?.uid));
               }
             });
           } else if (options?.shouldPerformDiff) {
