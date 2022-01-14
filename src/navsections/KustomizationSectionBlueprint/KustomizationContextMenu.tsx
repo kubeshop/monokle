@@ -1,5 +1,4 @@
 import React, {useMemo} from 'react';
-import {useSelector} from 'react-redux';
 
 import {Menu} from 'antd';
 
@@ -29,7 +28,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
 

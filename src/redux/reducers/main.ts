@@ -516,10 +516,28 @@ export const mainSlice = createSlice({
       state.previewLoader.targetResourceId = undefined;
     },
     updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
+      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
+        state.filtersToBeChanged = action.payload;
+        return;
+      }
+
+      if (state.filtersToBeChanged) {
+        state.filtersToBeChanged = undefined;
+      }
+
       state.resourceFilter = action.payload;
     },
     extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       const filter = action.payload;
+
+      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
+        state.filtersToBeChanged = filter;
+        return;
+      }
+
+      if (state.filtersToBeChanged) {
+        state.filtersToBeChanged = undefined;
+      }
 
       // construct new filter
       let newFilter: ResourceFilterType = {

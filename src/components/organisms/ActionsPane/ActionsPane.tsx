@@ -25,9 +25,11 @@ import {
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
+import {AlertEnum, AlertType} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -258,10 +260,21 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
+    if (!kubeconfigContext || kubeconfigContext === '') {
+      const alert: AlertType = {
+        type: AlertEnum.Error,
+        title: 'Diff not available',
+        message: 'No Cluster Configured',
+      };
+
+      dispatch(setAlert(alert));
+      return;
+    }
+
     if (selectedResourceId) {
       dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [dispatch, selectedResourceId]);
+  }, [dispatch, selectedResourceId, kubeconfigContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {

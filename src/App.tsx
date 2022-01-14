@@ -24,6 +24,9 @@ import {
   UpdateModal,
 } from '@organisms';
 
+import ChangeFiltersConfirmModal from '@components/molecules/ChangeFiltersConfirmModal/ChangeFiltersConfirmModal';
+import SaveResourceToFileFolderModal from '@components/molecules/SaveResourcesToFileFolderModal';
+
 import {useWindowSize} from '@utils/hooks';
 
 import AppContext from './AppContext';
@@ -60,6 +63,8 @@ const App = () => {
         <QuickSearchActions />
         <HotKeysHandler />
         <RenameResourceModal />
+        <SaveResourceToFileFolderModal />
+        <ChangeFiltersConfirmModal />
         <UpdateModal />
         <ClusterDiffModal />
         <RenameEntityModal />

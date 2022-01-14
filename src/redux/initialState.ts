@@ -107,6 +107,10 @@ const initialUiState: UiState = {
     isOpen: false,
     resourceId: '',
   },
+  saveResourcesToFileFolderModal: {
+    isOpen: false,
+    resourcesIds: [],
+  },
   renameEntityModal: {
     isOpen: false,
     entityName: '',
