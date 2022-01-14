@@ -87,7 +87,7 @@ ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
   try {
     const templateExtension = await downloadTemplate(templateUrl, templatesDir);
     const downloadTemplateResult: DownloadTemplateResult = {templateExtension};
-    event.sender.send(DOWNLOAD_TEMPLATE_RESULT, {downloadTemplateResult});
+    event.sender.send(DOWNLOAD_TEMPLATE_RESULT, downloadTemplateResult);
   } catch (err) {
     if (err instanceof Error) {
       event.sender.send(DOWNLOAD_TEMPLATE_RESULT, err);
