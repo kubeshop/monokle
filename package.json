@@ -118,7 +118,7 @@
     "redux-thunk": "2.4.1",
     "reselect": "4.1.5",
     "shell-path": "2.1.0",
-    "shelljs": "0.8.4",
+    "shelljs": "0.8.5",
     "strip-ansi": "6.0.1",
     "styled-components": "5.3.3",
     "tar": "6.1.11",
