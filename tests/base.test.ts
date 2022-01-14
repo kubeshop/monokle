@@ -1,8 +1,8 @@
 /* eslint-disable import/order */
-import {not} from 'micromatch';
+import path from 'path';
 import {Page, _electron as electron} from 'playwright';
 
-import {findDrawer, isDrawerVisible} from './antdHelpers';
+import {findDrawer, findModal, isDrawerVisible, isInvisible, isModalVisible} from './antdHelpers';
 import {findLatestBuild, parseElectronApp} from './electronHelpers';
 import {ElectronApplication, expect, test} from '@playwright/test';
 
@@ -29,6 +29,7 @@ test.beforeAll(async () => {
   const windows = electronApp.windows();
   expect(windows.length).toBe(1);
   appWindow = windows[0];
+  appWindow.on('console', console.log);
 });
 
 test('Validate title', async () => {
@@ -131,7 +132,78 @@ test('Validate github redirect', async () => {
   const githubIcon = appWindow.locator("span[aria-label='github']");
   expect(await githubIcon.count()).toBe(1);
 
-  await githubIcon.click();
+  //  await githubIcon.click();
+});
+test('Validate monokle popup', async () => {
+  let modal = await findModal(appWindow, 'WelcomeModal');
+  expect(modal).toBeFalsy();
+
+  appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  modal = await findModal(appWindow, 'WelcomeModal');
+  expect(modal).toBeTruthy();
+  // @ts-ignore
+  expect(await isModalVisible(modal)).toBeTruthy();
+
+  const notificationsIcon = appWindow.locator("span[aria-label='bell']");
+  notificationsIcon.click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  // @ts-ignore
+  expect(await isModalVisible(modal)).toBeFalsy();
+});
+
+test('Validate left section tabs', async () => {
+  let leftsection = appWindow.locator("div[id='LeftToolbar']");
+  let buttons = leftsection.locator('button');
+  expect(await buttons.count()).toBe(3);
+
+  const fileExplorer = appWindow.locator("div > div[id='FileExplorer']");
+  expect(await fileExplorer.count()).toBe(1);
+  expect(await isInvisible(fileExplorer)).toBeFalsy();
+
+  buttons.nth(1).click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  const kustomize = appWindow.locator("div > span[id='KustomizePane']");
+  expect(await kustomize.count()).toBe(1);
+  expect(await isInvisible(kustomize)).toBeFalsy();
+
+  buttons.nth(2).click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  const helm = appWindow.locator("div > span[id='HelmPane']");
+  expect(await helm.count()).toBe(1);
+  expect(await isInvisible(helm)).toBeFalsy();
+
+  buttons.nth(0).click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  buttons.nth(0).click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+
+  const leftpane = appWindow.locator("div[id='LeftPane']");
+  expect(await leftpane.count()).toBe(1);
+  expect(await isInvisible(leftpane)).toBeTruthy();
+
+  buttons.nth(0).click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+});
+
+test('Validate file browser', async () => {
+  const filexp = appWindow.locator("span[aria-label='folder-add']");
+  //  await filexp.click({noWaitAfter: true, force: true});
+  await new Promise(f => setTimeout(f, 500));
+  const folder = path.resolve(`tests${path.sep}argo-rollouts`);
+  await electronApp.evaluate(async (app, f) => {
+    app.webContents.getFocusedWebContents().send('set-root-folder', f);
+  }, folder);
+
+  await new Promise(f => setTimeout(f, 5000));
+
+  const footer = appWindow.locator('footer');
+  await expect(footer).toContainText('26 files');
 });
 
 test.afterAll(async () => {

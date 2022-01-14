@@ -11,13 +11,13 @@ import KustomizePatchSectionBlueprint from '@src/navsections/KustomizePatchSecti
 
 import * as S from './styled';
 
-const HelmPane: React.FC = () => {
+const KustomizePane: React.FC = () => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
   const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
 
   return (
-    <>
+    <span id="KustomizePane">
       <S.TitleBar>
         <MonoPaneTitle>Kustomize</MonoPaneTitle>
       </S.TitleBar>
@@ -25,8 +25,8 @@ const HelmPane: React.FC = () => {
         <SectionRenderer sectionBlueprint={KustomizationSectionBlueprint} level={0} isLastSection={false} />
         <SectionRenderer sectionBlueprint={KustomizePatchSectionBlueprint} level={0} isLastSection={false} />
       </S.List>
-    </>
+    </span>
   );
 };
 
-export default HelmPane;
+export default KustomizePane;
