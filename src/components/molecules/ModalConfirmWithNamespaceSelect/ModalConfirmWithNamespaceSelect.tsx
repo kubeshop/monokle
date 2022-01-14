@@ -111,7 +111,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   useEffect(() => {
     if (defaultOption && defaultOption === 'none') {
       setSelectedOption('none');
-      setSelectedNamespace('defualt');
+      setSelectedNamespace('default');
       setCreateNamespaceName('');
     } else if (!namespaces.includes(defaultNamespace)) {
       setSelectedOption('create');
