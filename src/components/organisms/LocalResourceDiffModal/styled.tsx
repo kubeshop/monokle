@@ -69,11 +69,10 @@ export const NamespaceSelectContainer = styled.div`
   margin: 0 auto;
 `;
 
-export const SwitchContainer = styled.span`
+export const SwitchContainer = styled.div`
   display: flex;
   justify-content: center;
-  padding-top: 16px;
-  padding-bottom: 0;
+  margin-top: 16px;
 `;
 
 export const StyledSwitchLabel = styled.span`

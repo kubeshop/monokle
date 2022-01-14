@@ -74,11 +74,10 @@ export const StyledSwitchLabel = styled.span`
   cursor: pointer;
 `;
 
-export const SwitchContainer = styled.span`
+export const SwitchContainer = styled.div`
   display: flex;
   justify-content: center;
-  padding-top: 16px;
-  padding-bottom: 0;
+  margin-top: 16px;
 `;
 
 export const TagsContainer = styled.div`

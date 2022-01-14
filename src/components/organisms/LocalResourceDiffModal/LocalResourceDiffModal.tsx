@@ -350,9 +350,11 @@ const DiffModal = () => {
                 </Button>
                 <S.StyledTag>Cluster</S.StyledTag>
               </S.TagsContainer>
-              <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-                <Switch checked={shouldDiffIgnorePaths} />
-                <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+              <S.SwitchContainer>
+                <div onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+                  <Switch checked={shouldDiffIgnorePaths} />
+                  <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+                </div>
               </S.SwitchContainer>
               <S.ButtonContainer>
                 <Button onClick={handleRefresh}>Refresh</Button>

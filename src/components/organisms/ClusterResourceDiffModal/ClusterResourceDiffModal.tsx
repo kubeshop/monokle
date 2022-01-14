@@ -311,9 +311,11 @@ const ClusterResourceDiffModal = () => {
                 <S.StyledTag>Local</S.StyledTag>
               </S.TagsContainer>
 
-              <S.SwitchContainer onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
-                <Switch checked={shouldDiffIgnorePaths} />
-                <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+              <S.SwitchContainer>
+                <div onClick={() => setShouldDiffIgnorePaths(!shouldDiffIgnorePaths)}>
+                  <Switch checked={shouldDiffIgnorePaths} />
+                  <S.StyledSwitchLabel>Hide ignored fields</S.StyledSwitchLabel>
+                </div>
               </S.SwitchContainer>
             </>
           )}
