@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import {ResourceFilterType} from '@models/appstate';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectK8sResource, updateResourceFilter} from '@redux/reducers/main';
+import {resetResourceFilter, selectK8sResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
 import {AppDispatch} from '@redux/store';
 
@@ -83,7 +83,7 @@ const selectK8sResourceWithConfirm = (resourceId: string, resourceName: string, 
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
-        dispatch(updateResourceFilter({labels: {}, annotations: {}}));
+        dispatch(resetResourceFilter());
         dispatch(selectK8sResource({resourceId}));
         dispatch(closeQuickSearchActionsPopup());
         resolve({});

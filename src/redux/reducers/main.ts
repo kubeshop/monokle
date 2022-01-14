@@ -488,6 +488,9 @@ export const mainSlice = createSlice({
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
     },
+    setFiltersToBeChanged: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType | undefined>) => {
+      state.filtersToBeChanged = action.payload;
+    },
     setApplyingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isApplyingResource = action.payload;
     },
@@ -514,6 +517,9 @@ export const mainSlice = createSlice({
     stopPreviewLoader: (state: Draft<AppState>) => {
       state.previewLoader.isLoading = false;
       state.previewLoader.targetResourceId = undefined;
+    },
+    resetResourceFilter: (state: Draft<AppState>) => {
+      state.resourceFilter = {labels: {}, annotations: {}};
     },
     updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
@@ -1085,11 +1091,13 @@ export const {
   checkResourceId,
   uncheckAllResourceIds,
   uncheckResourceId,
+  resetResourceFilter,
   checkMultipleResourceIds,
   uncheckMultipleResourceIds,
   addPlugin,
   setPlugins,
   closeResourceDiffModal,
   openResourceDiffModal,
+  setFiltersToBeChanged,
 } = mainSlice.actions;
 export default mainSlice.reducer;

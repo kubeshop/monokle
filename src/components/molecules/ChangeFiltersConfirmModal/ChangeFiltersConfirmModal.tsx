@@ -7,7 +7,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {ResourceFilterType} from '@models/appstate';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {extendResourceFilter, uncheckMultipleResourceIds} from '@redux/reducers/main';
+import {extendResourceFilter, setFiltersToBeChanged, uncheckMultipleResourceIds} from '@redux/reducers/main';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -101,7 +101,9 @@ const ChangeFiltersConfirmModal: React.FC = () => {
           resolve({});
         });
       },
-      onCancel() {},
+      onCancel() {
+        dispatch(setFiltersToBeChanged(undefined));
+      },
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
