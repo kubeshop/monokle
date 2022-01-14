@@ -1,6 +1,6 @@
-import React, {useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 
-import {Menu, Modal} from 'antd';
+import {Input, Menu, Modal} from 'antd';
 
 import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -8,16 +8,24 @@ import styled from 'styled-components';
 
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
+import {AlertEnum} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {uncheckAllResourceIds} from '@redux/reducers/main';
+import {setAlert} from '@redux/reducers/alert';
+import {removeResource, uncheckAllResourceIds} from '@redux/reducers/main';
+import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {currentConfigSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {AppDispatch} from '@redux/store';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 
 import Colors from '@styles/Colors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
+
+export const SaveDestinationWrapper = styled(Input.Group)`
+  display: flex !important;
+`;
 
 const StyledMenu = styled(Menu)`
   background: linear-gradient(90deg, #112a45 0%, #111d2c 100%);
@@ -46,7 +54,7 @@ const StyledMenu = styled(Menu)`
   }
 `;
 
-const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[]) => {
+const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[], dispatch: AppDispatch) => {
   let title = `Are you sure you want to delete the selected resources (${checkedResources.length}) ?`;
 
   Modal.confirm({
@@ -54,7 +62,15 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[]) => {
     icon: <ExclamationCircleOutlined />,
     centered: true,
     onOk() {
+      let alertMessage = '';
       return new Promise(resolve => {
+        checkedResources.forEach(resource => {
+          dispatch(removeResource(resource.id));
+          alertMessage += `${alertMessage && ' | '}${resource.name}\n`;
+        });
+        dispatch(uncheckAllResourceIds());
+
+        dispatch(setAlert({type: AlertEnum.Success, title: 'Successfully deleted resources', message: alertMessage}));
         resolve({});
       });
     },
@@ -64,7 +80,6 @@ const deleteCheckedResourcesWithConfirm = (checkedResources: K8sResource[]) => {
 
 const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
-
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -83,13 +98,13 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     [checkedResources, currentConfig.kubeConfig?.currentContext]
   );
 
-  const onClickDelete = () => {
+  const onClickDelete = useCallback(() => {
     const resourcesToDelete = checkedResourceIds
       .map(resource => resourceMap[resource])
       .filter((r): r is K8sResource => r !== undefined);
 
-    deleteCheckedResourcesWithConfirm(resourcesToDelete);
-  };
+    deleteCheckedResourcesWithConfirm(resourcesToDelete, dispatch);
+  }, [checkedResourceIds, dispatch, resourceMap]);
 
   const onClickDeployChecked = () => {
     setIsApplyModalVisible(true);
@@ -104,26 +119,38 @@ const CheckedResourcesActionsMenu: React.FC = () => {
     dispatch(uncheckAllResourceIds());
   };
 
+  const onClickSaveToFileFolder = () => {
+    dispatch(openSaveResourcesToFileFolderModal(checkedResourceIds));
+  };
+
   return (
-    <StyledMenu mode="horizontal">
-      <Menu.Item disabled key="resources-selected">
-        {checkedResourceIds.length} Selected
-      </Menu.Item>
-      {!isInPreviewMode && (
-        <Menu.Item style={{color: Colors.red7}} key="delete" onClick={onClickDelete}>
-          Delete
+    <>
+      <StyledMenu mode="horizontal">
+        <Menu.Item disabled key="selected_resources">
+          {checkedResourceIds.length} Selected
         </Menu.Item>
-      )}
+        {(!isInPreviewMode || isInClusterMode) && (
+          <Menu.Item style={{color: Colors.red7}} key="delete" onClick={onClickDelete}>
+            Delete
+          </Menu.Item>
+        )}
 
-      {!isInClusterMode && (
-        <Menu.Item key="deploy" onClick={onClickDeployChecked}>
-          Deploy
+        {!isInClusterMode && (
+          <Menu.Item key="deploy" onClick={onClickDeployChecked}>
+            Deploy
+          </Menu.Item>
+        )}
+
+        {isInPreviewMode && (
+          <Menu.Item key="save_to_file_folder" onClick={onClickSaveToFileFolder}>
+            Save to file/folder
+          </Menu.Item>
+        )}
+
+        <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickUncheckAll}>
+          <CloseOutlined />
         </Menu.Item>
-      )}
-
-      <Menu.Item style={{marginLeft: 'auto'}} key="deselect" onClick={onClickUncheckAll}>
-        <CloseOutlined />
-      </Menu.Item>
+      </StyledMenu>
 
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
@@ -134,7 +161,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
           onCancel={() => setIsApplyModalVisible(false)}
         />
       )}
-    </StyledMenu>
+    </>
   );
 };
 

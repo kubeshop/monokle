@@ -76,6 +76,10 @@ export type UiState = {
     isOpen: boolean;
     resourceId: string;
   };
+  saveResourcesToFileFolderModal: {
+    isOpen: boolean;
+    resourcesIds: string[];
+  };
   renameEntityModal: {
     isOpen: boolean;
     entityName: string;

@@ -321,10 +321,15 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
  * Adds the file at the specified path with the specified parent
  */
 
-function addFile(absolutePath: string, state: AppState) {
+function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   log.info(`adding file ${absolutePath}`);
   let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   const fileEntry = createFileEntry(absolutePath.substr(rootFolder.length));
+  if (!appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+    return fileEntry;
+  }
+  fileEntry.isSupported = true;
+
   const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
   resourcesFromFile.forEach(resource => {
     state.resourceMap[resource.id] = resource;
@@ -380,7 +385,7 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
       }
       return undefined;
     }
-    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state);
+    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state, appConfig);
 
     if (fileEntry) {
       state.fileMap[fileEntry.filePath] = fileEntry;

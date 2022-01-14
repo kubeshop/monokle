@@ -107,6 +107,18 @@ export const uiSlice = createSlice({
         resourceId: action.payload,
       };
     },
+    openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      state.saveResourcesToFileFolderModal = {
+        isOpen: true,
+        resourcesIds: action.payload,
+      };
+    },
+    closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
+      state.saveResourcesToFileFolderModal = {
+        isOpen: false,
+        resourcesIds: [],
+      };
+    },
     openCreateFolderModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.createFolderModal = {
         isOpen: true,
@@ -255,5 +267,7 @@ export const {
   highlightItem,
   openQuickSearchActionsPopup,
   closeQuickSearchActionsPopup,
+  openSaveResourcesToFileFolderModal,
+  closeSaveResourcesToFileFolderModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;
