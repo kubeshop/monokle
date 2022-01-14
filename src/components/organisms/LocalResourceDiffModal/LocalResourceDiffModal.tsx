@@ -18,6 +18,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal, updateResource} from '@redux/reducers/main';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -37,7 +38,6 @@ const DiffModal = () => {
 
   const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const isDiffModalVisible = useAppSelector(state => Boolean(state.main.resourceDiff.targetResourceId));
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const previewType = useAppSelector(state => state.main.previewType);
@@ -62,6 +62,13 @@ const DiffModal = () => {
   const [targetResourceText, setTargetResourceText] = useState<string>();
 
   const windowSize = useWindowSize();
+
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
+  const isDiffModalVisible = useMemo(
+    () => Boolean(targetResource) && !isInPreviewMode,
+    [isInPreviewMode, targetResource]
+  );
 
   const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
   const resizableBoxWidth = useMemo(() => {

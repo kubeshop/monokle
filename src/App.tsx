@@ -5,24 +5,24 @@ import styled from 'styled-components';
 import {Size} from '@models/window';
 
 import {
+  ClusterDiffModal,
+  ClusterResourceDiffModal,
+  CreateFolderModal,
   HotKeysHandler,
+  LocalResourceDiffModal,
   MessageBox,
   NewResourceWizard,
   NotificationsDrawer,
   PageFooter,
   PageHeader,
   PaneManager,
+  QuickSearchActions,
+  RenameEntityModal,
   RenameResourceModal,
   SettingsDrawer,
   StartupModal,
+  UpdateModal,
 } from '@organisms';
-
-import {ClusterDiffModal} from '@components/organisms';
-import ClusterResourceDiffModal from '@components/organisms/ClusterResourceDiffModal';
-import CreateFolderModal from '@components/organisms/CreateFolderModal';
-import QuickSearchActions from '@components/organisms/QuickSearchActions';
-import RenameEntityModal from '@components/organisms/RenameEntityModal';
-import UpdateModal from '@components/organisms/UpdateModal';
 
 import {useWindowSize} from '@utils/hooks';
 
@@ -53,7 +53,7 @@ const App = () => {
           <PaneManager />
           <PageFooter />
         </MainContainer>
-        {/* <DiffModal /> */}
+        <LocalResourceDiffModal />
         <ClusterResourceDiffModal />
         <StartupModal />
         <NewResourceWizard />

@@ -17,6 +17,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, updateResource} from '@redux/reducers/main';
+import {isInClusterModeSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -38,21 +39,13 @@ const monacoEditorOptions = {
 const ClusterResourceDiffModal = () => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const isDiffModalVisible = useAppSelector(state => Boolean(state.main.resourceDiff.targetResourceId));
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
   const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
 
-  const targetResource = useMemo(() => {
-    if (!targetResourceId || !resourceMap) {
-      return undefined;
-    }
-
-    return resourceMap[targetResourceId];
-  }, [resourceMap, targetResourceId]);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
@@ -64,20 +57,24 @@ const ClusterResourceDiffModal = () => {
 
   const windowSize = useWindowSize();
 
+  const isDiffModalVisible = useMemo(
+    () => Boolean(targetResourceId) && Boolean(isInClusterMode),
+    [isInClusterMode, targetResourceId]
+  );
+
+  const targetResource = useMemo(() => {
+    if (!targetResourceId || !resourceMap) {
+      return undefined;
+    }
+
+    return resourceMap[targetResourceId];
+  }, [resourceMap, targetResourceId]);
+
   const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
   const resizableBoxWidth = useMemo(() => {
     const vwValue = windowSize.width < 1200 ? 95 : 80;
     return windowSize.width * (vwValue / 100);
   }, [windowSize.width]);
-
-  const onCloseHandler = () => {
-    if (isApplyModalVisible) {
-      setIsApplyModalVisible(false);
-    }
-
-    setHasDiffModalLoaded(false);
-    dispatch(closeResourceDiffModal());
-  };
 
   const cleanTargetResourceText = useMemo(() => {
     if (!targetResource?.content) {
@@ -125,6 +122,15 @@ const ClusterResourceDiffModal = () => {
       })
     );
   }, [resourceMap, targetResource]);
+
+  const onCloseHandler = () => {
+    if (isApplyModalVisible) {
+      setIsApplyModalVisible(false);
+    }
+
+    setHasDiffModalLoaded(false);
+    dispatch(closeResourceDiffModal());
+  };
 
   const onClickApplyResource = (namespace?: string) => {
     if (selectedMatchingResourceId) {
