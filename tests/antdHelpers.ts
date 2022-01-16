@@ -69,10 +69,10 @@ export async function findModal(page: Page, title: string) {
   }
 }
 
-export async function waitForModal(page: Page, title: string, timeout?: number) {
+export async function waitForModalToShow(page: Page, title: string, timeout?: number) {
   console.log(`waiting for modal ${title}`);
   const modal = page.locator(
-    `//div[contains(@class,'ant-modal-root') and descendant::span[contains(@id, '${title}')]]`
+    `//div[contains(@class,'ant-modal-wrap') and not(contains(@style,'display: none')) and descendant::span[contains(@id, '${title}')]]`
   );
   try {
     const elm = await modal.elementHandle({timeout});
@@ -82,16 +82,16 @@ export async function waitForModal(page: Page, title: string, timeout?: number) 
   }
 }
 
-export async function waitForModalToHide(page: Page, title: string, timeout?: number) {
-  console.log(`waiting for modal ${title} to hide`);
+export async function waitForModalToHide(page: Page, id: string, timeout?: number) {
+  console.log(`waiting for modal ${id} to hide`);
   const modal = page.locator(
-    `//div[contains(@class,'ant-modal-wrap') and contains(@style,'display: none;')] and descendant::div[@class="ant-modal-mask"] and descendant::span[contains(@id, '${title}')]]`
+    `//div[contains(@class,'ant-modal-wrap') and contains(@style,'display: none;') and descendant::span[contains(@id, '${id}')]]`
   );
   try {
     const elm = await modal.elementHandle({timeout});
     return modal;
   } catch (e: any) {
-    console.log(`modal ${title} did not hide within ${timeout}ms`, e.name);
+    console.log(`modal ${id} did not hide within ${timeout}ms`, e);
   }
 }
 
@@ -100,6 +100,7 @@ export async function isModalVisible(modal: Locator) {
   const count = await locator.count();
   return count === 0;
 }
+
 export async function isInvisible(leftsection: Locator) {
   const locator = leftsection.locator('div[style*="display: none;"]');
   //  locator.waitFor({state: 'attached'});
