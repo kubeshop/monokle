@@ -2,7 +2,14 @@
 import path from 'path';
 import {Page, _electron as electron} from 'playwright';
 
-import {findDrawer, findModal, isDrawerVisible, isInvisible, isModalVisible, waitForModal} from './antdHelpers';
+import {
+  findDrawer,
+  isInvisible,
+  waitForDrawerToHide,
+  waitForDrawerToShow,
+  waitForModal,
+  waitForModalToHide,
+} from './antdHelpers';
 import {findLatestBuild, parseElectronApp} from './electronHelpers';
 import {ElectronApplication, expect, test} from '@playwright/test';
 
@@ -33,8 +40,8 @@ test.beforeAll(async () => {
   appWindow.on('console', console.log);
 
   if (await waitForModal(appWindow, 'WelcomeModal', 5000)) {
-    appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
-    await pause(2000);
+    clickOnMonokleLogo();
+    await waitForModalToHide(appWindow, 'WelcomeModal', 5000);
   }
 
   // Capture a screenshot.
@@ -94,6 +101,10 @@ test('Validate clustercontainer', async () => {
   expect(await div.count()).toBe(1);
 });
 
+function clickOnMonokleLogo() {
+  appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
+}
+
 test('Validate settings drawer', async () => {
   let drawer = await findDrawer(appWindow, 'Settings');
   expect(drawer).toBeFalsy();
@@ -101,20 +112,14 @@ test('Validate settings drawer', async () => {
   const settingsIcon = appWindow.locator("span[aria-label='setting']");
   expect(await settingsIcon.count()).toBe(1);
 
-  settingsIcon.click({noWaitAfter: true, force: true});
-  await pause(500);
+  await settingsIcon.click({noWaitAfter: true, force: true});
 
-  drawer = await findDrawer(appWindow, 'Settings');
+  drawer = await waitForDrawerToShow(appWindow, 'Settings', 5000);
   expect(drawer).toBeTruthy();
 
-  // @ts-ignore
-  expect(await isDrawerVisible(drawer)).toBeTruthy();
-  // Clicking away from the settings drawer.
-  appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
-  await pause(500);
+  clickOnMonokleLogo();
 
-  // @ts-ignore
-  expect(await isDrawerVisible(drawer)).toBeFalsy();
+  expect(await waitForDrawerToHide(appWindow, 'Settings', 5000)).toBeTruthy();
 });
 
 test('Validate notifications drawer', async () => {
@@ -124,46 +129,25 @@ test('Validate notifications drawer', async () => {
   const notificationsIcon = appWindow.locator("span[aria-label='bell']");
   expect(await notificationsIcon.count()).toBe(1);
 
-  notificationsIcon.click({noWaitAfter: true, force: true});
-  await pause(500);
+  await notificationsIcon.click({noWaitAfter: true, force: true});
 
-  drawer = await findDrawer(appWindow, 'Notifications');
+  drawer = await waitForDrawerToShow(appWindow, 'Notifications', 5000);
   expect(drawer).toBeTruthy();
 
-  // @ts-ignore
-  expect(await isDrawerVisible(drawer)).toBeTruthy();
+  clickOnMonokleLogo();
 
-  appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
-  await pause(500);
-
-  // @ts-ignore
-  expect(await isDrawerVisible(drawer)).toBeFalsy();
+  expect(await waitForDrawerToHide(appWindow, 'Notifications', 5000)).toBeTruthy();
 });
 
-test('Validate github redirect', async () => {
-  const githubIcon = appWindow.locator("span[aria-label='github']");
-  expect(await githubIcon.count()).toBe(1);
-
-  //  await githubIcon.click();
-});
 test('Validate monokle popup', async () => {
-  let modal = await findModal(appWindow, 'WelcomeModal');
-  expect(modal).toBeFalsy();
+  clickOnMonokleLogo();
 
-  appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
-  await pause(500);
+  expect(await waitForModal(appWindow, 'WelcomeModal', 5000)).toBeTruthy();
 
-  modal = await findModal(appWindow, 'WelcomeModal');
-  expect(modal).toBeTruthy();
-  // @ts-ignore
-  expect(await isModalVisible(modal)).toBeTruthy();
-
-  const notificationsIcon = appWindow.locator("span[aria-label='bell']");
-  notificationsIcon.click({noWaitAfter: true, force: true});
-  await pause(500);
+  clickOnMonokleLogo();
 
   // @ts-ignore
-  expect(await isModalVisible(modal)).toBeFalsy();
+  expect(await waitForModalToHide(appWindow, 'WelcomeModal', 5000)).toBeFalsy();
 });
 
 test('Validate left section tabs', async () => {
@@ -176,31 +160,31 @@ test('Validate left section tabs', async () => {
   expect(await isInvisible(fileExplorer)).toBeFalsy();
 
   buttons.nth(1).click({noWaitAfter: true, force: true});
-  await pause(500);
+  await pause(1000);
 
   const kustomize = appWindow.locator("div > span[id='KustomizePane']");
   expect(await kustomize.count()).toBe(1);
   expect(await isInvisible(kustomize)).toBeFalsy();
 
   buttons.nth(2).click({noWaitAfter: true, force: true});
-  await pause(500);
+  await pause(1000);
 
   const helm = appWindow.locator("div > span[id='HelmPane']");
   expect(await helm.count()).toBe(1);
   expect(await isInvisible(helm)).toBeFalsy();
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(500);
+  await pause(1000);
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(500);
+  await pause(1000);
 
   const leftpane = appWindow.locator("div[id='LeftPane']");
   expect(await leftpane.count()).toBe(1);
   expect(await isInvisible(leftpane)).toBeTruthy();
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(500);
+  await pause(1000);
 });
 
 test('Validate file browser', async () => {
