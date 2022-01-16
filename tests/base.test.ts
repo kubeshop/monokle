@@ -2,7 +2,7 @@
 import path from 'path';
 import {Page, _electron as electron} from 'playwright';
 
-import {findDrawer, findModal, isDrawerVisible, isInvisible, isModalVisible} from './antdHelpers';
+import {findDrawer, findModal, isDrawerVisible, isInvisible, isModalVisible, waitForModal} from './antdHelpers';
 import {findLatestBuild, parseElectronApp} from './electronHelpers';
 import {ElectronApplication, expect, test} from '@playwright/test';
 
@@ -32,6 +32,11 @@ test.beforeAll(async () => {
   appWindow = windows[0];
   appWindow.on('console', console.log);
 
+  if (await waitForModal(appWindow, 'WelcomeModal', 5000)) {
+    appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
+    await pause(2000);
+  }
+
   // Capture a screenshot.
   await appWindow.screenshot({path: 'test-output/screenshots/initial-screen.png'});
   await pause(1000);
@@ -51,26 +56,24 @@ test('Validate footer', async () => {
 
 test('Validate logo', async () => {
   const img = appWindow.locator("img[src*='MonokleKubeshopLogo'][src$='.svg']");
-  const count = await img.count();
-  expect(count).toBe(1);
+  expect(await img.count()).toBe(1);
 });
 
 test('Validate icons', async () => {
   let span = appWindow.locator("span[aria-label='question-circle']");
   expect(await span.count()).toBe(1);
+
   const img = appWindow.locator("img[src*='DiscordLogo'][src$='.svg']");
-
-  // check for github icon
   expect(await img.count()).toBe(1);
+
   span = appWindow.locator("span[aria-label='github']");
-
   expect(await span.count()).toBe(1);
+
   span = appWindow.locator("span[aria-label='bell']");
-
   expect(await span.count()).toBe(1);
+
   span = appWindow.locator("span[aria-label='setting']");
-  count = await span.count();
-  expect(count).toBe(1);
+  expect(await span.count()).toBe(1);
 });
 
 test('Validate main sections', async () => {
