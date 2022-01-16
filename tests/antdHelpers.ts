@@ -42,6 +42,21 @@ export async function findModal(page: Page, title: string) {
     }
   }
 }
+
+export async function waitForModal(page: Page, title: string, timeout?: number) {
+  console.log(`waiting for modal ${title}`);
+  const modals = page.locator(
+    `//div[contains(@class,'ant-modal-root')][descendant::div[@class="ant-modal-mask"]][descendant::span[contains(@id, '${title}')]]`
+  );
+  try {
+    const elm = await modals.elementHandle({timeout});
+    return true;
+  } catch (e: any) {
+    console.log(`modal ${title} did not show within ${timeout}ms`, e.name);
+    return false;
+  }
+}
+
 export async function isModalVisible(modal: Locator) {
   const locator = modal.locator('div[style*="display: none;"]');
   const count = await locator.count();
