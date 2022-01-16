@@ -14,10 +14,10 @@ export async function isDrawerVisible(drawer: Locator) {
 export async function waitForDrawerToShow(page: Page, title: string, timeout?: number) {
   console.log(`waiting for drawer ${title} to show`);
   const drawer = page.locator(
-    `//div[contains(@class,'ant-drawer') and contains(@class,'ant-drawer-open')]//div[contains(@class,'ant-drawer-title') and text() ='${title}']`
+    `//div[contains(@class,'ant-drawer') and contains(@class,'ant-drawer-open')]//div[contains(@class,'ant-drawer-title') and contains(text(),'${title}')]`
   );
   try {
-    await drawer.waitFor({state: 'attached', timeout});
+    await drawer.elementHandle({timeout});
     return drawer;
   } catch (e: any) {
     console.log(`drawer ${title} did not show within ${timeout}ms`, e);
@@ -30,7 +30,7 @@ export async function waitForDrawerToHide(page: Page, title: string, timeout?: n
     `//div[contains(@class,'ant-drawer') and not(contains(@class,'ant-drawer-open'))]//div[contains(@class,'ant-drawer-title') and contains(text(),'${title}')]`
   );
   try {
-    await drawer.waitFor({state: 'attached', timeout});
+    await drawer.elementHandle({timeout});
     return drawer;
   } catch (e: any) {
     console.log(`drawer ${title} did not hide within ${timeout}ms`, e);
