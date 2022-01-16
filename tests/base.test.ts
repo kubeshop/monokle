@@ -121,7 +121,7 @@ test('Validate settings drawer', async () => {
   clickOnMonokleLogo();
 
   expect(await waitForDrawerToHide(appWindow, 'Settings', 5000)).toBeTruthy();
-  await pause(500);
+  await pause(5000);
 });
 
 test('Validate notifications drawer', async () => {
@@ -140,7 +140,7 @@ test('Validate notifications drawer', async () => {
   clickOnMonokleLogo();
 
   expect(await waitForDrawerToHide(appWindow, 'Notifications', 5000)).toBeTruthy();
-  await pause(500);
+  await pause(5000);
 });
 
 test('Validate monokle popup', async () => {
