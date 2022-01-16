@@ -113,6 +113,7 @@ test('Validate settings drawer', async () => {
   expect(await settingsIcon.count()).toBe(1);
 
   await settingsIcon.click({noWaitAfter: true, force: true});
+  await pause(500);
 
   drawer = await waitForDrawerToShow(appWindow, 'Settings', 5000);
   expect(drawer).toBeTruthy();
@@ -120,6 +121,7 @@ test('Validate settings drawer', async () => {
   clickOnMonokleLogo();
 
   expect(await waitForDrawerToHide(appWindow, 'Settings', 5000)).toBeTruthy();
+  await pause(500);
 });
 
 test('Validate notifications drawer', async () => {
@@ -130,6 +132,7 @@ test('Validate notifications drawer', async () => {
   expect(await notificationsIcon.count()).toBe(1);
 
   await notificationsIcon.click({noWaitAfter: true, force: true});
+  await pause(500);
 
   drawer = await waitForDrawerToShow(appWindow, 'Notifications', 5000);
   expect(drawer).toBeTruthy();
@@ -137,6 +140,7 @@ test('Validate notifications drawer', async () => {
   clickOnMonokleLogo();
 
   expect(await waitForDrawerToHide(appWindow, 'Notifications', 5000)).toBeTruthy();
+  await pause(500);
 });
 
 test('Validate monokle popup', async () => {
@@ -187,7 +191,7 @@ test('Validate left section tabs', async () => {
   await pause(1000);
 });
 
-test('Validate file browser', async () => {
+test('Validate open folder', async () => {
   const folder = path.resolve(`tests${path.sep}argo-rollouts`);
   await electronApp.evaluate(async (app, f) => {
     app.webContents.getFocusedWebContents().send('set-root-folder', f);
