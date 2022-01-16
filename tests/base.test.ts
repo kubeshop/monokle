@@ -7,8 +7,8 @@ import {
   isInvisible,
   waitForDrawerToHide,
   waitForDrawerToShow,
-  waitForModal,
   waitForModalToHide,
+  waitForModalToShow,
 } from './antdHelpers';
 import {findLatestBuild, parseElectronApp} from './electronHelpers';
 import {ElectronApplication, expect, test} from '@playwright/test';
@@ -39,8 +39,9 @@ test.beforeAll(async () => {
   appWindow = windows[0];
   appWindow.on('console', console.log);
 
-  if (await waitForModal(appWindow, 'WelcomeModal', 10000)) {
+  if (await waitForModalToShow(appWindow, 'WelcomeModal', 10000)) {
     await clickOnMonokleLogo();
+    await pause(500);
     await waitForModalToHide(appWindow, 'WelcomeModal', 10000);
   }
 
@@ -144,14 +145,13 @@ test('Validate notifications drawer', async () => {
 });
 
 test('Validate monokle popup', async () => {
-  clickOnMonokleLogo();
+  await clickOnMonokleLogo();
 
-  expect(await waitForModal(appWindow, 'WelcomeModal', 5000)).toBeTruthy();
-
-  clickOnMonokleLogo();
+  expect(await waitForModalToShow(appWindow, 'WelcomeModal', 5000)).toBeTruthy();
+  await clickOnMonokleLogo();
 
   // @ts-ignore
-  expect(await waitForModalToHide(appWindow, 'WelcomeModal', 5000)).toBeFalsy();
+  expect(await waitForModalToHide(appWindow, 'WelcomeModal', 5000)).toBeTruthy();
 });
 
 test('Validate left section tabs', async () => {
