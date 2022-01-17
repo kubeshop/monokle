@@ -40,7 +40,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
 import {setAppRehydrating} from '@redux/reducers/main';
-import {setPluginMap, setTemplatePackMap, setTemplateMap} from '@redux/reducers/extension';
+import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
 import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
@@ -309,6 +309,11 @@ export const createWindow = (givenPath?: string) => {
       homeDir: userHomeDir,
       tempDir: userTempDir,
       dataDir: userDataDir
+    }));
+    dispatch(setExtensionsDirs({
+      templatesDir,
+      templatePacksDir,
+      pluginsDir
     }));
     await checkNewVersion(dispatch, true);
     initKubeconfig(dispatch, userHomeDir);

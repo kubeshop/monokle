@@ -10,6 +10,9 @@ export interface ExtensionState {
   templateMap: Record<string, AnyTemplate>;
   isLoadingExistingTemplatePacks: boolean;
   templatePackMap: Record<string, TemplatePack>;
+  templatesDir?: string;
+  templatePacksDir?: string;
+  pluginsDir?: string;
 }
 
 export type AnyExtension<ExtensionType> = {

@@ -40,6 +40,14 @@ export const extensionSlice = createSlice({
       state.templatePackMap = action.payload;
       state.isLoadingExistingTemplatePacks = false;
     },
+    setExtensionsDirs: (
+      state: Draft<ExtensionState>,
+      action: PayloadAction<{templatesDir: string; templatePacksDir: string; pluginsDir: string}>
+    ) => {
+      state.templatesDir = action.payload.templatesDir;
+      state.templatePacksDir = action.payload.templatePacksDir;
+      state.pluginsDir = action.payload.pluginsDir;
+    },
   },
 });
 
@@ -51,5 +59,6 @@ export const {
   setTemplateMap,
   addTemplatePack,
   setTemplatePackMap,
+  setExtensionsDirs,
 } = extensionSlice.actions;
 export default extensionSlice.reducer;
