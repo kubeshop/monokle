@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Button, Popconfirm} from 'antd';
 
-import {DeleteOutlined, ExclamationOutlined} from '@ant-design/icons';
+import {DeleteOutlined, ExclamationOutlined, FormOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -22,7 +22,7 @@ import Colors from '@styles/Colors';
 
 const Container = styled.div`
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: max-content 1fr;
   position: relative;
   margin-bottom: 16px;
 `;
@@ -61,9 +61,14 @@ const Version = styled.span`
 const StyledDeleteOutlined = styled(DeleteOutlined)`
   position: absolute;
   top: 5px;
-  right: 5px;
+  right: 0px;
   color: ${Colors.red7};
   cursor: pointer;
+`;
+
+const StyledFormOutlined = styled(FormOutlined)`
+  font-size: 30px;
+  padding-top: 4px;
 `;
 
 interface IProps {
@@ -104,7 +109,7 @@ const TemplateInformation: React.FC<IProps> = props => {
   return (
     <Container>
       <IconContainer>
-        <span />
+        <StyledFormOutlined />
       </IconContainer>
 
       <InfoContainer>

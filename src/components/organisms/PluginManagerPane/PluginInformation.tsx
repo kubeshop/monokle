@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Popconfirm} from 'antd';
 
-import {DeleteOutlined, ExclamationOutlined} from '@ant-design/icons';
+import {AppstoreOutlined, DeleteOutlined, ExclamationOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -59,6 +59,11 @@ const StyledDeleteOutlined = styled(DeleteOutlined)`
   cursor: pointer;
 `;
 
+const StyledAppstoreOutlined = styled(AppstoreOutlined)`
+  font-size: 30px;
+  padding-top: 4px;
+`;
+
 interface IProps {
   plugin: AnyPlugin;
   pluginPath: string;
@@ -79,7 +84,7 @@ const PluginInformation: React.FC<IProps> = props => {
   return (
     <Container>
       <IconContainer>
-        <span />
+        <StyledAppstoreOutlined />
       </IconContainer>
 
       <InfoContainer>
