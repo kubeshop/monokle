@@ -28,10 +28,19 @@ export const extensionSlice = createSlice({
       const {folderPath, extension} = action.payload;
       state.templateMap[folderPath] = extension;
     },
+    removeTemplate: (state: Draft<ExtensionState>, action: PayloadAction<string>) => {
+      const folderPath = action.payload;
+      delete state.templateMap[folderPath];
+    },
     addMultipleTemplates: (state: Draft<ExtensionState>, action: PayloadAction<AnyExtension<AnyTemplate>[]>) => {
       action.payload.forEach(current => {
         const {folderPath, extension} = current;
         state.templateMap[folderPath] = extension;
+      });
+    },
+    removeMultipleTemplates: (state: Draft<ExtensionState>, action: PayloadAction<string[]>) => {
+      action.payload.forEach(templateFolderPath => {
+        delete state.templateMap[templateFolderPath];
       });
     },
     setTemplateMap: (state: Draft<ExtensionState>, action: PayloadAction<Record<string, AnyTemplate>>) => {
@@ -68,6 +77,7 @@ export const {
   addMultiplePlugins,
   setPluginMap,
   addTemplate,
+  removeTemplate,
   addMultipleTemplates,
   setTemplateMap,
   addTemplatePack,

@@ -24,7 +24,7 @@ const TemplatesPane: React.FC = () => {
   const [isInstallModalVisible, setIsInstallModalVisible] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
-  const templates = useAppSelector(state => Object.values(state.extension.templateMap));
+  const templates = useAppSelector(state => state.extension.templateMap);
 
   const onTemplateModalClose = useCallback(() => {
     setSelectedTemplate(undefined);
@@ -46,8 +46,6 @@ const TemplatesPane: React.FC = () => {
 
   return (
     <>
-      <TemplateInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallModal} />
-      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
       <TitleBar title="Templates">
         <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
           <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
@@ -69,19 +67,27 @@ const TemplatesPane: React.FC = () => {
         </Tooltip>
         <Button onClick={openInstallModal} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
+
       <S.Container>
-        {templates.length === 0 ? (
+        {!Object.keys(templates).length ? (
           <p>No templates available.</p>
         ) : (
-          templates.map(template => (
+          Object.entries(templates).map(([path, template]) => (
             <TemplateInformation
               key={template.id}
               template={template}
+              templatePath={path}
               onClickOpenTemplate={() => onClickOpenTemplate(template)}
             />
           ))
         )}
       </S.Container>
+
+      {isInstallModalVisible && (
+        <TemplateInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallModal} />
+      )}
+
+      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
     </>
   );
 };
