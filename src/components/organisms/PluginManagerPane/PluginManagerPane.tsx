@@ -18,9 +18,10 @@ import * as S from './styled';
 
 function PluginManagerPane() {
   const dispatch = useAppDispatch();
-  const plugins = useAppSelector(state => Object.values(state.extension.pluginMap));
+  const pluginMap = useAppSelector(state => Object.values(state.extension.pluginMap));
   const isLoadingExistingPlugins = useAppSelector(state => state.extension.isLoadingExistingPlugins);
 
+  const plugins = useMemo(() => Object.values(pluginMap), [pluginMap]);
   const activePlugins = useMemo(() => plugins.filter(p => p.isActive), [plugins]);
   const inactivePlugins = useMemo(() => plugins.filter(p => !p.isActive), [plugins]);
 
@@ -50,13 +51,6 @@ function PluginManagerPane() {
               icon={<ReloadOutlined />}
             />
           </Tooltip>
-          <Button
-            disabled={plugins.length === 0}
-            onClick={onClickReload}
-            type="link"
-            size="small"
-            icon={<ReloadOutlined />}
-          />
         </Tooltip>
         <Button onClick={onClickInstallPlugin} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>

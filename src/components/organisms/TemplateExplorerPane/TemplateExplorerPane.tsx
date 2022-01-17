@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 
 import {Button, Tooltip} from 'antd';
 
@@ -24,7 +24,11 @@ const TemplatesPane: React.FC = () => {
   const [isInstallModalVisible, setIsInstallModalVisible] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
-  const templates = useAppSelector(state => state.extension.templateMap);
+  const templateMap = useAppSelector(state => state.extension.templateMap);
+
+  const templates = useMemo(() => {
+    return Object.values(templateMap);
+  }, [templateMap]);
 
   const onTemplateModalClose = useCallback(() => {
     setSelectedTemplate(undefined);
@@ -57,19 +61,12 @@ const TemplatesPane: React.FC = () => {
               icon={<ReloadOutlined />}
             />
           </Tooltip>
-          <Button
-            disabled={templates.length === 0}
-            onClick={onClickReload}
-            type="link"
-            size="small"
-            icon={<ReloadOutlined />}
-          />
         </Tooltip>
         <Button onClick={openInstallModal} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
 
       <S.Container>
-        {!Object.keys(templates).length ? (
+        {!Object.keys(templateMap).length ? (
           <p>No templates available.</p>
         ) : (
           Object.entries(templates).map(([path, template]) => (
