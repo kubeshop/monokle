@@ -20,10 +20,13 @@ async function loadMultipleExtensions<FileContentType, ExtensionType>(
 ): Promise<AnyExtension<ExtensionType>[]> {
   const {folderPath, ...restOptions} = options;
   const subfolders = await getSubfolders(folderPath);
-  const results: AnyExtension<ExtensionType>[] = await asyncLib.map(subfolders, async subfolder => {
-    const extension = await loadExtension({folderPath: subfolder, ...restOptions});
-    return extension;
-  });
+  const results: (AnyExtension<ExtensionType> | undefined)[] = await asyncLib.map(
+    subfolders,
+    async (subfolder: string) => {
+      const extension = await loadExtension({folderPath: subfolder, ...restOptions});
+      return extension;
+    }
+  );
   return results.filter((r): r is AnyExtension<ExtensionType> => r !== undefined);
 }
 

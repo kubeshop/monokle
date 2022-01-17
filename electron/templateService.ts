@@ -138,7 +138,7 @@ const makeLoadTemplateOptions = (folderPath: string) => {
 async function loadTemplatesFromPaths(paths: string[]): Promise<AnyExtension<AnyTemplate>[]> {
   const templateExtensions: (AnyExtension<AnyTemplate> | undefined)[] = await asyncLib.map(
     paths,
-    async templatePath => {
+    async (templatePath: string) => {
       const extension = await loadExtension(makeLoadTemplateOptions(templatePath));
       return extension;
     }
@@ -191,7 +191,7 @@ export async function loadTemplateMap(
 
   const templatePackExtensions: AnyExtension<AnyTemplate>[][] = await asyncLib.map(
     templatePacks,
-    async templatePack => {
+    async (templatePack: TemplatePack) => {
       const results = await loadTemplatesFromTemplatePack(templatePack);
       return results;
     }
@@ -201,7 +201,7 @@ export async function loadTemplateMap(
     templateMap[result.folderPath] = result.extension;
   });
 
-  const pluginExtensions: AnyExtension<AnyTemplate>[][] = await asyncLib.map(plugins, async plugin => {
+  const pluginExtensions: AnyExtension<AnyTemplate>[][] = await asyncLib.map(plugins, async (plugin: AnyPlugin) => {
     const results = await loadTemplatesFromPlugin(plugin);
     return results;
   });

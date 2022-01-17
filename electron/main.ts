@@ -127,7 +127,7 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
     ([key]) => key.startsWith(templatesDir)
   ).map(([_, value]) => value);
 
-  const updatedStandaloneTemplateExtensions: (AnyExtension<AnyTemplate> | undefined)[] = await asyncLib.map(standaloneTemplates, async (template) => {
+  const updatedStandaloneTemplateExtensions: (AnyExtension<AnyTemplate> | undefined)[] = await asyncLib.map(standaloneTemplates, async (template: AnyTemplate) => {
     try {
       const templateExtension = await updateTemplate(template, templatesDir, userTempDir);
       return templateExtension;
@@ -139,7 +139,7 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
     }
   });
 
-  const updatedPluginExtensions: (AnyExtension<AnyPlugin> | undefined)[] = await asyncLib.map(Object.values(pluginMap), async (plugin) => {
+  const updatedPluginExtensions: (AnyExtension<AnyPlugin> | undefined)[] = await asyncLib.map(Object.values(pluginMap), async (plugin: AnyPlugin) => {
     try {
       const pluginExtension = await updatePlugin(plugin, pluginsDir, userTempDir);
       return pluginExtension;
@@ -150,7 +150,7 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
     }
   });
 
-  const updatedTemplatePackExtensions: (AnyExtension<TemplatePack> | undefined)[] = await asyncLib.map(Object.values(templatePackMap), async (templatePack) => {
+  const updatedTemplatePackExtensions: (AnyExtension<TemplatePack> | undefined)[] = await asyncLib.map(Object.values(templatePackMap), async (templatePack: TemplatePack) => {
     try {
       const templatePackExtension = await updateTemplatePack(templatePack, templatePacksDir, userTempDir);
       return templatePackExtension;
@@ -171,12 +171,18 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
     templatePackExtensions: updatedTemplatePackExtensions.filter((x): x is AnyExtension<TemplatePack> => x != null),
   };
 
-  const updatedTemplateExtensionsFromPlugins: AnyExtension<AnyTemplate>[][] = await asyncLib.map(updateExtensionsResult.pluginExtensions, async (pluginExtension) => {
+  const updatedTemplateExtensionsFromPlugins: AnyExtension<AnyTemplate>[][] = await asyncLib.map(
+    updateExtensionsResult.pluginExtensions,
+    async (pluginExtension: AnyExtension<AnyPlugin>
+  ) => {
     const templateExtensions = await loadTemplatesFromPlugin(pluginExtension.extension);
     return templateExtensions;
   });
 
-  const updatedTemplateExtensionsFromTemplatePacks: AnyExtension<AnyTemplate>[][] = await asyncLib.map(updateExtensionsResult.templatePackExtensions, async (templatePackExtension) => {
+  const updatedTemplateExtensionsFromTemplatePacks: AnyExtension<AnyTemplate>[][] = await asyncLib.map(
+    updateExtensionsResult.templatePackExtensions,
+    async (templatePackExtension: AnyExtension<TemplatePack>
+  ) => {
     const templateExtensions = await loadTemplatesFromTemplatePack(templatePackExtension.extension);
     return templateExtensions;
   });
