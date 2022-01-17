@@ -36,6 +36,17 @@ jobs:
         run: |
           brew install jq
 
+      - name: Add MacOS certs
+        run: |
+          ls -la
+          chmod +x .github/workflows/scripts/add-osx-cert.sh && .github/workflows/scripts/add-osx-cert.sh
+        env:
+          CERTIFICATE_OSX_APPLICATION: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+
+      - name: Electron mac os security identities
+        run: security find-identity -v
+
       - name: Get Node Version
         run: |
           cat .nvmrc
@@ -63,6 +74,7 @@ jobs:
       - name: Generate and apply tag
         run: |
           npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true
+          export TAG=$(cat package.json | jq '.version') 
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -74,7 +86,7 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and Publish
+      - name: Package
         run: |
           npm exec -c "electron-builder --publish \"never\""
         env:
@@ -94,6 +106,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
+          tag: ${{ $TAG }}
           token: ${{ secrets.github_token }}
 
       # Check Binary Sizes
@@ -150,6 +163,13 @@ jobs:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
 
+      - name: Get MSFT Cert
+        id: write_file
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'kubeshop_msft.p12'
+          encodedString: ${{ secrets.CERT_MSFT_KUBESHOP_P12_B64 }}
+
       # Install Dependencies
       - name: Install Dependencies
         run: |
@@ -167,6 +187,8 @@ jobs:
         run: |
           Set-PSDebug -Trace 1
           npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true
+          $p = get-content package.json | ConvertFrom-Json
+          SET TAG $($p.version) 
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -201,6 +223,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
+          tag: ${{ $TAG }}
           token: ${{ secrets.github_token }}
 
       - name: Build Failed - Archive Build Logs
