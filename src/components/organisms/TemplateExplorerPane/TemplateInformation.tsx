@@ -10,6 +10,7 @@ import {AnyTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
+  deletePlugin,
   deleteStandalonTemplate,
   deleteTemplatePack,
   isPluginTemplate,
@@ -71,7 +72,7 @@ interface IProps {
   onClickOpenTemplate: () => void;
 }
 
-const getTemplatePackPath = (templatePath: string) => {
+const getTemplatePackPluginPath = (templatePath: string) => {
   const splittedTemplatePath = templatePath.split('\\');
   splittedTemplatePath.pop();
 
@@ -82,6 +83,7 @@ const TemplateInformation: React.FC<IProps> = props => {
   const {template, templatePath, onClickOpenTemplate} = props;
 
   const dispatch = useAppDispatch();
+  const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const pluginsDir = useAppSelector(state => state.extension.pluginsDir);
   const templatesDir = useAppSelector(state => state.extension.templatesDir);
   const templatePacksDir = useAppSelector(state => state.extension.templatePacksDir);
@@ -91,7 +93,11 @@ const TemplateInformation: React.FC<IProps> = props => {
     if (templatesDir && isStandaloneTemplate(templatePath, templatesDir)) {
       deleteStandalonTemplate(templatePath, dispatch);
     } else if (templatePacksDir && isTemplatePackTemplate(templatePath, templatePacksDir)) {
-      deleteTemplatePack(templatePackMap[getTemplatePackPath(templatePath)], templatePath, dispatch);
+      const templatePackPath = getTemplatePackPluginPath(templatePath);
+      deleteTemplatePack(templatePackMap[templatePackPath], templatePackPath, dispatch);
+    } else if (pluginsDir && isPluginTemplate(templatePath, pluginsDir)) {
+      const pluginPath = getTemplatePackPluginPath(templatePath);
+      deletePlugin(pluginMap[pluginPath], pluginPath, dispatch);
     }
   };
 

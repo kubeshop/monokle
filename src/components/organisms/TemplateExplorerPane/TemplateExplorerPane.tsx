@@ -74,7 +74,7 @@ const TemplatesPane: React.FC = () => {
         {!Object.keys(templateMap).length ? (
           <p>No templates available.</p>
         ) : (
-          Object.entries(templates).map(([path, template]) => (
+          Object.entries(templateMap).map(([path, template]) => (
             <TemplateInformation
               key={template.id}
               template={template}
