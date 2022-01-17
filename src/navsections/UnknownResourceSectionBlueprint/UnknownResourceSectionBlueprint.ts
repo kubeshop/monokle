@@ -11,6 +11,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceKindHandlers} from '@src/kindhandlers';
 
+import ResourceKindContextMenu from '../K8sResourceSectionBlueprint/ResourceKindContextMenu';
 import ResourceKindPrefix from '../K8sResourceSectionBlueprint/ResourceKindPrefix';
 import ResourceKindSuffix from '../K8sResourceSectionBlueprint/ResourceKindSuffix';
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -97,10 +98,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       isSelected: rawItem => rawItem.isSelected,
       isHighlighted: rawItem => rawItem.isHighlighted,
       isDirty: rawItem => isUnsavedResource(rawItem),
-      isVisible: (rawItem, scope) => {
-        const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
-        return isPassingFilter;
-      },
+      isVisible: (rawItem, scope) => isResourcePassingFilter(rawItem, scope.resourceFilter),
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
@@ -108,12 +106,9 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       },
     },
     customization: {
-      prefix: {
-        component: ResourceKindPrefix,
-      },
-      suffix: {
-        component: ResourceKindSuffix,
-      },
+      contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
+      prefix: {component: ResourceKindPrefix},
+      suffix: {component: ResourceKindSuffix},
     },
   },
 };
