@@ -1,4 +1,5 @@
 import fs from 'fs';
+import _ from 'lodash';
 
 import {TemplatePack} from '@models/template';
 
@@ -30,3 +31,9 @@ export const isTemplatePackTemplate = (templatePath: string, templatesPacksDir: 
   templatePath.startsWith(templatesPacksDir);
 
 export const isPluginTemplate = (templatePath: string, pluginsDir: string) => templatePath.startsWith(pluginsDir);
+
+export const interpolateTemplate = (text: string, formsData: any[]) => {
+  _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+  const lodashTemplate = _.template(text);
+  return lodashTemplate({forms: formsData});
+};

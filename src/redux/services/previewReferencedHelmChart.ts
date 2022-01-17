@@ -1,4 +1,3 @@
-import parseTemplateString from 'es6-template-strings';
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
@@ -10,6 +9,7 @@ import {AppDispatch} from '@redux/store';
 
 import {runHelm} from '@utils/helm';
 
+import {interpolateTemplate} from './templates';
 import {createUnsavedResource} from './unsavedResource';
 
 const fsWriteFilePromise = promisify(fs.writeFile);
@@ -62,7 +62,8 @@ export const previewReferencedHelmChart = async (
 ) => {
   const valuesFileContent = await fsReadFilePromise(valuesFilePath, 'utf8');
   const newTempValuesFilePath = path.join(userTempDir, uuidv4());
-  const parsedValuesFileContent: string = parseTemplateString(valuesFileContent, {forms: formsData});
+
+  const parsedValuesFileContent: string = interpolateTemplate(valuesFileContent, formsData);
 
   await fsWriteFilePromise(newTempValuesFilePath, parsedValuesFileContent);
 
