@@ -75,7 +75,7 @@ jobs:
         id: apply-tag
         run: |
           npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true
-          echo "::set-output name=TAG::$(cat package.json | jq '.version') 
+          echo "::set-output name=TAG::$(cat package.json | jq '.version')"
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
