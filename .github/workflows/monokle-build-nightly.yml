@@ -190,7 +190,7 @@ jobs:
           Set-PSDebug -Trace 1
           npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true
           $p = get-content package.json | ConvertFrom-Json
-          echo "::set-output name=TAG::$p.version"
+          echo "::set-output name=TAG::$($p.version)"
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -211,12 +211,6 @@ jobs:
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
 
-      # Check Binary Sizes
-      - name: Build Succeeded
-        run: |
-          cmd /r dir .\dist
-        if: ${{ success() }}
-
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
@@ -228,9 +222,123 @@ jobs:
           tag: ${{ steps.apply-tag.outputs.TAG }}
           token: ${{ secrets.github_token }}
 
+      # Check Binary Sizes
+      - name: Build Succeeded
+        run: |
+          cmd /r dir .\dist
+        if: ${{ success() }}
+
       - name: Build Failed - Archive Build Logs
         uses: actions/upload-artifact@v2
         with:
           name: logs
           path: .\msilog.txt
         if: ${{ failure() || cancelled() }}
+
+  # This workflow contains a single job called "build"
+  build-nightly-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      - name: Get Node Version
+        run: |
+          cat .nvmrc
+          echo "::set-output name=nodeversion::$(cat .nvmrc)"
+        id: get-node-version
+
+      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.get-node-version.outputs.nodeversion }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          env
+          echo "npm: $(npm --version)"
+          echo "node: $(node --version)"
+          npm install
+
+      - name: Verify Dependencies
+        run: |
+          ls -la
+          npm list --depth=1
+
+      - name: Install Tools
+        run: |
+          sudo apt-get install jq
+
+      - name: Generate and apply tag
+        id: apply-tag
+        run: |
+          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true
+          echo "::set-output name=TAG::$(cat package.json | jq '.version')"
+          git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
+      - name: Build
+        run: |
+          npm run electron:build:ci
+        env:
+          # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
+          CI: false
+
+      - name: Package
+        run: |
+          npm exec -c "electron-builder --publish \"never\""
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
+          draft: false
+          prerelease: true
+          omitBody: true
+          tag: ${{ steps.apply-tag.outputs.TAG }}
+          token: ${{ secrets.github_token }}
+
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          ls -alh dist | grep Monokle && du -sh dist || true
+        if: ${{ success() }}
+
+      - name: Archive Binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist-nix
+          path: dist
+        if: ${{ success() }}
+
+      - name: Build Failed - Output Build Logs
+        run: |
+          cat /Users/runner/.npm/_logs/*-debug.log || true
+        if: ${{ failure() || cancelled() }}
+
+      - name: Build Failed - Archive Build Logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: /Users/runner/.npm/_logs
+        if: ${{ failure() || cancelled() }}
+
+      # Make sure no secrets or certs are left on the runner
+      - name: Cleanup files after run
+        run: |
+          rm -rf *
+          ls -la
+        if: ${{ always() }}
