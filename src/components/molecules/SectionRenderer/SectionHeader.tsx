@@ -53,7 +53,7 @@ function SectionHeader(props: SectionHeaderProps) {
     return sectionInstance?.visibleDescendantItemIds?.length || 0;
   }, [sectionInstance.visibleDescendantItemIds]);
 
-  const { shouldDisplayPlus, shouldDisplayContext } = useMemo(() => {
+  const {shouldDisplayPlus, shouldDisplayContext} = useMemo(() => {
     let _shouldDisplayPlus = false;
     let _shouldDisplayContext = false;
     if (NameSuffix.Component) {
@@ -103,7 +103,9 @@ function SectionHeader(props: SectionHeaderProps) {
         {sectionInstance.checkable &&
           sectionInstance.isInitialized &&
           (sectionBlueprint.customization?.isCheckVisibleOnHover
-            ? sectionInstance.checkable.value === 'partial' || sectionInstance.checkable.value === 'checked' || isHovered
+            ? sectionInstance.checkable.value === 'partial' ||
+              sectionInstance.checkable.value === 'checked' ||
+              isHovered
             : true) && (
             <span>
               <S.Checkbox
@@ -130,9 +132,7 @@ function SectionHeader(props: SectionHeaderProps) {
             {itemsLength > 0 && (
               <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
             )}
-            {shouldDisplayPlus && NameSuffix.Component && (
-              <NameSuffix.Component sectionInstance={sectionInstance} />
-            )}
+            {shouldDisplayPlus && NameSuffix.Component && <NameSuffix.Component sectionInstance={sectionInstance} />}
             <S.BlankSpace level={level} onClick={toggleCollapse} />
             {isHovered && sectionInstance.isInitialized && (
               <S.Collapsible>

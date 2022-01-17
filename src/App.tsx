@@ -5,26 +5,27 @@ import styled from 'styled-components';
 import {Size} from '@models/window';
 
 import {
-  DiffModal,
+  ClusterDiffModal,
+  ClusterResourceDiffModal,
+  CreateFolderModal,
   HotKeysHandler,
+  LocalResourceDiffModal,
   MessageBox,
   NewResourceWizard,
   NotificationsDrawer,
   PageFooter,
   PageHeader,
   PaneManager,
+  QuickSearchActions,
+  RenameEntityModal,
   RenameResourceModal,
   SettingsDrawer,
   StartupModal,
+  UpdateModal,
 } from '@organisms';
 
 import ChangeFiltersConfirmModal from '@components/molecules/ChangeFiltersConfirmModal/ChangeFiltersConfirmModal';
 import SaveResourceToFileFolderModal from '@components/molecules/SaveResourcesToFileFolderModal';
-import {ClusterDiffModal} from '@components/organisms';
-import CreateFolderModal from '@components/organisms/CreateFolderModal';
-import QuickSearchActions from '@components/organisms/QuickSearchActions';
-import RenameEntityModal from '@components/organisms/RenameEntityModal';
-import UpdateModal from '@components/organisms/UpdateModal';
 
 import {useWindowSize} from '@utils/hooks';
 
@@ -55,7 +56,8 @@ const App = () => {
           <PaneManager />
           <PageFooter />
         </MainContainer>
-        <DiffModal />
+        <LocalResourceDiffModal />
+        <ClusterResourceDiffModal />
         <StartupModal />
         <NewResourceWizard />
         <QuickSearchActions />
