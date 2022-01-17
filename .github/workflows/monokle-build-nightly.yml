@@ -62,7 +62,7 @@ jobs:
 
       - name: Generate and apply tag
         run: |
-          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.tag true --skip.commit true
+          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -166,7 +166,7 @@ jobs:
       - name: Generate and apply tag
         run: |
           Set-PSDebug -Trace 1
-          npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.tag true --skip.commit true
+          npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
