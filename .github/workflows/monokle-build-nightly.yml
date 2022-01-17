@@ -106,7 +106,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: $TAG
+          tag: ${{ TAG }}
           token: ${{ secrets.github_token }}
 
       # Check Binary Sizes
@@ -223,7 +223,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: $TAG
+          tag: ${{ TAG }}
           token: ${{ secrets.github_token }}
 
       - name: Build Failed - Archive Build Logs
