@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useState} from 'react';
+import {useState} from 'react';
 
 import {Button, Input, Modal, Radio} from 'antd';
 
