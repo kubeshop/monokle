@@ -3,13 +3,16 @@ name: monokle-build-nightly
 on:
   schedule:
     - cron: '0 2 * * *'
+  push:
+    branches:
+      - erdikose/feature/sign-publish-nightly-builds
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   build-nightly-mac:
-    runs-on: macOS-latest
+    runs-on: macos-latest
 
     steps:
       # Make sure build is clean and no files from a previous run are re-used.
@@ -59,11 +62,8 @@ jobs:
 
       - name: Generate and apply tag
         run: |
-          npm --no-git-tag-version --preid="$(date +%Y%m%d)" version prerelease
-          npm version
-          t=$(jq -r '.version' package.json)
-          git tag "${t}" || true
-          git push origin "${t}" || true
+          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.tag true --skip.commit true
+          git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
@@ -76,9 +76,25 @@ jobs:
 
       - name: Package and Publish
         run: |
-          npm exec -c "electron-builder --publish \"always\""
+          npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+          NOTARIZE: true
+          CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
+          draft: false
+          prerelease: true
+          omitBody: true
+          token: ${{ secrets.github_token }}
 
       # Check Binary Sizes
       - name: Build Succeeded
@@ -150,17 +166,8 @@ jobs:
       - name: Generate and apply tag
         run: |
           Set-PSDebug -Trace 1
-          $datetoday = Get-Date -Format "yyyyMMdd"
-          echo $datetoday
-          npm --no-git-tag-version --preid=$datetoday version prerelease
-          npm version
-          $p = get-content package.json | ConvertFrom-Json
-
-          echo $p.version
-
-          $ErrorActionPreference = 'SilentlyContinue'
-          git tag $p.version
-          git push origin $tag
+          npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.tag true --skip.commit true
+          git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
@@ -171,17 +178,30 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and Publish
+      - name: Package
         run: |
-          npm exec -c 'electron-builder --publish "always"'
+          npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+          WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
+          EP_PRE_RELEASE: true
 
       # Check Binary Sizes
       - name: Build Succeeded
         run: |
           cmd /r dir .\dist
         if: ${{ success() }}
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap'
+          draft: false
+          prerelease: true
+          omitBody: true
+          token: ${{ secrets.github_token }}
 
       - name: Build Failed - Archive Build Logs
         uses: actions/upload-artifact@v2
