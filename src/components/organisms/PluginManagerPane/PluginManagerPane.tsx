@@ -24,8 +24,8 @@ function PluginManagerPane() {
   const isLoadingExistingPlugins = useAppSelector(state => state.extension.isLoadingExistingPlugins);
 
   const plugins = useMemo(() => Object.values(pluginMap), [pluginMap]);
-  const activePlugins = useMemo(() => plugins.filter(p => p.isActive), [plugins]);
-  const inactivePlugins = useMemo(() => plugins.filter(p => !p.isActive), [plugins]);
+  const activePlugins = useMemo(() => Object.entries(pluginMap).filter(p => p[1].isActive), [pluginMap]);
+  const inactivePlugins = useMemo(() => Object.entries(pluginMap).filter(p => !p[1].isActive), [pluginMap]);
 
   const [isInstallModalVisible, setInstallModalVisible] = useState<boolean>(false);
 
@@ -67,16 +67,16 @@ function PluginManagerPane() {
             {activePlugins.length > 0 && (
               <>
                 <h2>Active plugins</h2>
-                {activePlugins.map(activePlugin => (
-                  <PluginInformation key={activePlugin.name} plugin={activePlugin} />
+                {activePlugins.map(([path, activePlugin]) => (
+                  <PluginInformation key={activePlugin.name} plugin={activePlugin} pluginPath={path} />
                 ))}
               </>
             )}
             {inactivePlugins.length > 0 && (
               <>
                 <h2>Inactive plugins</h2>
-                {inactivePlugins.map(inactivePlugin => (
-                  <PluginInformation key={inactivePlugin.name} plugin={inactivePlugin} />
+                {inactivePlugins.map(([path, inactivePlugin]) => (
+                  <PluginInformation key={inactivePlugin.name} plugin={inactivePlugin} pluginPath={path} />
                 ))}
               </>
             )}
