@@ -48,6 +48,8 @@ async function downloadExtension<ExtensionEntryType, ExtensionType>(
     strip: 1,
   });
 
+  await deleteFile(tarballFilePath);
+
   return extension;
 }
 
