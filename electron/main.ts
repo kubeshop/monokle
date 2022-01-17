@@ -184,7 +184,6 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
   updateExtensionsResult.templateExtensions.push(...updatedTemplateExtensionsFromPlugins.flat(), ...updatedTemplateExtensionsFromTemplatePacks.flat());
 
   event.sender.send(UPDATE_EXTENSIONS_RESULT, updateExtensionsResult);
-
 });
 
 ipcMain.on('run-kustomize', (event, cmdOptions: any) => {

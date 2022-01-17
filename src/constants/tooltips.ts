@@ -42,3 +42,5 @@ export const FileExplorerChanged = 'File Explorer has some changes. Reload it to
 export const SaveResourceToNewFileTooltip = 'Save this resource to a new file';
 export const AddResourceToExistingFileTooltip = 'Add this resource to an existing manifest file';
 export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
+export const TemplateManagerPaneReloadTooltip = 'Check for updates';
+export const PluginManagerPaneReloadTooltip = 'Check for updates';

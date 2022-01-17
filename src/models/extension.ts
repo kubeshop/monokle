@@ -68,6 +68,21 @@ export type UpdateExtensionsResult = {
   templatePackExtensions: AnyExtension<TemplatePack>[];
 };
 
+export function isUpdateExtensionsResult(obj: any): obj is UpdateExtensionsResult {
+  if (!_.isObjectLike(obj)) {
+    return false;
+  }
+  const {pluginExtensions, templateExtensions, templatePackExtensions} = obj;
+  if (!_.isArray(pluginExtensions) || !_.isArray(templateExtensions) || !_.isArray(templatePackExtensions)) {
+    return false;
+  }
+  return (
+    pluginExtensions.every(p => isPluginExtension(p)) &&
+    templateExtensions.every(t => isTemplateExtension(t)) &&
+    templatePackExtensions.every(tp => isTemplatePackExtension(tp))
+  );
+}
+
 export function isDownloadPluginResult(obj: any): obj is DownloadPluginResult {
   if (!_.isObjectLike(obj)) {
     return false;
