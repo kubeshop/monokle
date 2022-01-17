@@ -75,7 +75,7 @@ jobs:
         id: apply-tag
         run: |
           npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true
-          echo "::set-output name=TAG::$(cat package.json | jq '.version')"
+          echo "::set-output name=TAG::$(cat package.json | jq -r '.version')"
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -188,6 +188,7 @@ jobs:
         id: apply-tag
         run: |
           Set-PSDebug -Trace 1
+          $datetoday = Get-Date -Format "yyyy-MM-dd"
           npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true
           $p = get-content package.json | ConvertFrom-Json
           echo "::set-output name=TAG::$($p.version)"
@@ -280,8 +281,8 @@ jobs:
       - name: Generate and apply tag
         id: apply-tag
         run: |
-          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true
-          echo "::set-output name=TAG::$(cat package.json | jq '.version')"
+          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog=true --skip.commit=true
+          echo "::set-output name=TAG::$(cat package.json | jq -r '.version')"
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
