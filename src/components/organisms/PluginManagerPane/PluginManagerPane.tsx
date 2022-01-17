@@ -18,7 +18,9 @@ import * as S from './styled';
 
 function PluginManagerPane() {
   const dispatch = useAppDispatch();
-  const pluginMap = useAppSelector(state => Object.values(state.extension.pluginMap));
+  const templateMap = useAppSelector(state => state.extension.templateMap);
+  const pluginMap = useAppSelector(state => state.extension.pluginMap);
+  const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
   const isLoadingExistingPlugins = useAppSelector(state => state.extension.isLoadingExistingPlugins);
 
   const plugins = useMemo(() => Object.values(pluginMap), [pluginMap]);
@@ -31,7 +33,10 @@ function PluginManagerPane() {
     setInstallModalVisible(true);
   };
 
-  const onClickReload = useCallback(() => checkForExtensionsUpdates(dispatch), [dispatch]);
+  const onClickReload = useCallback(
+    () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
+    [templateMap, pluginMap, templatePackMap, dispatch]
+  );
 
   const onCloseInstallPlugin = () => {
     setInstallModalVisible(false);

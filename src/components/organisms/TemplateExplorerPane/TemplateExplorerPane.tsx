@@ -25,6 +25,8 @@ const TemplatesPane: React.FC = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
   const templateMap = useAppSelector(state => state.extension.templateMap);
+  const pluginMap = useAppSelector(state => state.extension.pluginMap);
+  const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
 
   const templates = useMemo(() => {
     return Object.values(templateMap);
@@ -42,7 +44,10 @@ const TemplatesPane: React.FC = () => {
     setIsInstallModalVisible(true);
   };
 
-  const onClickReload = useCallback(() => checkForExtensionsUpdates(dispatch), [dispatch]);
+  const onClickReload = useCallback(
+    () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
+    [templateMap, pluginMap, templatePackMap, dispatch]
+  );
 
   const onCloseInstallModal = () => {
     setIsInstallModalVisible(false);
