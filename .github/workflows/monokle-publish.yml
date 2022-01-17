@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - auto-updater
       - erdikose/fix/pipelines-failing-issue
   release:
     types:
@@ -19,15 +18,6 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Delete release
-        uses: dev-drprasad/delete-tag-and-release@v0.2.0
-        with:
-          delete_release: true
-          tag_name: latest-version
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
-
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -90,7 +80,9 @@ jobs:
           CI: false
 
       - name: Package
+        id: build
         run: |
+          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -101,23 +93,6 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           USE_HARD_LINKS: false
-        if: "!contains(github.ref, 'auto-updater')"
-
-      - name: Package
-        run: |
-          contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
-          contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
-          npm exec -c "electron-builder --publish \"never\""
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-          EP_PRE_RELEASE: true
-          NOTARIZE: true
-          CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
-          CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          USE_HARD_LINKS: false
-        if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -128,15 +103,12 @@ jobs:
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
+          allowUpdates: false
           artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
-          draft: false
-          prerelease: true
           omitBody: true
-          tag: 'latest-version'
-          commit: 'auto-updater'
+          tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
+        if: "!contains(github.ref, 'erdikose/fix/pipelines-failing-issue')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -168,15 +140,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Delete release and tagname
-        uses: dev-drprasad/delete-tag-and-release@v0.2.0
-        with:
-          delete_release: true
-          tag_name: latest-version
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
-
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -229,7 +192,10 @@ jobs:
           CI: false
 
       - name: Package
+        id: package
         run: |
+          $p = get-content package.json | ConvertFrom-Json
+          echo "::set-output name=TAG::$($p.version)"
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -237,18 +203,6 @@ jobs:
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
-        if: "!contains(github.ref, 'auto-updater')"
-
-      - name: Package
-        run: |
-          npm exec -c 'electron-builder --publish "never"'
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-          WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
-          EP_PRE_RELEASE: true
-          USE_HARD_LINKS: false
-        if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -259,15 +213,12 @@ jobs:
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
+          allowUpdates: false
           artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap'
-          draft: false
-          prerelease: true
           omitBody: true
-          tag: 'latest-version'
-          commit: 'auto-updater'
+          tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
+        if: "!contains(github.ref, 'erdikose/fix/pipelines-failing-issue')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -281,15 +232,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Delete release
-        uses: dev-drprasad/delete-tag-and-release@v0.2.0
-        with:
-          delete_release: true
-          tag_name: latest-version
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
-
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -335,24 +277,14 @@ jobs:
           CI: false
 
       - name: Package
+        id: package
         run: |
+          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
-        if: "!contains(github.ref, 'auto-updater')"
-
-      - name: Package
-        run: |
-          contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
-          contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
-          npm exec -c "electron-builder --publish \"never\""
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-          EP_PRE_RELEASE: true
-          USE_HARD_LINKS: false
-        if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -363,15 +295,12 @@ jobs:
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
+          allowUpdates: false
           artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
-          draft: false
-          prerelease: true
           omitBody: true
-          tag: 'latest-version'
-          commit: 'auto-updater'
+          tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
+        if: "!contains(github.ref, 'erdikose/fix/pipelines-failing-issue')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
