@@ -162,13 +162,13 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
   });
 
   if (errorMessage.trim().length > 0) {
-    log.warn(errorMessage);
+    log.warn("[Update Extensions]:", errorMessage);
   }
 
   const updateExtensionsResult: UpdateExtensionsResult = {
-    pluginExtensions: updatedPluginExtensions.filter((x): x is AnyExtension<AnyPlugin> => x !== undefined),
-    templateExtensions: updatedStandaloneTemplateExtensions.filter((x): x is AnyExtension<AnyTemplate> => x !== undefined),
-    templatePackExtensions: updatedTemplatePackExtensions.filter((x): x is AnyExtension<TemplatePack> => x !== undefined),
+    pluginExtensions: updatedPluginExtensions.filter((x): x is AnyExtension<AnyPlugin> => x != null),
+    templateExtensions: updatedStandaloneTemplateExtensions.filter((x): x is AnyExtension<AnyTemplate> => x != null),
+    templatePackExtensions: updatedTemplatePackExtensions.filter((x): x is AnyExtension<TemplatePack> => x != null),
   };
 
   const updatedTemplateExtensionsFromPlugins: AnyExtension<AnyTemplate>[][] = await asyncLib.map(updateExtensionsResult.pluginExtensions, async (pluginExtension) => {
