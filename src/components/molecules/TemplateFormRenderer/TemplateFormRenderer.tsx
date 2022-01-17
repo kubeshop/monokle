@@ -66,11 +66,9 @@ const TemplateFormRenderer: React.FC<{
         onChange={e => setFormData(e.formData)}
         noHtml5Validate
       >
-        <div>
-          <Button htmlType="submit" type="primary">
-            {isLastForm ? 'Submit' : 'Next'}
-          </Button>
-        </div>
+        <Button htmlType="submit" type="primary" style={{marginTop: '16px'}}>
+          {isLastForm ? 'Submit' : 'Next'}
+        </Button>
       </Form>
     </>
   );

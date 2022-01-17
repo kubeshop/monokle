@@ -1,8 +1,9 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {LegacyRef, useCallback, useMemo, useState} from 'react';
+import {ResizableBox} from 'react-resizable';
+import {useMeasure} from 'react-use';
 
-import {Button, Input, Modal, Skeleton, Steps} from 'antd';
+import {Button, Skeleton, Steps} from 'antd';
 
-import styled from 'styled-components';
 import {Primitive} from 'type-fest';
 
 import {AnyTemplate, isReferencedHelmChartTemplate} from '@models/template';
@@ -12,36 +13,28 @@ import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmC
 
 import {TemplateFormRenderer} from '@components/molecules';
 
+import * as S from './styled';
+
 const {Step} = Steps;
-const {TextArea} = Input;
 
 type TemplateModalProps = {template: AnyTemplate; onClose: () => void};
-
-const Container = styled.div`
-  display: flex;
-`;
-
-const StyledTextArea = styled(TextArea)`
-  margin-top: 20px;
-  width: 100%;
-  ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
-`;
 
 type FormDataList = Record<string, Primitive>[];
 
 const TemplateModal: React.FC<TemplateModalProps> = props => {
   const {template, onClose} = props;
+
   const dispatch = useAppDispatch();
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const userTempDir = useAppSelector(state => state.config.userTempDir);
+
+  const [activeFormIndex, setActiveFormIndex] = useState<number>(0);
+  const [currentFormDataList, setCurrentFormDataList] = useState<FormDataList>(template.forms.map(() => ({})));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [resultMessage, setResultMessage] = useState<string>();
-  const [currentFormDataList, setCurrentFormDataList] = useState<FormDataList>(template.forms.map(() => ({})));
-  const [activeFormIndex, setActiveFormIndex] = useState<number>(0);
+
+  const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
   const activeForm = useMemo(() => {
     return activeFormIndex < template.forms.length ? template.forms[activeFormIndex] : undefined;
@@ -104,45 +97,56 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   }
 
   return (
-    <Modal
+    <S.Modal
       visible
       footer={
-        <>
-          {resultMessage && (
-            <Button type="primary" onClick={close} loading={isLoading}>
-              Done
-            </Button>
-          )}
-        </>
+        resultMessage ? (
+          <Button type="primary" onClick={close} loading={isLoading}>
+            Done
+          </Button>
+        ) : null
       }
       onCancel={close}
-      width={900}
+      width="min-content"
     >
-      <Container>
-        <div style={{minWidth: 200}}>
-          <Steps direction="vertical" current={activeFormIndex}>
-            {template.forms.map(form => {
-              return <Step key={form.name} title={form.name} />;
-            })}
-            <Step title="Result" />
-          </Steps>
-        </div>
-        <div style={{width: '100%'}}>
-          {isLoading ? (
-            <Skeleton />
-          ) : resultMessage ? (
-            <StyledTextArea rows={16} value={resultMessage} readOnly />
-          ) : activeForm ? (
-            <TemplateFormRenderer
-              key={activeFormIndex}
-              isLastForm={activeFormIndex === template.forms.length - 1}
-              onSubmit={formData => onFormSubmit(activeFormIndex, formData)}
-              templateForm={activeForm}
-            />
-          ) : null}
-        </div>
-      </Container>
-    </Modal>
+      <ResizableBox
+        height={containerHeight}
+        width={800}
+        minConstraints={[600, containerHeight]}
+        maxConstraints={[window.innerWidth - 64, containerHeight]}
+        axis="x"
+        resizeHandles={['w', 'e']}
+        handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+          <span className={`custom-modal-handle custom-modal-handle-${h}`} ref={ref} />
+        )}
+      >
+        <S.Container ref={containerRef}>
+          <div style={{minWidth: 200}}>
+            <Steps direction="vertical" current={activeFormIndex}>
+              {template.forms.map(form => {
+                return <Step key={form.name} title={form.name} />;
+              })}
+              <Step title="Result" />
+            </Steps>
+          </div>
+
+          <div>
+            {isLoading ? (
+              <Skeleton />
+            ) : resultMessage ? (
+              <S.StyledTextArea rows={16} value={resultMessage} readOnly />
+            ) : activeForm ? (
+              <TemplateFormRenderer
+                key={activeFormIndex}
+                isLastForm={activeFormIndex === template.forms.length - 1}
+                onSubmit={formData => onFormSubmit(activeFormIndex, formData)}
+                templateForm={activeForm}
+              />
+            ) : null}
+          </div>
+        </S.Container>
+      </ResizableBox>
+    </S.Modal>
   );
 };
 
