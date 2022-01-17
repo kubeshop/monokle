@@ -143,6 +143,8 @@ interface AppState {
   notifications: AlertType[];
   /** whether or not the editor should read the selectedPath file again - used when the file is updated externally */
   shouldEditorReloadSelectedPath: boolean;
+  /** type/value of filters that will be changed */
+  filtersToBeChanged?: ResourceFilterType;
 }
 
 export type {

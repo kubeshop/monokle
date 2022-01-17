@@ -86,6 +86,7 @@ const NewResourceWizard = () => {
       }, {} as Record<string, ResourceKindHandler[]>),
     // depend on resourceMap since newly loaded resources could have contained CRDs that resulted in dynamically
     // created kindHandlers
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [resourceMap]
   );
 

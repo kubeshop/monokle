@@ -29,6 +29,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath, extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {isKustomizationPatch} from '@redux/services/kustomize';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
@@ -252,7 +253,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all
   const isReadOnlyMode = useMemo(() => {
     if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
-      return true;
+      return previewType !== 'kustomization' || !isKustomizationPatch(selectedResource);
     }
     if (isInPreviewMode && selectedValuesFileId !== previewValuesFileId) {
       return true;

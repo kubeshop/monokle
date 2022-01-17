@@ -25,6 +25,7 @@ import {
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
+import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -80,6 +81,7 @@ export type UpdateResourcePayload = {
   resourceId: string;
   content: string;
   preventSelectionAndHighlightsUpdate?: boolean;
+  isInClusterMode?: boolean;
 };
 
 export type UpdateManyResourcesPayload = {
@@ -163,18 +165,33 @@ const clearSelectedResourceOnPreviewExit = (state: AppState) => {
  * Returns a resourceMap containing only active resources depending if we are in preview mode
  */
 
-function getActiveResources(state: Draft<AppState>) {
+function getActiveResourceMap(state: Draft<AppState>) {
   if (state.previewResourceId || state.previewValuesFileId) {
-    let activeResources: ResourceMapType = {};
+    let activeResourceMap: ResourceMapType = {};
     Object.values(state.resourceMap)
       .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
       .forEach(r => {
-        activeResources[r.id] = r;
+        activeResourceMap[r.id] = r;
       });
 
-    return activeResources;
+    return activeResourceMap;
   }
   return state.resourceMap;
+}
+
+/**
+ * Returns a resourceMap containing only local resources
+ */
+
+function getLocalResourceMap(state: Draft<AppState>) {
+  let localResourceMap: ResourceMapType = {};
+  Object.values(state.resourceMap)
+    .filter(r => !r.filePath.startsWith(PREVIEW_PREFIX) && !r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
+    .forEach(r => {
+      localResourceMap[r.id] = r;
+    });
+
+  return localResourceMap;
 }
 
 /**
@@ -310,7 +327,7 @@ export const mainSlice = createSlice({
         return false;
       });
 
-      processParsedResources(getActiveResources(state), state.resourceRefsProcessingOptions, {
+      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
         resourceKinds: resourceKindsWithOptionalRefs,
         skipValidation: true,
       });
@@ -322,7 +339,7 @@ export const mainSlice = createSlice({
       const resource = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-      processParsedResources(getActiveResources(state), state.resourceRefsProcessingOptions, {
+      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
         resourceIds: [resource.id],
         resourceKinds,
       });
@@ -333,18 +350,35 @@ export const mainSlice = createSlice({
      */
     updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
       try {
-        const activeResources = getActiveResources(state);
-        const resource = activeResources[action.payload.resourceId];
+        const isInClusterMode = action.payload.isInClusterMode;
+
+        const currentResourceMap = isInClusterMode ? getLocalResourceMap(state) : getActiveResourceMap(state);
+        const resource = isInClusterMode
+          ? state.resourceMap[action.payload.resourceId]
+          : currentResourceMap[action.payload.resourceId];
+
         if (resource) {
           performResourceContentUpdate(state, resource, action.payload.content);
-          let resourceIds = findResourcesToReprocess(resource, activeResources);
-          reprocessResources(resourceIds, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
+          let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
+          reprocessResources(resourceIds, currentResourceMap, state.fileMap, state.resourceRefsProcessingOptions);
           if (!action.payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
             updateSelectionAndHighlights(state, resource);
           }
         } else {
-          log.warn('Failed to find updated resource in active resources');
+          const r = state.resourceMap[action.payload.resourceId];
+          // check if this was a kustomization resource updated during a kustomize preview
+          if (
+            r &&
+            (isKustomizationResource(r) || isKustomizationPatch(r)) &&
+            state.previewResourceId &&
+            isKustomizationResource(state.resourceMap[state.previewResourceId])
+          ) {
+            performResourceContentUpdate(state, r, action.payload.content);
+            processKustomizations(state.resourceMap, state.fileMap);
+          } else {
+            log.warn('Failed to find updated resource during preview', action.payload.resourceId);
+          }
         }
       } catch (e) {
         log.error(e);
@@ -357,7 +391,7 @@ export const mainSlice = createSlice({
     updateManyResources: (state: Draft<AppState>, action: PayloadAction<UpdateManyResourcesPayload>) => {
       try {
         let resourceIdsToReprocess: string[] = [];
-        const activeResources = getActiveResources(state);
+        const activeResources = getActiveResourceMap(state);
 
         action.payload.forEach(({resourceId, content}) => {
           const resource = activeResources[resourceId];
@@ -453,6 +487,9 @@ export const mainSlice = createSlice({
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
     },
+    setFiltersToBeChanged: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType | undefined>) => {
+      state.filtersToBeChanged = action.payload;
+    },
     setApplyingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isApplyingResource = action.payload;
     },
@@ -480,11 +517,32 @@ export const mainSlice = createSlice({
       state.previewLoader.isLoading = false;
       state.previewLoader.targetResourceId = undefined;
     },
+    resetResourceFilter: (state: Draft<AppState>) => {
+      state.resourceFilter = {labels: {}, annotations: {}};
+    },
     updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
+      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
+        state.filtersToBeChanged = action.payload;
+        return;
+      }
+
+      if (state.filtersToBeChanged) {
+        state.filtersToBeChanged = undefined;
+      }
+
       state.resourceFilter = action.payload;
     },
     extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       const filter = action.payload;
+
+      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
+        state.filtersToBeChanged = filter;
+        return;
+      }
+
+      if (state.filtersToBeChanged) {
+        state.filtersToBeChanged = undefined;
+      }
 
       // construct new filter
       let newFilter: ResourceFilterType = {
@@ -1026,9 +1084,11 @@ export const {
   checkResourceId,
   uncheckAllResourceIds,
   uncheckResourceId,
+  resetResourceFilter,
   checkMultipleResourceIds,
   uncheckMultipleResourceIds,
   closeResourceDiffModal,
   openResourceDiffModal,
+  setFiltersToBeChanged,
 } = mainSlice.actions;
 export default mainSlice.reducer;

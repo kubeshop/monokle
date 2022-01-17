@@ -138,7 +138,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
     emptyDisplay: {
       component: K8sResourceSectionEmptyDisplay,
     },
-    nameSuffix: {
+    nameContext: {
       component: K8sResourceSectionNameSuffix,
     },
     isCheckVisibleOnHover: true,
