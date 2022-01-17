@@ -1,12 +1,15 @@
 import React, {useCallback, useState} from 'react';
 
-import {Button} from 'antd';
+import {Button, Tooltip} from 'antd';
 
-import {PlusOutlined} from '@ant-design/icons';
+import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
+
+import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {AnyTemplate} from '@models/template';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {checkForExtensionsUpdates} from '@redux/services/extension';
 
 import {TitleBar} from '@components/molecules';
 
@@ -17,6 +20,7 @@ import TemplateInstallModal from './TemplateInstallModal';
 import * as S from './styled';
 
 const TemplatesPane: React.FC = () => {
+  const dispatch = useAppDispatch();
   const [isInstallModalVisible, setIsInstallModalVisible] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
@@ -34,6 +38,8 @@ const TemplatesPane: React.FC = () => {
     setIsInstallModalVisible(true);
   };
 
+  const onClickReload = useCallback(() => checkForExtensionsUpdates(dispatch), [dispatch]);
+
   const onCloseInstallModal = () => {
     setIsInstallModalVisible(false);
   };
@@ -41,6 +47,24 @@ const TemplatesPane: React.FC = () => {
   return (
     <>
       <TitleBar title="Templates">
+        <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
+          <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
+            <Button
+              disabled={templates.length === 0}
+              onClick={onClickReload}
+              type="link"
+              size="small"
+              icon={<ReloadOutlined />}
+            />
+          </Tooltip>
+          <Button
+            disabled={templates.length === 0}
+            onClick={onClickReload}
+            type="link"
+            size="small"
+            icon={<ReloadOutlined />}
+          />
+        </Tooltip>
         <Button onClick={openInstallModal} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
 

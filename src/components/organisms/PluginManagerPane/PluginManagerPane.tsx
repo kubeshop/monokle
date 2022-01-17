@@ -1,10 +1,13 @@
-import React, {useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 
-import {Button, Skeleton} from 'antd';
+import {Button, Skeleton, Tooltip} from 'antd';
 
-import {PlusOutlined} from '@ant-design/icons';
+import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {useAppSelector} from '@redux/hooks';
+import {PluginManagerPaneReloadTooltip} from '@constants/tooltips';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {checkForExtensionsUpdates} from '@redux/services/extension';
 
 import {TitleBar} from '@components/molecules';
 
@@ -14,6 +17,7 @@ import PluginInstallModal from './PluginInstallModal';
 import * as S from './styled';
 
 function PluginManagerPane() {
+  const dispatch = useAppDispatch();
   const plugins = useAppSelector(state => Object.values(state.extension.pluginMap));
   const isLoadingExistingPlugins = useAppSelector(state => state.extension.isLoadingExistingPlugins);
 
@@ -21,9 +25,13 @@ function PluginManagerPane() {
   const inactivePlugins = useMemo(() => plugins.filter(p => !p.isActive), [plugins]);
 
   const [isInstallModalVisible, setInstallModalVisible] = useState<boolean>(false);
+
   const onClickInstallPlugin = () => {
     setInstallModalVisible(true);
   };
+
+  const onClickReload = useCallback(() => checkForExtensionsUpdates(dispatch), [dispatch]);
+
   const onCloseInstallPlugin = () => {
     setInstallModalVisible(false);
   };
@@ -32,6 +40,24 @@ function PluginManagerPane() {
     <div>
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
       <TitleBar title="Plugin Manager">
+        <Tooltip title={PluginManagerPaneReloadTooltip} placement="bottom">
+          <Tooltip title={PluginManagerPaneReloadTooltip} placement="bottom">
+            <Button
+              disabled={plugins.length === 0}
+              onClick={onClickReload}
+              type="link"
+              size="small"
+              icon={<ReloadOutlined />}
+            />
+          </Tooltip>
+          <Button
+            disabled={plugins.length === 0}
+            onClick={onClickReload}
+            type="link"
+            size="small"
+            icon={<ReloadOutlined />}
+          />
+        </Tooltip>
         <Button onClick={onClickInstallPlugin} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
       <S.Container>
