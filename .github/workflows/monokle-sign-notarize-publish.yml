@@ -99,6 +99,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          USE_HARD_LINKS: false
         if: "!contains(github.ref, 'auto-updater')"
 
       - name: Package
@@ -114,6 +115,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          USE_HARD_LINKS: false
         if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size
@@ -233,6 +235,7 @@ jobs:
           WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
+          USE_HARD_LINKS: false
         if: "!contains(github.ref, 'auto-updater')"
 
       - name: Package
@@ -243,6 +246,7 @@ jobs:
           WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
+          USE_HARD_LINKS: false
         if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size

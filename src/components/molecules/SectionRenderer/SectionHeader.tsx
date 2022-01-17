@@ -39,7 +39,7 @@ function SectionHeader(props: SectionHeaderProps) {
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {NameDisplay, NameSuffix} = useSectionCustomization(sectionBlueprint.customization);
+  const {NameDisplay, NameSuffix, NameContext} = useSectionCustomization(sectionBlueprint.customization);
 
   const toggleCollapse = useCallback(() => {
     if (isCollapsed) {
@@ -52,23 +52,6 @@ function SectionHeader(props: SectionHeaderProps) {
   const itemsLength = useMemo(() => {
     return sectionInstance?.visibleDescendantItemIds?.length || 0;
   }, [sectionInstance.visibleDescendantItemIds]);
-
-  const { shouldDisplayPlus, shouldDisplayContext } = useMemo(() => {
-    let _shouldDisplayPlus = false;
-    let _shouldDisplayContext = false;
-    if (NameSuffix.Component) {
-      if (NameSuffix.options?.isVisibleOnHover === undefined) {
-        _shouldDisplayContext = true;
-      } else {
-        _shouldDisplayPlus = NameSuffix.options?.isVisibleOnHover && isHovered;
-      }
-    }
-
-    return {
-      shouldDisplayPlus: _shouldDisplayPlus,
-      shouldDisplayContext: _shouldDisplayContext,
-    };
-  }, [NameSuffix.Component, NameSuffix.options, isHovered]);
 
   const onCheck = useCallback(() => {
     if (!sectionInstance.checkable || !sectionInstance.visibleDescendantItemIds) {
@@ -103,7 +86,9 @@ function SectionHeader(props: SectionHeaderProps) {
         {sectionInstance.checkable &&
           sectionInstance.isInitialized &&
           (sectionBlueprint.customization?.isCheckVisibleOnHover
-            ? sectionInstance.checkable.value === 'partial' || sectionInstance.checkable.value === 'checked' || isHovered
+            ? sectionInstance.checkable.value === 'partial' ||
+              sectionInstance.checkable.value === 'checked' ||
+              isHovered
             : true) && (
             <span>
               <S.Checkbox
@@ -130,7 +115,7 @@ function SectionHeader(props: SectionHeaderProps) {
             {itemsLength > 0 && (
               <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
             )}
-            {shouldDisplayPlus && NameSuffix.Component && (
+            {NameSuffix.Component && NameSuffix.options?.isVisibleOnHover && isHovered && (
               <NameSuffix.Component sectionInstance={sectionInstance} />
             )}
             <S.BlankSpace level={level} onClick={toggleCollapse} />
@@ -151,8 +136,8 @@ function SectionHeader(props: SectionHeaderProps) {
         )}
       </S.NameContainer>
       <S.NameDisplayContainer>
-        {!NameDisplay.Component && NameSuffix.Component && shouldDisplayContext && (
-          <NameSuffix.Component sectionInstance={sectionInstance} />
+        {!NameDisplay.Component && NameContext.Component && (
+          <NameContext.Component sectionInstance={sectionInstance} />
         )}
       </S.NameDisplayContainer>
     </S.SectionContainer>

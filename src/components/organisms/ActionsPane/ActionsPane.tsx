@@ -12,7 +12,6 @@ import {
   ACTIONS_PANE_FOOTER_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   NAVIGATOR_HEIGHT_OFFSET,
-  PREVIEW_PREFIX,
   TOOLTIP_DELAY,
 } from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -118,13 +117,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
     if (isButtonShrinked) {
       // 230px = approx width of not collapsed button
-      if (distance > 230) {
+      if (distance > 350) {
         setButtonShrinkedState(false);
       }
     }
 
     // The button has 10px margin-left
-    if (!isButtonShrinked && distance < 10) {
+    if (!isButtonShrinked && distance < 40) {
       setButtonShrinkedState(true);
     }
   }, [isButtonShrinked, tabsList]);
@@ -296,12 +295,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)) {
       return true;
     }
-    // if the resource is from the cluster preview
-    if (selectedResource.filePath === PREVIEW_PREFIX + String(currentConfig.kubeConfig?.path)) {
-      return true;
-    }
+
     return false;
-  }, [selectedResource, currentConfig.kubeConfig?.path]);
+  }, [selectedResource]);
 
   const onClickApplyResource = useCallback(
     (namespace?: string) => {

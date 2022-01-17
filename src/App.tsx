@@ -21,27 +21,28 @@ import {currentConfigSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import {
-  DiffModal,
+  ClusterDiffModal,
+  ClusterResourceDiffModal,
+  CreateFolderModal,
   HotKeysHandler,
+  LocalResourceDiffModal,
   MessageBox,
   NewResourceWizard,
   NotificationsDrawer,
   PageFooter,
   PageHeader,
   PaneManager,
+  QuickSearchActions,
+  RenameEntityModal,
   RenameResourceModal,
   SettingsDrawer,
   StartupModal,
+  UpdateModal,
 } from '@organisms';
 
 import ChangeFiltersConfirmModal from '@components/molecules/ChangeFiltersConfirmModal/ChangeFiltersConfirmModal';
 import SaveResourceToFileFolderModal from '@components/molecules/SaveResourcesToFileFolderModal';
-import {ClusterDiffModal} from '@components/organisms';
-import CreateFolderModal from '@components/organisms/CreateFolderModal';
 import CreateProjectModal from '@components/organisms/CreateProjectModal';
-import QuickSearchActions from '@components/organisms/QuickSearchActions';
-import RenameEntityModal from '@components/organisms/RenameEntityModal';
-import UpdateModal from '@components/organisms/UpdateModal';
 
 import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
@@ -133,7 +134,8 @@ const App = () => {
           <PaneManager />
           <PageFooter />
         </MainContainer>
-        <DiffModal />
+        <LocalResourceDiffModal />
+        <ClusterResourceDiffModal />
         <StartupModal />
         <NewResourceWizard />
         <QuickSearchActions />

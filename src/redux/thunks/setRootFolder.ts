@@ -24,7 +24,7 @@ import {getFileStats} from '@utils/files';
 
 export const setRootFolder = createAsyncThunk<
   SetRootFolderPayload,
-  string,
+  string | null,
   {
     dispatch: AppDispatch;
     state: RootState;
@@ -37,6 +37,10 @@ export const setRootFolder = createAsyncThunk<
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
 
+  if (!rootFolder) {
+    return;
+  }
+
   const stats = getFileStats(rootFolder);
   if (!stats) {
     return createRejectionWithAlert(thunkAPI, 'Missing folder', `Folder ${rootFolder} does not exist`);
@@ -48,24 +52,23 @@ export const setRootFolder = createAsyncThunk<
   const rootEntry: FileEntry = createFileEntry(rootFolder);
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
 
-    fileMap[ROOT_FILE_ENTRY] = rootEntry;
+  fileMap[ROOT_FILE_ENTRY] = rootEntry;
 
-    // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
-    const readFilesPromise = new Promise<string[]>(resolve => {
-      setImmediate(() => {
-        resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
-      });
+  // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
+  const readFilesPromise = new Promise<string[]>(resolve => {
+    setImmediate(() => {
+      resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
     });
-    const files = await readFilesPromise;
+  });
+  const files = await readFilesPromise;
 
-    rootEntry.children = files;
+  rootEntry.children = files;
 
-    processKustomizations(resourceMap, fileMap);
-    processParsedResources(resourceMap, resourceRefsProcessingOptions);
+  processKustomizations(resourceMap, fileMap);
+  processParsedResources(resourceMap, resourceRefsProcessingOptions);
 
-    monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
-    updateRecentFolders(thunkAPI, rootFolder);
-  }
+  monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
+  updateRecentFolders(thunkAPI, rootFolder);
 
   const generatedAlert = {
     title: 'Folder Import',

@@ -7,7 +7,7 @@ import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openResourceDiffModal, updateResourceFilter} from '@redux/reducers/main';
+import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
@@ -248,7 +248,7 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
-    dispatch(updateResourceFilter({labels: {}, annotations: {}}));
+    dispatch(resetResourceFilter());
   });
 
   useHotkeys(
