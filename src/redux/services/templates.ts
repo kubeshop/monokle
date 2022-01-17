@@ -1,13 +1,26 @@
 import fs from 'fs';
 
+import {AnyPlugin} from '@models/plugin';
 import {TemplatePack} from '@models/template';
 
-import {removeTemplate} from '@redux/reducers/extension';
+import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 import {AppDispatch} from '@redux/store';
 
 export const deleteStandalonTemplate = async (templatePath: string, dispatch: AppDispatch) => {
   dispatch(removeTemplate(templatePath));
   fs.rm(templatePath, {recursive: true, force: true}, () => {});
+};
+
+export const deletePlugin = async (plugin: AnyPlugin, pluginPath: string, dispatch: AppDispatch) => {
+  const modules = plugin.modules;
+
+  modules.forEach(m => {
+    if (m.type === 'template') {
+      dispatch(removeTemplate(m.path));
+    }
+  });
+  dispatch(removePlugin(pluginPath));
+  fs.rm(pluginPath, {recursive: true, force: true}, () => {});
 };
 
 export const deleteTemplatePack = async (
@@ -20,6 +33,7 @@ export const deleteTemplatePack = async (
   templates.forEach(template => {
     dispatch(removeTemplate(template.path));
   });
+  dispatch(removeTemplatePack(templatePackPath));
   fs.rm(templatePackPath, {recursive: true, force: true}, () => {});
 };
 
