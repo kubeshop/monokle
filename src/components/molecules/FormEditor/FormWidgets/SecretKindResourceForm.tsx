@@ -70,7 +70,7 @@ const secretTypes = [
   'bootstrap.kubernetes.io/token',
 ];
 
-export const SecretKindResourceForm = ({onChange, formData, disabled, ...args}: any) => {
+export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
   const [dataKeyValuePairs, setDataKeyValuePairs] = useState<{id: string; key: string; value: string}[]>([]);
   const [stringDataKeyValuePairs, setStringDataKeyValuePairs] = useState<{id: string; key: string; value: string}[]>(
     []
@@ -103,6 +103,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled, ...args}: 
         setDataKeyValuePairs(newDataKeyValuePairs.map(p => ({...p, id: uuidv4()})));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.data, formData.metadata?.name]);
 
   useEffect(() => {
@@ -124,6 +125,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled, ...args}: 
         setStringDataKeyValuePairs(newStringDataKeyValuePairs.map(p => ({...p, id: uuidv4()})));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.stringData, formData.metadata?.name]);
 
   useEffect(() => {
@@ -140,6 +142,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled, ...args}: 
         data: data || undefined,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataKeyValuePairs]);
 
   useEffect(() => {
@@ -156,6 +159,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled, ...args}: 
         stringData: stringData || undefined,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringDataKeyValuePairs]);
 
   const handleKeyValuePairFormChange = (key: string, value: {id: string; key: string; value: string}) => {
@@ -357,6 +361,7 @@ const TextAreaForm = ({value, onChange, disabled}: {value: string; onChange: Fun
     if (onChange) {
       onChange(localValue);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localValue]);
 
   return (
@@ -583,11 +588,16 @@ export const Base64Input = ({value, onChange, type = 'INPUT', disabled}: any) =>
   const [isEncoded, setIsEncoded] = useState(isBase64(inputValue));
 
   useEffect(() => {
-    if (isEncoded) {
-      setInputValue(value && isBase64(value) ? value : Buffer.from(value).toString('base64'));
-    } else {
-      setInputValue(value && isBase64(value) ? Buffer.from(value, 'base64').toString('utf-8') : value);
+    if (!value) {
+      setInputValue(value);
+      return;
     }
+    if (isEncoded) {
+      setInputValue(isBase64(value) ? value : Buffer.from(value).toString('base64'));
+    } else {
+      setInputValue(isBase64(value) ? Buffer.from(value, 'base64').toString('utf-8') : value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   useDebounce(
@@ -625,6 +635,7 @@ export const Base64Input = ({value, onChange, type = 'INPUT', disabled}: any) =>
     if (onChange) {
       onChange(debouncedValue);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue]);
 
   return (

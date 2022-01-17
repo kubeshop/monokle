@@ -84,7 +84,7 @@
     "@rjsf/antd": "3.2.1",
     "@rjsf/core": "3.2.1",
     "@trodi/electron-splashscreen": "1.0.2",
-    "@types/async": "3.2.11",
+    "@types/async": "3.2.12",
     "@types/flat": "5.0.2",
     "@types/lodash": "4.14.178",
     "ajv": "6.12.6",
