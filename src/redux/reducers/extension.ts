@@ -45,6 +45,10 @@ export const extensionSlice = createSlice({
       const {folderPath, extension} = action.payload;
       state.templatePackMap[folderPath] = extension;
     },
+    removeTemplatePack: (state: Draft<ExtensionState>, action: PayloadAction<string>) => {
+      const folderPath = action.payload;
+      delete state.templatePackMap[folderPath];
+    },
     setTemplatePackMap: (state: Draft<ExtensionState>, action: PayloadAction<Record<string, TemplatePack>>) => {
       state.templatePackMap = action.payload;
       state.isLoadingExistingTemplatePacks = false;
