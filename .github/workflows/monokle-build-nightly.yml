@@ -72,9 +72,10 @@ jobs:
           npm list --depth=1
 
       - name: Generate and apply tag
+        id: apply-tag
         run: |
           npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true
-          export TAG=$(cat package.json | jq '.version') 
+          echo "::set-output name=TAG::$(cat package.json | jq '.version') 
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -106,7 +107,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: ${{ TAG }}
+          tag: ${{ steps.apply-tag.outputs.TAG }}
           token: ${{ secrets.github_token }}
 
       # Check Binary Sizes
@@ -184,11 +185,12 @@ jobs:
           npm list --depth=1
 
       - name: Generate and apply tag
+        id: apply-tag
         run: |
           Set-PSDebug -Trace 1
           npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true
           $p = get-content package.json | ConvertFrom-Json
-          SET TAG $($p.version) 
+          echo "::set-output name=TAG::$p.version"
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -223,7 +225,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: ${{ TAG }}
+          tag: ${{ steps.apply-tag.outputs.TAG }}
           token: ${{ secrets.github_token }}
 
       - name: Build Failed - Archive Build Logs
