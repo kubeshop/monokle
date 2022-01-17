@@ -3,13 +3,13 @@ import {ipcRenderer} from 'electron';
 import {UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 
 import {AlertEnum} from '@models/alert';
-import {UpdateExtensionsResult, isUpdateExtensionsResult} from '@models/extension';
+import {UpdateExtensionsPayload, UpdateExtensionsResult, isUpdateExtensionsResult} from '@models/extension';
 
 import {setAlert} from '@redux/reducers/alert';
 import {addMultiplePlugins, addMultipleTemplatePacks, addMultipleTemplates} from '@redux/reducers/extension';
 import {AppDispatch} from '@redux/store';
 
-export const updateExtensions = () => {
+export const updateExtensions = (payload: UpdateExtensionsPayload) => {
   return new Promise<UpdateExtensionsResult>((resolve, reject) => {
     const downloadTemplateResult = (_: any, result: UpdateExtensionsResult | Error) => {
       if (result instanceof Error) {
@@ -23,13 +23,13 @@ export const updateExtensions = () => {
       resolve(result);
     };
     ipcRenderer.once(UPDATE_EXTENSIONS_RESULT, downloadTemplateResult);
-    ipcRenderer.send(UPDATE_EXTENSIONS);
+    ipcRenderer.send(UPDATE_EXTENSIONS, payload);
   });
 };
 
-export const checkForExtensionsUpdates = async (dispatch: AppDispatch) => {
+export const checkForExtensionsUpdates = async (payload: UpdateExtensionsPayload, dispatch: AppDispatch) => {
   try {
-    const result = await updateExtensions();
+    const result = await updateExtensions(payload);
     const {templateExtensions, templatePackExtensions, pluginExtensions} = result;
     dispatch(addMultipleTemplates(templateExtensions));
     dispatch(addMultipleTemplatePacks(templatePackExtensions));

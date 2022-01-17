@@ -62,6 +62,12 @@ export type DownloadTemplatePackResult = {
   templateExtensions: AnyExtension<AnyTemplate>[];
 };
 
+export type UpdateExtensionsPayload = {
+  templateMap: Record<string, AnyTemplate>;
+  templatePackMap: Record<string, TemplatePack>;
+  pluginMap: Record<string, AnyPlugin>;
+};
+
 export type UpdateExtensionsResult = {
   pluginExtensions: AnyExtension<AnyPlugin>[];
   templateExtensions: AnyExtension<AnyTemplate>[];
