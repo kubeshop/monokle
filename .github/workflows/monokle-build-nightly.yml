@@ -74,7 +74,7 @@ jobs:
       - name: Generate and apply tag
         id: apply-tag
         run: |
-          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true
+          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
           echo "::set-output name=TAG::$(cat package.json | jq -r '.version')"
           git push --tags
         env:
@@ -189,7 +189,7 @@ jobs:
         run: |
           Set-PSDebug -Trace 1
           $datetoday = Get-Date -Format "yyyy-MM-dd"
-          npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true
+          npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true --skip.tag true
           $p = get-content package.json | ConvertFrom-Json
           echo "::set-output name=TAG::$($p.version)"
           git push --tags
@@ -241,6 +241,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Make sure build is clean and no files from a previous run are re-used.
+      - name: Cleanup files before run
+        run: |
+          rm -rf *
+          rm /Users/runner/.npm/_logs/*.log || true
+        if: ${{ always() }}
+
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -281,7 +288,7 @@ jobs:
       - name: Generate and apply tag
         id: apply-tag
         run: |
-          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog=true --skip.commit=true
+          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
           echo "::set-output name=TAG::$(cat package.json | jq -r '.version')"
           git push --tags
         env:
