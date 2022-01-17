@@ -3,9 +3,6 @@ name: monokle-build-nightly
 on:
   schedule:
     - cron: '0 2 * * *'
-  push:
-    branches:
-      - erdikose/feature/sign-publish-nightly-builds
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
