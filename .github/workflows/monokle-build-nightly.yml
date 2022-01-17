@@ -95,6 +95,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          USE_HARD_LINKS: false
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -208,6 +209,7 @@ jobs:
           WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
+          USE_HARD_LINKS: false
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -304,6 +306,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
+          USE_HARD_LINKS: false
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
