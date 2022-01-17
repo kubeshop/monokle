@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - erdikose/fix/pipelines-failing-issue
   release:
     types:
       - prereleased
@@ -108,7 +107,7 @@ jobs:
           omitBody: true
           tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
-        if: "!contains(github.ref, 'erdikose/fix/pipelines-failing-issue')"
+        if: "!contains(github.ref, 'main')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -218,7 +217,7 @@ jobs:
           omitBody: true
           tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
-        if: "!contains(github.ref, 'erdikose/fix/pipelines-failing-issue')"
+        if: "!contains(github.ref, 'main')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -300,7 +299,7 @@ jobs:
           omitBody: true
           tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
-        if: "!contains(github.ref, 'erdikose/fix/pipelines-failing-issue')"
+        if: "!contains(github.ref, 'main')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
