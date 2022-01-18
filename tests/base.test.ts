@@ -10,21 +10,22 @@ import {
   waitForModalToHide,
   waitForModalToShow,
 } from './antdHelpers';
-import {findLatestBuild, parseElectronApp} from './electronHelpers';
+import {ElectronAppInfo, findLatestBuild, parseElectronApp} from './electronHelpers';
 import {ElectronApplication, expect, test} from '@playwright/test';
 
 let electronApp: ElectronApplication;
 let appWindow: Page;
+let appInfo: ElectronAppInfo;
 
 test.beforeAll(async () => {
   // find the latest build in the out directory
   const latestBuild = findLatestBuild();
   // parse the directory and find paths and other info
-  const appInfo = parseElectronApp(latestBuild);
+  appInfo = parseElectronApp(latestBuild);
   electronApp = await electron.launch({
     args: [appInfo.main],
     executablePath: appInfo.executable,
-    recordVideo: {dir: `./test-output/videos/${appInfo.platform}`, size: {width: 1200, height: 800}},
+    recordVideo: {dir: `./test-output/${appInfo.platform}/videos`, size: {width: 1200, height: 800}},
   });
 
   // wait for splash-screen to pass
@@ -46,7 +47,7 @@ test.beforeAll(async () => {
   }
 
   // Capture a screenshot.
-  await appWindow.screenshot({path: 'test-output/screenshots/initial-screen.png'});
+  await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/initial-screen.png`});
 });
 
 test.beforeEach(async () => {
@@ -195,7 +196,7 @@ test('Validate open folder', async () => {
 });
 
 test.afterAll(async () => {
-  await appWindow.screenshot({path: 'test-output/screenshots/final-screen.png'});
+  await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/final-screen.png`});
   await appWindow.context().close();
   await appWindow.close();
 });
