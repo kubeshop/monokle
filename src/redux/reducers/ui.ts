@@ -4,7 +4,14 @@ import path from 'path';
 
 import {KUSTOMIZATION_KIND} from '@constants/constants';
 
-import {LeftMenuSelection, MonacoUiState, NewResourceWizardInput, PaneConfiguration, UiState} from '@models/ui';
+import {
+  HighlightItems,
+  LeftMenuSelection,
+  MonacoUiState,
+  NewResourceWizardInput,
+  PaneConfiguration,
+  UiState,
+} from '@models/ui';
 
 import initialState from '@redux/initialState';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -120,6 +127,18 @@ export const uiSlice = createSlice({
         rootDir: '',
       };
     },
+    openCreateProjectModal: (state: Draft<UiState>, action: PayloadAction<{fromTemplate: boolean}>) => {
+      state.createProjectModal = {
+        isOpen: true,
+        fromTemplate: action.payload.fromTemplate,
+      };
+    },
+    closeCreateProjectModal: (state: Draft<UiState>) => {
+      state.createProjectModal = {
+        isOpen: false,
+        fromTemplate: false,
+      };
+    },
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
@@ -179,12 +198,11 @@ export const uiSlice = createSlice({
       state.paneConfiguration = defaultPaneConfiguration;
       electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);
     },
-    setClusterIconHighlightStatus: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.clusterPaneIconHighlighted = action.payload;
-    },
-    toggleClusterStatus: (state: Draft<UiState>) => {
-      state.clusterStatusHidden = !state.clusterStatusHidden;
-      electronStore.set('ui.clusterStatusHidden', state.clusterStatusHidden);
+    highlightItem: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
+      state.highlightedItems.clusterPaneIcon = action.payload === HighlightItems.CLUSTER_PANE_ICON;
+      state.highlightedItems.createResource = action.payload === HighlightItems.CREATE_RESOURCE;
+      state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
+      state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
     },
   },
   extraReducers: builder => {
@@ -238,10 +256,11 @@ export const {
   closeRenameEntityModal,
   openCreateFolderModal,
   closeCreateFolderModal,
+  openCreateProjectModal,
+  closeCreateProjectModal,
   toggleExpandActionsPaneFooter,
   resetLayout,
-  setClusterIconHighlightStatus,
-  toggleClusterStatus,
+  highlightItem,
   openQuickSearchActionsPopup,
   closeQuickSearchActionsPopup,
   openSaveResourcesToFileFolderModal,

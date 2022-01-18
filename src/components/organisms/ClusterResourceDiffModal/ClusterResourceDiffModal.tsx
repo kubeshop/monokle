@@ -17,7 +17,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, updateResource} from '@redux/reducers/main';
-import {isInClusterModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -39,8 +39,8 @@ const monacoEditorOptions = {
 const ClusterResourceDiffModal = () => {
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
@@ -102,9 +102,9 @@ const ClusterResourceDiffModal = () => {
     const resource = resourceMap[selectedMatchingResourceId];
 
     return isKustomizationResource(resource)
-      ? makeApplyKustomizationText(resource.name, kubeconfigContext)
-      : makeApplyResourceText(resource.name, kubeconfigContext);
-  }, [kubeconfigContext, selectedMatchingResourceId, resourceMap]);
+      ? makeApplyKustomizationText(resource.name, kubeConfigContext)
+      : makeApplyResourceText(resource.name, kubeConfigContext);
+  }, [kubeConfigContext, selectedMatchingResourceId, resourceMap]);
 
   const matchingLocalResources = useMemo(() => {
     if (!targetResource) {
@@ -136,7 +136,7 @@ const ClusterResourceDiffModal = () => {
     if (selectedMatchingResourceId) {
       const resource = resourceMap[selectedMatchingResourceId];
       if (resource) {
-        applyResource(resource.id, resourceMap, fileMap, dispatch, kubeconfigPath, kubeconfigContext || '', namespace, {
+        applyResource(resource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
           isClusterPreview: previewType === 'cluster',
         });
         onCloseHandler();

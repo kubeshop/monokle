@@ -46,7 +46,8 @@ export function createFileEntry(fileEntryPath: string) {
  */
 
 export function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
-  return appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
+  const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
+  return scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
 }
 
 /**
@@ -108,7 +109,8 @@ export function readFiles(
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
-        if (depth === appConfig.folderReadsMaxDepth) {
+        const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+        if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
         } else {
           fileEntry.children = readFiles(

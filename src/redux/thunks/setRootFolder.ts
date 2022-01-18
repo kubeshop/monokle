@@ -24,7 +24,7 @@ import {getFileStats} from '@utils/files';
 
 export const setRootFolder = createAsyncThunk<
   SetRootFolderPayload,
-  string,
+  string | null,
   {
     dispatch: AppDispatch;
     state: RootState;
@@ -37,6 +37,16 @@ export const setRootFolder = createAsyncThunk<
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
 
+  if (!rootFolder) {
+    return {
+      appConfig,
+      fileMap,
+      resourceMap,
+      helmChartMap,
+      helmValuesMap,
+    };
+  }
+
   const stats = getFileStats(rootFolder);
   if (!stats) {
     return createRejectionWithAlert(thunkAPI, 'Missing folder', `Folder ${rootFolder} does not exist`);
@@ -46,6 +56,8 @@ export const setRootFolder = createAsyncThunk<
   }
 
   const rootEntry: FileEntry = createFileEntry(rootFolder);
+  fileMap[ROOT_FILE_ENTRY] = rootEntry;
+
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
 
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
@@ -64,19 +76,21 @@ export const setRootFolder = createAsyncThunk<
   monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
   updateRecentFolders(thunkAPI, rootFolder);
 
+  const generatedAlert = {
+    title: 'Folder Import',
+    message: `${Object.values(resourceMap).length} resources found in ${
+      Object.values(fileMap).filter(f => !f.children).length
+    } files`,
+    type: AlertEnum.Success,
+  };
+
   return {
     appConfig,
     fileMap,
     resourceMap,
     helmChartMap,
     helmValuesMap,
-    alert: {
-      title: 'Folder Import',
-      message: `${Object.values(resourceMap).length} resources found in ${
-        Object.values(fileMap).filter(f => !f.children).length
-      } files`,
-      type: AlertEnum.Success,
-    },
+    alert: rootFolder ? generatedAlert : undefined,
   };
 });
 
