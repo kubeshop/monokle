@@ -1,6 +1,6 @@
 # Applying and Diffing Resources
 
-At any time when a resource is selected in the navigator the Editor contains "Apply" and "Diff" buttons in the top right.
+At any time when a resource is selected in the Navigator the Editor contains "Apply" and "Diff" buttons in the top right.
 
 ![Apply and Diff buttons](img/apply-and-diff-buttons.png)
 

@@ -4,6 +4,8 @@ Monokle is laid out like many other desktop applications:
 
 ![Monokle UI](img/monokle-ui-1.4.0.png)
 
+(On start-up, Monokle automatically loads the most recently selected folder or cluster.)
+
 Left to right:
 
 - The vertical toolbar to the far left allows you to switch between File, Kustomize, Helm and Cluster mode.

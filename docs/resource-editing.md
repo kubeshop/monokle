@@ -29,6 +29,14 @@ Resource links are marked in the gutter and underlined in the Editor, with corre
 Broken links are shown with yellow triangles in the Editor as in the Navigator:
 
 ![Source Editor Broken Links](img/source-editor-broken-links.png)
+
+Hover over the broken link in the Editor to show the options for working with the broken link:
+
+![Source Editor Broken Links](img/create-resource-from-unsatisfied-link-1.5.0.png)
+
+When editing a resource, click on the document icon at the top right of the Editor pane to open the corresponding kubernetes documentation in a browser window:
+
+![Source Editor Broken Links](img/resource-open-k8s-documentation-1.5.0.png)
   
 ## Add Resource
 
