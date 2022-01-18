@@ -10,8 +10,15 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {AppConfig} from '@models/appconfig';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
+import {KustomizeCommandType} from '@redux/services/kustomize';
 import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
+
+export type KustomizeCommandOptions = {
+  folder: string;
+  kustomizeCommand: KustomizeCommandType;
+  enableHelm: boolean;
+};
 
 /**
  * Thunk to preview kustomizations
@@ -56,6 +63,10 @@ function runKustomize(folder: string, appConfig: AppConfig): any {
     ipcRenderer.once('kustomize-result', (event, arg) => {
       resolve(arg);
     });
-    ipcRenderer.send('run-kustomize', {folder, kustomizeCommand: appConfig.settings.kustomizeCommand});
+    ipcRenderer.send('run-kustomize', {
+      folder,
+      kustomizeCommand: appConfig.settings.kustomizeCommand,
+      enableHelm: appConfig.settings.enableHelmWithKustomize,
+    } as KustomizeCommandOptions);
   });
 }
