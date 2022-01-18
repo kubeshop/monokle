@@ -5,14 +5,14 @@ import {useSelector} from 'react-redux';
 
 import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
 
-import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import micromatch from 'micromatch';
 import path from 'path';
 import styled from 'styled-components';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {BrowseFolderTooltip, FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
+import {FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
 import {FileMapType, ResourceMapType} from '@models/appstate';
@@ -20,16 +20,15 @@ import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setScanExcludesStatus, updateScanExcludes} from '@redux/reducers/appConfig';
+import {setScanExcludesStatus, updateProjectConfig} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
-  closeFolderExplorer,
   openCreateFolderModal,
   openNewResourceWizard,
   openRenameEntityModal,
   setShouldExpandAllNodes,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {fileIncludesSelector, isInPreviewModeSelector, scanExcludesSelector, settingsSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
@@ -37,15 +36,12 @@ import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
-import FileExplorer from '@atoms/FileExplorer';
 
 import Dots from '@components/atoms/Dots';
 import Icon from '@components/atoms/Icon';
 import ContextMenu from '@components/molecules/ContextMenu';
 
-import {useFileExplorer} from '@hooks/useFileExplorer';
-
-import {DeleteEntityCallback, deleteEntity, getFileStats} from '@utils/files';
+import {DeleteEntityCallback, deleteEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';
 import {showItemInFolder} from '@utils/shell';
 
@@ -260,10 +256,23 @@ const NoFilesContainer = styled.div`
   margin-top: 10px;
 `;
 
-const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
+const StyledTreeContainer = styled.div`
   margin-left: 2px;
   margin-top: 10px;
+`;
 
+const StyledRootFolderText = styled.div`
+  font-size: 12px;
+  line-height: 22px;
+  color: ${Colors.grey7};
+  margin-left: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
+  margin-top: 10px;
   .ant-tree-switcher svg {
     color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
   }
@@ -323,8 +332,6 @@ const StyledSkeleton = styled(Skeleton)`
 `;
 
 const ReloadButton = styled(Button)``;
-
-const BrowseButton = styled(Button)``;
 
 const SpinnerWrapper = styled.div`
   position: absolute;
@@ -630,40 +637,26 @@ const FileTreePane = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const dispatch = useAppDispatch();
-  const excludedFromScanFiles = useAppSelector(state => state.config.scanExcludes);
-  const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
-  const hideExcludedFilesInFileExplorer = useAppSelector(
-    state => state.config.settings.hideExcludedFilesInFileExplorer
-  );
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const isSelectingFile = useAppSelector(state => state.main.isSelectingFile);
-  const loadLastFolderOnStartup = useAppSelector(state => state.config.settings.loadLastFolderOnStartup);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const recentFolders = useAppSelector(state => state.config.recentFolders);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const scanExcludes = useAppSelector(state => state.config.scanExcludes);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
   const uiState = useAppSelector(state => state.ui);
+  const configState = useAppSelector(state => state.config);
+  const scanExcludes = useAppSelector(scanExcludesSelector);
+  const fileIncludes = useAppSelector(fileIncludesSelector);
+  const {hideExcludedFilesInFileExplorer} = useAppSelector(settingsSelector);
 
   const treeRef = useRef<any>();
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
-
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    ({folderPath}) => {
-      if (folderPath) {
-        setFolder(folderPath);
-      }
-      setAutoExpandParent(true);
-    },
-    {isDirectoryExplorer: true}
-  );
 
   const setFolder = useCallback(
     (folder: string) => {
@@ -679,9 +672,16 @@ const FileTreePane = () => {
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
+
     const treeData =
       rootEntry &&
-      createNode(rootEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter);
+      createNode(
+        rootEntry,
+        fileMap,
+        resourceMap,
+        Boolean(hideExcludedFilesInFileExplorer),
+        fileOrFolderContainedInFilter
+      );
 
     setTree(treeData);
 
@@ -808,16 +808,22 @@ const FileTreePane = () => {
   };
 
   const onExcludeFromProcessing = (relativePath: string) => {
-    dispatch(updateScanExcludes([...excludedFromScanFiles, relativePath]));
-
+    dispatch(
+      updateProjectConfig({
+        ...configState.projectConfig,
+        scanExcludes: [...scanExcludes, relativePath],
+      })
+    );
     openConfirmModal();
   };
 
   const onIncludeToProcessing = (relativePath: string) => {
     dispatch(
-      updateScanExcludes(excludedFromScanFiles.filter((_, index) => excludedFromScanFiles[index] !== relativePath))
+      updateProjectConfig({
+        ...configState.projectConfig,
+        scanExcludes: scanExcludes.filter(scanExclude => scanExclude !== relativePath),
+      })
     );
-
     openConfirmModal();
   };
 
@@ -826,13 +832,6 @@ const FileTreePane = () => {
       dispatch(setSelectingFile(false));
     }
   }, [isSelectingFile, dispatch]);
-
-  useEffect(() => {
-    if (uiState.leftMenu.selection === 'file-explorer' && uiState.folderExplorer.isOpen) {
-      openFileExplorer();
-      dispatch(closeFolderExplorer());
-    }
-  }, [uiState, dispatch, openFileExplorer]);
 
   const onExpand = (expandedKeysValue: React.Key[]) => {
     setExpandedKeys(expandedKeysValue);
@@ -849,17 +848,6 @@ const FileTreePane = () => {
     [setFolder]
   );
 
-  const onExecutedFrom = useCallback(
-    (_, data) => {
-      const folder = data.path || (loadLastFolderOnStartup && recentFolders.length > 0 ? recentFolders[0] : undefined);
-      if (folder && getFileStats(folder)?.isDirectory()) {
-        setFolder(folder);
-        setAutoExpandParent(true);
-      }
-    },
-    [loadLastFolderOnStartup, setFolder, recentFolders]
-  );
-
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {
     ipcRenderer.on('set-root-folder', onSelectRootFolderFromMainThread);
@@ -867,13 +855,6 @@ const FileTreePane = () => {
       ipcRenderer.removeListener('set-root-folder', onSelectRootFolderFromMainThread);
     };
   }, [onSelectRootFolderFromMainThread]);
-
-  useEffect(() => {
-    ipcRenderer.on('executed-from', onExecutedFrom);
-    return () => {
-      ipcRenderer.removeListener('executed-from', onExecutedFrom);
-    };
-  }, [onExecutedFrom]);
 
   const allTreeKeys = useMemo(() => {
     if (!tree) return [];
@@ -1003,67 +984,61 @@ const FileTreePane = () => {
                     disabled={isButtonDisabled}
                   />
                 </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseFolderTooltip}>
-                  <BrowseButton
-                    icon={<FolderAddOutlined />}
-                    size="small"
-                    type="primary"
-                    ghost
-                    onClick={openFileExplorer}
-                  >
-                    {Number(uiState.paneConfiguration.leftWidth.toFixed(2)) < 0.2 ? '' : 'Browse'}
-                  </BrowseButton>
-                </Tooltip>
               </RightButtons>
             </TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
-        <FileExplorer {...fileExplorerProps} />
       </Row>
       {uiState.isFolderLoading ? (
         <StyledSkeleton active />
       ) : tree ? (
-        <StyledTreeDirectoryTree
-          // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
-          height={
-            windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET
-              ? windowHeight - FILE_TREE_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0)
-              : 0
-          }
-          onSelect={onSelect}
-          treeData={[tree]}
-          ref={treeRef}
-          expandedKeys={expandedKeys}
-          onExpand={onExpand}
-          titleRender={event => {
-            return (
-              <TreeItem
-                treeKey={String(event.key)}
-                title={event.title}
-                processingEntity={processingEntity}
-                setProcessingEntity={setProcessingEntity}
-                onDelete={onDelete}
-                onRename={onRename}
-                onExcludeFromProcessing={onExcludeFromProcessing}
-                onIncludeToProcessing={onIncludeToProcessing}
-                onCreateFolder={onCreateFolder}
-                onCreateResource={onCreateResource}
-                onFilterByFileOrFolder={onFilterByFileOrFolder}
-                onPreview={onPreview}
-                {...event}
-              />
-            );
-          }}
-          autoExpandParent={autoExpandParent}
-          selectedKeys={[selectedPath || '-']}
-          filterTreeNode={node => {
-            // @ts-ignore
-            return node.highlight;
-          }}
-          disabled={isInPreviewMode || previewLoader.isLoading}
-          showIcon
-          showLine={{showLeafIcon: false}}
-        />
+        <StyledTreeContainer>
+          <StyledRootFolderText>
+            <div>{fileMap[ROOT_FILE_ENTRY].filePath}</div>
+            <div>{Object.values(fileMap).filter(f => !f.children).length} files</div>
+          </StyledRootFolderText>
+          <StyledTreeDirectoryTree
+            // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
+            height={
+              windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET
+                ? windowHeight - FILE_TREE_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0)
+                : 0
+            }
+            onSelect={onSelect}
+            treeData={[tree]}
+            ref={treeRef}
+            expandedKeys={expandedKeys}
+            onExpand={onExpand}
+            titleRender={event => {
+              return (
+                <TreeItem
+                  treeKey={String(event.key)}
+                  title={event.title}
+                  processingEntity={processingEntity}
+                  setProcessingEntity={setProcessingEntity}
+                  onDelete={onDelete}
+                  onRename={onRename}
+                  onExcludeFromProcessing={onExcludeFromProcessing}
+                  onIncludeToProcessing={onIncludeToProcessing}
+                  onCreateFolder={onCreateFolder}
+                  onCreateResource={onCreateResource}
+                  onFilterByFileOrFolder={onFilterByFileOrFolder}
+                  onPreview={onPreview}
+                  {...event}
+                />
+              );
+            }}
+            autoExpandParent={autoExpandParent}
+            selectedKeys={[selectedPath || '-']}
+            filterTreeNode={node => {
+              // @ts-ignore
+              return node.highlight;
+            }}
+            disabled={isInPreviewMode || previewLoader.isLoading}
+            showIcon
+            showLine={{showLeafIcon: false}}
+          />
+        </StyledTreeContainer>
       ) : (
         <NoFilesContainer>
           Get started by selecting a folder containing manifests, kustomizations or Helm Charts.

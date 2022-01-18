@@ -136,9 +136,7 @@ function SectionHeader(props: SectionHeaderProps) {
         )}
       </S.NameContainer>
       <S.NameDisplayContainer>
-        {!NameDisplay.Component && NameContext.Component && (
-          <NameContext.Component sectionInstance={sectionInstance} />
-        )}
+        {!NameDisplay.Component && NameContext.Component && <NameContext.Component sectionInstance={sectionInstance} />}
       </S.NameDisplayContainer>
     </S.SectionContainer>
   );

@@ -59,7 +59,9 @@ export function processHelmChartFolder(
     if (fileIsExcluded(appConfig, fileEntry)) {
       fileEntry.isExcluded = true;
     } else if (getFileStats(filePath)?.isDirectory()) {
-      if (depth === appConfig.folderReadsMaxDepth) {
+      const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+
+      if (depth === folderReadsMaxDepth) {
         log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
       } else {
         fileEntry.children = readFiles(

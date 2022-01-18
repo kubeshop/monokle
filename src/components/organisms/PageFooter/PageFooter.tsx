@@ -30,7 +30,7 @@ const PageFooter = () => {
   const rootEntry = fileMap[ROOT_FILE_ENTRY];
 
   // not counting the root
-  const nrOfFiles = Object.keys(fileMap).length - 1;
+  const nrOfFiles = Object.values(fileMap).filter(f => !f.children).length;
 
   ipcRenderer.send('app-version');
   ipcRenderer.once('app-version', (_, {version}) => {

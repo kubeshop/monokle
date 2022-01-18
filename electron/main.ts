@@ -20,30 +20,36 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
-import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
+import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
-import {updateNewVersion} from '@redux/reducers/appConfig';
+import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
+import asyncLib from "async";
 
 import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
 import terminal from '../cli/terminal';
-import {downloadPlugin, loadPlugins} from './pluginService';
+import {downloadPlugin, loadPluginMap, updatePlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
-import {setAppRehydrating, setPlugins} from '@redux/reducers/main';
+import {setAppRehydrating} from '@redux/reducers/main';
+import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
-import { indexOf } from 'lodash';
+import {indexOf} from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
-import { RootState } from '@redux/store';
+import {createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges} from './ipcMainRedux';
+import {RootState} from '@redux/store';
+import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack, updateTemplate, updateTemplatePack} from './templateService';
+import {AnyTemplate, TemplatePack} from '@models/template';
+import {AnyPlugin} from '@models/plugin';
+import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 
 Object.assign(console, ElectronLog.functions);
@@ -54,7 +60,10 @@ const isDev = PROCESS_ENV.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
+const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
+const templatesDir = path.join(userDataDir, 'monokleTemplates');
+const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
 ipcMain.on('get-user-home-dir', event => {
@@ -63,8 +72,10 @@ ipcMain.on('get-user-home-dir', event => {
 
 ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   try {
-    const plugin = await downloadPlugin(pluginUrl, pluginsDir);
-    event.sender.send(DOWNLOAD_PLUGIN_RESULT, plugin);
+    const pluginExtension = await downloadPlugin(pluginUrl, pluginsDir);
+    const templateExtensions = await loadTemplatesFromPlugin(pluginExtension.extension);
+    const downloadPluginResult: DownloadPluginResult = {pluginExtension, templateExtensions};
+    event.sender.send(DOWNLOAD_PLUGIN_RESULT, downloadPluginResult);
   } catch (err) {
     if (err instanceof Error) {
       event.sender.send(DOWNLOAD_PLUGIN_RESULT, err);
@@ -72,6 +83,114 @@ ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
       log.warn(err);
     }
   }
+});
+
+ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
+  try {
+    const templateExtension = await downloadTemplate(templateUrl, templatesDir);
+    const downloadTemplateResult: DownloadTemplateResult = {templateExtension};
+    event.sender.send(DOWNLOAD_TEMPLATE_RESULT, downloadTemplateResult);
+  } catch (err) {
+    if (err instanceof Error) {
+      event.sender.send(DOWNLOAD_TEMPLATE_RESULT, err);
+    } else {
+      log.warn(err);
+    }
+  }
+});
+
+ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event, templatePackUrl: string) => {
+  try {
+    const templatePackExtension = await downloadTemplatePack(templatePackUrl, templatePacksDir);
+    const templateExtensions = await loadTemplatesFromTemplatePack(templatePackExtension.extension);
+    const downloadTemplatePackResult: DownloadTemplatePackResult = {templatePackExtension, templateExtensions};
+    event.sender.send(DOWNLOAD_TEMPLATE_PACK_RESULT, downloadTemplatePackResult);
+  } catch (err) {
+    if (err instanceof Error) {
+      event.sender.send(DOWNLOAD_TEMPLATE_PACK_RESULT, err);
+    } else {
+      log.warn(err);
+    }
+  }
+});
+
+type UpdateExtensionsPayload = {
+  templateMap: Record<string, AnyTemplate>;
+  templatePackMap: Record<string, TemplatePack>;
+  pluginMap: Record<string, AnyPlugin>;
+};
+
+ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) => {
+  const {templateMap, pluginMap, templatePackMap} = payload;
+  let errorMessage = '';
+
+  const standaloneTemplates = Object.entries(templateMap).filter(
+    ([key]) => key.startsWith(templatesDir)
+  ).map(([_, value]) => value);
+
+  const updatedStandaloneTemplateExtensions: (AnyExtension<AnyTemplate> | undefined)[] = await asyncLib.map(standaloneTemplates, async (template: AnyTemplate) => {
+    try {
+      const templateExtension = await updateTemplate(template, templatesDir, userTempDir);
+      return templateExtension;
+    }
+    catch(e) {
+      if (e instanceof Error) {
+        errorMessage += `${e.message}\n`;
+      }
+    }
+  });
+
+  const updatedPluginExtensions: (AnyExtension<AnyPlugin> | undefined)[] = await asyncLib.map(Object.values(pluginMap), async (plugin: AnyPlugin) => {
+    try {
+      const pluginExtension = await updatePlugin(plugin, pluginsDir, userTempDir);
+      return pluginExtension;
+    } catch(e) {
+      if (e instanceof Error) {
+        errorMessage += `${e.message}\n`;
+      }
+    }
+  });
+
+  const updatedTemplatePackExtensions: (AnyExtension<TemplatePack> | undefined)[] = await asyncLib.map(Object.values(templatePackMap), async (templatePack: TemplatePack) => {
+    try {
+      const templatePackExtension = await updateTemplatePack(templatePack, templatePacksDir, userTempDir);
+      return templatePackExtension;
+    } catch(e) {
+      if (e instanceof Error) {
+        errorMessage += `${e.message}\n`;
+      }
+    }
+  });
+
+  if (errorMessage.trim().length > 0) {
+    log.warn("[Update Extensions]:", errorMessage);
+  }
+
+  const updateExtensionsResult: UpdateExtensionsResult = {
+    pluginExtensions: updatedPluginExtensions.filter((x): x is AnyExtension<AnyPlugin> => x != null),
+    templateExtensions: updatedStandaloneTemplateExtensions.filter((x): x is AnyExtension<AnyTemplate> => x != null),
+    templatePackExtensions: updatedTemplatePackExtensions.filter((x): x is AnyExtension<TemplatePack> => x != null),
+  };
+
+  const updatedTemplateExtensionsFromPlugins: AnyExtension<AnyTemplate>[][] = await asyncLib.map(
+    updateExtensionsResult.pluginExtensions,
+    async (pluginExtension: AnyExtension<AnyPlugin>
+  ) => {
+    const templateExtensions = await loadTemplatesFromPlugin(pluginExtension.extension);
+    return templateExtensions;
+  });
+
+  const updatedTemplateExtensionsFromTemplatePacks: AnyExtension<AnyTemplate>[][] = await asyncLib.map(
+    updateExtensionsResult.templatePackExtensions,
+    async (templatePackExtension: AnyExtension<TemplatePack>
+  ) => {
+    const templateExtensions = await loadTemplatesFromTemplatePack(templatePackExtension.extension);
+    return templateExtensions;
+  });
+
+  updateExtensionsResult.templateExtensions.push(...updatedTemplateExtensionsFromPlugins.flat(), ...updatedTemplateExtensionsFromTemplatePacks.flat());
+
+  event.sender.send(UPDATE_EXTENSIONS_RESULT, updateExtensionsResult);
 });
 
 ipcMain.on('run-kustomize', (event, cmdOptions: KustomizeCommandOptions) => {
@@ -192,6 +311,16 @@ export const createWindow = (givenPath?: string) => {
     });
 
     dispatch(setAppRehydrating(true));
+    dispatch(setUserDirs({
+      homeDir: userHomeDir,
+      tempDir: userTempDir,
+      dataDir: userDataDir
+    }));
+    dispatch(setExtensionsDirs({
+      templatesDir,
+      templatePacksDir,
+      pluginsDir
+    }));
     await checkNewVersion(dispatch, true);
     initKubeconfig(dispatch, userHomeDir);
     dispatch(setAppRehydrating(false));
@@ -201,7 +330,6 @@ export const createWindow = (givenPath?: string) => {
 
     if (missingDependencies.includes('kustomize') && isUserAbleToRunKubectlKustomize) {
       missingDependencies.splice(indexOf(missingDependencies, 'kustomize'), 1);
-
     }
 
     if (missingDependencies.length > 0) {
@@ -214,9 +342,12 @@ export const createWindow = (givenPath?: string) => {
     }
     win.webContents.send('executed-from', {path: givenPath});
 
-    loadPlugins(pluginsDir).then(plugins => {
-      dispatch(setPlugins(plugins));
-    });
+    const pluginMap = await loadPluginMap(pluginsDir);
+    dispatch(setPluginMap(pluginMap));
+    const templatePackMap = await loadTemplatePackMap(templatePacksDir);
+    dispatch(setTemplatePackMap(templatePackMap));
+    const templateMap = await loadTemplateMap(templatesDir, {plugins: Object.values(pluginMap), templatePacks: Object.values(templatePackMap)});
+    dispatch(setTemplateMap(templateMap));
   });
 
   return win;
@@ -274,15 +405,14 @@ if (MONOKLE_RUN_AS_NODE) {
   openApplication();
 }
 
-terminal()
-  // eslint-disable-next-line no-console
-  .catch(e => console.log(e));
+terminal().catch(e => log.error(e));
 
 export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   if (window.isDestroyed()) {
     return;
   }
   const isInPreviewMode = isInPreviewModeSelector(state);
+  const kubeConfigContext = kubeConfigContextSelector(state);
   const previewType = state.main.previewType;
   const previewResourceId = state.main.previewResourceId;
   const resourceMap = state.main.resourceMap;
@@ -313,7 +443,7 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
     return;
   }
   if (isInPreviewMode && previewType === 'cluster') {
-    windowTitle = `Monokle - previewing context [${  String(state.config.kubeConfig.currentContext)  }]` || 'Monokle';
+    windowTitle = `Monokle - previewing context [${ kubeConfigContext  }]` || 'Monokle';
     window.setTitle(windowTitle);
     return;
   }

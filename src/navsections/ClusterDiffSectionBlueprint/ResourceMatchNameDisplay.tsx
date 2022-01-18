@@ -21,6 +21,7 @@ import {
   unselectClusterDiffMatch,
   updateResource,
 } from '@redux/reducers/main';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -87,8 +88,8 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -121,9 +122,9 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     }
 
     return isKustomizationResource(firstLocalResource)
-      ? makeApplyKustomizationText(firstLocalResource.name, kubeconfigContext)
-      : makeApplyResourceText(firstLocalResource.name, kubeconfigContext);
-  }, [firstLocalResource, kubeconfigContext]);
+      ? makeApplyKustomizationText(firstLocalResource.name, kubeConfigContext)
+      : makeApplyResourceText(firstLocalResource.name, kubeConfigContext);
+  }, [firstLocalResource, kubeConfigContext]);
 
   const onClickDiff = () => {
     if (!firstLocalResource) {
@@ -147,8 +148,9 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       resourceMap,
       fileMap,
       dispatch,
-      kubeconfigPath,
-      kubeconfigContext || '',
+
+      kubeConfigPath,
+      kubeConfigContext,
       namespace
     );
     setIsApplyModalVisible(false);

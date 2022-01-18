@@ -3,6 +3,7 @@ import os from 'os';
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
+import {ExtensionState} from '@models/extension';
 import {LogsState} from '@models/logs';
 import {NavigatorState} from '@models/navigator';
 import {UiState} from '@models/ui';
@@ -28,7 +29,6 @@ const initialAppState: AppState = {
   resourceDiff: {},
   isSelectingFile: false,
   isApplyingResource: false,
-  plugins: [],
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
@@ -48,8 +48,6 @@ const initialAppState: AppState = {
 
 const initialAppConfigState: AppConfig = {
   isStartupModalVisible: electronStore.get('appConfig.startupModalVisible', true),
-  kubeconfigPath: '',
-  isKubeconfigPathValid: false,
   settings: {
     filterObjectsOnSelection: false,
     autoZoomGraphOnSelection: true,
@@ -58,7 +56,8 @@ const initialAppConfigState: AppConfig = {
     theme: electronStore.get('appConfig.settings.theme'),
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
-    loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
+    loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
+    isClusterSelectorVisible: electronStore.get('ui.clusterStatusHidden'),
     hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
   },
@@ -78,6 +77,9 @@ const initialAppConfigState: AppConfig = {
     currentContext: undefined,
   },
   osPlatform: os.platform(),
+  projects: electronStore.get('appConfig.projects') || [],
+  selectedProjectRootFolder: null,
+  projectConfig: null,
 };
 
 const initialAlertState: AlertState = {};
@@ -103,6 +105,10 @@ const initialUiState: UiState = {
   createFolderModal: {
     isOpen: false,
     rootDir: '',
+  },
+  createProjectModal: {
+    isOpen: false,
+    fromTemplate: false,
   },
   renameResourceModal: {
     isOpen: false,
@@ -144,8 +150,12 @@ const initialUiState: UiState = {
   shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
-  clusterPaneIconHighlighted: false,
-  clusterStatusHidden: electronStore.get('ui.clusterStatusHidden'),
+  highlightedItems: {
+    clusterPaneIcon: false,
+    createResource: false,
+    browseTemplates: false,
+    connectToCluster: false,
+  },
 };
 
 const initialNavigatorState: NavigatorState = {
@@ -158,6 +168,15 @@ const initialUiCoachState: UiCoachState = {
   hasUserPerformedClickOnClusterIcon: false,
 };
 
+const initialExtensionState: ExtensionState = {
+  isLoadingExistingPlugins: true,
+  isLoadingExistingTemplates: true,
+  isLoadingExistingTemplatePacks: true,
+  pluginMap: {},
+  templateMap: {},
+  templatePackMap: {},
+};
+
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
@@ -166,4 +185,5 @@ export default {
   ui: initialUiState,
   navigator: initialNavigatorState,
   uiCoach: initialUiCoachState,
+  extension: initialExtensionState,
 };

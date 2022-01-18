@@ -2,10 +2,12 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {ProjectConfig} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
+import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 import {RootState} from './store';
 
 export const rootFolderSelector = createSelector(
@@ -57,11 +59,86 @@ export const isInPreviewModeSelector = createSelector(
 
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,
-  appState =>
-    Boolean(appState.main.previewResourceId && appState.main.previewResourceId.endsWith(appState.config.kubeconfigPath))
+  ({main, config}) => {
+    const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
+    if (kubeConfigPath) {
+      return Boolean(main.previewResourceId && main.previewResourceId.endsWith(kubeConfigPath));
+    }
+    return false;
+  }
 );
 
 export const logsSelector = createSelector(
   (state: RootState) => state.logs.logs,
   logs => logs.join('\n')
+);
+
+export const activeProjectSelector = createSelector(
+  (state: RootState) => state.config,
+  config => config.projects.find(p => p.rootFolder === config.selectedProjectRootFolder)
+);
+
+export const currentConfigSelector = createSelector(
+  (state: RootState) => state.config,
+  config => {
+    const applicationConfig: ProjectConfig = populateProjectConfig(config);
+    const projectConfig: ProjectConfig | null | undefined = config.projectConfig;
+    return mergeConfigs(applicationConfig, projectConfig);
+  }
+);
+
+export const settingsSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.settings || {};
+  }
+);
+
+export const scanExcludesSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.scanExcludes || [];
+  }
+);
+
+export const fileIncludesSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.fileIncludes || [];
+  }
+);
+
+export const kubeConfigContextSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.kubeConfig?.currentContext || '';
+  }
+);
+
+export const kubeConfigContextsSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.kubeConfig?.contexts || [];
+  }
+);
+
+export const kubeConfigPathSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.kubeConfig?.path || '';
+  }
+);
+
+export const kubeConfigPathValidSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.kubeConfig?.isPathValid || false;
+  }
 );
