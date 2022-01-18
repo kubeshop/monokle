@@ -39,10 +39,10 @@ test.beforeAll(async () => {
   appWindow = windows[0];
   appWindow.on('console', console.log);
 
-  if (await waitForModalToShow(appWindow, 'WelcomeModal', 10000)) {
+  if (await waitForModalToShow(appWindow, 'WelcomeModal', 20000)) {
     await clickOnMonokleLogo();
     await pause(500);
-    await waitForModalToHide(appWindow, 'WelcomeModal', 10000);
+    await waitForModalToHide(appWindow, 'WelcomeModal');
   }
 
   // Capture a screenshot.
