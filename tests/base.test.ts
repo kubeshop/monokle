@@ -50,7 +50,7 @@ test.beforeAll(async () => {
 });
 
 test.afterEach(async () => {
-  await pause(1000);
+  await pause(2000);
 });
 
 test('Validate title', async () => {
@@ -121,17 +121,12 @@ test('Validate settings drawer', async () => {
 });
 
 test('Validate notifications drawer', async () => {
-  let drawer = await findDrawer(appWindow, 'Notifications');
-  expect(drawer).toBeFalsy();
-
-  const notificationsIcon = appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
+  appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
     noWaitAfter: true,
     force: true,
   });
 
-  drawer = await waitForDrawerToShow(appWindow, 'Notifications', 5000);
-  expect(drawer).toBeTruthy();
-
+  expect(await waitForDrawerToShow(appWindow, 'Notifications', 5000)).toBeTruthy();
   await clickOnMonokleLogo();
 
   expect(await waitForDrawerToHide(appWindow, 'Notifications')).toBeTruthy();
@@ -143,7 +138,6 @@ test('Validate monokle popup', async () => {
   expect(await waitForModalToShow(appWindow, 'WelcomeModal')).toBeTruthy();
   await clickOnMonokleLogo();
 
-  // @ts-ignore
   expect(await waitForModalToHide(appWindow, 'WelcomeModal')).toBeTruthy();
 });
 
