@@ -13,8 +13,7 @@ import {TitleBar} from '@components/molecules';
 
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
-
-import * as S from './styled';
+import * as S from './PluginManagerPane.styled';
 
 function PluginManagerPane() {
   const dispatch = useAppDispatch();

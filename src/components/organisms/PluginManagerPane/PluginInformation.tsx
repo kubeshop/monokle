@@ -2,67 +2,14 @@ import React from 'react';
 
 import {Popconfirm} from 'antd';
 
-import {AppstoreOutlined, DeleteOutlined, ExclamationOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
+import {ExclamationOutlined} from '@ant-design/icons';
 
 import {AnyPlugin} from '@models/plugin';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {deletePlugin} from '@redux/services/templates';
 
-import Colors from '@styles/Colors';
-
-const Container = styled.div`
-  display: grid;
-  grid-template-columns: 40px 1fr;
-  position: relative;
-  margin-bottom: 16px;
-`;
-
-const IconContainer = styled.span`
-  height: 50px;
-  width: 50px;
-`;
-
-const InfoContainer = styled.span`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Name = styled.span`
-  font-weight: 600;
-`;
-
-const Description = styled.span`
-  font-weight: 300;
-`;
-
-const Footer = styled.span`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const Author = styled.span`
-  color: ${Colors.grey500};
-`;
-
-const Version = styled.span`
-  font-style: italic;
-`;
-
-const StyledDeleteOutlined = styled(DeleteOutlined)`
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  color: ${Colors.red7};
-  cursor: pointer;
-`;
-
-const StyledAppstoreOutlined = styled(AppstoreOutlined)`
-  font-size: 30px;
-  padding-top: 4px;
-`;
+import * as S from './PluginInformation.styled';
 
 interface IProps {
   plugin: AnyPlugin;
@@ -82,18 +29,18 @@ const PluginInformation: React.FC<IProps> = props => {
   };
 
   return (
-    <Container>
-      <IconContainer>
-        <StyledAppstoreOutlined />
-      </IconContainer>
+    <S.Container>
+      <S.IconContainer>
+        <S.AppstoreOutlined />
+      </S.IconContainer>
 
-      <InfoContainer>
-        <Name>{plugin.name}</Name>
-        <Description>{plugin.description || 'No description'}</Description>
-        <Footer>
-          <Author>{plugin.author}</Author> <Version>{plugin.version}</Version>
-        </Footer>
-      </InfoContainer>
+      <S.InfoContainer>
+        <S.Name>{plugin.name}</S.Name>
+        <S.Description>{plugin.description || 'No description'}</S.Description>
+        <S.Footer>
+          <S.Author>{plugin.author}</S.Author> <S.Version>{plugin.version}</S.Version>
+        </S.Footer>
+      </S.InfoContainer>
 
       <Popconfirm
         cancelText="Cancel"
@@ -111,9 +58,9 @@ const PluginInformation: React.FC<IProps> = props => {
         )}
         onConfirm={handleDelete}
       >
-        <StyledDeleteOutlined />
+        <S.DeleteOutlined />
       </Popconfirm>
-    </Container>
+    </S.Container>
   );
 };
 
