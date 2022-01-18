@@ -15,7 +15,7 @@ import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCurrentContext, setOpenProject, toggleClusterStatus, updateProjectConfig} from '@redux/reducers/appConfig';
+import {setCurrentContext, setOpenProject, updateProjectConfig} from '@redux/reducers/appConfig';
 import {highlightItem, toggleSettings} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
@@ -159,7 +159,15 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const handleClusterHideConfirm = () => {
     dispatch(highlightItem(null));
-    dispatch(toggleClusterStatus());
+    dispatch(
+      updateProjectConfig({
+        ...projectConfig,
+        settings: {
+          ...projectConfig?.settings,
+          isClusterSelectorVisible: false,
+        },
+      })
+    );
   };
 
   const handleClusterHideCancel = () => {
@@ -210,7 +218,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <CLusterActionText>RELOAD OBJECTS</CLusterActionText>;
+      return <CLusterActionText>RELOAD</CLusterActionText>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
@@ -220,7 +228,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
         className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
         highlighted={highlightedItems.connectToCluster}
       >
-        LOAD OBJECTS
+        LOAD
       </CLusterActionText>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
