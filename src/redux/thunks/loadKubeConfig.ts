@@ -1,5 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 
+import {AnyAction} from '@reduxjs/toolkit';
+
 import fs from 'fs';
 import log from 'loglevel';
 
@@ -9,7 +11,11 @@ import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 import {setAlert} from '@redux/reducers/alert';
 import {updateProjectKubeConfig} from '@redux/reducers/appConfig';
 
-export const loadContexts = async (configPath: string, dispatch: any, currentContext?: string) => {
+export const loadContexts = async (
+  configPath: string,
+  dispatch: (action: AnyAction) => void,
+  currentContext?: string
+) => {
   try {
     const stats = await fs.promises.stat(configPath);
 

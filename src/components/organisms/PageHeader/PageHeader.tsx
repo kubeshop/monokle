@@ -390,7 +390,7 @@ const PageHeader = () => {
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <CLusterActionText>RELOAD</CLusterActionText>;
+      return <CLusterActionText>RELOAD OBJECTS</CLusterActionText>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;

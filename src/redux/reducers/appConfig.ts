@@ -1,8 +1,7 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
-import path, {sep} from 'path';
+import path from 'path';
 
 import {
   AppConfig,
@@ -15,8 +14,8 @@ import {
   Themes,
 } from '@models/appconfig';
 
-import {mergeConfigs, populateProjectConfig} from '@redux/selectors';
 import {KustomizeCommandType} from '@redux/services/kustomize';
+import {writeProjectConfigFile} from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -37,22 +36,6 @@ export const setOpenProject = createAsyncThunk(
     thunkAPI.dispatch(setRootFolder(projectRootPath));
     thunkAPI.dispatch(configSlice.actions.setProjectConfig(null));
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
-  }
-);
-
-export const updateProjectKubeConfig = createAsyncThunk(
-  'config/updateProjectKubeConfig',
-  async (kubeConfig: KubeConfig, thunkAPI: any) => {
-    const projectConfig: ProjectConfig | null = thunkAPI.getState().config.projectConfig;
-
-    if (!_.isEqual(projectConfig?.kubeConfig, kubeConfig)) {
-      thunkAPI.dispatch(
-        configSlice.actions.updateProjectConfig({
-          ...projectConfig,
-          kubeConfig: {...projectConfig?.kubeConfig, ...kubeConfig},
-        })
-      );
-    }
   }
 );
 
@@ -169,6 +152,26 @@ export const configSlice = createSlice({
     setProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
       state.projectConfig = action.payload;
     },
+    updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
+      if (!state.selectedProjectRootFolder) {
+        return;
+      }
+
+      const projectConfig: ProjectConfig | null | undefined = state.projectConfig;
+
+      if (_.isEqual(projectConfig?.kubeConfig, action.payload)) {
+        return;
+      }
+
+      const newProjectConfig: ProjectConfig = {
+        ...projectConfig,
+        kubeConfig: {...projectConfig?.kubeConfig, ...action.payload},
+      };
+
+      writeProjectConfigFile(state, newProjectConfig);
+
+      state.projectConfig = newProjectConfig;
+    },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
       if (!state.selectedProjectRootFolder) {
         return;
@@ -178,26 +181,8 @@ export const configSlice = createSlice({
         return;
       }
 
-      const absolutePath = `${state.selectedProjectRootFolder}${sep}.monokle`;
-
-      const applicationConfig: ProjectConfig = populateProjectConfig(state);
       if (!_.isEqual(state.projectConfig, action.payload)) {
-        const mergedConfigs = mergeConfigs(applicationConfig, action.payload);
-        delete mergedConfigs?.settings?.loadLastProjectOnStartup;
-        delete mergedConfigs?.kubeConfig?.isPathValid;
-        delete mergedConfigs?.kubeConfig?.contexts;
-        if (mergedConfigs && !_.isEmpty(mergedConfigs)) {
-          try {
-            const savedConfig: ProjectConfig = JSON.parse(readFileSync(absolutePath, 'utf8'));
-            if (!_.isEqual(savedConfig, mergedConfigs)) {
-              writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
-            }
-          } catch (error: any) {
-            writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
-          }
-        } else {
-          writeFileSync(absolutePath, ``, 'utf-8');
-        }
+        writeProjectConfigFile(state, action.payload);
 
         state.projectConfig = action.payload;
       }
@@ -228,6 +213,7 @@ export const {
   updateTheme,
   setKubeConfig,
   updateProjectConfig,
+  updateProjectKubeConfig,
   toggleClusterStatus,
 } = configSlice.actions;
 export default configSlice.reducer;

@@ -42,7 +42,7 @@ import {
 
 import ChangeFiltersConfirmModal from '@components/molecules/ChangeFiltersConfirmModal/ChangeFiltersConfirmModal';
 import SaveResourceToFileFolderModal from '@components/molecules/SaveResourcesToFileFolderModal';
-import CreateProjectModal from '@components/organisms/CreateProjectModal';
+import {CreateProjectModal} from '@components/organisms/CreateProjectModal';
 
 import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
