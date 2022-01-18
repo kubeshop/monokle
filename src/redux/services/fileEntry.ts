@@ -71,7 +71,8 @@ export function readFiles(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
-  depth: number = 1
+  depth: number = 1,
+  isSupportedResource: (resource: K8sResource) => boolean = () => true
 ) {
   const files = fs.readdirSync(folder);
   const result: string[] = [];
@@ -123,6 +124,11 @@ export function readFiles(
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
           extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+            if (!isSupportedResource(resource)) {
+              fileEntry.isSupported = false;
+              return;
+            }
+
             resourceMap[resource.id] = resource;
           });
         } catch (e) {
