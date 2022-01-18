@@ -20,7 +20,6 @@ export const uiSlice = createSlice({
     },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
-      electronStore.set('ui.isSettingsOpen', state.isSettingsOpen);
     },
     openClusterDiff: (state: Draft<UiState>) => {
       state.isClusterDiffVisible = true;
@@ -46,7 +45,6 @@ export const uiSlice = createSlice({
     },
     toggleNotifications: (state: Draft<UiState>) => {
       state.isNotificationsOpen = !state.isNotificationsOpen;
-      electronStore.set('ui.isNotificationsOpen', state.isNotificationsOpen);
     },
     setRightMenuIsActive: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.rightMenu.isActive = action.payload;
@@ -65,14 +63,12 @@ export const uiSlice = createSlice({
       action: PayloadAction<{defaultInput?: NewResourceWizardInput} | undefined>
     ) => {
       state.newResourceWizard.isOpen = true;
-      electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
       if (action.payload && action.payload.defaultInput) {
         state.newResourceWizard.defaultInput = action.payload.defaultInput;
       }
     },
     closeNewResourceWizard: (state: Draft<UiState>) => {
       state.newResourceWizard.isOpen = false;
-      electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
       state.newResourceWizard.defaultInput = undefined;
     },
     openRenameEntityModal: (
