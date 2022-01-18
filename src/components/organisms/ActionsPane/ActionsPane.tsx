@@ -12,7 +12,6 @@ import {
   ACTIONS_PANE_FOOTER_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   NAVIGATOR_HEIGHT_OFFSET,
-  PREVIEW_PREFIX,
   TOOLTIP_DELAY,
 } from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -26,9 +25,11 @@ import {
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
+import {AlertEnum, AlertType} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -60,9 +61,6 @@ import AppContext from '@src/AppContext';
 import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {getFormSchema, getUiSchema} from '@src/kindhandlers/common/formLoader';
-
-import { setAlert } from '@redux/reducers/alert';
-import { AlertEnum, AlertType } from '@models/alert';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneFooter from './ActionsPaneFooter';
@@ -122,13 +120,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
     if (isButtonShrinked) {
       // 230px = approx width of not collapsed button
-      if (distance > 230) {
+      if (distance > 350) {
         setButtonShrinkedState(false);
       }
     }
 
     // The button has 10px margin-left
-    if (!isButtonShrinked && distance < 10) {
+    if (!isButtonShrinked && distance < 40) {
       setButtonShrinkedState(true);
     }
   }, [isButtonShrinked, tabsList]);
@@ -294,12 +292,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)) {
       return true;
     }
-    // if the resource is from the cluster preview
-    if (selectedResource.filePath === PREVIEW_PREFIX + kubeconfigPath) {
-      return true;
-    }
+
     return false;
-  }, [selectedResource, kubeconfigPath]);
+  }, [selectedResource]);
 
   const onClickApplyResource = useCallback(
     (namespace?: string) => {

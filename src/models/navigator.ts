@@ -59,6 +59,9 @@ export interface SectionCustomization {
   emptyDisplay?: {
     component: SectionCustomComponent;
   };
+  nameContext?: {
+    component: SectionCustomComponent;
+  };
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
   isCheckVisibleOnHover?: boolean;

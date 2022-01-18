@@ -15,6 +15,10 @@ export function useSectionCustomization(customization: SectionCustomization = {}
     () => ({Component: customization.emptyDisplay?.component}),
     [customization.emptyDisplay]
   );
+  const NameContext = useMemo(
+    () => ({Component: customization.nameContext?.component}),
+    [customization.nameContext]
+  );
 
-  return {NameDisplay, EmptyDisplay, NameSuffix};
+  return {NameDisplay, EmptyDisplay, NameSuffix, NameContext};
 }

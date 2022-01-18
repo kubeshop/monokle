@@ -15,6 +15,7 @@ import {
   AddInclusionPatternTooltip,
   AutoLoadLastFolderTooltip,
   BrowseKubeconfigTooltip,
+  EnableHelmWithKustomizeTooltip,
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
   KustomizeCommandTooltip,
@@ -23,6 +24,7 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   setScanExcludesStatus,
+  updateEnableHelmWithKustomize,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
@@ -164,6 +166,10 @@ const SettingsDrawer = () => {
     if (selectedKustomizeCommand === 'kubectl' || selectedKustomizeCommand === 'kustomize') {
       dispatch(updateKustomizeCommand(selectedKustomizeCommand));
     }
+  };
+
+  const onChangeEnableHelmWithKustomize = (e: any) => {
+    dispatch(updateEnableHelmWithKustomize(e.target.checked));
   };
 
   const onChangeLoadLastFolderOnStartup = (e: any) => {
@@ -329,6 +335,13 @@ const SettingsDrawer = () => {
         </Tooltip>
       </StyledDiv>
       <StyledDiv>
+        <Tooltip title={EnableHelmWithKustomizeTooltip}>
+          <Checkbox checked={appConfig.settings.enableHelmWithKustomize} onChange={onChangeEnableHelmWithKustomize}>
+            Enable Helm-related features when invoking Kustomize
+          </Checkbox>
+        </Tooltip>
+      </StyledDiv>
+      <StyledDiv>
         <StyledSpan>On Startup</StyledSpan>
         <Tooltip title={AutoLoadLastFolderTooltip}>
           <Checkbox checked={appConfig.settings.loadLastFolderOnStartup} onChange={onChangeLoadLastFolderOnStartup}>
@@ -349,29 +362,6 @@ const SettingsDrawer = () => {
           Ignore optional unsatisfied links
         </Checkbox>
       </StyledDiv>
-      {/* <StyledDiv>
-        <StyledSpan>Theme</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>
-          <Radio.Button value={Themes.Dark}>Dark</Radio.Button>
-          <Radio.Button value={Themes.Light}>Light</Radio.Button>
-        </Radio.Group>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Text Size</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.textSize}>
-          <Radio.Button value={TextSizes.Large}>Large</Radio.Button>
-          <Radio.Button value={TextSizes.Medium}>Medium</Radio.Button>
-          <Radio.Button value={TextSizes.Small}>Small</Radio.Button>
-        </Radio.Group>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Language</StyledSpan>
-        <Radio.Group size="large" value={appConfig.settings.language}>
-          <Space direction="vertical">
-            <Radio value={Languages.English}>English</Radio>
-          </Space>
-        </Radio.Group>
-      </StyledDiv> */}
     </Drawer>
   );
 };
