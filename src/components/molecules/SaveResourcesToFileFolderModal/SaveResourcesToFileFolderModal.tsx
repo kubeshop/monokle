@@ -18,6 +18,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {closeSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
+import {isUnsavedResource} from '@redux/services/resource';
+import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -66,7 +68,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
     {isDirectoryExplorer: true}
   );
 
-  const [foldersList, filesList] = useMemo(() => {
+  const [foldersList, filesList]: [string[], string[]] = useMemo(() => {
     const folders: string[] = [];
     const files: string[] = [];
 
@@ -132,29 +134,33 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName);
       }
 
-      const cleanResourceContent = removeIgnoredPathsFromResourceContent(resource.content);
-      let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
+      if (isUnsavedResource(resource)) {
+        dispatch(saveUnsavedResource({resource, absolutePath}));
+      } else {
+        const cleanResourceContent = removeIgnoredPathsFromResourceContent(resource.content);
+        let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
 
-      if (savingDestination === 'saveToFile') {
-        if (resourceText.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
-          resourceText = `\n${resourceText}`;
-        } else {
-          resourceText = `\n${YAML_DOCUMENT_DELIMITER}\n${resourceText}`;
-        }
+        if (savingDestination === 'saveToFile') {
+          if (resourceText.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
+            resourceText = `\n${resourceText}`;
+          } else {
+            resourceText = `\n${YAML_DOCUMENT_DELIMITER}\n${resourceText}`;
+          }
 
-        fs.appendFileSync(absolutePath, resourceText);
-      } else if (savingDestination === 'saveToFolder') {
-        try {
-          fs.writeFileSync(absolutePath, resourceText);
-        } catch (err) {
-          writeAppendErrors += 1;
-          dispatch(
-            setAlert({
-              type: AlertEnum.Error,
-              title: `Could not save ${absolutePath}.`,
-              message: '',
-            })
-          );
+          fs.appendFileSync(absolutePath, resourceText);
+        } else if (savingDestination === 'saveToFolder') {
+          try {
+            fs.writeFileSync(absolutePath, resourceText);
+          } catch (err) {
+            writeAppendErrors += 1;
+            dispatch(
+              setAlert({
+                type: AlertEnum.Error,
+                title: `Could not save ${absolutePath}.`,
+                message: '',
+              })
+            );
+          }
         }
       }
     });

@@ -795,7 +795,7 @@ export const mainSlice = createSlice({
       if (resourceFileEntry) {
         resourceFileEntry.timestamp = action.payload.fileTimestamp;
       } else {
-        const newFileEntry = createFileEntry(relativeFilePath);
+        const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
         newFileEntry.timestamp = action.payload.fileTimestamp;
         state.fileMap[relativeFilePath] = newFileEntry;
         const childFileName = path.basename(relativeFilePath);
