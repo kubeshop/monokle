@@ -47,8 +47,10 @@ test.beforeAll(async () => {
 
   // Capture a screenshot.
   await appWindow.screenshot({path: 'test-output/screenshots/initial-screen.png'});
-  await pause(1000);
-  await appWindow.screenshot({path: 'test-output/screenshots/post-startup-screen.png'});
+});
+
+test.beforeEach(async () => {
+  pause(2000);
   appWindow.on('console', console.log);
 });
 
@@ -116,13 +118,12 @@ test('Validate settings drawer', async () => {
   await settingsIcon.click({noWaitAfter: true, force: true});
   await pause(500);
 
-  drawer = await waitForDrawerToShow(appWindow, 'Settings', 5000);
+  drawer = await waitForDrawerToShow(appWindow, 'Settings');
   expect(drawer).toBeTruthy();
 
   clickOnMonokleLogo();
 
-  expect(await waitForDrawerToHide(appWindow, 'Settings', 5000)).toBeTruthy();
-  await pause(5000);
+  expect(await waitForDrawerToHide(appWindow, 'Settings')).toBeTruthy();
 });
 
 test('Validate notifications drawer', async () => {
@@ -135,23 +136,22 @@ test('Validate notifications drawer', async () => {
   await notificationsIcon.click({noWaitAfter: true, force: true});
   await pause(500);
 
-  drawer = await waitForDrawerToShow(appWindow, 'Notifications', 5000);
+  drawer = await waitForDrawerToShow(appWindow, 'Notifications');
   expect(drawer).toBeTruthy();
 
   clickOnMonokleLogo();
 
-  expect(await waitForDrawerToHide(appWindow, 'Notifications', 5000)).toBeTruthy();
-  await pause(5000);
+  expect(await waitForDrawerToHide(appWindow, 'Notifications')).toBeTruthy();
 });
 
 test('Validate monokle popup', async () => {
   await clickOnMonokleLogo();
 
-  expect(await waitForModalToShow(appWindow, 'WelcomeModal', 5000)).toBeTruthy();
+  expect(await waitForModalToShow(appWindow, 'WelcomeModal')).toBeTruthy();
   await clickOnMonokleLogo();
 
   // @ts-ignore
-  expect(await waitForModalToHide(appWindow, 'WelcomeModal', 5000)).toBeTruthy();
+  expect(await waitForModalToHide(appWindow, 'WelcomeModal')).toBeTruthy();
 });
 
 test('Validate left section tabs', async () => {
@@ -164,31 +164,31 @@ test('Validate left section tabs', async () => {
   expect(await isInvisible(fileExplorer)).toBeFalsy();
 
   buttons.nth(1).click({noWaitAfter: true, force: true});
-  await pause(1000);
+  await pause(2000);
 
   const kustomize = appWindow.locator("div > span[id='KustomizePane']");
   expect(await kustomize.count()).toBe(1);
   expect(await isInvisible(kustomize)).toBeFalsy();
 
   buttons.nth(2).click({noWaitAfter: true, force: true});
-  await pause(1000);
+  await pause(2000);
 
   const helm = appWindow.locator("div > span[id='HelmPane']");
   expect(await helm.count()).toBe(1);
   expect(await isInvisible(helm)).toBeFalsy();
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(1000);
+  await pause(2000);
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(1000);
+  await pause(2000);
 
   const leftpane = appWindow.locator("div[id='LeftPane']");
   expect(await leftpane.count()).toBe(1);
   expect(await isInvisible(leftpane)).toBeTruthy();
 
   buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(1000);
+  await pause(2000);
 });
 
 test('Validate open folder', async () => {
@@ -197,7 +197,7 @@ test('Validate open folder', async () => {
     app.webContents.getFocusedWebContents().send('set-root-folder', f);
   }, folder);
 
-  await pause(5000);
+  await pause(10000);
 
   const footer = appWindow.locator('footer');
   await expect(footer).toContainText('26 files');
