@@ -49,6 +49,7 @@ const CreateProjectModal: React.FC = () => {
       dispatch(setCreateProject({rootFolder: formValues.location, name: formValues.projectName}));
       closeModal();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formValues]);
 
   useEffect(() => {

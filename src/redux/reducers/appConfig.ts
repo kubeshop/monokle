@@ -95,7 +95,7 @@ export const configSlice = createSlice({
       };
     },
     updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.loadLastFolderOnStartup', action.payload);
+      electronStore.set('appConfig.settings.loadLastProjectOnStartup', action.payload);
       state.settings.loadLastProjectOnStartup = action.payload;
     },
     updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
@@ -196,7 +196,7 @@ export const configSlice = createSlice({
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {
       state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;
-      electronStore.set('ui.clusterStatusHidden', state.settings.isClusterSelectorVisible);
+      electronStore.set('appConfig.settings.isClusterSelectorVisible', state.settings.isClusterSelectorVisible);
     },
     setUserDirs: (
       state: Draft<AppConfig>,
