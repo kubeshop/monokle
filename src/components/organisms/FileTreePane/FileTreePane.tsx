@@ -15,7 +15,6 @@ import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constant
 import {FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
 
 import {AlertEnum} from '@models/alert';
-import {ProjectConfig} from '@models/appconfig';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 
@@ -29,7 +28,7 @@ import {
   openRenameEntityModal,
   setShouldExpandAllNodes,
 } from '@redux/reducers/ui';
-import {currentConfigSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {fileIncludesSelector, isInPreviewModeSelector, scanExcludesSelector, settingsSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
@@ -638,7 +637,6 @@ const FileTreePane = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
   const dispatch = useAppDispatch();
-  const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
@@ -652,7 +650,9 @@ const FileTreePane = () => {
   const shouldExpandAllNodes = useAppSelector(state => state.ui.shouldExpandAllNodes);
   const uiState = useAppSelector(state => state.ui);
   const configState = useAppSelector(state => state.config);
-  const currentConfig: ProjectConfig = useSelector(currentConfigSelector);
+  const scanExcludes = useAppSelector(scanExcludesSelector);
+  const fileIncludes = useAppSelector(fileIncludesSelector);
+  const {hideExcludedFilesInFileExplorer} = useAppSelector(settingsSelector);
 
   const treeRef = useRef<any>();
 
@@ -679,7 +679,7 @@ const FileTreePane = () => {
         rootEntry,
         fileMap,
         resourceMap,
-        Boolean(currentConfig?.settings?.hideExcludedFilesInFileExplorer),
+        Boolean(hideExcludedFilesInFileExplorer),
         fileOrFolderContainedInFilter
       );
 
@@ -693,7 +693,7 @@ const FileTreePane = () => {
     resourceMap,
     fileMap,
     shouldExpandAllNodes,
-    currentConfig?.settings?.hideExcludedFilesInFileExplorer,
+    hideExcludedFilesInFileExplorer,
     fileOrFolderContainedInFilter,
     dispatch,
   ]);
@@ -780,11 +780,7 @@ const FileTreePane = () => {
     if (!fileIncludes.some(fileInclude => micromatch.isMatch(path.basename(info.node.key), fileInclude))) {
       return;
     }
-    if (
-      (currentConfig?.scanExcludes || []).some(scanExclude =>
-        micromatch.isMatch(path.basename(info.node.key), scanExclude)
-      )
-    ) {
+    if (scanExcludes.some(scanExclude => micromatch.isMatch(path.basename(info.node.key), scanExclude))) {
       return;
     }
     if (info.node.key) {
@@ -815,7 +811,7 @@ const FileTreePane = () => {
     dispatch(
       updateProjectConfig({
         ...configState.projectConfig,
-        scanExcludes: [...(currentConfig?.scanExcludes || []), relativePath],
+        scanExcludes: [...scanExcludes, relativePath],
       })
     );
     openConfirmModal();
@@ -825,9 +821,7 @@ const FileTreePane = () => {
     dispatch(
       updateProjectConfig({
         ...configState.projectConfig,
-        scanExcludes: (currentConfig?.scanExcludes || []).filter(
-          (_, index) => (currentConfig?.scanExcludes || [])[index] !== relativePath
-        ),
+        scanExcludes: scanExcludes.filter(scanExclude => scanExclude !== relativePath),
       })
     );
     openConfirmModal();

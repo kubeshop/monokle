@@ -39,11 +39,11 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
     })
     .on('unlink', () => {
       readApplicationConfigFileAndUpdateProjectSettings(absolutePath, dispatch);
-    });
-
-  watcher
-    /* eslint-disable no-console */
+    })
+    // eslint-disable-next-line no-console
     .on('error', error => console.log(`Watcher error: ${error}`));
+
+  /* eslint-disable no-console */
 }
 
 const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: string, dispatch: AppDispatch) => {

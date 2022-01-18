@@ -14,7 +14,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setClusterDiffRefreshDiffResource, setDiffResourceInClusterDiff} from '@redux/reducers/main';
 import {closeClusterDiff} from '@redux/reducers/ui';
-import {currentConfigSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {getClusterResourceText} from '@redux/services/clusterResource';
 import {replaceSelectedMatchesWithConfirm} from '@redux/services/replaceSelectedMatchesWithConfirm';
 import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
@@ -98,7 +98,8 @@ function ClusterDiffModal() {
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
-  const currentConfig = useAppSelector(currentConfigSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const diffResourceId = useAppSelector(state => state.main.clusterDiff.diffResourceId);
@@ -134,8 +135,8 @@ function ClusterDiffModal() {
   const windowSize = useWindowSize();
 
   const confirmModalTitle = useMemo(
-    () => makeApplyMultipleResourcesText(selectedMatches.length, currentConfig.kubeConfig?.currentContext),
-    [selectedMatches, currentConfig.kubeConfig?.currentContext]
+    () => makeApplyMultipleResourcesText(selectedMatches.length, kubeConfigContext),
+    [selectedMatches, kubeConfigContext]
   );
 
   const selectedResources = useMemo(
@@ -163,11 +164,7 @@ function ClusterDiffModal() {
 
   const loadClusterResourceText = async (localResource: K8sResource) => {
     try {
-      const {clusterResourceText} = await getClusterResourceText(
-        localResource,
-        String(currentConfig.kubeConfig?.path),
-        currentConfig.kubeConfig?.currentContext || ''
-      );
+      const {clusterResourceText} = await getClusterResourceText(localResource, kubeConfigPath, kubeConfigContext);
       setResourceDiffState({
         isLoading: false,
         localResource,
@@ -273,20 +270,14 @@ function ClusterDiffModal() {
       );
     }
     if (previewResource) {
-      return `Comparing kustomization preview resources to Cluster resources (${currentConfig.kubeConfig?.currentContext})`;
+      return `Comparing kustomization preview resources to Cluster resources (${kubeConfigContext})`;
     }
     if (previewValuesFile) {
-      return `Comparing Helm Chart preview resources to Cluster resources (${currentConfig.kubeConfig?.currentContext})`;
+      return `Comparing Helm Chart preview resources to Cluster resources (${kubeConfigContext})`;
     }
-    return `Comparing Local Resources to Cluster resources (${currentConfig.kubeConfig?.currentContext})`;
+    return `Comparing Local Resources to Cluster resources (${kubeConfigContext})`;
     // eslint-disable-next-line
-  }, [
-    previewResource,
-    previewValuesFile,
-    currentConfig.kubeConfig?.currentContext,
-    isResourceDiffVisible,
-    closeResourceDiff,
-  ]);
+  }, [previewResource, previewValuesFile, kubeConfigContext, isResourceDiffVisible, closeResourceDiff]);
 
   const onClickDeploySelected = () => {
     setIsApplyModalVisible(true);
@@ -298,10 +289,10 @@ function ClusterDiffModal() {
   };
 
   const onClickReplaceSelected = () => {
-    if (!currentConfig.kubeConfig?.currentContext) {
+    if (!kubeConfigContext) {
       return;
     }
-    replaceSelectedMatchesWithConfirm(selectedMatches.length, currentConfig.kubeConfig?.currentContext, dispatch);
+    replaceSelectedMatchesWithConfirm(selectedMatches.length, kubeConfigContext, dispatch);
   };
 
   const onCancel = () => {
@@ -325,9 +316,7 @@ function ClusterDiffModal() {
             ghost
             style={{float: 'left'}}
             icon={<Icon name="kubernetes" />}
-            disabled={
-              selectedMatches.length === 0 || !canDeploySelectedMatches || !currentConfig.kubeConfig?.currentContext
-            }
+            disabled={selectedMatches.length === 0 || !canDeploySelectedMatches || !kubeConfigContext}
             onClick={onClickDeploySelected}
           >
             Deploy selected local resources ({selectedMatches.length}) to cluster
@@ -339,9 +328,7 @@ function ClusterDiffModal() {
               type="primary"
               ghost
               style={{float: 'left'}}
-              disabled={
-                selectedMatches.length === 0 || !canReplaceSelectedMatches || !currentConfig.kubeConfig?.currentContext
-              }
+              disabled={selectedMatches.length === 0 || !canReplaceSelectedMatches || !kubeConfigContext}
               onClick={onClickReplaceSelected}
             >
               <ArrowLeftOutlined />

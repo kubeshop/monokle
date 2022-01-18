@@ -87,6 +87,62 @@ export const currentConfigSelector = createSelector(
   }
 );
 
+export const settingsSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.settings || {};
+  }
+);
+
+export const scanExcludesSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.scanExcludes || [];
+  }
+);
+
+export const fileIncludesSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.fileIncludes || [];
+  }
+);
+
+export const kubeConfigContextSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.kubeConfig?.currentContext || '';
+  }
+);
+
+export const kubeConfigContextsSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.kubeConfig?.contexts || [];
+  }
+);
+
+export const kubeConfigPathSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.kubeConfig?.path || '';
+  }
+);
+
+export const kubeConfigPathValidSelector = createSelector(
+  (state: RootState) => state,
+  state => {
+    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
+    return currentKubeConfig.kubeConfig?.isPathValid || false;
+  }
+);
+
 // Needs better way to do it!!
 export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null) => {
   if (!(baseConfig && baseConfig.settings && baseConfig.kubeConfig)) {

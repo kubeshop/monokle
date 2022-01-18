@@ -3,7 +3,7 @@ import * as k8s from '@kubernetes/client-node';
 import {ipcRenderer} from 'electron';
 
 import {useCallback, useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {useDebounce} from 'react-use';
 
 import 'antd/dist/antd.less';
@@ -17,7 +17,7 @@ import {Size} from '@models/window';
 
 import {useAppSelector} from '@redux/hooks';
 import {setOpenProject, updateProjectConfig} from '@redux/reducers/appConfig';
-import {currentConfigSelector} from '@redux/selectors';
+import {kubeConfigContextSelector, kubeConfigPathSelector, settingsSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import {
@@ -63,21 +63,21 @@ const MainContainer = styled.div`
 const App = () => {
   const size: Size = useWindowSize();
   const dispatch = useDispatch();
-  const currentConfig: ProjectConfig = useSelector(currentConfigSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const {loadLastProjectOnStartup} = useAppSelector(settingsSelector);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const projectConfig: ProjectConfig | null | undefined = useAppSelector(state => state.config.projectConfig);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
   const onExecutedFrom = useCallback(
     (_, data) => {
-      const project: Project =
-        data.path ||
-        (currentConfig?.settings?.loadLastProjectOnStartup && projects.length > 0 ? projects[0] : undefined);
+      const project: Project = data.path || (loadLastProjectOnStartup && projects.length > 0 ? projects[0] : undefined);
       if (project && getFileStats(project.rootFolder)?.isDirectory()) {
         dispatch(setOpenProject(project.rootFolder));
       }
     },
-    [currentConfig?.settings?.loadLastProjectOnStartup, projects]
+    [loadLastProjectOnStartup, projects]
   );
 
   useEffect(() => {
@@ -89,11 +89,11 @@ const App = () => {
 
   useDebounce(
     () => {
-      if (currentConfig && currentConfig.kubeConfig && currentConfig.kubeConfig.path) {
+      if (kubeConfigPath) {
         try {
           const kc = new k8s.KubeConfig();
 
-          kc.loadFromFile(currentConfig.kubeConfig.path);
+          kc.loadFromFile(kubeConfigPath);
           dispatch(
             updateProjectConfig({
               ...projectConfig,
@@ -103,7 +103,7 @@ const App = () => {
               },
             })
           );
-          loadContexts(currentConfig.kubeConfig.path, dispatch, currentConfig?.kubeConfig?.currentContext);
+          loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
         } catch (err) {
           dispatch(
             updateProjectConfig({
@@ -115,12 +115,7 @@ const App = () => {
       }
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
-    [
-      currentConfig.kubeConfig?.path,
-      dispatch,
-      projectConfig?.kubeConfig?.currentContext,
-      fileMap[ROOT_FILE_ENTRY]?.filePath,
-    ]
+    [kubeConfigPath, dispatch, kubeConfigContext, rootFile]
   );
 
   return (

@@ -17,7 +17,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -93,8 +93,8 @@ const ResourceDiff = (props: {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const currenConfig = useAppSelector(currentConfigSelector);
-  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
@@ -115,9 +115,9 @@ const ResourceDiff = (props: {
   const confirmModalTitle = useMemo(
     () =>
       isKustomizationResource(localResource)
-        ? makeApplyKustomizationText(localResource.name, kubeconfigContext)
-        : makeApplyResourceText(localResource.name, kubeconfigContext),
-    [localResource, kubeconfigContext]
+        ? makeApplyKustomizationText(localResource.name, kubeConfigContext)
+        : makeApplyResourceText(localResource.name, kubeConfigContext),
+    [localResource, kubeConfigContext]
   );
 
   const localResourceText = useMemo(() => {
@@ -164,20 +164,11 @@ const ResourceDiff = (props: {
       onApply();
     }
 
-    applyResource(
-      localResource.id,
-      resourceMap,
-      fileMap,
-      dispatch,
-      String(currenConfig.kubeConfig?.path),
-      kubeconfigContext || '',
-      namespace,
-      {
-        isClusterPreview: previewType === 'cluster',
-        shouldPerformDiff: true,
-        isInClusterDiff,
-      }
-    );
+    applyResource(localResource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
+      isClusterPreview: previewType === 'cluster',
+      shouldPerformDiff: true,
+      isInClusterDiff,
+    });
     setIsApplyModalVisible(false);
   };
 

@@ -37,9 +37,13 @@ import {highlightItem, toggleNotifications, toggleSettings} from '@redux/reducer
 import {
   activeProjectSelector,
   activeResourcesSelector,
-  currentConfigSelector,
   isInClusterModeSelector,
   isInPreviewModeSelector,
+  kubeConfigContextSelector,
+  kubeConfigContextsSelector,
+  kubeConfigPathSelector,
+  kubeConfigPathValidSelector,
+  settingsSelector,
 } from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
@@ -271,17 +275,19 @@ const PageHeader = () => {
   const dispatch = useAppDispatch();
   const activeProject = useSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const currentConfig = useAppSelector(currentConfigSelector);
+  const settings = useAppSelector(settingsSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const projectConfig = useAppSelector(state => state.config.projectConfig);
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
-    Boolean(!currentConfig?.kubeConfig?.path) || Boolean(!currentConfig?.kubeConfig?.isPathValid)
+    Boolean(!kubeConfigPath) || !isKubeConfigPathValid
   );
 
   useEffect(() => {
-    setIsClusterActionDisabled(
-      Boolean(!currentConfig?.kubeConfig?.path) || Boolean(!currentConfig?.kubeConfig?.isPathValid)
-    );
-  }, [currentConfig?.kubeConfig]);
+    setIsClusterActionDisabled(Boolean(!kubeConfigPath) || !isKubeConfigPathValid);
+  }, [kubeConfigPath, isKubeConfigPathValid]);
 
   useEffect(() => {
     if (previewResourceId) {
@@ -316,7 +322,7 @@ const PageHeader = () => {
     stopPreview(dispatch);
   };
 
-  const handleClusterChange = ({key}: any) => {
+  const handleClusterChange = ({key}: {key: string}) => {
     dispatch(setCurrentContext(key));
     dispatch(updateProjectConfig({...projectConfig, kubeConfig: {...projectConfig?.kubeConfig, currentContext: key}}));
   };
@@ -342,7 +348,7 @@ const PageHeader = () => {
     dispatch(highlightItem(null));
   };
 
-  const handleProjectChange = ({key}: any) => {
+  const handleProjectChange = ({key}: {key: string}) => {
     if (key === 'NEW') {
       dispatch(setOpenProject(null));
       return;
@@ -351,20 +357,20 @@ const PageHeader = () => {
   };
 
   const connectToCluster = () => {
-    if (isInPreviewMode && previewResource && previewResource.id !== currentConfig.kubeConfig?.path) {
+    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigPath) {
       stopPreview(dispatch);
     }
-    if (currentConfig.kubeConfig?.path) {
-      startPreview(currentConfig.kubeConfig?.path, 'cluster', dispatch);
+    if (kubeConfigPath) {
+      startPreview(kubeConfigPath, 'cluster', dispatch);
     }
   };
 
   const reconnectToCluster = () => {
-    if (isInPreviewMode && previewResource && previewResource.id !== currentConfig.kubeConfig?.path) {
+    if (isInPreviewMode && previewResource && previewResource.id !== kubeConfigPath) {
       stopPreview(dispatch);
     }
-    if (currentConfig.kubeConfig?.path) {
-      restartPreview(currentConfig.kubeConfig?.path, 'cluster', dispatch);
+    if (kubeConfigPath) {
+      restartPreview(kubeConfigPath, 'cluster', dispatch);
     }
   };
 
@@ -392,20 +398,18 @@ const PageHeader = () => {
         className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
         highlighted={highlightedItems.connectToCluster}
       >
-        LOAD
+        LOAD OBJECTS
       </CLusterActionText>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
   const clusterMenu = (
     <Menu>
-      {currentConfig.kubeConfig &&
-        currentConfig.kubeConfig?.contexts &&
-        currentConfig.kubeConfig?.contexts.map((context: any) => (
-          <Menu.Item key={context.cluster} onClick={handleClusterChange}>
-            {context.cluster}
-          </Menu.Item>
-        ))}
+      {kubeConfigContexts.map((context: any) => (
+        <Menu.Item key={context.cluster} onClick={handleClusterChange}>
+          {context.cluster}
+        </Menu.Item>
+      ))}
     </Menu>
   );
 
@@ -462,7 +466,7 @@ const PageHeader = () => {
           <LogoCol noborder="true">
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
-          {activeProject && currentConfig && currentConfig.settings && currentConfig.settings.isClusterSelectorVisible && (
+          {activeProject && settings.isClusterSelectorVisible && (
             <CLusterContainer>
               <CLusterStatus>
                 <StyledProjectsDropdown overlay={projectsMenu} placement="bottomCenter" arrow trigger={['click']}>
@@ -473,12 +477,12 @@ const PageHeader = () => {
                   </StyledProjectButton>
                 </StyledProjectsDropdown>
 
-                <CLusterStatusText connected={Boolean(currentConfig.kubeConfig?.isPathValid)}>
+                <CLusterStatusText connected={isKubeConfigPathValid}>
                   <StyledClusterOutlined />
-                  {Boolean(currentConfig.kubeConfig?.isPathValid) && <span>Configured</span>}
-                  {Boolean(!currentConfig.kubeConfig?.isPathValid) && <span>No Cluster Configured</span>}
+                  {isKubeConfigPathValid && <span>Configured</span>}
+                  {!isKubeConfigPathValid && <span>No Cluster Configured</span>}
                 </CLusterStatusText>
-                {Boolean(currentConfig.kubeConfig?.isPathValid) && (
+                {isKubeConfigPathValid && (
                   <StyledDropdown
                     overlay={clusterMenu}
                     placement="bottomCenter"
@@ -487,12 +491,12 @@ const PageHeader = () => {
                     disabled={previewLoader.isLoading || isInPreviewMode}
                   >
                     <StyledClusterButton>
-                      <span>{currentConfig.kubeConfig?.currentContext}</span>
+                      <span>{kubeConfigContext}</span>
                       <DownOutlined style={{margin: 4}} />
                     </StyledClusterButton>
                   </StyledDropdown>
                 )}
-                {currentConfig.kubeConfig?.isPathValid ? (
+                {isKubeConfigPathValid ? (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
                     <StyledButton
                       disabled={
