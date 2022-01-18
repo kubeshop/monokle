@@ -7,10 +7,10 @@ import {AppConfig, ProjectConfig} from '@models/appconfig';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {AppDispatch} from '@redux/store';
 
-export const CONFIG_PATH = (filePath?: string | null) => filePath || `${filePath}${sep}.monokle`;
+export const CONFIG_PATH = (filePath?: string | null) => (filePath ? `${filePath}${sep}.monokle` : '');
 
 export const writeProjectConfigFile = (state: AppConfig, projectConfig: ProjectConfig | null) => {
-  const absolutePath = `${state.selectedProjectRootFolder}${sep}.monokle`;
+  const absolutePath = CONFIG_PATH(state.selectedProjectRootFolder);
 
   const applicationConfig: ProjectConfig = populateProjectConfig(state);
   const mergedConfigs = mergeConfigs(applicationConfig, projectConfig);
@@ -43,6 +43,7 @@ export const populateProjectConfig = (state: AppConfig) => {
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
     isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
     loadLastProjectOnStartup: state.settings.loadLastProjectOnStartup,
+    enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
   };
   applicationConfig.kubeConfig = {
     path: state.kubeConfig.path,
@@ -84,7 +85,8 @@ export const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: 
   }
 };
 
-// Needs better way to do it!!
+// I am not proud of this code. It can be surely do it better.
+// After 1.5.0 I will refactor this one
 export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null) => {
   if (!(baseConfig && baseConfig.settings && baseConfig.kubeConfig)) {
     throw Error('Base config must be set');

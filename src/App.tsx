@@ -1,5 +1,3 @@
-import * as k8s from '@kubernetes/client-node';
-
 import {ipcRenderer} from 'electron';
 
 import {useCallback, useEffect} from 'react';
@@ -12,11 +10,11 @@ import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {Project, ProjectConfig} from '@models/appconfig';
+import {Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
 import {useAppSelector} from '@redux/hooks';
-import {setOpenProject, updateProjectConfig} from '@redux/reducers/appConfig';
+import {setOpenProject} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigPathSelector, settingsSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
@@ -67,7 +65,6 @@ const App = () => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const {loadLastProjectOnStartup} = useAppSelector(settingsSelector);
   const projects: Project[] = useAppSelector(state => state.config.projects);
-  const projectConfig: ProjectConfig | null | undefined = useAppSelector(state => state.config.projectConfig);
   const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
   const onExecutedFrom = useCallback(
@@ -90,30 +87,7 @@ const App = () => {
 
   useDebounce(
     () => {
-      if (kubeConfigPath) {
-        try {
-          const kc = new k8s.KubeConfig();
-
-          kc.loadFromFile(kubeConfigPath);
-          dispatch(
-            updateProjectConfig({
-              ...projectConfig,
-              kubeConfig: {
-                ...projectConfig?.kubeConfig,
-                isPathValid: Boolean(kc.contexts) || false,
-              },
-            })
-          );
-          loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
-        } catch (err) {
-          dispatch(
-            updateProjectConfig({
-              ...projectConfig,
-              kubeConfig: {...projectConfig?.kubeConfig, isPathValid: false},
-            })
-          );
-        }
-      }
+      loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
     [kubeConfigPath, dispatch, kubeConfigContext, rootFile]

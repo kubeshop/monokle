@@ -186,7 +186,12 @@ export const configSlice = createSlice({
         return;
       }
 
-      writeProjectConfigFile(state, action.payload);
+      const newProjectConfig: ProjectConfig | null = action.payload;
+
+      writeProjectConfigFile(state, newProjectConfig);
+      if (newProjectConfig && newProjectConfig.kubeConfig && newProjectConfig.kubeConfig.contexts) {
+        newProjectConfig.kubeConfig.contexts = state.projectConfig?.kubeConfig?.contexts;
+      }
       state.projectConfig = action.payload;
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {
