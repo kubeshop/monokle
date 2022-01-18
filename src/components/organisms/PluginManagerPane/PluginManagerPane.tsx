@@ -46,15 +46,13 @@ function PluginManagerPane() {
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
       <TitleBar title="Plugin Manager">
         <Tooltip title={PluginManagerPaneReloadTooltip} placement="bottom">
-          <Tooltip title={PluginManagerPaneReloadTooltip} placement="bottom">
-            <Button
-              disabled={plugins.length === 0}
-              onClick={onClickReload}
-              type="link"
-              size="small"
-              icon={<ReloadOutlined />}
-            />
-          </Tooltip>
+          <Button
+            disabled={plugins.length === 0}
+            onClick={onClickReload}
+            type="link"
+            size="small"
+            icon={<ReloadOutlined />}
+          />
         </Tooltip>
         <Button onClick={onClickInstallPlugin} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>

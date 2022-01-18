@@ -57,15 +57,13 @@ const TemplatesPane: React.FC = () => {
     <>
       <TitleBar title="Templates">
         <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
-          <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
-            <Button
-              disabled={templates.length === 0}
-              onClick={onClickReload}
-              type="link"
-              size="small"
-              icon={<ReloadOutlined />}
-            />
-          </Tooltip>
+          <Button
+            disabled={templates.length === 0}
+            onClick={onClickReload}
+            type="link"
+            size="small"
+            icon={<ReloadOutlined />}
+          />
         </Tooltip>
         <Button onClick={openInstallModal} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
