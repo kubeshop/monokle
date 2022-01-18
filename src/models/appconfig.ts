@@ -93,6 +93,9 @@ interface AppConfig {
   projects: Project[];
   selectedProjectRootFolder: string | null;
   projectConfig?: ProjectConfig | null;
+  userHomeDir?: string;
+  userDataDir?: string;
+  userTempDir?: string;
 }
 
 export type {AppConfig};

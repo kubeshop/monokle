@@ -87,7 +87,6 @@ const App = () => {
 
   useDebounce(
     () => {
-      console.log('kubeConfigPath', kubeConfigPath);
       loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,

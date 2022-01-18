@@ -1,162 +1,128 @@
-import fs from 'fs';
 import log from 'loglevel';
-import fetch from 'node-fetch';
 import path from 'path';
-import tar from 'tar';
-import {PackageJson} from 'type-fest';
-import util from 'util';
+import semver from 'semver';
 
-import {MonoklePlugin, PackageJsonMonoklePlugin} from '@models/plugin';
+import {AnyExtension} from '@models/extension';
+import {
+  AnyPlugin,
+  PluginPackageJson,
+  isTemplatePluginModule,
+  validatePluginPackageJson,
+  validateTemplatePluginModule,
+} from '@models/plugin';
 
-import {downloadFile} from '@utils/http';
+import downloadExtension from './extensions/downloadExtension';
+import downloadExtensionEntry from './extensions/downloadExtensionEntry';
+import {createFolder, doesPathExist} from './extensions/fileSystem';
+import loadMultipleExtensions from './extensions/loadMultipleExtensions';
+import {convertExtensionsToRecord, extractRepositoryOwnerAndNameFromUrl, makeExtensionDownloadData} from './utils';
 
-const fsExistsPromise = util.promisify(fs.exists);
-const fsReadFilePromise = util.promisify(fs.readFile);
-const fsMkdirPromise = util.promisify(fs.mkdir);
-const fsUnlinkPromise = util.promisify(fs.unlink);
-const fsRmPromise = util.promisify(fs.rm);
-const fsReadDirPromise = util.promisify(fs.readdir);
+const PLUGIN_ENTRY_FILE_NAME = 'package.json';
 
-const GITHUB_URL = 'https://github.com';
-const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
-
-function isValidRepositoryUrl(repositoryUrl: string) {
-  return GITHUB_REPOSITORY_REGEX.test(repositoryUrl);
-}
-
-function extractRepositoryOwnerAndName(pluginUrl: string) {
-  if (!isValidRepositoryUrl(pluginUrl)) {
-    throw new Error('Invalig repository URL');
-  }
-  const repositoryPath = pluginUrl.split(`${GITHUB_URL}/`)[1];
-  const [repositoryOwner, repositoryName] = repositoryPath.split('/');
-
-  return {
-    repositoryOwner,
-    repositoryName,
-  };
-}
-
-function extractInfoFromPackageJson(packageJson: PackageJsonMonoklePlugin) {
-  const {name, version, author, description, monoklePlugin} = packageJson;
-  if (name === undefined || version === undefined || author === undefined || monoklePlugin === undefined) {
-    throw new Error('Invalid plugin package.json');
-  }
-  return {name, version, author, description, monoklePlugin};
-}
-
-async function fetchPackageJson(repositoryOwner: string, repositoryName: string, targetCommitish: string) {
-  const packageJsonUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/${targetCommitish}/package.json`;
-  const packageJsonResponse = await fetch(packageJsonUrl);
-  if (!packageJsonResponse.ok) {
-    throw new Error("Couldn't find package.json file in the repository");
-  }
-  const packageJson = await packageJsonResponse.json();
-  return packageJson as PackageJsonMonoklePlugin;
-}
-
-export async function downloadPlugin(pluginUrl: string, pluginsDir: string) {
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(pluginUrl);
-  const repositoryBranch = 'main'; // TODO: allow input of branch name
-  const packageJson = await fetchPackageJson(repositoryOwner, repositoryName, repositoryBranch);
-  const pluginInfo = extractInfoFromPackageJson(packageJson);
-  const doesPluginsDirExist = await fsExistsPromise(pluginsDir);
-  if (!doesPluginsDirExist) {
-    await fsMkdirPromise(pluginsDir);
-  }
-
-  const pluginTarballFilePath = path.join(
-    pluginsDir,
-    `${repositoryOwner}-${repositoryName}-${pluginInfo.version.replace('.', '-')}.tgz`
-  );
-  if (fs.existsSync(pluginTarballFilePath)) {
-    await fsUnlinkPromise(pluginTarballFilePath);
-  }
-  const pluginTarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/${repositoryBranch}`;
-  await downloadFile(pluginTarballUrl, pluginTarballFilePath);
-
-  const pluginFolderPath: string = path.join(pluginsDir, `${repositoryOwner}-${repositoryName}`);
-
-  if (fs.existsSync(pluginFolderPath)) {
-    await fsRmPromise(pluginFolderPath, {recursive: true});
-  }
-
-  await fsMkdirPromise(pluginFolderPath);
-
-  await tar.extract({
-    file: pluginTarballFilePath,
-    cwd: pluginFolderPath,
-    strip: 1,
-  });
-
-  const plugin: MonoklePlugin = {
-    name: pluginInfo.name,
-    author: typeof pluginInfo.author === 'string' ? pluginInfo.author : pluginInfo.author.name,
-    version: pluginInfo.version,
-    description: pluginInfo.description,
-    isActive: false,
-    repository: {
-      owner: repositoryOwner,
-      name: repositoryName,
-      branch: repositoryBranch,
-    },
-    modules: pluginInfo.monoklePlugin.modules,
-  };
-
-  return plugin;
-}
-
-const getSubfolders = async (folderPath: string) => {
-  const subfolders = await fsReadDirPromise(folderPath, {withFileTypes: true});
-  return subfolders.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
-};
-
-async function parsePlugin(pluginsDir: string, pluginFolderName: string): Promise<MonoklePlugin | undefined> {
-  const pluginFolderPath = path.join(pluginsDir, pluginFolderName);
-  const packageJsonFilePath = path.join(pluginFolderPath, 'package.json');
-  const doesPackageJsonFileExist = await fsExistsPromise(packageJsonFilePath);
-  if (!doesPackageJsonFileExist) {
-    log.warn(`[Plugins]: Missing package.json for plugin ${pluginFolderPath}`);
-    return;
-  }
-  const packageJsonRaw = await fsReadFilePromise(packageJsonFilePath, 'utf8');
-  const packageJson = JSON.parse(packageJsonRaw) as PackageJson;
-  const pluginInfo = extractInfoFromPackageJson(packageJson);
-
-  if (!packageJson.repository) {
-    log.warn(`[Plugins]: Missing 'repository' property in ${packageJsonFilePath}`);
-    return;
-  }
-
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndName(
-    typeof packageJson.repository === 'string' ? packageJson.repository : packageJson.repository.url
-  );
-
-  return {
-    name: pluginInfo.name,
-    author: typeof pluginInfo.author === 'string' ? pluginInfo.author : pluginInfo.author.name,
-    version: pluginInfo.version,
-    description: pluginInfo.description,
-    isActive: false,
+function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderPath: string): AnyPlugin {
+  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(packageJson.repository);
+  const plugin: AnyPlugin = {
+    name: packageJson.name,
+    author: packageJson.author,
+    version: packageJson.version,
+    description: packageJson.description,
+    isActive: packageJson.monoklePlugin.modules.every(module => validateTemplatePluginModule(module)),
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
       branch: 'main', // TODO: handle the branch name
     },
-    modules: pluginInfo.monoklePlugin.modules,
+    modules: packageJson.monoklePlugin.modules.map(module => {
+      if (isTemplatePluginModule(module)) {
+        return {
+          ...module,
+          path: path.join(folderPath, module.path),
+        };
+      }
+      return module;
+    }),
   };
+  return plugin;
 }
 
-export async function loadPlugins(pluginsDir: string) {
-  const pluginFolders = await getSubfolders(pluginsDir);
-
-  const pluginsParsingResults = await Promise.allSettled(
-    pluginFolders.map(pluginFolderName => parsePlugin(pluginsDir, pluginFolderName))
+export async function downloadPlugin(
+  pluginUrl: string,
+  allPluginsFolderPath: string
+): Promise<AnyExtension<AnyPlugin>> {
+  const {entryFileUrl, tarballUrl, folderPath} = makeExtensionDownloadData(
+    pluginUrl,
+    PLUGIN_ENTRY_FILE_NAME,
+    allPluginsFolderPath
   );
+  const plugin: AnyPlugin = await downloadExtension<PluginPackageJson, AnyPlugin>({
+    extensionTarballUrl: tarballUrl,
+    entryFileName: 'package.json',
+    entryFileUrl,
+    parseEntryFileContent: JSON.parse,
+    validateEntryFileContent: validatePluginPackageJson,
+    transformEntryFileContentToExtension: transformPackageJsonToAnyPlugin,
+    makeExtensionFolderPath: () => {
+      return folderPath;
+    },
+  });
+  return {extension: plugin, folderPath};
+}
 
-  const plugins = pluginsParsingResults
-    .filter((r): r is {status: 'fulfilled'; value: MonoklePlugin} => r.status === 'fulfilled' && r.value !== undefined)
-    .map(r => r.value);
+export async function loadPluginMap(pluginsDir: string): Promise<Record<string, AnyPlugin>> {
+  try {
+    const doesPluginsDirExist = await doesPathExist(pluginsDir);
+    if (!doesPluginsDirExist) {
+      await createFolder(pluginsDir);
+    }
+  } catch (e) {
+    if (e instanceof Error) {
+      log.warn(`[loadPlugins]: Couldn't load plugins: ${e.message}`);
+    }
+    return {};
+  }
+  const pluginExtensions: AnyExtension<AnyPlugin>[] = await loadMultipleExtensions<PluginPackageJson, AnyPlugin>({
+    folderPath: pluginsDir,
+    entryFileName: 'package.json',
+    parseEntryFileContent: JSON.parse,
+    validateEntryFileContent: validatePluginPackageJson,
+    transformEntryFileContentToExtension: transformPackageJsonToAnyPlugin,
+  });
+  return convertExtensionsToRecord(pluginExtensions);
+}
 
-  return plugins;
+export async function updatePlugin(
+  plugin: AnyPlugin,
+  pluginsDir: string,
+  userTempDir: string
+): Promise<AnyExtension<AnyPlugin> | undefined> {
+  const repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
+  const {entryFileUrl, folderPath} = makeExtensionDownloadData(repositoryUrl, PLUGIN_ENTRY_FILE_NAME, userTempDir);
+  let tempPluginEntry: PluginPackageJson;
+  try {
+    tempPluginEntry = await downloadExtensionEntry({
+      entryFileName: PLUGIN_ENTRY_FILE_NAME,
+      entryFileUrl,
+      makeExtensionFolderPath: () => folderPath,
+      parseEntryFileContent: JSON.parse,
+      validateEntryFileContent: validatePluginPackageJson,
+    });
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new Error(`Failed to update plugin ${plugin.name} by ${plugin.author}`);
+    }
+    return;
+  }
+  if (semver.lt(plugin.version, tempPluginEntry.version)) {
+    try {
+      const pluginExtension = await downloadPlugin(repositoryUrl, pluginsDir);
+      return pluginExtension;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(
+          `Failed to update plugin ${plugin.name} by ${plugin.author} from version ${plugin.version} to ${tempPluginEntry.version}`
+        );
+      }
+    }
+  }
+  return undefined;
 }

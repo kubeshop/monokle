@@ -31,7 +31,7 @@ import {
   KustomizePane,
   NavigatorPane,
   PluginManagerPane,
-  TemplatesPane,
+  TemplateManagerPane,
 } from '@organisms';
 
 import {GraphView} from '@molecules';
@@ -172,32 +172,30 @@ const PaneManager = () => {
               <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
             </MenuButton>
           </Tooltip>
-          {featureJson.TemplatesPane && (
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
-              <MenuButton
+
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+            <MenuButton
+              isSelected={leftMenuSelection === 'templates-pane'}
+              isActive={leftActive}
+              onClick={() => setLeftActiveMenu('templates-pane')}
+            >
+              <MenuIcon
+                icon={FormatPainterOutlined}
+                active={leftActive}
                 isSelected={leftMenuSelection === 'templates-pane'}
-                isActive={leftActive}
-                onClick={() => setLeftActiveMenu('templates-pane')}
-              >
-                <MenuIcon
-                  icon={FormatPainterOutlined}
-                  active={leftActive}
-                  isSelected={leftMenuSelection === 'templates-pane'}
-                />
-              </MenuButton>
-            </Tooltip>
-          )}
-          {featureJson.PluginManager && (
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
-              <MenuButton
-                isSelected={leftMenuSelection === 'plugin-manager'}
-                isActive={leftActive}
-                onClick={() => setLeftActiveMenu('plugin-manager')}
-              >
-                <MenuIcon icon={ApiOutlined} active={leftActive} isSelected={leftMenuSelection === 'plugin-manager'} />
-              </MenuButton>
-            </Tooltip>
-          )}
+              />
+            </MenuButton>
+          </Tooltip>
+
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+            <MenuButton
+              isSelected={leftMenuSelection === 'plugin-manager'}
+              isActive={leftActive}
+              onClick={() => setLeftActiveMenu('plugin-manager')}
+            >
+              <MenuIcon icon={ApiOutlined} active={leftActive} isSelected={leftMenuSelection === 'plugin-manager'} />
+            </MenuButton>
+          </Tooltip>
         </Space>
       </StyledColumnLeftMenu>
 
@@ -218,14 +216,14 @@ const PaneManager = () => {
                 </div>
                 <div
                   style={{
-                    display: featureJson.TemplatesPane && leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
+                    display: leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
                   }}
                 >
-                  <TemplatesPane />
+                  <TemplateManagerPane />
                 </div>
                 <div
                   style={{
-                    display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                    display: leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
                   }}
                 >
                   <PluginManagerPane />

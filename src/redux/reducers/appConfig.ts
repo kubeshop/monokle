@@ -192,11 +192,20 @@ export const configSlice = createSlice({
       if (newProjectConfig && newProjectConfig.kubeConfig && newProjectConfig.kubeConfig.contexts) {
         newProjectConfig.kubeConfig.contexts = state.projectConfig?.kubeConfig?.contexts;
       }
-      state.projectConfig = action.payload;
+      state.projectConfig = newProjectConfig;
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {
       state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;
       electronStore.set('ui.clusterStatusHidden', state.settings.isClusterSelectorVisible);
+    },
+    setUserDirs: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string}>
+    ) => {
+      const {homeDir, tempDir, dataDir} = action.payload;
+      state.userHomeDir = homeDir;
+      state.userTempDir = tempDir;
+      state.userDataDir = dataDir;
     },
   },
 });
@@ -223,5 +232,6 @@ export const {
   updateProjectConfig,
   updateProjectKubeConfig,
   toggleClusterStatus,
+  setUserDirs,
 } = configSlice.actions;
 export default configSlice.reducer;
