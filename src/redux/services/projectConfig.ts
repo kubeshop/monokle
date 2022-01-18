@@ -4,6 +4,11 @@ import {sep} from 'path';
 
 import {AppConfig, ProjectConfig} from '@models/appconfig';
 
+import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {AppDispatch} from '@redux/store';
+
+export const CONFIG_PATH = (filePath?: string | null) => filePath || `${filePath}${sep}.monokle`;
+
 export const writeProjectConfigFile = (state: AppConfig, projectConfig: ProjectConfig | null) => {
   const absolutePath = `${state.selectedProjectRootFolder}${sep}.monokle`;
 
@@ -45,6 +50,38 @@ export const populateProjectConfig = (state: AppConfig) => {
     contexts: state.kubeConfig.contexts,
   };
   return applicationConfig;
+};
+
+export const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: string, dispatch: AppDispatch) => {
+  try {
+    const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth}: ProjectConfig = JSON.parse(
+      readFileSync(absolutePath, 'utf8')
+    );
+    const projectConfig: ProjectConfig = {};
+    projectConfig.settings = settings
+      ? {
+          helmPreviewMode: settings.helmPreviewMode,
+          kustomizeCommand: settings.kustomizeCommand,
+          hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
+          isClusterSelectorVisible: settings.isClusterSelectorVisible,
+        }
+      : undefined;
+    projectConfig.kubeConfig = kubeConfig
+      ? {
+          path: kubeConfig.path,
+          currentContext: kubeConfig.currentContext,
+          isPathValid: kubeConfig.isPathValid,
+        }
+      : undefined;
+
+    projectConfig.scanExcludes = scanExcludes;
+    projectConfig.fileIncludes = fileIncludes;
+    projectConfig.folderReadsMaxDepth = folderReadsMaxDepth;
+
+    dispatch(updateProjectConfig(projectConfig));
+  } catch (error) {
+    dispatch(updateProjectConfig(null));
+  }
 };
 
 // Needs better way to do it!!

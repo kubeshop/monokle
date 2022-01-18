@@ -1,11 +1,8 @@
 import {FSWatcher, watch} from 'chokidar';
-import {readFileSync} from 'fs';
-import {sep} from 'path';
 
-import {ProjectConfig} from '@models/appconfig';
-
-import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {AppDispatch} from '@redux/store';
+
+import {CONFIG_PATH, readApplicationConfigFileAndUpdateProjectSettings} from './projectConfig';
 
 let watcher: FSWatcher;
 
@@ -22,7 +19,7 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
     watcher.close();
   }
 
-  const absolutePath = `${filePath}${sep}.monokle`;
+  const absolutePath = CONFIG_PATH(filePath);
 
   watcher = watch(absolutePath, {
     persistent: true,
@@ -45,35 +42,3 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
 
   /* eslint-disable no-console */
 }
-
-const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: string, dispatch: AppDispatch) => {
-  try {
-    const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth}: ProjectConfig = JSON.parse(
-      readFileSync(absolutePath, 'utf8')
-    );
-    const projectConfig: ProjectConfig = {};
-    projectConfig.settings = settings
-      ? {
-          helmPreviewMode: settings.helmPreviewMode,
-          kustomizeCommand: settings.kustomizeCommand,
-          hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
-          isClusterSelectorVisible: settings.isClusterSelectorVisible,
-        }
-      : undefined;
-    projectConfig.kubeConfig = kubeConfig
-      ? {
-          path: kubeConfig.path,
-          currentContext: kubeConfig.currentContext,
-          isPathValid: kubeConfig.isPathValid,
-        }
-      : undefined;
-
-    projectConfig.scanExcludes = scanExcludes;
-    projectConfig.fileIncludes = fileIncludes;
-    projectConfig.folderReadsMaxDepth = folderReadsMaxDepth;
-
-    dispatch(updateProjectConfig(projectConfig));
-  } catch (error) {
-    dispatch(updateProjectConfig(null));
-  }
-};
