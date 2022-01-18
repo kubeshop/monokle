@@ -47,7 +47,7 @@ const initialAppState: AppState = {
 };
 
 const initialAppConfigState: AppConfig = {
-  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
+  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible', true),
   settings: {
     filterObjectsOnSelection: false,
     autoZoomGraphOnSelection: true,
@@ -57,8 +57,9 @@ const initialAppConfigState: AppConfig = {
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
     loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
-    hideExcludedFilesInFileExplorer: false,
     isClusterSelectorVisible: electronStore.get('ui.clusterStatusHidden'),
+    hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
+    enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'outdated',
@@ -91,15 +92,15 @@ const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
-  isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
+  isSettingsOpen: false,
   isClusterDiffVisible: false,
-  isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
+  isNotificationsOpen: false,
   isFolderLoading: false,
   quickSearchActionsPopup: {
     isOpen: false,
   },
   newResourceWizard: {
-    isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
+    isOpen: false,
   },
   createFolderModal: {
     isOpen: false,

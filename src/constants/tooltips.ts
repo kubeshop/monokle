@@ -34,6 +34,7 @@ export const AddExclusionPatternTooltip = 'Add pattern for files/folders to excl
 export const HelmPreviewModeTooltip = 'Set which Helm command to use when generating Helm previews';
 export const KustomizeCommandTooltip = 'Set how to invoke kustomize when previewing and applying kustomization files';
 export const AutoLoadLastProjectTooltip = 'Load last project when starting Monokle';
+export const EnableHelmWithKustomizeTooltip = 'Enable helm-related functionality when invoking Kustomize';
 export const SaveUnsavedResourceTooltip = 'Save resource to file';
 export const ClusterDiffApplyTooltip = 'Deploy this resource to your configured cluster';
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';

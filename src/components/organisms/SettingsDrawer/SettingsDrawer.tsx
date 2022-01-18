@@ -12,6 +12,7 @@ import {
   setKubeConfig,
   setScanExcludesStatus,
   toggleClusterStatus,
+  updateEnableHelmWithKustomize,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
@@ -67,6 +68,9 @@ const SettingsDrawer = () => {
     if (!_.isEqual(config.settings?.loadLastProjectOnStartup, appConfig.settings.loadLastProjectOnStartup)) {
       dispatch(updateLoadLastProjectOnStartup(Boolean(config.settings?.loadLastProjectOnStartup)));
     }
+    if (!_.isEqual(config.settings?.enableHelmWithKustomize, appConfig.settings.enableHelmWithKustomize)) {
+      dispatch(updateEnableHelmWithKustomize(Boolean(config.settings?.enableHelmWithKustomize)));
+    }
     if (!_.isEqual(config.settings?.helmPreviewMode, appConfig.settings.helmPreviewMode)) {
       dispatch(updateHelmPreviewMode(config.settings?.helmPreviewMode || 'template'));
     }
@@ -106,7 +110,12 @@ const SettingsDrawer = () => {
     >
       <Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
         <Panel header="Default Settings" key="1">
-          <Settings config={appConfig} onConfigChange={changeApplicationConfig} showLoadLastProjectOnStartup />
+          <Settings
+            config={appConfig}
+            onConfigChange={changeApplicationConfig}
+            showLoadLastProjectOnStartup
+            showEnableHelmWithKustomize
+          />
         </Panel>
         {activeProject && (
           <Panel header={`${activeProject.name} Settings`} key="2">

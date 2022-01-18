@@ -44,6 +44,7 @@ import { indexOf } from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
 import { RootState } from '@redux/store';
+import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -73,8 +74,8 @@ ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   }
 });
 
-ipcMain.on('run-kustomize', (event, cmdOptions: any) => {
-  runKustomize(cmdOptions.folder, cmdOptions.kustomizeCommand, event);
+ipcMain.on('run-kustomize', (event, cmdOptions: KustomizeCommandOptions) => {
+  runKustomize(cmdOptions, event);
 });
 
 ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
@@ -237,7 +238,6 @@ export const openApplication = async (givenPath?: string) => {
 
   ElectronStore.initRenderer();
   const win = createWindow(givenPath);
-
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));

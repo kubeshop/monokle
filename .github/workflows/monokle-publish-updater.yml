@@ -1,23 +1,31 @@
-name: monokle-build-nightly
+name: monokle-sign-notarize-publish
 
 on:
-  schedule:
-    - cron: '0 2 * * *'
+  push:
+    branches:
+      - auto-updater
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  build-nightly-mac:
+  # This workflow contains a single job called "build"
+  build-and-publish-mac:
     runs-on: macos-latest
 
     steps:
-      # Make sure build is clean and no files from a previous run are re-used.
-      - name: Cleanup files before run
-        run: |
-          rm -rf *
-          rm /Users/runner/.npm/_logs/*.log || true
-        if: ${{ always() }}
+      - name: Delete release
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: latest-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
+      - name: Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
@@ -68,13 +76,6 @@ jobs:
           ls -la
           npm list --depth=1
 
-      - name: Generate and apply tag
-        run: |
-          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
-          git push --tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-
       - name: Build
         run: |
           npm run electron:build:ci
@@ -83,9 +84,9 @@ jobs:
           CI: false
 
       - name: Package
-        id: package
         run: |
-          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
+          contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
+          contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -97,6 +98,12 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           USE_HARD_LINKS: false
 
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          ls -alh dist | grep Monokle && du -sh dist/mac || true
+        if: ${{ success() }}
+
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
@@ -105,19 +112,14 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: ${{ steps.package.outputs.TAG }}
+          tag: 'latest-version'
+          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
-
-      # Check Binary Sizes
-      - name: Build Succeeded
-        run: |
-          ls -alh dist | grep Monokle && du -sh dist/mac || true
-        if: ${{ success() }}
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
         with:
-          name: dist
+          name: dist-mac
           path: dist
         if: ${{ success() }}
 
@@ -133,15 +135,29 @@ jobs:
           path: /Users/runner/.npm/_logs
         if: ${{ failure() || cancelled() }}
 
-  build-nightly-windows:
+      # Make sure no secrets or certs are left on the runner
+      - name: Cleanup files after run
+        run: |
+          rm -rf *
+          ls -la
+        if: ${{ always() }}
+
+  build-and-publish-windows:
     runs-on: windows-latest
 
     steps:
-      # Make sure build is clean and no files from a previous run are re-used.
-      - name: Cleanup files before run
-        run: |
-          cmd /r dir
-        if: ${{ always() }}
+      - name: Delete release and tagname
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: latest-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
+      - name: Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
@@ -182,15 +198,6 @@ jobs:
           cmd /r dir
           npm list --depth=1
 
-      - name: Generate and apply tag
-        run: |
-          Set-PSDebug -Trace 1
-          $datetoday = Get-Date -Format "yyyy-MM-dd"
-          npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true --skip.tag true
-          git push --tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-
       - name: Build
         run: |
           npm run electron:build:ci
@@ -199,10 +206,7 @@ jobs:
           CI: false
 
       - name: Package
-        id: package
         run: |
-          $p = get-content package.json | ConvertFrom-Json
-          echo "::set-output name=TAG::v$($p.version)"
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -210,6 +214,12 @@ jobs:
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
+
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          cmd /r dir .\dist
+        if: ${{ success() }}
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -219,33 +229,29 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: ${{ steps.package.outputs.TAG }}
+          tag: 'latest-version'
+          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
 
-      # Check Binary Sizes
-      - name: Build Succeeded
-        run: |
-          cmd /r dir .\dist
-        if: ${{ success() }}
-
-      - name: Build Failed - Archive Build Logs
+      - name: Archive Binary
         uses: actions/upload-artifact@v2
         with:
-          name: logs
-          path: .\msilog.txt
-        if: ${{ failure() || cancelled() }}
+          name: dist-win
+          path: dist
+        if: ${{ success() }}
 
   # This workflow contains a single job called "build"
-  build-nightly-linux:
+  build-and-publish-linux:
     runs-on: ubuntu-latest
 
     steps:
-      # Make sure build is clean and no files from a previous run are re-used.
-      - name: Cleanup files before run
-        run: |
-          rm -rf *
-          rm /Users/runner/.npm/_logs/*.log || true
-        if: ${{ always() }}
+      - name: Delete release
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: latest-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
 
       - name: Context
         env:
@@ -284,13 +290,6 @@ jobs:
         run: |
           sudo apt-get install jq
 
-      - name: Generate and apply tag
-        run: |
-          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
-          git push --tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-
       - name: Build
         run: |
           npm run electron:build:ci
@@ -299,14 +298,20 @@ jobs:
           CI: false
 
       - name: Package
-        id: package
         run: |
-          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
+          contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
+          contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
+
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          ls -alh dist | grep Monokle && du -sh dist || true
+        if: ${{ success() }}
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -316,14 +321,10 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: ${{ steps.package.outputs.TAG }}
+          tag: 'latest-version'
+          commit: 'auto-updater'
           token: ${{ secrets.github_token }}
-
-      # Check Binary Size
-      - name: Build Succeeded
-        run: |
-          ls -alh dist | grep Monokle && du -sh dist || true
-        if: ${{ success() }}
+        if: "contains(github.ref, 'auto-updater')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2

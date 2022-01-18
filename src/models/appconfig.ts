@@ -26,6 +26,7 @@ export type Settings = {
   loadLastProjectOnStartup?: boolean;
   hideExcludedFilesInFileExplorer?: boolean;
   isClusterSelectorVisible?: boolean;
+  enableHelmWithKustomize?: boolean;
 };
 
 export enum NewVersionCode {

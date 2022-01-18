@@ -14,6 +14,7 @@ import {
   AddInclusionPatternTooltip,
   AutoLoadLastProjectTooltip,
   BrowseKubeconfigTooltip,
+  EnableHelmWithKustomizeTooltip,
   HelmPreviewModeTooltip,
   KubeconfigPathTooltip,
   KustomizeCommandTooltip,
@@ -77,6 +78,7 @@ type SettingsProps = {
   onConfigChange?: Function;
   isClusterPaneIconHighlighted?: boolean | null;
   showLoadLastProjectOnStartup?: boolean | null;
+  showEnableHelmWithKustomize?: boolean | null;
 };
 
 export const Settings = ({
@@ -84,6 +86,7 @@ export const Settings = ({
   onConfigChange,
   isClusterPaneIconHighlighted,
   showLoadLastProjectOnStartup,
+  showEnableHelmWithKustomize,
 }: SettingsProps) => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
@@ -174,22 +177,19 @@ export const Settings = ({
     dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
   };
 
+  const onChangeEnableHelmWithKustomize = (e: any) => {
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, enableHelmWithKustomize: e.target.checked},
+    });
+  };
+
   const openFileSelect = () => {
     if (isEditingDisabled) {
       return;
     }
     fileInput && fileInput.current?.click();
   };
-
-  // useDebounce(
-  //   () => {
-  //     if (currentKubeConfig !== kubeconfigPath) {
-  //       dispatch(updateKubeconfig(currentKubeConfig));
-  //     }
-  //   },
-  //   DEFAULT_KUBECONFIG_DEBOUNCE,
-  //   [currentKubeConfig]
-  // );
 
   useDebounce(
     () => {
@@ -307,6 +307,18 @@ export const Settings = ({
           </StyledSelect>
         </Tooltip>
       </StyledDiv>
+      {showEnableHelmWithKustomize && (
+        <StyledDiv>
+          <Tooltip title={EnableHelmWithKustomizeTooltip}>
+            <Checkbox
+              checked={localConfig?.settings?.enableHelmWithKustomize}
+              onChange={onChangeEnableHelmWithKustomize}
+            >
+              Enable Helm-related features when invoking Kustomize
+            </Checkbox>
+          </Tooltip>
+        </StyledDiv>
+      )}
       {showLoadLastProjectOnStartup && (
         <StyledDiv>
           <StyledSpan>On Startup</StyledSpan>

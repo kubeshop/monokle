@@ -53,7 +53,9 @@ export const configSlice = createSlice({
       state.recentFolders = action.payload;
     },
     updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.startupModalVisible', action.payload);
+      if (!action.payload) {
+        electronStore.set('appConfig.startupModalVisible', false);
+      }
       state.isStartupModalVisible = action.payload;
     },
     updateScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
@@ -99,6 +101,10 @@ export const configSlice = createSlice({
     updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
       state.settings.hideExcludedFilesInFileExplorer = action.payload;
+    },
+    updateEnableHelmWithKustomize: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.settings.enableHelmWithKustomize', action.payload);
+      state.settings.enableHelmWithKustomize = action.payload;
     },
     updateFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
@@ -169,7 +175,6 @@ export const configSlice = createSlice({
       };
 
       writeProjectConfigFile(state, newProjectConfig);
-
       state.projectConfig = newProjectConfig;
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
@@ -181,11 +186,8 @@ export const configSlice = createSlice({
         return;
       }
 
-      if (!_.isEqual(state.projectConfig, action.payload)) {
-        writeProjectConfigFile(state, action.payload);
-
-        state.projectConfig = action.payload;
-      }
+      writeProjectConfigFile(state, action.payload);
+      state.projectConfig = action.payload;
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {
       state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;
@@ -205,6 +207,7 @@ export const {
   updateFileIncludes,
   updateHelmPreviewMode,
   updateHideExcludedFilesInFileExplorer,
+  updateEnableHelmWithKustomize,
   updateKustomizeCommand,
   updateLoadLastProjectOnStartup,
   updateScanExcludes,

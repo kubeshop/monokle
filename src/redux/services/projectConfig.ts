@@ -114,6 +114,12 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     baseConfig.settings.loadLastProjectOnStartup = config.settings?.loadLastProjectOnStartup;
   }
   if (
+    _.isBoolean(config.settings?.enableHelmWithKustomize) &&
+    !_.isEqual(config.settings?.enableHelmWithKustomize, baseConfig.settings?.enableHelmWithKustomize)
+  ) {
+    baseConfig.settings.enableHelmWithKustomize = config.settings?.enableHelmWithKustomize;
+  }
+  if (
     _.isBoolean(config.settings?.hideExcludedFilesInFileExplorer) &&
     !_.isEqual(config.settings?.hideExcludedFilesInFileExplorer, baseConfig.settings?.hideExcludedFilesInFileExplorer)
   ) {
