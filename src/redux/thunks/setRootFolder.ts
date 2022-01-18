@@ -38,7 +38,13 @@ export const setRootFolder = createAsyncThunk<
   const helmValuesMap: HelmValuesMapType = {};
 
   if (!rootFolder) {
-    return;
+    return {
+      appConfig,
+      fileMap,
+      resourceMap,
+      helmChartMap,
+      helmValuesMap,
+    };
   }
 
   const stats = getFileStats(rootFolder);
