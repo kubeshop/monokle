@@ -1,11 +1,11 @@
-import {Button} from 'antd';
+import {Button, ButtonProps} from 'antd';
 
 import styled from 'styled-components';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import {AppBorders} from '@styles/Borders';
-import {BackgroundColors} from '@styles/Colors';
+import Colors, {BackgroundColors} from '@styles/Colors';
 
 export const List = styled.ol<{height: number}>`
   list-style-type: none;
@@ -36,10 +36,27 @@ export const TitleBarRightButtons = styled.div`
   padding-right: 16px;
 `;
 
-export const PlusButton = styled(Button)``;
-
 export const FilterButton = styled(Button)``;
 
 export const FiltersNumber = styled.div`
   margin-left: 5px;
+`;
+
+interface PlusItem extends ButtonProps {
+  highlighted?: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const PlusButton = styled(({highlighted, ...rest}: PlusItem) => <Button {...rest} />)`
+  ${({highlighted}) => `
+  border-radius: ${highlighted ? '100%' : 'inherit'} !important;
+  color: ${highlighted ? Colors.whitePure : Colors.blue6} !important`};
+  &:after {
+    ${({highlighted}) =>
+      `height: ${highlighted ? '24px' : 'inherit'};
+      width: ${highlighted ? '24px' : 'inherit'};
+      top: ${highlighted ? '-1px' : 'inherit'};
+      left: ${highlighted ? '-1px' : 'inherit'}
+      `};
+  }
 `;

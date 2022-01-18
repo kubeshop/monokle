@@ -70,6 +70,26 @@ const schema = {
       newVersion: {
         type: 'number',
       },
+      projects: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+            },
+            rootFolder: {
+              type: 'string',
+            },
+            k8sVersion: {
+              type: 'string',
+            },
+            lastOpened: {
+              type: 'string',
+            },
+          },
+        },
+      },
     },
   },
   ui: {

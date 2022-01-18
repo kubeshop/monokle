@@ -69,10 +69,8 @@ jobs:
           npm list --depth=1
 
       - name: Generate and apply tag
-        id: apply-tag
         run: |
           npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
-          echo "::set-output name=TAG::$(cat package.json | jq -r '.version')"
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -85,7 +83,9 @@ jobs:
           CI: false
 
       - name: Package
+        id: package
         run: |
+          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -105,7 +105,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: ${{ steps.apply-tag.outputs.TAG }}
+          tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
 
       # Check Binary Sizes
@@ -183,13 +183,10 @@ jobs:
           npm list --depth=1
 
       - name: Generate and apply tag
-        id: apply-tag
         run: |
           Set-PSDebug -Trace 1
           $datetoday = Get-Date -Format "yyyy-MM-dd"
           npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true --skip.tag true
-          $p = get-content package.json | ConvertFrom-Json
-          echo "::set-output name=TAG::$($p.version)"
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -202,7 +199,10 @@ jobs:
           CI: false
 
       - name: Package
+        id: package
         run: |
+          $p = get-content package.json | ConvertFrom-Json
+          echo "::set-output name=TAG::v$($p.version)"
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -219,7 +219,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: ${{ steps.apply-tag.outputs.TAG }}
+          tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
 
       # Check Binary Sizes
@@ -285,10 +285,8 @@ jobs:
           sudo apt-get install jq
 
       - name: Generate and apply tag
-        id: apply-tag
         run: |
           npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
-          echo "::set-output name=TAG::$(cat package.json | jq -r '.version')"
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -301,7 +299,9 @@ jobs:
           CI: false
 
       - name: Package
+        id: package
         run: |
+          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -316,7 +316,7 @@ jobs:
           draft: false
           prerelease: true
           omitBody: true
-          tag: ${{ steps.apply-tag.outputs.TAG }}
+          tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
 
       # Check Binary Size
