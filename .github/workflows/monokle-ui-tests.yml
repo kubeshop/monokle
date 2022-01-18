@@ -229,17 +229,6 @@ jobs:
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
 
-      - name: Create release
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
-          draft: false
-          prerelease: true
-          omitBody: true
-          tag: ${{ steps.apply-tag.outputs.TAG }}
-          token: ${{ secrets.github_token }}
-
       # Check Binary Size
       - name: Build Succeeded
         run: |
