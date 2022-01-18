@@ -16,6 +16,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {removeResource, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {isUnsavedResource} from '@redux/services/resource';
 import {AppDispatch} from '@redux/store';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 
@@ -88,6 +89,11 @@ const CheckedResourcesActionsMenu: React.FC = () => {
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
+  const areOnlyUnsavedResourcesChecked = useMemo(
+    () => !checkedResourceIds.filter(resourceId => !isUnsavedResource(resourceMap[resourceId])).length,
+    [checkedResourceIds, resourceMap]
+  );
+
   const checkedResources = useMemo(
     () => checkedResourceIds.map(resource => resourceMap[resource]).filter((r): r is K8sResource => r !== undefined),
     [checkedResourceIds, resourceMap]
@@ -141,7 +147,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
           </Menu.Item>
         )}
 
-        {isInPreviewMode && (
+        {(isInPreviewMode || areOnlyUnsavedResourcesChecked) && (
           <Menu.Item key="save_to_file_folder" onClick={onClickSaveToFileFolder}>
             Save to file/folder
           </Menu.Item>
