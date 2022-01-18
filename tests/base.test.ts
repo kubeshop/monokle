@@ -24,7 +24,7 @@ test.beforeAll(async () => {
   electronApp = await electron.launch({
     args: [appInfo.main],
     executablePath: appInfo.executable,
-    recordVideo: {dir: './test-output/videos', size: {width: 1200, height: 800}},
+    recordVideo: {dir: `./test-output/videos/${appInfo.platform}`, size: {width: 1200, height: 800}},
   });
 
   // wait for splash-screen to pass
@@ -49,8 +49,12 @@ test.beforeAll(async () => {
   await appWindow.screenshot({path: 'test-output/screenshots/initial-screen.png'});
 });
 
+test.beforeEach(async () => {
+  await pause(1000);
+});
+
 test.afterEach(async () => {
-  await pause(2000);
+  await pause(1000);
   appWindow.on('console', console.log);
 });
 
