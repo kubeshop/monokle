@@ -130,7 +130,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
             </Steps>
           </div>
 
-          <div>
+          <div style={{width: '100%'}}>
             {isLoading ? (
               <Skeleton />
             ) : resultMessage ? (

@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo, useState} from 'react';
 
-import {Button, Tooltip} from 'antd';
+import {Button, Skeleton, Tooltip} from 'antd';
 
 import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -23,9 +23,15 @@ const TemplatesPane: React.FC = () => {
   const [isInstallModalVisible, setIsInstallModalVisible] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
+  const isLoadingExistingTemplates = useAppSelector(state => state.extension.isLoadingExistingTemplates);
+  const isLoadingExistingTemplatePacks = useAppSelector(state => state.extension.isLoadingExistingTemplatePacks);
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
+
+  const isLoading = useMemo(() => {
+    return isLoadingExistingTemplates || isLoadingExistingTemplatePacks;
+  }, [isLoadingExistingTemplates, isLoadingExistingTemplatePacks]);
 
   const templates = useMemo(() => {
     return Object.values(templateMap);
@@ -68,7 +74,9 @@ const TemplatesPane: React.FC = () => {
       </TitleBar>
 
       <S.Container>
-        {!Object.keys(templateMap).length ? (
+        {isLoading ? (
+          <Skeleton />
+        ) : !Object.keys(templateMap).length ? (
           <p>No templates available.</p>
         ) : (
           Object.entries(templateMap).map(([path, template]) => (
