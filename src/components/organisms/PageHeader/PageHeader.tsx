@@ -1,7 +1,7 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {ReactElement, useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Dropdown, Menu, Popconfirm, Tooltip} from 'antd';
+import {Button, DropDownProps, Dropdown, Menu, Popconfirm, Tooltip} from 'antd';
 
 import {
   BellOutlined,
@@ -164,8 +164,15 @@ const StyledButton = styled(Button)`
 
 const StyledDropdown = styled(Dropdown)``;
 
-const StyledProjectsDropdown = styled(Dropdown)`
-  margin-right: 20px;
+interface StyledProjectsDropdownProps extends DropDownProps {
+  isClusterSelectorVisible: boolean | undefined;
+  children: ReactElement;
+}
+
+const StyledProjectsDropdown = styled(({children, ...rest}: StyledProjectsDropdownProps) => (
+  <Dropdown {...rest}>{children}</Dropdown>
+))`
+  ${({isClusterSelectorVisible}) => `margin-right: ${isClusterSelectorVisible ? '20px' : '0px'}`};
 `;
 
 const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
@@ -277,7 +284,7 @@ const PageHeader = () => {
   const dispatch = useAppDispatch();
   const activeProject = useSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const settings = useAppSelector(settingsSelector);
+  const {isClusterSelectorVisible} = useAppSelector(settingsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -468,73 +475,83 @@ const PageHeader = () => {
           <LogoCol noborder="true">
             <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </LogoCol>
-          {activeProject && settings.isClusterSelectorVisible && (
-            <CLusterContainer>
+          <CLusterContainer>
+            {activeProject && (
               <CLusterStatus>
-                <StyledProjectsDropdown overlay={projectsMenu} placement="bottomCenter" arrow trigger={['click']}>
+                <StyledProjectsDropdown
+                  isClusterSelectorVisible={isClusterSelectorVisible}
+                  overlay={projectsMenu}
+                  placement="bottomCenter"
+                  arrow
+                  trigger={['click']}
+                >
                   <StyledProjectButton>
                     <StyledFolderOpenOutlined />
-                    <span>{activeProject.name}</span>
+                    <span>{activeProject?.name}</span>
                     <DownOutlined style={{margin: 4}} />
                   </StyledProjectButton>
                 </StyledProjectsDropdown>
 
-                <CLusterStatusText connected={isKubeConfigPathValid}>
-                  <StyledClusterOutlined />
-                  {isKubeConfigPathValid && <span>Configured</span>}
-                  {!isKubeConfigPathValid && <span>No Cluster Configured</span>}
-                </CLusterStatusText>
-                {isKubeConfigPathValid && (
-                  <StyledDropdown
-                    overlay={clusterMenu}
-                    placement="bottomCenter"
-                    arrow
-                    trigger={['click']}
-                    disabled={previewLoader.isLoading || isInPreviewMode}
-                  >
-                    <StyledClusterButton>
-                      <span>{kubeConfigContext}</span>
-                      <DownOutlined style={{margin: 4}} />
-                    </StyledClusterButton>
-                  </StyledDropdown>
-                )}
-                {isKubeConfigPathValid ? (
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
-                    <StyledButton
-                      disabled={
-                        Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled
-                      }
-                      type="link"
-                      onClick={handleLoadCluster}
-                    >
-                      {createClusterObjectsLabel()}
-                    </StyledButton>
-                  </Tooltip>
-                ) : (
+                {isClusterSelectorVisible && (
                   <>
-                    <StyledClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
-                      Configure
-                    </StyledClusterActionButton>
-                    <Popconfirm
-                      placement="bottom"
-                      title={() => (
-                        <>
-                          <p>If you want to configure later, use the cluster icon in the left rail.</p>
-                          <p style={{margin: 0}}>You can re-enable the Cluster Selector in the Settings Panel</p>
-                        </>
-                      )}
-                      okText="Ok, hide"
-                      cancelText="Nevermind"
-                      onConfirm={handleClusterHideConfirm}
-                      onCancel={handleClusterHideCancel}
-                    >
-                      <StyledClusterActionButton onClick={handleClusterHideClick}>Hide</StyledClusterActionButton>
-                    </Popconfirm>
+                    <CLusterStatusText connected={isKubeConfigPathValid}>
+                      <StyledClusterOutlined />
+                      {isKubeConfigPathValid && <span>Configured</span>}
+                      {!isKubeConfigPathValid && <span>No Cluster Configured</span>}
+                    </CLusterStatusText>
+                    {isKubeConfigPathValid && (
+                      <StyledDropdown
+                        overlay={clusterMenu}
+                        placement="bottomCenter"
+                        arrow
+                        trigger={['click']}
+                        disabled={previewLoader.isLoading || isInPreviewMode}
+                      >
+                        <StyledClusterButton>
+                          <span>{kubeConfigContext}</span>
+                          <DownOutlined style={{margin: 4}} />
+                        </StyledClusterButton>
+                      </StyledDropdown>
+                    )}
+                    {isKubeConfigPathValid ? (
+                      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
+                        <StyledButton
+                          disabled={
+                            Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled
+                          }
+                          type="link"
+                          onClick={handleLoadCluster}
+                        >
+                          {createClusterObjectsLabel()}
+                        </StyledButton>
+                      </Tooltip>
+                    ) : (
+                      <>
+                        <StyledClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
+                          Configure
+                        </StyledClusterActionButton>
+                        <Popconfirm
+                          placement="bottom"
+                          title={() => (
+                            <>
+                              <p>If you want to configure later, use the cluster icon in the left rail.</p>
+                              <p style={{margin: 0}}>You can re-enable the Cluster Selector in the Settings Panel</p>
+                            </>
+                          )}
+                          okText="Ok, hide"
+                          cancelText="Nevermind"
+                          onConfirm={handleClusterHideConfirm}
+                          onCancel={handleClusterHideCancel}
+                        >
+                          <StyledClusterActionButton onClick={handleClusterHideClick}>Hide</StyledClusterActionButton>
+                        </Popconfirm>
+                      </>
+                    )}
                   </>
                 )}
               </CLusterStatus>
-            </CLusterContainer>
-          )}
+            )}
+          </CLusterContainer>
 
           <SettingsCol>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">

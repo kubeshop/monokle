@@ -63,9 +63,10 @@ const StyledWarningOutlined = styled(
   ${props =>
     `color: ${
       props.highlighted ? Colors.whitePure : !props.isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning
-    }`};
-  ${props => `margin-left: ${props.highlighted ? '10px' : '5px'}`};
-  ${props => `padding-top: ${props.highlighted ? '5px' : '0px'}`};
+    };
+    margin-left: ${props.highlighted ? '10px' : '5px'};
+    padding-top: ${props.highlighted ? '5px' : '0px'};
+    `};
 `;
 
 const StyledHeading = styled.h2`
