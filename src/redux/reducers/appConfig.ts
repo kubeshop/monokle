@@ -171,7 +171,10 @@ export const configSlice = createSlice({
 
       const newProjectConfig: ProjectConfig = {
         ...projectConfig,
-        kubeConfig: {...projectConfig?.kubeConfig, ...action.payload},
+        kubeConfig: {
+          ...projectConfig?.kubeConfig,
+          ...action.payload,
+        },
       };
 
       writeProjectConfigFile(state, newProjectConfig);

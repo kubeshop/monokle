@@ -168,7 +168,7 @@ const defaults = {
       textSize: 'medium',
       language: 'en',
       helmPreviewMode: 'template',
-      loadLastProjectOnStartup: true,
+      loadLastProjectOnStartup: false,
       isClusterSelectorVisible: true,
     },
     recentFolders: [],
