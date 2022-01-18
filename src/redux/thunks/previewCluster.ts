@@ -21,8 +21,11 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   try {
     const kc = new k8s.KubeConfig();
+    const currentContext =
+      thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
+      thunkAPI.getState().config.kubeConfig.currentContext;
     kc.loadFromFile(configPath);
-    kc.setCurrentContext(thunkAPI.getState().config.kubeConfig.currentContext);
+    kc.setCurrentContext(currentContext);
 
     const results = await Promise.allSettled(
       ResourceKindHandlers.filter(handler => !handler.isCustom).map(resourceKindHandler =>
@@ -44,13 +47,14 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
 
     // @ts-ignore
     const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+
     const previewResult = createPreviewResult(
       allYaml,
       configPath,
       'Get Cluster Resources',
       resourceRefsProcessingOptions,
       configPath,
-      thunkAPI.getState().config.kubeConfig.currentContext
+      currentContext
     );
 
     // if the cluster contains CRDs we need to check if there any corresponding resources also

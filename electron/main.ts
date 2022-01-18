@@ -26,7 +26,7 @@ import ElectronStore from 'electron-store';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
@@ -412,6 +412,7 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
     return;
   }
   const isInPreviewMode = isInPreviewModeSelector(state);
+  const kubeConfigContext = kubeConfigContextSelector(state);
   const previewType = state.main.previewType;
   const previewResourceId = state.main.previewResourceId;
   const resourceMap = state.main.resourceMap;
@@ -442,7 +443,7 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
     return;
   }
   if (isInPreviewMode && previewType === 'cluster') {
-    windowTitle = `Monokle - previewing context [${  String(state.config.kubeConfig.currentContext)  }]` || 'Monokle';
+    windowTitle = `Monokle - previewing context [${ kubeConfigContext  }]` || 'Monokle';
     window.setTitle(windowTitle);
     return;
   }

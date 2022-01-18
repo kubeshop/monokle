@@ -9,6 +9,7 @@ import {Primitive} from 'type-fest';
 import {AnyTemplate, isReferencedHelmChartTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmChart';
 
 import {TemplateFormRenderer} from '@components/molecules';
@@ -25,8 +26,8 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   const {template, onClose} = props;
 
   const dispatch = useAppDispatch();
-  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const userTempDir = useAppSelector(state => state.config.userTempDir);
 
   const [activeFormIndex, setActiveFormIndex] = useState<number>(0);
@@ -42,7 +43,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
 
   const onClickSubmit = useCallback(
     (formDataList: Record<string, Primitive>[]) => {
-      if (!isReferencedHelmChartTemplate(template) || !userTempDir || !kubeconfigPath || !kubeconfigContext) {
+      if (!isReferencedHelmChartTemplate(template) || !userTempDir || !kubeConfigPath || !kubeConfigContext) {
         return;
       }
       setIsLoading(true);
@@ -52,8 +53,8 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         template.chartRepo,
         template.valuesFilePath,
         formDataList,
-        kubeconfigPath,
-        kubeconfigContext,
+        kubeConfigPath,
+        kubeConfigContext,
         userTempDir,
         dispatch
       )
@@ -65,7 +66,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
           setResultMessage(err.message);
         });
     },
-    [template, userTempDir, kubeconfigPath, kubeconfigContext, dispatch]
+    [template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch]
   );
 
   const setFormData = useCallback(

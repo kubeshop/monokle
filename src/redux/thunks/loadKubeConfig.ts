@@ -6,12 +6,16 @@ import fs from 'fs';
 import log from 'loglevel';
 
 import {AlertEnum} from '@models/alert';
-import {KubeConfig, KubeConfigContext} from '@models/kubeConfig';
+import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {setContexts} from '@redux/reducers/appConfig';
+import {updateProjectKubeConfig} from '@redux/reducers/appConfig';
 
-export const loadContexts = async (configPath: string, dispatch: (action: AnyAction) => void) => {
+export const loadContexts = async (
+  configPath: string,
+  dispatch: (action: AnyAction) => void,
+  currentContext?: string
+) => {
   try {
     const stats = await fs.promises.stat(configPath);
 
@@ -20,11 +24,19 @@ export const loadContexts = async (configPath: string, dispatch: (action: AnyAct
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
 
+        const selectedContext = kc.contexts.find(c => c.cluster === currentContext);
+        if (selectedContext) {
+          kc.setCurrentContext(selectedContext && selectedContext.cluster);
+        } else {
+          kc.setCurrentContext((kc.contexts && kc.contexts.length > 0 && kc.contexts[0].cluster) || '');
+        }
+
         const kubeConfig: KubeConfig = {
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
         };
-        dispatch(setContexts(kubeConfig));
+
+        dispatch(updateProjectKubeConfig(kubeConfig));
       } catch (e: any) {
         dispatch(
           setAlert({
