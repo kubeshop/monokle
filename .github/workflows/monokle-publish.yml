@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - auto-updater
   release:
     types:
       - prereleased
@@ -18,15 +17,6 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Delete release
-        uses: dev-drprasad/delete-tag-and-release@v0.2.0
-        with:
-          delete_release: true
-          tag_name: latest-version
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
-
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -88,24 +78,10 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and Publish
-        run: |
-          npm exec -c "electron-builder --publish \"always\""
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-          EP_PRE_RELEASE: true
-          NOTARIZE: true
-          CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
-          CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          USE_HARD_LINKS: false
-        if: "!contains(github.ref, 'auto-updater')"
-
       - name: Package
+        id: build
         run: |
-          contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
-          contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
+          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -116,7 +92,6 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           USE_HARD_LINKS: false
-        if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -127,15 +102,12 @@ jobs:
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
+          allowUpdates: false
           artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
-          draft: false
-          prerelease: true
           omitBody: true
-          tag: 'latest-version'
-          commit: 'auto-updater'
+          tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
+        if: "!contains(github.ref, 'main')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -167,15 +139,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Delete release and tagname
-        uses: dev-drprasad/delete-tag-and-release@v0.2.0
-        with:
-          delete_release: true
-          tag_name: latest-version
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
-
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -227,19 +190,11 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and Publish
-        run: |
-          npm exec -c 'electron-builder --publish "always"'
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-          WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
-          EP_PRE_RELEASE: true
-          USE_HARD_LINKS: false
-        if: "!contains(github.ref, 'auto-updater')"
-
       - name: Package
+        id: package
         run: |
+          $p = get-content package.json | ConvertFrom-Json
+          echo "::set-output name=TAG::$($p.version)"
           npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -247,7 +202,6 @@ jobs:
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
-        if: "contains(github.ref, 'auto-updater')"
 
       # Check Binary Size
       - name: Build Succeeded
@@ -258,15 +212,12 @@ jobs:
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
+          allowUpdates: false
           artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap'
-          draft: false
-          prerelease: true
           omitBody: true
-          tag: 'latest-version'
-          commit: 'auto-updater'
+          tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
-        if: "contains(github.ref, 'auto-updater')"
+        if: "!contains(github.ref, 'main')"
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -274,3 +225,104 @@ jobs:
           name: dist-win
           path: dist
         if: ${{ success() }}
+
+  # This workflow contains a single job called "build"
+  build-and-publish-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      - name: Get Node Version
+        run: |
+          cat .nvmrc
+          echo "::set-output name=nodeversion::$(cat .nvmrc)"
+        id: get-node-version
+
+      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.get-node-version.outputs.nodeversion }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          env
+          echo "npm: $(npm --version)"
+          echo "node: $(node --version)"
+          npm install
+
+      - name: Verify Dependencies
+        run: |
+          ls -la
+          npm list --depth=1
+
+      - name: Install Tools
+        run: |
+          sudo apt-get install jq
+
+      - name: Build
+        run: |
+          npm run electron:build:ci
+        env:
+          # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
+          CI: false
+
+      - name: Package
+        id: package
+        run: |
+          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
+          npm exec -c "electron-builder --publish \"never\""
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+          USE_HARD_LINKS: false
+
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          ls -alh dist | grep Monokle && du -sh dist || true
+        if: ${{ success() }}
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: false
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
+          omitBody: true
+          tag: ${{ steps.package.outputs.TAG }}
+          token: ${{ secrets.github_token }}
+        if: "!contains(github.ref, 'main')"
+
+      - name: Archive Binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist-nix
+          path: dist
+        if: ${{ success() }}
+
+      - name: Build Failed - Output Build Logs
+        run: |
+          cat /Users/runner/.npm/_logs/*-debug.log || true
+        if: ${{ failure() || cancelled() }}
+
+      - name: Build Failed - Archive Build Logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: /Users/runner/.npm/_logs
+        if: ${{ failure() || cancelled() }}
+
+      # Make sure no secrets or certs are left on the runner
+      - name: Cleanup files after run
+        run: |
+          rm -rf *
+          ls -la
+        if: ${{ always() }}

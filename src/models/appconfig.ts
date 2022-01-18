@@ -54,6 +54,7 @@ interface AppConfig {
     kustomizeCommand: KustomizeCommandType;
     loadLastFolderOnStartup: boolean;
     hideExcludedFilesInFileExplorer: boolean;
+    enableHelmWithKustomize: boolean;
   };
   recentFolders: string[];
   newVersion: {

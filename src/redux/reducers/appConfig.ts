@@ -31,7 +31,9 @@ export const configSlice = createSlice({
       state.isKubeconfigPathValid = action.payload;
     },
     updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.startupModalVisible', action.payload);
+      if (!action.payload) {
+        electronStore.set('appConfig.startupModalVisible', false);
+      }
       state.isStartupModalVisible = action.payload;
     },
     updateScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
@@ -78,7 +80,10 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
       state.settings.hideExcludedFilesInFileExplorer = action.payload;
     },
-
+    updateEnableHelmWithKustomize: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.settings.enableHelmWithKustomize', action.payload);
+      state.settings.enableHelmWithKustomize = action.payload;
+    },
     updateFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
       state.folderReadsMaxDepth = action.payload;
@@ -117,6 +122,7 @@ export const {
   updateHelmPreviewMode,
   updateHideExcludedFilesInFileExplorer,
   updateKubeconfigPathValidity,
+  updateEnableHelmWithKustomize,
   updateKustomizeCommand,
   updateLoadLastFolderOnStartup,
   updateScanExcludes,

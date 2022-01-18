@@ -42,14 +42,15 @@ import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog
 import {setAppRehydrating} from '@redux/reducers/main';
 import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
-import { indexOf } from 'lodash';
+import {indexOf} from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-import { createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
-import { RootState } from '@redux/store';
-import { downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack, updateTemplate, updateTemplatePack } from './templateService';
-import { AnyTemplate, TemplatePack } from '@models/template';
-import { AnyPlugin } from '@models/plugin';
-import { AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult } from '@models/extension';
+import {createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
+import {RootState } from '@redux/store';
+import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack, updateTemplate, updateTemplatePack } from './templateService';
+import {AnyTemplate, TemplatePack } from '@models/template';
+import {AnyPlugin } from '@models/plugin';
+import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult } from '@models/extension';
+import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -192,8 +193,8 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
   event.sender.send(UPDATE_EXTENSIONS_RESULT, updateExtensionsResult);
 });
 
-ipcMain.on('run-kustomize', (event, cmdOptions: any) => {
-  runKustomize(cmdOptions.folder, cmdOptions.kustomizeCommand, event);
+ipcMain.on('run-kustomize', (event, cmdOptions: KustomizeCommandOptions) => {
+  runKustomize(cmdOptions, event);
 });
 
 ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
@@ -329,7 +330,6 @@ export const createWindow = (givenPath?: string) => {
 
     if (missingDependencies.includes('kustomize') && isUserAbleToRunKubectlKustomize) {
       missingDependencies.splice(indexOf(missingDependencies, 'kustomize'), 1);
-
     }
 
     if (missingDependencies.length > 0) {
@@ -369,7 +369,6 @@ export const openApplication = async (givenPath?: string) => {
 
   ElectronStore.initRenderer();
   const win = createWindow(givenPath);
-
 
   if (app.dock) {
     const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/large-icon-256.png'));
