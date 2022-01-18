@@ -1,13 +1,43 @@
-import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import {AppConfig, Languages, NewVersionCode, TextSizes, Themes} from '@models/appconfig';
-import {KubeConfig} from '@models/kubeConfig';
+import _ from 'lodash';
+import path from 'path';
+
+import {
+  AppConfig,
+  KubeConfig,
+  Languages,
+  NewVersionCode,
+  Project,
+  ProjectConfig,
+  TextSizes,
+  Themes,
+} from '@models/appconfig';
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
+import {writeProjectConfigFile} from '@redux/services/projectConfig';
+import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
+import {AppDispatch} from '@redux/store';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
 
 import initialState from '../initialState';
+
+export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
+  thunkAPI.dispatch(configSlice.actions.createProject(project));
+  thunkAPI.dispatch(setOpenProject(project.rootFolder));
+});
+
+export const setOpenProject = createAsyncThunk(
+  'config/openProject',
+  async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
+    thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
+    thunkAPI.dispatch(setRootFolder(projectRootPath));
+    thunkAPI.dispatch(configSlice.actions.setProjectConfig(null));
+    monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
+  }
+);
 
 export const configSlice = createSlice({
   name: 'config',
@@ -19,16 +49,8 @@ export const configSlice = createSlice({
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
-    updateKubeconfig: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      electronStore.set('appConfig.kubeconfig', action.payload);
-      state.kubeconfigPath = action.payload;
-    },
     setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       state.recentFolders = action.payload;
-    },
-    updateKubeconfigPathValidity: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.isKubeconfigPathValid', action.payload);
-      state.isKubeconfigPathValid = action.payload;
     },
     updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       if (!action.payload) {
@@ -72,9 +94,9 @@ export const configSlice = createSlice({
         ...action.payload.data,
       };
     },
-    updateLoadLastFolderOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+    updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.settings.loadLastFolderOnStartup', action.payload);
-      state.settings.loadLastFolderOnStartup = action.payload;
+      state.settings.loadLastProjectOnStartup = action.payload;
     },
     updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
@@ -94,8 +116,96 @@ export const configSlice = createSlice({
     setScanExcludesStatus: (state: Draft<AppConfig>, action: PayloadAction<'outdated' | 'applied'>) => {
       state.isScanExcludesUpdated = action.payload;
     },
-    setContexts: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
-      state.kubeConfig = action.payload;
+    setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
+      state.kubeConfig = {...state.kubeConfig, ...action.payload};
+    },
+    createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
+      const project: Project = action.payload;
+      const existingProject: Project | undefined = state.projects.find(
+        (p: Project) => p.rootFolder === project.rootFolder
+      );
+
+      if (existingProject) {
+        return;
+      }
+
+      if (!project.name) {
+        const folderNames: string[] = project.rootFolder.split(path.sep);
+        project.name = folderNames[folderNames.length - 1];
+      }
+
+      state.projects = [project, ...state.projects];
+      state.selectedProjectRootFolder = project.rootFolder;
+    },
+    openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
+      const projectRootPath: string | null = action.payload;
+
+      if (!projectRootPath) {
+        state.selectedProjectRootFolder = null;
+        return;
+      }
+
+      const project: Project | undefined = state.projects.find((p: Project) => p.rootFolder === projectRootPath);
+
+      if (project) {
+        state.selectedProjectRootFolder = projectRootPath;
+        project.lastOpened = new Date().toISOString();
+      }
+
+      state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
+      electronStore.set('appConfig.projects', state.projects);
+    },
+    setProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
+      state.projectConfig = action.payload;
+    },
+    updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
+      if (!state.selectedProjectRootFolder) {
+        return;
+      }
+
+      const projectConfig: ProjectConfig | null | undefined = state.projectConfig;
+
+      if (_.isEqual(projectConfig?.kubeConfig, action.payload)) {
+        return;
+      }
+
+      const newProjectConfig: ProjectConfig = {
+        ...projectConfig,
+        kubeConfig: {...projectConfig?.kubeConfig, ...action.payload},
+      };
+
+      writeProjectConfigFile(state, newProjectConfig);
+      state.projectConfig = newProjectConfig;
+    },
+    updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
+      if (!state.selectedProjectRootFolder) {
+        return;
+      }
+
+      if (_.isEqual(state.projectConfig, action.payload)) {
+        return;
+      }
+
+      const newProjectConfig: ProjectConfig | null = action.payload;
+
+      writeProjectConfigFile(state, newProjectConfig);
+      if (newProjectConfig && newProjectConfig.kubeConfig && newProjectConfig.kubeConfig.contexts) {
+        newProjectConfig.kubeConfig.contexts = state.projectConfig?.kubeConfig?.contexts;
+      }
+      state.projectConfig = newProjectConfig;
+    },
+    toggleClusterStatus: (state: Draft<AppConfig>) => {
+      state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;
+      electronStore.set('ui.clusterStatusHidden', state.settings.isClusterSelectorVisible);
+    },
+    setUserDirs: (
+      state: Draft<AppConfig>,
+      action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string}>
+    ) => {
+      const {homeDir, tempDir, dataDir} = action.payload;
+      state.userHomeDir = homeDir;
+      state.userTempDir = tempDir;
+      state.userDataDir = dataDir;
     },
   },
 });
@@ -105,21 +215,23 @@ export const {
   setAutoZoom,
   setCurrentContext,
   setScanExcludesStatus,
-  updateKubeconfig,
   updateFolderReadsMaxDepth,
   updateLanguage,
   updateNewVersion,
   updateFileIncludes,
   updateHelmPreviewMode,
   updateHideExcludedFilesInFileExplorer,
-  updateKubeconfigPathValidity,
   updateEnableHelmWithKustomize,
   updateKustomizeCommand,
-  updateLoadLastFolderOnStartup,
+  updateLoadLastProjectOnStartup,
   updateScanExcludes,
   updateStartupModalVisible,
   updateTextSize,
   updateTheme,
-  setContexts,
+  setKubeConfig,
+  updateProjectConfig,
+  updateProjectKubeConfig,
+  toggleClusterStatus,
+  setUserDirs,
 } = configSlice.actions;
 export default configSlice.reducer;

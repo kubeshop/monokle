@@ -1,3 +1,10 @@
+export enum HighlightItems {
+  CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
+  CREATE_RESOURCE = 'CREATE_RESOURCE',
+  BROWSE_TEMPLATES = 'BROWSE_TEMPLATES',
+  CONNECT_TO_CLUSTER = 'CONNECT_TO_CLUSTER',
+}
+
 export type NewResourceWizardInput = {
   name?: string;
   kind?: string;
@@ -61,6 +68,10 @@ export type UiState = {
     isOpen: boolean;
     rootDir: string;
   };
+  createProjectModal: {
+    isOpen: boolean;
+    fromTemplate: boolean;
+  };
   renameResourceModal?: {
     isOpen: boolean;
     resourceId: string;
@@ -97,8 +108,12 @@ export type UiState = {
   paneConfiguration: PaneConfiguration;
   shouldExpandAllNodes: boolean;
   resetLayout: boolean;
-  clusterPaneIconHighlighted: boolean;
-  clusterStatusHidden: boolean;
+  highlightedItems: {
+    clusterPaneIcon: boolean;
+    createResource: boolean;
+    browseTemplates: boolean;
+    connectToCluster: boolean;
+  };
 };
 
 export type PaneConfiguration = {
