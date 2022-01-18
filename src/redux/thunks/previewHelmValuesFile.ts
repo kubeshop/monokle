@@ -1,5 +1,3 @@
-import {ipcRenderer} from 'electron';
-
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import fs from 'fs';
@@ -11,6 +9,8 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
+
+import {runHelm} from '@utils/helm';
 
 /**
  * Thunk to preview a Helm Chart
@@ -67,16 +67,3 @@ export const previewHelmValuesFile = createAsyncThunk<
 
   return {};
 });
-
-/**
- * Invokes Helm in main thread
- */
-
-function runHelm(cmd: any): any {
-  return new Promise(resolve => {
-    ipcRenderer.once('helm-result', (event, arg) => {
-      resolve(arg);
-    });
-    ipcRenderer.send('run-helm', cmd);
-  });
-}

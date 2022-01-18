@@ -3,6 +3,7 @@ import os from 'os';
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
+import {ExtensionState} from '@models/extension';
 import {LogsState} from '@models/logs';
 import {NavigatorState} from '@models/navigator';
 import {UiState} from '@models/ui';
@@ -28,7 +29,6 @@ const initialAppState: AppState = {
   resourceDiff: {},
   isSelectingFile: false,
   isApplyingResource: false,
-  plugins: [],
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
@@ -158,6 +158,15 @@ const initialUiCoachState: UiCoachState = {
   hasUserPerformedClickOnClusterIcon: false,
 };
 
+const initialExtensionState: ExtensionState = {
+  isLoadingExistingPlugins: true,
+  isLoadingExistingTemplates: true,
+  isLoadingExistingTemplatePacks: true,
+  pluginMap: {},
+  templateMap: {},
+  templatePackMap: {},
+};
+
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
@@ -166,4 +175,5 @@ export default {
   ui: initialUiState,
   navigator: initialNavigatorState,
   uiCoach: initialUiCoachState,
+  extension: initialExtensionState,
 };
