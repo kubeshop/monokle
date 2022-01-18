@@ -44,12 +44,12 @@ import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} fro
 import autoUpdater from './auto-update';
 import {indexOf} from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-import {createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges } from './ipcMainRedux';
-import {RootState } from '@redux/store';
-import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack, updateTemplate, updateTemplatePack } from './templateService';
-import {AnyTemplate, TemplatePack } from '@models/template';
-import {AnyPlugin } from '@models/plugin';
-import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult } from '@models/extension';
+import {createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges} from './ipcMainRedux';
+import {RootState} from '@redux/store';
+import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack, updateTemplate, updateTemplatePack} from './templateService';
+import {AnyTemplate, TemplatePack} from '@models/template';
+import {AnyPlugin} from '@models/plugin';
+import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 
 Object.assign(console, ElectronLog.functions);
@@ -405,9 +405,7 @@ if (MONOKLE_RUN_AS_NODE) {
   openApplication();
 }
 
-terminal()
-  // eslint-disable-next-line no-console
-  .catch(e => console.log(e));
+terminal().catch(e => log.error(e));
 
 export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   if (window.isDestroyed()) {
