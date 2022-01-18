@@ -17,7 +17,7 @@ export {default as PaneManager} from './PaneManager';
 export {default as PluginManagerPane} from './PluginManagerPane';
 export {default as QuickSearchActions} from './QuickSearchActions';
 export {default as RenameEntityModal} from './RenameEntityModal';
-export {default as TemplateExplorerPane} from './TemplateExplorerPane';
+export {default as TemplateManagerPane} from './TemplateManagerPane';
 export {default as TemplateModal} from './TemplateModal';
 export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as SettingsDrawer} from './SettingsDrawer';

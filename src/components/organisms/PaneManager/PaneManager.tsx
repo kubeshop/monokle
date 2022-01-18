@@ -30,7 +30,7 @@ import {
   KustomizePane,
   NavigatorPane,
   PluginManagerPane,
-  TemplateExplorerPane,
+  TemplateManagerPane,
 } from '@organisms';
 
 import {GraphView} from '@molecules';
@@ -214,7 +214,7 @@ const PaneManager = () => {
                   display: leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
                 }}
               >
-                <TemplateExplorerPane />
+                <TemplateManagerPane />
               </div>
               <div
                 style={{

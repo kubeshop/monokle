@@ -16,8 +16,7 @@ import {TitleBar} from '@components/molecules';
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
 import TemplateInstallModal from './TemplateInstallModal';
-
-import * as S from './styled';
+import * as S from './TemplateManagerPane.styled';
 
 const TemplatesPane: React.FC = () => {
   const dispatch = useAppDispatch();
