@@ -2,7 +2,7 @@ import {ipcRenderer} from 'electron';
 
 import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 
-import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
+import {Button, Row, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
@@ -16,12 +16,10 @@ import {
 } from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
-  AddResourceToExistingFileTooltip,
   ApplyFileTooltip,
   ApplyTooltip,
   DiffTooltip,
   OpenExternalDocumentationTooltip,
-  SaveResourceToNewFileTooltip,
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
@@ -31,7 +29,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {setMonacoEditor} from '@redux/reducers/ui';
+import {openSaveResourcesToFileFolderModal, setMonacoEditor} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getRootFolder} from '@redux/services/fileEntry';
@@ -156,7 +154,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     [selectedResource, dispatch]
   );
 
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+  const {fileExplorerProps} = useFileExplorer(
     ({existingFilePath}) => {
       if (!existingFilePath) {
         return;
@@ -170,7 +168,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   );
 
-  const {openFileExplorer: openDirectoryExplorer, fileExplorerProps: directoryExplorerProps} = useFileExplorer(
+  const {fileExplorerProps: directoryExplorerProps} = useFileExplorer(
     ({saveFilePath}) => {
       if (!saveFilePath) {
         return;
@@ -188,29 +186,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   );
 
-  const resourceKindHandler = selectedResource && getResourceKindHandler(selectedResource.kind);
+  const onSaveHandler = () => {
+    if (selectedResource) {
+      dispatch(openSaveResourcesToFileFolderModal([selectedResource.id]));
+    }
+  };
 
-  const getSaveButtonMenu = useCallback(
-    () => (
-      <Menu>
-        <Menu.Item key="to-existing-file">
-          <Tooltip title={AddResourceToExistingFileTooltip}>
-            <Button onClick={() => openFileExplorer()} type="text">
-              To existing file..
-            </Button>
-          </Tooltip>
-        </Menu.Item>
-        <Menu.Item key="to-directory">
-          <Tooltip title={SaveResourceToNewFileTooltip}>
-            <Button onClick={() => openDirectoryExplorer()} type="text">
-              To new file..
-            </Button>
-          </Tooltip>
-        </Menu.Item>
-      </Menu>
-    ),
-    [openFileExplorer, openDirectoryExplorer]
-  );
+  const resourceKindHandler = selectedResource && getResourceKindHandler(selectedResource.kind);
 
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&
@@ -431,11 +413,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
                 {isSelectedResourceUnsaved() && (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
-                    <Dropdown overlay={getSaveButtonMenu()}>
-                      <S.SaveButton type="primary" size="small">
-                        Save
-                      </S.SaveButton>
-                    </Dropdown>
+                    <S.SaveButton type="primary" size="small" onClick={onSaveHandler}>
+                      Save
+                    </S.SaveButton>
                   </Tooltip>
                 )}
 
