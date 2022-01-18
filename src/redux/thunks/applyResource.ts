@@ -2,19 +2,24 @@ import {spawn} from 'child_process';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
+import {PREVIEW_PREFIX} from '@constants/constants';
+
 import {AlertEnum, AlertType} from '@models/alert';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
 import {
+  addResource,
   openResourceDiffModal,
+  reprocessNewResource,
   setApplyingResource,
   setClusterDiffRefreshDiffResource,
   updateResource,
 } from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kustomize';
+import {extractK8sResources} from '@redux/services/resource';
 import {AppDispatch} from '@redux/store';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {getResourceFromCluster} from '@redux/thunks/utils';
@@ -129,14 +134,22 @@ export async function applyResource(
             getResourceFromCluster(resource, kubeconfig, context).then(resourceFromCluster => {
               delete resourceFromCluster.body.metadata?.managedFields;
               const updatedResourceText = stringify(resourceFromCluster.body, {sortMapEntries: true});
-              dispatch(
-                updateResource({
-                  resourceId: resource.id,
-                  content: updatedResourceText,
-                })
-              );
+              if (resourceMap[resourceFromCluster.body.metadata?.uid]) {
+                dispatch(
+                  updateResource({
+                    resourceId: resourceFromCluster.body.metadata?.uid,
+                    content: updatedResourceText,
+                  })
+                );
+              } else {
+                const newK8sResource = extractK8sResources(updatedResourceText, PREVIEW_PREFIX + kubeconfig)[0];
+
+                dispatch(addResource(newK8sResource));
+                dispatch(reprocessNewResource(newK8sResource));
+              }
+
               if (options?.shouldPerformDiff) {
-                dispatch(openResourceDiffModal(resource.id));
+                dispatch(openResourceDiffModal(resourceFromCluster.body.metadata?.uid));
               }
             });
           } else if (options?.shouldPerformDiff) {

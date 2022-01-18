@@ -47,7 +47,7 @@ const initialAppState: AppState = {
 };
 
 const initialAppConfigState: AppConfig = {
-  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
+  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible', true),
   kubeconfigPath: '',
   isKubeconfigPathValid: false,
   settings: {
@@ -59,7 +59,8 @@ const initialAppConfigState: AppConfig = {
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
     loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
-    hideExcludedFilesInFileExplorer: false,
+    hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
+    enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
   },
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'outdated',
@@ -106,6 +107,10 @@ const initialUiState: UiState = {
   renameResourceModal: {
     isOpen: false,
     resourceId: '',
+  },
+  saveResourcesToFileFolderModal: {
+    isOpen: false,
+    resourcesIds: [],
   },
   renameEntityModal: {
     isOpen: false,

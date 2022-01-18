@@ -13,6 +13,7 @@ import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {processKustomizations} from '@redux/services/kustomize';
 import {processParsedResources} from '@redux/services/resource';
 import {AppDispatch, RootState} from '@redux/store';
+import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import electronStore from '@utils/electronStore';
 import {getFileStats} from '@utils/files';
@@ -33,10 +34,18 @@ export const setRootFolder = createAsyncThunk<
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
-  const rootEntry: FileEntry = createFileEntry(rootFolder);
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
 
+  const stats = getFileStats(rootFolder);
+  if (!stats) {
+    return createRejectionWithAlert(thunkAPI, 'Missing folder', `Folder ${rootFolder} does not exist`);
+  }
+  if (!stats.isDirectory()) {
+    return createRejectionWithAlert(thunkAPI, 'Invalid path', `Specified path ${rootFolder} is not a folder`);
+  }
+
+  const rootEntry: FileEntry = createFileEntry(rootFolder);
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
 
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly

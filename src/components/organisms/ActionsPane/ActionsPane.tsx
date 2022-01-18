@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
 
@@ -12,7 +12,6 @@ import {
   ACTIONS_PANE_FOOTER_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   NAVIGATOR_HEIGHT_OFFSET,
-  PREVIEW_PREFIX,
   TOOLTIP_DELAY,
 } from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -26,9 +25,11 @@ import {
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
+import {AlertEnum, AlertType} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
@@ -119,13 +120,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
     if (isButtonShrinked) {
       // 230px = approx width of not collapsed button
-      if (distance > 230) {
+      if (distance > 350) {
         setButtonShrinkedState(false);
       }
     }
 
     // The button has 10px margin-left
-    if (!isButtonShrinked && distance < 10) {
+    if (!isButtonShrinked && distance < 40) {
       setButtonShrinkedState(true);
     }
   }, [isButtonShrinked, tabsList]);
@@ -259,10 +260,21 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
+    if (!kubeconfigContext || kubeconfigContext === '') {
+      const alert: AlertType = {
+        type: AlertEnum.Error,
+        title: 'Diff not available',
+        message: 'No Cluster Configured',
+      };
+
+      dispatch(setAlert(alert));
+      return;
+    }
+
     if (selectedResourceId) {
       dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [dispatch, selectedResourceId]);
+  }, [dispatch, selectedResourceId, kubeconfigContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
@@ -280,12 +292,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)) {
       return true;
     }
-    // if the resource is from the cluster preview
-    if (selectedResource.filePath === PREVIEW_PREFIX + kubeconfigPath) {
-      return true;
-    }
+
     return false;
-  }, [selectedResource, kubeconfigPath]);
+  }, [selectedResource]);
 
   const onClickApplyResource = useCallback(
     (namespace?: string) => {
@@ -466,6 +475,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
+
       <S.ActionsPaneContainer $height={navigatorHeight}>
         <S.TabsContainer>
           <S.Tabs
@@ -487,9 +497,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
             }
           >
             <TabPane
-              style={{height: editorTabPaneHeight, width: '100%'}}
-              tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}
               key="source"
+              style={{height: editorTabPaneHeight}}
+              tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}
             >
               {uiState.isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
@@ -502,15 +512,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
             </TabPane>
             {selectedResource && resourceKindHandler?.formEditorOptions?.editorSchema && (
               <TabPane
-                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
                 disabled={!selectedResourceId}
                 key="form"
+                style={{height: editorTabPaneHeight}}
+                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
               >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : (
                   <FormEditor
-                    contentHeight={contentHeight}
                     formSchema={resourceKindHandler.formEditorOptions.editorSchema}
                     formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                   />
@@ -518,15 +528,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
               </TabPane>
             )}
             {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
-              <TabPane tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>} key="metadataForm">
+              <TabPane
+                key="metadataForm"
+                style={{height: editorTabPaneHeight}}
+                tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}
+              >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : (
-                  <FormEditor
-                    contentHeight={contentHeight}
-                    formSchema={getFormSchema('metadata')}
-                    formUiSchema={getUiSchema('metadata')}
-                  />
+                  <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
                 )}
               </TabPane>
             )}
