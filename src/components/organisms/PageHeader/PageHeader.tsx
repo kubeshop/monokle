@@ -201,9 +201,11 @@ const CLusterActionText = styled(
   )
 )`
   font-size: 12px;
-  ${({highlighted}) => `font-size: ${highlighted ? '8px' : '12px'} !important`};
-  ${({highlighted}) => `line-height: ${highlighted ? '32px' : '20px'} !important`};
-  ${({highlighted}) => `color: ${highlighted ? Colors.whitePure : Colors.blue6} !important`};
+  ${({highlighted}) => `
+  font-size: ${highlighted ? '8px' : '12px'} !important;
+  line-height: ${highlighted ? '32px' : '20px'} !important;
+  color: ${highlighted ? Colors.whitePure : Colors.blue6} !important
+  `};
 `;
 
 const StyledClusterOutlined = styled(ClusterOutlined)`

@@ -77,6 +77,7 @@ const App = () => {
         dispatch(setOpenProject(project.rootFolder));
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [loadLastProjectOnStartup, projects]
   );
 

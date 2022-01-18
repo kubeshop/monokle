@@ -27,7 +27,6 @@ import {isInClusterModeSelector} from '@redux/selectors';
 
 import FilePatternList from '@molecules/FilePatternList';
 
-// import {Themes, TextSizes, Languages} from '@models/appconfig';
 import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
@@ -117,11 +116,13 @@ export const Settings = ({
   }, [config?.kubeConfig]);
 
   useEffect(() => {
+    // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
   }, [config]);
 
   useEffect(() => {
     handleConfigChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localConfig]);
 
   useDebounce(
@@ -139,12 +140,6 @@ export const Settings = ({
   const onChangeScanExcludes = (patterns: string[]) => {
     setLocalConfig({...localConfig, scanExcludes: patterns});
   };
-
-  // const onChangeTheme = (e: RadioChangeEvent) => {
-  //   if (e.target.value) {
-  //     dispatch(updateTheme(e.target.value));
-  //   }
-  // };
 
   const onChangeHelmPreviewMode = (selectedHelmPreviewMode: any) => {
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {

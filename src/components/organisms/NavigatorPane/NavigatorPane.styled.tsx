@@ -48,12 +48,15 @@ interface PlusItem extends ButtonProps {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const PlusButton = styled(({highlighted, ...rest}: PlusItem) => <Button {...rest} />)`
-  ${({highlighted}) => `border-radius: ${highlighted ? '100%' : 'inherit'} !important`};
-  ${({highlighted}) => `color: ${highlighted ? Colors.whitePure : Colors.blue6} !important`};
+  ${({highlighted}) => `
+  border-radius: ${highlighted ? '100%' : 'inherit'} !important;
+  color: ${highlighted ? Colors.whitePure : Colors.blue6} !important`};
   &:after {
-    ${({highlighted}) => `height: ${highlighted ? '24px' : 'inherit'}`};
-    ${({highlighted}) => `width: ${highlighted ? '24px' : 'inherit'}`};
-    ${({highlighted}) => `top: ${highlighted ? '-1px' : 'inherit'}`};
-    ${({highlighted}) => `left: ${highlighted ? '-1px' : 'inherit'}`};
+    ${({highlighted}) =>
+      `height: ${highlighted ? '24px' : 'inherit'};
+      width: ${highlighted ? '24px' : 'inherit'};
+      top: ${highlighted ? '-1px' : 'inherit'};
+      left: ${highlighted ? '-1px' : 'inherit'}
+      `};
   }
 `;

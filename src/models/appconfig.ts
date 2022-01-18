@@ -38,8 +38,9 @@ export enum NewVersionCode {
   Downloaded = 4,
 }
 
+// Parsed from kubernetes config file
 export type KubeConfigContext = {
-  cluster: string;
+  cluster: string; // name of the cluster|context
   name: string;
   user: string | null;
   namespace: string | null;
