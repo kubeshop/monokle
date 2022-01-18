@@ -49,8 +49,8 @@ test.beforeAll(async () => {
   await appWindow.screenshot({path: 'test-output/screenshots/initial-screen.png'});
 });
 
-test.beforeEach(async () => {
-  pause(2000);
+test.afterEach(async () => {
+  await pause(1000);
 });
 
 test('Validate title', async () => {
@@ -103,24 +103,19 @@ test('Validate clustercontainer', async () => {
   expect(await div.count()).toBe(1);
 });
 
-function clickOnMonokleLogo() {
-  appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
+async function clickOnMonokleLogo() {
+  await appWindow.click("img[src*='MonokleKubeshopLogo'][src$='.svg']", {noWaitAfter: true, force: true});
 }
 
 test('Validate settings drawer', async () => {
   let drawer = await findDrawer(appWindow, 'Settings');
   expect(drawer).toBeFalsy();
 
-  const settingsIcon = appWindow.locator("span[aria-label='setting']");
-  expect(await settingsIcon.count()).toBe(1);
-
-  await settingsIcon.click({noWaitAfter: true, force: true});
-  await pause(500);
-
+  appWindow.click("span[aria-label='setting']", {noWaitAfter: true, force: true});
   drawer = await waitForDrawerToShow(appWindow, 'Settings');
   expect(drawer).toBeTruthy();
 
-  clickOnMonokleLogo();
+  await clickOnMonokleLogo();
 
   expect(await waitForDrawerToHide(appWindow, 'Settings')).toBeTruthy();
 });
@@ -129,16 +124,15 @@ test('Validate notifications drawer', async () => {
   let drawer = await findDrawer(appWindow, 'Notifications');
   expect(drawer).toBeFalsy();
 
-  const notificationsIcon = appWindow.locator("span[aria-label='bell']");
-  expect(await notificationsIcon.count()).toBe(1);
+  const notificationsIcon = appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
+    noWaitAfter: true,
+    force: true,
+  });
 
-  await notificationsIcon.click({noWaitAfter: true, force: true});
-  await pause(500);
-
-  drawer = await waitForDrawerToShow(appWindow, 'Notifications');
+  drawer = await waitForDrawerToShow(appWindow, 'Notifications', 5000);
   expect(drawer).toBeTruthy();
 
-  clickOnMonokleLogo();
+  await clickOnMonokleLogo();
 
   expect(await waitForDrawerToHide(appWindow, 'Notifications')).toBeTruthy();
 });
