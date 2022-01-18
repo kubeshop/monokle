@@ -6,7 +6,7 @@ import {AnyAction} from 'redux';
 import {NewVersionCode} from '@models/appconfig';
 
 import {updateNewVersion} from '@redux/reducers/appConfig';
-import {KustomizeCommandType} from '@redux/services/kustomize';
+import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
@@ -18,17 +18,21 @@ import autoUpdater from './auto-update';
  * called by thunk to preview a kustomization
  */
 
-export const runKustomize = (folder: string, kustomizeCommand: KustomizeCommandType, event: Electron.IpcMainEvent) => {
+export const runKustomize = (options: KustomizeCommandOptions, event: Electron.IpcMainEvent) => {
   try {
-    let cmd = kustomizeCommand === 'kubectl' ? 'kubectl kustomize' : 'kustomize build ';
-    let stdout = execSync(`${cmd} ${folder}`, {
+    let cmd = options.kustomizeCommand === 'kubectl' ? 'kubectl kustomize ' : 'kustomize build ';
+    if (options.enableHelm) {
+      cmd += '--enable-helm ';
+    }
+
+    let stdout = execSync(`${cmd} ${options.folder}`, {
       env: {
         NODE_ENV: PROCESS_ENV.NODE_ENV,
         PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
         PATH: PROCESS_ENV.PATH,
       },
       maxBuffer: 1024 * 1024 * 10,
-      windowsHide: true
+      windowsHide: true,
     });
 
     event.sender.send('kustomize-result', {stdout: stdout.toString()});
@@ -108,7 +112,7 @@ export const runHelm = (args: any, event: Electron.IpcMainEvent) => {
         PATH: PROCESS_ENV.PATH,
       },
       maxBuffer: 1024 * 1024 * 10,
-      windowsHide: true
+      windowsHide: true,
     });
 
     event.sender.send('helm-result', {stdout: stdout.toString()});

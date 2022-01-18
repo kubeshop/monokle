@@ -120,13 +120,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
     if (isButtonShrinked) {
       // 230px = approx width of not collapsed button
-      if (distance > 230) {
+      if (distance > 350) {
         setButtonShrinkedState(false);
       }
     }
 
     // The button has 10px margin-left
-    if (!isButtonShrinked && distance < 10) {
+    if (!isButtonShrinked && distance < 40) {
       setButtonShrinkedState(true);
     }
   }, [isButtonShrinked, tabsList]);
