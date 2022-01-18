@@ -25,10 +25,14 @@ export function setDecorations(
   return editor.deltaDecorations(idsOfOldDecorations, newDecorations);
 }
 
-export function createGlyphDecoration(lineIndex: number, glyphDecorationType: GlyphDecorationTypes) {
+export function createGlyphDecoration(
+  lineIndex: number,
+  glyphDecorationType: GlyphDecorationTypes,
+  hoverMessage?: monaco.IMarkdownString[]
+) {
   const glyphDecoration: monaco.editor.IModelDeltaDecoration = {
     range: new monaco.Range(lineIndex, 1, lineIndex, 1),
-    options: getGlyphDecorationOptions(glyphDecorationType),
+    options: getGlyphDecorationOptions(glyphDecorationType, hoverMessage),
   };
   return glyphDecoration;
 }
