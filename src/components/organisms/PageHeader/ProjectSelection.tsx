@@ -1,13 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Table} from 'antd';
+import {Table, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
 import {DownOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
 import {DateTime} from 'luxon';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {
+  NewEmptyProjectTooltip,
+  NewProjectFromFolderTooltip,
+  NewProjectFromTemplateTooltip,
+  ProjectManagementTooltip,
+  SearchProjectTooltip,
+} from '@constants/tooltips';
 
 import {Project} from '@models/appconfig';
 
@@ -104,16 +113,24 @@ const ProjectSelection = () => {
     return (
       <StyledProjectMenu>
         <StyledProjectsMenuContainer>
-          <StyledSearch placeholder="Search" value={searchText} onChange={handleProjectSearch} />
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SearchProjectTooltip} placement="bottomRight">
+            <StyledSearch placeholder="Search" value={searchText} onChange={handleProjectSearch} />
+          </Tooltip>
           <StyledProjectsMenuActionsContainer>
-            <StyledProjectFolderOpenOutlined
-              onClick={() => {
-                setIsDropdownMenuVisible(false);
-                openFileExplorer();
-              }}
-            />
-            <StyledProjectFolderAddOutlined onClick={() => handleCreateProject(false)} />
-            <StyledProjectFormatPainterOutlined onClick={() => handleCreateProject(true)} />
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromFolderTooltip} placement="bottomRight">
+              <StyledProjectFolderOpenOutlined
+                onClick={() => {
+                  setIsDropdownMenuVisible(false);
+                  openFileExplorer();
+                }}
+              />
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewEmptyProjectTooltip} placement="bottomRight">
+              <StyledProjectFolderAddOutlined onClick={() => handleCreateProject(false)} />
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromTemplateTooltip} placement="bottomRight">
+              <StyledProjectFormatPainterOutlined onClick={() => handleCreateProject(true)} />
+            </Tooltip>
           </StyledProjectsMenuActionsContainer>
         </StyledProjectsMenuContainer>
         <Table
@@ -216,12 +233,14 @@ const ProjectSelection = () => {
       onVisibleChange={setIsDropdownMenuVisible}
       visible={isDropdownMenuVisible}
     >
-      <StyledProjectButton>
-        <StyledFolderOpenOutlined />
-        <span>{activeProject?.name}</span>
-        <DownOutlined style={{margin: 4}} />
-        <FileExplorer {...fileExplorerProps} />
-      </StyledProjectButton>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ProjectManagementTooltip} placement="bottomRight">
+        <StyledProjectButton>
+          <StyledFolderOpenOutlined />
+          <span>{activeProject?.name}</span>
+          <DownOutlined style={{margin: 4}} />
+          <FileExplorer {...fileExplorerProps} />
+        </StyledProjectButton>
+      </Tooltip>
     </StyledProjectsDropdown>
   );
 };

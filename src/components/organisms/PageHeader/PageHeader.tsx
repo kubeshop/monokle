@@ -6,6 +6,13 @@ import {Tooltip} from 'antd';
 import {GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
+import {
+  DiscordTooltip,
+  DocumentationTooltip,
+  GitHubTooltip,
+  NotificationsTooltip,
+  SettingsTooltip,
+} from '@constants/tooltips';
 
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
@@ -38,7 +45,6 @@ import {
   StyledRow,
   StyledSettingsOutlined,
 } from './Styled';
-import {DiscordTooltip, DocumentationTooltip, GitHubTooltip, NotificationsTooltip, SettingsTooltip} from './tooltips';
 
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;
