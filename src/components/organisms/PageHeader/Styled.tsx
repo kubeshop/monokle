@@ -9,7 +9,9 @@ import {
   CopyOutlined,
   DeleteOutlined,
   EditOutlined,
+  FolderAddOutlined,
   FolderOpenOutlined,
+  FormatPainterOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 
@@ -236,6 +238,24 @@ export const StyledProjectTableActions = styled.div`
 
 export const StyledProjectMenu = styled(Menu)`
   background-color: ${Colors.grey1000};
+`;
+
+export const StyledProjectFolderOpenOutlined = styled(FolderOpenOutlined)`
+  font-size: 20px;
+  color: ${Colors.blue6};
+  cursor: pointer;
+`;
+
+export const StyledProjectFolderAddOutlined = styled(FolderAddOutlined)`
+  font-size: 20px;
+  color: ${Colors.blue6};
+  cursor: pointer;
+`;
+
+export const StyledProjectFormatPainterOutlined = styled(FormatPainterOutlined)`
+  font-size: 20px;
+  color: ${Colors.blue6};
+  cursor: pointer;
 `;
 
 interface StyledProjectsDropdownProps extends DropDownProps {

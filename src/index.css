@@ -132,6 +132,10 @@ code {
   display: none;
 }
 
+.ant-table-header {
+  margin-bottom: 18px;
+}
+
 .ant-table-header .ant-table-thead .ant-table-cell {
   background-color: transparent;
   border: none !important;

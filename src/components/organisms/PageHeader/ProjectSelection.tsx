@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Table} from 'antd';
+import {Input, Table} from 'antd';
 import Column from 'antd/lib/table/Column';
 
 import {DownOutlined} from '@ant-design/icons';
@@ -11,19 +11,27 @@ import {DateTime} from 'luxon';
 import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setOpenProject} from '@redux/reducers/appConfig';
+import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, settingsSelector} from '@redux/selectors';
 
+import FileExplorer from '@components/atoms/FileExplorer';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
+
 import {
-  StyledCopyOutlined,
   StyledDeleteOutlined,
-  StyledEditOutlined,
   StyledFolderOpenOutlined,
   StyledProjectButton,
+  StyledProjectFolderAddOutlined,
+  StyledProjectFolderOpenOutlined,
+  StyledProjectFormatPainterOutlined,
   StyledProjectMenu,
   StyledProjectTableActions,
   StyledProjectsDropdown,
 } from './Styled';
+
+const {Search} = Input;
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
@@ -33,22 +41,36 @@ const ProjectSelection = () => {
   const {isClusterSelectorVisible} = useAppSelector(settingsSelector);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
 
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (folderPath) {
+        dispatch(setCreateProject({rootFolder: folderPath}));
+      }
+    },
+    {isDirectoryExplorer: true}
+  );
+
   const handleProjectChange = (project: Project) => {
     setIsDropdownMenuVisible(false);
     setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
+  };
+
+  const handleCreateProject = (fromTemplate: boolean) => {
+    setIsDropdownMenuVisible(false);
+    dispatch(openCreateProjectModal({fromTemplate}));
   };
 
   const handleDeleteProject = (project: Project) => {
     setIsDropdownMenuVisible(false);
   };
 
-  const handleCopyProject = (project: Project) => {
-    setIsDropdownMenuVisible(false);
-  };
+  // const handleCopyProject = (project: Project) => {
+  //   setIsDropdownMenuVisible(false);
+  // };
 
-  const handleEditProject = (project: Project) => {
-    setIsDropdownMenuVisible(false);
-  };
+  // const handleEditProject = (project: Project) => {
+  //   setIsDropdownMenuVisible(false);
+  // };
 
   const getRelativeDate = (isoDate: string | undefined) => {
     if (isoDate) {
@@ -60,9 +82,22 @@ const ProjectSelection = () => {
   const projectMenu = () => {
     return (
       <StyledProjectMenu>
+        <div style={{display: 'flex', justifyContent: 'space-between', padding: '16px'}}>
+          <Search placeholder="Search" style={{width: '280px'}} />
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '120px'}}>
+            <StyledProjectFolderOpenOutlined
+              onClick={() => {
+                setIsDropdownMenuVisible(false);
+                openFileExplorer();
+              }}
+            />
+            <StyledProjectFolderAddOutlined onClick={() => handleCreateProject(false)} />
+            <StyledProjectFormatPainterOutlined onClick={() => handleCreateProject(true)} />
+          </div>
+        </div>
         <Table
           size="small"
-          style={{width: '800px', marginTop: '100px', borderTop: '1px solid #262626'}}
+          style={{width: '800px', borderTop: '1px solid #262626', paddingTop: '18px'}}
           showSorterTooltip={false}
           dataSource={projects}
           pagination={false}
@@ -125,7 +160,7 @@ const ProjectSelection = () => {
             width={1}
             render={(_, project: Project) => (
               <StyledProjectTableActions>
-                <StyledCopyOutlined
+                {/* <StyledCopyOutlined
                   onClick={(e: any) => {
                     e.stopPropagation();
                     handleCopyProject(project);
@@ -136,7 +171,7 @@ const ProjectSelection = () => {
                     e.stopPropagation();
                     handleEditProject(project);
                   }}
-                />
+                /> */}
                 <StyledDeleteOutlined
                   onClick={(e: any) => {
                     e.stopPropagation();
@@ -165,6 +200,7 @@ const ProjectSelection = () => {
         <StyledFolderOpenOutlined />
         <span>{activeProject?.name}</span>
         <DownOutlined style={{margin: 4}} />
+        <FileExplorer {...fileExplorerProps} />
       </StyledProjectButton>
     </StyledProjectsDropdown>
   );

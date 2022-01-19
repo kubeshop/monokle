@@ -2,10 +2,6 @@ import React from 'react';
 
 import {Row} from 'antd';
 
-import {FolderAddOutlined, FolderOpenOutlined, FormatPainterOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
-
 import {useAppDispatch} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
@@ -15,66 +11,17 @@ import FileExplorer from '@atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import Colors from '@styles/Colors';
-
-const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-`;
-
-const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
-`;
-
-const StyledFolderOpenOutlined = styled(FolderOpenOutlined)`
-  font-size: 56px;
-  color: ${Colors.blue10};
-  margin-bottom: 24px;
-`;
-
-const StyledFolderAddOutlined = styled(FolderAddOutlined)`
-  font-size: 56px;
-  color: ${Colors.blue10};
-  margin-bottom: 24px;
-`;
-
-const StyledFormatPainterOutlined = styled(FormatPainterOutlined)`
-  font-size: 56px;
-  color: ${Colors.blue10};
-  margin-bottom: 24px;
-`;
-
-const StyledActionContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 0 40px;
-  cursor: pointer;
-`;
-
-const StyledActionText = styled.div`
-  color: ${Colors.blue6};
-  font-size: 12px;
-`;
-
-const StyledActionTitle = styled.div`
-  font-size: 22px;
-  text-align: center;
-  margin-bottom: 150px;
-`;
-
-const StyledContainer = styled.div`
-  width: 100%;
-  height: calc(100vh - 112px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 150px;
-`;
+import {
+  StyledActionContainer,
+  StyledActionText,
+  StyledActionTitle,
+  StyledContainer,
+  StyledFolderAddOutlined,
+  StyledFolderOpenOutlined,
+  StyledFormatPainterOutlined,
+  Title,
+  TitleBarContainer,
+} from './Styled';
 
 const StartProjectPane = () => {
   const dispatch = useAppDispatch();
