@@ -11,6 +11,8 @@ import {Primitive} from 'type-fest';
 
 import {TemplateForm} from '@models/template';
 
+import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
+
 const Form = withTheme(AntDTheme);
 
 const readTemplateFormSchemas = (templateForm: TemplateForm) => {
@@ -54,7 +56,7 @@ const TemplateFormRenderer: React.FC<{
   }
 
   return (
-    <>
+    <TemplateFormErrorBoundary>
       <h1>{templateForm.name}</h1>
       <p>{templateForm.description}</p>
       <Divider />
@@ -70,7 +72,7 @@ const TemplateFormRenderer: React.FC<{
           {isLastForm ? 'Submit' : 'Next'}
         </Button>
       </Form>
-    </>
+    </TemplateFormErrorBoundary>
   );
 };
 
