@@ -1,3 +1,5 @@
+import {Button} from 'antd';
+
 import {DeleteOutlined as RawDeleteOutlined, FormOutlined as RawFormOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
@@ -22,12 +24,16 @@ export const InfoContainer = styled.div`
   overflow: hidden;
 `;
 
-export const Name = styled.span`
-  font-weight: 600;
-  word-break: break-word;
+export const Name = styled.span<{$width: number}>`
+  ${props => `width: ${props.$width}`}
+  font-weight: 300;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
-export const Description = styled.span`
+export const Description = styled.span<{$width: number}>`
+  ${props => `width: ${props.$width}`}
   font-weight: 300;
   white-space: nowrap;
   overflow: hidden;
@@ -58,4 +64,9 @@ export const DeleteOutlined = styled(RawDeleteOutlined)`
 export const FormOutlined = styled(RawFormOutlined)`
   font-size: 30px;
   padding-top: 4px;
+`;
+
+export const OpenButton = styled(Button)`
+  margin-top: 8px;
+  width: 100px;
 `;
