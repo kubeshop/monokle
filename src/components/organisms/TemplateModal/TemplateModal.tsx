@@ -17,8 +17,6 @@ import {TemplateFormRenderer} from '@components/molecules';
 
 import * as S from './styled';
 
-const {Step} = Steps;
-
 type TemplateModalProps = {template: AnyTemplate; onClose: () => void};
 
 type FormDataList = Record<string, Primitive>[];
@@ -136,16 +134,16 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         )}
       >
         <S.Container ref={containerRef}>
-          <div style={{minWidth: 200}}>
+          <div>
             <Steps direction="vertical" current={activeFormIndex}>
               {template.forms.map(form => {
-                return <Step key={form.name} title={form.name} />;
+                return <S.Step key={form.name} title={form.name} />;
               })}
-              <Step title="Result" />
+              <S.Step title="Result" />
             </Steps>
           </div>
 
-          <div style={{width: '100%'}}>
+          <div style={{paddingRight: '10px'}}>
             {isLoading ? (
               <Skeleton />
             ) : resultMessage ? (
