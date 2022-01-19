@@ -6,7 +6,7 @@ import Colors from '@styles/Colors';
 
 export const Container = styled.div`
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: max-content 1fr 40px;
   position: relative;
   margin-bottom: 16px;
 `;
