@@ -32,7 +32,7 @@ Broken links are shown with yellow triangles in the Editor as in the Navigator:
 
 While hovering over a broken link in the Editor, a pop-up window will allow you to create that resource:
 
-![Source Editor Create Unsatisfied Links](img/create-resource-from-unsatisfied-link-1.5.0.png)
+![Create Resource Broken Links](img/create-resource-unsatisfied-link-1.5.0.png)
   
 ## Add Resource
 
