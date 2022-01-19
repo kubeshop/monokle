@@ -47,7 +47,7 @@ export const checkForExtensionsUpdates = async (payload: UpdateExtensionsPayload
         setAlert({
           type: AlertEnum.Info,
           title: 'Updated templates and plugins successfully',
-          message: `Updated ${templateExtensions.length} templates, ${templatePackExtensions.length} template packs and ${pluginExtensions.length} plugins.`,
+          message: `Updated ${templateExtensions.length} templates and ${pluginExtensions.length} plugins.`,
         })
       );
     }
