@@ -149,13 +149,13 @@ const PaneManager = () => {
                 style={{marginLeft: 4}}
                 icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
                 active={leftActive}
-                isSelected={leftMenuSelection === 'file-explorer'}
+                isSelected={Boolean(activeProject) && leftMenuSelection === 'file-explorer'}
               />
             </MenuButton>
           </Tooltip>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'kustomize-pane'}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
               isActive={leftActive}
               onClick={() => setLeftActiveMenu('kustomize-pane')}
               sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
@@ -166,7 +166,7 @@ const PaneManager = () => {
           </Tooltip>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'helm-pane'}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
               isActive={leftActive}
               onClick={() => setLeftActiveMenu('helm-pane')}
               sectionNames={[HELM_CHART_SECTION_NAME]}
