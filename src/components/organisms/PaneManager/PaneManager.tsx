@@ -143,6 +143,7 @@ const PaneManager = () => {
               isActive={leftActive}
               shouldWatchSelectedPath
               onClick={() => setLeftActiveMenu('file-explorer')}
+              disabled={!activeProject}
             >
               <MenuIcon
                 style={{marginLeft: 4}}
@@ -158,6 +159,7 @@ const PaneManager = () => {
               isActive={leftActive}
               onClick={() => setLeftActiveMenu('kustomize-pane')}
               sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
+              disabled={!activeProject}
             >
               <MenuIcon iconName="kustomize" active={leftActive} isSelected={leftMenuSelection === 'kustomize-pane'} />
             </MenuButton>
@@ -168,6 +170,7 @@ const PaneManager = () => {
               isActive={leftActive}
               onClick={() => setLeftActiveMenu('helm-pane')}
               sectionNames={[HELM_CHART_SECTION_NAME]}
+              disabled={!activeProject}
             >
               <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
             </MenuButton>
