@@ -4,7 +4,7 @@ Monokle is laid out like many other desktop applications:
 
 ![Monokle UI](img/monokle-ui-1.4.0.png)
 
-(On start-up, Monokle automatically loads the most recently selected folder.)
+On start-up, Monokle automatically loads the most recently selected folder if the corresponding "Load recent folder on Startup" setting has been enabled.
 
 
 Left to right:
