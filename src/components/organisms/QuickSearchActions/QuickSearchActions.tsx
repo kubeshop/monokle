@@ -298,7 +298,7 @@ const QuickSearchActionsV3: React.FC = () => {
           }
         }}
         onSearch={value => setSearchingValue(value)}
-        onSelect={value => {
+        onSelect={(value: string) => {
           // options are of type : `type:value`
           applyOption(value.split(':')[0], value.split(':')[1]);
         }}

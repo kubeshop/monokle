@@ -4,6 +4,8 @@ import {Button, Popconfirm} from 'antd';
 
 import {ExclamationOutlined} from '@ant-design/icons';
 
+import _ from 'lodash';
+
 import {AnyTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -62,7 +64,7 @@ const TemplateInformation: React.FC<IProps> = props => {
       <S.InfoContainer>
         <S.Name>{template.name}</S.Name>
         <span>Type: {template.type}</span>
-        <S.Description>{template.description}</S.Description>
+        <S.Description>{_.truncate(template.description, {length: 100})}</S.Description>
         <S.Footer>
           <S.Author>{template.author}</S.Author> <S.Version>{template.version}</S.Version>
         </S.Footer>

@@ -23,10 +23,12 @@ export const InfoContainer = styled.span`
 
 export const Name = styled.span`
   font-weight: 600;
+  word-break: break-word;
 `;
 
 export const Description = styled.span`
   font-weight: 300;
+  word-break: break-word;
 `;
 
 export const Footer = styled.span`
