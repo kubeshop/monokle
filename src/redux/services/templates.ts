@@ -1,13 +1,18 @@
+import asyncLib from 'async';
 import fs from 'fs';
 import _ from 'lodash';
+import log from 'loglevel';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AnyPlugin} from '@models/plugin';
-import {TemplatePack} from '@models/template';
+import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
 
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
 import {AppDispatch} from '@redux/store';
+
+import {extractObjectsFromYaml} from './manifest-utils';
+import {createUnsavedResource} from './unsavedResource';
 
 export const deleteStandalonTemplate = async (templatePath: string, dispatch: AppDispatch) => {
   dispatch(removeTemplate(templatePath));
@@ -75,7 +80,46 @@ export const isTemplatePackTemplate = (templatePath: string, templatesPacksDir: 
 export const isPluginTemplate = (templatePath: string, pluginsDir: string) => templatePath.startsWith(pluginsDir);
 
 export const interpolateTemplate = (text: string, formsData: any[]) => {
-  _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+  _.templateSettings.interpolate = /\[\[([\s\S]+?)\]\]/g;
   const lodashTemplate = _.template(text);
   return lodashTemplate({forms: formsData});
+};
+
+export const createUnsavedResourcesFromVanillaTemplate = async (
+  template: VanillaTemplate,
+  formsData: any[],
+  dispatch: AppDispatch
+) => {
+  const resourceTextList: (string | undefined)[] = await asyncLib.map(
+    template.manifests,
+    async (manifest: TemplateManifest) => {
+      try {
+        const manifestText = await fs.promises.readFile(manifest.filePath, 'utf8');
+        const interpolatedTemplateText = interpolateTemplate(manifestText, formsData);
+        return interpolatedTemplateText;
+      } catch (e) {
+        if (e instanceof Error) {
+          log.warn(`[createUnsavedResourcesFromVanillaTemplate]: ${e.message}`);
+          return undefined;
+        }
+      }
+    }
+  );
+  resourceTextList
+    .filter((text): text is string => typeof text === 'string')
+    .forEach(resourceText => {
+      const objects = extractObjectsFromYaml(resourceText);
+      objects.forEach(obj => {
+        createUnsavedResource(
+          {
+            name: obj.metadata.name,
+            kind: obj.kind,
+            apiVersion: obj.apiVersion,
+          },
+          dispatch,
+          obj
+        );
+      });
+    });
+  return template.resultMessage || 'Done.';
 };

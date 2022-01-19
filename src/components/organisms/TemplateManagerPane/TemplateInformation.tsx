@@ -66,7 +66,13 @@ const TemplateInformation: React.FC<IProps> = props => {
         <S.Footer>
           <S.Author>{template.author}</S.Author> <S.Version>{template.version}</S.Version>
         </S.Footer>
-        <Button onClick={onClickOpenTemplate} type="primary" ghost size="small" style={{marginTop: '8px'}}>
+        <Button
+          onClick={onClickOpenTemplate}
+          type="primary"
+          ghost
+          size="small"
+          style={{marginTop: '8px', alignSelf: 'flex-start', width: '50%'}}
+        >
           Open
         </Button>
       </S.InfoContainer>
