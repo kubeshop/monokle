@@ -30,7 +30,7 @@ Broken links are shown with yellow triangles in the Editor as in the Navigator:
 
 ![Source Editor Broken Links](img/source-editor-broken-links.png)
 
-Hover over the broken link in the Editor to show the options for working with the broken link:
+Hover over the broken link in the Editor to show the options for working with the broken link. Clicking the "Create..." option in this popup will open the New Resource dialog, pre-filled accordingly.
 
 ![Source Editor Broken Links](img/create-resource-from-unsatisfied-link-1.5.0.png)
 
