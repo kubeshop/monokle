@@ -12,6 +12,8 @@ import {setOpenProject} from '@redux/reducers/appConfig';
 
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import Colors from '@styles/Colors';
 
 const TitleBarContainer = styled.div`
@@ -31,6 +33,7 @@ const ProjectsContainer = styled.div`
   padding: 16px 12px;
   height: calc(100vh - 112px);
   overflow-y: scroll;
+  ${GlobalScrollbarStyle}
 `;
 
 const ProjectItem = styled.div`

@@ -82,7 +82,7 @@ function SectionHeader(props: SectionHeaderProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <S.NameContainer isHovered={isHovered}>
+      <S.NameContainer isHovered={isHovered} $hasCustomNameDisplay={Boolean(NameDisplay.Component)}>
         {sectionInstance.checkable &&
           sectionInstance.isInitialized &&
           (sectionBlueprint.customization?.isCheckVisibleOnHover
