@@ -1,6 +1,7 @@
 import React from 'react';
+import {useMeasure} from 'react-use';
 
-import {Button, Popconfirm} from 'antd';
+import {Popconfirm} from 'antd';
 
 import {ExclamationOutlined} from '@ant-design/icons';
 
@@ -34,6 +35,8 @@ const getTemplatePackPluginPath = (templatePath: string) => {
 const TemplateInformation: React.FC<IProps> = props => {
   const {template, templatePath, onClickOpenTemplate} = props;
 
+  const [infoContainerRef, {width: infoContainerWidth}] = useMeasure<HTMLDivElement>();
+
   const dispatch = useAppDispatch();
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const pluginsDir = useAppSelector(state => state.extension.pluginsDir);
@@ -59,16 +62,16 @@ const TemplateInformation: React.FC<IProps> = props => {
         <S.FormOutlined />
       </S.IconContainer>
 
-      <S.InfoContainer>
-        <S.Name>{template.name}</S.Name>
+      <S.InfoContainer ref={infoContainerRef}>
+        <S.Name $width={infoContainerWidth}>{template.name}</S.Name>
         <span>Type: {template.type}</span>
-        <S.Description>{template.description}</S.Description>
+        <S.Description $width={infoContainerWidth}>{template.description}</S.Description>
         <S.Footer>
           <S.Author>{template.author}</S.Author> <S.Version>{template.version}</S.Version>
         </S.Footer>
-        <Button onClick={onClickOpenTemplate} type="primary" ghost size="small" style={{marginTop: '8px'}}>
+        <S.OpenButton ghost size="small" type="primary" onClick={onClickOpenTemplate}>
           Open
-        </Button>
+        </S.OpenButton>
       </S.InfoContainer>
 
       <Popconfirm

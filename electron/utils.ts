@@ -11,7 +11,7 @@ export function isValidRepositoryUrl(repositoryUrl: string) {
 
 export function extractRepositoryOwnerAndNameFromUrl(pluginUrl: string) {
   if (!isValidRepositoryUrl(pluginUrl)) {
-    throw new Error('Invalig repository URL');
+    throw new Error('Invalid repository URL');
   }
   const repositoryPath = pluginUrl.split(`${GITHUB_URL}/`)[1];
   const [repositoryOwner, repositoryName] = repositoryPath.split('/');

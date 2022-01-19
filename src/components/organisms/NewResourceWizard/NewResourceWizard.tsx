@@ -19,7 +19,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {reprocessNewResource} from '@redux/reducers/main';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
@@ -287,7 +287,12 @@ const NewResourceWizard = () => {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName);
       }
 
-      dispatch(saveUnsavedResource({resource: newResource, absolutePath}));
+      dispatch(
+        saveUnsavedResources({
+          resourcePayloads: [{resource: newResource, absolutePath}],
+          saveMode: savingDestination === 'saveToFolder' ? savingDestination : 'appendToFile',
+        })
+      );
     }
 
     setSavingDestination('doNotSave');

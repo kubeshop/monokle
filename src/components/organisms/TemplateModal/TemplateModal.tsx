@@ -6,17 +6,16 @@ import {Button, Skeleton, Steps} from 'antd';
 
 import {Primitive} from 'type-fest';
 
-import {AnyTemplate, isReferencedHelmChartTemplate} from '@models/template';
+import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmChart';
+import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templates';
 
 import {TemplateFormRenderer} from '@components/molecules';
 
 import * as S from './styled';
-
-const {Step} = Steps;
 
 type TemplateModalProps = {template: AnyTemplate; onClose: () => void};
 
@@ -43,6 +42,19 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
 
   const onClickSubmit = useCallback(
     (formDataList: Record<string, Primitive>[]) => {
+      if (isVanillaTemplate(template)) {
+        setIsLoading(true);
+        createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
+          .then((msg: string) => {
+            setResultMessage(msg);
+            setIsLoading(false);
+          })
+          .catch((err: Error) => {
+            setResultMessage(err.message);
+          });
+        return;
+      }
+
       if (!isReferencedHelmChartTemplate(template) || !userTempDir || !kubeConfigPath || !kubeConfigContext) {
         return;
       }
@@ -122,16 +134,16 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         )}
       >
         <S.Container ref={containerRef}>
-          <div style={{minWidth: 200}}>
+          <div>
             <Steps direction="vertical" current={activeFormIndex}>
               {template.forms.map(form => {
-                return <Step key={form.name} title={form.name} />;
+                return <S.Step key={form.name} title={form.name} />;
               })}
-              <Step title="Result" />
+              <S.Step title="Result" />
             </Steps>
           </div>
 
-          <div style={{width: '100%'}}>
+          <div style={{paddingRight: '10px'}}>
             {isLoading ? (
               <Skeleton />
             ) : resultMessage ? (

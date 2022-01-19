@@ -1,4 +1,17 @@
-import {Document, ParsedNode, Scalar, isMap, isPair, isScalar, isSeq, parseDocument, visit} from 'yaml';
+import log from 'loglevel';
+import {
+  Document,
+  LineCounter,
+  ParsedNode,
+  Scalar,
+  isMap,
+  isPair,
+  isScalar,
+  isSeq,
+  parseAllDocuments,
+  parseDocument,
+  visit,
+} from 'yaml';
 
 function copyValueIfMissing(templateDoc: Document.Parsed<ParsedNode>, path: readonly any[]) {
   const templateNode = findValueNode(templateDoc, path);
@@ -167,4 +180,40 @@ export function traverseDocument(
       }
     },
   });
+}
+
+interface PossibleResource {
+  apiVersion: string;
+  kind: string;
+  metadata: {
+    name: string;
+    [x: string]: any;
+  };
+  [x: string]: any;
+}
+
+export function extractObjectsFromYaml(yamlText: string) {
+  const lineCounter: LineCounter = new LineCounter();
+  const documents = parseAllDocuments(yamlText, {lineCounter});
+  const result: PossibleResource[] = [];
+  if (documents) {
+    let docIndex = 0;
+    documents.forEach(doc => {
+      if (doc.errors.length > 0) {
+        log.warn(`Ignoring document ${docIndex} in due to ${doc.errors.length} error(s)`);
+      } else {
+        const content = doc.toJS();
+        if (
+          content &&
+          typeof content.apiVersion === 'string' &&
+          typeof content.kind === 'string' &&
+          typeof content.metadata?.name === 'string'
+        ) {
+          result.push(content);
+        }
+      }
+      docIndex += 1;
+    });
+  }
+  return result;
 }

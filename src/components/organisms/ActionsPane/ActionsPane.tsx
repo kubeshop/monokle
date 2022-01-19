@@ -2,11 +2,9 @@ import {ipcRenderer} from 'electron';
 
 import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 
-import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
+import {Button, Row, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
-
-import path from 'path';
 
 import {
   ACTIONS_PANE_FOOTER_HEIGHT,
@@ -16,12 +14,10 @@ import {
 } from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
-  AddResourceToExistingFileTooltip,
   ApplyFileTooltip,
   ApplyTooltip,
   DiffTooltip,
   OpenExternalDocumentationTooltip,
-  SaveResourceToNewFileTooltip,
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
@@ -31,7 +27,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {setMonacoEditor} from '@redux/reducers/ui';
+import {openSaveResourcesToFileFolderModal, setMonacoEditor} from '@redux/reducers/ui';
 import {
   isInPreviewModeSelector,
   kubeConfigContextSelector,
@@ -39,12 +35,10 @@ import {
   settingsSelector,
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
-import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import FormEditor from '@molecules/FormEditor';
@@ -53,12 +47,9 @@ import Monaco from '@molecules/Monaco';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import TabHeader from '@atoms/TabHeader';
 
-import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
 import HelmChartModalConfirmWithNamespaceSelect from '@components/molecules/HelmChartModalConfirmWithNamespaceSelect';
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
-
-import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -146,75 +137,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     return defaultHeight;
   }, [contentHeight, isActionsPaneFooterExpanded]);
 
-  const onSelect = useCallback(
-    (absolutePath: string) => {
-      if (selectedResource) {
-        dispatch(
-          saveUnsavedResource({
-            resource: selectedResource,
-            absolutePath,
-          })
-        );
-      }
-    },
-    [selectedResource, dispatch]
-  );
-
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    ({existingFilePath}) => {
-      if (!existingFilePath) {
-        return;
-      }
-      onSelect(existingFilePath);
-    },
-    {
-      title: `Add Resource ${selectedResource?.name} to file`,
-      acceptedFileExtensions: ['.yaml'],
-      action: 'open',
+  const onSaveHandler = () => {
+    if (selectedResource) {
+      dispatch(openSaveResourcesToFileFolderModal([selectedResource.id]));
     }
-  );
-
-  const {openFileExplorer: openDirectoryExplorer, fileExplorerProps: directoryExplorerProps} = useFileExplorer(
-    ({saveFilePath}) => {
-      if (!saveFilePath) {
-        return;
-      }
-      onSelect(saveFilePath);
-    },
-    {
-      acceptedFileExtensions: ['.yaml'],
-      title: `Save Resource ${selectedResource?.name} to file`,
-      defaultPath: path.join(
-        getRootFolder(fileMap) || '',
-        `${selectedResource?.name}-${selectedResource?.kind.toLowerCase()}.yaml`
-      ),
-      action: 'save',
-    }
-  );
+  };
 
   const resourceKindHandler = selectedResource && getResourceKindHandler(selectedResource.kind);
-
-  const getSaveButtonMenu = useCallback(
-    () => (
-      <Menu>
-        <Menu.Item key="to-existing-file">
-          <Tooltip title={AddResourceToExistingFileTooltip}>
-            <Button onClick={() => openFileExplorer()} type="text">
-              To existing file..
-            </Button>
-          </Tooltip>
-        </Menu.Item>
-        <Menu.Item key="to-directory">
-          <Tooltip title={SaveResourceToNewFileTooltip}>
-            <Button onClick={() => openDirectoryExplorer()} type="text">
-              To new file..
-            </Button>
-          </Tooltip>
-        </Menu.Item>
-      </Menu>
-    ),
-    [openFileExplorer, openDirectoryExplorer]
-  );
 
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&
@@ -402,8 +331,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   return (
     <>
       <Row>
-        <FileExplorer {...fileExplorerProps} />
-        <FileExplorer {...directoryExplorerProps} />
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <S.TitleBarContainer>
@@ -426,11 +353,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
                 {isSelectedResourceUnsaved() && (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
-                    <Dropdown overlay={getSaveButtonMenu()}>
-                      <S.SaveButton type="primary" size="small">
-                        Save
-                      </S.SaveButton>
-                    </Dropdown>
+                    <S.SaveButton type="primary" size="small" onClick={onSaveHandler}>
+                      Save
+                    </S.SaveButton>
                   </Tooltip>
                 )}
 
