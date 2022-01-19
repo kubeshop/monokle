@@ -3,15 +3,7 @@ import {useSelector} from 'react-redux';
 
 import {Tooltip} from 'antd';
 
-import {
-  BellOutlined,
-  CloseCircleOutlined,
-  GithubOutlined,
-  QuestionCircleOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
-
-import styled from 'styled-components';
+import {GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
@@ -24,113 +16,29 @@ import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
-import Col from '@components/atoms/Col';
-import Header from '@components/atoms/Header';
-import Row from '@components/atoms/Row';
-
 import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
 
 import DiscordLogo from '@assets/DiscordLogo.svg';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
-import {AppBorders} from '@styles/Borders';
-import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
-
 import ClusterSelection from './ClusterSelection';
+import {
+  ClusterRow,
+  IconContainerSpan,
+  LogoCol,
+  PreviewRow,
+  SettingsCol,
+  StyledBellOutlined,
+  StyledCloseCircleOutlined,
+  StyledExitButton,
+  StyledHeader,
+  StyledLogo,
+  StyledModeSpan,
+  StyledResourceSpan,
+  StyledRow,
+  StyledSettingsOutlined,
+} from './Styled';
 import {DiscordTooltip, DocumentationTooltip, GitHubTooltip, NotificationsTooltip, SettingsTooltip} from './tooltips';
-
-const StyledLogo = styled.img`
-  height: 24px;
-  margin: 4px;
-  margin-top: 11px;
-`;
-
-const StyledRow = styled(Row)`
-  display: flex;
-  justify-content: space-between;
-  flex-flow: inherit;
-`;
-
-const LogoCol = styled(Col)`
-  padding-left: 4px;
-  flex: 1;
-`;
-
-const StyledHeader = styled(Header)`
-  width: 100%;
-  line-height: 30px;
-  background: ${BackgroundColors.darkThemeBackground};
-  border-bottom: ${AppBorders.pageDivider};
-  min-height: 50px;
-  z-index: 1;
-  height: 30px;
-`;
-
-const SettingsCol = styled(Col)`
-  width: 100%;
-  display: flex;
-  flex-direction: row-reverse;
-  flex: 1;
-`;
-
-const StyledSettingsOutlined = styled(SettingOutlined)`
-  color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
-  cursor: pointer;
-`;
-
-const StyledBellOutlined = styled(BellOutlined)`
-  color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
-  cursor: pointer;
-`;
-
-const IconContainerSpan = styled.span`
-  color: ${FontColors.elementSelectTitle};
-  padding-top: 10px;
-  padding-right: 10px;
-  font-size: 24px;
-  cursor: pointer;
-`;
-
-const PreviewRow = styled(Row)`
-  background: ${BackgroundColors.previewModeBackground};
-  margin: 0;
-  padding: 0 10px;
-  height: 25px;
-  color: ${Colors.blackPure};
-  display: flex;
-  justify-content: space-between;
-`;
-
-const ClusterRow = styled(Row)`
-  background: ${BackgroundColors.clusterModeBackground};
-  margin: 0;
-  padding: 0 10px;
-  height: 25px;
-  color: ${Colors.blackPure};
-  display: flex;
-  justify-content: space-between;
-`;
-
-const StyledModeSpan = styled.span`
-  font-weight: 500;
-`;
-
-const StyledResourceSpan = styled.span`
-  font-weight: 700;
-`;
-
-const StyledExitButton = styled.span`
-  cursor: pointer;
-  &:hover {
-    font-weight: 500;
-  }
-`;
-
-const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
-  margin-right: 5px;
-`;
 
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;

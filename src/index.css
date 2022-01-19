@@ -106,3 +106,68 @@ code {
 .resource-prefix-popover-overlay .ant-popover-inner-content {
   padding: 0 16px;
 }
+
+.projects-table-column-name {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.projects-table-column-folder {
+  color: #7d7d7d;
+  font-size: 12px;
+}
+
+.projects-table-column-created {
+  color: #7d7d7d;
+  font-size: 12px;
+}
+
+.projects-table-column-last-opened {
+  color: #acacac;
+  font-size: 12px;
+}
+
+.projects-table-column-actions {
+  display: none;
+}
+
+.ant-table-header .ant-table-thead .ant-table-cell {
+  background-color: transparent;
+  border: none !important;
+  font-size: 12px;
+  font-weight: 600;
+  color: #acacac;
+}
+
+.ant-table-header .ant-table-thead .ant-table-cell:first-child {
+  border-left: 4px transparent solid !important;
+}
+
+.ant-table-header .ant-table-thead .ant-table-cell:before {
+  width: 0 !important;
+  height: 0 !important;
+  background-color: transparent !important;
+}
+
+.ant-table-body .ant-table-row .ant-table-cell {
+  background-color: transparent !important;
+  border-bottom: none !important;
+}
+
+.ant-table-body .ant-table-row:hover .ant-table-cell {
+  color: #13a8a8;
+  cursor: pointer;
+}
+
+.ant-table-body .ant-table-row:hover .projects-table-column-actions {
+  display: flex;
+}
+
+.ant-table-body .ant-table-row .ant-table-cell:first-child {
+  border-left: 4px transparent solid;
+}
+
+.ant-table-body .ant-table-row:hover .ant-table-cell:first-child {
+  border-left: 4px #84e2d8 solid;
+}
