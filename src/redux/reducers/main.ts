@@ -784,13 +784,14 @@ export const mainSlice = createSlice({
         const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
         const resourceFileEntry = state.fileMap[relativeFilePath];
 
-        if (resource) {
-          resource.filePath = relativeFilePath;
-          resource.range = resourcePayload.resourceRange;
-        }
-
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
+          const resourcesFromFile = Object.values(state.resourceMap).filter(
+            r => r.filePath === resourceFileEntry.filePath
+          );
+          resourcesFromFile.forEach(r => {
+            delete state.resourceMap[r.id];
+          });
         } else {
           const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
           newFileEntry.timestamp = resourcePayload.fileTimestamp;
@@ -818,6 +819,11 @@ export const mainSlice = createSlice({
               log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
             }
           }
+        }
+
+        if (resource) {
+          resource.filePath = relativeFilePath;
+          resource.range = resourcePayload.resourceRange;
         }
       });
     });
