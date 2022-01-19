@@ -11,22 +11,27 @@ export const Container = styled.div`
   margin-bottom: 16px;
 `;
 
-export const IconContainer = styled.span`
+export const IconContainer = styled.div`
   height: 50px;
   width: 50px;
 `;
 
-export const InfoContainer = styled.span`
+export const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 export const Name = styled.span`
   font-weight: 600;
+  word-break: break-word;
 `;
 
 export const Description = styled.span`
   font-weight: 300;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const Footer = styled.span`
