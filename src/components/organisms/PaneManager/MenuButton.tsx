@@ -30,7 +30,6 @@ interface IMenuButtonProps extends ButtonProps {
   sectionNames?: string[];
   isSelected: boolean;
   isActive: boolean;
-  onClick: () => void;
 }
 
 const MenuButton: React.FC<IMenuButtonProps> = props => {

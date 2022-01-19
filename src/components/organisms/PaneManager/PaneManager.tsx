@@ -178,9 +178,10 @@ const PaneManager = () => {
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'templates-pane'}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
               isActive={leftActive}
               onClick={() => setLeftActiveMenu('templates-pane')}
+              disabled={!activeProject}
             >
               <MenuIcon
                 icon={FormatPainterOutlined}
@@ -249,6 +250,7 @@ const PaneManager = () => {
       ) : (
         <StyledColumnPanes style={{width: contentWidth}}>
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', height: '100%'}}>
+            {leftMenuSelection === 'plugin-manager' && leftActive && <PluginManagerPane />}
             <div style={{flex: 3, height: '100%'}}>
               <StartProjectPane />
             </div>
