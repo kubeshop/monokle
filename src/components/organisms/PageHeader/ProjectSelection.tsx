@@ -136,7 +136,7 @@ const ProjectSelection = () => {
             sorter={(a: Project, b: Project) =>
               a.name && b.name ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : 0
             }
-            width={2}
+            width={4}
             ellipsis
           />
           <Column
@@ -145,7 +145,7 @@ const ProjectSelection = () => {
             dataIndex="rootFolder"
             key="rootFolder"
             sorter={(a: Project, b: Project) => b.rootFolder.localeCompare(a.rootFolder)}
-            width={3}
+            width={6}
             ellipsis
           />
           <Column
@@ -156,7 +156,7 @@ const ProjectSelection = () => {
             sorter={(a: Project, b: Project) =>
               (b.created ? new Date(b.created).getTime() : 0) - (a.created ? new Date(a.created).getTime() : 0)
             }
-            width={1}
+            width={2}
             ellipsis
             render={getRelativeDate}
           />
@@ -169,7 +169,7 @@ const ProjectSelection = () => {
               (b.lastOpened ? new Date(b.lastOpened).getTime() : 0) -
               (a.lastOpened ? new Date(a.lastOpened).getTime() : 0)
             }
-            width={1}
+            width={2}
             ellipsis
             render={getRelativeDate}
           />
