@@ -58,8 +58,8 @@ const parseFields = (definition: any, firstCall = false) => {
       return;
     }
 
-    const hasRef = keyDefinition.hasOwnProperty('$ref');
-    const hasItems = keyDefinition.hasOwnProperty('items');
+    const hasRef = Boolean(keyDefinition['$ref']);
+    const hasItems = Boolean(keyDefinition['items']);
 
     if (hasRef) {
       const childKey = getKeyFromRef(keyDefinition);
@@ -78,7 +78,7 @@ const parseFields = (definition: any, firstCall = false) => {
         ...propertiesUi,
       };
     } else if (hasItems) {
-      if (keyDefinition.items.hasOwnProperty('$ref')) {
+      if (keyDefinition.items['$ref']) {
         const childKey = getKeyFromRef(keyDefinition.items);
         const { properties, propertiesUi } = parseFields(kubernetesSchema[childKey].properties);
         schemaDefinition[key] = {
