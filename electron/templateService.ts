@@ -9,6 +9,7 @@ import {
   AnyTemplate,
   TemplatePack,
   isHelmChartTemplate,
+  isVanillaTemplate,
   validateAnyTemplate,
   validateTemplatePack,
 } from '@models/template';
@@ -38,6 +39,17 @@ const parseTemplate = (template: AnyTemplate, templateFolderPath: string): AnyTe
     return {
       ...updatedTemplate,
       valuesFilePath: path.join(templateFolderPath, updatedTemplate.valuesFilePath),
+    };
+  }
+  if (isVanillaTemplate(updatedTemplate)) {
+    return {
+      ...updatedTemplate,
+      manifests: updatedTemplate.manifests.map(manifest => {
+        return {
+          ...manifest,
+          filePath: path.join(templateFolderPath, manifest.filePath),
+        };
+      }),
     };
   }
   return updatedTemplate;
