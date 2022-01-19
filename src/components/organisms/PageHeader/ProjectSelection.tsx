@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Table} from 'antd';
@@ -6,6 +6,7 @@ import Column from 'antd/lib/table/Column';
 
 import {DownOutlined} from '@ant-design/icons';
 
+import _ from 'lodash';
 import {DateTime} from 'luxon';
 
 import {Project} from '@models/appconfig';
@@ -41,6 +42,8 @@ const ProjectSelection = () => {
   const activeProject = useSelector(activeProjectSelector);
   const {isClusterSelectorVisible} = useAppSelector(settingsSelector);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -50,6 +53,23 @@ const ProjectSelection = () => {
     },
     {isDirectoryExplorer: true}
   );
+
+  useEffect(() => {
+    if (searchText) {
+      setFilteredProjects(
+        _.filter(
+          projects,
+          (p: Project) =>
+            _.includes(p.name?.toLowerCase(), searchText.toLowerCase()) ||
+            _.includes(p.rootFolder.toLowerCase(), searchText.toLowerCase())
+        )
+      );
+    }
+  }, [searchText, projects]);
+
+  const handleProjectSearch = (e: any) => {
+    setSearchText(e.target.value);
+  };
 
   const handleProjectChange = (project: Project) => {
     setIsDropdownMenuVisible(false);
@@ -84,7 +104,7 @@ const ProjectSelection = () => {
     return (
       <StyledProjectMenu>
         <StyledProjectsMenuContainer>
-          <StyledSearch placeholder="Search" />
+          <StyledSearch placeholder="Search" value={searchText} onChange={handleProjectSearch} />
           <StyledProjectsMenuActionsContainer>
             <StyledProjectFolderOpenOutlined
               onClick={() => {
@@ -100,7 +120,7 @@ const ProjectSelection = () => {
           size="small"
           style={{width: '800px', borderTop: '1px solid #262626', paddingTop: '18px'}}
           showSorterTooltip={false}
-          dataSource={projects}
+          dataSource={searchText ? filteredProjects : projects}
           pagination={false}
           scroll={{y: 300}}
           rowKey="rootFolder"
@@ -158,7 +178,7 @@ const ProjectSelection = () => {
             dataIndex="lastOpened"
             key="lastOpened"
             width={1}
-            render={(_, project: Project) => (
+            render={(value: any, project: Project) => (
               <StyledProjectTableActions>
                 {/* <StyledCopyOutlined
                   onClick={(e: any) => {

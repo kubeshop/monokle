@@ -99,7 +99,7 @@ export const updateProjectSettings = (dispatch: AppDispatch, projectRootPath?: s
   dispatch(updateProjectConfig(null));
 };
 
-// I am not proud of this code. It can be surely done it better.
+// I am not proud of this code. It can be surely do it better.
 // After 1.5.0 I will refactor this one
 export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null) => {
   if (!(baseConfig && baseConfig.settings && baseConfig.kubeConfig)) {
