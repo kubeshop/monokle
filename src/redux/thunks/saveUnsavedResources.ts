@@ -1,6 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import fs from 'fs';
+import micromatch from 'micromatch';
 import path from 'path';
 import util from 'util';
 
@@ -34,27 +35,32 @@ const writeFilePromise = util.promisify(fs.writeFile);
 const performSaveUnsavedResource = async (
   resource: K8sResource,
   rootFolder: FileEntry | undefined,
-  absolutePath: string
+  absolutePath: string,
+  fileIncludes: string[]
 ) => {
   let resourceRange: {start: number; length: number} | undefined;
   if (!rootFolder) {
     throw new Error('Could not find the root folder.');
   }
+
   const pathStats = getFileStats(absolutePath);
+
   // new file?
   if (pathStats === undefined) {
     await writeFilePromise(absolutePath, resource.text);
   } else {
     const isDirectory = pathStats.isDirectory();
+
     /** if the absolute path is a directory, we will use the resource.name to create a new fileName */
     if (isDirectory) {
       const fileName = `${resource.name}-${resource.kind.toLowerCase()}.yaml`;
       absolutePath = path.join(absolutePath, fileName);
     }
-    // TODO: use fileIncludes here
-    if (path.extname(absolutePath) !== '.yaml') {
+
+    if (!fileIncludes.some(fileInclude => micromatch.isMatch(absolutePath, fileInclude))) {
       throw new Error('The selected file does not have .yaml extension.');
     }
+
     if (fs.existsSync(absolutePath)) {
       const fileContent = await readFilePromise(absolutePath, 'utf-8');
       let contentToAppend = resource.text;
@@ -65,18 +71,18 @@ const performSaveUnsavedResource = async (
           contentToAppend = `\n${YAML_DOCUMENT_DELIMITER}\n${resource.text}`;
         }
       }
+
       resourceRange = {
         start: fileContent.length,
         length: contentToAppend.length,
       };
+
       await appendFilePromise(absolutePath, contentToAppend);
     }
   }
   const fileTimestamp = getFileTimestamp(absolutePath);
-  return {
-    resourceRange,
-    fileTimestamp,
-  };
+
+  return {resourceRange, fileTimestamp};
 };
 
 export const saveUnsavedResources = createAsyncThunk<
@@ -88,6 +94,7 @@ export const saveUnsavedResources = createAsyncThunk<
   }
 >('main/saveUnsavedResources', async (args, thunkAPI) => {
   const mainState = thunkAPI.getState().main;
+  const configState = thunkAPI.getState().config;
   const rootFolder = mainState.fileMap[ROOT_FILE_ENTRY];
 
   let resourcePayloads: ResourcePayload[] = [];
@@ -97,7 +104,12 @@ export const saveUnsavedResources = createAsyncThunk<
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      const {resourceRange, fileTimestamp} = await performSaveUnsavedResource(resource, rootFolder, absolutePath);
+      const {resourceRange, fileTimestamp} = await performSaveUnsavedResource(
+        resource,
+        rootFolder,
+        absolutePath,
+        configState.fileIncludes
+      );
 
       resourcePayloads.push({
         resourceId: resource.id,
