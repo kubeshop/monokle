@@ -2,7 +2,7 @@ import React, {useCallback, useMemo, useState} from 'react';
 
 import {Button, Skeleton, Tooltip} from 'antd';
 
-import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ReloadOutlined} from '@ant-design/icons';
 
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
@@ -15,12 +15,10 @@ import {TitleBar} from '@components/molecules';
 
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
-import TemplateInstallModal from './TemplateInstallModal';
 import * as S from './TemplateManagerPane.styled';
 
 const TemplatesPane: React.FC = () => {
   const dispatch = useAppDispatch();
-  const [isInstallModalVisible, setIsInstallModalVisible] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
   const isLoadingExistingTemplates = useAppSelector(state => state.extension.isLoadingExistingTemplates);
@@ -45,21 +43,14 @@ const TemplatesPane: React.FC = () => {
     setSelectedTemplate(template);
   };
 
-  const openInstallModal = () => {
-    setIsInstallModalVisible(true);
-  };
-
   const onClickReload = useCallback(
     () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
     [templateMap, pluginMap, templatePackMap, dispatch]
   );
 
-  const onCloseInstallModal = () => {
-    setIsInstallModalVisible(false);
-  };
-
   return (
     <>
+      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
       <TitleBar title="Templates">
         <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
           <Button
@@ -70,9 +61,7 @@ const TemplatesPane: React.FC = () => {
             icon={<ReloadOutlined />}
           />
         </Tooltip>
-        <Button onClick={openInstallModal} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
-
       <S.Container>
         {isLoading ? (
           <Skeleton />
@@ -89,12 +78,6 @@ const TemplatesPane: React.FC = () => {
           ))
         )}
       </S.Container>
-
-      {isInstallModalVisible && (
-        <TemplateInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallModal} />
-      )}
-
-      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
     </>
   );
 };
