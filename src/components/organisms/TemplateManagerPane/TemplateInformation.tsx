@@ -1,7 +1,7 @@
 import React from 'react';
 import {useMeasure} from 'react-use';
 
-import {Button, Popconfirm} from 'antd';
+import {Popconfirm} from 'antd';
 
 import {ExclamationOutlined} from '@ant-design/icons';
 
@@ -63,21 +63,15 @@ const TemplateInformation: React.FC<IProps> = props => {
       </S.IconContainer>
 
       <S.InfoContainer ref={infoContainerRef}>
-        <S.Name>{template.name}</S.Name>
+        <S.Name $width={infoContainerWidth}>{template.name}</S.Name>
         <span>Type: {template.type}</span>
-        <S.Description style={{width: infoContainerWidth}}>{template.description}</S.Description>
+        <S.Description $width={infoContainerWidth}>{template.description}</S.Description>
         <S.Footer>
           <S.Author>{template.author}</S.Author> <S.Version>{template.version}</S.Version>
         </S.Footer>
-        <Button
-          onClick={onClickOpenTemplate}
-          type="primary"
-          ghost
-          size="small"
-          style={{marginTop: '8px', alignSelf: 'flex-start', width: '50%'}}
-        >
+        <S.OpenButton ghost size="small" type="primary" onClick={onClickOpenTemplate}>
           Open
-        </Button>
+        </S.OpenButton>
       </S.InfoContainer>
 
       <Popconfirm
