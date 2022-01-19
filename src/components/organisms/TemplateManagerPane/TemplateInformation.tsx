@@ -1,10 +1,9 @@
 import React from 'react';
+import {useMeasure} from 'react-use';
 
 import {Button, Popconfirm} from 'antd';
 
 import {ExclamationOutlined} from '@ant-design/icons';
-
-import _ from 'lodash';
 
 import {AnyTemplate} from '@models/template';
 
@@ -36,6 +35,8 @@ const getTemplatePackPluginPath = (templatePath: string) => {
 const TemplateInformation: React.FC<IProps> = props => {
   const {template, templatePath, onClickOpenTemplate} = props;
 
+  const [infoContainerRef, {width: infoContainerWidth}] = useMeasure<HTMLDivElement>();
+
   const dispatch = useAppDispatch();
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const pluginsDir = useAppSelector(state => state.extension.pluginsDir);
@@ -61,10 +62,10 @@ const TemplateInformation: React.FC<IProps> = props => {
         <S.FormOutlined />
       </S.IconContainer>
 
-      <S.InfoContainer>
+      <S.InfoContainer ref={infoContainerRef}>
         <S.Name>{template.name}</S.Name>
         <span>Type: {template.type}</span>
-        <S.Description>{_.truncate(template.description, {length: 100})}</S.Description>
+        <S.Description style={{width: infoContainerWidth}}>{template.description}</S.Description>
         <S.Footer>
           <S.Author>{template.author}</S.Author> <S.Version>{template.version}</S.Version>
         </S.Footer>
