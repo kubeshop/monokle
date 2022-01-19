@@ -1,6 +1,6 @@
 import {ReactElement} from 'react';
 
-import {Button, DropDownProps, Dropdown, Menu} from 'antd';
+import {Button, DropDownProps, Dropdown, Input, Menu} from 'antd';
 
 import {
   BellOutlined,
@@ -23,6 +23,8 @@ import Row from '@components/atoms/Row';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
+
+const {Search} = Input;
 
 export const StyledButton = styled(Button)`
   border-left: 1px solid ${Colors.grey3};
@@ -256,6 +258,23 @@ export const StyledProjectFormatPainterOutlined = styled(FormatPainterOutlined)`
   font-size: 20px;
   color: ${Colors.blue6};
   cursor: pointer;
+`;
+
+export const StyledProjectsMenuActionsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 120px;
+`;
+
+export const StyledProjectsMenuContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+`;
+
+export const StyledSearch = styled(Search)`
+  width: 280px;
 `;
 
 interface StyledProjectsDropdownProps extends DropDownProps {

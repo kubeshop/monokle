@@ -29,6 +29,14 @@ export const setCreateProject = createAsyncThunk('config/setCreateProject', asyn
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
 });
 
+export const setDeleteProject = createAsyncThunk('config/setDeleteProject', async (project: Project, thunkAPI: any) => {
+  const selectedProjectRootFolder: string = thunkAPI.getState().config.selectedProjectRootFolder;
+  thunkAPI.dispatch(configSlice.actions.deleteProject(project));
+  if (project.rootFolder === selectedProjectRootFolder) {
+    thunkAPI.dispatch(setOpenProject(null));
+  }
+});
+
 export const setOpenProject = createAsyncThunk(
   'config/openProject',
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
@@ -140,8 +148,14 @@ export const configSlice = createSlice({
         project.name = folderNames[folderNames.length - 1];
       }
 
+      project.created = new Date().toISOString();
       state.projects = [project, ...state.projects];
       state.selectedProjectRootFolder = project.rootFolder;
+    },
+    deleteProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
+      state.projects = _.remove(state.projects, (p: Project) => p.rootFolder !== action.payload.rootFolder);
+      state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
+      electronStore.set('appConfig.projects', state.projects);
     },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
       const projectRootPath: string | null = action.payload;

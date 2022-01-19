@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Input, Table} from 'antd';
+import {Table} from 'antd';
 import Column from 'antd/lib/table/Column';
 
 import {DownOutlined} from '@ant-design/icons';
@@ -11,7 +11,7 @@ import {DateTime} from 'luxon';
 import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject, setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
 import {activeProjectSelector, settingsSelector} from '@redux/selectors';
 
@@ -29,9 +29,10 @@ import {
   StyledProjectMenu,
   StyledProjectTableActions,
   StyledProjectsDropdown,
+  StyledProjectsMenuActionsContainer,
+  StyledProjectsMenuContainer,
+  StyledSearch,
 } from './Styled';
-
-const {Search} = Input;
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
@@ -61,7 +62,7 @@ const ProjectSelection = () => {
   };
 
   const handleDeleteProject = (project: Project) => {
-    setIsDropdownMenuVisible(false);
+    dispatch(setDeleteProject(project));
   };
 
   // const handleCopyProject = (project: Project) => {
@@ -82,9 +83,9 @@ const ProjectSelection = () => {
   const projectMenu = () => {
     return (
       <StyledProjectMenu>
-        <div style={{display: 'flex', justifyContent: 'space-between', padding: '16px'}}>
-          <Search placeholder="Search" style={{width: '280px'}} />
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '120px'}}>
+        <StyledProjectsMenuContainer>
+          <StyledSearch placeholder="Search" />
+          <StyledProjectsMenuActionsContainer>
             <StyledProjectFolderOpenOutlined
               onClick={() => {
                 setIsDropdownMenuVisible(false);
@@ -93,8 +94,8 @@ const ProjectSelection = () => {
             />
             <StyledProjectFolderAddOutlined onClick={() => handleCreateProject(false)} />
             <StyledProjectFormatPainterOutlined onClick={() => handleCreateProject(true)} />
-          </div>
-        </div>
+          </StyledProjectsMenuActionsContainer>
+        </StyledProjectsMenuContainer>
         <Table
           size="small"
           style={{width: '800px', borderTop: '1px solid #262626', paddingTop: '18px'}}
@@ -130,11 +131,10 @@ const ProjectSelection = () => {
           <Column
             className="projects-table-column-created"
             title="Created"
-            dataIndex="lastOpened"
-            key="lastOpened"
+            dataIndex="created"
+            key="created"
             sorter={(a: Project, b: Project) =>
-              (b.lastOpened ? new Date(b.lastOpened).getTime() : 0) -
-              (a.lastOpened ? new Date(a.lastOpened).getTime() : 0)
+              (b.created ? new Date(b.created).getTime() : 0) - (a.created ? new Date(a.created).getTime() : 0)
             }
             width={1}
             ellipsis
