@@ -13,13 +13,14 @@ import {stringify} from 'yaml';
 import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
+import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {closeSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isUnsavedResource} from '@redux/services/resource';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -112,9 +113,10 @@ const SaveResourceToFileFolderModal: React.FC = () => {
     }
 
     let writeAppendErrors = 0;
+    let unsavedResources: {resource: K8sResource; absolutePath: string}[] = [];
 
-    resourcesIds.forEach(resourceId => {
-      const resource = resourceMap[resourceId];
+    for (let i = 0; i < resourcesIds.length; i += 1) {
+      const resource = resourceMap[resourcesIds[i]];
 
       let absolutePath;
 
@@ -135,7 +137,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
       }
 
       if (isUnsavedResource(resource)) {
-        dispatch(saveUnsavedResource({resource, absolutePath}));
+        unsavedResources.push({resource, absolutePath});
       } else {
         const cleanResourceContent = removeIgnoredPathsFromResourceContent(resource.content);
         let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
@@ -163,7 +165,11 @@ const SaveResourceToFileFolderModal: React.FC = () => {
           }
         }
       }
-    });
+    }
+
+    if (unsavedResources.length) {
+      dispatch(saveUnsavedResources(unsavedResources));
+    }
 
     dispatch(closeSaveResourcesToFileFolderModal());
     dispatch(uncheckAllResourceIds());

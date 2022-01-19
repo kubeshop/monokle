@@ -6,8 +6,6 @@ import {Button, Row, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
-import path from 'path';
-
 import {
   ACTIONS_PANE_FOOTER_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
@@ -32,12 +30,10 @@ import {openResourceDiffModal} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal, setMonacoEditor} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
-import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import FormEditor from '@molecules/FormEditor';
@@ -46,12 +42,9 @@ import Monaco from '@molecules/Monaco';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import TabHeader from '@atoms/TabHeader';
 
-import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
 import HelmChartModalConfirmWithNamespaceSelect from '@components/molecules/HelmChartModalConfirmWithNamespaceSelect';
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
-
-import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -139,52 +132,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
     return defaultHeight;
   }, [contentHeight, isActionsPaneFooterExpanded]);
-
-  const onSelect = useCallback(
-    (absolutePath: string) => {
-      if (selectedResource) {
-        dispatch(
-          saveUnsavedResource({
-            resource: selectedResource,
-            absolutePath,
-          })
-        );
-      }
-    },
-    [selectedResource, dispatch]
-  );
-
-  const {fileExplorerProps} = useFileExplorer(
-    ({existingFilePath}) => {
-      if (!existingFilePath) {
-        return;
-      }
-      onSelect(existingFilePath);
-    },
-    {
-      title: `Add Resource ${selectedResource?.name} to file`,
-      acceptedFileExtensions: ['.yaml'],
-      action: 'open',
-    }
-  );
-
-  const {fileExplorerProps: directoryExplorerProps} = useFileExplorer(
-    ({saveFilePath}) => {
-      if (!saveFilePath) {
-        return;
-      }
-      onSelect(saveFilePath);
-    },
-    {
-      acceptedFileExtensions: ['.yaml'],
-      title: `Save Resource ${selectedResource?.name} to file`,
-      defaultPath: path.join(
-        getRootFolder(fileMap) || '',
-        `${selectedResource?.name}-${selectedResource?.kind.toLowerCase()}.yaml`
-      ),
-      action: 'save',
-    }
-  );
 
   const onSaveHandler = () => {
     if (selectedResource) {
@@ -389,8 +336,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   return (
     <>
       <Row>
-        <FileExplorer {...fileExplorerProps} />
-        <FileExplorer {...directoryExplorerProps} />
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <S.TitleBarContainer>

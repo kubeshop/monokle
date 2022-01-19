@@ -34,7 +34,7 @@ import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
@@ -131,6 +131,57 @@ function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: b
   }
   state.currentSelectionHistoryIndex = undefined;
 }
+
+const updateCreateNewFileEntry = (
+  state: AppState,
+  resourcePayload: {
+    resourceId: string;
+    resourceFilePath: string;
+    resourceRange?: {start: number; length: number};
+    fileTimestamp: number | undefined;
+  }
+) => {
+  const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  const resource = state.resourceMap[resourcePayload.resourceId];
+  const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
+  const resourceFileEntry = state.fileMap[relativeFilePath];
+
+  if (resource) {
+    resource.filePath = relativeFilePath;
+    resource.range = resourcePayload.resourceRange;
+  }
+
+  if (resourceFileEntry) {
+    resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
+  } else {
+    const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
+    newFileEntry.timestamp = resourcePayload.fileTimestamp;
+    state.fileMap[relativeFilePath] = newFileEntry;
+    const childFileName = path.basename(relativeFilePath);
+    const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
+    if (parentPath === path.sep) {
+      const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
+      if (rootFileEntry.children) {
+        rootFileEntry.children.push(childFileName);
+        rootFileEntry.children.sort();
+      } else {
+        rootFileEntry.children = [childFileName];
+      }
+    } else {
+      const parentPathFileEntry = state.fileMap[parentPath];
+      if (parentPathFileEntry) {
+        if (parentPathFileEntry.children !== undefined) {
+          parentPathFileEntry.children.push(childFileName);
+          parentPathFileEntry.children.sort();
+        } else {
+          parentPathFileEntry.children = [childFileName];
+        }
+      } else {
+        log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
+      }
+    }
+  }
+};
 
 const performResourceContentUpdate = (state: AppState, resource: K8sResource, newText: string) => {
   if (isFileResource(resource)) {
@@ -783,45 +834,50 @@ export const mainSlice = createSlice({
       resetSelectionHistory(state);
     });
 
-    builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
+    builder.addCase(saveUnsavedResources.fulfilled, (state, action) => {
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-      const resource = state.resourceMap[action.payload.resourceId];
-      const relativeFilePath = action.payload.resourceFilePath.substr(rootFolder.length);
-      const resourceFileEntry = state.fileMap[relativeFilePath];
-      if (resource) {
-        resource.filePath = relativeFilePath;
-        resource.range = action.payload.resourceRange;
-      }
-      if (resourceFileEntry) {
-        resourceFileEntry.timestamp = action.payload.fileTimestamp;
-      } else {
-        const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
-        newFileEntry.timestamp = action.payload.fileTimestamp;
-        state.fileMap[relativeFilePath] = newFileEntry;
-        const childFileName = path.basename(relativeFilePath);
-        const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
-        if (parentPath === path.sep) {
-          const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
-          if (rootFileEntry.children) {
-            rootFileEntry.children.push(childFileName);
-            rootFileEntry.children.sort();
-          } else {
-            rootFileEntry.children = [childFileName];
-          }
+
+      action.payload.resourcePayloads.forEach(resourcePayload => {
+        const resource = state.resourceMap[resourcePayload.resourceId];
+        const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
+        const resourceFileEntry = state.fileMap[relativeFilePath];
+
+        if (resource) {
+          resource.filePath = relativeFilePath;
+          resource.range = resourcePayload.resourceRange;
+        }
+
+        if (resourceFileEntry) {
+          resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
         } else {
-          const parentPathFileEntry = state.fileMap[parentPath];
-          if (parentPathFileEntry) {
-            if (parentPathFileEntry.children !== undefined) {
-              parentPathFileEntry.children.push(childFileName);
-              parentPathFileEntry.children.sort();
+          const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
+          newFileEntry.timestamp = resourcePayload.fileTimestamp;
+          state.fileMap[relativeFilePath] = newFileEntry;
+          const childFileName = path.basename(relativeFilePath);
+          const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
+          if (parentPath === path.sep) {
+            const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
+            if (rootFileEntry.children) {
+              rootFileEntry.children.push(childFileName);
+              rootFileEntry.children.sort();
             } else {
-              parentPathFileEntry.children = [childFileName];
+              rootFileEntry.children = [childFileName];
             }
           } else {
-            log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
+            const parentPathFileEntry = state.fileMap[parentPath];
+            if (parentPathFileEntry) {
+              if (parentPathFileEntry.children !== undefined) {
+                parentPathFileEntry.children.push(childFileName);
+                parentPathFileEntry.children.sort();
+              } else {
+                parentPathFileEntry.children = [childFileName];
+              }
+            } else {
+              log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
+            }
           }
         }
-      }
+      });
     });
 
     builder
