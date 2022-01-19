@@ -46,7 +46,8 @@ export function createFileEntry(fileEntryPath: string) {
  */
 
 export function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
-  return appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
+  const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
+  return scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
 }
 
 /**
@@ -71,7 +72,8 @@ export function readFiles(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
-  depth: number = 1
+  depth: number = 1,
+  isSupportedResource: (resource: K8sResource) => boolean = () => true
 ) {
   const files = fs.readdirSync(folder);
   const result: string[] = [];
@@ -107,7 +109,8 @@ export function readFiles(
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
-        if (depth === appConfig.folderReadsMaxDepth) {
+        const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+        if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
         } else {
           fileEntry.children = readFiles(
@@ -123,6 +126,11 @@ export function readFiles(
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
           extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+            if (!isSupportedResource(resource)) {
+              fileEntry.isSupported = false;
+              return;
+            }
+
             resourceMap[resource.id] = resource;
           });
         } catch (e) {

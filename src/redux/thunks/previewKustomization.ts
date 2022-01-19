@@ -63,10 +63,13 @@ function runKustomize(folder: string, appConfig: AppConfig): any {
     ipcRenderer.once('kustomize-result', (event, arg) => {
       resolve(arg);
     });
+    const kustomizeCommand = appConfig.projectConfig?.settings?.kustomizeCommand || appConfig.settings.kustomizeCommand;
+    const enableHelmWithKustomize =
+      appConfig.projectConfig?.settings?.enableHelmWithKustomize || appConfig.settings.enableHelmWithKustomize;
     ipcRenderer.send('run-kustomize', {
       folder,
-      kustomizeCommand: appConfig.settings.kustomizeCommand,
-      enableHelm: appConfig.settings.enableHelmWithKustomize,
+      kustomizeCommand,
+      enableHelm: enableHelmWithKustomize,
     } as KustomizeCommandOptions);
   });
 }

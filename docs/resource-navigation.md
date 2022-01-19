@@ -27,6 +27,18 @@ In this screenshot:
 - The 3 ClusterRole resources in thie file are highlighed in the Navigator in the middle.
 - The contents of the file are shown in the editor to the right.
 
+While in the File Explorer, the File Action drop down list is available by clicking the ellipsis to the right of the file name.
+
+![Explorer File Actions](img/explorer-file-actions-1.4.0.png)
+
+In the drop down, the following actions are available:
+- Reveal in Finder
+- Copy Path
+- Copy Relative Path
+- Add to File: Exclude
+- Rename
+- Delete
+
 ## Resource Navigator
 
 The Navigator shows all resources found recursively in the selected folder. Resources are grouped into sections/subsections based
@@ -100,10 +112,10 @@ You can choose to reload the last reviewed folder while launching Monokle. For t
 
 ## Navigation History
 
-You can easily navigate back and forth between the selected resources with the help of the Navigation button.
+You can easily navigate back and forth between the selected resources with the help of the Navigation button. The highlight arrow will indicate when navigation to previous or next resource is available.
 
 
-![Navigation History](img/navigate-history.png)
+![Navigation History](img/navigate-history-1.5.0.png)
 
 ## Expand/Collapse Sections
 

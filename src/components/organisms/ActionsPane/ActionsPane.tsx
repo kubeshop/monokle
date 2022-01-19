@@ -2,11 +2,9 @@ import {ipcRenderer} from 'electron';
 
 import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 
-import {Button, Dropdown, Menu, Row, Tabs, Tooltip} from 'antd';
+import {Button, Row, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
-
-import path from 'path';
 
 import {
   ACTIONS_PANE_FOOTER_HEIGHT,
@@ -16,12 +14,10 @@ import {
 } from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
-  AddResourceToExistingFileTooltip,
   ApplyFileTooltip,
   ApplyTooltip,
   DiffTooltip,
   OpenExternalDocumentationTooltip,
-  SaveResourceToNewFileTooltip,
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
@@ -31,15 +27,18 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {setMonacoEditor} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {openSaveResourcesToFileFolderModal, setMonacoEditor} from '@redux/reducers/ui';
+import {
+  isInPreviewModeSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathSelector,
+  settingsSelector,
+} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
-import {getRootFolder} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import FormEditor from '@molecules/FormEditor';
@@ -48,12 +47,9 @@ import Monaco from '@molecules/Monaco';
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import TabHeader from '@atoms/TabHeader';
 
-import FileExplorer from '@components/atoms/FileExplorer';
 import Icon from '@components/atoms/Icon';
 import HelmChartModalConfirmWithNamespaceSelect from '@components/molecules/HelmChartModalConfirmWithNamespaceSelect';
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
-
-import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -81,9 +77,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
-  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const kustomizeCommand = useAppSelector(state => state.config.settings.kustomizeCommand);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -92,8 +85,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const {kustomizeCommand} = useAppSelector(settingsSelector);
 
   const navigatorHeight = useMemo(
     () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
@@ -142,75 +137,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
     return defaultHeight;
   }, [contentHeight, isActionsPaneFooterExpanded]);
 
-  const onSelect = useCallback(
-    (absolutePath: string) => {
-      if (selectedResource) {
-        dispatch(
-          saveUnsavedResource({
-            resource: selectedResource,
-            absolutePath,
-          })
-        );
-      }
-    },
-    [selectedResource, dispatch]
-  );
-
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    ({existingFilePath}) => {
-      if (!existingFilePath) {
-        return;
-      }
-      onSelect(existingFilePath);
-    },
-    {
-      title: `Add Resource ${selectedResource?.name} to file`,
-      acceptedFileExtensions: ['.yaml'],
-      action: 'open',
+  const onSaveHandler = () => {
+    if (selectedResource) {
+      dispatch(openSaveResourcesToFileFolderModal([selectedResource.id]));
     }
-  );
-
-  const {openFileExplorer: openDirectoryExplorer, fileExplorerProps: directoryExplorerProps} = useFileExplorer(
-    ({saveFilePath}) => {
-      if (!saveFilePath) {
-        return;
-      }
-      onSelect(saveFilePath);
-    },
-    {
-      acceptedFileExtensions: ['.yaml'],
-      title: `Save Resource ${selectedResource?.name} to file`,
-      defaultPath: path.join(
-        getRootFolder(fileMap) || '',
-        `${selectedResource?.name}-${selectedResource?.kind.toLowerCase()}.yaml`
-      ),
-      action: 'save',
-    }
-  );
+  };
 
   const resourceKindHandler = selectedResource && getResourceKindHandler(selectedResource.kind);
-
-  const getSaveButtonMenu = useCallback(
-    () => (
-      <Menu>
-        <Menu.Item key="to-existing-file">
-          <Tooltip title={AddResourceToExistingFileTooltip}>
-            <Button onClick={() => openFileExplorer()} type="text">
-              To existing file..
-            </Button>
-          </Tooltip>
-        </Menu.Item>
-        <Menu.Item key="to-directory">
-          <Tooltip title={SaveResourceToNewFileTooltip}>
-            <Button onClick={() => openDirectoryExplorer()} type="text">
-              To new file..
-            </Button>
-          </Tooltip>
-        </Menu.Item>
-      </Menu>
-    ),
-    [openFileExplorer, openDirectoryExplorer]
-  );
 
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&
@@ -237,17 +170,17 @@ const ActionsPane = (props: {contentHeight: string}) => {
     } else if (selectedResource) {
       setIsApplyModalVisible(true);
     } else if (selectedPath) {
-      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig, kubeconfigContext || '');
+      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeConfigPath, kubeConfigContext);
     }
   }, [
     selectedResource,
     fileMap,
-    kubeconfig,
+    kubeConfigPath,
     selectedPath,
     dispatch,
     helmValuesMap,
     selectedValuesFileId,
-    kubeconfigContext,
+    kubeConfigContext,
     selectedResourceId,
   ]);
 
@@ -260,7 +193,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
-    if (!kubeconfigContext || kubeconfigContext === '') {
+    if (!kubeConfigContext || kubeConfigContext === '') {
       const alert: AlertType = {
         type: AlertEnum.Error,
         title: 'Diff not available',
@@ -274,7 +207,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (selectedResourceId) {
       dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [dispatch, selectedResourceId, kubeconfigContext]);
+  }, [dispatch, selectedResourceId, kubeConfigContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
@@ -303,22 +236,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
         return;
       }
       const isClusterPreview = previewType === 'cluster';
-      applyResource(
-        selectedResource.id,
-        resourceMap,
-        fileMap,
-        dispatch,
-        kubeconfigPath,
-        kubeconfigContext || '',
-        namespace,
-        {
-          isClusterPreview,
-          kustomizeCommand,
-        }
-      );
+      applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
+        isClusterPreview,
+        kustomizeCommand,
+      });
       setIsApplyModalVisible(false);
     },
-    [dispatch, fileMap, kubeconfigContext, kubeconfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
+    [dispatch, fileMap, kubeConfigContext, kubeConfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
   );
 
   const onClickApplyHelmChart = useCallback(
@@ -334,14 +258,14 @@ const ActionsPane = (props: {contentHeight: string}) => {
         helmChartMap[helmValuesFile.helmChartId],
         fileMap,
         dispatch,
-        kubeconfig,
-        kubeconfigContext || '',
+        kubeConfigPath,
+        kubeConfigContext,
         namespace,
         shouldCreateNamespace
       );
       setIsHelmChartApplyModalVisible(false);
     },
-    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeconfig, kubeconfigContext, selectedValuesFileId]
+    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeConfigPath, kubeConfigContext, selectedValuesFileId]
   );
 
   const confirmModalTitle = useMemo(() => {
@@ -350,9 +274,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeconfigContext)
-      : makeApplyResourceText(selectedResource.name, kubeconfigContext);
-  }, [selectedResource, kubeconfigContext]);
+      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext)
+      : makeApplyResourceText(selectedResource.name, kubeConfigContext);
+  }, [selectedResource, kubeConfigContext]);
 
   const helmChartConfirmModalTitle = useMemo(() => {
     if (!selectedValuesFileId) {
@@ -363,8 +287,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
     return `Install the ${helmChartMap[helmValuesFile.helmChartId].name} Chart using ${
       helmValuesFile.name
-    } in cluster [${kubeconfigContext || ''}]?`;
-  }, [helmChartMap, helmValuesMap, kubeconfigContext, selectedValuesFileId]);
+    } in cluster [${kubeConfigContext}]?`;
+  }, [helmChartMap, helmValuesMap, kubeConfigContext, selectedValuesFileId]);
 
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {
@@ -407,8 +331,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   return (
     <>
       <Row>
-        <FileExplorer {...fileExplorerProps} />
-        <FileExplorer {...directoryExplorerProps} />
         <MonoPaneTitleCol>
           <MonoPaneTitle>
             <S.TitleBarContainer>
@@ -431,11 +353,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
                 {isSelectedResourceUnsaved() && (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
-                    <Dropdown overlay={getSaveButtonMenu()}>
-                      <S.SaveButton type="primary" size="small">
-                        Save
-                      </S.SaveButton>
-                    </Dropdown>
+                    <S.SaveButton type="primary" size="small" onClick={onSaveHandler}>
+                      Save
+                    </S.SaveButton>
                   </Tooltip>
                 )}
 

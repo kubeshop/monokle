@@ -33,7 +33,11 @@ Broken links are shown with yellow triangles in the Editor as in the Navigator:
 While hovering over a broken link in the Editor, a pop-up window will allow you to create that resource:
 
 ![Create Resource Broken Links](img/create-resource-unsatisfied-link-1.5.0.png)
-  
+
+When editing a resource, click on the document icon at the top right of the Editor pane to open the corresponding kubernetes documentation in a browser window:
+
+![Source Editor Broken Links](img/resource-open-k8s-documentation-1.5.0.png) 
+
 ## Add Resource
 
 While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the “New Resource” button at the top of the navigator to launch the “Add New Resource” dialog.

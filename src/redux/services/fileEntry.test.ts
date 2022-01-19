@@ -53,7 +53,7 @@ test('read-folder-with-helm-chart', () => {
 
   expect(files.length).toBe(4);
   expect(Object.values(fileMap).length).toBe(6);
-  expect(Object.values(resourceMap).length).toBe(2);
+  expect(Object.values(resourceMap).length).toBe(0);
 
   let helmCharts = Object.values(helmChartMap);
   expect(helmCharts.length).toBe(1);

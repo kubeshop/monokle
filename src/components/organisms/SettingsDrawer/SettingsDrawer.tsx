@@ -1,250 +1,100 @@
-import * as k8s from '@kubernetes/client-node';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 
-import React, {useEffect, useRef, useState} from 'react';
-import {useDebounce} from 'react-use';
+import {Collapse} from 'antd';
 
-import {Button, Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
+import _ from 'lodash';
 
-import {WarningOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
-
-import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
-import {
-  AddExclusionPatternTooltip,
-  AddInclusionPatternTooltip,
-  AutoLoadLastFolderTooltip,
-  BrowseKubeconfigTooltip,
-  EnableHelmWithKustomizeTooltip,
-  HelmPreviewModeTooltip,
-  KubeconfigPathTooltip,
-  KustomizeCommandTooltip,
-} from '@constants/tooltips';
+import {Project, ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
+  setKubeConfig,
   setScanExcludesStatus,
+  toggleClusterStatus,
   updateEnableHelmWithKustomize,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
   updateHideExcludedFilesInFileExplorer,
-  updateKubeconfig,
-  updateKubeconfigPathValidity,
   updateKustomizeCommand,
-  updateLoadLastFolderOnStartup,
+  updateLoadLastProjectOnStartup,
+  updateProjectConfig,
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
-import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
-import {toggleClusterStatus, toggleSettings} from '@redux/reducers/ui';
-import {isInClusterModeSelector} from '@redux/selectors';
-import {loadContexts} from '@redux/thunks/loadKubeConfig';
-
-// import {Themes, TextSizes, Languages} from '@models/appconfig';
-import FilePatternList from '@molecules/FilePatternList';
+import {toggleSettings} from '@redux/reducers/ui';
+import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
 import Drawer from '@components/atoms/Drawer';
 
-import {useFocus} from '@utils/hooks';
+import {Settings} from './Settings';
 
-import Colors from '@styles/Colors';
-
-const StyledDiv = styled.div`
-  margin-bottom: 20px;
-`;
-
-const StyledSpan = styled.span`
-  font-weight: 500;
-  font-size: 20px;
-  display: block;
-  margin-bottom: 6px;
-`;
-
-const StyledButton = styled(Button)`
-  margin-top: 10px;
-`;
-
-const HiddenInput = styled.input`
-  display: none;
-`;
-
-const StyledSelect = styled(Select)`
-  width: 100%;
-`;
-
-const StyledWarningOutlined = styled(
-  (props: {isKubeconfigPathValid: boolean; clusterPaneIconHighlighted: boolean; className: string}) => (
-    <WarningOutlined className={props.className} />
-  )
-)`
-  ${props =>
-    `color: ${
-      props.clusterPaneIconHighlighted
-        ? Colors.whitePure
-        : !props.isKubeconfigPathValid
-        ? Colors.redError
-        : Colors.yellowWarning
-    }`};
-  ${props => `margin-left: ${props.clusterPaneIconHighlighted ? '10px' : '5px'}`};
-  ${props => `padding-top: ${props.clusterPaneIconHighlighted ? '5px' : '0px'}`};
-`;
-
-const StyledHeading = styled.h2`
-  font-size: 16px;
-  margin-bottom: 7px;
-`;
+const {Panel} = Collapse;
 
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
-
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
-  const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
+
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
+  const [activePanels, setActivePanels] = useState<number[]>([2]);
   const appConfig = useAppSelector(state => state.config);
-  const uiState = useAppSelector(state => state.ui);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
-  const isKubeconfigPathValid = useAppSelector(state => state.config.isKubeconfigPathValid);
+  const currentConfig = useAppSelector(currentConfigSelector);
 
-  const folderReadsMaxDepth = useAppSelector(state => state.config.folderReadsMaxDepth);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const clusterStatusHidden = useAppSelector(state => state.ui.clusterStatusHidden);
-  const [currentFolderReadsMaxDepth, setCurrentFolderReadsMaxDepth] = useState<number>(5);
-  const [currentKubeConfig, setCurrentKubeConfig] = useState<string>('');
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [inputRef, focusInput] = useFocus<Input>();
-  const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
-  const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
-  const clusterPaneIconHighlighted = useAppSelector(state => state.ui.clusterPaneIconHighlighted);
-
-  const isClusterActionDisabled = !kubeconfigPath || !isKubeconfigPathValid;
-
-  const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
+  const activeProject: Project | undefined = useSelector(activeProjectSelector);
 
   useEffect(() => {
-    setCurrentFolderReadsMaxDepth(folderReadsMaxDepth);
-  }, [folderReadsMaxDepth]);
+    if (highlightedItems.clusterPaneIcon) {
+      setActivePanels(_.uniq([...activePanels, 2]));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightedItems.clusterPaneIcon]);
 
-  useDebounce(
-    () => {
-      if (currentFolderReadsMaxDepth !== folderReadsMaxDepth) {
-        dispatch(updateFolderReadsMaxDepth(currentFolderReadsMaxDepth));
-      }
-    },
-    DEFAULT_EDITOR_DEBOUNCE,
-    [currentFolderReadsMaxDepth]
-  );
+  const handlePaneCollapse = (value: any) => {
+    setActivePanels(_.uniq([...value]));
+  };
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());
   };
 
-  const onChangeFileIncludes = (patterns: string[]) => {
-    dispatch(updateFileIncludes(patterns));
+  const changeProjectConfig = (config: ProjectConfig) => {
+    dispatch(updateProjectConfig(config));
   };
 
-  const onChangeScanExcludes = (patterns: string[]) => {
-    dispatch(updateScanExcludes(patterns));
-    dispatch(setScanExcludesStatus('outdated'));
-  };
-
-  // const onChangeTheme = (e: RadioChangeEvent) => {
-  //   if (e.target.value) {
-  //     dispatch(updateTheme(e.target.value));
-  //   }
-  // };
-
-  const onChangeHelmPreviewMode = (selectedHelmPreviewMode: any) => {
-    if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
-      dispatch(updateHelmPreviewMode(selectedHelmPreviewMode));
+  const changeApplicationConfig = (config: ProjectConfig) => {
+    if (!_.isEqual(config.settings?.isClusterSelectorVisible, appConfig.settings.isClusterSelectorVisible)) {
+      dispatch(toggleClusterStatus());
     }
-  };
-
-  const onChangeHideExcludedFilesInFileExplorer = (e: any) => {
-    dispatch(updateHideExcludedFilesInFileExplorer(e.target.checked));
-  };
-
-  const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
-    if (selectedKustomizeCommand === 'kubectl' || selectedKustomizeCommand === 'kustomize') {
-      dispatch(updateKustomizeCommand(selectedKustomizeCommand));
+    if (!_.isEqual(config.settings?.loadLastProjectOnStartup, appConfig.settings.loadLastProjectOnStartup)) {
+      dispatch(updateLoadLastProjectOnStartup(Boolean(config.settings?.loadLastProjectOnStartup)));
     }
-  };
-
-  const onChangeEnableHelmWithKustomize = (e: any) => {
-    dispatch(updateEnableHelmWithKustomize(e.target.checked));
-  };
-
-  const onChangeLoadLastFolderOnStartup = (e: any) => {
-    dispatch(updateLoadLastFolderOnStartup(e.target.checked));
-  };
-
-  const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
-    dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
-  };
-
-  const openFileSelect = () => {
-    if (isEditingDisabled) {
-      return;
+    if (!_.isEqual(config.settings?.enableHelmWithKustomize, appConfig.settings.enableHelmWithKustomize)) {
+      dispatch(updateEnableHelmWithKustomize(Boolean(config.settings?.enableHelmWithKustomize)));
     }
-    fileInput && fileInput.current?.click();
-  };
-
-  useEffect(() => {
-    setCurrentKubeConfig(kubeconfigPath);
-  }, [kubeconfigPath]);
-
-  // useDebounce(
-  //   () => {
-  //     if (currentKubeConfig !== kubeconfigPath) {
-  //       dispatch(updateKubeconfig(currentKubeConfig));
-  //     }
-  //   },
-  //   DEFAULT_KUBECONFIG_DEBOUNCE,
-  //   [currentKubeConfig]
-  // );
-  useDebounce(
-    () => {
-      try {
-        const kc = new k8s.KubeConfig();
-
-        kc.loadFromFile(currentKubeConfig);
-
-        dispatch(updateKubeconfigPathValidity(Boolean(kc.contexts) || false));
-      } catch (err) {
-        dispatch(updateKubeconfigPathValidity(!currentKubeConfig.length));
-      } finally {
-        dispatch(updateKubeconfig(currentKubeConfig));
-      }
-    },
-    DEFAULT_KUBECONFIG_DEBOUNCE,
-    [currentKubeConfig, kubeconfigPath]
-  );
-
-  useEffect(() => {
-    if (kubeconfigPath) {
-      loadContexts(kubeconfigPath, dispatch);
+    if (!_.isEqual(config.settings?.helmPreviewMode, appConfig.settings.helmPreviewMode)) {
+      dispatch(updateHelmPreviewMode(config.settings?.helmPreviewMode || 'template'));
     }
-  }, [kubeconfigPath, dispatch]);
-
-  const onUpdateKubeconfig = (e: any) => {
-    if (isEditingDisabled) {
-      return;
+    if (!_.isEqual(config.settings?.kustomizeCommand, appConfig.settings.kustomizeCommand)) {
+      dispatch(updateKustomizeCommand(config.settings?.kustomizeCommand || 'kubectl'));
     }
-    let value = e.target.value;
-    setCurrentKubeConfig(value);
-  };
-
-  const onSelectFile = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (fileInput.current?.files && fileInput.current.files.length > 0) {
-      const file: any = fileInput.current.files[0];
-      if (file.path) {
-        const path = file.path;
-        dispatch(updateKubeconfig(path));
-      }
+    if (
+      !_.isEqual(config.settings?.hideExcludedFilesInFileExplorer, appConfig.settings.hideExcludedFilesInFileExplorer)
+    ) {
+      dispatch(updateHideExcludedFilesInFileExplorer(Boolean(config.settings?.hideExcludedFilesInFileExplorer)));
     }
-  };
-
-  const toggleClusterSelector = () => {
-    dispatch(toggleClusterStatus());
+    if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
+      dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
+    }
+    if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
+      dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
+    }
+    if (!_.isEqual(_.sortBy(config?.scanExcludes), _.sortBy(appConfig.scanExcludes))) {
+      dispatch(setScanExcludesStatus('outdated'));
+      dispatch(updateScanExcludes(config?.scanExcludes || []));
+    }
+    if (!_.isEqual(_.sortBy(config?.fileIncludes), _.sortBy(appConfig.fileIncludes))) {
+      dispatch(updateFileIncludes(config?.fileIncludes || []));
+    }
   };
 
   return (
@@ -256,112 +106,27 @@ const SettingsDrawer = () => {
       closable={false}
       onClose={toggleSettingsDrawer}
       visible={isSettingsOpened}
+      bodyStyle={{padding: 0}}
     >
-      <StyledDiv>
-        <StyledHeading>
-          KUBECONFIG
-          {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated && (
-            <StyledWarningOutlined
-              className={clusterPaneIconHighlighted ? 'animated-highlight' : ''}
-              isKubeconfigPathValid={isKubeconfigPathValid}
-              clusterPaneIconHighlighted={clusterPaneIconHighlighted}
-            />
-          )}
-        </StyledHeading>
-        <Tooltip title={KubeconfigPathTooltip}>
-          <Input
-            ref={inputRef}
-            value={currentKubeConfig}
-            onChange={onUpdateKubeconfig}
-            disabled={isEditingDisabled}
-            onClick={() => focusInput()}
+      <Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
+        <Panel header="Default Settings" key="1">
+          <Settings
+            config={appConfig}
+            onConfigChange={changeApplicationConfig}
+            showLoadLastProjectOnStartup
+            showEnableHelmWithKustomize
           />
-        </Tooltip>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-          <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
-            Browse
-          </StyledButton>
-        </Tooltip>
-        <StyledDiv style={{marginTop: 16}}>
-          <Checkbox checked={!clusterStatusHidden} onChange={toggleClusterSelector}>
-            Show Cluster Selector
-          </Checkbox>
-        </StyledDiv>
-        <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Files: Include</StyledSpan>
-        <FilePatternList
-          value={appConfig.fileIncludes}
-          onChange={onChangeFileIncludes}
-          tooltip={AddInclusionPatternTooltip}
-          isSettingsOpened={isSettingsOpened}
-        />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Files: Exclude</StyledSpan>
-        <FilePatternList
-          value={appConfig.scanExcludes}
-          onChange={onChangeScanExcludes}
-          tooltip={AddExclusionPatternTooltip}
-          isSettingsOpened={isSettingsOpened}
-          type="excludes"
-        />
-      </StyledDiv>
-      <StyledDiv>
-        <Checkbox
-          checked={appConfig.settings.hideExcludedFilesInFileExplorer}
-          onChange={onChangeHideExcludedFilesInFileExplorer}
-        >
-          Hide excluded files
-        </Checkbox>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Helm Preview Mode</StyledSpan>
-        <Tooltip title={HelmPreviewModeTooltip}>
-          <StyledSelect value={appConfig.settings.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
-            <Select.Option value="template">Template</Select.Option>
-            <Select.Option value="install">Install</Select.Option>
-          </StyledSelect>
-        </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Kustomize Command</StyledSpan>
-        <Tooltip title={KustomizeCommandTooltip}>
-          <StyledSelect value={appConfig.settings.kustomizeCommand} onChange={onChangeKustomizeCommand}>
-            <Select.Option value="kubectl">Use kubectl</Select.Option>
-            <Select.Option value="kustomize">Use kustomize</Select.Option>
-          </StyledSelect>
-        </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <Tooltip title={EnableHelmWithKustomizeTooltip}>
-          <Checkbox checked={appConfig.settings.enableHelmWithKustomize} onChange={onChangeEnableHelmWithKustomize}>
-            Enable Helm-related features when invoking Kustomize
-          </Checkbox>
-        </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>On Startup</StyledSpan>
-        <Tooltip title={AutoLoadLastFolderTooltip}>
-          <Checkbox checked={appConfig.settings.loadLastFolderOnStartup} onChange={onChangeLoadLastFolderOnStartup}>
-            Automatically load last folder
-          </Checkbox>
-        </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Maximum folder read recursion depth</StyledSpan>
-        <InputNumber min={1} value={currentFolderReadsMaxDepth} onChange={setCurrentFolderReadsMaxDepth} />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Resource links processing</StyledSpan>
-        <Checkbox
-          checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
-          onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
-        >
-          Ignore optional unsatisfied links
-        </Checkbox>
-      </StyledDiv>
+        </Panel>
+        {activeProject && (
+          <Panel header={`${activeProject.name} Settings`} key="2">
+            <Settings
+              config={currentConfig}
+              onConfigChange={changeProjectConfig}
+              isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
+            />
+          </Panel>
+        )}
+      </Collapse>
     </Drawer>
   );
 };

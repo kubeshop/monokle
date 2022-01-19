@@ -26,13 +26,14 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
+    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
     return {
       resourceMap: state.main.resourceMap,
       resourceFilter: state.main.resourceFilter,
       selectedPath: state.main.selectedPath,
       selectedResourceId: state.main.selectedResourceId,
       isInClusterMode: Boolean(
-        state.main.previewResourceId && state.main.previewResourceId.endsWith(state.config.kubeconfigPath)
+        state.main.previewResourceId && state.main.previewResourceId.endsWith(String(kubeConfigPath))
       ),
       isPreviewLoading: state.main.previewLoader.isLoading,
       isFolderLoading: state.ui.isFolderLoading,
