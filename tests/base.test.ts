@@ -91,19 +91,7 @@ test('Validate icons', async () => {
   expect(await span.count()).toBe(1);
 });
 
-test('Validate main sections', async () => {
-  const navigator = appWindow.locator('text=Navigator');
-  let count = await navigator.count();
-  expect(count).toBe(1);
-  const fileExplorer = appWindow.locator('text="File Explorer"');
-  count = await fileExplorer.count();
-  expect(count).toBe(1);
-  const editor = appWindow.locator('text=Editor');
-  count = await editor.count();
-  expect(count).toBe(1);
-});
-
-test('Validate clustercontainer', async () => {
+test('Validate ClusterContainer', async () => {
   const div = appWindow.locator("div[id='ClusterContainer']");
   expect(await div.count()).toBe(1);
 });
@@ -144,43 +132,6 @@ test('Validate monokle popup', async () => {
   await clickOnMonokleLogo();
 
   expect(await waitForModalToHide(appWindow, 'WelcomeModal')).toBeTruthy();
-});
-
-test('Validate left section tabs', async () => {
-  let leftsection = appWindow.locator("div[id='LeftToolbar']");
-  let buttons = leftsection.locator('button');
-  expect(await buttons.count()).toBe(3);
-
-  const fileExplorer = appWindow.locator("div > div[id='FileExplorer']");
-  expect(await fileExplorer.count()).toBe(1);
-  expect(await isInvisible(fileExplorer)).toBeFalsy();
-
-  buttons.nth(1).click({noWaitAfter: true, force: true});
-  await pause(2000);
-
-  const kustomize = appWindow.locator("div > span[id='KustomizePane']");
-  expect(await kustomize.count()).toBe(1);
-  expect(await isInvisible(kustomize)).toBeFalsy();
-
-  buttons.nth(2).click({noWaitAfter: true, force: true});
-  await pause(2000);
-
-  const helm = appWindow.locator("div > span[id='HelmPane']");
-  expect(await helm.count()).toBe(1);
-  expect(await isInvisible(helm)).toBeFalsy();
-
-  buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(2000);
-
-  buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(2000);
-
-  const leftpane = appWindow.locator("div[id='LeftPane']");
-  expect(await leftpane.count()).toBe(1);
-  expect(await isInvisible(leftpane)).toBeTruthy();
-
-  buttons.nth(0).click({noWaitAfter: true, force: true});
-  await pause(2000);
 });
 
 test('Validate open folder', async () => {
