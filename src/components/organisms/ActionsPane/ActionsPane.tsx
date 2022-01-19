@@ -28,7 +28,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal, setMonacoEditor} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {
+  isInPreviewModeSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathSelector,
+  settingsSelector,
+} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
@@ -72,9 +77,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const kubeconfig = useAppSelector(state => state.config.kubeconfigPath);
-  const kubeconfigContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const kustomizeCommand = useAppSelector(state => state.config.settings.kustomizeCommand);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -83,8 +85,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
-  const kubeconfigPath = useAppSelector(state => state.config.kubeconfigPath);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const {kustomizeCommand} = useAppSelector(
+  );
 
   const navigatorHeight = useMemo(
     () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
@@ -166,17 +171,17 @@ const ActionsPane = (props: {contentHeight: string}) => {
     } else if (selectedResource) {
       setIsApplyModalVisible(true);
     } else if (selectedPath) {
-      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeconfig, kubeconfigContext || '');
+      applyFileWithConfirm(selectedPath, fileMap, dispatch, kubeConfigPath, kubeConfigContext);
     }
   }, [
     selectedResource,
     fileMap,
-    kubeconfig,
+    kubeConfigPath,
     selectedPath,
     dispatch,
     helmValuesMap,
     selectedValuesFileId,
-    kubeconfigContext,
+    kubeConfigContext,
     selectedResourceId,
   ]);
 
@@ -189,7 +194,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [monacoEditor]);
 
   const diffSelectedResource = useCallback(() => {
-    if (!kubeconfigContext || kubeconfigContext === '') {
+    if (!kubeConfigContext || kubeConfigContext === '') {
       const alert: AlertType = {
         type: AlertEnum.Error,
         title: 'Diff not available',
@@ -203,7 +208,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (selectedResourceId) {
       dispatch(openResourceDiffModal(selectedResourceId));
     }
-  }, [dispatch, selectedResourceId, kubeconfigContext]);
+  }, [dispatch, selectedResourceId, kubeConfigContext]);
 
   const onPerformResourceDiff = useCallback(
     (_: any, resourceId: string) => {
@@ -232,22 +237,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
         return;
       }
       const isClusterPreview = previewType === 'cluster';
-      applyResource(
-        selectedResource.id,
-        resourceMap,
-        fileMap,
-        dispatch,
-        kubeconfigPath,
-        kubeconfigContext || '',
-        namespace,
-        {
-          isClusterPreview,
-          kustomizeCommand,
-        }
-      );
+      applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
+        isClusterPreview,
+        kustomizeCommand,
+      });
       setIsApplyModalVisible(false);
     },
-    [dispatch, fileMap, kubeconfigContext, kubeconfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
+    [dispatch, fileMap, kubeConfigContext, kubeConfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
   );
 
   const onClickApplyHelmChart = useCallback(
@@ -263,14 +259,14 @@ const ActionsPane = (props: {contentHeight: string}) => {
         helmChartMap[helmValuesFile.helmChartId],
         fileMap,
         dispatch,
-        kubeconfig,
-        kubeconfigContext || '',
+        kubeConfigPath,
+        kubeConfigContext,
         namespace,
         shouldCreateNamespace
       );
       setIsHelmChartApplyModalVisible(false);
     },
-    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeconfig, kubeconfigContext, selectedValuesFileId]
+    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeConfigPath, kubeConfigContext, selectedValuesFileId]
   );
 
   const confirmModalTitle = useMemo(() => {
@@ -279,9 +275,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, kubeconfigContext)
-      : makeApplyResourceText(selectedResource.name, kubeconfigContext);
-  }, [selectedResource, kubeconfigContext]);
+      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext)
+      : makeApplyResourceText(selectedResource.name, kubeConfigContext);
+  }, [selectedResource, kubeConfigContext]);
 
   const helmChartConfirmModalTitle = useMemo(() => {
     if (!selectedValuesFileId) {
@@ -292,8 +288,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
     return `Install the ${helmChartMap[helmValuesFile.helmChartId].name} Chart using ${
       helmValuesFile.name
-    } in cluster [${kubeconfigContext || ''}]?`;
-  }, [helmChartMap, helmValuesMap, kubeconfigContext, selectedValuesFileId]);
+    } in cluster [${kubeConfigContext}]?`;
+  }, [helmChartMap, helmValuesMap, kubeConfigContext, selectedValuesFileId]);
 
   // called from main thread because thunks cannot be dispatched by main
   useEffect(() => {

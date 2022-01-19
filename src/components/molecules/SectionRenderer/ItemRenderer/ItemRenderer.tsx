@@ -81,6 +81,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         isLastItem={isLastItem}
         hasOnClick={Boolean(instanceHandler?.onClick)}
         $isSectionCheckable={isSectionCheckable}
+        $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
       >
         {itemInstance.isCheckable &&
           (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (

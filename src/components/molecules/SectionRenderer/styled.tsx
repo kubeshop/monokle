@@ -6,6 +6,7 @@ import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
   isHovered?: boolean;
+  $hasCustomNameDisplay: boolean;
 };
 
 type SectionContainerProps = {
@@ -28,6 +29,7 @@ export const NameContainer = styled.span<NameContainerProps>`
   width: 100%;
   padding-left: 24px;
   ${props => !props.isHovered && 'padding-right: 30px;'}
+  ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
 `;
 
 export const SectionContainer = styled.li<SectionContainerProps>`

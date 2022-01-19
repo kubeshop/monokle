@@ -72,6 +72,7 @@ const NavPane: React.FC = () => {
 
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
 
   const navigatorHeight = useMemo(
     () => windowSize.height - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
@@ -117,6 +118,8 @@ const NavPane: React.FC = () => {
           </MonoPaneTitle>
           <S.TitleBarRightButtons>
             <S.PlusButton
+              className={highlightedItems.createResource ? 'animated-highlight' : ''}
+              highlighted={highlightedItems.createResource}
               disabled={!isFolderOpen || isInClusterMode || isInPreviewMode}
               onClick={onClickNewResource}
               type="link"

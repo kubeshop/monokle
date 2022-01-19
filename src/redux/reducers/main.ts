@@ -24,7 +24,6 @@ import {
   SelectionHistoryEntry,
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {MonoklePlugin} from '@models/plugin';
 
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
@@ -644,12 +643,6 @@ export const mainSlice = createSlice({
     uncheckMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
       state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
     },
-    addPlugin: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin>) => {
-      state.plugins.push(action.payload);
-    },
-    setPlugins: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin[]>) => {
-      state.plugins = action.payload;
-    },
     openResourceDiffModal: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.resourceDiff.targetResourceId = action.payload;
     },
@@ -1099,8 +1092,6 @@ export const {
   resetResourceFilter,
   checkMultipleResourceIds,
   uncheckMultipleResourceIds,
-  addPlugin,
-  setPlugins,
   closeResourceDiffModal,
   openResourceDiffModal,
   setFiltersToBeChanged,
