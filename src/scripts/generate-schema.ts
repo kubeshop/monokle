@@ -1,6 +1,8 @@
 import fs from 'fs';
+import path from 'path';
 
-const k8Path = `${__dirname}/../../resources/schemas/k8sschemas.json`;
+const k8Path = `${__dirname}${path.sep}..${path.sep}..${path.sep}resources${path.sep}schemas${path.sep}k8sschemas.json`;
+const schemaDir = `${__dirname}${path.sep}..${path.sep}..${path.sep}resources${path.sep}form-schemas`;
 
 const rootPropertiesToIgnore = ['apiVersion', 'kind', 'metadata'];
 
@@ -28,8 +30,15 @@ export const generateSchema = (kind: string) => {
     ...propertiesUi,
   };
 
-  fs.writeFileSync('test-schema.json', JSON.stringify(schemaDefinition, null, 2));
-  fs.writeFileSync('test-schema-ui.json', JSON.stringify(schemaUIDefinition, null, 2));
+  const schemaFilename = `${kind.toLocaleLowerCase()}-schema.json`;
+  const schemaUiFilename = `${kind.toLocaleLowerCase()}-ui-schema.json`;
+
+  fs.writeFileSync(`${schemaDir}${path.sep}${schemaFilename}`,
+    JSON.stringify(schemaDefinition, null, 2));
+  fs.writeFileSync(`${schemaDir}${path.sep}${schemaUiFilename}`,
+    JSON.stringify(schemaUIDefinition, null, 2));
+
+  console.log(`Created ${schemaFilename} and ${schemaUiFilename} in schema dir`);
 };
 
 const getKeyFromRef = (keyDefinition: any) => {
@@ -118,5 +127,3 @@ const parseFields = (definition: any, firstCall = false) => {
     propertiesUi: schemaUiDefinition,
   };
 };
-
-generateSchema('NetworkPolicy');
