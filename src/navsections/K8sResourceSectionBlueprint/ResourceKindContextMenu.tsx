@@ -113,7 +113,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
 
   const menu = (
     <Menu>
-      {isInPreviewMode && (
+      {(isInPreviewMode || isUnsavedResource(resource)) && (
         <>
           <Menu.Item onClick={onClickSaveToFileFolder} key="save_to_file_folder">
             Save to file/folder
