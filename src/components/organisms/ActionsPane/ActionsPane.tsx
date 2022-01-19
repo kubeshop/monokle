@@ -88,8 +88,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const {kustomizeCommand} = useAppSelector(
-  );
+  const {kustomizeCommand} = useAppSelector(settingsSelector);
 
   const navigatorHeight = useMemo(
     () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
