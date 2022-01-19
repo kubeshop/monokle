@@ -29,6 +29,10 @@ Resource links are marked in the gutter and underlined in the Editor, with corre
 Broken links are shown with yellow triangles in the Editor as in the Navigator:
 
 ![Source Editor Broken Links](img/source-editor-broken-links.png)
+
+While hovering over a broken link in the Editor, a pop-up window will allow you to create that resource:
+
+![Source Editor Create Unsatisfied Links](img/create-resource-from-unsatisfied-link-1.5.0.png)
   
 ## Add Resource
 
