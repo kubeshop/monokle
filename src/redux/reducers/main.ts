@@ -132,57 +132,6 @@ function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: b
   state.currentSelectionHistoryIndex = undefined;
 }
 
-const updateCreateNewFileEntry = (
-  state: AppState,
-  resourcePayload: {
-    resourceId: string;
-    resourceFilePath: string;
-    resourceRange?: {start: number; length: number};
-    fileTimestamp: number | undefined;
-  }
-) => {
-  const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-  const resource = state.resourceMap[resourcePayload.resourceId];
-  const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
-  const resourceFileEntry = state.fileMap[relativeFilePath];
-
-  if (resource) {
-    resource.filePath = relativeFilePath;
-    resource.range = resourcePayload.resourceRange;
-  }
-
-  if (resourceFileEntry) {
-    resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
-  } else {
-    const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
-    newFileEntry.timestamp = resourcePayload.fileTimestamp;
-    state.fileMap[relativeFilePath] = newFileEntry;
-    const childFileName = path.basename(relativeFilePath);
-    const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
-    if (parentPath === path.sep) {
-      const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
-      if (rootFileEntry.children) {
-        rootFileEntry.children.push(childFileName);
-        rootFileEntry.children.sort();
-      } else {
-        rootFileEntry.children = [childFileName];
-      }
-    } else {
-      const parentPathFileEntry = state.fileMap[parentPath];
-      if (parentPathFileEntry) {
-        if (parentPathFileEntry.children !== undefined) {
-          parentPathFileEntry.children.push(childFileName);
-          parentPathFileEntry.children.sort();
-        } else {
-          parentPathFileEntry.children = [childFileName];
-        }
-      } else {
-        log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
-      }
-    }
-  }
-};
-
 const performResourceContentUpdate = (state: AppState, resource: K8sResource, newText: string) => {
   if (isFileResource(resource)) {
     const updatedFileText = saveResource(resource, newText, state.fileMap);
