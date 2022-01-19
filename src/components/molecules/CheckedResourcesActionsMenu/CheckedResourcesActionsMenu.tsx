@@ -90,7 +90,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
   const areOnlyUnsavedResourcesChecked = useMemo(
-    () => !checkedResourceIds.filter(resourceId => !isUnsavedResource(resourceMap[resourceId])).length,
+    () => checkedResourceIds.every(resourceId => isUnsavedResource(resourceMap[resourceId])),
     [checkedResourceIds, resourceMap]
   );
 

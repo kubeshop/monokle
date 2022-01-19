@@ -287,7 +287,12 @@ const NewResourceWizard = () => {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName);
       }
 
-      dispatch(saveUnsavedResources([{resource: newResource, absolutePath}]));
+      dispatch(
+        saveUnsavedResources({
+          resourcePayloads: [{resource: newResource, absolutePath}],
+          saveMode: savingDestination === 'saveToFolder' ? savingDestination : 'appendToFile',
+        })
+      );
     }
 
     setSavingDestination('doNotSave');

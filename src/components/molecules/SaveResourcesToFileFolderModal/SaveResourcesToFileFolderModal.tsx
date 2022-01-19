@@ -52,7 +52,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const [errorMessage, setErrorMessage] = useState('');
-  const [savingDestination, setSavingDestination] = useState<string>('saveToFolder');
+  const [savingDestination, setSavingDestination] = useState<'saveToFolder' | 'appendToFile'>('saveToFolder');
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
   const [selectedFolder, setSelectedFolder] = useState<string>();
   const [saveToFolderPaths, setSaveToFolderPaths] = useState<Record<'create' | 'replace', string[]>>({
@@ -105,7 +105,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
       return;
     }
 
-    if (savingDestination === 'saveToFile') {
+    if (savingDestination === 'appendToFile') {
       if (!selectedFile) {
         setErrorMessage('Select file');
         return;
@@ -130,7 +130,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         } else {
           absolutePath = path.join(selectedFolder, fullFileName);
         }
-      } else if (savingDestination === 'saveToFile' && selectedFile) {
+      } else if (savingDestination === 'appendToFile' && selectedFile) {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFile);
       } else {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName);
@@ -142,7 +142,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         const cleanResourceContent = removeIgnoredPathsFromResourceContent(resource.content);
         let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
 
-        if (savingDestination === 'saveToFile') {
+        if (savingDestination === 'appendToFile') {
           if (resourceText.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
             resourceText = `\n${resourceText}`;
           } else {
@@ -168,7 +168,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
     }
 
     if (unsavedResources.length) {
-      dispatch(saveUnsavedResources(unsavedResources));
+      dispatch(saveUnsavedResources({resourcePayloads: unsavedResources, saveMode: savingDestination}));
     }
 
     dispatch(closeSaveResourcesToFileFolderModal());
@@ -185,7 +185,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!resourcesIds || !resourcesIds.length || !selectedFolder || savingDestination === 'saveToFile') {
+    if (!resourcesIds || !resourcesIds.length || !selectedFolder || savingDestination === 'appendToFile') {
       return;
     }
 
@@ -255,7 +255,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         <S.Select
           value={savingDestination}
           onChange={value => {
-            setSavingDestination(value as string);
+            setSavingDestination(value as 'saveToFolder' | 'appendToFile');
 
             if (errorMessage) {
               setErrorMessage('');
@@ -263,7 +263,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
           }}
         >
           <Option value="saveToFolder">Save to folder</Option>
-          <Option value="saveToFile">Append to file</Option>
+          <Option value="appendToFile">Append to file</Option>
         </S.Select>
 
         {savingDestination === 'saveToFolder' && (
@@ -288,7 +288,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
           </S.Select>
         )}
 
-        {savingDestination === 'saveToFile' && (
+        {savingDestination === 'appendToFile' && (
           <S.Select
             showSearch
             onChange={(value: any) => {

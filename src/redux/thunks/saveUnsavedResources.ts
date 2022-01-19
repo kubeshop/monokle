@@ -2,7 +2,6 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import fs from 'fs';
 import micromatch from 'micromatch';
-import path from 'path';
 import util from 'util';
 
 import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
@@ -12,7 +11,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {AppDispatch, RootState} from '@redux/store';
 
-import {getFileStats, getFileTimestamp} from '@utils/files';
+import {getFileTimestamp} from '@utils/files';
 
 import {createRejectionWithAlert} from './utils';
 
@@ -26,7 +25,10 @@ type ResourcePayload = {
 };
 
 type SaveMultipleUnsavedResourcesPayload = {resourcePayloads: ResourcePayload[]};
-type SaveMultipleUnsavedResourcesArgs = {resource: K8sResource; absolutePath: string}[];
+type SaveMultipleUnsavedResourcesArgs = {
+  resourcePayloads: {resource: K8sResource; absolutePath: string}[];
+  saveMode: 'saveToFolder' | 'appendToFile';
+};
 
 const readFilePromise = util.promisify(fs.readFile);
 const appendFilePromise = util.promisify(fs.appendFile);
@@ -36,49 +38,39 @@ const performSaveUnsavedResource = async (
   resource: K8sResource,
   rootFolder: FileEntry | undefined,
   absolutePath: string,
-  fileIncludes: string[]
+  fileIncludes: string[],
+  saveMode: 'saveToFolder' | 'appendToFile'
 ) => {
   let resourceRange: {start: number; length: number} | undefined;
   if (!rootFolder) {
     throw new Error('Could not find the root folder.');
   }
 
-  const pathStats = getFileStats(absolutePath);
-
-  // new file?
-  if (pathStats === undefined) {
+  if (saveMode === 'saveToFolder') {
     await writeFilePromise(absolutePath, resource.text);
   } else {
-    const isDirectory = pathStats.isDirectory();
+    const fileName = absolutePath.split('\\').pop();
 
-    /** if the absolute path is a directory, we will use the resource.name to create a new fileName */
-    if (isDirectory) {
-      const fileName = `${resource.name}-${resource.kind.toLowerCase()}.yaml`;
-      absolutePath = path.join(absolutePath, fileName);
-    }
-
-    if (!fileIncludes.some(fileInclude => micromatch.isMatch(absolutePath, fileInclude))) {
+    if (fileName && !micromatch.isMatch(fileName, fileIncludes)) {
       throw new Error('The selected file does not have .yaml extension.');
     }
 
-    if (fs.existsSync(absolutePath)) {
-      const fileContent = await readFilePromise(absolutePath, 'utf-8');
-      let contentToAppend = resource.text;
-      if (fileContent.trim().length > 0) {
-        if (fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
-          contentToAppend = `\n${resource.text}`;
-        } else {
-          contentToAppend = `\n${YAML_DOCUMENT_DELIMITER}\n${resource.text}`;
-        }
+    const fileContent = await readFilePromise(absolutePath, 'utf-8');
+    let contentToAppend = resource.text;
+    if (fileContent.trim().length > 0) {
+      if (fileContent.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {
+        contentToAppend = `\n${resource.text}`;
+      } else {
+        contentToAppend = `\n${YAML_DOCUMENT_DELIMITER}\n${resource.text}`;
       }
-
-      resourceRange = {
-        start: fileContent.length,
-        length: contentToAppend.length,
-      };
-
-      await appendFilePromise(absolutePath, contentToAppend);
     }
+
+    resourceRange = {
+      start: fileContent.length,
+      length: contentToAppend.length,
+    };
+
+    await appendFilePromise(absolutePath, contentToAppend);
   }
   const fileTimestamp = getFileTimestamp(absolutePath);
 
@@ -99,8 +91,8 @@ export const saveUnsavedResources = createAsyncThunk<
 
   let resourcePayloads: ResourcePayload[] = [];
 
-  for (let i = 0; i < args.length; i += 1) {
-    const {resource, absolutePath} = args[i];
+  for (let i = 0; i < args.resourcePayloads.length; i += 1) {
+    const {resource, absolutePath} = args.resourcePayloads[i];
 
     try {
       // eslint-disable-next-line no-await-in-loop
@@ -108,7 +100,8 @@ export const saveUnsavedResources = createAsyncThunk<
         resource,
         rootFolder,
         absolutePath,
-        configState.fileIncludes
+        configState.fileIncludes,
+        args.saveMode
       );
 
       resourcePayloads.push({
