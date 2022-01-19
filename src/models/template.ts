@@ -9,7 +9,6 @@ const TemplateFormRuntype = Rt.Record({
 
 const TemplateManifestRuntype = Rt.Record({
   filePath: Rt.String,
-  fileRenameRule: Rt.String,
 });
 
 const TemplateBaseRuntype = Rt.Record({
@@ -28,6 +27,7 @@ const VanillaTemplateRuntype = TemplateBaseRuntype.extend({
   type: Rt.Literal('vanilla'),
   forms: Rt.Array(TemplateFormRuntype),
   manifests: Rt.Array(TemplateManifestRuntype),
+  resultMessage: Rt.Optional(Rt.String),
 });
 
 const BundledHelmChartTemplateRuntype = TemplateBaseRuntype.extend({
