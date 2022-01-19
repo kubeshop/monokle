@@ -100,6 +100,10 @@ Click on the filter button on the top of the navigator to launch the dialog for 
 
 ![Resource Filtering](img/resource-filtering-1.4.0.png)
 
+Users can also add or remove filters by highlighting and hovering over labels, annotations or other metadata properties in the code editor:
+
+![Filter from Editor](img/filter-from-editor-1.5.0.png)
+
 ## Reload Folder On Startup
 
 You can choose to reload the last reviewed folder while launching Monokle. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
