@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Table, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
 import {DownOutlined} from '@ant-design/icons';
@@ -120,9 +120,8 @@ const ProjectSelection = () => {
             </Tooltip>
           </S.ProjectsMenuActionsContainer>
         </S.ProjectsMenuContainer>
-        <Table
+        <S.ProjectsTable
           size="small"
-          style={{width: '800px', borderTop: '1px solid #262626', paddingTop: '18px'}}
           showSorterTooltip={false}
           dataSource={searchText ? filteredProjects : projects}
           pagination={false}
@@ -205,7 +204,7 @@ const ProjectSelection = () => {
               </S.ProjectTableActions>
             )}
           />
-        </Table>
+        </S.ProjectsTable>
       </S.ProjectMenu>
     );
   };

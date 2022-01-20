@@ -1,6 +1,14 @@
 import {ReactElement} from 'react';
 
-import {DropDownProps, Menu, Button as RawButton, Dropdown as RawDropdown, Input as RawInput} from 'antd';
+import {
+  DropDownProps,
+  Menu,
+  Button as RawButton,
+  Dropdown as RawDropdown,
+  Input as RawInput,
+  Table,
+  TableProps,
+} from 'antd';
 
 import {
   BellOutlined as RawBellOutlined,
@@ -20,6 +28,8 @@ import styled from 'styled-components';
 import Col from '@components/atoms/Col';
 import * as RawHeader from '@components/atoms/Header';
 import * as RawRow from '@components/atoms/Row';
+
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
@@ -275,6 +285,17 @@ export const ProjectsMenuContainer = styled.div`
 
 export const Search = styled(RawSearch)`
   width: 280px;
+`;
+
+interface ProjectsTableProps extends TableProps<any> {
+  children: ReactElement[];
+}
+
+export const ProjectsTable = styled(({children, ...rest}: ProjectsTableProps) => <Table {...rest}> {children}</Table>)`
+  width: 800px;
+  border-top: 1px solid ${Colors.grey3};
+  padding-top: 18px;
+  ${GlobalScrollbarStyle}
 `;
 
 interface ProjectsDropdownProps extends DropDownProps {
