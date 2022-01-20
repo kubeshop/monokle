@@ -65,7 +65,6 @@ const initialAppConfigState: AppConfig = {
   isScanExcludesUpdated: 'outdated',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
-  recentFolders: electronStore.get('appConfig.recentFolders') || [],
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
     data: {
