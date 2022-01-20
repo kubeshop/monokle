@@ -113,9 +113,9 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       objects.forEach(obj => {
         createUnsavedResource(
           {
-            name: obj.metadata.name,
-            kind: obj.kind,
-            apiVersion: obj.apiVersion,
+            name: obj.metadata?.name ? obj.metadata.name : 'missing-name',
+            kind: obj.kind || 'UnknownKind',
+            apiVersion: obj.apiVersion || 'v1',
           },
           dispatch,
           obj
