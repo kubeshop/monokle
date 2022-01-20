@@ -119,6 +119,9 @@ const parseFields = (definition: any, firstCall = false) => {
       schemaUiDefinition[key] = {
         'ui:title': prettyUiTitle(key),
       };
+      if (key === 'namespace') {
+        schemaUiDefinition[key]['ui:widget'] = 'namespaceSelection';
+      }
     }
   });
 
