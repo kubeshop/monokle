@@ -141,6 +141,75 @@ const PaneManager = () => {
     }
   };
 
+  let content;
+  if (isProjectLoading) {
+    content = <Skeleton />
+  } else if (activeProject) {
+    content = (
+      <StyledColumnPanes style={{width: contentWidth}}>
+        <SplitView
+          contentWidth={contentWidth}
+          left={
+            <>
+              <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
+                <FileTreePane />
+              </div>
+              <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
+                <KustomizePane />
+              </div>
+              <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
+                <HelmPane />
+              </div>
+              <div
+                style={{
+                  display: leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
+                }}
+              >
+                <TemplateManagerPane />
+              </div>
+              <div
+                style={{
+                  display: leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                }}
+              >
+                <PluginManagerPane />
+              </div>
+            </>
+          }
+          hideLeft={!leftActive}
+          nav={<NavigatorPane />}
+          editor={<ActionsPane contentHeight={contentHeight} />}
+          right={
+            <>
+              {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
+                <GraphView editorHeight={contentHeight} />
+              ) : undefined}
+            </>
+          }
+          hideRight={!rightActive}
+        />
+      </StyledColumnPanes>
+    );
+  } else {
+    content = (
+      <StyledColumnPanes style={{width: contentWidth}}>
+        <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
+          {leftMenuSelection === 'plugin-manager' && leftActive && (
+            <div style={{borderRight: `1px solid ${Colors.grey3}`}}>
+              <PluginManagerPane />
+            </div>
+          )}
+          <div style={{flex: 3}}>
+            <StartProjectPane />
+          </div>
+          <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
+            <RecentProjectsPane />
+          </div>
+        </div>
+      </StyledColumnPanes>
+    );
+  }
+
   return (
     <StyledRow style={{height: contentHeight}}>
       <StyledColumnLeftMenu>
@@ -223,70 +292,7 @@ const PaneManager = () => {
         </Space>
       </StyledColumnLeftMenu>
 
-      {
-        isProjectLoading ? (<Skeleton />) :
-          activeProject ? (
-            <StyledColumnPanes style={{width: contentWidth}}>
-              <SplitView
-                contentWidth={contentWidth}
-                left={
-                  <>
-                    <div style={{display: leftMenuSelection === 'file-explorer' ? 'inline' : 'none'}}>
-                      <FileTreePane />
-                    </div>
-                    <div style={{display: leftMenuSelection === 'kustomize-pane' ? 'inline' : 'none'}}>
-                      <KustomizePane />
-                    </div>
-                    <div style={{display: leftMenuSelection === 'helm-pane' ? 'inline' : 'none'}}>
-                      <HelmPane />
-                    </div>
-                    <div
-                      style={{
-                        display: leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
-                      }}
-                    >
-                      <TemplateManagerPane />
-                    </div>
-                    <div
-                      style={{
-                        display: leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
-                      }}
-                    >
-                      <PluginManagerPane />
-                    </div>
-                  </>
-                }
-                hideLeft={!leftActive}
-                nav={<NavigatorPane />}
-                editor={<ActionsPane contentHeight={contentHeight} />}
-                right={
-                  <>
-                    {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                      <GraphView editorHeight={contentHeight} />
-                    ) : undefined}
-                  </>
-                }
-                hideRight={!rightActive}
-              />
-            </StyledColumnPanes>
-          ) : (
-            <StyledColumnPanes style={{width: contentWidth}}>
-              <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
-            {leftMenuSelection === 'plugin-manager' && leftActive && (
-              <div style={{borderRight: `1px solid ${Colors.grey3}`}}>
-                <PluginManagerPane />
-              </div>
-            )}
-                <div style={{flex: 3}}>
-                  <StartProjectPane />
-                </div>
-                <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
-                  <RecentProjectsPane />
-                </div>
-              </div>
-            </StyledColumnPanes>
-          )
-      }
+      {content}
 
       <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
         <Space direction="vertical" style={{width: 43}}>
