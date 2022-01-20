@@ -159,7 +159,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         )}
       >
         <S.Container ref={containerRef}>
-          <div>
+          <S.StepsContainer>
             <Steps direction="vertical" current={activeFormIndex}>
               <S.Step title="Information" />
               {template.forms.map(form => {
@@ -167,9 +167,9 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
               })}
               <S.Step title="Result" />
             </Steps>
-          </div>
+          </S.StepsContainer>
 
-          <div style={{paddingRight: '10px'}}>
+          <S.FormContainer>
             {isLoading ? (
               <Skeleton />
             ) : activeFormIndex === 0 ? (
@@ -202,6 +202,10 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
                         </S.TableData>
                       </tr>
                     )}
+                    <tr>
+                      <S.TableHead>Description</S.TableHead>
+                      <S.TableData>{template.description}</S.TableData>
+                    </tr>
                     <tr>
                       <S.TableHead>Description</S.TableHead>
                       <S.TableData>{template.description}</S.TableData>
@@ -241,7 +245,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
                 templateForm={activeForm}
               />
             ) : null}
-          </div>
+          </S.FormContainer>
         </S.Container>
       </ResizableBox>
     </S.Modal>
