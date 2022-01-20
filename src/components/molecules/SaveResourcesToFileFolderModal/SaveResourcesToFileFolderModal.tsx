@@ -219,8 +219,8 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         if (
           (subfolders.length && subfolders.find(dirent => dirent.name === fullFileName)) ||
           (selectedFolder === ROOT_FILE_ENTRY
-            ? fileMap[`\\${fullFileName}`]
-            : fileMap[`\\${path.join(selectedFolder, fullFileName)}`])
+            ? fileMap[`${path.sep}${fullFileName}`]
+            : fileMap[`${path.sep}${path.join(selectedFolder, fullFileName)}`])
         ) {
           filesToBeReplaced.push(fullFileName);
         } else {
