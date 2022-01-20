@@ -21,11 +21,13 @@ const readTemplateFormSchemas = (templateForm: TemplateForm) => {
   return {schema, uiSchema};
 };
 
-const TemplateFormRenderer: React.FC<{
-  templateForm: TemplateForm;
+interface IProps {
   isLastForm: boolean;
+  templateForm: TemplateForm;
   onSubmit: (formData: any) => void;
-}> = props => {
+}
+
+const TemplateFormRenderer: React.FC<IProps> = props => {
   const {templateForm, isLastForm, onSubmit} = props;
 
   const [formData, setFormData] = useState<Record<string, Primitive>>({});
