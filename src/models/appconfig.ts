@@ -58,6 +58,7 @@ export type Project = {
   name?: string;
   rootFolder: string;
   k8sVersion?: string;
+  created?: string;
   lastOpened?: string;
 };
 
@@ -83,7 +84,6 @@ interface AppConfig {
   /** if the startup modal is visible */
   isStartupModalVisible: boolean;
   settings: Settings;
-  recentFolders: string[];
   newVersion: {
     code: NewVersionCode;
     data: any;

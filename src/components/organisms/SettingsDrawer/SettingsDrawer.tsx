@@ -23,7 +23,7 @@ import {
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
 import {toggleSettings} from '@redux/reducers/ui';
-import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
+import {activeProjectSelector} from '@redux/selectors';
 
 import Drawer from '@components/atoms/Drawer';
 
@@ -38,7 +38,7 @@ const SettingsDrawer = () => {
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const [activePanels, setActivePanels] = useState<number[]>([2]);
   const appConfig = useAppSelector(state => state.config);
-  const currentConfig = useAppSelector(currentConfigSelector);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
 
   const activeProject: Project | undefined = useSelector(activeProjectSelector);
 
@@ -120,7 +120,7 @@ const SettingsDrawer = () => {
         {activeProject && (
           <Panel header="Project Settings" key="2">
             <Settings
-              config={currentConfig}
+              config={projectConfig}
               onConfigChange={changeProjectConfig}
               isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
             />

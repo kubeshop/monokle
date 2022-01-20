@@ -56,8 +56,8 @@ const initialAppConfigState: AppConfig = {
     theme: electronStore.get('appConfig.settings.theme'),
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
-    loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
-    isClusterSelectorVisible: electronStore.get('ui.clusterStatusHidden'),
+    loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastProjectOnStartup'),
+    isClusterSelectorVisible: electronStore.get('appConfig.settings.isClusterSelectorVisible'),
     hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
   },
@@ -65,7 +65,6 @@ const initialAppConfigState: AppConfig = {
   isScanExcludesUpdated: 'outdated',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
-  recentFolders: electronStore.get('appConfig.recentFolders') || [],
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
     data: {

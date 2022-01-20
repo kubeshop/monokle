@@ -4,6 +4,7 @@ import _ from 'lodash';
 import log from 'loglevel';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {K8sResource} from '@models/k8sresource';
 import {AnyPlugin} from '@models/plugin';
 import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
 
@@ -105,12 +106,13 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       }
     }
   );
+  const createdResources: K8sResource[] = [];
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
     .forEach(resourceText => {
       const objects = extractObjectsFromYaml(resourceText);
       objects.forEach(obj => {
-        createUnsavedResource(
+        const resource = createUnsavedResource(
           {
             name: obj.metadata.name,
             kind: obj.kind,
@@ -119,7 +121,8 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
           dispatch,
           obj
         );
+        createdResources.push(resource);
       });
     });
-  return template.resultMessage || 'Done.';
+  return {message: template.resultMessage || 'Done.', resources: createdResources};
 };
