@@ -85,6 +85,21 @@ const App = () => {
     };
   }, [onExecutedFrom]);
 
+  // called from main thread because thunks cannot be dispatched by main
+  const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
+    if (project) {
+      dispatch(setOpenProject(project.rootFolder));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('open-project', onOpenProjectFolderFromMainThread);
+    return () => {
+      ipcRenderer.removeListener('open-project', onOpenProjectFolderFromMainThread);
+    };
+  }, [onOpenProjectFolderFromMainThread]);
+
   useDebounce(
     () => {
       loadContexts(kubeConfigPath, dispatch, kubeConfigContext);

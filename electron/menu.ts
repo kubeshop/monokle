@@ -4,7 +4,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
 import {ReloadFolderTooltip} from '@constants/tooltips';
 
-import {NewVersionCode} from '@models/appconfig';
+import {NewVersionCode, Project} from '@models/appconfig';
 
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
@@ -79,6 +79,14 @@ function setRootFolderInRendererThread(folder: string) {
   }
 }
 
+// need this because we cannot dispatch thunks from main
+function openProjectInRendererThread(project: Project) {
+  const window = BrowserWindow.getFocusedWindow();
+  if (window) {
+    window.webContents.send('open-project', project);
+  }
+}
+
 const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: 'File',
@@ -129,6 +137,16 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         click: async () => {
           dispatch(openNewResourceWizard());
         },
+      },
+      {type: 'separator'},
+      {
+        label: 'Recent Projects',
+        submenu: state.config.projects.map((project: Project) => ({
+          label: `${project.name} - ${project.rootFolder}`,
+          click: () => {
+            openProjectInRendererThread(project);
+          },
+        })),
       },
       {type: 'separator'},
       {
