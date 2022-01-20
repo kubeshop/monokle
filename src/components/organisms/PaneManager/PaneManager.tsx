@@ -143,7 +143,7 @@ const PaneManager = () => {
 
   let content;
   if (isProjectLoading) {
-    content = <Skeleton />
+    content = <Skeleton />;
   } else if (activeProject) {
     content = (
       <StyledColumnPanes style={{width: contentWidth}}>
