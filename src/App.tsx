@@ -14,7 +14,8 @@ import {Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
 import {useAppSelector} from '@redux/hooks';
-import {setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setOpenProject} from '@redux/reducers/appConfig';
+import {closeFolderExplorer} from '@redux/reducers/ui';
 import {kubeConfigContextSelector, kubeConfigPathSelector, settingsSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
@@ -38,9 +39,12 @@ import {
   UpdateModal,
 } from '@organisms';
 
+import FileExplorer from '@components/atoms/FileExplorer';
 import ChangeFiltersConfirmModal from '@components/molecules/ChangeFiltersConfirmModal/ChangeFiltersConfirmModal';
 import SaveResourceToFileFolderModal from '@components/molecules/SaveResourcesToFileFolderModal';
 import {CreateProjectModal} from '@components/organisms/CreateProjectModal';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
@@ -85,6 +89,21 @@ const App = () => {
     };
   }, [onExecutedFrom]);
 
+  // called from main thread because thunks cannot be dispatched by main
+  const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
+    if (project) {
+      dispatch(setOpenProject(project.rootFolder));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('open-project', onOpenProjectFolderFromMainThread);
+    return () => {
+      ipcRenderer.removeListener('open-project', onOpenProjectFolderFromMainThread);
+    };
+  }, [onOpenProjectFolderFromMainThread]);
+
   useDebounce(
     () => {
       loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
@@ -92,6 +111,25 @@ const App = () => {
     DEFAULT_KUBECONFIG_DEBOUNCE,
     [kubeConfigPath, dispatch, kubeConfigContext, rootFile, isClusterSelectorVisible]
   );
+
+  const isFolderExplorerOpen = useAppSelector(state => state.ui.folderExplorer.isOpen);
+
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({folderPath}) => {
+      if (folderPath) {
+        dispatch(setCreateProject({rootFolder: folderPath}));
+      }
+    },
+    {isDirectoryExplorer: true}
+  );
+
+  useEffect(() => {
+    if (isFolderExplorerOpen) {
+      openFileExplorer();
+      dispatch(closeFolderExplorer());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFolderExplorerOpen]);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
@@ -104,6 +142,7 @@ const App = () => {
           <PaneManager />
           <PageFooter />
         </MainContainer>
+        <FileExplorer {...fileExplorerProps} />
         <LocalResourceDiffModal />
         <ClusterResourceDiffModal />
         <StartupModal />

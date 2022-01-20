@@ -63,9 +63,6 @@ export const configSlice = createSlice({
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
-    setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
-      state.recentFolders = action.payload;
-    },
     updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       if (!action.payload) {
         electronStore.set('appConfig.startupModalVisible', false);
@@ -149,8 +146,8 @@ export const configSlice = createSlice({
       }
 
       project.created = new Date().toISOString();
-      state.projects = [project, ...state.projects];
-      state.selectedProjectRootFolder = project.rootFolder;
+      state.projects = _.sortBy([project, ...state.projects], (p: Project) => p.lastOpened).reverse();
+      electronStore.set('appConfig.projects', state.projects);
     },
     deleteProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       state.projects = _.remove(state.projects, (p: Project) => p.rootFolder !== action.payload.rootFolder);
@@ -257,5 +254,6 @@ export const {
   updateProjectKubeConfig,
   toggleClusterStatus,
   setUserDirs,
+  createProject,
 } = configSlice.actions;
 export default configSlice.reducer;

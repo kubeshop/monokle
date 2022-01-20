@@ -51,6 +51,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
+import { convertRecentFilesToRecentProjects } from './utils';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -69,6 +70,7 @@ const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
 });
+
 
 ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   try {
@@ -348,6 +350,9 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setTemplatePackMap(templatePackMap));
     const templateMap = await loadTemplateMap(templatesDir, {plugins: Object.values(pluginMap), templatePacks: Object.values(templatePackMap)});
     dispatch(setTemplateMap(templateMap));
+
+    convertRecentFilesToRecentProjects(dispatch);
+
   });
 
   return win;
