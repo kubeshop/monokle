@@ -51,6 +51,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
           })
           .catch((err: Error) => {
             setResultMessage(err.message);
+            setIsLoading(false);
           });
         return;
       }
@@ -76,6 +77,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         })
         .catch((err: Error) => {
           setResultMessage(err.message);
+          setIsLoading(false);
         });
     },
     [template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch]
