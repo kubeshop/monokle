@@ -1,6 +1,12 @@
+import {AnyAction} from '@reduxjs/toolkit';
+
 import path from 'path';
 
 import {AnyExtension} from '@models/extension';
+
+import {createProject} from '@redux/reducers/appConfig';
+
+import electronStore from '@utils/electronStore';
 
 const GITHUB_URL = 'https://github.com';
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
@@ -45,3 +51,14 @@ export function convertExtensionsToRecord<ExtensionType>(
     return acc;
   }, {});
 }
+
+export const convertRecentFilesToRecentProjects = (dispatch: (action: AnyAction) => void) => {
+  const recentFolders: string[] = electronStore.get('appConfig.recentFolders');
+
+  if (recentFolders && recentFolders.length > 0) {
+    recentFolders.forEach((folder: string) => {
+      dispatch(createProject({rootFolder: folder}));
+    });
+    electronStore.delete('appConfig.recentFolders');
+  }
+};

@@ -134,8 +134,8 @@ export const configSlice = createSlice({
         project.name = folderNames[folderNames.length - 1];
       }
 
-      state.projects = [project, ...state.projects];
-      state.selectedProjectRootFolder = project.rootFolder;
+      state.projects = _.sortBy([project, ...state.projects], (p: Project) => p.lastOpened).reverse();
+      electronStore.set('appConfig.projects', state.projects);
     },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
       const projectRootPath: string | null = action.payload;
@@ -233,5 +233,6 @@ export const {
   updateProjectKubeConfig,
   toggleClusterStatus,
   setUserDirs,
+  createProject,
 } = configSlice.actions;
 export default configSlice.reducer;

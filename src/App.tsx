@@ -85,6 +85,19 @@ const App = () => {
     };
   }, [onExecutedFrom]);
 
+  const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
+    if (project) {
+      dispatch(setOpenProject(project.rootFolder));
+    }
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('open-project', onOpenProjectFolderFromMainThread);
+    return () => {
+      ipcRenderer.removeListener('open-project', onOpenProjectFolderFromMainThread);
+    };
+  }, [onOpenProjectFolderFromMainThread]);
+
   useDebounce(
     () => {
       loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
