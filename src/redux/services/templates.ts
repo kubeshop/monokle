@@ -4,6 +4,7 @@ import _ from 'lodash';
 import log from 'loglevel';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {K8sResource} from '@models/k8sresource';
 import {AnyPlugin} from '@models/plugin';
 import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
 
@@ -105,13 +106,13 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       }
     }
   );
-  let nrOfCreatedResources = 0;
+  const createdResources: K8sResource[] = [];
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
     .forEach(resourceText => {
       const objects = extractObjectsFromYaml(resourceText);
       objects.forEach(obj => {
-        createUnsavedResource(
+        const resource = createUnsavedResource(
           {
             name: obj.metadata.name,
             kind: obj.kind,
@@ -120,11 +121,8 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
           dispatch,
           obj
         );
-        nrOfCreatedResources += 1;
+        createdResources.push(resource);
       });
     });
-  let resultMessage = template.resultMessage || 'Done.';
-  return nrOfCreatedResources === 0
-    ? `${resultMessage}\nNOTE: Processed the template successfully but the output did not create any valid resources.`
-    : resultMessage;
+  return {message: template.resultMessage || 'Done.', resources: createdResources};
 };
