@@ -1,7 +1,7 @@
 import React, {useContext, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Space, Tooltip} from 'antd';
+import {Badge, Button, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
 
 import {
@@ -22,7 +22,12 @@ import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {
+  activeProjectSelector,
+  helmChartsSelector,
+  isInPreviewModeSelector,
+  kustomizationsSelector,
+} from '@redux/selectors';
 
 import {
   ActionsPane,
@@ -99,6 +104,8 @@ const PaneManager = () => {
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const activeProject = useSelector(activeProjectSelector);
+  const kustomizeResources = useAppSelector(kustomizationsSelector);
+  const helmChartResources = useAppSelector(helmChartsSelector);
 
   // TODO: refactor this to get the size of the page header dinamically
   const contentHeight = useMemo(() => {
@@ -159,7 +166,13 @@ const PaneManager = () => {
               onClick={() => setLeftActiveMenu('kustomize-pane')}
               sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
             >
-              <MenuIcon iconName="kustomize" active={leftActive} isSelected={leftMenuSelection === 'kustomize-pane'} />
+              <Badge count={kustomizeResources.length || 0} color={Colors.blue6} size="default" dot>
+                <MenuIcon
+                  iconName="kustomize"
+                  active={leftActive}
+                  isSelected={leftMenuSelection === 'kustomize-pane'}
+                />
+              </Badge>
             </MenuButton>
           </Tooltip>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
@@ -169,7 +182,9 @@ const PaneManager = () => {
               onClick={() => setLeftActiveMenu('helm-pane')}
               sectionNames={[HELM_CHART_SECTION_NAME]}
             >
-              <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
+              <Badge count={helmChartResources.length || 0} color={Colors.blue6} size="default" dot>
+                <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
+              </Badge>
             </MenuButton>
           </Tooltip>
 
