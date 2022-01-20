@@ -154,6 +154,18 @@ code {
   background-color: transparent !important;
 }
 
+.ant-table-body::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.ant-table-body::-webkit-scrollbar-track {
+  background: #141414 !important;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb {
+  background: #303030 !important;
+}
+
 .ant-table-body .ant-table-row .ant-table-cell {
   background-color: transparent !important;
   border-bottom: none !important;
