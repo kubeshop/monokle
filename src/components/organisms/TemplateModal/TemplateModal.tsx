@@ -2,10 +2,11 @@ import React, {LegacyRef, useCallback, useMemo, useState} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
-import {Button, Skeleton, Steps} from 'antd';
+import {Button, Skeleton, Steps, Tag} from 'antd';
 
 import {Primitive} from 'type-fest';
 
+import {K8sResource} from '@models/k8sresource';
 import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -33,6 +34,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   const [currentFormDataList, setCurrentFormDataList] = useState<FormDataList>(template.forms.map(() => ({})));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [resultMessage, setResultMessage] = useState<string>();
+  const [createdResources, setCreatedResources] = useState<K8sResource[]>([]);
 
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -45,12 +47,14 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
       if (isVanillaTemplate(template)) {
         setIsLoading(true);
         createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
-          .then((msg: string) => {
-            setResultMessage(msg);
+          .then(({message, resources}) => {
+            setResultMessage(message);
+            setCreatedResources(resources);
             setIsLoading(false);
           })
           .catch((err: Error) => {
             setResultMessage(err.message);
+            setIsLoading(false);
           });
         return;
       }
@@ -70,12 +74,14 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         userTempDir,
         dispatch
       )
-        .then((notes: string) => {
-          setResultMessage(notes);
+        .then(({message, resources}) => {
+          setResultMessage(message);
+          setCreatedResources(resources);
           setIsLoading(false);
         })
         .catch((err: Error) => {
           setResultMessage(err.message);
+          setIsLoading(false);
         });
     },
     [template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch]
@@ -101,6 +107,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   const close = () => {
     setIsLoading(false);
     setResultMessage(undefined);
+    setCreatedResources([]);
     setCurrentFormDataList([]);
     onClose();
   };
@@ -147,7 +154,29 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
             {isLoading ? (
               <Skeleton />
             ) : resultMessage ? (
-              <S.StyledTextArea rows={16} value={resultMessage} readOnly />
+              <>
+                {createdResources.length === 0 ? (
+                  <S.CreatedResourceLabel>
+                    Processed the template successfully but the output did not create any valid resources.
+                  </S.CreatedResourceLabel>
+                ) : (
+                  <>
+                    <S.CreatedResourceLabel>Created the following resources:</S.CreatedResourceLabel>
+                    <ul>
+                      {createdResources.map(resource => {
+                        return (
+                          <li key={resource.id}>
+                            {resource.namespace && <Tag title={resource.namespace} />}
+                            <S.CreatedResourceName>{resource.name}*</S.CreatedResourceName>
+                            <S.CreatedResourceKind>{resource.kind}</S.CreatedResourceKind>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
+                <S.StyledTextArea rows={10} value={resultMessage} readOnly />
+              </>
             ) : activeForm ? (
               <TemplateFormRenderer
                 key={activeFormIndex}

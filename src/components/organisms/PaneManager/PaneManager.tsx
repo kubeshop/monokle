@@ -147,57 +147,65 @@ const PaneManager = () => {
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
             <MenuButton
               isSelected={leftMenuSelection === 'file-explorer'}
-              isActive={leftActive}
+              isActive={Boolean(activeProject) && leftActive}
               shouldWatchSelectedPath
               onClick={() => setLeftActiveMenu('file-explorer')}
+              disabled={!activeProject}
             >
               <MenuIcon
                 style={{marginLeft: 4}}
                 icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
-                active={leftActive}
-                isSelected={leftMenuSelection === 'file-explorer'}
+                active={Boolean(activeProject) && leftActive}
+                isSelected={Boolean(activeProject) && leftMenuSelection === 'file-explorer'}
               />
             </MenuButton>
           </Tooltip>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'kustomize-pane'}
-              isActive={leftActive}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
+              isActive={Boolean(activeProject) && leftActive}
               onClick={() => setLeftActiveMenu('kustomize-pane')}
               sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
+              disabled={!activeProject}
             >
               <Badge count={kustomizeResources.length || 0} color={Colors.blue6} size="default" dot>
                 <MenuIcon
                   iconName="kustomize"
-                  active={leftActive}
-                  isSelected={leftMenuSelection === 'kustomize-pane'}
+                  active={Boolean(activeProject) && leftActive}
+                  isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
                 />
               </Badge>
             </MenuButton>
           </Tooltip>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'helm-pane'}
-              isActive={leftActive}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
+              isActive={Boolean(activeProject) && leftActive}
               onClick={() => setLeftActiveMenu('helm-pane')}
               sectionNames={[HELM_CHART_SECTION_NAME]}
+              disabled={!activeProject}
             >
               <Badge count={helmChartResources.length || 0} color={Colors.blue6} size="default" dot>
-                <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
+                <MenuIcon
+                  iconName="helm"
+                  active={Boolean(activeProject) && leftActive}
+                  isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
+                />
               </Badge>
             </MenuButton>
           </Tooltip>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'templates-pane'}
-              isActive={leftActive}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
+              isActive={Boolean(activeProject) && leftActive}
               onClick={() => setLeftActiveMenu('templates-pane')}
+              disabled={!activeProject}
             >
               <MenuIcon
                 icon={FormatPainterOutlined}
-                active={leftActive}
-                isSelected={leftMenuSelection === 'templates-pane'}
+                active={Boolean(activeProject) && leftActive}
+                isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
               />
             </MenuButton>
           </Tooltip>
@@ -260,11 +268,16 @@ const PaneManager = () => {
         </StyledColumnPanes>
       ) : (
         <StyledColumnPanes style={{width: contentWidth}}>
-          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', height: '100%'}}>
-            <div style={{flex: 3, height: '100%'}}>
+          <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
+            {leftMenuSelection === 'plugin-manager' && leftActive && (
+              <div style={{borderRight: `1px solid ${Colors.grey3}`}}>
+                <PluginManagerPane />
+              </div>
+            )}
+            <div style={{flex: 3}}>
               <StartProjectPane />
             </div>
-            <div style={{flex: 1, height: '100%', borderLeft: `1px solid ${Colors.grey3}`}}>
+            <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
               <RecentProjectsPane />
             </div>
           </div>
