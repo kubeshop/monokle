@@ -49,9 +49,6 @@ export const configSlice = createSlice({
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
-    setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
-      state.recentFolders = action.payload;
-    },
     updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       if (!action.payload) {
         electronStore.set('appConfig.startupModalVisible', false);

@@ -83,7 +83,6 @@ interface AppConfig {
   /** if the startup modal is visible */
   isStartupModalVisible: boolean;
   settings: Settings;
-  recentFolders: string[];
   newVersion: {
     code: NewVersionCode;
     data: any;
