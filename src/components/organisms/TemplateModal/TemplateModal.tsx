@@ -206,10 +206,6 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
                       <S.TableHead>Description</S.TableHead>
                       <S.TableData>{template.description}</S.TableData>
                     </tr>
-                    <tr>
-                      <S.TableHead>Description</S.TableHead>
-                      <S.TableData>{template.description}</S.TableData>
-                    </tr>
                   </tbody>
                 </S.Table>
               </>
