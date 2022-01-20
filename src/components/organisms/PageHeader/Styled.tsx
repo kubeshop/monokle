@@ -1,32 +1,32 @@
 import {ReactElement} from 'react';
 
-import {Button, DropDownProps, Dropdown, Input, Menu} from 'antd';
+import {DropDownProps, Menu, Button as RawButton, Dropdown as RawDropdown, Input as RawInput} from 'antd';
 
 import {
-  BellOutlined,
-  CloseCircleOutlined,
-  ClusterOutlined,
-  CopyOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  FolderAddOutlined,
-  FolderOpenOutlined,
-  FormatPainterOutlined,
-  SettingOutlined,
+  BellOutlined as RawBellOutlined,
+  CloseCircleOutlined as RawCloseCircleOutlined,
+  ClusterOutlined as RawClusterOutlined,
+  CopyOutlined as RawCopyOutlined,
+  DeleteOutlined as RawDeleteOutlined,
+  EditOutlined as RawEditOutlined,
+  FolderAddOutlined as RawFolderAddOutlined,
+  FolderOpenOutlined as RawFolderOpenOutlined,
+  FormatPainterOutlined as RawFormatPainterOutlined,
+  SettingOutlined as RawSettingOutlined,
 } from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import Col from '@components/atoms/Col';
-import Header from '@components/atoms/Header';
-import Row from '@components/atoms/Row';
+import * as RawHeader from '@components/atoms/Header';
+import * as RawRow from '@components/atoms/Row';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
-const {Search} = Input;
+const {Search: RawSearch} = RawInput;
 
-export const StyledButton = styled(Button)`
+export const Button = styled(RawButton)`
   border-left: 1px solid ${Colors.grey3};
   padding: 0;
   padding-left: 8px;
@@ -38,13 +38,13 @@ export const StyledButton = styled(Button)`
   }
 `;
 
-export const StyledClusterButton = styled(Button)`
+export const ClusterButton = styled(RawButton)`
   border: none;
   outline: none;
   padding: 0px 8px;
 `;
 
-export const StyledClusterActionButton = styled(Button)`
+export const ClusterActionButton = styled(RawButton)`
   border: none;
   outline: none;
   padding: 0px;
@@ -52,7 +52,7 @@ export const StyledClusterActionButton = styled(Button)`
   font-size: 12px;
 `;
 
-export const StyledProjectButton = styled(Button)`
+export const ProjectButton = styled(RawButton)`
   border: none;
   outline: none;
   padding: 0px 8px;
@@ -63,7 +63,7 @@ export const StyledProjectButton = styled(Button)`
   line-height: 20px;
 `;
 
-export const StyledFolderOpenOutlined = styled(FolderOpenOutlined)`
+export const FolderOpenOutlined = styled(RawFolderOpenOutlined)`
   color: ${Colors.whitePure};
 `;
 
@@ -103,7 +103,7 @@ export const CLusterActionText = styled(
   `};
 `;
 
-export const StyledClusterOutlined = styled(ClusterOutlined)`
+export const ClusterOutlined = styled(RawClusterOutlined)`
   font-size: 10px;
   margin-right: 4px;
   letter-spacing: 0.05em;
@@ -112,15 +112,15 @@ export const StyledClusterOutlined = styled(ClusterOutlined)`
   text-transform: uppercase;
 `;
 
-export const StyledDropdown = styled(Dropdown)``;
+export const Dropdown = styled(RawDropdown)``;
 
-export const StyledLogo = styled.img`
+export const Logo = styled.img`
   height: 24px;
   margin: 4px;
   margin-top: 11px;
 `;
 
-export const StyledRow = styled(Row)`
+export const Row = styled(RawRow.default)`
   display: flex;
   justify-content: space-between;
   flex-flow: inherit;
@@ -131,7 +131,7 @@ export const LogoCol = styled(Col)`
   flex: 1;
 `;
 
-export const StyledHeader = styled(Header)`
+export const Header = styled(RawHeader.default)`
   width: 100%;
   line-height: 30px;
   background: ${BackgroundColors.darkThemeBackground};
@@ -148,13 +148,13 @@ export const SettingsCol = styled(Col)`
   flex: 1;
 `;
 
-export const StyledSettingsOutlined = styled(SettingOutlined)`
+export const SettingsOutlined = styled(RawSettingOutlined)`
   color: ${FontColors.elementSelectTitle};
   font-size: 24px;
   cursor: pointer;
 `;
 
-export const StyledBellOutlined = styled(BellOutlined)`
+export const BellOutlined = styled(RawBellOutlined)`
   color: ${FontColors.elementSelectTitle};
   font-size: 24px;
   cursor: pointer;
@@ -188,26 +188,26 @@ export const ClusterRow = styled(Row)`
   justify-content: space-between;
 `;
 
-export const StyledModeSpan = styled.span`
+export const ModeSpan = styled.span`
   font-weight: 500;
 `;
 
-export const StyledResourceSpan = styled.span`
+export const ResourceSpan = styled.span`
   font-weight: 700;
 `;
 
-export const StyledExitButton = styled.span`
+export const ExitButton = styled.span`
   cursor: pointer;
   &:hover {
     font-weight: 500;
   }
 `;
 
-export const StyledCloseCircleOutlined = styled(CloseCircleOutlined)`
+export const CloseCircleOutlined = styled(RawCloseCircleOutlined)`
   margin-right: 5px;
 `;
 
-export const StyledDeleteOutlined = styled(DeleteOutlined)`
+export const DeleteOutlined = styled(RawDeleteOutlined)`
   color: ${Colors.red7};
   margin-left: 8px;
   &:hover {
@@ -215,7 +215,7 @@ export const StyledDeleteOutlined = styled(DeleteOutlined)`
   }
 `;
 
-export const StyledEditOutlined = styled(EditOutlined)`
+export const EditOutlined = styled(RawEditOutlined)`
   color: ${Colors.blue6};
   margin-left: 8px;
   &:hover {
@@ -223,14 +223,14 @@ export const StyledEditOutlined = styled(EditOutlined)`
   }
 `;
 
-export const StyledCopyOutlined = styled(CopyOutlined)`
+export const CopyOutlined = styled(RawCopyOutlined)`
   color: ${Colors.blue6};
   &:hover {
     opacity: 0.8;
   }
 `;
 
-export const StyledProjectTableActions = styled.div`
+export const ProjectTableActions = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -238,51 +238,51 @@ export const StyledProjectTableActions = styled.div`
   padding-top: 4px;
 `;
 
-export const StyledProjectMenu = styled(Menu)`
+export const ProjectMenu = styled(Menu)`
   background-color: ${Colors.grey1000};
 `;
 
-export const StyledProjectFolderOpenOutlined = styled(FolderOpenOutlined)`
+export const ProjectFolderOpenOutlined = styled(FolderOpenOutlined)`
   font-size: 20px;
   color: ${Colors.blue6};
   cursor: pointer;
 `;
 
-export const StyledProjectFolderAddOutlined = styled(FolderAddOutlined)`
+export const ProjectFolderAddOutlined = styled(RawFolderAddOutlined)`
   font-size: 20px;
   color: ${Colors.blue6};
   cursor: pointer;
 `;
 
-export const StyledProjectFormatPainterOutlined = styled(FormatPainterOutlined)`
+export const ProjectFormatPainterOutlined = styled(RawFormatPainterOutlined)`
   font-size: 20px;
   color: ${Colors.blue6};
   cursor: pointer;
 `;
 
-export const StyledProjectsMenuActionsContainer = styled.div`
+export const ProjectsMenuActionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 120px;
 `;
 
-export const StyledProjectsMenuContainer = styled.div`
+export const ProjectsMenuContainer = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 16px;
 `;
 
-export const StyledSearch = styled(Search)`
+export const Search = styled(RawSearch)`
   width: 280px;
 `;
 
-interface StyledProjectsDropdownProps extends DropDownProps {
+interface ProjectsDropdownProps extends DropDownProps {
   isClusterSelectorVisible: boolean | undefined;
   children: ReactElement;
 }
 
-export const StyledProjectsDropdown = styled(({children, ...rest}: StyledProjectsDropdownProps) => (
+export const ProjectsDropdown = styled(({children, ...rest}: ProjectsDropdownProps) => (
   <Dropdown {...rest}>{children}</Dropdown>
 ))`
   ${props => `margin-right: ${props.isClusterSelectorVisible ? '20px' : '0px'}`};

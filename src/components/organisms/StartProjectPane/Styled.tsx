@@ -1,4 +1,8 @@
-import {FolderAddOutlined, FolderOpenOutlined, FormatPainterOutlined} from '@ant-design/icons';
+import {
+  FolderAddOutlined as RawFolderAddOutlined,
+  FolderOpenOutlined as RawFolderOpenOutlined,
+  FormatPainterOutlined as RawFormatPainterOutlined,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -17,25 +21,25 @@ export const Title = styled.span`
   padding-right: 10px;
 `;
 
-export const StyledFolderOpenOutlined = styled(FolderOpenOutlined)`
+export const FolderOpenOutlined = styled(RawFolderOpenOutlined)`
   font-size: 56px;
   color: ${Colors.blue10};
   margin-bottom: 24px;
 `;
 
-export const StyledFolderAddOutlined = styled(FolderAddOutlined)`
+export const FolderAddOutlined = styled(RawFolderAddOutlined)`
   font-size: 56px;
   color: ${Colors.blue10};
   margin-bottom: 24px;
 `;
 
-export const StyledFormatPainterOutlined = styled(FormatPainterOutlined)`
+export const FormatPainterOutlined = styled(RawFormatPainterOutlined)`
   font-size: 56px;
   color: ${Colors.blue10};
   margin-bottom: 24px;
 `;
 
-export const StyledActionContainer = styled.div`
+export const ActionContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -43,18 +47,18 @@ export const StyledActionContainer = styled.div`
   cursor: pointer;
 `;
 
-export const StyledActionText = styled.div`
+export const ActionText = styled.div`
   color: ${Colors.blue6};
   font-size: 12px;
 `;
 
-export const StyledActionTitle = styled.div`
+export const ActionTitle = styled.div`
   font-size: 22px;
   text-align: center;
   margin-bottom: 150px;
 `;
 
-export const StyledContainer = styled.div`
+export const Container = styled.div`
   width: 100%;
   height: calc(100vh - 112px);
   display: flex;

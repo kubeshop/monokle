@@ -29,20 +29,7 @@ import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {
-  StyledDeleteOutlined,
-  StyledFolderOpenOutlined,
-  StyledProjectButton,
-  StyledProjectFolderAddOutlined,
-  StyledProjectFolderOpenOutlined,
-  StyledProjectFormatPainterOutlined,
-  StyledProjectMenu,
-  StyledProjectTableActions,
-  StyledProjectsDropdown,
-  StyledProjectsMenuActionsContainer,
-  StyledProjectsMenuContainer,
-  StyledSearch,
-} from './Styled';
+import * as S from './Styled';
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
@@ -111,14 +98,14 @@ const ProjectSelection = () => {
 
   const projectMenu = () => {
     return (
-      <StyledProjectMenu>
-        <StyledProjectsMenuContainer>
+      <S.ProjectMenu>
+        <S.ProjectsMenuContainer>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SearchProjectTooltip} placement="bottomRight">
-            <StyledSearch placeholder="Search" value={searchText} onChange={handleProjectSearch} />
+            <S.Search placeholder="Search" value={searchText} onChange={handleProjectSearch} />
           </Tooltip>
-          <StyledProjectsMenuActionsContainer>
+          <S.ProjectsMenuActionsContainer>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromFolderTooltip} placement="bottomRight">
-              <StyledProjectFolderOpenOutlined
+              <S.ProjectFolderOpenOutlined
                 onClick={() => {
                   setIsDropdownMenuVisible(false);
                   openFileExplorer();
@@ -126,13 +113,13 @@ const ProjectSelection = () => {
               />
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewEmptyProjectTooltip} placement="bottomRight">
-              <StyledProjectFolderAddOutlined onClick={() => handleCreateProject(false)} />
+              <S.ProjectFolderAddOutlined onClick={() => handleCreateProject(false)} />
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromTemplateTooltip} placement="bottomRight">
-              <StyledProjectFormatPainterOutlined onClick={() => handleCreateProject(true)} />
+              <S.ProjectFormatPainterOutlined onClick={() => handleCreateProject(true)} />
             </Tooltip>
-          </StyledProjectsMenuActionsContainer>
-        </StyledProjectsMenuContainer>
+          </S.ProjectsMenuActionsContainer>
+        </S.ProjectsMenuContainer>
         <Table
           size="small"
           style={{width: '800px', borderTop: '1px solid #262626', paddingTop: '18px'}}
@@ -175,7 +162,7 @@ const ProjectSelection = () => {
             }
             width={2}
             ellipsis
-            render={getRelativeDate}
+            render={(value: string) => (value ? getRelativeDate(value) : '-')}
           />
           <Column
             className="projects-table-column-last-opened"
@@ -188,7 +175,7 @@ const ProjectSelection = () => {
             }
             width={2}
             ellipsis
-            render={getRelativeDate}
+            render={(value: string) => (value ? getRelativeDate(value) : '-')}
           />
           <Column
             className="projects-table-column-actions"
@@ -196,35 +183,35 @@ const ProjectSelection = () => {
             key="lastOpened"
             width={1}
             render={(value: any, project: Project) => (
-              <StyledProjectTableActions>
-                {/* <StyledCopyOutlined
+              <S.ProjectTableActions>
+                {/* <S.CopyOutlined
                   onClick={(e: any) => {
                     e.stopPropagation();
                     handleCopyProject(project);
                   }}
                 />
-                <StyledEditOutlined
+                <S.EditOutlined
                   onClick={(e: any) => {
                     e.stopPropagation();
                     handleEditProject(project);
                   }}
                 /> */}
-                <StyledDeleteOutlined
+                <S.DeleteOutlined
                   onClick={(e: any) => {
                     e.stopPropagation();
                     handleDeleteProject(project);
                   }}
                 />
-              </StyledProjectTableActions>
+              </S.ProjectTableActions>
             )}
           />
         </Table>
-      </StyledProjectMenu>
+      </S.ProjectMenu>
     );
   };
 
   return (
-    <StyledProjectsDropdown
+    <S.ProjectsDropdown
       isClusterSelectorVisible={isClusterSelectorVisible}
       overlay={projectMenu}
       placement="bottomCenter"
@@ -234,14 +221,14 @@ const ProjectSelection = () => {
       visible={isDropdownMenuVisible}
     >
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ProjectManagementTooltip} placement="bottomRight">
-        <StyledProjectButton>
-          <StyledFolderOpenOutlined />
+        <S.ProjectButton>
+          <S.FolderOpenOutlined />
           <span>{activeProject?.name}</span>
           <DownOutlined style={{margin: 4}} />
           <FileExplorer {...fileExplorerProps} />
-        </StyledProjectButton>
+        </S.ProjectButton>
       </Tooltip>
-    </StyledProjectsDropdown>
+    </S.ProjectsDropdown>
   );
 };
 

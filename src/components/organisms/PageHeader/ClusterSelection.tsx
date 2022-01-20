@@ -27,17 +27,7 @@ import {
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import ProjectSelection from './ProjectSelection';
-import {
-  CLusterActionText,
-  CLusterContainer,
-  CLusterStatus,
-  CLusterStatusText,
-  StyledButton,
-  StyledClusterActionButton,
-  StyledClusterButton,
-  StyledClusterOutlined,
-  StyledDropdown,
-} from './Styled';
+import * as S from './Styled';
 
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
@@ -129,18 +119,18 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <CLusterActionText>RELOAD</CLusterActionText>;
+      return <S.CLusterActionText>RELOAD</S.CLusterActionText>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
     }
     return (
-      <CLusterActionText
+      <S.CLusterActionText
         className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
         highlighted={highlightedItems.connectToCluster}
       >
         LOAD
-      </CLusterActionText>
+      </S.CLusterActionText>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
@@ -155,46 +145,46 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   );
 
   return (
-    <CLusterContainer>
+    <S.CLusterContainer>
       {activeProject && (
-        <CLusterStatus>
+        <S.CLusterStatus>
           <ProjectSelection />
           {isClusterSelectorVisible && (
             <>
-              <CLusterStatusText connected={isKubeConfigPathValid}>
-                <StyledClusterOutlined />
+              <S.CLusterStatusText connected={isKubeConfigPathValid}>
+                <S.ClusterOutlined />
                 {isKubeConfigPathValid && <span>Configured</span>}
                 {!isKubeConfigPathValid && <span>No Cluster Configured</span>}
-              </CLusterStatusText>
+              </S.CLusterStatusText>
               {isKubeConfigPathValid && (
-                <StyledDropdown
+                <S.Dropdown
                   overlay={clusterMenu}
                   placement="bottomCenter"
                   arrow
                   trigger={['click']}
                   disabled={previewLoader.isLoading || isInPreviewMode}
                 >
-                  <StyledClusterButton>
+                  <S.ClusterButton>
                     <span>{kubeConfigContext}</span>
                     <DownOutlined style={{margin: 4}} />
-                  </StyledClusterButton>
-                </StyledDropdown>
+                  </S.ClusterButton>
+                </S.Dropdown>
               )}
               {isKubeConfigPathValid ? (
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
-                  <StyledButton
+                  <S.Button
                     disabled={Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled}
                     type="link"
                     onClick={handleLoadCluster}
                   >
                     {createClusterObjectsLabel()}
-                  </StyledButton>
+                  </S.Button>
                 </Tooltip>
               ) : (
                 <>
-                  <StyledClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
+                  <S.ClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
                     Configure
-                  </StyledClusterActionButton>
+                  </S.ClusterActionButton>
                   <Popconfirm
                     placement="bottom"
                     title={() => (
@@ -208,15 +198,15 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                     onConfirm={handleClusterHideConfirm}
                     onCancel={handleClusterHideCancel}
                   >
-                    <StyledClusterActionButton onClick={handleClusterHideClick}>Hide</StyledClusterActionButton>
+                    <S.ClusterActionButton onClick={handleClusterHideClick}>Hide</S.ClusterActionButton>
                   </Popconfirm>
                 </>
               )}
             </>
           )}
-        </CLusterStatus>
+        </S.CLusterStatus>
       )}
-    </CLusterContainer>
+    </S.CLusterContainer>
   );
 };
 

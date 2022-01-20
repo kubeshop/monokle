@@ -7,17 +7,7 @@ import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 
-import {
-  StyledActionContainer,
-  StyledActionText,
-  StyledActionTitle,
-  StyledContainer,
-  StyledFolderAddOutlined,
-  StyledFolderOpenOutlined,
-  StyledFormatPainterOutlined,
-  Title,
-  TitleBarContainer,
-} from './Styled';
+import * as S from './Styled';
 
 const StartProjectPane = () => {
   const dispatch = useAppDispatch();
@@ -35,32 +25,32 @@ const StartProjectPane = () => {
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>
-            <TitleBarContainer>
-              <Title>Start a Project</Title>
-            </TitleBarContainer>
+            <S.TitleBarContainer>
+              <S.Title>Start a Project</S.Title>
+            </S.TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
       <Row>
-        <StyledContainer>
+        <S.Container>
           <div>
-            <StyledActionTitle>How would you like to begin?</StyledActionTitle>
+            <S.ActionTitle>How would you like to begin?</S.ActionTitle>
             <div style={{display: 'flex'}}>
-              <StyledActionContainer onClick={handleOpenFolderExplorer}>
-                <StyledFolderOpenOutlined />
-                <StyledActionText>Select an existing folder</StyledActionText>
-              </StyledActionContainer>
-              <StyledActionContainer onClick={() => handleCreateProject(false)}>
-                <StyledFolderAddOutlined />
-                <StyledActionText>Create an empty project</StyledActionText>
-              </StyledActionContainer>
-              <StyledActionContainer onClick={() => handleCreateProject(true)}>
-                <StyledFormatPainterOutlined />
-                <StyledActionText>Start from a template</StyledActionText>
-              </StyledActionContainer>
+              <S.ActionContainer onClick={handleOpenFolderExplorer}>
+                <S.FolderOpenOutlined />
+                <S.ActionText>Select an existing folder</S.ActionText>
+              </S.ActionContainer>
+              <S.ActionContainer onClick={() => handleCreateProject(false)}>
+                <S.FolderAddOutlined />
+                <S.ActionText>Create an empty project</S.ActionText>
+              </S.ActionContainer>
+              <S.ActionContainer onClick={() => handleCreateProject(true)}>
+                <S.FormatPainterOutlined />
+                <S.ActionText>Start from a template</S.ActionText>
+              </S.ActionContainer>
             </div>
           </div>
-        </StyledContainer>
+        </S.Container>
       </Row>
     </>
   );

@@ -29,30 +29,15 @@ import DiscordLogo from '@assets/DiscordLogo.svg';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import ClusterSelection from './ClusterSelection';
-import {
-  ClusterRow,
-  IconContainerSpan,
-  LogoCol,
-  PreviewRow,
-  SettingsCol,
-  StyledBellOutlined,
-  StyledCloseCircleOutlined,
-  StyledExitButton,
-  StyledHeader,
-  StyledLogo,
-  StyledModeSpan,
-  StyledResourceSpan,
-  StyledRow,
-  StyledSettingsOutlined,
-} from './Styled';
+import * as S from './Styled';
 
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;
   return (
-    <StyledExitButton onClick={onClick}>
-      <StyledCloseCircleOutlined />
+    <S.ExitButton onClick={onClick}>
+      <S.CloseCircleOutlined />
       Exit
-    </StyledExitButton>
+    </S.ExitButton>
   );
 };
 
@@ -109,75 +94,75 @@ const PageHeader = () => {
   return (
     <>
       {isInPreviewMode && previewType === 'kustomization' && (
-        <PreviewRow noborder="true">
-          <StyledModeSpan>PREVIEW MODE</StyledModeSpan>
+        <S.PreviewRow noborder="true">
+          <S.ModeSpan>PREVIEW MODE</S.ModeSpan>
           {previewResource && (
-            <StyledResourceSpan>
+            <S.ResourceSpan>
               Previewing [{previewResource.name}] kustomization - {activeResources.length} resources
-            </StyledResourceSpan>
+            </S.ResourceSpan>
           )}
           <ExitButton onClick={onClickExit} />
-        </PreviewRow>
+        </S.PreviewRow>
       )}
       {isInPreviewMode && previewType === 'cluster' && (
-        <ClusterRow>
-          <StyledModeSpan>CLUSTER MODE</StyledModeSpan>
+        <S.ClusterRow>
+          <S.ModeSpan>CLUSTER MODE</S.ModeSpan>
           {previewResourceId && (
-            <StyledResourceSpan>
+            <S.ResourceSpan>
               Previewing context [{currentContext}] - {activeResources.length} resources
-            </StyledResourceSpan>
+            </S.ResourceSpan>
           )}
           <ExitButton onClick={onClickExit} />
-        </ClusterRow>
+        </S.ClusterRow>
       )}
       {isInPreviewMode && previewType === 'helm' && (
-        <PreviewRow noborder="true">
-          <StyledModeSpan>HELM MODE</StyledModeSpan>
+        <S.PreviewRow noborder="true">
+          <S.ModeSpan>HELM MODE</S.ModeSpan>
           {previewValuesFileId && (
-            <StyledResourceSpan>
+            <S.ResourceSpan>
               Previewing {previewValuesFile?.name} for {helmChart?.name} Helm chart - {activeResources.length} resources
-            </StyledResourceSpan>
+            </S.ResourceSpan>
           )}
           <ExitButton onClick={onClickExit} />
-        </PreviewRow>
+        </S.PreviewRow>
       )}
-      <StyledHeader noborder="true">
-        <StyledRow noborder="true">
-          <LogoCol noborder="true">
-            <StyledLogo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
-          </LogoCol>
+      <S.Header noborder="true">
+        <S.Row noborder="true">
+          <S.LogoCol noborder="true">
+            <S.Logo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
+          </S.LogoCol>
 
           <ClusterSelection previewResource={previewResource} />
 
-          <SettingsCol>
+          <S.SettingsCol>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
-              <IconContainerSpan>
+              <S.IconContainerSpan>
                 <QuestionCircleOutlined size={24} onClick={openDocumentation} />
-              </IconContainerSpan>
+              </S.IconContainerSpan>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiscordTooltip} placement="bottomRight">
-              <IconContainerSpan onClick={openDiscord}>
+              <S.IconContainerSpan onClick={openDiscord}>
                 <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer', marginBottom: '4px'}} />
-              </IconContainerSpan>
+              </S.IconContainerSpan>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={GitHubTooltip} placement="bottomRight">
-              <IconContainerSpan>
+              <S.IconContainerSpan>
                 <GithubOutlined size={24} onClick={openGitHub} />
-              </IconContainerSpan>
+              </S.IconContainerSpan>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-              <IconContainerSpan>
-                <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
-              </IconContainerSpan>
+              <S.IconContainerSpan>
+                <S.SettingsOutlined onClick={toggleSettingsDrawer} />
+              </S.IconContainerSpan>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
-              <IconContainerSpan>
-                <StyledBellOutlined onClick={toggleNotificationsDrawer} />
-              </IconContainerSpan>
+              <S.IconContainerSpan>
+                <S.BellOutlined onClick={toggleNotificationsDrawer} />
+              </S.IconContainerSpan>
             </Tooltip>
-          </SettingsCol>
-        </StyledRow>
-      </StyledHeader>
+          </S.SettingsCol>
+        </S.Row>
+      </S.Header>
     </>
   );
 };
