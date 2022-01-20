@@ -58,6 +58,7 @@ export type Project = {
   name?: string;
   rootFolder: string;
   k8sVersion?: string;
+  created?: string;
   lastOpened?: string;
 };
 

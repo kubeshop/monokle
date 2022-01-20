@@ -1,7 +1,7 @@
 import React, {useContext, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Space, Tooltip} from 'antd';
+import {Badge, Button, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
 
 import {
@@ -22,7 +22,12 @@ import {LeftMenuSelection} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {
+  activeProjectSelector,
+  helmChartsSelector,
+  isInPreviewModeSelector,
+  kustomizationsSelector,
+} from '@redux/selectors';
 
 import {
   ActionsPane,
@@ -99,6 +104,8 @@ const PaneManager = () => {
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const activeProject = useSelector(activeProjectSelector);
+  const kustomizeResources = useAppSelector(kustomizationsSelector);
+  const helmChartResources = useAppSelector(helmChartsSelector);
 
   // TODO: refactor this to get the size of the page header dinamically
   const contentHeight = useMemo(() => {
@@ -140,49 +147,65 @@ const PaneManager = () => {
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
             <MenuButton
               isSelected={leftMenuSelection === 'file-explorer'}
-              isActive={leftActive}
+              isActive={Boolean(activeProject) && leftActive}
               shouldWatchSelectedPath
               onClick={() => setLeftActiveMenu('file-explorer')}
+              disabled={!activeProject}
             >
               <MenuIcon
                 style={{marginLeft: 4}}
                 icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
-                active={leftActive}
-                isSelected={leftMenuSelection === 'file-explorer'}
+                active={Boolean(activeProject) && leftActive}
+                isSelected={Boolean(activeProject) && leftMenuSelection === 'file-explorer'}
               />
             </MenuButton>
           </Tooltip>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'kustomize-pane'}
-              isActive={leftActive}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
+              isActive={Boolean(activeProject) && leftActive}
               onClick={() => setLeftActiveMenu('kustomize-pane')}
               sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
+              disabled={!activeProject}
             >
-              <MenuIcon iconName="kustomize" active={leftActive} isSelected={leftMenuSelection === 'kustomize-pane'} />
+              <Badge count={kustomizeResources.length || 0} color={Colors.blue6} size="default" dot>
+                <MenuIcon
+                  iconName="kustomize"
+                  active={Boolean(activeProject) && leftActive}
+                  isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
+                />
+              </Badge>
             </MenuButton>
           </Tooltip>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'helm-pane'}
-              isActive={leftActive}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
+              isActive={Boolean(activeProject) && leftActive}
               onClick={() => setLeftActiveMenu('helm-pane')}
               sectionNames={[HELM_CHART_SECTION_NAME]}
+              disabled={!activeProject}
             >
-              <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
+              <Badge count={helmChartResources.length || 0} color={Colors.blue6} size="default" dot>
+                <MenuIcon
+                  iconName="helm"
+                  active={Boolean(activeProject) && leftActive}
+                  isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
+                />
+              </Badge>
             </MenuButton>
           </Tooltip>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
             <MenuButton
-              isSelected={leftMenuSelection === 'templates-pane'}
-              isActive={leftActive}
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
+              isActive={Boolean(activeProject) && leftActive}
               onClick={() => setLeftActiveMenu('templates-pane')}
+              disabled={!activeProject}
             >
               <MenuIcon
                 icon={FormatPainterOutlined}
-                active={leftActive}
-                isSelected={leftMenuSelection === 'templates-pane'}
+                active={Boolean(activeProject) && leftActive}
+                isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
               />
             </MenuButton>
           </Tooltip>
@@ -245,11 +268,16 @@ const PaneManager = () => {
         </StyledColumnPanes>
       ) : (
         <StyledColumnPanes style={{width: contentWidth}}>
-          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', height: '100%'}}>
-            <div style={{flex: 3, height: '100%'}}>
+          <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
+            {leftMenuSelection === 'plugin-manager' && leftActive && (
+              <div style={{borderRight: `1px solid ${Colors.grey3}`}}>
+                <PluginManagerPane />
+              </div>
+            )}
+            <div style={{flex: 3}}>
               <StartProjectPane />
             </div>
-            <div style={{flex: 1, height: '100%', borderLeft: `1px solid ${Colors.grey3}`}}>
+            <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
               <RecentProjectsPane />
             </div>
           </div>

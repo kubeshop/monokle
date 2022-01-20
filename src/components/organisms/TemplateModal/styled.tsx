@@ -6,6 +6,8 @@ import styled from 'styled-components';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
+import Colors from '@styles/Colors';
+
 export const Container = styled.div`
   display: grid;
   grid-template-columns: 200px 1fr;
@@ -83,4 +85,18 @@ export const TitleContainer = styled.div`
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 20px;
+`;
+
+export const CreatedResourceLabel = styled.p`
+  font-weight: 600;
+`;
+
+export const CreatedResourceName = styled.span`
+  margin-left: 10px;
+  color: ${Colors.yellow7};
+`;
+
+export const CreatedResourceKind = styled.span`
+  margin-left: 10px;
+  font-style: italic;
 `;

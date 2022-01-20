@@ -34,6 +34,7 @@ export const loadContexts = async (
         const kubeConfig: KubeConfig = {
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
+          isPathValid: kc.contexts.length > 0,
         };
 
         dispatch(updateProjectKubeConfig(kubeConfig));
@@ -49,5 +50,6 @@ export const loadContexts = async (
     }
   } catch (e) {
     log.info(e);
+    dispatch(updateProjectKubeConfig({isPathValid: false}));
   }
 };

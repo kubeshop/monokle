@@ -56,7 +56,7 @@ const schema = {
           kustomizeCommand: {
             type: 'string',
           },
-          loadLastFolderOnStartup: {
+          loadLastProjectOnStartup: {
             type: 'boolean',
           },
         },
@@ -146,9 +146,6 @@ const schema = {
           },
         },
       },
-      clusterStatusHidden: {
-        type: 'boolean',
-      },
     },
   },
   uiCoach: {
@@ -171,7 +168,8 @@ const defaults = {
       textSize: 'medium',
       language: 'en',
       helmPreviewMode: 'template',
-      loadLastFolderOnStartup: true,
+      loadLastProjectOnStartup: false,
+      isClusterSelectorVisible: true,
     },
     recentFolders: [],
     newVersion: 0,
@@ -193,7 +191,6 @@ const defaults = {
       editWidth: 0.3333,
       rightWidth: 0,
     },
-    clusterStatusHidden: false,
   },
 };
 

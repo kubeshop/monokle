@@ -3,6 +3,8 @@ import path from 'path';
 import {promisify} from 'util';
 import {v4 as uuidv4} from 'uuid';
 
+import {K8sResource} from '@models/k8sresource';
+
 import {AppDispatch} from '@redux/store';
 
 import {runHelm} from '@utils/helm';
@@ -46,13 +48,13 @@ export const previewReferencedHelmChart = async (
     throw new Error(result.error);
   }
 
-  if (result.stdout) {
-    const [yamlOutput, notes] = result.stdout.split('NOTES:');
-
+  const createdResources: K8sResource[] = [];
+  const {stdout} = result;
+  if (typeof stdout === 'string') {
+    const [yamlOutput, notes] = stdout.split('NOTES:');
     const objects = extractObjectsFromYaml(yamlOutput);
-
     objects.forEach(obj => {
-      createUnsavedResource(
+      const resource = createUnsavedResource(
         {
           name: obj.metadata.name,
           kind: obj.kind,
@@ -61,8 +63,11 @@ export const previewReferencedHelmChart = async (
         dispatch,
         obj
       );
+      createdResources.push(resource);
     });
 
-    return notes;
+    return {message: notes.length > 0 ? notes : 'Done.', resources: createdResources};
   }
+
+  return {message: 'Done.', resources: createdResources};
 };

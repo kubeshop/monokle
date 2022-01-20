@@ -1,0 +1,169 @@
+{
+  "ui:title": "NetworkPolicy Properties",
+  "spec": {
+    "ui:title": "Object specs",
+    "egress": {
+      "ui:title": "Egress",
+      "items": {
+        "ports": {
+          "ui:title": "Ports",
+          "items": {
+            "endPort": {
+              "ui:title": "End Port"
+            },
+            "protocol": {
+              "ui:title": "Protocol"
+            }
+          }
+        },
+        "to": {
+          "ui:title": "To",
+          "items": {
+            "ipBlock": {
+              "ui:title": "Object ipBlocks",
+              "cidr": {
+                "ui:title": "Cidr"
+              },
+              "except": {
+                "ui:title": "Except"
+              }
+            },
+            "namespaceSelector": {
+              "ui:title": "Object namespaceSelectors",
+              "matchExpressions": {
+                "ui:title": "MatchExpressions",
+                "items": {
+                  "key": {
+                    "ui:title": "Key"
+                  },
+                  "operator": {
+                    "ui:title": "Operator"
+                  },
+                  "values": {
+                    "ui:title": "Values"
+                  }
+                }
+              },
+              "matchLabels": {
+                "ui:title": "Match Labels"
+              }
+            },
+            "podSelector": {
+              "ui:title": "Object podSelectors",
+              "matchExpressions": {
+                "ui:title": "MatchExpressions",
+                "items": {
+                  "key": {
+                    "ui:title": "Key"
+                  },
+                  "operator": {
+                    "ui:title": "Operator"
+                  },
+                  "values": {
+                    "ui:title": "Values"
+                  }
+                }
+              },
+              "matchLabels": {
+                "ui:title": "Match Labels"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ingress": {
+      "ui:title": "Ingress",
+      "items": {
+        "from": {
+          "ui:title": "From",
+          "items": {
+            "ipBlock": {
+              "ui:title": "Object ipBlocks",
+              "cidr": {
+                "ui:title": "Cidr"
+              },
+              "except": {
+                "ui:title": "Except"
+              }
+            },
+            "namespaceSelector": {
+              "ui:title": "Object namespaceSelectors",
+              "matchExpressions": {
+                "ui:title": "MatchExpressions",
+                "items": {
+                  "key": {
+                    "ui:title": "Key"
+                  },
+                  "operator": {
+                    "ui:title": "Operator"
+                  },
+                  "values": {
+                    "ui:title": "Values"
+                  }
+                }
+              },
+              "matchLabels": {
+                "ui:title": "Match Labels"
+              }
+            },
+            "podSelector": {
+              "ui:title": "Object podSelectors",
+              "matchExpressions": {
+                "ui:title": "MatchExpressions",
+                "items": {
+                  "key": {
+                    "ui:title": "Key"
+                  },
+                  "operator": {
+                    "ui:title": "Operator"
+                  },
+                  "values": {
+                    "ui:title": "Values"
+                  }
+                }
+              },
+              "matchLabels": {
+                "ui:title": "Match Labels"
+              }
+            }
+          }
+        },
+        "ports": {
+          "ui:title": "Ports",
+          "items": {
+            "endPort": {
+              "ui:title": "End Port"
+            },
+            "protocol": {
+              "ui:title": "Protocol"
+            }
+          }
+        }
+      }
+    },
+    "podSelector": {
+      "ui:title": "Object podSelectors",
+      "matchExpressions": {
+        "ui:title": "MatchExpressions",
+        "items": {
+          "key": {
+            "ui:title": "Key"
+          },
+          "operator": {
+            "ui:title": "Operator"
+          },
+          "values": {
+            "ui:title": "Values"
+          }
+        }
+      },
+      "matchLabels": {
+        "ui:title": "Match Labels"
+      }
+    },
+    "policyTypes": {
+      "ui:title": "Policy Types"
+    }
+  }
+}

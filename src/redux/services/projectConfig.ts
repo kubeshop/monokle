@@ -7,7 +7,8 @@ import {AppConfig, ProjectConfig} from '@models/appconfig';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {AppDispatch} from '@redux/store';
 
-export const CONFIG_PATH = (filePath?: string | null) => (filePath ? `${filePath}${sep}.monokle` : '');
+export const CONFIG_PATH = (projectRootPath?: string | null) =>
+  projectRootPath ? `${projectRootPath}${sep}.monokle` : '';
 
 export const writeProjectConfigFile = (state: AppConfig, projectConfig: ProjectConfig | null) => {
   const absolutePath = CONFIG_PATH(state.selectedProjectRootFolder);
@@ -53,10 +54,14 @@ export const populateProjectConfig = (state: AppConfig) => {
   return applicationConfig;
 };
 
-export const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: string, dispatch: AppDispatch) => {
+export const readProjectConfig = (projectRootPath?: string | null): ProjectConfig | null => {
+  if (!projectRootPath) {
+    return null;
+  }
+
   try {
     const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth}: ProjectConfig = JSON.parse(
-      readFileSync(absolutePath, 'utf8')
+      readFileSync(CONFIG_PATH(projectRootPath), 'utf8')
     );
     const projectConfig: ProjectConfig = {};
     projectConfig.settings = settings
@@ -79,10 +84,19 @@ export const readApplicationConfigFileAndUpdateProjectSettings = (absolutePath: 
     projectConfig.fileIncludes = fileIncludes;
     projectConfig.folderReadsMaxDepth = folderReadsMaxDepth;
 
-    dispatch(updateProjectConfig(projectConfig));
+    return projectConfig;
   } catch (error) {
-    dispatch(updateProjectConfig(null));
+    return null;
   }
+};
+
+export const updateProjectSettings = (dispatch: AppDispatch, projectRootPath?: string | null) => {
+  const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
+  if (projectConfig) {
+    dispatch(updateProjectConfig(projectConfig));
+    return;
+  }
+  dispatch(updateProjectConfig(null));
 };
 
 // I am not proud of this code. It can be surely do it better.
