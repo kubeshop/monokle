@@ -13,11 +13,11 @@ import {
   TextSizes,
   Themes,
 } from '@models/appconfig';
+import {AppDispatch} from '@models/appdispatch';
+import {KustomizeCommandType} from '@models/kustomize';
 
-import {KustomizeCommandType} from '@redux/services/kustomize';
 import {populateProjectConfig, readProjectConfig, writeProjectConfigFile} from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
-import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';

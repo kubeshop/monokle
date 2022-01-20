@@ -1,11 +1,11 @@
 import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
 import {sep} from 'path';
+import {AnyAction} from 'redux';
 
 import {AppConfig, ProjectConfig} from '@models/appconfig';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
-import {AppDispatch} from '@redux/store';
 
 export const CONFIG_PATH = (projectRootPath?: string | null) =>
   projectRootPath ? `${projectRootPath}${sep}.monokle` : '';
@@ -90,7 +90,7 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
   }
 };
 
-export const updateProjectSettings = (dispatch: AppDispatch, projectRootPath?: string | null) => {
+export const updateProjectSettings = (dispatch: (action: AnyAction) => void, projectRootPath?: string | null) => {
   const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
   if (projectConfig) {
     dispatch(updateProjectConfig(projectConfig));

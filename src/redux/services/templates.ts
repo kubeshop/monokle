@@ -4,13 +4,13 @@ import _ from 'lodash';
 import log from 'loglevel';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 import {AnyPlugin} from '@models/plugin';
 import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
 
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
-import {AppDispatch} from '@redux/store';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createUnsavedResource} from './unsavedResource';

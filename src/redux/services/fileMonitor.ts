@@ -1,9 +1,9 @@
 import {FSWatcher, watch} from 'chokidar';
 
 import {AppConfig} from '@models/appconfig';
+import {AppDispatch} from '@models/appdispatch';
 
 import {multipleFilesChanged, multiplePathsAdded, multiplePathsRemoved} from '@redux/reducers/main';
-import {AppDispatch} from '@redux/store';
 
 import {debounceWithPreviousArgs} from '@utils/helpers';
 

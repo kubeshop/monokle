@@ -2,7 +2,7 @@ import {BrowserWindow, WebContents, ipcMain, webContents} from 'electron';
 
 import {AnyAction} from 'redux';
 
-import {RootState} from '@redux/store';
+import {RootState} from '@models/rootstate';
 
 import {promiseTimeout} from '@utils/promises';
 

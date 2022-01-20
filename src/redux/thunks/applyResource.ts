@@ -5,8 +5,10 @@ import {stringify} from 'yaml';
 import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
+import {KustomizeCommandType} from '@models/kustomize';
 
 import {setAlert} from '@redux/reducers/alert';
 import {
@@ -18,9 +20,8 @@ import {
   updateResource,
 } from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
-import {KustomizeCommandType, isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {extractK8sResources} from '@redux/services/resource';
-import {AppDispatch} from '@redux/store';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {getResourceFromCluster} from '@redux/thunks/utils';
 
