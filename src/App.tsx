@@ -67,7 +67,7 @@ const App = () => {
   const dispatch = useDispatch();
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const {loadLastProjectOnStartup} = useAppSelector(settingsSelector);
+  const {loadLastProjectOnStartup, isClusterSelectorVisible} = useAppSelector(settingsSelector);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
@@ -109,7 +109,7 @@ const App = () => {
       loadContexts(kubeConfigPath, dispatch, kubeConfigContext);
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
-    [kubeConfigPath, dispatch, kubeConfigContext, rootFile]
+    [kubeConfigPath, dispatch, kubeConfigContext, rootFile, isClusterSelectorVisible]
   );
 
   const isFolderExplorerOpen = useAppSelector(state => state.ui.folderExplorer.isOpen);

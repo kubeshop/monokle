@@ -15,7 +15,7 @@ import {
 } from '@models/appconfig';
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
-import {writeProjectConfigFile} from '@redux/services/projectConfig';
+import {populateProjectConfig, readProjectConfig, writeProjectConfigFile} from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -29,13 +29,27 @@ export const setCreateProject = createAsyncThunk('config/setCreateProject', asyn
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
 });
 
+export const setDeleteProject = createAsyncThunk('config/setDeleteProject', async (project: Project, thunkAPI: any) => {
+  const selectedProjectRootFolder: string = thunkAPI.getState().config.selectedProjectRootFolder;
+  thunkAPI.dispatch(configSlice.actions.deleteProject(project));
+  if (project.rootFolder === selectedProjectRootFolder) {
+    thunkAPI.dispatch(setOpenProject(null));
+  }
+});
+
 export const setOpenProject = createAsyncThunk(
   'config/openProject',
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
+    const appConfig: AppConfig = thunkAPI.getState().config;
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     thunkAPI.dispatch(setRootFolder(projectRootPath));
-    thunkAPI.dispatch(configSlice.actions.setProjectConfig(null));
+    const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
+    if (projectConfig) {
+      thunkAPI.dispatch(configSlice.actions.setProjectConfig(projectConfig));
+    } else {
+      thunkAPI.dispatch(configSlice.actions.setProjectConfig(populateProjectConfig(appConfig)));
+    }
   }
 );
 
@@ -92,7 +106,7 @@ export const configSlice = createSlice({
       };
     },
     updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.loadLastFolderOnStartup', action.payload);
+      electronStore.set('appConfig.settings.loadLastProjectOnStartup', action.payload);
       state.settings.loadLastProjectOnStartup = action.payload;
     },
     updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
@@ -131,7 +145,13 @@ export const configSlice = createSlice({
         project.name = folderNames[folderNames.length - 1];
       }
 
+      project.created = new Date().toISOString();
       state.projects = _.sortBy([project, ...state.projects], (p: Project) => p.lastOpened).reverse();
+      electronStore.set('appConfig.projects', state.projects);
+    },
+    deleteProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
+      state.projects = _.remove(state.projects, (p: Project) => p.rootFolder !== action.payload.rootFolder);
+      state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
@@ -168,7 +188,10 @@ export const configSlice = createSlice({
 
       const newProjectConfig: ProjectConfig = {
         ...projectConfig,
-        kubeConfig: {...projectConfig?.kubeConfig, ...action.payload},
+        kubeConfig: {
+          ...projectConfig?.kubeConfig,
+          ...action.payload,
+        },
       };
 
       writeProjectConfigFile(state, newProjectConfig);
@@ -186,14 +209,15 @@ export const configSlice = createSlice({
       const newProjectConfig: ProjectConfig | null = action.payload;
 
       writeProjectConfigFile(state, newProjectConfig);
-      if (newProjectConfig && newProjectConfig.kubeConfig && newProjectConfig.kubeConfig.contexts) {
-        newProjectConfig.kubeConfig.contexts = state.projectConfig?.kubeConfig?.contexts;
-      }
-      state.projectConfig = newProjectConfig;
+
+      state.projectConfig = {
+        ...newProjectConfig,
+        kubeConfig: {...newProjectConfig?.kubeConfig, contexts: state.projectConfig?.kubeConfig?.contexts},
+      };
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {
       state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;
-      electronStore.set('ui.clusterStatusHidden', state.settings.isClusterSelectorVisible);
+      electronStore.set('appConfig.settings.isClusterSelectorVisible', state.settings.isClusterSelectorVisible);
     },
     setUserDirs: (
       state: Draft<AppConfig>,

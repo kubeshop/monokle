@@ -2,76 +2,12 @@ import React from 'react';
 
 import {Row} from 'antd';
 
-import {FolderAddOutlined, FolderOpenOutlined, FormatPainterOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
-
 import {useAppDispatch} from '@redux/hooks';
 import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 
-import Colors from '@styles/Colors';
-
-const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-`;
-
-const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
-`;
-
-const StyledFolderOpenOutlined = styled(FolderOpenOutlined)`
-  font-size: 56px;
-  color: ${Colors.blue10};
-  margin-bottom: 24px;
-`;
-
-const StyledFolderAddOutlined = styled(FolderAddOutlined)`
-  font-size: 56px;
-  color: ${Colors.blue10};
-  margin-bottom: 24px;
-`;
-
-const StyledFormatPainterOutlined = styled(FormatPainterOutlined)`
-  font-size: 56px;
-  color: ${Colors.blue10};
-  margin-bottom: 24px;
-`;
-
-const StyledActionContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 0 40px;
-  cursor: pointer;
-`;
-
-const StyledActionText = styled.div`
-  color: ${Colors.blue6};
-  font-size: 12px;
-  text-align: center;
-`;
-
-const StyledActionTitle = styled.div`
-  font-size: 22px;
-  text-align: center;
-  margin-bottom: 150px;
-`;
-
-const StyledContainer = styled.div`
-  width: 100%;
-  height: calc(100vh - 112px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 150px;
-`;
+import * as S from './Styled';
 
 const StartProjectPane = () => {
   const dispatch = useAppDispatch();
@@ -89,32 +25,32 @@ const StartProjectPane = () => {
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>
-            <TitleBarContainer>
-              <Title>Start a Project</Title>
-            </TitleBarContainer>
+            <S.TitleBarContainer>
+              <S.Title>Start a Project</S.Title>
+            </S.TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
       <Row>
-        <StyledContainer>
+        <S.Container>
           <div>
-            <StyledActionTitle>How would you like to begin?</StyledActionTitle>
+            <S.ActionTitle>How would you like to begin?</S.ActionTitle>
             <div style={{display: 'flex'}}>
-              <StyledActionContainer onClick={handleOpenFolderExplorer}>
-                <StyledFolderOpenOutlined />
-                <StyledActionText>Select an existing folder</StyledActionText>
-              </StyledActionContainer>
-              <StyledActionContainer onClick={() => handleCreateProject(false)}>
-                <StyledFolderAddOutlined />
-                <StyledActionText>Create an empty project</StyledActionText>
-              </StyledActionContainer>
-              <StyledActionContainer onClick={() => handleCreateProject(true)}>
-                <StyledFormatPainterOutlined />
-                <StyledActionText>Start from a template</StyledActionText>
-              </StyledActionContainer>
+              <S.ActionContainer onClick={handleOpenFolderExplorer}>
+                <S.FolderOpenOutlined />
+                <S.ActionText>Select an existing folder</S.ActionText>
+              </S.ActionContainer>
+              <S.ActionContainer onClick={() => handleCreateProject(false)}>
+                <S.FolderAddOutlined />
+                <S.ActionText>Create an empty project</S.ActionText>
+              </S.ActionContainer>
+              <S.ActionContainer onClick={() => handleCreateProject(true)}>
+                <S.FormatPainterOutlined />
+                <S.ActionText>Start from a template</S.ActionText>
+              </S.ActionContainer>
             </div>
           </div>
-        </StyledContainer>
+        </S.Container>
       </Row>
     </>
   );
