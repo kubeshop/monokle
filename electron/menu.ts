@@ -72,6 +72,7 @@ function setRootFolderInRendererThread(folder: string) {
   }
 }
 
+// need this because we cannot dispatch thunks from main
 function openProjectInRendererThread(project: Project) {
   const window = BrowserWindow.getFocusedWindow();
   if (window) {

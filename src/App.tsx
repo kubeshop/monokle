@@ -85,6 +85,7 @@ const App = () => {
     };
   }, [onExecutedFrom]);
 
+  // called from main thread because thunks cannot be dispatched by main
   const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
     if (project) {
       dispatch(setOpenProject(project.rootFolder));
