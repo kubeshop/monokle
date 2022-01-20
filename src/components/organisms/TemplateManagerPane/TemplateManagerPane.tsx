@@ -1,6 +1,6 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Button, Skeleton, Tooltip} from 'antd';
+import {Button, Input, Skeleton, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
@@ -17,6 +17,20 @@ import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
 import * as S from './TemplateManagerPane.styled';
 
+const filterTemplateBySearchedValue = (searchedValue: string, name: string) => {
+  let shouldBeFiltered = true;
+  const splittedSearchedValue = searchedValue.split(' ');
+
+  for (let i = 0; i < splittedSearchedValue.length; i += 1) {
+    if (!name.split(' ').find(namePart => namePart.toLowerCase().includes(splittedSearchedValue[i].toLowerCase()))) {
+      shouldBeFiltered = false;
+      break;
+    }
+  }
+
+  return shouldBeFiltered;
+};
+
 const TemplatesPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
@@ -26,6 +40,9 @@ const TemplatesPane: React.FC = () => {
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
+
+  const [searchedValue, setSearchedValue] = useState<string>();
+  const [templatesToShow, setTemplatesToShow] = useState<Record<string, AnyTemplate>>();
 
   const isLoading = useMemo(() => {
     return isLoadingExistingTemplates || isLoadingExistingTemplatePacks;
@@ -48,6 +65,21 @@ const TemplatesPane: React.FC = () => {
     [templateMap, pluginMap, templatePackMap, dispatch]
   );
 
+  useEffect(() => {
+    if (!searchedValue) {
+      setTemplatesToShow(templateMap);
+    } else {
+      setTemplatesToShow(
+        Object.fromEntries(
+          Object.entries(templateMap).filter(templateEntry => {
+            const templateName = templateEntry[1].name;
+            return filterTemplateBySearchedValue(searchedValue, templateName);
+          })
+        )
+      );
+    }
+  }, [searchedValue, templateMap]);
+
   return (
     <>
       {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
@@ -62,20 +94,34 @@ const TemplatesPane: React.FC = () => {
           />
         </Tooltip>
       </TitleBar>
+
       <S.Container>
         {isLoading ? (
           <Skeleton />
-        ) : !Object.keys(templateMap).length ? (
+        ) : !templatesToShow ? (
           <p>No templates available.</p>
         ) : (
-          Object.entries(templateMap).map(([path, template]) => (
-            <TemplateInformation
-              key={template.id}
-              template={template}
-              templatePath={path}
-              onClickOpenTemplate={() => onClickOpenTemplate(template)}
+          <>
+            <Input.Search
+              placeholder="Search template by name"
+              style={{marginBottom: '20px'}}
+              value={searchedValue}
+              onChange={e => setSearchedValue(e.target.value)}
             />
-          ))
+
+            {!Object.keys(templatesToShow).length ? (
+              <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
+            ) : (
+              Object.entries(templatesToShow).map(([path, template]) => (
+                <TemplateInformation
+                  key={template.id}
+                  template={template}
+                  templatePath={path}
+                  onClickOpenTemplate={() => onClickOpenTemplate(template)}
+                />
+              ))
+            )}
+          </>
         )}
       </S.Container>
     </>

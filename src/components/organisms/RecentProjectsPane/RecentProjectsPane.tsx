@@ -104,7 +104,11 @@ const RecentProjectsPane = () => {
             <ProjectItem key={project.rootFolder}>
               <ProjectName onClick={() => openProject(project)}>{project.name}</ProjectName>
               <ProjectPath>{project.rootFolder}</ProjectPath>
-              <ProjectLastOpened>last opened {getRelativeDate(project.lastOpened)}</ProjectLastOpened>
+              <ProjectLastOpened>
+                {getRelativeDate(project.lastOpened)
+                  ? `last opened ${getRelativeDate(project.lastOpened)}`
+                  : 'Not opened yet'}
+              </ProjectLastOpened>
             </ProjectItem>
           ))}
         </ProjectsContainer>
