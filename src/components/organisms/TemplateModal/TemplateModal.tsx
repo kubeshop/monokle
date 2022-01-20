@@ -50,6 +50,8 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
     (formDataList: Record<string, Primitive>[]) => {
       if (isVanillaTemplate(template)) {
         setIsLoading(true);
+        // remove first entry - which is the intro page
+        formDataList.shift();
         createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
           .then(({message, resources}) => {
             setResultMessage(message);
