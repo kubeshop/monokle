@@ -44,6 +44,7 @@ const initialAppState: AppState = {
   notifications: [],
   shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
+  registeredKindHandlers: [],
 };
 
 const initialAppConfigState: AppConfig = {
@@ -161,6 +162,7 @@ const initialNavigatorState: NavigatorState = {
   sectionInstanceMap: {},
   itemInstanceMap: {},
   collapsedSectionIds: [],
+  registeredSectionBlueprintIds: [],
 };
 
 const initialUiCoachState: UiCoachState = {

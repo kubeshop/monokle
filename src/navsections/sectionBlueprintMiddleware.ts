@@ -4,41 +4,13 @@ import asyncLib from 'async';
 import log from 'loglevel';
 import {Middleware} from 'redux';
 
+import {AppDispatch} from '@models/appdispatch';
 import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance} from '@models/navigator';
+import {RootState} from '@models/rootstate';
 
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
-import {AppDispatch, RootState} from '@redux/store';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
-
-const heightByContainerElementId: Record<string, number> = {};
-const resizeObserver = new window.ResizeObserver(entries => {
-  entries.forEach(entry => {
-    const elementId = entry.target.id;
-    const {height} = entry.contentRect;
-    heightByContainerElementId[elementId] = height;
-  });
-});
-sectionBlueprintMap.getAll().forEach(sectionBlueprint => {
-  const element = document.getElementById(sectionBlueprint.containerElementId);
-  if (!element) {
-    throw new Error(
-      `[SectionBlueprint]: Couldn't find container element with id ${sectionBlueprint.containerElementId}`
-    );
-  }
-  resizeObserver.observe(element);
-});
-const getContainerElementHeight = (containerElementId: string) => {
-  if (heightByContainerElementId[containerElementId]) {
-    return heightByContainerElementId[containerElementId];
-  }
-  const element = document.getElementById(containerElementId);
-  if (!element) {
-    return window.innerHeight;
-  }
-  resizeObserver.observe(element);
-  return element.getBoundingClientRect().height;
-};
 
 const fullScopeCache: Record<string, any> = {};
 
@@ -78,7 +50,7 @@ function isScrolledIntoView(elementId: string, containerElementHeight: number) {
 
 function computeItemScrollIntoView(sectionInstance: SectionInstance, itemInstanceMap: Record<string, ItemInstance>) {
   const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
-  const containerElementHeight = getContainerElementHeight(sectionBlueprint.containerElementId);
+  const containerElementHeight = sectionBlueprintMap.getSectionContainerElementHeight(sectionBlueprint);
 
   const allDescendantVisibleItems: ItemInstance[] = (sectionInstance.visibleDescendantItemIds || []).map(
     itemId => itemInstanceMap[itemId]

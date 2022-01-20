@@ -29,6 +29,11 @@ function SectionRenderer(props: SectionRendererProps) {
     state => state.navigator.sectionInstanceMap[sectionId]
   );
 
+  const registeredSectionIds = useAppSelector(state => state.navigator.registeredSectionBlueprintIds);
+  const childSectionIds = useMemo(() => {
+    return sectionBlueprint.childSectionIds?.filter(id => registeredSectionIds.includes(id));
+  }, [sectionBlueprint.childSectionIds, registeredSectionIds]);
+
   const dispatch = useAppDispatch();
 
   const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
@@ -225,8 +230,8 @@ function SectionRenderer(props: SectionRendererProps) {
             </React.Fragment>
           );
         })}
-      {sectionBlueprint.childSectionIds &&
-        sectionBlueprint.childSectionIds
+      {childSectionIds &&
+        childSectionIds
           .map(childSectionId => navSectionMap.getById(childSectionId))
           .map(child => (
             <SectionRenderer

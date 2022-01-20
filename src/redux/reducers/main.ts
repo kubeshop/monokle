@@ -653,6 +653,18 @@ export const mainSlice = createSlice({
       state.clusterDiff.hideClusterOnlyResources = !state.clusterDiff.hideClusterOnlyResources;
       state.clusterDiff.selectedMatches = [];
     },
+    addMultipleKindHandlers: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      action.payload.forEach(kind => {
+        if (!state.registeredKindHandlers.includes(kind)) {
+          state.registeredKindHandlers.push(kind);
+        }
+      });
+    },
+    addKindHandler: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      if (!state.registeredKindHandlers.includes(action.payload)) {
+        state.registeredKindHandlers.push(action.payload);
+      }
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1101,5 +1113,7 @@ export const {
   closeResourceDiffModal,
   openResourceDiffModal,
   setFiltersToBeChanged,
+  addMultipleKindHandlers,
+  addKindHandler,
 } = mainSlice.actions;
 export default mainSlice.reducer;
