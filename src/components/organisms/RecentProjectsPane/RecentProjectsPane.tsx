@@ -33,6 +33,7 @@ const ProjectsContainer = styled.div`
   padding: 16px 12px;
   height: calc(100vh - 112px);
   overflow-y: scroll;
+  width: 100%;
   ${GlobalScrollbarStyle}
 `;
 

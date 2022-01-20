@@ -118,7 +118,7 @@ const SettingsDrawer = () => {
           />
         </Panel>
         {activeProject && (
-          <Panel header={`${activeProject.name} Settings`} key="2">
+          <Panel header="Project Settings" key="2">
             <Settings
               config={currentConfig}
               onConfigChange={changeProjectConfig}
