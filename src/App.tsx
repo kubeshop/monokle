@@ -89,6 +89,7 @@ const App = () => {
     if (project) {
       dispatch(setOpenProject(project.rootFolder));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
