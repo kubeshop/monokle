@@ -8,7 +8,14 @@ import {NewVersionCode} from '@models/appconfig';
 
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
-import {openNewResourceWizard, resetLayout, setMonacoEditor, toggleLeftMenu} from '@redux/reducers/ui';
+import {
+  openCreateProjectModal,
+  openFolderExplorer,
+  openNewResourceWizard,
+  resetLayout,
+  setMonacoEditor,
+  toggleLeftMenu,
+} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {RootState} from '@redux/store';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -90,6 +97,30 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         click: () => {
           setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
         },
+      },
+      {type: 'separator'},
+      {
+        label: 'New Project',
+        submenu: [
+          {
+            label: 'Select Folder',
+            click: () => {
+              dispatch(openFolderExplorer());
+            },
+          },
+          {
+            label: 'Empty Project',
+            click: () => {
+              dispatch(openCreateProjectModal({fromTemplate: false}));
+            },
+          },
+          {
+            label: 'From Template',
+            click: () => {
+              dispatch(openCreateProjectModal({fromTemplate: true}));
+            },
+          },
+        ],
       },
       {type: 'separator'},
       {

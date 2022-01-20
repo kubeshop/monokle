@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {Row} from 'antd';
 
@@ -6,9 +6,9 @@ import {FolderAddOutlined, FolderOpenOutlined, FormatPainterOutlined} from '@ant
 
 import styled from 'styled-components';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
-import {openCreateProjectModal} from '@redux/reducers/ui';
+import {closeFolderExplorer, openCreateProjectModal} from '@redux/reducers/ui';
 
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 import FileExplorer from '@atoms/FileExplorer';
@@ -78,6 +78,7 @@ const StyledContainer = styled.div`
 
 const StartProjectPane = () => {
   const dispatch = useAppDispatch();
+  const isFolderExplorerOpen = useAppSelector(state => state.ui.folderExplorer.isOpen);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -87,6 +88,14 @@ const StartProjectPane = () => {
     },
     {isDirectoryExplorer: true}
   );
+
+  useEffect(() => {
+    if (isFolderExplorerOpen) {
+      openFileExplorer();
+      dispatch(closeFolderExplorer());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFolderExplorerOpen]);
 
   const handleCreateProject = (fromTemplate: boolean) => {
     dispatch(openCreateProjectModal({fromTemplate}));
