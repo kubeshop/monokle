@@ -9,7 +9,7 @@ const rootPropertiesToIgnore = ['apiVersion', 'kind', 'metadata'];
 const kubernetesSchema = JSON.parse(fs.readFileSync(k8Path, 'utf-8')).definitions;
 
 export const generateSchema = (kind: string) => {
-  const kindDefinitionKey = Object.keys(kubernetesSchema).find((key) => {
+  const kindDefinitionKey = Object.keys(kubernetesSchema).find(key => {
     const parts = key.split('.');
     return parts[parts.length - 1] === kind;
   });
@@ -20,7 +20,7 @@ export const generateSchema = (kind: string) => {
 
   const kindDefinition = kubernetesSchema[kindDefinitionKey];
 
-  const { properties, propertiesUi } = parseFields(kindDefinition.properties, true);
+  const {properties, propertiesUi} = parseFields(kindDefinition.properties, true);
   const schemaDefinition = {
     properties,
     type: 'object',
@@ -33,10 +33,8 @@ export const generateSchema = (kind: string) => {
   const schemaFilename = `${kind.toLocaleLowerCase()}-schema.json`;
   const schemaUiFilename = `${kind.toLocaleLowerCase()}-ui-schema.json`;
 
-  fs.writeFileSync(`${schemaDir}${path.sep}${schemaFilename}`,
-    JSON.stringify(schemaDefinition, null, 2));
-  fs.writeFileSync(`${schemaDir}${path.sep}${schemaUiFilename}`,
-    JSON.stringify(schemaUIDefinition, null, 2));
+  fs.writeFileSync(`${schemaDir}${path.sep}${schemaFilename}`, JSON.stringify(schemaDefinition, null, 2));
+  fs.writeFileSync(`${schemaDir}${path.sep}${schemaUiFilename}`, JSON.stringify(schemaUIDefinition, null, 2));
 
   console.log(`Created ${schemaFilename} and ${schemaUiFilename} in schema dir`);
 };
@@ -60,7 +58,7 @@ const parseFields = (definition: any, firstCall = false) => {
   const schemaDefinition: any = {};
   const schemaUiDefinition: any = {};
 
-  Object.keys(definition).forEach((key) => {
+  Object.keys(definition).forEach(key => {
     const keyDefinition = definition[key];
 
     if (firstCall && rootPropertiesToIgnore.includes(key)) {
@@ -77,7 +75,7 @@ const parseFields = (definition: any, firstCall = false) => {
         return;
       }
 
-      const { properties, propertiesUi } = parseFields(kubernetesSchema[childKey].properties);
+      const {properties, propertiesUi} = parseFields(kubernetesSchema[childKey].properties);
       schemaDefinition[key] = {
         type: 'object',
         properties,
@@ -89,7 +87,7 @@ const parseFields = (definition: any, firstCall = false) => {
     } else if (hasItems) {
       if (keyDefinition.items['$ref']) {
         const childKey = getKeyFromRef(keyDefinition.items);
-        const { properties, propertiesUi } = parseFields(kubernetesSchema[childKey].properties);
+        const {properties, propertiesUi} = parseFields(kubernetesSchema[childKey].properties);
         schemaDefinition[key] = {
           type: 'array',
           items: {
