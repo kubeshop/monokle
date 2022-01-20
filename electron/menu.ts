@@ -23,7 +23,7 @@ import {selectFromHistory} from '@redux/thunks/selectionHistory';
 import {openDocumentation, openGitHub} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
-import {MainDispatch} from './ipcMainRedux';
+import {MainDispatch, dispatchToFocusedWindow} from './ipcMainRedux';
 import {openApplication} from './main';
 
 const isMac = process.platform === 'darwin';
@@ -113,32 +113,23 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
           {
             label: 'Select Folder',
             click: () => {
-              dispatch(openFolderExplorer());
+              dispatchToFocusedWindow(openFolderExplorer());
             },
           },
           {
             label: 'Empty Project',
             click: () => {
-              dispatch(openCreateProjectModal({fromTemplate: false}));
+              dispatchToFocusedWindow(openCreateProjectModal({fromTemplate: false}));
             },
           },
           {
             label: 'From Template',
             click: () => {
-              dispatch(openCreateProjectModal({fromTemplate: true}));
+              dispatchToFocusedWindow(openCreateProjectModal({fromTemplate: true}));
             },
           },
         ],
       },
-      {type: 'separator'},
-      {
-        label: 'New Resource',
-        enabled: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-        click: async () => {
-          dispatch(openNewResourceWizard());
-        },
-      },
-      {type: 'separator'},
       {
         label: 'Recent Projects',
         submenu: state.config.projects.map((project: Project) => ({
@@ -148,6 +139,15 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
           },
         })),
       },
+      {type: 'separator'},
+      {
+        label: 'New Resource',
+        enabled: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
+        click: async () => {
+          dispatch(openNewResourceWizard());
+        },
+      },
+
       {type: 'separator'},
       {
         label: 'Exit Preview',

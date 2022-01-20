@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 
 import {Row} from 'antd';
 
@@ -6,14 +6,10 @@ import {FolderAddOutlined, FolderOpenOutlined, FormatPainterOutlined} from '@ant
 
 import styled from 'styled-components';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject} from '@redux/reducers/appConfig';
-import {closeFolderExplorer, openCreateProjectModal} from '@redux/reducers/ui';
+import {useAppDispatch} from '@redux/hooks';
+import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
-import FileExplorer from '@atoms/FileExplorer';
-
-import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import Colors from '@styles/Colors';
 
@@ -78,24 +74,10 @@ const StyledContainer = styled.div`
 
 const StartProjectPane = () => {
   const dispatch = useAppDispatch();
-  const isFolderExplorerOpen = useAppSelector(state => state.ui.folderExplorer.isOpen);
 
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    ({folderPath}) => {
-      if (folderPath) {
-        dispatch(setCreateProject({rootFolder: folderPath}));
-      }
-    },
-    {isDirectoryExplorer: true}
-  );
-
-  useEffect(() => {
-    if (isFolderExplorerOpen) {
-      openFileExplorer();
-      dispatch(closeFolderExplorer());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFolderExplorerOpen]);
+  const handleOpenFolderExplorer = () => {
+    dispatch(openFolderExplorer());
+  };
 
   const handleCreateProject = (fromTemplate: boolean) => {
     dispatch(openCreateProjectModal({fromTemplate}));
@@ -117,7 +99,7 @@ const StartProjectPane = () => {
           <div>
             <StyledActionTitle>How would you like to begin?</StyledActionTitle>
             <div style={{display: 'flex'}}>
-              <StyledActionContainer onClick={openFileExplorer}>
+              <StyledActionContainer onClick={handleOpenFolderExplorer}>
                 <StyledFolderOpenOutlined />
                 <StyledActionText>Select an existing folder</StyledActionText>
               </StyledActionContainer>
@@ -133,7 +115,6 @@ const StartProjectPane = () => {
           </div>
         </StyledContainer>
       </Row>
-      <FileExplorer {...fileExplorerProps} />
     </>
   );
 };
