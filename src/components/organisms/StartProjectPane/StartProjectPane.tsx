@@ -59,6 +59,7 @@ const StyledActionContainer = styled.div`
 const StyledActionText = styled.div`
   color: ${Colors.blue6};
   font-size: 12px;
+  text-align: center;
 `;
 
 const StyledActionTitle = styled.div`
