@@ -105,6 +105,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       }
     }
   );
+  let nrOfCreatedResources = 0;
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
     .forEach(resourceText => {
@@ -119,7 +120,11 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
           dispatch,
           obj
         );
+        nrOfCreatedResources += 1;
       });
     });
-  return template.resultMessage || 'Done.';
+  let resultMessage = template.resultMessage || 'Done.';
+  return nrOfCreatedResources === 0
+    ? `${resultMessage}\nNOTE: Processed the template successfully but the output did not create any valid resources.`
+    : resultMessage;
 };
