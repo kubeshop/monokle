@@ -1,5 +1,7 @@
 import {Modal as AntModal, Input, Steps} from 'antd';
 
+import {FormOutlined as RawFormOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
@@ -15,6 +17,11 @@ export const Container = styled.div`
   overflow-x: hidden;
   margin: 24px 0px;
   ${GlobalScrollbarStyle};
+`;
+
+export const FormOutlined = styled(RawFormOutlined)`
+  font-size: 22px;
+  margin-right: 10px;
 `;
 
 export const Modal = styled(AntModal)`
@@ -53,6 +60,31 @@ export const Step = styled(Steps.Step)`
     overflow: hidden;
     white-space: nowrap;
   }
+`;
+
+export const Table = styled.table`
+  width: 100%;
+`;
+
+export const TableHead = styled.th`
+  width: 120px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgb(48, 48, 48);
+  padding: 8px;
+  font-weight: 400;
+`;
+
+export const TableData = styled.td`
+  border: 1px solid rgb(48, 48, 48);
+  padding: 5px 10px;
+`;
+
+export const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
 `;
 
 export const CreatedResourceLabel = styled.p`
