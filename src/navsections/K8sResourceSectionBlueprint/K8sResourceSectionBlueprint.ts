@@ -42,6 +42,7 @@ const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
     name: subsectionName,
     id: subsectionName,
     containerElementId: 'navigator-sections-container',
+    childSectionIds,
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       const activeResources = Object.values(state.main.resourceMap).filter(
@@ -155,7 +156,10 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
 sectionBlueprintMap.register(K8sResourceSectionBlueprint);
 
 KindHandlersEventEmitter.on('register', kindHandler => {
-  const [_, parentSectionId, kindSectionId] = kindHandler.navigatorPath;
+  const [rootSectionId, parentSectionId, kindSectionId] = kindHandler.navigatorPath;
+  if (rootSectionId !== navSectionNames.K8S_RESOURCES) {
+    return;
+  }
   const rootSection = K8sResourceSectionBlueprint;
 
   let parentSection = rootSection.childSectionIds
@@ -165,6 +169,11 @@ KindHandlersEventEmitter.on('register', kindHandler => {
   if (!parentSection) {
     parentSection = makeSubsection(parentSectionId, [kindSectionId]);
     sectionBlueprintMap.register(parentSection);
+    if (rootSection.childSectionIds) {
+      rootSection.childSectionIds.push(parentSection.id);
+    } else {
+      rootSection.childSectionIds = [parentSection.id];
+    }
   } else {
     parentSection.childSectionIds = parentSection.childSectionIds?.length
       ? parentSection.childSectionIds.includes(kindSectionId)
