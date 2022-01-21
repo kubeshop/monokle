@@ -172,10 +172,6 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   };
 
   const calculateLeftWidthOnDrawersChange = () => {
-    if (hideLeft) {
-      return 0;
-    }
-
     if (leftWidth > MIN_LEFT_PANE_WIDTH / viewWidth) {
       return leftWidth;
     }
@@ -303,9 +299,9 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   };
 
   const calculateLeftNavCombination = (clientX: number, movingDirection: string) => {
-    const combinedPixelWidth = Math.floor((hideLeft ? 0 : leftWidth) * viewWidth + navWidth * viewWidth);
+    const combinedPixelWidth = Math.floor(leftWidth * viewWidth + navWidth * viewWidth);
     const newLeftWidth = Math.floor(leftWidth * viewWidth + clientX - separatorLeftNavXPosition);
-    const newNavWidth = Math.floor(combinedPixelWidth - (hideLeft ? 0 : newLeftWidth));
+    const newNavWidth = Math.floor(combinedPixelWidth - newLeftWidth);
 
     setSeparatorLeftNavXPosition(clientX);
 
