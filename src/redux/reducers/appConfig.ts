@@ -1,6 +1,7 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import _ from 'lodash';
+import objectPath from 'object-path';
 import path from 'path';
 
 import {
@@ -19,7 +20,7 @@ import {
   SerializableObject,
   populateProjectConfig,
   readProjectConfig,
-  setStateForBulkOperation,
+  serializeObject,
   writeProjectConfigFile,
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
@@ -52,9 +53,9 @@ export const setOpenProject = createAsyncThunk(
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
     if (projectConfig) {
-      thunkAPI.dispatch(configSlice.actions.setProjectConfig(projectConfig));
+      thunkAPI.dispatch(configSlice.actions.updateProjectConfig(projectConfig));
     } else {
-      thunkAPI.dispatch(configSlice.actions.setProjectConfig(populateProjectConfig(appConfig)));
+      thunkAPI.dispatch(configSlice.actions.updateProjectConfig(populateProjectConfig(appConfig)));
     }
   }
 );
@@ -178,9 +179,6 @@ export const configSlice = createSlice({
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
-    setProjectConfig: (state: Draft<AppConfig | SerializableObject>, action: PayloadAction<ProjectConfig | null>) => {
-      setStateForBulkOperation(state.projectConfig, action.payload);
-    },
     updateProjectKubeConfig: (
       state: Draft<AppConfig | SerializableObject>,
       action: PayloadAction<KubeConfig | null>
@@ -188,7 +186,27 @@ export const configSlice = createSlice({
       if (!state.selectedProjectRootFolder) {
         return;
       }
-      setStateForBulkOperation(state.projectConfig?.kubeConfig, action.payload);
+
+      const serializedIncomingConfig = serializeObject(action.payload);
+      const serializedState = serializeObject(state.projectConfig.kubeConfig);
+      Object.keys(serializedIncomingConfig).forEach((key: string) => {
+        if (
+          _.isBoolean(serializedIncomingConfig[key]) &&
+          !_.isEqual(serializedState[key], serializedIncomingConfig[key])
+        ) {
+          if (!state.projectConfig.kubeConfig) {
+            state.projectConfig.kubeConfig = {};
+          }
+          objectPath.set(state.projectConfig.kubeConfig, key, serializedIncomingConfig[key]);
+        }
+        if (serializedIncomingConfig[key] && !_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+          console.log('key', key);
+          if (!state.projectConfig.kubeConfig) {
+            state.kubeConfig = {};
+          }
+          objectPath.set(state.projectConfig.kubeConfig, key, serializedIncomingConfig[key]);
+        }
+      });
       writeProjectConfigFile(state, state.projectConfig);
     },
     updateProjectConfig: (
@@ -198,7 +216,26 @@ export const configSlice = createSlice({
       if (!state.selectedProjectRootFolder) {
         return;
       }
-      setStateForBulkOperation(state.projectConfig, action.payload);
+      const serializedIncomingConfig = serializeObject(action.payload);
+      const serializedState = serializeObject(state.projectConfig);
+      Object.keys(serializedIncomingConfig).forEach((key: string) => {
+        if (
+          _.isBoolean(serializedIncomingConfig[key]) &&
+          !_.isEqual(serializedState[key], serializedIncomingConfig[key])
+        ) {
+          if (!state.projectConfig) {
+            state.projectConfig = {};
+          }
+          objectPath.set(state.projectConfig, key, serializedIncomingConfig[key]);
+        }
+        if (serializedIncomingConfig[key] && !_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+          console.log('key', key);
+          if (!state.projectConfig) {
+            state.projectConfig = {};
+          }
+          objectPath.set(state.projectConfig, key, serializedIncomingConfig[key]);
+        }
+      });
       writeProjectConfigFile(state, action.payload);
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {

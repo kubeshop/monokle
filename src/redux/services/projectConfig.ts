@@ -158,22 +158,3 @@ export const deserializeObject = (objectToDeserialize?: SerializableObject | nul
   });
   return deserialized;
 };
-
-export const setStateForBulkOperation = (state?: any, applyingObject?: object | null) => {
-  if (!applyingObject) {
-    return;
-  }
-
-  const serializedIncomingConfig = serializeObject(applyingObject);
-  const serializedState = serializeObject(state);
-
-  Object.keys(serializedIncomingConfig).forEach((key: string) => {
-    if (serializedIncomingConfig[key] && !_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
-      console.log('key', key);
-      if (!state) {
-        state = {};
-      }
-      objectPath.set(state, key, serializedIncomingConfig[key]);
-    }
-  });
-};

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
@@ -138,17 +139,27 @@ export const kubeConfigContextsSelector = createSelector(
 );
 
 export const kubeConfigPathSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.kubeConfig?.path || '';
+  (state: RootState) => state.config,
+  config => {
+    if (config.projectConfig?.kubeConfig?.path) {
+      return config.projectConfig?.kubeConfig?.path;
+    }
+    if (config.kubeConfig.path) {
+      return config.kubeConfig.path;
+    }
+    return '';
   }
 );
 
 export const kubeConfigPathValidSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.kubeConfig?.isPathValid || false;
+  (state: RootState) => state.config,
+  config => {
+    if (_.isBoolean(config.projectConfig?.kubeConfig?.isPathValid)) {
+      return Boolean(config.projectConfig?.kubeConfig?.isPathValid);
+    }
+    if (_.isBoolean(config.kubeConfig.isPathValid)) {
+      return Boolean(config.kubeConfig.isPathValid);
+    }
+    return false;
   }
 );
