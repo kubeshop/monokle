@@ -46,12 +46,8 @@ const getSectionContainerElementHeight = (sectionBlueprint: SectionBlueprint<any
   return element.getBoundingClientRect().height;
 };
 
-const getById = (name: string) => {
-  const navSection = SectionBlueprintMap[name];
-  if (!navSection) {
-    throw new Error(`NavSection with name ${name} is not registered in the SectionBlueprintMap`);
-  }
-  return navSection;
+const getById = (name: string): SectionBlueprint<any, any> | undefined => {
+  return SectionBlueprintMap[name];
 };
 
 export default {
