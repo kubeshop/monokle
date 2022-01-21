@@ -52,4 +52,5 @@ export const FormOutlined = styled(RawFormOutlined)`
 
 export const OpenButton = styled(Button)`
   width: max-content;
+  padding: 0px;
 `;
