@@ -7,6 +7,8 @@ import _ from 'lodash';
 
 import {AnyTemplate} from '@models/template';
 
+import TemplateIcon from '@assets/TemplateIcon.svg';
+
 import * as S from './TemplateInformation.styled';
 
 interface IProps {
@@ -21,9 +23,7 @@ const TemplateInformation: React.FC<IProps> = props => {
 
   return (
     <S.Container>
-      <S.IconContainer>
-        <S.FormOutlined />
-      </S.IconContainer>
+      <S.Image src={template.icon ? template.icon : TemplateIcon} alt="Template_Icon" />
 
       <S.InfoContainer ref={infoContainerRef}>
         <S.Name $width={infoContainerWidth}>{template.name}</S.Name>

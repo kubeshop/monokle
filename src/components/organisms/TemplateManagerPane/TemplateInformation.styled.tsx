@@ -17,7 +17,8 @@ export const AdditionalInformation = styled.div`
 
 export const Container = styled.div`
   display: grid;
-  grid-template-columns: max-content 1fr 40px;
+  grid-template-columns: max-content 1fr;
+  grid-column-gap: 18px;
   position: relative;
   margin-bottom: 16px;
 `;
@@ -26,9 +27,9 @@ export const Description = styled.span`
   color: ${Colors.grey7};
 `;
 
-export const IconContainer = styled.div`
-  height: 50px;
-  width: 50px;
+export const Image = styled.img`
+  width: 32px;
+  height: 32px;
 `;
 
 export const InfoContainer = styled.div`
