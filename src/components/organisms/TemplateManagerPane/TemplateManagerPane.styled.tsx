@@ -25,6 +25,7 @@ export const SearchInput = styled(Input.Search)`
 
 export const TemplatesContainer = styled.div<{$height: number}>`
   display: grid;
+  grid-auto-rows: max-content;
   grid-row-gap: 25px;
   ${props => `height: ${props.$height}px;`}
   overflow-y: auto;
