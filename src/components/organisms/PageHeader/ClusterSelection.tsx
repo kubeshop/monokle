@@ -145,8 +145,8 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const clusterMenu = (
     <Menu>
       {kubeConfigContexts.map((context: any) => (
-        <Menu.Item key={context.cluster} onClick={handleClusterChange}>
-          {context.cluster}
+        <Menu.Item key={context.name} onClick={handleClusterChange}>
+          {context.name}
         </Menu.Item>
       ))}
     </Menu>

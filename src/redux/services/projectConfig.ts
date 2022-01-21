@@ -1,5 +1,6 @@
 import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
+import log from 'loglevel';
 import {sep} from 'path';
 import {AnyAction} from 'redux';
 
@@ -25,6 +26,9 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
         writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
       }
     } catch (error: any) {
+      if (error instanceof Error) {
+        log.warn(`[writeProjectConfigFile]: ${error.message}`);
+      }
       writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
     }
   } else {
@@ -105,6 +109,9 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
 
     return projectConfig;
   } catch (error) {
+    if (error instanceof Error) {
+      log.warn(`[readProjectConfig]: ${error.message}`);
+    }
     return null;
   }
 };
