@@ -2,6 +2,8 @@ import {Input} from 'antd';
 
 import styled from 'styled-components';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
@@ -19,4 +21,12 @@ export const SearchInput = styled(Input.Search)`
   & input::placeholder {
     color: ${Colors.grey7};
   }
+`;
+
+export const TemplatesContainer = styled.div<{$height: number}>`
+  display: grid;
+  grid-row-gap: 25px;
+  ${props => `height: ${props.$height}px;`}
+  overflow-y: auto;
+  ${GlobalScrollbarStyle};
 `;

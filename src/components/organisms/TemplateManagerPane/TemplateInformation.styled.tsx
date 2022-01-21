@@ -20,7 +20,6 @@ export const Container = styled.div`
   grid-template-columns: max-content 1fr;
   grid-column-gap: 18px;
   position: relative;
-  margin-bottom: 25px;
 `;
 
 export const Description = styled.span`
