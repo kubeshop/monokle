@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Button, Input, Skeleton, Tooltip} from 'antd';
+import {Button, Skeleton, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
@@ -102,9 +102,8 @@ const TemplatesPane: React.FC = () => {
           <p>No templates available.</p>
         ) : (
           <>
-            <Input.Search
-              placeholder="Search template by name"
-              style={{marginBottom: '20px'}}
+            <S.SearchInput
+              placeholder="Search installed templates"
               value={searchedValue}
               onChange={e => setSearchedValue(e.target.value)}
             />
