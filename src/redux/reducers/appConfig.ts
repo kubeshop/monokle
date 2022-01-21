@@ -16,7 +16,7 @@ import {
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
 import {
-  SerializableObject,
+  keysToUpdateStateBulk,
   populateProjectConfig,
   readProjectConfig,
   serializeObject,
@@ -52,9 +52,9 @@ export const setOpenProject = createAsyncThunk(
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
     if (projectConfig) {
-      thunkAPI.dispatch(configSlice.actions.updateProjectConfig(projectConfig));
+      thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config:projectConfig,fromConfigFile:false}));
     } else {
-      thunkAPI.dispatch(configSlice.actions.updateProjectConfig(populateProjectConfig(appConfig)));
+      thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config:populateProjectConfig(appConfig),fromConfigFile:false}));
     }
   }
 );
@@ -178,74 +178,56 @@ export const configSlice = createSlice({
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
-    updateProjectKubeConfig: (
-      state: Draft<AppConfig | SerializableObject>,
+    updateProjectKubeConfig: (state: Draft<AppConfig>,
       action: PayloadAction<KubeConfig | null>
     ) => {
       if (!state.selectedProjectRootFolder) {
         return;
       }
 
+      if (!state.projectConfig) {
+        state.projectConfig = {};
+      }
+
+      if (!state.projectConfig.kubeConfig) {
+        state.projectConfig.kubeConfig = {};
+      }
+
       const serializedIncomingConfig = serializeObject(action.payload);
       const serializedState = serializeObject(state.projectConfig.kubeConfig);
-      let writeToFile = false;
+      const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
 
-      Object.keys(serializedIncomingConfig).forEach((key: string) => {
-        if (
-          _.isBoolean(serializedIncomingConfig[key]) &&
-          !_.isEqual(serializedState[key], serializedIncomingConfig[key])
-        ) {
-          if (!state.projectConfig.kubeConfig) {
-            state.projectConfig.kubeConfig = {};
-          }
-          writeToFile = true;
-          _.set(state.projectConfig.kubeConfig, key, serializedIncomingConfig[key]);
-        }
-        if (serializedIncomingConfig[key] && !_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
-          console.log('key', key);
-          if (!state.projectConfig.kubeConfig) {
-            state.kubeConfig = {};
-          }
-          writeToFile = true;
-          _.set(state.projectConfig.kubeConfig, key, serializedIncomingConfig[key]);
-        }
+      keys.forEach(key => {
+        _.set(<object>state.projectConfig?.kubeConfig, key, serializedIncomingConfig[key]);
       });
-      if (writeToFile) {
-        writeProjectConfigFile(state, state.projectConfig);
+
+      if (keys.length > 0) {
+        writeProjectConfigFile(state);
       }
     },
-    updateProjectConfig: (
-      state: Draft<AppConfig | SerializableObject>,
-      action: PayloadAction<ProjectConfig | null>
-    ) => {
+    updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<{config:ProjectConfig | null,fromConfigFile:boolean}>) => {
       if (!state.selectedProjectRootFolder) {
         return;
       }
-      const serializedIncomingConfig = serializeObject(action.payload);
+
+      if (!state.projectConfig) {
+        state.projectConfig = {};
+      }
+
+      const serializedIncomingConfig = serializeObject(action.payload.config);
       const serializedState = serializeObject(state.projectConfig);
-      let writeToFile = false;
-      Object.keys(serializedIncomingConfig).forEach((key: string) => {
-        if (
-          _.isBoolean(serializedIncomingConfig[key]) &&
-          !_.isEqual(serializedState[key], serializedIncomingConfig[key])
-        ) {
-          if (!state.projectConfig) {
-            state.projectConfig = {};
-          }
-          _.set(state.projectConfig, key, serializedIncomingConfig[key]);
-          writeToFile = true;
-        }
-        if (serializedIncomingConfig[key] && !_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
-          console.log('key', key);
-          if (!state.projectConfig) {
-            state.projectConfig = {};
-          }
-          writeToFile = true;
-          _.set(state.projectConfig, key, serializedIncomingConfig[key]);
-        }
+      let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
+
+      if (action.payload.fromConfigFile) {
+        _.remove(keys, (k) => _.includes(['kubeConfig.contexts','kubeConfig.isPathValid'], k));
+      }
+
+      keys.forEach(key => {
+        _.set(<object>state.projectConfig, key, serializedIncomingConfig[key]);
       });
-      if (writeToFile) {
-        writeProjectConfigFile(state, state.projectConfig);
+
+      if (keys.length > 0) {
+        writeProjectConfigFile(state);
       }
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {

@@ -14,12 +14,10 @@ export interface SerializableObject {
 export const CONFIG_PATH = (projectRootPath?: string | null) =>
   projectRootPath ? `${projectRootPath}${sep}.monokle` : '';
 
-export const writeProjectConfigFile = (state: AppConfig | SerializableObject, projectConfig: ProjectConfig | null) => {
+export const writeProjectConfigFile = (state: AppConfig | SerializableObject) => {
   const absolutePath = CONFIG_PATH(state.selectedProjectRootFolder);
 
-  delete projectConfig?.settings?.loadLastProjectOnStartup;
-  delete projectConfig?.kubeConfig?.isPathValid;
-  delete projectConfig?.kubeConfig?.contexts;
+  const projectConfig = populateProjectConfigToWrite(state);
   if (projectConfig && !_.isEmpty(projectConfig)) {
     try {
       const savedConfig: ProjectConfig = JSON.parse(readFileSync(absolutePath, 'utf8'));
@@ -34,6 +32,25 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject, pr
   }
 };
 
+export const populateProjectConfigToWrite = (state: AppConfig | SerializableObject) => {
+  const applicationConfig: ProjectConfig = {
+    scanExcludes: state.projectConfig.scanExcludes,
+    fileIncludes: state.projectConfig.fileIncludes,
+    folderReadsMaxDepth: state.projectConfig.folderReadsMaxDepth,
+  };
+  applicationConfig.settings = {
+    helmPreviewMode: state.projectConfig.settings.helmPreviewMode,
+    kustomizeCommand: state.projectConfig.settings.kustomizeCommand,
+    hideExcludedFilesInFileExplorer: state.projectConfig.settings.hideExcludedFilesInFileExplorer,
+    isClusterSelectorVisible: state.projectConfig.settings.isClusterSelectorVisible,
+    enableHelmWithKustomize: state.projectConfig.settings.enableHelmWithKustomize,
+  };
+  applicationConfig.kubeConfig = {
+    path: state.projectConfig.kubeConfig.path,
+    currentContext: state.projectConfig.kubeConfig.currentContext,
+  };
+  return applicationConfig;
+};
 export const populateProjectConfig = (state: AppConfig | SerializableObject) => {
   const applicationConfig: ProjectConfig = {
     scanExcludes: state.scanExcludes,
@@ -52,6 +69,7 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     path: state.kubeConfig.path,
     isPathValid: state.kubeConfig.isPathValid,
     contexts: state.kubeConfig.contexts,
+    currentContext: state.kubeConfig.currentContext,
   };
   return applicationConfig;
 };
@@ -78,7 +96,6 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
       ? {
           path: kubeConfig.path,
           currentContext: kubeConfig.currentContext,
-          isPathValid: kubeConfig.isPathValid,
         }
       : undefined;
 
@@ -95,10 +112,10 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
 export const updateProjectSettings = (dispatch: AppDispatch, projectRootPath?: string | null) => {
   const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
   if (projectConfig) {
-    dispatch(updateProjectConfig(projectConfig));
+    dispatch(updateProjectConfig({config: projectConfig, fromConfigFile: true}));
     return;
   }
-  dispatch(updateProjectConfig(null));
+  dispatch(updateProjectConfig({config: null, fromConfigFile: true}));
 };
 
 export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null): ProjectConfig => {
@@ -154,4 +171,19 @@ export const deserializeObject = (objectToDeserialize?: SerializableObject | nul
     _.set(deserialized, key, objectToDeserialize[key]);
   });
   return deserialized;
+};
+
+export const keysToUpdateStateBulk = (
+  serializedState: SerializableObject,
+  serializedIncomingConfig: SerializableObject
+) => {
+  const keys: string[] = [];
+
+  Object.keys(serializedIncomingConfig).forEach((key: string) => {
+    if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+      keys.push(key);
+    }
+  });
+
+  return keys;
 };
