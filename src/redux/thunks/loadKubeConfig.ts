@@ -24,11 +24,11 @@ export const loadContexts = async (
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
 
-        const selectedContext = kc.contexts.find(c => c.cluster === currentContext);
+        const selectedContext = kc.contexts.find(c => c.name === currentContext);
         if (selectedContext) {
-          kc.setCurrentContext(selectedContext && selectedContext.cluster);
+          kc.setCurrentContext(selectedContext && selectedContext.name);
         } else {
-          kc.setCurrentContext((kc.contexts && kc.contexts.length > 0 && kc.contexts[0].cluster) || '');
+          kc.setCurrentContext((kc.contexts && kc.contexts.length > 0 && kc.contexts[0].name) || '');
         }
 
         const kubeConfig: KubeConfig = {
@@ -39,6 +39,9 @@ export const loadContexts = async (
 
         dispatch(updateProjectKubeConfig(kubeConfig));
       } catch (e: any) {
+        if (e instanceof Error) {
+          log.warn(`[loadContexts]: ${e.message}`);
+        }
         dispatch(
           setAlert({
             title: 'Loading kubeconfig file failed',
@@ -49,7 +52,9 @@ export const loadContexts = async (
       }
     }
   } catch (e) {
-    log.info(e);
+    if (e instanceof Error) {
+      log.warn(e.message);
+    }
     dispatch(updateProjectKubeConfig({isPathValid: false}));
   }
 };
