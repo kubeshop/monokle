@@ -161,7 +161,7 @@ const schema = {
 const defaults = {
   appConfig: {
     startupModalVisible: true,
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
+    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
       theme: 'dark',
