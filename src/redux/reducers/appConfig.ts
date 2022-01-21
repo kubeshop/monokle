@@ -1,5 +1,3 @@
-import _default from 'react-use/lib/useMediaDevices';
-
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import _ from 'lodash';
@@ -247,7 +245,7 @@ export const configSlice = createSlice({
         }
       });
       if (writeToFile) {
-        writeProjectConfigFile(state, action.payload);
+        writeProjectConfigFile(state, state.projectConfig);
       }
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {

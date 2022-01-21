@@ -21,7 +21,7 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
   const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
 
   watcher = watch(folder, {
-    ignored: scanExcludes,
+    ignored: [...scanExcludes, '/.monokle'],
     ignoreInitial: true,
     persistent: true,
     usePolling: true,
