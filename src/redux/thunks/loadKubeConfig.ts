@@ -24,11 +24,11 @@ export const loadContexts = async (
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
 
-        const selectedContext = kc.contexts.find(c => c.cluster === currentContext);
+        const selectedContext = kc.contexts.find(c => c.name === currentContext);
         if (selectedContext) {
-          kc.setCurrentContext(selectedContext && selectedContext.cluster);
+          kc.setCurrentContext(selectedContext && selectedContext.name);
         } else {
-          kc.setCurrentContext((kc.contexts && kc.contexts.length > 0 && kc.contexts[0].cluster) || '');
+          kc.setCurrentContext((kc.contexts && kc.contexts.length > 0 && kc.contexts[0].name) || '');
         }
 
         const kubeConfig: KubeConfig = {
