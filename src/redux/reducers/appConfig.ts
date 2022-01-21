@@ -15,7 +15,13 @@ import {
 } from '@models/appconfig';
 
 import {KustomizeCommandType} from '@redux/services/kustomize';
-import {populateProjectConfig, readProjectConfig, writeProjectConfigFile} from '@redux/services/projectConfig';
+import {
+  SerializableObject,
+  populateProjectConfig,
+  readProjectConfig,
+  setStateForBulkOperation,
+  writeProjectConfigFile,
+} from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -172,48 +178,28 @@ export const configSlice = createSlice({
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
-    setProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
-      state.projectConfig = action.payload;
+    setProjectConfig: (state: Draft<AppConfig | SerializableObject>, action: PayloadAction<ProjectConfig | null>) => {
+      setStateForBulkOperation(state.projectConfig, action.payload);
     },
-    updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
+    updateProjectKubeConfig: (
+      state: Draft<AppConfig | SerializableObject>,
+      action: PayloadAction<KubeConfig | null>
+    ) => {
       if (!state.selectedProjectRootFolder) {
         return;
       }
-
-      const projectConfig: ProjectConfig | null | undefined = state.projectConfig;
-
-      if (_.isEqual(projectConfig?.kubeConfig, action.payload)) {
-        return;
-      }
-
-      const newProjectConfig: ProjectConfig = {
-        ...projectConfig,
-        kubeConfig: {
-          ...projectConfig?.kubeConfig,
-          ...action.payload,
-        },
-      };
-
-      writeProjectConfigFile(state, newProjectConfig);
-      state.projectConfig = newProjectConfig;
+      setStateForBulkOperation(state.projectConfig?.kubeConfig, action.payload);
+      writeProjectConfigFile(state, state.projectConfig);
     },
-    updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
+    updateProjectConfig: (
+      state: Draft<AppConfig | SerializableObject>,
+      action: PayloadAction<ProjectConfig | null>
+    ) => {
       if (!state.selectedProjectRootFolder) {
         return;
       }
-
-      if (_.isEqual(state.projectConfig, action.payload)) {
-        return;
-      }
-
-      const newProjectConfig: ProjectConfig | null = action.payload;
-
-      writeProjectConfigFile(state, newProjectConfig);
-
-      state.projectConfig = {
-        ...newProjectConfig,
-        kubeConfig: {...newProjectConfig?.kubeConfig, contexts: state.projectConfig?.kubeConfig?.contexts},
-      };
+      setStateForBulkOperation(state.projectConfig, action.payload);
+      writeProjectConfigFile(state, action.payload);
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {
       state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;

@@ -8,10 +8,14 @@ import {AppConfig, ProjectConfig} from '@models/appconfig';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {AppDispatch} from '@redux/store';
 
+export interface SerializableObject {
+  [name: string]: any;
+}
+
 export const CONFIG_PATH = (projectRootPath?: string | null) =>
   projectRootPath ? `${projectRootPath}${sep}.monokle` : '';
 
-export const writeProjectConfigFile = (state: AppConfig, projectConfig: ProjectConfig | null) => {
+export const writeProjectConfigFile = (state: AppConfig | SerializableObject, projectConfig: ProjectConfig | null) => {
   const absolutePath = CONFIG_PATH(state.selectedProjectRootFolder);
 
   const applicationConfig: ProjectConfig = populateProjectConfig(state);
@@ -33,7 +37,7 @@ export const writeProjectConfigFile = (state: AppConfig, projectConfig: ProjectC
   }
 };
 
-export const populateProjectConfig = (state: AppConfig) => {
+export const populateProjectConfig = (state: AppConfig | SerializableObject) => {
   const applicationConfig: ProjectConfig = {
     scanExcludes: state.scanExcludes,
     fileIncludes: state.fileIncludes,
@@ -109,8 +113,8 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     return baseConfig;
   }
 
-  const serializedBaseConfig: any = serializeObject(baseConfig);
-  const serializedConfig: any = serializeObject(baseConfig);
+  const serializedBaseConfig: SerializableObject = serializeObject(baseConfig);
+  const serializedConfig: SerializableObject = serializeObject(baseConfig);
 
   Object.keys(serializedBaseConfig).forEach((key: string) => {
     if (!_.isUndefined(serializedConfig[key])) {
@@ -121,8 +125,12 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
   return deserializeObject(baseConfig);
 };
 
-const serializeObject = (objectToSerialize: any, prefix?: string): any => {
+export const serializeObject = (objectToSerialize?: SerializableObject | null, prefix?: string): SerializableObject => {
   let serialized: any = {};
+
+  if (!objectToSerialize) {
+    return serialized;
+  }
   Object.keys(objectToSerialize).forEach(key => {
     if (_.isObject(objectToSerialize[key]) && !_.isArray(objectToSerialize[key])) {
       const result: any = serializeObject(objectToSerialize[key], key);
@@ -138,11 +146,34 @@ const serializeObject = (objectToSerialize: any, prefix?: string): any => {
   return serialized;
 };
 
-const deserializeObject = (objectToDeserialize: any) => {
+export const deserializeObject = (objectToDeserialize?: SerializableObject | null): SerializableObject => {
   const deserialized = {};
+
+  if (!objectToDeserialize) {
+    return deserialized;
+  }
 
   Object.keys(objectToDeserialize).forEach(key => {
     objectPath.set(deserialized, key, objectToDeserialize[key]);
   });
   return deserialized;
+};
+
+export const setStateForBulkOperation = (state?: any, applyingObject?: object | null) => {
+  if (!applyingObject) {
+    return;
+  }
+
+  const serializedIncomingConfig = serializeObject(applyingObject);
+  const serializedState = serializeObject(state);
+
+  Object.keys(serializedIncomingConfig).forEach((key: string) => {
+    if (serializedIncomingConfig[key] && !_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+      console.log('key', key);
+      if (!state) {
+        state = {};
+      }
+      objectPath.set(state, key, serializedIncomingConfig[key]);
+    }
+  });
 };

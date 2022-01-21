@@ -112,18 +112,28 @@ export const fileIncludesSelector = createSelector(
 );
 
 export const kubeConfigContextSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.kubeConfig?.currentContext || '';
+  (state: RootState) => state.config,
+  config => {
+    if (config.projectConfig?.kubeConfig?.currentContext) {
+      return config.projectConfig?.kubeConfig?.currentContext;
+    }
+    if (config.kubeConfig.currentContext) {
+      return config.kubeConfig.currentContext;
+    }
+    return '';
   }
 );
 
 export const kubeConfigContextsSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.kubeConfig?.contexts || [];
+  (state: RootState) => state.config,
+  config => {
+    if (config.projectConfig?.kubeConfig?.contexts) {
+      return config.projectConfig?.kubeConfig?.contexts;
+    }
+    if (config.kubeConfig.contexts) {
+      return config.kubeConfig.contexts;
+    }
+    return [];
   }
 );
 
