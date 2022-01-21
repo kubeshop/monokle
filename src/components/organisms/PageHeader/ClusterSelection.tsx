@@ -51,7 +51,12 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const handleClusterChange = ({key}: {key: string}) => {
     dispatch(setCurrentContext(key));
-    dispatch(updateProjectConfig({...projectConfig, kubeConfig: {...projectConfig?.kubeConfig, currentContext: key}}));
+    dispatch(
+      updateProjectConfig({
+        config: {...projectConfig, kubeConfig: {...projectConfig?.kubeConfig, currentContext: key}},
+        fromConfigFile: false,
+      })
+    );
   };
 
   const handleClusterConfigure = () => {
@@ -70,11 +75,14 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     dispatch(highlightItem(null));
     dispatch(
       updateProjectConfig({
-        ...projectConfig,
-        settings: {
-          ...projectConfig?.settings,
-          isClusterSelectorVisible: false,
+        config: {
+          ...projectConfig,
+          settings: {
+            ...projectConfig?.settings,
+            isClusterSelectorVisible: false,
+          },
         },
+        fromConfigFile: false,
       })
     );
   };

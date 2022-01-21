@@ -810,8 +810,11 @@ const FileTreePane = () => {
   const onExcludeFromProcessing = (relativePath: string) => {
     dispatch(
       updateProjectConfig({
-        ...configState.projectConfig,
-        scanExcludes: [...scanExcludes, relativePath],
+        config: {
+          ...configState.projectConfig,
+          scanExcludes: [...scanExcludes, relativePath],
+        },
+        fromConfigFile: false,
       })
     );
     openConfirmModal();
@@ -820,8 +823,11 @@ const FileTreePane = () => {
   const onIncludeToProcessing = (relativePath: string) => {
     dispatch(
       updateProjectConfig({
-        ...configState.projectConfig,
-        scanExcludes: scanExcludes.filter(scanExclude => scanExclude !== relativePath),
+        config: {
+          ...configState.projectConfig,
+          scanExcludes: scanExcludes.filter(scanExclude => scanExclude !== relativePath),
+        },
+        fromConfigFile: false,
       })
     );
     openConfirmModal();

@@ -50,6 +50,8 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
     (formDataList: Record<string, Primitive>[]) => {
       if (isVanillaTemplate(template)) {
         setIsLoading(true);
+        // remove first entry - which is the intro page
+        formDataList.shift();
         createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
           .then(({message, resources}) => {
             setResultMessage(message);
@@ -159,7 +161,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         )}
       >
         <S.Container ref={containerRef}>
-          <div>
+          <S.StepsContainer>
             <Steps direction="vertical" current={activeFormIndex}>
               <S.Step title="Information" />
               {template.forms.map(form => {
@@ -167,9 +169,9 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
               })}
               <S.Step title="Result" />
             </Steps>
-          </div>
+          </S.StepsContainer>
 
-          <div style={{paddingRight: '10px'}}>
+          <S.FormContainer>
             {isLoading ? (
               <Skeleton />
             ) : activeFormIndex === 0 ? (
@@ -241,7 +243,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
                 templateForm={activeForm}
               />
             ) : null}
-          </div>
+          </S.FormContainer>
         </S.Container>
       </ResizableBox>
     </S.Modal>

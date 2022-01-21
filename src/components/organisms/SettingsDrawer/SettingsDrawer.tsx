@@ -58,7 +58,7 @@ const SettingsDrawer = () => {
   };
 
   const changeProjectConfig = (config: ProjectConfig) => {
-    dispatch(updateProjectConfig(config));
+    dispatch(updateProjectConfig({config, fromConfigFile: false}));
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
