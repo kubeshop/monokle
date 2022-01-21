@@ -10,7 +10,7 @@ import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reduc
 
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {ResourceKindHandlers} from '@src/kindhandlers';
+import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
 
 import K8sResourceSectionEmptyDisplay from './K8sResourceSectionEmptyDisplay';
@@ -37,19 +37,12 @@ ResourceKindHandlers.forEach(kindHandler => {
   }
 });
 
-const childSections = childSectionNames.map(childSectionName => {
-  const kindHandlerSections = (kindHandlersBySubsectionName[childSectionName] || []).map(kindHandler =>
-    makeResourceKindNavSection(kindHandler)
-  );
-
-  kindHandlerSections.forEach(k => sectionBlueprintMap.register(k));
-
+const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
   const subsection: SectionBlueprint<K8sResource, {activeResourcesLength: number; checkedResourceIds: string[]}> = {
-    name: childSectionName,
-    id: childSectionName,
+    name: subsectionName,
+    id: subsectionName,
     containerElementId: 'navigator-sections-container',
     rootSectionId: navSectionNames.K8S_RESOURCES,
-    childSectionIds: kindHandlerSections.map(k => k.name),
     getScope: state => {
       const activeResources = Object.values(state.main.resourceMap).filter(
         r =>
@@ -75,6 +68,20 @@ const childSections = childSectionNames.map(childSectionName => {
       isCheckVisibleOnHover: true,
     },
   };
+  return subsection;
+};
+
+const childSections = childSectionNames.map(childSectionName => {
+  const kindHandlerSections = (kindHandlersBySubsectionName[childSectionName] || []).map(kindHandler =>
+    makeResourceKindNavSection(kindHandler)
+  );
+
+  kindHandlerSections.forEach(k => sectionBlueprintMap.register(k));
+
+  const subsection = makeSubsection(
+    childSectionName,
+    kindHandlerSections.map(k => k.name)
+  );
   return subsection;
 });
 
@@ -146,5 +153,34 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
 };
 
 sectionBlueprintMap.register(K8sResourceSectionBlueprint);
+
+KindHandlersEventEmitter.on('register', kindHandler => {
+  const [_, parentSectionId, kindSectionId] = kindHandler.navigatorPath;
+  const rootSection = K8sResourceSectionBlueprint;
+
+  let parentSection = rootSection.childSectionIds
+    ?.map(id => sectionBlueprintMap.getById(id))
+    .find(s => s.id === parentSectionId);
+
+  if (!parentSection) {
+    parentSection = makeSubsection(parentSectionId, [kindSectionId]);
+    sectionBlueprintMap.register(parentSection);
+  } else {
+    parentSection.childSectionIds = parentSection.childSectionIds?.length
+      ? parentSection.childSectionIds.includes(kindSectionId)
+        ? parentSection.childSectionIds
+        : [...parentSection.childSectionIds, kindSectionId]
+      : [kindSectionId];
+  }
+
+  let kindSection = parentSection.childSectionIds
+    ?.map(id => sectionBlueprintMap.getById(id))
+    .find(s => s.id === kindSectionId);
+
+  if (!kindSection) {
+    kindSection = makeResourceKindNavSection(kindHandler);
+    sectionBlueprintMap.register(kindSection);
+  }
+});
 
 export default K8sResourceSectionBlueprint;
