@@ -53,12 +53,22 @@ export const setOpenProject = createAsyncThunk(
   }
 );
 
+export const setLoadingProject = createAsyncThunk(
+  'config/loadingProject',
+  async (loading: boolean, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
+    thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
+  }
+);
+
 export const configSlice = createSlice({
   name: 'config',
   initialState: initialState.config,
   reducers: {
     setFilterObjects: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.filterObjectsOnSelection = action.payload;
+    },
+    setLoadingProject: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.isProjectLoading = action.payload;
     },
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
