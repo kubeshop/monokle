@@ -174,7 +174,7 @@ function computeSectionVisibility(
 /**
  * Build the section and item instances based on the registered section blueprints
  */
-const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
+const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch) => {
   const sectionInstanceMap: Record<string, SectionInstance> = {};
   const itemInstanceMap: Record<string, ItemInstance> = {};
 
@@ -183,7 +183,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   const isChangedByScopeKey: Record<string, boolean> = {};
 
   // check if anything from the full scope has changed and store the keys of changed values
-  asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
+  await asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
     const sectionScope = sectionBlueprint.getScope(state);
     const sectionScopeKeys: string[] = [];
     Object.entries(sectionScope).forEach(([key, value]) => {
@@ -206,7 +206,7 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     return;
   }
 
-  asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
+  await asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
     const sectionScopeKeys = scopeKeysBySectionId[sectionBlueprint.id];
     const hasSectionScopeChanged = Object.entries(isChangedByScopeKey).some(
       ([key, value]) => sectionScopeKeys.includes(key) && value === true
@@ -294,17 +294,17 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     return sectionBlueprint.rootSectionId === sectionBlueprint.id;
   });
 
-  asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
+  await asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
     computeSectionVisibility(sectionInstanceRoot, sectionInstanceMap)
   );
 
   // this has to run after the `computeSectionVisibility` because it depends on the `section.visibleDescendantItemIds`
-  asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
+  await asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
     computeItemScrollIntoView(sectionInstanceRoot, itemInstanceMap)
   );
 
   // this has to run after the `computeSectionVisibility` because it depends on the `section.visibleDescendantItemIds`
-  asyncLib.each(Object.values(sectionInstanceMap), async sectionInstance => {
+  await asyncLib.each(Object.values(sectionInstanceMap), async sectionInstance => {
     const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
     const sectionScope = pickPartialRecord(fullScope, scopeKeysBySectionId[sectionBlueprint.id]);
     computeSectionCheckable(sectionBlueprint, sectionInstance, sectionScope);
