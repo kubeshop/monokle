@@ -44,16 +44,29 @@ const getFullFileName = (filename: string, fileIncludes: string[], suffix?: stri
   return `${filename}${suffix || ''}.yaml`;
 };
 
-const generateFileName = (
+const generateFullFileName = (
   subfiles: fs.Dirent[],
   resourceName: string,
   fileIncludes: string[],
   selectedFolder: string,
   fileMap: FileMapType,
-  suffix?: number
-): {fullFileName: string; suffix: number | undefined} => {
+  suffix: number,
+  existingFileNames: string[]
+): string => {
   let fullFileName = getFullFileName(`${resourceName}${suffix ? ` (${suffix})` : ''}`, fileIncludes);
   let foundFile: fs.Dirent | FileEntry | undefined;
+
+  if (existingFileNames.includes(fullFileName)) {
+    return generateFullFileName(
+      subfiles,
+      resourceName,
+      fileIncludes,
+      selectedFolder,
+      fileMap,
+      suffix ? suffix + 1 : 2,
+      existingFileNames
+    );
+  }
 
   if (subfiles.length) {
     foundFile = subfiles.find(dirent => dirent.name === fullFileName);
@@ -64,10 +77,18 @@ const generateFileName = (
   }
 
   if (foundFile) {
-    return generateFileName(subfiles, resourceName, fileIncludes, selectedFolder, fileMap, suffix ? suffix + 1 : 2);
+    return generateFullFileName(
+      subfiles,
+      resourceName,
+      fileIncludes,
+      selectedFolder,
+      fileMap,
+      suffix ? suffix + 1 : 2,
+      existingFileNames
+    );
   }
 
-  return {fullFileName, suffix};
+  return fullFileName;
 };
 
 const SaveResourceToFileFolderModal: React.FC = () => {
@@ -244,19 +265,22 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         );
       }
 
-      let existingFileNames: {[path: string]: number} = {};
+      let existingFileNames: string[] = [];
 
       resourcesIds.forEach(resourceId => {
         const resource = resourceMap[resourceId];
-        let {fullFileName, suffix} = generateFileName(subfiles, resource.name, fileIncludes, selectedFolder, fileMap);
+        let fullFileName = generateFullFileName(
+          subfiles,
+          resource.name,
+          fileIncludes,
+          selectedFolder,
+          fileMap,
+          0,
+          existingFileNames
+        );
 
-        if (existingFileNames[fullFileName]) {
-          existingFileNames[fullFileName] += 1;
-          fullFileName = getFullFileName(resource.name, fileIncludes, ` (${existingFileNames[fullFileName]})`);
-        } else if (suffix) {
-          existingFileNames[fullFileName] = suffix;
-        } else {
-          existingFileNames[fullFileName] = 1;
+        if (!existingFileNames.includes(fullFileName)) {
+          existingFileNames.push(fullFileName);
         }
 
         resourcesFileName.current[resource.id] = fullFileName;
