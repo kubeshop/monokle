@@ -164,6 +164,7 @@ KindHandlersEventEmitter.on('register', kindHandler => {
 
   let parentSection = rootSection.childSectionIds
     ?.map(id => sectionBlueprintMap.getById(id))
+    .filter((s): s is SectionBlueprint<any, any> => s !== undefined)
     .find(s => s.id === parentSectionId);
 
   if (!parentSection) {
@@ -184,6 +185,7 @@ KindHandlersEventEmitter.on('register', kindHandler => {
 
   let kindSection = parentSection.childSectionIds
     ?.map(id => sectionBlueprintMap.getById(id))
+    .filter((s): s is SectionBlueprint<any, any> => s !== undefined)
     .find(s => s.id === kindSectionId);
 
   if (!kindSection) {

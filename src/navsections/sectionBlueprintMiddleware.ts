@@ -125,8 +125,15 @@ function computeSectionVisibility(
 
     sectionBlueprint.childSectionIds.forEach(childSectionId => {
       const childSectionInstance = sectionInstanceMap[childSectionId];
+      if (!childSectionInstance) {
+        return;
+      }
+      const childSectionBlueprint = sectionBlueprintMap.getById(childSectionInstance.id);
+      if (!childSectionBlueprint) {
+        return;
+      }
       const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection, visibleDescendantItemIdsOfChildSection] =
-        computeSectionVisibility(childSectionInstance, sectionInstanceMap, sectionBlueprint);
+        computeSectionVisibility(childSectionInstance, sectionInstanceMap, childSectionBlueprint);
 
       if (visibleDescendantSectionIdsOfChildSection) {
         if (sectionInstance.visibleDescendantSectionIds) {

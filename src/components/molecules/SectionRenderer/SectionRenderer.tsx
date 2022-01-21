@@ -34,6 +34,12 @@ function SectionRenderer(props: SectionRendererProps) {
     return sectionBlueprint.childSectionIds?.filter(id => registeredSectionIds.includes(id));
   }, [sectionBlueprint.childSectionIds, registeredSectionIds]);
 
+  const childSections = useMemo(() => {
+    return childSectionIds
+      ?.map(id => navSectionMap.getById(id))
+      .filter((s): s is SectionBlueprint<any, any> => s !== undefined);
+  }, [childSectionIds]);
+
   const dispatch = useAppDispatch();
 
   const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
@@ -230,17 +236,15 @@ function SectionRenderer(props: SectionRendererProps) {
             </React.Fragment>
           );
         })}
-      {childSectionIds &&
-        childSectionIds
-          .map(childSectionId => navSectionMap.getById(childSectionId))
-          .map(child => (
-            <SectionRenderer
-              key={child.name}
-              sectionBlueprint={child}
-              level={level + 1}
-              isLastSection={child.id === lastVisibleChildSectionId}
-            />
-          ))}
+      {childSections &&
+        childSections.map(child => (
+          <SectionRenderer
+            key={child.name}
+            sectionBlueprint={child}
+            level={level + 1}
+            isLastSection={child.id === lastVisibleChildSectionId}
+          />
+        ))}
     </>
   );
 }
