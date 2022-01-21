@@ -1,7 +1,8 @@
+import _default from 'react-use/lib/useMediaDevices';
+
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import _ from 'lodash';
-import objectPath from 'object-path';
 import path from 'path';
 
 import {
@@ -189,6 +190,8 @@ export const configSlice = createSlice({
 
       const serializedIncomingConfig = serializeObject(action.payload);
       const serializedState = serializeObject(state.projectConfig.kubeConfig);
+      let writeToFile = false;
+
       Object.keys(serializedIncomingConfig).forEach((key: string) => {
         if (
           _.isBoolean(serializedIncomingConfig[key]) &&
@@ -197,17 +200,21 @@ export const configSlice = createSlice({
           if (!state.projectConfig.kubeConfig) {
             state.projectConfig.kubeConfig = {};
           }
-          objectPath.set(state.projectConfig.kubeConfig, key, serializedIncomingConfig[key]);
+          writeToFile = true;
+          _.set(state.projectConfig.kubeConfig, key, serializedIncomingConfig[key]);
         }
         if (serializedIncomingConfig[key] && !_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
           console.log('key', key);
           if (!state.projectConfig.kubeConfig) {
             state.kubeConfig = {};
           }
-          objectPath.set(state.projectConfig.kubeConfig, key, serializedIncomingConfig[key]);
+          writeToFile = true;
+          _.set(state.projectConfig.kubeConfig, key, serializedIncomingConfig[key]);
         }
       });
-      writeProjectConfigFile(state, state.projectConfig);
+      if (writeToFile) {
+        writeProjectConfigFile(state, state.projectConfig);
+      }
     },
     updateProjectConfig: (
       state: Draft<AppConfig | SerializableObject>,
@@ -218,6 +225,7 @@ export const configSlice = createSlice({
       }
       const serializedIncomingConfig = serializeObject(action.payload);
       const serializedState = serializeObject(state.projectConfig);
+      let writeToFile = false;
       Object.keys(serializedIncomingConfig).forEach((key: string) => {
         if (
           _.isBoolean(serializedIncomingConfig[key]) &&
@@ -226,17 +234,21 @@ export const configSlice = createSlice({
           if (!state.projectConfig) {
             state.projectConfig = {};
           }
-          objectPath.set(state.projectConfig, key, serializedIncomingConfig[key]);
+          _.set(state.projectConfig, key, serializedIncomingConfig[key]);
+          writeToFile = true;
         }
         if (serializedIncomingConfig[key] && !_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
           console.log('key', key);
           if (!state.projectConfig) {
             state.projectConfig = {};
           }
-          objectPath.set(state.projectConfig, key, serializedIncomingConfig[key]);
+          writeToFile = true;
+          _.set(state.projectConfig, key, serializedIncomingConfig[key]);
         }
       });
-      writeProjectConfigFile(state, action.payload);
+      if (writeToFile) {
+        writeProjectConfigFile(state, action.payload);
+      }
     },
     toggleClusterStatus: (state: Draft<AppConfig>) => {
       state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;

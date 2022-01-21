@@ -1,6 +1,5 @@
 import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
-import objectPath from 'object-path';
 import {sep} from 'path';
 
 import {AppConfig, ProjectConfig} from '@models/appconfig';
@@ -18,19 +17,17 @@ export const CONFIG_PATH = (projectRootPath?: string | null) =>
 export const writeProjectConfigFile = (state: AppConfig | SerializableObject, projectConfig: ProjectConfig | null) => {
   const absolutePath = CONFIG_PATH(state.selectedProjectRootFolder);
 
-  const applicationConfig: ProjectConfig = populateProjectConfig(state);
-  const mergedConfigs = mergeConfigs(applicationConfig, projectConfig);
-  delete mergedConfigs?.settings?.loadLastProjectOnStartup;
-  delete mergedConfigs?.kubeConfig?.isPathValid;
-  delete mergedConfigs?.kubeConfig?.contexts;
-  if (mergedConfigs && !_.isEmpty(mergedConfigs)) {
+  delete projectConfig?.settings?.loadLastProjectOnStartup;
+  delete projectConfig?.kubeConfig?.isPathValid;
+  delete projectConfig?.kubeConfig?.contexts;
+  if (projectConfig && !_.isEmpty(projectConfig)) {
     try {
       const savedConfig: ProjectConfig = JSON.parse(readFileSync(absolutePath, 'utf8'));
-      if (!_.isEqual(savedConfig, mergedConfigs)) {
-        writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
+      if (!_.isEqual(savedConfig, projectConfig)) {
+        writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
       }
     } catch (error: any) {
-      writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
+      writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
     }
   } else {
     writeFileSync(absolutePath, ``, 'utf-8');
@@ -154,7 +151,7 @@ export const deserializeObject = (objectToDeserialize?: SerializableObject | nul
   }
 
   Object.keys(objectToDeserialize).forEach(key => {
-    objectPath.set(deserialized, key, objectToDeserialize[key]);
+    _.set(deserialized, key, objectToDeserialize[key]);
   });
   return deserialized;
 };
