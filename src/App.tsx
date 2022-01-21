@@ -14,7 +14,7 @@ import {Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
 import {useAppSelector} from '@redux/hooks';
-import {setCreateProject, setOpenProject} from '@redux/reducers/appConfig';
+import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closeFolderExplorer} from '@redux/reducers/ui';
 import {kubeConfigContextSelector, kubeConfigPathSelector, settingsSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
@@ -77,6 +77,7 @@ const App = () => {
       if (project && getFileStats(project.rootFolder)?.isDirectory()) {
         dispatch(setOpenProject(project.rootFolder));
       }
+      dispatch(setLoadingProject(false));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loadLastProjectOnStartup, projects]

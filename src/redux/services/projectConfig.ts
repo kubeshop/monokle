@@ -7,32 +7,51 @@ import {AppConfig, ProjectConfig} from '@models/appconfig';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 
+export interface SerializableObject {
+  [name: string]: any;
+}
+
 export const CONFIG_PATH = (projectRootPath?: string | null) =>
   projectRootPath ? `${projectRootPath}${sep}.monokle` : '';
 
-export const writeProjectConfigFile = (state: AppConfig, projectConfig: ProjectConfig | null) => {
+export const writeProjectConfigFile = (state: AppConfig | SerializableObject) => {
   const absolutePath = CONFIG_PATH(state.selectedProjectRootFolder);
 
-  const applicationConfig: ProjectConfig = populateProjectConfig(state);
-  const mergedConfigs = mergeConfigs(applicationConfig, projectConfig);
-  delete mergedConfigs?.settings?.loadLastProjectOnStartup;
-  delete mergedConfigs?.kubeConfig?.isPathValid;
-  delete mergedConfigs?.kubeConfig?.contexts;
-  if (mergedConfigs && !_.isEmpty(mergedConfigs)) {
+  const projectConfig = populateProjectConfigToWrite(state);
+  if (projectConfig && !_.isEmpty(projectConfig)) {
     try {
       const savedConfig: ProjectConfig = JSON.parse(readFileSync(absolutePath, 'utf8'));
-      if (!_.isEqual(savedConfig, mergedConfigs)) {
-        writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
+      if (!_.isEqual(savedConfig, projectConfig)) {
+        writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
       }
     } catch (error: any) {
-      writeFileSync(absolutePath, JSON.stringify(mergedConfigs, null, 4), 'utf-8');
+      writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
     }
   } else {
     writeFileSync(absolutePath, ``, 'utf-8');
   }
 };
 
-export const populateProjectConfig = (state: AppConfig) => {
+export const populateProjectConfigToWrite = (state: AppConfig | SerializableObject) => {
+  const applicationConfig: ProjectConfig = {
+    scanExcludes: state.projectConfig.scanExcludes,
+    fileIncludes: state.projectConfig.fileIncludes,
+    folderReadsMaxDepth: state.projectConfig.folderReadsMaxDepth,
+  };
+  applicationConfig.settings = {
+    helmPreviewMode: state.projectConfig.settings.helmPreviewMode,
+    kustomizeCommand: state.projectConfig.settings.kustomizeCommand,
+    hideExcludedFilesInFileExplorer: state.projectConfig.settings.hideExcludedFilesInFileExplorer,
+    isClusterSelectorVisible: state.projectConfig.settings.isClusterSelectorVisible,
+    enableHelmWithKustomize: state.projectConfig.settings.enableHelmWithKustomize,
+  };
+  applicationConfig.kubeConfig = {
+    path: state.projectConfig.kubeConfig.path,
+    currentContext: state.projectConfig.kubeConfig.currentContext,
+  };
+  return applicationConfig;
+};
+export const populateProjectConfig = (state: AppConfig | SerializableObject) => {
   const applicationConfig: ProjectConfig = {
     scanExcludes: state.scanExcludes,
     fileIncludes: state.fileIncludes,
@@ -50,6 +69,7 @@ export const populateProjectConfig = (state: AppConfig) => {
     path: state.kubeConfig.path,
     isPathValid: state.kubeConfig.isPathValid,
     contexts: state.kubeConfig.contexts,
+    currentContext: state.kubeConfig.currentContext,
   };
   return applicationConfig;
 };
@@ -76,7 +96,6 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
       ? {
           path: kubeConfig.path,
           currentContext: kubeConfig.currentContext,
-          isPathValid: kubeConfig.isPathValid,
         }
       : undefined;
 
@@ -93,15 +112,13 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
 export const updateProjectSettings = (dispatch: (action: AnyAction) => void, projectRootPath?: string | null) => {
   const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
   if (projectConfig) {
-    dispatch(updateProjectConfig(projectConfig));
+    dispatch(updateProjectConfig({config: projectConfig, fromConfigFile: true}));
     return;
   }
-  dispatch(updateProjectConfig(null));
+  dispatch(updateProjectConfig({config: null, fromConfigFile: true}));
 };
 
-// I am not proud of this code. It can be surely do it better.
-// After 1.5.0 I will refactor this one
-export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null) => {
+export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig | null): ProjectConfig => {
   if (!(baseConfig && baseConfig.settings && baseConfig.kubeConfig)) {
     throw Error('Base config must be set');
   }
@@ -110,85 +127,63 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     return baseConfig;
   }
 
-  if (
-    _.isString(config.settings?.helmPreviewMode) &&
-    !_.isEqual(config.settings?.helmPreviewMode, baseConfig.settings?.helmPreviewMode)
-  ) {
-    baseConfig.settings.helmPreviewMode = config.settings?.helmPreviewMode;
+  const serializedBaseConfig: SerializableObject = serializeObject(baseConfig);
+  const serializedConfig: SerializableObject = serializeObject(baseConfig);
+
+  Object.keys(serializedBaseConfig).forEach((key: string) => {
+    if (!_.isUndefined(serializedConfig[key])) {
+      serializedBaseConfig[key] = serializedConfig[key];
+    }
+  });
+
+  return deserializeObject(baseConfig);
+};
+
+export const serializeObject = (objectToSerialize?: SerializableObject | null, prefix?: string): SerializableObject => {
+  let serialized: any = {};
+
+  if (!objectToSerialize) {
+    return serialized;
+  }
+  Object.keys(objectToSerialize).forEach(key => {
+    if (_.isObject(objectToSerialize[key]) && !_.isArray(objectToSerialize[key])) {
+      const result: any = serializeObject(objectToSerialize[key], key);
+      serialized = {
+        ...serialized,
+        ...result,
+      };
+    } else {
+      const objectKey = prefix ? `${prefix}.${key}` : key;
+      serialized[objectKey] = objectToSerialize[key];
+    }
+  });
+  return serialized;
+};
+
+export const deserializeObject = (objectToDeserialize?: SerializableObject | null): SerializableObject => {
+  const deserialized = {};
+
+  if (!objectToDeserialize) {
+    return deserialized;
   }
 
-  if (
-    _.isString(config.settings?.kustomizeCommand) &&
-    !_.isEqual(config.settings?.kustomizeCommand, baseConfig.settings?.kustomizeCommand)
-  ) {
-    baseConfig.settings.kustomizeCommand = config.settings?.kustomizeCommand;
-  }
-  if (
-    _.isBoolean(config.settings?.loadLastProjectOnStartup) &&
-    !_.isEqual(config.settings?.loadLastProjectOnStartup, baseConfig.settings?.loadLastProjectOnStartup)
-  ) {
-    baseConfig.settings.loadLastProjectOnStartup = config.settings?.loadLastProjectOnStartup;
-  }
-  if (
-    _.isBoolean(config.settings?.enableHelmWithKustomize) &&
-    !_.isEqual(config.settings?.enableHelmWithKustomize, baseConfig.settings?.enableHelmWithKustomize)
-  ) {
-    baseConfig.settings.enableHelmWithKustomize = config.settings?.enableHelmWithKustomize;
-  }
-  if (
-    _.isBoolean(config.settings?.hideExcludedFilesInFileExplorer) &&
-    !_.isEqual(config.settings?.hideExcludedFilesInFileExplorer, baseConfig.settings?.hideExcludedFilesInFileExplorer)
-  ) {
-    baseConfig.settings.hideExcludedFilesInFileExplorer = config.settings?.hideExcludedFilesInFileExplorer;
-  }
-  if (
-    _.isBoolean(config.settings?.isClusterSelectorVisible) &&
-    !_.isEqual(config.settings?.isClusterSelectorVisible, baseConfig.settings?.isClusterSelectorVisible)
-  ) {
-    baseConfig.settings.isClusterSelectorVisible = config.settings?.isClusterSelectorVisible;
-  }
-  if (_.isEmpty(baseConfig.settings)) {
-    baseConfig.settings = undefined;
-  }
-  if (_.isString(config.kubeConfig?.path) && !_.isEqual(config.kubeConfig?.path, baseConfig.kubeConfig?.path)) {
-    baseConfig.kubeConfig.path = config.kubeConfig?.path;
-  }
-  if (
-    _.isBoolean(config.kubeConfig?.isPathValid) &&
-    !_.isEqual(config.kubeConfig?.isPathValid, baseConfig.kubeConfig?.isPathValid)
-  ) {
-    baseConfig.kubeConfig.isPathValid = config.kubeConfig?.isPathValid;
-  }
-  if (
-    _.isString(config.kubeConfig?.currentContext) &&
-    !_.isEqual(config.kubeConfig?.currentContext, baseConfig.kubeConfig?.currentContext)
-  ) {
-    baseConfig.kubeConfig.currentContext = config.kubeConfig?.currentContext;
-  }
-  if (
-    _.isArray(config.kubeConfig?.contexts) &&
-    !_.isEqual(_.sortBy(config.kubeConfig?.contexts), _.sortBy(baseConfig.kubeConfig?.contexts))
-  ) {
-    baseConfig.kubeConfig.contexts = config.kubeConfig?.contexts;
-  }
-  if (_.isEmpty(baseConfig.kubeConfig)) {
-    baseConfig.kubeConfig = undefined;
-  }
+  Object.keys(objectToDeserialize).forEach(key => {
+    _.set(deserialized, key, objectToDeserialize[key]);
+  });
+  return deserialized;
+};
 
-  if (_.isArray(config.scanExcludes) && !_.isEqual(_.sortBy(config.scanExcludes), _.sortBy(baseConfig.scanExcludes))) {
-    baseConfig.scanExcludes = config.scanExcludes;
-  }
+export const keysToUpdateStateBulk = (
+  serializedState: SerializableObject,
+  serializedIncomingConfig: SerializableObject
+) => {
+  const keys: string[] = [];
 
-  if (_.isArray(config.fileIncludes) && !_.isEqual(_.sortBy(config.fileIncludes), _.sortBy(baseConfig.fileIncludes))) {
-    baseConfig.fileIncludes = config.fileIncludes;
-  }
+  Object.keys(serializedIncomingConfig).forEach((key: string) => {
+    if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+      keys.push(key);
+    }
+  });
 
-  if (
-    _.isNumber(config.folderReadsMaxDepth) &&
-    !_.isEqual(config.folderReadsMaxDepth, baseConfig.folderReadsMaxDepth)
-  ) {
-    baseConfig.folderReadsMaxDepth = config.folderReadsMaxDepth;
-  }
-
-  return baseConfig;
+  return keys;
 };

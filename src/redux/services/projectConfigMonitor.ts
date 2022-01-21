@@ -24,7 +24,7 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
   watcher = watch(absolutePath, {
     persistent: true,
     usePolling: true,
-    interval: 1000,
+    interval: 100,
   });
 
   watcher

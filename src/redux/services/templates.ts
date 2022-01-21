@@ -115,6 +115,7 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
         const resource = createUnsavedResource(
           {
             name: obj.metadata.name,
+            namespace: obj.metadata.namespace,
             kind: obj.kind,
             apiVersion: obj.apiVersion,
           },

@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import React, {LegacyRef, useCallback, useMemo, useState} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
@@ -39,13 +41,17 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
   const activeForm = useMemo(() => {
-    return activeFormIndex < template.forms.length ? template.forms[activeFormIndex] : undefined;
+    return activeFormIndex && activeFormIndex <= template.forms.length
+      ? template.forms[activeFormIndex - 1]
+      : undefined;
   }, [template.forms, activeFormIndex]);
 
   const onClickSubmit = useCallback(
     (formDataList: Record<string, Primitive>[]) => {
       if (isVanillaTemplate(template)) {
         setIsLoading(true);
+        // remove first entry - which is the intro page
+        formDataList.shift();
         createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
           .then(({message, resources}) => {
             setResultMessage(message);
@@ -93,7 +99,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
       newFormDataList.splice(formIndex, 1, formData);
       setCurrentFormDataList(newFormDataList);
       setActiveFormIndex(formIndex + 1);
-      if (formIndex + 1 === template.forms.length) {
+      if (formIndex === template.forms.length) {
         onClickSubmit(newFormDataList);
       }
     },
@@ -112,7 +118,17 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
     onClose();
   };
 
-  if (!activeForm && !resultMessage && !isLoading) {
+  const openHelpUrl = () => {
+    if (template.helpUrl) {
+      shell.openExternal(template.helpUrl);
+    }
+  };
+
+  const openRepository = () => {
+    shell.openExternal(template.repository);
+  };
+
+  if (activeFormIndex && !activeForm && !resultMessage && !isLoading) {
     return <p>Something went wrong...</p>;
   }
 
@@ -120,7 +136,11 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
     <S.Modal
       visible
       footer={
-        resultMessage ? (
+        activeFormIndex === 0 ? (
+          <Button htmlType="submit" type="primary" loading={isLoading} onClick={() => setActiveFormIndex(1)}>
+            Start
+          </Button>
+        ) : resultMessage ? (
           <Button type="primary" onClick={close} loading={isLoading}>
             Done
           </Button>
@@ -132,7 +152,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
       <ResizableBox
         height={containerHeight}
         width={800}
-        minConstraints={[600, containerHeight]}
+        minConstraints={[800, containerHeight]}
         maxConstraints={[window.innerWidth - 64, containerHeight]}
         axis="x"
         resizeHandles={['w', 'e']}
@@ -141,18 +161,56 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         )}
       >
         <S.Container ref={containerRef}>
-          <div>
+          <S.StepsContainer>
             <Steps direction="vertical" current={activeFormIndex}>
+              <S.Step title="Information" />
               {template.forms.map(form => {
                 return <S.Step key={form.name} title={form.name} />;
               })}
               <S.Step title="Result" />
             </Steps>
-          </div>
+          </S.StepsContainer>
 
-          <div style={{paddingRight: '10px'}}>
+          <S.FormContainer>
             {isLoading ? (
               <Skeleton />
+            ) : activeFormIndex === 0 ? (
+              <>
+                <S.TitleContainer>
+                  <S.FormOutlined />
+                  <span>{template.name}</span>
+                </S.TitleContainer>
+                <S.Table>
+                  <tbody>
+                    <tr>
+                      <S.TableHead>Author</S.TableHead>
+                      <S.TableData>{template.author}</S.TableData>
+                    </tr>
+                    <tr>
+                      <S.TableHead>Version</S.TableHead>
+                      <S.TableData>{template.version}</S.TableData>
+                    </tr>
+                    <tr>
+                      <S.TableHead>Repository</S.TableHead>
+                      <S.TableData>
+                        <a onClick={openRepository}>{template.repository}</a>
+                      </S.TableData>
+                    </tr>
+                    {template.helpUrl && (
+                      <tr>
+                        <S.TableHead>Help URL</S.TableHead>
+                        <S.TableData>
+                          <a onClick={openHelpUrl}>{template.helpUrl}</a>
+                        </S.TableData>
+                      </tr>
+                    )}
+                    <tr>
+                      <S.TableHead>Description</S.TableHead>
+                      <S.TableData>{template.description}</S.TableData>
+                    </tr>
+                  </tbody>
+                </S.Table>
+              </>
             ) : resultMessage ? (
               <>
                 {createdResources.length === 0 ? (
@@ -180,12 +238,12 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
             ) : activeForm ? (
               <TemplateFormRenderer
                 key={activeFormIndex}
-                isLastForm={activeFormIndex === template.forms.length - 1}
+                isLastForm={activeFormIndex === template.forms.length}
                 onSubmit={formData => onFormSubmit(activeFormIndex, formData)}
                 templateForm={activeForm}
               />
             ) : null}
-          </div>
+          </S.FormContainer>
         </S.Container>
       </ResizableBox>
     </S.Modal>
