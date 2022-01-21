@@ -112,11 +112,10 @@ const TemplatesPane: React.FC = () => {
             {!Object.keys(templatesToShow).length ? (
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
             ) : (
-              Object.entries(templatesToShow).map(([path, template]) => (
+              Object.values(templatesToShow).map(template => (
                 <TemplateInformation
                   key={template.id}
                   template={template}
-                  templatePath={path}
                   onClickOpenTemplate={() => onClickOpenTemplate(template)}
                 />
               ))
