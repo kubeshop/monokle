@@ -1,3 +1,5 @@
+import {PodSelectorSelection} from '@molecules/FormEditor/FormWidgets/PodSelectorSelection';
+
 import {ApiGroupSelection} from './ApiGroupSelection';
 import {NamespaceSelection} from './NamespaceSelection';
 import {ResourceSelection} from './ResourceSelection';
@@ -9,6 +11,7 @@ export function getCustomFormWidgets() {
     namespaceSelection: NamespaceSelection,
     resourceSelection: ResourceSelection,
     apiGroupSelection: ApiGroupSelection,
+    podSelectorSelection: PodSelectorSelection,
   };
 }
 

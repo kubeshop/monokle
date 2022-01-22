@@ -182,8 +182,8 @@ export class NodeWrapper {
  * Utility function to get all resources of a specific kind
  */
 
-export function getK8sResources(resourceMap: ResourceMapType, type: string) {
-  return Object.values(resourceMap).filter(item => item.kind === type);
+export function getK8sResources(resourceMap: ResourceMapType, kind: string) {
+  return Object.values(resourceMap).filter(item => item.kind === kind);
 }
 
 export function areRefPosEqual(a: RefPosition | undefined, b: RefPosition | undefined) {
