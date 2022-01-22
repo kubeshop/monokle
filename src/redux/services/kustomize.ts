@@ -38,7 +38,7 @@ function linkParentKustomization(
  */
 
 export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === KUSTOMIZATION_KIND;
+  return r && r.kind === KUSTOMIZATION_KIND && (!r.version || r.version.startsWith('kustomize.config.k8s.io'));
 }
 
 /**
