@@ -667,6 +667,8 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
               const kindHandler = extractKindHandler(resource.content);
               if (kindHandler) {
                 registerKindHandler(kindHandler, false);
+              } else {
+                log.warn('Failed to extract kindHandler', resource.content);
               }
             } catch (e) {
               log.warn('Failed to register custom kindhandler', resource, e);

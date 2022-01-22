@@ -1,32 +1,26 @@
 import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 
 import {Select} from 'antd';
 
 import {uniq} from 'lodash';
 
-import {K8sResource} from '@models/k8sresource';
-
-import {useAppSelector} from '@redux/hooks';
-import {selectedResourceSelector} from '@redux/selectors';
+import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const Option = Select.Option;
 
 const NEW_ITEM = 'CREATE_NEW_ITEM';
 const EMPTY_VALUE = 'NONE';
 
-export const NamespaceSelection = ({value, onChange, disabled}: any) => {
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResource = useSelector(selectedResourceSelector);
-  const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
+export const ApiGroupSelection = ({value, onChange, disabled}: any) => {
+  const [apiGroups, setApiGroups] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
       setSelectValue(inputValue);
-      if (!namespaces.includes(inputValue)) {
-        setNamespaces([...namespaces, inputValue]);
+      if (!apiGroups.includes(inputValue)) {
+        setApiGroups([...apiGroups, inputValue]);
       }
       setInputValue('');
     } else {
@@ -42,7 +36,7 @@ export const NamespaceSelection = ({value, onChange, disabled}: any) => {
       setSelectValue(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, value]);
+  }, [value]);
 
   useEffect(() => {
     if (selectValue === EMPTY_VALUE) {
@@ -54,18 +48,16 @@ export const NamespaceSelection = ({value, onChange, disabled}: any) => {
   }, [selectValue]);
 
   useEffect(() => {
-    if (resourceMap) {
-      setNamespaces(
-        uniq(
-          Object.values(resourceMap)
-            .map((resource: K8sResource) => resource.namespace)
-            .filter(namespace => Boolean(namespace))
-        ).sort()
-      );
-    } else {
-      setNamespaces([]);
-    }
-  }, [resourceMap]);
+    setApiGroups(
+      uniq(
+        ResourceKindHandlers.map(handler =>
+          handler.clusterApiVersion.includes('/')
+            ? handler.clusterApiVersion.substring(0, handler.clusterApiVersion.indexOf('/'))
+            : handler.clusterApiVersion
+        )
+      ).sort()
+    );
+  }, []);
 
   return (
     <Select
@@ -77,14 +69,14 @@ export const NamespaceSelection = ({value, onChange, disabled}: any) => {
       disabled={disabled}
     >
       <Option value={EMPTY_VALUE}>None</Option>
-      {inputValue && namespaces.filter(namespace => namespace === inputValue).length === 0 && (
+      {inputValue && apiGroups.filter(apiGroup => apiGroup === inputValue).length === 0 && (
         <Option key={inputValue} value={NEW_ITEM}>
-          {`create '${inputValue}'`}
+          {`unknown apiGroup '${inputValue}'`}
         </Option>
       )}
-      {namespaces.map(namespace => (
-        <Option key={namespace} value={String(namespace)}>
-          {namespace}
+      {apiGroups.map(apiGroup => (
+        <Option key={apiGroup} value={String(apiGroup)}>
+          {apiGroup}
         </Option>
       ))}
     </Select>
