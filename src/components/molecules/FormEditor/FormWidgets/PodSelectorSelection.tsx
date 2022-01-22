@@ -61,7 +61,9 @@ export const PodSelectorSelection = ({value, onChange, disabled}: any) => {
     });
 
     Object.values(resourceMap)
-      .filter(r => ['Deployment'].includes(r.kind))
+      .filter(r =>
+        ['DaemonSet', 'Deployment', 'Job', 'ReplicaSet', 'ReplicationController', 'StatefulSet'].includes(r.kind)
+      )
       .forEach(r => {
         if (r.content?.spec?.template?.metadata?.labels) {
           Object.keys(r.content.spec?.template?.metadata?.labels).forEach(key =>
