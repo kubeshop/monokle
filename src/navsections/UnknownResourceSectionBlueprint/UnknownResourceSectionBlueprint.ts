@@ -1,10 +1,11 @@
-import {KUSTOMIZATION_KIND, PREVIEW_PREFIX} from '@constants/constants';
+import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -26,7 +27,7 @@ export type UnknownResourceScopeType = {
   isFolderLoading: boolean;
 };
 
-const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
+const KnownResourceKinds: string[] = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
 export const UNKNOWN_RESOURCE_SECTION_NAME = 'Unknown Resources' as const;
 
@@ -58,6 +59,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       const unknownResources = Object.values(scope.resourceMap).filter(
         resource =>
           !KnownResourceKinds.includes(resource.kind) &&
+          !isKustomizationResource(resource) &&
           !resource.name.startsWith('Patch:') &&
           (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
       );

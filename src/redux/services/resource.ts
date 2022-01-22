@@ -297,7 +297,10 @@ export async function getTargetClusterNamespaces(kubeconfigPath: string, context
 
 export function createResourceName(filePath: string, content: any, kind: string) {
   // for Kustomizations we return the name of the containing folder ('base', 'staging', etc)
-  if (kind === KUSTOMIZATION_KIND) {
+  if (
+    kind === KUSTOMIZATION_KIND &&
+    (!content?.apiVersion || content.apiVersion.startsWith('kustomize.config.k8s.io'))
+  ) {
     const ix = filePath.lastIndexOf(path.sep);
     if (ix > 0) {
       return filePath.substr(1, ix - 1);

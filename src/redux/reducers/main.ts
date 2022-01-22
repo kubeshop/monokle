@@ -9,7 +9,7 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {parseDocument} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
 import {AppConfig} from '@models/appconfig';
@@ -863,7 +863,7 @@ export const mainSlice = createSlice({
           resource =>
             !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
             !resource.name.startsWith('Patch:') &&
-            resource.kind !== KUSTOMIZATION_KIND
+            !isKustomizationResource(resource)
         );
 
         // if we are in preview mode, localResources must contain only the preview resources

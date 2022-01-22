@@ -6,8 +6,6 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
@@ -64,7 +62,7 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
   });
 }
 
-const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
+const KnownResourceKinds: string[] = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
 const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
