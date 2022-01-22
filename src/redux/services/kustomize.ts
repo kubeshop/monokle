@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
@@ -38,7 +38,7 @@ function linkParentKustomization(
  */
 
 export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === KUSTOMIZATION_KIND && (!r.version || r.version.startsWith('kustomize.config.k8s.io'));
+  return r && r.kind === KUSTOMIZATION_KIND && (!r.version || r.version.startsWith(KUSTOMIZATION_API_GROUP));
 }
 
 /**
