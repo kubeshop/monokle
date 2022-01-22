@@ -13,6 +13,7 @@ export const PreviewSpan = styled.span<{isItemSelected: boolean}>`
   font-size: 12px;
   cursor: pointer;
   color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)};
+  margin-left: 5px;
   margin-right: 15px;
 `;
 
