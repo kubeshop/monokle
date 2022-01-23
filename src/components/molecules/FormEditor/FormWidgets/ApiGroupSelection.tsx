@@ -11,7 +11,8 @@ const Option = Select.Option;
 const NEW_ITEM = 'CREATE_NEW_ITEM';
 const EMPTY_VALUE = 'NONE';
 
-export const ApiGroupSelection = ({value, onChange, disabled}: any) => {
+export const ApiGroupSelection = (params: any) => {
+  const {value, onChange, disabled, readonly} = params;
   const [apiGroups, setApiGroups] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
@@ -66,7 +67,7 @@ export const ApiGroupSelection = ({value, onChange, disabled}: any) => {
       optionFilterProp="children"
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
-      disabled={disabled}
+      disabled={disabled || readonly}
     >
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && apiGroups.filter(apiGroup => apiGroup === inputValue).length === 0 && (

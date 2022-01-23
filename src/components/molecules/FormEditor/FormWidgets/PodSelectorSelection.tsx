@@ -12,7 +12,8 @@ const Option = Select.Option;
 const NEW_ITEM = 'CREATE_NEW_ITEM';
 const EMPTY_VALUE = 'NONE';
 
-export const PodSelectorSelection = ({value, onChange, disabled}: any) => {
+export const PodSelectorSelection = (params: any) => {
+  const {value, onChange, disabled, readonly} = params;
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [podSelectors, setPodSelectors] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
@@ -82,7 +83,7 @@ export const PodSelectorSelection = ({value, onChange, disabled}: any) => {
       optionFilterProp="children"
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
-      disabled={disabled}
+      disabled={disabled || readonly}
     >
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && podSelectors.filter(selector => selector === inputValue).length === 0 && (

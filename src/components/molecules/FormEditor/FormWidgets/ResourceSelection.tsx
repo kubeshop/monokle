@@ -18,7 +18,7 @@ ResourceSelection.defaultProps = {
 };
 
 export function ResourceSelection(props: any) {
-  const {value, onChange, disabled, options} = props;
+  const {value, onChange, disabled, options, readonly} = props;
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const [resourceNames, setResourceNames] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
@@ -76,7 +76,7 @@ export function ResourceSelection(props: any) {
       onSearch={(e: string) => setInputValue(e)}
       optionFilterProp="children"
       onChange={handleChange}
-      disabled={disabled}
+      disabled={disabled || readonly}
     >
       <Option value={EMPTY_VALUE}>{EMPTY_VALUE}</Option>
       {inputValue && !resourceNames.some(name => name === inputValue) && (

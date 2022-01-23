@@ -15,12 +15,15 @@ const Option = Select.Option;
 const NEW_ITEM = 'CREATE_NEW_ITEM';
 const EMPTY_VALUE = 'NONE';
 
-export const NamespaceSelection = ({value, onChange, disabled}: any) => {
+export const NamespaceSelection = (params: any) => {
+  const {value, onChange, disabled, readonly} = params;
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResource = useSelector(selectedResourceSelector);
   const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
+
+  console.log('Creating namespace selection with params', params);
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
@@ -74,7 +77,7 @@ export const NamespaceSelection = ({value, onChange, disabled}: any) => {
       optionFilterProp="children"
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
-      disabled={disabled}
+      disabled={disabled || readonly}
     >
       <Option value={EMPTY_VALUE}>None</Option>
       {inputValue && namespaces.filter(namespace => namespace === inputValue).length === 0 && (
