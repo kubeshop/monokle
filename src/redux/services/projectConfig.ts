@@ -46,7 +46,6 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     helmPreviewMode: state.projectConfig.settings.helmPreviewMode,
     kustomizeCommand: state.projectConfig.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.projectConfig.settings.hideExcludedFilesInFileExplorer,
-    isClusterSelectorVisible: state.projectConfig.settings.isClusterSelectorVisible,
     enableHelmWithKustomize: state.projectConfig.settings.enableHelmWithKustomize,
   };
   applicationConfig.kubeConfig = {
@@ -65,8 +64,6 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     helmPreviewMode: state.settings.helmPreviewMode,
     kustomizeCommand: state.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
-    isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
-    loadLastProjectOnStartup: state.settings.loadLastProjectOnStartup,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
   };
   applicationConfig.kubeConfig = {
@@ -93,7 +90,6 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
           helmPreviewMode: settings.helmPreviewMode,
           kustomizeCommand: settings.kustomizeCommand,
           hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
-          isClusterSelectorVisible: settings.isClusterSelectorVisible,
         }
       : undefined;
     projectConfig.kubeConfig = kubeConfig

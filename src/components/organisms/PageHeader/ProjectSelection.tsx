@@ -23,7 +23,7 @@ import {Project} from '@models/appconfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
-import {activeProjectSelector, settingsSelector} from '@redux/selectors';
+import {activeProjectSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -36,7 +36,7 @@ const ProjectSelection = () => {
 
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const activeProject = useSelector(activeProjectSelector);
-  const {isClusterSelectorVisible} = useAppSelector(settingsSelector);
+  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);

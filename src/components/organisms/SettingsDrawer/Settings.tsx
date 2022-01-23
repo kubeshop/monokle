@@ -1,18 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
-
-import {WarningOutlined} from '@ant-design/icons';
+import {Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
 
 import _ from 'lodash';
-import styled from 'styled-components';
 
 import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
-  AutoLoadLastProjectTooltip,
   BrowseKubeconfigTooltip,
   EnableHelmWithKustomizeTooltip,
   HelmPreviewModeTooltip,
@@ -30,49 +26,7 @@ import FilePatternList from '@molecules/FilePatternList';
 
 import {useFocus} from '@utils/hooks';
 
-import Colors from '@styles/Colors';
-
-const StyledDiv = styled.div`
-  margin-bottom: 20px;
-`;
-
-const StyledSpan = styled.span`
-  font-weight: 500;
-  font-size: 20px;
-  display: block;
-  margin-bottom: 6px;
-`;
-
-const StyledButton = styled(Button)`
-  margin-top: 10px;
-`;
-
-const HiddenInput = styled.input`
-  display: none;
-`;
-
-const StyledSelect = styled(Select)`
-  width: 100%;
-`;
-
-const StyledWarningOutlined = styled(
-  (props: {isKubeconfigPathValid: boolean; highlighted?: boolean; className: string}) => (
-    <WarningOutlined className={props.className} />
-  )
-)`
-  ${props =>
-    `color: ${
-      props.highlighted ? Colors.whitePure : !props.isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning
-    };
-    margin-left: ${props.highlighted ? '10px' : '5px'};
-    padding-top: ${props.highlighted ? '5px' : '0px'};
-    `};
-`;
-
-const StyledHeading = styled.h2`
-  font-size: 16px;
-  margin-bottom: 7px;
-`;
+import * as S from './Styles';
 
 type SettingsProps = {
   config?: ProjectConfig | null;
@@ -167,13 +121,6 @@ export const Settings = ({
     }
   };
 
-  const onChangeLoadLastFolderOnStartup = (e: any) => {
-    setLocalConfig({
-      ...localConfig,
-      settings: {...localConfig?.settings, loadLastProjectOnStartup: e.target.checked},
-    });
-  };
-
   const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
     dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
   };
@@ -220,28 +167,19 @@ export const Settings = ({
     }
   };
 
-  const toggleClusterSelector = () => {
-    setLocalConfig({
-      ...localConfig,
-      settings: {
-        ...localConfig?.settings,
-        isClusterSelectorVisible: Boolean(!localConfig?.settings?.isClusterSelectorVisible),
-      },
-    });
-  };
   return (
     <>
-      <StyledDiv>
-        <StyledHeading>
+      <S.Div>
+        <S.Heading>
           KUBECONFIG
           {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated && (
-            <StyledWarningOutlined
+            <S.WarningOutlined
               className={isClusterPaneIconHighlighted ? 'animated-highlight' : ''}
               isKubeconfigPathValid={Boolean(config?.kubeConfig?.isPathValid)}
               highlighted={Boolean(isClusterPaneIconHighlighted)}
             />
           )}
-        </StyledHeading>
+        </S.Heading>
         <Tooltip title={KubeconfigPathTooltip}>
           <Input
             ref={inputRef}
@@ -252,28 +190,23 @@ export const Settings = ({
           />
         </Tooltip>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-          <StyledButton onClick={openFileSelect} disabled={isEditingDisabled}>
+          <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
             Browse
-          </StyledButton>
+          </S.Button>
         </Tooltip>
-        <StyledDiv style={{marginTop: 16}}>
-          <Checkbox checked={Boolean(localConfig?.settings?.isClusterSelectorVisible)} onChange={toggleClusterSelector}>
-            Show Cluster Selector
-          </Checkbox>
-        </StyledDiv>
-        <HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Files: Include</StyledSpan>
+        <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
+      </S.Div>
+      <S.Div>
+        <S.Span>Files: Include</S.Span>
         <FilePatternList
           value={localConfig?.fileIncludes || []}
           onChange={onChangeFileIncludes}
           tooltip={AddInclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
         />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Files: Exclude</StyledSpan>
+      </S.Div>
+      <S.Div>
+        <S.Span>Files: Exclude</S.Span>
         <FilePatternList
           value={localConfig?.scanExcludes || []}
           onChange={onChangeScanExcludes}
@@ -281,35 +214,35 @@ export const Settings = ({
           isSettingsOpened={isSettingsOpened}
           type="excludes"
         />
-      </StyledDiv>
-      <StyledDiv>
+      </S.Div>
+      <S.Div>
         <Checkbox
           checked={Boolean(localConfig?.settings?.hideExcludedFilesInFileExplorer)}
           onChange={onChangeHideExcludedFilesInFileExplorer}
         >
           Hide excluded files
         </Checkbox>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Helm Preview Mode</StyledSpan>
+      </S.Div>
+      <S.Div>
+        <S.Span>Helm Preview Mode</S.Span>
         <Tooltip title={HelmPreviewModeTooltip}>
-          <StyledSelect value={localConfig?.settings?.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
+          <Select value={localConfig?.settings?.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
             <Select.Option value="template">Template</Select.Option>
             <Select.Option value="install">Install</Select.Option>
-          </StyledSelect>
+          </Select>
         </Tooltip>
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Kustomize Command</StyledSpan>
+      </S.Div>
+      <S.Div>
+        <S.Span>Kustomize Command</S.Span>
         <Tooltip title={KustomizeCommandTooltip}>
-          <StyledSelect value={localConfig?.settings?.kustomizeCommand} onChange={onChangeKustomizeCommand}>
+          <Select value={localConfig?.settings?.kustomizeCommand} onChange={onChangeKustomizeCommand}>
             <Select.Option value="kubectl">Use kubectl</Select.Option>
             <Select.Option value="kustomize">Use kustomize</Select.Option>
-          </StyledSelect>
+          </Select>
         </Tooltip>
-      </StyledDiv>
+      </S.Div>
       {showEnableHelmWithKustomize && (
-        <StyledDiv>
+        <S.Div>
           <Tooltip title={EnableHelmWithKustomizeTooltip}>
             <Checkbox
               checked={localConfig?.settings?.enableHelmWithKustomize}
@@ -318,38 +251,25 @@ export const Settings = ({
               Enable Helm-related features when invoking Kustomize
             </Checkbox>
           </Tooltip>
-        </StyledDiv>
+        </S.Div>
       )}
-      {showLoadLastProjectOnStartup && (
-        <StyledDiv>
-          <StyledSpan>On Startup</StyledSpan>
-          <Tooltip title={AutoLoadLastProjectTooltip}>
-            <Checkbox
-              checked={Boolean(localConfig?.settings?.loadLastProjectOnStartup)}
-              onChange={onChangeLoadLastFolderOnStartup}
-            >
-              Automatically load last project
-            </Checkbox>
-          </Tooltip>
-        </StyledDiv>
-      )}
-      <StyledDiv>
-        <StyledSpan>Maximum folder read recursion depth</StyledSpan>
+      <S.Div>
+        <S.Span>Maximum folder read recursion depth</S.Span>
         <InputNumber
           min={1}
           value={localConfig?.folderReadsMaxDepth}
           onChange={(value: number) => setLocalConfig({...localConfig, folderReadsMaxDepth: value})}
         />
-      </StyledDiv>
-      <StyledDiv>
-        <StyledSpan>Resource links processing</StyledSpan>
+      </S.Div>
+      <S.Div>
+        <S.Span>Resource links processing</S.Span>
         <Checkbox
           checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
           onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
         >
           Ignore optional unsatisfied links
         </Checkbox>
-      </StyledDiv>
+      </S.Div>
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>
         <Radio.Group size="large" value={appConfig.settings.theme} onChange={onChangeTheme}>
