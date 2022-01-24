@@ -11,7 +11,7 @@ import {Primitive} from 'type-fest';
 
 import {TemplateForm} from '@models/template';
 
-import {NamespaceSelection} from '@molecules/FormEditor/FormWidgets';
+import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
 
@@ -69,9 +69,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
         schema={schema}
         uiSchema={uiSchema}
         formData={formData}
-        widgets={{
-          namespaceSelection: NamespaceSelection,
-        }}
+        widgets={getCustomFormWidgets()}
         onChange={e => setFormData(e.formData)}
         noHtml5Validate
       >

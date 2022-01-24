@@ -14,7 +14,6 @@ import {setAlert} from '@redux/reducers/alert';
 import {
   addResource,
   openResourceDiffModal,
-  reprocessNewResource,
   setApplyingResource,
   setClusterDiffRefreshDiffResource,
   updateResource,
@@ -144,9 +143,7 @@ export async function applyResource(
                 );
               } else {
                 const newK8sResource = extractK8sResources(updatedResourceText, PREVIEW_PREFIX + kubeconfig)[0];
-
                 dispatch(addResource(newK8sResource));
-                dispatch(reprocessNewResource(newK8sResource));
               }
 
               if (options?.shouldPerformDiff) {

@@ -6,6 +6,7 @@ import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
   isHovered?: boolean;
+  isCheckable?: boolean;
   $hasCustomNameDisplay: boolean;
 };
 
@@ -27,7 +28,7 @@ export const NameContainer = styled.span<NameContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
-  padding-left: 24px;
+  ${props => props.isCheckable && `padding-left: 24px;`}
   ${props => !props.isHovered && 'padding-right: 30px;'}
   ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
 `;

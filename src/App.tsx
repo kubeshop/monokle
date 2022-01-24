@@ -16,7 +16,7 @@ import {Size} from '@models/window';
 import {useAppSelector} from '@redux/hooks';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closeFolderExplorer} from '@redux/reducers/ui';
-import {kubeConfigContextSelector, kubeConfigPathSelector, settingsSelector} from '@redux/selectors';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
 import {
@@ -67,7 +67,8 @@ const App = () => {
   const dispatch = useDispatch();
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const {loadLastProjectOnStartup, isClusterSelectorVisible} = useAppSelector(settingsSelector);
+  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
+  const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 

@@ -83,7 +83,8 @@ export const isPluginTemplate = (templatePath: string, pluginsDir: string) => te
 export const interpolateTemplate = (text: string, formsData: any[]) => {
   _.templateSettings.interpolate = /\[\[([\s\S]+?)\]\]/g;
   const lodashTemplate = _.template(text);
-  return lodashTemplate({forms: formsData});
+  const result = lodashTemplate({forms: formsData});
+  return result;
 };
 
 export const createUnsavedResourcesFromVanillaTemplate = async (

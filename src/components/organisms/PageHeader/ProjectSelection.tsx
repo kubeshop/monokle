@@ -4,8 +4,6 @@ import {useSelector} from 'react-redux';
 import {Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
-import {DownOutlined} from '@ant-design/icons';
-
 import _ from 'lodash';
 import {DateTime} from 'luxon';
 
@@ -23,20 +21,20 @@ import {Project} from '@models/appconfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
-import {activeProjectSelector, settingsSelector} from '@redux/selectors';
+import {activeProjectSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import * as S from './Styled';
+import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
 
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const activeProject = useSelector(activeProjectSelector);
-  const {isClusterSelectorVisible} = useAppSelector(settingsSelector);
+  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -113,22 +111,23 @@ const ProjectSelection = () => {
               />
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewEmptyProjectTooltip} placement="bottomRight">
-              <S.ProjectFolderAddOutlined onClick={() => handleCreateProject(false)} />
+              <S.FolderAddOutlined onClick={() => handleCreateProject(false)} />
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromTemplateTooltip} placement="bottomRight">
-              <S.ProjectFormatPainterOutlined onClick={() => handleCreateProject(true)} />
+              <S.FormatPainterOutlined onClick={() => handleCreateProject(true)} />
             </Tooltip>
           </S.ProjectsMenuActionsContainer>
         </S.ProjectsMenuContainer>
-        <S.ProjectsTable
+
+        <S.Table
           size="small"
           showSorterTooltip={false}
           dataSource={searchText ? filteredProjects : projects}
           pagination={false}
           scroll={{y: 300}}
           rowKey="rootFolder"
-          onRow={(project: Project) => ({
-            onClick: () => handleProjectChange(project),
+          onRow={project => ({
+            onClick: () => handleProjectChange(project as Project),
           })}
         >
           <Column
@@ -204,28 +203,28 @@ const ProjectSelection = () => {
               </S.ProjectTableActions>
             )}
           />
-        </S.ProjectsTable>
+        </S.Table>
       </S.ProjectMenu>
     );
   };
 
   return (
     <S.ProjectsDropdown
-      isClusterSelectorVisible={isClusterSelectorVisible}
+      $isClusterSelectorVisible={isClusterSelectorVisible}
+      arrow
       overlay={projectMenu}
       placement="bottomCenter"
-      arrow
       trigger={['click']}
-      onVisibleChange={setIsDropdownMenuVisible}
       visible={isDropdownMenuVisible}
+      onVisibleChange={setIsDropdownMenuVisible}
     >
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ProjectManagementTooltip} placement="bottomRight">
-        <S.ProjectButton>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
+        <S.Button>
           <S.FolderOpenOutlined />
-          <span>{activeProject?.name}</span>
-          <DownOutlined style={{margin: 4}} />
+          <S.ProjectName>{activeProject?.name}</S.ProjectName>
+          <S.DownOutlined />
           <FileExplorer {...fileExplorerProps} />
-        </S.ProjectButton>
+        </S.Button>
       </Tooltip>
     </S.ProjectsDropdown>
   );

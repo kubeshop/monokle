@@ -127,7 +127,11 @@ export const configSlice = createSlice({
     },
     updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.settings.loadLastProjectOnStartup', action.payload);
-      state.settings.loadLastProjectOnStartup = action.payload;
+      state.loadLastProjectOnStartup = action.payload;
+    },
+    updateClusterSelectorVisibilty: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.settings.isClusterSelectorVisible', action.payload);
+      state.isClusterSelectorVisible = action.payload;
     },
     updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
@@ -248,10 +252,6 @@ export const configSlice = createSlice({
         writeProjectConfigFile(state);
       }
     },
-    toggleClusterStatus: (state: Draft<AppConfig>) => {
-      state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;
-      electronStore.set('appConfig.settings.isClusterSelectorVisible', state.settings.isClusterSelectorVisible);
-    },
     setUserDirs: (
       state: Draft<AppConfig>,
       action: PayloadAction<{homeDir: string; tempDir: string; dataDir: string}>
@@ -285,7 +285,7 @@ export const {
   setKubeConfig,
   updateProjectConfig,
   updateProjectKubeConfig,
-  toggleClusterStatus,
+  updateClusterSelectorVisibilty,
   setUserDirs,
   createProject,
 } = configSlice.actions;

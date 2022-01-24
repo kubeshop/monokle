@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Tooltip} from 'antd';
+import {Badge, Tooltip} from 'antd';
 
 import {GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 
@@ -29,7 +29,8 @@ import DiscordLogo from '@assets/DiscordLogo.svg';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import ClusterSelection from './ClusterSelection';
-import * as S from './Styled';
+
+import * as S from './styled';
 
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;
@@ -50,6 +51,7 @@ const PageHeader = () => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewType = useAppSelector(state => state.main.previewType);
+  const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
@@ -157,7 +159,9 @@ const PageHeader = () => {
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
               <S.IconContainerSpan>
-                <S.BellOutlined onClick={toggleNotificationsDrawer} />
+                <Badge count={unseenNotificationsCount} size="small">
+                  <S.BellOutlined onClick={toggleNotificationsDrawer} />
+                </Badge>
               </S.IconContainerSpan>
             </Tooltip>
           </S.SettingsCol>
