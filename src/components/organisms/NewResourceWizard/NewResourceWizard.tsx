@@ -16,7 +16,6 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {reprocessNewResource} from '@redux/reducers/main';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
@@ -268,9 +267,6 @@ const NewResourceWizard = () => {
       dispatch,
       jsonTemplate
     );
-
-    // validate and update any possible broking incoming links that are now fixed
-    dispatch(reprocessNewResource(newResource));
 
     if (savingDestination !== 'doNotSave') {
       let absolutePath;
