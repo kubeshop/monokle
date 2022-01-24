@@ -54,3 +54,17 @@ Open the Plugins manager from the top right icon
 
 - The URL must be a valid GitHub repository url in the format https://github.com/[user]/[repository]
 - The primary branch should be `main`, that’s where the plugin installer will search for the `package.json` file
+
+### How do I manually install a Plugin?
+
+This should be used only as a workaround for developing plugins.
+
+On Mac:
+
+- Copy your plugin folder to the `/Users/<YourUser>/Libray/Application Support/monokle/monoklePlugins`
+- Reopen or reload (from Window -> Reload) Monokle
+
+On Windows:
+
+- Copy your plugin folder to the `C:\Users\<YourUser>\AppData\Roaming\monokle\monoklePlugins`
+- Reopen or reload (from Window -> Reload) Monokle
