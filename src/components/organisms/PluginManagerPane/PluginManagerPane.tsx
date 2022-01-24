@@ -45,7 +45,7 @@ function PluginManagerPane() {
   return (
     <div>
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
-      <TitleBar title="Plugin Manager">
+      <TitleBar title="Plugins">
         <Tooltip title={PluginManagerPaneReloadTooltip} placement="bottom">
           <Button
             disabled={sortedPluginEntries.length === 0}
