@@ -47,7 +47,7 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type LeftMenuSelection =
+export type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'
   | 'kustomize-pane'
@@ -87,7 +87,7 @@ export type UiState = {
   };
   isFolderLoading: boolean;
   leftMenu: {
-    selection: string;
+    selection: LeftMenuSelectionType;
     isActive: boolean;
   };
   quickSearchActionsPopup: {
