@@ -230,6 +230,9 @@ export async function updateTemplate(
   templatesDir: string,
   userTempDir: string
 ): Promise<AnyExtension<AnyTemplate> | undefined> {
+  if (!template.repository) {
+    return undefined;
+  }
   const {entryFileUrl, folderPath} = makeExtensionDownloadData(
     template.repository,
     TEMPLATE_ENTRY_FILE_NAME,

@@ -125,7 +125,9 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   };
 
   const openRepository = () => {
-    shell.openExternal(template.repository);
+    if (template.repository) {
+      shell.openExternal(template.repository);
+    }
   };
 
   if (activeFormIndex && !activeForm && !resultMessage && !isLoading) {
@@ -190,12 +192,14 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
                       <S.TableHead>Version</S.TableHead>
                       <S.TableData>{template.version}</S.TableData>
                     </tr>
-                    <tr>
-                      <S.TableHead>Repository</S.TableHead>
-                      <S.TableData>
-                        <a onClick={openRepository}>{template.repository}</a>
-                      </S.TableData>
-                    </tr>
+                    {template.repository && (
+                      <tr>
+                        <S.TableHead>Repository</S.TableHead>
+                        <S.TableData>
+                          <a onClick={openRepository}>{template.repository}</a>
+                        </S.TableData>
+                      </tr>
+                    )}
                     {template.helpUrl && (
                       <tr>
                         <S.TableHead>Help URL</S.TableHead>
