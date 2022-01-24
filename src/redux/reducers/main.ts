@@ -653,6 +653,11 @@ export const mainSlice = createSlice({
       state.clusterDiff.hideClusterOnlyResources = !state.clusterDiff.hideClusterOnlyResources;
       state.clusterDiff.selectedMatches = [];
     },
+    seenNotifications: (state: Draft<AppState>) => {
+      state.notifications.forEach(notification => {
+        notification.hasSeen = true;
+      });
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1101,5 +1106,6 @@ export const {
   closeResourceDiffModal,
   openResourceDiffModal,
   setFiltersToBeChanged,
+  seenNotifications,
 } = mainSlice.actions;
 export default mainSlice.reducer;

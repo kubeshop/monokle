@@ -16,6 +16,7 @@ import {
   ClusterOutlined as RawClusterOutlined,
   CopyOutlined as RawCopyOutlined,
   DeleteOutlined as RawDeleteOutlined,
+  DownOutlined as RawDownOutlined,
   EditOutlined as RawEditOutlined,
   FolderAddOutlined as RawFolderAddOutlined,
   FolderOpenOutlined as RawFolderOpenOutlined,
@@ -71,10 +72,12 @@ export const ProjectButton = styled(RawButton)`
   letter-spacing: 0.05em;
   font-size: 10px;
   line-height: 20px;
+  display: flex;
 `;
 
 export const FolderOpenOutlined = styled(RawFolderOpenOutlined)`
   color: ${Colors.whitePure};
+  align-self: center;
 `;
 
 export const CLusterContainer = styled.div`
@@ -88,6 +91,7 @@ export const CLusterStatus = styled.div`
   border: 1px solid ${Colors.grey3};
   border-radius: 4px;
   padding: 0px 8px;
+  display: flex;
 `;
 
 export const CLusterStatusText = styled.span<{connected: Boolean}>`
@@ -269,6 +273,10 @@ export const ProjectFormatPainterOutlined = styled(RawFormatPainterOutlined)`
   color: ${Colors.blue6};
   cursor: pointer;
 `;
+export const DownOutlined = styled(RawDownOutlined)`
+  margin: 4px;
+  align-self: center;
+`;
 
 export const ProjectsMenuActionsContainer = styled.div`
   display: flex;
@@ -285,6 +293,14 @@ export const ProjectsMenuContainer = styled.div`
 
 export const Search = styled(RawSearch)`
   width: 280px;
+`;
+
+export const ProjectName = styled.span`
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  align-self: center;
 `;
 
 interface ProjectsTableProps extends TableProps<any> {

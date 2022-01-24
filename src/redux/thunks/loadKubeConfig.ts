@@ -39,6 +39,9 @@ export const loadContexts = async (
 
         dispatch(updateProjectKubeConfig(kubeConfig));
       } catch (e: any) {
+        if (e instanceof Error) {
+          log.warn(`[loadContexts]: ${e.message}`);
+        }
         dispatch(
           setAlert({
             title: 'Loading kubeconfig file failed',
@@ -49,7 +52,9 @@ export const loadContexts = async (
       }
     }
   } catch (e) {
-    log.info(e);
+    if (e instanceof Error) {
+      log.warn(e.message);
+    }
     dispatch(updateProjectKubeConfig({isPathValid: false}));
   }
 };
