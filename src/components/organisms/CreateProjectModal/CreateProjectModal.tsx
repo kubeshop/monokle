@@ -17,9 +17,9 @@ import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
 
-import {TemplateModal} from '..';
 import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
 import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';
+import TemplateModal from '../TemplateModal';
 
 export enum FormSteps {
   STEP_ONE = 1,
@@ -84,6 +84,7 @@ const CreateProjectModal: React.FC = () => {
   const closeModal = () => {
     setFormValues({name: '', rootFolder: ''});
     setFormStep(FormSteps.STEP_ONE);
+    setSelectedTemplate(undefined);
     createProjectForm.resetFields();
     dispatch(closeCreateProjectModal());
     setIsModalHid(false);
