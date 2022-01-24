@@ -69,10 +69,7 @@ const ProjectSelection = () => {
 
   const handleProjectChange = (project: Project) => {
     setIsDropdownMenuVisible(false);
-    setTimeout(() => {
-      dispatch(setOpenProject(project.rootFolder));
-      dispatch(toggleStartProjectPane());
-    }, 400);
+    setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
   };
 
   const handleCreateProject = (fromTemplate: boolean) => {
