@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Dropdown, Menu, Popconfirm, Tooltip} from 'antd';
+import {Dropdown, Menu, Tooltip} from 'antd';
 
 import {DownOutlined, LoadingOutlined} from '@ant-design/icons';
 
@@ -64,18 +64,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);
-  };
-
-  const handleClusterHideClick = () => {
-    dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
-  };
-
-  const handleClusterHideConfirm = () => {
-    dispatch(highlightItem(null));
-  };
-
-  const handleClusterHideCancel = () => {
-    dispatch(highlightItem(null));
   };
 
   const connectToCluster = () => {
@@ -161,7 +149,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 >
                   <S.ClusterButton>
                     <span>{kubeConfigContext}</span>
-                    <DownOutlined style={{margin: 4}} />
+                    <DownOutlined />
                   </S.ClusterButton>
                 </Dropdown>
               )}
@@ -177,24 +165,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 </Tooltip>
               ) : (
                 <>
-                  <S.ClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
-                    Configure
-                  </S.ClusterActionButton>
-                  <Popconfirm
-                    placement="bottom"
-                    title={() => (
-                      <>
-                        <p>If you want to configure later, use the cluster icon in the left rail.</p>
-                        <p style={{margin: 0}}>You can re-enable the Cluster Selector in the Settings Panel</p>
-                      </>
-                    )}
-                    okText="Ok, hide"
-                    cancelText="Nevermind"
-                    onConfirm={handleClusterHideConfirm}
-                    onCancel={handleClusterHideCancel}
-                  >
-                    <S.ClusterActionButton onClick={handleClusterHideClick}>Hide</S.ClusterActionButton>
-                  </Popconfirm>
+                  <S.ClusterActionButton onClick={handleClusterConfigure}>Configure</S.ClusterActionButton>
                 </>
               )}
             </>

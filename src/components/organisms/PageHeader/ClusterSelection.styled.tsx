@@ -23,6 +23,7 @@ export const ClusterActionButton = styled(RawButton)`
   border: none;
   outline: none;
   padding: 0px;
+  margin-left: 5px;
   color: ${Colors.blue6};
   font-size: 12px;
 `;

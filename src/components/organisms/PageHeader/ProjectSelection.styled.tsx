@@ -35,7 +35,6 @@ export const DeleteOutlined = styled(RawDeleteOutlined)`
 `;
 
 export const DownOutlined = styled(RawDownOutlined)`
-  margin: 4px;
   align-self: center;
 `;
 
