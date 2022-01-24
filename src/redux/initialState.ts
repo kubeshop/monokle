@@ -44,6 +44,7 @@ const initialAppState: AppState = {
   notifications: [],
   shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
+  registeredKindHandlers: [],
 };
 
 const initialAppConfigState: AppConfig = {
@@ -56,11 +57,11 @@ const initialAppConfigState: AppConfig = {
     theme: electronStore.get('appConfig.settings.theme'),
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
-    loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastProjectOnStartup'),
-    isClusterSelectorVisible: electronStore.get('appConfig.settings.isClusterSelectorVisible'),
     hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
   },
+  isClusterSelectorVisible: electronStore.get('appConfig.settings.isClusterSelectorVisible'),
+  loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'outdated',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
@@ -162,6 +163,7 @@ const initialNavigatorState: NavigatorState = {
   sectionInstanceMap: {},
   itemInstanceMap: {},
   collapsedSectionIds: [],
+  registeredSectionBlueprintIds: [],
 };
 
 const initialUiCoachState: UiCoachState = {

@@ -2,11 +2,11 @@ import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
 import log from 'loglevel';
 import {sep} from 'path';
+import {AnyAction} from 'redux';
 
 import {AppConfig, ProjectConfig} from '@models/appconfig';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
-import {AppDispatch} from '@redux/store';
 
 export interface SerializableObject {
   [name: string]: any;
@@ -46,7 +46,6 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     helmPreviewMode: state.projectConfig.settings.helmPreviewMode,
     kustomizeCommand: state.projectConfig.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.projectConfig.settings.hideExcludedFilesInFileExplorer,
-    isClusterSelectorVisible: state.projectConfig.settings.isClusterSelectorVisible,
     enableHelmWithKustomize: state.projectConfig.settings.enableHelmWithKustomize,
   };
   applicationConfig.kubeConfig = {
@@ -65,8 +64,6 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     helmPreviewMode: state.settings.helmPreviewMode,
     kustomizeCommand: state.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
-    isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
-    loadLastProjectOnStartup: state.settings.loadLastProjectOnStartup,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
   };
   applicationConfig.kubeConfig = {
@@ -93,7 +90,6 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
           helmPreviewMode: settings.helmPreviewMode,
           kustomizeCommand: settings.kustomizeCommand,
           hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
-          isClusterSelectorVisible: settings.isClusterSelectorVisible,
         }
       : undefined;
     projectConfig.kubeConfig = kubeConfig
@@ -116,7 +112,7 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
   }
 };
 
-export const updateProjectSettings = (dispatch: AppDispatch, projectRootPath?: string | null) => {
+export const updateProjectSettings = (dispatch: (action: AnyAction) => void, projectRootPath?: string | null) => {
   const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
   if (projectConfig) {
     dispatch(updateProjectConfig({config: projectConfig, fromConfigFile: true}));

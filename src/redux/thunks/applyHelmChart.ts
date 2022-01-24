@@ -3,13 +3,13 @@ import log from 'loglevel';
 import path from 'path';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
 import {FileMapType} from '@models/appstate';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 
 import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
-import {AppDispatch} from '@redux/store';
 
 import {PROCESS_ENV} from '@utils/env';
 import {getShellPath} from '@utils/shell';
@@ -114,7 +114,9 @@ export async function applyHelmChart(
         dispatch(setApplyingResource(false));
       });
     } catch (e) {
-      log.error(e.message);
+      if (e instanceof Error) {
+        log.error(e.message);
+      }
       dispatch(setApplyingResource(true));
     }
   } catch (e) {

@@ -1,6 +1,6 @@
 import {FSWatcher, watch} from 'chokidar';
 
-import {AppDispatch} from '@redux/store';
+import {AppDispatch} from '@models/appdispatch';
 
 import {CONFIG_PATH, updateProjectSettings} from './projectConfig';
 
@@ -24,7 +24,7 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
   watcher = watch(absolutePath, {
     persistent: true,
     usePolling: true,
-    interval: 100,
+    interval: 1000,
   });
 
   watcher

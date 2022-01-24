@@ -88,6 +88,8 @@ export function registerKindHandler(kindHandler: ResourceKindHandler, shouldRepl
   if (shouldReplace || !HandlerByResourceKind[kindHandler.kind]) {
     log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`, kindHandler);
     HandlerByResourceKind[kindHandler.kind] = kindHandler;
+    // we need to store the list of registered kind handlers in the redux store for reactivity
+    KindHandlersEventEmitter.emit('register', kindHandler);
 
     const ix = ResourceKindHandlers.findIndex(handler => handler.kind === kindHandler.kind);
     if (ix >= 0) {
@@ -98,8 +100,20 @@ export function registerKindHandler(kindHandler: ResourceKindHandler, shouldRepl
   }
 }
 
+/**
+ * THIS IS NOT REACTIVE, use the knownResourceKindsSelector if you need reactivy
+ * @returns list of registered resource kinds
+ */
 export const getKnownResourceKinds = () => {
   return ResourceKindHandlers.map(handler => handler.kind);
+};
+
+/**
+ * THIS IS NOT REACTIVE, use the registeredKindHandlersSelector if you need reactivity
+ * @returns list of registered ResourceKindHandlers
+ */
+export const getRegisteredKindHandlers = () => {
+  return ResourceKindHandlers;
 };
 
 export const getResourceKindHandler = (resourceKind: string): ResourceKindHandler | undefined => {
@@ -150,7 +164,7 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
  * Read bundled kindhandlers and emit event to notify when finished (used in tests)
  */
 
-const KindHandlersEventEmitter = new EventEmitter();
+export const KindHandlersEventEmitter = new EventEmitter();
 readBundledCrdKindHandlers();
 
 async function readBundledCrdKindHandlers() {

@@ -211,6 +211,13 @@ export const mainSlice = createSlice({
     addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;
       state.resourceMap[resource.id] = resource;
+
+      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
+        resourceIds: [resource.id],
+        resourceKinds,
+      });
     },
     /**
      * called by the file monitor when multiple paths are added to the file system
@@ -333,9 +340,9 @@ export const mainSlice = createSlice({
       });
     },
     /**
-     * Reprocess a newly created resource
+     * Reprocesses a resource
      */
-    reprocessNewResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+    reprocessResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
@@ -652,6 +659,18 @@ export const mainSlice = createSlice({
     toggleClusterOnlyResourcesInClusterDiff: (state: Draft<AppState>) => {
       state.clusterDiff.hideClusterOnlyResources = !state.clusterDiff.hideClusterOnlyResources;
       state.clusterDiff.selectedMatches = [];
+    },
+    addMultipleKindHandlers: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      action.payload.forEach(kind => {
+        if (!state.registeredKindHandlers.includes(kind)) {
+          state.registeredKindHandlers.push(kind);
+        }
+      });
+    },
+    addKindHandler: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      if (!state.registeredKindHandlers.includes(action.payload)) {
+        state.registeredKindHandlers.push(action.payload);
+      }
     },
     seenNotifications: (state: Draft<AppState>) => {
       state.notifications.forEach(notification => {
@@ -1095,7 +1114,7 @@ export const {
   reloadClusterDiff,
   toggleClusterOnlyResourcesInClusterDiff,
   setSelectionHistory,
-  reprocessNewResource,
+  reprocessResource,
   editorHasReloadedSelectedPath,
   checkResourceId,
   uncheckAllResourceIds,
@@ -1106,6 +1125,8 @@ export const {
   closeResourceDiffModal,
   openResourceDiffModal,
   setFiltersToBeChanged,
+  addMultipleKindHandlers,
+  addKindHandler,
   seenNotifications,
 } = mainSlice.actions;
 export default mainSlice.reducer;

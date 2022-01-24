@@ -183,8 +183,8 @@ export class NodeWrapper {
  * Utility function to get all resources of a specific kind
  */
 
-export function getK8sResources(resourceMap: ResourceMapType, type: string) {
-  return Object.values(resourceMap).filter(item => item.kind === type);
+export function getK8sResources(resourceMap: ResourceMapType, kind: string) {
+  return Object.values(resourceMap).filter(item => item.kind === kind);
 }
 
 export function areRefPosEqual(a: RefPosition | undefined, b: RefPosition | undefined) {
@@ -661,13 +661,15 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
           if (
             resource.kind === 'CustomResourceDefinition' &&
-            resource.content?.spec?.kind &&
-            !getResourceKindHandler(resource.content.spec.kind)
+            resource.content?.spec?.names?.kind &&
+            !getResourceKindHandler(resource.content.spec.names.kind)
           ) {
             try {
               const kindHandler = extractKindHandler(resource.content);
               if (kindHandler) {
                 registerKindHandler(kindHandler, false);
+              } else {
+                log.warn('Failed to extract kindHandler', resource.content);
               }
             } catch (e) {
               log.warn('Failed to register custom kindhandler', resource, e);

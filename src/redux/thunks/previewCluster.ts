@@ -8,14 +8,15 @@ import log from 'loglevel';
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
+import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {extractK8sResources, processParsedResources} from '@redux/services/resource';
-import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
-import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
+import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
@@ -28,11 +29,13 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
     kc.setCurrentContext(currentContext);
 
     const results = await Promise.allSettled(
-      ResourceKindHandlers.filter(handler => !handler.isCustom).map(resourceKindHandler =>
-        resourceKindHandler
-          .listResourcesInCluster(kc)
-          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
-      )
+      getRegisteredKindHandlers()
+        .filter(handler => !handler.isCustom)
+        .map(resourceKindHandler =>
+          resourceKindHandler
+            .listResourcesInCluster(kc)
+            .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
+        )
     );
 
     const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);

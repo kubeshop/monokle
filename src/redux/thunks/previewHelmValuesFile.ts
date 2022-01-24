@@ -6,8 +6,10 @@ import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {AppDispatch} from '@models/appdispatch';
+import {RootState} from '@models/rootstate';
+
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {runHelm} from '@utils/helm';

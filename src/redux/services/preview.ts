@@ -1,10 +1,11 @@
+import {AppDispatch} from '@models/appdispatch';
+
 import {
   clearPreview,
   clearPreviewAndSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
 } from '@redux/reducers/main';
-import {AppDispatch} from '@redux/store';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';

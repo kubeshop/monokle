@@ -1,4 +1,4 @@
-import {KustomizeCommandType} from '@redux/services/kustomize';
+import {KustomizeCommandType} from '@models/kustomize';
 
 export enum Themes {
   Dark = 'dark',
@@ -23,9 +23,7 @@ export type Settings = {
   autoZoomGraphOnSelection?: boolean;
   helmPreviewMode?: 'template' | 'install';
   kustomizeCommand?: KustomizeCommandType;
-  loadLastProjectOnStartup?: boolean;
   hideExcludedFilesInFileExplorer?: boolean;
-  isClusterSelectorVisible?: boolean;
   enableHelmWithKustomize?: boolean;
 };
 
@@ -83,6 +81,8 @@ interface AppConfig {
   folderReadsMaxDepth: number;
   /** if the startup modal is visible */
   isStartupModalVisible: boolean;
+  loadLastProjectOnStartup: boolean;
+  isClusterSelectorVisible: boolean;
   settings: Settings;
   newVersion: {
     code: NewVersionCode;

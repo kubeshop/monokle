@@ -114,11 +114,13 @@ const TemplatesPane: React.FC = () => {
           <p>No templates available.</p>
         ) : (
           <>
-            <S.SearchInput
-              placeholder="Search installed templates"
-              value={searchedValue}
-              onChange={e => setSearchedValue(e.target.value)}
-            />
+            <S.SearchInputContainer>
+              <S.SearchInput
+                placeholder="Search installed templates"
+                value={searchedValue}
+                onChange={e => setSearchedValue(e.target.value)}
+              />
+            </S.SearchInputContainer>
 
             {!Object.keys(templatesToShow).length ? (
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>

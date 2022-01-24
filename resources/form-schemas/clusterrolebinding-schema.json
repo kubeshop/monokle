@@ -5,7 +5,8 @@
         "type": "object",
         "properties": {
           "kind": {
-            "type": "string"
+            "type": "string",
+            "enum": ["User", "Group", "ServiceAccount"]
           },
           "name": {
             "type": "string"

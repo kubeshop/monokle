@@ -6,6 +6,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
@@ -13,18 +14,15 @@ import {ItemCustomComponentProps} from '@models/navigator';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {removeResource} from '@redux/reducers/main';
 import {openNewResourceWizard, openRenameResourceModal, openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, knownResourceKindsSelector} from '@redux/selectors';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isFileResource, isUnsavedResource} from '@redux/services/resource';
-import {AppDispatch} from '@redux/store';
 
 import {Dots} from '@atoms';
 
 import ContextMenu from '@components/molecules/ContextMenu';
 
 import Colors from '@styles/Colors';
-
-import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const ContextMenuDivider = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
@@ -62,8 +60,6 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
   });
 }
 
-const KnownResourceKinds: string[] = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
-
 const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
@@ -74,6 +70,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const isResourceSelected = useMemo(() => {
     return itemInstance.id === selectedResourceId;
@@ -124,7 +121,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
         Rename
       </Menu.Item>
 
-      {KnownResourceKinds.includes(resource.kind) && (
+      {knownResourceKinds.includes(resource.kind) && (
         <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
           Clone
         </Menu.Item>
