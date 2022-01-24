@@ -36,11 +36,14 @@ const CreateProjectModal: React.FC = () => {
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
   const [isModalHid, setIsModalHid] = useState(false);
+  const [isSubmitEnabled, setSubmitEnabled] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
       if (folderPath) {
         createProjectForm.setFieldsValue({rootFolder: folderPath});
+        setIsFormValid(Object.values(createProjectForm.getFieldsValue()).every(value => Boolean(value)));
       }
     },
     {isDirectoryExplorer: true}
@@ -56,6 +59,16 @@ const CreateProjectModal: React.FC = () => {
       closeModal();
     }
   };
+
+  useEffect(() => {
+    if (formStep === FormSteps.STEP_ONE) {
+      setSubmitEnabled(isFormValid);
+    } else if (formStep === FormSteps.STEP_TWO) {
+      setSubmitEnabled(isFormValid && Boolean(selectedTemplate));
+    } else {
+      setSubmitEnabled(false);
+    }
+  }, [isFormValid, selectedTemplate, formStep]);
 
   useEffect(() => {
     if (uiState.isOpen) {
@@ -83,11 +96,13 @@ const CreateProjectModal: React.FC = () => {
 
   const closeModal = () => {
     setFormValues({name: '', rootFolder: ''});
+    createProjectForm.resetFields();
     setFormStep(FormSteps.STEP_ONE);
     setSelectedTemplate(undefined);
-    createProjectForm.resetFields();
-    dispatch(closeCreateProjectModal());
     setIsModalHid(false);
+    setSubmitEnabled(false);
+    setIsFormValid(false);
+    dispatch(closeCreateProjectModal());
   };
 
   if (!uiState.isOpen) {
@@ -118,7 +133,7 @@ const CreateProjectModal: React.FC = () => {
             Back
           </Button>
         ),
-        <Button key="submit" type="primary" onClick={() => createProjectForm.submit()}>
+        <Button key="submit" type="primary" disabled={!isSubmitEnabled} onClick={() => createProjectForm.submit()}>
           {uiState.fromTemplate && formStep === FormSteps.STEP_ONE ? 'Next: Select a Template' : 'Create Project'}
         </Button>,
       ]}
@@ -129,19 +144,37 @@ const CreateProjectModal: React.FC = () => {
         onFinish={onFinish}
         initialValues={() => formValues}
         style={{display: formStep === FormSteps.STEP_ONE ? 'block' : 'none'}}
+        onFieldsChange={(_, allFields) => {
+          setIsFormValid(allFields.every(item => item.value));
+        }}
       >
         <Form.Item
           name="name"
           label="Project Name"
           required
           tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
+          rules={[
+            {
+              required: true,
+              message: 'Please provide your project name!',
+            },
+          ]}
         >
           <Input ref={inputRef} />
         </Form.Item>
         <Form.Item label="Location" required tooltip="The local path where your project will live.">
           <Input.Group compact>
-            <Form.Item name="rootFolder" noStyle>
-              <Input required style={{width: 'calc(100% - 100px)'}} />
+            <Form.Item
+              name="rootFolder"
+              noStyle
+              rules={[
+                {
+                  required: true,
+                  message: 'Please provide your local path!',
+                },
+              ]}
+            >
+              <Input style={{width: 'calc(100% - 100px)'}} />
             </Form.Item>
             <Button style={{width: '100px'}} onClick={openFileExplorer}>
               Browse
