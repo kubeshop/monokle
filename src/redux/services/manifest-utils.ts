@@ -200,7 +200,7 @@ export function extractObjectsFromYaml(yamlText: string) {
     let docIndex = 0;
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
-        log.warn(`Ignoring document ${docIndex} in due to ${doc.errors.length} error(s)`);
+        log.warn(`Ignoring document ${docIndex} in due to ${doc.errors.length} error(s)`, doc.errors);
       } else {
         const content = doc.toJS();
         if (
