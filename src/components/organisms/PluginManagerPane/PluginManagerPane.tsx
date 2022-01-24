@@ -22,7 +22,10 @@ function PluginManagerPane() {
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
-  const plugins = useMemo(() => Object.values(pluginMap), [pluginMap]);
+
+  const sortedPluginEntries = useMemo(() => {
+    return Object.entries(pluginMap).sort((a, b) => a[1].name.localeCompare(b[1].name));
+  }, [pluginMap]);
 
   const [isInstallModalVisible, setInstallModalVisible] = useState<boolean>(false);
 
@@ -45,7 +48,7 @@ function PluginManagerPane() {
       <TitleBar title="Plugin Manager">
         <Tooltip title={PluginManagerPaneReloadTooltip} placement="bottom">
           <Button
-            disabled={plugins.length === 0}
+            disabled={sortedPluginEntries.length === 0}
             onClick={onClickReload}
             type="link"
             size="small"
@@ -55,15 +58,15 @@ function PluginManagerPane() {
         <Button onClick={onClickInstallPlugin} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
       <S.Container>
-        {plugins.length === 0 ? (
+        {sortedPluginEntries.length === 0 ? (
           <>{isLoadingExistingPlugins ? <Skeleton /> : <p>No plugins installed yet.</p>}</>
         ) : (
           <>
-            {plugins.length > 0 &&
-              Object.entries(pluginMap).map(([path, activePlugin]) => (
+            {sortedPluginEntries.length > 0 &&
+              sortedPluginEntries.map(([path, activePlugin]) => (
                 <PluginInformation key={activePlugin.name} plugin={activePlugin} pluginPath={path} />
               ))}
-            {!plugins.length && <S.NotFoundLabel>No plugins found.</S.NotFoundLabel>}
+            {!sortedPluginEntries.length && <S.NotFoundLabel>No plugins found.</S.NotFoundLabel>}
           </>
         )}
       </S.Container>
