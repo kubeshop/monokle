@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useEffect, useState} from 'react';
 
 import {Badge, Tooltip} from 'antd';
 
@@ -18,8 +17,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateStartupModalVisible} from '@redux/reducers/appConfig';
-import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
@@ -43,22 +41,22 @@ const ExitButton = (props: {onClick: () => void}) => {
 };
 
 const PageHeader = () => {
+  const dispatch = useAppDispatch();
+  const activeResources = useAppSelector(activeResourcesSelector);
+  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const activeResources = useSelector(activeResourcesSelector);
-  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
-  const previewType = useAppSelector(state => state.main.previewType);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-
+  const [helmChart, setHelmChart] = useState<HelmChart>();
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
-  const [helmChart, setHelmChart] = useState<HelmChart>();
-  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (previewResourceId) {
@@ -85,8 +83,10 @@ const PageHeader = () => {
     dispatch(toggleNotifications());
   };
 
-  const showStartupModal = () => {
-    dispatch(updateStartupModalVisible(true));
+  const showGetStartingPage = () => {
+    if (!isStartProjectPaneVisible) {
+      dispatch(toggleStartProjectPane());
+    }
   };
 
   const onClickExit = () => {
@@ -130,7 +130,7 @@ const PageHeader = () => {
       )}
       <S.Header noborder="true">
         <S.Row noborder="true">
-          <S.Logo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
+          <S.Logo onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
 
           <ClusterSelection previewResource={previewResource} />
 

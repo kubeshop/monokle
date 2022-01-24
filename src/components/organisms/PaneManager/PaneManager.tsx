@@ -1,5 +1,4 @@
-import React, {useContext, useMemo} from 'react';
-import {useSelector} from 'react-redux';
+import {useContext, useMemo} from 'react';
 
 import {Badge, Button, Skeleton, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
@@ -93,20 +92,21 @@ const iconMenuWidth = 45;
 
 const PaneManager = () => {
   const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const helmChartResources = useAppSelector(helmChartsSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const kustomizeResources = useAppSelector(kustomizationsSelector);
+  const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
+  const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
+  const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
+
   const {windowSize} = useContext(AppContext);
 
   const contentWidth = windowSize.width - (featureJson.ShowRightMenu ? 2 : 1) * iconMenuWidth;
-
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
-  const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
-  const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
-  const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
-  const activeProject = useSelector(activeProjectSelector);
-  const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
-  const kustomizeResources = useAppSelector(kustomizationsSelector);
-  const helmChartResources = useAppSelector(helmChartsSelector);
 
   // TODO: refactor this to get the size of the page header dynamically
   const contentHeight = useMemo(() => {
@@ -144,7 +144,7 @@ const PaneManager = () => {
   let content;
   if (isProjectLoading) {
     content = <Skeleton />;
-  } else if (activeProject) {
+  } else if (!isStartProjectPaneVisible) {
     content = (
       <StyledColumnPanes style={{width: contentWidth}}>
         <SplitView

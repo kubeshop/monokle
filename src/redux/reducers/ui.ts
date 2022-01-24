@@ -142,6 +142,9 @@ export const uiSlice = createSlice({
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
+    toggleStartProjectPane: (state: Draft<UiState>) => {
+      state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
+    },
     collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
       if (expandedSections.length > 0) {
@@ -250,6 +253,7 @@ export const {
   setMonacoEditor,
   setShouldExpandAllNodes,
   setPaneConfiguration,
+  toggleStartProjectPane,
   setRightMenuIsActive,
   setLeftMenuIsActive,
   openRenameEntityModal,

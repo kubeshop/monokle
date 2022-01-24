@@ -15,7 +15,7 @@ import {Size} from '@models/window';
 
 import {useAppSelector} from '@redux/hooks';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
-import {closeFolderExplorer} from '@redux/reducers/ui';
+import {closeFolderExplorer, toggleStartProjectPane} from '@redux/reducers/ui';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
@@ -77,6 +77,7 @@ const App = () => {
       const project: Project = data.path || (loadLastProjectOnStartup && projects.length > 0 ? projects[0] : undefined);
       if (project && getFileStats(project.rootFolder)?.isDirectory()) {
         dispatch(setOpenProject(project.rootFolder));
+        dispatch(toggleStartProjectPane());
       }
       dispatch(setLoadingProject(false));
     },
