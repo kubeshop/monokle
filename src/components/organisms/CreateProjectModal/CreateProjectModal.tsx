@@ -17,6 +17,7 @@ import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
 
+import {TemplateModal} from '..';
 import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
 import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';
 
@@ -31,39 +32,34 @@ const CreateProjectModal: React.FC = () => {
   const [createProjectForm] = useForm();
   const [inputRef, focus] = useFocus<any>();
   const [formStep, setFormStep] = useState(FormSteps.STEP_ONE);
-  const [formValues, setFormValues] = useState({projectName: '', location: ''});
+  const [formValues, setFormValues] = useState({name: '', rootFolder: ''});
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
+  const [isModalHid, setIsModalHid] = useState(false);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
       if (folderPath) {
-        createProjectForm.setFieldsValue({location: folderPath});
+        createProjectForm.setFieldsValue({rootFolder: folderPath});
       }
     },
     {isDirectoryExplorer: true}
   );
 
-  const onFinish = (values: {projectName: string; location: string}) => {
+  const onFinish = (values: {name: string; rootFolder: string}) => {
     setFormValues(values);
     if (uiState.fromTemplate && formStep === FormSteps.STEP_ONE) {
       setFormStep(FormSteps.STEP_TWO);
     }
-  };
-
-  useEffect(() => {
-    if (!uiState.fromTemplate && formValues.location && formValues.projectName) {
-      dispatch(setCreateProject({rootFolder: formValues.location, name: formValues.projectName}));
+    if (!uiState.fromTemplate && values.rootFolder && values.name) {
+      dispatch(setCreateProject({...values}));
       closeModal();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues]);
+  };
 
   useEffect(() => {
     if (uiState.isOpen) {
       focus();
-    } else {
-      createProjectForm.resetFields();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiState.isOpen]);
@@ -72,11 +68,25 @@ const CreateProjectModal: React.FC = () => {
     setSelectedTemplate(template);
   };
 
+  const onTemplateModalClose = (status: string) => {
+    if (status === 'PREVIEW') {
+      setIsModalHid(true);
+    }
+    if (status === 'DONE') {
+      closeModal();
+    }
+
+    if (status === 'CANCELED') {
+      setSelectedTemplate(undefined);
+    }
+  };
+
   const closeModal = () => {
-    setFormValues({projectName: '', location: ''});
-    createProjectForm.resetFields();
+    setFormValues({name: '', rootFolder: ''});
     setFormStep(FormSteps.STEP_ONE);
+    createProjectForm.resetFields();
     dispatch(closeCreateProjectModal());
+    setIsModalHid(false);
   };
 
   if (!uiState.isOpen) {
@@ -97,6 +107,7 @@ const CreateProjectModal: React.FC = () => {
       }
       visible={uiState?.isOpen}
       onCancel={closeModal}
+      style={{opacity: isModalHid ? 0 : 1}}
       footer={[
         <Button key="cancel" onClick={closeModal}>
           Cancel
@@ -119,7 +130,7 @@ const CreateProjectModal: React.FC = () => {
         style={{display: formStep === FormSteps.STEP_ONE ? 'block' : 'none'}}
       >
         <Form.Item
-          name="projectName"
+          name="name"
           label="Project Name"
           required
           tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
@@ -128,7 +139,7 @@ const CreateProjectModal: React.FC = () => {
         </Form.Item>
         <Form.Item label="Location" required tooltip="The local path where your project will live.">
           <Input.Group compact>
-            <Form.Item name="location" noStyle>
+            <Form.Item name="rootFolder" noStyle>
               <Input required style={{width: 'calc(100% - 100px)'}} />
             </Form.Item>
             <Button style={{width: '100px'}} onClick={openFileExplorer}>
@@ -139,6 +150,10 @@ const CreateProjectModal: React.FC = () => {
       </Form>
 
       <S.TemplatesContainer $height={400} style={{display: formStep === FormSteps.STEP_TWO ? 'grid' : 'none'}}>
+        {selectedTemplate && (
+          <TemplateModal template={selectedTemplate} projectToCreate={formValues} onClose={onTemplateModalClose} />
+        )}
+
         {Object.values(templateMap).map(template => (
           <TemplateInformation
             key={template.id}

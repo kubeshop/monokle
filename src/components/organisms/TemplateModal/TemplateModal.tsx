@@ -8,10 +8,12 @@ import {Button, Skeleton, Steps, Tag} from 'antd';
 
 import {Primitive} from 'type-fest';
 
+import {Project} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setCreateProject} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmChart';
 import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templates';
@@ -20,12 +22,12 @@ import {TemplateFormRenderer} from '@components/molecules';
 
 import * as S from './styled';
 
-type TemplateModalProps = {template: AnyTemplate; onClose: () => void};
+type TemplateModalProps = {template: AnyTemplate; onClose: (status: string) => void; projectToCreate?: Project};
 
 type FormDataList = Record<string, Primitive>[];
 
 const TemplateModal: React.FC<TemplateModalProps> = props => {
-  const {template, onClose} = props;
+  const {template, onClose, projectToCreate} = props;
 
   const dispatch = useAppDispatch();
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -48,6 +50,11 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
 
   const onClickSubmit = useCallback(
     (formDataList: Record<string, Primitive>[]) => {
+      if (projectToCreate) {
+        dispatch(setCreateProject({...projectToCreate}));
+        onClose('PREVIEW');
+      }
+
       if (isVanillaTemplate(template)) {
         setIsLoading(true);
         // remove first entry - which is the intro page
@@ -110,12 +117,12 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
     setFormData(formIndex, formData);
   };
 
-  const close = () => {
+  const close = (status: string) => {
     setIsLoading(false);
     setResultMessage(undefined);
     setCreatedResources([]);
     setCurrentFormDataList([]);
-    onClose();
+    onClose(status);
   };
 
   const openHelpUrl = () => {
@@ -141,12 +148,12 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
             Start
           </Button>
         ) : resultMessage ? (
-          <Button type="primary" onClick={close} loading={isLoading}>
+          <Button type="primary" onClick={() => close('DONE')} loading={isLoading}>
             Done
           </Button>
         ) : null
       }
-      onCancel={close}
+      onCancel={() => close('CANCELED')}
       width="min-content"
     >
       <ResizableBox
