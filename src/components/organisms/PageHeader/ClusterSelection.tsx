@@ -135,6 +135,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 <S.ClusterOutlined />
                 <span>{isKubeConfigPathValid ? 'Configured' : 'No Cluster Configured'}</span>
               </S.ClusterStatusText>
+
+              <S.Divider type="vertical" />
+
               {isKubeConfigPathValid && (
                 <Dropdown
                   overlay={clusterMenu}
@@ -151,18 +154,25 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               )}
 
               {isKubeConfigPathValid ? (
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
-                  <S.Button
-                    disabled={Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled}
-                    type="link"
-                    onClick={handleLoadCluster}
-                  >
-                    {createClusterObjectsLabel()}
-                  </S.Button>
-                </Tooltip>
+                <>
+                  <S.Divider type="vertical" />
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
+                    <S.Button
+                      disabled={
+                        Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled
+                      }
+                      type="link"
+                      onClick={handleLoadCluster}
+                    >
+                      {createClusterObjectsLabel()}
+                    </S.Button>
+                  </Tooltip>
+                </>
               ) : (
                 <>
-                  <S.ClusterActionButton onClick={handleClusterConfigure}>Configure</S.ClusterActionButton>
+                  <S.ClusterActionButton type="link" onClick={handleClusterConfigure}>
+                    Configure
+                  </S.ClusterActionButton>
                 </>
               )}
             </>

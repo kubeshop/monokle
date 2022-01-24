@@ -18,6 +18,7 @@ export const BackToProjectButton = styled(RawButton)`
   margin-right: 0px !important;
   padding: 0px;
   font-size: 12px;
+  color: ${Colors.blue6};
 `;
 
 export const Button = styled(RawButton)`
