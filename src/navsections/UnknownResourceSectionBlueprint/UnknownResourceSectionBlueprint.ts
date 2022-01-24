@@ -49,7 +49,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     getRawItems: scope => {
       return Object.values(scope.resourceMap).filter(
         resource =>
-          resource.kind !== KUSTOMIZATION_KIND &&
+          !isKustomizationResource(resource) &&
           !getResourceKindHandler(resource.kind) &&
           (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
       );
@@ -57,7 +57,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     getGroups: scope => {
       const unknownResources = Object.values(scope.resourceMap).filter(
         resource =>
-          resource.kind !== KUSTOMIZATION_KIND &&
+          !isKustomizationResource(resource) &&
           !getResourceKindHandler(resource.kind) &&
           !resource.name.startsWith('Patch:') &&
           (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
