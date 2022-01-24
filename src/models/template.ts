@@ -17,7 +17,7 @@ const TemplateBaseRuntype = Rt.Record({
   author: Rt.String,
   version: Rt.String,
   description: Rt.String,
-  repository: Rt.String,
+  repository: Rt.Optional(Rt.String),
   icon: Rt.Optional(Rt.String),
   tags: Rt.Optional(Rt.Array(Rt.String)),
   helpUrl: Rt.Optional(Rt.String),

@@ -6,6 +6,8 @@ import styled from 'styled-components';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
+import TemplateIconSvg from '@assets/TemplateIcon.svg';
+
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
@@ -45,6 +47,10 @@ export const Modal = styled(AntModal)`
 
   & .custom-modal-handle-w {
     left: -5px;
+  }
+
+  & .ant-modal-body {
+    padding-top: 0;
   }
 `;
 
@@ -111,4 +117,12 @@ export const CreatedResourceName = styled.span`
 export const CreatedResourceKind = styled.span`
   margin-left: 10px;
   font-style: italic;
+`;
+
+export const TemplateIcon: React.FC = () => {
+  return <img src={TemplateIconSvg} style={{width: 20, height: 20, marginRight: 8}} />;
+};
+
+export const ModalTitle = styled.span`
+  display: flex;
 `;

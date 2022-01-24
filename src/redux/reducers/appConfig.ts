@@ -170,7 +170,10 @@ export const configSlice = createSlice({
       }
 
       project.created = new Date().toISOString();
-      state.projects = _.sortBy([project, ...state.projects], (p: Project) => p.lastOpened).reverse();
+      state.projects = _.sortBy(
+        [project, ...state.projects],
+        (p: Project) => p.lastOpened || new Date(-8640000000000000).toISOString()
+      ).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
     deleteProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {

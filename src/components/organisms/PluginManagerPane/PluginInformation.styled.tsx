@@ -6,40 +6,43 @@ import Colors from '@styles/Colors';
 
 export const Container = styled.div`
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: max-content 1fr;
+  grid-column-gap: 18px;
   position: relative;
   margin-bottom: 16px;
 `;
 
 export const IconContainer = styled.span`
-  height: 50px;
-  width: 50px;
+  height: 32px;
+  width: 32px;
 `;
 
 export const InfoContainer = styled.span`
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 export const Name = styled.span`
-  font-weight: 600;
+  width: 100%;
+  color: ${Colors.whitePure};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
 `;
 
 export const Description = styled.span`
-  font-weight: 300;
+  color: ${Colors.grey7};
 `;
 
-export const Footer = styled.span`
+export const AdditionalInformation = styled.div`
+  color: ${Colors.grey6};
+  line-height: 20px;
+  font-size: 12px;
+  margin: 6px 0px;
   display: flex;
-  justify-content: space-between;
-`;
-
-export const Author = styled.span`
-  color: ${Colors.grey500};
-`;
-
-export const Version = styled.span`
-  font-style: italic;
+  flex-direction: column;
 `;
 
 export const DeleteOutlined = styled(RawDeleteOutlined)`
