@@ -38,6 +38,8 @@ export const ClusterRow = styled(Row)`
   padding: 0 10px;
   height: 25px;
   color: ${Colors.blackPure};
+  display: flex;
+  justify-content: space-between;
 `;
 
 export const CopyOutlined = styled(RawCopyOutlined)`

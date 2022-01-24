@@ -13,7 +13,7 @@ import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateProjectConfig} from '@redux/reducers/appConfig';
-import {highlightItem, toggleSettings} from '@redux/reducers/ui';
+import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   isInClusterModeSelector,
@@ -35,6 +35,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const isInClusterMode = useSelector(isInClusterModeSelector);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -87,6 +88,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       return;
     }
 
+    if (isStartProjectPaneVisible) {
+      dispatch(toggleStartProjectPane());
+    }
     if (isInClusterMode) {
       reconnectToCluster();
     } else {

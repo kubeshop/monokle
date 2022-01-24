@@ -1,4 +1,4 @@
-import {Dropdown, Menu, Button as RawButton, Divider as RawDivider, Input as RawInput, Table as RawTable} from 'antd';
+import {Menu, Button as RawButton, Divider as RawDivider, Input as RawInput, Table as RawTable} from 'antd';
 
 import {
   DeleteOutlined as RawDeleteOutlined,
@@ -22,13 +22,13 @@ export const BackToProjectButton = styled(RawButton)`
 `;
 
 export const Button = styled(RawButton)`
+  display: flex;
+  align-items: center;
   color: ${Colors.whitePure};
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: 10px;
   line-height: 20px;
-  display: flex;
-  align-items: center;
   margin-right: 0px !important;
   padding: 0px;
 `;
@@ -93,10 +93,6 @@ export const ProjectName = styled.span`
   overflow: hidden;
   white-space: nowrap;
   align-self: center;
-`;
-
-export const ProjectsDropdown = styled(Dropdown)<{$isClusterSelectorVisible: boolean}>`
-  ${props => `margin-right: ${props.$isClusterSelectorVisible ? '20px' : '0px'}`};
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`

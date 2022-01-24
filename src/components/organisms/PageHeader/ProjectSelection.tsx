@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Tooltip} from 'antd';
+import {Dropdown, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
 import _ from 'lodash';
@@ -21,7 +21,7 @@ import {Project} from '@models/appconfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -32,8 +32,9 @@ import * as S from './ProjectSelection.styled';
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useSelector(activeProjectSelector);
-  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
 
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -218,9 +219,9 @@ const ProjectSelection = () => {
 
   return (
     <S.ProjectContainer>
-      <S.ProjectsDropdown
-        $isClusterSelectorVisible={isClusterSelectorVisible}
+      <Dropdown
         arrow
+        disabled={previewLoader.isLoading || isInPreviewMode}
         overlay={projectMenu}
         placement="bottomCenter"
         trigger={['click']}
@@ -228,13 +229,13 @@ const ProjectSelection = () => {
         onVisibleChange={setIsDropdownMenuVisible}
       >
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-          <S.Button type="link">
+          <S.Button disabled={previewLoader.isLoading || isInPreviewMode} type="link">
             <S.FolderOpenOutlined />
             <S.ProjectName>{activeProject.name}</S.ProjectName>
             <S.DownOutlined />
           </S.Button>
         </Tooltip>
-      </S.ProjectsDropdown>
+      </Dropdown>
 
       {isStartProjectPaneVisible && activeProject && (
         <>

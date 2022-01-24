@@ -40,7 +40,11 @@ export const ClusterButton = styled(RawButton)`
 export const ClusterContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center; ;
+  justify-content: center;
+
+  & .ant-btn[disabled] {
+    background: transparent !important;
+  }
 `;
 
 export const ClusterOutlined = styled(RawClusterOutlined)`
