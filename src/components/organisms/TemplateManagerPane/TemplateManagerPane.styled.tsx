@@ -1,4 +1,4 @@
-import {Input} from 'antd';
+import {Input, Skeleton as RawSkeleton} from 'antd';
 
 import styled from 'styled-components';
 
@@ -37,4 +37,8 @@ export const TemplatesContainer = styled.div<{$height: number}>`
   overflow-y: auto;
   padding: 0px 16px 10px 16px;
   ${GlobalScrollbarStyle};
+`;
+
+export const Skeleton = styled(RawSkeleton)`
+  padding: 8px;
 `;

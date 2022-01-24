@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Button, Skeleton, Tooltip} from 'antd';
+import {Button, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
@@ -109,7 +109,7 @@ const TemplatesPane: React.FC = () => {
 
       <S.Container>
         {isLoading ? (
-          <Skeleton />
+          <S.Skeleton />
         ) : !templatesToShow ? (
           <p>No templates available.</p>
         ) : (

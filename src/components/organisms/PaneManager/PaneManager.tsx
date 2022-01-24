@@ -89,6 +89,10 @@ const StyledColumnRightMenu = styled(Col)`
   border-left: ${AppBorders.pageDivider};
 `;
 
+const StyledSkeleton = styled(Skeleton)`
+  padding: 8px 16px;
+`;
+
 const iconMenuWidth = 45;
 
 const PaneManager = () => {
@@ -143,7 +147,7 @@ const PaneManager = () => {
 
   let content;
   if (isProjectLoading) {
-    content = <Skeleton />;
+    content = <StyledSkeleton />;
   } else if (activeProject) {
     content = (
       <StyledColumnPanes style={{width: contentWidth}}>
