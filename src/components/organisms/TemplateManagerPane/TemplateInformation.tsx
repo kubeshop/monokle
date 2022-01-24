@@ -18,7 +18,7 @@ import * as S from './TemplateInformation.styled';
 interface IProps {
   template: AnyTemplate;
   onClickOpenTemplate: () => void;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const TemplateInformation: React.FC<IProps> = props => {
