@@ -8,9 +8,7 @@ import {
   CloseCircleOutlined,
   ClusterOutlined,
   DownOutlined,
-  GithubOutlined,
   LoadingOutlined,
-  QuestionCircleOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 
@@ -37,15 +35,13 @@ import Col from '@components/atoms/Col';
 import Header from '@components/atoms/Header';
 import Row from '@components/atoms/Row';
 
-import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
-
-import DiscordLogo from '@assets/DiscordLogo.svg';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
-import {DiscordTooltip, DocumentationTooltip, GitHubTooltip, NotificationsTooltip, SettingsTooltip} from './tooltips';
+import HelpMenu from './HelpMenu';
+import {NotificationsTooltip, SettingsTooltip} from './tooltips';
 
 const StyledLogo = styled.img`
   height: 24px;
@@ -436,21 +432,6 @@ const PageHeader = () => {
           )}
 
           <SettingsCol>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
-              <IconContainerSpan>
-                <QuestionCircleOutlined size={24} onClick={openDocumentation} />
-              </IconContainerSpan>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiscordTooltip} placement="bottomRight">
-              <IconContainerSpan onClick={openDiscord}>
-                <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer', marginBottom: '4px'}} />
-              </IconContainerSpan>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={GitHubTooltip} placement="bottomRight">
-              <IconContainerSpan>
-                <GithubOutlined size={24} onClick={openGitHub} />
-              </IconContainerSpan>
-            </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
               <IconContainerSpan>
                 <StyledSettingsOutlined onClick={toggleSettingsDrawer} />
@@ -461,6 +442,7 @@ const PageHeader = () => {
                 <StyledBellOutlined onClick={toggleNotificationsDrawer} />
               </IconContainerSpan>
             </Tooltip>
+            <HelpMenu />
           </SettingsCol>
         </StyledRow>
       </StyledHeader>
