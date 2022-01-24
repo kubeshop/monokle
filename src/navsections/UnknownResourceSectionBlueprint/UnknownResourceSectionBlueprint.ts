@@ -9,7 +9,7 @@ import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {ResourceKindHandlers} from '@src/kindhandlers';
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import ResourceKindContextMenu from '../K8sResourceSectionBlueprint/ResourceKindContextMenu';
 import ResourceKindPrefix from '../K8sResourceSectionBlueprint/ResourceKindPrefix';
@@ -25,8 +25,6 @@ export type UnknownResourceScopeType = {
   isPreviewLoading: boolean;
   isFolderLoading: boolean;
 };
-
-const KnownResourceKinds: string[] = [KUSTOMIZATION_KIND, ...ResourceKindHandlers.map(kindHandler => kindHandler.kind)];
 
 export const UNKNOWN_RESOURCE_SECTION_NAME = 'Unknown Resources' as const;
 
@@ -50,14 +48,16 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     getRawItems: scope => {
       return Object.values(scope.resourceMap).filter(
         resource =>
-          !KnownResourceKinds.includes(resource.kind) &&
+          resource.kind !== KUSTOMIZATION_KIND &&
+          !getResourceKindHandler(resource.kind) &&
           (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
       );
     },
     getGroups: scope => {
       const unknownResources = Object.values(scope.resourceMap).filter(
         resource =>
-          !KnownResourceKinds.includes(resource.kind) &&
+          resource.kind !== KUSTOMIZATION_KIND &&
+          !getResourceKindHandler(resource.kind) &&
           !resource.name.startsWith('Patch:') &&
           (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
       );

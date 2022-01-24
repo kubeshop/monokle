@@ -17,7 +17,7 @@ import {
   toggleLeftMenu,
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {RootState} from '@redux/store';
+import {RootState} from '@models/rootstate';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {openDocumentation, openGitHub} from '@utils/shell';

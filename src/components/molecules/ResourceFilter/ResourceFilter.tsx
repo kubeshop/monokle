@@ -9,14 +9,13 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
+import {knownResourceKindsSelector} from '@redux/selectors';
 
 import {KeyValueInput} from '@components/atoms';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import Colors from '@styles/Colors';
-
-import {ResourceKindHandlers} from '@src/kindhandlers';
 
 const ALL_OPTIONS = '<all>';
 const ROOT_OPTIONS = '<root>';
@@ -50,8 +49,6 @@ const StyledTitleButton = styled(Button)`
 `;
 
 const {Option} = Select;
-
-const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
 const makeKeyValuesFromObjectList = (objectList: any[], getNestedObject: (currentObject: any) => any) => {
   const keyValues: Record<string, string[]> = {};
@@ -88,6 +85,7 @@ const ResourceFilter = () => {
 
   const [allNamespaces] = useNamespaces({extra: ['all', 'default']});
 
+  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const areFiltersDisabled = useAppSelector(
     state => Boolean(state.main.checkedResourceIds.length) || Boolean(state.main.clusterDiff.selectedMatches.length)
   );
@@ -98,13 +96,13 @@ const ResourceFilter = () => {
   const allResourceKinds = useMemo(() => {
     return [
       ...new Set([
-        ...KnownResourceKinds,
+        ...knownResourceKinds,
         ...Object.values(resourceMap)
-          .filter(r => !KnownResourceKinds.includes(r.kind))
+          .filter(r => !knownResourceKinds.includes(r.kind))
           .map(r => r.kind),
       ]),
     ].sort();
-  }, [resourceMap]);
+  }, [knownResourceKinds, resourceMap]);
 
   const allLabels = useMemo<Record<string, string[]>>(() => {
     return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.labels);

@@ -1,6 +1,6 @@
 import {FSWatcher, watch} from 'chokidar';
 
-import {AppDispatch} from '@redux/store';
+import {AppDispatch} from '@models/appdispatch';
 
 import {CONFIG_PATH, updateProjectSettings} from './projectConfig';
 

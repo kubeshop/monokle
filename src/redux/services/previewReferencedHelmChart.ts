@@ -3,9 +3,8 @@ import path from 'path';
 import {promisify} from 'util';
 import {v4 as uuidv4} from 'uuid';
 
+import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
-
-import {AppDispatch} from '@redux/store';
 
 import {runHelm} from '@utils/helm';
 

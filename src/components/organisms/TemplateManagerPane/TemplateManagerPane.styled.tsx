@@ -11,6 +11,7 @@ export const Container = styled.div`
 `;
 
 export const NotFoundLabel = styled.span`
+  margin-left: 16px;
   color: ${Colors.grey7};
 `;
 

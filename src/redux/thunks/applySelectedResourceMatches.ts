@@ -1,10 +1,11 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
+import {RootState} from '@models/rootstate';
 
 import {reloadClusterDiff} from '@redux/reducers/main';
 import applyMultipleResources from '@redux/services/applyMultipleResources';
-import {AppDispatch, RootState} from '@redux/store';
 
 export const applySelectedResourceMatches = createAsyncThunk<
   void,

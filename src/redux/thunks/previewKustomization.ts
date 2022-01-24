@@ -8,10 +8,11 @@ import path from 'path';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppConfig} from '@models/appconfig';
+import {AppDispatch} from '@models/appdispatch';
+import {KustomizeCommandType} from '@models/kustomize';
+import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {KustomizeCommandType} from '@redux/services/kustomize';
-import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 export type KustomizeCommandOptions = {

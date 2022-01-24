@@ -5,11 +5,14 @@ import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/c
 
 import {ProjectConfig} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {RootState} from '@models/rootstate';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
-import {RootState} from './store';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
@@ -161,5 +164,24 @@ export const kubeConfigPathValidSelector = createSelector(
       return Boolean(config.kubeConfig.isPathValid);
     }
     return false;
+  }
+);
+
+export const registeredKindHandlersSelector = createSelector(
+  (state: RootState) => state.main.registeredKindHandlers,
+  registeredKindHandlers => {
+    return registeredKindHandlers
+      .map(kind => getResourceKindHandler(kind))
+      .filter((handler): handler is ResourceKindHandler => handler !== undefined);
+  }
+);
+
+export const knownResourceKindsSelector = createSelector(
+  (state: RootState) => state.main.registeredKindHandlers,
+  registeredKindHandlers => {
+    return registeredKindHandlers
+      .map(kind => getResourceKindHandler(kind))
+      .filter((handler): handler is ResourceKindHandler => handler !== undefined)
+      .map(handler => handler.kind);
   }
 );

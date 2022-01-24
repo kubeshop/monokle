@@ -4,41 +4,13 @@ import asyncLib from 'async';
 import log from 'loglevel';
 import {Middleware} from 'redux';
 
+import {AppDispatch} from '@models/appdispatch';
 import {ItemInstance, NavigatorInstanceState, SectionBlueprint, SectionInstance} from '@models/navigator';
+import {RootState} from '@models/rootstate';
 
 import {collapseSectionIds, expandSectionIds, updateNavigatorInstanceState} from '@redux/reducers/navigator';
-import {AppDispatch, RootState} from '@redux/store';
 
 import sectionBlueprintMap from './sectionBlueprintMap';
-
-const heightByContainerElementId: Record<string, number> = {};
-const resizeObserver = new window.ResizeObserver(entries => {
-  entries.forEach(entry => {
-    const elementId = entry.target.id;
-    const {height} = entry.contentRect;
-    heightByContainerElementId[elementId] = height;
-  });
-});
-sectionBlueprintMap.getAll().forEach(sectionBlueprint => {
-  const element = document.getElementById(sectionBlueprint.containerElementId);
-  if (!element) {
-    throw new Error(
-      `[SectionBlueprint]: Couldn't find container element with id ${sectionBlueprint.containerElementId}`
-    );
-  }
-  resizeObserver.observe(element);
-});
-const getContainerElementHeight = (containerElementId: string) => {
-  if (heightByContainerElementId[containerElementId]) {
-    return heightByContainerElementId[containerElementId];
-  }
-  const element = document.getElementById(containerElementId);
-  if (!element) {
-    return window.innerHeight;
-  }
-  resizeObserver.observe(element);
-  return element.getBoundingClientRect().height;
-};
 
 const fullScopeCache: Record<string, any> = {};
 
@@ -78,7 +50,10 @@ function isScrolledIntoView(elementId: string, containerElementHeight: number) {
 
 function computeItemScrollIntoView(sectionInstance: SectionInstance, itemInstanceMap: Record<string, ItemInstance>) {
   const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
-  const containerElementHeight = getContainerElementHeight(sectionBlueprint.containerElementId);
+  if (!sectionBlueprint) {
+    return;
+  }
+  const containerElementHeight = sectionBlueprintMap.getSectionContainerElementHeight(sectionBlueprint);
 
   const allDescendantVisibleItems: ItemInstance[] = (sectionInstance.visibleDescendantItemIds || []).map(
     itemId => itemInstanceMap[itemId]
@@ -140,9 +115,9 @@ function computeSectionCheckable(
  */
 function computeSectionVisibility(
   sectionInstance: SectionInstance,
-  sectionInstanceMap: Record<string, SectionInstance>
+  sectionInstanceMap: Record<string, SectionInstance>,
+  sectionBlueprint: SectionBlueprint<any, any>
 ): [boolean, string[] | undefined, string[] | undefined] {
-  const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
   let visibleDescendantItemIds: string[] = [];
 
   if (sectionBlueprint.childSectionIds && sectionBlueprint.childSectionIds.length > 0) {
@@ -150,8 +125,15 @@ function computeSectionVisibility(
 
     sectionBlueprint.childSectionIds.forEach(childSectionId => {
       const childSectionInstance = sectionInstanceMap[childSectionId];
+      if (!childSectionInstance) {
+        return;
+      }
+      const childSectionBlueprint = sectionBlueprintMap.getById(childSectionInstance.id);
+      if (!childSectionBlueprint) {
+        return;
+      }
       const [isChildSectionVisible, visibleDescendantSectionIdsOfChildSection, visibleDescendantItemIdsOfChildSection] =
-        computeSectionVisibility(childSectionInstance, sectionInstanceMap);
+        computeSectionVisibility(childSectionInstance, sectionInstanceMap, childSectionBlueprint);
 
       if (visibleDescendantSectionIdsOfChildSection) {
         if (sectionInstance.visibleDescendantSectionIds) {
@@ -202,7 +184,7 @@ function computeSectionVisibility(
 /**
  * Build the section and item instances based on the registered section blueprints
  */
-const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
+const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch) => {
   const sectionInstanceMap: Record<string, SectionInstance> = {};
   const itemInstanceMap: Record<string, ItemInstance> = {};
 
@@ -210,8 +192,10 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
   const scopeKeysBySectionId: Record<string, string[]> = {};
   const isChangedByScopeKey: Record<string, boolean> = {};
 
+  const sectionBlueprintList = sectionBlueprintMap.getAll();
+
   // check if anything from the full scope has changed and store the keys of changed values
-  asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
+  await asyncLib.each(sectionBlueprintList, async sectionBlueprint => {
     const sectionScope = sectionBlueprint.getScope(state);
     const sectionScopeKeys: string[] = [];
     Object.entries(sectionScope).forEach(([key, value]) => {
@@ -234,8 +218,8 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
     return;
   }
 
-  asyncLib.each(sectionBlueprintMap.getAll(), async sectionBlueprint => {
-    const sectionScopeKeys = scopeKeysBySectionId[sectionBlueprint.id];
+  await asyncLib.each(sectionBlueprintList, async sectionBlueprint => {
+    const sectionScopeKeys: string[] | undefined = scopeKeysBySectionId[sectionBlueprint.id];
     const hasSectionScopeChanged = Object.entries(isChangedByScopeKey).some(
       ([key, value]) => sectionScopeKeys.includes(key) && value === true
     );
@@ -319,21 +303,31 @@ const processSectionBlueprints = (state: RootState, dispatch: AppDispatch) => {
 
   const sectionInstanceRoots = Object.values(sectionInstanceMap).filter(sectionInstance => {
     const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
+    if (!sectionBlueprint) {
+      return false;
+    }
     return sectionBlueprint.rootSectionId === sectionBlueprint.id;
   });
 
-  asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
-    computeSectionVisibility(sectionInstanceRoot, sectionInstanceMap)
-  );
+  await asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot => {
+    const sectionBlueprint = sectionBlueprintMap.getById(sectionInstanceRoot.id);
+    if (!sectionBlueprint) {
+      return;
+    }
+    computeSectionVisibility(sectionInstanceRoot, sectionInstanceMap, sectionBlueprint);
+  });
 
   // this has to run after the `computeSectionVisibility` because it depends on the `section.visibleDescendantItemIds`
-  asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
+  await asyncLib.each(sectionInstanceRoots, async sectionInstanceRoot =>
     computeItemScrollIntoView(sectionInstanceRoot, itemInstanceMap)
   );
 
   // this has to run after the `computeSectionVisibility` because it depends on the `section.visibleDescendantItemIds`
-  asyncLib.each(Object.values(sectionInstanceMap), async sectionInstance => {
+  await asyncLib.each(Object.values(sectionInstanceMap), async sectionInstance => {
     const sectionBlueprint = sectionBlueprintMap.getById(sectionInstance.id);
+    if (!sectionBlueprint) {
+      return;
+    }
     const sectionScope = pickPartialRecord(fullScope, scopeKeysBySectionId[sectionBlueprint.id]);
     computeSectionCheckable(sectionBlueprint, sectionInstance, sectionScope);
   });

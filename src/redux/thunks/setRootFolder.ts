@@ -3,15 +3,16 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertEnum} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
+import {RootState} from '@models/rootstate';
 
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {createFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {processKustomizations} from '@redux/services/kustomize';
 import {processParsedResources} from '@redux/services/resource';
-import {AppDispatch, RootState} from '@redux/store';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
