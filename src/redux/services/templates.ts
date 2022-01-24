@@ -84,7 +84,6 @@ export const interpolateTemplate = (text: string, formsData: any[]) => {
   _.templateSettings.interpolate = /\[\[([\s\S]+?)\]\]/g;
   const lodashTemplate = _.template(text);
   const result = lodashTemplate({forms: formsData});
-  console.log('interpolated ', formsData, text, result);
   return result;
 };
 
