@@ -2,8 +2,6 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-
 import {
   HighlightItems,
   LeftMenuSelectionType,
@@ -14,6 +12,7 @@ import {
 } from '@models/ui';
 
 import initialState from '@redux/initialState';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
@@ -215,7 +214,7 @@ export const uiSlice = createSlice({
         state.shouldExpandAllNodes = true;
         if (
           state.leftMenu.selection === 'kustomize-pane' &&
-          !Object.values(action.payload.resourceMap).some(r => r.kind === KUSTOMIZATION_KIND)
+          !Object.values(action.payload.resourceMap).some(r => isKustomizationResource(r))
         ) {
           state.leftMenu.selection = 'file-explorer';
         }

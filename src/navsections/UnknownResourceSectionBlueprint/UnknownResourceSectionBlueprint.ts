@@ -1,10 +1,11 @@
-import {KUSTOMIZATION_KIND, PREVIEW_PREFIX} from '@constants/constants';
+import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {ResourceFilterType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -48,7 +49,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     getRawItems: scope => {
       return Object.values(scope.resourceMap).filter(
         resource =>
-          resource.kind !== KUSTOMIZATION_KIND &&
+          !isKustomizationResource(resource) &&
           !getResourceKindHandler(resource.kind) &&
           (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
       );
@@ -56,7 +57,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
     getGroups: scope => {
       const unknownResources = Object.values(scope.resourceMap).filter(
         resource =>
-          resource.kind !== KUSTOMIZATION_KIND &&
+          !isKustomizationResource(resource) &&
           !getResourceKindHandler(resource.kind) &&
           !resource.name.startsWith('Patch:') &&
           (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)

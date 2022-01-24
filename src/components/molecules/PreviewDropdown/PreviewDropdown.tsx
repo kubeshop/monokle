@@ -8,10 +8,9 @@ import {DownOutlined} from '@ant-design/icons';
 import {MenuClickEventHandler} from 'rc-menu/lib/interface';
 import styled from 'styled-components';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile, selectK8sResource} from '@redux/reducers/main';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -103,7 +102,7 @@ const PreviewDropdown = (props: {btnStyle?: React.CSSProperties}) => {
 
   const kustomizations: KustomizationMenuItem[] = useAppSelector(state => {
     return Object.values(state.main.resourceMap)
-      .filter(i => i.kind === KUSTOMIZATION_KIND)
+      .filter(i => isKustomizationResource(i))
       .map(res => ({id: res.id, name: res.name}))
       .sort((a, b) => a.name.localeCompare(b.name));
   }, shallowEqual);
