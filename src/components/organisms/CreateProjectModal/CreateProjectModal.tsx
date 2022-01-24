@@ -15,6 +15,9 @@ import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
 
+import TemplateInformation from '../TemplateManagerPane/TemplateInformation';
+import * as S from '../TemplateManagerPane/TemplateManagerPane.styled';
+
 export enum FormSteps {
   STEP_ONE = 1,
   STEP_TWO = 2,
@@ -27,6 +30,7 @@ const CreateProjectModal: React.FC = () => {
   const [inputRef, focus] = useFocus<any>();
   const [formStep, setFormStep] = useState(FormSteps.STEP_ONE);
   const [formValues, setFormValues] = useState({projectName: '', location: ''});
+  const templateMap = useAppSelector(state => state.extension.templateMap);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -127,7 +131,11 @@ const CreateProjectModal: React.FC = () => {
         </Form.Item>
       </Form>
 
-      <div style={{display: formStep === FormSteps.STEP_TWO ? 'block' : 'none'}}>[TEMPLATE EXPLORER GOES HERE]</div>
+      <S.TemplatesContainer $height={400} style={{display: formStep === FormSteps.STEP_TWO ? 'grid' : 'none'}}>
+        {Object.values(templateMap).map(template => (
+          <TemplateInformation key={template.id} template={template} onClickOpenTemplate={() => {}} />
+        ))}
+      </S.TemplatesContainer>
       <FileExplorer {...fileExplorerProps} />
     </Modal>
   );
