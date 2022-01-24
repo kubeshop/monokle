@@ -10,7 +10,7 @@ export const AdditionalInformation = styled.div`
   color: ${Colors.grey6};
   line-height: 20px;
   font-size: 12px;
-  margin: 10px 0px;
+  margin: 6px 0px;
   display: flex;
   flex-direction: column;
 `;
@@ -37,13 +37,13 @@ export const InfoContainer = styled.div`
   overflow: hidden;
 `;
 
-export const Name = styled.span<{$width: number}>`
-  ${props => `width: ${props.$width}`}
-  color:${Colors.whitePure};
+export const Name = styled.span`
+  width: 100%;
+  color: ${Colors.whitePure};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 `;
 
 export const FormOutlined = styled(RawFormOutlined)`
@@ -53,4 +53,9 @@ export const FormOutlined = styled(RawFormOutlined)`
 export const OpenButton = styled(Button)`
   width: max-content;
   padding: 0px;
+`;
+
+export const Footer = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
