@@ -57,7 +57,6 @@ export const FolderAddOutlined = styled(RawFolderAddOutlined)`
 `;
 
 export const FolderOpenOutlined = styled(RawFolderOpenOutlined)`
-  color: ${Colors.whitePure};
   font-size: 14px;
   padding-top: 2px;
 `;
