@@ -3,6 +3,8 @@ import {useEffect, useState} from 'react';
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import {AnyTemplate} from '@models/template';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {closeCreateProjectModal} from '@redux/reducers/ui';
@@ -31,6 +33,7 @@ const CreateProjectModal: React.FC = () => {
   const [formStep, setFormStep] = useState(FormSteps.STEP_ONE);
   const [formValues, setFormValues] = useState({projectName: '', location: ''});
   const templateMap = useAppSelector(state => state.extension.templateMap);
+  const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -64,6 +67,10 @@ const CreateProjectModal: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiState.isOpen]);
+
+  const onClickOpenTemplate = (template: AnyTemplate) => {
+    setSelectedTemplate(template);
+  };
 
   const closeModal = () => {
     setFormValues({projectName: '', location: ''});
@@ -133,7 +140,11 @@ const CreateProjectModal: React.FC = () => {
 
       <S.TemplatesContainer $height={400} style={{display: formStep === FormSteps.STEP_TWO ? 'grid' : 'none'}}>
         {Object.values(templateMap).map(template => (
-          <TemplateInformation key={template.id} template={template} onClickOpenTemplate={() => {}} />
+          <TemplateInformation
+            key={template.id}
+            template={template}
+            onClickOpenTemplate={() => onClickOpenTemplate(template)}
+          />
         ))}
       </S.TemplatesContainer>
       <FileExplorer {...fileExplorerProps} />
