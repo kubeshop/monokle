@@ -1,5 +1,4 @@
 import React from 'react';
-import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
 
@@ -24,14 +23,12 @@ interface IProps {
 const TemplateInformation: React.FC<IProps> = props => {
   const {template, onClickOpenTemplate, disabled} = props;
 
-  const [infoContainerRef, {width: infoContainerWidth}] = useMeasure<HTMLDivElement>();
-
   return (
     <S.Container>
       <S.Image src={template.icon ? template.icon : TemplateIcon} alt="Template_Icon" />
 
-      <S.InfoContainer ref={infoContainerRef}>
-        <S.Name $width={infoContainerWidth}>{template.name}</S.Name>
+      <S.InfoContainer>
+        <S.Name>{template.name}</S.Name>
 
         <S.Description>{_.truncate(template.description, {length: 140})}</S.Description>
 

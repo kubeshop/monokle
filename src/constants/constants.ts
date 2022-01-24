@@ -11,6 +11,7 @@ export const NAVIGATOR_HEIGHT_OFFSET = 115;
 export const FILE_TREE_HEIGHT_OFFSET = 185;
 export const REF_PATH_SEPARATOR = '#';
 export const KUSTOMIZATION_KIND = 'Kustomization';
+export const KUSTOMIZATION_API_GROUP = 'kustomize.config.k8s.io';
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const ACTIONS_PANE_FOOTER_HEIGHT = 200;

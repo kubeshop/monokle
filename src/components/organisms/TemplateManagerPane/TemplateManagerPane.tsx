@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Button, Skeleton, Tooltip} from 'antd';
+import {Button, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
@@ -47,7 +47,7 @@ const TemplatesPane: React.FC = () => {
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
 
   const [searchedValue, setSearchedValue] = useState<string>();
-  const [templatesToShow, setTemplatesToShow] = useState<Record<string, AnyTemplate>>();
+  const [visibleTemplateEntries, setVisibleTemplateEntries] = useState<[string, AnyTemplate][]>();
 
   const windowSize = useWindowSize();
 
@@ -79,15 +79,15 @@ const TemplatesPane: React.FC = () => {
 
   useEffect(() => {
     if (!searchedValue) {
-      setTemplatesToShow(templateMap);
+      setVisibleTemplateEntries(Object.entries(templateMap).sort((a, b) => a[1].name.localeCompare(b[1].name)));
     } else {
-      setTemplatesToShow(
-        Object.fromEntries(
-          Object.entries(templateMap).filter(templateEntry => {
+      setVisibleTemplateEntries(
+        Object.entries(templateMap)
+          .filter(templateEntry => {
             const templateName = templateEntry[1].name;
             return filterTemplateBySearchedValue(searchedValue, templateName);
           })
-        )
+          .sort((a, b) => a[1].name.localeCompare(b[1].name))
       );
     }
   }, [searchedValue, templateMap]);
@@ -109,8 +109,8 @@ const TemplatesPane: React.FC = () => {
 
       <S.Container>
         {isLoading ? (
-          <Skeleton />
-        ) : !templatesToShow ? (
+          <S.Skeleton />
+        ) : !visibleTemplateEntries ? (
           <p>No templates available.</p>
         ) : (
           <>
@@ -122,13 +122,13 @@ const TemplatesPane: React.FC = () => {
               />
             </S.SearchInputContainer>
 
-            {!Object.keys(templatesToShow).length ? (
+            {!visibleTemplateEntries.length ? (
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
             ) : (
               <S.TemplatesContainer $height={templatesHeight}>
-                {Object.values(templatesToShow).map(template => (
+                {visibleTemplateEntries.map(([path, template]) => (
                   <TemplateInformation
-                    key={template.id}
+                    key={path}
                     template={template}
                     disabled={isInPreviewMode}
                     onClickOpenTemplate={() => onClickOpenTemplate(template)}
