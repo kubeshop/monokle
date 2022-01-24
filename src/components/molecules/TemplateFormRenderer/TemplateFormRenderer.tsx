@@ -13,6 +13,8 @@ import {TemplateForm} from '@models/template';
 
 import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
+import Colors from '@styles/Colors';
+
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
 
 const Form = withTheme(AntDTheme);
@@ -61,8 +63,8 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
 
   return (
     <TemplateFormErrorBoundary>
-      <h1>{templateForm.name}</h1>
-      <p>{templateForm.description}</p>
+      <h2>{templateForm.name}</h2>
+      <p style={{color: Colors.grey7}}>{templateForm.description}</p>
       <Divider />
       <Form
         onSubmit={e => onSubmit(e.formData)}

@@ -136,6 +136,12 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
 
   return (
     <S.Modal
+      title={
+        <S.ModalTitle>
+          <S.TemplateIcon />
+          <span>{template.name}</span>
+        </S.ModalTitle>
+      }
       visible
       footer={
         activeFormIndex === 0 ? (
@@ -177,44 +183,38 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
             {isLoading ? (
               <Skeleton />
             ) : activeFormIndex === 0 ? (
-              <>
-                <S.TitleContainer>
-                  <S.FormOutlined />
-                  <span>{template.name}</span>
-                </S.TitleContainer>
-                <S.Table>
-                  <tbody>
+              <S.Table>
+                <tbody>
+                  <tr>
+                    <S.TableHead>Author</S.TableHead>
+                    <S.TableData>{template.author}</S.TableData>
+                  </tr>
+                  <tr>
+                    <S.TableHead>Version</S.TableHead>
+                    <S.TableData>{template.version}</S.TableData>
+                  </tr>
+                  {template.repository ? (
                     <tr>
-                      <S.TableHead>Author</S.TableHead>
-                      <S.TableData>{template.author}</S.TableData>
+                      <S.TableHead>Repository</S.TableHead>
+                      <S.TableData>
+                        <a onClick={openRepository}>{template.repository}</a>
+                      </S.TableData>
                     </tr>
+                  ) : null}
+                  {template.helpUrl ? (
                     <tr>
-                      <S.TableHead>Version</S.TableHead>
-                      <S.TableData>{template.version}</S.TableData>
+                      <S.TableHead>Help URL</S.TableHead>
+                      <S.TableData>
+                        <a onClick={openHelpUrl}>{template.helpUrl}</a>
+                      </S.TableData>
                     </tr>
-                    {template.repository ? (
-                      <tr>
-                        <S.TableHead>Repository</S.TableHead>
-                        <S.TableData>
-                          <a onClick={openRepository}>{template.repository}</a>
-                        </S.TableData>
-                      </tr>
-                    ) : null}
-                    {template.helpUrl ? (
-                      <tr>
-                        <S.TableHead>Help URL</S.TableHead>
-                        <S.TableData>
-                          <a onClick={openHelpUrl}>{template.helpUrl}</a>
-                        </S.TableData>
-                      </tr>
-                    ) : null}
-                    <tr>
-                      <S.TableHead>Description</S.TableHead>
-                      <S.TableData>{template.description}</S.TableData>
-                    </tr>
-                  </tbody>
-                </S.Table>
-              </>
+                  ) : null}
+                  <tr>
+                    <S.TableHead>Description</S.TableHead>
+                    <S.TableData>{template.description}</S.TableData>
+                  </tr>
+                </tbody>
+              </S.Table>
             ) : resultMessage ? (
               <>
                 {createdResources.length === 0 ? (
