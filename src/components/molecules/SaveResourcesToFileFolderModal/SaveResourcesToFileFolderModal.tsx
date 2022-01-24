@@ -46,45 +46,58 @@ const getFullFileName = (filename: string, fileIncludes: string[], suffix?: stri
 
 const generateFullFileName = (
   subfiles: fs.Dirent[],
-  resourceName: string,
+  resource: K8sResource,
   fileIncludes: string[],
   selectedFolder: string,
   fileMap: FileMapType,
   suffix: number,
-  existingFileNames: string[]
+  existingFileNames: string[],
+  includeKind?: boolean
 ): string => {
-  let fullFileName = getFullFileName(`${resourceName}${suffix ? ` (${suffix})` : ''}`, fileIncludes);
+  const {kind, name} = resource;
+  let fullFileName = getFullFileName(
+    `${name}${includeKind ? `-${kind}` : ''}${suffix ? ` (${suffix})` : ''}`,
+    fileIncludes
+  );
   let foundFile: fs.Dirent | FileEntry | undefined;
+  let foundExistingFileName = false;
 
   if (existingFileNames.includes(fullFileName)) {
+    foundExistingFileName = true;
+  }
+
+  if (!foundExistingFileName) {
+    if (subfiles.length) {
+      foundFile = subfiles.find(dirent => dirent.name === fullFileName);
+    } else if (selectedFolder === ROOT_FILE_ENTRY) {
+      foundFile = fileMap[`${path.sep}${fullFileName}`];
+    } else {
+      foundFile = fileMap[`${path.sep}${path.join(selectedFolder, fullFileName)}`];
+    }
+  }
+
+  if (foundFile || foundExistingFileName) {
+    if (includeKind) {
+      return generateFullFileName(
+        subfiles,
+        resource,
+        fileIncludes,
+        selectedFolder,
+        fileMap,
+        suffix ? suffix + 1 : 2,
+        existingFileNames,
+        true
+      );
+    }
     return generateFullFileName(
       subfiles,
-      resourceName,
+      resource,
       fileIncludes,
       selectedFolder,
       fileMap,
-      suffix ? suffix + 1 : 2,
-      existingFileNames
-    );
-  }
-
-  if (subfiles.length) {
-    foundFile = subfiles.find(dirent => dirent.name === fullFileName);
-  } else if (selectedFolder === ROOT_FILE_ENTRY) {
-    foundFile = fileMap[`${path.sep}${fullFileName}`];
-  } else {
-    foundFile = fileMap[`${path.sep}${path.join(selectedFolder, fullFileName)}`];
-  }
-
-  if (foundFile) {
-    return generateFullFileName(
-      subfiles,
-      resourceName,
-      fileIncludes,
-      selectedFolder,
-      fileMap,
-      suffix ? suffix + 1 : 2,
-      existingFileNames
+      suffix ? suffix + 1 : 0,
+      existingFileNames,
+      true
     );
   }
 
@@ -271,7 +284,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
         const resource = resourceMap[resourceId];
         let fullFileName = generateFullFileName(
           subfiles,
-          resource.name,
+          resource,
           fileIncludes,
           selectedFolder,
           fileMap,
