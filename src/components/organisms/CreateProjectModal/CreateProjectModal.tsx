@@ -124,6 +124,7 @@ const CreateProjectModal: React.FC = () => {
       visible={uiState?.isOpen}
       onCancel={closeModal}
       style={{opacity: isModalHid ? 0 : 1}}
+      transitionName=""
       footer={[
         <Button key="cancel" onClick={closeModal}>
           Cancel
