@@ -3,11 +3,12 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {CLUSTER_DIFF_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
+import {RootState} from '@models/rootstate';
 
 import getClusterObjects from '@redux/services/getClusterObjects';
 import {extractK8sResources} from '@redux/services/resource';
-import {AppDispatch, RootState} from '@redux/store';
 
 import {createRejectionWithAlert} from './utils';
 

@@ -3,8 +3,10 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import log from 'loglevel';
 import {parse, stringify} from 'yaml';
 
+import {AppDispatch} from '@models/appdispatch';
+import {RootState} from '@models/rootstate';
+
 import {UpdateManyResourcesPayload, reloadClusterDiff, updateManyResources} from '@redux/reducers/main';
-import {AppDispatch, RootState} from '@redux/store';
 
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 

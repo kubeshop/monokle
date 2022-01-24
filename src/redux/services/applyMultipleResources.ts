@@ -4,10 +4,10 @@ import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppConfig} from '@models/appconfig';
+import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
-import {AppDispatch} from '@redux/store';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
 import {doesTextStartWithYamlDocumentDelimiter} from './resource';
