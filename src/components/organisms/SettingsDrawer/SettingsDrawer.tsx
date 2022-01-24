@@ -13,12 +13,14 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   setKubeConfig,
   setScanExcludesStatus,
+  updateClusterSelectorVisibilty,
   updateEnableHelmWithKustomize,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
   updateHelmPreviewMode,
   updateHideExcludedFilesInFileExplorer,
   updateKustomizeCommand,
+  updateLoadLastProjectOnStartup,
   updateProjectConfig,
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
@@ -40,6 +42,8 @@ const SettingsDrawer = () => {
   const [activePanels, setActivePanels] = useState<number[]>([2]);
   const appConfig = useAppSelector(state => state.config);
   const projectConfig = useAppSelector(state => state.config.projectConfig);
+  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
+  const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
 
   const activeProject: Project | undefined = useSelector(activeProjectSelector);
 
@@ -63,12 +67,6 @@ const SettingsDrawer = () => {
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
-    // if (!_.isEqual(config.settings?.isClusterSelectorVisible, appConfig.settings.isClusterSelectorVisible)) {
-    //   dispatch(toggleClusterStatus());
-    // }
-    // if (!_.isEqual(config.settings?.loadLastProjectOnStartup, appConfig.settings.loadLastProjectOnStartup)) {
-    //   dispatch(updateLoadLastProjectOnStartup(Boolean(config.settings?.loadLastProjectOnStartup)));
-    // }
     if (!_.isEqual(config.settings?.enableHelmWithKustomize, appConfig.settings.enableHelmWithKustomize)) {
       dispatch(updateEnableHelmWithKustomize(Boolean(config.settings?.enableHelmWithKustomize)));
     }
@@ -98,9 +96,13 @@ const SettingsDrawer = () => {
     }
   };
 
-  const onChangeLoadLastFolderOnStartup = (e: any) => {};
+  const handleChangeLoadLastFolderOnStartup = (e: any) => {
+    dispatch(updateLoadLastProjectOnStartup(e.target.checked));
+  };
 
-  const toggleClusterSelector = () => {};
+  const handleChangeClusterSelectorVisibilty = (e: any) => {
+    dispatch(updateClusterSelectorVisibilty(e.target.checked));
+  };
 
   return (
     <Drawer
@@ -118,24 +120,19 @@ const SettingsDrawer = () => {
           <S.Div>
             <S.Span>On Startup</S.Span>
             <Tooltip title={AutoLoadLastProjectTooltip}>
-              <Checkbox checked onChange={onChangeLoadLastFolderOnStartup}>
+              <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
                 Automatically load last project
               </Checkbox>
             </Tooltip>
-            <S.Div style={{marginTop: 16}}>
-              <Checkbox checked onChange={toggleClusterSelector}>
-                Show Cluster Selector
-              </Checkbox>
-            </S.Div>
+          </S.Div>
+          <S.Div style={{marginTop: 16}}>
+            <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
+              Show Cluster Selector
+            </Checkbox>
           </S.Div>
         </Panel>
         <Panel header="Default Settings" key="2">
-          <Settings
-            config={appConfig}
-            onConfigChange={changeApplicationConfig}
-            showLoadLastProjectOnStartup
-            showEnableHelmWithKustomize
-          />
+          <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
         </Panel>
         {activeProject && (
           <Panel header="Project Settings" key="3">

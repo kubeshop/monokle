@@ -32,17 +32,9 @@ type SettingsProps = {
   config?: ProjectConfig | null;
   onConfigChange?: Function;
   isClusterPaneIconHighlighted?: boolean | null;
-  showLoadLastProjectOnStartup?: boolean | null;
-  showEnableHelmWithKustomize?: boolean | null;
 };
 
-export const Settings = ({
-  config,
-  onConfigChange,
-  isClusterPaneIconHighlighted,
-  showLoadLastProjectOnStartup,
-  showEnableHelmWithKustomize,
-}: SettingsProps) => {
+export const Settings = ({config, onConfigChange, isClusterPaneIconHighlighted}: SettingsProps) => {
   const dispatch = useAppDispatch();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
@@ -241,18 +233,13 @@ export const Settings = ({
           </Select>
         </Tooltip>
       </S.Div>
-      {showEnableHelmWithKustomize && (
-        <S.Div>
-          <Tooltip title={EnableHelmWithKustomizeTooltip}>
-            <Checkbox
-              checked={localConfig?.settings?.enableHelmWithKustomize}
-              onChange={onChangeEnableHelmWithKustomize}
-            >
-              Enable Helm-related features when invoking Kustomize
-            </Checkbox>
-          </Tooltip>
-        </S.Div>
-      )}
+      <S.Div>
+        <Tooltip title={EnableHelmWithKustomizeTooltip}>
+          <Checkbox checked={localConfig?.settings?.enableHelmWithKustomize} onChange={onChangeEnableHelmWithKustomize}>
+            Enable Helm-related features when invoking Kustomize
+          </Checkbox>
+        </Tooltip>
+      </S.Div>
       <S.Div>
         <S.Span>Maximum folder read recursion depth</S.Span>
         <InputNumber
