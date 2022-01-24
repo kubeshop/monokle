@@ -78,17 +78,17 @@ const CreateProjectModal: React.FC = () => {
         uiState.fromTemplate ? (
           <div>
             <div style={{color: `${Colors.grey800}`, fontSize: '10px'}}>Step {formStep} of 2</div>
-            <div>Create a Project</div>
+            <div>Create a Project from a Template</div>
           </div>
         ) : (
-          <div>Create a Project</div>
+          <div>Create an Empty Project</div>
         )
       }
       visible={uiState?.isOpen}
       onCancel={closeModal}
       footer={[
         <Button key="cancel" onClick={closeModal}>
-          Discard
+          Cancel
         </Button>,
         uiState.fromTemplate && formStep === FormSteps.STEP_TWO && (
           <Button key="back" onClick={() => setFormStep(FormSteps.STEP_ONE)}>
