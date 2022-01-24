@@ -18,6 +18,7 @@ const hotkeys = {
   OPEN_HELM_TAB: 'ctrl+shift+h, command+shift+h',
   RESET_RESOURCE_FILTERS: 'ctrl+alt+r, command+alt+r',
   OPEN_QUICK_SEARCH: 'ctrl+shift+p, command+shift+p',
+  OPEN_GETTING_STARTED_PAGE: 'ctrl+shift+n, command+shift+n',
 };
 
 export default hotkeys;

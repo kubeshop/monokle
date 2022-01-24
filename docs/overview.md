@@ -6,7 +6,6 @@ Monokle is laid out like many other desktop applications:
 
 On start-up, Monokle automatically loads the most recently selected folder if the corresponding "Load recent folder on Startup" setting has been enabled.
 
-
 Left to right:
 
 - The vertical toolbar to the far left allows you to switch between File, Kustomize, Helm and Cluster mode.
@@ -42,7 +41,7 @@ Clicking the Settings icon on the top right opens the settings:
 - **File Explorer**:
   - Hide excluded files: Removes files designated in the 'Files: Exclude' setting from File Explorer.
 - **Maximum folder-read recursion depth**: configures how "deep" Monokle will parse a specified folder (to avoid going too deep).
-- **Resource links processing**: 
+- **Resource links processing**:
   - Ignore optional unsatisfied links
 
 ## System Menu
@@ -88,6 +87,7 @@ Monokle currently supports the following keyboard shortcuts:
 - Open Helm Tab: Ctrl/Cmd Shift H
 - Reset Resource Filters: Ctrl/Cmd ALT R
 - Open Quick Search: Ctrl/Cmd SHIFT P
+- Open Getting Started Page: Ctrl/Cmd SHIFT N
 
 ## Auto-update
 
