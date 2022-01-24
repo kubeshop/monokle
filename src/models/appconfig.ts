@@ -1,4 +1,4 @@
-import {KustomizeCommandType} from '@redux/services/kustomize';
+import {KustomizeCommandType} from '@models/kustomize';
 
 export enum Themes {
   Dark = 'dark',

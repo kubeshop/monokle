@@ -15,9 +15,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
-import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
-
-const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 const SuffixContainer = styled.span`
   display: inline-block;
@@ -57,7 +55,7 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
     dispatch(openNewResourceWizard({defaultInput: input}));
   }, [resourceKind, dispatch]);
 
-  if (!resourceKind || !KnownResourceKinds.includes(resourceKind) || !isFolderOpen) {
+  if (!resourceKind || !getResourceKindHandler(resourceKind) || !isFolderOpen) {
     return null;
   }
   return (

@@ -660,8 +660,8 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
           if (
             resource.kind === 'CustomResourceDefinition' &&
-            resource.content?.spec?.kind &&
-            !getResourceKindHandler(resource.content.spec.kind)
+            resource.content?.spec?.names?.kind &&
+            !getResourceKindHandler(resource.content.spec.names.kind)
           ) {
             try {
               const kindHandler = extractKindHandler(resource.content);

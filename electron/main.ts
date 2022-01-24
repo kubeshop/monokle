@@ -45,7 +45,7 @@ import autoUpdater from './auto-update';
 import {indexOf} from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 import {createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges} from './ipcMainRedux';
-import {RootState} from '@redux/store';
+import {RootState} from '@models/rootstate';
 import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack, updateTemplate, updateTemplatePack} from './templateService';
 import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';

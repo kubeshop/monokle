@@ -131,11 +131,11 @@ const SettingsDrawer = () => {
             </Checkbox>
           </S.Div>
         </Panel>
-        <Panel header="Default Settings" key="2">
+        <Panel header="Default Project Settings" key="2">
           <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
         </Panel>
         {activeProject && (
-          <Panel header="Project Settings" key="3">
+          <Panel header="Active Project Settings" key="3">
             <Settings
               config={projectConfig}
               onConfigChange={changeProjectConfig}

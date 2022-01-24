@@ -3,10 +3,10 @@ import {parseDocument, stringify} from 'yaml';
 
 import {UNSAVED_PREFIX} from '@constants/constants';
 
+import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
 import {addResource, selectK8sResource} from '@redux/reducers/main';
-import {AppDispatch} from '@redux/store';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `

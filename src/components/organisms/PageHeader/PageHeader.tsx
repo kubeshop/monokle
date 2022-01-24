@@ -30,7 +30,8 @@ import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import ClusterSelection from './ClusterSelection';
 import ProjectSelection from './ProjectSelection';
-import * as S from './Styled';
+
+import * as S from './styled';
 
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;

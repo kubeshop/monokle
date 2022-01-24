@@ -14,10 +14,11 @@ import * as S from './TemplateInformation.styled';
 interface IProps {
   template: AnyTemplate;
   onClickOpenTemplate: () => void;
+  disabled: boolean;
 }
 
 const TemplateInformation: React.FC<IProps> = props => {
-  const {template, onClickOpenTemplate} = props;
+  const {template, onClickOpenTemplate, disabled} = props;
 
   const [infoContainerRef, {width: infoContainerWidth}] = useMeasure<HTMLDivElement>();
 
@@ -36,7 +37,13 @@ const TemplateInformation: React.FC<IProps> = props => {
           <span>Version: {template.version}</span>
         </S.AdditionalInformation>
 
-        <S.OpenButton icon={<DeliveredProcedureOutlined />} type="link" size="small" onClick={onClickOpenTemplate}>
+        <S.OpenButton
+          disabled={disabled}
+          icon={<DeliveredProcedureOutlined />}
+          type="link"
+          size="small"
+          onClick={onClickOpenTemplate}
+        >
           Use Template
         </S.OpenButton>
       </S.InfoContainer>

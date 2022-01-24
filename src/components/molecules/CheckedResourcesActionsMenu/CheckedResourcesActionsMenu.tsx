@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
 import {AlertEnum} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -17,7 +18,6 @@ import {removeResource, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
-import {AppDispatch} from '@redux/store';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 
 import Colors from '@styles/Colors';
