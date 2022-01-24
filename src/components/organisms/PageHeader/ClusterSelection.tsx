@@ -1,7 +1,7 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Menu, Popconfirm, Tooltip} from 'antd';
+import {Dropdown, Menu, Popconfirm, Tooltip} from 'antd';
 
 import {DownOutlined, LoadingOutlined} from '@ant-design/icons';
 
@@ -25,8 +25,8 @@ import {
 } from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
+import * as S from './ClusterSelection.styled';
 import ProjectSelection from './ProjectSelection';
-import * as S from './Styled';
 
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
@@ -114,18 +114,18 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const createClusterObjectsLabel = useCallback(() => {
     if (isInClusterMode) {
-      return <S.CLusterActionText>RELOAD</S.CLusterActionText>;
+      return <S.ClusterActionText>RELOAD</S.ClusterActionText>;
     }
     if (previewType === 'cluster' && previewLoader.isLoading) {
       return <LoadingOutlined />;
     }
     return (
-      <S.CLusterActionText
+      <S.ClusterActionText
         className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
-        highlighted={highlightedItems.connectToCluster}
+        $highlighted={highlightedItems.connectToCluster}
       >
         LOAD
-      </S.CLusterActionText>
+      </S.ClusterActionText>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
@@ -140,19 +140,19 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   );
 
   return (
-    <S.CLusterContainer>
+    <S.ClusterContainer>
       {activeProject && (
-        <S.CLusterStatus>
+        <S.ClusterStatus>
           <ProjectSelection />
           {isClusterSelectorVisible && (
             <>
-              <S.CLusterStatusText connected={isKubeConfigPathValid}>
+              <S.ClusterStatusText connected={isKubeConfigPathValid}>
                 <S.ClusterOutlined />
                 {isKubeConfigPathValid && <span>Configured</span>}
                 {!isKubeConfigPathValid && <span>No Cluster Configured</span>}
-              </S.CLusterStatusText>
+              </S.ClusterStatusText>
               {isKubeConfigPathValid && (
-                <S.Dropdown
+                <Dropdown
                   overlay={clusterMenu}
                   placement="bottomCenter"
                   arrow
@@ -163,7 +163,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                     <span>{kubeConfigContext}</span>
                     <DownOutlined style={{margin: 4}} />
                   </S.ClusterButton>
-                </S.Dropdown>
+                </Dropdown>
               )}
               {isKubeConfigPathValid ? (
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
@@ -199,9 +199,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               )}
             </>
           )}
-        </S.CLusterStatus>
+        </S.ClusterStatus>
       )}
-    </S.CLusterContainer>
+    </S.ClusterContainer>
   );
 };
 
