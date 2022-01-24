@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Tooltip} from 'antd';
+import {Modal, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
+
+import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
 import {DateTime} from 'luxon';
@@ -34,7 +36,6 @@ const ProjectSelection = () => {
 
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const activeProject = useSelector(activeProjectSelector);
-  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -76,7 +77,21 @@ const ProjectSelection = () => {
   };
 
   const handleDeleteProject = (project: Project) => {
-    dispatch(setDeleteProject(project));
+    const title = `Do you want to remove ${project?.name}?`;
+
+    Modal.confirm({
+      title,
+      icon: <ExclamationCircleOutlined />,
+      centered: true,
+      zIndex: 9999,
+      onOk() {
+        return new Promise(resolve => {
+          dispatch(setDeleteProject(project));
+          resolve({});
+        });
+      },
+      onCancel() {},
+    });
   };
 
   // const handleCopyProject = (project: Project) => {
