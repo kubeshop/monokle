@@ -255,7 +255,7 @@ const PaneManager = () => {
               sectionNames={[HELM_CHART_SECTION_NAME]}
               disabled={!activeProject}
             >
-              <Badge count={Object.values(helmChartResources).length || 0} color={Colors.blue6} size="default" dot>
+              <Badge count={Object.values(helmChartResources).length} color={Colors.blue6} size="default" dot>
                 <MenuIcon
                   iconName="helm"
                   active={Boolean(activeProject) && leftActive}
