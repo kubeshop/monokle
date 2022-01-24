@@ -145,6 +145,7 @@ interface AppState {
   shouldEditorReloadSelectedPath: boolean;
   /** type/value of filters that will be changed */
   filtersToBeChanged?: ResourceFilterType;
+  registeredKindHandlers: string[];
 }
 
 export type {

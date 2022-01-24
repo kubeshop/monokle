@@ -6,10 +6,10 @@ import util from 'util';
 
 import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
+import {AppDispatch} from '@models/appdispatch';
 import {FileEntry} from '@models/fileentry';
 import {K8sResource} from '@models/k8sresource';
-
-import {AppDispatch, RootState} from '@redux/store';
+import {RootState} from '@models/rootstate';
 
 import {getFileTimestamp} from '@utils/files';
 

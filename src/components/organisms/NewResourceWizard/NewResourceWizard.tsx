@@ -17,6 +17,7 @@ import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
+import {registeredKindHandlersSelector} from '@redux/selectors';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 
@@ -24,7 +25,7 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
-import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
@@ -41,6 +42,7 @@ const NewResourceWizard = () => {
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
+  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -74,7 +76,7 @@ const NewResourceWizard = () => {
 
   const kindsByApiVersion = useMemo(
     () =>
-      ResourceKindHandlers.reduce((result, resourcekindHandler) => {
+      registeredKindHandlers.reduce((result, resourcekindHandler) => {
         if (result[resourcekindHandler.clusterApiVersion]) {
           result[resourcekindHandler.clusterApiVersion].push(resourcekindHandler);
         } else {
@@ -86,7 +88,7 @@ const NewResourceWizard = () => {
     // depend on resourceMap since newly loaded resources could have contained CRDs that resulted in dynamically
     // created kindHandlers
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resourceMap]
+    [registeredKindHandlers, resourceMap]
   );
 
   const [resourceKindOptions, setResourceKindOptions] =

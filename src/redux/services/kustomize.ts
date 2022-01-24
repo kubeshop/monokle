@@ -10,8 +10,6 @@ import {getResourcesForPath} from '@redux/services/fileEntry';
 
 import {NodeWrapper, createFileRef, getK8sResources, getScalarNodes, linkResources} from './resource';
 
-export type KustomizeCommandType = 'kubectl' | 'kustomize';
-
 /**
  * Creates kustomization refs between a kustomization and its resources
  */

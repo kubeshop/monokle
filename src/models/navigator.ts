@@ -2,7 +2,8 @@ import React from 'react';
 
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
-import {AppDispatch, RootState} from '@redux/store';
+import {AppDispatch} from '@models/appdispatch';
+import {RootState} from '@models/rootstate';
 
 export type ItemCustomComponentProps = {
   itemInstance: ItemInstance;
@@ -171,4 +172,5 @@ export interface NavigatorInstanceState {
 
 export interface NavigatorState extends NavigatorInstanceState {
   collapsedSectionIds: string[];
+  registeredSectionBlueprintIds: string[];
 }
