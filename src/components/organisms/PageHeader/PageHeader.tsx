@@ -29,8 +29,7 @@ import DiscordLogo from '@assets/DiscordLogo.svg';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import ClusterSelection from './ClusterSelection';
-
-import * as S from './styled';
+import * as S from './Styled';
 
 const ExitButton = (props: {onClick: () => void}) => {
   const {onClick} = props;
