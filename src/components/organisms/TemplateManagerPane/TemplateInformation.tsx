@@ -36,13 +36,7 @@ const TemplateInformation: React.FC<IProps> = props => {
           <span>Version: {template.version}</span>
         </S.AdditionalInformation>
 
-        <S.OpenButton
-          icon={<DeliveredProcedureOutlined />}
-          ghost
-          size="small"
-          type="primary"
-          onClick={onClickOpenTemplate}
-        >
+        <S.OpenButton icon={<DeliveredProcedureOutlined />} type="link" size="small" onClick={onClickOpenTemplate}>
           Use Template
         </S.OpenButton>
       </S.InfoContainer>
