@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Collapse} from 'antd';
+import {Checkbox, Collapse, Tooltip} from 'antd';
 
 import _ from 'lodash';
+
+import {AutoLoadLastProjectTooltip} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
 
@@ -11,7 +13,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   setKubeConfig,
   setScanExcludesStatus,
-  toggleClusterStatus,
+  updateClusterSelectorVisibilty,
   updateEnableHelmWithKustomize,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
@@ -28,6 +30,7 @@ import {activeProjectSelector} from '@redux/selectors';
 import Drawer from '@components/atoms/Drawer';
 
 import {Settings} from './Settings';
+import * as S from './Styles';
 
 const {Panel} = Collapse;
 
@@ -36,15 +39,17 @@ const SettingsDrawer = () => {
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const [activePanels, setActivePanels] = useState<number[]>([2]);
+  const [activePanels, setActivePanels] = useState<number[]>([3]);
   const appConfig = useAppSelector(state => state.config);
   const projectConfig = useAppSelector(state => state.config.projectConfig);
+  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
+  const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
 
   const activeProject: Project | undefined = useSelector(activeProjectSelector);
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
-      setActivePanels(_.uniq([...activePanels, 2]));
+      setActivePanels(_.uniq([...activePanels, 3]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedItems.clusterPaneIcon]);
@@ -62,12 +67,6 @@ const SettingsDrawer = () => {
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
-    if (!_.isEqual(config.settings?.isClusterSelectorVisible, appConfig.settings.isClusterSelectorVisible)) {
-      dispatch(toggleClusterStatus());
-    }
-    if (!_.isEqual(config.settings?.loadLastProjectOnStartup, appConfig.settings.loadLastProjectOnStartup)) {
-      dispatch(updateLoadLastProjectOnStartup(Boolean(config.settings?.loadLastProjectOnStartup)));
-    }
     if (!_.isEqual(config.settings?.enableHelmWithKustomize, appConfig.settings.enableHelmWithKustomize)) {
       dispatch(updateEnableHelmWithKustomize(Boolean(config.settings?.enableHelmWithKustomize)));
     }
@@ -97,6 +96,14 @@ const SettingsDrawer = () => {
     }
   };
 
+  const handleChangeLoadLastFolderOnStartup = (e: any) => {
+    dispatch(updateLoadLastProjectOnStartup(e.target.checked));
+  };
+
+  const handleChangeClusterSelectorVisibilty = (e: any) => {
+    dispatch(updateClusterSelectorVisibilty(e.target.checked));
+  };
+
   return (
     <Drawer
       width="400"
@@ -109,16 +116,26 @@ const SettingsDrawer = () => {
       bodyStyle={{padding: 0}}
     >
       <Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
-        <Panel header="Default Settings" key="1">
-          <Settings
-            config={appConfig}
-            onConfigChange={changeApplicationConfig}
-            showLoadLastProjectOnStartup
-            showEnableHelmWithKustomize
-          />
+        <Panel header="Global Settings" key="1">
+          <S.Div>
+            <S.Span>On Startup</S.Span>
+            <Tooltip title={AutoLoadLastProjectTooltip}>
+              <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
+                Automatically load last project
+              </Checkbox>
+            </Tooltip>
+          </S.Div>
+          <S.Div style={{marginTop: 16}}>
+            <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
+              Show Cluster Selector
+            </Checkbox>
+          </S.Div>
+        </Panel>
+        <Panel header="Default Settings" key="2">
+          <Settings config={appConfig} onConfigChange={changeApplicationConfig} />
         </Panel>
         {activeProject && (
-          <Panel header={`${activeProject.name} Settings`} key="2">
+          <Panel header="Project Settings" key="3">
             <Settings
               config={projectConfig}
               onConfigChange={changeProjectConfig}

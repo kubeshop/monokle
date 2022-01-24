@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 
 import {Badge, Tooltip} from 'antd';
 
@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import {AlertEnum, AlertType} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {seenNotifications} from '@redux/reducers/main';
 import {toggleNotifications} from '@redux/reducers/ui';
 
 import Drawer from '@components/atoms/Drawer';
@@ -29,7 +30,6 @@ const StyledMessageContainer = styled(StyledDiv)`
 
 const StyledNoNotificationsContainer = styled(StyledDiv)`
   display: flex;
-  justify-content: center;
 `;
 
 const StyledMessageBodyContainer = styled(StyledDiv)`
@@ -142,6 +142,12 @@ const NotificationsDrawer = () => {
     dispatch(toggleNotifications());
   };
 
+  useEffect(() => {
+    if (isNotificationsOpen) {
+      dispatch(seenNotifications());
+    }
+  }, [isNotificationsOpen, dispatch]);
+
   const getNotificationBadge = useCallback(
     (type: AlertEnum) => {
       if (type === AlertEnum.Success) {
@@ -180,7 +186,7 @@ const NotificationsDrawer = () => {
           );
         })
       ) : (
-        <StyledNoNotificationsContainer>There is no notifications to show</StyledNoNotificationsContainer>
+        <StyledNoNotificationsContainer>You don&apos;t have any notifications.</StyledNoNotificationsContainer>
       )}
     </Drawer>
   );

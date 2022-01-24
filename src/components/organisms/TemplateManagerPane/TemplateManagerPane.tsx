@@ -1,17 +1,21 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Button, Input, Skeleton, Tooltip} from 'antd';
+import {Button, Skeleton, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
+import {TEMPLATES_HEIGHT_OFFSET} from '@constants/constants';
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {AnyTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {isInPreviewModeSelector} from '@redux/selectors';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
 import {TitleBar} from '@components/molecules';
+
+import {useWindowSize} from '@utils/hooks';
 
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
@@ -37,12 +41,15 @@ const TemplatesPane: React.FC = () => {
 
   const isLoadingExistingTemplates = useAppSelector(state => state.extension.isLoadingExistingTemplates);
   const isLoadingExistingTemplatePacks = useAppSelector(state => state.extension.isLoadingExistingTemplatePacks);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
 
   const [searchedValue, setSearchedValue] = useState<string>();
   const [templatesToShow, setTemplatesToShow] = useState<Record<string, AnyTemplate>>();
+
+  const windowSize = useWindowSize();
 
   const isLoading = useMemo(() => {
     return isLoadingExistingTemplates || isLoadingExistingTemplatePacks;
@@ -51,6 +58,11 @@ const TemplatesPane: React.FC = () => {
   const templates = useMemo(() => {
     return Object.values(templateMap);
   }, [templateMap]);
+
+  const templatesHeight = useMemo(
+    () => windowSize.height - TEMPLATES_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
+    [windowSize.height, isInPreviewMode]
+  );
 
   const onTemplateModalClose = useCallback(() => {
     setSelectedTemplate(undefined);
@@ -102,24 +114,26 @@ const TemplatesPane: React.FC = () => {
           <p>No templates available.</p>
         ) : (
           <>
-            <Input.Search
-              placeholder="Search template by name"
-              style={{marginBottom: '20px'}}
-              value={searchedValue}
-              onChange={e => setSearchedValue(e.target.value)}
-            />
+            <S.SearchInputContainer>
+              <S.SearchInput
+                placeholder="Search installed templates"
+                value={searchedValue}
+                onChange={e => setSearchedValue(e.target.value)}
+              />
+            </S.SearchInputContainer>
 
             {!Object.keys(templatesToShow).length ? (
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
             ) : (
-              Object.entries(templatesToShow).map(([path, template]) => (
-                <TemplateInformation
-                  key={template.id}
-                  template={template}
-                  templatePath={path}
-                  onClickOpenTemplate={() => onClickOpenTemplate(template)}
-                />
-              ))
+              <S.TemplatesContainer $height={templatesHeight}>
+                {Object.values(templatesToShow).map(template => (
+                  <TemplateInformation
+                    key={template.id}
+                    template={template}
+                    onClickOpenTemplate={() => onClickOpenTemplate(template)}
+                  />
+                ))}
+              </S.TemplatesContainer>
             )}
           </>
         )}

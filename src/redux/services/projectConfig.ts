@@ -1,5 +1,6 @@
 import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
+import log from 'loglevel';
 import {sep} from 'path';
 
 import {AppConfig, ProjectConfig} from '@models/appconfig';
@@ -25,6 +26,9 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
         writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
       }
     } catch (error: any) {
+      if (error instanceof Error) {
+        log.warn(`[writeProjectConfigFile]: ${error.message}`);
+      }
       writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
     }
   } else {
@@ -42,7 +46,6 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     helmPreviewMode: state.projectConfig.settings.helmPreviewMode,
     kustomizeCommand: state.projectConfig.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.projectConfig.settings.hideExcludedFilesInFileExplorer,
-    isClusterSelectorVisible: state.projectConfig.settings.isClusterSelectorVisible,
     enableHelmWithKustomize: state.projectConfig.settings.enableHelmWithKustomize,
   };
   applicationConfig.kubeConfig = {
@@ -61,8 +64,6 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     helmPreviewMode: state.settings.helmPreviewMode,
     kustomizeCommand: state.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
-    isClusterSelectorVisible: state.settings.isClusterSelectorVisible,
-    loadLastProjectOnStartup: state.settings.loadLastProjectOnStartup,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
   };
   applicationConfig.kubeConfig = {
@@ -89,7 +90,6 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
           helmPreviewMode: settings.helmPreviewMode,
           kustomizeCommand: settings.kustomizeCommand,
           hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
-          isClusterSelectorVisible: settings.isClusterSelectorVisible,
         }
       : undefined;
     projectConfig.kubeConfig = kubeConfig
@@ -105,6 +105,9 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
 
     return projectConfig;
   } catch (error) {
+    if (error instanceof Error) {
+      log.warn(`[readProjectConfig]: ${error.message}`);
+    }
     return null;
   }
 };

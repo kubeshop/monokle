@@ -15,6 +15,7 @@ enum Colors {
   grey5 = '#5A5A5A', // gray, gray 5
   grey4 = '#303030', // gray, gray 4
   grey3 = '#262626', // gray, gray 3
+  grey1 = '#141414', // gray, gray 1
 
   // Notifications
   greenOkay = '#09b89d',

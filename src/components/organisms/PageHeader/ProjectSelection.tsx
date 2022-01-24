@@ -4,8 +4,6 @@ import {useSelector} from 'react-redux';
 import {Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
-import {DownOutlined} from '@ant-design/icons';
-
 import _ from 'lodash';
 import {DateTime} from 'luxon';
 
@@ -23,7 +21,7 @@ import {Project} from '@models/appconfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal} from '@redux/reducers/ui';
-import {activeProjectSelector, settingsSelector} from '@redux/selectors';
+import {activeProjectSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -36,7 +34,7 @@ const ProjectSelection = () => {
 
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const activeProject = useSelector(activeProjectSelector);
-  const {isClusterSelectorVisible} = useAppSelector(settingsSelector);
+  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -228,8 +226,8 @@ const ProjectSelection = () => {
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ProjectManagementTooltip} placement="bottomRight">
         <S.ProjectButton>
           <S.FolderOpenOutlined />
-          <span>{activeProject?.name}</span>
-          <DownOutlined style={{margin: 4}} />
+          <S.ProjectName>{activeProject?.name}</S.ProjectName>
+          <S.DownOutlined />
           <FileExplorer {...fileExplorerProps} />
         </S.ProjectButton>
       </Tooltip>

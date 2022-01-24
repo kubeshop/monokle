@@ -22,7 +22,6 @@ import {
   kubeConfigContextsSelector,
   kubeConfigPathSelector,
   kubeConfigPathValidSelector,
-  settingsSelector,
 } from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
@@ -33,7 +32,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const activeProject = useSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const {isClusterSelectorVisible} = useAppSelector(settingsSelector);
+  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
   const isInClusterMode = useSelector(isInClusterModeSelector);
@@ -72,18 +71,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const handleClusterHideConfirm = () => {
     dispatch(highlightItem(null));
-    dispatch(
-      updateProjectConfig({
-        config: {
-          ...projectConfig,
-          settings: {
-            ...projectConfig?.settings,
-            isClusterSelectorVisible: false,
-          },
-        },
-        fromConfigFile: false,
-      })
-    );
   };
 
   const handleClusterHideCancel = () => {
@@ -144,8 +131,8 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const clusterMenu = (
     <Menu>
       {kubeConfigContexts.map((context: any) => (
-        <Menu.Item key={context.cluster} onClick={handleClusterChange}>
-          {context.cluster}
+        <Menu.Item key={context.name} onClick={handleClusterChange}>
+          {context.name}
         </Menu.Item>
       ))}
     </Menu>
