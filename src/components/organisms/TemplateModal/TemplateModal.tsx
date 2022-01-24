@@ -192,22 +192,22 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
                       <S.TableHead>Version</S.TableHead>
                       <S.TableData>{template.version}</S.TableData>
                     </tr>
-                    {template.repository && (
+                    {template.repository ? (
                       <tr>
                         <S.TableHead>Repository</S.TableHead>
                         <S.TableData>
                           <a onClick={openRepository}>{template.repository}</a>
                         </S.TableData>
                       </tr>
-                    )}
-                    {template.helpUrl && (
+                    ) : null}
+                    {template.helpUrl ? (
                       <tr>
                         <S.TableHead>Help URL</S.TableHead>
                         <S.TableData>
                           <a onClick={openHelpUrl}>{template.helpUrl}</a>
                         </S.TableData>
                       </tr>
-                    )}
+                    ) : null}
                     <tr>
                       <S.TableHead>Description</S.TableHead>
                       <S.TableData>{template.description}</S.TableData>
