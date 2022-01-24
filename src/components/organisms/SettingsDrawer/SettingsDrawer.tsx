@@ -39,7 +39,7 @@ const SettingsDrawer = () => {
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const [activePanels, setActivePanels] = useState<number[]>([2]);
+  const [activePanels, setActivePanels] = useState<number[]>([3]);
   const appConfig = useAppSelector(state => state.config);
   const projectConfig = useAppSelector(state => state.config.projectConfig);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
@@ -49,7 +49,7 @@ const SettingsDrawer = () => {
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
-      setActivePanels(_.uniq([...activePanels, 2]));
+      setActivePanels(_.uniq([...activePanels, 3]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedItems.clusterPaneIcon]);
