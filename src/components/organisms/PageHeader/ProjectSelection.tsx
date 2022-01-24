@@ -130,6 +130,13 @@ const ProjectSelection = () => {
           onRow={(project: Project) => ({
             onClick: () => handleProjectChange(project),
           })}
+          rowClassName={(project: Project) => {
+            if (activeProject?.name === project?.name) {
+              return 'project-table-active-project';
+            }
+
+            return '';
+          }}
         >
           <Column
             className="projects-table-column-name"
@@ -209,9 +216,8 @@ const ProjectSelection = () => {
     );
   };
 
-  return (
+  return activeProject ? (
     <S.ProjectsDropdown
-      isClusterSelectorVisible={isClusterSelectorVisible}
       overlay={projectMenu}
       placement="bottomCenter"
       arrow
@@ -228,7 +234,7 @@ const ProjectSelection = () => {
         </S.ProjectButton>
       </Tooltip>
     </S.ProjectsDropdown>
-  );
+  ) : null;
 };
 
 export default ProjectSelection;

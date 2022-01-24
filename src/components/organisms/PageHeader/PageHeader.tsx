@@ -29,6 +29,7 @@ import DiscordLogo from '@assets/DiscordLogo.svg';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import ClusterSelection from './ClusterSelection';
+import ProjectSelection from './ProjectSelection';
 import * as S from './Styled';
 
 const ExitButton = (props: {onClick: () => void}) => {
@@ -131,9 +132,10 @@ const PageHeader = () => {
           <S.LogoCol noborder="true">
             <S.Logo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
           </S.LogoCol>
-
-          <ClusterSelection previewResource={previewResource} />
-
+          <S.HeaderContent>
+            <ProjectSelection />
+            <ClusterSelection previewResource={previewResource} />
+          </S.HeaderContent>
           <S.SettingsCol>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
               <S.IconContainerSpan>

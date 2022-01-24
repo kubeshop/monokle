@@ -172,7 +172,6 @@ code {
 }
 
 .ant-table-body .ant-table-row:hover .ant-table-cell {
-  color: #13a8a8;
   cursor: pointer;
 }
 
@@ -180,10 +179,14 @@ code {
   display: flex;
 }
 
-.ant-table-body .ant-table-row .ant-table-cell:first-child {
-  border-left: 4px transparent solid;
+.ant-table-body .ant-table-row:hover {
+  background: #111d2c;
 }
 
-.ant-table-body .ant-table-row:hover .ant-table-cell:first-child {
-  border-left: 4px #84e2d8 solid;
+.project-table-active-project td {
+  color: #13a8a8;
+}
+
+.project-table-active-project > :first-child {
+  border-left: 4px #13a8a8 solid;
 }

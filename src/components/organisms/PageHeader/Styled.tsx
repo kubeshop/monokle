@@ -57,6 +57,7 @@ export const ClusterButton = styled(RawButton)`
 export const ClusterActionButton = styled(RawButton)`
   border: none;
   outline: none;
+  margin-right: 8px;
   padding: 0px;
   color: ${Colors.blue6};
   font-size: 12px;
@@ -71,6 +72,10 @@ export const ProjectButton = styled(RawButton)`
   letter-spacing: 0.05em;
   font-size: 10px;
   line-height: 20px;
+  :hover,
+  :focus {
+    color: ${Colors.lightSeaGreen};
+  }
 `;
 
 export const FolderOpenOutlined = styled(RawFolderOpenOutlined)`
@@ -299,12 +304,19 @@ export const ProjectsTable = styled(({children, ...rest}: ProjectsTableProps) =>
 `;
 
 interface ProjectsDropdownProps extends DropDownProps {
-  isClusterSelectorVisible: boolean | undefined;
   children: ReactElement;
 }
 
 export const ProjectsDropdown = styled(({children, ...rest}: ProjectsDropdownProps) => (
   <Dropdown {...rest}>{children}</Dropdown>
 ))`
-  ${props => `margin-right: ${props.isClusterSelectorVisible ? '20px' : '0px'}`};
+  border: 1px solid ${Colors.grey3};
+  border-radius: 4px;
+  padding: 0px 8px;
+`;
+
+export const HeaderContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;

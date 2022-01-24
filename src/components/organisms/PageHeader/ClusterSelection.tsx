@@ -26,7 +26,6 @@ import {
 } from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
-import ProjectSelection from './ProjectSelection';
 import * as S from './Styled';
 
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
@@ -156,7 +155,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     <S.CLusterContainer>
       {activeProject && (
         <S.CLusterStatus>
-          <ProjectSelection />
           {isClusterSelectorVisible && (
             <>
               <S.CLusterStatusText connected={isKubeConfigPathValid}>
@@ -190,9 +188,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                 </Tooltip>
               ) : (
                 <>
-                  <S.ClusterActionButton style={{marginRight: 8}} onClick={handleClusterConfigure}>
-                    Configure
-                  </S.ClusterActionButton>
+                  <S.ClusterActionButton onClick={handleClusterConfigure}>Configure</S.ClusterActionButton>
                   <Popconfirm
                     placement="bottom"
                     title={() => (
