@@ -6,7 +6,7 @@ import {KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {
   HighlightItems,
-  LeftMenuSelection,
+  LeftMenuSelectionType,
   MonacoUiState,
   NewResourceWizardInput,
   PaneConfiguration,
@@ -42,7 +42,7 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
-    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelection>) => {
+    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },

@@ -18,7 +18,7 @@ import styled from 'styled-components';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 
-import {LeftMenuSelection} from '@models/ui';
+import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
@@ -117,7 +117,7 @@ const PaneManager = () => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
 
-  const setLeftActiveMenu = (selectedMenu: LeftMenuSelection) => {
+  const setLeftActiveMenu = (selectedMenu: LeftMenuSelectionType) => {
     if (leftMenuSelection === selectedMenu) {
       dispatch(toggleLeftMenu());
     } else {
@@ -255,7 +255,7 @@ const PaneManager = () => {
               sectionNames={[HELM_CHART_SECTION_NAME]}
               disabled={!activeProject}
             >
-              <Badge count={helmChartResources.length || 0} color={Colors.blue6} size="default" dot>
+              <Badge count={Object.values(helmChartResources).length || 0} color={Colors.blue6} size="default" dot>
                 <MenuIcon
                   iconName="helm"
                   active={Boolean(activeProject) && leftActive}

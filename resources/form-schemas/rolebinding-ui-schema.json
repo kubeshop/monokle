@@ -10,7 +10,8 @@
         "ui:title": "Name"
       },
       "apiGroup": {
-        "ui:title": "API Group"
+        "ui:title": "API Group",
+        "ui:widget": "apiGroupSelection"
       }
     }
   },
