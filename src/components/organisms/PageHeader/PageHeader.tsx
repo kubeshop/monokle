@@ -27,6 +27,7 @@ import DiscordLogo from '@assets/DiscordLogo.svg';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import ClusterSelection from './ClusterSelection';
+import ProjectSelection from './ProjectSelection';
 
 import * as S from './styled';
 
@@ -132,7 +133,10 @@ const PageHeader = () => {
         <S.Row noborder="true">
           <S.Logo onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
 
-          <ClusterSelection previewResource={previewResource} />
+          <S.ProjectClusterSelectionContainer>
+            <ProjectSelection />
+            <ClusterSelection previewResource={previewResource} />
+          </S.ProjectClusterSelectionContainer>
 
           <S.SettingsCol>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>

@@ -97,6 +97,11 @@ export const PreviewRow = styled(Row)`
   justify-content: space-between;
 `;
 
+export const ProjectClusterSelectionContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 export const ResourceSpan = styled.span`
   font-weight: 700;
 `;

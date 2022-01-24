@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Tooltip} from 'antd';
@@ -20,7 +20,7 @@ import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
-import {openCreateProjectModal} from '@redux/reducers/ui';
+import {openCreateProjectModal, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
@@ -31,13 +31,14 @@ import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
-
-  const projects: Project[] = useAppSelector(state => state.config.projects);
   const activeProject = useSelector(activeProjectSelector);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const projects: Project[] = useAppSelector(state => state.config.projects);
+
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -67,7 +68,10 @@ const ProjectSelection = () => {
 
   const handleProjectChange = (project: Project) => {
     setIsDropdownMenuVisible(false);
-    setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
+    setTimeout(() => {
+      dispatch(setOpenProject(project.rootFolder));
+      dispatch(toggleStartProjectPane());
+    }, 400);
   };
 
   const handleCreateProject = (fromTemplate: boolean) => {
@@ -208,25 +212,40 @@ const ProjectSelection = () => {
     );
   };
 
+  if (!activeProject) {
+    return null;
+  }
+
   return (
-    <S.ProjectsDropdown
-      $isClusterSelectorVisible={isClusterSelectorVisible}
-      arrow
-      overlay={projectMenu}
-      placement="bottomCenter"
-      trigger={['click']}
-      visible={isDropdownMenuVisible}
-      onVisibleChange={setIsDropdownMenuVisible}
-    >
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-        <S.Button>
-          <S.FolderOpenOutlined />
-          <S.ProjectName>{activeProject?.name}</S.ProjectName>
-          <S.DownOutlined />
-          <FileExplorer {...fileExplorerProps} />
-        </S.Button>
-      </Tooltip>
-    </S.ProjectsDropdown>
+    <S.ProjectContainer>
+      <S.ProjectsDropdown
+        $isClusterSelectorVisible={isClusterSelectorVisible}
+        arrow
+        overlay={projectMenu}
+        placement="bottomCenter"
+        trigger={['click']}
+        visible={isDropdownMenuVisible}
+        onVisibleChange={setIsDropdownMenuVisible}
+      >
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
+          <S.Button type="link">
+            <S.FolderOpenOutlined />
+            <S.ProjectName>{activeProject.name}</S.ProjectName>
+            <S.DownOutlined />
+          </S.Button>
+        </Tooltip>
+      </S.ProjectsDropdown>
+
+      {isStartProjectPaneVisible && activeProject && (
+        <>
+          <S.Divider type="vertical" />
+          <S.BackToProjectButton type="link" onClick={() => dispatch(toggleStartProjectPane())}>
+            Back to Project
+          </S.BackToProjectButton>
+        </>
+      )}
+      <FileExplorer {...fileExplorerProps} />
+    </S.ProjectContainer>
   );
 };
 
