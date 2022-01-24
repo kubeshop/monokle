@@ -130,26 +130,16 @@ const PageHeader = () => {
       )}
       <S.Header noborder="true">
         <S.Row noborder="true">
-          <S.LogoCol noborder="true">
-            <S.Logo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
-          </S.LogoCol>
+          <S.Logo onClick={showStartupModal} src={MonokleKubeshopLogo} alt="Monokle" />
 
           <ClusterSelection previewResource={previewResource} />
 
           <S.SettingsCol>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
               <S.IconContainerSpan>
-                <QuestionCircleOutlined size={24} onClick={openDocumentation} />
-              </S.IconContainerSpan>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiscordTooltip} placement="bottomRight">
-              <S.IconContainerSpan onClick={openDiscord}>
-                <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer', marginBottom: '4px'}} />
-              </S.IconContainerSpan>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={GitHubTooltip} placement="bottomRight">
-              <S.IconContainerSpan>
-                <GithubOutlined size={24} onClick={openGitHub} />
+                <Badge count={unseenNotificationsCount} size="small">
+                  <S.BellOutlined onClick={toggleNotificationsDrawer} />
+                </Badge>
               </S.IconContainerSpan>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
@@ -157,11 +147,19 @@ const PageHeader = () => {
                 <S.SettingsOutlined onClick={toggleSettingsDrawer} />
               </S.IconContainerSpan>
             </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={GitHubTooltip} placement="bottomRight">
               <S.IconContainerSpan>
-                <Badge count={unseenNotificationsCount} size="small">
-                  <S.BellOutlined onClick={toggleNotificationsDrawer} />
-                </Badge>
+                <GithubOutlined size={24} onClick={openGitHub} />
+              </S.IconContainerSpan>
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiscordTooltip} placement="bottomRight">
+              <S.IconContainerSpan onClick={openDiscord}>
+                <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer', marginBottom: '4px'}} />
+              </S.IconContainerSpan>
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
+              <S.IconContainerSpan>
+                <QuestionCircleOutlined size={24} onClick={openDocumentation} />
               </S.IconContainerSpan>
             </Tooltip>
           </S.SettingsCol>

@@ -16,9 +16,10 @@ import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
 export const Row = styled(RawRow.default)`
-  display: flex;
-  justify-content: space-between;
-  flex-flow: inherit;
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  align-items: center;
+  padding: 0px 10px;
 `;
 
 export const BellOutlined = styled(RawBellOutlined)`
@@ -73,21 +74,13 @@ export const Header = styled(RawHeader.default)`
 
 export const IconContainerSpan = styled.span`
   color: ${FontColors.elementSelectTitle};
-  padding-top: 10px;
-  padding-right: 10px;
   font-size: 24px;
   cursor: pointer;
 `;
 
 export const Logo = styled.img`
   height: 24px;
-  margin: 4px;
-  margin-top: 11px;
-`;
-
-export const LogoCol = styled(Col)`
-  padding-left: 4px;
-  flex: 1;
+  cursor: pointer;
 `;
 
 export const ModeSpan = styled.span`
@@ -109,10 +102,10 @@ export const ResourceSpan = styled.span`
 `;
 
 export const SettingsCol = styled(Col)`
-  width: 100%;
-  display: flex;
-  flex-direction: row-reverse;
-  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, max-content);
+  align-items: center;
+  grid-column-gap: 10px;
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`
