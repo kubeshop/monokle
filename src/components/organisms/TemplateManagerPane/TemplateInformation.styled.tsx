@@ -37,9 +37,9 @@ export const InfoContainer = styled.div`
   overflow: hidden;
 `;
 
-export const Name = styled.span<{$width: number}>`
-  ${props => `width: ${props.$width}`}
-  color:${Colors.whitePure};
+export const Name = styled.span`
+  width: 100%;
+  color: ${Colors.whitePure};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

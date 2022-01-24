@@ -4,7 +4,8 @@ import {Popconfirm} from 'antd';
 
 import {ExclamationOutlined} from '@ant-design/icons';
 
-import {AnyPlugin} from '@models/plugin';
+import {AnyPlugin, isTemplatePluginModule} from '@models/plugin';
+import {AnyTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {deletePlugin} from '@redux/services/templates';
@@ -21,6 +22,14 @@ const PluginInformation: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const pluginsDir = useAppSelector(state => state.extension.pluginsDir);
+  const pluginTemplates = useAppSelector(state =>
+    plugin.modules
+      .filter(isTemplatePluginModule)
+      .map(module => module.path)
+      .map(templatePath => state.extension.templateMap[templatePath])
+      .filter((t): t is AnyTemplate => t !== undefined)
+      .sort((a, b) => a.name.localeCompare(b.name))
+  );
 
   const handleDelete = () => {
     if (pluginsDir) {
@@ -37,9 +46,10 @@ const PluginInformation: React.FC<IProps> = props => {
       <S.InfoContainer>
         <S.Name>{plugin.name}</S.Name>
         <S.Description>{plugin.description || 'No description'}</S.Description>
-        <S.Footer>
-          <S.Author>{plugin.author}</S.Author> <S.Version>{plugin.version}</S.Version>
-        </S.Footer>
+        <S.AdditionalInformation>
+          <span>Author: {plugin.author}</span>
+          <span>Version: {plugin.version}</span>
+        </S.AdditionalInformation>
       </S.InfoContainer>
 
       <Popconfirm
@@ -52,7 +62,12 @@ const PluginInformation: React.FC<IProps> = props => {
             <p>Are you sure you want to delete {plugin.name}?</p>
             <p>
               <ExclamationOutlined style={{color: 'red'}} />
-              This will also delete all the templates corresponding to the plugin.
+              This action will delete the following templates:
+              <ul>
+                {pluginTemplates.map(t => (
+                  <li key={t.id}>{t.name}</li>
+                ))}
+              </ul>
             </p>
           </>
         )}
