@@ -19,7 +19,7 @@ import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH, DEFAULT_PLUGINS, ROOT_FILE_ENTRY} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
@@ -345,10 +345,22 @@ export const createWindow = (givenPath?: string) => {
     win.webContents.send('executed-from', {path: givenPath});
 
     const pluginMap = await loadPluginMap(pluginsDir);
-    dispatch(setPluginMap(pluginMap));
+    const pluginRepoNames = Object.values(pluginMap).map((plugin) => plugin.repository.name);
+
+    const defaultPluginsToLoad = DEFAULT_PLUGINS.filter((defaultPlugin) => {
+      return !pluginRepoNames.includes(defaultPlugin.name);
+    });
+
+    const downloadedPlugins = await Promise.all(defaultPluginsToLoad
+      .map((defaultPlugin) => downloadPlugin(defaultPlugin.url, pluginsDir)));
+    downloadedPlugins.forEach((downloadedPlugin) => {
+      pluginMap[downloadedPlugin.folderPath] = downloadedPlugin.extension;
+    });
     const templatePackMap = await loadTemplatePackMap(templatePacksDir);
-    dispatch(setTemplatePackMap(templatePackMap));
     const templateMap = await loadTemplateMap(templatesDir, {plugins: Object.values(pluginMap), templatePacks: Object.values(templatePackMap)});
+
+    dispatch(setPluginMap(pluginMap));
+    dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
 
     convertRecentFilesToRecentProjects(dispatch);

@@ -17,3 +17,9 @@ export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const ACTIONS_PANE_FOOTER_HEIGHT = 200;
 export const ACTIONS_PANE_TAB_PANE_OFFSET = 106;
 export const TEMPLATES_HEIGHT_OFFSET = 190;
+export const DEFAULT_PLUGINS = [
+  {
+    name: 'monokle-default-templates-plugin',
+    url: 'https://github.com/kubeshop/monokle-default-templates-plugin',
+  }
+];
