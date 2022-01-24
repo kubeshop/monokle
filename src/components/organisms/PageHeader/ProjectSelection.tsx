@@ -4,8 +4,6 @@ import {useSelector} from 'react-redux';
 import {Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
 
-import {DownOutlined} from '@ant-design/icons';
-
 import _ from 'lodash';
 import {DateTime} from 'luxon';
 
@@ -222,8 +220,8 @@ const ProjectSelection = () => {
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ProjectManagementTooltip} placement="bottomRight">
         <S.ProjectButton>
           <S.FolderOpenOutlined />
-          <span>{activeProject?.name}</span>
-          <DownOutlined style={{margin: 4}} />
+          <S.ProjectName>{activeProject?.name}</S.ProjectName>
+          <S.DownOutlined />
           <FileExplorer {...fileExplorerProps} />
         </S.ProjectButton>
       </Tooltip>
