@@ -24,6 +24,11 @@ export const Button = styled(RawButton)`
   font-size: 10px;
   line-height: 20px;
   display: flex;
+
+  :hover,
+  :focus {
+    color: ${Colors.lightSeaGreen};
+  }
 `;
 
 export const DeleteOutlined = styled(RawDeleteOutlined)`
@@ -73,8 +78,10 @@ export const ProjectName = styled.span`
   align-self: center;
 `;
 
-export const ProjectsDropdown = styled(Dropdown)<{$isClusterSelectorVisible: boolean}>`
-  ${props => `margin-right: ${props.$isClusterSelectorVisible ? '20px' : '0px'}`};
+export const ProjectsDropdown = styled(Dropdown)`
+  border: 1px solid ${Colors.grey3};
+  border-radius: 4px;
+  padding: 0px 8px;
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`
@@ -102,7 +109,7 @@ export const Search = styled(RawInput.Search)`
   width: 280px;
 `;
 
-export const Table = styled(RawTable)`
+export const Table = styled(props => <RawTable {...props} />)`
   width: 800px;
   border-top: 1px solid ${Colors.grey3};
   padding-top: 18px;
