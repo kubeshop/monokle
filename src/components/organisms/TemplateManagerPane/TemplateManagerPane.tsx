@@ -130,6 +130,7 @@ const TemplatesPane: React.FC = () => {
                   <TemplateInformation
                     key={template.id}
                     template={template}
+                    disabled={isInPreviewMode}
                     onClickOpenTemplate={() => onClickOpenTemplate(template)}
                   />
                 ))}
