@@ -20,7 +20,13 @@ import {FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
+import {
+  setLeftMenuSelection,
+  setRightMenuSelection,
+  toggleLeftMenu,
+  toggleRightMenu,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   helmChartsSelector,
@@ -119,9 +125,17 @@ const PaneManager = () => {
 
   const setLeftActiveMenu = (selectedMenu: LeftMenuSelectionType) => {
     if (leftMenuSelection === selectedMenu) {
-      dispatch(toggleLeftMenu());
+      if (isStartProjectPaneVisible) {
+        dispatch(toggleStartProjectPane());
+      } else {
+        dispatch(toggleLeftMenu());
+      }
     } else {
+      if (isStartProjectPaneVisible) {
+        dispatch(toggleStartProjectPane());
+      }
       dispatch(setLeftMenuSelection(selectedMenu));
+
       if (!leftActive) {
         dispatch(toggleLeftMenu());
       }
