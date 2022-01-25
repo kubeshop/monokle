@@ -29,9 +29,9 @@ export const StyledMenu = styled(Menu)`
 export const StyledMenuItem = styled(Menu.Item)`
   margin-bottom: 0 !important;
   margin-top: 0 !important;
-  height: 28px !important;
-  line-height: 28px !important;
-  padding: 0 4px;
+  height: 32px !important;
+  line-height: 32px !important;
+  padding: 0px 4px;
 `;
 
 export const WarningKindLabel = styled.span`

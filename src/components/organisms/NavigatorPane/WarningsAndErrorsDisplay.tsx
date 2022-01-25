@@ -1,8 +1,6 @@
 import {useMemo} from 'react';
 
-import {Dropdown} from 'antd';
-
-import {sortBy} from 'lodash';
+import {Dropdown, Tag} from 'antd';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
 
@@ -21,11 +19,29 @@ type Warning = {
   type: string;
   name: string;
   count: number;
+  namespace: string | undefined;
 };
 
 type RefDropdownMenuProps = {
   warnings: Warning[];
 };
+
+const sortWarnings = (warnings: Warning[]) =>
+  warnings.sort((a, b) => {
+    if (a.type !== b.type) {
+      return a.type.localeCompare(b.type);
+    }
+    if (a.namespace && !b.namespace) {
+      return -1;
+    }
+    if (!a.namespace && b.namespace) {
+      return 1;
+    }
+    if (a.namespace && b.namespace && a.namespace !== b.namespace) {
+      return a.namespace.localeCompare(b.namespace);
+    }
+    return a.name.localeCompare(b.name);
+  });
 
 const RefDropdownMenu = (props: RefDropdownMenuProps) => {
   const {warnings} = props;
@@ -36,6 +52,7 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
     <S.StyledMenu>
       {warnings.map(warning => (
         <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
+          {warning.namespace && <Tag>{warning.namespace}</Tag>}
           <S.Label>{warning.name}</S.Label>
           <S.Label>({warning.count})</S.Label>
           <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
@@ -63,6 +80,7 @@ function WarningsAndErrorsDisplay() {
               type: resource.kind,
               name: resource.name,
               count: unsatisfiedRefs.length,
+              namespace: resource.namespace,
             };
           }
           return null;
@@ -70,11 +88,11 @@ function WarningsAndErrorsDisplay() {
         return null;
       })
       .filter(warning => warning);
-    return sortBy(warningsCollection, ['type', 'name']);
+    return sortWarnings(warningsCollection as Warning[]);
   }, [resourceMap, isInPreviewMode]);
 
   const errors: any[] = useMemo(() => {
-    return Object.values(resourceMap)
+    const errorsCollection = Object.values(resourceMap)
       .filter(resource =>
         isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
       )
@@ -85,11 +103,14 @@ function WarningsAndErrorsDisplay() {
             type: resource.kind,
             name: resource.name,
             count: resource.validation.errors.length,
+            namespace: resource.namespace,
           };
         }
         return null;
       })
       .filter(error => error);
+
+    return sortWarnings(errorsCollection as Warning[]);
   }, [resourceMap, isInPreviewMode]);
 
   const warningsCount = useMemo(() => {
