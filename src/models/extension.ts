@@ -13,6 +13,7 @@ export interface ExtensionState {
   templatesDir?: string;
   templatePacksDir?: string;
   pluginsDir?: string;
+  isPluginsDrawerVisible: boolean;
 }
 
 export type AnyExtension<ExtensionType> = {

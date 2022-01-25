@@ -52,7 +52,6 @@ export type LeftMenuSelectionType =
   | 'helm-pane'
   | 'kustomize-pane'
   | 'cluster-explorer'
-  | 'plugin-manager'
   | 'templates-pane';
 
 export type UiState = {

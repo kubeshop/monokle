@@ -3,12 +3,13 @@ import {useEffect, useState} from 'react';
 import {Badge, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {NotificationsTooltip, SettingsTooltip} from '@constants/tooltips';
+import {NotificationsTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
 
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openPluginsDrawer} from '@redux/reducers/extension';
 import {toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
@@ -72,6 +73,10 @@ const PageHeader = () => {
 
   const toggleNotificationsDrawer = () => {
     dispatch(toggleNotifications());
+  };
+
+  const showPluginsDrawer = () => {
+    dispatch(openPluginsDrawer());
   };
 
   const showGetStartingPage = () => {
@@ -139,6 +144,13 @@ const PageHeader = () => {
                 </Badge>
               </S.IconContainerSpan>
             </Tooltip>
+
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
+              <S.IconContainerSpan>
+                <S.ApiOutlined onClick={showPluginsDrawer} />
+              </S.IconContainerSpan>
+            </Tooltip>
+
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
               <S.IconContainerSpan>
                 <S.SettingsOutlined onClick={toggleSettingsDrawer} />

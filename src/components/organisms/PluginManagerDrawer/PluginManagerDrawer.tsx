@@ -4,20 +4,22 @@ import {Button, Skeleton, Tooltip} from 'antd';
 
 import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {PluginManagerPaneReloadTooltip} from '@constants/tooltips';
+import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {closePluginsDrawer} from '@redux/reducers/extension';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
-import {TitleBar} from '@components/molecules';
+import Drawer from '@components/atoms/Drawer';
 
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
-import * as S from './PluginManagerPane.styled';
+import * as S from './PluginManagerDrawer.styled';
 
-function PluginManagerPane() {
+function PluginManagerDrawer() {
   const dispatch = useAppDispatch();
   const isLoadingExistingPlugins = useAppSelector(state => state.extension.isLoadingExistingPlugins);
+  const isPluginsDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
 
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templateMap = useAppSelector(state => state.extension.templateMap);
@@ -43,20 +45,40 @@ function PluginManagerPane() {
   };
 
   return (
-    <div>
+    <Drawer
+      width="400"
+      noborder="true"
+      title="Plugins Manager"
+      placement="right"
+      closable={false}
+      visible={isPluginsDrawerVisible}
+      onClose={() => dispatch(closePluginsDrawer())}
+      bodyStyle={{padding: 0}}
+    >
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
-      <TitleBar title="Plugins">
-        <Tooltip title={PluginManagerPaneReloadTooltip} placement="bottom">
+      <S.ButtonsContainer>
+        <Tooltip title={PluginManagerDrawerReloadTooltip} placement="bottom">
           <Button
             disabled={sortedPluginEntries.length === 0}
             onClick={onClickReload}
             type="link"
             size="small"
             icon={<ReloadOutlined />}
-          />
+          >
+            Update
+          </Button>
         </Tooltip>
-        <Button onClick={onClickInstallPlugin} type="link" size="small" icon={<PlusOutlined />} />
-      </TitleBar>
+        <Button
+          onClick={onClickInstallPlugin}
+          type="primary"
+          ghost
+          size="small"
+          icon={<PlusOutlined />}
+          style={{marginLeft: 8}}
+        >
+          Install
+        </Button>
+      </S.ButtonsContainer>
       <S.Container>
         {sortedPluginEntries.length === 0 ? (
           <>{isLoadingExistingPlugins ? <Skeleton /> : <p>No plugins installed yet.</p>}</>
@@ -70,8 +92,8 @@ function PluginManagerPane() {
           </>
         )}
       </S.Container>
-    </div>
+    </Drawer>
   );
 }
 
-export default PluginManagerPane;
+export default PluginManagerDrawer;
