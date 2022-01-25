@@ -345,10 +345,10 @@ export const createWindow = (givenPath?: string) => {
     win.webContents.send('executed-from', {path: givenPath});
 
     const pluginMap = await loadPluginMap(pluginsDir);
-    const pluginRepoNames = Object.values(pluginMap).map((plugin) => plugin.repository.name);
+    const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
 
     const defaultPluginsToLoad = DEFAULT_PLUGINS.filter((defaultPlugin) => {
-      return !pluginRepoNames.includes(defaultPlugin.name);
+      return !uniquePluginNames.includes(`${defaultPlugin.owner}- ${defaultPlugin.name}`);
     });
 
     const downloadedPlugins = await Promise.all(defaultPluginsToLoad
