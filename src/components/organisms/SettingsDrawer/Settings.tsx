@@ -90,7 +90,8 @@ export const Settings = ({
 
   useEffect(() => {
     settingsForm.setFieldsValue({projectName});
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectName]);
 
   useDebounce(
     () => {
