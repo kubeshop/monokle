@@ -16,6 +16,7 @@ import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
+import {Project} from '@models/appconfig';
 import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -97,6 +98,7 @@ const iconMenuWidth = 45;
 const PaneManager = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const projects: Project[] = useAppSelector(state => state.config.projects);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
@@ -233,9 +235,11 @@ const PaneManager = () => {
           <div style={{flex: 3}}>
             <StartProjectPane />
           </div>
-          <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
-            <RecentProjectsPane />
-          </div>
+          {Boolean(projects.length) && (
+            <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
+              <RecentProjectsPane />
+            </div>
+          )}
         </div>
       </StyledColumnPanes>
     );
