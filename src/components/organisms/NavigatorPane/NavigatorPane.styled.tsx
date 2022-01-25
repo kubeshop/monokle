@@ -40,10 +40,10 @@ export const FiltersNumber = styled.div`
   margin-left: 5px;
 `;
 
-export const PlusButton = styled(Button)<{$highlighted?: boolean}>`
-  ${({$highlighted}) => `
+export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: boolean}>`
+  ${({$disabled, $highlighted}) => `
     border-radius: ${$highlighted ? '100%' : 'inherit'} !important;
-    color: ${$highlighted ? Colors.whitePure : Colors.blue6} !important`};
+    color: ${$highlighted ? Colors.whitePure : $disabled ? 'rgba(255, 255, 255, 0.3)' : Colors.blue6} !important`};
 
   &:after {
     ${({$highlighted}) => `

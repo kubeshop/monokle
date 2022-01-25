@@ -120,13 +120,14 @@ const NavPane: React.FC = () => {
           </MonoPaneTitle>
           <S.TitleBarRightButtons>
             <S.PlusButton
-              className={highlightedItems.createResource ? 'animated-highlight' : ''}
+              $disabled={!isFolderOpen || isInPreviewMode}
               $highlighted={highlightedItems.createResource}
-              disabled={!isFolderOpen || isInClusterMode || isInPreviewMode}
-              onClick={onClickNewResource}
-              type="link"
-              size="small"
+              className={highlightedItems.createResource ? 'animated-highlight' : ''}
+              disabled={!isFolderOpen || isInPreviewMode}
               icon={<PlusOutlined />}
+              size="small"
+              type="link"
+              onClick={onClickNewResource}
             />
             <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
               <Button
