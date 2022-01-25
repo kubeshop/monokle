@@ -348,7 +348,7 @@ export const createWindow = (givenPath?: string) => {
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
 
     const defaultPluginsToLoad = DEFAULT_PLUGINS.filter((defaultPlugin) => {
-      return !uniquePluginNames.includes(`${defaultPlugin.owner}- ${defaultPlugin.name}`);
+      return !uniquePluginNames.includes(`${defaultPlugin.owner}-${defaultPlugin.name}`);
     });
 
     const downloadedPlugins = await Promise.all(defaultPluginsToLoad
