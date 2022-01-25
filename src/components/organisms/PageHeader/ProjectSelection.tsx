@@ -1,8 +1,10 @@
 import {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Dropdown, Tooltip} from 'antd';
+import {Dropdown, Modal, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
+
+import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
 import {DateTime} from 'luxon';
@@ -36,7 +38,6 @@ const ProjectSelection = () => {
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
-
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -78,7 +79,21 @@ const ProjectSelection = () => {
   };
 
   const handleDeleteProject = (project: Project) => {
-    dispatch(setDeleteProject(project));
+    const title = `Do you want to remove ${project?.name}?`;
+
+    Modal.confirm({
+      title,
+      icon: <ExclamationCircleOutlined />,
+      centered: true,
+      zIndex: 9999,
+      onOk() {
+        return new Promise(resolve => {
+          dispatch(setDeleteProject(project));
+          resolve({});
+        });
+      },
+      onCancel() {},
+    });
   };
 
   // const handleCopyProject = (project: Project) => {
@@ -128,9 +143,16 @@ const ProjectSelection = () => {
           pagination={false}
           scroll={{y: 300}}
           rowKey="rootFolder"
-          onRow={project => ({
-            onClick: () => handleProjectChange(project as Project),
+          onRow={(project: Project) => ({
+            onClick: () => handleProjectChange(project),
           })}
+          rowClassName={(project: Project) => {
+            if (activeProject?.rootFolder === project?.rootFolder) {
+              return 'project-table-active-project';
+            }
+
+            return '';
+          }}
         >
           <Column
             className="projects-table-column-name"

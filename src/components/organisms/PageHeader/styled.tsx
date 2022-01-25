@@ -120,3 +120,9 @@ export const SettingsOutlined = styled(RawSettingOutlined)`
   font-size: 24px;
   cursor: pointer;
 `;
+
+export const HeaderContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
