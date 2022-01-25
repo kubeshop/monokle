@@ -46,19 +46,10 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
 
 ## Download & Install
 
-Download and install the latest version below
-
-### macOS
-
-[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.dmg` file
-
-### Windows
-
-[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.exe` file
-
-### Linux (since Monokle 1.3.0)
-
-[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.appImage`/`.deb` file for your platform
+| <p align="center">Windows                                                                  | <p align="center">macOS                                                                    | <p align="center">Linux                                                                                                  |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| <p align="center"><img src="docs/img/windows.svg" height="50" width="50" /></p>            | <p align="center"><img src="docs/img/macos.svg" height="50" width="50" /></p>              | <p align="center"><img src="docs/img/linux.svg" height="50" width="50" /></p>                                            |
+| <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.exe` file | <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.dmg` file | <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.appImage`/`.deb` file for your platform |
 
 ## Roadmap
 
