@@ -19,7 +19,7 @@ export const Row = styled(RawRow.default)`
   display: grid;
   grid-template-columns: max-content 1fr max-content;
   align-items: center;
-  padding: 0px 10px;
+  padding: 0px 15px 0px 10px;
 `;
 
 export const BellOutlined = styled(RawBellOutlined)`
@@ -110,9 +110,9 @@ export const ResourceSpan = styled.span`
 
 export const SettingsCol = styled(Col)`
   display: grid;
-  grid-template-columns: repeat(5, max-content);
+  grid-template-columns: repeat(3, max-content);
   align-items: center;
-  grid-column-gap: 10px;
+  grid-column-gap: 12px;
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`

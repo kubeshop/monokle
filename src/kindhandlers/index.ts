@@ -2,9 +2,11 @@ import EventEmitter from 'events';
 import fs from 'fs';
 import {readdir} from 'fs/promises';
 import log from 'loglevel';
+import micromatch from 'micromatch';
 import path from 'path';
 import {parseAllDocuments} from 'yaml';
 
+import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {getStaticResourcePath} from '@redux/services';
@@ -214,4 +216,12 @@ async function* findFiles(dir: string, ext: string): any {
       yield res;
     }
   }
+}
+
+/**
+ * Matches the specified resource against the kind and apiVersionMatcher of the specified ResourceKindHandler
+ */
+
+export function resourceMatchesKindHandler(resource: K8sResource, kindHandler: ResourceKindHandler) {
+  return resource.kind === kindHandler.kind && micromatch.isMatch(resource.version, kindHandler.apiVersionMatcher);
 }

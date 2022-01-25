@@ -271,6 +271,21 @@ export const configSlice = createSlice({
       state.userTempDir = tempDir;
       state.userDataDir = dataDir;
     },
+    changeCurrentProjectName: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      if (!state.selectedProjectRootFolder) {
+        return;
+      }
+      const project: Project | undefined = state.projects.find(
+        (p: Project) => p.rootFolder === state.selectedProjectRootFolder
+      );
+
+      if (project) {
+        project.name = action.payload;
+        state.selectedProjectRootFolder = project.rootFolder;
+        state.projects = _.uniq([project, ...state.projects]);
+        electronStore.set('appConfig.projects', state.projects);
+      }
+    },
   },
 });
 
@@ -298,5 +313,6 @@ export const {
   updateClusterSelectorVisibilty,
   setUserDirs,
   createProject,
+  changeCurrentProjectName,
 } = configSlice.actions;
 export default configSlice.reducer;

@@ -183,7 +183,7 @@ const createNamespacedCustomObjectKindHandler = (
 ): ResourceKindHandler => {
   return {
     kind,
-    apiVersionMatcher: '**',
+    apiVersionMatcher: `${kindGroup}/*`,
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     isCustom: true,
@@ -264,7 +264,7 @@ const createClusterCustomObjectKindHandler = (
 ): ResourceKindHandler => {
   return {
     kind,
-    apiVersionMatcher: '**',
+    apiVersionMatcher: `${kindGroup}/*`,
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     helpLink,
