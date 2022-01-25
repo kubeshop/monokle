@@ -147,7 +147,7 @@ const ProjectSelection = () => {
             onClick: () => handleProjectChange(project),
           })}
           rowClassName={(project: Project) => {
-            if (activeProject?.name === project?.name) {
+            if (activeProject?.rootFolder === project?.rootFolder) {
               return 'project-table-active-project';
             }
 
