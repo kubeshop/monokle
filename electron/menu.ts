@@ -5,6 +5,7 @@ import hotkeys from '@constants/hotkeys';
 import {ReloadFolderTooltip} from '@constants/tooltips';
 
 import {NewVersionCode, Project} from '@models/appconfig';
+import {RootState} from '@models/rootstate';
 
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
@@ -15,9 +16,9 @@ import {
   resetLayout,
   setMonacoEditor,
   toggleLeftMenu,
+  toggleStartProjectPane,
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {RootState} from '@models/rootstate';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {openDocumentation, openGitHub} from '@utils/shell';
@@ -110,6 +111,15 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'New Project',
         submenu: [
+          {
+            label: 'Getting Started Page',
+            click: () => {
+              if (!state.ui.isStartProjectPaneVisible) {
+                dispatch(toggleStartProjectPane());
+              }
+            },
+          },
+          {type: 'separator'},
           {
             label: 'Select Folder',
             click: () => {

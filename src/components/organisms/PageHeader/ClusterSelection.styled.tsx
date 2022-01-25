@@ -1,4 +1,4 @@
-import {Button as RawButton} from 'antd';
+import {Button as RawButton, Divider as RawDivider} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined} from '@ant-design/icons';
 
@@ -7,9 +7,7 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const Button = styled(RawButton)`
-  border-left: 1px solid ${Colors.grey3};
   padding: 0;
-  padding-left: 8px;
   margin: 0;
   color: ${Colors.blue6};
 
@@ -20,10 +18,7 @@ export const Button = styled(RawButton)`
 `;
 
 export const ClusterActionButton = styled(RawButton)`
-  border: none;
-  outline: none;
   padding: 0px;
-  margin-left: 5px;
   color: ${Colors.blue6};
   font-size: 12px;
 `;
@@ -39,14 +34,17 @@ export const ClusterActionText = styled.span<{$highlighted?: boolean}>`
 export const ClusterButton = styled(RawButton)`
   border: none;
   outline: none;
-  padding: 0px 8px;
+  padding: 0px;
 `;
 
 export const ClusterContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 4;
+
+  & .ant-btn[disabled] {
+    background: transparent !important;
+  }
 `;
 
 export const ClusterOutlined = styled(RawClusterOutlined)`
@@ -59,17 +57,21 @@ export const ClusterOutlined = styled(RawClusterOutlined)`
 `;
 
 export const ClusterStatus = styled.div`
+  display: flex;
+  align-items: center;
   border: 1px solid ${Colors.grey3};
   border-radius: 4px;
   padding: 0px 8px;
-  display: flex;
 `;
 
 export const ClusterStatusText = styled.span<{connected: Boolean}>`
   font-size: 10px;
   font-weight: 600;
-  border-right: 1px solid ${Colors.grey3};
-  padding-right: 8px;
   text-transform: uppercase;
   ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.grey7}`};
+`;
+
+export const Divider = styled(RawDivider)`
+  border-color: ${Colors.grey3};
+  height: 1em;
 `;
