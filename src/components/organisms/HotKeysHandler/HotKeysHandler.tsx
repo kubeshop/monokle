@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
@@ -15,6 +15,7 @@ import {
   toggleLeftMenu,
   toggleRightMenu,
   toggleSettings,
+  toggleStartProjectPane,
 } from '@redux/reducers/ui';
 import {
   isInPreviewModeSelector,
@@ -257,6 +258,16 @@ const HotKeysHandler = () => {
       }
     },
     [uiState.quickSearchActionsPopup.isOpen]
+  );
+
+  useHotkeys(
+    hotkeys.OPEN_GETTING_STARTED_PAGE,
+    () => {
+      if (!uiState.isStartProjectPaneVisible) {
+        dispatch(toggleStartProjectPane());
+      }
+    },
+    [uiState.isStartProjectPaneVisible]
   );
 
   return (

@@ -22,5 +22,5 @@ export const DEFAULT_PLUGINS = [
     owner: 'kubeshop',
     name: 'monokle-default-templates-plugin',
     url: 'https://github.com/kubeshop/monokle-default-templates-plugin',
-  }
+  },
 ];

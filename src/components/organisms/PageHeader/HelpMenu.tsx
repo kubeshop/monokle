@@ -12,59 +12,59 @@ import {FontColors} from '@styles/Colors';
 
 const IconContainerSpan = styled.span`
   color: ${FontColors.elementSelectTitle};
-  padding-top: 10px;
-  padding-right: 10px;
-  font-size: 1.5em;
+  font-size: 24px;
   cursor: pointer;
 `;
 
-const LabelContainer = styled(Col)`
-  padding: 0 25px 0 0;
-  display: flex;
-  display: flex;
-  align-content: center;
+const MenuItem = styled(Menu.Item)`
+  padding-right: 20px;
 `;
 
 const HelpMenu = () => {
   const menu = (
     <Menu inlineIndent={25}>
-      <Menu.Item onClick={openDocumentation} key="documentation">
-        <Row justify="center">
-          <Col span={8}>
+      <MenuItem onClick={openDocumentation} key="documentation" style={{paddingRight: '20px'}}>
+        <Row align="middle">
+          <Col span={7}>
             <IconContainerSpan>
-              <FileSearchOutlined size={24} />
+              <FileSearchOutlined />
             </IconContainerSpan>
           </Col>
-          <LabelContainer span={16}>Documentation</LabelContainer>
+
+          <Col span={17}>Documentation</Col>
         </Row>
-      </Menu.Item>
-      <Menu.Item onClick={openGitHub} key="github">
-        <Row justify="center">
-          <Col span={8}>
+      </MenuItem>
+
+      <MenuItem onClick={openGitHub} key="github">
+        <Row align="middle">
+          <Col span={7}>
             <IconContainerSpan>
-              <GithubOutlined size={24} />
+              <GithubOutlined />
             </IconContainerSpan>
           </Col>
-          <LabelContainer span={16}>GitHub</LabelContainer>
+
+          <Col span={17}>GitHub</Col>
         </Row>
-      </Menu.Item>
-      <Menu.Item onClick={openDiscord} key="discord">
-        <Row justify="center">
-          <Col span={8}>
+      </MenuItem>
+
+      <MenuItem onClick={openDiscord} key="discord">
+        <Row align="middle">
+          <Col span={7}>
             <IconContainerSpan>
-              <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer', marginBottom: '4px'}} />
+              <img src={DiscordLogo} style={{height: '24px', width: '24px'}} />
             </IconContainerSpan>
           </Col>
-          <LabelContainer span={16}>Discord</LabelContainer>
+
+          <Col span={17}>Discord</Col>
         </Row>
-      </Menu.Item>
+      </MenuItem>
     </Menu>
   );
 
   return (
     <Dropdown key="more" overlay={menu}>
       <IconContainerSpan>
-        <QuestionCircleOutlined size={24} />
+        <QuestionCircleOutlined />
       </IconContainerSpan>
     </Dropdown>
   );

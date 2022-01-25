@@ -1,5 +1,4 @@
-import React, {useContext, useEffect, useMemo, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useContext, useEffect, useMemo, useState} from 'react';
 
 import {Badge, Button, Skeleton, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
@@ -21,7 +20,13 @@ import {FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
+import {
+  setLeftMenuSelection,
+  setRightMenuSelection,
+  toggleLeftMenu,
+  toggleRightMenu,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kustomizationsSelector} from '@redux/selectors';
 
 import {
@@ -92,18 +97,19 @@ const iconMenuWidth = 45;
 
 const PaneManager = () => {
   const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
+  const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
+  const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
+
   const {windowSize} = useContext(AppContext);
 
   const contentWidth = windowSize.width - (featureJson.ShowRightMenu ? 2 : 1) * iconMenuWidth;
-
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
-  const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
-  const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
-  const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
-  const activeProject = useSelector(activeProjectSelector);
-  const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const kustomizations = useAppSelector(kustomizationsSelector);
   const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
 
@@ -137,9 +143,17 @@ const PaneManager = () => {
 
   const setLeftActiveMenu = (selectedMenu: LeftMenuSelectionType) => {
     if (leftMenuSelection === selectedMenu) {
-      dispatch(toggleLeftMenu());
+      if (isStartProjectPaneVisible) {
+        dispatch(toggleStartProjectPane());
+      } else {
+        dispatch(toggleLeftMenu());
+      }
     } else {
+      if (isStartProjectPaneVisible) {
+        dispatch(toggleStartProjectPane());
+      }
       dispatch(setLeftMenuSelection(selectedMenu));
+
       if (!leftActive) {
         dispatch(toggleLeftMenu());
       }
@@ -162,7 +176,7 @@ const PaneManager = () => {
   let content;
   if (isProjectLoading) {
     content = <StyledSkeleton />;
-  } else if (activeProject) {
+  } else if (!isStartProjectPaneVisible) {
     content = (
       <StyledColumnPanes style={{width: contentWidth}}>
         <SplitView
