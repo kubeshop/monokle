@@ -14,7 +14,7 @@ export {default as NotificationsDrawer} from './NotificationsDrawer';
 export {default as PageFooter} from './PageFooter';
 export {default as PageHeader} from './PageHeader';
 export {default as PaneManager} from './PaneManager';
-export {default as PluginManagerPane} from './PluginManagerPane';
+export {default as PluginManagerDrawer} from './PluginManagerDrawer';
 export {default as QuickSearchActions} from './QuickSearchActions';
 export {default as RenameEntityModal} from './RenameEntityModal';
 export {default as TemplateManagerPane} from './TemplateManagerPane';

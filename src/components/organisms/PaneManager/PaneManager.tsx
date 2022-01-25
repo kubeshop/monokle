@@ -5,7 +5,6 @@ import 'antd/dist/antd.less';
 
 import {
   ApartmentOutlined,
-  ApiOutlined,
   CodeOutlined,
   FolderOpenOutlined,
   FolderOutlined,
@@ -28,15 +27,7 @@ import {
 } from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kustomizationsSelector} from '@redux/selectors';
 
-import {
-  ActionsPane,
-  FileTreePane,
-  HelmPane,
-  KustomizePane,
-  NavigatorPane,
-  PluginManagerPane,
-  TemplateManagerPane,
-} from '@organisms';
+import {ActionsPane, FileTreePane, HelmPane, KustomizePane, NavigatorPane, TemplateManagerPane} from '@organisms';
 
 import {GraphView} from '@molecules';
 
@@ -198,13 +189,6 @@ const PaneManager = () => {
               >
                 <TemplateManagerPane />
               </div>
-              <div
-                style={{
-                  display: leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
-                }}
-              >
-                <PluginManagerPane />
-              </div>
             </>
           }
           hideLeft={!leftActive}
@@ -225,11 +209,6 @@ const PaneManager = () => {
     content = (
       <StyledColumnPanes style={{width: contentWidth}}>
         <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
-          {leftMenuSelection === 'plugin-manager' && leftActive && (
-            <div style={{borderRight: `1px solid ${Colors.grey3}`}}>
-              <PluginManagerPane />
-            </div>
-          )}
           <div style={{flex: 3}}>
             <StartProjectPane />
           </div>
@@ -334,20 +313,6 @@ const PaneManager = () => {
                 active={Boolean(activeProject) && leftActive}
                 isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
               />
-            </MenuButton>
-          </Tooltip>
-
-          <Tooltip
-            mouseEnterDelay={TOOLTIP_DELAY}
-            title={leftMenuSelection === 'plugin-manager' && leftActive ? 'Hide Plugins' : 'View Plugins'}
-            placement="right"
-          >
-            <MenuButton
-              isSelected={leftMenuSelection === 'plugin-manager'}
-              isActive={leftActive}
-              onClick={() => setLeftActiveMenu('plugin-manager')}
-            >
-              <MenuIcon icon={ApiOutlined} active={leftActive} isSelected={leftMenuSelection === 'plugin-manager'} />
             </MenuButton>
           </Tooltip>
         </Space>
