@@ -38,6 +38,7 @@ enum Colors {
   volcano = '#F3956A',
   lightSeaGreen = '#13a8a8',
   blue6 = '#1890FF', // Daybreak Blue
+  blue7 = '#177DDC', // Daybreak Blue
   blue10 = '#B7E3FA',
 
   red7 = '#E84748', // Dust Red

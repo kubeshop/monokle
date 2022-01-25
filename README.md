@@ -1,12 +1,35 @@
-# Monokle
+<p align="center">
+  <img src="src/assets/MonokleLogoLight.svg#gh-light-mode-only" alt="Monokle Logo Light"/>
+  <img src="src/assets/MonokleLogoDark.svg#gh-dark-mode-only" alt="Monokle Logo Dark" />
+</p>
 
-[![Release](https://img.shields.io/github/v/release/kubeshop/monokle)](<[https://](https://github.com/kubeshop/monokle/releases/latest)>)
-[![License](https://img.shields.io/github/license/kubeshop/monokle)](https://github.com/kubeshop/monokle/blob/main/LICENSE)
-[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/kMJxmuYTMu)
-[![Nightly Build](https://img.shields.io/github/workflow/status/kubeshop/monokle/monokle-build-nightly?label=nightly-build)](https://github.com/kubeshop/monokle/tags)
-[![Known Vulnerabilities](https://snyk.io/test/github/kubeshop/monokle/badge.svg)](https://snyk.io/test/github/kubeshop/monokle)
+<p align="center">
+<a href="https://monokle.io">Website</a> |
+<a href="https://kubeshop.github.io/monokle/">Documentation</a> |
+<a href="https://discord.gg/uNuhy6GDyn">Discord</a>
+</p>
 
-Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
+<p align="center">
+Welcome to Monokle 🧐 - your friendly desktop UI for managing k8s manifests!
+</p>
+
+<p align="center">
+  <a href="https://github.com/kubeshop/monokle/releases/latest">
+    <img src="https://img.shields.io/github/v/release/kubeshop/monokle" alt="Latest Release" />
+  </a>
+  <a href="https://github.com/kubeshop/monokle/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/kubeshop/monokle" alt="License" />
+  </a>
+  <a href="https://discord.gg/kMJxmuYTMu">
+    <img src="https://badgen.net/badge/icon/discord?icon=discord&label" alt="Discord" />
+  </a>
+  <a href="https://github.com/kubeshop/monokle/tags">
+    <img src="https://img.shields.io/github/workflow/status/kubeshop/monokle/monokle-build-nightly?label=nightly-build" alt="Nightly Build" />
+  </a>
+  <a href="https://snyk.io/test/github/kubeshop/monokle">
+    <img src="https://snyk.io/test/github/kubeshop/monokle/badge.svg" alt="Snyk" />
+  </a>
+</p>
 
 > Read the [1.4.0 Release blog-post](https://medium.com/kubeshop-i/monokle-1-4-0-4122e88742c5)
 
@@ -23,19 +46,10 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
 
 ## Download & Install
 
-Download and install the latest version below
-
-### macOS
-
-[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.dmg` file
-
-### Windows
-
-[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.exe` file
-
-### Linux (since Monokle 1.3.0)
-
-[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.appImage`/`.deb` file for your platform
+| <p align="center">Windows                                                                  | <p align="center">macOS                                                                    | <p align="center">Linux                                                                                                  |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| <p align="center"><img src="docs/img/windows.svg" height="50" width="50" /></p>            | <p align="center"><img src="docs/img/macos.svg" height="50" width="50" /></p>              | <p align="center"><img src="docs/img/linux.svg" height="50" width="50" /></p>                                            |
+| <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.exe` file | <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.dmg` file | <a href="https://github.com/kubeshop/monokle/releases/latest">Download</a> the `.appImage`/`.deb` file for your platform |
 
 ## Roadmap
 
@@ -58,4 +72,3 @@ Don't hesitate provide any feedback you might have to help us prioritize and imp
 - Check out the [Development](docs/development.md) document for how to build and run Monokle from its source
 - Check out the [Architecture](docs/architecture.md) document to get a high-level understanding of how Monokle works
 - Check out the Roadmap above and open [issues](https://github.com/kubeshop/monokle/issues) here on GitHub
-

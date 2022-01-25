@@ -114,12 +114,14 @@ const NavPane: React.FC = () => {
       ) : (
         <S.TitleBar>
           <MonoPaneTitle>
-            Navigator <WarningsAndErrorsDisplay />
+            <div style={{display: 'flex', alignItems: 'center'}}>
+              Navigator <WarningsAndErrorsDisplay />
+            </div>
           </MonoPaneTitle>
           <S.TitleBarRightButtons>
             <S.PlusButton
               className={highlightedItems.createResource ? 'animated-highlight' : ''}
-              highlighted={highlightedItems.createResource}
+              $highlighted={highlightedItems.createResource}
               disabled={!isFolderOpen || isInClusterMode || isInPreviewMode}
               onClick={onClickNewResource}
               type="link"
