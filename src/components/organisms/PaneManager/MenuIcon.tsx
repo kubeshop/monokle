@@ -28,7 +28,11 @@ const MenuIcon = (props: {
   };
 
   if (active && isSelected) {
-    style.color = Colors.grey400;
+    style.color = Colors.grey7;
+  }
+
+  if (!active) {
+    style.color = Colors.grey5;
   }
 
   if (IconComponent) {
