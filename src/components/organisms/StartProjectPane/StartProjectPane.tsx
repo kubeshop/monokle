@@ -36,7 +36,7 @@ const StartProjectPane = () => {
         </MonoPaneTitleCol>
       </Row>
       <Row>
-        <S.Container>
+        <S.StartBackground>
           <div>
             <S.ActionTitle>How would you like to begin?</S.ActionTitle>
             <div style={{display: 'flex'}}>
@@ -60,7 +60,7 @@ const StartProjectPane = () => {
               </S.ActionContainer>
             </div>
           </div>
-        </S.Container>
+        </S.StartBackground>
       </Row>
     </>
   );

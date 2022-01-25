@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import StartBackgrojnd from '@assets/StartBackground.svg';
+
 import Colors from '@styles/Colors';
 
 export const TitleBarContainer = styled.div`
@@ -65,4 +67,9 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   padding-bottom: 150px;
+`;
+
+export const StartBackground = styled(Container)`
+  background: url('${StartBackgrojnd}') no-repeat;
+  background-position: 55% 35%;
 `;
