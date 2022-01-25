@@ -11,6 +11,7 @@ import {Project, ProjectConfig} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
+  changeCurrentProjectName,
   setKubeConfig,
   setScanExcludesStatus,
   updateClusterSelectorVisibilty,
@@ -104,6 +105,12 @@ const SettingsDrawer = () => {
     dispatch(updateClusterSelectorVisibilty(e.target.checked));
   };
 
+  const onProjectNameChange = (projectName: string) => {
+    if (projectName) {
+      dispatch(changeCurrentProjectName(projectName));
+    }
+  };
+
   return (
     <Drawer
       width="400"
@@ -139,6 +146,9 @@ const SettingsDrawer = () => {
             <Settings
               config={projectConfig}
               onConfigChange={changeProjectConfig}
+              showProjectName
+              projectName={activeProject.name}
+              onProjectNameChange={onProjectNameChange}
               isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
             />
           </Panel>
