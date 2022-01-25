@@ -15,6 +15,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 
+import Colors from '@styles/Colors';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 const SuffixContainer = styled.span`
@@ -38,6 +40,7 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
 
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isSectionCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(sectionInstance.id));
 
   const resourceKind = useMemo(() => {
     return sectionInstance.meta?.resourceKind;
@@ -58,10 +61,18 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
   if (!resourceKind || !getResourceKindHandler(resourceKind) || !isFolderOpen) {
     return null;
   }
+
   return (
     <SuffixContainer>
       <ButtonContainer>
-        <Button icon={<PlusOutlined />} type="link" onClick={createResource} size="small" disabled={isInPreviewMode} />
+        <Button
+          icon={<PlusOutlined />}
+          type="link"
+          onClick={createResource}
+          size="small"
+          disabled={isInPreviewMode}
+          style={{color: sectionInstance.isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
+        />
       </ButtonContainer>
     </SuffixContainer>
   );
