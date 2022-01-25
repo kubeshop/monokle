@@ -1,9 +1,3 @@
-import {
-  FolderAddOutlined as RawFolderAddOutlined,
-  FolderOpenOutlined as RawFolderOpenOutlined,
-  FormatPainterOutlined as RawFormatPainterOutlined,
-} from '@ant-design/icons';
-
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
@@ -21,20 +15,19 @@ export const Title = styled.span`
   padding-right: 10px;
 `;
 
-export const FolderOpenOutlined = styled(RawFolderOpenOutlined)`
-  font-size: 56px;
+export const FolderOpenOutlined = styled.img`
+  width: 64px;
   color: ${Colors.blue10};
   margin-bottom: 24px;
 `;
 
-export const FolderAddOutlined = styled(RawFolderAddOutlined)`
-  font-size: 56px;
-  color: ${Colors.blue10};
+export const FolderAddOutlined = styled.img`
+  width: 64px;
   margin-bottom: 24px;
 `;
 
-export const FormatPainterOutlined = styled(RawFormatPainterOutlined)`
-  font-size: 56px;
+export const FormatPainterOutlined = styled.img`
+  width: 64px;
   color: ${Colors.blue10};
   margin-bottom: 24px;
 `;
@@ -45,6 +38,12 @@ export const ActionContainer = styled.div`
   justify-content: center;
   margin: 0 40px;
   cursor: pointer;
+`;
+
+export const IconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  flex: 1;
 `;
 
 export const ActionText = styled.div`
