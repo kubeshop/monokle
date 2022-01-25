@@ -30,7 +30,6 @@ export const SearchInputContainer = styled.div`
 
 export const TemplatesContainer = styled.div<{$height: number}>`
   ${props => `height: ${props.$height}px;`}
-
   display: grid;
   grid-auto-rows: max-content;
   grid-row-gap: 25px;
