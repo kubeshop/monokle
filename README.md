@@ -1,12 +1,19 @@
-# Monokle
+![Monokle-Logo-Light](src/assets/MonokleLogoLight.svg#gh-light-mode-only)
+![Monokle-Logo-Dark ](src/assets/MonokleLogoDark.svg#gh-dark-mode-only)
+
+<p align="center">
+<a href="https://monokle.io">Website</a> |
+<a href="https://kubeshop.github.io/monokle/">Documentation</a> |
+<a href="https://discord.gg/uNuhy6GDyn">Discord</a>
+</p>
+
+Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
 [![Release](https://img.shields.io/github/v/release/kubeshop/monokle)](<[https://](https://github.com/kubeshop/monokle/releases/latest)>)
 [![License](https://img.shields.io/github/license/kubeshop/monokle)](https://github.com/kubeshop/monokle/blob/main/LICENSE)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/kMJxmuYTMu)
 [![Nightly Build](https://img.shields.io/github/workflow/status/kubeshop/monokle/monokle-build-nightly?label=nightly-build)](https://github.com/kubeshop/monokle/tags)
 [![Known Vulnerabilities](https://snyk.io/test/github/kubeshop/monokle/badge.svg)](https://snyk.io/test/github/kubeshop/monokle)
-
-Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
 
 > Read the [1.4.0 Release blog-post](https://medium.com/kubeshop-i/monokle-1-4-0-4122e88742c5)
 
@@ -58,4 +65,3 @@ Don't hesitate provide any feedback you might have to help us prioritize and imp
 - Check out the [Development](docs/development.md) document for how to build and run Monokle from its source
 - Check out the [Architecture](docs/architecture.md) document to get a high-level understanding of how Monokle works
 - Check out the Roadmap above and open [issues](https://github.com/kubeshop/monokle/issues) here on GitHub
-
