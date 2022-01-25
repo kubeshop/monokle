@@ -1,10 +1,11 @@
-import {KUSTOMIZATION_KIND, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
+import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -52,7 +53,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
   builder: {
     getRawItems: scope => {
       return Object.values(scope.resourceMap)
-        .filter(i => i.kind === KUSTOMIZATION_KIND)
+        .filter(i => isKustomizationResource(i))
         .sort((a, b) => a.name.localeCompare(b.name));
     },
     isLoading: scope => {

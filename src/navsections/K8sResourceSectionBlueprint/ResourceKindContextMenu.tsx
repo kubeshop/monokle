@@ -6,8 +6,6 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-
 import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
@@ -74,10 +72,6 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
-  const resourceKinds = useMemo(() => {
-    return [KUSTOMIZATION_KIND, ...knownResourceKinds];
-  }, [knownResourceKinds]);
-
   const isResourceSelected = useMemo(() => {
     return itemInstance.id === selectedResourceId;
   }, [itemInstance, selectedResourceId]);
@@ -127,7 +121,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
         Rename
       </Menu.Item>
 
-      {resourceKinds.includes(resource.kind) && (
+      {knownResourceKinds.includes(resource.kind) && (
         <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
           Clone
         </Menu.Item>
