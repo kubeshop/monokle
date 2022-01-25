@@ -148,6 +148,10 @@ code {
   border-left: 4px transparent solid !important;
 }
 
+.ant-table table {
+  border-collapse: collapse;
+}
+
 .ant-table-header .ant-table-thead .ant-table-cell:before {
   width: 0 !important;
   height: 0 !important;
@@ -188,7 +192,7 @@ code {
 }
 
 .project-table-active-project > :first-child {
-  border-left: 4px #13a8a8 solid;
+  border-left: 8px #13a8a8 solid;
 }
 
 .cluster-dropdown-item li:hover {
