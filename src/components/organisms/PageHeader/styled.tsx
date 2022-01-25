@@ -1,4 +1,5 @@
 import {
+  ApiOutlined,
   BellOutlined as RawBellOutlined,
   CloseCircleOutlined as RawCloseCircleOutlined,
   CopyOutlined as RawCopyOutlined,
@@ -23,6 +24,12 @@ export const Row = styled(RawRow.default)`
 `;
 
 export const BellOutlined = styled(RawBellOutlined)`
+  color: ${FontColors.elementSelectTitle};
+  font-size: 24px;
+  cursor: pointer;
+`;
+
+export const PluginsOutlined = styled(ApiOutlined)`
   color: ${FontColors.elementSelectTitle};
   font-size: 24px;
   cursor: pointer;
@@ -110,9 +117,9 @@ export const ResourceSpan = styled.span`
 
 export const SettingsCol = styled(Col)`
   display: grid;
-  grid-template-columns: repeat(3, max-content);
+  grid-template-columns: repeat(4, max-content);
   align-items: center;
-  grid-column-gap: 12px;
+  grid-column-gap: 25px;
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`

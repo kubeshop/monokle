@@ -9,7 +9,13 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
+import {
+  setLeftMenuSelection,
+  toggleLeftMenu,
+  toggleNotifications,
+  toggleSettings,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
@@ -33,6 +39,8 @@ const ExitButton = (props: {onClick: () => void}) => {
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
+  const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const activeResources = useAppSelector(activeResourcesSelector);
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
@@ -65,6 +73,21 @@ const PageHeader = () => {
       setHelmChart(undefined);
     }
   }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap]);
+
+  const openPlugins = () => {
+    if (leftMenuSelection === 'plugin-manager') {
+      dispatch(toggleLeftMenu());
+    } else {
+      if (isStartProjectPaneVisible) {
+        dispatch(toggleStartProjectPane());
+      }
+      dispatch(setLeftMenuSelection('plugin-manager'));
+
+      if (!leftActive) {
+        dispatch(toggleLeftMenu());
+      }
+    }
+  };
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());
@@ -139,12 +162,20 @@ const PageHeader = () => {
                 </Badge>
               </S.IconContainerSpan>
             </Tooltip>
+            <Tooltip
+              mouseEnterDelay={TOOLTIP_DELAY}
+              title={leftMenuSelection === 'plugin-manager' && leftActive ? 'Hide Plugins' : 'View Plugins'}
+              placement="right"
+            >
+              <S.IconContainerSpan>
+                <S.PluginsOutlined onClick={openPlugins} />
+              </S.IconContainerSpan>
+            </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
               <S.IconContainerSpan>
                 <S.SettingsOutlined onClick={toggleSettingsDrawer} />
               </S.IconContainerSpan>
             </Tooltip>
-
             <HelpMenu />
           </S.SettingsCol>
         </S.Row>

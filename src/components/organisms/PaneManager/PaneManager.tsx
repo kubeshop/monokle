@@ -5,7 +5,6 @@ import 'antd/dist/antd.less';
 
 import {
   ApartmentOutlined,
-  ApiOutlined,
   CodeOutlined,
   FolderOpenOutlined,
   FolderOutlined,
@@ -334,20 +333,6 @@ const PaneManager = () => {
                 active={Boolean(activeProject) && leftActive}
                 isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
               />
-            </MenuButton>
-          </Tooltip>
-
-          <Tooltip
-            mouseEnterDelay={TOOLTIP_DELAY}
-            title={leftMenuSelection === 'plugin-manager' && leftActive ? 'Hide Plugins' : 'View Plugins'}
-            placement="right"
-          >
-            <MenuButton
-              isSelected={leftMenuSelection === 'plugin-manager'}
-              isActive={leftActive}
-              onClick={() => setLeftActiveMenu('plugin-manager')}
-            >
-              <MenuIcon icon={ApiOutlined} active={leftActive} isSelected={leftMenuSelection === 'plugin-manager'} />
             </MenuButton>
           </Tooltip>
         </Space>
