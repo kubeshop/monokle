@@ -14,5 +14,5 @@ export const ButtonsContainer = styled.div`
   padding: 16px;
   margin-top: 8px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
 `;

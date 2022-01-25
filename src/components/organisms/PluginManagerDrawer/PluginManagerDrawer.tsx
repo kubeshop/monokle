@@ -57,21 +57,27 @@ function PluginManagerDrawer() {
     >
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
       <S.ButtonsContainer>
-        <Button onClick={onClickInstallPlugin} type="primary" ghost size="small" icon={<PlusOutlined />}>
-          Install plugin
-        </Button>
         <Tooltip title={PluginManagerDrawerReloadTooltip} placement="bottom">
           <Button
             disabled={sortedPluginEntries.length === 0}
             onClick={onClickReload}
-            type="primary"
-            ghost
+            type="link"
             size="small"
             icon={<ReloadOutlined />}
           >
-            Update plugins
+            Update
           </Button>
         </Tooltip>
+        <Button
+          onClick={onClickInstallPlugin}
+          type="primary"
+          ghost
+          size="small"
+          icon={<PlusOutlined />}
+          style={{marginLeft: 8}}
+        >
+          Install
+        </Button>
       </S.ButtonsContainer>
       <S.Container>
         {sortedPluginEntries.length === 0 ? (
