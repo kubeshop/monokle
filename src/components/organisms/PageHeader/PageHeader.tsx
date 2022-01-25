@@ -12,7 +12,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeResourcesSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
@@ -37,7 +37,7 @@ const PageHeader = () => {
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const activeResources = useSelector(activeResourcesSelector);
-  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const currentContext = useAppSelector(kubeConfigContextSelector);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewType = useAppSelector(state => state.main.previewType);
