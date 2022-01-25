@@ -49,8 +49,8 @@ export const IconWrapper = styled.div`
 `;
 
 export const ActionText = styled.div`
-  color: ${Colors.blue6};
-  font-size: 12px;
+  color: ${Colors.blue7};
+  font-size: 0.875em;
   text-align: center;
 `;
 
