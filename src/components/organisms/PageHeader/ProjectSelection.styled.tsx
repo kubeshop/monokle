@@ -24,13 +24,18 @@ export const BackToProjectButton = styled(RawButton)`
 export const Button = styled(RawButton)`
   display: flex;
   align-items: center;
+  margin-right: 0px !important;
+  padding: 0px;
   color: ${Colors.whitePure};
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: 10px;
   line-height: 20px;
-  margin-right: 0px !important;
-  padding: 0px;
+
+  :hover,
+  :focus {
+    color: ${Colors.lightSeaGreen};
+  }
 `;
 
 export const DeleteOutlined = styled(RawDeleteOutlined)`
@@ -119,7 +124,7 @@ export const Search = styled(RawInput.Search)`
   width: 280px;
 `;
 
-export const Table = styled(RawTable)`
+export const Table = styled(props => <RawTable {...props} />)`
   width: 800px;
   border-top: 1px solid ${Colors.grey3};
   padding-top: 18px;

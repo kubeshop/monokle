@@ -19,6 +19,10 @@ export const Button = styled(RawButton)`
 
 export const ClusterActionButton = styled(RawButton)`
   padding: 0px;
+
+  margin-left: 5px;
+  margin-right: 8px;
+
   color: ${Colors.blue6};
   font-size: 12px;
 `;
@@ -35,6 +39,11 @@ export const ClusterButton = styled(RawButton)`
   border: none;
   outline: none;
   padding: 0px;
+
+  :hover,
+  :focus {
+    color: ${Colors.lightSeaGreen};
+  }
 `;
 
 export const ClusterContainer = styled.div`
