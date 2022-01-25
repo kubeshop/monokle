@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 
 import {Dropdown, Menu, Tooltip} from 'antd';
 
-import {DownOutlined, LoadingOutlined} from '@ant-design/icons';
+import {LoadingOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterModeTooltip} from '@constants/tooltips';
@@ -152,9 +152,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               trigger={['click']}
               disabled={previewLoader.isLoading || isInPreviewMode}
             >
-              <S.ClusterButton>
-                <span>{kubeConfigContext}</span>
-                <DownOutlined />
+              <S.ClusterButton type="link">
+                <S.ClusterContextName>{kubeConfigContext}</S.ClusterContextName>
+                <S.DownOutlined />
               </S.ClusterButton>
             </Dropdown>
           )}

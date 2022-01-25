@@ -1,6 +1,6 @@
 import {Button as RawButton, Divider as RawDivider} from 'antd';
 
-import {ClusterOutlined as RawClusterOutlined} from '@ant-design/icons';
+import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -36,8 +36,9 @@ export const ClusterActionText = styled.span<{$highlighted?: boolean}>`
 `;
 
 export const ClusterButton = styled(RawButton)`
-  border: none;
-  outline: none;
+  display: flex;
+  align-items: center;
+  color: ${Colors.whitePure};
   padding: 0px;
 
   :hover,
@@ -54,6 +55,13 @@ export const ClusterContainer = styled.div`
   & .ant-btn[disabled] {
     background: transparent !important;
   }
+`;
+
+export const ClusterContextName = styled.span`
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `;
 
 export const ClusterOutlined = styled(RawClusterOutlined)`
@@ -83,4 +91,8 @@ export const ClusterStatusText = styled.span<{connected: Boolean}>`
 export const Divider = styled(RawDivider)`
   border-color: ${Colors.grey3};
   height: 1em;
+`;
+
+export const DownOutlined = styled(RawDownOutlined)`
+  padding-top: 2px;
 `;
