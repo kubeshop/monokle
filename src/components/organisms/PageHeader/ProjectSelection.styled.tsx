@@ -1,4 +1,4 @@
-import {Dropdown, Menu, Button as RawButton, Input as RawInput, Table as RawTable} from 'antd';
+import {Menu, Button as RawButton, Divider as RawDivider, Input as RawInput, Table as RawTable} from 'antd';
 
 import {
   DeleteOutlined as RawDeleteOutlined,
@@ -14,16 +14,23 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import Colors from '@styles/Colors';
 
+export const BackToProjectButton = styled(RawButton)`
+  margin-right: 0px !important;
+  padding: 0px;
+  font-size: 12px;
+  color: ${Colors.blue6};
+`;
+
 export const Button = styled(RawButton)`
-  border: none;
-  outline: none;
-  padding: 0px 8px;
+  display: flex;
+  align-items: center;
+  margin-right: 0px !important;
+  padding: 0px;
   color: ${Colors.whitePure};
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: 10px;
   line-height: 20px;
-  display: flex;
 
   :hover,
   :focus {
@@ -39,8 +46,13 @@ export const DeleteOutlined = styled(RawDeleteOutlined)`
   }
 `;
 
+export const Divider = styled(RawDivider)`
+  border-color: ${Colors.grey3};
+  height: 1em;
+`;
+
 export const DownOutlined = styled(RawDownOutlined)`
-  align-self: center;
+  padding-top: 2px;
 `;
 
 export const FolderAddOutlined = styled(RawFolderAddOutlined)`
@@ -50,8 +62,8 @@ export const FolderAddOutlined = styled(RawFolderAddOutlined)`
 `;
 
 export const FolderOpenOutlined = styled(RawFolderOpenOutlined)`
-  color: ${Colors.whitePure};
-  align-self: center;
+  font-size: 14px;
+  padding-top: 2px;
 `;
 
 export const FormatPainterOutlined = styled(RawFormatPainterOutlined)`
@@ -66,6 +78,15 @@ export const ProjectFolderOpenOutlined = styled(RawFolderOpenOutlined)`
   cursor: pointer;
 `;
 
+export const ProjectContainer = styled.div`
+  display: flex;
+  align-items: center;
+  border: 1px solid ${Colors.grey3};
+  border-radius: 4px;
+  margin-right: 10px;
+  padding: 0px 10px;
+`;
+
 export const ProjectMenu = styled(Menu)`
   background-color: ${Colors.grey1000};
 `;
@@ -76,12 +97,6 @@ export const ProjectName = styled.span`
   overflow: hidden;
   white-space: nowrap;
   align-self: center;
-`;
-
-export const ProjectsDropdown = styled(Dropdown)`
-  border: 1px solid ${Colors.grey3};
-  border-radius: 4px;
-  padding: 0px 8px;
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`

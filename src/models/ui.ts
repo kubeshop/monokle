@@ -80,6 +80,7 @@ export type UiState = {
     isOpen: boolean;
     resourcesIds: string[];
   };
+  isStartProjectPaneVisible: boolean;
   renameEntityModal: {
     isOpen: boolean;
     entityName: string;

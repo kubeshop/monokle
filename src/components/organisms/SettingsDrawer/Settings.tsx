@@ -1,7 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Checkbox, Input, InputNumber, Select, Tooltip} from 'antd';
+import {Checkbox, Form, Input, InputNumber, Select, Tooltip} from 'antd';
+import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
 
@@ -30,12 +31,23 @@ import * as S from './Styles';
 
 type SettingsProps = {
   config?: ProjectConfig | null;
+  showProjectName?: boolean;
+  projectName?: string;
+  onProjectNameChange?: Function;
   onConfigChange?: Function;
   isClusterPaneIconHighlighted?: boolean | null;
 };
 
-export const Settings = ({config, onConfigChange, isClusterPaneIconHighlighted}: SettingsProps) => {
+export const Settings = ({
+  config,
+  onConfigChange,
+  isClusterPaneIconHighlighted,
+  projectName,
+  onProjectNameChange,
+  showProjectName,
+}: SettingsProps) => {
   const dispatch = useAppDispatch();
+  const [settingsForm] = useForm();
   const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
@@ -50,6 +62,7 @@ export const Settings = ({config, onConfigChange, isClusterPaneIconHighlighted}:
     Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid)
   );
   const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
+  const [currentProjectName, setCurrentProjectName] = useState(projectName);
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
 
   const [localConfig, setLocalConfig] = useState<ProjectConfig | null | undefined>(config);
@@ -74,6 +87,11 @@ export const Settings = ({config, onConfigChange, isClusterPaneIconHighlighted}:
     handleConfigChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localConfig]);
+
+  useEffect(() => {
+    settingsForm.setFieldsValue({projectName});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectName]);
 
   useDebounce(
     () => {
@@ -141,11 +159,25 @@ export const Settings = ({config, onConfigChange, isClusterPaneIconHighlighted}:
     [currentKubeConfig]
   );
 
+  useDebounce(
+    () => {
+      if (currentProjectName !== projectName && onProjectNameChange) {
+        onProjectNameChange(currentProjectName);
+      }
+    },
+    DEFAULT_KUBECONFIG_DEBOUNCE,
+    [currentProjectName]
+  );
+
   const onUpdateKubeconfig = (e: any) => {
     if (isEditingDisabled) {
       return;
     }
     setCurrentKubeConfig(e.target.value);
+  };
+
+  const handleOnchangeProjectName = (e: any) => {
+    setCurrentProjectName(e.target.value);
   };
 
   const onSelectFile = (e: React.SyntheticEvent) => {
@@ -161,6 +193,34 @@ export const Settings = ({config, onConfigChange, isClusterPaneIconHighlighted}:
 
   return (
     <>
+      {showProjectName && (
+        <Form
+          form={settingsForm}
+          initialValues={() => ({projectName})}
+          autoComplete="off"
+          onFieldsChange={(field, allFields) => {
+            const name = allFields.filter(f => _.includes(f.name.toString(), 'projectName'))[0].value;
+            setCurrentProjectName(name);
+          }}
+        >
+          <>
+            <S.Heading>Project Name</S.Heading>
+            <Form.Item
+              name="projectName"
+              required
+              tooltip="The name of your project throughout Monokle."
+              rules={[
+                {
+                  required: true,
+                  message: 'Please provide your project name!',
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          </>
+        </Form>
+      )}
       <S.Div>
         <S.Heading>
           KUBECONFIG
@@ -175,10 +235,10 @@ export const Settings = ({config, onConfigChange, isClusterPaneIconHighlighted}:
         <Tooltip title={KubeconfigPathTooltip}>
           <Input
             ref={inputRef}
+            onClick={() => focusInput()}
             value={currentKubeConfig}
             onChange={onUpdateKubeconfig}
             disabled={isEditingDisabled}
-            onClick={() => focusInput()}
           />
         </Tooltip>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">

@@ -15,6 +15,7 @@ import {
 } from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {KustomizeCommandType} from '@models/kustomize';
+import {UiState} from '@models/ui';
 
 import {
   keysToUpdateStateBulk,
@@ -29,6 +30,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import electronStore from '@utils/electronStore';
 
 import initialState from '../initialState';
+import {toggleStartProjectPane} from './ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
   thunkAPI.dispatch(configSlice.actions.createProject(project));
@@ -47,10 +49,15 @@ export const setOpenProject = createAsyncThunk(
   'config/openProject',
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
     const appConfig: AppConfig = thunkAPI.getState().config;
+    const appUi: UiState = thunkAPI.getState().ui;
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     thunkAPI.dispatch(setRootFolder(projectRootPath));
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
+    if (appUi.isStartProjectPaneVisible) {
+      thunkAPI.dispatch(toggleStartProjectPane());
+    }
+
     if (projectConfig) {
       thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config: projectConfig, fromConfigFile: false}));
     } else {
@@ -264,6 +271,21 @@ export const configSlice = createSlice({
       state.userTempDir = tempDir;
       state.userDataDir = dataDir;
     },
+    changeCurrentProjectName: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      if (!state.selectedProjectRootFolder) {
+        return;
+      }
+      const project: Project | undefined = state.projects.find(
+        (p: Project) => p.rootFolder === state.selectedProjectRootFolder
+      );
+
+      if (project) {
+        project.name = action.payload;
+        state.selectedProjectRootFolder = project.rootFolder;
+        state.projects = _.uniq([project, ...state.projects]);
+        electronStore.set('appConfig.projects', state.projects);
+      }
+    },
   },
 });
 
@@ -291,5 +313,6 @@ export const {
   updateClusterSelectorVisibilty,
   setUserDirs,
   createProject,
+  changeCurrentProjectName,
 } = configSlice.actions;
 export default configSlice.reducer;

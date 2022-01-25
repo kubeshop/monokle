@@ -115,6 +115,7 @@ const initialUiState: UiState = {
     isOpen: false,
     resourceId: '',
   },
+  isStartProjectPaneVisible: true,
   saveResourcesToFileFolderModal: {
     isOpen: false,
     resourcesIds: [],

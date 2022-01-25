@@ -13,7 +13,7 @@ import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateProjectConfig} from '@redux/reducers/appConfig';
-import {highlightItem, toggleSettings} from '@redux/reducers/ui';
+import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   isInClusterModeSelector,
@@ -29,19 +29,19 @@ import * as S from './ClusterSelection.styled';
 
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
-
   const activeProject = useSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
+  const isInClusterMode = useSelector(isInClusterModeSelector);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
-  const isInClusterMode = useSelector(isInClusterModeSelector);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const projectConfig = useAppSelector(state => state.config.projectConfig);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const previewType = useAppSelector(state => state.main.previewType);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
@@ -88,6 +88,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       return;
     }
 
+    if (isStartProjectPaneVisible) {
+      dispatch(toggleStartProjectPane());
+    }
     if (isInClusterMode) {
       reconnectToCluster();
     } else {
@@ -134,9 +137,11 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             <>
               <S.ClusterStatusText connected={isKubeConfigPathValid}>
                 <S.ClusterOutlined />
-                {isKubeConfigPathValid && <span>Configured</span>}
-                {!isKubeConfigPathValid && <span>No Cluster Configured</span>}
+                <span>{isKubeConfigPathValid ? 'Configured' : 'No Cluster Configured'}</span>
               </S.ClusterStatusText>
+
+              <S.Divider type="vertical" />
+
               {isKubeConfigPathValid && (
                 <Dropdown
                   overlay={clusterMenu}
@@ -152,19 +157,27 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
                   </S.ClusterButton>
                 </Dropdown>
               )}
+
               {isKubeConfigPathValid ? (
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
-                  <S.Button
-                    disabled={Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled}
-                    type="link"
-                    onClick={handleLoadCluster}
-                  >
-                    {createClusterObjectsLabel()}
-                  </S.Button>
-                </Tooltip>
+                <>
+                  <S.Divider type="vertical" />
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
+                    <S.Button
+                      disabled={
+                        Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled
+                      }
+                      type="link"
+                      onClick={handleLoadCluster}
+                    >
+                      {createClusterObjectsLabel()}
+                    </S.Button>
+                  </Tooltip>
+                </>
               ) : (
                 <>
-                  <S.ClusterActionButton onClick={handleClusterConfigure}>Configure</S.ClusterActionButton>
+                  <S.ClusterActionButton type="link" onClick={handleClusterConfigure}>
+                    Configure
+                  </S.ClusterActionButton>
                 </>
               )}
             </>
