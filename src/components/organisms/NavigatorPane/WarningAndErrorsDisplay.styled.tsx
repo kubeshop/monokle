@@ -20,9 +20,10 @@ export const Label = styled.span`
 
 export const StyledMenu = styled(Menu)`
   max-height: 400px;
-  overflow-y: scroll;
-  ${GlobalScrollbarStyle}
   padding: 4px 0;
+  border-right: none;
+  overflow-y: scroll;
+  ${GlobalScrollbarStyle};
 `;
 
 export const StyledMenuItem = styled(Menu.Item)`
@@ -31,4 +32,10 @@ export const StyledMenuItem = styled(Menu.Item)`
   height: 28px !important;
   line-height: 28px !important;
   padding: 0 4px;
+`;
+
+export const WarningKindLabel = styled.span`
+  margin-left: 8px;
+  font-style: italic;
+  color: ${Colors.grey7};
 `;

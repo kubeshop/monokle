@@ -36,9 +36,9 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
     <S.StyledMenu>
       {warnings.map(warning => (
         <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
-          <S.Label>{warning.type}:</S.Label>
-          <S.Label>&nbsp;{warning.name}</S.Label>
-          <S.Label>&nbsp;({warning.count})</S.Label>
+          <S.Label>{warning.name}</S.Label>
+          <S.Label>({warning.count})</S.Label>
+          <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
         </S.StyledMenuItem>
       ))}
     </S.StyledMenu>
