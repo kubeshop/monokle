@@ -96,14 +96,6 @@ const ProjectSelection = () => {
     });
   };
 
-  // const handleCopyProject = (project: Project) => {
-  //   setIsDropdownMenuVisible(false);
-  // };
-
-  // const handleEditProject = (project: Project) => {
-  //   setIsDropdownMenuVisible(false);
-  // };
-
   const getRelativeDate = (isoDate: string | undefined) => {
     if (isoDate) {
       return DateTime.fromISO(isoDate).toRelative();
@@ -206,18 +198,6 @@ const ProjectSelection = () => {
             width={1}
             render={(value: any, project: Project) => (
               <S.ProjectTableActions>
-                {/* <S.CopyOutlined
-                  onClick={(e: any) => {
-                    e.stopPropagation();
-                    handleCopyProject(project);
-                  }}
-                />
-                <S.EditOutlined
-                  onClick={(e: any) => {
-                    e.stopPropagation();
-                    handleEditProject(project);
-                  }}
-                /> */}
                 <S.DeleteOutlined
                   onClick={(e: any) => {
                     e.stopPropagation();

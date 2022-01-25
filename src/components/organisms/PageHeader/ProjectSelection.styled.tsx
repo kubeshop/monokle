@@ -96,7 +96,6 @@ export const ProjectName = styled.span`
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  align-self: center;
 `;
 
 export const ProjectsMenuActionsContainer = styled.div`
