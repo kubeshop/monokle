@@ -140,6 +140,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               {isKubeConfigPathValid && (
                 <Dropdown
                   overlay={clusterMenu}
+                  overlayClassName="cluster-dropdown-item"
                   placement="bottomCenter"
                   arrow
                   trigger={['click']}

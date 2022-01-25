@@ -190,3 +190,7 @@ code {
 .project-table-active-project > :first-child {
   border-left: 4px #13a8a8 solid;
 }
+
+.cluster-dropdown-item li:hover {
+  background: #111d2c;
+}
