@@ -1,4 +1,4 @@
-import React, {useContext, useMemo} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {Badge, Button, Skeleton, Space, Tooltip} from 'antd';
@@ -22,12 +22,7 @@ import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
-import {
-  activeProjectSelector,
-  helmChartsSelector,
-  isInPreviewModeSelector,
-  kustomizationsSelector,
-} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector, kustomizationsSelector} from '@redux/selectors';
 
 import {
   ActionsPane,
@@ -109,8 +104,27 @@ const PaneManager = () => {
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const activeProject = useSelector(activeProjectSelector);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
-  const kustomizeResources = useAppSelector(kustomizationsSelector);
-  const helmChartResources = useAppSelector(helmChartsSelector);
+  const kustomizations = useAppSelector(kustomizationsSelector);
+  const helmCharts = useAppSelector(state => Object.values(state.main.helmChartMap));
+
+  const rootFileEntry = useMemo(() => fileMap[ROOT_FILE_ENTRY], [fileMap]);
+
+  const [hasSeenKustomizations, setHasSeenKustomizations] = useState<boolean>(false);
+  const [hasSeenHelmCharts, setHasSeenHelmCharts] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (leftActive && leftMenuSelection === 'kustomize-pane') {
+      setHasSeenKustomizations(true);
+    }
+    if (leftActive && leftMenuSelection === 'helm-pane') {
+      setHasSeenHelmCharts(true);
+    }
+  }, [leftActive, leftMenuSelection]);
+
+  useEffect(() => {
+    setHasSeenKustomizations(false);
+    setHasSeenHelmCharts(false);
+  }, [rootFileEntry]);
 
   // TODO: refactor this to get the size of the page header dynamically
   const contentHeight = useMemo(() => {
@@ -242,7 +256,12 @@ const PaneManager = () => {
               sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
               disabled={!activeProject}
             >
-              <Badge count={kustomizeResources.length || 0} color={Colors.blue6} size="default" dot>
+              <Badge
+                count={!hasSeenKustomizations && kustomizations.length ? kustomizations.length : 0}
+                color={Colors.blue6}
+                size="default"
+                dot
+              >
                 <MenuIcon
                   iconName="kustomize"
                   active={Boolean(activeProject) && leftActive}
@@ -259,7 +278,12 @@ const PaneManager = () => {
               sectionNames={[HELM_CHART_SECTION_NAME]}
               disabled={!activeProject}
             >
-              <Badge count={Object.values(helmChartResources).length} color={Colors.blue6} size="default" dot>
+              <Badge
+                count={!hasSeenHelmCharts && helmCharts.length ? helmCharts.length : 0}
+                color={Colors.blue6}
+                size="default"
+                dot
+              >
                 <MenuIcon
                   iconName="helm"
                   active={Boolean(activeProject) && leftActive}
