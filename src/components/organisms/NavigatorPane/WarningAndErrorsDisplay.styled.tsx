@@ -34,6 +34,11 @@ export const StyledMenuItem = styled(Menu.Item)`
   padding: 0px 4px;
 `;
 
+export const WarningCountLabel = styled.span<{$type: 'warning' | 'error'}>`
+  ${({$type}) => `color: ${$type === 'warning' ? Colors.yellowWarning : Colors.redError};`}
+  margin-left: 5px;
+`;
+
 export const WarningKindLabel = styled.span`
   margin-left: 8px;
   font-style: italic;

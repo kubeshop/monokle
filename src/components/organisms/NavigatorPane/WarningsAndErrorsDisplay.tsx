@@ -23,6 +23,7 @@ type Warning = {
 };
 
 type RefDropdownMenuProps = {
+  type: 'error' | 'warning';
   warnings: Warning[];
 };
 
@@ -44,7 +45,7 @@ const sortWarnings = (warnings: Warning[]) =>
   });
 
 const RefDropdownMenu = (props: RefDropdownMenuProps) => {
-  const {warnings} = props;
+  const {type, warnings} = props;
 
   const dispatch = useAppDispatch();
 
@@ -53,8 +54,8 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
       {warnings.map(warning => (
         <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
           {warning.namespace && <Tag>{warning.namespace}</Tag>}
-          <S.Label>{warning.name}</S.Label>
-          <S.Label>({warning.count})</S.Label>
+          <span>{warning.name}</span>
+          <S.WarningCountLabel $type={type}>({warning.count})</S.WarningCountLabel>
           <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
         </S.StyledMenuItem>
       ))}
@@ -136,7 +137,11 @@ function WarningsAndErrorsDisplay() {
   return (
     <>
       {warningsCount > 0 && (
-        <Dropdown overlay={<RefDropdownMenu warnings={warnings} />} trigger={['click']} placement="bottomCenter">
+        <Dropdown
+          overlay={<RefDropdownMenu type="warning" warnings={warnings} />}
+          trigger={['click']}
+          placement="bottomCenter"
+        >
           <S.ErrorWarningContainer $type="warning">
             <Icon name="warning" />
             <S.Label>{warningsCount}</S.Label>
@@ -145,7 +150,11 @@ function WarningsAndErrorsDisplay() {
       )}
 
       {errorsCount > 0 && (
-        <Dropdown overlay={<RefDropdownMenu warnings={errors} />} trigger={['click']} placement="bottomCenter">
+        <Dropdown
+          overlay={<RefDropdownMenu type="error" warnings={errors} />}
+          trigger={['click']}
+          placement="bottomCenter"
+        >
           <S.ErrorWarningContainer $type="error">
             <Icon name="error" style={{paddingTop: '2px'}} />
             <S.Label>{errorsCount}</S.Label>
