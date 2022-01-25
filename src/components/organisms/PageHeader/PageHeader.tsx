@@ -3,16 +3,8 @@ import {useSelector} from 'react-redux';
 
 import {Badge, Tooltip} from 'antd';
 
-import {GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
-
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {
-  DiscordTooltip,
-  DocumentationTooltip,
-  GitHubTooltip,
-  NotificationsTooltip,
-  SettingsTooltip,
-} from '@constants/tooltips';
+import {NotificationsTooltip, SettingsTooltip} from '@constants/tooltips';
 
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
@@ -23,12 +15,10 @@ import {toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
-import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
-
-import DiscordLogo from '@assets/DiscordLogo.svg';
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
 
 import ClusterSelection from './ClusterSelection';
+import HelpMenu from './HelpMenu';
 
 import * as S from './styled';
 
@@ -137,21 +127,7 @@ const PageHeader = () => {
           <ClusterSelection previewResource={previewResource} />
 
           <S.SettingsCol>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DocumentationTooltip} placement="bottomRight">
-              <S.IconContainerSpan>
-                <QuestionCircleOutlined size={24} onClick={openDocumentation} />
-              </S.IconContainerSpan>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiscordTooltip} placement="bottomRight">
-              <S.IconContainerSpan onClick={openDiscord}>
-                <img src={DiscordLogo} style={{height: '24px', cursor: 'pointer', marginBottom: '4px'}} />
-              </S.IconContainerSpan>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={GitHubTooltip} placement="bottomRight">
-              <S.IconContainerSpan>
-                <GithubOutlined size={24} onClick={openGitHub} />
-              </S.IconContainerSpan>
-            </Tooltip>
+            <HelpMenu />
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
               <S.IconContainerSpan>
                 <S.SettingsOutlined onClick={toggleSettingsDrawer} />
