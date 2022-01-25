@@ -3,7 +3,7 @@ import {ipcRenderer} from 'electron';
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
+import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -64,8 +64,9 @@ interface TreeNode {
   isSupported?: boolean;
 }
 
-const StyledNumberOfResources = styled(Typography.Text)`
+const StyledNumberOfResources = styled.span`
   margin-left: 12px;
+  color: ${Colors.grey7};
 `;
 
 const NodeContainer = styled.div`
@@ -106,12 +107,12 @@ const createNode = (
             {fileEntry.name}
           </span>
           {resources.length > 0 ? (
-            <StyledNumberOfResources className="file-entry-nr-of-resources" type="secondary">
-              {resources.length}
-            </StyledNumberOfResources>
-          ) : (
-            ''
-          )}
+            <Tooltip title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}>
+              <StyledNumberOfResources className="file-entry-nr-of-resources">
+                {resources.length}
+              </StyledNumberOfResources>
+            </Tooltip>
+          ) : null}
         </NodeTitleContainer>
       </NodeContainer>
     ),
