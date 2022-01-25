@@ -16,7 +16,6 @@ import {
 import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 
 import {LeftMenuSelectionType} from '@models/ui';
 
@@ -218,7 +217,11 @@ const PaneManager = () => {
     <StyledRow style={{height: contentHeight}}>
       <StyledColumnLeftMenu>
         <Space direction="vertical" style={{width: 43}}>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={leftMenuSelection === 'file-explorer' && leftActive ? 'Hide File Explorer' : 'View File Explorer'}
+            placement="right"
+          >
             <MenuButton
               isSelected={leftMenuSelection === 'file-explorer'}
               isActive={Boolean(activeProject) && leftActive}
@@ -234,7 +237,11 @@ const PaneManager = () => {
               />
             </MenuButton>
           </Tooltip>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={leftMenuSelection === 'kustomize-pane' && leftActive ? 'Hide Kustomizations' : 'View Kustomizations'}
+            placement="right"
+          >
             <MenuButton
               isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
               isActive={Boolean(activeProject) && leftActive}
@@ -251,7 +258,11 @@ const PaneManager = () => {
               </Badge>
             </MenuButton>
           </Tooltip>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={leftMenuSelection === 'helm-pane' && leftActive ? 'Hide Helm Charts' : 'View Helm Charts'}
+            placement="right"
+          >
             <MenuButton
               isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
               isActive={Boolean(activeProject) && leftActive}
@@ -269,7 +280,11 @@ const PaneManager = () => {
             </MenuButton>
           </Tooltip>
 
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={leftMenuSelection === 'templates-pane' && leftActive ? 'Hide Templates' : 'View Templates'}
+            placement="right"
+          >
             <MenuButton
               isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
               isActive={Boolean(activeProject) && leftActive}
@@ -284,7 +299,11 @@ const PaneManager = () => {
             </MenuButton>
           </Tooltip>
 
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+          <Tooltip
+            mouseEnterDelay={TOOLTIP_DELAY}
+            title={leftMenuSelection === 'plugin-manager' && leftActive ? 'Hide Plugins' : 'View Plugins'}
+            placement="right"
+          >
             <MenuButton
               isSelected={leftMenuSelection === 'plugin-manager'}
               isActive={leftActive}
