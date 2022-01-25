@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-Welcome to Monokle - your friendly desktop UI for managing k8s manifests!
+Welcome to Monokle 🧐 - your friendly desktop UI for managing k8s manifests!
 </p>
 
 <p align="center">
