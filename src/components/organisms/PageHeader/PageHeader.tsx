@@ -10,7 +10,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeResourcesSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
 import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
@@ -34,7 +34,7 @@ const ExitButton = (props: {onClick: () => void}) => {
 const PageHeader = () => {
   const dispatch = useAppDispatch();
   const activeResources = useAppSelector(activeResourcesSelector);
-  const currentContext = useAppSelector(state => state.config.kubeConfig.currentContext);
+  const currentContext = useAppSelector(kubeConfigContextSelector);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
