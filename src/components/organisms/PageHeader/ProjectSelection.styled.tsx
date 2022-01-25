@@ -127,6 +127,5 @@ export const Table = styled(props => <RawTable {...props} />)`
   width: 800px;
   border-top: 1px solid ${Colors.grey3};
   padding-top: 18px;
-  padding-left: 16px;
   ${GlobalScrollbarStyle}
 `;
