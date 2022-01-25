@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-nightly-mac:
-    runs-on: macOS-latest
+    runs-on: macos-latest
 
     steps:
       # Make sure build is clean and no files from a previous run are re-used.
@@ -32,6 +32,17 @@ jobs:
       - name: Install Tools
         run: |
           brew install jq
+
+      - name: Add MacOS certs
+        run: |
+          ls -la
+          chmod +x .github/workflows/scripts/add-osx-cert.sh && .github/workflows/scripts/add-osx-cert.sh
+        env:
+          CERTIFICATE_OSX_APPLICATION: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+
+      - name: Electron mac os security identities
+        run: security find-identity -v
 
       - name: Get Node Version
         run: |
@@ -59,11 +70,8 @@ jobs:
 
       - name: Generate and apply tag
         run: |
-          npm --no-git-tag-version --preid="$(date +%Y%m%d)" version prerelease
-          npm version
-          t=$(jq -r '.version' package.json)
-          git tag "${t}" || true
-          git push origin "${t}" || true
+          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
+          git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
@@ -74,11 +82,31 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and Publish
+      - name: Package
+        id: package
         run: |
-          npm exec -c "electron-builder --publish \"always\""
+          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
+          npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+          NOTARIZE: true
+          CSC_LINK: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CSC_KEY_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          USE_HARD_LINKS: false
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest-mac.yml,dist/*.dmg,dist/*.blockmap,dist/*.zip'
+          draft: false
+          prerelease: true
+          omitBody: true
+          tag: ${{ steps.package.outputs.TAG }}
+          token: ${{ secrets.github_token }}
 
       # Check Binary Sizes
       - name: Build Succeeded
@@ -134,6 +162,13 @@ jobs:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
 
+      - name: Get MSFT Cert
+        id: write_file
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'kubeshop_msft.p12'
+          encodedString: ${{ secrets.CERT_MSFT_KUBESHOP_P12_B64 }}
+
       # Install Dependencies
       - name: Install Dependencies
         run: |
@@ -150,17 +185,9 @@ jobs:
       - name: Generate and apply tag
         run: |
           Set-PSDebug -Trace 1
-          $datetoday = Get-Date -Format "yyyyMMdd"
-          echo $datetoday
-          npm --no-git-tag-version --preid=$datetoday version prerelease
-          npm version
-          $p = get-content package.json | ConvertFrom-Json
-
-          echo $p.version
-
-          $ErrorActionPreference = 'SilentlyContinue'
-          git tag $p.version
-          git push origin $tag
+          $datetoday = Get-Date -Format "yyyy-MM-dd"
+          npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true --skip.tag true
+          git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
@@ -171,11 +198,29 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
-      - name: Package and Publish
+      - name: Package
+        id: package
         run: |
-          npm exec -c 'electron-builder --publish "always"'
+          $p = get-content package.json | ConvertFrom-Json
+          echo "::set-output name=TAG::v$($p.version)"
+          npm exec -c 'electron-builder --publish "never"'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+          WIN_CSC_LINK: ${{ steps.write_file.outputs.filePath }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
+          EP_PRE_RELEASE: true
+          USE_HARD_LINKS: false
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest.yml,dist/*.exe,dist/*.blockmap'
+          draft: false
+          prerelease: true
+          omitBody: true
+          tag: ${{ steps.package.outputs.TAG }}
+          token: ${{ secrets.github_token }}
 
       # Check Binary Sizes
       - name: Build Succeeded
@@ -189,3 +234,119 @@ jobs:
           name: logs
           path: .\msilog.txt
         if: ${{ failure() || cancelled() }}
+
+  # This workflow contains a single job called "build"
+  build-nightly-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Make sure build is clean and no files from a previous run are re-used.
+      - name: Cleanup files before run
+        run: |
+          rm -rf *
+          rm /Users/runner/.npm/_logs/*.log || true
+        if: ${{ always() }}
+
+      - name: Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      - name: Get Node Version
+        run: |
+          cat .nvmrc
+          echo "::set-output name=nodeversion::$(cat .nvmrc)"
+        id: get-node-version
+
+      - name: Use Node.js ${{ steps.get-node-version.outputs.nodeversion }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.get-node-version.outputs.nodeversion }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          env
+          echo "npm: $(npm --version)"
+          echo "node: $(node --version)"
+          npm install
+
+      - name: Verify Dependencies
+        run: |
+          ls -la
+          npm list --depth=1
+
+      - name: Install Tools
+        run: |
+          sudo apt-get install jq
+
+      - name: Generate and apply tag
+        run: |
+          npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
+          git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
+      - name: Build
+        run: |
+          npm run electron:build:ci
+        env:
+          # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
+          CI: false
+
+      - name: Package
+        id: package
+        run: |
+          echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
+          npm exec -c "electron-builder --publish \"never\""
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+          USE_HARD_LINKS: false
+
+      - name: Create release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
+          draft: false
+          prerelease: true
+          omitBody: true
+          tag: ${{ steps.package.outputs.TAG }}
+          token: ${{ secrets.github_token }}
+
+      # Check Binary Size
+      - name: Build Succeeded
+        run: |
+          ls -alh dist | grep Monokle && du -sh dist || true
+        if: ${{ success() }}
+
+      - name: Archive Binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist-nix
+          path: dist
+        if: ${{ success() }}
+
+      - name: Build Failed - Output Build Logs
+        run: |
+          cat /Users/runner/.npm/_logs/*-debug.log || true
+        if: ${{ failure() || cancelled() }}
+
+      - name: Build Failed - Archive Build Logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: /Users/runner/.npm/_logs
+        if: ${{ failure() || cancelled() }}
+
+      # Make sure no secrets or certs are left on the runner
+      - name: Cleanup files after run
+        run: |
+          rm -rf *
+          ls -la
+        if: ${{ always() }}

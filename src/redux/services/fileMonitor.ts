@@ -1,9 +1,9 @@
 import {FSWatcher, watch} from 'chokidar';
 
 import {AppConfig} from '@models/appconfig';
+import {AppDispatch} from '@models/appdispatch';
 
 import {multipleFilesChanged, multiplePathsAdded, multiplePathsRemoved} from '@redux/reducers/main';
-import {AppDispatch} from '@redux/store';
 
 import {debounceWithPreviousArgs} from '@utils/helpers';
 
@@ -18,8 +18,10 @@ export function monitorRootFolder(folder: string, appConfig: AppConfig, dispatch
     watcher.close();
   }
 
+  const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
+
   watcher = watch(folder, {
-    ignored: appConfig.scanExcludes,
+    ignored: scanExcludes,
     ignoreInitial: true,
     persistent: true,
     usePolling: true,

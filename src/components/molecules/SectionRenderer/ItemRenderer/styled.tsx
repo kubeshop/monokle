@@ -13,6 +13,7 @@ type ItemContainerProps = {
   isLastItem: boolean;
   hasOnClick: boolean;
   $isSectionCheckable: boolean;
+  $hasCustomNameDisplay: boolean;
 };
 
 export const ItemContainer = styled.span<ItemContainerProps>`
@@ -50,6 +51,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
     }
   }};
   ${props => !props.isHovered && 'padding-right: 46px;'}
+  ${props => props.$hasCustomNameDisplay && 'padding-right: 0px;'}
 `;
 
 type ItemNameProps = {

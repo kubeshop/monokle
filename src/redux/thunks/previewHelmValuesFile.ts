@@ -1,5 +1,3 @@
-import {ipcRenderer} from 'electron';
-
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import fs from 'fs';
@@ -8,9 +6,13 @@ import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {AppDispatch} from '@models/appdispatch';
+import {RootState} from '@models/rootstate';
+
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
+
+import {runHelm} from '@utils/helm';
 
 /**
  * Thunk to preview a Helm Chart
@@ -26,8 +28,10 @@ export const previewHelmValuesFile = createAsyncThunk<
 >('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
-  const kubeconfig = thunkAPI.getState().config.kubeconfigPath;
-  const kubeconfigContext = thunkAPI.getState().config.kubeConfig.currentContext;
+  const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
+  const currentContext =
+    thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
+    thunkAPI.getState().config.kubeConfig.currentContext;
   const valuesFile = state.helmValuesMap[valuesFileId];
 
   if (valuesFile && valuesFile.filePath) {
@@ -39,11 +43,14 @@ export const previewHelmValuesFile = createAsyncThunk<
     if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
       log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
+      const helmPreviewMode =
+        configState.projectConfig?.settings?.helmPreviewMode || configState.settings.helmPreviewMode;
+
       const args = {
         helmCommand:
-          configState.settings.helmPreviewMode === 'template'
+          helmPreviewMode === 'template'
             ? `helm template -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder}`
-            : `helm install --kube-context ${kubeconfigContext} -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder} --dry-run`,
+            : `helm install --kube-context ${currentContext} -f ${folder}${path.sep}${valuesFile.name} ${chart.name} ${folder} --dry-run`,
         kubeconfig,
       };
 
@@ -67,16 +74,3 @@ export const previewHelmValuesFile = createAsyncThunk<
 
   return {};
 });
-
-/**
- * Invokes Helm in main thread
- */
-
-function runHelm(cmd: any): any {
-  return new Promise(resolve => {
-    ipcRenderer.once('helm-result', (event, arg) => {
-      resolve(arg);
-    });
-    ipcRenderer.send('run-helm', cmd);
-  });
-}

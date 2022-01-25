@@ -50,7 +50,7 @@ interface ResourceKindHandler {
   kind: ResourceKind;
 
   /**
-   * a standard matcher for selecting resources of this kind
+   * a micromatch matcher for selecting resources of this kind
    */
 
   apiVersionMatcher: string;

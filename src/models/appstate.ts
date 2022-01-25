@@ -3,7 +3,6 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
-import {MonoklePlugin} from './plugin';
 
 /**
  * Maps uuid:s to K8sResources
@@ -130,7 +129,6 @@ interface AppState {
   previewValuesFileId?: string;
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
-  plugins: MonoklePlugin[];
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
   clusterDiff: {
     hasLoaded: boolean;
@@ -145,6 +143,9 @@ interface AppState {
   notifications: AlertType[];
   /** whether or not the editor should read the selectedPath file again - used when the file is updated externally */
   shouldEditorReloadSelectedPath: boolean;
+  /** type/value of filters that will be changed */
+  filtersToBeChanged?: ResourceFilterType;
+  registeredKindHandlers: string[];
 }
 
 export type {

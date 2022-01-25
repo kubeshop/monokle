@@ -3,11 +3,12 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {CLUSTER_DIFF_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
+import {RootState} from '@models/rootstate';
 
 import getClusterObjects from '@redux/services/getClusterObjects';
 import {extractK8sResources} from '@redux/services/resource';
-import {AppDispatch, RootState} from '@redux/store';
 
 import {createRejectionWithAlert} from './utils';
 
@@ -27,14 +28,17 @@ export const loadClusterDiff = createAsyncThunk<
   }
 >('main/loadClusterDiff', async (_, thunkAPI) => {
   const state = thunkAPI.getState();
+  const currentContext =
+    state.config.projectConfig?.kubeConfig?.currentContext || state.config.kubeConfig?.currentContext;
   if (!state.ui.isClusterDiffVisible) {
     return;
   }
-  if (!state.config.kubeConfig.currentContext) {
+  if (!currentContext) {
     return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, 'Could not find current kubeconfig context.');
   }
   try {
-    return getClusterObjects(state.config.kubeconfigPath, state.config.kubeConfig.currentContext).then(
+    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+    return getClusterObjects(String(kubeConfigPath), currentContext).then(
       results => {
         const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
@@ -49,7 +53,7 @@ export const loadClusterDiff = createAsyncThunk<
 
         // @ts-ignore
         const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-        const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + state.config.kubeconfigPath);
+        const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + String(kubeConfigPath));
         const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
           rm[r.id] = r;
           return rm;

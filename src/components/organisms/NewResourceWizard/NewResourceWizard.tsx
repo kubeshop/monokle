@@ -16,16 +16,16 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {reprocessNewResource} from '@redux/reducers/main';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
+import {registeredKindHandlersSelector} from '@redux/selectors';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
-import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
@@ -42,6 +42,7 @@ const NewResourceWizard = () => {
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
+  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -75,7 +76,7 @@ const NewResourceWizard = () => {
 
   const kindsByApiVersion = useMemo(
     () =>
-      ResourceKindHandlers.reduce((result, resourcekindHandler) => {
+      registeredKindHandlers.reduce((result, resourcekindHandler) => {
         if (result[resourcekindHandler.clusterApiVersion]) {
           result[resourcekindHandler.clusterApiVersion].push(resourcekindHandler);
         } else {
@@ -86,7 +87,8 @@ const NewResourceWizard = () => {
       }, {} as Record<string, ResourceKindHandler[]>),
     // depend on resourceMap since newly loaded resources could have contained CRDs that resulted in dynamically
     // created kindHandlers
-    [resourceMap]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [registeredKindHandlers, resourceMap]
   );
 
   const [resourceKindOptions, setResourceKindOptions] =
@@ -268,9 +270,6 @@ const NewResourceWizard = () => {
       jsonTemplate
     );
 
-    // validate and update any possible broking incoming links that are now fixed
-    dispatch(reprocessNewResource(newResource));
-
     if (savingDestination !== 'doNotSave') {
       let absolutePath;
 
@@ -286,7 +285,12 @@ const NewResourceWizard = () => {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName);
       }
 
-      dispatch(saveUnsavedResource({resource: newResource, absolutePath}));
+      dispatch(
+        saveUnsavedResources({
+          resourcePayloads: [{resource: newResource, absolutePath}],
+          saveMode: savingDestination === 'saveToFolder' ? savingDestination : 'appendToFile',
+        })
+      );
     }
 
     setSavingDestination('doNotSave');

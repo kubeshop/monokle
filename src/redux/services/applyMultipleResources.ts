@@ -4,10 +4,10 @@ import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppConfig} from '@models/appconfig';
+import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
-import {AppDispatch} from '@redux/store';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
 import {doesTextStartWithYamlDocumentDelimiter} from './resource';
@@ -19,10 +19,10 @@ const applyMultipleResources = (
   namespace?: string,
   onSuccessCallback?: () => void
 ) => {
-  const kubeconfigPath = config.kubeconfigPath;
-  const context = config.kubeConfig.currentContext;
+  const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
+  const currentContext = config.projectConfig?.kubeConfig?.currentContext || config.kubeConfig.currentContext;
 
-  if (!kubeconfigPath || !context || !resourcesToApply.length) {
+  if (!kubeConfigPath || !currentContext || !resourcesToApply.length) {
     return;
   }
 
@@ -36,7 +36,7 @@ const applyMultipleResources = (
     }, '');
 
   try {
-    const child = applyYamlToCluster(yamlToApply, kubeconfigPath, context, namespace);
+    const child = applyYamlToCluster(yamlToApply, kubeConfigPath, currentContext, namespace);
     child.on('exit', (code, signal) => {
       log.info(`kubectl exited with code ${code} and signal ${signal}`);
     });
@@ -50,7 +50,7 @@ const applyMultipleResources = (
     child.stdout.on('end', () => {
       const alert: AlertType = {
         type: AlertEnum.Success,
-        title: `Applied selected resources to cluster ${context} successfully`,
+        title: `Applied selected resources to cluster ${currentContext} successfully`,
         message: alertMessage,
       };
 
@@ -64,7 +64,7 @@ const applyMultipleResources = (
     child.stderr.on('data', data => {
       const alert: AlertType = {
         type: AlertEnum.Error,
-        title: `Applying selected resources to cluster ${context} failed`,
+        title: `Applying selected resources to cluster ${currentContext} failed`,
         message: data.toString(),
       };
       dispatch(setAlert(alert));

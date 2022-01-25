@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {ItemBlueprint} from '@models/navigator';
 
@@ -29,22 +29,18 @@ export type ItemRendererProps<ItemType, ScopeType> = {
 
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
   const {itemId, blueprint, level, isLastItem, isSectionCheckable, sectionContainerElementId, options} = props;
+  const {instanceHandler} = blueprint;
+
   const dispatch = useAppDispatch();
+  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
+  const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const itemInstance = useAppSelector(state => state.navigator.itemInstanceMap[itemId]);
-  const {instanceHandler} = blueprint;
-
   const {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay} = useItemCustomization(blueprint.customization);
 
+  const previouslyCheckedResourcesLength = useRef(checkedResourceIds.length);
   const scrollContainer = useRef<ScrollContainerRef>(null);
-  useEffect(() => {
-    if (!itemInstance.shouldScrollIntoView) {
-      return;
-    }
-    scrollContainer.current?.scrollIntoView();
-  }, [itemInstance.shouldScrollIntoView]);
 
   const onClick = useCallback(() => {
     if (instanceHandler && instanceHandler.onClick && !itemInstance.isDisabled) {
@@ -57,6 +53,20 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
       instanceHandler.onCheck(itemInstance, dispatch);
     }
   }, [instanceHandler, itemInstance, dispatch]);
+
+  useEffect(() => {
+    if (!itemInstance.shouldScrollIntoView) {
+      return;
+    }
+
+    // checking/unchecking a resource should not scroll
+    if (checkedResourceIds.length !== previouslyCheckedResourcesLength.current) {
+      previouslyCheckedResourcesLength.current = checkedResourceIds.length;
+      return;
+    }
+
+    scrollContainer.current?.scrollIntoView();
+  }, [checkedResourceIds.length, itemInstance.shouldScrollIntoView]);
 
   return (
     <ScrollIntoView id={itemInstance.id} ref={scrollContainer} parentContainerElementId={sectionContainerElementId}>
@@ -71,6 +81,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         isLastItem={isLastItem}
         hasOnClick={Boolean(instanceHandler?.onClick)}
         $isSectionCheckable={isSectionCheckable}
+        $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
       >
         {itemInstance.isCheckable &&
           (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (

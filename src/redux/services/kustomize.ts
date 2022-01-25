@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
@@ -8,9 +8,7 @@ import {K8sResource, ResourceRefType} from '@models/k8sresource';
 
 import {getResourcesForPath} from '@redux/services/fileEntry';
 
-import {NodeWrapper, createFileRef, getK8sResources, getScalarNodes, linkResources} from './resource';
-
-export type KustomizeCommandType = 'kubectl' | 'kustomize';
+import {NodeWrapper, createFileRef, getScalarNodes, linkResources} from './resource';
 
 /**
  * Creates kustomization refs between a kustomization and its resources
@@ -38,7 +36,7 @@ function linkParentKustomization(
  */
 
 export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === KUSTOMIZATION_KIND;
+  return r && r.kind === KUSTOMIZATION_KIND && (!r.version || r.version.startsWith(KUSTOMIZATION_API_GROUP));
 }
 
 /**
@@ -130,7 +128,8 @@ function extractPatches(
  */
 
 export function processKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
-  getK8sResources(resourceMap, KUSTOMIZATION_KIND)
+  Object.values(resourceMap)
+    .filter(r => isKustomizationResource(r))
     .filter(k => k.content.resources || k.content.bases || k.content.patchesStrategicMerge || k.content.patchesJson6902)
     .forEach(kustomization => {
       let resources = getScalarNodes(kustomization, 'resources') || [];
@@ -171,7 +170,7 @@ export function getKustomizationRefs(
           if (target) {
             linkedResourceIds.push(r.target.resourceId);
 
-            if (target.kind === KUSTOMIZATION_KIND && r.type === ResourceRefType.Outgoing) {
+            if (isKustomizationResource(target) && r.type === ResourceRefType.Outgoing) {
               linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target.resourceId));
             }
           }

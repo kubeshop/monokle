@@ -6,12 +6,16 @@ import fs from 'fs';
 import log from 'loglevel';
 
 import {AlertEnum} from '@models/alert';
-import {KubeConfig, KubeConfigContext} from '@models/kubeConfig';
+import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {setContexts} from '@redux/reducers/appConfig';
+import {updateProjectKubeConfig} from '@redux/reducers/appConfig';
 
-export const loadContexts = async (configPath: string, dispatch: (action: AnyAction) => void) => {
+export const loadContexts = async (
+  configPath: string,
+  dispatch: (action: AnyAction) => void,
+  currentContext?: string
+) => {
   try {
     const stats = await fs.promises.stat(configPath);
 
@@ -20,12 +24,24 @@ export const loadContexts = async (configPath: string, dispatch: (action: AnyAct
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
 
+        const selectedContext = kc.contexts.find(c => c.name === currentContext);
+        if (selectedContext) {
+          kc.setCurrentContext(selectedContext && selectedContext.name);
+        } else {
+          kc.setCurrentContext((kc.contexts && kc.contexts.length > 0 && kc.contexts[0].name) || '');
+        }
+
         const kubeConfig: KubeConfig = {
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
+          isPathValid: kc.contexts.length > 0,
         };
-        dispatch(setContexts(kubeConfig));
+
+        dispatch(updateProjectKubeConfig(kubeConfig));
       } catch (e: any) {
+        if (e instanceof Error) {
+          log.warn(`[loadContexts]: ${e.message}`);
+        }
         dispatch(
           setAlert({
             title: 'Loading kubeconfig file failed',
@@ -36,6 +52,9 @@ export const loadContexts = async (configPath: string, dispatch: (action: AnyAct
       }
     }
   } catch (e) {
-    log.info(e);
+    if (e instanceof Error) {
+      log.warn(e.message);
+    }
+    dispatch(updateProjectKubeConfig({isPathValid: false}));
   }
 };

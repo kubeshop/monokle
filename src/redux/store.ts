@@ -6,6 +6,7 @@ import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddl
 
 import {alertSlice} from './reducers/alert';
 import {configSlice} from './reducers/appConfig';
+import {extensionSlice} from './reducers/extension';
 import {logsSlice} from './reducers/logs';
 import {mainSlice} from './reducers/main';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
@@ -32,12 +33,9 @@ const store = configureStore({
     ui: uiSlice.reducer,
     navigator: navigatorSlice.reducer,
     uiCoach: uiCoachSlice.reducer,
+    extension: extensionSlice.reducer,
   },
   middleware: getDefaultMiddleware => [...getDefaultMiddleware().concat(middlewares), sectionBlueprintMiddleware],
 });
-
-// eslint-disable-next-line no-undef
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
 
 export default store;

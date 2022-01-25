@@ -9,7 +9,7 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {parseDocument} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
 import {AppConfig} from '@models/appconfig';
@@ -24,7 +24,6 @@ import {
   SelectionHistoryEntry,
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {MonoklePlugin} from '@models/plugin';
 
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
@@ -34,7 +33,7 @@ import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
-import {saveUnsavedResource} from '@redux/thunks/saveUnsavedResource';
+import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
@@ -82,6 +81,7 @@ export type UpdateResourcePayload = {
   resourceId: string;
   content: string;
   preventSelectionAndHighlightsUpdate?: boolean;
+  isInClusterMode?: boolean;
 };
 
 export type UpdateManyResourcesPayload = {
@@ -165,18 +165,33 @@ const clearSelectedResourceOnPreviewExit = (state: AppState) => {
  * Returns a resourceMap containing only active resources depending if we are in preview mode
  */
 
-function getActiveResources(state: Draft<AppState>) {
+function getActiveResourceMap(state: Draft<AppState>) {
   if (state.previewResourceId || state.previewValuesFileId) {
-    let activeResources: ResourceMapType = {};
+    let activeResourceMap: ResourceMapType = {};
     Object.values(state.resourceMap)
       .filter(r => r.filePath.startsWith(PREVIEW_PREFIX))
       .forEach(r => {
-        activeResources[r.id] = r;
+        activeResourceMap[r.id] = r;
       });
 
-    return activeResources;
+    return activeResourceMap;
   }
   return state.resourceMap;
+}
+
+/**
+ * Returns a resourceMap containing only local resources
+ */
+
+function getLocalResourceMap(state: Draft<AppState>) {
+  let localResourceMap: ResourceMapType = {};
+  Object.values(state.resourceMap)
+    .filter(r => !r.filePath.startsWith(PREVIEW_PREFIX) && !r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
+    .forEach(r => {
+      localResourceMap[r.id] = r;
+    });
+
+  return localResourceMap;
 }
 
 /**
@@ -196,6 +211,13 @@ export const mainSlice = createSlice({
     addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;
       state.resourceMap[resource.id] = resource;
+
+      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
+        resourceIds: [resource.id],
+        resourceKinds,
+      });
     },
     /**
      * called by the file monitor when multiple paths are added to the file system
@@ -312,19 +334,19 @@ export const mainSlice = createSlice({
         return false;
       });
 
-      processParsedResources(getActiveResources(state), state.resourceRefsProcessingOptions, {
+      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
         resourceKinds: resourceKindsWithOptionalRefs,
         skipValidation: true,
       });
     },
     /**
-     * Reprocess a newly created resource
+     * Reprocesses a resource
      */
-    reprocessNewResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+    reprocessResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-      processParsedResources(getActiveResources(state), state.resourceRefsProcessingOptions, {
+      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
         resourceIds: [resource.id],
         resourceKinds,
       });
@@ -335,12 +357,17 @@ export const mainSlice = createSlice({
      */
     updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
       try {
-        const activeResources = getActiveResources(state);
-        const resource = activeResources[action.payload.resourceId];
+        const isInClusterMode = action.payload.isInClusterMode;
+
+        const currentResourceMap = isInClusterMode ? getLocalResourceMap(state) : getActiveResourceMap(state);
+        const resource = isInClusterMode
+          ? state.resourceMap[action.payload.resourceId]
+          : currentResourceMap[action.payload.resourceId];
+
         if (resource) {
           performResourceContentUpdate(state, resource, action.payload.content);
-          let resourceIds = findResourcesToReprocess(resource, activeResources);
-          reprocessResources(resourceIds, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
+          let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
+          reprocessResources(resourceIds, currentResourceMap, state.fileMap, state.resourceRefsProcessingOptions);
           if (!action.payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
             updateSelectionAndHighlights(state, resource);
@@ -371,7 +398,7 @@ export const mainSlice = createSlice({
     updateManyResources: (state: Draft<AppState>, action: PayloadAction<UpdateManyResourcesPayload>) => {
       try {
         let resourceIdsToReprocess: string[] = [];
-        const activeResources = getActiveResources(state);
+        const activeResources = getActiveResourceMap(state);
 
         action.payload.forEach(({resourceId, content}) => {
           const resource = activeResources[resourceId];
@@ -467,6 +494,9 @@ export const mainSlice = createSlice({
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
     },
+    setFiltersToBeChanged: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType | undefined>) => {
+      state.filtersToBeChanged = action.payload;
+    },
     setApplyingResource: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isApplyingResource = action.payload;
     },
@@ -494,11 +524,32 @@ export const mainSlice = createSlice({
       state.previewLoader.isLoading = false;
       state.previewLoader.targetResourceId = undefined;
     },
+    resetResourceFilter: (state: Draft<AppState>) => {
+      state.resourceFilter = {labels: {}, annotations: {}};
+    },
     updateResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
+      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
+        state.filtersToBeChanged = action.payload;
+        return;
+      }
+
+      if (state.filtersToBeChanged) {
+        state.filtersToBeChanged = undefined;
+      }
+
       state.resourceFilter = action.payload;
     },
     extendResourceFilter: (state: Draft<AppState>, action: PayloadAction<ResourceFilterType>) => {
       const filter = action.payload;
+
+      if (state.checkedResourceIds.length && !state.filtersToBeChanged) {
+        state.filtersToBeChanged = filter;
+        return;
+      }
+
+      if (state.filtersToBeChanged) {
+        state.filtersToBeChanged = undefined;
+      }
 
       // construct new filter
       let newFilter: ResourceFilterType = {
@@ -599,12 +650,6 @@ export const mainSlice = createSlice({
     uncheckMultipleResourceIds: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
       state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
     },
-    addPlugin: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin>) => {
-      state.plugins.push(action.payload);
-    },
-    setPlugins: (state: Draft<AppState>, action: PayloadAction<MonoklePlugin[]>) => {
-      state.plugins = action.payload;
-    },
     openResourceDiffModal: (state: Draft<AppState>, action: PayloadAction<string>) => {
       state.resourceDiff.targetResourceId = action.payload;
     },
@@ -614,6 +659,23 @@ export const mainSlice = createSlice({
     toggleClusterOnlyResourcesInClusterDiff: (state: Draft<AppState>) => {
       state.clusterDiff.hideClusterOnlyResources = !state.clusterDiff.hideClusterOnlyResources;
       state.clusterDiff.selectedMatches = [];
+    },
+    addMultipleKindHandlers: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      action.payload.forEach(kind => {
+        if (!state.registeredKindHandlers.includes(kind)) {
+          state.registeredKindHandlers.push(kind);
+        }
+      });
+    },
+    addKindHandler: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      if (!state.registeredKindHandlers.includes(action.payload)) {
+        state.registeredKindHandlers.push(action.payload);
+      }
+    },
+    seenNotifications: (state: Draft<AppState>) => {
+      state.notifications.forEach(notification => {
+        notification.hasSeen = true;
+      });
     },
   },
   extraReducers: builder => {
@@ -738,45 +800,56 @@ export const mainSlice = createSlice({
       resetSelectionHistory(state);
     });
 
-    builder.addCase(saveUnsavedResource.fulfilled, (state, action) => {
+    builder.addCase(saveUnsavedResources.fulfilled, (state, action) => {
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-      const resource = state.resourceMap[action.payload.resourceId];
-      const relativeFilePath = action.payload.resourceFilePath.substr(rootFolder.length);
-      const resourceFileEntry = state.fileMap[relativeFilePath];
-      if (resource) {
-        resource.filePath = relativeFilePath;
-        resource.range = action.payload.resourceRange;
-      }
-      if (resourceFileEntry) {
-        resourceFileEntry.timestamp = action.payload.fileTimestamp;
-      } else {
-        const newFileEntry = createFileEntry(relativeFilePath);
-        newFileEntry.timestamp = action.payload.fileTimestamp;
-        state.fileMap[relativeFilePath] = newFileEntry;
-        const childFileName = path.basename(relativeFilePath);
-        const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
-        if (parentPath === path.sep) {
-          const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
-          if (rootFileEntry.children) {
-            rootFileEntry.children.push(childFileName);
-            rootFileEntry.children.sort();
-          } else {
-            rootFileEntry.children = [childFileName];
-          }
+
+      action.payload.resourcePayloads.forEach(resourcePayload => {
+        const resource = state.resourceMap[resourcePayload.resourceId];
+        const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
+        const resourceFileEntry = state.fileMap[relativeFilePath];
+
+        if (resourceFileEntry) {
+          resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
+          const resourcesFromFile = Object.values(state.resourceMap).filter(
+            r => r.filePath === resourceFileEntry.filePath
+          );
+          resourcesFromFile.forEach(r => {
+            delete state.resourceMap[r.id];
+          });
         } else {
-          const parentPathFileEntry = state.fileMap[parentPath];
-          if (parentPathFileEntry) {
-            if (parentPathFileEntry.children !== undefined) {
-              parentPathFileEntry.children.push(childFileName);
-              parentPathFileEntry.children.sort();
+          const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
+          newFileEntry.timestamp = resourcePayload.fileTimestamp;
+          state.fileMap[relativeFilePath] = newFileEntry;
+          const childFileName = path.basename(relativeFilePath);
+          const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
+          if (parentPath === path.sep) {
+            const rootFileEntry = state.fileMap[ROOT_FILE_ENTRY];
+            if (rootFileEntry.children) {
+              rootFileEntry.children.push(childFileName);
+              rootFileEntry.children.sort();
             } else {
-              parentPathFileEntry.children = [childFileName];
+              rootFileEntry.children = [childFileName];
             }
           } else {
-            log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
+            const parentPathFileEntry = state.fileMap[parentPath];
+            if (parentPathFileEntry) {
+              if (parentPathFileEntry.children !== undefined) {
+                parentPathFileEntry.children.push(childFileName);
+                parentPathFileEntry.children.sort();
+              } else {
+                parentPathFileEntry.children = [childFileName];
+              }
+            } else {
+              log.warn(`[saveUnsavedResource]: Couldn't find parent path for ${relativeFilePath}`);
+            }
           }
         }
-      }
+
+        if (resource) {
+          resource.filePath = relativeFilePath;
+          resource.range = resourcePayload.resourceRange;
+        }
+      });
     });
 
     builder
@@ -809,7 +882,7 @@ export const mainSlice = createSlice({
           resource =>
             !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
             !resource.name.startsWith('Patch:') &&
-            resource.kind !== KUSTOMIZATION_KIND
+            !isKustomizationResource(resource)
         );
 
         // if we are in preview mode, localResources must contain only the preview resources
@@ -1041,16 +1114,19 @@ export const {
   reloadClusterDiff,
   toggleClusterOnlyResourcesInClusterDiff,
   setSelectionHistory,
-  reprocessNewResource,
+  reprocessResource,
   editorHasReloadedSelectedPath,
   checkResourceId,
   uncheckAllResourceIds,
   uncheckResourceId,
+  resetResourceFilter,
   checkMultipleResourceIds,
   uncheckMultipleResourceIds,
-  addPlugin,
-  setPlugins,
   closeResourceDiffModal,
   openResourceDiffModal,
+  setFiltersToBeChanged,
+  addMultipleKindHandlers,
+  addKindHandler,
+  seenNotifications,
 } = mainSlice.actions;
 export default mainSlice.reducer;

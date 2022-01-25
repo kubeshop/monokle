@@ -56,7 +56,7 @@ const schema = {
           kustomizeCommand: {
             type: 'string',
           },
-          loadLastFolderOnStartup: {
+          loadLastProjectOnStartup: {
             type: 'boolean',
           },
         },
@@ -69,6 +69,26 @@ const schema = {
       },
       newVersion: {
         type: 'number',
+      },
+      projects: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+            },
+            rootFolder: {
+              type: 'string',
+            },
+            k8sVersion: {
+              type: 'string',
+            },
+            lastOpened: {
+              type: 'string',
+            },
+          },
+        },
       },
     },
   },
@@ -126,9 +146,6 @@ const schema = {
           },
         },
       },
-      clusterStatusHidden: {
-        type: 'boolean',
-      },
     },
   },
   uiCoach: {
@@ -144,14 +161,15 @@ const schema = {
 const defaults = {
   appConfig: {
     startupModalVisible: true,
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
+    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
       theme: 'dark',
       textSize: 'medium',
       language: 'en',
       helmPreviewMode: 'template',
-      loadLastFolderOnStartup: true,
+      loadLastProjectOnStartup: false,
+      isClusterSelectorVisible: true,
     },
     recentFolders: [],
     newVersion: 0,
@@ -173,7 +191,6 @@ const defaults = {
       editWidth: 0.3333,
       rightWidth: 0,
     },
-    clusterStatusHidden: false,
   },
 };
 

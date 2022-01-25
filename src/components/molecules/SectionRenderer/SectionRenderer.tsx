@@ -29,6 +29,17 @@ function SectionRenderer(props: SectionRendererProps) {
     state => state.navigator.sectionInstanceMap[sectionId]
   );
 
+  const registeredSectionIds = useAppSelector(state => state.navigator.registeredSectionBlueprintIds);
+  const childSectionIds = useMemo(() => {
+    return sectionBlueprint.childSectionIds?.filter(id => registeredSectionIds.includes(id));
+  }, [sectionBlueprint.childSectionIds, registeredSectionIds]);
+
+  const childSections = useMemo(() => {
+    return childSectionIds
+      ?.map(id => navSectionMap.getById(id))
+      .filter((s): s is SectionBlueprint<any, any> => s !== undefined);
+  }, [childSectionIds]);
+
   const dispatch = useAppDispatch();
 
   const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
@@ -204,12 +215,12 @@ function SectionRenderer(props: SectionRendererProps) {
           const group = groupInstanceById[groupId];
           return (
             <React.Fragment key={group.id}>
-              <S.NameContainer style={{color: 'red'}}>
+              <S.SectionContainer style={{color: 'red'}}>
                 <S.Name $level={level + 1}>
                   {group.name}
                   <S.ItemsLength selected={false}>{group.visibleItemIds.length}</S.ItemsLength>
                 </S.Name>
-              </S.NameContainer>
+              </S.SectionContainer>
               {group.visibleItemIds.map(itemId => (
                 <ItemRenderer
                   key={itemId}
@@ -225,17 +236,15 @@ function SectionRenderer(props: SectionRendererProps) {
             </React.Fragment>
           );
         })}
-      {sectionBlueprint.childSectionIds &&
-        sectionBlueprint.childSectionIds
-          .map(childSectionId => navSectionMap.getById(childSectionId))
-          .map(child => (
-            <SectionRenderer
-              key={child.name}
-              sectionBlueprint={child}
-              level={level + 1}
-              isLastSection={child.id === lastVisibleChildSectionId}
-            />
-          ))}
+      {childSections &&
+        childSections.map(child => (
+          <SectionRenderer
+            key={child.name}
+            sectionBlueprint={child}
+            level={level + 1}
+            isLastSection={child.id === lastVisibleChildSectionId}
+          />
+        ))}
     </>
   );
 }

@@ -7,6 +7,7 @@ import {AppConfig} from '@models/appconfig';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
+import {K8sResource} from '@models/k8sresource';
 
 import {createFileEntry, extractK8sResourcesFromFile, fileIsExcluded, readFiles} from '@redux/services/fileEntry';
 
@@ -26,6 +27,17 @@ export function getHelmValuesFile(fileEntry: FileEntry, helmValuesMap: HelmValue
 
 export function isHelmChartFolder(files: string[]) {
   return files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1;
+}
+
+/**
+ * check if the k8sResource is supported
+ * @param resource
+ * @returns @boolean
+ */
+function isSupportedHelmResource(resource: K8sResource): boolean {
+  const helmVariableRegex = /{{.*}}/g;
+
+  return Boolean(resource.text.match(helmVariableRegex)?.length) === false;
 }
 
 /**
@@ -59,7 +71,9 @@ export function processHelmChartFolder(
     if (fileIsExcluded(appConfig, fileEntry)) {
       fileEntry.isExcluded = true;
     } else if (getFileStats(filePath)?.isDirectory()) {
-      if (depth === appConfig.folderReadsMaxDepth) {
+      const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+
+      if (depth === folderReadsMaxDepth) {
         log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
       } else {
         fileEntry.children = readFiles(
@@ -69,7 +83,8 @@ export function processHelmChartFolder(
           fileMap,
           helmChartMap,
           helmValuesMap,
-          depth + 1
+          depth + 1,
+          isSupportedHelmResource
         );
       }
     } else if (micromatch.isMatch(file, '*values*.yaml')) {

@@ -18,7 +18,7 @@ import {mergeManifests} from '@redux/services/manifest-utils';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
-import {NamespaceSelection, SecretKindSelection} from './FormWidgets';
+import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
 
@@ -154,12 +154,8 @@ const FormEditor = (props: {formSchema: any; formUiSchema: any}) => {
         uiSchema={formUiSchema}
         formData={formData}
         onChange={onFormUpdate}
-        widgets={{
-          namespaceSelection: NamespaceSelection,
-        }}
-        fields={{
-          secretKindSelection: SecretKindSelection,
-        }}
+        widgets={getCustomFormWidgets()}
+        fields={getCustomFormFields()}
         disabled={isInPreviewMode}
       >
         <div />

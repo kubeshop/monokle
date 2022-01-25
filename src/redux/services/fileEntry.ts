@@ -46,7 +46,8 @@ export function createFileEntry(fileEntryPath: string) {
  */
 
 export function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
-  return appConfig.scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
+  const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
+  return scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
 }
 
 /**
@@ -71,7 +72,8 @@ export function readFiles(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
-  depth: number = 1
+  depth: number = 1,
+  isSupportedResource: (resource: K8sResource) => boolean = () => true
 ) {
   const files = fs.readdirSync(folder);
   const result: string[] = [];
@@ -107,7 +109,8 @@ export function readFiles(
       if (fileIsExcluded(appConfig, fileEntry)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
-        if (depth === appConfig.folderReadsMaxDepth) {
+        const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+        if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
         } else {
           fileEntry.children = readFiles(
@@ -123,6 +126,11 @@ export function readFiles(
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
           extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
+            if (!isSupportedResource(resource)) {
+              fileEntry.isSupported = false;
+              return;
+            }
+
             resourceMap[resource.id] = resource;
           });
         } catch (e) {
@@ -319,10 +327,15 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
  * Adds the file at the specified path with the specified parent
  */
 
-function addFile(absolutePath: string, state: AppState) {
+function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   log.info(`adding file ${absolutePath}`);
   let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   const fileEntry = createFileEntry(absolutePath.substr(rootFolder.length));
+  if (!appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+    return fileEntry;
+  }
+  fileEntry.isSupported = true;
+
   const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
   resourcesFromFile.forEach(resource => {
     state.resourceMap[resource.id] = resource;
@@ -378,7 +391,7 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
       }
       return undefined;
     }
-    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state);
+    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state, appConfig);
 
     if (fileEntry) {
       state.fileMap[fileEntry.filePath] = fileEntry;

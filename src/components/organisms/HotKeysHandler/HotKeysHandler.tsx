@@ -7,7 +7,7 @@ import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openResourceDiffModal, updateResourceFilter} from '@redux/reducers/main';
+import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
@@ -16,7 +16,12 @@ import {
   toggleRightMenu,
   toggleSettings,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {
+  isInPreviewModeSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathSelector,
+  settingsSelector,
+} from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
@@ -35,9 +40,11 @@ import featureJson from '@src/feature-flags.json';
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
   const mainState = useAppSelector(state => state.main);
-  const configState = useAppSelector(state => state.config);
   const uiState = useAppSelector(state => state.ui);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const {kustomizeCommand} = useAppSelector(settingsSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -79,20 +86,14 @@ const HotKeysHandler = () => {
     if (selectedResource) {
       setIsApplyModalVisible(true);
     } else if (mainState.selectedPath) {
-      applyFileWithConfirm(
-        mainState.selectedPath,
-        mainState.fileMap,
-        dispatch,
-        configState.kubeconfigPath,
-        configState.kubeConfig.currentContext || ''
-      );
+      applyFileWithConfirm(mainState.selectedPath, mainState.fileMap, dispatch, kubeConfigPath, kubeConfigContext);
     }
   }, [
     mainState.selectedResourceId,
     mainState.resourceMap,
     mainState.fileMap,
-    configState.kubeconfigPath,
-    configState.kubeConfig.currentContext,
+    kubeConfigPath,
+    kubeConfigContext,
     mainState.selectedPath,
     dispatch,
   ]);
@@ -118,17 +119,18 @@ const HotKeysHandler = () => {
     }
 
     const isClusterPreview = mainState.previewType === 'cluster';
+
     applyResource(
       selectedResource.id,
       mainState.resourceMap,
       mainState.fileMap,
       dispatch,
-      configState.kubeconfigPath,
-      configState.kubeConfig.currentContext || '',
+      kubeConfigPath,
+      kubeConfigContext,
       namespace,
       {
         isClusterPreview,
-        kustomizeCommand: configState.settings.kustomizeCommand,
+        kustomizeCommand,
       }
     );
     setIsApplyModalVisible(false);
@@ -145,9 +147,9 @@ const HotKeysHandler = () => {
     }
 
     return isKustomizationResource(selectedResource)
-      ? makeApplyKustomizationText(selectedResource.name, configState.kubeConfig.currentContext)
-      : makeApplyResourceText(selectedResource.name, configState.kubeConfig.currentContext);
-  }, [mainState.resourceMap, mainState.selectedResourceId, configState.kubeConfig.currentContext]);
+      ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext)
+      : makeApplyResourceText(selectedResource.name, kubeConfigContext);
+  }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext]);
 
   useHotkeys(
     hotkeys.APPLY_SELECTION,
@@ -174,9 +176,9 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.PREVIEW_CLUSTER,
     () => {
-      startPreview(configState.kubeconfigPath, 'cluster', dispatch);
+      startPreview(kubeConfigPath, 'cluster', dispatch);
     },
-    [configState]
+    [kubeConfigPath]
   );
 
   useHotkeys(
@@ -244,7 +246,7 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
-    dispatch(updateResourceFilter({labels: {}, annotations: {}}));
+    dispatch(resetResourceFilter());
   });
 
   useHotkeys(

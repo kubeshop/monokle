@@ -2,11 +2,17 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-
-import {LeftMenuSelection, MonacoUiState, NewResourceWizardInput, PaneConfiguration, UiState} from '@models/ui';
+import {
+  HighlightItems,
+  LeftMenuSelectionType,
+  MonacoUiState,
+  NewResourceWizardInput,
+  PaneConfiguration,
+  UiState,
+} from '@models/ui';
 
 import initialState from '@redux/initialState';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
@@ -20,7 +26,6 @@ export const uiSlice = createSlice({
     },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
-      electronStore.set('ui.isSettingsOpen', state.isSettingsOpen);
     },
     openClusterDiff: (state: Draft<UiState>) => {
       state.isClusterDiffVisible = true;
@@ -36,7 +41,7 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
-    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelection>) => {
+    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
@@ -46,7 +51,6 @@ export const uiSlice = createSlice({
     },
     toggleNotifications: (state: Draft<UiState>) => {
       state.isNotificationsOpen = !state.isNotificationsOpen;
-      electronStore.set('ui.isNotificationsOpen', state.isNotificationsOpen);
     },
     setRightMenuIsActive: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.rightMenu.isActive = action.payload;
@@ -65,14 +69,12 @@ export const uiSlice = createSlice({
       action: PayloadAction<{defaultInput?: NewResourceWizardInput} | undefined>
     ) => {
       state.newResourceWizard.isOpen = true;
-      electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
       if (action.payload && action.payload.defaultInput) {
         state.newResourceWizard.defaultInput = action.payload.defaultInput;
       }
     },
     closeNewResourceWizard: (state: Draft<UiState>) => {
       state.newResourceWizard.isOpen = false;
-      electronStore.set('ui.newResourceWizard.isOpen', state.newResourceWizard.isOpen);
       state.newResourceWizard.defaultInput = undefined;
     },
     openRenameEntityModal: (
@@ -100,6 +102,18 @@ export const uiSlice = createSlice({
         resourceId: action.payload,
       };
     },
+    openSaveResourcesToFileFolderModal: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      state.saveResourcesToFileFolderModal = {
+        isOpen: true,
+        resourcesIds: action.payload,
+      };
+    },
+    closeSaveResourcesToFileFolderModal: (state: Draft<UiState>) => {
+      state.saveResourcesToFileFolderModal = {
+        isOpen: false,
+        resourcesIds: [],
+      };
+    },
     openCreateFolderModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.createFolderModal = {
         isOpen: true,
@@ -110,6 +124,18 @@ export const uiSlice = createSlice({
       state.createFolderModal = {
         isOpen: false,
         rootDir: '',
+      };
+    },
+    openCreateProjectModal: (state: Draft<UiState>, action: PayloadAction<{fromTemplate: boolean}>) => {
+      state.createProjectModal = {
+        isOpen: true,
+        fromTemplate: action.payload.fromTemplate,
+      };
+    },
+    closeCreateProjectModal: (state: Draft<UiState>) => {
+      state.createProjectModal = {
+        isOpen: false,
+        fromTemplate: false,
       };
     },
     closeRenameResourceModal: (state: Draft<UiState>) => {
@@ -171,12 +197,11 @@ export const uiSlice = createSlice({
       state.paneConfiguration = defaultPaneConfiguration;
       electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);
     },
-    setClusterIconHighlightStatus: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.clusterPaneIconHighlighted = action.payload;
-    },
-    toggleClusterStatus: (state: Draft<UiState>) => {
-      state.clusterStatusHidden = !state.clusterStatusHidden;
-      electronStore.set('ui.clusterStatusHidden', state.clusterStatusHidden);
+    highlightItem: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
+      state.highlightedItems.clusterPaneIcon = action.payload === HighlightItems.CLUSTER_PANE_ICON;
+      state.highlightedItems.createResource = action.payload === HighlightItems.CREATE_RESOURCE;
+      state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
+      state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
     },
   },
   extraReducers: builder => {
@@ -189,7 +214,7 @@ export const uiSlice = createSlice({
         state.shouldExpandAllNodes = true;
         if (
           state.leftMenu.selection === 'kustomize-pane' &&
-          !Object.values(action.payload.resourceMap).some(r => r.kind === KUSTOMIZATION_KIND)
+          !Object.values(action.payload.resourceMap).some(r => isKustomizationResource(r))
         ) {
           state.leftMenu.selection = 'file-explorer';
         }
@@ -230,11 +255,14 @@ export const {
   closeRenameEntityModal,
   openCreateFolderModal,
   closeCreateFolderModal,
+  openCreateProjectModal,
+  closeCreateProjectModal,
   toggleExpandActionsPaneFooter,
   resetLayout,
-  setClusterIconHighlightStatus,
-  toggleClusterStatus,
+  highlightItem,
   openQuickSearchActionsPopup,
   closeQuickSearchActionsPopup,
+  openSaveResourcesToFileFolderModal,
+  closeSaveResourcesToFileFolderModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

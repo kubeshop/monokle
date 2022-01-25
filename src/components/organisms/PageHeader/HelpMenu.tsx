@@ -28,7 +28,7 @@ const LabelContainer = styled(Col)`
 const HelpMenu = () => {
   const menu = (
     <Menu inlineIndent={25}>
-      <Menu.Item onClick={openDocumentation}>
+      <Menu.Item onClick={openDocumentation} key="documentation">
         <Row justify="center">
           <Col span={8}>
             <IconContainerSpan>
@@ -38,7 +38,7 @@ const HelpMenu = () => {
           <LabelContainer span={16}>Documentation</LabelContainer>
         </Row>
       </Menu.Item>
-      <Menu.Item onClick={openGitHub}>
+      <Menu.Item onClick={openGitHub} key="github">
         <Row justify="center">
           <Col span={8}>
             <IconContainerSpan>
@@ -48,7 +48,7 @@ const HelpMenu = () => {
           <LabelContainer span={16}>GitHub</LabelContainer>
         </Row>
       </Menu.Item>
-      <Menu.Item onClick={openDiscord}>
+      <Menu.Item onClick={openDiscord} key="discord">
         <Row justify="center">
           <Col span={8}>
             <IconContainerSpan>

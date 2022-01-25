@@ -2,13 +2,14 @@ import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 import hotkeys from '@constants/hotkeys';
-import {BrowseFolderTooltip, ReloadFolderTooltip} from '@constants/tooltips';
+import {ReloadFolderTooltip} from '@constants/tooltips';
 
-import {NewVersionCode} from '@models/appconfig';
+import {NewVersionCode, Project} from '@models/appconfig';
 
 import {updateStartupModalVisible} from '@redux/reducers/appConfig';
 import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
 import {
+  openCreateProjectModal,
   openFolderExplorer,
   openNewResourceWizard,
   resetLayout,
@@ -16,13 +17,13 @@ import {
   toggleLeftMenu,
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {RootState} from '@redux/store';
+import {RootState} from '@models/rootstate';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {openDocumentation, openGitHub} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
-import {MainDispatch} from './ipcMainRedux';
+import {MainDispatch, dispatchToFocusedWindow} from './ipcMainRedux';
 import {openApplication} from './main';
 
 const isMac = process.platform === 'darwin';
@@ -78,6 +79,14 @@ function setRootFolderInRendererThread(folder: string) {
   }
 }
 
+// need this because we cannot dispatch thunks from main
+function openProjectInRendererThread(project: Project) {
+  const window = BrowserWindow.getFocusedWindow();
+  if (window) {
+    window.webContents.send('open-project', project);
+  }
+}
+
 const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: 'File',
@@ -90,14 +99,6 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       },
       {type: 'separator'},
       {
-        label: 'Browse Folder',
-        toolTip: BrowseFolderTooltip,
-        enabled: !isInPreviewModeSelector(state),
-        click: () => {
-          dispatch(openFolderExplorer());
-        },
-      },
-      {
         label: 'Refresh Folder',
         enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         toolTip: ReloadFolderTooltip,
@@ -107,11 +108,34 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       },
       {type: 'separator'},
       {
-        label: 'Recent Folders',
-        submenu: state.config.recentFolders.map((folder: string) => ({
-          label: folder,
+        label: 'New Project',
+        submenu: [
+          {
+            label: 'Select Folder',
+            click: () => {
+              dispatchToFocusedWindow(openFolderExplorer());
+            },
+          },
+          {
+            label: 'Empty Project',
+            click: () => {
+              dispatchToFocusedWindow(openCreateProjectModal({fromTemplate: false}));
+            },
+          },
+          {
+            label: 'From Template',
+            click: () => {
+              dispatchToFocusedWindow(openCreateProjectModal({fromTemplate: true}));
+            },
+          },
+        ],
+      },
+      {
+        label: 'Recent Projects',
+        submenu: state.config.projects.map((project: Project) => ({
+          label: `${project.name} - ${project.rootFolder}`,
           click: () => {
-            setRootFolderInRendererThread(folder);
+            openProjectInRendererThread(project);
           },
         })),
       },
@@ -123,6 +147,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
           dispatch(openNewResourceWizard());
         },
       },
+
       {type: 'separator'},
       {
         label: 'Exit Preview',

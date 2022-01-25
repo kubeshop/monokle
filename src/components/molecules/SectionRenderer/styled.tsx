@@ -5,6 +5,12 @@ import styled from 'styled-components';
 import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
+  isHovered?: boolean;
+  isCheckable?: boolean;
+  $hasCustomNameDisplay: boolean;
+};
+
+type SectionContainerProps = {
   isSelected?: boolean;
   isHighlighted?: boolean;
   isHovered?: boolean;
@@ -18,7 +24,16 @@ type NameContainerProps = {
   hasCustomNameDisplay?: boolean;
 };
 
-export const NameContainer = styled.li<NameContainerProps>`
+export const NameContainer = styled.span<NameContainerProps>`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  ${props => props.isCheckable && `padding-left: 24px;`}
+  ${props => !props.isHovered && 'padding-right: 30px;'}
+  ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
+`;
+
+export const SectionContainer = styled.li<SectionContainerProps>`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -68,9 +83,11 @@ type NameProps = {
 };
 
 export const Name = styled.span<NameProps>`
-  padding: 2px 8px;
-  padding-right: 0px;
-  margin-right: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 5px;
+  cursor: pointer;
   ${props => {
     return `font-size: ${24 - 4 * props.$level}px;`;
   }}
@@ -124,9 +141,13 @@ export const BlankSpace = styled.span<{level?: number}>`
 `;
 
 export const Checkbox = styled(RawCheckbox)<{$level: number}>`
-  margin-left: 8px;
+  margin-left: -16px;
 `;
 
 export const CheckboxPlaceholder = styled.span<{$level: number}>`
   width: 24px;
+`;
+
+export const NameDisplayContainer = styled.span`
+  margin-left: 26px;
 `;

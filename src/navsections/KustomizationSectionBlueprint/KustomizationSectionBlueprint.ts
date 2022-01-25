@@ -1,10 +1,11 @@
-import {KUSTOMIZATION_KIND, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
+import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -34,14 +35,15 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
   rootSectionId: KUSTOMIZE_PATCH_SECTION_NAME,
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
+    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
     return {
       resourceMap: state.main.resourceMap,
       previewResourceId: state.main.previewResourceId,
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isFolderLoading: state.ui.isFolderLoading,
-      isInClusterMode: Boolean(
-        state.main.previewResourceId && state.main.previewResourceId.endsWith(state.config.kubeconfigPath)
-      ),
+      isInClusterMode: kubeConfigPath
+        ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
+        : false,
       selectedPath: state.main.selectedPath,
       selectedResourceId: state.main.selectedResourceId,
       isPreviewLoading: state.main.previewLoader.isLoading,
@@ -51,7 +53,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
   builder: {
     getRawItems: scope => {
       return Object.values(scope.resourceMap)
-        .filter(i => i.kind === KUSTOMIZATION_KIND)
+        .filter(i => isKustomizationResource(i))
         .sort((a, b) => a.name.localeCompare(b.name));
     },
     isLoading: scope => {

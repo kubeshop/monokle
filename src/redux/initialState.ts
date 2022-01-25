@@ -3,6 +3,7 @@ import os from 'os';
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
+import {ExtensionState} from '@models/extension';
 import {LogsState} from '@models/logs';
 import {NavigatorState} from '@models/navigator';
 import {UiState} from '@models/ui';
@@ -28,7 +29,6 @@ const initialAppState: AppState = {
   resourceDiff: {},
   isSelectingFile: false,
   isApplyingResource: false,
-  plugins: [],
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
       'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
@@ -44,12 +44,11 @@ const initialAppState: AppState = {
   notifications: [],
   shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
+  registeredKindHandlers: [],
 };
 
 const initialAppConfigState: AppConfig = {
-  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible'),
-  kubeconfigPath: '',
-  isKubeconfigPathValid: false,
+  isStartupModalVisible: electronStore.get('appConfig.startupModalVisible', true),
   settings: {
     filterObjectsOnSelection: false,
     autoZoomGraphOnSelection: true,
@@ -58,14 +57,15 @@ const initialAppConfigState: AppConfig = {
     theme: electronStore.get('appConfig.settings.theme'),
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
-    loadLastFolderOnStartup: electronStore.get('appConfig.settings.loadLastFolderOnStartup'),
-    hideExcludedFilesInFileExplorer: false,
+    hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
+    enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
   },
+  isClusterSelectorVisible: electronStore.get('appConfig.settings.isClusterSelectorVisible'),
+  loadLastProjectOnStartup: electronStore.get('appConfig.settings.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'outdated',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
-  recentFolders: electronStore.get('appConfig.recentFolders') || [],
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
     data: {
@@ -77,6 +77,10 @@ const initialAppConfigState: AppConfig = {
     currentContext: undefined,
   },
   osPlatform: os.platform(),
+  projects: electronStore.get('appConfig.projects') || [],
+  selectedProjectRootFolder: null,
+  projectConfig: null,
+  isProjectLoading: true,
 };
 
 const initialAlertState: AlertState = {};
@@ -89,23 +93,31 @@ const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
-  isSettingsOpen: electronStore.get('ui.isSettingsOpen'),
+  isSettingsOpen: false,
   isClusterDiffVisible: false,
-  isNotificationsOpen: electronStore.get('ui.isNotificationsOpen'),
+  isNotificationsOpen: false,
   isFolderLoading: false,
   quickSearchActionsPopup: {
     isOpen: false,
   },
   newResourceWizard: {
-    isOpen: electronStore.get('ui.isNewResourceWizardOpen'),
+    isOpen: false,
   },
   createFolderModal: {
     isOpen: false,
     rootDir: '',
   },
+  createProjectModal: {
+    isOpen: false,
+    fromTemplate: false,
+  },
   renameResourceModal: {
     isOpen: false,
     resourceId: '',
+  },
+  saveResourcesToFileFolderModal: {
+    isOpen: false,
+    resourcesIds: [],
   },
   renameEntityModal: {
     isOpen: false,
@@ -139,18 +151,32 @@ const initialUiState: UiState = {
   shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
-  clusterPaneIconHighlighted: false,
-  clusterStatusHidden: electronStore.get('ui.clusterStatusHidden'),
+  highlightedItems: {
+    clusterPaneIcon: false,
+    createResource: false,
+    browseTemplates: false,
+    connectToCluster: false,
+  },
 };
 
 const initialNavigatorState: NavigatorState = {
   sectionInstanceMap: {},
   itemInstanceMap: {},
   collapsedSectionIds: [],
+  registeredSectionBlueprintIds: [],
 };
 
 const initialUiCoachState: UiCoachState = {
   hasUserPerformedClickOnClusterIcon: false,
+};
+
+const initialExtensionState: ExtensionState = {
+  isLoadingExistingPlugins: true,
+  isLoadingExistingTemplates: true,
+  isLoadingExistingTemplatePacks: true,
+  pluginMap: {},
+  templateMap: {},
+  templatePackMap: {},
 };
 
 export default {
@@ -161,4 +187,5 @@ export default {
   ui: initialUiState,
   navigator: initialNavigatorState,
   uiCoach: initialUiCoachState,
+  extension: initialExtensionState,
 };

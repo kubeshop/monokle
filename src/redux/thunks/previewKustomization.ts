@@ -8,10 +8,18 @@ import path from 'path';
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppConfig} from '@models/appconfig';
+import {AppDispatch} from '@models/appdispatch';
+import {KustomizeCommandType} from '@models/kustomize';
+import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {AppDispatch, RootState} from '@redux/store';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
+
+export type KustomizeCommandOptions = {
+  folder: string;
+  kustomizeCommand: KustomizeCommandType;
+  enableHelm: boolean;
+};
 
 /**
  * Thunk to preview kustomizations
@@ -56,6 +64,13 @@ function runKustomize(folder: string, appConfig: AppConfig): any {
     ipcRenderer.once('kustomize-result', (event, arg) => {
       resolve(arg);
     });
-    ipcRenderer.send('run-kustomize', {folder, kustomizeCommand: appConfig.settings.kustomizeCommand});
+    const kustomizeCommand = appConfig.projectConfig?.settings?.kustomizeCommand || appConfig.settings.kustomizeCommand;
+    const enableHelmWithKustomize =
+      appConfig.projectConfig?.settings?.enableHelmWithKustomize || appConfig.settings.enableHelmWithKustomize;
+    ipcRenderer.send('run-kustomize', {
+      folder,
+      kustomizeCommand,
+      enableHelm: enableHelmWithKustomize,
+    } as KustomizeCommandOptions);
   });
 }

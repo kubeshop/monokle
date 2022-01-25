@@ -1,6 +1,7 @@
 import React, {useContext, useMemo} from 'react';
+import {useSelector} from 'react-redux';
 
-import {Button, Space, Tooltip} from 'antd';
+import {Badge, Button, Skeleton, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
 
 import {
@@ -17,11 +18,16 @@ import styled from 'styled-components';
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {FileExplorerTooltip, PluginManagerTooltip} from '@constants/tooltips';
 
-import {LeftMenuSelection} from '@models/ui';
+import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, setRightMenuSelection, toggleLeftMenu, toggleRightMenu} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {
+  activeProjectSelector,
+  helmChartsSelector,
+  isInPreviewModeSelector,
+  kustomizationsSelector,
+} from '@redux/selectors';
 
 import {
   ActionsPane,
@@ -30,7 +36,7 @@ import {
   KustomizePane,
   NavigatorPane,
   PluginManagerPane,
-  TemplatesPane,
+  TemplateManagerPane,
 } from '@organisms';
 
 import {GraphView} from '@molecules';
@@ -38,7 +44,7 @@ import {GraphView} from '@molecules';
 import {Col, SplitView} from '@atoms';
 
 import {AppBorders} from '@styles/Borders';
-import {BackgroundColors} from '@styles/Colors';
+import Colors, {BackgroundColors} from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
 import featureJson from '@src/feature-flags.json';
@@ -46,6 +52,8 @@ import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprin
 import {KUSTOMIZATION_SECTION_NAME} from '@src/navsections/KustomizationSectionBlueprint';
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '@src/navsections/KustomizePatchSectionBlueprint';
 
+import RecentProjectsPane from '../RecentProjectsPane';
+import StartProjectPane from '../StartProjectPane';
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
 
@@ -81,6 +89,10 @@ const StyledColumnRightMenu = styled(Col)`
   border-left: ${AppBorders.pageDivider};
 `;
 
+const StyledSkeleton = styled(Skeleton)`
+  padding: 8px 16px;
+`;
+
 const iconMenuWidth = 45;
 
 const PaneManager = () => {
@@ -95,8 +107,12 @@ const PaneManager = () => {
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
+  const activeProject = useSelector(activeProjectSelector);
+  const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
+  const kustomizeResources = useAppSelector(kustomizationsSelector);
+  const helmChartResources = useAppSelector(helmChartsSelector);
 
-  // TODO: refactor this to get the size of the page header dinamically
+  // TODO: refactor this to get the size of the page header dynamically
   const contentHeight = useMemo(() => {
     return isInPreviewMode ? `${windowSize.height - 100}px` : `${windowSize.height - 75}px`;
   }, [isInPreviewMode, windowSize.height]);
@@ -105,7 +121,7 @@ const PaneManager = () => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
 
-  const setLeftActiveMenu = (selectedMenu: LeftMenuSelection) => {
+  const setLeftActiveMenu = (selectedMenu: LeftMenuSelectionType) => {
     if (leftMenuSelection === selectedMenu) {
       dispatch(toggleLeftMenu());
     } else {
@@ -129,74 +145,11 @@ const PaneManager = () => {
     }
   };
 
-  return (
-    <StyledRow style={{height: contentHeight}}>
-      <StyledColumnLeftMenu>
-        <Space direction="vertical" style={{width: 43}}>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
-            <MenuButton
-              isSelected={leftMenuSelection === 'file-explorer'}
-              isActive={leftActive}
-              shouldWatchSelectedPath
-              onClick={() => setLeftActiveMenu('file-explorer')}
-            >
-              <MenuIcon
-                style={{marginLeft: 4}}
-                icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
-                active={leftActive}
-                isSelected={leftMenuSelection === 'file-explorer'}
-              />
-            </MenuButton>
-          </Tooltip>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
-            <MenuButton
-              isSelected={leftMenuSelection === 'kustomize-pane'}
-              isActive={leftActive}
-              onClick={() => setLeftActiveMenu('kustomize-pane')}
-              sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
-            >
-              <MenuIcon iconName="kustomize" active={leftActive} isSelected={leftMenuSelection === 'kustomize-pane'} />
-            </MenuButton>
-          </Tooltip>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
-            <MenuButton
-              isSelected={leftMenuSelection === 'helm-pane'}
-              isActive={leftActive}
-              onClick={() => setLeftActiveMenu('helm-pane')}
-              sectionNames={[HELM_CHART_SECTION_NAME]}
-            >
-              <MenuIcon iconName="helm" active={leftActive} isSelected={leftMenuSelection === 'helm-pane'} />
-            </MenuButton>
-          </Tooltip>
-          {featureJson.TemplatesPane && (
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
-              <MenuButton
-                isSelected={leftMenuSelection === 'templates-pane'}
-                isActive={leftActive}
-                onClick={() => setLeftActiveMenu('templates-pane')}
-              >
-                <MenuIcon
-                  icon={FormatPainterOutlined}
-                  active={leftActive}
-                  isSelected={leftMenuSelection === 'templates-pane'}
-                />
-              </MenuButton>
-            </Tooltip>
-          )}
-          {featureJson.PluginManager && (
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
-              <MenuButton
-                isSelected={leftMenuSelection === 'plugin-manager'}
-                isActive={leftActive}
-                onClick={() => setLeftActiveMenu('plugin-manager')}
-              >
-                <MenuIcon icon={ApiOutlined} active={leftActive} isSelected={leftMenuSelection === 'plugin-manager'} />
-              </MenuButton>
-            </Tooltip>
-          )}
-        </Space>
-      </StyledColumnLeftMenu>
-
+  let content;
+  if (isProjectLoading) {
+    content = <StyledSkeleton />;
+  } else if (activeProject) {
+    content = (
       <StyledColumnPanes style={{width: contentWidth}}>
         <SplitView
           contentWidth={contentWidth}
@@ -213,14 +166,14 @@ const PaneManager = () => {
               </div>
               <div
                 style={{
-                  display: featureJson.TemplatesPane && leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
+                  display: leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
                 }}
               >
-                <TemplatesPane />
+                <TemplateManagerPane />
               </div>
               <div
                 style={{
-                  display: featureJson.PluginManager && leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
+                  display: leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
                 }}
               >
                 <PluginManagerPane />
@@ -240,6 +193,110 @@ const PaneManager = () => {
           hideRight={!rightActive}
         />
       </StyledColumnPanes>
+    );
+  } else {
+    content = (
+      <StyledColumnPanes style={{width: contentWidth}}>
+        <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
+          {leftMenuSelection === 'plugin-manager' && leftActive && (
+            <div style={{borderRight: `1px solid ${Colors.grey3}`}}>
+              <PluginManagerPane />
+            </div>
+          )}
+          <div style={{flex: 3}}>
+            <StartProjectPane />
+          </div>
+          <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
+            <RecentProjectsPane />
+          </div>
+        </div>
+      </StyledColumnPanes>
+    );
+  }
+
+  return (
+    <StyledRow style={{height: contentHeight}}>
+      <StyledColumnLeftMenu>
+        <Space direction="vertical" style={{width: 43}}>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerTooltip} placement="right">
+            <MenuButton
+              isSelected={leftMenuSelection === 'file-explorer'}
+              isActive={Boolean(activeProject) && leftActive}
+              shouldWatchSelectedPath
+              onClick={() => setLeftActiveMenu('file-explorer')}
+              disabled={!activeProject}
+            >
+              <MenuIcon
+                style={{marginLeft: 4}}
+                icon={isFolderOpen ? FolderOpenOutlined : FolderOutlined}
+                active={Boolean(activeProject) && leftActive}
+                isSelected={Boolean(activeProject) && leftMenuSelection === 'file-explorer'}
+              />
+            </MenuButton>
+          </Tooltip>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Kustomizations" placement="right">
+            <MenuButton
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
+              isActive={Boolean(activeProject) && leftActive}
+              onClick={() => setLeftActiveMenu('kustomize-pane')}
+              sectionNames={[KUSTOMIZATION_SECTION_NAME, KUSTOMIZE_PATCH_SECTION_NAME]}
+              disabled={!activeProject}
+            >
+              <Badge count={kustomizeResources.length || 0} color={Colors.blue6} size="default" dot>
+                <MenuIcon
+                  iconName="kustomize"
+                  active={Boolean(activeProject) && leftActive}
+                  isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
+                />
+              </Badge>
+            </MenuButton>
+          </Tooltip>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title="Helm Charts" placement="right">
+            <MenuButton
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
+              isActive={Boolean(activeProject) && leftActive}
+              onClick={() => setLeftActiveMenu('helm-pane')}
+              sectionNames={[HELM_CHART_SECTION_NAME]}
+              disabled={!activeProject}
+            >
+              <Badge count={Object.values(helmChartResources).length} color={Colors.blue6} size="default" dot>
+                <MenuIcon
+                  iconName="helm"
+                  active={Boolean(activeProject) && leftActive}
+                  isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
+                />
+              </Badge>
+            </MenuButton>
+          </Tooltip>
+
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+            <MenuButton
+              isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
+              isActive={Boolean(activeProject) && leftActive}
+              onClick={() => setLeftActiveMenu('templates-pane')}
+              disabled={!activeProject}
+            >
+              <MenuIcon
+                icon={FormatPainterOutlined}
+                active={Boolean(activeProject) && leftActive}
+                isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
+              />
+            </MenuButton>
+          </Tooltip>
+
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerTooltip} placement="right">
+            <MenuButton
+              isSelected={leftMenuSelection === 'plugin-manager'}
+              isActive={leftActive}
+              onClick={() => setLeftActiveMenu('plugin-manager')}
+            >
+              <MenuIcon icon={ApiOutlined} active={leftActive} isSelected={leftMenuSelection === 'plugin-manager'} />
+            </MenuButton>
+          </Tooltip>
+        </Space>
+      </StyledColumnLeftMenu>
+
+      {content}
 
       <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
         <Space direction="vertical" style={{width: 43}}>

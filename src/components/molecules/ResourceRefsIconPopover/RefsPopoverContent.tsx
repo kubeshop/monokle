@@ -4,8 +4,6 @@ import {Divider, Typography} from 'antd';
 
 import styled from 'styled-components';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-
 import {ResourceMapType} from '@models/appstate';
 import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
 import {MonacoRange} from '@models/ui';
@@ -13,6 +11,7 @@ import {MonacoRange} from '@models/ui';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectK8sResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
@@ -86,7 +85,7 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
       if (previewType === 'kustomization' && ref.target?.type === 'resource') {
         const targetResourceId = ref.target.resourceId;
         const targetResource = targetResourceId ? resourceMap[targetResourceId] : undefined;
-        if (targetResource?.kind === KUSTOMIZATION_KIND && targetResourceId !== previewResourceId) {
+        if (isKustomizationResource(targetResource) && targetResourceId !== previewResourceId) {
           return true;
         }
       }

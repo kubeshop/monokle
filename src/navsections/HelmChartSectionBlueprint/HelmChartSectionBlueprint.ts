@@ -29,13 +29,14 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
   containerElementId: 'helm-sections-container',
   rootSectionId: HELM_CHART_SECTION_NAME,
   getScope: state => {
+    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
     return {
       helmChartMap: state.main.helmChartMap,
       helmValuesMap: state.main.helmValuesMap,
       previewValuesFileId: state.main.previewValuesFileId,
-      isInClusterMode: Boolean(
-        state.main.previewResourceId && state.main.previewResourceId.endsWith(state.config.kubeconfigPath)
-      ),
+      isInClusterMode: kubeConfigPath
+        ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
+        : false,
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isFolderLoading: state.ui.isFolderLoading,
       isPreviewLoading: state.main.previewLoader.isLoading,

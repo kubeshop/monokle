@@ -1,28 +1,43 @@
-import React, {useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
-import {Button} from 'antd';
+import {Button, Skeleton, Tooltip} from 'antd';
 
-import {PlusOutlined} from '@ant-design/icons';
+import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
-import {useAppSelector} from '@redux/hooks';
+import {PluginManagerPaneReloadTooltip} from '@constants/tooltips';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {checkForExtensionsUpdates} from '@redux/services/extension';
 
 import {TitleBar} from '@components/molecules';
 
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
-
-import * as S from './styled';
+import * as S from './PluginManagerPane.styled';
 
 function PluginManagerPane() {
-  const plugins = useAppSelector(state => state.main.plugins);
+  const dispatch = useAppDispatch();
+  const isLoadingExistingPlugins = useAppSelector(state => state.extension.isLoadingExistingPlugins);
 
-  const activePlugins = useMemo(() => plugins.filter(p => p.isActive), [plugins]);
-  const inactivePlugins = useMemo(() => plugins.filter(p => !p.isActive), [plugins]);
+  const pluginMap = useAppSelector(state => state.extension.pluginMap);
+  const templateMap = useAppSelector(state => state.extension.templateMap);
+  const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
+
+  const sortedPluginEntries = useMemo(() => {
+    return Object.entries(pluginMap).sort((a, b) => a[1].name.localeCompare(b[1].name));
+  }, [pluginMap]);
 
   const [isInstallModalVisible, setInstallModalVisible] = useState<boolean>(false);
+
   const onClickInstallPlugin = () => {
     setInstallModalVisible(true);
   };
+
+  const onClickReload = useCallback(
+    () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
+    [templateMap, pluginMap, templatePackMap, dispatch]
+  );
+
   const onCloseInstallPlugin = () => {
     setInstallModalVisible(false);
   };
@@ -30,30 +45,28 @@ function PluginManagerPane() {
   return (
     <div>
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
-      <TitleBar title="Plugin Manager">
+      <TitleBar title="Plugins">
+        <Tooltip title={PluginManagerPaneReloadTooltip} placement="bottom">
+          <Button
+            disabled={sortedPluginEntries.length === 0}
+            onClick={onClickReload}
+            type="link"
+            size="small"
+            icon={<ReloadOutlined />}
+          />
+        </Tooltip>
         <Button onClick={onClickInstallPlugin} type="link" size="small" icon={<PlusOutlined />} />
       </TitleBar>
       <S.Container>
-        {plugins.length === 0 ? (
-          <p>No plugins installed yet.</p>
+        {sortedPluginEntries.length === 0 ? (
+          <>{isLoadingExistingPlugins ? <Skeleton /> : <p>No plugins installed yet.</p>}</>
         ) : (
           <>
-            {activePlugins.length > 0 && (
-              <>
-                <h2>Active plugins</h2>
-                {activePlugins.map(activePlugin => (
-                  <PluginInformation key={activePlugin.name} plugin={activePlugin} />
-                ))}
-              </>
-            )}
-            {inactivePlugins.length > 0 && (
-              <>
-                <h2>Inactive plugins</h2>
-                {inactivePlugins.map(inactivePlugin => (
-                  <PluginInformation key={inactivePlugin.name} plugin={inactivePlugin} />
-                ))}
-              </>
-            )}
+            {sortedPluginEntries.length > 0 &&
+              sortedPluginEntries.map(([path, activePlugin]) => (
+                <PluginInformation key={activePlugin.name} plugin={activePlugin} pluginPath={path} />
+              ))}
+            {!sortedPluginEntries.length && <S.NotFoundLabel>No plugins found.</S.NotFoundLabel>}
           </>
         )}
       </S.Container>
