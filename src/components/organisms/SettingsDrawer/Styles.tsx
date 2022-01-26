@@ -1,8 +1,10 @@
-import {Button as RawButton, Select as RawSelect} from 'antd';
+import {Button as RawButton, Collapse as RawCollapse, Select as RawSelect} from 'antd';
 
 import {WarningOutlined as RawWarningOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
+
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import Colors from '@styles/Colors';
 
@@ -27,6 +29,12 @@ export const HiddenInput = styled.input`
 
 export const Select = styled(RawSelect)`
   width: 100%;
+`;
+
+export const Collapse = styled(RawCollapse)`
+  max-height: 100%;
+  overflow-y: scroll;
+  ${GlobalScrollbarStyle};
 `;
 
 export const WarningOutlined = styled(

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Collapse, Form, Input, Tooltip} from 'antd';
+import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
@@ -40,7 +40,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {Settings} from './Settings';
 import * as S from './Styles';
 
-const {Panel} = Collapse;
+const {Panel} = S.Collapse;
 
 const SettingsDrawer = () => {
   const dispatch = useAppDispatch();
@@ -158,7 +158,7 @@ const SettingsDrawer = () => {
       visible={isSettingsOpened}
       bodyStyle={{padding: 0}}
     >
-      <Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
+      <S.Collapse bordered={false} activeKey={activePanels} onChange={handlePaneCollapse}>
         <Panel header="Global Settings" key="1">
           <Form
             form={settingsForm}
@@ -221,7 +221,7 @@ const SettingsDrawer = () => {
             />
           </Panel>
         )}
-      </Collapse>
+      </S.Collapse>
       <FileExplorer {...fileExplorerProps} />
     </Drawer>
   );
