@@ -42,7 +42,7 @@ const ProjectSelection = () => {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const dropdownButtonRef = useRef<HTMLButtonElement>();
+  const dropdownButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
