@@ -70,7 +70,7 @@ const CreateProjectModal: React.FC = () => {
         {
           name: 'rootFolder',
           value: projectPath,
-          errors: ['Path exists!'],
+          errors: !formValues.name ? [] : ['Path exists!'],
         },
       ]);
       setSubmitEnabled(false);
