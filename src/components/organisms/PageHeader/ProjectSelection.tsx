@@ -1,4 +1,5 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
 import {Dropdown, Modal, Tooltip} from 'antd';
@@ -41,6 +42,7 @@ const ProjectSelection = () => {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const dropdownButtonRef = useRef<HTMLButtonElement>();
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -50,6 +52,11 @@ const ProjectSelection = () => {
     },
     {isDirectoryExplorer: true}
   );
+
+  useHotkeys('escape', () => {
+    setIsDropdownMenuVisible(false);
+    dropdownButtonRef.current?.blur();
+  });
 
   useEffect(() => {
     if (searchText) {
@@ -227,7 +234,7 @@ const ProjectSelection = () => {
         onVisibleChange={setIsDropdownMenuVisible}
       >
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
-          <S.Button disabled={previewLoader.isLoading || isInPreviewMode} type="link">
+          <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
             <S.FolderOpenOutlined />
             <S.ProjectName>{activeProject.name}</S.ProjectName>
             <S.DownOutlined />

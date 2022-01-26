@@ -21,7 +21,7 @@ export const BackToProjectButton = styled(RawButton)`
   color: ${Colors.blue6};
 `;
 
-export const Button = styled(RawButton)`
+export const Button = styled(props => <RawButton {...props} />)`
   display: flex;
   align-items: center;
   margin-right: 0px !important;
