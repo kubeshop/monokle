@@ -447,7 +447,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 )}
               </TabPane>
             )}
-            {selectedResource && resourceKindHandler && resourceKindHandler.kind !== 'Kustomization' && (
+            {selectedResource && resourceKindHandler && !isKustomizationResource(selectedResource) && (
               <TabPane
                 key="metadataForm"
                 style={{height: editorTabPaneHeight}}
