@@ -1,3 +1,5 @@
+import {Button} from 'antd';
+
 import styled from 'styled-components';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
@@ -25,12 +27,15 @@ export const ProjectsContainer = styled.div`
   ${GlobalScrollbarStyle}
 `;
 
-export const ProjectItem = styled.div`
+export const ProjectItem = styled.div<{activeproject: boolean}>`
   margin-bottom: 16px;
+  margin-left: ${props => (props.activeproject ? '-12px' : 'unset')};
+  padding-left: ${props => (props.activeproject ? '12px' : 'unset')};
+  border-left: 4px solid ${props => (props.activeproject ? Colors.lightSeaGreen : 'transparent')};
+  color: ${props => (props.activeproject ? Colors.lightSeaGreen : Colors.whitePure)};
 `;
 
 export const ProjectName = styled.div`
-  color: ${Colors.whitePure};
   font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
@@ -60,4 +65,9 @@ export const ProjectLastOpened = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   width: auto;
+`;
+
+export const BackToProjectButton = styled(Button)`
+  font-size: 12px;
+  color: ${Colors.lightSeaGreen};
 `;
