@@ -138,23 +138,17 @@ const PageHeader = () => {
 
           <S.SettingsCol>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
-              <S.IconContainerSpan>
-                <Badge count={unseenNotificationsCount} size="small">
-                  <S.BellOutlined onClick={toggleNotificationsDrawer} />
-                </Badge>
-              </S.IconContainerSpan>
+              <Badge count={unseenNotificationsCount} size="small">
+                <S.BellOutlined onClick={toggleNotificationsDrawer} />
+              </Badge>
             </Tooltip>
 
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginDrawerTooltip}>
-              <S.IconContainerSpan>
-                <S.ApiOutlined onClick={showPluginsDrawer} />
-              </S.IconContainerSpan>
+              <S.ApiOutlined onClick={showPluginsDrawer} />
             </Tooltip>
 
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SettingsTooltip}>
-              <S.IconContainerSpan>
-                <S.SettingsOutlined onClick={toggleSettingsDrawer} />
-              </S.IconContainerSpan>
+              <S.SettingsOutlined onClick={toggleSettingsDrawer} />
             </Tooltip>
 
             <HelpMenu />
