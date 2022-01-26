@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Form, Input, Modal, Select} from 'antd';
@@ -297,37 +297,39 @@ const NewResourceWizard = () => {
     closeWizard();
   };
 
-  const foldersList = useMemo(
-    () =>
-      Object.entries(fileMap)
-        .map(([key, value]) => ({folderName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
-        .filter(file => file.isFolder),
-    [fileMap]
-  );
+  const [foldersList, filesList]: [string[], string[]] = useMemo(() => {
+    const folders: string[] = [];
+    const files: string[] = [];
 
-  const fileList = useMemo(
-    () =>
-      Object.entries(fileMap)
-        .map(([key, value]) => ({fileName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
-        .filter(file => !file.isFolder),
-    [fileMap]
-  );
+    Object.entries(fileMap).forEach(([key, value]) => {
+      if (!value.isSupported || value.isExcluded) {
+        return;
+      }
+      if (value.children) {
+        folders.push(key.replace(path.sep, ''));
+      } else {
+        files.push(key.replace(path.sep, ''));
+      }
+    });
 
-  const renderFolderSelectOptions = () => {
-    return foldersList.map(folder => (
-      <Option key={folder.folderName} value={folder.folderName}>
-        {folder.folderName}
+    return [folders, files];
+  }, [fileMap]);
+
+  const renderFileSelectOptions = useCallback(() => {
+    return filesList.map(fileName => (
+      <Option key={fileName} value={fileName}>
+        {fileName}
       </Option>
     ));
-  };
+  }, [filesList]);
 
-  const renderFileSelectOptions = () => {
-    return fileList.map(folder => (
-      <Option key={folder.fileName} value={folder.fileName}>
-        {folder.fileName}
+  const renderFolderSelectOptions = useCallback(() => {
+    return foldersList.map(folderName => (
+      <Option key={folderName} value={folderName}>
+        {folderName}
       </Option>
     ));
-  };
+  }, [foldersList]);
 
   const onSelectChange = () => {
     setInputValue('');
