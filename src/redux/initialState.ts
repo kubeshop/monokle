@@ -81,6 +81,7 @@ const initialAppConfigState: AppConfig = {
   selectedProjectRootFolder: null,
   projectConfig: null,
   isProjectLoading: true,
+  projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
 };
 
 const initialAlertState: AlertState = {};

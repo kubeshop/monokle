@@ -62,3 +62,10 @@ export const convertRecentFilesToRecentProjects = (dispatch: (action: AnyAction)
     electronStore.delete('appConfig.recentFolders');
   }
 };
+export const setProjectsRootFolder = (userHomeDir: string) => {
+  const projectsRootPath: string = electronStore.get('appConfig.projectsRootPath');
+
+  if (!projectsRootPath) {
+    electronStore.set('appConfig.projectsRootPath', path.join(userHomeDir, 'Monokle'));
+  }
+};

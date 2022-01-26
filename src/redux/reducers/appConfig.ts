@@ -1,5 +1,6 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import path from 'path';
 
@@ -171,6 +172,10 @@ export const configSlice = createSlice({
         return;
       }
 
+      if (!existsSync(project.rootFolder)) {
+        mkdirSync(project.rootFolder, {recursive: true});
+      }
+
       if (!project.name) {
         const folderNames: string[] = project.rootFolder.split(path.sep);
         project.name = folderNames[folderNames.length - 1];
@@ -286,6 +291,10 @@ export const configSlice = createSlice({
         electronStore.set('appConfig.projects', state.projects);
       }
     },
+    changeProjectsRootPath: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      state.projectsRootPath = action.payload;
+      electronStore.set('appConfig.projectsRootPath', state.projectsRootPath);
+    },
   },
 });
 
@@ -314,5 +323,6 @@ export const {
   setUserDirs,
   createProject,
   changeCurrentProjectName,
+  changeProjectsRootPath,
 } = configSlice.actions;
 export default configSlice.reducer;

@@ -70,6 +70,7 @@ const schema = {
       newVersion: {
         type: 'number',
       },
+
       projects: {
         type: 'array',
         items: {
@@ -89,6 +90,9 @@ const schema = {
             },
           },
         },
+      },
+      projectsRootFolder: {
+        type: 'string',
       },
     },
   },

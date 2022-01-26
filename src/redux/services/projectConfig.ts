@@ -16,23 +16,28 @@ export const CONFIG_PATH = (projectRootPath?: string | null) =>
   projectRootPath ? `${projectRootPath}${sep}.monokle` : '';
 
 export const writeProjectConfigFile = (state: AppConfig | SerializableObject) => {
-  const absolutePath = CONFIG_PATH(state.selectedProjectRootFolder);
+  try {
+    const absolutePath = CONFIG_PATH(state.selectedProjectRootFolder);
 
-  const projectConfig = populateProjectConfigToWrite(state);
-  if (projectConfig && !_.isEmpty(projectConfig)) {
-    try {
-      const savedConfig: ProjectConfig = JSON.parse(readFileSync(absolutePath, 'utf8'));
-      if (!_.isEqual(savedConfig, projectConfig)) {
+    const projectConfig = populateProjectConfigToWrite(state);
+    if (projectConfig && !_.isEmpty(projectConfig)) {
+      try {
+        const savedConfig: ProjectConfig = JSON.parse(readFileSync(absolutePath, 'utf8'));
+        if (!_.isEqual(savedConfig, projectConfig)) {
+          writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
+        }
+      } catch (error: any) {
+        if (error instanceof Error) {
+          log.warn(`[writeProjectConfigFile]: ${error.message}`);
+        }
         writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
       }
-    } catch (error: any) {
-      if (error instanceof Error) {
-        log.warn(`[writeProjectConfigFile]: ${error.message}`);
-      }
-      writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
+    } else {
+      writeFileSync(absolutePath, ``, 'utf-8');
     }
-  } else {
-    writeFileSync(absolutePath, ``, 'utf-8');
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error);
   }
 };
 

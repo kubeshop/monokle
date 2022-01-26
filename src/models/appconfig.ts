@@ -97,6 +97,7 @@ interface AppConfig {
   userDataDir?: string;
   userTempDir?: string;
   isProjectLoading?: boolean;
+  projectsRootPath: string;
 }
 
 export type {AppConfig};
