@@ -1,4 +1,4 @@
-name: monokle-sign-notarize-publish
+name: monokle-sign-notarize-publish-updater
 
 on:
   push:
