@@ -176,10 +176,6 @@ export const Settings = ({
     setCurrentKubeConfig(e.target.value);
   };
 
-  const handleOnchangeProjectName = (e: any) => {
-    setCurrentProjectName(e.target.value);
-  };
-
   const onSelectFile = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (fileInput.current?.files && fileInput.current.files.length > 0) {
