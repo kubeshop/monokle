@@ -37,6 +37,9 @@ const PluginInformation: React.FC<IProps> = props => {
     }
   };
 
+  const openGithub = () => {};
+  const openHelpUrl = () => {};
+
   return (
     <S.Container>
       <S.IconContainer>
@@ -44,37 +47,44 @@ const PluginInformation: React.FC<IProps> = props => {
       </S.IconContainer>
 
       <S.InfoContainer>
-        <S.Name>{plugin.name}</S.Name>
+        <S.NameActionsContainer>
+          <S.Name>{plugin.name}</S.Name>
+
+          <S.IconsContainer>
+            <S.QuestionCircleOutlined onClick={openHelpUrl} />
+            <S.GithubOutlined onClick={openGithub} />
+            <Popconfirm
+              cancelText="Cancel"
+              okText="Delete"
+              okType="danger"
+              placement="bottom"
+              title={() => (
+                <>
+                  <p>Are you sure you want to delete {plugin.name}?</p>
+                  <p>
+                    <ExclamationOutlined style={{color: 'red'}} />
+                    This action will delete the following templates:
+                    <ul>
+                      {pluginTemplates.map(t => (
+                        <li key={t.id}>{t.name}</li>
+                      ))}
+                    </ul>
+                  </p>
+                </>
+              )}
+              onConfirm={handleDelete}
+            >
+              <S.DeleteOutlined />
+            </Popconfirm>
+          </S.IconsContainer>
+        </S.NameActionsContainer>
+
         <S.Description>{plugin.description || 'No description'}</S.Description>
         <S.AdditionalInformation>
           <span>Author: {plugin.author}</span>
           <span>Version: {plugin.version}</span>
         </S.AdditionalInformation>
       </S.InfoContainer>
-
-      <Popconfirm
-        cancelText="Cancel"
-        okText="Delete"
-        okType="danger"
-        placement="bottom"
-        title={() => (
-          <>
-            <p>Are you sure you want to delete {plugin.name}?</p>
-            <p>
-              <ExclamationOutlined style={{color: 'red'}} />
-              This action will delete the following templates:
-              <ul>
-                {pluginTemplates.map(t => (
-                  <li key={t.id}>{t.name}</li>
-                ))}
-              </ul>
-            </p>
-          </>
-        )}
-        onConfirm={handleDelete}
-      >
-        <S.DeleteOutlined />
-      </Popconfirm>
     </S.Container>
   );
 };

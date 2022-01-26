@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div`
-  padding: 16px;
+  padding: 12px;
 `;
 
 export const NotFoundLabel = styled.span`
