@@ -41,6 +41,7 @@ const ProjectSelection = () => {
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
+  const deleteModalVisible = useRef({visible: false});
   const [searchText, setSearchText] = useState('');
   const dropdownButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -87,7 +88,7 @@ const ProjectSelection = () => {
 
   const handleDeleteProject = (project: Project) => {
     const title = `Do you want to remove ${project?.name}?`;
-
+    deleteModalVisible.current.visible = true;
     Modal.confirm({
       title,
       icon: <ExclamationCircleOutlined />,
@@ -97,10 +98,19 @@ const ProjectSelection = () => {
         return new Promise(resolve => {
           dispatch(setDeleteProject(project));
           resolve({});
+          deleteModalVisible.current.visible = false;
         });
       },
-      onCancel() {},
+      onCancel() {
+        deleteModalVisible.current.visible = false;
+      },
     });
+  };
+
+  const onDropdownVisibleChange = (visible: boolean) => {
+    if (!deleteModalVisible.current.visible) {
+      setIsDropdownMenuVisible(visible);
+    }
   };
 
   const getRelativeDate = (isoDate: string | undefined) => {
@@ -231,7 +241,7 @@ const ProjectSelection = () => {
         placement="bottomCenter"
         trigger={['click']}
         visible={isDropdownMenuVisible}
-        onVisibleChange={setIsDropdownMenuVisible}
+        onVisibleChange={onDropdownVisibleChange}
       >
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} placement="bottomRight" title={ProjectManagementTooltip}>
           <S.Button ref={dropdownButtonRef} disabled={previewLoader.isLoading || isInPreviewMode} type="link">
