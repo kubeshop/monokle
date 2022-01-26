@@ -18,6 +18,12 @@ const IconContainerSpan = styled.span`
   cursor: pointer;
 `;
 
+const StyledQuestionCircleOutlined = styled(QuestionCircleOutlined)`
+  cursor: pointer;
+  font-size: 20px;
+  color: ${FontColors.elementSelectTitle};
+`;
+
 const MenuItem = styled(Menu.Item)`
   padding-right: 20px;
 `;
@@ -53,7 +59,7 @@ const HelpMenu = () => {
         <Row align="middle">
           <Col span={7}>
             <IconContainerSpan>
-              <img src={DiscordLogo} style={{height: '24px', width: '24px'}} />
+              <img src={DiscordLogo} style={{height: '18px', width: '18px'}} />
             </IconContainerSpan>
           </Col>
 
@@ -65,9 +71,7 @@ const HelpMenu = () => {
 
   return (
     <Dropdown key="more" overlay={menu}>
-      <IconContainerSpan>
-        <QuestionCircleOutlined />
-      </IconContainerSpan>
+      <StyledQuestionCircleOutlined />
     </Dropdown>
   );
 };
