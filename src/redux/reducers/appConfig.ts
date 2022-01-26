@@ -1,5 +1,6 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import path from 'path';
 
@@ -169,6 +170,10 @@ export const configSlice = createSlice({
 
       if (existingProject) {
         return;
+      }
+
+      if (!existsSync(project.rootFolder)) {
+        mkdirSync(project.rootFolder, {recursive: true});
       }
 
       if (!project.name) {

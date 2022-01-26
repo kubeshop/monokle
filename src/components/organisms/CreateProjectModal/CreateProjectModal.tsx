@@ -43,38 +43,56 @@ const CreateProjectModal: React.FC = () => {
   const [isModalHid, setIsModalHid] = useState(false);
   const [isSubmitEnabled, setSubmitEnabled] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [isEditingRootPath, setIsEditingRoothPath] = useState(false);
   const [pickedPath, setPickedPath] = useState(projectsRootPath);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
       if (folderPath) {
         setPickedPath(folderPath);
-        createProjectForm.setFields([{name: 'rootFolder', value: folderPath, errors: ['Path exists!']}]);
-        setSubmitEnabled(false);
+        setFormValues({...formValues});
+        setIsEditingRoothPath(false);
       }
     },
     {isDirectoryExplorer: true}
   );
 
-  const setProjectRootPath = (rootFolder: string) => {
-    const pathExists = existsSync(rootFolder);
-    setFormValues({...formValues, rootFolder});
+  const setProjectRootPath = () => {
+    let projectPath = formValues.rootFolder;
+    if (!isEditingRootPath) {
+      projectPath = formValues.name ? path.join(pickedPath, formValues.name) : pickedPath;
+    }
+    const pathExists = existsSync(projectPath);
     if (pathExists) {
-      createProjectForm.setFields([{name: 'rootFolder', value: rootFolder, errors: ['Path exists!']}]);
+      createProjectForm.setFields([
+        {
+          name: 'rootFolder',
+          value: projectPath,
+          errors: ['Path exists!'],
+        },
+      ]);
       setSubmitEnabled(false);
     } else {
-      createProjectForm.setFields([{name: 'rootFolder', value: rootFolder}]);
+      createProjectForm.setFields([{name: 'rootFolder', value: projectPath, errors: []}]);
+      setSubmitEnabled(true);
     }
   };
 
   useEffect(() => {
-    setProjectRootPath(projectsRootPath);
+    setProjectRootPath();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pickedPath, formValues, isEditingRootPath]);
+
+  useEffect(() => {
+    setFormValues({...formValues, rootFolder: projectsRootPath});
+    setIsEditingRoothPath(false);
     setPickedPath(projectsRootPath);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectsRootPath, uiState.isOpen]);
 
   const onFinish = (values: {name: string; rootFolder: string}) => {
-    setFormValues(values);
+    setFormValues({...values});
+    setIsEditingRoothPath(false);
     if (uiState.fromTemplate && formStep === FormSteps.STEP_ONE) {
       setFormStep(FormSteps.STEP_TWO);
     }
@@ -120,6 +138,7 @@ const CreateProjectModal: React.FC = () => {
 
   const closeModal = () => {
     setFormValues({name: '', rootFolder: ''});
+    setIsEditingRoothPath(false);
     createProjectForm.resetFields();
     setFormStep(FormSteps.STEP_ONE);
     setSelectedTemplate(undefined);
@@ -170,10 +189,15 @@ const CreateProjectModal: React.FC = () => {
         initialValues={() => formValues}
         style={{display: formStep === FormSteps.STEP_ONE ? 'block' : 'none'}}
         onFieldsChange={(field, allFields) => {
-          setIsFormValid(allFields.every(item => item.value));
-          const name = allFields.filter(item => _.includes(item.name.toString(), 'name'))[0].value;
-          if (name) {
-            setProjectRootPath(path.join(pickedPath, name));
+          const name = field.filter(item => _.includes(item.name.toString(), 'name'));
+          if (name && name.length > 0) {
+            setFormValues({...formValues, name: name[0].value});
+            setIsEditingRoothPath(false);
+          }
+          const rootFolder = field.filter(item => _.includes(item.name.toString(), 'rootFolder'));
+          if (rootFolder && rootFolder.length > 0) {
+            setFormValues({...formValues, rootFolder: rootFolder[0].value});
+            setIsEditingRoothPath(true);
           }
         }}
       >
