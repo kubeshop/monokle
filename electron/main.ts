@@ -51,7 +51,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { convertRecentFilesToRecentProjects } from './utils';
+import { convertRecentFilesToRecentProjects, setProjectsRootFolder } from './utils';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -66,6 +66,8 @@ const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
+
+setProjectsRootFolder(userHomeDir);
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
@@ -362,7 +364,6 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setPluginMap(pluginMap));
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
-
     convertRecentFilesToRecentProjects(dispatch);
 
   });
