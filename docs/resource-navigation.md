@@ -31,13 +31,30 @@ While in the File Explorer, the File Action drop down list is available by click
 
 ![Explorer File Actions](img/explorer-file-actions-1.5.0.png)
 
-In the drop down, the following actions are available:
-- Reveal in Finder
+In the File Actions pop up menu, the following actions are available:
+- Add Resource
+- Filter on this file
+- Add to Files: Exclude
 - Copy Path
 - Copy Relative Path
-- Add to File: Exclude
 - Rename
 - Delete
+- Reveal in Finder
+
+The same functionality is available for Folders:
+
+![Explorer File Actions](img/explorer-folder-actions-1.5.0.png)
+
+In the Folder Actions pop up menu, the following actions are available:
+- New Folder
+- New Resource
+- Filter on this folder
+- Add to Files: Exclude
+- Copy Path
+- Copy Relative Path
+- Rename
+- Delete
+- Reveal in Finder
 
 ## Resource Navigator
 
