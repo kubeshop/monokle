@@ -1,14 +1,20 @@
+import {shell} from 'electron';
+
 import React from 'react';
 
 import {Popconfirm} from 'antd';
 
-import {ExclamationOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {AnyPlugin, isTemplatePluginModule} from '@models/plugin';
 import {AnyTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {deletePlugin} from '@redux/services/templates';
+
+import PluginIcon from '@assets/PluginIcon.svg';
+
+import Colors from '@styles/Colors';
 
 import * as S from './PluginInformation.styled';
 
@@ -37,44 +43,60 @@ const PluginInformation: React.FC<IProps> = props => {
     }
   };
 
+  const openGithub = () => {
+    const repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
+    shell.openExternal(repositoryUrl);
+  };
+
+  const openHelpUrl = () => {
+    if (plugin.helpUrl) {
+      shell.openExternal(plugin.helpUrl);
+    }
+  };
+
   return (
     <S.Container>
-      <S.IconContainer>
-        <S.AppstoreOutlined />
-      </S.IconContainer>
+      <S.Image src={plugin.icon ? plugin.icon : PluginIcon} alt="Plugin_Icon" />
 
       <S.InfoContainer>
-        <S.Name>{plugin.name}</S.Name>
+        <S.NameActionsContainer>
+          <S.Name>{plugin.name}</S.Name>
+
+          <S.IconsContainer>
+            {plugin.helpUrl && <S.QuestionCircleOutlined onClick={openHelpUrl} />}
+            <S.GithubOutlined onClick={openGithub} />
+            <Popconfirm
+              cancelText="Cancel"
+              okText="Delete"
+              okType="danger"
+              placement="bottom"
+              icon={<ExclamationCircleOutlined style={{color: Colors.redError}} />}
+              title={() => (
+                <>
+                  <p>
+                    Are you sure you want to delete <span style={{fontWeight: 600}}>{plugin.name}</span>?
+                  </p>
+                  <p>This action will delete the following templates:</p>
+                  <ul>
+                    {pluginTemplates.map(t => (
+                      <li key={t.id}>{t.name}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              onConfirm={handleDelete}
+            >
+              <S.DeleteOutlined />
+            </Popconfirm>
+          </S.IconsContainer>
+        </S.NameActionsContainer>
+
         <S.Description>{plugin.description || 'No description'}</S.Description>
         <S.AdditionalInformation>
           <span>Author: {plugin.author}</span>
           <span>Version: {plugin.version}</span>
         </S.AdditionalInformation>
       </S.InfoContainer>
-
-      <Popconfirm
-        cancelText="Cancel"
-        okText="Delete"
-        okType="danger"
-        placement="bottom"
-        title={() => (
-          <>
-            <p>Are you sure you want to delete {plugin.name}?</p>
-            <p>
-              <ExclamationOutlined style={{color: 'red'}} />
-              This action will delete the following templates:
-              <ul>
-                {pluginTemplates.map(t => (
-                  <li key={t.id}>{t.name}</li>
-                ))}
-              </ul>
-            </p>
-          </>
-        )}
-        onConfirm={handleDelete}
-      >
-        <S.DeleteOutlined />
-      </Popconfirm>
     </S.Container>
   );
 };

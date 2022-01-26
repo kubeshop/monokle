@@ -24,3 +24,5 @@ export const DEFAULT_PLUGINS = [
     url: 'https://github.com/kubeshop/monokle-default-templates-plugin',
   },
 ];
+
+export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';

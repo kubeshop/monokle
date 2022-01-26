@@ -16,8 +16,6 @@ export const NotFoundLabel = styled.span`
 `;
 
 export const SearchInput = styled(Input.Search)`
-  background: ${Colors.grey1};
-
   & input::placeholder {
     color: ${Colors.grey7};
   }
