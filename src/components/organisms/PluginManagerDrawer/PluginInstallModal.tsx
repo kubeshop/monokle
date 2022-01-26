@@ -1,15 +1,18 @@
-import {ipcRenderer} from 'electron';
+import {ipcRenderer, shell} from 'electron';
 
 import React, {useState} from 'react';
 
 import {Button, Input, Modal} from 'antd';
 
+import {PLUGIN_DOCS_URL} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
 
 import {DownloadPluginResult, isDownloadPluginResult} from '@models/extension';
 
 import {useAppDispatch} from '@redux/hooks';
 import {addMultipleTemplates, addPlugin} from '@redux/reducers/extension';
+
+import Colors from '@styles/Colors';
 
 const downloadPlugin = (pluginUrl: string) => {
   return new Promise<DownloadPluginResult>((resolve, reject) => {
@@ -52,6 +55,10 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
     setIsDownloading(false);
   };
 
+  const onClickOpenDocs = () => {
+    shell.openExternal(PLUGIN_DOCS_URL);
+  };
+
   const close = () => {
     setPluginUrl('');
     setIsDownloading(false);
@@ -66,13 +73,19 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
           Close
         </Button>,
         <Button key="submit" type="primary" loading={isDownloading} onClick={onClickDownload}>
-          Download plugin
+          Download and install plugin
         </Button>,
       ]}
       onCancel={close}
     >
-      <p>Plugin URL:</p>
-      <Input defaultValue={pluginUrl} onChange={e => setPluginUrl(e.target.value)} />
+      <h2>Plugin Installation</h2>
+      <p style={{color: Colors.grey7}}>To install a Plugin, please enter a valid GitHub repository URL below.</p>
+      <p>
+        <Button type="link" onClick={onClickOpenDocs} style={{padding: 0}}>
+          See Plugin&apos;s documentation for more information.
+        </Button>
+      </p>
+      <Input placeholder="Enter Plugin URL" defaultValue={pluginUrl} onChange={e => setPluginUrl(e.target.value)} />
       {errorMessage && (
         <div>
           <p>{errorMessage}</p>
