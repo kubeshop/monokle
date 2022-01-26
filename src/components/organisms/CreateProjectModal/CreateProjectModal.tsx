@@ -60,7 +60,7 @@ const CreateProjectModal: React.FC = () => {
   const setProjectRootPath = () => {
     let projectPath = formValues.rootFolder;
     if (!isEditingRootPath) {
-      projectPath = formValues.name ? path.join(pickedPath, formValues.name) : pickedPath;
+      projectPath = formValues.name ? path.join(pickedPath, formValues.name.toLowerCase()) : pickedPath;
     }
     const pathExists = existsSync(projectPath);
     if (pathExists) {
