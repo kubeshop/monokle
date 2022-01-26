@@ -30,6 +30,7 @@ import {openResourceDiffModal} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal, setMonacoEditor} from '@redux/reducers/ui';
 import {
   isInPreviewModeSelector,
+  knownResourceKindsSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
   settingsSelector,
@@ -89,6 +90,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const {kustomizeCommand} = useAppSelector(settingsSelector);
+  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const navigatorHeight = useMemo(
     () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
@@ -225,9 +227,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (isKustomizationPatch(selectedResource) || isKustomizationResource(selectedResource)) {
       return true;
     }
-
+    if (!knownResourceKinds.includes(selectedResource.kind)) {
+      return true;
+    }
     return false;
-  }, [selectedResource]);
+  }, [selectedResource, knownResourceKinds]);
 
   const onClickApplyResource = useCallback(
     (namespace?: string) => {
@@ -372,7 +376,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     onClick={applySelection}
                     disabled={
                       (!selectedResourceId && !selectedPath) ||
-                      (selectedResource && isKustomizationPatch(selectedResource))
+                      (selectedResource &&
+                        (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
                     }
                     icon={<Icon name="kubernetes" />}
                   >
