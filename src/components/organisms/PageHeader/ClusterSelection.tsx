@@ -103,19 +103,19 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   }, [kubeConfigPath, isKubeConfigPathValid]);
 
   const createClusterObjectsLabel = useCallback(() => {
+    let content: any;
+    let className = '';
     if (isInClusterMode) {
-      return <S.ClusterActionText>RELOAD</S.ClusterActionText>;
+      content = 'RELOAD';
+    } else if (previewType === 'cluster' && previewLoader.isLoading) {
+      content = <LoadingOutlined />;
+    } else {
+      content = 'LOAD';
+      className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
     }
-    if (previewType === 'cluster' && previewLoader.isLoading) {
-      return <LoadingOutlined />;
-    }
+
     return (
-      <S.ClusterActionText
-        className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
-        $highlighted={highlightedItems.connectToCluster}
-      >
-        LOAD
-      </S.ClusterActionText>
+      <S.ClusterActionText className={className}>{content}</S.ClusterActionText>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
@@ -162,9 +162,8 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           {isKubeConfigPathValid ? (
             <>
               <S.Divider type="vertical" />
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterModeTooltip} placement="right">
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} mouseLeaveDelay={0} title={ClusterModeTooltip} placement="right">
                 <S.Button
-                  disabled={Boolean(previewType === 'cluster' && previewLoader.isLoading) || isClusterActionDisabled}
                   type="link"
                   onClick={handleLoadCluster}
                 >
