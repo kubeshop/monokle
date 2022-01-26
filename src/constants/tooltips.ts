@@ -53,3 +53,4 @@ export const NewProjectFromFolderTooltip = 'New project from existing folder';
 export const NewEmptyProjectTooltip = 'New Empty Project';
 export const SearchProjectTooltip = 'Search for project by name or path';
 export const PluginDrawerTooltip = 'Open Plugins Manager';
+export const QuickFilterTooltip = 'Filter results – Hint: quick-filter using CTRL + P';

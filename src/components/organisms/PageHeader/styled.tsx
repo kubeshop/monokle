@@ -25,7 +25,7 @@ export const Row = styled(RawRow.default)`
 
 export const BellOutlined = styled(RawBellOutlined)`
   color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
+  font-size: 18px;
   cursor: pointer;
 `;
 
@@ -76,8 +76,10 @@ export const Header = styled(RawHeader.default)`
 `;
 
 export const IconContainerSpan = styled.span`
+  width: 18px;
+  height: 18px;
   color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
+  font-size: 18px;
   cursor: pointer;
 `;
 
@@ -111,20 +113,20 @@ export const ResourceSpan = styled.span`
 
 export const SettingsCol = styled(Col)`
   display: grid;
-  grid-template-columns: repeat(4, max-content);
+  grid-template-columns: repeat(4, 18px);
   align-items: center;
   grid-column-gap: 12px;
 `;
 
 export const SettingsOutlined = styled(RawSettingOutlined)`
   color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
+  font-size: 18px;
   cursor: pointer;
 `;
 
 export const ApiOutlined = styled(RawApiOutlined)`
   color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
+  font-size: 18px;
   cursor: pointer;
 `;
 

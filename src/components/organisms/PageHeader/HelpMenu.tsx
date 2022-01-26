@@ -11,8 +11,10 @@ import DiscordLogo from '@assets/DiscordLogo.svg';
 import {FontColors} from '@styles/Colors';
 
 const IconContainerSpan = styled.span`
+  width: 18px;
+  height: 18px;
   color: ${FontColors.elementSelectTitle};
-  font-size: 24px;
+  font-size: 18px;
   cursor: pointer;
 `;
 
