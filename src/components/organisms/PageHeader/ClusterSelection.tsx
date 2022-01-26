@@ -1,4 +1,5 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
 import {Dropdown, Menu, Tooltip} from 'antd';
@@ -42,11 +43,16 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
   const projectConfig = useAppSelector(state => state.config.projectConfig);
-
+  const [isClusterDropdownOpen, setIsClusterDropdownOpen] = useState(false);
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
   );
+  const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
+  useHotkeys('escape', () => {
+    setIsClusterDropdownOpen(false);
+    dropdownButtonRef.current?.blur();
+  });
   const handleClusterChange = ({key}: {key: string}) => {
     dispatch(setCurrentContext(key));
     dispatch(
@@ -114,9 +120,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
     }
 
-    return (
-      <S.ClusterActionText className={className}>{content}</S.ClusterActionText>
-    );
+    return <S.ClusterActionText className={className}>{content}</S.ClusterActionText>;
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
   const clusterMenu = (
@@ -151,8 +155,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               arrow
               trigger={['click']}
               disabled={previewLoader.isLoading || isInPreviewMode}
+              visible={isClusterDropdownOpen}
+              onVisibleChange={setIsClusterDropdownOpen}
             >
-              <S.ClusterButton type="link">
+              <S.ClusterButton type="link" ref={dropdownButtonRef}>
                 <S.ClusterContextName>{kubeConfigContext}</S.ClusterContextName>
                 <S.DownOutlined />
               </S.ClusterButton>
@@ -163,10 +169,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
             <>
               <S.Divider type="vertical" />
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} mouseLeaveDelay={0} title={ClusterModeTooltip} placement="right">
-                <S.Button
-                  type="link"
-                  onClick={handleLoadCluster}
-                >
+                <S.Button type="link" onClick={handleLoadCluster}>
                   {createClusterObjectsLabel()}
                 </S.Button>
               </Tooltip>
