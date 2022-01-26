@@ -60,7 +60,9 @@ const CreateProjectModal: React.FC = () => {
   const setProjectRootPath = () => {
     let projectPath = formValues.rootFolder;
     if (!isEditingRootPath) {
-      projectPath = formValues.name ? path.join(pickedPath, formValues.name.toLowerCase()) : pickedPath;
+      projectPath = formValues.name
+        ? path.join(pickedPath, formValues.name.toLowerCase().replace(' ', '-'))
+        : pickedPath;
     }
     const pathExists = existsSync(projectPath);
     if (pathExists) {
@@ -73,8 +75,10 @@ const CreateProjectModal: React.FC = () => {
       ]);
       setSubmitEnabled(false);
     } else {
-      createProjectForm.setFields([{name: 'rootFolder', value: projectPath, errors: []}]);
-      setSubmitEnabled(true);
+      createProjectForm.setFields([
+        {name: 'rootFolder', value: projectPath, errors: projectPath ? [] : ['Please provide your local path!']},
+      ]);
+      setSubmitEnabled(Boolean(projectPath));
     }
   };
 
