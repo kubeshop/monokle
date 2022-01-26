@@ -44,9 +44,9 @@ export const GithubOutlined = styled(RawGithubOutlined)`
   cursor: pointer;
 `;
 
-export const IconContainer = styled.span`
-  height: 32px;
+export const Image = styled.img`
   width: 32px;
+  height: 32px;
 `;
 
 export const IconsContainer = styled.div`

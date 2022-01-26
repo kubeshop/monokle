@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import React from 'react';
 
 import {Popconfirm} from 'antd';
@@ -9,6 +11,8 @@ import {AnyTemplate} from '@models/template';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {deletePlugin} from '@redux/services/templates';
+
+import PluginIcon from '@assets/PluginIcon.svg';
 
 import * as S from './PluginInformation.styled';
 
@@ -37,21 +41,27 @@ const PluginInformation: React.FC<IProps> = props => {
     }
   };
 
-  const openGithub = () => {};
-  const openHelpUrl = () => {};
+  const openGithub = () => {
+    const repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
+    shell.openExternal(repositoryUrl);
+  };
+
+  const openHelpUrl = () => {
+    if (plugin.helpUrl) {
+      shell.openExternal(plugin.helpUrl);
+    }
+  };
 
   return (
     <S.Container>
-      <S.IconContainer>
-        <S.AppstoreOutlined />
-      </S.IconContainer>
+      <S.Image src={plugin.icon ? plugin.icon : PluginIcon} alt="Plugin_Icon" />
 
       <S.InfoContainer>
         <S.NameActionsContainer>
           <S.Name>{plugin.name}</S.Name>
 
           <S.IconsContainer>
-            <S.QuestionCircleOutlined onClick={openHelpUrl} />
+            {plugin.helpUrl && <S.QuestionCircleOutlined onClick={openHelpUrl} />}
             <S.GithubOutlined onClick={openGithub} />
             <Popconfirm
               cancelText="Cancel"

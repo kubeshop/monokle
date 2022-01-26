@@ -20,6 +20,7 @@ const PluginPackageJsonRuntype = Rt.Record({
   monoklePlugin: Rt.Record({
     id: Rt.String,
     modules: Rt.Array(AnyPluginModuleRuntype),
+    icon: Rt.Optional(Rt.String),
     helpUrl: Rt.Optional(Rt.String),
   }),
 }).And(Rt.Dictionary(Rt.Unknown));
@@ -33,6 +34,7 @@ const AnyPluginRuntype = Rt.Record({
   description: Rt.Optional(Rt.String),
   isActive: Rt.Boolean,
   modules: Rt.Array(AnyPluginModuleRuntype),
+  icon: Rt.Optional(Rt.String),
   helpUrl: Rt.Optional(Rt.String),
 });
 
