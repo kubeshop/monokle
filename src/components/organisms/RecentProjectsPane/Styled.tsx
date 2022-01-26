@@ -33,6 +33,15 @@ export const ProjectItem = styled.div<{activeproject: boolean}>`
   padding-left: ${props => (props.activeproject ? '12px' : 'unset')};
   border-left: 4px solid ${props => (props.activeproject ? Colors.lightSeaGreen : 'transparent')};
   color: ${props => (props.activeproject ? Colors.lightSeaGreen : Colors.whitePure)};
+  cursor: pointer;
+
+  :hover {
+    background: ${Colors.blackPearl};
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 `;
 
 export const ProjectName = styled.div`
@@ -56,6 +65,7 @@ export const ProjectPath = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   width: auto;
+  max-width: 300px;
 `;
 
 export const ProjectLastOpened = styled.div`

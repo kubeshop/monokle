@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Row} from 'antd';
+import {Row, Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
 
@@ -53,7 +53,9 @@ const RecentProjectsPane = () => {
                 >
                   {project.name}
                 </S.ProjectName>
-                <S.ProjectPath>{project.rootFolder}</S.ProjectPath>
+                <Tooltip title={project.rootFolder}>
+                  <S.ProjectPath>{project.rootFolder}</S.ProjectPath>
+                </Tooltip>
                 <S.ProjectLastOpened>
                   {getRelativeDate(project.lastOpened)
                     ? `last opened ${getRelativeDate(project.lastOpened)}`
