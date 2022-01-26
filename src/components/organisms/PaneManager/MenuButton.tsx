@@ -10,19 +10,26 @@ import {useAppSelector} from '@redux/hooks';
 
 import Colors from '@styles/Colors';
 
-const StyledButton = styled(Button)<{$isHovered: boolean; $hasGradientBackground: boolean}>`
+const StyledButton = styled(Button)<{$hasGradientBackground: boolean}>`
   ${props => {
     if (props.$hasGradientBackground) {
       return `& .anticon {
         color: ${Colors.blackPure} !important;
       }`;
     }
-    if (props.$isHovered) {
-      return `& .anticon {
-        color: ${Colors.grey400} !important;
-      }`;
-    }
   }}
+
+  & .anticon {
+    transition: all 0.2s ease-in;
+  }
+
+  ${props => `
+    &:hover {
+      & .anticon {
+        color: ${props.$hasGradientBackground ? Colors.grey5 : Colors.grey8} !important;
+      }
+    }
+  `}
 `;
 
 interface IMenuButtonProps extends ButtonProps {
@@ -74,7 +81,6 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
 
   return (
     <StyledButton
-      $isHovered={isHovered}
       $hasGradientBackground={hasGradientBackground}
       size="large"
       type="text"
