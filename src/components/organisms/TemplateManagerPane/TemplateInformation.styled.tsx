@@ -37,8 +37,14 @@ export const InfoContainer = styled.div`
   overflow: hidden;
 `;
 
-export const Name = styled.span`
+export const NameContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
   width: 100%;
+  gap: 6px;
+`;
+
+export const Name = styled.span`
   color: ${Colors.whitePure};
   white-space: nowrap;
   overflow: hidden;
