@@ -75,14 +75,6 @@ export const Header = styled(RawHeader.default)`
   height: 30px;
 `;
 
-export const IconContainerSpan = styled.span`
-  width: 20px;
-  height: 20px;
-  color: ${FontColors.elementSelectTitle};
-  font-size: 18px;
-  cursor: pointer;
-`;
-
 export const Logo = styled.img`
   height: 24px;
   cursor: pointer;
