@@ -69,7 +69,7 @@ You can launch multiple project windows using the New Monokle Windows option. Th
 Monokle currently supports the following keyboard shortcuts:
 
 - Cluster Preview: Ctrl/Cmd I
-- Settings: Ctrl/Cmd P
+- Settings: Ctrl/Cmd , (Comma)
 - Exit Preview: ESC
 - Browse Folder: Ctrl/Cmd O
 - Refresh Folder: Ctrl/Cmd F5
@@ -86,7 +86,7 @@ Monokle currently supports the following keyboard shortcuts:
 - Open Kustomization Tab: Ctrl/Cmd Shift K
 - Open Helm Tab: Ctrl/Cmd Shift H
 - Reset Resource Filters: Ctrl/Cmd ALT R
-- Open Quick Search: Ctrl/Cmd SHIFT P
+- Open Quick Search: Ctrl/Cmd P, Ctrl/Cmd SHIFT P
 - Open Getting Started Page: Ctrl/Cmd SHIFT N
 
 ## Auto-update
