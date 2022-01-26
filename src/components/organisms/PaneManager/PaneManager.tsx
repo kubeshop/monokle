@@ -168,7 +168,7 @@ const PaneManager = () => {
   let content;
   if (isProjectLoading) {
     content = <StyledSkeleton />;
-  } else if (!isStartProjectPaneVisible) {
+  } else if (activeProject && !isStartProjectPaneVisible) {
     content = (
       <StyledColumnPanes style={{width: contentWidth}}>
         <SplitView
