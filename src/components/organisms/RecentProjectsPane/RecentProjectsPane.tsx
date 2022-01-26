@@ -8,6 +8,8 @@ import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setOpenProject} from '@redux/reducers/appConfig';
+import {toggleStartProjectPane} from '@redux/reducers/ui';
+import {activeProjectSelector} from '@redux/selectors';
 
 import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 
@@ -17,6 +19,7 @@ const RecentProjectsPane = () => {
   const dispatch = useAppDispatch();
 
   const projects: Project[] = useAppSelector(state => state.config.projects);
+  const activeProject = useAppSelector(activeProjectSelector);
 
   const openProject = (project: Project) => {
     dispatch(setOpenProject(project.rootFolder));
@@ -41,17 +44,24 @@ const RecentProjectsPane = () => {
       </Row>
       <Row>
         <S.ProjectsContainer>
-          {projects.map((project: Project) => (
-            <S.ProjectItem key={project.rootFolder}>
-              <S.ProjectName onClick={() => openProject(project)}>{project.name}</S.ProjectName>
-              <S.ProjectPath>{project.rootFolder}</S.ProjectPath>
-              <S.ProjectLastOpened>
-                {getRelativeDate(project.lastOpened)
-                  ? `last opened ${getRelativeDate(project.lastOpened)}`
-                  : 'Not opened yet'}
-              </S.ProjectLastOpened>
-            </S.ProjectItem>
-          ))}
+          {projects.map((project: Project) => {
+            const isActivePropject = project.rootFolder === activeProject?.rootFolder;
+            return (
+              <S.ProjectItem key={project.rootFolder} activeproject={isActivePropject}>
+                <S.ProjectName
+                  onClick={() => (isActivePropject ? dispatch(toggleStartProjectPane()) : openProject(project))}
+                >
+                  {project.name}
+                </S.ProjectName>
+                <S.ProjectPath>{project.rootFolder}</S.ProjectPath>
+                <S.ProjectLastOpened>
+                  {getRelativeDate(project.lastOpened)
+                    ? `last opened ${getRelativeDate(project.lastOpened)}`
+                    : 'Not opened yet'}
+                </S.ProjectLastOpened>
+              </S.ProjectItem>
+            );
+          })}
         </S.ProjectsContainer>
       </Row>
     </>
