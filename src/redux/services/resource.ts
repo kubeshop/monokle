@@ -464,7 +464,7 @@ export function reprocessResources(
 
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
-      resource.namespace = resource.content.metadata?.namespace;
+      resource.namespace = extractNamespace(resource.content);
 
       if (isKustomizationResource(resource)) {
         hasKustomizations = true;
@@ -626,6 +626,17 @@ export function removeResourceFromFile(
 }
 
 /**
+ * Extracts the namespace from the specified resource content
+ */
+
+function extractNamespace(content: any) {
+  // namespace could be an object if it's a helm template value...
+  return content.metadata?.namespace && typeof content.metadata.namespace === 'string'
+    ? content.metadata.namespace
+    : undefined;
+}
+
+/**
  * Extracts all resources from the specified text content (must be yaml)
  */
 
@@ -686,9 +697,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           }
 
           // set the namespace if available
-          if (content.metadata?.namespace && typeof content.metadata.namespace === 'string') {
-            resource.namespace = content.metadata.namespace;
-          }
+          resource.namespace = extractNamespace(content);
 
           result.push(resource);
         }
