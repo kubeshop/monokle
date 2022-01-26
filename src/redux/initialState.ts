@@ -178,6 +178,7 @@ const initialExtensionState: ExtensionState = {
   pluginMap: {},
   templateMap: {},
   templatePackMap: {},
+  isPluginsDrawerVisible: false,
 };
 
 export default {

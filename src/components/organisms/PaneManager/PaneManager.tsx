@@ -5,7 +5,6 @@ import 'antd/dist/antd.less';
 
 import {
   ApartmentOutlined,
-  ApiOutlined,
   CodeOutlined,
   FolderOpenOutlined,
   FolderOutlined,
@@ -16,6 +15,7 @@ import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
+import {Project} from '@models/appconfig';
 import {LeftMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -28,15 +28,7 @@ import {
 } from '@redux/reducers/ui';
 import {activeProjectSelector, isInPreviewModeSelector, kustomizationsSelector} from '@redux/selectors';
 
-import {
-  ActionsPane,
-  FileTreePane,
-  HelmPane,
-  KustomizePane,
-  NavigatorPane,
-  PluginManagerPane,
-  TemplateManagerPane,
-} from '@organisms';
+import {ActionsPane, FileTreePane, HelmPane, KustomizePane, NavigatorPane, TemplateManagerPane} from '@organisms';
 
 import {GraphView} from '@molecules';
 
@@ -97,6 +89,7 @@ const iconMenuWidth = 45;
 const PaneManager = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const projects: Project[] = useAppSelector(state => state.config.projects);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
@@ -198,13 +191,6 @@ const PaneManager = () => {
               >
                 <TemplateManagerPane />
               </div>
-              <div
-                style={{
-                  display: leftMenuSelection === 'plugin-manager' ? 'inline' : 'none',
-                }}
-              >
-                <PluginManagerPane />
-              </div>
             </>
           }
           hideLeft={!leftActive}
@@ -225,17 +211,14 @@ const PaneManager = () => {
     content = (
       <StyledColumnPanes style={{width: contentWidth}}>
         <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
-          {leftMenuSelection === 'plugin-manager' && leftActive && (
-            <div style={{borderRight: `1px solid ${Colors.grey3}`}}>
-              <PluginManagerPane />
-            </div>
-          )}
           <div style={{flex: 3}}>
             <StartProjectPane />
           </div>
-          <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
-            <RecentProjectsPane />
-          </div>
+          {Boolean(projects.length) && (
+            <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
+              <RecentProjectsPane />
+            </div>
+          )}
         </div>
       </StyledColumnPanes>
     );
@@ -334,20 +317,6 @@ const PaneManager = () => {
                 active={Boolean(activeProject) && leftActive}
                 isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
               />
-            </MenuButton>
-          </Tooltip>
-
-          <Tooltip
-            mouseEnterDelay={TOOLTIP_DELAY}
-            title={leftMenuSelection === 'plugin-manager' && leftActive ? 'Hide Plugins' : 'View Plugins'}
-            placement="right"
-          >
-            <MenuButton
-              isSelected={leftMenuSelection === 'plugin-manager'}
-              isActive={leftActive}
-              onClick={() => setLeftActiveMenu('plugin-manager')}
-            >
-              <MenuIcon icon={ApiOutlined} active={leftActive} isSelected={leftMenuSelection === 'plugin-manager'} />
             </MenuButton>
           </Tooltip>
         </Space>

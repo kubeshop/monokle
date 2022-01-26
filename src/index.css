@@ -146,6 +146,11 @@ code {
 
 .ant-table-header .ant-table-thead .ant-table-cell:first-child {
   border-left: 4px transparent solid !important;
+  padding-left: 12px;
+}
+
+.ant-table table {
+  border-collapse: collapse;
 }
 
 .ant-table-header .ant-table-thead .ant-table-cell:before {
@@ -171,6 +176,10 @@ code {
   border-bottom: none !important;
 }
 
+.ant-table-body .ant-table-row .ant-table-cell:first-child {
+  padding-left: 16px;
+}
+
 .ant-table-body .ant-table-row:hover .ant-table-cell {
   cursor: pointer;
 }
@@ -188,7 +197,9 @@ code {
 }
 
 .project-table-active-project > :first-child {
-  border-left: 4px #13a8a8 solid;
+  box-sizing: content-box;
+  border-left: 8px #13a8a8 solid;
+  padding-left: 12px !important;
 }
 
 .cluster-dropdown-item li:hover {

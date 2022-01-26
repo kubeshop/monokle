@@ -77,6 +77,12 @@ export const extensionSlice = createSlice({
       state.templatePacksDir = action.payload.templatePacksDir;
       state.pluginsDir = action.payload.pluginsDir;
     },
+    openPluginsDrawer: (state: Draft<ExtensionState>) => {
+      state.isPluginsDrawerVisible = true;
+    },
+    closePluginsDrawer: (state: Draft<ExtensionState>) => {
+      state.isPluginsDrawerVisible = false;
+    },
   },
 });
 
@@ -94,5 +100,7 @@ export const {
   addMultipleTemplatePacks,
   setTemplatePackMap,
   setExtensionsDirs,
+  openPluginsDrawer,
+  closePluginsDrawer,
 } = extensionSlice.actions;
 export default extensionSlice.reducer;

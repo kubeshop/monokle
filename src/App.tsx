@@ -31,6 +31,7 @@ import {
   PageFooter,
   PageHeader,
   PaneManager,
+  PluginManagerDrawer,
   QuickSearchActions,
   RenameEntityModal,
   RenameResourceModal,
@@ -140,6 +141,7 @@ const App = () => {
         <MainContainer>
           <PageHeader />
           <SettingsDrawer />
+          <PluginManagerDrawer />
           <NotificationsDrawer />
           <PaneManager />
           <PageFooter />

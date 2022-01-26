@@ -193,8 +193,7 @@ const ProjectSelection = () => {
           />
           <Column
             className="projects-table-column-actions"
-            dataIndex="lastOpened"
-            key="lastOpened"
+            key="projectActions"
             width={1}
             render={(value: any, project: Project) => (
               <S.ProjectTableActions>
