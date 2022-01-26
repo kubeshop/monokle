@@ -107,30 +107,32 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   };
 
   const menu = (
-    <Menu>
-      {(isInPreviewMode || isUnsavedResource(resource)) && (
-        <>
-          <Menu.Item onClick={onClickSaveToFileFolder} key="save_to_file_folder">
-            Save to file/folder
-          </Menu.Item>
-          <ContextMenuDivider />
-        </>
-      )}
+    <div style={{transform: 'translateY(-6px)'}}>
+      <Menu>
+        {(isInPreviewMode || isUnsavedResource(resource)) && (
+          <>
+            <Menu.Item onClick={onClickSaveToFileFolder} key="save_to_file_folder">
+              Save to file/folder
+            </Menu.Item>
+            <ContextMenuDivider />
+          </>
+        )}
 
-      <Menu.Item disabled={isInPreviewMode} onClick={onClickRename} key="rename">
-        Rename
-      </Menu.Item>
-
-      {knownResourceKinds.includes(resource.kind) && (
-        <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
-          Clone
+        <Menu.Item disabled={isInPreviewMode} onClick={onClickRename} key="rename">
+          Rename
         </Menu.Item>
-      )}
 
-      <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={onClickDelete} key="delete">
-        Delete
-      </Menu.Item>
-    </Menu>
+        {knownResourceKinds.includes(resource.kind) && (
+          <Menu.Item disabled={isInPreviewMode} onClick={onClickClone} key="clone">
+            Clone
+          </Menu.Item>
+        )}
+
+        <Menu.Item disabled={isInPreviewMode && previewType !== 'cluster'} onClick={onClickDelete} key="delete">
+          Delete
+        </Menu.Item>
+      </Menu>
+    </div>
   );
 
   return (

@@ -4,7 +4,7 @@ import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate
 import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
-import {isPreviewResource} from '@redux/services/resource';
+import {isPreviewResource, isUnsavedResource} from '@redux/services/resource';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
@@ -204,7 +204,7 @@ export async function applyForResource(
         }
 
         let text = `${outgoingRefResource.kind}: ${outgoingRefResource.name}`;
-        if (!isPreviewResource(outgoingRefResource)) {
+        if (!isPreviewResource(outgoingRefResource) && !isUnsavedResource(outgoingRefResource)) {
           text += ` in ${outgoingRefResource.filePath}`;
         }
 
