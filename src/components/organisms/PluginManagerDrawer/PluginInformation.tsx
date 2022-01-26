@@ -4,7 +4,7 @@ import React from 'react';
 
 import {Popconfirm} from 'antd';
 
-import {ExclamationOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {AnyPlugin, isTemplatePluginModule} from '@models/plugin';
 import {AnyTemplate} from '@models/template';
@@ -13,6 +13,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {deletePlugin} from '@redux/services/templates';
 
 import PluginIcon from '@assets/PluginIcon.svg';
+
+import Colors from '@styles/Colors';
 
 import * as S from './PluginInformation.styled';
 
@@ -68,18 +70,18 @@ const PluginInformation: React.FC<IProps> = props => {
               okText="Delete"
               okType="danger"
               placement="bottom"
+              icon={<ExclamationCircleOutlined style={{color: Colors.redError}} />}
               title={() => (
                 <>
-                  <p>Are you sure you want to delete {plugin.name}?</p>
                   <p>
-                    <ExclamationOutlined style={{color: 'red'}} />
-                    This action will delete the following templates:
-                    <ul>
-                      {pluginTemplates.map(t => (
-                        <li key={t.id}>{t.name}</li>
-                      ))}
-                    </ul>
+                    Are you sure you want to delete <span style={{fontWeight: 600}}>{plugin.name}</span>?
                   </p>
+                  <p>This action will delete the following templates:</p>
+                  <ul>
+                    {pluginTemplates.map(t => (
+                      <li key={t.id}>{t.name}</li>
+                    ))}
+                  </ul>
                 </>
               )}
               onConfirm={handleDelete}
