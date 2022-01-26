@@ -104,16 +104,18 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const createClusterObjectsLabel = useCallback(() => {
     let content: any;
+    let className = '';
     if (isInClusterMode) {
       content = 'RELOAD';
     } else if (previewType === 'cluster' && previewLoader.isLoading) {
       content = <LoadingOutlined />;
     } else {
       content = 'LOAD';
+      className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
     }
 
     return (
-      <S.ClusterActionText>{content}</S.ClusterActionText>
+      <S.ClusterActionText className={className}>{content}</S.ClusterActionText>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
