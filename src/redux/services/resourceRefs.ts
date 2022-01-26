@@ -11,6 +11,8 @@ import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} fr
 import {traverseDocument} from './manifest-utils';
 import {NodeWrapper, createResourceRef, getLineCounter, getParsedDoc, linkResources} from './resource';
 
+const NAME_REFNODE_PATH = `metadata${REF_PATH_SEPARATOR}name`;
+
 export function isIncomingRef(refType: ResourceRefType) {
   return refType === ResourceRefType.Incoming;
 }
@@ -167,6 +169,15 @@ export function getResourceRefNodes(resource: K8sResource) {
           pathEndsWithPath(keyPathParts, refMapper.target.pathParts)
         ) {
           addRefNodeAtPath(refNode, joinPathParts(refMapper.target.pathParts), refNodes);
+        } else if (
+          refMapper.type === 'name' &&
+          keyPathParts.length === 2 &&
+          keyPathParts[0] === 'metadata' &&
+          keyPathParts[1] === 'name'
+        ) {
+          if (!refNodes[NAME_REFNODE_PATH]) {
+            addRefNodeAtPath(refNode, NAME_REFNODE_PATH, refNodes);
+          }
         }
       }
 
@@ -500,12 +511,16 @@ function handleRefMappingByKey(
         if (outgoingRefMapper.type === 'name') {
           if (targetResource.name === sourceRefNode.scalar.value) {
             if (shouldCreateSatisfiedRef(sourceRefNode, undefined, sourceResource, targetResource, outgoingRefMapper)) {
+              const targetRefNodes = getResourceRefNodes(targetResource);
+              const targetNodes = targetRefNodes ? targetRefNodes[NAME_REFNODE_PATH] : undefined;
               hasSatisfiedRefs = true;
               linkResources(
                 sourceResource,
                 targetResource,
                 new NodeWrapper(sourceRefNode.scalar, getLineCounter(sourceResource)),
-                undefined,
+                targetNodes && targetNodes.length > 0
+                  ? new NodeWrapper(targetNodes[0].scalar, getLineCounter(targetResource))
+                  : undefined,
                 isOptional(sourceResource, sourceRefNode, outgoingRefMapper)
               );
             }
