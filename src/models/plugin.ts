@@ -18,11 +18,14 @@ const PluginPackageJsonRuntype = Rt.Record({
   repository: Rt.String,
   description: Rt.Optional(Rt.String),
   monoklePlugin: Rt.Record({
+    id: Rt.String,
     modules: Rt.Array(AnyPluginModuleRuntype),
+    helpUrl: Rt.Optional(Rt.String),
   }),
 }).And(Rt.Dictionary(Rt.Unknown));
 
 const AnyPluginRuntype = Rt.Record({
+  id: Rt.String,
   name: Rt.String,
   author: Rt.String,
   version: Rt.String,
@@ -30,6 +33,7 @@ const AnyPluginRuntype = Rt.Record({
   description: Rt.Optional(Rt.String),
   isActive: Rt.Boolean,
   modules: Rt.Array(AnyPluginModuleRuntype),
+  helpUrl: Rt.Optional(Rt.String),
 });
 
 export type PluginPackageJson = Rt.Static<typeof PluginPackageJsonRuntype>;

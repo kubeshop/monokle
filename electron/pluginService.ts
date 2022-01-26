@@ -22,6 +22,7 @@ const PLUGIN_ENTRY_FILE_NAME = 'package.json';
 function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderPath: string): AnyPlugin {
   const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(packageJson.repository);
   const plugin: AnyPlugin = {
+    id: packageJson.monoklePlugin.id,
     name: packageJson.name,
     author: packageJson.author,
     version: packageJson.version,
@@ -41,6 +42,7 @@ function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderP
       }
       return module;
     }),
+    helpUrl: packageJson.monoklePlugin.helpUrl,
   };
   return plugin;
 }
