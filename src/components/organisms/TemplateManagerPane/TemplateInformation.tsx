@@ -28,8 +28,14 @@ const TemplateInformation: React.FC<IProps> = props => {
       <S.Image src={template.icon ? template.icon : TemplateIcon} alt="Template_Icon" />
 
       <S.InfoContainer>
-        <S.Name>{template.name}</S.Name>
-
+        <S.NameContainer>
+          <S.Name>{template.name}</S.Name>
+          {template.type === 'helm-chart' && (
+            <Tooltip title="This template requires Helm to run">
+              <Icon name="helm" />
+            </Tooltip>
+          )}
+        </S.NameContainer>
         <S.Description>{_.truncate(template.description, {length: 140})}</S.Description>
 
         <S.AdditionalInformation>
@@ -47,11 +53,6 @@ const TemplateInformation: React.FC<IProps> = props => {
           >
             Use Template
           </S.OpenButton>
-          {template.type === 'helm-chart' && (
-            <Tooltip title="This template requires Helm to run">
-              <Icon name="helm" />
-            </Tooltip>
-          )}
         </S.Footer>
       </S.InfoContainer>
     </S.Container>
