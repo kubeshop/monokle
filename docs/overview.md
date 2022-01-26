@@ -2,7 +2,7 @@
 
 Monokle is laid out like many other desktop applications:
 
-![Monokle UI](img/monokle-ui-1.4.0.png)
+![Monokle UI](img/monokle-ui-1.5.0.png)
 
 On start-up, Monokle automatically loads the most recently selected folder if the corresponding "Load recent folder on Startup" setting has been enabled.
 
@@ -26,7 +26,7 @@ The top right contains the following buttons:
 
 Clicking the Settings icon on the top right opens the settings:
 
-![Monokle Settings](img/monokle-settings.gif)
+![Monokle Settings](img/monokle-settings-1.5.0.gif)
 
 - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
 - **Files: Include**: Sets which files to parse for kubernetes resources when scanning folders.
@@ -51,7 +51,7 @@ Monokle provides a system menu with common File/Edit/View/Window/Help functional
 
 Mac System Menu:
 
-![MacOS Monokle System Menu](img/mac-system-menu.png)
+![MacOS Monokle System Menu](img/mac-system-menu-1.5.0.png)
 
 Windows System Menu:
 
@@ -63,7 +63,7 @@ You can launch multiple project windows using the New Monokle Windows option. Th
 
 **Action:** File > New Monokle Window
 
-![Multiple Window](img/multiple-window.png)
+![Multiple Window](img/multiple-window-1.5.0.png)
 
 ## Keyboard Shortcuts
 

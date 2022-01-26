@@ -37,7 +37,7 @@ and replace the contents of the Navigator with the generated resources.
 
 For example, previewing the values file above will result in the following:
 
-![Helm Preview Output](img/helm-preview-output.png)
+![Helm Preview Output](img/helm-preview-output-1.5.0.png)
 
 Monokle is now in "Preview Mode" (as indicated by the header at the top):
 
