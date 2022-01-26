@@ -25,6 +25,7 @@ export const Row = styled(RawRow.default)`
 
 export const BellOutlined = styled(RawBellOutlined)`
   color: ${FontColors.elementSelectTitle};
+  font-size: 18px;
   cursor: pointer;
 `;
 
@@ -119,11 +120,13 @@ export const SettingsCol = styled(Col)`
 
 export const SettingsOutlined = styled(RawSettingOutlined)`
   color: ${FontColors.elementSelectTitle};
+  font-size: 18px;
   cursor: pointer;
 `;
 
 export const ApiOutlined = styled(RawApiOutlined)`
   color: ${FontColors.elementSelectTitle};
+  font-size: 18px;
   cursor: pointer;
 `;
 
