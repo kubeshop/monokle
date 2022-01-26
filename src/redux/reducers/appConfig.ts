@@ -51,13 +51,13 @@ export const setOpenProject = createAsyncThunk(
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
+    if (projectRootPath && appUi.isStartProjectPaneVisible) {
+      thunkAPI.dispatch(toggleStartProjectPane());
+    }
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     thunkAPI.dispatch(setRootFolder(projectRootPath));
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
-    if (appUi.isStartProjectPaneVisible) {
-      thunkAPI.dispatch(toggleStartProjectPane());
-    }
 
     if (projectConfig) {
       thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config: projectConfig, fromConfigFile: false}));
