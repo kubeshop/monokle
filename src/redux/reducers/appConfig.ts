@@ -47,25 +47,23 @@ export const setDeleteProject = createAsyncThunk('config/setDeleteProject', asyn
 });
 
 export const setOpenProject = createAsyncThunk(
-  'config/openProject',
+  'config/setOpenProject',
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
       thunkAPI.dispatch(toggleStartProjectPane());
     }
-    thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
-    thunkAPI.dispatch(setRootFolder(projectRootPath));
+
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
-
-    if (projectConfig) {
-      thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config: projectConfig, fromConfigFile: false}));
-    } else {
-      thunkAPI.dispatch(
-        configSlice.actions.updateProjectConfig({config: populateProjectConfig(appConfig), fromConfigFile: false})
-      );
-    }
+    // First open the project so state.selectedProjectRootFolder is sey
+    thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
+    const config: ProjectConfig | null = projectConfig || populateProjectConfig(appConfig);
+    // Then set project config by reading .monokle or populating it
+    thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config, fromConfigFile: false}));
+    // Last set rootFolder so function can read the latest projectConfig
+    thunkAPI.dispatch(setRootFolder(projectRootPath));
   }
 );
 

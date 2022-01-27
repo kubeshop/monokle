@@ -57,8 +57,6 @@ export const setRootFolder = createAsyncThunk<
   const rootEntry: FileEntry = createFileEntry(rootFolder);
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
 
-  fileMap[ROOT_FILE_ENTRY] = rootEntry;
-
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
   const readFilesPromise = new Promise<string[]>(resolve => {
     setImmediate(() => {
