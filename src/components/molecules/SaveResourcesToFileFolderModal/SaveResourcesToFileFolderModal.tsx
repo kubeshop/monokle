@@ -138,7 +138,7 @@ const SaveResourceToFileFolderModal: React.FC = () => {
     const files: string[] = [];
 
     Object.entries(fileMap).forEach(([key, value]) => {
-      if (!value.isSupported || value.isExcluded) {
+      if ((!value.isSupported || value.isExcluded) && ROOT_FILE_ENTRY !== key) {
         return;
       }
       if (value.children) {
