@@ -75,9 +75,22 @@ const App = () => {
 
   const onExecutedFrom = useCallback(
     (_, data) => {
-      const project: Project = data.path || (loadLastProjectOnStartup && projects.length > 0 ? projects[0] : undefined);
-      if (project && getFileStats(project.rootFolder)?.isDirectory()) {
-        dispatch(setOpenProject(project.rootFolder));
+      if (data.path) {
+        const selectedProject: Project | undefined | null = projects.find(p => p.rootFolder === data.path);
+        if (selectedProject && getFileStats(selectedProject.rootFolder)?.isDirectory()) {
+          dispatch(setOpenProject(selectedProject.rootFolder));
+        } else {
+          dispatch(setCreateProject({rootFolder: data.path}));
+        }
+        dispatch(setLoadingProject(false));
+        return;
+      }
+
+      const selectedProject: Project | undefined | null = projects.length > 0 ? projects[0] : undefined;
+      if (loadLastProjectOnStartup) {
+        if (selectedProject && getFileStats(selectedProject.rootFolder)?.isDirectory()) {
+          dispatch(setOpenProject(selectedProject.rootFolder));
+        }
       }
       dispatch(setLoadingProject(false));
     },
