@@ -450,147 +450,145 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   );
 
   const menu = (
-    <div style={{transform: 'translateY(-6px)'}}>
-      <Menu>
-        {canPreview(relativePath) ? (
-          <>
-            <Menu.Item
-              onClick={e => {
-                e.domEvent.stopPropagation();
-                onPreview(relativePath);
-              }}
-              key="preview"
-            >
-              Preview
-            </Menu.Item>
-            <ContextMenuDivider />
-          </>
-        ) : null}
-        {isFolder ? (
-          <>
-            <Menu.Item
-              disabled={isInPreviewMode}
-              onClick={e => {
-                e.domEvent.stopPropagation();
-                onCreateFolder(absolutePath);
-              }}
-              key="create_directory"
-            >
-              New Folder
-            </Menu.Item>
-          </>
-        ) : null}
+    <Menu>
+      {canPreview(relativePath) ? (
+        <>
+          <Menu.Item
+            onClick={e => {
+              e.domEvent.stopPropagation();
+              onPreview(relativePath);
+            }}
+            key="preview"
+          >
+            Preview
+          </Menu.Item>
+          <ContextMenuDivider />
+        </>
+      ) : null}
+      {isFolder ? (
+        <>
+          <Menu.Item
+            disabled={isInPreviewMode}
+            onClick={e => {
+              e.domEvent.stopPropagation();
+              onCreateFolder(absolutePath);
+            }}
+            key="create_directory"
+          >
+            New Folder
+          </Menu.Item>
+        </>
+      ) : null}
 
-        <Menu.Item
-          disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
-          onClick={e => {
-            e.domEvent.stopPropagation();
-            onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
-          }}
-          key="create_resource"
-        >
-          {isFolder ? 'New Resource' : 'Add Resource'}
-        </Menu.Item>
-        <ContextMenuDivider />
-        <Menu.Item
-          key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
-          disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
-          onClick={e => {
-            e.domEvent.stopPropagation();
+      <Menu.Item
+        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
+        onClick={e => {
+          e.domEvent.stopPropagation();
+          onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
+        }}
+        key="create_resource"
+      >
+        {isFolder ? 'New Resource' : 'Add Resource'}
+      </Menu.Item>
+      <ContextMenuDivider />
+      <Menu.Item
+        key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
+        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
+        onClick={e => {
+          e.domEvent.stopPropagation();
 
-            if (isRoot || (fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter)) {
-              onFilterByFileOrFolder(undefined);
-            } else {
-              onFilterByFileOrFolder(relativePath);
-            }
-          }}
-        >
-          {fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
-            ? 'Remove from filter'
-            : `Filter on this ${isFolder ? 'folder' : 'file'}`}
-        </Menu.Item>
-        {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-          <>
-            <Menu.Item
-              disabled={isInPreviewMode || (!isFolder && !isSupported && !isExcluded)}
-              onClick={e => {
-                e.domEvent.stopPropagation();
-                if (isExcluded) {
-                  onIncludeToProcessing(relativePath);
-                } else {
-                  onExcludeFromProcessing(relativePath);
-                }
-              }}
-              key="add_to_files_exclude"
-            >
-              {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
-            </Menu.Item>
-          </>
-        ) : null}
-        <ContextMenuDivider />
-        <Menu.Item
-          onClick={e => {
-            e.domEvent.stopPropagation();
-            navigator.clipboard.writeText(absolutePath);
-          }}
-          key="copy_full_path"
-        >
-          Copy Path
-        </Menu.Item>
-        <Menu.Item
-          onClick={e => {
-            e.domEvent.stopPropagation();
+          if (isRoot || (fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter)) {
+            onFilterByFileOrFolder(undefined);
+          } else {
+            onFilterByFileOrFolder(relativePath);
+          }
+        }}
+      >
+        {fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : `Filter on this ${isFolder ? 'folder' : 'file'}`}
+      </Menu.Item>
+      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
+        <>
+          <Menu.Item
+            disabled={isInPreviewMode || (!isFolder && !isSupported && !isExcluded)}
+            onClick={e => {
+              e.domEvent.stopPropagation();
+              if (isExcluded) {
+                onIncludeToProcessing(relativePath);
+              } else {
+                onExcludeFromProcessing(relativePath);
+              }
+            }}
+            key="add_to_files_exclude"
+          >
+            {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
+          </Menu.Item>
+        </>
+      ) : null}
+      <ContextMenuDivider />
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+          navigator.clipboard.writeText(absolutePath);
+        }}
+        key="copy_full_path"
+      >
+        Copy Path
+      </Menu.Item>
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
 
-            navigator.clipboard.writeText(relativePath);
-          }}
-          key="copy_relative_path"
-        >
-          Copy Relative Path
-        </Menu.Item>
-        {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-          <>
-            <ContextMenuDivider />
-            <Menu.Item
-              disabled={isInPreviewMode}
-              onClick={e => {
-                e.domEvent.stopPropagation();
-                onRename(absolutePath, osPlatform);
-              }}
-              key="rename_entity"
-            >
-              Rename
-            </Menu.Item>
-            <Menu.Item
-              disabled={isInPreviewMode}
-              key="delete_entity"
-              onClick={e => {
-                e.domEvent.stopPropagation();
-                deleteEntityWizard(
-                  {entityAbsolutePath: absolutePath},
-                  () => {
-                    setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
-                    deleteEntity(absolutePath, onDelete);
-                  },
-                  () => {}
-                );
-              }}
-            >
-              Delete
-            </Menu.Item>
-          </>
-        ) : null}
-        <ContextMenuDivider />
-        <Menu.Item
-          onClick={e => {
-            e.domEvent.stopPropagation();
-            showItemInFolder(absolutePath);
-          }}
-          key="reveal_in_finder"
-        >
-          Reveal in {platformFilemanagerName}
-        </Menu.Item>
-      </Menu>
-    </div>
+          navigator.clipboard.writeText(relativePath);
+        }}
+        key="copy_relative_path"
+      >
+        Copy Relative Path
+      </Menu.Item>
+      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
+        <>
+          <ContextMenuDivider />
+          <Menu.Item
+            disabled={isInPreviewMode}
+            onClick={e => {
+              e.domEvent.stopPropagation();
+              onRename(absolutePath, osPlatform);
+            }}
+            key="rename_entity"
+          >
+            Rename
+          </Menu.Item>
+          <Menu.Item
+            disabled={isInPreviewMode}
+            key="delete_entity"
+            onClick={e => {
+              e.domEvent.stopPropagation();
+              deleteEntityWizard(
+                {entityAbsolutePath: absolutePath},
+                () => {
+                  setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
+                  deleteEntity(absolutePath, onDelete);
+                },
+                () => {}
+              );
+            }}
+          >
+            Delete
+          </Menu.Item>
+        </>
+      ) : null}
+      <ContextMenuDivider />
+      <Menu.Item
+        onClick={e => {
+          e.domEvent.stopPropagation();
+          showItemInFolder(absolutePath);
+        }}
+        key="reveal_in_finder"
+      >
+        Reveal in {platformFilemanagerName}
+      </Menu.Item>
+    </Menu>
   );
 
   return (
