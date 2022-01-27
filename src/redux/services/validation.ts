@@ -40,7 +40,8 @@ export function validateResource(resource: K8sResource) {
     return;
   }
 
-  if (!validatorCache.has(resource.kind)) {
+  const validatorCacheKey = resource.kind + resource.version;
+  if (!validatorCache.has(validatorCacheKey)) {
     const ajv = new Ajv({
       unknownFormats: 'ignore',
       validateSchema: false,
@@ -49,10 +50,10 @@ export function validateResource(resource: K8sResource) {
       verbose: true,
       allErrors: true,
     });
-    validatorCache.set(resource.kind, ajv.compile(resourceSchema));
+    validatorCache.set(validatorCacheKey, ajv.compile(resourceSchema));
   }
 
-  const validate = validatorCache.get(resource.kind);
+  const validate = validatorCache.get(validatorCacheKey);
   if (validate) {
     try {
       validate(resource.content);
