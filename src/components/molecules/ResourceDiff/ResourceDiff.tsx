@@ -101,7 +101,7 @@ const ResourceDiff = (props: {
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
-  useResourceYamlSchema(yaml, resourceMap, localResource.id);
+  useResourceYamlSchema(yaml, localResource);
 
   const options = {
     renderSideBySide: true,
