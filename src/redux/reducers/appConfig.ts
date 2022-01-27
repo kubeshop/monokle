@@ -57,7 +57,7 @@ export const setOpenProject = createAsyncThunk(
 
     const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
-    // First open the project so state.selectedProjectRootFolder is sey
+    // First open the project so state.selectedProjectRootFolder is set
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     const config: ProjectConfig | null = projectConfig || populateProjectConfig(appConfig);
     // Then set project config by reading .monokle or populating it
