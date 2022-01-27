@@ -82,6 +82,16 @@ jobs:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
 
+      - name: E2E Test for Electron 🧪
+        run: npm run ui-test
+
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: playwright-output
+          path: test-output/**
+
       - name: Package
         id: package
         run: |
@@ -197,6 +207,16 @@ jobs:
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+
+      - name: E2E Test for Electron 🧪
+        run: npm run ui-test
+
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: playwright-output
+          path: test-output/**
 
       - name: Package
         id: package
@@ -324,6 +344,17 @@ jobs:
         run: |
           ls -alh dist | grep Monokle && du -sh dist || true
         if: ${{ success() }}
+
+# todo fix linux tests first and then run them
+#      - name: E2E Test for Electron 🧪
+#        run: npm run ui-test
+#
+#      - name: Upload Test Results 🗃
+#        if: always()
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: playwright-output
+#          path: test-output/**
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
