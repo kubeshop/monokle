@@ -25,6 +25,14 @@ const RecentProjectsPane = () => {
     dispatch(setOpenProject(project.rootFolder));
   };
 
+  const onProjectItemClick = (isActivePropject: boolean, project: Project) => {
+    if (isActivePropject) {
+      dispatch(toggleStartProjectPane());
+      return;
+    }
+    openProject(project);
+  };
+
   const getRelativeDate = (isoDate: string | undefined) => {
     if (isoDate) {
       return DateTime.fromISO(isoDate).toRelative();
@@ -50,7 +58,7 @@ const RecentProjectsPane = () => {
               <S.ProjectItem
                 key={project.rootFolder}
                 activeproject={isActivePropject}
-                onClick={() => (isActivePropject ? dispatch(toggleStartProjectPane()) : openProject(project))}
+                onClick={() => onProjectItemClick(isActivePropject, project)}
               >
                 <S.ProjectName>{project.name}</S.ProjectName>
                 <Tooltip title={project.rootFolder} placement="bottom">

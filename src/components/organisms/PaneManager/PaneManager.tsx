@@ -215,7 +215,7 @@ const PaneManager = () => {
             <StartProjectPane />
           </div>
           {Boolean(projects.length) && (
-            <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`}}>
+            <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`, maxWidth: '28vw'}}>
               <RecentProjectsPane />
             </div>
           )}

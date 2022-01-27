@@ -49,8 +49,7 @@ export const ProjectName = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: auto;
-  max-width: 320px;
+  width: 100%;
 `;
 
 export const ProjectPath = styled.div`
@@ -59,8 +58,7 @@ export const ProjectPath = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: auto;
-  max-width: 300px;
+  width: 100%;
 `;
 
 export const ProjectLastOpened = styled.div`
@@ -69,7 +67,7 @@ export const ProjectLastOpened = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: auto;
+  width: 100%;
 `;
 
 export const BackToProjectButton = styled(Button)`
