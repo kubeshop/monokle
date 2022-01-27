@@ -20,7 +20,7 @@ export const Title = styled.span`
 `;
 
 export const ProjectsContainer = styled.div`
-  padding: 16px 12px;
+  padding: 8px 12px;
   height: calc(100vh - 112px);
   overflow-y: scroll;
   width: 100%;
@@ -28,7 +28,7 @@ export const ProjectsContainer = styled.div`
 `;
 
 export const ProjectItem = styled.div<{activeproject: boolean}>`
-  margin-bottom: 16px;
+  padding: 4px 8px 4px 8px;
   margin-left: ${props => (props.activeproject ? '-12px' : 'unset')};
   padding-left: ${props => (props.activeproject ? '12px' : 'unset')};
   border-left: 4px solid ${props => (props.activeproject ? Colors.lightSeaGreen : 'transparent')};
@@ -51,11 +51,6 @@ export const ProjectName = styled.div`
   text-overflow: ellipsis;
   width: auto;
   max-width: 320px;
-
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
 `;
 
 export const ProjectPath = styled.div`

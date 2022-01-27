@@ -47,13 +47,13 @@ const RecentProjectsPane = () => {
           {projects.map((project: Project) => {
             const isActivePropject = project.rootFolder === activeProject?.rootFolder;
             return (
-              <S.ProjectItem key={project.rootFolder} activeproject={isActivePropject}>
-                <S.ProjectName
-                  onClick={() => (isActivePropject ? dispatch(toggleStartProjectPane()) : openProject(project))}
-                >
-                  {project.name}
-                </S.ProjectName>
-                <Tooltip title={project.rootFolder}>
+              <S.ProjectItem
+                key={project.rootFolder}
+                activeproject={isActivePropject}
+                onClick={() => (isActivePropject ? dispatch(toggleStartProjectPane()) : openProject(project))}
+              >
+                <S.ProjectName>{project.name}</S.ProjectName>
+                <Tooltip title={project.rootFolder} placement="bottom">
                   <S.ProjectPath>{project.rootFolder}</S.ProjectPath>
                 </Tooltip>
                 <S.ProjectLastOpened>
