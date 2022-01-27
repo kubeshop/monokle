@@ -1,6 +1,6 @@
 import {useContext, useEffect, useMemo, useState} from 'react';
 
-import {Badge, Button, Skeleton, Space, Tooltip} from 'antd';
+import {Badge, Button, Space, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
 
 import {
@@ -10,8 +10,6 @@ import {
   FolderOutlined,
   FormatPainterOutlined,
 } from '@ant-design/icons';
-
-import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
@@ -32,10 +30,9 @@ import {ActionsPane, FileTreePane, HelmPane, KustomizePane, NavigatorPane, Templ
 
 import {GraphView} from '@molecules';
 
-import {Col, SplitView} from '@atoms';
+import {SplitView} from '@atoms';
 
-import {AppBorders} from '@styles/Borders';
-import Colors, {BackgroundColors} from '@styles/Colors';
+import Colors from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
 import featureJson from '@src/feature-flags.json';
@@ -47,42 +44,7 @@ import RecentProjectsPane from '../RecentProjectsPane';
 import StartProjectPane from '../StartProjectPane';
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
-
-const StyledRow = styled.div`
-  background-color: ${BackgroundColors.darkThemeBackground};
-  width: 100%;
-  padding: 0px;
-  margin: 0px;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-`;
-const StyledColumnLeftMenu = styled(Col)`
-  background-color: ${BackgroundColors.darkThemeBackground};
-  height: 100%;
-  padding: 0px;
-  margin: 0px;
-  border-right: ${AppBorders.pageDivider};
-`;
-const StyledColumnPanes = styled(Col)`
-  background-color: ${BackgroundColors.darkThemeBackground};
-  height: 100%;
-  padding: 0px;
-  margin: 0px;
-  overflow-x: visible !important;
-  overflow-y: visible !important;
-`;
-const StyledColumnRightMenu = styled(Col)`
-  background-color: ${BackgroundColors.darkThemeBackground};
-  height: 100%;
-  padding: 0px;
-  margin: 0px;
-  border-left: ${AppBorders.pageDivider};
-`;
-
-const StyledSkeleton = styled(Skeleton)`
-  padding: 8px 16px;
-`;
+import * as S from './Styled';
 
 const iconMenuWidth = 45;
 
@@ -167,10 +129,10 @@ const PaneManager = () => {
 
   let content;
   if (isProjectLoading) {
-    content = <StyledSkeleton />;
+    content = <S.Skeleton />;
   } else if (activeProject && !isStartProjectPaneVisible) {
     content = (
-      <StyledColumnPanes style={{width: contentWidth}}>
+      <S.ColumnPanes style={{width: contentWidth}}>
         <SplitView
           contentWidth={contentWidth}
           left={
@@ -205,28 +167,28 @@ const PaneManager = () => {
           }
           hideRight={!rightActive}
         />
-      </StyledColumnPanes>
+      </S.ColumnPanes>
     );
   } else {
     content = (
-      <StyledColumnPanes style={{width: contentWidth}}>
-        <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
-          <div style={{flex: 3}}>
+      <S.ColumnPanes style={{width: contentWidth}}>
+        <S.GettingStartedPaneContainer>
+          <S.StartProjectPaneContainer>
             <StartProjectPane />
-          </div>
+          </S.StartProjectPaneContainer>
           {Boolean(projects.length) && (
-            <div style={{flex: 1, borderLeft: `1px solid ${Colors.grey3}`, maxWidth: '28vw'}}>
+            <S.RecentProjectsPaneContainer>
               <RecentProjectsPane />
-            </div>
+            </S.RecentProjectsPaneContainer>
           )}
-        </div>
-      </StyledColumnPanes>
+        </S.GettingStartedPaneContainer>
+      </S.ColumnPanes>
     );
   }
 
   return (
-    <StyledRow style={{height: contentHeight}}>
-      <StyledColumnLeftMenu>
+    <S.Row style={{height: contentHeight}}>
+      <S.ColumnLeftMenu>
         <Space direction="vertical" style={{width: 43}}>
           <Tooltip
             mouseEnterDelay={TOOLTIP_DELAY}
@@ -320,11 +282,11 @@ const PaneManager = () => {
             </MenuButton>
           </Tooltip>
         </Space>
-      </StyledColumnLeftMenu>
+      </S.ColumnLeftMenu>
 
       {content}
 
-      <StyledColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
+      <S.ColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
         <Space direction="vertical" style={{width: 43}}>
           <Button
             size="large"
@@ -343,8 +305,8 @@ const PaneManager = () => {
             icon={<MenuIcon icon={CodeOutlined} active={rightActive} isSelected={rightMenuSelection === 'logs'} />}
           />
         </Space>
-      </StyledColumnRightMenu>
-    </StyledRow>
+      </S.ColumnRightMenu>
+    </S.Row>
   );
 };
 
