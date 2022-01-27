@@ -1,21 +1,22 @@
 import {useEffect} from 'react';
 
-import {ResourceMapType} from '@models/appstate';
+import {K8sResource} from '@models/k8sresource';
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getResourceSchema} from '@redux/services/schema';
 
-function useResourceYamlSchema(yaml: any, resourceMap: ResourceMapType, resourceId: string | undefined) {
+function useResourceYamlSchema(yaml: any, resource: K8sResource | undefined) {
   useEffect(() => {
+    if (!resource) {
+      return;
+    }
+
     let resourceSchema;
     let validate = true;
 
-    if (resourceId) {
-      const resource = resourceMap[resourceId];
-      if (resource) {
-        resourceSchema = getResourceSchema(resource);
-        validate = !isKustomizationPatch(resource);
-      }
+    if (resource) {
+      resourceSchema = getResourceSchema(resource);
+      validate = !isKustomizationPatch(resource);
     }
 
     yaml &&
@@ -35,7 +36,7 @@ function useResourceYamlSchema(yaml: any, resourceMap: ResourceMapType, resource
         ],
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceId, resourceMap]);
+  }, [resource]);
 }
 
 export default useResourceYamlSchema;

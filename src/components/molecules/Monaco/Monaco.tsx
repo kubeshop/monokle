@@ -29,6 +29,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath, extendResourceFilter, selectFile, selectK8sResource} from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
+import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch} from '@redux/services/kustomize';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
@@ -78,6 +79,13 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const previewType = useAppSelector(state => state.main.previewType);
   const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+
+  const resourcesFromSelectedPath = useMemo(() => {
+    if (!selectedPath) {
+      return [];
+    }
+    return getResourcesForPath(selectedPath, resourceMap);
+  }, [selectedPath, resourceMap]);
 
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -130,7 +138,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
   useCodeIntel(
     editor,
-    selectedResource,
+    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     code,
     resourceMap,
     fileMap,
@@ -147,7 +155,10 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     applySelection,
     diffSelectedResource
   );
-  useResourceYamlSchema(yaml, resourceMap, selectedResourceId);
+  useResourceYamlSchema(
+    yaml,
+    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined)
+  );
   useDebouncedCodeSave(
     editor,
     orgCode,
