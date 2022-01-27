@@ -18,7 +18,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal, updateResource} from '@redux/reducers/main';
-import {isInPreviewModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -37,6 +37,7 @@ const DiffModal = () => {
   const dispatch = useAppDispatch();
 
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const previewType = useAppSelector(state => state.main.previewType);
@@ -63,11 +64,9 @@ const DiffModal = () => {
 
   const windowSize = useWindowSize();
 
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-
   const isDiffModalVisible = useMemo(
-    () => Boolean(targetResource) && !isInPreviewMode,
-    [isInPreviewMode, targetResource]
+    () => Boolean(targetResource) && !isInClusterMode,
+    [isInClusterMode, targetResource]
   );
 
   const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
