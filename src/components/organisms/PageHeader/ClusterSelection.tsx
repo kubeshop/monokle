@@ -159,7 +159,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
               placement="bottomCenter"
               arrow
               trigger={['click']}
-              disabled={previewLoader.isLoading || isInPreviewMode}
+              disabled={previewLoader.isLoading || isInClusterMode}
               visible={isClusterDropdownOpen}
               onVisibleChange={setIsClusterDropdownOpen}
             >
