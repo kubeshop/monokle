@@ -104,8 +104,23 @@ Read more about this here: https://react-jsonschema-form.readthedocs.io/en/lates
 
 Monokle 1.5.0 provides the following widgets:
 
-- namespaceSelection
-- [TODO: list all widgets here]
+- `namespaceSelection`: shows a dropdown with all namespaces in the current set of resources
+- `apiGroupSelection`: shows a dropdown with all apiGroups known by Monokle
+- `podSelectSelection`: shows a dropdown with all labels assigned to any pods or pod-specs in the current set of resources
+- `resourceSelection`: shows a dropdown with resource names from the current set of resources, this can be narrowed down by adding a ui:options.resourceKinds property containing 
+  a |-separated string of desired resourceKinds. For example:
+
+```json
+  "targetClusterRole": {
+    "ui:title": "Target ClusterRole",
+    "ui:help": "The ClusterRole to bind to the created ServiceAccount",
+    "ui:widget": "resourceSelection",
+    "ui:options": {
+      "resourceKinds": "ClusterRole"
+  }
+```
+
+All these widgets allow entry of custom values - i.e. none require you to select a known value.
 
 ## What types of templates exist?
 
