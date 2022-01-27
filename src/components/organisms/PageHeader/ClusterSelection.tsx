@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
-import {useSelector} from 'react-redux';
 
 import {Dropdown, Menu, Tooltip} from 'antd';
 
@@ -30,11 +29,11 @@ import * as S from './ClusterSelection.styled';
 
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
-  const activeProject = useSelector(activeProjectSelector);
+  const activeProject = useAppSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
-  const isInClusterMode = useSelector(isInClusterModeSelector);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
@@ -43,10 +42,12 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
   const projectConfig = useAppSelector(state => state.config.projectConfig);
-  const [isClusterDropdownOpen, setIsClusterDropdownOpen] = useState(false);
+
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
   );
+  const [isClusterDropdownOpen, setIsClusterDropdownOpen] = useState(false);
+
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
   useHotkeys('escape', () => {
@@ -56,13 +57,15 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
 
   const handleClusterChange = ({key}: {key: string}) => {
     setIsClusterDropdownOpen(false);
-    dispatch(setCurrentContext(key));
-    dispatch(
-      updateProjectConfig({
-        config: {...projectConfig, kubeConfig: {...projectConfig?.kubeConfig, currentContext: key}},
-        fromConfigFile: false,
-      })
-    );
+    if (key !== kubeConfigContext) {
+      dispatch(setCurrentContext(key));
+      dispatch(
+        updateProjectConfig({
+          config: {...projectConfig, kubeConfig: {...projectConfig?.kubeConfig, currentContext: key}},
+          fromConfigFile: false,
+        })
+      );
+    }
   };
 
   const handleClusterConfigure = () => {
