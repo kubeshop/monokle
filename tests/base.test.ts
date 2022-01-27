@@ -1,10 +1,8 @@
 /* eslint-disable import/order */
-import path from 'path';
 import {Page, _electron as electron} from 'playwright';
 
 import {
   findDrawer,
-  isInvisible,
   waitForDrawerToHide,
   waitForDrawerToShow,
   waitForModalToHide,
@@ -79,12 +77,6 @@ test('Validate icons', async () => {
   let span = appWindow.locator("span[aria-label='question-circle']");
   expect(await span.count()).toBe(1);
 
-  const img = appWindow.locator("img[src*='DiscordLogo'][src$='.svg']");
-  expect(await img.count()).toBe(1);
-
-  span = appWindow.locator("span[aria-label='github']");
-  expect(await span.count()).toBe(1);
-
   span = appWindow.locator("span[aria-label='bell']");
   expect(await span.count()).toBe(1);
 
@@ -124,27 +116,6 @@ test('Validate notifications drawer', async () => {
   await clickOnMonokleLogo();
 
   expect(await waitForDrawerToHide(appWindow, 'Notifications')).toBeTruthy();
-});
-
-test('Validate monokle popup', async () => {
-  await clickOnMonokleLogo();
-
-  expect(await waitForModalToShow(appWindow, 'WelcomeModal')).toBeTruthy();
-  await clickOnMonokleLogo();
-
-  expect(await waitForModalToHide(appWindow, 'WelcomeModal')).toBeTruthy();
-});
-
-test('Validate open folder', async () => {
-  const folder = path.resolve(`tests${path.sep}argo-rollouts`);
-  await electronApp.evaluate(async (app, f) => {
-    app.webContents.getFocusedWebContents().send('set-root-folder', f);
-  }, folder);
-
-  await pause(10000);
-
-  const footer = appWindow.locator('footer');
-  await expect(footer).toContainText('26 files');
 });
 
 test.afterAll(async () => {
