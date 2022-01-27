@@ -137,8 +137,10 @@ const QuickSearchActionsV3: React.FC = () => {
       } else if (type === 'resource') {
         if (!filteredResources[option]) {
           selectK8sResourceWithConfirm(option, resourceMap[option].name, dispatch);
-        } else if (selectedResourceId !== option) {
-          dispatch(selectK8sResource({resourceId: option}));
+        } else {
+          if (selectedResourceId !== option) {
+            dispatch(selectK8sResource({resourceId: option}));
+          }
           dispatch(closeQuickSearchActionsPopup());
         }
       }
