@@ -98,8 +98,7 @@ test('Validate settings drawer', async () => {
   expect(drawer).toBeFalsy();
 
   appWindow.click("span[aria-label='setting']", {noWaitAfter: true, force: true});
-  drawer = await waitForDrawerToShow(appWindow, 'Settings');
-  await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/drawer.png`});
+  drawer = await waitForDrawerToShow(appWindow, 'Settings', 20000);
 
   expect(drawer).toBeTruthy();
 
