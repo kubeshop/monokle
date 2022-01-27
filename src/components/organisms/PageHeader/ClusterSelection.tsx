@@ -53,7 +53,9 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     setIsClusterDropdownOpen(false);
     dropdownButtonRef.current?.blur();
   });
+
   const handleClusterChange = ({key}: {key: string}) => {
+    setIsClusterDropdownOpen(false);
     dispatch(setCurrentContext(key));
     dispatch(
       updateProjectConfig({
