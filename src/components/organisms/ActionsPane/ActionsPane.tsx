@@ -446,6 +446,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   <S.Skeleton active />
                 ) : (
                   <FormEditor
+                    isActive={activeTabKey === 'form'}
                     formSchema={resourceKindHandler.formEditorOptions.editorSchema}
                     formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                   />
@@ -461,7 +462,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : (
-                  <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
+                  <FormEditor
+                    isActive={activeTabKey === 'metadataForm'}
+                    formSchema={getFormSchema('metadata')}
+                    formUiSchema={getUiSchema('metadata')}
+                  />
                 )}
               </TabPane>
             )}
