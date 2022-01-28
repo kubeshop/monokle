@@ -1,16 +1,13 @@
-import React, {useCallback, useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import {Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
 
-import {AlertEnum, AlertType} from '@models/alert';
+import {AlertEnum} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {seenNotifications} from '@redux/reducers/main';
-import {toggleNotifications} from '@redux/reducers/ui';
-
-import Drawer from '@components/atoms/Drawer';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 
@@ -57,20 +54,10 @@ const Notification: React.FC<NotificationProps> = props => {
   );
 };
 
-const NotificationsDrawer = () => {
+const NotificationsManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const isNotificationsOpen = Boolean(useAppSelector(state => state.ui.isNotificationsOpen));
-  const notifications: AlertType[] = useAppSelector(state => state.main.notifications);
-
-  const toggleSettingsDrawer = () => {
-    dispatch(toggleNotifications());
-  };
-
-  useEffect(() => {
-    if (isNotificationsOpen) {
-      dispatch(seenNotifications());
-    }
-  }, [isNotificationsOpen, dispatch]);
+  const notifications = useAppSelector(state => state.main.notifications);
 
   const getNotificationBadge = useCallback(
     (type: AlertEnum) => {
@@ -89,16 +76,14 @@ const NotificationsDrawer = () => {
     [notifications]
   );
 
+  useEffect(() => {
+    if (isNotificationsOpen) {
+      dispatch(seenNotifications());
+    }
+  }, [isNotificationsOpen, dispatch]);
+
   return (
-    <Drawer
-      width="400"
-      noborder="true"
-      title="Notifications"
-      placement="right"
-      closable={false}
-      onClose={toggleSettingsDrawer}
-      visible={isNotificationsOpen}
-    >
+    <>
       {notifications && notifications.length > 0 ? (
         notifications.map(notification => {
           return (
@@ -112,8 +97,8 @@ const NotificationsDrawer = () => {
       ) : (
         <S.NoNotificationsContainer>You don&apos;t have any notifications.</S.NoNotificationsContainer>
       )}
-    </Drawer>
+    </>
   );
 };
 
-export default NotificationsDrawer;
+export default NotificationsManager;

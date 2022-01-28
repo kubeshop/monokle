@@ -27,7 +27,7 @@ import FilePatternList from '@molecules/FilePatternList';
 
 import {useFocus} from '@utils/hooks';
 
-import * as S from './Styles';
+import * as S from './styled';
 
 type SettingsProps = {
   config?: ProjectConfig | null;

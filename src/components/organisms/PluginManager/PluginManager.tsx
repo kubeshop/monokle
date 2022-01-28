@@ -7,19 +7,15 @@ import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {closePluginsDrawer} from '@redux/reducers/extension';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
-
-import Drawer from '@components/atoms/Drawer';
 
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
-import * as S from './PluginManagerDrawer.styled';
+import * as S from './PluginManager.styled';
 
 const PluginManagerDrawer: React.FC = () => {
   const dispatch = useAppDispatch();
   const isLoadingExistingPlugins = useAppSelector(state => state.extension.isLoadingExistingPlugins);
-  const isPluginsDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
@@ -44,16 +40,7 @@ const PluginManagerDrawer: React.FC = () => {
   };
 
   return (
-    <Drawer
-      width="400"
-      noborder="true"
-      title="Plugins Manager"
-      placement="right"
-      closable={false}
-      visible={isPluginsDrawerVisible}
-      onClose={() => dispatch(closePluginsDrawer())}
-      bodyStyle={{padding: 0}}
-    >
+    <>
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
       <S.ButtonsContainer>
         <Tooltip title={PluginManagerDrawerReloadTooltip} placement="bottom">
@@ -91,7 +78,7 @@ const PluginManagerDrawer: React.FC = () => {
           </>
         )}
       </S.Container>
-    </Drawer>
+    </>
   );
 };
 

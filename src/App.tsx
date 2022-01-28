@@ -15,11 +15,12 @@ import {Size} from '@models/window';
 
 import {useAppSelector} from '@redux/hooks';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
-import {closeFolderExplorer} from '@redux/reducers/ui';
+import {closePluginsDrawer} from '@redux/reducers/extension';
+import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
-import {HotKeysHandler, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
+import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -37,13 +38,13 @@ const CreateFolderModal = React.lazy(() => import('@organisms/CreateFolderModal'
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
 const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
 const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
-const NotificationsDrawer = React.lazy(() => import('@organisms/NotificationsDrawer'));
+const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
 const QuickSearchActions = React.lazy(() => import('@organisms/QuickSearchActions'));
-const PluginManagerDrawer = React.lazy(() => import('@organisms/PluginManagerDrawer'));
+const PluginManager = React.lazy(() => import('@components/organisms/PluginManager'));
 const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
 const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
 const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
-const SettingsDrawer = React.lazy(() => import('@organisms/SettingsDrawer'));
+const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
 
@@ -176,6 +177,18 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFolderExplorerOpen]);
 
+  const notificationsDrawerOnClose = () => {
+    dispatch(toggleNotifications());
+  };
+
+  const pluginsDrawerOnClose = () => {
+    dispatch(closePluginsDrawer());
+  };
+
+  const settingsDrawerOnClose = () => {
+    dispatch(toggleSettings());
+  };
+
   return (
     <AppContext.Provider value={{windowSize: size}}>
       <AppContainer $height={size.height} $width={size.width}>
@@ -185,11 +198,22 @@ const App = () => {
           <PaneManager />
           <PageFooter />
 
-          <Suspense fallback={null}>
-            {isNotificationsDrawerVisible && <NotificationsDrawer />}
-            {isPluginManagerDrawerVisible && <PluginManagerDrawer />}
-            {isSettingsDrawerVisible && <SettingsDrawer />}
-          </Suspense>
+          <LazyDrawer onClose={notificationsDrawerOnClose} title="Notifications" visible={isNotificationsDrawerVisible}>
+            <NotificationsManager />
+          </LazyDrawer>
+
+          <LazyDrawer
+            noPadding
+            onClose={pluginsDrawerOnClose}
+            title="Plugins Manager"
+            visible={isPluginManagerDrawerVisible}
+          >
+            <PluginManager />
+          </LazyDrawer>
+
+          <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
+            <SettingsManager />
+          </LazyDrawer>
         </MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
