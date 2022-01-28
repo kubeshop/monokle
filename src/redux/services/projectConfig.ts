@@ -41,6 +41,8 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
   }
 };
 
+// This function needs to be extended when new related value is added
+// We need to think a better way
 export const populateProjectConfigToWrite = (state: AppConfig | SerializableObject) => {
   const applicationConfig: ProjectConfig = {
     scanExcludes: state.projectConfig.scanExcludes,
@@ -61,6 +63,9 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
   };
   return applicationConfig;
 };
+
+// This function needs to be extended when new related value is added
+// We need to think a better way
 export const populateProjectConfig = (state: AppConfig | SerializableObject) => {
   const applicationConfig: ProjectConfig = {
     scanExcludes: state.scanExcludes,
@@ -72,6 +77,8 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     kustomizeCommand: state.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
+    createDefaultObjects: state.settings.createDefaultObjects,
+    setDefaultPrimitiveValues: state.settings.setDefaultPrimitiveValues,
   };
   applicationConfig.kubeConfig = {
     path: state.kubeConfig.path,
