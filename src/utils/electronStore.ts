@@ -26,17 +26,6 @@ const schema = {
       loadLastProjectOnStartup: {
         type: 'boolean',
       },
-      kubeconfig: {
-        type: 'object',
-        properties: {
-          contexts: {
-            type: 'array',
-          },
-          currentContext: {
-            type: 'string',
-          },
-        },
-      },
       scanExcludes: {
         type: 'array',
         items: {
