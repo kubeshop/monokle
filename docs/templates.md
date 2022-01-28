@@ -51,8 +51,8 @@ In the above example, the type of the template is `"vanilla"`.
 
 ## What does a form schema look like?
 
-The format of form schemas is JSON schema.
-This defines how the data of the form will be sent to the template manifests.
+The format of form schemas is [JSON schema](https://json-schema.org/).
+This defines which data that will be sent to the template manifests.
 
 ```json
 {
@@ -95,9 +95,12 @@ Example:
 }
 ```
 
-The role of this form is to specify information about how to render the form.
+The role of this form is to specify information about how to render the form - read more about ui-schemas in the 
+[UI-Schema Documentation](https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/) 
 
-Monokle 1.5.0 provides a number of custom form widgets to provide a better user experience:
+### Custom Form Widgets 
+
+Monokle 1.5.0 provides a number of [custom form widgets](https://react-jsonschema-form.readthedocs.io/en/latest/advanced-customization/custom-widgets-fields/) to provide a better user experience:
 
 - `namespaceSelection`: Shows a dropdown with all namespaces in the current set of resources.
 - `apiGroupSelection`: Shows a dropdown with all apiGroups known by Monokle.
