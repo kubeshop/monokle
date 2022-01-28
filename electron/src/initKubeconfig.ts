@@ -35,11 +35,6 @@ function initKubeconfig(dispatch: (action: AnyAction) => void, userHomeDir: stri
     return;
   }
   const storedKubeconfig: string | undefined = electronStore.get('appConfig.kubeconfig');
-  const hasUserPerformedClickOnClusterIcon: boolean = electronStore.get('appConfig.hasUserPerformedClickOnClusterIcon');
-
-  if (hasUserPerformedClickOnClusterIcon) {
-    dispatch(onUserPerformedClickOnClusterIcon());
-  }
 
   if (storedKubeconfig && storedKubeconfig.trim().length > 0) {
     dispatch(setKubeConfig(getKubeConfigContext(storedKubeconfig)));

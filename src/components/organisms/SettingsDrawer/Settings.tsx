@@ -56,7 +56,6 @@ export const Settings = ({
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const fileInput = useRef<HTMLInputElement>(null);
   const [inputRef, focusInput] = useFocus<Input>();
-  const hasUserPerformedClickOnClusterIcon = useAppSelector(state => state.uiCoach.hasUserPerformedClickOnClusterIcon);
   const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid)
@@ -220,7 +219,7 @@ export const Settings = ({
       <S.Div>
         <S.Heading>
           KUBECONFIG
-          {isClusterActionDisabled && hasUserPerformedClickOnClusterIcon && wasRehydrated && (
+          {isClusterActionDisabled && wasRehydrated && (
             <S.WarningOutlined
               className={isClusterPaneIconHighlighted ? 'animated-highlight' : ''}
               isKubeconfigPathValid={Boolean(config?.kubeConfig?.isPathValid)}
