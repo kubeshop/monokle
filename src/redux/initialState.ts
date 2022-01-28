@@ -60,7 +60,7 @@ const initialAppConfigState: AppConfig = {
     hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
     createDefaultObjects: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
-    setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues'),
+    setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues') || true,
   },
   isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible') || true,
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
