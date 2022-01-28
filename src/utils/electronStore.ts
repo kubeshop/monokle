@@ -20,11 +20,22 @@ const schema = {
       startupModalVisible: {
         type: 'boolean',
       },
-      kubeconfig: {
-        type: 'string',
-      },
-      isKubeconfigPathValid: {
+      isClusterSelectorVisible: {
         type: 'boolean',
+      },
+      loadLastProjectOnStartup: {
+        type: 'boolean',
+      },
+      kubeconfig: {
+        type: 'object',
+        properties: {
+          contexts: {
+            type: 'array',
+          },
+          currentContext: {
+            type: 'string',
+          },
+        },
       },
       scanExcludes: {
         type: 'array',
@@ -56,7 +67,16 @@ const schema = {
           kustomizeCommand: {
             type: 'string',
           },
-          loadLastProjectOnStartup: {
+          hideExcludedFilesInFileExplorer: {
+            type: 'boolean',
+          },
+          enableHelmWithKustomize: {
+            type: 'boolean',
+          },
+          createDefaultObjects: {
+            type: 'boolean',
+          },
+          setDefaultPrmitiveValues: {
             type: 'boolean',
           },
         },
@@ -70,7 +90,6 @@ const schema = {
       newVersion: {
         type: 'number',
       },
-
       projects: {
         type: 'array',
         items: {
@@ -165,6 +184,8 @@ const schema = {
 const defaults = {
   appConfig: {
     startupModalVisible: true,
+    isClusterSelectorVisible: true,
+    loadLastProjectOnStartup: false,
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
@@ -172,8 +193,8 @@ const defaults = {
       textSize: 'medium',
       language: 'en',
       helmPreviewMode: 'template',
-      loadLastProjectOnStartup: false,
-      isClusterSelectorVisible: true,
+      createDefaultObjects: false,
+      setDefaultPrmitiveValues: true,
     },
     recentFolders: [],
     newVersion: 0,

@@ -18,13 +18,10 @@ import {
   changeProjectsRootPath,
   setKubeConfig,
   setScanExcludesStatus,
+  updateApplicationSettings,
   updateClusterSelectorVisibilty,
-  updateEnableHelmWithKustomize,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
-  updateHelmPreviewMode,
-  updateHideExcludedFilesInFileExplorer,
-  updateKustomizeCommand,
   updateLoadLastProjectOnStartup,
   updateProjectConfig,
   updateScanExcludes,
@@ -79,20 +76,8 @@ const SettingsDrawer = () => {
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
-    if (!_.isEqual(config.settings?.enableHelmWithKustomize, appConfig.settings.enableHelmWithKustomize)) {
-      dispatch(updateEnableHelmWithKustomize(Boolean(config.settings?.enableHelmWithKustomize)));
-    }
-    if (!_.isEqual(config.settings?.helmPreviewMode, appConfig.settings.helmPreviewMode)) {
-      dispatch(updateHelmPreviewMode(config.settings?.helmPreviewMode || 'template'));
-    }
-    if (!_.isEqual(config.settings?.kustomizeCommand, appConfig.settings.kustomizeCommand)) {
-      dispatch(updateKustomizeCommand(config.settings?.kustomizeCommand || 'kubectl'));
-    }
-    if (
-      !_.isEqual(config.settings?.hideExcludedFilesInFileExplorer, appConfig.settings.hideExcludedFilesInFileExplorer)
-    ) {
-      dispatch(updateHideExcludedFilesInFileExplorer(Boolean(config.settings?.hideExcludedFilesInFileExplorer)));
-    }
+    dispatch(updateApplicationSettings(config.settings));
+
     if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
       dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
     }
