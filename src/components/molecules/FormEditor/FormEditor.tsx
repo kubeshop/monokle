@@ -106,13 +106,8 @@ const FormContainer = styled.div`
   }
 `;
 
-interface IProps {
-  formSchema: any;
-  formUiSchema: any;
-  isActive: boolean;
-}
-
-const FormEditor = ({formSchema, formUiSchema, isActive}: IProps) => {
+const FormEditor = (props: {formSchema: any; formUiSchema: any}) => {
+  const {formSchema, formUiSchema} = props;
   const selectedResource = useSelector(selectedResourceSelector);
   const [formData, setFormData] = useState<any>();
   const dispatch = useAppDispatch();
@@ -124,7 +119,7 @@ const FormEditor = ({formSchema, formUiSchema, isActive}: IProps) => {
 
   useDebounce(
     () => {
-      if (selectedResource && isActive) {
+      if (selectedResource) {
         let formString = stringify(formData);
         const content = mergeManifests(selectedResource.text, formString);
 
@@ -134,7 +129,7 @@ const FormEditor = ({formSchema, formUiSchema, isActive}: IProps) => {
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [formData, selectedResource, isActive]
+    [formData, selectedResource]
   );
 
   useEffect(() => {
