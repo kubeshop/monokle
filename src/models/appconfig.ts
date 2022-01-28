@@ -26,7 +26,7 @@ export type Settings = {
   hideExcludedFilesInFileExplorer?: boolean;
   enableHelmWithKustomize?: boolean;
   createDefaultObjects?: boolean;
-  setDefaultPrmitiveValues?: boolean;
+  setDefaultPrimitiveValues?: boolean;
 };
 
 export enum NewVersionCode {

@@ -146,10 +146,10 @@ export const Settings = ({
       settings: {...localConfig?.settings, createDefaultObjects: e.target.checked},
     });
   };
-  const onChangeSetDefaultPrmitiveValues = (e: any) => {
+  const onChangeSetDefaultPrimitiveValues = (e: any) => {
     setLocalConfig({
       ...localConfig,
-      settings: {...localConfig?.settings, setDefaultPrmitiveValues: e.target.checked},
+      settings: {...localConfig?.settings, setDefaultPrimitiveValues: e.target.checked},
     });
   };
 
@@ -336,8 +336,8 @@ export const Settings = ({
         <S.Div>
           <Tooltip title="Title">
             <Checkbox
-              checked={localConfig?.settings?.setDefaultPrmitiveValues}
-              onChange={onChangeSetDefaultPrmitiveValues}
+              checked={localConfig?.settings?.setDefaultPrimitiveValues}
+              onChange={onChangeSetDefaultPrimitiveValues}
             >
               Set default primitive values
             </Checkbox>

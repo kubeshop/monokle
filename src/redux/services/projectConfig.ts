@@ -53,7 +53,7 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     hideExcludedFilesInFileExplorer: state.projectConfig.settings.hideExcludedFilesInFileExplorer,
     enableHelmWithKustomize: state.projectConfig.settings.enableHelmWithKustomize,
     createDefaultObjects: state.projectConfig.settings.createDefaultObjects,
-    setDefaultPrmitiveValues: state.projectConfig.settings.setDefaultPrmitiveValues,
+    setDefaultPrimitiveValues: state.projectConfig.settings.setDefaultPrimitiveValues,
   };
   applicationConfig.kubeConfig = {
     path: state.projectConfig.kubeConfig.path,

@@ -76,7 +76,7 @@ const schema = {
           createDefaultObjects: {
             type: 'boolean',
           },
-          setDefaultPrmitiveValues: {
+          setDefaultPrimitiveValues: {
             type: 'boolean',
           },
         },
@@ -194,7 +194,7 @@ const defaults = {
       language: 'en',
       helmPreviewMode: 'template',
       createDefaultObjects: false,
-      setDefaultPrmitiveValues: true,
+      setDefaultPrimitiveValues: true,
     },
     recentFolders: [],
     newVersion: 0,
