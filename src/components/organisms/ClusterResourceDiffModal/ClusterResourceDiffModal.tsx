@@ -58,7 +58,7 @@ const ClusterResourceDiffModal = () => {
   const windowSize = useWindowSize();
 
   const isDiffModalVisible = useMemo(
-    () => Boolean(targetResourceId) && Boolean(isInClusterMode),
+    () => Boolean(targetResourceId) && isInClusterMode,
     [isInClusterMode, targetResourceId]
   );
 
@@ -77,8 +77,8 @@ const ClusterResourceDiffModal = () => {
   }, [windowSize.width]);
 
   const cleanTargetResourceText = useMemo(() => {
-    if (!targetResource?.content) {
-      return;
+    if (!isDiffModalVisible || !targetResource || !targetResource.content) {
+      return undefined;
     }
 
     if (!shouldDiffIgnorePaths) {
@@ -88,7 +88,7 @@ const ClusterResourceDiffModal = () => {
     return stringify(removeIgnoredPathsFromResourceContent(targetResource.content, targetResource.namespace), {
       sortMapEntries: true,
     });
-  }, [shouldDiffIgnorePaths, targetResource]);
+  }, [isDiffModalVisible, shouldDiffIgnorePaths, targetResource]);
 
   const areResourcesDifferent = useMemo(() => {
     return cleanTargetResourceText !== matchingResourceText;
@@ -107,7 +107,7 @@ const ClusterResourceDiffModal = () => {
   }, [kubeConfigContext, selectedMatchingResourceId, resourceMap]);
 
   const matchingLocalResources = useMemo(() => {
-    if (!targetResource) {
+    if (!isDiffModalVisible || !targetResource) {
       return;
     }
 
@@ -121,7 +121,7 @@ const ClusterResourceDiffModal = () => {
         );
       })
     );
-  }, [resourceMap, targetResource]);
+  }, [isDiffModalVisible, resourceMap, targetResource]);
 
   const onCloseHandler = () => {
     if (isApplyModalVisible) {
@@ -178,7 +178,7 @@ const ClusterResourceDiffModal = () => {
   };
 
   useEffect(() => {
-    if (!targetResource || !resourceMap || !matchingLocalResources) {
+    if (!isDiffModalVisible || !targetResource || !targetResource.content || !resourceMap || !matchingLocalResources) {
       return;
     }
 
@@ -235,7 +235,7 @@ const ClusterResourceDiffModal = () => {
     }
 
     setHasDiffModalLoaded(true);
-  }, [dispatch, matchingLocalResources, resourceMap, targetResource]);
+  }, [dispatch, isDiffModalVisible, matchingLocalResources, resourceMap, targetResource]);
 
   return (
     <>

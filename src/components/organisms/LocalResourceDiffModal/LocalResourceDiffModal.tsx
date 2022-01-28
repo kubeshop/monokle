@@ -139,6 +139,7 @@ const DiffModal = () => {
 
   const cleanMatchingResourceText = useMemo(() => {
     if (
+      !isDiffModalVisible ||
       !matchingResourceText ||
       !targetResource?.content ||
       !selectedMatchingResourceId ||
@@ -158,12 +159,13 @@ const DiffModal = () => {
     const cleanDiffContentString = stringify(newDiffContentObject, {sortMapEntries: true});
     return cleanDiffContentString;
   }, [
-    hasDiffModalLoaded,
-    matchingResourcesById,
+    isDiffModalVisible,
     matchingResourceText,
-    selectedMatchingResourceId,
-    shouldDiffIgnorePaths,
     targetResource,
+    selectedMatchingResourceId,
+    matchingResourcesById,
+    hasDiffModalLoaded,
+    shouldDiffIgnorePaths,
   ]);
 
   const areResourcesDifferent = useMemo(() => {
@@ -179,7 +181,7 @@ const DiffModal = () => {
   };
 
   useEffect(() => {
-    if (!targetResource || !resourceMap) {
+    if (!isDiffModalVisible || !targetResource || !resourceMap) {
       return;
     }
 
@@ -258,7 +260,15 @@ const DiffModal = () => {
 
     setTargetResourceText(stringify(targetResource.content, {sortMapEntries: true}));
     getClusterResources();
-  }, [kubeConfigContext, dispatch, kubeConfigPath, resourceMap, resourceFilter.namespace, targetResource]);
+  }, [
+    kubeConfigContext,
+    dispatch,
+    kubeConfigPath,
+    resourceMap,
+    resourceFilter.namespace,
+    targetResource,
+    isDiffModalVisible,
+  ]);
 
   useEffect(() => {
     if (!isDiffModalVisible) {
