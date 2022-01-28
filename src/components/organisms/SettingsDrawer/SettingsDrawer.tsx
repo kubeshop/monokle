@@ -76,7 +76,13 @@ const SettingsDrawer = () => {
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
-    dispatch(updateApplicationSettings(config.settings));
+    dispatch(
+      updateApplicationSettings({
+        ...config.settings,
+        helmPreviewMode: config.settings?.helmPreviewMode || 'template',
+        kustomizeCommand: config.settings?.kustomizeCommand || 'kubectl',
+      })
+    );
 
     if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
       dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
