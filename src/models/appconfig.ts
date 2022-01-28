@@ -25,6 +25,8 @@ export type Settings = {
   kustomizeCommand?: KustomizeCommandType;
   hideExcludedFilesInFileExplorer?: boolean;
   enableHelmWithKustomize?: boolean;
+  createDefaultObjects?: boolean;
+  setDefaultPrmitiveValues?: boolean;
 };
 
 export enum NewVersionCode {
