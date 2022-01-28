@@ -8,7 +8,6 @@ import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
 import {setKubeConfig} from '@redux/reducers/appConfig';
-import {onUserPerformedClickOnClusterIcon} from '@redux/reducers/uiCoach';
 import {monitorKubeConfig} from '@redux/services/kubeConfigMonitor';
 
 import electronStore from '@utils/electronStore';
