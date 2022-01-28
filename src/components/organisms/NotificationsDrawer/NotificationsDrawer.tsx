@@ -1,11 +1,8 @@
 import React, {useCallback, useEffect} from 'react';
 
-import {Badge, Tooltip} from 'antd';
-
-import {CheckCircleOutlined, CopyOutlined, ExclamationCircleOutlined, InfoCircleOutlined} from '@ant-design/icons';
+import {Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
-import styled from 'styled-components';
 
 import {AlertEnum, AlertType} from '@models/alert';
 
@@ -17,80 +14,7 @@ import Drawer from '@components/atoms/Drawer';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 
-import Colors, {FontColors} from '@styles/Colors';
-
-const StyledDiv = styled.div`
-  margin-bottom: 12px;
-`;
-
-const StyledMessageContainer = styled(StyledDiv)`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const StyledNoNotificationsContainer = styled(StyledDiv)`
-  display: flex;
-`;
-
-const StyledMessageBodyContainer = styled(StyledDiv)`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`;
-
-const StyledSpan = styled.span`
-  font-weight: 500;
-  font-size: 12px;
-  display: block;
-  margin-bottom: 6px;
-`;
-
-const StyledDateSpan = styled(StyledSpan)`
-  color: ${Colors.grey500};
-`;
-
-const StyledTitleSpan = styled(StyledSpan)`
-  color: ${Colors.whitePure};
-  width: 100%;
-  font-size: 14px;
-  font-weight: 600;
-`;
-
-const StyledMessageSpan = styled(StyledSpan)`
-  color: ${Colors.whitePure};
-  width: 100%;
-  margin-bottom: 0px;
-`;
-
-const StyledStatusBadge = styled(Badge)`
-  margin-right: 8px;
-  margin-top: 4px;
-`;
-
-const StyledCopyOutlined = styled(CopyOutlined)`
-  margin-right: 8px;
-  margin-top: 4px;
-`;
-
-const StyledExclamationCircleOutlined = styled(ExclamationCircleOutlined)`
-  color: ${FontColors.error};
-  font-size: 16px;
-`;
-
-const StyledCheckCircleOutlined = styled(CheckCircleOutlined)`
-  color: ${Colors.greenOkay};
-  font-size: 16px;
-`;
-
-const StyledInfoCircleOutlined = styled(InfoCircleOutlined)`
-  color: ${Colors.cyan};
-  font-size: 16px;
-`;
-
-const StyledExclamationCircleOutlinedWarning = styled(ExclamationCircleOutlined)`
-  color: ${Colors.yellowWarning};
-  font-size: 16px;
-`;
+import * as S from './styled';
 
 type NotificationProps = {
   notification: any;
@@ -114,22 +38,22 @@ const Notification: React.FC<NotificationProps> = props => {
   };
 
   return (
-    <StyledDiv key={notification.id}>
-      <StyledDateSpan>
+    <S.StyledDiv key={notification.id}>
+      <S.DateSpan>
         {DateTime.fromMillis(Number(createdAt)).toRelativeCalendar()}&nbsp;
         {DateTime.fromMillis(Number(createdAt)).toFormat('T')}
-      </StyledDateSpan>
-      <StyledMessageContainer>
-        <StyledStatusBadge>{badge}</StyledStatusBadge>
+      </S.DateSpan>
+      <S.MessageContainer>
+        <S.StatusBadge>{badge}</S.StatusBadge>
         <Tooltip title={isCopied ? 'Copied!' : 'Copy'}>
-          <StyledCopyOutlined onClick={onCopyToClipboard} />
+          <S.CopyOutlined onClick={onCopyToClipboard} />
         </Tooltip>
-        <StyledMessageBodyContainer>
-          <StyledTitleSpan>{title}</StyledTitleSpan>
-          <StyledMessageSpan>{message}</StyledMessageSpan>
-        </StyledMessageBodyContainer>
-      </StyledMessageContainer>
-    </StyledDiv>
+        <S.MessageBodyContainer>
+          <S.TitleSpan>{title}</S.TitleSpan>
+          <S.MessageSpan>{message}</S.MessageSpan>
+        </S.MessageBodyContainer>
+      </S.MessageContainer>
+    </S.StyledDiv>
   );
 };
 
@@ -151,15 +75,15 @@ const NotificationsDrawer = () => {
   const getNotificationBadge = useCallback(
     (type: AlertEnum) => {
       if (type === AlertEnum.Success) {
-        return <StyledCheckCircleOutlined />;
+        return <S.CheckCircleOutlined />;
       }
       if (type === AlertEnum.Warning) {
-        return <StyledExclamationCircleOutlinedWarning />;
+        return <S.ExclamationCircleOutlinedWarning />;
       }
       if (type === AlertEnum.Error) {
-        return <StyledExclamationCircleOutlined />;
+        return <S.ExclamationCircleOutlined />;
       }
-      return <StyledInfoCircleOutlined />;
+      return <S.InfoCircleOutlined />;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [notifications]
@@ -186,7 +110,7 @@ const NotificationsDrawer = () => {
           );
         })
       ) : (
-        <StyledNoNotificationsContainer>You don&apos;t have any notifications.</StyledNoNotificationsContainer>
+        <S.NoNotificationsContainer>You don&apos;t have any notifications.</S.NoNotificationsContainer>
       )}
     </Drawer>
   );
