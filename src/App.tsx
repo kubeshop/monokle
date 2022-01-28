@@ -76,7 +76,7 @@ const App = () => {
 
   const onExecutedFrom = useCallback(
     (_, data) => {
-      const targetPath = path.resolve(data.path);
+      const targetPath = data?.path?.startsWith('.') ? path.resolve(data.path) : data.path;
       if (targetPath) {
         const selectedProject: Project | undefined | null = projects.find(p => p.rootFolder === targetPath);
         if (selectedProject && getFileStats(selectedProject.rootFolder)?.isDirectory()) {
