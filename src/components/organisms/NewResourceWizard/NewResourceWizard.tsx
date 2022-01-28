@@ -34,6 +34,13 @@ const SELECT_OPTION_NONE = '<none>';
 const {Option, OptGroup} = Select;
 
 const NewResourceWizard = () => {
+  const dispatch = useAppDispatch();
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
+  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
+  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
 
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
@@ -42,7 +49,6 @@ const NewResourceWizard = () => {
   const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
   const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
-  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -50,12 +56,6 @@ const NewResourceWizard = () => {
   const [form] = Form.useForm();
   lastKindRef.current = form.getFieldValue('kind');
   lastApiVersionRef.current = form.getFieldValue('apiVersion');
-
-  const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
-  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 

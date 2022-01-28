@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
@@ -42,22 +41,22 @@ import * as S from './Styles';
 
 const {Panel} = S.Collapse;
 
-const SettingsDrawer = () => {
+const SettingsDrawer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const [settingsForm] = useForm();
 
-  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
-
-  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const [activePanels, setActivePanels] = useState<number[]>([3]);
+  const activeProject: Project | undefined = useAppSelector(activeProjectSelector);
   const appConfig = useAppSelector(state => state.config);
-  const projectConfig = useAppSelector(state => state.config.projectConfig);
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
+  const isSettingsOpened = Boolean(useAppSelector(state => state.ui.isSettingsOpen));
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
+
+  const [activePanels, setActivePanels] = useState<number[]>([3]);
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
-  const activeProject: Project | undefined = useSelector(activeProjectSelector);
+  const [settingsForm] = useForm();
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {

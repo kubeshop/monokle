@@ -31,20 +31,22 @@ export enum FormSteps {
 }
 
 const CreateProjectModal: React.FC = () => {
-  const uiState = useAppSelector(state => state.ui.createProjectModal);
   const dispatch = useAppDispatch();
-  const [createProjectForm] = useForm();
-  const [inputRef, focus] = useFocus<any>();
-  const [formStep, setFormStep] = useState(FormSteps.STEP_ONE);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
-  const [formValues, setFormValues] = useState({name: '', rootFolder: projectsRootPath});
   const templateMap = useAppSelector(state => state.extension.templateMap);
-  const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
+  const uiState = useAppSelector(state => state.ui.createProjectModal);
+
+  const [formStep, setFormStep] = useState(FormSteps.STEP_ONE);
+  const [formValues, setFormValues] = useState({name: '', rootFolder: projectsRootPath});
+  const [isEditingRootPath, setIsEditingRoothPath] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
   const [isModalHid, setIsModalHid] = useState(false);
   const [isSubmitEnabled, setSubmitEnabled] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [isEditingRootPath, setIsEditingRoothPath] = useState(false);
   const [pickedPath, setPickedPath] = useState(projectsRootPath);
+  const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
+
+  const [createProjectForm] = useForm();
+  const [inputRef, focus] = useFocus<any>();
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {

@@ -16,29 +16,28 @@ import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
 import * as S from './PluginManagerDrawer.styled';
 
-function PluginManagerDrawer() {
+const PluginManagerDrawer: React.FC = () => {
   const dispatch = useAppDispatch();
   const isLoadingExistingPlugins = useAppSelector(state => state.extension.isLoadingExistingPlugins);
   const isPluginsDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
-
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
+
+  const [isInstallModalVisible, setInstallModalVisible] = useState<boolean>(false);
 
   const sortedPluginEntries = useMemo(() => {
     return Object.entries(pluginMap).sort((a, b) => a[1].name.localeCompare(b[1].name));
   }, [pluginMap]);
 
-  const [isInstallModalVisible, setInstallModalVisible] = useState<boolean>(false);
-
-  const onClickInstallPlugin = () => {
-    setInstallModalVisible(true);
-  };
-
   const onClickReload = useCallback(
     () => checkForExtensionsUpdates({templateMap, pluginMap, templatePackMap}, dispatch),
     [templateMap, pluginMap, templatePackMap, dispatch]
   );
+
+  const onClickInstallPlugin = () => {
+    setInstallModalVisible(true);
+  };
 
   const onCloseInstallPlugin = () => {
     setInstallModalVisible(false);
@@ -94,6 +93,6 @@ function PluginManagerDrawer() {
       </S.Container>
     </Drawer>
   );
-}
+};
 
 export default PluginManagerDrawer;

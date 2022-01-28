@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {Checkbox, Input, Modal} from 'antd';
 
@@ -14,15 +14,17 @@ const CheckboxContainer = styled.div`
   margin-top: 10px;
 `;
 
-const RenameResourceModel = () => {
+const RenameResourceModel: React.FC = () => {
   const dispatch = useAppDispatch();
-  const uiState = useAppSelector(state => state.ui.renameResourceModal);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const uiState = useAppSelector(state => state.ui.renameResourceModal);
+
   const [newResourceName, setNewResourceName] = useState<string>();
-  const [shouldUpdateRefs, setShouldUpdateRefs] = useState<boolean>(false);
-  const inputNameRef = useRef<any>();
   const [resource, setResource] = useState<K8sResource>();
+  const [shouldUpdateRefs, setShouldUpdateRefs] = useState<boolean>(false);
+
+  const inputNameRef = useRef<any>();
 
   useEffect(() => {
     if (uiState) {
@@ -40,11 +42,7 @@ const RenameResourceModel = () => {
     inputNameRef?.current?.focus();
   }, [uiState, resourceMap]);
 
-  if (!uiState) {
-    return null;
-  }
-
-  if (!resource) {
+  if (!uiState || !resource) {
     return null;
   }
 

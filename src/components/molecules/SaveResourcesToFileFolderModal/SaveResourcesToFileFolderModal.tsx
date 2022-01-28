@@ -105,12 +105,11 @@ const generateFullFileName = (
 };
 
 const SaveResourceToFileFolderModal: React.FC = () => {
-  const isVisible = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.isOpen);
-  const resourcesIds = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIds);
-
   const dispatch = useAppDispatch();
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const isVisible = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.isOpen);
+  const resourcesIds = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIds);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const [errorMessage, setErrorMessage] = useState('');
