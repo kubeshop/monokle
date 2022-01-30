@@ -451,7 +451,6 @@ export function reprocessResources(
   const dependentResourceKinds = getDependentResourceKinds(resourceKinds);
   let resourceKindsToReprocess = [...resourceKinds, ...dependentResourceKinds];
   resourceKindsToReprocess = [...new Set(resourceKindsToReprocess)];
-  let hasKustomizations = false;
 
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
@@ -466,10 +465,6 @@ export function reprocessResources(
       resource.version = resource.content.apiVersion;
       resource.namespace = extractNamespace(resource.content);
 
-      if (isKustomizationResource(resource)) {
-        hasKustomizations = true;
-      }
-
       // clear caches
       parsedDocCache.delete(resource.id);
       clearRefNodesCache(resource.id);
@@ -481,9 +476,8 @@ export function reprocessResources(
     resourceKinds: resourceKindsToReprocess,
   });
 
-  if (hasKustomizations) {
-    reprocessKustomizations(resourceMap, fileMap);
-  }
+  // always reprocess kustomizations - kustomization refs to updated resources may need to be recreated
+  reprocessKustomizations(resourceMap, fileMap);
 }
 
 /**
