@@ -109,27 +109,29 @@ const StartupModal = () => {
         </Button>
       }
     >
-      <HeightFillDiv />
-      <StyledGradientDiv>
-        <StyledBackgroundImg src={MonokleStartupBackground} />
-      </StyledGradientDiv>
-      <StyledContentContainerDiv>
-        <StyledContentDiv>
-          <h1>Welcome 🎉</h1>
-          <p>Monokle is your K8s best friend!</p>
-          <ul>
-            <li>Read your manifest folders and files</li>
-            <li>See resources and understand links between them</li>
-            <li>Edit manifests without having to learn all yaml syntax</li>
-            <li>Preview and debug kustomizations and Helm charts</li>
-            <li>Diff and apply resource changes to your clusters</li>
-            <li>And much more!</li>
-          </ul>
-          <p>
-            Suggestions? Complaints? Head over to our <a onClick={openGitHub}>GitHub repo</a> and get involved!
-          </p>
-        </StyledContentDiv>
-      </StyledContentContainerDiv>
+      <span id="WelcomeModal">
+        <HeightFillDiv />
+        <StyledGradientDiv>
+          <StyledBackgroundImg src={MonokleStartupBackground} />
+        </StyledGradientDiv>
+        <StyledContentContainerDiv>
+          <StyledContentDiv>
+            <h1>Welcome 🎉</h1>
+            <p>Monokle is your K8s best friend!</p>
+            <ul>
+              <li>Read your manifest folders and files</li>
+              <li>See resources and understand links between them</li>
+              <li>Edit manifests without having to learn all yaml syntax</li>
+              <li>Preview and debug kustomizations and Helm charts</li>
+              <li>Diff and apply resource changes to your clusters</li>
+              <li>And much more!</li>
+            </ul>
+            <p>
+              Suggestions? Complaints? Head over to our <a onClick={openGitHub}>GitHub repo</a> and get involved!
+            </p>
+          </StyledContentDiv>
+        </StyledContentContainerDiv>
+      </span>
     </StyledModal>
   );
 };
