@@ -27,7 +27,7 @@ import {
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
 import {toggleSettings} from '@redux/reducers/ui';
-import {activeProjectSelector} from '@redux/selectors';
+import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
 import Drawer from '@components/atoms/Drawer';
 import FileExplorer from '@components/atoms/FileExplorer';
@@ -48,13 +48,13 @@ const SettingsDrawer = () => {
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const [activePanels, setActivePanels] = useState<number[]>([3]);
   const appConfig = useAppSelector(state => state.config);
-  const projectConfig = useAppSelector(state => state.config.projectConfig);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
   const activeProject: Project | undefined = useSelector(activeProjectSelector);
+  const mergedConfig: ProjectConfig = useSelector(currentConfigSelector);
 
   useEffect(() => {
     if (highlightedItems.clusterPaneIcon) {
@@ -203,7 +203,7 @@ const SettingsDrawer = () => {
         {activeProject && (
           <Panel header="Active Project Settings" key="3">
             <Settings
-              config={projectConfig}
+              config={mergedConfig}
               onConfigChange={changeProjectConfig}
               showProjectName
               projectName={activeProject.name}
