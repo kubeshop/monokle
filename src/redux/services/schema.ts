@@ -120,7 +120,6 @@ export function extractSchema(crd: any, versionName: string) {
 }
 
 export function removeSchemaDefaults(schema: any, removeObjectDefaults: boolean, removePrimitiveDefaults: boolean) {
-  console.log('removing schema defaults', schema, removeObjectDefaults, removePrimitiveDefaults);
   const schemaClone = cloneDeep(schema);
   removeDefaults(schemaClone, removeObjectDefaults, removePrimitiveDefaults);
   return schemaClone;

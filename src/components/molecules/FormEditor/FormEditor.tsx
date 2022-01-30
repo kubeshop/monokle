@@ -143,7 +143,6 @@ const FormEditor = (props: {formSchema: any; formUiSchema: any}) => {
   }, [selectedResource]);
 
   useEffect(() => {
-    console.log('Settings', settings);
     if (!settings.createDefaultObjects || !settings.setDefaultPrimitiveValues) {
       setSchema(removeSchemaDefaults(formSchema, !settings.createDefaultObjects, !settings.setDefaultPrimitiveValues));
     } else {
