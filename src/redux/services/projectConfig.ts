@@ -148,7 +148,7 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
   }
 
   const serializedBaseConfig: SerializableObject = serializeObject(baseConfig);
-  const serializedConfig: SerializableObject = serializeObject(baseConfig);
+  const serializedConfig: SerializableObject = serializeObject(config);
 
   Object.keys(serializedBaseConfig).forEach((key: string) => {
     if (!_.isUndefined(serializedConfig[key])) {
@@ -156,7 +156,7 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     }
   });
 
-  return deserializeObject(baseConfig);
+  return deserializeObject(serializedBaseConfig);
 };
 
 export const serializeObject = (objectToSerialize?: SerializableObject | null, prefix?: string): SerializableObject => {
