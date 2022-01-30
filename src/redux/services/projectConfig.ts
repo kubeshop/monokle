@@ -101,24 +101,34 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
     const projectConfig: ProjectConfig = {};
     projectConfig.settings = settings
       ? {
-          helmPreviewMode: settings.helmPreviewMode,
-          kustomizeCommand: settings.kustomizeCommand,
-          hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
-          enableHelmWithKustomize: settings.enableHelmWithKustomize,
-          createDefaultObjects: settings.createDefaultObjects,
-          setDefaultPrimitiveValues: settings.setDefaultPrimitiveValues,
+          helmPreviewMode: _.includes(['template', 'install'], settings.helmPreviewMode)
+            ? settings.helmPreviewMode
+            : undefined,
+          kustomizeCommand: _.includes(['kubectl', 'kustomize'], settings.kustomizeCommand)
+            ? settings.kustomizeCommand
+            : undefined,
+          hideExcludedFilesInFileExplorer: _.isBoolean(settings.hideExcludedFilesInFileExplorer)
+            ? settings.hideExcludedFilesInFileExplorer
+            : undefined,
+          enableHelmWithKustomize: _.isBoolean(settings.enableHelmWithKustomize)
+            ? settings.enableHelmWithKustomize
+            : undefined,
+          createDefaultObjects: _.isBoolean(settings.createDefaultObjects) ? settings.createDefaultObjects : undefined,
+          setDefaultPrimitiveValues: _.isBoolean(settings.setDefaultPrimitiveValues)
+            ? settings.setDefaultPrimitiveValues
+            : undefined,
         }
       : undefined;
     projectConfig.kubeConfig = kubeConfig
       ? {
-          path: kubeConfig.path,
-          currentContext: kubeConfig.currentContext,
+          path: _.isString(kubeConfig.path) ? kubeConfig.path : undefined,
+          currentContext: _.isString(kubeConfig.currentContext) ? kubeConfig.currentContext : undefined,
         }
       : undefined;
 
-    projectConfig.scanExcludes = scanExcludes;
-    projectConfig.fileIncludes = fileIncludes;
-    projectConfig.folderReadsMaxDepth = folderReadsMaxDepth;
+    projectConfig.scanExcludes = _.isArray(scanExcludes) ? scanExcludes : undefined;
+    projectConfig.fileIncludes = _.isArray(fileIncludes) ? fileIncludes : undefined;
+    projectConfig.folderReadsMaxDepth = _.isNumber(folderReadsMaxDepth) ? folderReadsMaxDepth : undefined;
 
     return projectConfig;
   } catch (error) {
