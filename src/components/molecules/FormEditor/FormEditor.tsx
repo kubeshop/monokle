@@ -106,7 +106,7 @@ const FormContainer = styled.div`
   }
 `;
 
-const FormEditor = (props: {formSchema: any; formUiSchema: any}) => {
+const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const {formSchema, formUiSchema} = props;
   const selectedResource = useSelector(selectedResourceSelector);
   const [formData, setFormData] = useState<any>();
@@ -151,7 +151,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema: any}) => {
     <FormContainer>
       <Form
         schema={formSchema}
-        uiSchema={formUiSchema}
+        uiSchema={formUiSchema || {}}
         formData={formData}
         onChange={onFormUpdate}
         widgets={getCustomFormWidgets()}
