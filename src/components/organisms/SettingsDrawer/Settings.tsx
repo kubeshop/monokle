@@ -327,14 +327,14 @@ export const Settings = ({
       <S.Div>
         <S.Span>Form Editor</S.Span>
         <S.Div>
-          <Tooltip title="Title">
+          <Tooltip title="Automatically create default objects and values defined in the schema">
             <Checkbox checked={localConfig?.settings?.createDefaultObjects} onChange={onChangeCreateDefaultObjects}>
               Create default objects
             </Checkbox>
           </Tooltip>
         </S.Div>
         <S.Div>
-          <Tooltip title="Title">
+          <Tooltip title="Automatically set default values defined in the schema">
             <Checkbox
               checked={localConfig?.settings?.setDefaultPrimitiveValues}
               onChange={onChangeSetDefaultPrimitiveValues}

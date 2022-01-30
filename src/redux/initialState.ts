@@ -31,7 +31,8 @@ const initialAppState: AppState = {
   isApplyingResource: false,
   resourceRefsProcessingOptions: {
     shouldIgnoreOptionalUnsatisfiedRefs: electronStore.get(
-      'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs'
+      'main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs',
+      false
     ),
   },
   clusterDiff: {
@@ -59,10 +60,10 @@ const initialAppConfigState: AppConfig = {
     language: electronStore.get('appConfig.settings.language'),
     hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
-    createDefaultObjects: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
-    setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues') || true,
+    createDefaultObjects: electronStore.get('appConfig.settings.createDefaultObjects', false),
+    setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),
   },
-  isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible') || true,
+  isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'outdated',

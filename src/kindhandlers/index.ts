@@ -88,7 +88,7 @@ const HandlerByResourceKind = Object.fromEntries(
 
 export function registerKindHandler(kindHandler: ResourceKindHandler, shouldReplace: boolean) {
   if (shouldReplace || !HandlerByResourceKind[kindHandler.kind]) {
-    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`, kindHandler);
+    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`);
     HandlerByResourceKind[kindHandler.kind] = kindHandler;
     // we need to store the list of registered kind handlers in the redux store for reactivity
     KindHandlersEventEmitter.emit('register', kindHandler);

@@ -104,6 +104,9 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
           helmPreviewMode: settings.helmPreviewMode,
           kustomizeCommand: settings.kustomizeCommand,
           hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
+          enableHelmWithKustomize: settings.enableHelmWithKustomize,
+          createDefaultObjects: settings.createDefaultObjects,
+          setDefaultPrimitiveValues: settings.setDefaultPrimitiveValues,
         }
       : undefined;
     projectConfig.kubeConfig = kubeConfig
