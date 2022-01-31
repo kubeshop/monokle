@@ -45,21 +45,21 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
 // We need to think a better way
 export const populateProjectConfigToWrite = (state: AppConfig | SerializableObject) => {
   const applicationConfig: ProjectConfig = {
-    scanExcludes: state.projectConfig.scanExcludes,
-    fileIncludes: state.projectConfig.fileIncludes,
-    folderReadsMaxDepth: state.projectConfig.folderReadsMaxDepth,
+    scanExcludes: state.projectConfig?.scanExcludes,
+    fileIncludes: state.projectConfig?.fileIncludes,
+    folderReadsMaxDepth: state.projectConfig?.folderReadsMaxDepth,
   };
   applicationConfig.settings = {
-    helmPreviewMode: state.projectConfig.settings.helmPreviewMode,
-    kustomizeCommand: state.projectConfig.settings.kustomizeCommand,
-    hideExcludedFilesInFileExplorer: state.projectConfig.settings.hideExcludedFilesInFileExplorer,
-    enableHelmWithKustomize: state.projectConfig.settings.enableHelmWithKustomize,
-    createDefaultObjects: state.projectConfig.settings.createDefaultObjects,
-    setDefaultPrimitiveValues: state.projectConfig.settings.setDefaultPrimitiveValues,
+    helmPreviewMode: state.projectConfig?.settings?.helmPreviewMode,
+    kustomizeCommand: state.projectConfig?.settings?.kustomizeCommand,
+    hideExcludedFilesInFileExplorer: state.projectConfig?.settings?.hideExcludedFilesInFileExplorer,
+    enableHelmWithKustomize: state.projectConfig?.settings?.enableHelmWithKustomize,
+    createDefaultObjects: state.projectConfig?.settings?.createDefaultObjects,
+    setDefaultPrimitiveValues: state.projectConfig?.settings?.setDefaultPrimitiveValues,
   };
   applicationConfig.kubeConfig = {
-    path: state.projectConfig.kubeConfig.path,
-    currentContext: state.projectConfig.kubeConfig.currentContext,
+    path: state.projectConfig?.kubeConfig?.path,
+    currentContext: state.projectConfig?.kubeConfig?.currentContext,
   };
   return applicationConfig;
 };
