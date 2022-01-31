@@ -142,7 +142,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     return null;
   }
   return (
-    <S.ClusterContainer>
+    <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <S.ClusterStatus>
           <S.ClusterStatusText connected={isKubeConfigPathValid}>
