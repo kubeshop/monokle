@@ -17,9 +17,8 @@ import {useFocus} from '@utils/hooks';
 const prohibitedFirstSymbols = ['/', '\\'];
 
 const RenameEntityModal: React.FC = () => {
-  const uiState = useAppSelector(state => state.ui.renameEntityModal);
-
   const dispatch = useAppDispatch();
+  const uiState = useAppSelector(state => state.ui.renameEntityModal);
 
   const [renameEntityForm] = useForm();
 
@@ -76,7 +75,7 @@ const RenameEntityModal: React.FC = () => {
   return (
     <Modal
       title="Rename entity"
-      visible={uiState?.isOpen}
+      visible={uiState.isOpen}
       onCancel={() => {
         dispatch(closeRenameEntityModal());
       }}
