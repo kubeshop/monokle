@@ -19,7 +19,7 @@ allows for manual reloading of the folder, if needed.
 Selecting a file will highlight contained resources in the Navigator and attempt to scroll them into view. The contents of the 
 file will be shown in the source editor to the right - allowing for direct editing of the file.
 
-![File Explorer Navigation](img/resource-navigation-2.png)
+![File Explorer Navigation](img/resource-navigation-2-1.5.0.png)
 
 In this screenshot:
 
@@ -29,15 +29,32 @@ In this screenshot:
 
 While in the File Explorer, the File Action drop down list is available by clicking the ellipsis to the right of the file name.
 
-![Explorer File Actions](img/explorer-file-actions-1.4.0.png)
+![Explorer File Actions](img/explorer-file-actions-1.5.0.png)
 
-In the drop down, the following actions are available:
-- Reveal in Finder
+In the File Actions pop up menu, the following actions are available:
+- Add Resource
+- Filter on this file
+- Add to Files: Exclude
 - Copy Path
 - Copy Relative Path
-- Add to File: Exclude
 - Rename
 - Delete
+- Reveal in Finder
+
+The same functionality is available for Folders:
+
+![Explorer File Actions](img/explorer-folder-actions-1.5.0.png)
+
+In the Folder Actions pop up menu, the following actions are available:
+- New Folder
+- New Resource
+- Filter on this folder
+- Add to Files: Exclude
+- Copy Path
+- Copy Relative Path
+- Rename
+- Delete
+- Reveal in Finder
 
 ## Resource Navigator
 
@@ -45,7 +62,7 @@ The Navigator shows all resources found recursively in the selected folder. Reso
 on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
 any other resourced linked to the selected one:
 
-![Resource Navigation](img/resource-navigation-1.png)
+![Resource Navigation](img/resource-navigation-1-1.5.0.png)
 
 In this screenshot: 
 
@@ -98,7 +115,7 @@ Resource filters allow you to filter the resources based on various properties s
 
 Click on the filter button on the top of the navigator to launch the dialog for configuration.
 
-![Resource Filtering](img/resource-filtering-1.4.0.png)
+![Resource Filtering](img/resource-filtering-1.5.0.png)
 
 Users can also add or remove filters by highlighting and hovering over labels, annotations or other metadata properties in the code editor:
 
@@ -115,7 +132,7 @@ You can choose to reload the last reviewed folder while launching Monokle. For t
 You can easily navigate back and forth between the selected resources with the help of the Navigation button. The highlight arrow will indicate when navigation to previous or next resource is available.
 
 
-![Navigation History](img/navigate-history-1.5.0.png)
+![Navigation History](img/navigation-history-1.5.0.png)
 
 ## Expand/Collapse Sections
 
@@ -128,7 +145,7 @@ The Recent Folders option has been added to the system menu to make it easy to s
 
 **Action:** File > Recent Folders
 
-![Recent Folders](img/recent-folders-1.4.0.png)
+![Recent Folders](img/recent-folders-1.5.0.png)
 ## Supported Resource links
 
 Monokle currently finds and visualizes the following links between Kubernetes resources - please let us know if

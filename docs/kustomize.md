@@ -14,7 +14,7 @@ All examples below are from the [Argo Rollouts manifest folder](https://github.c
 When selecting a folder containing kustomization.yaml files, these will automatically be displayed in a "Kustomizations" section 
 on top of the Navigator:
 
-![Kustomize Navigation](img/kustomize-navigation-1.4.0.png)
+![Kustomize Navigation](img/kustomize-navigation-1.5.0.png)
 
 In the screenshot:
 
@@ -50,7 +50,7 @@ generated resources.
 
 For example previewing the "base" kustomization above will result in the following:
 
-![Kustomize Preview](img/kustomize-preview-1.4.0.png)
+![Kustomize Preview](img/kustomize-preview-1.5.0.png)
 
 Monokle is now in "Preview Mode" (as indicated by the header at the top):
 
@@ -64,11 +64,11 @@ Monokle is now in "Preview Mode" (as indicated by the header at the top):
 In the screenshot we can see that the selected kustomization resulted in 7 resources that contain references to the image
 specified in the kustomization configuration:
 
-![Kustomize Preview Content](img/kustomize-preview-content-1.4.0.png)
+![Kustomize Preview Content](img/kustomize-preview-content-1.5.0.png)
 
 ## Editing of kustomizations during preview
 
 When previewing a kustomization it is possible to edit the previewed kustomization.yaml file and recreate the preview, allowing 
 you to quickly assess the impact of any changes on the generated files, instead of having to exit and recreate the preview to make a change.
  
-![Edit kustomization during Preview](img/kust-preview-reload-1.4.0.png)
+![Edit kustomization during Preview](img/kust-preview-reload-1.5.0.png)

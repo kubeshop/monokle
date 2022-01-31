@@ -40,6 +40,13 @@ Want to browse your cluster instead of a repo? Simply click the "Show Cluster Ob
 the cluster into Monokle - [read more](cluster-integration.md). If you need to make any immediate hot-fixes, simply modify
 the resource in the source editor and click the "Apply" button.
 
+## Manage Multiple Projects
+
+![Browse your clusters objects](img/manage-multiple-projects.gif)
+
+Easily switch in between projects to more efficiently work with multiple projects at the same time.
+
+
 
 
 

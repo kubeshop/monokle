@@ -9,15 +9,15 @@ Selecting the "Cluster Preview" button in the left toolbar replaces the File Exp
 
 - The kubeconfig field sets which kubeconfig to use for cluster interactions (this is the same as in the global settings).
 
-Selecting the "Show Cluster Objects" button will attempt to populate the Resource Navigator with objects from the configured cluster:
+Selecting the "Load" button will attempt to populate the Resource Navigator with objects from the configured cluster:
 
-![Cluster Preview](img/cluster-preview-1.4.0.png)
+![Cluster Preview](img/cluster-preview-1.5.0.png)
 
 Monokle is now in "Cluster Mode" (as indicated by the header at the top):
 
 - The File Explorer has been disabled if a folder had been previously selected.
 - The Navigator contains all resources retrieved from the configured cluster:
-  - Resource navigation works as with files; selecting a resource shows its content in the source editor in read-only mode.
+  - Resource navigation works as with files; selecting a resource shows its content in the source editor.
   - Resource links are shown as before with corresponding popups/links/etc.
 - Selecting "Exit" in the top right restores the contents of the Resource Navigator to the currently selected folder.
 
@@ -25,3 +25,13 @@ You can also exit Cluster Mode by selecting the File Explorer in the left toolba
 
 
 ![Cluster Browse](img/file-manager-browse-cluster-1.4.0.png)
+
+While in Cluster Mode, select the "Reload" option to refresh cluster resources.
+
+![Cluster Reload](img/cluster-reload-1.5.0.png)
+
+## Saving Multiple Resources
+
+In Cluster Mode, select multiple resources with the check box(es) to the left of the resource(s), pick the folder to save to from the dropdown list and click "Ok".
+
+![Cluster Save Multiple Resources](img/cluster-save-multiple-resources-1.5.0.png)
