@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -92,7 +92,6 @@
     "@types/lodash": "4.14.178",
     "ajv": "6.12.6",
     "antd": "4.17.3",
-    "asar": "^3.1.0",
     "asar": "^3.1.0",
     "async": "3.2.2",
     "chokidar": "3.5.2",
