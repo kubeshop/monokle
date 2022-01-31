@@ -311,13 +311,14 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (
-      (activeTabKey === 'metadataForm' || activeTabKey === 'form') &&
-      (!selectedResourceId || !(resourceKindHandler && resourceKindHandler.formEditorOptions))
-    ) {
+    if (activeTabKey === 'form' && !(resourceKindHandler && resourceKindHandler.formEditorOptions?.editorSchema)) {
       setActiveTabKey('source');
     }
-  }, [selectedResourceId, selectedResource, activeTabKey, resourceKindHandler]);
+
+    if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomizationResource(selectedResource))) {
+      setActiveTabKey('source');
+    }
+  }, [selectedResource, activeTabKey, resourceKindHandler]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
