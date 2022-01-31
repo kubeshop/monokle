@@ -40,6 +40,7 @@ export const ClusterDiffSaveTooltip = 'Replace local resource with cluster versi
 export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
 export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';
 export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
+export const OpenKustomizeDocumentationTooltip = 'Open documentation for Kustomize in external browser';
 export const TemplateManagerPaneReloadTooltip = 'Updates all templates that have a newer version available';
 export const PluginManagerDrawerReloadTooltip = 'Updates all plugins that have a newer version available';
 export const DocumentationTooltip = 'Open Monokle Documentation Website';

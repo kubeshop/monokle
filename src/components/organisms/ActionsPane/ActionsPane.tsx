@@ -9,6 +9,7 @@ import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, Conta
 import {
   ACTIONS_PANE_FOOTER_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
+  KUSTOMIZE_HELP_URL,
   NAVIGATOR_HEIGHT_OFFSET,
   TOOLTIP_DELAY,
 } from '@constants/constants';
@@ -18,6 +19,7 @@ import {
   ApplyTooltip,
   DiffTooltip,
   OpenExternalDocumentationTooltip,
+  OpenKustomizeDocumentationTooltip,
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
@@ -38,6 +40,7 @@ import {
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
+import {getResourceSchema} from '@redux/services/schema';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -57,6 +60,7 @@ import {openExternalResourceKindDocumentation} from '@utils/shell';
 import AppContext from '@src/AppContext';
 import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
+import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
 import {getFormSchema, getUiSchema} from '@src/kindhandlers/common/formLoader';
 
 import * as S from './ActionsPane.styled';
@@ -145,7 +149,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   };
 
-  const resourceKindHandler = selectedResource && getResourceKindHandler(selectedResource.kind);
+  const isKustomization = isKustomizationResource(selectedResource);
+  const resourceKindHandler =
+    selectedResource && !isKustomization ? getResourceKindHandler(selectedResource.kind) : undefined;
 
   const isLeftArrowEnabled =
     selectionHistory.length > 1 &&
@@ -313,7 +319,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   useEffect(() => {
     if (
       (activeTabKey === 'metadataForm' || activeTabKey === 'form') &&
-      (!selectedResourceId || !(resourceKindHandler && resourceKindHandler.formEditorOptions))
+      (!selectedResourceId || !(isKustomization || (resourceKindHandler && resourceKindHandler.formEditorOptions)))
     ) {
       setActiveTabKey('source');
     }
@@ -418,6 +424,16 @@ const ActionsPane = (props: {contentHeight: string}) => {
                     {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
                   </S.ExtraRightButton>
                 </Tooltip>
+              ) : isKustomization ? (
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
+                  <S.ExtraRightButton
+                    onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
+                    type="link"
+                    ref={extraButton}
+                  >
+                    {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
+                  </S.ExtraRightButton>
+                </Tooltip>
               ) : null
             }
           >
@@ -428,14 +444,14 @@ const ActionsPane = (props: {contentHeight: string}) => {
             >
               {uiState.isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
-              ) : (
+              ) : activeTabKey === 'source' ? (
                 !isClusterDiffVisible &&
                 (selectedResourceId || selectedPath || selectedValuesFileId) && (
                   <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
                 )
-              )}
+              ) : null}
             </TabPane>
-            {selectedResource && resourceKindHandler?.formEditorOptions?.editorSchema && (
+            {selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema) && (
               <TabPane
                 disabled={!selectedResourceId}
                 key="form"
@@ -445,10 +461,16 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : activeTabKey === 'form' ? (
-                  <FormEditor
-                    formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                    formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                  />
+                  isKustomization ? (
+                    <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
+                  ) : (
+                    resourceKindHandler?.formEditorOptions && (
+                      <FormEditor
+                        formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                        formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                      />
+                    )
+                  )
                 ) : null}
               </TabPane>
             )}
