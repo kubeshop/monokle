@@ -107,7 +107,7 @@ const FormContainer = styled.div`
   }
 `;
 
-const FormEditor = (props: {formSchema: any; formUiSchema: any}) => {
+const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const {formSchema, formUiSchema} = props;
   const selectedResource = useSelector(selectedResourceSelector);
   const [formData, setFormData] = useState<any>();
