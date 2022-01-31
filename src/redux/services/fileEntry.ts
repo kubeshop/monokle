@@ -278,6 +278,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     const resourcesInFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
     let wasAnyResourceSelected = false;
 
+    // delete old resources in file since we can't be sure the updated file contains the same resource(s)
     resourcesInFile.forEach(resource => {
       if (state.selectedResourceId === resource.id) {
         updateSelectionAndHighlights(state, resource);
