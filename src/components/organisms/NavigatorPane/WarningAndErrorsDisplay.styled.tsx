@@ -2,6 +2,8 @@ import {Menu} from 'antd';
 
 import styled from 'styled-components';
 
+import {Icon as RawIcon} from '@components/atoms';
+
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import Colors from '@styles/Colors';
@@ -16,6 +18,16 @@ export const ErrorWarningContainer = styled.div<{$type: 'warning' | 'error'}>`
 
 export const Label = styled.span`
   margin-left: 5px;
+`;
+
+export const Icon = styled(RawIcon)<{$type: 'warning' | 'error'}>`
+  ${({$type}) => {
+    if ($type === 'error') {
+      return `
+      transform: translateY(-1.5px);
+    `;
+    }
+  }}
 `;
 
 export const StyledMenu = styled(Menu)`
@@ -34,9 +46,9 @@ export const StyledMenuItem = styled(Menu.Item)`
   padding: 0px 4px;
 `;
 
-export const WarningCountLabel = styled.span<{$type: 'warning' | 'error'}>`
+export const WarningCountContainer = styled.span<{$type: 'warning' | 'error'}>`
   ${({$type}) => `color: ${$type === 'warning' ? Colors.yellowWarning : Colors.redError};`}
-  margin-left: 5px;
+  margin-left: 8px;
 `;
 
 export const WarningKindLabel = styled.span`
