@@ -6,20 +6,19 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {AppDispatch} from '@models/appdispatch';
 import {ResourceFilterType} from '@models/appstate';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {resetResourceFilter, selectK8sResource, updateResourceFilter} from '@redux/reducers/main';
 import {closeQuickSearchActionsPopup} from '@redux/reducers/ui';
-import {AppDispatch} from '@redux/store';
+import {knownResourceKindsSelector} from '@redux/selectors';
 
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import Colors from '@styles/Colors';
-
-import {ResourceKindHandlers} from '@src/kindhandlers';
 
 import LabelMapper from './LabelMapper';
 
@@ -48,8 +47,6 @@ const StyledModal = styled(Modal)`
     border: 1px solid #165996 !important;
   }
 `;
-
-const KnownResourceKinds = ResourceKindHandlers.map(kindHandler => kindHandler.kind);
 
 const applyFilterWithConfirm = (
   option: string,
@@ -101,6 +98,7 @@ const QuickSearchActionsV3: React.FC = () => {
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
 
   const [namespaces] = useNamespaces({extra: ['default']});
 
@@ -109,13 +107,13 @@ const QuickSearchActionsV3: React.FC = () => {
   const allResourceKinds = useMemo(() => {
     return [
       ...new Set([
-        ...KnownResourceKinds,
+        ...knownResourceKinds,
         ...Object.values(resourceMap)
-          .filter(r => !KnownResourceKinds.includes(r.kind))
+          .filter(r => !knownResourceKinds.includes(r.kind))
           .map(r => r.kind),
       ]),
     ].sort();
-  }, [resourceMap]);
+  }, [knownResourceKinds, resourceMap]);
 
   const filteredResources = useMemo(
     () =>
@@ -139,8 +137,10 @@ const QuickSearchActionsV3: React.FC = () => {
       } else if (type === 'resource') {
         if (!filteredResources[option]) {
           selectK8sResourceWithConfirm(option, resourceMap[option].name, dispatch);
-        } else if (selectedResourceId !== option) {
-          dispatch(selectK8sResource({resourceId: option}));
+        } else {
+          if (selectedResourceId !== option) {
+            dispatch(selectK8sResource({resourceId: option}));
+          }
           dispatch(closeQuickSearchActionsPopup());
         }
       }

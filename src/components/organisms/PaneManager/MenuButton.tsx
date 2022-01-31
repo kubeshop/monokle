@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {shallowEqual} from 'react-redux';
 
-import {Button} from 'antd';
+import {Button, ButtonProps} from 'antd';
 
 import _ from 'lodash';
 import styled from 'styled-components';
@@ -10,29 +10,37 @@ import {useAppSelector} from '@redux/hooks';
 
 import Colors from '@styles/Colors';
 
-const StyledButton = styled(Button)<{$isHovered: boolean; $hasGradientBackground: boolean}>`
+const StyledButton = styled(Button)<{$hasGradientBackground: boolean}>`
   ${props => {
     if (props.$hasGradientBackground) {
       return `& .anticon {
         color: ${Colors.blackPure} !important;
       }`;
     }
-    if (props.$isHovered) {
-      return `& .anticon {
-        color: ${Colors.grey400} !important;
-      }`;
-    }
   }}
+
+  & .anticon {
+    transition: all 0.2s ease-in;
+  }
+
+  ${props => `
+    &:hover {
+      & .anticon {
+        color: ${props.$hasGradientBackground ? Colors.grey5 : Colors.grey8} !important;
+      }
+    }
+  `}
 `;
 
-const MenuButton: React.FC<{
+interface IMenuButtonProps extends ButtonProps {
   shouldWatchSelectedPath?: boolean;
   sectionNames?: string[];
   isSelected: boolean;
   isActive: boolean;
-  onClick: () => void;
-}> = props => {
-  const {children, sectionNames, shouldWatchSelectedPath, isSelected, isActive, onClick} = props;
+}
+
+const MenuButton: React.FC<IMenuButtonProps> = props => {
+  const {children, sectionNames, shouldWatchSelectedPath, isSelected, isActive, onClick, ...buttonProps} = props;
 
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
@@ -73,7 +81,6 @@ const MenuButton: React.FC<{
 
   return (
     <StyledButton
-      $isHovered={isHovered}
       $hasGradientBackground={hasGradientBackground}
       size="large"
       type="text"
@@ -82,6 +89,7 @@ const MenuButton: React.FC<{
       style={style}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      {...buttonProps}
     />
   );
 };

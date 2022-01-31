@@ -4,12 +4,13 @@ import _ from 'lodash';
 import log from 'loglevel';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {AppDispatch} from '@models/appdispatch';
+import {K8sResource} from '@models/k8sresource';
 import {AnyPlugin} from '@models/plugin';
 import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template';
 
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
-import {AppDispatch} from '@redux/store';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createUnsavedResource} from './unsavedResource';
@@ -82,7 +83,8 @@ export const isPluginTemplate = (templatePath: string, pluginsDir: string) => te
 export const interpolateTemplate = (text: string, formsData: any[]) => {
   _.templateSettings.interpolate = /\[\[([\s\S]+?)\]\]/g;
   const lodashTemplate = _.template(text);
-  return lodashTemplate({forms: formsData});
+  const result = lodashTemplate({forms: formsData});
+  return result;
 };
 
 export const createUnsavedResourcesFromVanillaTemplate = async (
@@ -105,21 +107,24 @@ export const createUnsavedResourcesFromVanillaTemplate = async (
       }
     }
   );
+  const createdResources: K8sResource[] = [];
   resourceTextList
     .filter((text): text is string => typeof text === 'string')
     .forEach(resourceText => {
       const objects = extractObjectsFromYaml(resourceText);
       objects.forEach(obj => {
-        createUnsavedResource(
+        const resource = createUnsavedResource(
           {
             name: obj.metadata.name,
+            namespace: obj.metadata.namespace,
             kind: obj.kind,
             apiVersion: obj.apiVersion,
           },
           dispatch,
           obj
         );
+        createdResources.push(resource);
       });
     });
-  return template.resultMessage || 'Done.';
+  return {message: template.resultMessage || 'Done.', resources: createdResources};
 };

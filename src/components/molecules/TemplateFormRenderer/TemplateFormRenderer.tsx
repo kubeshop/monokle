@@ -11,6 +11,10 @@ import {Primitive} from 'type-fest';
 
 import {TemplateForm} from '@models/template';
 
+import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
+
+import Colors from '@styles/Colors';
+
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
 
 const Form = withTheme(AntDTheme);
@@ -21,11 +25,13 @@ const readTemplateFormSchemas = (templateForm: TemplateForm) => {
   return {schema, uiSchema};
 };
 
-const TemplateFormRenderer: React.FC<{
-  templateForm: TemplateForm;
+interface IProps {
   isLastForm: boolean;
+  templateForm: TemplateForm;
   onSubmit: (formData: any) => void;
-}> = props => {
+}
+
+const TemplateFormRenderer: React.FC<IProps> = props => {
   const {templateForm, isLastForm, onSubmit} = props;
 
   const [formData, setFormData] = useState<Record<string, Primitive>>({});
@@ -57,14 +63,15 @@ const TemplateFormRenderer: React.FC<{
 
   return (
     <TemplateFormErrorBoundary>
-      <h1>{templateForm.name}</h1>
-      <p>{templateForm.description}</p>
+      <h2>{templateForm.name}</h2>
+      <p style={{color: Colors.grey7}}>{templateForm.description}</p>
       <Divider />
       <Form
         onSubmit={e => onSubmit(e.formData)}
         schema={schema}
         uiSchema={uiSchema}
         formData={formData}
+        widgets={getCustomFormWidgets()}
         onChange={e => setFormData(e.formData)}
         noHtml5Validate
       >

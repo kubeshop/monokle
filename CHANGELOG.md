@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/kubeshop/monokle/compare/v1.4.1-nightly-2022-01-31.0...v1.5.0) (2022-01-31)
+
+
+### Features
+
+* implemented logic for removal of default values ([d9ba34f](https://github.com/kubeshop/monokle/commit/d9ba34f5cf83af24d0b31b7f30cd6c6279ad5ee8))
+* set value checker for .monokle file ([91266e2](https://github.com/kubeshop/monokle/commit/91266e204b91933fee55af8a17df6b75978e485d))
+
+
+### Bug Fixes
+
+* check iskustomization for form ([1ce5ae3](https://github.com/kubeshop/monokle/commit/1ce5ae3f15846c8e5265b015354c9efb9b4a4d2b))
+* close dropdown when deleting a project ([99e3749](https://github.com/kubeshop/monokle/commit/99e3749908cc27089de87ed01ce3b8400391dc73))
+* dispatch open project only for different projects ([df57584](https://github.com/kubeshop/monokle/commit/df5758494744097430e17a8e31a488043644e42e))
+* fallback to source editor if no form available ([626f64c](https://github.com/kubeshop/monokle/commit/626f64cb8ed48384222223098ba167316f4568d3))
+* handle both relative and obsolute ([5b91fb0](https://github.com/kubeshop/monokle/commit/5b91fb0aa248029fc62a4cc0a38703040a84a998))
+* improved kustomization reprocessing ([a307bb1](https://github.com/kubeshop/monokle/commit/a307bb1c8504bdeb273c5dc55900f3ff4d20dbe0))
+* Kustomize schema/forms and errors related to conflicts with Flux Kustomize CRD ([8a99bcf](https://github.com/kubeshop/monokle/commit/8a99bcfa9eb008046eea9cff738d07b4e440448d))
+* lazy drawer wrapper ([1479976](https://github.com/kubeshop/monokle/commit/14799766ce38c4afab376a0c080f75992db7aa23))
+* load form only if active ([6b5897a](https://github.com/kubeshop/monokle/commit/6b5897a13d9892c78c25567aa73455f31b5c95e7))
+* merge branch 'main' into mm/bugfix/defaultsourceeditor ([b3b1ae3](https://github.com/kubeshop/monokle/commit/b3b1ae3a7b4ac124ae46c6b3ffb79593139d46f4))
+* mergeConfig issue ([3f57c67](https://github.com/kubeshop/monokle/commit/3f57c6754db8b2c94cd0584e9f97600661cef576))
+* merged main into branch ([36714d0](https://github.com/kubeshop/monokle/commit/36714d023e88b96b76538fb3be6234ba4411d5e1))
+* removed console logs ([e2eab62](https://github.com/kubeshop/monokle/commit/e2eab625b13b956e614585420e9727dffb1b1888))
+* resolve relative path ([da7b185](https://github.com/kubeshop/monokle/commit/da7b185adc504f07b19374d1023530b37f3ba873))
+* update active forms ([49992c2](https://github.com/kubeshop/monokle/commit/49992c2511f94ea04f4d69ed9603988bf6fd3d16))
+
 ## [1.4.0](https://github.com/kubeshop/monokle/compare/v1.3.4-20211202.0...v1.4.0) (2021-12-06)
 
 

@@ -2,9 +2,11 @@ import EventEmitter from 'events';
 import fs from 'fs';
 import {readdir} from 'fs/promises';
 import log from 'loglevel';
+import micromatch from 'micromatch';
 import path from 'path';
 import {parseAllDocuments} from 'yaml';
 
+import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {getStaticResourcePath} from '@redux/services';
@@ -86,8 +88,10 @@ const HandlerByResourceKind = Object.fromEntries(
 
 export function registerKindHandler(kindHandler: ResourceKindHandler, shouldReplace: boolean) {
   if (shouldReplace || !HandlerByResourceKind[kindHandler.kind]) {
-    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`, kindHandler);
+    log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`);
     HandlerByResourceKind[kindHandler.kind] = kindHandler;
+    // we need to store the list of registered kind handlers in the redux store for reactivity
+    KindHandlersEventEmitter.emit('register', kindHandler);
 
     const ix = ResourceKindHandlers.findIndex(handler => handler.kind === kindHandler.kind);
     if (ix >= 0) {
@@ -98,8 +102,20 @@ export function registerKindHandler(kindHandler: ResourceKindHandler, shouldRepl
   }
 }
 
+/**
+ * THIS IS NOT REACTIVE, use the knownResourceKindsSelector if you need reactivy
+ * @returns list of registered resource kinds
+ */
 export const getKnownResourceKinds = () => {
   return ResourceKindHandlers.map(handler => handler.kind);
+};
+
+/**
+ * THIS IS NOT REACTIVE, use the registeredKindHandlersSelector if you need reactivity
+ * @returns list of registered ResourceKindHandlers
+ */
+export const getRegisteredKindHandlers = () => {
+  return ResourceKindHandlers;
 };
 
 export const getResourceKindHandler = (resourceKind: string): ResourceKindHandler | undefined => {
@@ -150,7 +166,7 @@ export const getDependentResourceKinds = (resourceKinds: string[]) => {
  * Read bundled kindhandlers and emit event to notify when finished (used in tests)
  */
 
-const KindHandlersEventEmitter = new EventEmitter();
+export const KindHandlersEventEmitter = new EventEmitter();
 readBundledCrdKindHandlers();
 
 async function readBundledCrdKindHandlers() {
@@ -200,4 +216,12 @@ async function* findFiles(dir: string, ext: string): any {
       yield res;
     }
   }
+}
+
+/**
+ * Matches the specified resource against the kind and apiVersionMatcher of the specified ResourceKindHandler
+ */
+
+export function resourceMatchesKindHandler(resource: K8sResource, kindHandler: ResourceKindHandler) {
+  return resource.kind === kindHandler.kind && micromatch.isMatch(resource.version, kindHandler.apiVersionMatcher);
 }

@@ -19,7 +19,7 @@ import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH, ROOT_FILE_ENTRY} from '@constants/constants';
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH, DEFAULT_PLUGINS, ROOT_FILE_ENTRY} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
@@ -45,12 +45,13 @@ import autoUpdater from './auto-update';
 import {indexOf} from 'lodash';
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 import {createDispatchForWindow, dispatchToAllWindows, dispatchToWindow, subscribeToStoreStateChanges} from './ipcMainRedux';
-import {RootState} from '@redux/store';
+import {RootState} from '@models/rootstate';
 import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplateMap, loadTemplatesFromPlugin, loadTemplatesFromTemplatePack, updateTemplate, updateTemplatePack} from './templateService';
 import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
+import { convertRecentFilesToRecentProjects, setProjectsRootFolder } from './utils';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -66,9 +67,12 @@ const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
+setProjectsRootFolder(userHomeDir);
+
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
 });
+
 
 ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   try {
@@ -343,11 +347,25 @@ export const createWindow = (givenPath?: string) => {
     win.webContents.send('executed-from', {path: givenPath});
 
     const pluginMap = await loadPluginMap(pluginsDir);
-    dispatch(setPluginMap(pluginMap));
+    const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
+
+    const defaultPluginsToLoad = DEFAULT_PLUGINS.filter((defaultPlugin) => {
+      return !uniquePluginNames.includes(`${defaultPlugin.owner}-${defaultPlugin.name}`);
+    });
+
+    const downloadedPlugins = await Promise.all(defaultPluginsToLoad
+      .map((defaultPlugin) => downloadPlugin(defaultPlugin.url, pluginsDir)));
+    downloadedPlugins.forEach((downloadedPlugin) => {
+      pluginMap[downloadedPlugin.folderPath] = downloadedPlugin.extension;
+    });
     const templatePackMap = await loadTemplatePackMap(templatePacksDir);
-    dispatch(setTemplatePackMap(templatePackMap));
     const templateMap = await loadTemplateMap(templatesDir, {plugins: Object.values(pluginMap), templatePacks: Object.values(templatePackMap)});
+
+    dispatch(setPluginMap(pluginMap));
+    dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
+    convertRecentFilesToRecentProjects(dispatch);
+
   });
 
   return win;

@@ -1,5 +1,6 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import path from 'path';
 
@@ -10,34 +11,70 @@ import {
   NewVersionCode,
   Project,
   ProjectConfig,
+  Settings,
   TextSizes,
   Themes,
 } from '@models/appconfig';
+import {AppDispatch} from '@models/appdispatch';
+import {UiState} from '@models/ui';
 
-import {KustomizeCommandType} from '@redux/services/kustomize';
-import {writeProjectConfigFile} from '@redux/services/projectConfig';
+import {
+  keysToUpdateStateBulk,
+  populateProjectConfig,
+  readProjectConfig,
+  serializeObject,
+  writeProjectConfigFile,
+} from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
-import {AppDispatch} from '@redux/store';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
 
 import initialState from '../initialState';
+import {toggleStartProjectPane} from './ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
   thunkAPI.dispatch(configSlice.actions.createProject(project));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
 });
 
+export const setDeleteProject = createAsyncThunk('config/setDeleteProject', async (project: Project, thunkAPI: any) => {
+  const selectedProjectRootFolder: string = thunkAPI.getState().config.selectedProjectRootFolder;
+  thunkAPI.dispatch(configSlice.actions.deleteProject(project));
+  if (project.rootFolder === selectedProjectRootFolder) {
+    thunkAPI.dispatch(setOpenProject(null));
+  }
+});
+
 export const setOpenProject = createAsyncThunk(
-  'config/openProject',
+  'config/setOpenProject',
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
-    thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
-    thunkAPI.dispatch(setRootFolder(projectRootPath));
-    thunkAPI.dispatch(configSlice.actions.setProjectConfig(null));
+    const appConfig: AppConfig = thunkAPI.getState().config;
+    const appUi: UiState = thunkAPI.getState().ui;
+    if (projectRootPath && appUi.isStartProjectPaneVisible) {
+      thunkAPI.dispatch(toggleStartProjectPane());
+    }
+
+    const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
+    // First open the project so state.selectedProjectRootFolder is set
+    thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
+    const config: ProjectConfig | null = projectConfig || populateProjectConfig(appConfig);
+    // Then set project config by reading .monokle or populating it
+    thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config, fromConfigFile: false}));
+    // Last set rootFolder so function can read the latest projectConfig
+    thunkAPI.dispatch(setRootFolder(projectRootPath));
   }
 );
+
+export const setLoadingProject = createAsyncThunk(
+  'config/loadingProject',
+  async (loading: boolean, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
+    thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
+  }
+);
+
+type UpdateProjectConfigPayload = {config: ProjectConfig | null; fromConfigFile: boolean};
 
 export const configSlice = createSlice({
   name: 'config',
@@ -46,11 +83,11 @@ export const configSlice = createSlice({
     setFilterObjects: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.filterObjectsOnSelection = action.payload;
     },
+    setLoadingProject: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.isProjectLoading = action.payload;
+    },
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
-    },
-    setRecentFolders: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
-      state.recentFolders = action.payload;
     },
     updateStartupModalVisible: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       if (!action.payload) {
@@ -78,14 +115,6 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.settings.language', action.payload);
       state.settings.language = action.payload;
     },
-    updateHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
-      electronStore.set('appConfig.settings.helmPreviewMode', action.payload);
-      state.settings.helmPreviewMode = action.payload;
-    },
-    updateKustomizeCommand: (state: Draft<AppConfig>, action: PayloadAction<KustomizeCommandType>) => {
-      electronStore.set('appConfig.settings.kustomizeCommand', action.payload);
-      state.settings.kustomizeCommand = action.payload;
-    },
     updateNewVersion: (state: Draft<AppConfig>, action: PayloadAction<{code: NewVersionCode; data: any}>) => {
       electronStore.set('appConfig.newVersion', action.payload.code);
       state.newVersion.code = action.payload.code;
@@ -95,16 +124,12 @@ export const configSlice = createSlice({
       };
     },
     updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.loadLastFolderOnStartup', action.payload);
-      state.settings.loadLastProjectOnStartup = action.payload;
+      electronStore.set('appConfig.loadLastProjectOnStartup', action.payload);
+      state.loadLastProjectOnStartup = action.payload;
     },
-    updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
-      state.settings.hideExcludedFilesInFileExplorer = action.payload;
-    },
-    updateEnableHelmWithKustomize: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.enableHelmWithKustomize', action.payload);
-      state.settings.enableHelmWithKustomize = action.payload;
+    updateClusterSelectorVisibilty: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      electronStore.set('appConfig.isClusterSelectorVisible', action.payload);
+      state.isClusterSelectorVisible = action.payload;
     },
     updateFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
@@ -129,13 +154,26 @@ export const configSlice = createSlice({
         return;
       }
 
+      if (!existsSync(project.rootFolder)) {
+        mkdirSync(project.rootFolder, {recursive: true});
+      }
+
       if (!project.name) {
         const folderNames: string[] = project.rootFolder.split(path.sep);
         project.name = folderNames[folderNames.length - 1];
       }
 
-      state.projects = [project, ...state.projects];
-      state.selectedProjectRootFolder = project.rootFolder;
+      project.created = new Date().toISOString();
+      state.projects = _.sortBy(
+        [project, ...state.projects],
+        (p: Project) => p.lastOpened || new Date(-8640000000000000).toISOString()
+      ).reverse();
+      electronStore.set('appConfig.projects', state.projects);
+    },
+    deleteProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
+      state.projects = _.remove(state.projects, (p: Project) => p.rootFolder !== action.payload.rootFolder);
+      state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
+      electronStore.set('appConfig.projects', state.projects);
     },
     openProject: (state: Draft<AppConfig>, action: PayloadAction<string | null>) => {
       const projectRootPath: string | null = action.payload;
@@ -155,48 +193,61 @@ export const configSlice = createSlice({
       state.projects = _.sortBy(state.projects, (p: Project) => p.lastOpened).reverse();
       electronStore.set('appConfig.projects', state.projects);
     },
-    setProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
-      state.projectConfig = action.payload;
-    },
     updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
       if (!state.selectedProjectRootFolder) {
         return;
       }
 
-      const projectConfig: ProjectConfig | null | undefined = state.projectConfig;
-
-      if (_.isEqual(projectConfig?.kubeConfig, action.payload)) {
-        return;
+      if (!state.projectConfig) {
+        state.projectConfig = {};
       }
 
-      const newProjectConfig: ProjectConfig = {
-        ...projectConfig,
-        kubeConfig: {...projectConfig?.kubeConfig, ...action.payload},
-      };
+      if (!state.projectConfig.kubeConfig) {
+        state.projectConfig.kubeConfig = {};
+      }
 
-      writeProjectConfigFile(state, newProjectConfig);
-      state.projectConfig = newProjectConfig;
+      const serializedIncomingConfig = serializeObject(action.payload);
+      const serializedState = serializeObject(state.projectConfig.kubeConfig);
+      const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
+
+      keys.forEach(key => {
+        const kubeConfig = state.projectConfig?.kubeConfig;
+        if (kubeConfig) {
+          _.set(kubeConfig, key, serializedIncomingConfig[key]);
+        }
+      });
+
+      if (keys.length > 0) {
+        writeProjectConfigFile(state);
+      }
     },
-    updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<ProjectConfig | null>) => {
+    updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
         return;
       }
 
-      if (_.isEqual(state.projectConfig, action.payload)) {
-        return;
+      if (!state.projectConfig) {
+        state.projectConfig = {};
       }
 
-      const newProjectConfig: ProjectConfig | null = action.payload;
+      const serializedIncomingConfig = serializeObject(action.payload.config);
+      const serializedState = serializeObject(state.projectConfig);
+      let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
 
-      writeProjectConfigFile(state, newProjectConfig);
-      if (newProjectConfig && newProjectConfig.kubeConfig && newProjectConfig.kubeConfig.contexts) {
-        newProjectConfig.kubeConfig.contexts = state.projectConfig?.kubeConfig?.contexts;
+      if (action.payload.fromConfigFile) {
+        _.remove(keys, k => _.includes(['kubeConfig.contexts', 'kubeConfig.isPathValid'], k));
       }
-      state.projectConfig = newProjectConfig;
-    },
-    toggleClusterStatus: (state: Draft<AppConfig>) => {
-      state.settings.isClusterSelectorVisible = !state.settings.isClusterSelectorVisible;
-      electronStore.set('ui.clusterStatusHidden', state.settings.isClusterSelectorVisible);
+
+      keys.forEach(key => {
+        const projectConfig = state.projectConfig;
+        if (projectConfig) {
+          _.set(projectConfig, key, serializedIncomingConfig[key]);
+        }
+      });
+
+      if (keys.length > 0) {
+        writeProjectConfigFile(state);
+      }
     },
     setUserDirs: (
       state: Draft<AppConfig>,
@@ -206,6 +257,43 @@ export const configSlice = createSlice({
       state.userHomeDir = homeDir;
       state.userTempDir = tempDir;
       state.userDataDir = dataDir;
+    },
+    changeCurrentProjectName: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      if (!state.selectedProjectRootFolder) {
+        return;
+      }
+      const project: Project | undefined = state.projects.find(
+        (p: Project) => p.rootFolder === state.selectedProjectRootFolder
+      );
+
+      if (project) {
+        project.name = action.payload;
+        state.selectedProjectRootFolder = project.rootFolder;
+        state.projects = _.uniq([project, ...state.projects]);
+        electronStore.set('appConfig.projects', state.projects);
+      }
+    },
+    changeProjectsRootPath: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      state.projectsRootPath = action.payload;
+      electronStore.set('appConfig.projectsRootPath', state.projectsRootPath);
+    },
+    updateApplicationSettings: (state: Draft<AppConfig>, action: PayloadAction<Settings | null | undefined>) => {
+      if (!state.settings) {
+        state.settings = {};
+      }
+
+      const serializedIncomingSettings = serializeObject(action.payload);
+      const serializedState = serializeObject(state.settings);
+      let keys = keysToUpdateStateBulk(serializedState, serializedIncomingSettings);
+
+      keys.forEach(key => {
+        const projectSettings = state.settings;
+        if (projectSettings) {
+          _.set(projectSettings, key, serializedIncomingSettings[key]);
+        }
+      });
+
+      electronStore.set('appConfig.settings', state.settings);
     },
   },
 });
@@ -219,10 +307,6 @@ export const {
   updateLanguage,
   updateNewVersion,
   updateFileIncludes,
-  updateHelmPreviewMode,
-  updateHideExcludedFilesInFileExplorer,
-  updateEnableHelmWithKustomize,
-  updateKustomizeCommand,
   updateLoadLastProjectOnStartup,
   updateScanExcludes,
   updateStartupModalVisible,
@@ -231,7 +315,11 @@ export const {
   setKubeConfig,
   updateProjectConfig,
   updateProjectKubeConfig,
-  toggleClusterStatus,
+  updateClusterSelectorVisibilty,
   setUserDirs,
+  createProject,
+  changeCurrentProjectName,
+  changeProjectsRootPath,
+  updateApplicationSettings,
 } = configSlice.actions;
 export default configSlice.reducer;

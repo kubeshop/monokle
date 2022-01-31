@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Form, Input, Modal, Select} from 'antd';
@@ -16,8 +16,8 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {reprocessNewResource} from '@redux/reducers/main';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
+import {registeredKindHandlersSelector} from '@redux/selectors';
 import {createUnsavedResource} from '@redux/services/unsavedResource';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 
@@ -25,7 +25,7 @@ import {useNamespaces} from '@hooks/useNamespaces';
 
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
 
-import {ResourceKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
+import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
@@ -34,6 +34,13 @@ const SELECT_OPTION_NONE = '<none>';
 const {Option, OptGroup} = Select;
 
 const NewResourceWizard = () => {
+  const dispatch = useAppDispatch();
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
+  const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
+  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
 
   const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
@@ -49,12 +56,6 @@ const NewResourceWizard = () => {
   const [form] = Form.useForm();
   lastKindRef.current = form.getFieldValue('kind');
   lastApiVersionRef.current = form.getFieldValue('apiVersion');
-
-  const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
-  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
@@ -75,7 +76,7 @@ const NewResourceWizard = () => {
 
   const kindsByApiVersion = useMemo(
     () =>
-      ResourceKindHandlers.reduce((result, resourcekindHandler) => {
+      registeredKindHandlers.reduce((result, resourcekindHandler) => {
         if (result[resourcekindHandler.clusterApiVersion]) {
           result[resourcekindHandler.clusterApiVersion].push(resourcekindHandler);
         } else {
@@ -87,7 +88,7 @@ const NewResourceWizard = () => {
     // depend on resourceMap since newly loaded resources could have contained CRDs that resulted in dynamically
     // created kindHandlers
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resourceMap]
+    [registeredKindHandlers, resourceMap]
   );
 
   const [resourceKindOptions, setResourceKindOptions] =
@@ -269,9 +270,6 @@ const NewResourceWizard = () => {
       jsonTemplate
     );
 
-    // validate and update any possible broking incoming links that are now fixed
-    dispatch(reprocessNewResource(newResource));
-
     if (savingDestination !== 'doNotSave') {
       let absolutePath;
 
@@ -299,37 +297,39 @@ const NewResourceWizard = () => {
     closeWizard();
   };
 
-  const foldersList = useMemo(
-    () =>
-      Object.entries(fileMap)
-        .map(([key, value]) => ({folderName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
-        .filter(file => file.isFolder),
-    [fileMap]
-  );
+  const [foldersList, filesList]: [string[], string[]] = useMemo(() => {
+    const folders: string[] = [];
+    const files: string[] = [];
 
-  const fileList = useMemo(
-    () =>
-      Object.entries(fileMap)
-        .map(([key, value]) => ({fileName: key.replace(path.sep, ''), isFolder: Boolean(value.children)}))
-        .filter(file => !file.isFolder),
-    [fileMap]
-  );
+    Object.entries(fileMap).forEach(([key, value]) => {
+      if (value.children) {
+        folders.push(key.replace(path.sep, ''));
+      } else {
+        if (!value.isSupported || value.isExcluded) {
+          return;
+        }
+        files.push(key.replace(path.sep, ''));
+      }
+    });
 
-  const renderFolderSelectOptions = () => {
-    return foldersList.map(folder => (
-      <Option key={folder.folderName} value={folder.folderName}>
-        {folder.folderName}
+    return [folders, files];
+  }, [fileMap]);
+
+  const renderFileSelectOptions = useCallback(() => {
+    return filesList.map(fileName => (
+      <Option key={fileName} value={fileName}>
+        {fileName}
       </Option>
     ));
-  };
+  }, [filesList]);
 
-  const renderFileSelectOptions = () => {
-    return fileList.map(folder => (
-      <Option key={folder.fileName} value={folder.fileName}>
-        {folder.fileName}
+  const renderFolderSelectOptions = useCallback(() => {
+    return foldersList.map(folderName => (
+      <Option key={folderName} value={folderName}>
+        {folderName}
       </Option>
     ));
-  };
+  }, [foldersList]);
 
   const onSelectChange = () => {
     setInputValue('');

@@ -26,8 +26,11 @@ nav:
   - Cluster Integration: cluster-integration.md
   - Cluster Compare: cluster-compare.md
   - Deploy/Diff: apply-and-diff.md
-  - Development: development.md
-  - Architecture: architecture.md
+  - Development:
+    - Development: development.md
+    - Architecture: architecture.md
+    - Plugins: plugins.md
+    - Templates: templates.md
   - FAQ: faq.md
   - Tutorials:
       - tutorials/how-to-navigate-and-edit-manifests.md
@@ -49,3 +52,8 @@ extra:
       documentation better.
 
 copyright: Copyright &copy; 2021 <a href="https://kubeshop.io">Kubeshop</a>
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite

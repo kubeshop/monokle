@@ -10,8 +10,6 @@ export const ClusterExplorerTooltips = {
   noKubeconfigPath: 'Kubeconfig path is missing, configure it to enable Cluster features',
   notValidKubeconfigPath: 'The specified Kubeconfig path is not valid',
 };
-export const PluginManagerTooltip = 'Show/hide Plugin Manager';
-export const TemplatesPaneTooltip = 'Show/hide Templates Explorer';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Cluster Compare';
 export const ClusterDiffDisabledInClusterPreviewTooltip =
@@ -42,5 +40,18 @@ export const ClusterDiffSaveTooltip = 'Replace local resource with cluster versi
 export const ClusterDiffCompareTooltip = 'Diff resources - Opens the Diff Modal';
 export const FileExplorerChanged = 'File Explorer has some changes. Reload it to see them.';
 export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
-export const TemplateManagerPaneReloadTooltip = 'Check for updates';
-export const PluginManagerPaneReloadTooltip = 'Check for updates';
+export const OpenKustomizeDocumentationTooltip = 'Open documentation for Kustomize in external browser';
+export const TemplateManagerPaneReloadTooltip = 'Updates all templates that have a newer version available';
+export const PluginManagerDrawerReloadTooltip = 'Updates all plugins that have a newer version available';
+export const DocumentationTooltip = 'Open Monokle Documentation Website';
+export const DiscordTooltip = 'Open Kubeshop Discord Server';
+export const GitHubTooltip = 'Open Monokle Github Repository';
+export const SettingsTooltip = 'Open Settings';
+export const NotificationsTooltip = 'Show latest notifications';
+export const ProjectManagementTooltip = 'Select and manage your projects';
+export const NewProjectFromTemplateTooltip = 'New Project from Template';
+export const NewProjectFromFolderTooltip = 'New project from existing folder';
+export const NewEmptyProjectTooltip = 'New Empty Project';
+export const SearchProjectTooltip = 'Search for project by name or path';
+export const PluginDrawerTooltip = 'Open Plugins Manager';
+export const QuickFilterTooltip = `Filter results – Hint: quick-filter using ${KEY_CTRL_CMD} + P`;

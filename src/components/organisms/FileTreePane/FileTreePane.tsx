@@ -3,13 +3,12 @@ import {ipcRenderer} from 'electron';
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Menu, Modal, Row, Skeleton, Tooltip, Tree, Typography} from 'antd';
+import {Button, Menu, Modal, Row, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import micromatch from 'micromatch';
 import path from 'path';
-import styled from 'styled-components';
 
 import {FILE_TREE_HEIGHT_OFFSET, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 import {FileExplorerChanged, ReloadFolderTooltip, ToggleTreeTooltip} from '@constants/tooltips';
@@ -45,9 +44,11 @@ import {DeleteEntityCallback, deleteEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';
 import {showItemInFolder} from '@utils/shell';
 
-import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
+import Colors from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
+
+import * as S from './Styled';
 
 interface TreeNode {
   key: string;
@@ -64,21 +65,6 @@ interface TreeNode {
   isSupported?: boolean;
 }
 
-const StyledNumberOfResources = styled(Typography.Text)`
-  margin-left: 12px;
-`;
-
-const NodeContainer = styled.div`
-  position: relative;
-`;
-
-const NodeTitleContainer = styled.div`
-  padding-right: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
 const createNode = (
   fileEntry: FileEntry,
   fileMap: FileMapType,
@@ -91,8 +77,8 @@ const createNode = (
   const node: TreeNode = {
     key: fileEntry.filePath,
     title: (
-      <NodeContainer>
-        <NodeTitleContainer>
+      <S.NodeContainer>
+        <S.NodeTitleContainer>
           <span
             className={
               fileEntry.isExcluded
@@ -106,14 +92,12 @@ const createNode = (
             {fileEntry.name}
           </span>
           {resources.length > 0 ? (
-            <StyledNumberOfResources className="file-entry-nr-of-resources" type="secondary">
-              {resources.length}
-            </StyledNumberOfResources>
-          ) : (
-            ''
-          )}
-        </NodeTitleContainer>
-      </NodeContainer>
+            <Tooltip title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}>
+              <S.NumberOfResources className="file-entry-nr-of-resources">{resources.length}</S.NumberOfResources>
+            </Tooltip>
+          ) : null}
+        </S.NodeTitleContainer>
+      </S.NodeContainer>
     ),
     children: [],
     highlight: false,
@@ -145,216 +129,6 @@ const createNode = (
   return node;
 };
 
-const FileTreeContainer = styled.div`
-  background: ${BackgroundColors.darkThemeBackground};
-  width: 100%;
-  height: 100%;
-
-  & .ant-tree {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    font-variant: tabular-nums;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 22px;
-    color: ${FontColors.darkThemeMainFont};
-  }
-  & .ant-tree-list-scrollbar {
-    width: 8px;
-    background: ${Colors.grey1000};
-    border-radius: 0;
-  }
-
-  & .ant-tree-list-scrollbar-thumb {
-    background: ${Colors.grey4} !important;
-    border-radius: 0 !important;
-  }
-
-  & .ant-tree-treenode {
-    margin-left: 8px;
-    background: transparent;
-  }
-
-  & .ant-tree-switcher-leaf-line::before {
-    border-right: 1px solid #434343;
-  }
-
-  & .ant-tree-switcher-leaf-line::after {
-    border-bottom: 1px solid #434343;
-  }
-
-  & .ant-tree-treenode-selected {
-    vertical-align: center;
-    margin-left: 0px !important;
-    border-left: 8px hidden transparent;
-    padding-left: 8px;
-    padding-bottom: 0px;
-    background: ${Colors.selectionGradient} !important;
-  }
-  & .ant-tree-treenode-selected::before {
-    background: ${Colors.selectionGradient} !important;
-  }
-  & .file-entry-name {
-    color: ${Colors.blue10};
-  }
-  & .ant-tree-treenode-selected .file-entry-name {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode-selected .ant-tree-switcher {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode-selected .file-entry-nr-of-resources {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode::selection {
-    background: ${Colors.selectionGradient} !important;
-  }
-  & .filter-node {
-    font-weight: bold;
-    background: ${Colors.highlightGradient};
-  }
-  & .filter-node .file-entry-name {
-    color: ${FontColors.resourceRowHighlight} !important;
-  }
-  .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
-    color: ${Colors.blackPure} !important;
-    font-weight: bold;
-  }
-  & .ant-tree-iconEle {
-    flex-shrink: 0;
-  }
-  & .ant-tree-iconEle .anticon {
-    vertical-align: text-bottom;
-  }
-  & .ant-tree-node-content-wrapper {
-    display: flex;
-    overflow: hidden;
-  }
-
-  & .ant-tree-node-content-wrapper .ant-tree-title {
-    overflow: hidden;
-    flex-grow: 1;
-  }
-
-  & .ant-tree-switcher {
-    background: transparent;
-  }
-
-  & .excluded-file-entry-name {
-    color: ${Colors.grey800};
-    font-style: italic;
-  }
-
-  & .not-supported-file-entry-name {
-    color: ${Colors.grey800};
-  }
-`;
-
-const NoFilesContainer = styled.div`
-  margin-left: 16px;
-  margin-top: 10px;
-`;
-
-const StyledTreeContainer = styled.div`
-  margin-left: 2px;
-  margin-top: 10px;
-`;
-
-const StyledRootFolderText = styled.div`
-  font-size: 12px;
-  line-height: 22px;
-  color: ${Colors.grey7};
-  margin-left: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const StyledTreeDirectoryTree = styled(Tree.DirectoryTree)`
-  margin-top: 10px;
-  .ant-tree-switcher svg {
-    color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
-  }
-
-  opacity: ${props => (props.disabled ? '70%' : '100%')};
-`;
-
-const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-`;
-
-const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
-`;
-
-const RightButtons = styled.div`
-  display: flex;
-  align-items: center;
-
-  button:not(:last-child),
-  .ant-tooltip-disabled-compatible-wrapper:not(:last-child) {
-    margin-right: 10px;
-  }
-
-  .ant-tooltip-disabled-compatible-wrapper {
-    margin-bottom: 1px;
-  }
-`;
-
-const TreeTitleWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  height: 100%;
-
-  & .ant-dropdown-trigger {
-    height: inherit;
-    margin-right: 10px;
-  }
-`;
-
-const TreeTitleText = styled.span`
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-`;
-
-const StyledSkeleton = styled(Skeleton)`
-  margin: 20px;
-  width: 90%;
-`;
-
-const ReloadButton = styled(Button)``;
-
-const SpinnerWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  width: 100%;
-
-  @supports (backdrop-filter: blur(10px)) or (--webkit-backdrop-filter: blur(10px)) {
-    backdrop-filter: blur(5px);
-    --webkit-backdrop-filter: blur(5px);
-  }
-`;
-
-const ContextMenuDivider = styled.div`
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-`;
 interface ProcessingEntity {
   processingEntityID?: string;
   processingType?: 'delete' | 'rename';
@@ -461,7 +235,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           >
             Preview
           </Menu.Item>
-          <ContextMenuDivider />
+          <S.ContextMenuDivider />
         </>
       ) : null}
       {isFolder ? (
@@ -489,7 +263,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       >
         {isFolder ? 'New Resource' : 'Add Resource'}
       </Menu.Item>
-      <ContextMenuDivider />
+      <S.ContextMenuDivider />
       <Menu.Item
         key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
         disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
@@ -525,7 +299,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           </Menu.Item>
         </>
       ) : null}
-      <ContextMenuDivider />
+      <S.ContextMenuDivider />
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
@@ -547,7 +321,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       </Menu.Item>
       {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
         <>
-          <ContextMenuDivider />
+          <S.ContextMenuDivider />
           <Menu.Item
             disabled={isInPreviewMode}
             onClick={e => {
@@ -577,7 +351,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           </Menu.Item>
         </>
       ) : null}
-      <ContextMenuDivider />
+      <S.ContextMenuDivider />
       <Menu.Item
         onClick={e => {
           e.domEvent.stopPropagation();
@@ -591,7 +365,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   );
 
   return (
-    <TreeTitleWrapper
+    <S.TreeTitleWrapper
       onMouseEnter={() => {
         setTitleHoverState(true);
       }}
@@ -599,11 +373,11 @@ const TreeItem: React.FC<TreeItemProps> = props => {
         setTitleHoverState(false);
       }}
     >
-      <TreeTitleText>{title}</TreeTitleText>
+      <S.TreeTitleText>{title}</S.TreeTitleText>
       {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' ? (
-        <SpinnerWrapper>
+        <S.SpinnerWrapper>
           <Spinner />
-        </SpinnerWrapper>
+        </S.SpinnerWrapper>
       ) : null}
       {isTitleHovered && !processingEntity.processingType ? (
         <ContextMenu overlay={menu}>
@@ -616,7 +390,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
           </div>
         </ContextMenu>
       ) : null}
-    </TreeTitleWrapper>
+    </S.TreeTitleWrapper>
   );
 };
 
@@ -672,7 +446,6 @@ const FileTreePane = () => {
 
   useEffect(() => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
-
     const treeData =
       rootEntry &&
       createNode(
@@ -810,8 +583,11 @@ const FileTreePane = () => {
   const onExcludeFromProcessing = (relativePath: string) => {
     dispatch(
       updateProjectConfig({
-        ...configState.projectConfig,
-        scanExcludes: [...scanExcludes, relativePath],
+        config: {
+          ...configState.projectConfig,
+          scanExcludes: [...scanExcludes, relativePath],
+        },
+        fromConfigFile: false,
       })
     );
     openConfirmModal();
@@ -820,8 +596,11 @@ const FileTreePane = () => {
   const onIncludeToProcessing = (relativePath: string) => {
     dispatch(
       updateProjectConfig({
-        ...configState.projectConfig,
-        scanExcludes: scanExcludes.filter(scanExclude => scanExclude !== relativePath),
+        config: {
+          ...configState.projectConfig,
+          scanExcludes: scanExcludes.filter(scanExclude => scanExclude !== relativePath),
+        },
+        fromConfigFile: false,
       })
     );
     openConfirmModal();
@@ -841,6 +620,7 @@ const FileTreePane = () => {
   const onSelectRootFolderFromMainThread = useCallback(
     (_: any, data: string) => {
       if (data) {
+        console.log('setting root folder from main thread', data);
         setFolder(data);
       }
     },
@@ -949,12 +729,12 @@ const FileTreePane = () => {
   };
 
   return (
-    <FileTreeContainer>
+    <S.FileTreeContainer id="FileExplorer">
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>
-            <TitleBarContainer>
-              <Title>
+            <S.TitleBarContainer>
+              <S.Title>
                 File Explorer{' '}
                 {isScanExcludesUpdated === 'outdated' ? (
                   <Tooltip title={FileExplorerChanged}>
@@ -963,10 +743,10 @@ const FileTreePane = () => {
                 ) : (
                   ''
                 )}
-              </Title>
-              <RightButtons>
+              </S.Title>
+              <S.RightButtons>
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                  <ReloadButton
+                  <S.ReloadButton
                     size="small"
                     onClick={refreshFolder}
                     icon={<ReloadOutlined />}
@@ -983,20 +763,20 @@ const FileTreePane = () => {
                     disabled={isButtonDisabled}
                   />
                 </Tooltip>
-              </RightButtons>
-            </TitleBarContainer>
+              </S.RightButtons>
+            </S.TitleBarContainer>
           </MonoPaneTitle>
         </MonoPaneTitleCol>
       </Row>
       {uiState.isFolderLoading ? (
-        <StyledSkeleton active />
+        <S.Skeleton active />
       ) : tree ? (
-        <StyledTreeContainer>
-          <StyledRootFolderText>
+        <S.TreeContainer>
+          <S.RootFolderText>
             <div>{fileMap[ROOT_FILE_ENTRY].filePath}</div>
             <div>{Object.values(fileMap).filter(f => !f.children).length} files</div>
-          </StyledRootFolderText>
-          <StyledTreeDirectoryTree
+          </S.RootFolderText>
+          <S.TreeDirectoryTree
             // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
             height={
               windowHeight && windowHeight > FILE_TREE_HEIGHT_OFFSET
@@ -1037,13 +817,13 @@ const FileTreePane = () => {
             showIcon
             showLine={{showLeafIcon: false}}
           />
-        </StyledTreeContainer>
+        </S.TreeContainer>
       ) : (
-        <NoFilesContainer>
+        <S.NoFilesContainer>
           Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
-        </NoFilesContainer>
+        </S.NoFilesContainer>
       )}
-    </FileTreeContainer>
+    </S.FileTreeContainer>
   );
 };
 

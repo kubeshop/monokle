@@ -1,9 +1,6 @@
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
-import {Dropdown, Menu} from 'antd';
-
-import {sortBy} from 'lodash';
-import styled from 'styled-components';
+import {Dropdown, Tag} from 'antd';
 
 import {PREVIEW_PREFIX} from '@constants/constants';
 
@@ -15,70 +12,56 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 
 import {Icon} from '@atoms';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
-import Colors from '@styles/Colors';
-
-const Container = styled.span`
-  width: 100%;
-  white-space: nowrap;
-`;
-
-const WarningContainer = styled.span`
-  margin-left: 10px;
-  color: ${Colors.yellowWarning};
-  cursor: pointer;
-`;
-
-const ErrorContainer = styled.span`
-  margin-left: 10px;
-  color: ${Colors.redError};
-  cursor: pointer;
-`;
-
-const Label = styled.span`
-  margin-left: 3px;
-`;
-
-const StyledMenu = styled(Menu)`
-  max-height: 400px;
-  overflow-y: scroll;
-  ${GlobalScrollbarStyle}
-  padding: 4px 0;
-`;
-
-const StyledMenuItem = styled(Menu.Item)`
-  margin-bottom: 0 !important;
-  margin-top: 0 !important;
-  height: 28px !important;
-  line-height: 28px !important;
-  padding: 0 4px;
-`;
+import * as S from './WarningAndErrorsDisplay.styled';
 
 type Warning = {
   id: string;
   type: string;
   name: string;
   count: number;
+  namespace: string | undefined;
 };
 
 type RefDropdownMenuProps = {
+  type: 'error' | 'warning';
   warnings: Warning[];
 };
 
+const sortWarnings = (warnings: Warning[]) =>
+  warnings.sort((a, b) => {
+    if (a.type !== b.type) {
+      return a.type.localeCompare(b.type);
+    }
+    if (a.namespace && !b.namespace) {
+      return -1;
+    }
+    if (!a.namespace && b.namespace) {
+      return 1;
+    }
+    if (a.namespace && b.namespace && a.namespace !== b.namespace) {
+      return a.namespace.localeCompare(b.namespace);
+    }
+    return a.name.localeCompare(b.name);
+  });
+
 const RefDropdownMenu = (props: RefDropdownMenuProps) => {
+  const {type, warnings} = props;
+
   const dispatch = useAppDispatch();
-  const {warnings} = props;
+
   return (
-    <StyledMenu>
+    <S.StyledMenu>
       {warnings.map(warning => (
-        <StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
-          <Label>{warning.type}:</Label>
-          <Label>&nbsp;{warning.name}</Label>
-          <Label>&nbsp;({warning.count})</Label>
-        </StyledMenuItem>
+        <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
+          {warning.namespace && <Tag>{warning.namespace}</Tag>}
+          <span>{warning.name}</span>
+          <S.WarningCountContainer $type={type}>
+            <S.Icon $type={type} name={type} /> {warning.count}
+          </S.WarningCountContainer>
+          <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
+        </S.StyledMenuItem>
       ))}
-    </StyledMenu>
+    </S.StyledMenu>
   );
 };
 
@@ -100,6 +83,7 @@ function WarningsAndErrorsDisplay() {
               type: resource.kind,
               name: resource.name,
               count: unsatisfiedRefs.length,
+              namespace: resource.namespace,
             };
           }
           return null;
@@ -107,11 +91,11 @@ function WarningsAndErrorsDisplay() {
         return null;
       })
       .filter(warning => warning);
-    return sortBy(warningsCollection, ['type', 'name']);
+    return sortWarnings(warningsCollection as Warning[]);
   }, [resourceMap, isInPreviewMode]);
 
   const errors: any[] = useMemo(() => {
-    return Object.values(resourceMap)
+    const errorsCollection = Object.values(resourceMap)
       .filter(resource =>
         isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : !resource.filePath.startsWith(PREVIEW_PREFIX)
       )
@@ -122,11 +106,14 @@ function WarningsAndErrorsDisplay() {
             type: resource.kind,
             name: resource.name,
             count: resource.validation.errors.length,
+            namespace: resource.namespace,
           };
         }
         return null;
       })
       .filter(error => error);
+
+    return sortWarnings(errorsCollection as Warning[]);
   }, [resourceMap, isInPreviewMode]);
 
   const warningsCount = useMemo(() => {
@@ -150,24 +137,33 @@ function WarningsAndErrorsDisplay() {
   }, [resourceMap, isInPreviewMode]);
 
   return (
-    <Container>
+    <>
       {warningsCount > 0 && (
-        <Dropdown overlay={<RefDropdownMenu warnings={warnings} />} trigger={['click']} placement="bottomCenter">
-          <WarningContainer>
+        <Dropdown
+          overlay={<RefDropdownMenu type="warning" warnings={warnings} />}
+          trigger={['click']}
+          placement="bottomCenter"
+        >
+          <S.ErrorWarningContainer $type="warning">
             <Icon name="warning" />
-            <Label>{warningsCount}</Label>
-          </WarningContainer>
+            <S.Label>{warningsCount}</S.Label>
+          </S.ErrorWarningContainer>
         </Dropdown>
       )}
+
       {errorsCount > 0 && (
-        <Dropdown overlay={<RefDropdownMenu warnings={errors} />} trigger={['click']} placement="bottomCenter">
-          <ErrorContainer>
-            <Icon name="error" />
-            <Label>{errorsCount}</Label>
-          </ErrorContainer>
+        <Dropdown
+          overlay={<RefDropdownMenu type="error" warnings={errors} />}
+          trigger={['click']}
+          placement="bottomCenter"
+        >
+          <S.ErrorWarningContainer $type="error">
+            <Icon name="error" style={{paddingTop: '2px'}} />
+            <S.Label>{errorsCount}</S.Label>
+          </S.ErrorWarningContainer>
         </Dropdown>
       )}
-    </Container>
+    </>
   );
 }
 

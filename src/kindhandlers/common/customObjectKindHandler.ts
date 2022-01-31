@@ -1,5 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
+import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 
@@ -32,8 +33,8 @@ function extractResourceVersion(resource: K8sResource, kindVersion: string, kind
   return {version, group};
 }
 
-function extractFormSchema(editorSchema: any) {
-  const schema: any = JSON.parse(JSON.stringify(editorSchema));
+export function extractFormSchema(editorSchema: any) {
+  const schema: any = cloneDeep(editorSchema);
   if (schema && schema.properties) {
     // remove common object properties since these are shown in a separate form
     delete schema.properties['apiVersion'];
@@ -183,7 +184,7 @@ const createNamespacedCustomObjectKindHandler = (
 ): ResourceKindHandler => {
   return {
     kind,
-    apiVersionMatcher: '**',
+    apiVersionMatcher: `${kindGroup}/*`,
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     isCustom: true,
@@ -264,7 +265,7 @@ const createClusterCustomObjectKindHandler = (
 ): ResourceKindHandler => {
   return {
     kind,
-    apiVersionMatcher: '**',
+    apiVersionMatcher: `${kindGroup}/*`,
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     helpLink,

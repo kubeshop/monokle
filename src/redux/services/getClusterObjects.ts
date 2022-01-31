@@ -2,7 +2,7 @@ import * as k8s from '@kubernetes/client-node';
 
 import {getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
-import {ResourceKindHandlers} from '@src/kindhandlers';
+import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
 const getClusterObjects = (configPath: string, currentContext: string) => {
   const kc = new k8s.KubeConfig();
@@ -10,7 +10,7 @@ const getClusterObjects = (configPath: string, currentContext: string) => {
   kc.setCurrentContext(currentContext);
 
   return Promise.allSettled(
-    ResourceKindHandlers.map(resourceKindHandler =>
+    getRegisteredKindHandlers().map(resourceKindHandler =>
       resourceKindHandler
         .listResourcesInCluster(kc)
         .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))

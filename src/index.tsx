@@ -6,6 +6,7 @@ import * as log from 'loglevel';
 
 import '@redux/ipcRendererRedux';
 import store from '@redux/store';
+import '@redux/storeListeners';
 
 import App from './App';
 import './index.css';

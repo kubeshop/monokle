@@ -9,7 +9,7 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {parseDocument} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, KUSTOMIZATION_KIND, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
 import {AppConfig} from '@models/appconfig';
@@ -211,6 +211,13 @@ export const mainSlice = createSlice({
     addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;
       state.resourceMap[resource.id] = resource;
+
+      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
+        resourceIds: [resource.id],
+        resourceKinds,
+      });
     },
     /**
      * called by the file monitor when multiple paths are added to the file system
@@ -333,9 +340,9 @@ export const mainSlice = createSlice({
       });
     },
     /**
-     * Reprocess a newly created resource
+     * Reprocesses a resource
      */
-    reprocessNewResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
+    reprocessResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
       const resource = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
@@ -653,6 +660,23 @@ export const mainSlice = createSlice({
       state.clusterDiff.hideClusterOnlyResources = !state.clusterDiff.hideClusterOnlyResources;
       state.clusterDiff.selectedMatches = [];
     },
+    addMultipleKindHandlers: (state: Draft<AppState>, action: PayloadAction<string[]>) => {
+      action.payload.forEach(kind => {
+        if (!state.registeredKindHandlers.includes(kind)) {
+          state.registeredKindHandlers.push(kind);
+        }
+      });
+    },
+    addKindHandler: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      if (!state.registeredKindHandlers.includes(action.payload)) {
+        state.registeredKindHandlers.push(action.payload);
+      }
+    },
+    seenNotifications: (state: Draft<AppState>) => {
+      state.notifications.forEach(notification => {
+        notification.hasSeen = true;
+      });
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -858,7 +882,7 @@ export const mainSlice = createSlice({
           resource =>
             !resource.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
             !resource.name.startsWith('Patch:') &&
-            resource.kind !== KUSTOMIZATION_KIND
+            !isKustomizationResource(resource)
         );
 
         // if we are in preview mode, localResources must contain only the preview resources
@@ -1090,7 +1114,7 @@ export const {
   reloadClusterDiff,
   toggleClusterOnlyResourcesInClusterDiff,
   setSelectionHistory,
-  reprocessNewResource,
+  reprocessResource,
   editorHasReloadedSelectedPath,
   checkResourceId,
   uncheckAllResourceIds,
@@ -1101,5 +1125,8 @@ export const {
   closeResourceDiffModal,
   openResourceDiffModal,
   setFiltersToBeChanged,
+  addMultipleKindHandlers,
+  addKindHandler,
+  seenNotifications,
 } = mainSlice.actions;
 export default mainSlice.reducer;

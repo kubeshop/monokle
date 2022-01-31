@@ -1,14 +1,18 @@
+import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
+import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {RootState} from '@models/rootstate';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
-import {RootState} from './store';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
@@ -90,8 +94,8 @@ export const currentConfigSelector = createSelector(
 export const settingsSelector = createSelector(
   (state: RootState) => state,
   state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.settings || {};
+    const currentConfig: ProjectConfig = currentConfigSelector(state);
+    return currentConfig.settings || {};
   }
 );
 
@@ -112,33 +116,72 @@ export const fileIncludesSelector = createSelector(
 );
 
 export const kubeConfigContextSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.kubeConfig?.currentContext || '';
+  (state: RootState) => state.config,
+  config => {
+    if (config.projectConfig?.kubeConfig?.currentContext) {
+      return config.projectConfig?.kubeConfig?.currentContext;
+    }
+    if (config.kubeConfig.currentContext) {
+      return config.kubeConfig.currentContext;
+    }
+    return '';
   }
 );
 
 export const kubeConfigContextsSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.kubeConfig?.contexts || [];
+  (state: RootState) => state.config,
+  config => {
+    if (config.projectConfig?.kubeConfig?.contexts) {
+      return config.projectConfig?.kubeConfig?.contexts;
+    }
+    if (config.kubeConfig.contexts) {
+      return config.kubeConfig.contexts;
+    }
+    return [];
   }
 );
 
 export const kubeConfigPathSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.kubeConfig?.path || '';
+  (state: RootState) => state.config,
+  config => {
+    if (config.projectConfig?.kubeConfig?.path) {
+      return config.projectConfig?.kubeConfig?.path;
+    }
+    if (config.kubeConfig.path) {
+      return config.kubeConfig.path;
+    }
+    return '';
   }
 );
 
 export const kubeConfigPathValidSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.kubeConfig?.isPathValid || false;
+  (state: RootState) => state.config,
+  config => {
+    if (_.isBoolean(config.projectConfig?.kubeConfig?.isPathValid)) {
+      return Boolean(config.projectConfig?.kubeConfig?.isPathValid);
+    }
+    if (_.isBoolean(config.kubeConfig.isPathValid)) {
+      return Boolean(config.kubeConfig.isPathValid);
+    }
+    return false;
+  }
+);
+
+export const registeredKindHandlersSelector = createSelector(
+  (state: RootState) => state.main.registeredKindHandlers,
+  registeredKindHandlers => {
+    return registeredKindHandlers
+      .map(kind => getResourceKindHandler(kind))
+      .filter((handler): handler is ResourceKindHandler => handler !== undefined);
+  }
+);
+
+export const knownResourceKindsSelector = createSelector(
+  (state: RootState) => state.main.registeredKindHandlers,
+  registeredKindHandlers => {
+    return registeredKindHandlers
+      .map(kind => getResourceKindHandler(kind))
+      .filter((handler): handler is ResourceKindHandler => handler !== undefined)
+      .map(handler => handler.kind);
   }
 );

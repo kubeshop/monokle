@@ -2,11 +2,9 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
-
 import {
   HighlightItems,
-  LeftMenuSelection,
+  LeftMenuSelectionType,
   MonacoUiState,
   NewResourceWizardInput,
   PaneConfiguration,
@@ -14,6 +12,7 @@ import {
 } from '@models/ui';
 
 import initialState from '@redux/initialState';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
@@ -42,7 +41,7 @@ export const uiSlice = createSlice({
       state.leftMenu.isActive = action.payload;
       electronStore.set('ui.leftMenu.isActive', state.leftMenu.isActive);
     },
-    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelection>) => {
+    setLeftMenuSelection: (state: Draft<UiState>, action: PayloadAction<LeftMenuSelectionType>) => {
       state.leftMenu.selection = action.payload;
       electronStore.set('ui.leftMenu.selection', state.leftMenu.selection);
     },
@@ -142,6 +141,9 @@ export const uiSlice = createSlice({
     closeRenameResourceModal: (state: Draft<UiState>) => {
       state.renameResourceModal = undefined;
     },
+    toggleStartProjectPane: (state: Draft<UiState>) => {
+      state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
+    },
     collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
       if (expandedSections.length > 0) {
@@ -215,7 +217,7 @@ export const uiSlice = createSlice({
         state.shouldExpandAllNodes = true;
         if (
           state.leftMenu.selection === 'kustomize-pane' &&
-          !Object.values(action.payload.resourceMap).some(r => r.kind === KUSTOMIZATION_KIND)
+          !Object.values(action.payload.resourceMap).some(r => isKustomizationResource(r))
         ) {
           state.leftMenu.selection = 'file-explorer';
         }
@@ -250,6 +252,7 @@ export const {
   setMonacoEditor,
   setShouldExpandAllNodes,
   setPaneConfiguration,
+  toggleStartProjectPane,
   setRightMenuIsActive,
   setLeftMenuIsActive,
   openRenameEntityModal,

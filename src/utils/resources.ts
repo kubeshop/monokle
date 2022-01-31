@@ -41,10 +41,13 @@ export function isResourcePassingFilter(resource: K8sResource, filters: Resource
   }
   if (filters.labels && Object.keys(filters.labels).length > 0) {
     const resourceLabels = resource.content?.metadata?.labels;
-    if (!resourceLabels) {
+    const templateLabels = resource.content?.spec?.template?.metadata?.labels;
+    if (!resourceLabels && !templateLabels) {
       return false;
     }
-    const isPassingLabelFilter = isPassingKeyValueFilter(resourceLabels, filters.labels);
+    const isPassingLabelFilter =
+      (resourceLabels && isPassingKeyValueFilter(resourceLabels, filters.labels)) ||
+      (templateLabels && isPassingKeyValueFilter(templateLabels, filters.labels));
     if (!isPassingLabelFilter) {
       return false;
     }

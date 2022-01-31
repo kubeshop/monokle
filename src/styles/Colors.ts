@@ -15,6 +15,7 @@ enum Colors {
   grey5 = '#5A5A5A', // gray, gray 5
   grey4 = '#303030', // gray, gray 4
   grey3 = '#262626', // gray, gray 3
+  grey1 = '#141414', // gray, gray 1
 
   // Notifications
   greenOkay = '#09b89d',
@@ -35,8 +36,9 @@ enum Colors {
   cyan = '#58D1C9',
   cyan7 = '#33BCB7',
   volcano = '#F3956A',
-
+  lightSeaGreen = '#13a8a8',
   blue6 = '#1890FF', // Daybreak Blue
+  blue7 = '#177DDC', // Daybreak Blue
   blue10 = '#B7E3FA',
 
   red7 = '#E84748', // Dust Red

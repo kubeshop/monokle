@@ -6,7 +6,6 @@ Monokle is laid out like many other desktop applications:
 
 On start-up, Monokle automatically loads the most recently selected folder if the corresponding "Load recent folder on Startup" setting has been enabled.
 
-
 Left to right:
 
 - The vertical toolbar to the far left allows you to switch between File, Kustomize, Helm and View Template mode.
@@ -66,7 +65,6 @@ Clicking the Settings icon on the top right opens the settings:
   - **Resource links processing**:
     - Ignore optional unsatisfied links.
 
-
 ## System Menu
 
 Monokle provides a system menu with common File/Edit/View/Window/Help functionality.
@@ -90,8 +88,6 @@ You can launch multiple project windows using the New Monokle Windows option. Th
 ## Keyboard Shortcuts
 
 Please visit [Monokle Keyboard Shortcuts](hotkeys.md) for a complete list of keyboard shortcuts.
-
-
 
 ## Auto-update
 

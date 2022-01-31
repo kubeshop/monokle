@@ -1,3 +1,1 @@
-import CreateProjectModal from './CreateProjectModal';
-
-export {CreateProjectModal};
+export {default} from './CreateProjectModal';

@@ -1,8 +1,8 @@
 import {FSWatcher, watch} from 'chokidar';
 
-import {AppDispatch} from '@redux/store';
+import {AppDispatch} from '@models/appdispatch';
 
-import {CONFIG_PATH, readApplicationConfigFileAndUpdateProjectSettings} from './projectConfig';
+import {CONFIG_PATH, updateProjectSettings} from './projectConfig';
 
 let watcher: FSWatcher;
 
@@ -29,13 +29,13 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
 
   watcher
     .on('add', () => {
-      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, dispatch);
+      updateProjectSettings(dispatch, filePath);
     })
     .on('change', () => {
-      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, dispatch);
+      updateProjectSettings(dispatch, filePath);
     })
     .on('unlink', () => {
-      readApplicationConfigFileAndUpdateProjectSettings(absolutePath, dispatch);
+      updateProjectSettings(dispatch, filePath);
     })
     // eslint-disable-next-line no-console
     .on('error', error => console.log(`Watcher error: ${error}`));

@@ -17,6 +17,8 @@ import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
+import {resourceMatchesKindHandler} from '@src/kindhandlers';
+
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSectionNameSuffix from './ResourceKindSectionNameSuffix';
@@ -57,7 +59,7 @@ export function makeResourceKindNavSection(
     builder: {
       getRawItems: scope => {
         return scope.activeResources
-          .filter(r => r.kind === kindHandler.kind)
+          .filter(r => resourceMatchesKindHandler(r, kindHandler))
           .sort((a, b) => {
             if (a.namespace && !b.namespace) {
               return -1;

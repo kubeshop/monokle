@@ -4,12 +4,12 @@ import {FileMapType, ResourceFilterType, ResourceMapType} from '@models/appstate
 import {K8sResource, RefPosition, ResourceRef, ResourceRefType} from '@models/k8sresource';
 
 import {getResourceFolder} from '@redux/services/fileEntry';
-import {isPreviewResource} from '@redux/services/resource';
+import {isPreviewResource, isUnsavedResource} from '@redux/services/resource';
 import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
 
-import {ResourceKindHandlers, getIncomingRefMappers} from '@src/kindhandlers';
+import {getIncomingRefMappers, getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
 import {
@@ -28,29 +28,33 @@ export type SymbolsToResourceKindMatcher = {
   symbolsPaths?: string[][];
 };
 
-const SymbolsToResourceKindMatchers = ResourceKindHandlers.map(resourceKindHandler => {
-  return {
-    resourceKind: resourceKindHandler.kind,
-    symbolsPaths: getIncomingRefMappers(resourceKindHandler.kind)
-      .map(incomingRefMapper => incomingRefMapper.source.pathParts)
-      .reduce<string[][]>((previousValue, currentValue) => {
-        if (
-          previousValue.some(
-            symbolsPath =>
-              symbolsPath.length === currentValue.length &&
-              symbolsPath.every((symbol, index) => symbol === currentValue[index])
-          )
-        ) {
-          return previousValue;
-        }
-        return [...previousValue, currentValue];
-      }, []),
-  };
-}).flat();
+const getSymbolsToResourceKindMatchers = () =>
+  getRegisteredKindHandlers()
+    .map(resourceKindHandler => {
+      return {
+        resourceKind: resourceKindHandler.kind,
+        symbolsPaths: getIncomingRefMappers(resourceKindHandler.kind)
+          .map(incomingRefMapper => incomingRefMapper.source.pathParts)
+          .reduce<string[][]>((previousValue, currentValue) => {
+            if (
+              previousValue.some(
+                symbolsPath =>
+                  symbolsPath.length === currentValue.length &&
+                  symbolsPath.every((symbol, index) => symbol === currentValue[index])
+              )
+            ) {
+              return previousValue;
+            }
+            return [...previousValue, currentValue];
+          }, []),
+      };
+    })
+    .flat();
 
 const getResourceKindFromSymbols = (symbols: monaco.languages.DocumentSymbol[]) => {
-  for (let i = 0; i < SymbolsToResourceKindMatchers.length; i += 1) {
-    const matcher = SymbolsToResourceKindMatchers[i];
+  const symbolsToResourceKindMatchers = getSymbolsToResourceKindMatchers();
+  for (let i = 0; i < symbolsToResourceKindMatchers.length; i += 1) {
+    const matcher = symbolsToResourceKindMatchers[i];
     if (matcher.symbolsPaths && matcher.symbolsPaths.length > 0) {
       const isMatch = matcher.symbolsPaths.some(symbolsPath => {
         const sliceIndex = matcher.symbolsPaths ? -symbolsPath.length : 0;
@@ -200,7 +204,7 @@ export async function applyForResource(
         }
 
         let text = `${outgoingRefResource.kind}: ${outgoingRefResource.name}`;
-        if (!isPreviewResource(outgoingRefResource)) {
+        if (!isPreviewResource(outgoingRefResource) && !isUnsavedResource(outgoingRefResource)) {
           text += ` in ${outgoingRefResource.filePath}`;
         }
 

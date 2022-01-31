@@ -15,10 +15,7 @@ const MonoPaneTitle = styled((props: MonoSectionPaneProps) => <Text {...props} /
     white-space: nowrap;
     display: block;
     margin-bottom: 0;
-    padding-top: 7px;
-    padding-bottom: 8px;
-    padding-right: 4px;
-    padding-left: 16px;
+    padding: 8px 4px 8px 16px;
     text-transform: uppercase;
     font-size: 14px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,

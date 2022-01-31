@@ -78,10 +78,15 @@ const StyledPaneDiv = styled.div`
 `;
 
 const Pane: FunctionComponent<{
+  id: string;
   width: number;
   hide: boolean;
-}> = ({children, width, hide}) => {
-  return <StyledPaneDiv style={{display: hide ? 'none' : 'inline-block', width}}>{children}</StyledPaneDiv>;
+}> = ({children, id, width, hide}) => {
+  return (
+    <StyledPaneDiv id={id} style={{display: hide ? 'none' : 'inline-block', width}}>
+      {children}
+    </StyledPaneDiv>
+  );
 };
 
 const SplitView: FunctionComponent<SplitViewProps> = ({
@@ -172,10 +177,6 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   };
 
   const calculateLeftWidthOnDrawersChange = () => {
-    if (hideLeft) {
-      return 0;
-    }
-
     if (leftWidth > MIN_LEFT_PANE_WIDTH / viewWidth) {
       return leftWidth;
     }
@@ -303,9 +304,9 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
   };
 
   const calculateLeftNavCombination = (clientX: number, movingDirection: string) => {
-    const combinedPixelWidth = Math.floor((hideLeft ? 0 : leftWidth) * viewWidth + navWidth * viewWidth);
+    const combinedPixelWidth = Math.floor(leftWidth * viewWidth + navWidth * viewWidth);
     const newLeftWidth = Math.floor(leftWidth * viewWidth + clientX - separatorLeftNavXPosition);
-    const newNavWidth = Math.floor(combinedPixelWidth - (hideLeft ? 0 : newLeftWidth));
+    const newNavWidth = Math.floor(combinedPixelWidth - newLeftWidth);
 
     setSeparatorLeftNavXPosition(clientX);
 
@@ -463,7 +464,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
       hideLeft={hideLeft}
       hideRight={hideRight}
     >
-      <Pane width={leftWidth * viewWidth} hide={hideLeft}>
+      <Pane id="LeftPane" width={leftWidth * viewWidth} hide={hideLeft}>
         {left}
       </Pane>
 
@@ -476,7 +477,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         <StyledDivider />
       </StyledDividerHitBox>
 
-      <Pane width={navWidth * viewWidth} hide={false}>
+      <Pane id="NavPane" width={navWidth * viewWidth} hide={false}>
         {nav}
       </Pane>
 
@@ -490,7 +491,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         <StyledDivider />
       </StyledDividerHitBox>
 
-      <Pane width={editWidth * viewWidth} hide={false}>
+      <Pane id="EditorPane" width={editWidth * viewWidth} hide={false}>
         {editor}
       </Pane>
 
@@ -504,7 +505,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         <StyledDivider />
       </StyledDividerHitBox>
 
-      <Pane width={rightWidth * viewWidth} hide={hideRight}>
+      <Pane id="RightPane" width={rightWidth * viewWidth} hide={hideRight}>
         {right}
       </Pane>
     </StyledSplitView>

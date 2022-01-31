@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
@@ -8,9 +8,7 @@ import {K8sResource, ResourceRefType} from '@models/k8sresource';
 
 import {getResourcesForPath} from '@redux/services/fileEntry';
 
-import {NodeWrapper, createFileRef, getK8sResources, getScalarNodes, linkResources} from './resource';
-
-export type KustomizeCommandType = 'kubectl' | 'kustomize';
+import {NodeWrapper, createFileRef, getScalarNodes, linkResources} from './resource';
 
 /**
  * Creates kustomization refs between a kustomization and its resources
@@ -38,7 +36,7 @@ function linkParentKustomization(
  */
 
 export function isKustomizationResource(r: K8sResource | undefined) {
-  return r && r.kind === KUSTOMIZATION_KIND;
+  return r && r.kind === KUSTOMIZATION_KIND && (!r.version || r.version.startsWith(KUSTOMIZATION_API_GROUP));
 }
 
 /**
@@ -104,25 +102,27 @@ function extractPatches(
   patchPath: string
 ) {
   let strategicMergePatches = getScalarNodes(kustomization, patchPath);
-  strategicMergePatches.forEach((refNode: NodeWrapper) => {
-    let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
-    const fileEntry = fileMap[kpath];
-    if (fileEntry) {
-      let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
-      if (linkedResources.length > 0) {
-        linkedResources.forEach(resource => {
-          if (!resource.name.startsWith('Patch:')) {
-            resource.name = `Patch: ${resource.name}`;
-          }
-        });
+  strategicMergePatches
+    .filter(refNode => refNode.node.type === 'PLAIN')
+    .forEach((refNode: NodeWrapper) => {
+      let kpath = path.join(path.parse(kustomization.filePath).dir, refNode.nodeValue());
+      const fileEntry = fileMap[kpath];
+      if (fileEntry) {
+        let linkedResources = linkParentKustomization(fileEntry, kustomization, resourceMap, refNode);
+        if (linkedResources.length > 0) {
+          linkedResources.forEach(resource => {
+            if (!resource.name.startsWith('Patch:')) {
+              resource.name = `Patch: ${resource.name}`;
+            }
+          });
+        } else {
+          createFileRef(kustomization, refNode, kpath, fileMap);
+        }
       } else {
+        // this will create an unsatisfied file ref
         createFileRef(kustomization, refNode, kpath, fileMap);
       }
-    } else {
-      // this will create an unsatisfied file ref
-      createFileRef(kustomization, refNode, kpath, fileMap);
-    }
-  });
+    });
 }
 
 /**
@@ -130,7 +130,8 @@ function extractPatches(
  */
 
 export function processKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
-  getK8sResources(resourceMap, KUSTOMIZATION_KIND)
+  Object.values(resourceMap)
+    .filter(r => isKustomizationResource(r))
     .filter(k => k.content.resources || k.content.bases || k.content.patchesStrategicMerge || k.content.patchesJson6902)
     .forEach(kustomization => {
       let resources = getScalarNodes(kustomization, 'resources') || [];
@@ -138,9 +139,11 @@ export function processKustomizations(resourceMap: ResourceMapType, fileMap: Fil
         resources = resources.concat(getScalarNodes(kustomization, 'bases'));
       }
 
-      resources.forEach((refNode: NodeWrapper) => {
-        processKustomizationResourceRef(kustomization, refNode, resourceMap, fileMap);
-      });
+      resources
+        .filter(refNode => !refNode.nodeValue().startsWith('http'))
+        .forEach((refNode: NodeWrapper) => {
+          processKustomizationResourceRef(kustomization, refNode, resourceMap, fileMap);
+        });
 
       if (kustomization.content.patchesStrategicMerge) {
         extractPatches(kustomization, fileMap, resourceMap, 'patchesStrategicMerge');
@@ -171,7 +174,7 @@ export function getKustomizationRefs(
           if (target) {
             linkedResourceIds.push(r.target.resourceId);
 
-            if (target.kind === KUSTOMIZATION_KIND && r.type === ResourceRefType.Outgoing) {
+            if (isKustomizationResource(target) && r.type === ResourceRefType.Outgoing) {
               linkedResourceIds = linkedResourceIds.concat(getKustomizationRefs(resourceMap, r.target.resourceId));
             }
           }

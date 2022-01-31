@@ -47,12 +47,11 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type LeftMenuSelection =
+export type LeftMenuSelectionType =
   | 'file-explorer'
   | 'helm-pane'
   | 'kustomize-pane'
   | 'cluster-explorer'
-  | 'plugin-manager'
   | 'templates-pane';
 
 export type UiState = {
@@ -80,6 +79,7 @@ export type UiState = {
     isOpen: boolean;
     resourcesIds: string[];
   };
+  isStartProjectPaneVisible: boolean;
   renameEntityModal: {
     isOpen: boolean;
     entityName: string;
@@ -87,7 +87,7 @@ export type UiState = {
   };
   isFolderLoading: boolean;
   leftMenu: {
-    selection: string;
+    selection: LeftMenuSelectionType;
     isActive: boolean;
   };
   quickSearchActionsPopup: {

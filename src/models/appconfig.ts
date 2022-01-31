@@ -1,4 +1,4 @@
-import {KustomizeCommandType} from '@redux/services/kustomize';
+import {KustomizeCommandType} from '@models/kustomize';
 
 export enum Themes {
   Dark = 'dark',
@@ -23,10 +23,10 @@ export type Settings = {
   autoZoomGraphOnSelection?: boolean;
   helmPreviewMode?: 'template' | 'install';
   kustomizeCommand?: KustomizeCommandType;
-  loadLastProjectOnStartup?: boolean;
   hideExcludedFilesInFileExplorer?: boolean;
-  isClusterSelectorVisible?: boolean;
   enableHelmWithKustomize?: boolean;
+  createDefaultObjects?: boolean;
+  setDefaultPrimitiveValues?: boolean;
 };
 
 export enum NewVersionCode {
@@ -58,6 +58,7 @@ export type Project = {
   name?: string;
   rootFolder: string;
   k8sVersion?: string;
+  created?: string;
   lastOpened?: string;
 };
 
@@ -82,8 +83,9 @@ interface AppConfig {
   folderReadsMaxDepth: number;
   /** if the startup modal is visible */
   isStartupModalVisible: boolean;
+  loadLastProjectOnStartup: boolean;
+  isClusterSelectorVisible: boolean;
   settings: Settings;
-  recentFolders: string[];
   newVersion: {
     code: NewVersionCode;
     data: any;
@@ -96,6 +98,8 @@ interface AppConfig {
   userHomeDir?: string;
   userDataDir?: string;
   userTempDir?: string;
+  isProjectLoading?: boolean;
+  projectsRootPath: string;
 }
 
 export type {AppConfig};

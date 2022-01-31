@@ -3,13 +3,14 @@ import {useSelector} from 'react-redux';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
-import {Badge, Button} from 'antd';
+import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
+import {QuickFilterTooltip} from '@constants/tooltips';
 
 import {ResourceFilterType} from '@models/appstate';
 
@@ -114,27 +115,32 @@ const NavPane: React.FC = () => {
       ) : (
         <S.TitleBar>
           <MonoPaneTitle>
-            Navigator <WarningsAndErrorsDisplay />
+            <div style={{display: 'flex', alignItems: 'center'}}>
+              Navigator <WarningsAndErrorsDisplay />
+            </div>
           </MonoPaneTitle>
           <S.TitleBarRightButtons>
             <S.PlusButton
+              $disabled={!isFolderOpen || isInPreviewMode}
+              $highlighted={highlightedItems.createResource}
               className={highlightedItems.createResource ? 'animated-highlight' : ''}
-              highlighted={highlightedItems.createResource}
-              disabled={!isFolderOpen || isInClusterMode || isInPreviewMode}
-              onClick={onClickNewResource}
-              type="link"
-              size="small"
+              disabled={!isFolderOpen || isInPreviewMode}
               icon={<PlusOutlined />}
+              size="small"
+              type="link"
+              onClick={onClickNewResource}
             />
-            <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-              <Button
-                disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
-                type="link"
-                size="small"
-                icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-                onClick={resourceFilterButtonHandler}
-              />
-            </Badge>
+            <Tooltip title={QuickFilterTooltip}>
+              <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
+                <Button
+                  disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
+                  type="link"
+                  size="small"
+                  icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
+                  onClick={resourceFilterButtonHandler}
+                />
+              </Badge>
+            </Tooltip>
             <ClusterCompareButton />
           </S.TitleBarRightButtons>
         </S.TitleBar>

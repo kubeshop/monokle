@@ -8,6 +8,7 @@ import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq, parseAllDocuments, p
 
 import {
   CLUSTER_DIFF_PREFIX,
+  KUSTOMIZATION_API_GROUP,
   KUSTOMIZATION_KIND,
   PREVIEW_PREFIX,
   UNSAVED_PREFIX,
@@ -182,8 +183,8 @@ export class NodeWrapper {
  * Utility function to get all resources of a specific kind
  */
 
-export function getK8sResources(resourceMap: ResourceMapType, type: string) {
-  return Object.values(resourceMap).filter(item => item.kind === type);
+export function getK8sResources(resourceMap: ResourceMapType, kind: string) {
+  return Object.values(resourceMap).filter(item => item.kind === kind);
 }
 
 export function areRefPosEqual(a: RefPosition | undefined, b: RefPosition | undefined) {
@@ -297,7 +298,7 @@ export async function getTargetClusterNamespaces(kubeconfigPath: string, context
 
 export function createResourceName(filePath: string, content: any, kind: string) {
   // for Kustomizations we return the name of the containing folder ('base', 'staging', etc)
-  if (kind === KUSTOMIZATION_KIND) {
+  if (kind === KUSTOMIZATION_KIND && (!content?.apiVersion || content.apiVersion.startsWith(KUSTOMIZATION_API_GROUP))) {
     const ix = filePath.lastIndexOf(path.sep);
     if (ix > 0) {
       return filePath.substr(1, ix - 1);
@@ -450,7 +451,6 @@ export function reprocessResources(
   const dependentResourceKinds = getDependentResourceKinds(resourceKinds);
   let resourceKindsToReprocess = [...resourceKinds, ...dependentResourceKinds];
   resourceKindsToReprocess = [...new Set(resourceKindsToReprocess)];
-  let hasKustomizations = false;
 
   resourceIds.forEach(id => {
     const resource = resourceMap[id];
@@ -463,11 +463,7 @@ export function reprocessResources(
 
       resource.kind = resource.content.kind;
       resource.version = resource.content.apiVersion;
-      resource.namespace = resource.content.metadata?.namespace;
-
-      if (isKustomizationResource(resource)) {
-        hasKustomizations = true;
-      }
+      resource.namespace = extractNamespace(resource.content);
 
       // clear caches
       parsedDocCache.delete(resource.id);
@@ -480,9 +476,8 @@ export function reprocessResources(
     resourceKinds: resourceKindsToReprocess,
   });
 
-  if (hasKustomizations) {
-    reprocessKustomizations(resourceMap, fileMap);
-  }
+  // always reprocess kustomizations - kustomization refs to updated resources may need to be recreated
+  reprocessKustomizations(resourceMap, fileMap);
 }
 
 /**
@@ -625,6 +620,17 @@ export function removeResourceFromFile(
 }
 
 /**
+ * Extracts the namespace from the specified resource content
+ */
+
+function extractNamespace(content: any) {
+  // namespace could be an object if it's a helm template value...
+  return content.metadata?.namespace && typeof content.metadata.namespace === 'string'
+    ? content.metadata.namespace
+    : undefined;
+}
+
+/**
  * Extracts all resources from the specified text content (must be yaml)
  */
 
@@ -660,13 +666,15 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
 
           if (
             resource.kind === 'CustomResourceDefinition' &&
-            resource.content?.spec?.kind &&
-            !getResourceKindHandler(resource.content.spec.kind)
+            resource.content?.spec?.names?.kind &&
+            !getResourceKindHandler(resource.content.spec.names.kind)
           ) {
             try {
               const kindHandler = extractKindHandler(resource.content);
               if (kindHandler) {
                 registerKindHandler(kindHandler, false);
+              } else {
+                log.warn('Failed to extract kindHandler', resource.content);
               }
             } catch (e) {
               log.warn('Failed to register custom kindhandler', resource, e);
@@ -683,9 +691,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           }
 
           // set the namespace if available
-          if (content.metadata?.namespace && typeof content.metadata.namespace === 'string') {
-            resource.namespace = content.metadata.namespace;
-          }
+          resource.namespace = extractNamespace(content);
 
           result.push(resource);
         }
@@ -698,7 +704,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             isHighlighted: false,
             isSelected: false,
             kind: KUSTOMIZATION_KIND,
-            version: 'kustomize.config.k8s.io/v1beta1',
+            version: `${KUSTOMIZATION_API_GROUP}/v1beta1`,
             content,
             text: fileContent,
           };

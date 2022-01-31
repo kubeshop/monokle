@@ -1,12 +1,8 @@
 import {useCallback, useMemo, useState} from 'react';
 
-import {MinusSquareOutlined, PlusSquareOutlined} from '@ant-design/icons';
-
 import {SectionBlueprint, SectionInstance} from '@models/navigator';
 
 import {useAppDispatch} from '@redux/hooks';
-
-import Colors from '@styles/Colors';
 
 import {useSectionCustomization} from './useSectionCustomization';
 
@@ -82,7 +78,11 @@ function SectionHeader(props: SectionHeaderProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <S.NameContainer isHovered={isHovered} $hasCustomNameDisplay={Boolean(NameDisplay.Component)}>
+      <S.NameContainer
+        isHovered={isHovered}
+        isCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
+        $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
+      >
         {sectionInstance.checkable &&
           sectionInstance.isInitialized &&
           (sectionBlueprint.customization?.isCheckVisibleOnHover
@@ -115,22 +115,9 @@ function SectionHeader(props: SectionHeaderProps) {
             {itemsLength > 0 && (
               <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
             )}
+            <S.BlankSpace level={level} onClick={toggleCollapse} />
             {NameSuffix.Component && NameSuffix.options?.isVisibleOnHover && isHovered && (
               <NameSuffix.Component sectionInstance={sectionInstance} />
-            )}
-            <S.BlankSpace level={level} onClick={toggleCollapse} />
-            {isHovered && sectionInstance.isInitialized && (
-              <S.Collapsible>
-                {(isCollapsedMode === 'collapsed' || isCollapsedMode === 'mixed') && (
-                  <PlusSquareOutlined
-                    style={{color: sectionInstance.isSelected ? Colors.blackPure : undefined}}
-                    onClick={expandSection}
-                  />
-                )}
-                {(isCollapsedMode === 'expanded' || isCollapsedMode === 'mixed') && (
-                  <MinusSquareOutlined onClick={collapseSection} style={{marginLeft: '5px'}} />
-                )}
-              </S.Collapsible>
             )}
           </>
         )}
