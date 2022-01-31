@@ -317,14 +317,14 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (activeTabKey === 'form' && !(resourceKindHandler && resourceKindHandler.formEditorOptions?.editorSchema)) {
+    if (activeTabKey === 'form' && !isKustomization && !resourceKindHandler?.formEditorOptions?.editorSchema) {
       setActiveTabKey('source');
     }
 
-    if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomizationResource(selectedResource))) {
+    if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
       setActiveTabKey('source');
     }
-  }, [selectedResource, activeTabKey, resourceKindHandler]);
+  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
@@ -475,7 +475,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 ) : null}
               </TabPane>
             )}
-            {selectedResource && resourceKindHandler && !isKustomizationResource(selectedResource) && (
+            {selectedResource && resourceKindHandler && !isKustomization && (
               <TabPane
                 key="metadataForm"
                 style={{height: editorTabPaneHeight}}
