@@ -55,7 +55,9 @@ const RefDropdownMenu = (props: RefDropdownMenuProps) => {
         <S.StyledMenuItem key={warning.id} onClick={() => dispatch(selectK8sResource({resourceId: warning.id}))}>
           {warning.namespace && <Tag>{warning.namespace}</Tag>}
           <span>{warning.name}</span>
-          <S.WarningCountLabel $type={type}>({warning.count})</S.WarningCountLabel>
+          <S.WarningCountContainer $type={type}>
+            <S.Icon $type={type} name={type} /> {warning.count}
+          </S.WarningCountContainer>
           <S.WarningKindLabel>{warning.type}</S.WarningKindLabel>
         </S.StyledMenuItem>
       ))}
