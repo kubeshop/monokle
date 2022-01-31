@@ -444,12 +444,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
               >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
-                ) : (
+                ) : activeTabKey === 'form' ? (
                   <FormEditor
                     formSchema={resourceKindHandler.formEditorOptions.editorSchema}
                     formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                   />
-                )}
+                ) : null}
               </TabPane>
             )}
             {selectedResource && resourceKindHandler && !isKustomizationResource(selectedResource) && (
@@ -460,9 +460,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
               >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
-                ) : (
+                ) : activeTabKey === 'metadataForm' ? (
                   <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
-                )}
+                ) : null}
               </TabPane>
             )}
           </S.Tabs>
