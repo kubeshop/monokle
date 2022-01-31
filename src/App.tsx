@@ -6,6 +6,7 @@ import {useDebounce} from 'react-use';
 
 import 'antd/dist/antd.less';
 
+import path from 'path';
 import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
@@ -75,12 +76,13 @@ const App = () => {
 
   const onExecutedFrom = useCallback(
     (_, data) => {
-      if (data.path) {
-        const selectedProject: Project | undefined | null = projects.find(p => p.rootFolder === data.path);
+      const targetPath = data?.path?.startsWith('.') ? path.resolve(data.path) : data.path;
+      if (targetPath) {
+        const selectedProject: Project | undefined | null = projects.find(p => p.rootFolder === targetPath);
         if (selectedProject && getFileStats(selectedProject.rootFolder)?.isDirectory()) {
           dispatch(setOpenProject(selectedProject.rootFolder));
         } else {
-          dispatch(setCreateProject({rootFolder: data.path}));
+          dispatch(setCreateProject({rootFolder: targetPath}));
         }
         dispatch(setLoadingProject(false));
         return;
