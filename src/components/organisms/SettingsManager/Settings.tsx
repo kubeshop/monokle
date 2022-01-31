@@ -140,6 +140,18 @@ export const Settings = ({
       settings: {...localConfig?.settings, enableHelmWithKustomize: e.target.checked},
     });
   };
+  const onChangeCreateDefaultObjects = (e: any) => {
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, createDefaultObjects: e.target.checked},
+    });
+  };
+  const onChangeSetDefaultPrimitiveValues = (e: any) => {
+    setLocalConfig({
+      ...localConfig,
+      settings: {...localConfig?.settings, setDefaultPrimitiveValues: e.target.checked},
+    });
+  };
 
   const openFileSelect = () => {
     if (isEditingDisabled) {
@@ -311,6 +323,26 @@ export const Settings = ({
         >
           Ignore optional unsatisfied links
         </Checkbox>
+      </S.Div>
+      <S.Div>
+        <S.Span>Form Editor</S.Span>
+        <S.Div>
+          <Tooltip title="Automatically create default objects and values defined in the schema">
+            <Checkbox checked={localConfig?.settings?.createDefaultObjects} onChange={onChangeCreateDefaultObjects}>
+              Create default objects
+            </Checkbox>
+          </Tooltip>
+        </S.Div>
+        <S.Div>
+          <Tooltip title="Automatically set default values defined in the schema">
+            <Checkbox
+              checked={localConfig?.settings?.setDefaultPrimitiveValues}
+              onChange={onChangeSetDefaultPrimitiveValues}
+            >
+              Set default primitive values
+            </Checkbox>
+          </Tooltip>
+        </S.Div>
       </S.Div>
       {/* <StyledDiv>
         <StyledSpan>Theme</StyledSpan>

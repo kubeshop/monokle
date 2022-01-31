@@ -1,3 +1,4 @@
+import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 
 import {K8sResource} from '@models/k8sresource';
@@ -116,4 +117,28 @@ export function extractSchema(crd: any, versionName: string) {
   });
 
   return schema;
+}
+
+export function removeSchemaDefaults(schema: any, removeObjectDefaults: boolean, removePrimitiveDefaults: boolean) {
+  const schemaClone = cloneDeep(schema);
+  removeDefaults(schemaClone, removeObjectDefaults, removePrimitiveDefaults);
+  return schemaClone;
+}
+
+function removeDefaults(schemaItem: any, removeObjectDefaults: boolean, removePrimitiveDefaults: boolean) {
+  if (removeObjectDefaults && schemaItem.default && schemaItem.type === 'object') {
+    delete schemaItem.default;
+  }
+
+  if (schemaItem.properties) {
+    Object.values(schemaItem.properties).forEach((prop: any) => {
+      if (prop.type === 'object') {
+        removeDefaults(prop, removeObjectDefaults, removePrimitiveDefaults);
+      } else if (prop.type === 'array') {
+        removeDefaults(prop.items, removeObjectDefaults, removePrimitiveDefaults);
+      } else if (removePrimitiveDefaults && prop.default !== undefined) {
+        delete prop.default;
+      }
+    });
+  }
 }

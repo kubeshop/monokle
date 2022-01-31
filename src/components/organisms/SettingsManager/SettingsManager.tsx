@@ -17,18 +17,15 @@ import {
   changeProjectsRootPath,
   setKubeConfig,
   setScanExcludesStatus,
+  updateApplicationSettings,
   updateClusterSelectorVisibilty,
-  updateEnableHelmWithKustomize,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
-  updateHelmPreviewMode,
-  updateHideExcludedFilesInFileExplorer,
-  updateKustomizeCommand,
   updateLoadLastProjectOnStartup,
   updateProjectConfig,
   updateScanExcludes,
 } from '@redux/reducers/appConfig';
-import {activeProjectSelector} from '@redux/selectors';
+import {activeProjectSelector, currentConfigSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -43,11 +40,11 @@ const {Panel} = S.Collapse;
 const SettingsManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject: Project | undefined = useAppSelector(activeProjectSelector);
+  const mergedConfig: ProjectConfig = useAppSelector(currentConfigSelector);
   const appConfig = useAppSelector(state => state.config);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
-  const projectConfig = useAppSelector(state => state.config.projectConfig);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
 
   const [activePanels, setActivePanels] = useState<number[]>([3]);
@@ -71,20 +68,14 @@ const SettingsManager: React.FC = () => {
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
-    if (!_.isEqual(config.settings?.enableHelmWithKustomize, appConfig.settings.enableHelmWithKustomize)) {
-      dispatch(updateEnableHelmWithKustomize(Boolean(config.settings?.enableHelmWithKustomize)));
-    }
-    if (!_.isEqual(config.settings?.helmPreviewMode, appConfig.settings.helmPreviewMode)) {
-      dispatch(updateHelmPreviewMode(config.settings?.helmPreviewMode || 'template'));
-    }
-    if (!_.isEqual(config.settings?.kustomizeCommand, appConfig.settings.kustomizeCommand)) {
-      dispatch(updateKustomizeCommand(config.settings?.kustomizeCommand || 'kubectl'));
-    }
-    if (
-      !_.isEqual(config.settings?.hideExcludedFilesInFileExplorer, appConfig.settings.hideExcludedFilesInFileExplorer)
-    ) {
-      dispatch(updateHideExcludedFilesInFileExplorer(Boolean(config.settings?.hideExcludedFilesInFileExplorer)));
-    }
+    dispatch(
+      updateApplicationSettings({
+        ...config.settings,
+        helmPreviewMode: config.settings?.helmPreviewMode || 'template',
+        kustomizeCommand: config.settings?.kustomizeCommand || 'kubectl',
+      })
+    );
+
     if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
       dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
     }
@@ -195,7 +186,7 @@ const SettingsManager: React.FC = () => {
         {activeProject && (
           <Panel header="Active Project Settings" key="3">
             <Settings
-              config={projectConfig}
+              config={mergedConfig}
               onConfigChange={changeProjectConfig}
               showProjectName
               projectName={activeProject.name}

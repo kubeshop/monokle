@@ -11,11 +11,11 @@ import {
   NewVersionCode,
   Project,
   ProjectConfig,
+  Settings,
   TextSizes,
   Themes,
 } from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
-import {KustomizeCommandType} from '@models/kustomize';
 import {UiState} from '@models/ui';
 
 import {
@@ -115,14 +115,6 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.settings.language', action.payload);
       state.settings.language = action.payload;
     },
-    updateHelmPreviewMode: (state: Draft<AppConfig>, action: PayloadAction<'template' | 'install'>) => {
-      electronStore.set('appConfig.settings.helmPreviewMode', action.payload);
-      state.settings.helmPreviewMode = action.payload;
-    },
-    updateKustomizeCommand: (state: Draft<AppConfig>, action: PayloadAction<KustomizeCommandType>) => {
-      electronStore.set('appConfig.settings.kustomizeCommand', action.payload);
-      state.settings.kustomizeCommand = action.payload;
-    },
     updateNewVersion: (state: Draft<AppConfig>, action: PayloadAction<{code: NewVersionCode; data: any}>) => {
       electronStore.set('appConfig.newVersion', action.payload.code);
       state.newVersion.code = action.payload.code;
@@ -132,20 +124,12 @@ export const configSlice = createSlice({
       };
     },
     updateLoadLastProjectOnStartup: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.loadLastProjectOnStartup', action.payload);
+      electronStore.set('appConfig.loadLastProjectOnStartup', action.payload);
       state.loadLastProjectOnStartup = action.payload;
     },
     updateClusterSelectorVisibilty: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.isClusterSelectorVisible', action.payload);
+      electronStore.set('appConfig.isClusterSelectorVisible', action.payload);
       state.isClusterSelectorVisible = action.payload;
-    },
-    updateHideExcludedFilesInFileExplorer: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.hideExcludedFilesInFileExplorer', action.payload);
-      state.settings.hideExcludedFilesInFileExplorer = action.payload;
-    },
-    updateEnableHelmWithKustomize: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.settings.enableHelmWithKustomize', action.payload);
-      state.settings.enableHelmWithKustomize = action.payload;
     },
     updateFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
@@ -293,6 +277,24 @@ export const configSlice = createSlice({
       state.projectsRootPath = action.payload;
       electronStore.set('appConfig.projectsRootPath', state.projectsRootPath);
     },
+    updateApplicationSettings: (state: Draft<AppConfig>, action: PayloadAction<Settings | null | undefined>) => {
+      if (!state.settings) {
+        state.settings = {};
+      }
+
+      const serializedIncomingSettings = serializeObject(action.payload);
+      const serializedState = serializeObject(state.settings);
+      let keys = keysToUpdateStateBulk(serializedState, serializedIncomingSettings);
+
+      keys.forEach(key => {
+        const projectSettings = state.settings;
+        if (projectSettings) {
+          _.set(projectSettings, key, serializedIncomingSettings[key]);
+        }
+      });
+
+      electronStore.set('appConfig.settings', state.settings);
+    },
   },
 });
 
@@ -305,10 +307,6 @@ export const {
   updateLanguage,
   updateNewVersion,
   updateFileIncludes,
-  updateHelmPreviewMode,
-  updateHideExcludedFilesInFileExplorer,
-  updateEnableHelmWithKustomize,
-  updateKustomizeCommand,
   updateLoadLastProjectOnStartup,
   updateScanExcludes,
   updateStartupModalVisible,
@@ -322,5 +320,6 @@ export const {
   createProject,
   changeCurrentProjectName,
   changeProjectsRootPath,
+  updateApplicationSettings,
 } = configSlice.actions;
 export default configSlice.reducer;

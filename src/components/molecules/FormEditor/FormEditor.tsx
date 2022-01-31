@@ -13,8 +13,9 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
-import {isInPreviewModeSelector, selectedResourceSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, selectedResourceSelector, settingsSelector} from '@redux/selectors';
 import {mergeManifests} from '@redux/services/manifest-utils';
+import {removeSchemaDefaults} from '@redux/services/schema';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
@@ -112,6 +113,8 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const [formData, setFormData] = useState<any>();
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const settings = useSelector(settingsSelector);
+  const [schema, setSchema] = useState<any>({});
 
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
@@ -139,6 +142,14 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource]);
 
+  useEffect(() => {
+    if (!settings.createDefaultObjects || !settings.setDefaultPrimitiveValues) {
+      setSchema(removeSchemaDefaults(formSchema, !settings.createDefaultObjects, !settings.setDefaultPrimitiveValues));
+    } else {
+      setSchema(formSchema);
+    }
+  }, [formSchema, settings]);
+
   if (!selectedResource) {
     return <div>Nothing selected...</div>;
   }
@@ -150,8 +161,8 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   return (
     <FormContainer>
       <Form
-        schema={formSchema}
-        uiSchema={formUiSchema || {}}
+        schema={schema}
+        uiSchema={formUiSchema}
         formData={formData}
         onChange={onFormUpdate}
         widgets={getCustomFormWidgets()}

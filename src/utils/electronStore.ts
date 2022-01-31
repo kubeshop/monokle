@@ -20,10 +20,10 @@ const schema = {
       startupModalVisible: {
         type: 'boolean',
       },
-      kubeconfig: {
-        type: 'string',
+      isClusterSelectorVisible: {
+        type: 'boolean',
       },
-      isKubeconfigPathValid: {
+      loadLastProjectOnStartup: {
         type: 'boolean',
       },
       scanExcludes: {
@@ -56,7 +56,16 @@ const schema = {
           kustomizeCommand: {
             type: 'string',
           },
-          loadLastProjectOnStartup: {
+          hideExcludedFilesInFileExplorer: {
+            type: 'boolean',
+          },
+          enableHelmWithKustomize: {
+            type: 'boolean',
+          },
+          createDefaultObjects: {
+            type: 'boolean',
+          },
+          setDefaultPrimitiveValues: {
             type: 'boolean',
           },
         },
@@ -70,7 +79,6 @@ const schema = {
       newVersion: {
         type: 'number',
       },
-
       projects: {
         type: 'array',
         items: {
@@ -165,6 +173,8 @@ const schema = {
 const defaults = {
   appConfig: {
     startupModalVisible: true,
+    isClusterSelectorVisible: true,
+    loadLastProjectOnStartup: false,
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
@@ -172,8 +182,8 @@ const defaults = {
       textSize: 'medium',
       language: 'en',
       helmPreviewMode: 'template',
-      loadLastProjectOnStartup: false,
-      isClusterSelectorVisible: true,
+      createDefaultObjects: false,
+      setDefaultPrimitiveValues: true,
     },
     recentFolders: [],
     newVersion: 0,

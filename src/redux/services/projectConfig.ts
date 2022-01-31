@@ -41,24 +41,31 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
   }
 };
 
+// This function needs to be extended when new related value is added
+// We need to think a better way
 export const populateProjectConfigToWrite = (state: AppConfig | SerializableObject) => {
   const applicationConfig: ProjectConfig = {
-    scanExcludes: state.projectConfig.scanExcludes,
-    fileIncludes: state.projectConfig.fileIncludes,
-    folderReadsMaxDepth: state.projectConfig.folderReadsMaxDepth,
+    scanExcludes: state.projectConfig?.scanExcludes,
+    fileIncludes: state.projectConfig?.fileIncludes,
+    folderReadsMaxDepth: state.projectConfig?.folderReadsMaxDepth,
   };
   applicationConfig.settings = {
-    helmPreviewMode: state.projectConfig.settings.helmPreviewMode,
-    kustomizeCommand: state.projectConfig.settings.kustomizeCommand,
-    hideExcludedFilesInFileExplorer: state.projectConfig.settings.hideExcludedFilesInFileExplorer,
-    enableHelmWithKustomize: state.projectConfig.settings.enableHelmWithKustomize,
+    helmPreviewMode: state.projectConfig?.settings?.helmPreviewMode,
+    kustomizeCommand: state.projectConfig?.settings?.kustomizeCommand,
+    hideExcludedFilesInFileExplorer: state.projectConfig?.settings?.hideExcludedFilesInFileExplorer,
+    enableHelmWithKustomize: state.projectConfig?.settings?.enableHelmWithKustomize,
+    createDefaultObjects: state.projectConfig?.settings?.createDefaultObjects,
+    setDefaultPrimitiveValues: state.projectConfig?.settings?.setDefaultPrimitiveValues,
   };
   applicationConfig.kubeConfig = {
-    path: state.projectConfig.kubeConfig.path,
-    currentContext: state.projectConfig.kubeConfig.currentContext,
+    path: state.projectConfig?.kubeConfig?.path,
+    currentContext: state.projectConfig?.kubeConfig?.currentContext,
   };
   return applicationConfig;
 };
+
+// This function needs to be extended when new related value is added
+// We need to think a better way
 export const populateProjectConfig = (state: AppConfig | SerializableObject) => {
   const applicationConfig: ProjectConfig = {
     scanExcludes: state.scanExcludes,
@@ -70,6 +77,8 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     kustomizeCommand: state.settings.kustomizeCommand,
     hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
+    createDefaultObjects: state.settings.createDefaultObjects,
+    setDefaultPrimitiveValues: state.settings.setDefaultPrimitiveValues,
   };
   applicationConfig.kubeConfig = {
     path: state.kubeConfig.path,
@@ -92,21 +101,34 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
     const projectConfig: ProjectConfig = {};
     projectConfig.settings = settings
       ? {
-          helmPreviewMode: settings.helmPreviewMode,
-          kustomizeCommand: settings.kustomizeCommand,
-          hideExcludedFilesInFileExplorer: settings.hideExcludedFilesInFileExplorer,
+          helmPreviewMode: _.includes(['template', 'install'], settings.helmPreviewMode)
+            ? settings.helmPreviewMode
+            : undefined,
+          kustomizeCommand: _.includes(['kubectl', 'kustomize'], settings.kustomizeCommand)
+            ? settings.kustomizeCommand
+            : undefined,
+          hideExcludedFilesInFileExplorer: _.isBoolean(settings.hideExcludedFilesInFileExplorer)
+            ? settings.hideExcludedFilesInFileExplorer
+            : undefined,
+          enableHelmWithKustomize: _.isBoolean(settings.enableHelmWithKustomize)
+            ? settings.enableHelmWithKustomize
+            : undefined,
+          createDefaultObjects: _.isBoolean(settings.createDefaultObjects) ? settings.createDefaultObjects : undefined,
+          setDefaultPrimitiveValues: _.isBoolean(settings.setDefaultPrimitiveValues)
+            ? settings.setDefaultPrimitiveValues
+            : undefined,
         }
       : undefined;
     projectConfig.kubeConfig = kubeConfig
       ? {
-          path: kubeConfig.path,
-          currentContext: kubeConfig.currentContext,
+          path: _.isString(kubeConfig.path) ? kubeConfig.path : undefined,
+          currentContext: _.isString(kubeConfig.currentContext) ? kubeConfig.currentContext : undefined,
         }
       : undefined;
 
-    projectConfig.scanExcludes = scanExcludes;
-    projectConfig.fileIncludes = fileIncludes;
-    projectConfig.folderReadsMaxDepth = folderReadsMaxDepth;
+    projectConfig.scanExcludes = _.isArray(scanExcludes) ? scanExcludes : undefined;
+    projectConfig.fileIncludes = _.isArray(fileIncludes) ? fileIncludes : undefined;
+    projectConfig.folderReadsMaxDepth = _.isNumber(folderReadsMaxDepth) ? folderReadsMaxDepth : undefined;
 
     return projectConfig;
   } catch (error) {
@@ -136,7 +158,7 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
   }
 
   const serializedBaseConfig: SerializableObject = serializeObject(baseConfig);
-  const serializedConfig: SerializableObject = serializeObject(baseConfig);
+  const serializedConfig: SerializableObject = serializeObject(config);
 
   Object.keys(serializedBaseConfig).forEach((key: string) => {
     if (!_.isUndefined(serializedConfig[key])) {
@@ -144,7 +166,7 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     }
   });
 
-  return deserializeObject(baseConfig);
+  return deserializeObject(serializedBaseConfig);
 };
 
 export const serializeObject = (objectToSerialize?: SerializableObject | null, prefix?: string): SerializableObject => {

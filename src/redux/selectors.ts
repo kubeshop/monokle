@@ -94,8 +94,8 @@ export const currentConfigSelector = createSelector(
 export const settingsSelector = createSelector(
   (state: RootState) => state,
   state => {
-    const currentKubeConfig: ProjectConfig = currentConfigSelector(state);
-    return currentKubeConfig.settings || {};
+    const currentConfig: ProjectConfig = currentConfigSelector(state);
+    return currentConfig.settings || {};
   }
 );
 
