@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
-import {useSelector} from 'react-redux';
 
 import {Dropdown, Modal, Tooltip} from 'antd';
 import Column from 'antd/lib/table/Column';
@@ -34,15 +33,17 @@ import * as S from './ProjectSelection.styled';
 
 const ProjectSelection = () => {
   const dispatch = useAppDispatch();
-  const activeProject = useSelector(activeProjectSelector);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const activeProject = useAppSelector(activeProjectSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
+
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
-  const deleteModalVisible = useRef({visible: false});
   const [searchText, setSearchText] = useState('');
+
+  const deleteModalVisible = useRef({visible: false});
   const dropdownButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
@@ -78,7 +79,9 @@ const ProjectSelection = () => {
 
   const handleProjectChange = (project: Project) => {
     setIsDropdownMenuVisible(false);
-    setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
+    if (activeProject?.rootFolder !== project.rootFolder) {
+      setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
+    }
   };
 
   const handleCreateProject = (fromTemplate: boolean) => {
@@ -96,6 +99,10 @@ const ProjectSelection = () => {
       zIndex: 9999,
       onOk() {
         return new Promise(resolve => {
+          if (activeProject?.rootFolder === project.rootFolder) {
+            setIsDropdownMenuVisible(false);
+          }
+
           dispatch(setDeleteProject(project));
           resolve({});
           deleteModalVisible.current.visible = false;
