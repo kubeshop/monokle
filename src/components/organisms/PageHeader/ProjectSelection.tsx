@@ -79,7 +79,9 @@ const ProjectSelection = () => {
 
   const handleProjectChange = (project: Project) => {
     setIsDropdownMenuVisible(false);
-    setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
+    if (activeProject?.rootFolder !== project.rootFolder) {
+      setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
+    }
   };
 
   const handleCreateProject = (fromTemplate: boolean) => {
@@ -97,7 +99,10 @@ const ProjectSelection = () => {
       zIndex: 9999,
       onOk() {
         return new Promise(resolve => {
-          setIsDropdownMenuVisible(false);
+          if (activeProject?.rootFolder === project.rootFolder) {
+            setIsDropdownMenuVisible(false);
+          }
+
           dispatch(setDeleteProject(project));
           resolve({});
           deleteModalVisible.current.visible = false;
