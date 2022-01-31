@@ -188,7 +188,7 @@ const PaneManager = () => {
 
   return (
     <S.Row style={{height: contentHeight}}>
-      <S.ColumnLeftMenu>
+      <S.ColumnLeftMenu id="LeftToolbar">
         <Space direction="vertical" style={{width: 43}}>
           <Tooltip
             mouseEnterDelay={TOOLTIP_DELAY}

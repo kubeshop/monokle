@@ -480,9 +480,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
               >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
-                ) : (
+                ) : activeTabKey === 'metadataForm' ? (
                   <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
-                )}
+                ) : null}
               </TabPane>
             )}
           </S.Tabs>

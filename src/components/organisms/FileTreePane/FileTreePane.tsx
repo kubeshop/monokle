@@ -620,6 +620,7 @@ const FileTreePane = () => {
   const onSelectRootFolderFromMainThread = useCallback(
     (_: any, data: string) => {
       if (data) {
+        console.log('setting root folder from main thread', data);
         setFolder(data);
       }
     },
@@ -728,7 +729,7 @@ const FileTreePane = () => {
   };
 
   return (
-    <S.FileTreeContainer>
+    <S.FileTreeContainer id="FileExplorer">
       <Row>
         <MonoPaneTitleCol>
           <MonoPaneTitle>

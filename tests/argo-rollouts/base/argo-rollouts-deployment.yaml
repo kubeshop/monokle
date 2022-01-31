@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-rollouts
+  labels:
+    app.kubernetes.io/component: rollouts-controlleras
+    app.kubernetes.io/name: argo-rollouts
+    app.kubernetes.io/part-of: argo-rollouts
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argo-rollouts
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argo-rollouts
+    spec:
+      serviceAccountName: argo-rollouts
+      containers:
+        - name: argo-rollouts
+          image: quay.io/argoproj/argo-rollouts:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+              name: metrics
+      securityContext:
+        runAsNonRoot: true
+  strategy:
+    type: Recreate

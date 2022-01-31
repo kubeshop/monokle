@@ -14,7 +14,6 @@ import {isResourcePassingFilter} from '@utils/resources';
 const ChangeFiltersConfirmModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
-
   const filtersToBeChanged = useAppSelector(state => state.main.filtersToBeChanged);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);

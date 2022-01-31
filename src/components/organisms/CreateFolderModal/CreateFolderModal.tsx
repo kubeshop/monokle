@@ -17,9 +17,8 @@ import {useFocus} from '@utils/hooks';
 const prohibitedFirstSymbols = ['/', '\\'];
 
 const CreateFolderModal: React.FC = () => {
-  const uiState = useAppSelector(state => state.ui.createFolderModal);
-
   const dispatch = useAppDispatch();
+  const uiState = useAppSelector(state => state.ui.createFolderModal);
 
   const [createFolderForm] = useForm();
 
@@ -72,7 +71,7 @@ const CreateFolderModal: React.FC = () => {
   return (
     <Modal
       title="Create folder"
-      visible={uiState?.isOpen}
+      visible={uiState.isOpen}
       onCancel={() => {
         dispatch(closeCreateFolderModal());
       }}
