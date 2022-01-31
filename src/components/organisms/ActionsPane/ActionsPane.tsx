@@ -444,12 +444,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
             >
               {uiState.isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
-              ) : (
+              ) : activeTabKey === 'source' ? (
                 !isClusterDiffVisible &&
                 (selectedResourceId || selectedPath || selectedValuesFileId) && (
                   <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
                 )
-              )}
+              ) : null}
             </TabPane>
             {selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema) && (
               <TabPane
@@ -460,16 +460,18 @@ const ActionsPane = (props: {contentHeight: string}) => {
               >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
-                ) : isKustomization ? (
-                  <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
-                ) : (
-                  resourceKindHandler?.formEditorOptions && (
-                    <FormEditor
-                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                    />
+                ) : activeTabKey === 'form' ? (
+                  isKustomization ? (
+                    <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
+                  ) : (
+                    resourceKindHandler?.formEditorOptions && (
+                      <FormEditor
+                        formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                        formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                      />
+                    )
                   )
-                )}
+                ) : null}
               </TabPane>
             )}
             {selectedResource && resourceKindHandler && !isKustomizationResource(selectedResource) && (
