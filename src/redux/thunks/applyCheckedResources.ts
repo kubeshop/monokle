@@ -8,7 +8,7 @@ import applyMultipleResources from '@redux/services/applyMultipleResources';
 
 export const applyCheckedResources = createAsyncThunk<
   void,
-  string | undefined,
+  {name: string; new: boolean} | undefined,
   {dispatch: AppDispatch; state: RootState}
 >('main/applyCheckedResources', async (namespace, thunkAPI) => {
   const state = thunkAPI.getState();

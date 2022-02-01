@@ -194,7 +194,7 @@ const CreateProjectModal: React.FC = () => {
         onFinish={onFinish}
         initialValues={() => formValues}
         style={{display: formStep === FormSteps.STEP_ONE ? 'block' : 'none'}}
-        onFieldsChange={(field, allFields) => {
+        onFieldsChange={field => {
           const name = field.filter(item => _.includes(item.name.toString(), 'name'));
           if (name && name.length > 0) {
             setFormValues({...formValues, name: name[0].value});

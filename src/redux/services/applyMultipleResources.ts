@@ -9,6 +9,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
+import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {doesTextStartWithYamlDocumentDelimiter} from './resource';
 
@@ -16,7 +17,7 @@ const applyMultipleResources = (
   config: AppConfig,
   resourcesToApply: K8sResource[],
   dispatch: AppDispatch,
-  namespace?: string,
+  namespace?: {name: string; new: boolean},
   onSuccessCallback?: () => void
 ) => {
   const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
@@ -45,9 +46,17 @@ const applyMultipleResources = (
 
     child.stdout.on('data', data => {
       alertMessage += `\n${data.toString()}`;
-    });
 
-    child.stdout.on('end', () => {
+      if (namespace && namespace.new) {
+        const namespaceAlert: AlertType = {
+          type: AlertEnum.Success,
+          title: `Created ${namespace.name} namespace to cluster ${currentContext} successfully`,
+          message: '',
+        };
+
+        dispatch(setAlert(namespaceAlert));
+      }
+
       const alert: AlertType = {
         type: AlertEnum.Success,
         title: `Applied selected resources to cluster ${currentContext} successfully`,
@@ -58,15 +67,20 @@ const applyMultipleResources = (
         onSuccessCallback();
       }
 
-      dispatch(setAlert(alert));
+      setTimeout(() => dispatch(setAlert(alert)), 400);
     });
 
-    child.stderr.on('data', data => {
+    child.stderr.on('data', async data => {
       const alert: AlertType = {
         type: AlertEnum.Error,
         title: `Applying selected resources to cluster ${currentContext} failed`,
         message: data.toString(),
       };
+
+      if (namespace && namespace.new) {
+        await removeNamespaceFromCluster(namespace.name, kubeConfigPath, currentContext);
+      }
+
       dispatch(setAlert(alert));
     });
   } catch (e) {

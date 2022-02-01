@@ -9,7 +9,7 @@ import applyMultipleResources from '@redux/services/applyMultipleResources';
 
 export const applySelectedResourceMatches = createAsyncThunk<
   void,
-  string | undefined,
+  {name: string; new: boolean} | undefined,
   {
     dispatch: AppDispatch;
     state: RootState;
