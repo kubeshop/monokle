@@ -11,6 +11,10 @@ import {useAppSelector} from '@redux/hooks';
 import Colors from '@styles/Colors';
 
 const StyledButton = styled(Button)<{$hasGradientBackground: boolean}>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   ${props => {
     if (props.$hasGradientBackground) {
       return `& .anticon {
