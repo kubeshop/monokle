@@ -1,6 +1,6 @@
 import {Suspense} from 'react';
 
-import Drawer from '@components/atoms/Drawer';
+import * as S from './styled';
 
 interface IProps {
   noPadding?: boolean;
@@ -13,7 +13,7 @@ const LazyDrawer: React.FC<IProps> = props => {
   const {children, noPadding, title, visible, onClose} = props;
 
   return (
-    <Drawer
+    <S.StyledDrawer
       bodyStyle={noPadding ? {padding: 0} : {}}
       closable={false}
       noborder="true"
@@ -24,7 +24,7 @@ const LazyDrawer: React.FC<IProps> = props => {
       onClose={onClose}
     >
       {visible ? <Suspense fallback={null}>{children}</Suspense> : null}
-    </Drawer>
+    </S.StyledDrawer>
   );
 };
 
