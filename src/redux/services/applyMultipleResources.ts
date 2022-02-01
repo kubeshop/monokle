@@ -32,7 +32,7 @@ const applyMultipleResources = (
   const yamlToApply = resourcesToApply
     .map(r => {
       const resourceContent = _.cloneDeep(r.content);
-      if (r.namespace && namespace && r.namespace !== namespace) {
+      if (namespace && namespace.name !== resourceContent.metadata?.namespace) {
         delete resourceContent.metadata.namespace;
       }
 

@@ -39,7 +39,7 @@ function applyK8sResource(
   namespace?: {name: string; new: boolean}
 ) {
   const resourceContent = _.cloneDeep(resource.content);
-  if (resource.namespace && namespace && namespace.name !== resource.namespace) {
+  if (namespace && namespace.name !== resourceContent.metadata?.namespace) {
     delete resourceContent.metadata.namespace;
   }
 
