@@ -62,7 +62,9 @@ const RoleBindingHandler: ResourceKindHandler = {
             }
 
             return value === 'default' || !value
-              ? !targetResource.namespace || targetResource.namespace === 'default'
+              ? !targetResource.namespace ||
+                  targetResource.namespace === 'default' ||
+                  sourceResource.namespace === targetResource.namespace
               : targetResource.namespace === value;
           },
         },

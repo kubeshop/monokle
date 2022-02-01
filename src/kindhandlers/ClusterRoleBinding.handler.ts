@@ -61,7 +61,12 @@ const ClusterRoleBindingHandler: ResourceKindHandler = {
               return !value;
             }
 
-            return value === 'default' || !value
+            // must be ServiceAccount and have a namespace
+            if (siblingValues['kind'] !== 'ServiceAccount' || !value) {
+              return false;
+            }
+
+            return value === 'default'
               ? !targetResource.namespace || targetResource.namespace === 'default'
               : targetResource.namespace === value;
           },
