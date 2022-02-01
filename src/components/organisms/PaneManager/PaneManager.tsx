@@ -44,7 +44,8 @@ import RecentProjectsPane from '../RecentProjectsPane';
 import StartProjectPane from '../StartProjectPane';
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
-import * as S from './Styled';
+
+import * as S from './styled';
 
 const iconMenuWidth = 45;
 
