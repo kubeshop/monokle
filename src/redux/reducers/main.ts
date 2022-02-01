@@ -810,12 +810,6 @@ export const mainSlice = createSlice({
 
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
-          const resourcesFromFile = Object.values(state.resourceMap).filter(
-            r => r.filePath === resourceFileEntry.filePath
-          );
-          resourcesFromFile.forEach(r => {
-            delete state.resourceMap[r.id];
-          });
         } else {
           const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
           newFileEntry.timestamp = resourcePayload.fileTimestamp;
