@@ -34,7 +34,7 @@ import {getShellPath} from '@utils/shell';
 
 function applyK8sResource(resource: K8sResource, kubeconfig: string, context: string, namespace?: string) {
   const resourceContent = _.cloneDeep(resource.content);
-  if (resourceContent.metadata.namespace) {
+  if (resource.namespace && resource.namespace !== resourceContent.metadata.namespace) {
     delete resourceContent.metadata.namespace;
   }
 
