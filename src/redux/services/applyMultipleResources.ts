@@ -1,4 +1,6 @@
+import _ from 'lodash';
 import log from 'loglevel';
+import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
@@ -28,7 +30,14 @@ const applyMultipleResources = (
   }
 
   const yamlToApply = resourcesToApply
-    .map(r => r.text)
+    .map(r => {
+      const resourceContent = _.cloneDeep(r.content);
+      if (r.namespace && namespace && r.namespace !== namespace) {
+        delete resourceContent.metadata.namespace;
+      }
+
+      return stringify(resourceContent);
+    })
     .reduce<string>((fullYaml, currentText) => {
       if (doesTextStartWithYamlDocumentDelimiter(currentText)) {
         return `${fullYaml}\n${currentText}`;

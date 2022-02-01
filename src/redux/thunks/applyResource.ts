@@ -1,4 +1,5 @@
 import {spawn} from 'child_process';
+import _ from 'lodash';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
@@ -37,7 +38,12 @@ function applyK8sResource(
   context: string,
   namespace?: {name: string; new: boolean}
 ) {
-  return applyYamlToCluster(resource.text, kubeconfig, context, namespace);
+  const resourceContent = _.cloneDeep(resource.content);
+  if (resource.namespace && namespace && namespace.name !== resource.namespace) {
+    delete resourceContent.metadata.namespace;
+  }
+
+  return applyYamlToCluster(stringify(resourceContent), kubeconfig, context, namespace);
 }
 
 /**
