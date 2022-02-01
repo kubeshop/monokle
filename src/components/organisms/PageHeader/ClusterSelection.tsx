@@ -125,7 +125,11 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
     }
 
-    return <S.ClusterActionText className={className}>{content}</S.ClusterActionText>;
+    return (
+      <S.ClusterActionText className={className} $highlighted={highlightedItems.connectToCluster}>
+        {content}
+      </S.ClusterActionText>
+    );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
   const clusterMenu = (

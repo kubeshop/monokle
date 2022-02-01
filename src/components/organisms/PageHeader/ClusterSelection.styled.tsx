@@ -29,7 +29,7 @@ export const ClusterActionButton = styled(RawButton)`
 
 export const ClusterActionText = styled.span<{$highlighted?: boolean}>`
   ${({$highlighted}) => `
-    font-size: ${$highlighted ? '8px' : '12px'};
+    font-size: ${$highlighted ? '9px' : '12px'};
     line-height: ${$highlighted ? '32px' : '20px'};
     color: ${$highlighted ? Colors.whitePure : Colors.blue6};
 `}
