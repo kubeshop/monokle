@@ -24,6 +24,11 @@ const MenuIcon = (props: {
   const style = {
     fontSize: 25,
     color,
+    width: '30px',
+    height: '30px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     ...customStyle,
   };
 
