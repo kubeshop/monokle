@@ -15,7 +15,6 @@ export const KUSTOMIZATION_API_GROUP = 'kustomize.config.k8s.io';
 export const KUSTOMIZE_HELP_URL = 'https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/';
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
-export const ACTIONS_PANE_FOOTER_HEIGHT = 200;
 export const ACTIONS_PANE_TAB_PANE_OFFSET = 106;
 export const TEMPLATES_HEIGHT_OFFSET = 190;
 export const DEFAULT_PLUGINS = [

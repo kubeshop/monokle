@@ -1,13 +1,13 @@
 import {ipcRenderer} from 'electron';
 
 import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Button, Row, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import {
-  ACTIONS_PANE_FOOTER_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   KUSTOMIZE_HELP_URL,
   NAVIGATOR_HEIGHT_OFFSET,
@@ -113,6 +113,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
   const extraButton = useRef<any>();
 
+  const [actionsPaneFooterRef, {height: actionsPaneFooterHeight}] = useMeasure<HTMLDivElement>();
+
   const getDistanceBetweenTwoComponents = useCallback(() => {
     const tabsListEl = tabsList[0].getBoundingClientRect();
     const extraButtonEl = extraButton.current.getBoundingClientRect();
@@ -133,15 +135,10 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [isButtonShrinked, tabsList]);
 
   const editorTabPaneHeight = useMemo(() => {
-    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
-    if (!featureFlags.ActionsPaneFooter) {
-      defaultHeight += 20;
-    }
-    if (isActionsPaneFooterExpanded) {
-      return defaultHeight - ACTIONS_PANE_FOOTER_HEIGHT;
-    }
+    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET - actionsPaneFooterHeight;
+
     return defaultHeight;
-  }, [contentHeight, isActionsPaneFooterExpanded]);
+  }, [actionsPaneFooterHeight, contentHeight]);
 
   const onSaveHandler = () => {
     if (selectedResource) {
@@ -490,7 +487,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
             )}
           </S.Tabs>
         </S.TabsContainer>
-        {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}
+
+        {featureFlags.ActionsPaneFooter && <ActionsPaneFooter ref={actionsPaneFooterRef} />}
       </S.ActionsPaneContainer>
 
       {isApplyModalVisible && (
