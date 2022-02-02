@@ -93,7 +93,7 @@
     "ajv": "6.12.6",
     "antd": "4.17.3",
     "asar": "^3.1.0",
-    "async": "3.2.2",
+    "async": "3.2.3",
     "chokidar": "3.5.2",
     "dagre": "0.8.5",
     "electron-devtools-installer": "3.2.0",
