@@ -98,13 +98,13 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
 
   const handleOnMouseEnter = () => setTitleHoverState(true);
   const handleOnMouseLeave = () => setTitleHoverState(false);
-  const handlePrevie = (e: any) => {
+  const handlePreview = (e: any) => {
     e.stopPropagation();
     canPreview(relativePath) && onPreview(relativePath);
   };
   const menu = (
     <Menu>
-      {canPreview(relativePath) ? (
+      {canPreview(relativePath) && (
         <>
           <Menu.Item
             onClick={e => {
@@ -117,7 +117,7 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
           </Menu.Item>
           <S.ContextMenuDivider />
         </>
-      ) : null}
+      )}
       {isFolder ? (
         <>
           <Menu.Item
@@ -255,8 +255,8 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
       ) : null}
       {isTitleHovered && !processingEntity.processingType ? (
         <>
-          {canPreview(relativePath) && !isInPreviewMode && (
-            <S.PreviewSpan isItemSelected={isTitleHovered || isFileSelected} onClick={handlePrevie}>
+          {canPreview(relativePath) && (
+            <S.PreviewSpan isItemSelected={isFileSelected} onClick={handlePreview}>
               Preview
             </S.PreviewSpan>
           )}
