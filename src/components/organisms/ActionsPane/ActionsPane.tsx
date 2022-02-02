@@ -240,7 +240,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResource, knownResourceKinds]);
 
   const onClickApplyResource = useCallback(
-    (namespace?: string) => {
+    (namespace?: {name: string; new: boolean}) => {
       if (!selectedResource) {
         setIsApplyModalVisible(false);
         return;
