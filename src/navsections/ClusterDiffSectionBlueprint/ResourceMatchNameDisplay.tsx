@@ -137,7 +137,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     setIsApplyModalVisible(true);
   };
 
-  const onClickApplyResource = (namespace?: string) => {
+  const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
     if (!firstLocalResource) {
       setIsApplyModalVisible(false);
       return;
@@ -255,7 +255,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
           isVisible={isApplyModalVisible}
           resources={firstLocalResource ? [firstLocalResource] : []}
           title={confirmModalTitle}
-          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onOk={namespace => onClickApplyResource(namespace)}
           onCancel={() => setIsApplyModalVisible(false)}
         />
       )}

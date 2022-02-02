@@ -90,3 +90,14 @@ export async function getResourceFromCluster(resource: K8sResource, kubeconfigPa
     return resourceFromCluster;
   }
 }
+
+export async function removeNamespaceFromCluster(namespace: string, kubeconfigPath: string, context?: string) {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromFile(kubeconfigPath);
+  if (context && context.length > 0) {
+    kc.setCurrentContext(context);
+  }
+
+  const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+  await k8sCoreV1Api.deleteNamespace(namespace);
+}

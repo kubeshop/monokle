@@ -280,7 +280,7 @@ function ClusterDiffModal() {
     setIsApplyModalVisible(true);
   };
 
-  const onClickApplySelectedResourceMatches = (namespace?: string) => {
+  const onClickApplySelectedResourceMatches = (namespace?: {name: string; new: boolean}) => {
     dispatch(applySelectedResourceMatches(namespace));
     setIsApplyModalVisible(false);
   };
@@ -339,7 +339,7 @@ function ClusterDiffModal() {
               isVisible={isApplyModalVisible}
               resources={selectedResources}
               title={confirmModalTitle}
-              onOk={selectedNamespace => onClickApplySelectedResourceMatches(selectedNamespace)}
+              onOk={namespace => onClickApplySelectedResourceMatches(namespace)}
               onCancel={() => setIsApplyModalVisible(false)}
             />
           )}

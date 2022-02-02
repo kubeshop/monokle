@@ -8,11 +8,9 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {AlertEnum, AlertType} from '@models/alert';
 import {K8sResource} from '@models/k8sresource';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAlert} from '@redux/reducers/alert';
+import {useAppSelector} from '@redux/hooks';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
@@ -52,14 +50,13 @@ interface IProps {
   isVisible: boolean;
   resources?: K8sResource[];
   title: string;
-  onOk: (selectedNamespace?: string) => void;
+  onOk: (namespace?: {name: string; new: boolean}) => void;
   onCancel: () => void;
 }
 
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resources = [], title, onCancel, onOk} = props;
 
-  const dispatch = useAppDispatch();
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
 
@@ -86,14 +83,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       k8sCoreV1Api
         .createNamespace({metadata: {name: createNamespaceName}})
         .then(() => {
-          const alert: AlertType = {
-            type: AlertEnum.Success,
-            title: `Created ${createNamespaceName} namespace to cluster ${kubeConfigContext} successfully`,
-            message: '',
-          };
-
-          dispatch(setAlert(alert));
-          onOk(createNamespaceName);
+          onOk({name: createNamespaceName, new: true});
         })
         .catch(err => {
           if (err.statusCode === 409) {
@@ -103,11 +93,11 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           }
         });
     } else if (selectedOption === 'existing') {
-      onOk(selectedNamespace);
+      onOk({name: selectedNamespace, new: false});
     } else if (selectedOption === 'none') {
       onOk();
     }
-  }, [kubeConfigContext, createNamespaceName, dispatch, kubeConfigPath, selectedNamespace, selectedOption, onOk]);
+  }, [kubeConfigContext, createNamespaceName, kubeConfigPath, selectedNamespace, selectedOption, onOk]);
 
   useEffect(() => {
     if (defaultOption && defaultOption === 'none') {
