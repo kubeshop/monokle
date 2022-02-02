@@ -25,7 +25,7 @@ export const runKustomize = (options: KustomizeCommandOptions, event: Electron.I
       cmd += '--enable-helm ';
     }
 
-    let stdout = execSync(`${cmd} ${options.folder}`, {
+    let stdout = execSync(`${cmd} "${options.folder}"`, {
       env: {
         NODE_ENV: PROCESS_ENV.NODE_ENV,
         PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
