@@ -542,7 +542,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 <span className={isActionsPaneFooterExpanded ? 'custom-handle' : ''} ref={ref} />
               )}
             >
-              <ActionsPaneFooter />
+              <ActionsPaneFooter
+                tabs={{
+                  terminal: {title: 'Terminal', content: <>Terminal content</>},
+                  documentation: {title: 'Documentation', content: <>Documentation content</>},
+                }}
+              />
             </ResizableBox>
           </S.ActionsPaneFooterContainer>
         )}
