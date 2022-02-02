@@ -28,7 +28,7 @@ export const TitleBarTabs = styled.div`
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -2px;
+    bottom: -4px;
     border: 1px solid ${Colors.grey9};
   }
 `;
@@ -36,6 +36,8 @@ export const TitleBarTabs = styled.div`
 export const TitleLabel = styled.span`
   color: ${Colors.grey9};
   cursor: pointer;
+  text-transform: uppercase;
+  font-size: 12px;
   position: relative;
 
   &:hover::after {
@@ -43,7 +45,7 @@ export const TitleLabel = styled.span`
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -2px;
+    bottom: -4px;
     border: 1px solid ${Colors.grey9};
   }
 `;
