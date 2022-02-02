@@ -16,7 +16,8 @@ export const KUSTOMIZE_HELP_URL = 'https://kubectl.docs.kubernetes.io/references
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const ACTIONS_PANE_TAB_PANE_OFFSET = 95;
-export const ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT = 150;
+export const ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT = 43;
+export const ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT = 150;
 export const TEMPLATES_HEIGHT_OFFSET = 190;
 export const DEFAULT_PLUGINS = [
   {

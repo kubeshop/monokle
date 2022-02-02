@@ -9,7 +9,8 @@ import {Button, Row, Tabs, Tooltip} from 'antd';
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import {
-  ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT,
+  ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
+  ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   KUSTOMIZE_HELP_URL,
   NAVIGATOR_HEIGHT_OFFSET,
@@ -139,15 +140,18 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const resizableBoxHeight = useMemo(() => {
     if (isActionsPaneFooterExpanded) {
-      if (actionsPaneFooterHeight === 43) {
-        return ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT;
-      }
-      if (actionsPaneFooterHeight >= ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT) {
+      if (actionsPaneFooterHeight >= ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT) {
         return actionsPaneFooterHeight;
       }
+
+      return ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT;
     }
 
-    return 43;
+    if (featureFlags.ActionsPaneFooter) {
+      return ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT;
+    }
+
+    return -5;
   }, [actionsPaneFooterHeight, isActionsPaneFooterExpanded]);
 
   const editorTabPaneHeight = useMemo(() => {
@@ -513,7 +517,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
               resizeHandles={['n']}
               minConstraints={[
                 actionsPaneFooterWidth,
-                isActionsPaneFooterExpanded ? ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT : 43,
+                isActionsPaneFooterExpanded
+                  ? ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT
+                  : ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
               ]}
               maxConstraints={[actionsPaneFooterWidth, navigatorHeight - 200]}
               handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
