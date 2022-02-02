@@ -269,6 +269,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     ) {
       dispatch(
         setPaneConfiguration({
+          ...paneConfiguration,
           leftWidth,
           navWidth,
           editWidth,
