@@ -1,6 +1,7 @@
 import {ipcRenderer} from 'electron';
 
-import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {LegacyRef, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
 import {Button, Row, Tabs, Tooltip} from 'antd';
@@ -8,6 +9,7 @@ import {Button, Row, Tabs, Tooltip} from 'antd';
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import {
+  ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   KUSTOMIZE_HELP_URL,
   NAVIGATOR_HEIGHT_OFFSET,
@@ -88,8 +90,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const previewType = useAppSelector(state => state.main.previewType);
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
-  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
+  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -113,7 +115,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
   const extraButton = useRef<any>();
 
-  const [actionsPaneFooterRef, {height: actionsPaneFooterHeight}] = useMeasure<HTMLDivElement>();
+  const [actionsPaneFooterRef, {height: actionsPaneFooterHeight, width: actionsPaneFooterWidth}] =
+    useMeasure<HTMLDivElement>();
 
   const getDistanceBetweenTwoComponents = useCallback(() => {
     const tabsListEl = tabsList[0].getBoundingClientRect();
@@ -134,11 +137,24 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   }, [isButtonShrinked, tabsList]);
 
+  const resizableBoxHeight = useMemo(() => {
+    if (isActionsPaneFooterExpanded) {
+      if (actionsPaneFooterHeight === 43) {
+        return ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT;
+      }
+      if (actionsPaneFooterHeight >= ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT) {
+        return actionsPaneFooterHeight;
+      }
+    }
+
+    return 43;
+  }, [actionsPaneFooterHeight, isActionsPaneFooterExpanded]);
+
   const editorTabPaneHeight = useMemo(() => {
-    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET - actionsPaneFooterHeight;
+    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET - resizableBoxHeight;
 
     return defaultHeight;
-  }, [actionsPaneFooterHeight, contentHeight]);
+  }, [contentHeight, resizableBoxHeight]);
 
   const onSaveHandler = () => {
     if (selectedResource) {
@@ -488,7 +504,26 @@ const ActionsPane = (props: {contentHeight: string}) => {
           </S.Tabs>
         </S.TabsContainer>
 
-        {featureFlags.ActionsPaneFooter && <ActionsPaneFooter ref={actionsPaneFooterRef} />}
+        {featureFlags.ActionsPaneFooter && (
+          <S.ActionsPaneFooterContainer ref={actionsPaneFooterRef}>
+            <ResizableBox
+              height={resizableBoxHeight}
+              width={actionsPaneFooterWidth}
+              axis="y"
+              resizeHandles={['n']}
+              minConstraints={[
+                actionsPaneFooterWidth,
+                isActionsPaneFooterExpanded ? ACTIONS_PANE_FOOTER_CONTENT_DEFAULT_HEIGHT : 43,
+              ]}
+              maxConstraints={[actionsPaneFooterWidth, navigatorHeight - 200]}
+              handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+                <span className={isActionsPaneFooterExpanded ? 'custom-handle' : ''} ref={ref} />
+              )}
+            >
+              <ActionsPaneFooter />
+            </ResizableBox>
+          </S.ActionsPaneFooterContainer>
+        )}
       </S.ActionsPaneContainer>
 
       {isApplyModalVisible && (

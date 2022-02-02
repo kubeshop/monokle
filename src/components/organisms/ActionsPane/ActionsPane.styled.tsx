@@ -2,6 +2,8 @@ import {Button, Skeleton as RawSkeleton, Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
+
 import {BackgroundColors} from '@styles/Colors';
 
 export const Tabs = styled(RawTabs)`
@@ -27,6 +29,26 @@ export const ActionsPaneContainer = styled.div<{$height: number}>`
   flex-direction: column;
   align-content: start;
   align-items: start;
+`;
+
+export const ActionsPaneFooterContainer = styled.div`
+  position: relative;
+  width: 100%;
+
+  & .react-resizable {
+    overflow-y: auto;
+
+    ${GlobalScrollbarStyle}
+  }
+
+  & .custom-handle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0px;
+    height: 3px;
+    cursor: row-resize;
+  }
 `;
 
 export const TabsContainer = styled.div`
