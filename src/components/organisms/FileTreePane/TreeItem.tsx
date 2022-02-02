@@ -96,6 +96,12 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
     [fileMap, resourceMap, helmValuesMap]
   );
 
+  const handleOnMouseEnter = () => setTitleHoverState(true);
+  const handleOnMouseLeave = () => setTitleHoverState(false);
+  const handlePrevie = (e: any) => {
+    e.stopPropagation();
+    canPreview(relativePath) && onPreview(relativePath);
+  };
   const menu = (
     <Menu>
       {canPreview(relativePath) ? (
@@ -239,30 +245,31 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
   );
 
   return (
-    <S.TreeTitleWrapper
-      onMouseEnter={() => {
-        setTitleHoverState(true);
-      }}
-      onMouseLeave={() => {
-        setTitleHoverState(false);
-      }}
-    >
+    <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
       <S.TreeTitleText>{title}</S.TreeTitleText>
+
       {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' ? (
         <S.SpinnerWrapper>
           <Spinner />
         </S.SpinnerWrapper>
       ) : null}
       {isTitleHovered && !processingEntity.processingType ? (
-        <ContextMenu overlay={menu}>
-          <div
-            onClick={e => {
-              e.stopPropagation();
-            }}
-          >
-            <Dots color={isFileSelected ? Colors.blackPure : undefined} />
-          </div>
-        </ContextMenu>
+        <>
+          {canPreview(relativePath) && !isInPreviewMode && (
+            <S.PreviewSpan isItemSelected={isTitleHovered || isFileSelected} onClick={handlePrevie}>
+              Preview
+            </S.PreviewSpan>
+          )}
+          <ContextMenu overlay={menu}>
+            <div
+              onClick={e => {
+                e.stopPropagation();
+              }}
+            >
+              <Dots color={isFileSelected ? Colors.blackPure : undefined} />
+            </div>
+          </ContextMenu>
+        </>
       ) : null}
     </S.TreeTitleWrapper>
   );

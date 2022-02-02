@@ -230,3 +230,12 @@ export const NodeTitleContainer = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
 `;
+
+export const PreviewSpan = styled.span<{isItemSelected: boolean}>`
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+  color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)};
+  margin-left: 5px;
+  margin-right: 15px;
+`;
