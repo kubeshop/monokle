@@ -34,7 +34,7 @@ export function isHelmChartFolder(files: string[]) {
  * @param resource
  * @returns @boolean
  */
-function isSupportedHelmResource(resource: K8sResource): boolean {
+export function isSupportedHelmResource(resource: K8sResource): boolean {
   const helmVariableRegex = /{{.*}}/g;
 
   return Boolean(resource.text.match(helmVariableRegex)?.length) === false;
