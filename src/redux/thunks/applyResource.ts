@@ -58,11 +58,11 @@ function applyKustomization(
   const args =
     kustomizeCommand === 'kubectl'
       ? namespace
-        ? `kubectl --context ${context} --namespace ${namespace} apply -k ${folder}`
-        : `kubectl --context ${context} apply -k ${folder}`
+        ? `kubectl --context ${context} --namespace ${namespace} apply -k "${folder}"`
+        : `kubectl --context ${context} apply -k "${folder}"`
       : namespace
-      ? `kustomize build ${folder} | kubectl --context ${context} --namespace ${namespace} apply -k -`
-      : `kustomize build ${folder} | kubectl --context ${context} apply -k -`;
+      ? `kustomize build "${folder}" | kubectl --context ${context} --namespace ${namespace} apply -k -`
+      : `kustomize build "${folder}" | kubectl --context ${context} apply -k -`;
 
   const child =
     kustomizeCommand === 'kubectl'
