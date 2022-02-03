@@ -129,7 +129,7 @@ const PageHeader = () => {
 
       <S.Header noborder="true">
         <S.Row noborder="true">
-          <S.Logo onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
+          <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
 
           <S.ProjectClusterSelectionContainer>
             <ProjectSelection />

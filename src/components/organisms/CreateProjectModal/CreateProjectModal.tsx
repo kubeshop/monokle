@@ -183,7 +183,7 @@ const CreateProjectModal: React.FC = () => {
             Back
           </Button>
         ),
-        <Button key="submit" type="primary" disabled={!isSubmitEnabled} onClick={() => createProjectForm.submit()}>
+        <Button id="empty-project-save" key="submit" type="primary" disabled={!isSubmitEnabled} onClick={() => createProjectForm.submit()}>
           {uiState.fromTemplate && formStep === FormSteps.STEP_ONE ? 'Next: Select a Template' : 'Create Project'}
         </Button>,
       ]}

@@ -86,6 +86,9 @@ export const configSlice = createSlice({
     setLoadingProject: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.isProjectLoading = action.payload;
     },
+    setAutomation: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.automation = action.payload;
+    },
     setAutoZoom: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.settings.autoZoomGraphOnSelection = action.payload;
     },
@@ -299,6 +302,7 @@ export const configSlice = createSlice({
 });
 
 export const {
+  setAutomation,
   setFilterObjects,
   setAutoZoom,
   setCurrentContext,

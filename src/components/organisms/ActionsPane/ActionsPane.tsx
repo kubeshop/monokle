@@ -397,7 +397,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
                 {isSelectedResourceUnsaved() && (
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
-                    <S.SaveButton type="primary" size="small" onClick={onSaveHandler}>
+                    <S.SaveButton id="save-button" type="primary" size="small" onClick={onSaveHandler}>
                       Save
                     </S.SaveButton>
                   </Tooltip>
