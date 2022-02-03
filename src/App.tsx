@@ -226,11 +226,9 @@ const App = () => {
             <PluginManager />
           </LazyDrawer>
 
-          <div id="settings-drawer-container">
-            <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
-              <SettingsManager />
-            </LazyDrawer>
-          </div>
+          <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
+            <SettingsManager />
+          </LazyDrawer>
         </MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
