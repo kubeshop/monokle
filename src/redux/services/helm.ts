@@ -22,7 +22,7 @@ export function getHelmValuesFile(fileEntry: FileEntry, helmValuesMap: HelmValue
 }
 
 /**
- * Gets the file HelmValuesFile for a specific FileEntry
+ * Gets the HelmChart for a specific FileEntry
  */
 
 export function getHelmChartFromFileEntry(fileEntry: FileEntry, helmChartMap: HelmChartMapType) {
