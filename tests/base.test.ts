@@ -62,11 +62,11 @@ test('Validate settings drawer', async () => {
   expect(await settingsTitle.isVisible()).toBe(false);
 
   await appWindow.click("span[aria-label='setting']", {noWaitAfter: true, force: true});
-  await pause(4000);
+  await pause(20000);
   expect(await settingsTitle.isVisible()).toBe(true);
 
   await clickOnMonokleLogo(appWindow);
-  await pause(4000);
+  await pause(20000);
   expect(await settingsTitle.isVisible()).toBe(false);
 });
 
