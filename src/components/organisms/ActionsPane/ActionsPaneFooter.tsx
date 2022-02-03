@@ -1,68 +1,55 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 
-import {Divider} from 'antd';
-
-import {ArrowDownOutlined, ArrowUpOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
-
-import {ACTIONS_PANE_FOOTER_HEIGHT} from '@constants/constants';
+import {DownCircleOutlined, UpCircleOutlined} from '@ant-design/icons';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleExpandActionsPaneFooter} from '@redux/reducers/ui';
 
-import Colors from '@styles/Colors';
+import * as S from './ActionsPaneFooter.styled';
 
-const TitleBar = styled.div`
-  height: 25px;
-  width: 100%;
-  background-color: ${Colors.grey900};
-  display: flex;
-  align-items: center;
-`;
+interface IProps {
+  tabs: {[tabKey: string]: {title: string; content: React.ReactNode}};
+}
 
-const TitleBarRightButtons = styled.div`
-  margin-left: auto;
-`;
+const ActionsPaneFooter: React.FC<IProps> = props => {
+  const {tabs} = props;
 
-const ArrowContainer = styled.span`
-  margin-right: 4px;
-  padding: 0 8px;
-  cursor: pointer;
-`;
-
-const Container = styled.div`
-  min-height: 0;
-  width: 100%;
-`;
-
-const Pane = styled.div`
-  height: ${ACTIONS_PANE_FOOTER_HEIGHT}px;
-  background-color: ${Colors.grey900};
-`;
-
-const ActionsPaneFooter = () => {
   const dispatch = useAppDispatch();
   const isExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
-  const toggleIsExpanded = useCallback(() => {
-    dispatch(toggleExpandActionsPaneFooter());
-  }, [dispatch]);
+
+  const toggleIsExpanded = useCallback(() => dispatch(toggleExpandActionsPaneFooter()), [dispatch]);
+
+  const [activeTab, setActiveTab] = useState<string>();
+
+  const onClickTabLabel = (key: string) => {
+    setActiveTab(key);
+
+    if (!isExpanded) {
+      toggleIsExpanded();
+    }
+  };
 
   return (
-    <Container>
-      <TitleBar>
-        <TitleBarRightButtons>
-          <ArrowContainer onClick={toggleIsExpanded}>
-            {isExpanded ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
-          </ArrowContainer>
-        </TitleBarRightButtons>
-      </TitleBar>
-      {isExpanded && (
-        <Pane>
-          <Divider style={{margin: 0}} />
-        </Pane>
-      )}
-    </Container>
+    <S.Container>
+      <S.TitleBar>
+        <S.TitleBarTabs>
+          {Object.entries(tabs).map(([key, value]) => (
+            <S.TitleLabel
+              className={activeTab === key && isExpanded ? 'selected-tab' : ''}
+              onClick={() => onClickTabLabel(key)}
+            >
+              {value.title}
+            </S.TitleLabel>
+          ))}
+        </S.TitleBarTabs>
+
+        <S.TitleIcon onClick={toggleIsExpanded}>
+          {isExpanded ? <DownCircleOutlined /> : <UpCircleOutlined />}
+        </S.TitleIcon>
+      </S.TitleBar>
+
+      {isExpanded && activeTab && <S.Pane>{tabs[activeTab].content}</S.Pane>}
+    </S.Container>
   );
 };
 
