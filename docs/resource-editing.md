@@ -16,7 +16,7 @@ Right-clicking in the editor shows a list of available commands. Pressing F1 ope
 When editing resources (not files), the editor is schema-aware for all native Kubernetes resources, which provides
 auto-complete (Ctrl-Space) and context-sensitive hover documentation.
 
-![Source Editor Auto Complete](img/source-editor-auto-complete.png)
+![Source Editor Auto Complete](img/source-editor-auto-complete-1.5.0.png)
 
 ![Source Editor Context Hover](img/source-editor-context-hover.png)
 
