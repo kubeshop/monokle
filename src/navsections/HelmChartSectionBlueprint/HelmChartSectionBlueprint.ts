@@ -73,6 +73,7 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, HelmChartScope
   },
   customization: {
     emptyDisplay: {component: HelmChartSectionEmptyDisplay},
+    emptyGroupText: 'No values files found for this Chart.',
     beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
   },
   itemBlueprint: {

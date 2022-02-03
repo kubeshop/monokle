@@ -274,7 +274,9 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
       visibleItemIds: g.itemIds.filter(itemId => itemInstanceMap[itemId].isVisible === true),
     }));
     const visibleItemIds = itemInstances?.filter(i => i.isVisible === true).map(i => i.id) || [];
-    const visibleGroupIds = sectionInstanceGroups.filter(g => g.visibleItemIds.length > 0).map(g => g.id);
+    const visibleGroupIds = sectionBlueprint.customization?.emptyGroupText
+      ? sectionInstanceGroups.map(g => g.id)
+      : sectionInstanceGroups.filter(g => g.visibleItemIds.length > 0).map(g => g.id);
     const sectionInstance: SectionInstance = {
       id: sectionBlueprint.id,
       rootSectionId: sectionBlueprint.rootSectionId,
