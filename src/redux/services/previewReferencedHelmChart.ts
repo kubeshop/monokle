@@ -37,7 +37,7 @@ export const previewReferencedHelmChart = async (
   await fsWriteFilePromise(newTempValuesFilePath, parsedValuesFileContent);
 
   const helmArgs = {
-    helmCommand: `helm install --kube-context ${kubeconfigContext} -f ${newTempValuesFilePath} --repo ${chartRepo} ${chartName} --version ${chartVersion} --generate-name --dry-run`,
+    helmCommand: `helm install --kube-context ${kubeconfigContext} -f "${newTempValuesFilePath}" --repo ${chartRepo} ${chartName} --version ${chartVersion} --generate-name --dry-run`,
     kubeconfig: kubeconfigPath,
   };
 

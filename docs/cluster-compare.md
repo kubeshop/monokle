@@ -17,6 +17,6 @@ To use Cluster Compare follow these steps:
 
 ![Cluster Compare](img/cluster-compare-button-1.5.0.png)
 
-Check out the below short video to see how it in action:
+Check out the below short video to see it in action:
 
 [![Monokle Cluster Compare](img/cluster-compare.png)](https://youtu.be/9ha3-aPgSt8)

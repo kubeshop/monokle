@@ -55,10 +55,11 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         onClose('PREVIEW');
       }
 
+      // remove first entry - which is the intro page
+      formDataList.shift();
+
       if (isVanillaTemplate(template)) {
         setIsLoading(true);
-        // remove first entry - which is the intro page
-        formDataList.shift();
         createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
           .then(({message, resources}) => {
             setResultMessage(message);

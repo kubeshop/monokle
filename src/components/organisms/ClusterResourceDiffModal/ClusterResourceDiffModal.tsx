@@ -132,7 +132,7 @@ const ClusterResourceDiffModal = () => {
     dispatch(closeResourceDiffModal());
   };
 
-  const onClickApplyResource = (namespace?: string) => {
+  const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
     if (selectedMatchingResourceId) {
       const resource = resourceMap[selectedMatchingResourceId];
       if (resource) {
@@ -327,7 +327,7 @@ const ClusterResourceDiffModal = () => {
           isVisible={isApplyModalVisible}
           resources={selectedMatchingResourceId ? [resourceMap[selectedMatchingResourceId]] : []}
           title={confirmModalTitle}
-          onOk={selectedNamespace => onClickApplyResource(selectedNamespace)}
+          onOk={namespace => onClickApplyResource(namespace)}
           onCancel={() => setIsApplyModalVisible(false)}
         />
       )}

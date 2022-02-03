@@ -21,6 +21,6 @@ Monokle is now in "Cluster Mode" (as indicated by the header at the top):
 
 - The File Explorer has been disabled if a folder had been previously selected.
 - The Navigator contains all resources retrieved from the configured cluster:
-  - Resource navigation works as with files; selecting a resource shows its content in the source editor in read-only mode.
+  - Resource navigation works as with files; selecting a resource shows its content in the source editor.
   - Resource links are shown as before with corresponding popups/links/etc.
 - Selecting "Exit" in the top right restores the contents of the Resource Navigator to the currently selected folder.

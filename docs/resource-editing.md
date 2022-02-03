@@ -9,7 +9,7 @@ YAML and provide context-sensitive help and auto-complete functionality for stan
 
 Right-clicking in the editor shows a list of available commands. Pressing F1 opens its command-palette:
 
-![Source Editor Command Palette](img/source-editor-command-palette.png)
+![Source Editor Command Palette](img/source-editor-command-palette-1.5.0.png)
 
 ### Editing Resources
 
@@ -37,6 +37,12 @@ While hovering over a broken link in the Editor, a pop-up window will allow you 
 When editing a resource, click on the document icon at the top right of the Editor pane to open the corresponding kubernetes documentation in a browser window:
 
 ![Source Editor Broken Links](img/resource-open-k8s-documentation-1.5.0.png) 
+
+### Working with Multiple Resources
+
+Select multiple resources by clicking the checkbox to the left of the resource name. Below, two resources are selected and the "delete" or "deploy" actions are available for both resources.
+
+![Working with Multiple Resources](img/select-multi-resource-1.5.0.png) 
 
 ## Add Resource
 
@@ -73,7 +79,7 @@ When editing files directly by selecting them in the File Explorer, the editor w
 
 In version 1.4.0, Monokle shows properties for ConfigMap resources only:
 
-![Form Editor](img/form-editor-1.4.0.png)
+![Form Editor](img/form-editor-1.5.0.png)
 
 Clicking "ConfigMap" at the top of the Editor opens the  form fields editor for key ConfigMap properties, allowing you to edit/discover all available properties without 
 having to learn or lookup the corresponding YAML/resource documentation. Any changes made and saved (with the Save button on the top right)

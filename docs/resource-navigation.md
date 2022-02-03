@@ -31,13 +31,30 @@ While in the File Explorer, the File Action drop down list is available by click
 
 ![Explorer File Actions](img/explorer-file-actions-1.5.0.png)
 
-In the drop down, the following actions are available:
-- Reveal in Finder
+In the File Actions pop up menu, the following actions are available:
+- Add Resource
+- Filter on this file
+- Add to Files: Exclude
 - Copy Path
 - Copy Relative Path
-- Add to File: Exclude
 - Rename
 - Delete
+- Reveal in Finder
+
+The same functionality is available for Folders:
+
+![Explorer File Actions](img/explorer-folder-actions-1.5.0.png)
+
+In the Folder Actions pop up menu, the following actions are available:
+- New Folder
+- New Resource
+- Filter on this folder
+- Add to Files: Exclude
+- Copy Path
+- Copy Relative Path
+- Rename
+- Delete
+- Reveal in Finder
 
 ## Resource Navigator
 
@@ -98,7 +115,7 @@ Resource filters allow you to filter the resources based on various properties s
 
 Click on the filter button on the top of the navigator to launch the dialog for configuration.
 
-![Resource Filtering](img/resource-filtering-1.4.0.png)
+![Resource Filtering](img/resource-filtering-1.5.0.png)
 
 Users can also add or remove filters by highlighting and hovering over labels, annotations or other metadata properties in the code editor:
 
@@ -115,7 +132,7 @@ You can choose to reload the last reviewed folder while launching Monokle. For t
 You can easily navigate back and forth between the selected resources with the help of the Navigation button. The highlight arrow will indicate when navigation to previous or next resource is available.
 
 
-![Navigation History](img/navigate-history-1.5.0.png)
+![Navigation History](img/navigation-history-1.5.0.png)
 
 ## Expand/Collapse Sections
 

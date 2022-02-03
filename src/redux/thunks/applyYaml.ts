@@ -7,11 +7,16 @@ import {getShellPath} from '@utils/shell';
  * Invokes kubectl apply for the specified yaml
  */
 
-export function applyYamlToCluster(yaml: string, kubeconfig: string, context: string, namespace?: string) {
+export function applyYamlToCluster(
+  yaml: string,
+  kubeconfig: string,
+  context: string,
+  namespace?: {name: string; new: boolean}
+) {
   const spawnArgs = ['--context', context, 'apply', '-f', '-'];
 
   if (namespace) {
-    spawnArgs.unshift(...['--namespace', namespace]);
+    spawnArgs.unshift(...['--namespace', namespace.name]);
   }
 
   const child = spawn('kubectl', spawnArgs, {

@@ -26,7 +26,7 @@ export function getHelmValuesFile(fileEntry: FileEntry, helmValuesMap: HelmValue
  */
 
 export function isHelmChartFolder(files: string[]) {
-  return files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1;
+  return files.indexOf('Chart.yaml') !== -1;
 }
 
 /**
@@ -34,7 +34,7 @@ export function isHelmChartFolder(files: string[]) {
  * @param resource
  * @returns @boolean
  */
-function isSupportedHelmResource(resource: K8sResource): boolean {
+export function isSupportedHelmResource(resource: K8sResource): boolean {
   const helmVariableRegex = /{{.*}}/g;
 
   return Boolean(resource.text.match(helmVariableRegex)?.length) === false;

@@ -1,4 +1,5 @@
 import {spawn} from 'child_process';
+import _ from 'lodash';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
@@ -22,7 +23,7 @@ import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {extractK8sResources} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
-import {getResourceFromCluster} from '@redux/thunks/utils';
+import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {PROCESS_ENV} from '@utils/env';
 import {getShellPath} from '@utils/shell';
@@ -31,8 +32,18 @@ import {getShellPath} from '@utils/shell';
  * Invokes kubectl for the content of the specified resource
  */
 
-function applyK8sResource(resource: K8sResource, kubeconfig: string, context: string, namespace?: string) {
-  return applyYamlToCluster(resource.text, kubeconfig, context, namespace);
+function applyK8sResource(
+  resource: K8sResource,
+  kubeconfig: string,
+  context: string,
+  namespace?: {name: string; new: boolean}
+) {
+  const resourceContent = _.cloneDeep(resource.content);
+  if (namespace && namespace.name !== resourceContent.metadata?.namespace) {
+    delete resourceContent.metadata.namespace;
+  }
+
+  return applyYamlToCluster(stringify(resourceContent), kubeconfig, context, namespace);
 }
 
 /**
@@ -45,18 +56,18 @@ function applyKustomization(
   kubeconfig: string,
   context: string,
   kustomizeCommand: KustomizeCommandType,
-  namespace?: string
+  namespace?: {name: string; new: boolean}
 ) {
   const folder = getAbsoluteResourceFolder(resource, fileMap);
 
   const args =
     kustomizeCommand === 'kubectl'
       ? namespace
-        ? `kubectl --context ${context} --namespace ${namespace} apply -k ${folder}`
-        : `kubectl --context ${context} apply -k ${folder}`
+        ? `kubectl --context ${context} --namespace ${namespace.name} apply -k "${folder}"`
+        : `kubectl --context ${context} apply -k "${folder}"`
       : namespace
-      ? `kustomize build ${folder} | kubectl --context ${context} --namespace ${namespace} apply -k -`
-      : `kustomize build ${folder} | kubectl --context ${context} apply -k -`;
+      ? `kustomize build "${folder}" | kubectl --context ${context} --namespace ${namespace.name} apply -k -`
+      : `kustomize build "${folder}" | kubectl --context ${context} apply -k -`;
 
   const child =
     kustomizeCommand === 'kubectl'
@@ -94,7 +105,7 @@ export async function applyResource(
   dispatch: AppDispatch,
   kubeconfig: string,
   context: string,
-  namespace?: string,
+  namespace?: {name: string; new: boolean},
   options?: {
     isClusterPreview?: boolean;
     isInClusterDiff?: boolean;
@@ -125,11 +136,6 @@ export async function applyResource(
         });
 
         child.stdout.on('data', data => {
-          const alert: AlertType = {
-            type: AlertEnum.Success,
-            title: `Applied ${resource.name} to cluster ${context} successfully`,
-            message: data.toString(),
-          };
           if (options?.isClusterPreview) {
             getResourceFromCluster(resource, kubeconfig, context).then(resourceFromCluster => {
               delete resourceFromCluster.body.metadata?.managedFields;
@@ -157,16 +163,37 @@ export async function applyResource(
               dispatch(openResourceDiffModal(resource.id));
             }
           }
-          dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
+
+          if (namespace && namespace.new) {
+            const namespaceAlert: AlertType = {
+              type: AlertEnum.Success,
+              title: `Created ${namespace.name} namespace to cluster ${context} successfully`,
+              message: '',
+            };
+
+            dispatch(setAlert(namespaceAlert));
+          }
+
+          const alert: AlertType = {
+            type: AlertEnum.Success,
+            title: `Applied ${resource.name} to cluster ${context} successfully`,
+            message: data.toString(),
+          };
+
+          setTimeout(() => dispatch(setAlert(alert)), 400);
         });
 
-        child.stderr.on('data', data => {
+        child.stderr.on('data', async data => {
           const alert: AlertType = {
             type: AlertEnum.Error,
             title: `Applying ${resource.name} to cluster ${context} failed`,
             message: data.toString(),
           };
+
+          if (namespace && namespace.new) {
+            await removeNamespaceFromCluster(namespace.name, kubeconfig, context);
+          }
           dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
         });

@@ -1,6 +1,6 @@
 import {useContext, useEffect, useMemo, useState} from 'react';
 
-import {Badge, Button, Space, Tooltip} from 'antd';
+import {Badge, Button, Tooltip} from 'antd';
 import 'antd/dist/antd.less';
 
 import {
@@ -44,7 +44,8 @@ import RecentProjectsPane from '../RecentProjectsPane';
 import StartProjectPane from '../StartProjectPane';
 import MenuButton from './MenuButton';
 import MenuIcon from './MenuIcon';
-import * as S from './Styled';
+
+import * as S from './styled';
 
 const iconMenuWidth = 45;
 
@@ -53,6 +54,7 @@ const PaneManager = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
@@ -189,7 +191,7 @@ const PaneManager = () => {
   return (
     <S.Row style={{height: contentHeight}}>
       <S.ColumnLeftMenu id="LeftToolbar">
-        <Space direction="vertical" style={{width: 43}}>
+        <S.Space direction="vertical">
           <Tooltip
             mouseEnterDelay={TOOLTIP_DELAY}
             title={leftMenuSelection === 'file-explorer' && leftActive ? 'Hide File Explorer' : 'View File Explorer'}
@@ -275,19 +277,21 @@ const PaneManager = () => {
               disabled={!activeProject}
             >
               <MenuIcon
+                className={highlightedItems.browseTemplates ? 'animated-highlight' : ''}
+                style={highlightedItems.browseTemplates ? {fontSize: '20px', marginLeft: '2px'} : {}}
                 icon={FormatPainterOutlined}
                 active={Boolean(activeProject) && leftActive}
                 isSelected={Boolean(activeProject) && leftMenuSelection === 'templates-pane'}
               />
             </MenuButton>
           </Tooltip>
-        </Space>
+        </S.Space>
       </S.ColumnLeftMenu>
 
       {content}
 
       <S.ColumnRightMenu style={{display: featureJson.ShowRightMenu ? 'inline' : 'none'}}>
-        <Space direction="vertical" style={{width: 43}}>
+        <S.Space direction="vertical">
           <Button
             size="large"
             type="text"
@@ -304,7 +308,7 @@ const PaneManager = () => {
             onClick={() => setRightActiveMenu('logs')}
             icon={<MenuIcon icon={CodeOutlined} active={rightActive} isSelected={rightMenuSelection === 'logs'} />}
           />
-        </Space>
+        </S.Space>
       </S.ColumnRightMenu>
     </S.Row>
   );

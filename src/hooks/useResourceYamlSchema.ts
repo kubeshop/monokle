@@ -2,12 +2,17 @@ import {useEffect} from 'react';
 
 import {K8sResource} from '@models/k8sresource';
 
+import {isSupportedHelmResource} from '@redux/services/helm';
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getResourceSchema} from '@redux/services/schema';
 
 function useResourceYamlSchema(yaml: any, resource: K8sResource | undefined) {
   useEffect(() => {
     if (!resource) {
+      yaml &&
+        yaml.yamlDefaults.setDiagnosticsOptions({
+          validate: false,
+        });
       return;
     }
 
@@ -16,7 +21,7 @@ function useResourceYamlSchema(yaml: any, resource: K8sResource | undefined) {
 
     if (resource) {
       resourceSchema = getResourceSchema(resource);
-      validate = !isKustomizationPatch(resource);
+      validate = !isKustomizationPatch(resource) && isSupportedHelmResource(resource);
     }
 
     yaml &&

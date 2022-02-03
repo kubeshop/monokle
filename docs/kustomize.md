@@ -50,7 +50,7 @@ generated resources.
 
 For example previewing the "base" kustomization above will result in the following:
 
-![Kustomize Preview](img/kustomize-preview-1.4.0.png)
+![Kustomize Preview](img/kustomize-preview-1.5.0.png)
 
 Monokle is now in "Preview Mode" (as indicated by the header at the top):
 
