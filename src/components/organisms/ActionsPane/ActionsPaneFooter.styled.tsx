@@ -4,13 +4,16 @@ import Colors from '@styles/Colors';
 
 export const Container = styled.div`
   width: 100%;
+  height: 100%;
   border-top: 1px solid ${Colors.grey3};
   padding: 10px;
-  display
+  display: grid;
+  grid-template-rows: max-content 1fr;
+  grid-row-gap: 15px;
 `;
 
 export const Pane = styled.div`
-  margin-top: 15px;
+  width: 100%;
 `;
 
 export const TitleBar = styled.div`

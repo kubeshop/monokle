@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import {LegacyRef, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {LegacyRef, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
@@ -57,6 +57,7 @@ import TabHeader from '@atoms/TabHeader';
 import Icon from '@components/atoms/Icon';
 import HelmChartModalConfirmWithNamespaceSelect from '@components/molecules/HelmChartModalConfirmWithNamespaceSelect';
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
+import TerminalContainer from '@components/molecules/TerminalContainer';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -372,6 +373,21 @@ const ActionsPane = (props: {contentHeight: string}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionsPaneFooterHeight, paneConfiguration.actionsPaneFooterExpandedHeight]);
 
+  const actionsPaneFooterTabs = useMemo(() => {
+    const footerTabs: {[key: string]: {title: string; content: React.ReactNode}} = {};
+
+    if (featureFlags.Terminal) {
+      footerTabs['terminal'] = {
+        title: 'Terminal',
+        content: <TerminalContainer height={resizableBoxHeight - 57} width={actionsPaneFooterWidth - 20} />,
+      };
+    }
+
+    footerTabs['documentation'] = {title: 'Documentation', content: <>Documentation content</>};
+
+    return footerTabs;
+  }, [actionsPaneFooterWidth, resizableBoxHeight]);
+
   return (
     <>
       <Row>
@@ -542,12 +558,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 <span className={isActionsPaneFooterExpanded ? 'custom-handle' : ''} ref={ref} />
               )}
             >
-              <ActionsPaneFooter
-                tabs={{
-                  terminal: {title: 'Terminal', content: <>Terminal content</>},
-                  documentation: {title: 'Documentation', content: <>Documentation content</>},
-                }}
-              />
+              <ActionsPaneFooter tabs={actionsPaneFooterTabs} />
             </ResizableBox>
           </S.ActionsPaneFooterContainer>
         )}

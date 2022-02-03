@@ -13,6 +13,8 @@ moduleAlias.addAliases({
   '@root': `${__dirname}/../`,
 });
 
+const pty = require('node-pty');
+
 import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
 import * as path from 'path';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
@@ -31,6 +33,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
 import asyncLib from "async";
+import os from 'os';
 
 import {createMenu, getDockMenu} from './menu';
 import initKubeconfig from './src/initKubeconfig';
@@ -39,7 +42,7 @@ import {downloadPlugin, loadPluginMap, updatePlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
-import {setAppRehydrating} from '@redux/reducers/main';
+import {setAppRehydrating, setWebContentsId} from '@redux/reducers/main';
 import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
 import {indexOf} from 'lodash';
@@ -66,6 +69,7 @@ const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
+const shell = os.platform() === 'win32' ? 'powershell.exe' : "bash";
 
 setProjectsRootFolder(userHomeDir);
 
@@ -226,6 +230,38 @@ ipcMain.on('quit-and-install', () => {
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
 
+// string is the webContentsId
+let ptyProcessMap: Record<string, any> = {};
+
+ipcMain.on("init-terminal", (e, data) => {
+  const {rootFolder, webContentsId} = data;
+  const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
+
+  if(currentWebContents) {
+     const ptyProcess = pty.spawn(shell, [], {
+      name: 'xterm-color',
+      cols: 100,
+      rows: 100,
+      cwd: rootFolder,
+      env: process.env as any
+    });
+
+    ptyProcessMap[webContentsId] = ptyProcess;
+
+    ptyProcess.on('data', (incomingData: any) => {
+      currentWebContents.send('terminal.incomingData', incomingData);
+     });
+  }
+});
+
+ipcMain.on("terminal.ptyProcessWriteData", (event, d) => {
+  const {data, webContentsId} = d;
+  const ptyProcess = ptyProcessMap[webContentsId];
+  if(ptyProcess) {
+    ptyProcess.write(data);
+  }
+});
+
 export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -364,8 +400,8 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setPluginMap(pluginMap));
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
+    dispatch(setWebContentsId(win.webContents.id));
     convertRecentFilesToRecentProjects(dispatch);
-
   });
 
   return win;

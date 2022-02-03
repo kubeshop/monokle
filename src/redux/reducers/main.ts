@@ -491,6 +491,9 @@ export const mainSlice = createSlice({
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
     },
+    setWebContentsId: (state: Draft<AppState>, action: PayloadAction<number>) => {
+      state.webContentsId = action.payload;
+    },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
     },
@@ -1122,5 +1125,6 @@ export const {
   addMultipleKindHandlers,
   addKindHandler,
   seenNotifications,
+  setWebContentsId,
 } = mainSlice.actions;
 export default mainSlice.reducer;

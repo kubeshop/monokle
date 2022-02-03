@@ -146,6 +146,7 @@ interface AppState {
   /** type/value of filters that will be changed */
   filtersToBeChanged?: ResourceFilterType;
   registeredKindHandlers: string[];
+  webContentsId: number;
 }
 
 export type {

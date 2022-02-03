@@ -15,6 +15,7 @@ const initialAppState: AppState = {
   isRehydrating: false,
   wasRehydrated: false,
   selectionHistory: [],
+  webContentsId: 1,
   resourceMap: {},
   resourceFilter: {
     labels: {},
