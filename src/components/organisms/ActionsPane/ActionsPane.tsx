@@ -1,13 +1,16 @@
 import {ipcRenderer} from 'electron';
 
-import {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {LegacyRef, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {ResizableBox} from 'react-resizable';
+import {useMeasure} from 'react-use';
 
 import {Button, Row, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import {
-  ACTIONS_PANE_FOOTER_HEIGHT,
+  ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
+  ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
   ACTIONS_PANE_TAB_PANE_OFFSET,
   KUSTOMIZE_HELP_URL,
   NAVIGATOR_HEIGHT_OFFSET,
@@ -29,7 +32,7 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {openSaveResourcesToFileFolderModal, setMonacoEditor} from '@redux/reducers/ui';
+import {openSaveResourcesToFileFolderModal, setMonacoEditor, setPaneConfiguration} from '@redux/reducers/ui';
 import {
   isInPreviewModeSelector,
   knownResourceKindsSelector,
@@ -74,27 +77,28 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const {windowSize} = useContext(AppContext);
   const windowHeight = windowSize.height;
 
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const uiState = useAppSelector(state => state.ui);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
-  const selectionHistory = useAppSelector(state => state.main.selectionHistory);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
-  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
+  const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const {kustomizeCommand} = useAppSelector(settingsSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
+  const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
+  const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
+  const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const previewType = useAppSelector(state => state.main.previewType);
+  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const selectionHistory = useAppSelector(state => state.main.selectionHistory);
+  const uiState = useAppSelector(state => state.ui);
 
   const navigatorHeight = useMemo(
     () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
@@ -112,6 +116,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
   const extraButton = useRef<any>();
+
+  const [actionsPaneFooterRef, {height: actionsPaneFooterHeight, width: actionsPaneFooterWidth}] =
+    useMeasure<HTMLDivElement>();
 
   const getDistanceBetweenTwoComponents = useCallback(() => {
     const tabsListEl = tabsList[0].getBoundingClientRect();
@@ -132,16 +139,27 @@ const ActionsPane = (props: {contentHeight: string}) => {
     }
   }, [isButtonShrinked, tabsList]);
 
-  const editorTabPaneHeight = useMemo(() => {
-    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET;
-    if (!featureFlags.ActionsPaneFooter) {
-      defaultHeight += 20;
-    }
+  const resizableBoxHeight = useMemo(() => {
     if (isActionsPaneFooterExpanded) {
-      return defaultHeight - ACTIONS_PANE_FOOTER_HEIGHT;
+      if (actionsPaneFooterHeight >= ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT) {
+        return actionsPaneFooterHeight;
+      }
+
+      return paneConfiguration.actionsPaneFooterExpandedHeight || ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT;
     }
+
+    if (featureFlags.ActionsPaneFooter) {
+      return ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT;
+    }
+
+    return -5;
+  }, [actionsPaneFooterHeight, isActionsPaneFooterExpanded, paneConfiguration.actionsPaneFooterExpandedHeight]);
+
+  const editorTabPaneHeight = useMemo(() => {
+    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET - resizableBoxHeight;
+
     return defaultHeight;
-  }, [contentHeight, isActionsPaneFooterExpanded]);
+  }, [contentHeight, resizableBoxHeight]);
 
   const onSaveHandler = () => {
     if (selectedResource) {
@@ -225,6 +243,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
     },
     [dispatch]
   );
+
+  const onMouseUp = useCallback(() => {
+    if (isActionsPaneFooterExpanded && actionsPaneFooterHeight !== paneConfiguration.actionsPaneFooterExpandedHeight) {
+      dispatch(setPaneConfiguration({...paneConfiguration, actionsPaneFooterExpandedHeight: actionsPaneFooterHeight}));
+    }
+  }, [actionsPaneFooterHeight, dispatch, isActionsPaneFooterExpanded, paneConfiguration]);
 
   const isDiffButtonDisabled = useMemo(() => {
     if (!selectedResource) {
@@ -338,6 +362,15 @@ const ActionsPane = (props: {contentHeight: string}) => {
       getDistanceBetweenTwoComponents();
     }
   }, [tabsList, uiState.paneConfiguration, windowSize, selectedResource, getDistanceBetweenTwoComponents]);
+
+  useEffect(() => {
+    document.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actionsPaneFooterHeight, paneConfiguration.actionsPaneFooterExpandedHeight]);
 
   return (
     <>
@@ -490,7 +523,34 @@ const ActionsPane = (props: {contentHeight: string}) => {
             )}
           </S.Tabs>
         </S.TabsContainer>
-        {featureFlags.ActionsPaneFooter && <ActionsPaneFooter />}
+
+        {featureFlags.ActionsPaneFooter && (
+          <S.ActionsPaneFooterContainer ref={actionsPaneFooterRef}>
+            <ResizableBox
+              height={resizableBoxHeight}
+              width={actionsPaneFooterWidth}
+              axis="y"
+              resizeHandles={['n']}
+              minConstraints={[
+                actionsPaneFooterWidth,
+                isActionsPaneFooterExpanded
+                  ? ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT
+                  : ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
+              ]}
+              maxConstraints={[actionsPaneFooterWidth, navigatorHeight - 200]}
+              handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
+                <span className={isActionsPaneFooterExpanded ? 'custom-handle' : ''} ref={ref} />
+              )}
+            >
+              <ActionsPaneFooter
+                tabs={{
+                  terminal: {title: 'Terminal', content: <>Terminal content</>},
+                  documentation: {title: 'Documentation', content: <>Documentation content</>},
+                }}
+              />
+            </ResizableBox>
+          </S.ActionsPaneFooterContainer>
+        )}
       </S.ActionsPaneContainer>
 
       {isApplyModalVisible && (
