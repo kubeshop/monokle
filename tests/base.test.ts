@@ -1,7 +1,6 @@
 import {Page} from 'playwright';
 import {expect, test} from '@playwright/test';
 import {
-  findDrawer,
   waitForDrawerToHide,
   waitForDrawerToShow,
 } from './antdHelpers';
@@ -59,17 +58,16 @@ test('Validate ClusterContainer', async () => {
 });
 
 test('Validate settings drawer', async () => {
-  let drawer = await findDrawer(appWindow, 'Settings');
-  expect(drawer).toBeFalsy();
+  const settingsTitle = appWindow.locator('.ant-drawer-open .ant-drawer-title');
+  expect(await settingsTitle.isVisible()).toBe(false);
 
   await appWindow.click("span[aria-label='setting']", {noWaitAfter: true, force: true});
-  drawer = await waitForDrawerToShow(appWindow, 'Settings', 30000);
-
-  expect(drawer).toBeTruthy();
+  await pause(4000);
+  expect(await settingsTitle.isVisible()).toBe(true);
 
   await clickOnMonokleLogo(appWindow);
-
-  expect(await waitForDrawerToHide(appWindow, 'Settings')).toBeTruthy();
+  await pause(4000);
+  expect(await settingsTitle.isVisible()).toBe(false);
 });
 
 test('Validate notifications drawer', async () => {
