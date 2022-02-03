@@ -108,6 +108,11 @@ export const Name = styled.span<NameProps>`
   }}
 `;
 
+export const EmptyGroupText = styled.span`
+  margin-left: 26px;
+  font-size: 12px;
+`;
+
 export const Collapsible = styled.span`
   margin-left: auto;
   margin-right: 15px;
