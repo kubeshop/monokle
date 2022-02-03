@@ -14,11 +14,19 @@ import {createFileEntry, extractK8sResourcesFromFile, fileIsExcluded, readFiles}
 import {getFileStats} from '@utils/files';
 
 /**
- * Checks if the specified fileEntry is a kustomization file
+ * Gets the file HelmValuesFile for a specific FileEntry
  */
 
 export function getHelmValuesFile(fileEntry: FileEntry, helmValuesMap: HelmValuesMapType) {
   return Object.values(helmValuesMap).find(valuesFile => valuesFile.filePath === fileEntry.filePath);
+}
+
+/**
+ * Gets the file HelmValuesFile for a specific FileEntry
+ */
+
+export function getHelmChartFromFileEntry(fileEntry: FileEntry, helmChartMap: HelmChartMapType) {
+  return Object.values(helmChartMap).find(chart => chart.filePath === fileEntry.filePath);
 }
 
 /**
