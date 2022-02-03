@@ -14,7 +14,7 @@ import {createFileEntry, extractK8sResourcesFromFile, fileIsExcluded, readFiles}
 import {getFileStats} from '@utils/files';
 
 /**
- * Gets the file HelmValuesFile for a specific FileEntry
+ * Gets the HelmValuesFile for a specific FileEntry
  */
 
 export function getHelmValuesFile(fileEntry: FileEntry, helmValuesMap: HelmValuesMapType) {
