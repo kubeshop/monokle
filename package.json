@@ -160,7 +160,7 @@
     "release:patch": "standard-version --release-as patch",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
-    "ui-test": "xvfb-maybe npx playwright test --workers=1 tests/base.test.ts",
+    "ui-test": "xvfb-maybe npx playwright test --workers=1",
     "custom-script": "npx ts-node src/scripts/index.ts"
   },
   "build": {
