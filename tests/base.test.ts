@@ -57,7 +57,7 @@ test('Validate ClusterContainer', async () => {
   expect(await div.count()).toBe(1);
 });
 
-§test('Validate settings drawer', async () => {
+test('Validate settings drawer', async () => {
   const settingsTitle = appWindow.locator('.ant-drawer-open .ant-drawer-title');
   expect(await settingsTitle.isVisible()).toBe(false);
 
