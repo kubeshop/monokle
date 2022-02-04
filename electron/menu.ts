@@ -17,6 +17,8 @@ import {
   setMonacoEditor,
   toggleLeftMenu,
   toggleStartProjectPane,
+  zoomIn,
+  zoomOut,
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -308,6 +310,21 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       },
       {type: 'separator'},
       {role: 'togglefullscreen'},
+      {type: 'separator'},
+      {
+        label: 'Zoom in',
+        accelerator: hotkeys.ZOOM_IN,
+        click: () => {
+          dispatch(zoomIn());
+        },
+      },
+      {
+        label: 'Zoom out',
+        accelerator: hotkeys.ZOOM_OUT,
+        click: () => {
+          dispatch(zoomOut());
+        },
+      },
     ],
   };
 };

@@ -1,3 +1,5 @@
+import {webFrame} from 'electron';
+
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
@@ -25,6 +27,12 @@ export const uiSlice = createSlice({
   reducers: {
     toggleResourceFilters: (state: Draft<UiState>) => {
       state.isResourceFiltersOpen = !state.isResourceFiltersOpen;
+    },
+    zoomIn: () => {
+      webFrame.setZoomFactor(webFrame.getZoomFactor() + 0.1);
+    },
+    zoomOut: () => {
+      webFrame.setZoomFactor(Number(webFrame.getZoomFactor() - 0.1));
     },
     toggleSettings: (state: Draft<UiState>) => {
       state.isSettingsOpen = !state.isSettingsOpen;
@@ -271,5 +279,7 @@ export const {
   closeQuickSearchActionsPopup,
   openSaveResourcesToFileFolderModal,
   closeSaveResourcesToFileFolderModal,
+  zoomIn,
+  zoomOut,
 } = uiSlice.actions;
 export default uiSlice.reducer;

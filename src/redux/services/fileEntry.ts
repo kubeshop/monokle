@@ -11,7 +11,12 @@ import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
-import {isHelmChartFolder, processHelmChartFolder} from '@redux/services/helm';
+import {
+  getHelmChartFromFileEntry,
+  getHelmValuesFile,
+  isHelmChartFolder,
+  processHelmChartFolder,
+} from '@redux/services/helm';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {
   clearResourceSelections,
@@ -25,6 +30,8 @@ import {deleteResource, extractK8sResources, reprocessResources} from './resourc
 
 type PathRemovalSideEffect = {
   removedResources: K8sResource[];
+  removedHelmCharts: HelmChart[];
+  removedHelmValuesFiles: HelmValuesFile[];
 };
 
 /**
@@ -413,21 +420,33 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
  * Removes the specified fileEntry and its resources from the provided state
  */
 
-export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect?: PathRemovalSideEffect) {
+export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
   log.info(`removing file ${fileEntry.filePath}`);
   getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(resource => {
-    if (removalSideEffect) {
-      removalSideEffect.removedResources.push(resource);
-    }
+    removalSideEffect.removedResources.push(resource);
     deleteResource(resource, state.resourceMap);
   });
+  const valuesFile = getHelmValuesFile(fileEntry, state.helmValuesMap);
+  if (valuesFile) {
+    removalSideEffect.removedHelmValuesFiles.push(valuesFile);
+    if (state.helmValuesMap[valuesFile.id]) {
+      delete state.helmValuesMap[valuesFile.id];
+    }
+  }
+  const chart = getHelmChartFromFileEntry(fileEntry, state.helmChartMap);
+  if (chart) {
+    removalSideEffect.removedHelmCharts.push(chart);
+    if (state.helmChartMap[chart.id]) {
+      delete state.helmChartMap[chart.id];
+    }
+  }
 }
 
 /**
  * Removes the specified fileEntry and its resources from the provided state
  */
 
-function removeFolder(fileEntry: FileEntry, state: AppState, removalSideEffect?: PathRemovalSideEffect) {
+function removeFolder(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
   log.info(`removing folder ${fileEntry.filePath}`);
   fileEntry.children?.forEach(child => {
     const childEntry = state.fileMap[path.join(fileEntry.filePath, child)];
@@ -450,6 +469,8 @@ export function removePath(absolutePath: string, state: AppState, fileEntry: Fil
 
   const removalSideEffect: PathRemovalSideEffect = {
     removedResources: [],
+    removedHelmCharts: [],
+    removedHelmValuesFiles: [],
   };
 
   if (fileEntry.children) {
