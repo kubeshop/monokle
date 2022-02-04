@@ -207,6 +207,7 @@ export const uiSlice = createSlice({
         editWidth: 0.3333,
         rightWidth: 0,
         actionsPaneFooterExpandedHeight: ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
+        recentProjectsPaneWidth: 450,
       };
       state.paneConfiguration = defaultPaneConfiguration;
       electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);

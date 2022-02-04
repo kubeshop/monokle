@@ -122,4 +122,5 @@ export type PaneConfiguration = {
   editWidth: number;
   rightWidth: number;
   actionsPaneFooterExpandedHeight: number;
+  recentProjectsPaneWidth: number;
 };

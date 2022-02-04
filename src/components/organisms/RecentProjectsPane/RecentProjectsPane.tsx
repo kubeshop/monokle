@@ -1,4 +1,4 @@
-import {LegacyRef} from 'react';
+import {LegacyRef, useCallback, useEffect} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
@@ -10,7 +10,7 @@ import {Project} from '@models/appconfig';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setOpenProject} from '@redux/reducers/appConfig';
-import {toggleStartProjectPane} from '@redux/reducers/ui';
+import {setPaneConfiguration, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
 import {MonoPaneTitle} from '@atoms';
@@ -20,6 +20,7 @@ import * as S from './styled';
 const RecentProjectsPane = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
   const projects = useAppSelector(state => state.config.projects);
 
   const [recentProjectsPaneRef, {height: recentProjectsPaneHeight, width: recentProjectsPaneWidth}] =
@@ -44,10 +45,25 @@ const RecentProjectsPane = () => {
     return '';
   };
 
+  const onMouseUp = useCallback(() => {
+    if (recentProjectsPaneWidth !== paneConfiguration.recentProjectsPaneWidth) {
+      dispatch(setPaneConfiguration({...paneConfiguration, recentProjectsPaneWidth}));
+    }
+  }, [dispatch, paneConfiguration, recentProjectsPaneWidth]);
+
+  useEffect(() => {
+    document.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recentProjectsPaneWidth, paneConfiguration.recentProjectsPaneWidth]);
+
   return (
     <S.RecentProjectsPaneContainer ref={recentProjectsPaneRef}>
       <ResizableBox
-        width={recentProjectsPaneWidth || 450}
+        width={paneConfiguration.recentProjectsPaneWidth || recentProjectsPaneWidth || 450}
         height={recentProjectsPaneHeight}
         minConstraints={[350, recentProjectsPaneHeight]}
         maxConstraints={[1000, recentProjectsPaneHeight]}
