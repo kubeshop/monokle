@@ -1,6 +1,6 @@
 {
   "ShowGraphView": false,
   "ShowRightMenu": false,
-  "ActionsPaneFooter": true,
-  "Terminal": true
+  "ActionsPaneFooter": false,
+  "Terminal": false
 }
