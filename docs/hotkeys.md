@@ -21,3 +21,5 @@ Monokle currently supports the following keyboard shortcuts:
 - Open Helm Tab: Ctrl/Cmd Shift H
 - Reset Resource Filters: Ctrl/Cmd ALT R
 - Open Quick Search: Ctrl/Cmd SHIFT P
+- Zoom In: Ctrl/Cmd =
+- Zoom Out: Ctrl/Cmd -
