@@ -1,6 +1,7 @@
 import {shallowEqual} from 'react-redux';
 
 import asyncLib from 'async';
+import _ from 'lodash';
 import log from 'loglevel';
 import {Middleware} from 'redux';
 
@@ -273,8 +274,18 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
       ...g,
       visibleItemIds: g.itemIds.filter(itemId => itemInstanceMap[itemId].isVisible === true),
     }));
-    const visibleItemIds = itemInstances?.filter(i => i.isVisible === true).map(i => i.id) || [];
-    const visibleGroupIds = sectionInstanceGroups.filter(g => g.visibleItemIds.length > 0).map(g => g.id);
+    const visibleItemIds = itemInstances
+      ? _(itemInstances)
+          .filter(i => i.isVisible === true)
+          .map(i => i.id)
+          .value()
+      : [];
+    const visibleGroupIds = sectionBlueprint.customization?.emptyGroupText
+      ? sectionInstanceGroups.map(g => g.id)
+      : _(sectionInstanceGroups)
+          .filter(g => g.visibleItemIds.length > 0)
+          .map(g => g.id)
+          .value();
     const sectionInstance: SectionInstance = {
       id: sectionBlueprint.id,
       rootSectionId: sectionBlueprint.rootSectionId,

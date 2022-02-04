@@ -26,7 +26,7 @@ export function getHelmValuesFile(fileEntry: FileEntry, helmValuesMap: HelmValue
  */
 
 export function isHelmChartFolder(files: string[]) {
-  return files.indexOf('Chart.yaml') !== -1 && files.indexOf('values.yaml') !== -1;
+  return files.indexOf('Chart.yaml') !== -1;
 }
 
 /**

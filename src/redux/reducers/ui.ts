@@ -2,6 +2,8 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 
+import {ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT} from '@constants/constants';
+
 import {
   HighlightItems,
   LeftMenuSelectionType,
@@ -196,6 +198,7 @@ export const uiSlice = createSlice({
         navWidth: 0.3333,
         editWidth: 0.3333,
         rightWidth: 0,
+        actionsPaneFooterExpandedHeight: ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
       };
       state.paneConfiguration = defaultPaneConfiguration;
       electronStore.set('ui.paneConfiguration', defaultPaneConfiguration);

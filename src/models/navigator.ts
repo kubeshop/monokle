@@ -63,6 +63,7 @@ export interface SectionCustomization {
   nameContext?: {
     component: SectionCustomComponent;
   };
+  emptyGroupText?: string;
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
   isCheckVisibleOnHover?: boolean;

@@ -269,6 +269,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
     ) {
       dispatch(
         setPaneConfiguration({
+          ...paneConfiguration,
           leftWidth,
           navWidth,
           editWidth,
@@ -491,7 +492,7 @@ const SplitView: FunctionComponent<SplitViewProps> = ({
         <StyledDivider />
       </StyledDividerHitBox>
 
-      <Pane id="EditorPane" width={editWidth * viewWidth} hide={false}>
+      <Pane id="EditorPane" width={editWidth * viewWidth + 5} hide={false}>
         {editor}
       </Pane>
 

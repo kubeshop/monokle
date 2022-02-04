@@ -121,4 +121,5 @@ export type PaneConfiguration = {
   navWidth: number;
   editWidth: number;
   rightWidth: number;
+  actionsPaneFooterExpandedHeight: number;
 };

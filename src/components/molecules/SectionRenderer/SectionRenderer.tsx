@@ -221,18 +221,24 @@ function SectionRenderer(props: SectionRendererProps) {
                   <S.ItemsLength selected={false}>{group.visibleItemIds.length}</S.ItemsLength>
                 </S.Name>
               </S.SectionContainer>
-              {group.visibleItemIds.map(itemId => (
-                <ItemRenderer
-                  key={itemId}
-                  itemId={itemId}
-                  blueprint={itemBlueprint}
-                  level={level + 2}
-                  isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
-                  isSectionCheckable={Boolean(sectionInstance.checkable)}
-                  sectionContainerElementId={sectionBlueprint.containerElementId}
-                  options={itemRendererOptions}
-                />
-              ))}
+              {group.visibleItemIds.length ? (
+                group.visibleItemIds.map(itemId => (
+                  <ItemRenderer
+                    key={itemId}
+                    itemId={itemId}
+                    blueprint={itemBlueprint}
+                    level={level + 2}
+                    isLastItem={isLastVisibleItemIdInGroup(group.id, itemId)}
+                    isSectionCheckable={Boolean(sectionInstance.checkable)}
+                    sectionContainerElementId={sectionBlueprint.containerElementId}
+                    options={itemRendererOptions}
+                  />
+                ))
+              ) : (
+                <S.EmptyGroupText>
+                  {sectionBlueprint.customization?.emptyGroupText || 'No items in this group.'}
+                </S.EmptyGroupText>
+              )}
             </React.Fragment>
           );
         })}
