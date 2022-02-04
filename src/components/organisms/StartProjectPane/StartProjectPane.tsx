@@ -7,7 +7,7 @@ import SelectAnEmptyProject from '@assets/SelectAnEmptyProject.svg';
 import SelectAnExistingFolder from '@assets/SelectAnExistingFolder.svg';
 import StartFromTemplate from '@assets/StartFromTemplate.svg';
 
-import * as S from './Styled';
+import * as S from './styled';
 
 const StartProjectPane = () => {
   const dispatch = useAppDispatch();

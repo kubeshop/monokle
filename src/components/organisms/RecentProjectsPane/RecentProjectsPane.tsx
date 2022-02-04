@@ -15,7 +15,7 @@ import {activeProjectSelector} from '@redux/selectors';
 
 import {MonoPaneTitle} from '@atoms';
 
-import * as S from './Styled';
+import * as S from './styled';
 
 const RecentProjectsPane = () => {
   const dispatch = useAppDispatch();
