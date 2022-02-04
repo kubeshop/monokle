@@ -15,7 +15,6 @@ import Colors, {BackgroundColors} from '@styles/Colors';
 
 const StyledFooter = styled(Footer)`
   width: 100%;
-  height: 1.5em;
   padding-left: 10px;
   background: ${BackgroundColors.darkThemeBackground};
   border-top: ${AppBorders.pageDivider};

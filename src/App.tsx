@@ -21,7 +21,15 @@ import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/r
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
-import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
+import {
+  HotKeysHandler,
+  LazyDrawer,
+  MessageBox,
+  PageFooter,
+  PageHeader,
+  PaneManager,
+  PaneManagerRefactor,
+} from '@organisms';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -29,6 +37,8 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
+
+import featureJson from '@src/feature-flags.json';
 
 import AppContext from './AppContext';
 
@@ -49,15 +59,18 @@ const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
 
-const AppContainer = styled.div<{$height: number; $width: number}>`
-  ${props => (props.$height ? `height: ${props.$height}px;` : `height: 100%;`)}
-  ${props => (props.$width ? `width: ${props.$width}px;` : `width: 100%;`)}
+const AppContainer = styled.div`
+  height: 100%;
+  width: 100%;
   overflow: hidden;
 `;
 
 const MainContainer = styled.div`
   height: 100%;
   width: 100%;
+
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
 `;
 
 const App = () => {
@@ -193,32 +206,33 @@ const App = () => {
 
   return (
     <AppContext.Provider value={{windowSize: size}}>
-      <AppContainer $height={size.height} $width={size.width}>
+      <AppContainer>
         <MessageBox />
         <MainContainer>
           <PageHeader />
-          <PaneManager />
+          {featureJson.PaneManagerRefactor ? <PaneManagerRefactor /> : <PaneManager />}
+
           <PageFooter />
-
-          <LazyDrawer onClose={notificationsDrawerOnClose} title="Notifications" visible={isNotificationsDrawerVisible}>
-            <NotificationsManager />
-          </LazyDrawer>
-
-          <LazyDrawer
-            noPadding
-            onClose={pluginsDrawerOnClose}
-            title="Plugins Manager"
-            visible={isPluginManagerDrawerVisible}
-          >
-            <PluginManager />
-          </LazyDrawer>
-
-          <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
-            <SettingsManager />
-          </LazyDrawer>
         </MainContainer>
         <FileExplorer {...fileExplorerProps} />
         <HotKeysHandler />
+
+        <LazyDrawer onClose={notificationsDrawerOnClose} title="Notifications" visible={isNotificationsDrawerVisible}>
+          <NotificationsManager />
+        </LazyDrawer>
+
+        <LazyDrawer
+          noPadding
+          onClose={pluginsDrawerOnClose}
+          title="Plugins Manager"
+          visible={isPluginManagerDrawerVisible}
+        >
+          <PluginManager />
+        </LazyDrawer>
+
+        <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
+          <SettingsManager />
+        </LazyDrawer>
 
         <Suspense fallback={null}>
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
