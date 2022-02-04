@@ -54,8 +54,15 @@ const TerminalContainer: React.FC<IProps> = props => {
   useEffect(() => {
     if (terminalContainerRef.current) {
       term.open(terminalContainerRef.current);
-      terminalContainerRef.current.focus();
+      fitAddon.fit();
     }
+
+    return () => {
+      term.reset();
+      ipcRenderer.send('terminal.onExit', {webContentsId});
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [terminalContainerRef]);
 
   useEffect(() => {
@@ -65,10 +72,6 @@ const TerminalContainer: React.FC<IProps> = props => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    fitAddon.fit();
-  }, [height, width]);
 
   useEffect(() => {
     ipcRenderer.on('terminal.incomingData', onIncomingData);

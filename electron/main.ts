@@ -254,6 +254,19 @@ ipcMain.on("init-terminal", (e, data) => {
   }
 });
 
+ipcMain.on("terminal.onExit", (event, data) => {
+  const {webContentsId} = data;
+  const ptyProcess = ptyProcessMap[webContentsId];
+
+  if(ptyProcess) {
+    try {
+      ptyProcess.kill();
+    } catch (err) {
+       console.log(err);
+    }
+  }
+});
+
 ipcMain.on("terminal.ptyProcessWriteData", (event, d) => {
   const {data, webContentsId} = d;
   const ptyProcess = ptyProcessMap[webContentsId];
