@@ -57,7 +57,7 @@ test('Validate ClusterContainer', async () => {
   expect(await div.count()).toBe(1);
 });
 
-test.skip('Validate settings drawer', async () => {
+§test('Validate settings drawer', async () => {
   const settingsTitle = appWindow.locator('.ant-drawer-open .ant-drawer-title');
   expect(await settingsTitle.isVisible()).toBe(false);
 
@@ -70,7 +70,7 @@ test.skip('Validate settings drawer', async () => {
   expect(await settingsTitle.isVisible()).toBe(false);
 });
 
-test.skip('Validate notifications drawer', async () => {
+test('Validate notifications drawer', async () => {
   appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
     noWaitAfter: true,
     force: true,

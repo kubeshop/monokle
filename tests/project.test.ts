@@ -1,16 +1,16 @@
 import {Page} from 'playwright';
-import { expect, test, } from '@playwright/test';
-import { ElectronApplication } from 'playwright-core';
-import { ElectronAppInfo, startApp } from './electronHelpers';
-import {getRecordingPath, pause} from './utils';
-import { StartProjectPane } from './models/startProjectPane';
-import { MainWindow } from './models/mainWindow';
-import { ProjectsDropdown } from './models/projectsDropdown';
-import { NavigatorPane } from './models/navigatorPane';
-import { NewResourceModal } from './models/newResourceModal';
-import { EditorPane } from './models/editorPane';
-import { SaveResourceModal } from './models/saveResourceModal';
-import { FileExplorerPane } from './models/fileExplorerPane';
+import {expect, test} from '@playwright/test';
+import {ElectronApplication} from 'playwright-core';
+import {ElectronAppInfo, startApp} from './electronHelpers';
+import {pause} from './utils';
+import {StartProjectPane} from './models/startProjectPane';
+import {MainWindow} from './models/mainWindow';
+import {ProjectsDropdown} from './models/projectsDropdown';
+import {NavigatorPane} from './models/navigatorPane';
+import {NewResourceModal} from './models/newResourceModal';
+import {EditorPane} from './models/editorPane';
+import {SaveResourceModal} from './models/saveResourceModal';
+import {FileExplorerPane} from './models/fileExplorerPane';
 
 let appWindow: Page;
 let appInfo: ElectronAppInfo;
@@ -41,9 +41,6 @@ test.beforeAll(async () => {
 
 test.beforeEach(async () => {
   await pause(1000);
-  await appWindow.screenshot({
-    path: getRecordingPath(appInfo.platform, 'logo-click.png')
-  });
   await mainWindow.clickLogo();
 });
 

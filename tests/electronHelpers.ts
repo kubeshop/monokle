@@ -5,6 +5,7 @@ import {Page} from 'playwright';
 import {_electron as electron, ElectronApplication} from 'playwright-core';
 import {getRecordingPath, pause} from './utils';
 import {StartupFlags} from '../src/utils/startupFlag';
+import {waitForModalToHide, waitForModalToShow} from './antdHelpers';
 
 export async function clickOnMonokleLogo(appWindow: Page) {
   await appWindow.click('#monokle-logo-header', {noWaitAfter: true, force: true});
@@ -50,11 +51,11 @@ export async function startApp(): Promise<StartAppResponse> {
   const appWindow: Page = windows[0];
   appWindow.on('console', console.log);
 
-  // if (await waitForModalToShow(appWindow, 'WelcomeModal', 20000)) {
-  //   await clickOnMonokleLogo(appWindow);
-  //   await pause(500);
-  //   await waitForModalToHide(appWindow, 'WelcomeModal');
-  // }
+  if (await waitForModalToShow(appWindow, 'WelcomeModal', 20000)) {
+    await clickOnMonokleLogo(appWindow);
+    await pause(500);
+    await waitForModalToHide(appWindow, 'WelcomeModal');
+  }
 
   // Capture a screenshot.
   await appWindow.screenshot({
