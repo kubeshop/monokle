@@ -2,7 +2,7 @@ import {Page} from 'playwright';
 import { expect, test, } from '@playwright/test';
 import { ElectronApplication } from 'playwright-core';
 import { ElectronAppInfo, startApp } from './electronHelpers';
-import { pause } from './utils';
+import {getRecordingPath, pause} from './utils';
 import { StartProjectPane } from './models/startProjectPane';
 import { MainWindow } from './models/mainWindow';
 import { ProjectsDropdown } from './models/projectsDropdown';
@@ -41,6 +41,9 @@ test.beforeAll(async () => {
 
 test.beforeEach(async () => {
   await pause(1000);
+  await appWindow.screenshot({
+    path: getRecordingPath(appInfo.platform, 'logo-click.png')
+  });
   await mainWindow.clickLogo();
 });
 
