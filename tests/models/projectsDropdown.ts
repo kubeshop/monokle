@@ -1,7 +1,7 @@
 import {Locator, Page} from 'playwright';
-import { v4 as uuidV4 } from 'uuid';
-import { ElectronApplication } from 'playwright-core';
-import { getChannelName } from '../../src/utils/ipc';
+import {v4 as uuidV4} from 'uuid';
+import {ElectronApplication} from 'playwright-core';
+import {getChannelName} from '../../src/utils/ipc';
 
 export class ProjectsDropdown {
 

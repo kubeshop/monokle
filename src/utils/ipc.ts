@@ -1,4 +1,4 @@
-import { StartupFlag, StartupFlags } from './startupFlag';
+import {StartupFlag, StartupFlags} from './startupFlag';
 
 export function getChannelName(
   name: string,

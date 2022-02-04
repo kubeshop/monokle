@@ -1,5 +1,5 @@
 import {Locator, Page} from 'playwright';
-import { v4 as uuidV4 } from 'uuid';
+import {v4 as uuidV4} from 'uuid';
 
 export class StartProjectPane {
 

@@ -52,7 +52,7 @@ import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 import { convertRecentFilesToRecentProjects, setProjectsRootFolder } from './utils';
-import {StartupFlags } from '@utils/startupFlag';
+import {StartupFlags} from '@utils/startupFlag';
 
 Object.assign(console, ElectronLog.functions);
 
