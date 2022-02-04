@@ -31,9 +31,11 @@ Welcome to Monokle 🧐 - your friendly desktop UI for managing k8s manifests!
   </a>
 </p>
 
-> Read the [1.4.0 Release blog-post](https://medium.com/kubeshop-i/monokle-1-4-0-4122e88742c5)
-
-![Monokle Overview](docs/img/monokle-overview.gif)
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=wkFWg_S8eUA">
+    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Overview" />
+  </a>
+</p>
 
 - Quickly get a high-level view of your manifests, their contained resources and relationships
 - Easily edit resources without having to learn or look up yaml syntax
