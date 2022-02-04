@@ -4,48 +4,12 @@ import StartBackgrojnd from '@assets/StartBackground.svg';
 
 import Colors from '@styles/Colors';
 
-export const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-`;
-
-export const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
-`;
-
-export const FolderOpenOutlined = styled.img`
-  width: 64px;
-  color: ${Colors.blue10};
-  margin-bottom: 24px;
-`;
-
-export const FolderAddOutlined = styled.img`
-  width: 64px;
-  margin-bottom: 24px;
-`;
-
-export const FormatPainterOutlined = styled.img`
-  width: 64px;
-  color: ${Colors.blue10};
-  margin-bottom: 24px;
-`;
-
 export const ActionContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 0 40px;
   cursor: pointer;
-`;
-
-export const IconWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  flex: 1;
 `;
 
 export const ActionText = styled.div`
@@ -69,7 +33,48 @@ export const Container = styled.div`
   padding-bottom: 150px;
 `;
 
+export const FolderAddOutlined = styled.img`
+  width: 64px;
+  margin-bottom: 24px;
+`;
+
+export const FolderOpenOutlined = styled.img`
+  width: 64px;
+  color: ${Colors.blue10};
+  margin-bottom: 24px;
+`;
+
+export const FormatPainterOutlined = styled.img`
+  width: 64px;
+  color: ${Colors.blue10};
+  margin-bottom: 24px;
+`;
+
+export const IconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  flex: 1;
+`;
+
+export const Title = styled.span`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 10px;
+`;
+
+export const TitleBarContainer = styled.div`
+  border-bottom: 1px solid ${Colors.grey3};
+`;
+
 export const StartBackground = styled(Container)`
   background: url('${StartBackgrojnd}') no-repeat;
   background-position: 55% 35%;
+`;
+
+export const StartProjectPaneContainer = styled.div`
+  height: 100%;
+  border-left: 1px solid ${Colors.grey3};
+  display: grid;
+  grid-template-rows: max-content 1fr;
 `;

@@ -7,23 +7,21 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import Colors from '@styles/Colors';
 
 export const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
+  border-bottom: 1px solid ${Colors.grey3};
 `;
 
 export const Title = styled.span`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  padding-right: 10px;
 `;
 
 export const ProjectsContainer = styled.div`
   padding: 8px 12px;
-  height: calc(100vh - 112px);
-  overflow-y: scroll;
+  height: 100%;
   width: 100%;
+  overflow-y: auto;
+
   ${GlobalScrollbarStyle}
 `;
 
@@ -73,4 +71,27 @@ export const ProjectLastOpened = styled.div`
 export const BackToProjectButton = styled(Button)`
   font-size: 12px;
   color: ${Colors.lightSeaGreen};
+`;
+
+export const Container = styled.div`
+  height: 100%;
+  display: grid;
+  grid-template-rows: max-content 1fr;
+`;
+
+export const RecentProjectsPaneContainer = styled.div`
+  height: 100%;
+  border-left: 1px solid ${Colors.grey3};
+  position: relative;
+
+  & .custom-modal-handle {
+    position: absolute;
+    top: 50%;
+    left: -5px;
+    height: 100%;
+    width: 10px;
+    background-color: transparent;
+    cursor: col-resize;
+    transform: translateY(-50%);
+  }
 `;
