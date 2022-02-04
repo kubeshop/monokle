@@ -70,7 +70,7 @@ test.skip('Validate settings drawer', async () => {
   expect(await settingsTitle.isVisible()).toBe(false);
 });
 
-test('Validate notifications drawer', async () => {
+test.skip('Validate notifications drawer', async () => {
   appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
     noWaitAfter: true,
     force: true,
