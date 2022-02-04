@@ -231,11 +231,10 @@ export const NodeTitleContainer = styled.div`
   text-overflow: ellipsis;
 `;
 
-export const PreviewSpan = styled.span<{isItemSelected: boolean}>`
+export const PreviewSpan = styled(Button)<{isItemSelected: boolean}>`
   font-weight: 500;
   font-size: 12px;
-  cursor: pointer;
-  color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)};
+  color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)}!important;
   margin-left: 5px;
   margin-right: 15px;
 `;

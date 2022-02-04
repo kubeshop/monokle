@@ -256,7 +256,13 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
       {isTitleHovered && !processingEntity.processingType ? (
         <>
           {canPreview(relativePath) && (
-            <S.PreviewSpan isItemSelected={isFileSelected} onClick={handlePreview}>
+            <S.PreviewSpan
+              type="text"
+              size="small"
+              disabled={isInPreviewMode}
+              isItemSelected={isFileSelected}
+              onClick={handlePreview}
+            >
               Preview
             </S.PreviewSpan>
           )}
