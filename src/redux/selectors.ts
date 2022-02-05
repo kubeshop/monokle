@@ -13,6 +13,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
+import {isUnsavedResource} from './services/resource';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
@@ -34,6 +35,11 @@ export const activeResourcesSelector = createSelector(
         ((previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)) &&
         !r.filePath.startsWith(CLUSTER_DIFF_PREFIX)
     )
+);
+
+export const unsavedResourcesSelector = createSelector(
+  (state: RootState) => state.main.resourceMap,
+  resourceMap => Object.values(resourceMap).filter(isUnsavedResource)
 );
 
 export const selectedResourceSelector = createSelector(

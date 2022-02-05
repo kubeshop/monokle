@@ -13,7 +13,7 @@ moduleAlias.addAliases({
   '@root': `${__dirname}/../`,
 });
 
-import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
+import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
 import * as path from 'path';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import * as Splashscreen from '@trodi/electron-splashscreen';
@@ -32,7 +32,7 @@ import ElectronStore from 'electron-store';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
@@ -276,6 +276,7 @@ export const createWindow = (givenPath?: string) => {
   };
 
   const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
+  let unsavedResourceCount = 0;
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -331,6 +332,7 @@ export const createWindow = (givenPath?: string) => {
     subscribeToStoreStateChanges(win.webContents, (storeState) => {
       createMenu(storeState, dispatch);
       setWindowTitle(storeState, win);
+      unsavedResourceCount = unsavedResourcesSelector(storeState).length;
     });
 
     dispatch(setAppRehydrating(true));
@@ -390,6 +392,30 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
     convertRecentFilesToRecentProjects(dispatch);
+  });
+
+  win.on('close', (e) => {
+    if (unsavedResourceCount === 0) {
+      return;
+    }
+
+    const message = unsavedResourceCount === 1
+      ? 'You have an unsaved resource'
+      : `You have ${unsavedResourceCount} unsaved resources`;
+
+    const choice = dialog.showMessageBoxSync({
+      type: 'info',
+      title: 'Confirmation',
+      message,
+      detail: "Progress will be lost if you choose to close this window. You can't undo this action.",
+      buttons: ['Close', 'Cancel'],
+      defaultId: 0,
+      cancelId: 1,
+    });
+
+    if (choice === 1) {
+      e.preventDefault();
+    }
   });
 
   return win;
