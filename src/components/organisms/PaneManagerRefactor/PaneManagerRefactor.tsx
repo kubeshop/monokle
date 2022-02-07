@@ -9,6 +9,7 @@ import RecentProjectsPane from '../RecentProjectsPane';
 import StartProjectPane from '../StartProjectPane';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
 import PaneManagerRightMenu from './PaneManagerRightMenu';
+import PaneManagerSplitView from './PaneMangerSplitView';
 
 import * as S from './styled';
 
@@ -34,7 +35,9 @@ const PaneManagerRefactor: React.FC = () => {
 
       {isProjectLoading ? (
         <S.Skeleton />
-      ) : activeProject && !isStartProjectPaneVisible ? null : (
+      ) : activeProject && !isStartProjectPaneVisible ? (
+        <PaneManagerSplitView />
+      ) : (
         <S.GettingStartedContainer>
           <StartProjectPane />
 

@@ -13,7 +13,7 @@ import {setOpenProject} from '@redux/reducers/appConfig';
 import {setPaneConfiguration, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector} from '@redux/selectors';
 
-import {MonoPaneTitle} from '@atoms';
+import {TitleBar} from '@molecules';
 
 import * as S from './styled';
 
@@ -72,11 +72,7 @@ const RecentProjectsPane = () => {
         handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-modal-handle" ref={ref} />}
       >
         <S.Container>
-          <S.TitleBarContainer>
-            <MonoPaneTitle>
-              <S.Title>Recent Projects</S.Title>
-            </MonoPaneTitle>
-          </S.TitleBarContainer>
+          <TitleBar title="Recent Projects" />
 
           <S.ProjectsContainer>
             {projects.map((project: Project) => {

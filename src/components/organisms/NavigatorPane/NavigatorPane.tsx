@@ -1,13 +1,10 @@
 import {LegacyRef, useContext, useMemo} from 'react';
-import {useSelector} from 'react-redux';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
 import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
-
-import styled from 'styled-components';
 
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
 import {QuickFilterTooltip} from '@constants/tooltips';
@@ -22,8 +19,6 @@ import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
 import Colors from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
@@ -33,29 +28,6 @@ import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSec
 import ClusterCompareButton from './ClusterCompareButton';
 import * as S from './NavigatorPane.styled';
 import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
-
-const FiltersContainer = styled.div`
-  position: relative;
-  padding: 6px 0 3px 0;
-  margin-bottom: 10px;
-
-  & .react-resizable {
-    padding: 8px 16px;
-    overflow-y: auto;
-
-    ${GlobalScrollbarStyle}
-  }
-
-  & .custom-handle {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -4px;
-    height: 3px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    cursor: row-resize;
-  }
-`;
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -71,8 +43,8 @@ const NavPane: React.FC = () => {
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
-  const isInClusterMode = useSelector(isInClusterModeSelector);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
 
   const navigatorHeight = useMemo(
@@ -147,7 +119,7 @@ const NavPane: React.FC = () => {
       )}
 
       {isResourceFiltersOpen && (
-        <FiltersContainer ref={filtersContainerRef}>
+        <S.FiltersContainer ref={filtersContainerRef}>
           <ResizableBox
             width={width}
             height={height || 350}
@@ -159,7 +131,7 @@ const NavPane: React.FC = () => {
           >
             <ResourceFilter />
           </ResizableBox>
-        </FiltersContainer>
+        </S.FiltersContainer>
       )}
 
       <S.List id="navigator-sections-container" height={sectionListHeight}>

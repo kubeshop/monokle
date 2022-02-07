@@ -3,7 +3,7 @@ import {ipcRenderer} from 'electron';
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Menu, Modal, Row, Tooltip} from 'antd';
+import {Button, Menu, Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -34,7 +34,7 @@ import {isKustomizationFile, isKustomizationResource} from '@redux/services/kust
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
+import {MonoPaneTitle, Spinner} from '@atoms';
 
 import Dots from '@components/atoms/Dots';
 import Icon from '@components/atoms/Icon';
@@ -730,44 +730,43 @@ const FileTreePane = () => {
 
   return (
     <S.FileTreeContainer id="FileExplorer">
-      <Row>
-        <MonoPaneTitleCol>
-          <MonoPaneTitle>
-            <S.TitleBarContainer>
-              <S.Title>
-                File Explorer{' '}
-                {isScanExcludesUpdated === 'outdated' ? (
-                  <Tooltip title={FileExplorerChanged}>
-                    <ExclamationCircleOutlined />
-                  </Tooltip>
-                ) : (
-                  ''
-                )}
-              </S.Title>
-              <S.RightButtons>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                  <S.ReloadButton
-                    size="small"
-                    onClick={refreshFolder}
-                    icon={<ReloadOutlined />}
-                    type="link"
-                    disabled={isButtonDisabled}
-                  />
+      <S.TitleBarContainer>
+        <MonoPaneTitle>
+          <S.TitleContainer>
+            <S.Title>
+              File Explorer{' '}
+              {isScanExcludesUpdated === 'outdated' && (
+                <Tooltip title={FileExplorerChanged}>
+                  <ExclamationCircleOutlined />
                 </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
-                  <Button
-                    icon={<Icon name="collapse" />}
-                    onClick={onToggleTree}
-                    type="link"
-                    size="small"
-                    disabled={isButtonDisabled}
-                  />
-                </Tooltip>
-              </S.RightButtons>
-            </S.TitleBarContainer>
-          </MonoPaneTitle>
-        </MonoPaneTitleCol>
-      </Row>
+              )}
+            </S.Title>
+
+            <S.RightButtons>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                <Button
+                  size="small"
+                  onClick={refreshFolder}
+                  icon={<ReloadOutlined />}
+                  type="link"
+                  disabled={isButtonDisabled}
+                />
+              </Tooltip>
+
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+                <Button
+                  icon={<Icon name="collapse" />}
+                  onClick={onToggleTree}
+                  type="link"
+                  size="small"
+                  disabled={isButtonDisabled}
+                />
+              </Tooltip>
+            </S.RightButtons>
+          </S.TitleContainer>
+        </MonoPaneTitle>
+      </S.TitleBarContainer>
+
       {uiState.isFolderLoading ? (
         <S.Skeleton active />
       ) : tree ? (

@@ -2,34 +2,18 @@ import styled from 'styled-components';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
-import {AppBorders} from '@styles/Borders';
-import {BackgroundColors} from '@styles/Colors';
-
-export const TitleBar = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-  border-bottom: ${AppBorders.sectionDivider};
-  width: 100%;
-  height: 40px;
-  margin: 0;
-  padding: 0;
-  background: ${BackgroundColors.darkThemeBackground};
-  overflow: hidden;
+export const KustomizePaneContainer = styled.div`
+  height: 100%;
+  display: grid;
+  grid-template-rows: max-content 1fr;
 `;
 
-export const TitleBarRightButtons = styled.div`
-  float: right;
-  display: flex;
-  align-items: center;
-  padding-right: 16px;
-`;
-
-export const List = styled.ol<{height: number}>`
+export const List = styled.ol`
+  height: 100%;
   list-style-type: none;
   padding: 0;
+  padding-bottom: 20px;
+  margin: 0;
   overflow-y: auto;
   ${GlobalScrollbarStyle}
-  ${props => `height: ${props.height}px;`}
-  padding-bottom: 20px;
 `;

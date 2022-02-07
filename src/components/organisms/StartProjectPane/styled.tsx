@@ -67,14 +67,3 @@ export const StartProjectPaneContainer = styled.div`
   display: grid;
   grid-template-rows: max-content 1fr;
 `;
-
-export const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
-`;
-
-export const TitleBarContainer = styled.div`
-  border-bottom: 1px solid ${Colors.grey3};
-`;

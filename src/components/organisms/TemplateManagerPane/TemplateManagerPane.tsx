@@ -35,7 +35,7 @@ const filterTemplateBySearchedValue = (searchedValue: string, name: string) => {
   return shouldBeFiltered;
 };
 
-const TemplatesPane: React.FC = () => {
+const TemplatesManagerPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
@@ -93,8 +93,7 @@ const TemplatesPane: React.FC = () => {
   }, [searchedValue, templateMap]);
 
   return (
-    <>
-      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
+    <S.TemplateManagerPaneContainer id="TemplateManagerPane">
       <TitleBar title="Templates">
         <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
           <Button
@@ -139,8 +138,10 @@ const TemplatesPane: React.FC = () => {
           </>
         )}
       </S.Container>
-    </>
+
+      {selectedTemplate && <TemplateModal template={selectedTemplate} onClose={onTemplateModalClose} />}
+    </S.TemplateManagerPaneContainer>
   );
 };
 
-export default TemplatesPane;
+export default TemplatesManagerPane;

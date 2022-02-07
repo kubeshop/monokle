@@ -3,7 +3,6 @@ export {default as FormEditor} from './FormEditor';
 export {default as GraphView} from './GraphView';
 export {default as Monaco} from './Monaco';
 export {default as ScrollIntoView} from './ScrollIntoView';
-export {default as TitleBar} from './TitleBar';
 export {default as SectionRenderer} from './SectionRenderer';
 export {default as ClusterDiff} from './ClusterDiff';
 export {default as ResourceFilter} from './ResourceFilter';
@@ -11,4 +10,5 @@ export {default as ResourceFilterIconWithPopover} from './ResourceFilterIconWith
 export {default as ResourceDiff} from './ResourceDiff';
 export {default as PreviewDropdown} from './PreviewDropdown';
 export {default as TemplateFormRenderer} from './TemplateFormRenderer';
+export {default as TitleBar} from './TitleBar';
 export {default as ValidationErrorsPopover} from './ValidationErrorsPopover';

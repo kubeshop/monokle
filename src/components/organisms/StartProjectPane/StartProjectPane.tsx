@@ -1,7 +1,7 @@
 import {useAppDispatch} from '@redux/hooks';
 import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
-import {MonoPaneTitle} from '@atoms';
+import {TitleBar} from '@molecules';
 
 import SelectAnEmptyProject from '@assets/SelectAnEmptyProject.svg';
 import SelectAnExistingFolder from '@assets/SelectAnExistingFolder.svg';
@@ -22,11 +22,7 @@ const StartProjectPane = () => {
 
   return (
     <S.StartProjectPaneContainer>
-      <S.TitleBarContainer>
-        <MonoPaneTitle>
-          <S.Title>Start a Project</S.Title>
-        </MonoPaneTitle>
-      </S.TitleBarContainer>
+      <TitleBar title="Start a Project" />
 
       <S.StartBackground>
         <div>

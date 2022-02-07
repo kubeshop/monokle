@@ -85,13 +85,3 @@ export const RecentProjectsPaneContainer = styled.div`
     transform: translateY(-50%);
   }
 `;
-
-export const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-`;
-
-export const TitleBarContainer = styled.div`
-  border-bottom: 1px solid ${Colors.grey3};
-`;
