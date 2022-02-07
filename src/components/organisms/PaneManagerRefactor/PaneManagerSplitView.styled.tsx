@@ -1,7 +1,10 @@
 import styled from 'styled-components';
 
-export const LeftPane = styled.div`
-  height: 100%;
+export const LeftPane = styled.div<{$height: number; $width: number}>`
+  ${({$height, $width}) => `
+  width: ${$width}px;
+  height: ${$height}px;
+  `};
 `;
 
 export const NavPane = styled.div`

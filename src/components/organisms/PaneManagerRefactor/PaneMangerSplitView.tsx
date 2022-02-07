@@ -2,6 +2,9 @@ import React, {Suspense} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {useMainPaneHeight} from '@utils/hooks';
+
+// import {NavigatorPane} from '@organisms';
 import * as S from './PaneManagerSplitView.styled';
 
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
@@ -12,12 +15,15 @@ const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerP
 const PaneManagerSplitView: React.FC = () => {
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
+  const leftWidth = useAppSelector(state => state.ui.paneConfiguration.leftWidth);
+
+  const paneHeight = useMainPaneHeight();
 
   return (
     <S.SplitViewContainer>
       {leftActive && leftMenuSelection && (
         <Suspense fallback={null}>
-          <S.LeftPane id="LeftPane">
+          <S.LeftPane id="LeftPane" $width={500 || leftWidth} $height={paneHeight}>
             {leftMenuSelection === 'file-explorer' && <FileTreePane />}
             {leftMenuSelection === 'helm-pane' && <HelmPane />}
             {leftMenuSelection === 'kustomize-pane' && <KustomizePane />}

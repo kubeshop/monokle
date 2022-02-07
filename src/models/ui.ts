@@ -49,6 +49,11 @@ export type MonacoUiState = {
 
 export type LeftMenuSelectionType = 'file-explorer' | 'helm-pane' | 'kustomize-pane' | 'templates-pane';
 
+export type LayoutSizeType = {
+  footer: number;
+  header: number;
+};
+
 export type UiState = {
   isResourceFiltersOpen: boolean;
   isSettingsOpen: boolean;
@@ -80,6 +85,7 @@ export type UiState = {
     entityName: string;
     absolutePathToEntity: string;
   };
+  layoutSize: LayoutSizeType;
   isFolderLoading: boolean;
   leftMenu: {
     selection: LeftMenuSelectionType;

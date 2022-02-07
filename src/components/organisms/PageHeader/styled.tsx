@@ -94,6 +94,8 @@ export const PreviewRow = styled(Row)`
   justify-content: space-between;
 `;
 
+export const PageHeaderContainer = styled.div``;
+
 export const ProjectClusterSelectionContainer = styled.div`
   display: flex;
   justify-content: center;

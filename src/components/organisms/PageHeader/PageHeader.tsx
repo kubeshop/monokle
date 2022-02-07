@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Badge, Tooltip} from 'antd';
 
@@ -10,7 +11,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPluginsDrawer} from '@redux/reducers/extension';
-import {toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
+import {setLayoutSize, toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
@@ -40,6 +41,7 @@ const PageHeader = () => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const layoutSize = useAppSelector(state => state.ui.layoutSize);
   const previewResourceId = useAppSelector(state => state.main.previewResourceId);
   const previewType = useAppSelector(state => state.main.previewType);
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
@@ -50,22 +52,7 @@ const PageHeader = () => {
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
 
-  useEffect(() => {
-    if (previewResourceId) {
-      setPreviewResource(resourceMap[previewResourceId]);
-    } else {
-      setPreviewResource(undefined);
-    }
-
-    if (previewValuesFileId && helmValuesMap[previewValuesFileId]) {
-      const valuesFile = helmValuesMap[previewValuesFileId];
-      setPreviewValuesFile(valuesFile);
-      setHelmChart(helmChartMap[valuesFile.helmChartId]);
-    } else {
-      setPreviewValuesFile(undefined);
-      setHelmChart(undefined);
-    }
-  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap]);
+  const [pageHeaderRef, {height: pageHeaderHeight}] = useMeasure<HTMLDivElement>();
 
   const toggleSettingsDrawer = () => {
     dispatch(toggleSettings());
@@ -89,8 +76,33 @@ const PageHeader = () => {
     stopPreview(dispatch);
   };
 
+  useEffect(() => {
+    if (previewResourceId) {
+      setPreviewResource(resourceMap[previewResourceId]);
+    } else {
+      setPreviewResource(undefined);
+    }
+
+    if (previewValuesFileId && helmValuesMap[previewValuesFileId]) {
+      const valuesFile = helmValuesMap[previewValuesFileId];
+      setPreviewValuesFile(valuesFile);
+      setHelmChart(helmChartMap[valuesFile.helmChartId]);
+    } else {
+      setPreviewValuesFile(undefined);
+      setHelmChart(undefined);
+    }
+  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap]);
+
+  useEffect(() => {
+    if (pageHeaderHeight) {
+      dispatch(setLayoutSize({...layoutSize, header: pageHeaderHeight}));
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageHeaderHeight]);
+
   return (
-    <>
+    <S.PageHeaderContainer ref={pageHeaderRef}>
       {isInPreviewMode && previewType === 'kustomization' && (
         <S.PreviewRow noborder="true">
           <S.ModeSpan>PREVIEW MODE</S.ModeSpan>
@@ -155,7 +167,7 @@ const PageHeader = () => {
           </S.SettingsCol>
         </S.Row>
       </S.Header>
-    </>
+    </S.PageHeaderContainer>
   );
 };
 

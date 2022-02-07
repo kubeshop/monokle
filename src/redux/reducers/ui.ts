@@ -8,6 +8,7 @@ import {ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT} from '@constants/constants'
 
 import {
   HighlightItems,
+  LayoutSizeType,
   LeftMenuSelectionType,
   MonacoUiState,
   NewResourceWizardInput,
@@ -58,6 +59,9 @@ export const uiSlice = createSlice({
     toggleRightMenu: (state: Draft<UiState>) => {
       state.rightMenu.isActive = !state.rightMenu.isActive;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
+    },
+    setLayoutSize: (state: Draft<UiState>, action: PayloadAction<LayoutSizeType>) => {
+      state.layoutSize = action.payload;
     },
     toggleNotifications: (state: Draft<UiState>) => {
       state.isNotificationsOpen = !state.isNotificationsOpen;
@@ -275,6 +279,7 @@ export const {
   closeCreateProjectModal,
   toggleExpandActionsPaneFooter,
   resetLayout,
+  setLayoutSize,
   highlightItem,
   openQuickSearchActionsPopup,
   closeQuickSearchActionsPopup,
