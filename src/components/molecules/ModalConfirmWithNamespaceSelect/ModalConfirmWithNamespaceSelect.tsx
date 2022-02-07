@@ -15,6 +15,7 @@ import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selector
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
+import {createKubeClient} from '@utils/kubeclient';
 import {getDefaultNamespaceForApply} from '@utils/resources';
 
 import Colors from '@styles/Colors';
@@ -60,6 +61,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
 
+  const configState = useAppSelector(state => state.config);
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources);
   const [namespaces] = useTargetClusterNamespaces();
 
@@ -74,10 +76,8 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         setErrorMessage('Namespace name must not be empty!');
         return;
       }
-      const kc = new k8s.KubeConfig();
-      kc.loadFromFile(kubeConfigPath);
-      kc.setCurrentContext(kubeConfigContext);
 
+      const kc = createKubeClient(configState);
       const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
       k8sCoreV1Api

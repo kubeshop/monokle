@@ -16,17 +16,14 @@ import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {extractK8sResources, processParsedResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
+import {createKubeClient} from '@utils/kubeclient';
+
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
+const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   try {
-    const kc = new k8s.KubeConfig();
-    const currentContext =
-      thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
-      thunkAPI.getState().config.kubeConfig.currentContext;
-    kc.loadFromFile(configPath);
-    kc.setCurrentContext(currentContext);
+    const kc = createKubeClient(thunkAPI.getState().config, context);
 
     const results = await Promise.allSettled(
       getRegisteredKindHandlers()
@@ -53,11 +50,11 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
 
     const previewResult = createPreviewResult(
       allYaml,
-      configPath,
+      context,
       'Get Cluster Resources',
       resourceRefsProcessingOptions,
-      configPath,
-      currentContext
+      context,
+      kc.currentContext
     );
 
     // if the cluster contains CRDs we need to check if there any corresponding resources also
@@ -70,7 +67,7 @@ const previewClusterHandler = async (configPath: string, thunkAPI: any) => {
       // if any were found we need to merge them into the preview-result
       if (customResourceObjects.length > 0) {
         const customResourcesYaml = customResourceObjects.join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-        const customResources = extractK8sResources(customResourcesYaml, PREVIEW_PREFIX + configPath);
+        const customResources = extractK8sResources(customResourcesYaml, PREVIEW_PREFIX + context);
         customResources.forEach(r => {
           previewResult.previewResources[r.id] = r;
         });

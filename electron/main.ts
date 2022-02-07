@@ -39,7 +39,7 @@ import {downloadPlugin, loadPluginMap, updatePlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
-import {setAppRehydrating} from '@redux/reducers/main';
+import {setAppRehydrating, setMainProcessEnv} from '@redux/reducers/main';
 import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
 import {indexOf} from 'lodash';
@@ -72,7 +72,6 @@ setProjectsRootFolder(userHomeDir);
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
 });
-
 
 ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   try {
@@ -344,7 +343,7 @@ export const createWindow = (givenPath?: string) => {
       };
       dispatchToWindow(win, setAlert(alert));
     }
-    win.webContents.send('executed-from', {path: givenPath});
+    win.webContents.send('executed-from', {path: givenPath });
 
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
@@ -364,8 +363,8 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setPluginMap(pluginMap));
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
+    dispatch(setMainProcessEnv( PROCESS_ENV ));
     convertRecentFilesToRecentProjects(dispatch);
-
   });
 
   return win;
