@@ -4,7 +4,7 @@ import log from 'loglevel';
 
 import {AppConfig} from '@models/appconfig';
 
-import {getMainProcessEnv} from '@redux/reducers/main';
+import {getMainProcessEnv} from '@utils/env';
 
 export function createKubeClient(config: string | AppConfig, context?: string) {
   const kc = new k8s.KubeConfig();

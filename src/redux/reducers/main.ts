@@ -195,12 +195,6 @@ function getLocalResourceMap(state: Draft<AppState>) {
   return localResourceMap;
 }
 
-let mainProcessEnv: any | undefined;
-
-export function getMainProcessEnv() {
-  return mainProcessEnv;
-}
-
 /**
  * The main reducer slice
  */
@@ -209,9 +203,6 @@ export const mainSlice = createSlice({
   name: 'main',
   initialState: initialState.main,
   reducers: {
-    setMainProcessEnv: (state: Draft<AppState>, action: PayloadAction<any>) => {
-      mainProcessEnv = action.payload;
-    },
     setAppRehydrating: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isRehydrating = action.payload;
       if (!action.payload) {
@@ -1130,6 +1121,5 @@ export const {
   addMultipleKindHandlers,
   addKindHandler,
   seenNotifications,
-  setMainProcessEnv,
 } = mainSlice.actions;
 export default mainSlice.reducer;

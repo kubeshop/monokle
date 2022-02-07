@@ -27,6 +27,7 @@ import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
 
@@ -151,6 +152,18 @@ const App = () => {
       ipcRenderer.removeListener('open-project', onOpenProjectFolderFromMainThread);
     };
   }, [onOpenProjectFolderFromMainThread]);
+
+  const onSetMainProcessEnv = useCallback((_: any, args: any) => {
+    setMainProcessEnv(args.mainProcessEnv);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('set-main-process-env', onSetMainProcessEnv);
+    return () => {
+      ipcRenderer.removeListener('set-main-process-env', onSetMainProcessEnv);
+    };
+  }, [onSetMainProcessEnv]);
 
   useDebounce(
     () => {

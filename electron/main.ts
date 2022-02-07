@@ -39,7 +39,7 @@ import {downloadPlugin, loadPluginMap, updatePlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
-import {setAppRehydrating, setMainProcessEnv} from '@redux/reducers/main';
+import {setAppRehydrating} from '@redux/reducers/main';
 import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
 import {indexOf} from 'lodash';
@@ -344,6 +344,7 @@ export const createWindow = (givenPath?: string) => {
       dispatchToWindow(win, setAlert(alert));
     }
     win.webContents.send('executed-from', {path: givenPath });
+    win.webContents.send('set-main-process-env', {mainProcessEnv: PROCESS_ENV });
 
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
@@ -363,7 +364,6 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setPluginMap(pluginMap));
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
-    dispatch(setMainProcessEnv( PROCESS_ENV ));
     convertRecentFilesToRecentProjects(dispatch);
   });
 
