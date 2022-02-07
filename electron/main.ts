@@ -73,7 +73,6 @@ ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
 });
 
-
 ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   try {
     const pluginExtension = await downloadPlugin(pluginUrl, pluginsDir);
@@ -344,7 +343,8 @@ export const createWindow = (givenPath?: string) => {
       };
       dispatchToWindow(win, setAlert(alert));
     }
-    win.webContents.send('executed-from', {path: givenPath});
+    win.webContents.send('executed-from', {path: givenPath });
+    win.webContents.send('set-main-process-env', {mainProcessEnv: PROCESS_ENV });
 
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
@@ -365,7 +365,6 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
     convertRecentFilesToRecentProjects(dispatch);
-
   });
 
   return win;

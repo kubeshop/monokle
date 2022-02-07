@@ -38,6 +38,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
 import {getFileStats, getFileTimestamp} from '@utils/files';
+import {createKubeClient} from '@utils/kubeclient';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 
 import {getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
@@ -437,13 +438,11 @@ export const mainSlice = createSlice({
       }
       if (state.previewType === 'cluster' && state.previewKubeConfigPath && state.previewKubeConfigContext) {
         try {
-          const kubeConfig = new k8s.KubeConfig();
-          kubeConfig.loadFromFile(state.previewKubeConfigPath);
-          kubeConfig.setCurrentContext(state.previewKubeConfigContext);
+          const kubeClient = createKubeClient(state.previewKubeConfigPath, state.previewKubeConfigContext);
 
           const kindHandler = getResourceKindHandler(resource.kind);
           if (kindHandler?.deleteResourceInCluster) {
-            kindHandler.deleteResourceInCluster(kubeConfig, resource);
+            kindHandler.deleteResourceInCluster(kubeClient, resource);
             deleteResource(resource, state.resourceMap);
           }
         } catch (err) {

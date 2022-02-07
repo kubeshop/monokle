@@ -1,5 +1,3 @@
-import * as k8s from '@kubernetes/client-node';
-
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
@@ -23,6 +21,7 @@ import {isKustomizationPatch, isKustomizationResource, processKustomizations} fr
 import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
+import {createKubeClient} from '@utils/kubeclient';
 
 import {
   getDependentResourceKinds,
@@ -274,11 +273,8 @@ export function getNamespaces(resourceMap: ResourceMapType) {
 }
 
 export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string) {
-  const kc = new k8s.KubeConfig();
-  kc.loadFromFile(kubeconfigPath);
-  kc.setCurrentContext(context);
-
-  const namespaces = await NamespaceHandler.listResourcesInCluster(kc);
+  const kubeClient = createKubeClient(kubeconfigPath, context);
+  const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient);
 
   const ns: string[] = [];
   namespaces.forEach(namespace => {

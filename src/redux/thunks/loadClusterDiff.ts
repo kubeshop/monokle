@@ -10,6 +10,8 @@ import {RootState} from '@models/rootstate';
 import getClusterObjects from '@redux/services/getClusterObjects';
 import {extractK8sResources} from '@redux/services/resource';
 
+import {createKubeClient} from '@utils/kubeclient';
+
 import {createRejectionWithAlert} from './utils';
 
 export type LoadClusterDiffPayload = {
@@ -28,17 +30,12 @@ export const loadClusterDiff = createAsyncThunk<
   }
 >('main/loadClusterDiff', async (_, thunkAPI) => {
   const state = thunkAPI.getState();
-  const currentContext =
-    state.config.projectConfig?.kubeConfig?.currentContext || state.config.kubeConfig?.currentContext;
   if (!state.ui.isClusterDiffVisible) {
     return;
   }
-  if (!currentContext) {
-    return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, 'Could not find current kubeconfig context.');
-  }
   try {
-    const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
-    return getClusterObjects(String(kubeConfigPath), currentContext).then(
+    const kc = createKubeClient(state.config);
+    return getClusterObjects(kc).then(
       results => {
         const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
@@ -53,7 +50,7 @@ export const loadClusterDiff = createAsyncThunk<
 
         // @ts-ignore
         const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-        const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + String(kubeConfigPath));
+        const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + String(kc.currentContext));
         const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
           rm[r.id] = r;
           return rm;
