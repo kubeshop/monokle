@@ -1,4 +1,4 @@
-import {LegacyRef, useContext, useMemo} from 'react';
+import {LegacyRef, useMemo} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
@@ -6,7 +6,7 @@ import {Badge, Button, Tooltip} from 'antd';
 
 import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 
-import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 import {QuickFilterTooltip} from '@constants/tooltips';
 
 import {ResourceFilterType} from '@models/appstate';
@@ -19,9 +19,10 @@ import {MonoPaneTitle} from '@components/atoms';
 import {ResourceFilter, SectionRenderer} from '@components/molecules';
 import CheckedResourcesActionsMenu from '@components/molecules/CheckedResourcesActionsMenu';
 
+import {useMainPaneHeight} from '@utils/hooks';
+
 import Colors from '@styles/Colors';
 
-import AppContext from '@src/AppContext';
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
@@ -31,7 +32,6 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
-  const {windowSize} = useContext(AppContext);
 
   const [filtersContainerRef, {height, width}] = useMeasure<HTMLDivElement>();
 
@@ -40,17 +40,13 @@ const NavPane: React.FC = () => {
   const activeResources = useAppSelector(activeResourcesSelector);
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-
-  const navigatorHeight = useMemo(
-    () => windowSize.height - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
-    [windowSize.height, isInPreviewMode]
-  );
+  const paneHeight = useMainPaneHeight();
 
   const appliedFilters = useMemo(() => {
     return Object.entries(resourceFilters)
@@ -64,14 +60,6 @@ const NavPane: React.FC = () => {
     return Boolean(fileMap[ROOT_FILE_ENTRY]);
   }, [fileMap]);
 
-  const sectionListHeight = useMemo(() => {
-    if (isResourceFiltersOpen && height) {
-      return navigatorHeight - (height + 24);
-    }
-
-    return navigatorHeight;
-  }, [height, isResourceFiltersOpen, navigatorHeight]);
-
   const onClickNewResource = () => {
     dispatch(openNewResourceWizard());
   };
@@ -80,8 +68,18 @@ const NavPane: React.FC = () => {
     dispatch(toggleResourceFilters());
   };
 
+  const containerGridTemplateRows = useMemo(() => {
+    let gridTemplateRows = 'max-content 1fr';
+
+    if (isResourceFiltersOpen) {
+      gridTemplateRows = 'repeat(2, max-content) 1fr';
+    }
+
+    return gridTemplateRows;
+  }, [isResourceFiltersOpen]);
+
   return (
-    <>
+    <S.NavigatorPaneContainer $gridTemplateRows={containerGridTemplateRows}>
       {checkedResourceIds.length && !isPreviewLoading ? (
         <CheckedResourcesActionsMenu />
       ) : (
@@ -126,7 +124,7 @@ const NavPane: React.FC = () => {
             axis="y"
             resizeHandles={['s']}
             minConstraints={[100, 200]}
-            maxConstraints={[width, navigatorHeight - 200]}
+            maxConstraints={[width, paneHeight - 300]}
             handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-handle" ref={ref} />}
           >
             <ResourceFilter />
@@ -134,11 +132,11 @@ const NavPane: React.FC = () => {
         </S.FiltersContainer>
       )}
 
-      <S.List id="navigator-sections-container" height={sectionListHeight}>
+      <S.List id="navigator-sections-container">
         <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
         <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
       </S.List>
-    </>
+    </S.NavigatorPaneContainer>
   );
 };
 

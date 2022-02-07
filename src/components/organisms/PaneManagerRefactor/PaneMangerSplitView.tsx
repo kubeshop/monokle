@@ -2,9 +2,10 @@ import React, {Suspense} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {NavigatorPane} from '@organisms';
+
 import {useMainPaneHeight} from '@utils/hooks';
 
-// import {NavigatorPane} from '@organisms';
 import * as S from './PaneManagerSplitView.styled';
 
 const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
@@ -32,9 +33,9 @@ const PaneManagerSplitView: React.FC = () => {
         </Suspense>
       )}
 
-      {/* <S.NavPane id="NavPane">
+      <S.NavPane id="NavPane" $height={paneHeight}>
         <NavigatorPane />
-      </S.NavPane> */}
+      </S.NavPane>
     </S.SplitViewContainer>
   );
 };

@@ -10,7 +10,7 @@ import Colors, {BackgroundColors} from '@styles/Colors';
 export const FiltersContainer = styled.div`
   position: relative;
   padding: 6px 0 3px 0;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 
   & .react-resizable {
     padding: 8px 16px;
@@ -34,13 +34,25 @@ export const FiltersNumber = styled.div`
   margin-left: 5px;
 `;
 
-export const List = styled.ol<{height: number}>`
-  ${props => `height: ${props.height}px;`}
+export const List = styled.ol`
+  height: 100%;
   list-style-type: none;
   padding: 0;
-  overflow-y: auto;
   padding-bottom: 20px;
+  margin: 0;
+  overflow-y: auto;
+
   ${GlobalScrollbarStyle}
+`;
+
+export const NavigatorPaneContainer = styled.div<{$gridTemplateRows: string}>`
+  height: 100%;
+  display: grid;
+
+  ${({$gridTemplateRows}) => `
+    grid-template-rows: ${$gridTemplateRows};
+  `};
+  grid-row-gap: 5px;
 `;
 
 export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: boolean}>`
@@ -61,10 +73,8 @@ export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: bool
 export const TitleBar = styled.div`
   display: flex;
   justify-content: space-between;
-  height: 24px;
   border-bottom: ${AppBorders.sectionDivider};
   width: 100%;
-  height: 40px;
   margin: 0;
   padding: 0;
   background: ${BackgroundColors.darkThemeBackground};

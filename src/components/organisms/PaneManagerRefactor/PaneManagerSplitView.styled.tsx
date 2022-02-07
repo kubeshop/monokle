@@ -7,8 +7,10 @@ export const LeftPane = styled.div<{$height: number; $width: number}>`
   `};
 `;
 
-export const NavPane = styled.div`
-  height: 100%;
+export const NavPane = styled.div<{$height: number}>`
+  ${({$height}) => `
+    height: ${$height}px;
+  `};
 `;
 
 export const SplitViewContainer = styled.div`
