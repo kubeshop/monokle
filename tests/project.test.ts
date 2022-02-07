@@ -1,7 +1,7 @@
 import {Page} from 'playwright';
 import {expect, test} from '@playwright/test';
 import {ElectronApplication} from 'playwright-core';
-import {ElectronAppInfo, startApp} from './electronHelpers';
+import {startApp} from './electronHelpers';
 import {pause} from './utils';
 import {StartProjectPane} from './models/startProjectPane';
 import {MainWindow} from './models/mainWindow';
@@ -13,7 +13,6 @@ import {SaveResourceModal} from './models/saveResourceModal';
 import {FileExplorerPane} from './models/fileExplorerPane';
 
 let appWindow: Page;
-let appInfo: ElectronAppInfo;
 let electronApp: ElectronApplication;
 let startPane: StartProjectPane;
 let mainWindow: MainWindow;
@@ -27,7 +26,6 @@ let fileExplorerPane: FileExplorerPane;
 test.beforeAll(async () => {
   const startAppResponse = await startApp();
   appWindow = startAppResponse.appWindow;
-  appInfo = startAppResponse.appInfo;
   electronApp = startAppResponse.electronApp;
   startPane = new StartProjectPane(appWindow);
   mainWindow = new MainWindow(appWindow);
@@ -41,12 +39,12 @@ test.beforeAll(async () => {
 
 test.beforeEach(async () => {
   await pause(1000);
+  // click on logo to always start on the same screen
   await mainWindow.clickLogo();
 });
 
 test.afterEach(async () => {
   await pause(1000);
-  appWindow.on('console', console.log);
 });
 
 test('should create empty project from welcome screen', async () => {
@@ -76,7 +74,8 @@ test('should create new resource', async () => {
 
   await editorPane.saveResource();
   await saveResourceModal.clickSave();
-  // await mainWindow.clickFileExplorer();
+  // pause for 1 sec to wait for file save
+  await pause(1000);
 
   expect((await fileExplorerPane.projectName.textContent())?.includes(projectName)).toBe(true);
   expect(await fileExplorerPane.fileCount.textContent()).toEqual('1 files');

@@ -30,6 +30,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
+import {StartupFlag} from '@utils/startupFlag';
 
 import AppContext from './AppContext';
 
@@ -152,6 +153,17 @@ const App = () => {
       ipcRenderer.removeListener('open-project', onOpenProjectFolderFromMainThread);
     };
   }, [onOpenProjectFolderFromMainThread]);
+
+  const onSetAutomation = useCallback(() => {
+    StartupFlag.getInstance().automationFlag = true;
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('set-automation', onSetAutomation);
+    return () => {
+      ipcRenderer.removeListener('set-automation', onSetAutomation);
+    };
+  }, [onSetAutomation]);
 
   const onSetMainProcessEnv = useCallback((_: any, args: any) => {
     setMainProcessEnv(args.mainProcessEnv);

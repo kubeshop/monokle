@@ -23,7 +23,7 @@ import {APP_MIN_HEIGHT, APP_MIN_WIDTH, DEFAULT_PLUGINS, ROOT_FILE_ENTRY} from '@
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
-import {setAutomation, setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
+import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
@@ -316,7 +316,7 @@ export const createWindow = (givenPath?: string) => {
 
     dispatch(setAppRehydrating(true));
     if (process.argv.includes(StartupFlags.AUTOMATION)) {
-      dispatch(setAutomation(true));
+      win.webContents.send('set-automation');
     }
 
     dispatch(setUserDirs({

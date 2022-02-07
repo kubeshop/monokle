@@ -99,7 +99,6 @@ interface AppConfig {
   userDataDir?: string;
   userTempDir?: string;
   isProjectLoading?: boolean;
-  automation?: boolean;
   projectsRootPath: string;
 }
 
