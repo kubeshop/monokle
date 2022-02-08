@@ -2,6 +2,12 @@ import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
 
+export const EditorPaneContainer = styled.div`
+  height: 100%;
+  border-left: ${AppBorders.sectionDivider};
+  position: relative;
+`;
+
 export const LeftPaneContainer = styled.div`
   height: 100%;
   border-right: ${AppBorders.sectionDivider};
@@ -26,12 +32,11 @@ export const SplitViewContainer = styled.div<{$gridTemplateColumns: string}>`
 
   & .custom-modal-handle {
     position: absolute;
-    top: 50%;
-    right: -5px;
-    height: 100%;
-    width: 10px;
+    top: 0;
+    bottom: 0;
+    right: -3px;
+    width: 5px;
     background-color: transparent;
     cursor: col-resize;
-    transform: translateY(-50%);
   }
 `;

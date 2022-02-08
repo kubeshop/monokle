@@ -4,16 +4,14 @@ import {LegacyRef, useCallback, useContext, useEffect, useMemo, useRef, useState
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
-import {Button, Row, Tabs, Tooltip} from 'antd';
+import {Button, Tabs, Tooltip} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, ContainerOutlined} from '@ant-design/icons';
 
 import {
   ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
   ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
-  ACTIONS_PANE_TAB_PANE_OFFSET,
   KUSTOMIZE_HELP_URL,
-  NAVIGATOR_HEIGHT_OFFSET,
   TOOLTIP_DELAY,
 } from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -34,7 +32,6 @@ import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal, setMonacoEditor, setPaneConfiguration} from '@redux/reducers/ui';
 import {
-  isInPreviewModeSelector,
   knownResourceKindsSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -48,15 +45,15 @@ import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
-import FormEditor from '@molecules/FormEditor';
-import Monaco from '@molecules/Monaco';
+import {
+  FormEditor,
+  HelmChartModalConfirmWithNamespaceSelect,
+  ModalConfirmWithNamespaceSelect,
+  Monaco,
+  TitleBar,
+} from '@molecules';
 
-import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
-import TabHeader from '@atoms/TabHeader';
-
-import Icon from '@components/atoms/Icon';
-import HelmChartModalConfirmWithNamespaceSelect from '@components/molecules/HelmChartModalConfirmWithNamespaceSelect';
-import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
+import {Icon, TabHeader} from '@atoms';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
@@ -71,12 +68,16 @@ import ActionsPaneFooter from './ActionsPaneFooter';
 
 const {TabPane} = Tabs;
 
-const ActionsPane = (props: {contentHeight: string}) => {
+interface IProps {
+  contentHeight: number;
+}
+
+const ActionsPane: React.FC<IProps> = props => {
   const {contentHeight} = props;
 
   const {windowSize} = useContext(AppContext);
-  const windowHeight = windowSize.height;
 
+  const dispatch = useAppDispatch();
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -84,7 +85,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const {kustomizeCommand} = useAppSelector(settingsSelector);
@@ -100,18 +100,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const uiState = useAppSelector(state => state.ui);
 
-  const navigatorHeight = useMemo(
-    () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
-    [windowHeight, isInPreviewMode]
-  );
-
   const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
-
-  const dispatch = useAppDispatch();
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
@@ -119,6 +112,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
 
   const [actionsPaneFooterRef, {height: actionsPaneFooterHeight, width: actionsPaneFooterWidth}] =
     useMeasure<HTMLDivElement>();
+  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
   const getDistanceBetweenTwoComponents = useCallback(() => {
     const tabsListEl = tabsList[0].getBoundingClientRect();
@@ -152,14 +146,13 @@ const ActionsPane = (props: {contentHeight: string}) => {
       return ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT;
     }
 
-    return -5;
+    return 0;
   }, [actionsPaneFooterHeight, isActionsPaneFooterExpanded, paneConfiguration.actionsPaneFooterExpandedHeight]);
 
-  const editorTabPaneHeight = useMemo(() => {
-    let defaultHeight = parseInt(contentHeight, 10) - ACTIONS_PANE_TAB_PANE_OFFSET - resizableBoxHeight;
-
-    return defaultHeight;
-  }, [contentHeight, resizableBoxHeight]);
+  const tabsHeight = useMemo(
+    () => contentHeight - resizableBoxHeight - titleBarHeight,
+    [contentHeight, resizableBoxHeight, titleBarHeight]
+  );
 
   const onSaveHandler = () => {
     if (selectedResource) {
@@ -373,156 +366,142 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [actionsPaneFooterHeight, paneConfiguration.actionsPaneFooterExpandedHeight]);
 
   return (
-    <>
-      <Row>
-        <MonoPaneTitleCol>
-          <MonoPaneTitle>
-            <S.TitleBarContainer>
-              <span>Editor</span>
-              <S.RightButtons>
-                <S.LeftArrowButton
-                  onClick={onClickLeftArrow}
-                  disabled={!isLeftArrowEnabled}
-                  type="link"
-                  size="small"
-                  icon={<ArrowLeftOutlined />}
-                />
-                <S.RightArrowButton
-                  onClick={onClickRightArrow}
-                  disabled={!isRightArrowEnabled}
-                  type="link"
-                  size="small"
-                  icon={<ArrowRightOutlined />}
-                />
+    <S.ActionsPaneMainContainer>
+      <div ref={titleBarRef}>
+        <TitleBar title="Editor">
+          <>
+            <S.LeftArrowButton
+              onClick={onClickLeftArrow}
+              disabled={!isLeftArrowEnabled}
+              type="link"
+              size="small"
+              icon={<ArrowLeftOutlined />}
+            />
+            <S.RightArrowButton
+              onClick={onClickRightArrow}
+              disabled={!isRightArrowEnabled}
+              type="link"
+              size="small"
+              icon={<ArrowRightOutlined />}
+            />
 
-                {isSelectedResourceUnsaved() && (
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
-                    <S.SaveButton type="primary" size="small" onClick={onSaveHandler}>
-                      Save
-                    </S.SaveButton>
-                  </Tooltip>
-                )}
+            {isSelectedResourceUnsaved() && (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
+                <S.SaveButton type="primary" size="small" onClick={onSaveHandler}>
+                  Save
+                </S.SaveButton>
+              </Tooltip>
+            )}
 
-                <Tooltip
-                  mouseEnterDelay={TOOLTIP_DELAY}
-                  title={selectedPath ? ApplyFileTooltip : ApplyTooltip}
-                  placement="bottomLeft"
+            <Tooltip
+              mouseEnterDelay={TOOLTIP_DELAY}
+              title={selectedPath ? ApplyFileTooltip : ApplyTooltip}
+              placement="bottomLeft"
+            >
+              <Button
+                loading={Boolean(applyingResource)}
+                type="primary"
+                size="small"
+                ghost
+                onClick={applySelection}
+                disabled={
+                  (!selectedResourceId && !selectedPath) ||
+                  (selectedResource &&
+                    (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
+                }
+                icon={<Icon name="kubernetes" />}
+              >
+                Deploy
+              </Button>
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
+              <S.DiffButton
+                size="small"
+                type="primary"
+                ghost
+                onClick={diffSelectedResource}
+                disabled={isDiffButtonDisabled}
+              >
+                Diff
+              </S.DiffButton>
+            </Tooltip>
+          </>
+        </TitleBar>
+      </div>
+
+      <S.ActionsPaneContainer>
+        <S.Tabs
+          $height={tabsHeight}
+          defaultActiveKey="source"
+          activeKey={activeTabKey}
+          onChange={k => setActiveTabKey(k)}
+          tabBarExtraContent={
+            selectedResource && resourceKindHandler?.helpLink ? (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
+                <S.ExtraRightButton
+                  onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
+                  type="link"
+                  ref={extraButton}
                 >
-                  <Button
-                    loading={Boolean(applyingResource)}
-                    type="primary"
-                    size="small"
-                    ghost
-                    onClick={applySelection}
-                    disabled={
-                      (!selectedResourceId && !selectedPath) ||
-                      (selectedResource &&
-                        (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
-                    }
-                    icon={<Icon name="kubernetes" />}
-                  >
-                    Deploy
-                  </Button>
-                </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
-                  <S.DiffButton
-                    size="small"
-                    type="primary"
-                    ghost
-                    onClick={diffSelectedResource}
-                    disabled={isDiffButtonDisabled}
-                  >
-                    Diff
-                  </S.DiffButton>
-                </Tooltip>
-              </S.RightButtons>
-            </S.TitleBarContainer>
-          </MonoPaneTitle>
-        </MonoPaneTitleCol>
-      </Row>
+                  {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
+                </S.ExtraRightButton>
+              </Tooltip>
+            ) : isKustomization ? (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
+                <S.ExtraRightButton
+                  onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
+                  type="link"
+                  ref={extraButton}
+                >
+                  {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
+                </S.ExtraRightButton>
+              </Tooltip>
+            ) : null
+          }
+        >
+          <TabPane key="source" tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}>
+            {uiState.isFolderLoading || previewLoader.isLoading ? (
+              <S.Skeleton active />
+            ) : activeTabKey === 'source' ? (
+              !isClusterDiffVisible &&
+              (selectedResourceId || selectedPath || selectedValuesFileId) && (
+                <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
+              )
+            ) : null}
+          </TabPane>
 
-      <S.ActionsPaneContainer $height={navigatorHeight}>
-        <S.TabsContainer>
-          <S.Tabs
-            defaultActiveKey="source"
-            activeKey={activeTabKey}
-            onChange={k => setActiveTabKey(k)}
-            tabBarExtraContent={
-              selectedResource && resourceKindHandler?.helpLink ? (
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenExternalDocumentationTooltip}>
-                  <S.ExtraRightButton
-                    onClick={() => openExternalResourceKindDocumentation(resourceKindHandler?.helpLink)}
-                    type="link"
-                    ref={extraButton}
-                  >
-                    {isButtonShrinked ? '' : `See ${selectedResource?.kind} documentation`} <BookOutlined />
-                  </S.ExtraRightButton>
-                </Tooltip>
-              ) : isKustomization ? (
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenKustomizeDocumentationTooltip}>
-                  <S.ExtraRightButton
-                    onClick={() => openExternalResourceKindDocumentation(KUSTOMIZE_HELP_URL)}
-                    type="link"
-                    ref={extraButton}
-                  >
-                    {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
-                  </S.ExtraRightButton>
-                </Tooltip>
-              ) : null
-            }
-          >
+          {selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema) && (
             <TabPane
-              key="source"
-              style={{height: editorTabPaneHeight}}
-              tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}
+              disabled={!selectedResourceId}
+              key="form"
+              tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
             >
               {uiState.isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
-              ) : activeTabKey === 'source' ? (
-                !isClusterDiffVisible &&
-                (selectedResourceId || selectedPath || selectedValuesFileId) && (
-                  <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
+              ) : activeTabKey === 'form' ? (
+                isKustomization ? (
+                  <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
+                ) : (
+                  resourceKindHandler?.formEditorOptions && (
+                    <FormEditor
+                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                    />
+                  )
                 )
               ) : null}
             </TabPane>
-            {selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema) && (
-              <TabPane
-                disabled={!selectedResourceId}
-                key="form"
-                style={{height: editorTabPaneHeight}}
-                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
-              >
-                {uiState.isFolderLoading || previewLoader.isLoading ? (
-                  <S.Skeleton active />
-                ) : activeTabKey === 'form' ? (
-                  isKustomization ? (
-                    <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
-                  ) : (
-                    resourceKindHandler?.formEditorOptions && (
-                      <FormEditor
-                        formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                        formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                      />
-                    )
-                  )
-                ) : null}
-              </TabPane>
-            )}
-            {selectedResource && resourceKindHandler && !isKustomization && (
-              <TabPane
-                key="metadataForm"
-                style={{height: editorTabPaneHeight}}
-                tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}
-              >
-                {uiState.isFolderLoading || previewLoader.isLoading ? (
-                  <S.Skeleton active />
-                ) : activeTabKey === 'metadataForm' ? (
-                  <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
-                ) : null}
-              </TabPane>
-            )}
-          </S.Tabs>
-        </S.TabsContainer>
+          )}
+          {selectedResource && resourceKindHandler && !isKustomization && (
+            <TabPane key="metadataForm" tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}>
+              {uiState.isFolderLoading || previewLoader.isLoading ? (
+                <S.Skeleton active />
+              ) : activeTabKey === 'metadataForm' ? (
+                <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />
+              ) : null}
+            </TabPane>
+          )}
+        </S.Tabs>
 
         {featureFlags.ActionsPaneFooter && (
           <S.ActionsPaneFooterContainer ref={actionsPaneFooterRef}>
@@ -537,7 +516,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   ? ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT
                   : ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
               ]}
-              maxConstraints={[actionsPaneFooterWidth, navigatorHeight - 200]}
+              maxConstraints={[actionsPaneFooterWidth, contentHeight - 300]}
               handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
                 <span className={isActionsPaneFooterExpanded ? 'custom-handle' : ''} ref={ref} />
               )}
@@ -552,7 +531,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
           </S.ActionsPaneFooterContainer>
         )}
       </S.ActionsPaneContainer>
-
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
           isVisible={isApplyModalVisible}
@@ -562,7 +540,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
           onCancel={() => setIsApplyModalVisible(false)}
         />
       )}
-
       {isHelmChartApplyModalVisible && (
         <HelmChartModalConfirmWithNamespaceSelect
           isVisible={isHelmChartApplyModalVisible}
@@ -573,7 +550,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
           }
         />
       )}
-    </>
+    </S.ActionsPaneMainContainer>
   );
 };
 

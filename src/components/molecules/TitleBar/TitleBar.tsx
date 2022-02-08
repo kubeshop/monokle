@@ -4,7 +4,11 @@ import {MonoPaneTitle} from '@components/atoms';
 
 import * as S from './styled';
 
-function TitleBar(props: {title: string; children?: React.ReactNode}) {
+interface IProps {
+  title: string;
+}
+
+const TitleBar: React.FC<IProps> = props => {
   const {title, children} = props;
 
   return (
@@ -17,6 +21,6 @@ function TitleBar(props: {title: string; children?: React.ReactNode}) {
       </MonoPaneTitle>
     </S.TitleBarContainer>
   );
-}
+};
 
 export default TitleBar;

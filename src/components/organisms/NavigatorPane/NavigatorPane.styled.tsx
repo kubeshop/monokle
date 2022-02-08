@@ -38,7 +38,6 @@ export const List = styled.ol`
   height: 100%;
   list-style-type: none;
   padding: 0;
-  padding-bottom: 20px;
   margin: 0;
   overflow-y: auto;
 

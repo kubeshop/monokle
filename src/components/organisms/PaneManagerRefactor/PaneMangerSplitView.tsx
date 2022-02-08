@@ -7,7 +7,7 @@ import {MIN_SPLIT_VIEW_PANE_WIDTH} from '@constants/constants';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
 
-import {NavigatorPane} from '@organisms';
+import {ActionsPane, NavigatorPane} from '@organisms';
 
 import {useMainPaneHeight} from '@utils/hooks';
 
@@ -39,10 +39,10 @@ const PaneManagerSplitView: React.FC = () => {
   };
 
   const splitViewGridTemplateColumns = useMemo(() => {
-    let gridTemplateColumns = 'max-content 1fr';
+    let gridTemplateColumns = 'max-content 1fr max-content';
 
     if (!leftActive) {
-      gridTemplateColumns = '1fr';
+      gridTemplateColumns = '1fr max-content';
     }
 
     return gridTemplateColumns;
@@ -77,6 +77,12 @@ const PaneManagerSplitView: React.FC = () => {
       <S.Pane id="NavPane" $height={paneHeight}>
         <NavigatorPane />
       </S.Pane>
+
+      <S.EditorPaneContainer>
+        <S.Pane id="EditorPane" $height={paneHeight}>
+          <ActionsPane contentHeight={paneHeight} />
+        </S.Pane>
+      </S.EditorPaneContainer>
     </S.SplitViewContainer>
   );
 };

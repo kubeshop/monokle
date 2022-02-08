@@ -159,7 +159,7 @@ const PaneManager = () => {
           }
           hideLeft={!leftActive}
           nav={<NavigatorPane />}
-          editor={<ActionsPane contentHeight={contentHeight} />}
+          editor={<ActionsPane contentHeight={0} />}
           right={
             <>
               {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
