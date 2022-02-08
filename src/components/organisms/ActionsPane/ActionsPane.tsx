@@ -237,7 +237,7 @@ const ActionsPane: React.FC<IProps> = props => {
     [dispatch]
   );
 
-  const onMouseUp = useCallback(() => {
+  const resizeActionsPaneFooter = useCallback(() => {
     if (isActionsPaneFooterExpanded && actionsPaneFooterHeight !== paneConfiguration.actionsPaneFooterExpandedHeight) {
       dispatch(setPaneConfiguration({...paneConfiguration, actionsPaneFooterExpandedHeight: actionsPaneFooterHeight}));
     }
@@ -355,15 +355,6 @@ const ActionsPane: React.FC<IProps> = props => {
       getDistanceBetweenTwoComponents();
     }
   }, [tabsList, uiState.paneConfiguration, windowSize, selectedResource, getDistanceBetweenTwoComponents]);
-
-  useEffect(() => {
-    document.addEventListener('mouseup', onMouseUp);
-
-    return () => {
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionsPaneFooterHeight, paneConfiguration.actionsPaneFooterExpandedHeight]);
 
   return (
     <S.ActionsPaneMainContainer>
@@ -520,6 +511,7 @@ const ActionsPane: React.FC<IProps> = props => {
               handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => (
                 <span className={isActionsPaneFooterExpanded ? 'custom-handle' : ''} ref={ref} />
               )}
+              onResizeStop={resizeActionsPaneFooter}
             >
               <ActionsPaneFooter
                 tabs={{
