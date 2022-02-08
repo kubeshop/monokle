@@ -32,11 +32,6 @@ import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
-
-  const [filtersContainerRef, {height, width}] = useMeasure<HTMLDivElement>();
-
-  const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
-
   const activeResources = useAppSelector(activeResourcesSelector);
   const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -45,28 +40,22 @@ const NavPane: React.FC = () => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
+  const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
 
   const paneHeight = useMainPaneHeight();
 
-  const appliedFilters = useMemo(() => {
-    return Object.entries(resourceFilters)
-      .map(([key, value]) => {
-        return {filterName: key, filterValue: value};
-      })
-      .filter(filter => filter.filterValue && Object.values(filter.filterValue).length);
-  }, [resourceFilters]);
+  const [filtersContainerRef, {height, width}] = useMeasure<HTMLDivElement>();
+  const [navigatorPaneRef, {width: navigatorPaneWidth}] = useMeasure<HTMLDivElement>();
 
-  const isFolderOpen = useMemo(() => {
-    return Boolean(fileMap[ROOT_FILE_ENTRY]);
-  }, [fileMap]);
-
-  const onClickNewResource = () => {
-    dispatch(openNewResourceWizard());
-  };
-
-  const resourceFilterButtonHandler = () => {
-    dispatch(toggleResourceFilters());
-  };
+  const appliedFilters = useMemo(
+    () =>
+      Object.entries(resourceFilters)
+        .map(([key, value]) => {
+          return {filterName: key, filterValue: value};
+        })
+        .filter(filter => filter.filterValue && Object.values(filter.filterValue).length),
+    [resourceFilters]
+  );
 
   const containerGridTemplateRows = useMemo(() => {
     let gridTemplateRows = 'max-content 1fr';
@@ -78,8 +67,18 @@ const NavPane: React.FC = () => {
     return gridTemplateRows;
   }, [isResourceFiltersOpen]);
 
+  const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
+
+  const onClickNewResource = () => {
+    dispatch(openNewResourceWizard());
+  };
+
+  const resourceFilterButtonHandler = () => {
+    dispatch(toggleResourceFilters());
+  };
+
   return (
-    <S.NavigatorPaneContainer $gridTemplateRows={containerGridTemplateRows}>
+    <S.NavigatorPaneContainer $gridTemplateRows={containerGridTemplateRows} ref={navigatorPaneRef}>
       {checkedResourceIds.length && !isPreviewLoading ? (
         <CheckedResourcesActionsMenu />
       ) : (
@@ -100,6 +99,7 @@ const NavPane: React.FC = () => {
               type="link"
               onClick={onClickNewResource}
             />
+
             <Tooltip title={QuickFilterTooltip}>
               <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
                 <Button
@@ -111,7 +111,8 @@ const NavPane: React.FC = () => {
                 />
               </Badge>
             </Tooltip>
-            <ClusterCompareButton />
+
+            <ClusterCompareButton navigatorPaneWidth={navigatorPaneWidth} />
           </S.TitleBarRightButtons>
         </S.TitleBar>
       )}

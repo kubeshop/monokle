@@ -4,10 +4,10 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 export const KustomizePaneContainer = styled.div`
   height: 100%;
-  padding-bottom: 10px;
   display: grid;
   grid-template-rows: max-content 1fr;
-  grid-row-gap: 10px;
+  grid-row-gap: 3px;
+  padding-bottom: 3px;
 `;
 
 export const List = styled.ol`

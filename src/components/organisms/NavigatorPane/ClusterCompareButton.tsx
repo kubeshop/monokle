@@ -15,26 +15,22 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openClusterDiff} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 
-import {useWindowSize} from '@utils/hooks';
+interface IProps {
+  navigatorPaneWidth: number;
+}
 
-function ClusterCompareButton() {
+const ClusterCompareButton: React.FC<IProps> = props => {
+  const {navigatorPaneWidth} = props;
+
   const dispatch = useAppDispatch();
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const navWidth = useAppSelector(state => state.ui.paneConfiguration.navWidth);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const windowSize = useWindowSize();
 
-  const isFolderOpen = useMemo(() => {
-    return Boolean(fileMap[ROOT_FILE_ENTRY]);
-  }, [fileMap]);
+  const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
 
   const onClickClusterComparison = () => {
     dispatch(openClusterDiff());
   };
-
-  const shouldHideClusterCompareText = useMemo(() => {
-    return windowSize.width * Number(navWidth.toFixed(2)) < 350;
-  }, [navWidth, windowSize.width]);
 
   return (
     <Tooltip
@@ -57,10 +53,10 @@ function ClusterCompareButton() {
         style={{marginLeft: 8}}
         disabled={!isFolderOpen || isInClusterMode}
       >
-        {shouldHideClusterCompareText ? '' : 'Cluster Compare'}
+        {navigatorPaneWidth < 400 ? '' : 'Cluster Compare'}
       </Button>
     </Tooltip>
   );
-}
+};
 
 export default ClusterCompareButton;
