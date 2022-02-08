@@ -1,3 +1,5 @@
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 import {getTestResourcePath} from '@redux/services/__test__/utils';
 import {readManifests} from '@redux/services/fileEntry.test';
 import {validateResource} from '@redux/services/validation';
@@ -10,7 +12,7 @@ test('validate-resource', () => {
   const deployment = resources.find(r => r.kind === 'Deployment');
   expect(deployment).toBeDefined();
   // @ts-ignore
-  validateResource(deployment);
+  validateResource(deployment, PREDEFINED_K8S_VERSION);
 
   expect(deployment?.validation).toBeDefined();
   expect(deployment?.validation?.errors).toBeDefined();
