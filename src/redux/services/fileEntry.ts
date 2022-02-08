@@ -3,7 +3,7 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {PREDEFINED_K8S_VERSION, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
@@ -306,6 +306,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     });
 
     reprocessResources(
+      PREDEFINED_K8S_VERSION,
       resourcesFromFile.map(r => r.id),
       state.resourceMap,
       state.fileMap,
@@ -350,6 +351,7 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   });
 
   reprocessResources(
+    PREDEFINED_K8S_VERSION,
     resourcesFromFile.map(r => r.id),
     state.resourceMap,
     state.fileMap,

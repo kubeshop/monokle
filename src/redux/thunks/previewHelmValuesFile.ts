@@ -29,6 +29,7 @@ export const previewHelmValuesFile = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
+  const k8sVersion = configState.projectConfig?.k8sVersion;
   const currentContext =
     thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
     thunkAPI.getState().config.kubeConfig.currentContext;
@@ -61,7 +62,13 @@ export const previewHelmValuesFile = createAsyncThunk<
       }
 
       if (result.stdout) {
-        return createPreviewResult(result.stdout, valuesFile.id, 'Helm Preview', state.resourceRefsProcessingOptions);
+        return createPreviewResult(
+          String(k8sVersion),
+          result.stdout,
+          valuesFile.id,
+          'Helm Preview',
+          state.resourceRefsProcessingOptions
+        );
       }
     }
 

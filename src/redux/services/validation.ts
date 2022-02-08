@@ -30,12 +30,12 @@ function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | unde
   };
 }
 
-export function validateResource(resource: K8sResource) {
+export function validateResource(resource: K8sResource, schemaVersion: string) {
   if (isKustomizationPatch(resource)) {
     return;
   }
 
-  const resourceSchema = getResourceSchema(resource);
+  const resourceSchema = getResourceSchema(resource, schemaVersion);
   if (!resourceSchema) {
     return;
   }

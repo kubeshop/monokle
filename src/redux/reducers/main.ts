@@ -9,7 +9,7 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {parseDocument} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREDEFINED_K8S_VERSION, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
 import {AppConfig} from '@models/appconfig';
@@ -215,7 +215,7 @@ export const mainSlice = createSlice({
 
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
+      processParsedResources(PREDEFINED_K8S_VERSION, getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
         resourceIds: [resource.id],
         resourceKinds,
       });
@@ -310,9 +310,16 @@ export const mainSlice = createSlice({
               resourceIds.push(r.id);
             });
 
-            reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
-              resourceKinds: extractedResources.map(r => r.kind),
-            });
+            reprocessResources(
+              PREDEFINED_K8S_VERSION,
+              resourceIds,
+              state.resourceMap,
+              state.fileMap,
+              state.resourceRefsProcessingOptions,
+              {
+                resourceKinds: extractedResources.map(r => r.kind),
+              }
+            );
           }
         } else {
           log.error(`Could not find FileEntry for ${action.payload.path}`);
@@ -335,7 +342,7 @@ export const mainSlice = createSlice({
         return false;
       });
 
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
+      processParsedResources(PREDEFINED_K8S_VERSION, getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
         resourceKinds: resourceKindsWithOptionalRefs,
         skipValidation: true,
       });
@@ -347,7 +354,7 @@ export const mainSlice = createSlice({
       const resource = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
+      processParsedResources(PREDEFINED_K8S_VERSION, getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
         resourceIds: [resource.id],
         resourceKinds,
       });
@@ -368,7 +375,13 @@ export const mainSlice = createSlice({
         if (resource) {
           performResourceContentUpdate(state, resource, action.payload.content);
           let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
-          reprocessResources(resourceIds, currentResourceMap, state.fileMap, state.resourceRefsProcessingOptions);
+          reprocessResources(
+            PREDEFINED_K8S_VERSION,
+            resourceIds,
+            currentResourceMap,
+            state.fileMap,
+            state.resourceRefsProcessingOptions
+          );
           if (!action.payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
             updateSelectionAndHighlights(state, resource);
@@ -409,7 +422,13 @@ export const mainSlice = createSlice({
             resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
           }
         });
-        reprocessResources(resourceIdsToReprocess, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
+        reprocessResources(
+          PREDEFINED_K8S_VERSION,
+          resourceIdsToReprocess,
+          activeResources,
+          state.fileMap,
+          state.resourceRefsProcessingOptions
+        );
       } catch (e) {
         log.error(e);
         return original(state);

@@ -1,5 +1,7 @@
 import {useEffect} from 'react';
 
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 import {K8sResource} from '@models/k8sresource';
 
 import {isSupportedHelmResource} from '@redux/services/helm';
@@ -20,7 +22,7 @@ function useResourceYamlSchema(yaml: any, resource: K8sResource | undefined) {
     let validate = true;
 
     if (resource) {
-      resourceSchema = getResourceSchema(resource);
+      resourceSchema = getResourceSchema(resource, PREDEFINED_K8S_VERSION);
       validate = !isKustomizationPatch(resource) && isSupportedHelmResource(resource);
     }
 

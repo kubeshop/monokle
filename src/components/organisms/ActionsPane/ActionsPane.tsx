@@ -99,6 +99,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
   const uiState = useAppSelector(state => state.ui);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
 
   const navigatorHeight = useMemo(
     () => windowHeight - NAVIGATOR_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
@@ -496,7 +497,9 @@ const ActionsPane = (props: {contentHeight: string}) => {
                   <S.Skeleton active />
                 ) : activeTabKey === 'form' ? (
                   isKustomization ? (
-                    <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
+                    <FormEditor
+                      formSchema={extractFormSchema(getResourceSchema(selectedResource, String(k8sVersion)))}
+                    />
                   ) : (
                     resourceKindHandler?.formEditorOptions && (
                       <FormEditor

@@ -424,6 +424,7 @@ function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapT
  */
 
 export function reprocessResources(
+  schemaVersion: string,
   resourceIds: string[],
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
@@ -467,7 +468,7 @@ export function reprocessResources(
     }
   });
 
-  processParsedResources(resourceMap, processingOptions, {
+  processParsedResources(schemaVersion, resourceMap, processingOptions, {
     resourceIds,
     resourceKinds: resourceKindsToReprocess,
   });
@@ -481,6 +482,7 @@ export function reprocessResources(
  */
 
 export function processParsedResources(
+  schemaVersion: string,
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
   options?: {resourceIds?: string[]; resourceKinds?: string[]; skipValidation?: boolean}
@@ -490,7 +492,7 @@ export function processParsedResources(
       Object.values(resourceMap)
         .filter(r => options.resourceIds?.includes(r.id))
         .forEach(resource => {
-          validateResource(resource);
+          validateResource(resource, schemaVersion);
         });
     }
 
@@ -499,14 +501,14 @@ export function processParsedResources(
         .filter(r => options.resourceKinds?.includes(r.kind))
         .forEach(resource => {
           if (!options.resourceIds || !options.resourceIds.includes(resource.id)) {
-            validateResource(resource);
+            validateResource(resource, schemaVersion);
           }
         });
     }
 
     if (!options || (!options.resourceIds && !options.resourceKinds)) {
       Object.values(resourceMap).forEach(resource => {
-        validateResource(resource);
+        validateResource(resource, schemaVersion);
       });
     }
   }

@@ -68,6 +68,7 @@ export type ProjectConfig = {
   scanExcludes?: string[];
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
+  k8sVersion?: string;
 };
 
 interface AppConfig {

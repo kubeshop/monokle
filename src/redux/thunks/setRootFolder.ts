@@ -68,7 +68,7 @@ export const setRootFolder = createAsyncThunk<
   rootEntry.children = files;
 
   processKustomizations(resourceMap, fileMap);
-  processParsedResources(resourceMap, resourceRefsProcessingOptions);
+  processParsedResources(String(appConfig.projectConfig?.k8sVersion), resourceMap, resourceRefsProcessingOptions);
 
   monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
 

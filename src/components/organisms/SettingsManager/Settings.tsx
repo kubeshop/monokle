@@ -6,7 +6,7 @@ import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
 
-import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
+import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, K8S_VERSIONS, TOOLTIP_DELAY} from '@constants/constants';
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
@@ -63,6 +63,7 @@ export const Settings = ({
   const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
   const [currentProjectName, setCurrentProjectName] = useState(projectName);
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
+  const [k8sVersions] = useState(_.reverse(K8S_VERSIONS));
 
   const [localConfig, setLocalConfig] = useState<ProjectConfig | null | undefined>(config);
 
@@ -228,6 +229,18 @@ export const Settings = ({
           </>
         </Form>
       )}
+      <S.Div>
+        <S.Span>K8S Version</S.Span>
+        <Tooltip title={KustomizeCommandTooltip}>
+          <Select value={k8sVersions[0]} onChange={() => {}}>
+            {k8sVersions.map(version => (
+              <Select.Option key={version} value={version}>
+                {version}
+              </Select.Option>
+            ))}
+          </Select>
+        </Tooltip>
+      </S.Div>
       <S.Div>
         <S.Heading>
           KUBECONFIG
