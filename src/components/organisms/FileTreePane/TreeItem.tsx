@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 
 import {Menu, Modal} from 'antd';
 
-import {ExclamationCircleOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, EyeOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
@@ -246,25 +246,27 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
 
   return (
     <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-      <S.TreeTitleText>{title}</S.TreeTitleText>
-
-      {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' ? (
+      <S.TitleWrapper>
+        <S.TreeTitleText>{title}</S.TreeTitleText>
+        {canPreview(relativePath) && <EyeOutlined style={{color: Colors.grey7}} />}
+      </S.TitleWrapper>
+      {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' && (
         <S.SpinnerWrapper>
           <Spinner />
         </S.SpinnerWrapper>
-      ) : null}
+      )}
       {isTitleHovered && !processingEntity.processingType ? (
-        <>
+        <S.ActionsWrapper>
           {canPreview(relativePath) && (
-            <S.PreviewSpan
+            <S.PreviewButton
               type="text"
               size="small"
               disabled={isInPreviewMode}
-              isItemSelected={isFileSelected}
+              $isItemSelected={isFileSelected}
               onClick={handlePreview}
             >
               Preview
-            </S.PreviewSpan>
+            </S.PreviewButton>
           )}
           <ContextMenu overlay={menu}>
             <div
@@ -275,7 +277,7 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
               <Dots color={isFileSelected ? Colors.blackPure : undefined} />
             </div>
           </ContextMenu>
-        </>
+        </S.ActionsWrapper>
       ) : null}
     </S.TreeTitleWrapper>
   );
