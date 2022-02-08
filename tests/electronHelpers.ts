@@ -1,13 +1,75 @@
 import * as ASAR from 'asar';
 import * as fs from 'fs';
 import * as path from 'path';
+import {Page} from 'playwright';
+import {_electron as electron, ElectronApplication} from 'playwright-core';
+import {getRecordingPath, pause} from './utils';
+import {StartupFlags} from '../src/utils/startupFlag';
+import {waitForModalToHide, waitForModalToShow} from './antdHelpers';
+
+export async function clickOnMonokleLogo(appWindow: Page) {
+  await appWindow.click('#monokle-logo-header', {noWaitAfter: true, force: true});
+}
+
+interface StartAppResponse {
+  electronApp: ElectronApplication;
+  appWindow: Page;
+  appInfo: ElectronAppInfo;
+}
+
+/**
+ * Find the latest build and start monokle app for testing
+ */
+export async function startApp(): Promise<StartAppResponse> {
+  // find the latest build in the out directory
+  const latestBuild = findLatestBuild();
+  // parse the directory and find paths and other info
+  const appInfo = parseElectronApp(latestBuild);
+  const electronApp = await electron.launch({
+    args: [appInfo.main, StartupFlags.AUTOMATION],
+    executablePath: appInfo.executable,
+    recordVideo: {
+      dir: getRecordingPath(appInfo.platform),
+      size: {
+        width: 1200,
+        height: 800
+      },
+    },
+  });
+
+  // wait for splash-screen to pass
+  await electronApp.firstWindow();
+  while (electronApp.windows().length === 2) {
+    // eslint-disable-next-line no-await-in-loop
+    await pause(100);
+  }
+
+  const windows = electronApp.windows();
+  if (windows.length !== 1) {
+    throw new Error('too many windows open');
+  }
+  const appWindow: Page = windows[0];
+  appWindow.on('console', console.log);
+
+  if (await waitForModalToShow(appWindow, 'WelcomeModal', 20000)) {
+    await clickOnMonokleLogo(appWindow);
+    await pause(500);
+    await waitForModalToHide(appWindow, 'WelcomeModal');
+  }
+
+  // Capture a screenshot.
+  await appWindow.screenshot({
+    path: getRecordingPath(appInfo.platform, 'initial-screen.png')
+  });
+
+  return {appWindow, appInfo, electronApp};
+}
 
 /**
  * Parses the `out` directory to find the latest build.
  * Use `npm run package` (or similar) to build your app prior to testing.
  * @returns path to the most recently modified build directory
  */
-
 export function findLatestBuild(): string {
   // root of your project
   const rootDir = path.resolve('./');

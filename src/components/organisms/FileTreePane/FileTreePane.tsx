@@ -773,8 +773,8 @@ const FileTreePane = () => {
       ) : tree ? (
         <S.TreeContainer>
           <S.RootFolderText>
-            <div>{fileMap[ROOT_FILE_ENTRY].filePath}</div>
-            <div>{Object.values(fileMap).filter(f => !f.children).length} files</div>
+            <div id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</div>
+            <div id="file-explorer-count">{Object.values(fileMap).filter(f => !f.children).length} files</div>
           </S.RootFolderText>
           <S.TreeDirectoryTree
             // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.

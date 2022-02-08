@@ -121,6 +121,7 @@ const NavPane: React.FC = () => {
           </MonoPaneTitle>
           <S.TitleBarRightButtons>
             <S.PlusButton
+              id="create-resource-button"
               $disabled={!isFolderOpen || isInPreviewMode}
               $highlighted={highlightedItems.createResource}
               className={highlightedItems.createResource ? 'animated-highlight' : ''}

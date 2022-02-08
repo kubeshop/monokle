@@ -52,6 +52,7 @@ import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 import { convertRecentFilesToRecentProjects, setProjectsRootFolder } from './utils';
+import {StartupFlags} from '@utils/startupFlag';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -314,6 +315,10 @@ export const createWindow = (givenPath?: string) => {
     });
 
     dispatch(setAppRehydrating(true));
+    if (process.argv.includes(StartupFlags.AUTOMATION)) {
+      win.webContents.send('set-automation');
+    }
+
     dispatch(setUserDirs({
       homeDir: userHomeDir,
       tempDir: userTempDir,

@@ -30,6 +30,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
+import {StartupFlag} from '@utils/startupFlag';
 
 import AppContext from './AppContext';
 
@@ -153,6 +154,17 @@ const App = () => {
     };
   }, [onOpenProjectFolderFromMainThread]);
 
+  const onSetAutomation = useCallback(() => {
+    StartupFlag.getInstance().automationFlag = true;
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('set-automation', onSetAutomation);
+    return () => {
+      ipcRenderer.removeListener('set-automation', onSetAutomation);
+    };
+  }, [onSetAutomation]);
+
   const onSetMainProcessEnv = useCallback((_: any, args: any) => {
     setMainProcessEnv(args.mainProcessEnv);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -240,7 +252,6 @@ const App = () => {
           {isCreateFolderModalVisible && <CreateFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}
           {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
-          {isNewResourceWizardVisible && <NewResourceWizard />}
           {isNewResourceWizardVisible && <NewResourceWizard />}
           {isQuickSearchActionsVisible && <QuickSearchActions />}
           {isRenameEntityModalVisible && <RenameEntityModal />}
