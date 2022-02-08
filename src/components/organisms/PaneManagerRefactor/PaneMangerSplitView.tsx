@@ -9,7 +9,11 @@ import {setPaneConfiguration} from '@redux/reducers/ui';
 
 import {ActionsPane, NavigatorPane} from '@organisms';
 
+import {GraphView} from '@components/molecules';
+
 import {useMainPaneHeight} from '@utils/hooks';
+
+import featureJson from '@src/feature-flags.json';
 
 import * as S from './PaneManagerSplitView.styled';
 
@@ -26,6 +30,8 @@ const PaneManagerSplitView: React.FC = () => {
   const leftWidth = useAppSelector(state => state.ui.paneConfiguration.leftWidth);
   const navWidth = useAppSelector(state => state.ui.paneConfiguration.navWidth);
   const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
+  const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
+  const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
 
   const paneHeight = useMainPaneHeight();
 
@@ -137,6 +143,12 @@ const PaneManagerSplitView: React.FC = () => {
           </S.Pane>
         </ResizableBox>
       </S.EditorPaneContainer>
+
+      {featureJson.ShowGraphView && rightMenuSelection === 'graph' && rightActive && (
+        <S.Pane id="RightPane" $height={paneHeight}>
+          <GraphView editorHeight={paneHeight} />
+        </S.Pane>
+      )}
     </S.SplitViewContainer>
   );
 };

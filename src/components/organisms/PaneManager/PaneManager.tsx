@@ -14,7 +14,7 @@ import {
 import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
 
 import {Project} from '@models/appconfig';
-import {LeftMenuSelectionType} from '@models/ui';
+import {LeftMenuSelectionType, RightMenuSelectionType} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -116,7 +116,7 @@ const PaneManager = () => {
     }
   };
 
-  const setRightActiveMenu = (selectedMenu: string) => {
+  const setRightActiveMenu = (selectedMenu: RightMenuSelectionType) => {
     if (featureJson.ShowRightMenu) {
       if (rightMenuSelection === selectedMenu) {
         dispatch(toggleRightMenu());
@@ -162,9 +162,7 @@ const PaneManager = () => {
           editor={<ActionsPane contentHeight={0} />}
           right={
             <>
-              {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? (
-                <GraphView editorHeight={contentHeight} />
-              ) : undefined}
+              {featureJson.ShowGraphView && rightMenuSelection === 'graph' ? <GraphView editorHeight={0} /> : undefined}
             </>
           }
           hideRight={!rightActive}

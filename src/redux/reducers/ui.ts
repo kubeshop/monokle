@@ -13,6 +13,7 @@ import {
   MonacoUiState,
   NewResourceWizardInput,
   PaneConfiguration,
+  RightMenuSelectionType,
   UiState,
 } from '@models/ui';
 
@@ -70,7 +71,7 @@ export const uiSlice = createSlice({
       state.rightMenu.isActive = action.payload;
       electronStore.set('ui.rightMenu.isActive', state.rightMenu.isActive);
     },
-    setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<string>) => {
+    setRightMenuSelection: (state: Draft<UiState>, action: PayloadAction<RightMenuSelectionType>) => {
       state.rightMenu.selection = action.payload;
       electronStore.set('ui.rightMenu.selection', state.rightMenu.selection);
     },

@@ -48,6 +48,7 @@ export type MonacoUiState = {
 };
 
 export type LeftMenuSelectionType = 'file-explorer' | 'helm-pane' | 'kustomize-pane' | 'templates-pane';
+export type RightMenuSelectionType = 'logs' | 'graph';
 
 export type LayoutSizeType = {
   footer: number;
@@ -95,7 +96,7 @@ export type UiState = {
     isOpen: boolean;
   };
   rightMenu: {
-    selection?: string;
+    selection?: RightMenuSelectionType;
     isActive: boolean;
   };
   navPane: {

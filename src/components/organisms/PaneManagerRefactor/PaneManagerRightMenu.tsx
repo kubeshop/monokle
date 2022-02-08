@@ -2,6 +2,8 @@ import {Button} from 'antd';
 
 import {ApartmentOutlined, CodeOutlined} from '@ant-design/icons';
 
+import {RightMenuSelectionType} from '@models/ui';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setRightMenuSelection, toggleRightMenu} from '@redux/reducers/ui';
 
@@ -15,7 +17,7 @@ const PaneManagerRightMenu: React.FC = () => {
   const rightActive = useAppSelector(state => state.ui.rightMenu.isActive);
   const rightMenuSelection = useAppSelector(state => state.ui.rightMenu.selection);
 
-  const setRightActiveMenu = (selectedMenu: string) => {
+  const setRightActiveMenu = (selectedMenu: RightMenuSelectionType) => {
     if (featureJson.ShowRightMenu) {
       if (rightMenuSelection === selectedMenu) {
         dispatch(toggleRightMenu());
@@ -29,7 +31,7 @@ const PaneManagerRightMenu: React.FC = () => {
   };
 
   return (
-    <S.Container>
+    <S.Container id="RightRoolbar">
       <Button
         size="large"
         type="text"
