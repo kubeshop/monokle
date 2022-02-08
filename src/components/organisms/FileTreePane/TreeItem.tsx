@@ -248,7 +248,7 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
     <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
       <S.TitleWrapper>
         <S.TreeTitleText>{title}</S.TreeTitleText>
-        {canPreview(relativePath) && <EyeOutlined style={{color: Colors.grey7}} />}
+        {canPreview(relativePath) && <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />}
       </S.TitleWrapper>
       {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' && (
         <S.SpinnerWrapper>
