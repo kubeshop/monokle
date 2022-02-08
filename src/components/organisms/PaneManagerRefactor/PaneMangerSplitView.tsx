@@ -1,4 +1,4 @@
-import React, {LegacyRef, Suspense, useMemo} from 'react';
+import React, {LegacyRef, Suspense, useCallback, useMemo} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
@@ -20,6 +20,7 @@ const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerP
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
+  const editWidth = useAppSelector(state => state.ui.paneConfiguration.editWidth);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const leftWidth = useAppSelector(state => state.ui.paneConfiguration.leftWidth);
@@ -27,16 +28,25 @@ const PaneManagerSplitView: React.FC = () => {
 
   const paneHeight = useMainPaneHeight();
 
+  const [editPaneRef, {width: editPaneWidth}] = useMeasure<HTMLDivElement>();
   const [leftPaneRef, {width: leftPaneWidth}] = useMeasure<HTMLDivElement>();
   const [splitViewContainerRef, {width: splitViewContainerWidth}] = useMeasure<HTMLDivElement>();
 
-  const resizeLeftPane = () => {
+  const resizeLeftPane = useCallback(() => {
     const newLeftWidthPercentage = leftPaneWidth / splitViewContainerWidth;
 
     if (newLeftWidthPercentage !== paneConfiguration.leftWidth) {
       dispatch(setPaneConfiguration({...paneConfiguration, leftWidth: newLeftWidthPercentage}));
     }
-  };
+  }, [dispatch, leftPaneWidth, paneConfiguration, splitViewContainerWidth]);
+
+  const resizeEditPane = useCallback(() => {
+    const newEditPaneWidthPercentage = editPaneWidth / splitViewContainerWidth;
+
+    if (newEditPaneWidthPercentage !== paneConfiguration.editWidth) {
+      dispatch(setPaneConfiguration({...paneConfiguration, editWidth: newEditPaneWidthPercentage}));
+    }
+  }, [dispatch, editPaneWidth, paneConfiguration, splitViewContainerWidth]);
 
   const splitViewGridTemplateColumns = useMemo(() => {
     let gridTemplateColumns = 'max-content 1fr max-content';
@@ -56,11 +66,11 @@ const PaneManagerSplitView: React.FC = () => {
             height={paneHeight}
             width={splitViewContainerWidth * leftWidth}
             minConstraints={[MIN_SPLIT_VIEW_PANE_WIDTH, paneHeight]}
-            maxConstraints={[splitViewContainerWidth - MIN_SPLIT_VIEW_PANE_WIDTH, paneHeight]}
-            onResizeStop={resizeLeftPane}
+            maxConstraints={[splitViewContainerWidth - MIN_SPLIT_VIEW_PANE_WIDTH - editPaneWidth, paneHeight]}
             axis="x"
             resizeHandles={['e']}
             handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-modal-handle" ref={ref} />}
+            onResizeStop={resizeLeftPane}
           >
             <S.Pane id="LeftPane">
               <Suspense fallback={null}>
@@ -78,10 +88,21 @@ const PaneManagerSplitView: React.FC = () => {
         <NavigatorPane />
       </S.Pane>
 
-      <S.EditorPaneContainer>
-        <S.Pane id="EditorPane" $height={paneHeight}>
-          <ActionsPane contentHeight={paneHeight} />
-        </S.Pane>
+      <S.EditorPaneContainer ref={editPaneRef}>
+        <ResizableBox
+          height={paneHeight}
+          width={splitViewContainerWidth * editWidth}
+          minConstraints={[MIN_SPLIT_VIEW_PANE_WIDTH, paneHeight]}
+          maxConstraints={[splitViewContainerWidth - MIN_SPLIT_VIEW_PANE_WIDTH - leftPaneWidth, paneHeight]}
+          axis="x"
+          resizeHandles={['w']}
+          handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-modal-handle" ref={ref} />}
+          onResizeStop={resizeEditPane}
+        >
+          <S.Pane id="EditorPane" $height={paneHeight}>
+            <ActionsPane contentHeight={paneHeight} />
+          </S.Pane>
+        </ResizableBox>
       </S.EditorPaneContainer>
     </S.SplitViewContainer>
   );

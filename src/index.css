@@ -15,6 +15,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.custom-modal-handle:active {
+  border-right: 2px solid rgba(23, 125, 220, 0.5);
+  border-left: 2px solid rgba(23, 125, 220, 0.5);
+}
+
 .monokleEditorUnsatisfiedRefGlyphClass {
   background-image: url('./assets/MonokleWarning.svg');
   background-repeat: no-repeat;

@@ -6,12 +6,21 @@ export const EditorPaneContainer = styled.div`
   height: 100%;
   border-left: ${AppBorders.sectionDivider};
   position: relative;
+  margin-left: 1px;
+
+  & .custom-modal-handle {
+    left: -3px;
+  }
 `;
 
 export const LeftPaneContainer = styled.div`
   height: 100%;
   border-right: ${AppBorders.sectionDivider};
   position: relative;
+
+  & .custom-modal-handle {
+    right: -3px;
+  }
 `;
 
 export const Pane = styled.div<{$height?: number}>`
@@ -34,9 +43,7 @@ export const SplitViewContainer = styled.div<{$gridTemplateColumns: string}>`
     position: absolute;
     top: 0;
     bottom: 0;
-    right: -3px;
     width: 5px;
-    background-color: transparent;
     cursor: col-resize;
   }
 `;

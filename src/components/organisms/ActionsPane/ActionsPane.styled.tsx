@@ -53,9 +53,9 @@ export const ActionsPaneFooterContainer = styled.div`
 
 export const ActionsPaneMainContainer = styled.div`
   height: 100%;
+  width: 100%;
   display: grid;
   grid-template-rows: max-content 1fr;
-  width: 500px;
 `;
 
 export const DiffButton = styled(Button)`
