@@ -1,4 +1,4 @@
-import {LegacyRef, useCallback, useEffect} from 'react';
+import {LegacyRef, useCallback} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
@@ -45,31 +45,23 @@ const RecentProjectsPane = () => {
     return '';
   };
 
-  const onMouseUp = useCallback(() => {
+  const resizePane = useCallback(() => {
     if (recentProjectsPaneWidth !== paneConfiguration.recentProjectsPaneWidth) {
       dispatch(setPaneConfiguration({...paneConfiguration, recentProjectsPaneWidth}));
     }
   }, [dispatch, paneConfiguration, recentProjectsPaneWidth]);
 
-  useEffect(() => {
-    document.addEventListener('mouseup', onMouseUp);
-
-    return () => {
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recentProjectsPaneWidth, paneConfiguration.recentProjectsPaneWidth]);
-
   return (
     <S.RecentProjectsPaneContainer ref={recentProjectsPaneRef}>
       <ResizableBox
-        width={paneConfiguration.recentProjectsPaneWidth || recentProjectsPaneWidth || 450}
+        width={paneConfiguration.recentProjectsPaneWidth || 450}
         height={recentProjectsPaneHeight}
         minConstraints={[350, recentProjectsPaneHeight]}
         maxConstraints={[1000, recentProjectsPaneHeight]}
         axis="x"
         resizeHandles={['w']}
         handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-modal-handle" ref={ref} />}
+        onResizeStop={resizePane}
       >
         <S.Container>
           <TitleBar title="Recent Projects" />

@@ -56,29 +56,27 @@ const PaneManagerSplitView: React.FC = () => {
             height={paneHeight}
             width={splitViewContainerWidth * leftWidth}
             minConstraints={[MIN_SPLIT_VIEW_PANE_WIDTH, paneHeight]}
-            maxConstraints={[splitViewContainerWidth - 350, paneHeight]}
+            maxConstraints={[splitViewContainerWidth - MIN_SPLIT_VIEW_PANE_WIDTH, paneHeight]}
             onResizeStop={resizeLeftPane}
             axis="x"
             resizeHandles={['e']}
             handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-modal-handle" ref={ref} />}
           >
-            <S.LeftPane id="LeftPane">
+            <S.Pane id="LeftPane">
               <Suspense fallback={null}>
                 {leftMenuSelection === 'file-explorer' && <FileTreePane />}
                 {leftMenuSelection === 'helm-pane' && <HelmPane />}
                 {leftMenuSelection === 'kustomize-pane' && <KustomizePane />}
                 {leftMenuSelection === 'templates-pane' && <TemplateManagerPane />}
               </Suspense>
-            </S.LeftPane>
+            </S.Pane>
           </ResizableBox>
         </S.LeftPaneContainer>
       )}
 
-      <S.NavPaneContainer>
-        <S.NavPane id="NavPane">
-          <NavigatorPane />
-        </S.NavPane>
-      </S.NavPaneContainer>
+      <S.Pane id="NavPane" $height={paneHeight}>
+        <NavigatorPane />
+      </S.Pane>
     </S.SplitViewContainer>
   );
 };

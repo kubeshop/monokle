@@ -2,33 +2,17 @@ import styled from 'styled-components';
 
 import {AppBorders} from '@styles/Borders';
 
-export const EditorPane = styled.div`
-  height: 100%;
-  width: 100%;
-`;
-
-export const LeftPane = styled.div`
-  height: 100%;
-  width: 100%;
-  border-right: ${AppBorders.sectionDivider};
-`;
-
 export const LeftPaneContainer = styled.div`
   height: 100%;
   border-right: ${AppBorders.sectionDivider};
   position: relative;
 `;
 
-export const NavPane = styled.div`
-  height: 100%;
+export const Pane = styled.div<{$height?: number}>`
+  ${({$height}) => `
+    height: ${$height ? `${$height}px` : '100%'};
+  `};
   width: 100%;
-  border-right: ${AppBorders.sectionDivider};
-`;
-
-export const NavPaneContainer = styled.div`
-  height: 100%;
-  border-right: ${AppBorders.sectionDivider};
-  position: relative;
 `;
 
 export const SplitViewContainer = styled.div<{$gridTemplateColumns: string}>`
