@@ -83,9 +83,6 @@ export const FileTreeContainer = styled.div`
   & .ant-tree-iconEle {
     flex-shrink: 0;
   }
-  & .ant-tree-iconEle .anticon {
-    vertical-align: text-bottom;
-  }
   & .ant-tree-node-content-wrapper {
     display: flex;
     overflow: hidden;
