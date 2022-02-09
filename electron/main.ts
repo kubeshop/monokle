@@ -361,7 +361,7 @@ export const createWindow = (givenPath?: string) => {
       dispatchToWindow(win, setAlert(alert));
     }
     win.webContents.send('executed-from', {path: givenPath });
-    win.webContents.send('set-main-process-env', {mainProcessEnv: PROCESS_ENV });
+    win.webContents.send('set-main-process-env', {mainProcessEnv: JSON.stringify(PROCESS_ENV) });
 
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);

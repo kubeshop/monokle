@@ -166,7 +166,7 @@ const App = () => {
   }, [onSetAutomation]);
 
   const onSetMainProcessEnv = useCallback((_: any, args: any) => {
-    setMainProcessEnv(args.mainProcessEnv);
+    setMainProcessEnv(JSON.parse(args.mainProcessEnv));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
