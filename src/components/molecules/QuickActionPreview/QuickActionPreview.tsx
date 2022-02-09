@@ -9,7 +9,7 @@ import {stopPreview} from '@redux/services/preview';
 
 import * as S from './styled';
 
-function QuickActionPreview(props: {
+const QuickActionPreview = (props: {
   isItemSelected: boolean;
   isItemBeingPreviewed: boolean;
   previewTooltip: string;
@@ -17,7 +17,7 @@ function QuickActionPreview(props: {
   exitPreviewTooltip: string;
   selectAndPreview: () => void;
   reloadPreview: () => void;
-}) {
+}) => {
   const {
     isItemSelected,
     isItemBeingPreviewed,
@@ -62,6 +62,6 @@ function QuickActionPreview(props: {
       )}
     </S.Container>
   );
-}
+};
 
 export default QuickActionPreview;

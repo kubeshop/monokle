@@ -1,9 +1,9 @@
 import {ipcRenderer} from 'electron';
 
-import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Menu, Modal, Row, Tooltip} from 'antd';
+import {Button, Modal, Row, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -30,40 +30,21 @@ import {
 import {fileIncludesSelector, isInPreviewModeSelector, scanExcludesSelector, settingsSelector} from '@redux/selectors';
 import {getChildFilePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
-import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {MonoPaneTitle, MonoPaneTitleCol, Spinner} from '@atoms';
+import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
 
-import Dots from '@components/atoms/Dots';
 import Icon from '@components/atoms/Icon';
-import ContextMenu from '@components/molecules/ContextMenu';
 
-import {DeleteEntityCallback, deleteEntity} from '@utils/files';
 import {uniqueArr} from '@utils/index';
-import {showItemInFolder} from '@utils/shell';
-
-import Colors from '@styles/Colors';
 
 import AppContext from '@src/AppContext';
 
 import * as S from './Styled';
-
-interface TreeNode {
-  key: string;
-  title: React.ReactNode;
-  children: TreeNode[];
-  highlight: boolean;
-  isFolder?: boolean;
-  /**
-   * Whether the TreeNode has children
-   */
-  isLeaf?: boolean;
-  icon?: React.ReactNode;
-  isExcluded?: boolean;
-  isSupported?: boolean;
-}
+import {TreeItem} from './TreeItem';
+import {ProcessingEntity, TreeNode} from './types';
 
 const createNode = (
   fileEntry: FileEntry,
@@ -127,271 +108,6 @@ const createNode = (
   }
 
   return node;
-};
-
-interface ProcessingEntity {
-  processingEntityID?: string;
-  processingType?: 'delete' | 'rename';
-}
-
-interface TreeItemProps {
-  title: React.ReactNode;
-  treeKey: string;
-  setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
-  processingEntity: ProcessingEntity;
-  onDelete: (args: DeleteEntityCallback) => void;
-  onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
-  onExcludeFromProcessing: (relativePath: string) => void;
-  onIncludeToProcessing: (relativePath: string) => void;
-  onCreateFolder: (absolutePath: string) => void;
-  onCreateResource: (params: {targetFolder?: string; targetFile?: string}) => void;
-  onFilterByFileOrFolder: (relativePath: string | undefined) => void;
-  onPreview: (relativePath: string) => void;
-  isExcluded?: boolean;
-  isSupported?: boolean;
-  isFolder?: Boolean;
-}
-
-function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () => void, onCancel: () => void) {
-  const title = `Are you sure you want to delete "${path.basename(entityInfo.entityAbsolutePath)}"?`;
-
-  Modal.confirm({
-    title,
-    icon: <ExclamationCircleOutlined />,
-    onOk() {
-      onOk();
-    },
-    onCancel() {
-      onCancel();
-    },
-  });
-}
-
-const TreeItem: React.FC<TreeItemProps> = props => {
-  const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
-  const {
-    setProcessingEntity,
-    onDelete,
-    onRename,
-    onExcludeFromProcessing,
-    onIncludeToProcessing,
-    onCreateFolder,
-    onCreateResource,
-    onFilterByFileOrFolder,
-    onPreview,
-  } = props;
-
-  const [isTitleHovered, setTitleHoverState] = useState(false);
-
-  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
-  const fileMap = useAppSelector(state => state.main.fileMap);
-  const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
-
-  const isFileSelected = useMemo(() => {
-    return treeKey === selectedPath;
-  }, [treeKey, selectedPath]);
-
-  const getBasename = osPlatform === 'win32' ? path.win32.basename : path.basename;
-
-  const isRoot = fileMap[ROOT_FILE_ENTRY].filePath === treeKey;
-  const relativePath = isRoot ? getBasename(path.normalize(treeKey)) : treeKey;
-  const absolutePath = isRoot
-    ? fileMap[ROOT_FILE_ENTRY].filePath
-    : path.join(fileMap[ROOT_FILE_ENTRY].filePath, treeKey);
-
-  const target = isRoot ? ROOT_FILE_ENTRY : treeKey.replace(path.sep, '');
-
-  const platformFilemanagerNames: {[name: string]: string} = {
-    darwin: 'Finder',
-  };
-
-  const platformFilemanagerName = platformFilemanagerNames[osPlatform] || 'Explorer';
-
-  const canPreview = useCallback(
-    (entryPath: string): boolean => {
-      const fileEntry = fileMap[entryPath];
-      return (
-        fileEntry &&
-        (isKustomizationFile(fileEntry, resourceMap) || getHelmValuesFile(fileEntry, helmValuesMap) !== undefined)
-      );
-    },
-    [fileMap, resourceMap, helmValuesMap]
-  );
-
-  const menu = (
-    <Menu>
-      {canPreview(relativePath) ? (
-        <>
-          <Menu.Item
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              onPreview(relativePath);
-            }}
-            key="preview"
-          >
-            Preview
-          </Menu.Item>
-          <S.ContextMenuDivider />
-        </>
-      ) : null}
-      {isFolder ? (
-        <>
-          <Menu.Item
-            disabled={isInPreviewMode}
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              onCreateFolder(absolutePath);
-            }}
-            key="create_directory"
-          >
-            New Folder
-          </Menu.Item>
-        </>
-      ) : null}
-
-      <Menu.Item
-        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
-        }}
-        key="create_resource"
-      >
-        {isFolder ? 'New Resource' : 'Add Resource'}
-      </Menu.Item>
-      <S.ContextMenuDivider />
-      <Menu.Item
-        key={`filter_on_this_${isFolder ? 'folder' : 'file'}`}
-        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
-          if (isRoot || (fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter)) {
-            onFilterByFileOrFolder(undefined);
-          } else {
-            onFilterByFileOrFolder(relativePath);
-          }
-        }}
-      >
-        {fileOrFolderContainedInFilter && relativePath === fileOrFolderContainedInFilter
-          ? 'Remove from filter'
-          : `Filter on this ${isFolder ? 'folder' : 'file'}`}
-      </Menu.Item>
-      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-        <>
-          <Menu.Item
-            disabled={isInPreviewMode || (!isFolder && !isSupported && !isExcluded)}
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              if (isExcluded) {
-                onIncludeToProcessing(relativePath);
-              } else {
-                onExcludeFromProcessing(relativePath);
-              }
-            }}
-            key="add_to_files_exclude"
-          >
-            {isExcluded ? 'Remove from' : 'Add to'} Files: Exclude
-          </Menu.Item>
-        </>
-      ) : null}
-      <S.ContextMenuDivider />
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          navigator.clipboard.writeText(absolutePath);
-        }}
-        key="copy_full_path"
-      >
-        Copy Path
-      </Menu.Item>
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-
-          navigator.clipboard.writeText(relativePath);
-        }}
-        key="copy_relative_path"
-      >
-        Copy Relative Path
-      </Menu.Item>
-      {fileMap[ROOT_FILE_ENTRY].filePath !== treeKey ? (
-        <>
-          <S.ContextMenuDivider />
-          <Menu.Item
-            disabled={isInPreviewMode}
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              onRename(absolutePath, osPlatform);
-            }}
-            key="rename_entity"
-          >
-            Rename
-          </Menu.Item>
-          <Menu.Item
-            disabled={isInPreviewMode}
-            key="delete_entity"
-            onClick={e => {
-              e.domEvent.stopPropagation();
-              deleteEntityWizard(
-                {entityAbsolutePath: absolutePath},
-                () => {
-                  setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
-                  deleteEntity(absolutePath, onDelete);
-                },
-                () => {}
-              );
-            }}
-          >
-            Delete
-          </Menu.Item>
-        </>
-      ) : null}
-      <S.ContextMenuDivider />
-      <Menu.Item
-        onClick={e => {
-          e.domEvent.stopPropagation();
-          showItemInFolder(absolutePath);
-        }}
-        key="reveal_in_finder"
-      >
-        Reveal in {platformFilemanagerName}
-      </Menu.Item>
-    </Menu>
-  );
-
-  return (
-    <S.TreeTitleWrapper
-      onMouseEnter={() => {
-        setTitleHoverState(true);
-      }}
-      onMouseLeave={() => {
-        setTitleHoverState(false);
-      }}
-    >
-      <S.TreeTitleText>{title}</S.TreeTitleText>
-      {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' ? (
-        <S.SpinnerWrapper>
-          <Spinner />
-        </S.SpinnerWrapper>
-      ) : null}
-      {isTitleHovered && !processingEntity.processingType ? (
-        <ContextMenu overlay={menu}>
-          <div
-            onClick={e => {
-              e.stopPropagation();
-            }}
-          >
-            <Dots color={isFileSelected ? Colors.blackPure : undefined} />
-          </div>
-        </ContextMenu>
-      ) : null}
-    </S.TreeTitleWrapper>
-  );
 };
 
 const FileTreePane = () => {
@@ -773,8 +489,8 @@ const FileTreePane = () => {
       ) : tree ? (
         <S.TreeContainer>
           <S.RootFolderText>
-            <div>{fileMap[ROOT_FILE_ENTRY].filePath}</div>
-            <div>{Object.values(fileMap).filter(f => !f.children).length} files</div>
+            <div id="file-explorer-project-name">{fileMap[ROOT_FILE_ENTRY].filePath}</div>
+            <div id="file-explorer-count">{Object.values(fileMap).filter(f => !f.children).length} files</div>
           </S.RootFolderText>
           <S.TreeDirectoryTree
             // height is needed to enable Tree's virtual scroll ToDo: Do constants based on the hights of app title and pane title, or get height of parent.
@@ -788,25 +504,23 @@ const FileTreePane = () => {
             ref={treeRef}
             expandedKeys={expandedKeys}
             onExpand={onExpand}
-            titleRender={event => {
-              return (
-                <TreeItem
-                  treeKey={String(event.key)}
-                  title={event.title}
-                  processingEntity={processingEntity}
-                  setProcessingEntity={setProcessingEntity}
-                  onDelete={onDelete}
-                  onRename={onRename}
-                  onExcludeFromProcessing={onExcludeFromProcessing}
-                  onIncludeToProcessing={onIncludeToProcessing}
-                  onCreateFolder={onCreateFolder}
-                  onCreateResource={onCreateResource}
-                  onFilterByFileOrFolder={onFilterByFileOrFolder}
-                  onPreview={onPreview}
-                  {...event}
-                />
-              );
-            }}
+            titleRender={event => (
+              <TreeItem
+                treeKey={String(event.key)}
+                title={event.title}
+                processingEntity={processingEntity}
+                setProcessingEntity={setProcessingEntity}
+                onDelete={onDelete}
+                onRename={onRename}
+                onExcludeFromProcessing={onExcludeFromProcessing}
+                onIncludeToProcessing={onIncludeToProcessing}
+                onCreateFolder={onCreateFolder}
+                onCreateResource={onCreateResource}
+                onFilterByFileOrFolder={onFilterByFileOrFolder}
+                onPreview={onPreview}
+                {...event}
+              />
+            )}
             autoExpandParent={autoExpandParent}
             selectedKeys={[selectedPath || '-']}
             filterTreeNode={node => {

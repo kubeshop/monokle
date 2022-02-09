@@ -60,6 +60,7 @@ import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, Download
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 import { convertRecentFilesToRecentProjects, setProjectsRootFolder } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
+import {StartupFlags} from '@utils/startupFlag';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -326,6 +327,10 @@ export const createWindow = (givenPath?: string) => {
     });
 
     dispatch(setAppRehydrating(true));
+    if (process.argv.includes(StartupFlags.AUTOMATION)) {
+      win.webContents.send('set-automation');
+    }
+
     dispatch(setUserDirs({
       homeDir: userHomeDir,
       tempDir: userTempDir,
@@ -355,7 +360,8 @@ export const createWindow = (givenPath?: string) => {
       };
       dispatchToWindow(win, setAlert(alert));
     }
-    win.webContents.send('executed-from', {path: givenPath});
+    win.webContents.send('executed-from', {path: givenPath });
+    win.webContents.send('set-main-process-env', {mainProcessEnv: PROCESS_ENV });
 
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
@@ -376,7 +382,6 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
     convertRecentFilesToRecentProjects(dispatch);
-
   });
 
   return win;

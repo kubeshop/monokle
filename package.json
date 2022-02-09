@@ -82,7 +82,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
-    "@kubernetes/client-node": "0.16.1",
+    "@kubernetes/client-node": "0.16.2",
     "@reduxjs/toolkit": "1.7.1",
     "@rjsf/antd": "3.2.1",
     "@rjsf/core": "3.2.1",
@@ -91,7 +91,7 @@
     "@types/flat": "5.0.2",
     "@types/lodash": "4.14.178",
     "ajv": "6.12.6",
-    "antd": "4.18.3",
+    "antd": "4.18.4",
     "asar": "^3.1.0",
     "async": "3.2.3",
     "chokidar": "3.5.2",
@@ -161,7 +161,7 @@
     "release:patch": "standard-version --release-as patch",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
-    "ui-test": "xvfb-maybe npx playwright test",
+    "ui-test": "xvfb-maybe npx playwright test --workers=1",
     "custom-script": "npx ts-node src/scripts/index.ts"
   },
   "build": {
