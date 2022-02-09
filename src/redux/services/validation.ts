@@ -14,7 +14,14 @@ import {getResourceSchema} from './schema';
  * Validates the specified resource against its JSON Schema and adds validation details
  */
 
-const ignoredProperties = ['lastProbeTime', 'creationTimestamp'];
+const ignoredProperties = [
+  'lastProbeTime',
+  'creationTimestamp',
+  'finishedAt',
+  'createdAt',
+  'startedAt',
+  'x_kubernetes_preserve_unknown_fields',
+];
 const validatorCache = new Map<string, ValidateFunction>();
 
 function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | undefined): RefPosition | undefined {
