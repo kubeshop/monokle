@@ -8,6 +8,8 @@ import Colors from '@styles/Colors';
 
 export const Container = styled.div<{$height: number}>`
   ${({$height}) => `height: ${$height ? `${$height}px` : '100%'};`};
+  display: grid;
+  grid-template-rows: max-content 1fr;
 `;
 
 export const NotFoundLabel = styled.span`
