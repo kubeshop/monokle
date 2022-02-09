@@ -1,5 +1,6 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
+import _ from 'lodash';
 import path from 'path';
 
 import {AnyExtension} from '@models/extension';
@@ -7,6 +8,7 @@ import {AnyExtension} from '@models/extension';
 import {createProject} from '@redux/reducers/appConfig';
 
 import electronStore from '@utils/electronStore';
+import {PROCESS_ENV} from '@utils/env';
 
 const GITHUB_URL = 'https://github.com';
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
@@ -62,10 +64,33 @@ export const convertRecentFilesToRecentProjects = (dispatch: (action: AnyAction)
     electronStore.delete('appConfig.recentFolders');
   }
 };
+
 export const setProjectsRootFolder = (userHomeDir: string) => {
   const projectsRootPath: string = electronStore.get('appConfig.projectsRootPath');
 
   if (!projectsRootPath) {
     electronStore.set('appConfig.projectsRootPath', path.join(userHomeDir, 'Monokle'));
+  }
+};
+
+export const getSerializedProcessEnv = () => {
+  const serializedProcessEnv: Record<string, string> = {};
+  const processEnv = _.isObject(PROCESS_ENV) ? PROCESS_ENV : _.isObject(process.env) ? process.env : {};
+  Object.entries(processEnv).forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      serializedProcessEnv[key] = value;
+      return;
+    }
+    try {
+      const serializedValue: string = JSON.stringify(value);
+      serializedProcessEnv[key] = serializedValue;
+    } catch {
+      // do nothing
+    }
+  });
+  try {
+    return JSON.stringify(serializedProcessEnv);
+  } catch {
+    return undefined;
   }
 };
