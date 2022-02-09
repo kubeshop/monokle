@@ -131,4 +131,9 @@ interface ResourceKindHandler {
   validationSchemaPrefix?: string;
 }
 
-export type {ResourceKindHandler, RefMapper, SymbolMatcher};
+type KindHandlerIdentifier = {
+  version: string;
+  kind: string;
+};
+
+export type {ResourceKindHandler, RefMapper, SymbolMatcher, KindHandlerIdentifier};

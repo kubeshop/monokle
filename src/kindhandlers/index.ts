@@ -7,7 +7,7 @@ import path from 'path';
 import {parseAllDocuments} from 'yaml';
 
 import {K8sResource} from '@models/k8sresource';
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
+import {KindHandlerIdentifier, RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {getStaticResourcePath} from '@redux/services';
 import {refMapperMatchesKind} from '@redux/services/resourceRefs';
@@ -71,7 +71,12 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   VolumeAttachmentHandler,
 ];
 
-const HandlerByResourceKind = Object.fromEntries(
+export function makeKindHandlerId(input: K8sResource | KindHandlerIdentifier): string {
+  const {version, kind} = input;
+  return `${version}#${kind}`;
+}
+
+const KindHandlerMap = Object.fromEntries(
   ResourceKindHandlers.map(kindHandler => {
     if (kindHandler.isCustom) {
       return kindHandler;
@@ -83,13 +88,16 @@ const HandlerByResourceKind = Object.fromEntries(
         editorUiSchema: getUiSchema(kindHandler.kind),
       },
     };
-  }).map(kindHandler => [kindHandler.kind, kindHandler])
+  }).map(kindHandler => [
+    makeKindHandlerId({version: kindHandler.clusterApiVersion, kind: kindHandler.kind}),
+    kindHandler,
+  ])
 );
 
 export function registerKindHandler(kindHandler: ResourceKindHandler, shouldReplace: boolean) {
-  if (shouldReplace || !HandlerByResourceKind[kindHandler.kind]) {
+  if (shouldReplace || !KindHandlerMap[kindHandler.kind]) {
     log.info(`Adding KindHandler for ${kindHandler.clusterApiVersion}.${kindHandler.kind}`);
-    HandlerByResourceKind[kindHandler.kind] = kindHandler;
+    KindHandlerMap[kindHandler.kind] = kindHandler;
     // we need to store the list of registered kind handlers in the redux store for reactivity
     KindHandlersEventEmitter.emit('register', kindHandler);
 
@@ -118,8 +126,11 @@ export const getRegisteredKindHandlers = () => {
   return ResourceKindHandlers;
 };
 
-export const getResourceKindHandler = (resourceKind: string): ResourceKindHandler | undefined => {
-  return HandlerByResourceKind[resourceKind];
+export const getResourceKindHandler = (input: string | K8sResource): ResourceKindHandler | undefined => {
+  if (typeof input === 'string') {
+    return KindHandlerMap[input];
+  }
+  return KindHandlerMap[makeKindHandlerId(input)];
 };
 
 const incomingRefMappersCache = new Map<string, RefMapper[]>();
@@ -128,10 +139,11 @@ const incomingRefMappersCache = new Map<string, RefMapper[]>();
  * Gets all incoming refMappers for the specified resource kind
  */
 
-export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
-  if (!incomingRefMappersCache.has(resourceKind)) {
+export const getIncomingRefMappers = (input: K8sResource | KindHandlerIdentifier): RefMapper[] => {
+  const kindHandlerId = makeKindHandlerId(input);
+  if (!incomingRefMappersCache.has(kindHandlerId)) {
     incomingRefMappersCache.set(
-      resourceKind,
+      kindHandlerId,
       ResourceKindHandlers.map(
         resourceKindHandler =>
           resourceKindHandler.outgoingRefMappers?.filter(outgoingRefMapper =>
