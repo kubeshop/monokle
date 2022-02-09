@@ -1,5 +1,10 @@
 export const CLUSTER_RESOURCE_IGNORED_PATHS = [
   '...creationTimestamp',
+  '...lastProbeTime',
+  '...finishedAt',
+  '...createdAt',
+  '...startedAt',
+  '...x_kubernetes_preserve_unknown_fields',
   'metadata#annotations#kubectl.kubernetes.io/last-applied-configuration',
   'metadata#annotations#deployment.kubernetes.io/revision',
   'metadata#resourceVersion',
