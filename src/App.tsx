@@ -6,15 +6,18 @@ import {useDebounce} from 'react-use';
 
 import 'antd/dist/antd.less';
 
+import log from 'loglevel';
 import path from 'path';
 import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {AlertEnum} from '@models/alert';
 import {NewVersionCode, Project} from '@models/appconfig';
 import {Size} from '@models/window';
 
 import {useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
 import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
@@ -165,10 +168,27 @@ const App = () => {
     };
   }, [onSetAutomation]);
 
-  const onSetMainProcessEnv = useCallback((_: any, args: any) => {
-    setMainProcessEnv(args.mainProcessEnv);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onSetMainProcessEnv = useCallback(
+    (_: any, args: any) => {
+      try {
+        if (args && typeof args.serializedMainProcessEnv === 'string') {
+          setMainProcessEnv(JSON.parse(args.serializedMainProcessEnv));
+        } else {
+          throw new Error('serializedMainProcessEnv is not of type string');
+        }
+      } catch (e: any) {
+        log.warn(`[onSetMainProcessEnv]": ${e.message || ''}`);
+        dispatch(
+          setAlert({
+            title: 'Environment loading failed',
+            message: "Couldn't load your environment variables",
+            type: AlertEnum.Warning,
+          })
+        );
+      }
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     ipcRenderer.on('set-main-process-env', onSetMainProcessEnv);

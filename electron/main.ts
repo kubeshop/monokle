@@ -58,7 +58,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { convertRecentFilesToRecentProjects, setProjectsRootFolder } from './utils';
+import { convertRecentFilesToRecentProjects, getSerializedProcessEnv, setProjectsRootFolder } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 
@@ -361,7 +361,7 @@ export const createWindow = (givenPath?: string) => {
       dispatchToWindow(win, setAlert(alert));
     }
     win.webContents.send('executed-from', {path: givenPath });
-    win.webContents.send('set-main-process-env', {mainProcessEnv: PROCESS_ENV });
+    win.webContents.send('set-main-process-env', {serializedMainProcessEnv: getSerializedProcessEnv()});
 
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
