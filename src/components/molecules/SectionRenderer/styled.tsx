@@ -108,8 +108,9 @@ export const Name = styled.span<NameProps>`
   }}
 `;
 
-export const EmptyGroupText = styled.span`
+export const EmptyGroupText = styled.p`
   margin-left: 26px;
+  margin-bottom: 12px;
   font-size: 12px;
 `;
 

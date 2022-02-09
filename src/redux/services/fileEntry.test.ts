@@ -1,4 +1,4 @@
-import {KUSTOMIZATION_KIND} from '@constants/constants';
+import {HELM_CHART_ENTRY_FILE, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {AppConfig} from '@models/appconfig';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
@@ -59,5 +59,5 @@ test('read-folder-with-helm-chart', () => {
   expect(helmCharts.length).toBe(1);
   expect(helmCharts[0].valueFileIds.length).toBe(1);
   expect(helmCharts[0].name).toBe('aks-helloworld');
-  expect(fileMap[helmCharts[0].filePath].name).toBe('Chart.yaml');
+  expect(fileMap[helmCharts[0].filePath].name).toBe(HELM_CHART_ENTRY_FILE);
 });
