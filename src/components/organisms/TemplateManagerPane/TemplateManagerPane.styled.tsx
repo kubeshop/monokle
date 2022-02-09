@@ -6,8 +6,8 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import Colors from '@styles/Colors';
 
-export const Container = styled.div`
-  height: 100%;
+export const Container = styled.div<{$height: number}>`
+  ${({$height}) => `height: ${$height ? `${$height}px` : '100%'};`};
 `;
 
 export const NotFoundLabel = styled.span`
@@ -22,7 +22,7 @@ export const SearchInput = styled(Input.Search)`
 `;
 
 export const SearchInputContainer = styled.div`
-  margin-bottom: 25px;
+  margin: 16px 0px 25px 0px;
   padding: 0px 16px;
 `;
 
@@ -30,11 +30,10 @@ export const TemplateManagerPaneContainer = styled.div`
   height: 100%;
   display: grid;
   grid-template-rows: max-content 1fr;
-  grid-row-gap: 16px;
 `;
 
-export const TemplatesContainer = styled.div<{$height: number}>`
-  ${props => `height: ${props.$height}px;`}
+export const TemplatesContainer = styled.div<{$height?: number}>`
+  ${props => `height: ${props.$height ? `${props.$height}px` : '100%'};`}
   display: grid;
   grid-auto-rows: max-content;
   grid-row-gap: 25px;

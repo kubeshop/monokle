@@ -1,10 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Button, Tooltip} from 'antd';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {TEMPLATES_HEIGHT_OFFSET} from '@constants/constants';
 import {TemplateManagerPaneReloadTooltip} from '@constants/tooltips';
 
 import {AnyTemplate} from '@models/template';
@@ -14,8 +14,6 @@ import {isInPreviewModeSelector} from '@redux/selectors';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
 import {TitleBar} from '@molecules';
-
-import {useWindowSize} from '@utils/hooks';
 
 import TemplateModal from '../TemplateModal';
 import TemplateInformation from './TemplateInformation';
@@ -35,7 +33,13 @@ const filterTemplateBySearchedValue = (searchedValue: string, name: string) => {
   return shouldBeFiltered;
 };
 
-const TemplatesManagerPane: React.FC = () => {
+interface IProps {
+  contentHeight?: number;
+}
+
+const TemplatesManagerPane: React.FC<IProps> = props => {
+  const {contentHeight} = props;
+
   const dispatch = useAppDispatch();
   const [selectedTemplate, setSelectedTemplate] = useState<AnyTemplate | undefined>(undefined);
 
@@ -49,7 +53,7 @@ const TemplatesManagerPane: React.FC = () => {
   const [searchedValue, setSearchedValue] = useState<string>();
   const [visibleTemplateEntries, setVisibleTemplateEntries] = useState<[string, AnyTemplate][]>();
 
-  const windowSize = useWindowSize();
+  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
   const isLoading = useMemo(() => {
     return isLoadingExistingTemplates || isLoadingExistingTemplatePacks;
@@ -58,11 +62,6 @@ const TemplatesManagerPane: React.FC = () => {
   const templates = useMemo(() => {
     return Object.values(templateMap);
   }, [templateMap]);
-
-  const templatesHeight = useMemo(
-    () => windowSize.height - TEMPLATES_HEIGHT_OFFSET - (isInPreviewMode ? 25 : 0),
-    [windowSize.height, isInPreviewMode]
-  );
 
   const onTemplateModalClose = useCallback(() => {
     setSelectedTemplate(undefined);
@@ -94,19 +93,21 @@ const TemplatesManagerPane: React.FC = () => {
 
   return (
     <S.TemplateManagerPaneContainer id="TemplateManagerPane">
-      <TitleBar title="Templates">
-        <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
-          <Button
-            disabled={templates.length === 0}
-            onClick={onClickReload}
-            type="link"
-            size="small"
-            icon={<ReloadOutlined />}
-          />
-        </Tooltip>
-      </TitleBar>
+      <div ref={titleBarRef}>
+        <TitleBar title="Templates">
+          <Tooltip title={TemplateManagerPaneReloadTooltip} placement="bottom">
+            <Button
+              disabled={templates.length === 0}
+              onClick={onClickReload}
+              type="link"
+              size="small"
+              icon={<ReloadOutlined />}
+            />
+          </Tooltip>
+        </TitleBar>
+      </div>
 
-      <S.Container>
+      <S.Container $height={contentHeight ? contentHeight - titleBarHeight : 0}>
         {isLoading ? (
           <S.Skeleton />
         ) : !visibleTemplateEntries ? (
@@ -124,7 +125,7 @@ const TemplatesManagerPane: React.FC = () => {
             {!visibleTemplateEntries.length ? (
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
             ) : (
-              <S.TemplatesContainer $height={templatesHeight}>
+              <S.TemplatesContainer>
                 {visibleTemplateEntries.map(([path, template]) => (
                   <TemplateInformation
                     key={path}

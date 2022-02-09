@@ -153,7 +153,7 @@ const PaneManager = () => {
                   display: leftMenuSelection === 'templates-pane' ? 'inline' : 'none',
                 }}
               >
-                <TemplateManagerPane />
+                <TemplateManagerPane contentHeight={parseInt(contentHeight, 10) - 75} />
               </div>
             </>
           }

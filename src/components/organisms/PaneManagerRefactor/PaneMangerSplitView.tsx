@@ -116,7 +116,7 @@ const PaneManagerSplitView: React.FC = () => {
                 {leftMenuSelection === 'file-explorer' && <FileTreePane />}
                 {leftMenuSelection === 'helm-pane' && <HelmPane />}
                 {leftMenuSelection === 'kustomize-pane' && <KustomizePane />}
-                {leftMenuSelection === 'templates-pane' && <TemplateManagerPane />}
+                {leftMenuSelection === 'templates-pane' && <TemplateManagerPane contentHeight={paneHeight} />}
               </Suspense>
             </S.Pane>
           </ResizableBox>
