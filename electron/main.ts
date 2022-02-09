@@ -13,7 +13,7 @@ moduleAlias.addAliases({
   '@root': `${__dirname}/../`,
 });
 
-import {app, BrowserWindow, nativeImage, ipcMain, dialog} from 'electron';
+import {app, BrowserWindow, nativeImage, ipcMain} from 'electron';
 import * as path from 'path';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import * as Splashscreen from '@trodi/electron-splashscreen';
@@ -64,7 +64,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
+import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 
@@ -245,6 +245,10 @@ ipcMain.on('quit-and-install', () => {
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
 
+ipcMain.on('confirm-action', (event, args) => {
+  event.returnValue = askActionConfirmation(args);
+});
+
 export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -395,25 +399,12 @@ export const createWindow = (givenPath?: string) => {
   });
 
   win.on('close', (e) => {
-    if (unsavedResourceCount === 0) {
-      return;
-    }
-
-    const message = unsavedResourceCount === 1
-      ? 'You have an unsaved resource'
-      : `You have ${unsavedResourceCount} unsaved resources`;
-
-    const choice = dialog.showMessageBoxSync({
-      type: 'info',
-      title: 'Confirmation',
-      message,
-      detail: "Progress will be lost if you choose to close this window. You can't undo this action.",
-      buttons: ['Close', 'Cancel'],
-      defaultId: 0,
-      cancelId: 1,
+    const confirmed = askActionConfirmation({
+      unsavedResourceCount,
+      action: "close this window"
     });
 
-    if (choice === 1) {
+    if (!confirmed) {
       e.preventDefault();
     }
   });
