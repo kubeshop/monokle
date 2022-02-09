@@ -127,8 +127,7 @@ All these widgets allow entry of custom values - i.e. none require you to select
 
 ## Property interpolation
 
-Monokle uses [_lodash.template](https://lodash.com/docs/4.17.15#template) for property interpolation, using
-`[[` and `]]` as escape delimiters.
+Monokle uses `[[` and `]]` as escape delimiters for script interpolation. 
 
 For the JSON Schema example above example, if this form is the first one in the `forms` array 
 from `monokle-template.json`, then we will be able to use the values in the template manifests:
@@ -137,6 +136,15 @@ from `monokle-template.json`, then we will be able to use the values in the temp
 propertyOne: [[forms[0].name]]
 propertyTwo: [[forms[0].namespace]]
 otherProperty: [[forms[0].image]]
+```
+
+Scripts are run in a sandboxed environment giving you access to built-in Javascript objects. For
+example the following is taken from the [basic-role-template](https://github.com/kubeshop/monokle-default-templates-plugin/blob/main/basic-role-template/template.yaml) which will create a YAML array of 
+selected verbs in the corresponding form.
+
+```yaml
+    verbs:
+      - [[ forms[0].verbs.join("\n      - ") ]]
 ```
 
 ## What types of templates exist?
