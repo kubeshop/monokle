@@ -32,7 +32,7 @@ interface K8sResource {
   /** k8s resource kind */
   kind: string;
   /** k8s resource apiVersion value */
-  version: string;
+  apiVersion: string;
   /** k8s namespace is specified (for filtering) */
   namespace?: string;
   /** if highlighted in UI (should probalby move to UI state object) */

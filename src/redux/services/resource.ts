@@ -462,7 +462,7 @@ export function reprocessResources(
       }
 
       resource.kind = resource.content.kind;
-      resource.version = resource.content.apiVersion;
+      resource.apiVersion = resource.content.apiVersion;
       resource.namespace = extractNamespace(resource.content);
 
       // clear caches
@@ -659,7 +659,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             isHighlighted: false,
             isSelected: false,
             kind: content.kind,
-            version: content.apiVersion,
+            apiVersion: content.apiVersion,
             content,
             text,
           };
@@ -704,7 +704,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             isHighlighted: false,
             isSelected: false,
             kind: KUSTOMIZATION_KIND,
-            version: `${KUSTOMIZATION_API_GROUP}/v1beta1`,
+            apiVersion: `${KUSTOMIZATION_API_GROUP}/v1beta1`,
             content,
             text: fileContent,
           };

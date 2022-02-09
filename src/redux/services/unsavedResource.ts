@@ -54,7 +54,7 @@ export function createUnsavedResource(
     isHighlighted: false,
     isSelected: false,
     kind: input.kind,
-    version: input.apiVersion,
+    apiVersion: input.apiVersion,
     namespace: input.namespace,
     text: newResourceText,
     content: newResourceContent,

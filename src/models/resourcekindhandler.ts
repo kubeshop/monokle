@@ -132,7 +132,7 @@ interface ResourceKindHandler {
 }
 
 type KindHandlerIdentifier = {
-  version: string;
+  apiVersion: string;
   kind: string;
 };
 

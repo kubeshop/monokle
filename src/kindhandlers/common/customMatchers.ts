@@ -45,5 +45,5 @@ export function targetKindMatcher(sourceResource: K8sResource, targetResource: K
  */
 
 export function targetGroupMatcher(sourceResource: K8sResource, targetResource: K8sResource, value: string) {
-  return targetResource.version.startsWith(`${value}/`);
+  return targetResource.apiVersion.startsWith(`${value}/`);
 }

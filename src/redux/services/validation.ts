@@ -40,7 +40,7 @@ export function validateResource(resource: K8sResource) {
     return;
   }
 
-  const validatorCacheKey = resource.kind + resource.version;
+  const validatorCacheKey = resource.kind + resource.apiVersion;
   if (!validatorCache.has(validatorCacheKey)) {
     const ajv = new Ajv({
       unknownFormats: 'ignore',

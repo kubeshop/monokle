@@ -76,7 +76,7 @@ const PersistentVolumeHandler: ResourceKindHandler = {
             return value === undefined || targetResource.kind === value;
           },
           apiVersion: (sourceResource, targetResource, value) => {
-            return value === undefined || targetResource.version.startsWith(value);
+            return value === undefined || targetResource.apiVersion.startsWith(value);
           },
           namespace: (sourceResource, targetResource, value) => {
             return value === undefined || targetResource.namespace === value;

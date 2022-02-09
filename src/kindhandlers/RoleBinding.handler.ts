@@ -53,7 +53,7 @@ const RoleBindingHandler: ResourceKindHandler = {
           apiGroup: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
             const apiGroup =
               value || ['User', 'Group'].includes(siblingValues['kind']) ? 'rbac.authorization.k8s.io' : '';
-            return targetResource.version.startsWith(apiGroup);
+            return targetResource.apiVersion.startsWith(apiGroup);
           },
           namespace: (sourceResource: K8sResource, targetResource, value, siblingValues) => {
             // namespace should not be specified for User/Group kinds

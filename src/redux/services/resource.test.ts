@@ -13,7 +13,7 @@ test('get-namespaces', () => {
     filePath: 'folder/filename',
     name: 'resource name',
     kind: 'ResourceType',
-    version: '1.0',
+    apiVersion: '1.0',
     isHighlighted: false,
     isSelected: false,
     content: {},
