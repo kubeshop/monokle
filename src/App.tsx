@@ -6,6 +6,7 @@ import {useDebounce} from 'react-use';
 
 import 'antd/dist/antd.less';
 
+import log from 'loglevel';
 import path from 'path';
 import styled from 'styled-components';
 
@@ -169,9 +170,14 @@ const App = () => {
 
   const onSetMainProcessEnv = useCallback(
     (_: any, args: any) => {
-      if (args && typeof args.serializedMainProcessEnv === 'string') {
-        setMainProcessEnv(JSON.parse(args.serializedMainProcessEnv));
-      } else {
+      try {
+        if (args && typeof args.serializedMainProcessEnv === 'string') {
+          setMainProcessEnv(JSON.parse(args.serializedMainProcessEnv));
+        } else {
+          throw new Error('serializedMainProcessEnv is not of type string');
+        }
+      } catch (e: any) {
+        log.warn(`[onSetMainProcessEnv]": ${e.message || ''}`);
         dispatch(
           setAlert({
             title: 'Environment loading failed',
