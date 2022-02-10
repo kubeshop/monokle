@@ -407,7 +407,7 @@ export function saveResource(resource: K8sResource, newValue: string, fileMap: F
  * Reprocess kustomization-specific references for all kustomizations
  */
 
-function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
+export function reprocessKustomizations(resourceMap: ResourceMapType, fileMap: FileMapType) {
   Object.values(resourceMap)
     .filter(r => isKustomizationResource(r))
     .forEach(r => {
