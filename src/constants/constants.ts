@@ -26,5 +26,5 @@ export const DEFAULT_PLUGINS = [
     url: 'https://github.com/kubeshop/monokle-default-templates-plugin',
   },
 ];
-
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
+export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';
