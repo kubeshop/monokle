@@ -28,7 +28,7 @@ import {
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
-import {deleteResource, extractK8sResources, reprocessResources} from './resource';
+import {deleteResource, extractK8sResources, reprocessKustomizations, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: K8sResource[];
@@ -476,6 +476,8 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
       parentEntry.children.push(fileEntry.name);
       parentEntry.children.sort();
     }
+
+    reprocessKustomizations(state.resourceMap, state.fileMap);
 
     return fileEntry;
   }
