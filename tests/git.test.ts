@@ -43,18 +43,9 @@ test.beforeAll(async () => {
 
   appWindow.on('console', console.log);
 
-  let cloneCheckout = execSync(`git clone ${repo}`, {
+  execSync(`git clone ${repo}`, {
     cwd: `${clonePath}`,
   });
-  console.log('cloneCheckout', cloneCheckout);
-});
-
-test.beforeEach(async () => {
-  await pause(1000);
-});
-
-test.afterEach(async () => {
-  await pause(1000);
 });
 
 const startCommit = 'aeb1e59a03913b00020eca6ac2a416d085f34a6b';
@@ -62,10 +53,9 @@ const removeSomeFiles = 'f5518240cf7cac1f686c1bc9e4ca8099bfd7daa1';
 const removeMoreFiles = '28879f29f62c8357b5ca988e475db30e13c8300b';
 
 async function goToCommit(hash: string) {
-  let stdoutCheckout = execSync(`git checkout ${hash}`, {
+  execSync(`git checkout ${hash}`, {
     cwd: `${projectPath}`,
   });
-  console.log('stdoutCheckout', stdoutCheckout.toString());
 
   await pause(5000);
 }
@@ -73,32 +63,32 @@ async function goToCommit(hash: string) {
 const testData = [
   {
     hash: startCommit,
-    fileExplorerCount: 54,
+    fileExplorerCount: 53,
     kustomizeCount: 22,
     helmCount: 4,
     navigatorCount: 55,
   },
   {
     hash: removeSomeFiles,
-    fileExplorerCount: 33,
+    fileExplorerCount: 32,
     kustomizeCount: 5,
     helmCount: 4,
     navigatorCount: 48,
   },
   {
     hash: removeMoreFiles,
-    fileExplorerCount: 17,
+    fileExplorerCount: 15,
     kustomizeCount: 2,
     helmCount: 4,
     navigatorCount: 35,
   },
-  // {
-  //   hash: startCommit,
-  //   fileExplorerCount: 54,
-  //   kustomizeCount: 22,
-  //   helmCount: 4,
-  //   navigatorCount: 55,
-  // },
+  {
+    hash: startCommit,
+    fileExplorerCount: 53,
+    kustomizeCount: 22,
+    helmCount: 4,
+    navigatorCount: 55,
+  },
 ];
 
 test('all files should be loaded', async () => {
@@ -111,7 +101,6 @@ test('all files should be loaded', async () => {
   for (const data of testData) {
     console.log(`testing commit hash: ${data.hash}`);
     await goToCommit(data.hash);
-    await pause(10000);
 
     expect(parseInt(await navigatorPane.resourcesCount.textContent(), 10)).toEqual(data.navigatorCount);
 
@@ -120,17 +109,15 @@ test('all files should be loaded', async () => {
     expect(await fileExplorerPane.fileCount.textContent()).toEqual(`${data.fileExplorerCount} files`);
 
     await mainWindow.clickKustomizeButton();
-    await pause(1000);
     const kustomizeInnerTexts = (await kustomizePane.kustomizeItemsContainer.allInnerTexts())[0].split('\n');
     expect(kustomizeInnerTexts.length).toEqual(data.kustomizeCount);
 
     await mainWindow.clickHelmButton();
     const helmInnerTexts = (await helmPane.helmItemsContainer.allInnerTexts())[0].split('\n');
-    await pause(1000);
     expect(helmInnerTexts.length).toEqual(data.helmCount);
   }
 });
 
 test.afterAll(() => {
-  fs.rmdirSync(projectPath, { recursive: true });
+  fs.rmSync(projectPath, { recursive: true, force: true });
 });
