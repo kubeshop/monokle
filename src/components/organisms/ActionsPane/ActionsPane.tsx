@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import {LegacyRef, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {LegacyRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
@@ -57,7 +57,6 @@ import {Icon, TabHeader} from '@atoms';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
-import AppContext from '@src/AppContext';
 import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
@@ -75,8 +74,6 @@ interface IProps {
 const ActionsPane: React.FC<IProps> = props => {
   const {contentHeight} = props;
 
-  const {windowSize} = useContext(AppContext);
-
   const dispatch = useAppDispatch();
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -85,6 +82,7 @@ const ActionsPane: React.FC<IProps> = props => {
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const isActionsPaneFooterExpanded = useAppSelector(state => state.ui.isActionsPaneFooterExpanded);
   const isClusterDiffVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
+  const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const {kustomizeCommand} = useAppSelector(settingsSelector);
@@ -98,7 +96,6 @@ const ActionsPane: React.FC<IProps> = props => {
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
   const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
-  const uiState = useAppSelector(state => state.ui);
 
   const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
@@ -112,6 +109,7 @@ const ActionsPane: React.FC<IProps> = props => {
 
   const [actionsPaneFooterRef, {height: actionsPaneFooterHeight, width: actionsPaneFooterWidth}] =
     useMeasure<HTMLDivElement>();
+  const [actionsPaneRef, {width: actionsPaneWidth}] = useMeasure<HTMLDivElement>();
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
   const getDistanceBetweenTwoComponents = useCallback(() => {
@@ -120,11 +118,8 @@ const ActionsPane: React.FC<IProps> = props => {
 
     const distance = extraButtonEl.left - tabsListEl.right;
 
-    if (isButtonShrinked) {
-      // 230px = approx width of not collapsed button
-      if (distance > 350) {
-        setButtonShrinkedState(false);
-      }
+    if (isButtonShrinked && distance > 280) {
+      setButtonShrinkedState(false);
     }
 
     // The button has 10px margin-left
@@ -354,10 +349,10 @@ const ActionsPane: React.FC<IProps> = props => {
     if (tabsList && tabsList.length && extraButton.current) {
       getDistanceBetweenTwoComponents();
     }
-  }, [tabsList, uiState.paneConfiguration, windowSize, selectedResource, getDistanceBetweenTwoComponents]);
+  }, [actionsPaneWidth, tabsList, paneConfiguration, selectedResource, getDistanceBetweenTwoComponents]);
 
   return (
-    <S.ActionsPaneMainContainer>
+    <S.ActionsPaneMainContainer ref={actionsPaneRef}>
       <div ref={titleBarRef}>
         <TitleBar title="Editor">
           <>
@@ -423,6 +418,7 @@ const ActionsPane: React.FC<IProps> = props => {
       <S.ActionsPaneContainer>
         <S.Tabs
           $height={tabsHeight}
+          $width={actionsPaneWidth}
           defaultActiveKey="source"
           activeKey={activeTabKey}
           onChange={k => setActiveTabKey(k)}
@@ -451,7 +447,7 @@ const ActionsPane: React.FC<IProps> = props => {
           }
         >
           <TabPane key="source" tab={<TabHeader icon={<CodeOutlined />}>Source</TabHeader>}>
-            {uiState.isFolderLoading || previewLoader.isLoading ? (
+            {isFolderLoading || previewLoader.isLoading ? (
               <S.Skeleton active />
             ) : activeTabKey === 'source' ? (
               !isClusterDiffVisible &&
@@ -467,7 +463,7 @@ const ActionsPane: React.FC<IProps> = props => {
               key="form"
               tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
             >
-              {uiState.isFolderLoading || previewLoader.isLoading ? (
+              {isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
               ) : activeTabKey === 'form' ? (
                 isKustomization ? (
@@ -485,7 +481,7 @@ const ActionsPane: React.FC<IProps> = props => {
           )}
           {selectedResource && resourceKindHandler && !isKustomization && (
             <TabPane key="metadataForm" tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}>
-              {uiState.isFolderLoading || previewLoader.isLoading ? (
+              {isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
               ) : activeTabKey === 'metadataForm' ? (
                 <FormEditor formSchema={getFormSchema('metadata')} formUiSchema={getUiSchema('metadata')} />

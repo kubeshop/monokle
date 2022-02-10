@@ -4,8 +4,11 @@ import styled from 'styled-components';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
-export const Tabs = styled(RawTabs)<{$height: number}>`
-  ${({$height}) => `height: ${$height}px;`};
+export const Tabs = styled(RawTabs)<{$height: number; $width: number}>`
+  ${({$height, $width}) => `
+    height: ${$height}px;
+    width: ${$width}px;
+  `};
   overflow: visible;
 
   & .ant-tabs-nav {
