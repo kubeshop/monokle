@@ -1,5 +1,8 @@
 import {Locator, Page} from 'playwright';
 import {v4 as uuidV4} from 'uuid';
+import {ElectronApplication} from 'playwright-core';
+import {getChannelName} from '../../src/utils/ipc';
+import {mockHandle} from './util';
 
 export class StartProjectPane {
 
@@ -32,6 +35,17 @@ export class StartProjectPane {
     await this._emptyProjectSave.click();
 
     return name;
+  }
+
+  async createProjectFromFolder(electronApp: ElectronApplication, path: string) {
+    const chanel = getChannelName('select-file', true);
+    await mockHandle(electronApp, chanel, path);
+
+    await this._selectExisingFolderLink.click();
+
+    await electronApp.evaluate(({ ipcMain }, params) => {
+      ipcMain.removeAllListeners(params.chanel);
+    }, { chanel });
   }
 
 }

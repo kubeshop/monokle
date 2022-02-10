@@ -219,6 +219,7 @@ const PaneManager = () => {
             placement="right"
           >
             <MenuButton
+              id="kustomize-pane"
               isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
               isActive={Boolean(activeProject) && leftActive}
               onClick={() => setLeftActiveMenu('kustomize-pane')}
@@ -245,6 +246,7 @@ const PaneManager = () => {
             placement="right"
           >
             <MenuButton
+              id="helm-pane"
               isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
               isActive={Boolean(activeProject) && leftActive}
               onClick={() => setLeftActiveMenu('helm-pane')}

@@ -1,0 +1,136 @@
+import {expect, test} from '@playwright/test';
+import {Page} from 'playwright';
+import {ElectronApplication} from 'playwright-core';
+import {execSync} from 'child_process';
+import * as path from 'path';
+import * as fs from 'fs';
+import {ElectronAppInfo, startApp} from './electronHelpers';
+import {pause} from './utils';
+import {MainWindow} from './models/mainWindow';
+import {FileExplorerPane} from './models/fileExplorerPane';
+import {KustomizePane} from './models/kustomizePane';
+import {HelmPane} from './models/helmPane';
+import {StartProjectPane} from './models/startProjectPane';
+import {NavigatorPane} from './models/navigatorPane';
+
+let appWindow: Page = {} as any;
+let appInfo: ElectronAppInfo = {} as any;
+let electronApp: ElectronApplication = {} as any;
+
+const clonePath = path.join(__dirname, '..', '..');
+const projectPath = path.join(clonePath, 'manifest-test-data');
+const repo = 'https://github.com/kubeshop/manifest-test-data';
+
+let mainWindow: MainWindow;
+let fileExplorerPane: FileExplorerPane;
+let kustomizePane: KustomizePane;
+let helmPane: HelmPane;
+let startProjectPane: StartProjectPane;
+let navigatorPane: NavigatorPane;
+
+test.beforeAll(async () => {
+  const startAppResponse = await startApp();
+  appWindow = startAppResponse.appWindow;
+  appInfo = startAppResponse.appInfo;
+  electronApp = startAppResponse.electronApp;
+
+  mainWindow = new MainWindow(appWindow);
+  fileExplorerPane = new FileExplorerPane(appWindow);
+  kustomizePane = new KustomizePane(appWindow);
+  helmPane = new HelmPane(appWindow);
+  startProjectPane = new StartProjectPane(appWindow);
+  navigatorPane = new NavigatorPane(appWindow);
+
+  appWindow.on('console', console.log);
+
+  let cloneCheckout = execSync(`git clone ${repo}`, {
+    cwd: `${clonePath}`,
+  });
+  console.log('cloneCheckout', cloneCheckout);
+});
+
+test.beforeEach(async () => {
+  await pause(1000);
+});
+
+test.afterEach(async () => {
+  await pause(1000);
+});
+
+const startCommit = 'aeb1e59a03913b00020eca6ac2a416d085f34a6b';
+const removeSomeFiles = 'f5518240cf7cac1f686c1bc9e4ca8099bfd7daa1';
+const removeMoreFiles = '28879f29f62c8357b5ca988e475db30e13c8300b';
+
+async function goToCommit(hash: string) {
+  let stdoutCheckout = execSync(`git checkout ${hash}`, {
+    cwd: `${projectPath}`,
+  });
+  console.log('stdoutCheckout', stdoutCheckout.toString());
+
+  await pause(5000);
+}
+
+const testData = [
+  {
+    hash: startCommit,
+    fileExplorerCount: 54,
+    kustomizeCount: 22,
+    helmCount: 4,
+    navigatorCount: 55,
+  },
+  {
+    hash: removeSomeFiles,
+    fileExplorerCount: 33,
+    kustomizeCount: 5,
+    helmCount: 4,
+    navigatorCount: 48,
+  },
+  {
+    hash: removeMoreFiles,
+    fileExplorerCount: 17,
+    kustomizeCount: 2,
+    helmCount: 4,
+    navigatorCount: 35,
+  },
+  // {
+  //   hash: startCommit,
+  //   fileExplorerCount: 54,
+  //   kustomizeCount: 22,
+  //   helmCount: 4,
+  //   navigatorCount: 55,
+  // },
+];
+
+test('all files should be loaded', async () => {
+  // todo checkout project
+
+  await startProjectPane.createProjectFromFolder(electronApp, projectPath);
+  await pause(5000);
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const data of testData) {
+    console.log(`testing commit hash: ${data.hash}`);
+    await goToCommit(data.hash);
+    await pause(10000);
+
+    expect(parseInt(await navigatorPane.resourcesCount.textContent(), 10)).toEqual(data.navigatorCount);
+
+    await mainWindow.clickFileExplorer();
+    expect((await fileExplorerPane.projectName.textContent())?.includes(projectPath)).toBe(true);
+    expect(await fileExplorerPane.fileCount.textContent()).toEqual(`${data.fileExplorerCount} files`);
+
+    await mainWindow.clickKustomizeButton();
+    await pause(1000);
+    const kustomizeInnerTexts = (await kustomizePane.kustomizeItemsContainer.allInnerTexts())[0].split('\n');
+    expect(kustomizeInnerTexts.length).toEqual(data.kustomizeCount);
+
+    await mainWindow.clickHelmButton();
+    const helmInnerTexts = (await helmPane.helmItemsContainer.allInnerTexts())[0].split('\n');
+    await pause(1000);
+    expect(helmInnerTexts.length).toEqual(data.helmCount);
+  }
+});
+
+test.afterAll(() => {
+  fs.rmdirSync(projectPath, { recursive: true });
+});
