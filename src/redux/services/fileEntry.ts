@@ -16,6 +16,7 @@ import {
   getHelmChartFromFileEntry,
   getHelmValuesFile,
   isHelmChartFolder,
+  isHelmValuesFile,
   processHelmChartFolder,
 } from '@redux/services/helm';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
@@ -386,8 +387,7 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
       if (!parentFolderEntry) {
         return;
       }
-      const isValuesFile = micromatch.isMatch(fileName, '*values*.yaml');
-      if (isValuesFile) {
+      if (isHelmValuesFile(fileName)) {
         const valuesFilePath =
           parentFolderEntry.filePath === rootFolderEntry.filePath
             ? `${path.sep}${fileName}`
@@ -406,7 +406,7 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   }
 
   // if this new file is a values file, search for it's helm chart and update it
-  if (micromatch.isMatch(path.basename(absolutePath), '*values*.yaml')) {
+  if (isHelmValuesFile(absolutePath)) {
     const helmChart = Object.values(state.helmChartMap).find(chart => {
       return path.dirname(chart.filePath) === parentFolderEntry?.filePath;
     });

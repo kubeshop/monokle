@@ -32,6 +32,14 @@ export function getHelmChartFromFileEntry(fileEntry: FileEntry, helmChartMap: He
 }
 
 /**
+ * Checks if the specified path is a helm values file
+ */
+
+export function isHelmValuesFile(filePath: string) {
+  return micromatch.isMatch(path.basename(filePath), '*values*.yaml');
+}
+
+/**
  * Checks if the specified files are a Helm Chart folder
  */
 
@@ -97,7 +105,7 @@ export function processHelmChartFolder(
           isSupportedHelmResource
         );
       }
-    } else if (micromatch.isMatch(file, '*values*.yaml')) {
+    } else if (isHelmValuesFile(file)) {
       const helmValues: HelmValuesFile = {
         id: uuidv4(),
         filePath: fileEntryPath,
