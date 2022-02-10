@@ -95,7 +95,7 @@ test('all files should be loaded', async () => {
   // todo checkout project
 
   await startProjectPane.createProjectFromFolder(electronApp, projectPath);
-  await pause(5000);
+  await pause(10000);
 
   // eslint-disable-next-line no-restricted-syntax
   for (const data of testData) {
