@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/kubeshop/monokle/compare/v1.5.1-nightly-2022-02-10.0...v1.5.1) (2022-02-10)
+
+
+### Bug Fixes
+
+* added more ignored properties ([0328761](https://github.com/kubeshop/monokle/commit/032876136a920ba5d88da77c706ac512b96547f1))
+* added more properties to ignore during validation ([6a8f16e](https://github.com/kubeshop/monokle/commit/6a8f16ec01b6803a3ae67713c4cbcbd24adadca2))
+* added properties to ignored properties in diff ([182059a](https://github.com/kubeshop/monokle/commit/182059a0f22755a22ef5f45024a31590fe0a40aa))
+* adding/removing Chart.yaml and values files ([ebd7f09](https://github.com/kubeshop/monokle/commit/ebd7f095ab1eb13f900d8f8add5509c52d6c09cd))
+* enable select a template button on back ([b7659d0](https://github.com/kubeshop/monokle/commit/b7659d01a372ab334f0f4acfff509a86fe05649d))
+* reprocess kustomizations on addPath ([121f5fa](https://github.com/kubeshop/monokle/commit/121f5fa6ca91f4a15ad95c69ae2446b49a43f26e))
+
 ## [1.5.0](https://github.com/kubeshop/monokle/compare/v1.4.1-nightly-2022-01-31.0...v1.5.0) (2022-01-31)
 
 
