@@ -38,7 +38,14 @@ import terminal from '../cli/terminal';
 import {downloadPlugin, loadPluginMap, updatePlugin} from './pluginService';
 import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
-import {checkNewVersion, runHelm, runKustomize, saveFileDialog, selectFileDialog} from '@root/electron/commands';
+import {
+  checkNewVersion,
+  interpolateTemplate,
+  runHelm,
+  runKustomize,
+  saveFileDialog,
+  selectFileDialog,
+} from '@root/electron/commands';
 import {setAppRehydrating} from '@redux/reducers/main';
 import {setPluginMap, setTemplatePackMap, setTemplateMap, setExtensionsDirs} from '@redux/reducers/extension';
 import autoUpdater from './auto-update';
@@ -51,7 +58,8 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { convertRecentFilesToRecentProjects, setProjectsRootFolder } from './utils';
+import { convertRecentFilesToRecentProjects, getSerializedProcessEnv, setProjectsRootFolder } from './utils';
+import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 
 Object.assign(console, ElectronLog.functions);
@@ -195,6 +203,10 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
   updateExtensionsResult.templateExtensions.push(...updatedTemplateExtensionsFromPlugins.flat(), ...updatedTemplateExtensionsFromTemplatePacks.flat());
 
   event.sender.send(UPDATE_EXTENSIONS_RESULT, updateExtensionsResult);
+});
+
+ipcMain.on('interpolate-vanilla-template', (event, args: InterpolateTemplateOptions) => {
+  interpolateTemplate(args, event);
 });
 
 ipcMain.on('run-kustomize', (event, cmdOptions: KustomizeCommandOptions) => {
@@ -349,7 +361,7 @@ export const createWindow = (givenPath?: string) => {
       dispatchToWindow(win, setAlert(alert));
     }
     win.webContents.send('executed-from', {path: givenPath });
-    win.webContents.send('set-main-process-env', {mainProcessEnv: PROCESS_ENV });
+    win.webContents.send('set-main-process-env', {serializedMainProcessEnv: getSerializedProcessEnv()});
 
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);

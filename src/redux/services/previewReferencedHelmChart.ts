@@ -31,9 +31,7 @@ export const previewReferencedHelmChart = async (
 ) => {
   const valuesFileContent = await fsReadFilePromise(valuesFilePath, 'utf8');
   const newTempValuesFilePath = path.join(userTempDir, uuidv4());
-
-  const parsedValuesFileContent: string = interpolateTemplate(valuesFileContent, formsData);
-
+  const parsedValuesFileContent: string = await interpolateTemplate(valuesFileContent, formsData);
   await fsWriteFilePromise(newTempValuesFilePath, parsedValuesFileContent);
 
   const helmArgs = {

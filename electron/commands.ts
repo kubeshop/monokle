@@ -2,10 +2,12 @@ import {BrowserWindow, dialog} from 'electron';
 
 import {execSync} from 'child_process';
 import {AnyAction} from 'redux';
+import {VM} from 'vm2';
 
 import {NewVersionCode} from '@models/appconfig';
 
 import {updateNewVersion} from '@redux/reducers/appConfig';
+import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
@@ -136,4 +138,45 @@ export const checkNewVersion = async (dispatch: (action: AnyAction) => void, ini
       dispatch(updateNewVersion({code: NewVersionCode.Errored, data: {errorCode: null, initial: Boolean(initial)}}));
     }
   }
+};
+
+/**
+ * Interpolates the provided vanilla template in a sandboxed vm
+ */
+
+export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Electron.IpcMainEvent) => {
+  const vm = new VM({
+    eval: false,
+    wasm: false,
+    fixAsync: true,
+    sandbox: {
+      forms: args.formsData,
+    },
+  });
+  let text: string = args.templateText;
+  let result: string = '';
+
+  let ix = text.indexOf('[[');
+  while (ix >= 0) {
+    let ix2 = text.indexOf(']]', ix + 2);
+    if (ix2 === -1) {
+      break;
+    }
+    result += text.substring(0, ix);
+    const js = text.substring(ix + 2, ix2);
+
+    try {
+      result += vm.run(js);
+    } catch (e) {
+      console.error(`Failed to interpolate [${js}]`, e.message);
+    }
+    text = text.substring(ix2 + 2);
+
+    ix = text.indexOf('[[');
+  }
+
+  // add any leftover
+  result += text;
+
+  event.sender.send('interpolate-vanilla-template-result', result);
 };

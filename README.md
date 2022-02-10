@@ -34,7 +34,7 @@
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=wkFWg_S8eUA">
-    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Overview" width="700" height="400" />
+    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Overview" />
     <p align="center">Click on the image or this link to watch the "Intro to Monokle" short video (3 mins)</p>
   </a>
 </p>
