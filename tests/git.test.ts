@@ -13,9 +13,9 @@ import {HelmPane} from './models/helmPane';
 import {StartProjectPane} from './models/startProjectPane';
 import {NavigatorPane} from './models/navigatorPane';
 
-let appWindow: Page = {} as any;
-let appInfo: ElectronAppInfo = {} as any;
-let electronApp: ElectronApplication = {} as any;
+let appWindow: Page;
+let appInfo: ElectronAppInfo;
+let electronApp: ElectronApplication;
 
 const clonePath = path.join(__dirname, '..', '..');
 const projectPath = path.join(clonePath, 'manifest-test-data');
@@ -118,6 +118,9 @@ test('all files should be loaded', async () => {
   }
 });
 
-test.afterAll(() => {
+test.afterAll(async () => {
   fs.rmSync(projectPath, { recursive: true, force: true });
+  await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/final-screen.png`});
+  await appWindow.context().close();
+  await appWindow.close();
 });
