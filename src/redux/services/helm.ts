@@ -1,3 +1,4 @@
+import {EventEmitter} from 'events';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
@@ -14,6 +15,8 @@ import {K8sResource} from '@models/k8sresource';
 import {createFileEntry, extractK8sResourcesFromFile, fileIsExcluded, readFiles} from '@redux/services/fileEntry';
 
 import {getFileStats} from '@utils/files';
+
+export const HelmChartEventEmitter = new EventEmitter();
 
 /**
  * Gets the HelmValuesFile for a specific FileEntry
@@ -80,6 +83,7 @@ export function processHelmChartFolder(
     name: folder.substr(folder.lastIndexOf(path.sep) + 1),
     valueFileIds: [],
   };
+  HelmChartEventEmitter.emit('create', helmChart);
 
   files.forEach(file => {
     const filePath = path.join(folder, file);

@@ -28,3 +28,4 @@ export const DEFAULT_PLUGINS = [
 ];
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';
+export const HELM_CHART_SECTION_NAME = 'Helm Charts';
