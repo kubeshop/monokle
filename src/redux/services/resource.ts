@@ -462,13 +462,10 @@ export function reprocessResources(
       const isKustomziationFile = resource.filePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME);
       const kindHandler = resource.content.kind ? getResourceKindHandler(resource.content.kind) : undefined;
 
-      resource.kind = resource.content.kind || isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown';
+      resource.kind = resource.content.kind || (isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown');
       resource.version =
-        resource.content.apiVersion || isKustomziationFile
-          ? KUSTOMIZATION_API_VERSION
-          : kindHandler
-          ? kindHandler.clusterApiVersion
-          : 'Unknown';
+        resource.content.apiVersion ||
+        (isKustomziationFile ? KUSTOMIZATION_API_VERSION : kindHandler ? kindHandler.clusterApiVersion : 'Unknown');
 
       resource.namespace = extractNamespace(resource.content);
 
