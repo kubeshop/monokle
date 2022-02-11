@@ -5,7 +5,7 @@ import {
   waitForDrawerToShow,
 } from './antdHelpers';
 import {clickOnMonokleLogo, ElectronAppInfo, startApp} from './electronHelpers';
-import {pause} from './utils';
+import {getRecordingPath, pause} from './utils';
 
 let appWindow: Page = {} as any;
 let appInfo: ElectronAppInfo = {} as any;
@@ -63,6 +63,7 @@ test('Validate settings drawer', async () => {
 
   await appWindow.click("span[aria-label='setting']", {noWaitAfter: true, force: true});
   await pause(20000);
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'settings-drawer.png')});
   expect(await settingsTitle.isVisible()).toBe(true);
 
   await clickOnMonokleLogo(appWindow);
@@ -71,11 +72,12 @@ test('Validate settings drawer', async () => {
 });
 
 test('Validate notifications drawer', async () => {
-  appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
+  await appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
     noWaitAfter: true,
     force: true,
   });
 
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'notifications-drawer.png')});
   expect(await waitForDrawerToShow(appWindow, 'Notifications', 5000)).toBeTruthy();
   await clickOnMonokleLogo(appWindow);
 
@@ -83,7 +85,7 @@ test('Validate notifications drawer', async () => {
 });
 
 test.afterAll(async () => {
-  await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/final-screen.png`});
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'final-screen.png')});
   await appWindow.context().close();
   await appWindow.close();
 });
