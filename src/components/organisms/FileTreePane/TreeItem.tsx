@@ -41,7 +41,7 @@ function deleteEntityWizard(entityInfo: {entityAbsolutePath: string}, onOk: () =
   });
 }
 
-export const TreeItem: React.FC<TreeItemProps> = props => {
+const TreeItem: React.FC<TreeItemProps> = props => {
   const {isExcluded, isFolder, isSupported, processingEntity, title, treeKey} = props;
   const {
     setProcessingEntity,
@@ -282,3 +282,5 @@ export const TreeItem: React.FC<TreeItemProps> = props => {
     </S.TreeTitleWrapper>
   );
 };
+
+export default TreeItem;

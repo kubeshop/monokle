@@ -43,7 +43,7 @@ import {uniqueArr} from '@utils/index';
 import AppContext from '@src/AppContext';
 
 import * as S from './Styled';
-import {TreeItem} from './TreeItem';
+import TreeItem from './TreeItem';
 import {ProcessingEntity, TreeNode} from './types';
 
 const createNode = (
