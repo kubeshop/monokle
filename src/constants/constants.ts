@@ -10,6 +10,7 @@ export const TOOLTIP_DELAY = 1.0;
 export const NAVIGATOR_HEIGHT_OFFSET = 116;
 export const FILE_TREE_HEIGHT_OFFSET = 185;
 export const REF_PATH_SEPARATOR = '#';
+export const KUSTOMIZATION_FILE_NAME = 'kustomization.yaml';
 export const KUSTOMIZATION_KIND = 'Kustomization';
 export const KUSTOMIZATION_API_GROUP = 'kustomize.config.k8s.io';
 export const KUSTOMIZATION_API_VERSION = `${KUSTOMIZATION_API_GROUP}/v1beta1`;

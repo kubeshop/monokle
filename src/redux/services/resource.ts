@@ -8,6 +8,7 @@ import {
   CLUSTER_DIFF_PREFIX,
   KUSTOMIZATION_API_GROUP,
   KUSTOMIZATION_API_VERSION,
+  KUSTOMIZATION_FILE_NAME,
   KUSTOMIZATION_KIND,
   PREVIEW_PREFIX,
   UNSAVED_PREFIX,
@@ -458,7 +459,7 @@ export function reprocessResources(
         resource.name = `Patch: ${resource.name}`;
       }
 
-      const isKustomziationFile = resource.filePath.endsWith('kustomization.yaml');
+      const isKustomziationFile = resource.filePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME);
       const kindHandler = resource.content.kind ? getResourceKindHandler(resource.content.kind) : undefined;
 
       resource.kind = resource.content.kind || isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown';
@@ -702,7 +703,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           result.push(resource);
         }
         // handle special case of untyped kustomization.yaml files
-        else if (content && relativePath.endsWith('/kustomization.yaml') && documents.length === 1) {
+        else if (content && relativePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME) && documents.length === 1) {
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, KUSTOMIZATION_KIND),
             filePath: relativePath,

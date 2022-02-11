@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
+import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_FILE_NAME, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
@@ -52,7 +52,7 @@ export function isKustomizationPatch(r: K8sResource | undefined) {
  */
 
 export function isKustomizationFile(fileEntry: FileEntry, resourceMap: ResourceMapType) {
-  if (fileEntry.name.toLowerCase() === 'kustomization.yaml') {
+  if (fileEntry.name.toLowerCase() === KUSTOMIZATION_FILE_NAME) {
     const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
     return resources.length === 1 && isKustomizationResource(resources[0]);
   }
