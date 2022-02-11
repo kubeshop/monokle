@@ -154,6 +154,16 @@ const CreateProjectModal: React.FC = () => {
     dispatch(closeCreateProjectModal());
   };
 
+  useEffect(() => {
+    if (formStep === 1) {
+      const {name, rootFolder} = createProjectForm.getFieldsValue();
+
+      if (name && rootFolder) {
+        setIsFormValid(true);
+      }
+    }
+  }, [createProjectForm, formStep]);
+
   if (!uiState.isOpen) {
     return null;
   }
@@ -183,78 +193,87 @@ const CreateProjectModal: React.FC = () => {
             Back
           </Button>
         ),
-        <Button key="submit" type="primary" disabled={!isSubmitEnabled} onClick={() => createProjectForm.submit()}>
+        <Button
+          id="empty-project-save"
+          key="submit"
+          type="primary"
+          disabled={!isSubmitEnabled}
+          onClick={() => createProjectForm.submit()}
+        >
           {uiState.fromTemplate && formStep === FormSteps.STEP_ONE ? 'Next: Select a Template' : 'Create Project'}
         </Button>,
       ]}
     >
-      <Form
-        layout="vertical"
-        form={createProjectForm}
-        onFinish={onFinish}
-        initialValues={() => formValues}
-        style={{display: formStep === FormSteps.STEP_ONE ? 'block' : 'none'}}
-        onFieldsChange={field => {
-          const name = field.filter(item => _.includes(item.name.toString(), 'name'));
-          if (name && name.length > 0) {
-            setFormValues({...formValues, name: name[0].value});
-            setIsEditingRoothPath(false);
-          }
-          const rootFolder = field.filter(item => _.includes(item.name.toString(), 'rootFolder'));
-          if (rootFolder && rootFolder.length > 0) {
-            setFormValues({...formValues, rootFolder: rootFolder[0].value});
-            setIsEditingRoothPath(true);
-          }
-        }}
-      >
-        <Form.Item
-          name="name"
-          label="Project Name"
-          required
-          tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
-          rules={[
-            {
-              required: true,
-              message: 'Please provide your project name!',
-            },
-          ]}
+      {formStep === FormSteps.STEP_ONE ? (
+        <Form
+          layout="vertical"
+          form={createProjectForm}
+          onFinish={onFinish}
+          initialValues={() => formValues}
+          onFieldsChange={field => {
+            const name = field.filter(item => _.includes(item.name.toString(), 'name'));
+            if (name && name.length > 0) {
+              setFormValues({...formValues, name: name[0].value});
+              setIsEditingRoothPath(false);
+            }
+            const rootFolder = field.filter(item => _.includes(item.name.toString(), 'rootFolder'));
+            if (rootFolder && rootFolder.length > 0) {
+              setFormValues({...formValues, rootFolder: rootFolder[0].value});
+              setIsEditingRoothPath(true);
+            }
+          }}
         >
-          <Input ref={inputRef} />
-        </Form.Item>
-        <Form.Item label="Location" required tooltip="The local path where your project will live.">
-          <Input.Group compact>
-            <Form.Item
-              name="rootFolder"
-              noStyle
-              rules={[
-                {
-                  required: true,
-                  message: 'Please provide your local path!',
-                },
-              ]}
-            >
-              <Input style={{width: 'calc(100% - 100px)'}} />
-            </Form.Item>
-            <Button style={{width: '100px'}} onClick={openFileExplorer}>
-              Browse
-            </Button>
-          </Input.Group>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            name="name"
+            label="Project Name"
+            required
+            tooltip="The name of your project throughout Monokle. Default is the name of your selected folder."
+            rules={[
+              {
+                required: true,
+                message: 'Please provide your project name!',
+              },
+            ]}
+          >
+            <Input ref={inputRef} />
+          </Form.Item>
 
-      <S.TemplatesContainer $height={400} style={{display: formStep === FormSteps.STEP_TWO ? 'grid' : 'none'}}>
-        {selectedTemplate && (
-          <TemplateModal template={selectedTemplate} projectToCreate={formValues} onClose={onTemplateModalClose} />
-        )}
+          <Form.Item label="Location" required tooltip="The local path where your project will live.">
+            <Input.Group compact>
+              <Form.Item
+                name="rootFolder"
+                noStyle
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please provide your local path!',
+                  },
+                ]}
+              >
+                <Input style={{width: 'calc(100% - 100px)'}} />
+              </Form.Item>
+              <Button style={{width: '100px'}} onClick={openFileExplorer}>
+                Browse
+              </Button>
+            </Input.Group>
+          </Form.Item>
+        </Form>
+      ) : (
+        <S.TemplatesContainer $height={400}>
+          {selectedTemplate && (
+            <TemplateModal template={selectedTemplate} projectToCreate={formValues} onClose={onTemplateModalClose} />
+          )}
 
-        {Object.values(templateMap).map(template => (
-          <TemplateInformation
-            key={template.id}
-            template={template}
-            onClickOpenTemplate={() => onClickOpenTemplate(template)}
-          />
-        ))}
-      </S.TemplatesContainer>
+          {Object.values(templateMap).map(template => (
+            <TemplateInformation
+              key={template.id}
+              template={template}
+              onClickOpenTemplate={() => onClickOpenTemplate(template)}
+            />
+          ))}
+        </S.TemplatesContainer>
+      )}
+
       <FileExplorer {...fileExplorerProps} />
     </Modal>
   );

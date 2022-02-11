@@ -2,8 +2,9 @@ import fs from 'fs';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
+import {v4 as uuidv4} from 'uuid';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
@@ -15,6 +16,7 @@ import {
   getHelmChartFromFileEntry,
   getHelmValuesFile,
   isHelmChartFolder,
+  isHelmValuesFile,
   processHelmChartFolder,
 } from '@redux/services/helm';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
@@ -26,7 +28,7 @@ import {
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
-import {deleteResource, extractK8sResources, reprocessResources} from './resource';
+import {deleteResource, extractK8sResources, reprocessKustomizations, reprocessResources} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: K8sResource[];
@@ -337,8 +339,10 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
 function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   log.info(`adding file ${absolutePath}`);
-  let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-  const fileEntry = createFileEntry(absolutePath.substr(rootFolder.length));
+  const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
+  const relativePath = absolutePath.substr(rootFolderEntry.filePath.length);
+  const fileEntry = createFileEntry(relativePath);
+
   if (!appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
     return fileEntry;
   }
@@ -348,13 +352,77 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   resourcesFromFile.forEach(resource => {
     state.resourceMap[resource.id] = resource;
   });
-
   reprocessResources(
     resourcesFromFile.map(r => r.id),
     state.resourceMap,
     state.fileMap,
     state.resourceRefsProcessingOptions
   );
+
+  const parentFolderAbsPath = path.dirname(absolutePath);
+  let parentFolderEntry: FileEntry | undefined;
+
+  if (parentFolderAbsPath === rootFolderEntry.filePath) {
+    parentFolderEntry = rootFolderEntry;
+  } else {
+    const parentFolderRelPath = parentFolderAbsPath.substring(rootFolderEntry.filePath.length);
+    const parentFolderEntryKey = Object.keys(state.fileMap).find(key => key === parentFolderRelPath);
+    if (parentFolderEntryKey) {
+      parentFolderEntry = state.fileMap[parentFolderEntryKey];
+    }
+  }
+
+  // if this file is the Helm Chart entry file, create a new helm chart and search for exising values files
+  const isHelmChartFile = path.basename(absolutePath) === HELM_CHART_ENTRY_FILE;
+  if (isHelmChartFile) {
+    const helmChart: HelmChart = {
+      id: uuidv4(),
+      filePath: fileEntry.filePath,
+      name: parentFolderAbsPath.trim() !== '' ? path.basename(parentFolderAbsPath) : 'Unnamed Chart',
+      valueFileIds: [],
+    };
+    state.helmChartMap[helmChart.id] = helmChart;
+
+    parentFolderEntry?.children?.forEach(fileName => {
+      if (!parentFolderEntry) {
+        return;
+      }
+      if (isHelmValuesFile(fileName)) {
+        const valuesFilePath =
+          parentFolderEntry.filePath === rootFolderEntry.filePath
+            ? `${path.sep}${fileName}`
+            : path.join(parentFolderEntry.filePath, fileName);
+        const helmValuesFile: HelmValuesFile = {
+          id: uuidv4(),
+          filePath: valuesFilePath,
+          name: fileName,
+          isSelected: false,
+          helmChartId: helmChart.id,
+        };
+        helmChart.valueFileIds.push(helmValuesFile.id);
+        state.helmValuesMap[helmValuesFile.id] = helmValuesFile;
+      }
+    });
+  }
+
+  // if this new file is a values file, search for it's helm chart and update it
+  if (isHelmValuesFile(absolutePath)) {
+    const helmChart = Object.values(state.helmChartMap).find(chart => {
+      return path.dirname(chart.filePath) === parentFolderEntry?.filePath;
+    });
+    if (helmChart) {
+      const helmValuesFile: HelmValuesFile = {
+        id: uuidv4(),
+        filePath: relativePath,
+        name: path.basename(relativePath),
+        isSelected: false,
+        helmChartId: helmChart.id,
+      };
+      state.helmValuesMap[helmValuesFile.id] = helmValuesFile;
+      helmChart.valueFileIds.push(helmValuesFile.id);
+    }
+  }
+
   return fileEntry;
 }
 
@@ -409,6 +477,8 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
       parentEntry.children.sort();
     }
 
+    reprocessKustomizations(state.resourceMap, state.fileMap);
+
     return fileEntry;
   }
   log.warn(`Failed to find folder entry for ${absolutePath}, ignoring..`);
@@ -426,13 +496,21 @@ export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEff
     removalSideEffect.removedResources.push(resource);
     deleteResource(resource, state.resourceMap);
   });
+
   const valuesFile = getHelmValuesFile(fileEntry, state.helmValuesMap);
   if (valuesFile) {
     removalSideEffect.removedHelmValuesFiles.push(valuesFile);
     if (state.helmValuesMap[valuesFile.id]) {
       delete state.helmValuesMap[valuesFile.id];
     }
+    Object.values(state.helmChartMap).forEach(helmChart => {
+      const valuesIndex = helmChart.valueFileIds.findIndex(id => valuesFile.id === id);
+      if (valuesIndex !== -1) {
+        helmChart.valueFileIds.splice(valuesIndex, 1);
+      }
+    });
   }
+
   const chart = getHelmChartFromFileEntry(fileEntry, state.helmChartMap);
   if (chart) {
     removalSideEffect.removedHelmCharts.push(chart);

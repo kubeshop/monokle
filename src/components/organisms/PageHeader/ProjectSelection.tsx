@@ -132,11 +132,12 @@ const ProjectSelection = () => {
       <S.ProjectMenu>
         <S.ProjectsMenuContainer>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SearchProjectTooltip} placement="bottomRight">
-            <S.Search placeholder="Search" value={searchText} onChange={handleProjectSearch} />
+            <S.Search id="project-search" placeholder="Search" value={searchText} onChange={handleProjectSearch} />
           </Tooltip>
           <S.ProjectsMenuActionsContainer>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewProjectFromFolderTooltip} placement="bottomRight">
               <S.ProjectFolderOpenOutlined
+                id="open-new-project"
                 onClick={() => {
                   setIsDropdownMenuVisible(false);
                   openFileExplorer();
@@ -240,7 +241,7 @@ const ProjectSelection = () => {
   }
 
   return (
-    <S.ProjectContainer>
+    <S.ProjectContainer id="projects-dropdown-container">
       <Dropdown
         arrow
         disabled={previewLoader.isLoading || isInPreviewMode}

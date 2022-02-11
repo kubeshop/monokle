@@ -1,14 +1,10 @@
-import * as k8s from '@kubernetes/client-node';
+import {KubeConfig} from '@kubernetes/client-node';
 
 import {getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {getRegisteredKindHandlers} from '@src/kindhandlers';
 
-const getClusterObjects = (configPath: string, currentContext: string) => {
-  const kc = new k8s.KubeConfig();
-  kc.loadFromFile(configPath);
-  kc.setCurrentContext(currentContext);
-
+const getClusterObjects = async (kc: KubeConfig) => {
   return Promise.allSettled(
     getRegisteredKindHandlers().map(resourceKindHandler =>
       resourceKindHandler

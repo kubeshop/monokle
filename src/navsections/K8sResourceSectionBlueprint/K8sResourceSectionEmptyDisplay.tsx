@@ -58,13 +58,21 @@ function K8sResourceSectionEmptyDisplay() {
     <>
       {activeResources.length === 0 ? (
         <StyledContainer>
-          <StyledTitle>Get started:</StyledTitle>
-          <StyledLink onClick={() => handleClick(HighlightItems.CREATE_RESOURCE)}>Create a resource</StyledLink>
-          <StyledLink onClick={() => handleClick(HighlightItems.BROWSE_TEMPLATES)}>Browse templates</StyledLink>
+          <StyledTitle id="get-started-title">Get started:</StyledTitle>
+          <StyledLink id="create-resource-link" onClick={() => handleClick(HighlightItems.CREATE_RESOURCE)}>
+            Create a resource
+          </StyledLink>
+          <StyledLink id="browse-template-link" onClick={() => handleClick(HighlightItems.BROWSE_TEMPLATES)}>
+            Browse templates
+          </StyledLink>
           {isKubeConfigPathValid ? (
-            <StyledLink onClick={() => handleClick(HighlightItems.CONNECT_TO_CLUSTER)}>Connect to a cluster</StyledLink>
+            <StyledLink id="connect-to-cluster-link" onClick={() => handleClick(HighlightItems.CONNECT_TO_CLUSTER)}>
+              Connect to a cluster
+            </StyledLink>
           ) : (
-            <StyledLink onClick={handleClusterConfigure}>Configure a cluster</StyledLink>
+            <StyledLink id="configure-cluster-link" onClick={handleClusterConfigure}>
+              Configure a cluster
+            </StyledLink>
           )}
         </StyledContainer>
       ) : (

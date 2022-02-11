@@ -28,19 +28,19 @@ const StartProjectPane = () => {
         <div>
           <S.ActionTitle>How would you like to begin?</S.ActionTitle>
           <div style={{display: 'flex'}}>
-            <S.ActionContainer onClick={handleOpenFolderExplorer}>
+            <S.ActionContainer id="select-existing-folder" onClick={handleOpenFolderExplorer}>
               <S.IconWrapper>
                 <S.FolderOpenOutlined src={SelectAnExistingFolder} />
               </S.IconWrapper>
               <S.ActionText>Select an existing folder</S.ActionText>
             </S.ActionContainer>
-            <S.ActionContainer onClick={() => handleCreateProject(false)}>
+            <S.ActionContainer id="create-empty-project" onClick={() => handleCreateProject(false)}>
               <S.IconWrapper>
                 <S.FolderAddOutlined src={SelectAnEmptyProject} />
               </S.IconWrapper>
               <S.ActionText>Create an empty project</S.ActionText>
             </S.ActionContainer>
-            <S.ActionContainer onClick={() => handleCreateProject(true)}>
+            <S.ActionContainer id="start-from-template" onClick={() => handleCreateProject(true)}>
               <S.IconWrapper>
                 <S.FormatPainterOutlined src={StartFromTemplate} />
               </S.IconWrapper>

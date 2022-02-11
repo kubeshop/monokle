@@ -196,6 +196,7 @@ const PaneManager = () => {
             placement="right"
           >
             <MenuButton
+              id="file-explorer"
               isSelected={leftMenuSelection === 'file-explorer'}
               isActive={Boolean(activeProject) && leftActive}
               shouldWatchSelectedPath

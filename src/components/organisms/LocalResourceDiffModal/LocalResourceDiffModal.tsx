@@ -1,5 +1,3 @@
-import * as k8s from '@kubernetes/client-node';
-
 import {LegacyRef, useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {ResizableBox} from 'react-resizable';
@@ -26,6 +24,7 @@ import Icon from '@components/atoms/Icon';
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';
+import {createKubeClient} from '@utils/kubeclient';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
@@ -61,6 +60,7 @@ const DiffModal = () => {
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
   const [selectedMatchingResourceId, setSelectedMathingResourceId] = useState<string>();
   const [targetResourceText, setTargetResourceText] = useState<string>();
+  const configState = useAppSelector(state => state.config);
 
   const windowSize = useWindowSize();
 
@@ -186,9 +186,7 @@ const DiffModal = () => {
     }
 
     const getClusterResources = async () => {
-      const kc = new k8s.KubeConfig();
-      kc.loadFromFile(kubeConfigPath);
-      kc.setCurrentContext(kubeConfigContext);
+      const kc = createKubeClient(configState);
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const resourcesFromCluster =

@@ -389,7 +389,7 @@ const NewResourceWizard = () => {
             icon: <InfoCircleOutlined />,
           }}
         >
-          <Input maxLength={63} placeholder="Enter resource name" />
+          <Input id="resource-name-input" maxLength={63} placeholder="Enter resource name" />
         </Form.Item>
 
         <Form.Item

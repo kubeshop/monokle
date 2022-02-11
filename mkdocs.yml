@@ -31,6 +31,7 @@ nav:
     - Architecture: architecture.md
     - Plugins: plugins.md
     - Templates: templates.md
+    - Testing: testing.md
   - FAQ: faq.md
   - Tutorials:
       - tutorials/how-to-navigate-and-edit-manifests.md

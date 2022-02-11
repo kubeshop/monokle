@@ -17,7 +17,7 @@ Left to right:
 
 The top right contains the following buttons:
 
-- Show latest notifications
+- Show Latest Notifications
 - Open Plugins Manager
 - Open Settings (see below)
 - Help:

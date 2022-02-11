@@ -3,6 +3,8 @@ import micromatch from 'micromatch';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
+import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
+
 import {AppConfig} from '@models/appconfig';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
@@ -30,11 +32,19 @@ export function getHelmChartFromFileEntry(fileEntry: FileEntry, helmChartMap: He
 }
 
 /**
+ * Checks if the specified path is a helm values file
+ */
+
+export function isHelmValuesFile(filePath: string) {
+  return micromatch.isMatch(path.basename(filePath), '*values*.yaml');
+}
+
+/**
  * Checks if the specified files are a Helm Chart folder
  */
 
 export function isHelmChartFolder(files: string[]) {
-  return files.indexOf('Chart.yaml') !== -1;
+  return files.indexOf(HELM_CHART_ENTRY_FILE) !== -1;
 }
 
 /**
@@ -66,7 +76,7 @@ export function processHelmChartFolder(
 ) {
   const helmChart: HelmChart = {
     id: uuidv4(),
-    filePath: path.join(folder, 'Chart.yaml').substr(rootFolder.length),
+    filePath: path.join(folder, HELM_CHART_ENTRY_FILE).substr(rootFolder.length),
     name: folder.substr(folder.lastIndexOf(path.sep) + 1),
     valueFileIds: [],
   };
@@ -95,7 +105,7 @@ export function processHelmChartFolder(
           isSupportedHelmResource
         );
       }
-    } else if (micromatch.isMatch(file, '*values*.yaml')) {
+    } else if (isHelmValuesFile(file)) {
       const helmValues: HelmValuesFile = {
         id: uuidv4(),
         filePath: fileEntryPath,
