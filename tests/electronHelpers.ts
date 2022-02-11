@@ -57,7 +57,7 @@ export async function startApp(): Promise<StartAppResponse> {
     path: getRecordingPath(appInfo.platform, 'before-modals.png')
   });
 
-  for (const modalName in modalsToWait) {
+  for (const modalName of modalsToWait) {
     if (await waitForModalToShow(appWindow, modalName, 20000)) {
       await clickOnMonokleLogo(appWindow);
       await pause(500);
