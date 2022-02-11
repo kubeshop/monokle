@@ -17,6 +17,8 @@ interface StartAppResponse {
   appInfo: ElectronAppInfo;
 }
 
+const modalsToWait = ['UpdateModal', 'WelcomeModal'];
+
 /**
  * Find the latest build and start monokle app for testing
  */
@@ -51,10 +53,19 @@ export async function startApp(): Promise<StartAppResponse> {
   const appWindow: Page = windows[0];
   appWindow.on('console', console.log);
 
-  if (await waitForModalToShow(appWindow, 'WelcomeModal', 20000)) {
-    await clickOnMonokleLogo(appWindow);
-    await pause(500);
-    await waitForModalToHide(appWindow, 'WelcomeModal');
+  await appWindow.screenshot({
+    path: getRecordingPath(appInfo.platform, 'before-modals.png')
+  });
+
+  for (const modalName in modalsToWait) {
+    if (await waitForModalToShow(appWindow, modalName, 20000)) {
+      await clickOnMonokleLogo(appWindow);
+      await pause(500);
+      await waitForModalToHide(appWindow, modalName);
+    }
+    await appWindow.screenshot({
+      path: getRecordingPath(appInfo.platform, `modal-gone-${modalName}.png`)
+    });
   }
 
   // Capture a screenshot.
