@@ -352,14 +352,14 @@ export const createWindow = (givenPath?: string) => {
       missingDependencies.splice(indexOf(missingDependencies, 'kustomize'), 1);
     }
 
-    // if (missingDependencies.length > 0) {
+    if (missingDependencies.length > 0) {
       const alert: AlertType = {
         type: AlertEnum.Warning,
         title: 'Missing dependency',
-        message: `testests must be installed for all Monokle functionality to be available`,
+        message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available`,
       };
       dispatchToWindow(win, setAlert(alert));
-    // }
+    }
     win.webContents.send('executed-from', {path: givenPath });
     win.webContents.send('set-main-process-env', {serializedMainProcessEnv: getSerializedProcessEnv()});
 
