@@ -12,9 +12,23 @@ import {getResourceSchema} from './schema';
 
 /**
  * Validates the specified resource against its JSON Schema and adds validation details
+ * This overlaps with CLUSTER_RESOURCE_IGNORED_PATHS and should probably be moved into corresponding
+ * kindHandlers
  */
 
-const ignoredProperties = ['lastProbeTime', 'creationTimestamp'];
+const ignoredProperties = [
+  '*lastProbeTime',
+  '*creationTimestamp',
+  '*finishedAt',
+  '*createdAt',
+  '*startedAt',
+  '*x_kubernetes_preserve_unknown_fields',
+  '/metadata/resourceVersion*',
+  '/metadata/selfLink*',
+  '/metadata/uid*',
+  '/metadata/generation*',
+  '/status*',
+];
 const validatorCache = new Map<string, ValidateFunction>();
 
 function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | undefined): RefPosition | undefined {
@@ -62,7 +76,15 @@ export function validateResource(resource: K8sResource, schemaVersion: string) {
       if (validate.errors) {
         errors.push(
           ...validate.errors
-            .filter(err => !ignoredProperties.some(ignored => err.dataPath.endsWith(ignored)))
+            .filter(
+              err =>
+                !ignoredProperties.some(
+                  ignored =>
+                    (ignored.startsWith('*') && err.dataPath.endsWith(ignored.substring(1))) ||
+                    (ignored.endsWith('*') && err.dataPath.startsWith(ignored.substring(0, ignored.length - 1))) ||
+                    err.dataPath === ignored
+                )
+            )
             .map(err => {
               const parsedDoc = getParsedDoc(resource);
 

@@ -3,7 +3,7 @@ name: monokle-ui-tests
 on:
   push:
     branches:
-      - olelensmar/test/playwright-baseline
+      - andreiv1992/test/more-tests-around-projects
 
   workflow_dispatch:
 

@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -91,10 +91,10 @@
     "@types/flat": "5.0.2",
     "@types/lodash": "4.14.178",
     "ajv": "6.12.6",
-    "antd": "4.18.3",
+    "antd": "4.18.4",
     "asar": "^3.1.0",
     "async": "3.2.3",
-    "chokidar": "3.5.2",
+    "chokidar": "3.5.3",
     "dagre": "0.8.5",
     "electron-devtools-installer": "3.2.0",
     "electron-log": "4.4.4",
@@ -133,6 +133,7 @@
     "tar": "6.1.11",
     "type-fest": "2.9.0",
     "uuid": "8.3.2",
+    "vm2": "^3.9.5",
     "web-vitals": "2.1.3",
     "worker-loader": "3.0.8",
     "yaml": "2.0.0-10",
@@ -160,7 +161,7 @@
     "release:patch": "standard-version --release-as patch",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
-    "ui-test": "xvfb-maybe npx playwright test",
+    "ui-test": "xvfb-maybe npx playwright test --workers=1",
     "custom-script": "npx ts-node src/scripts/index.ts"
   },
   "build": {

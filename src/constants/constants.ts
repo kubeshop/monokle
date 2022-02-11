@@ -26,7 +26,6 @@ export const DEFAULT_PLUGINS = [
     url: 'https://github.com/kubeshop/monokle-default-templates-plugin',
   },
 ];
-
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 
 export const PREDEFINED_K8S_VERSION = '1.22.1';
@@ -155,3 +154,5 @@ export const K8S_VERSIONS = [
   '1.23.2',
   '1.23.3',
 ];
+
+export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';

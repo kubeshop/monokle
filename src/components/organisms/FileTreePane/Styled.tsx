@@ -83,9 +83,6 @@ export const FileTreeContainer = styled.div`
   & .ant-tree-iconEle {
     flex-shrink: 0;
   }
-  & .ant-tree-iconEle .anticon {
-    vertical-align: text-bottom;
-  }
   & .ant-tree-node-content-wrapper {
     display: flex;
     overflow: hidden;
@@ -229,4 +226,25 @@ export const NodeTitleContainer = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+export const PreviewButton = styled(Button)<{$isItemSelected: boolean}>`
+  font-weight: 500;
+  font-size: 12px;
+  color: ${props => (props.$isItemSelected ? Colors.blackPure : Colors.blue6)}!important;
+  margin-left: 5px;
+  margin-right: 15px;
+`;
+
+export const TitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+`;
+
+export const ActionsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: row;
 `;

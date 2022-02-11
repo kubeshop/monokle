@@ -4,6 +4,7 @@ import {useEffect} from 'react';
 
 import log from 'loglevel';
 
+import {getChannelName} from '@utils/ipc';
 import {FileExplorerOptions} from './FileExplorerOptions';
 
 export type FileExplorerProps = {
@@ -29,7 +30,7 @@ const FileExplorer = (props: FileExplorerProps) => {
           }
         });
       } else {
-        ipcRenderer.invoke('select-file', options).then(files => {
+        ipcRenderer.invoke(getChannelName('select-file'), options).then(files => {
           if (files) {
             onSelect(files);
           }
