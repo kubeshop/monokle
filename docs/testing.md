@@ -42,5 +42,5 @@ await electronApp.evaluate(({ ipcMain }, params) => {
 ```
 
 Examples:
-- [override in electron](src/components/atoms/FileExplorer/FileExplorer.tsx)
-- [override in tests](tests/models/projectsDropdown.ts)
+- [override in electron](https://github.com/kubeshop/monokle/blob/main/src/components/atoms/FileExplorer/FileExplorer.tsx)
+- [override in tests](https://github.com/kubeshop/monokle/blob/main/tests/models/projectsDropdown.ts)
