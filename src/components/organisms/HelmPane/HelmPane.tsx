@@ -6,7 +6,7 @@ import {MonoPaneTitle} from '@components/atoms';
 import {SectionRenderer} from '@components/molecules';
 
 import AppContext from '@src/AppContext';
-import HelmChartSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
+import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
 
 import * as S from './styled';
 
@@ -21,7 +21,7 @@ const HelmPane: React.FC = () => {
         <MonoPaneTitle>Helm</MonoPaneTitle>
       </S.TitleBar>
       <S.List id="helm-sections-container" height={navigatorHeight}>
-        <SectionRenderer sectionBlueprint={HelmChartSectionBlueprint} level={0} isLastSection={false} />
+        <SectionRenderer sectionBlueprint={RootHelmChartsSectionBlueprint} level={0} isLastSection={false} />
       </S.List>
     </span>
   );

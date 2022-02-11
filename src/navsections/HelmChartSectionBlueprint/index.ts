@@ -1,2 +1,3 @@
-export {default, HELM_CHART_SECTION_NAME} from './HelmChartSectionBlueprint';
-export type {HelmChartScopeType} from './HelmChartSectionBlueprint';
+export {default} from './RootHelmChartsSectionBlueprint';
+export {makeHelmChartSectionBlueprint} from './HelmChartSectionBlueprint';
+export {HELM_CHART_SECTION_NAME} from '@constants/constants';

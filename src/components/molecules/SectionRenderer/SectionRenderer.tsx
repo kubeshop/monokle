@@ -184,7 +184,6 @@ function SectionRenderer(props: SectionRendererProps) {
         sectionInstance={sectionInstance}
         sectionBlueprint={sectionBlueprint}
         isCollapsed={isCollapsed}
-        isCollapsedMode={isCollapsedMode}
         isLastSection={isLastSection}
         level={level}
         expandSection={expandSection}
@@ -218,7 +217,7 @@ function SectionRenderer(props: SectionRendererProps) {
               <S.SectionContainer style={{color: 'red'}}>
                 <S.Name $level={level + 1}>
                   {group.name}
-                  <S.ItemsLength selected={false}>{group.visibleItemIds.length}</S.ItemsLength>
+                  <S.Counter selected={false}>{group.visibleItemIds.length}</S.Counter>
                 </S.Name>
               </S.SectionContainer>
               {group.visibleItemIds.length ? (
