@@ -13,7 +13,6 @@ interface SectionHeaderProps {
   sectionInstance: SectionInstance;
   sectionBlueprint: SectionBlueprint<any>;
   isCollapsed: boolean;
-  isCollapsedMode: 'collapsed' | 'expanded' | 'mixed';
   isLastSection: boolean;
   level: number;
   expandSection: () => void;
@@ -21,17 +20,8 @@ interface SectionHeaderProps {
 }
 
 function SectionHeader(props: SectionHeaderProps) {
-  const {
-    name,
-    sectionInstance,
-    sectionBlueprint,
-    isCollapsed,
-    isLastSection,
-    isCollapsedMode,
-    level,
-    expandSection,
-    collapseSection,
-  } = props;
+  const {name, sectionInstance, sectionBlueprint, isCollapsed, isLastSection, level, expandSection, collapseSection} =
+    props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -45,9 +35,19 @@ function SectionHeader(props: SectionHeaderProps) {
     }
   }, [isCollapsed, expandSection, collapseSection]);
 
-  const itemsLength = useMemo(() => {
-    return sectionInstance?.visibleDescendantItemIds?.length || 0;
-  }, [sectionInstance.visibleDescendantItemIds]);
+  const counter = useMemo(() => {
+    const counterDisplayMode = sectionBlueprint.customization?.counterDisplayMode;
+    if (!counterDisplayMode || counterDisplayMode === 'descendants') {
+      return sectionInstance?.visibleDescendantItemIds?.length || 0;
+    }
+    if (counterDisplayMode === 'items') {
+      return sectionInstance?.visibleItemIds.length;
+    }
+    if (counterDisplayMode === 'subsections') {
+      return sectionInstance?.visibleChildSectionIds?.length || 0;
+    }
+    return undefined;
+  }, [sectionInstance, sectionBlueprint]);
 
   const onCheck = useCallback(() => {
     if (!sectionInstance.checkable || !sectionInstance.visibleDescendantItemIds) {
@@ -112,9 +112,7 @@ function SectionHeader(props: SectionHeaderProps) {
             >
               {name}
             </S.Name>
-            {itemsLength > 0 && (
-              <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
-            )}
+            {counter && <S.Counter selected={sectionInstance.isSelected && isCollapsed}>{counter}</S.Counter>}
             <S.BlankSpace level={level} onClick={toggleCollapse} />
             {NameSuffix.Component && NameSuffix.options?.isVisibleOnHover && isHovered && (
               <NameSuffix.Component sectionInstance={sectionInstance} />

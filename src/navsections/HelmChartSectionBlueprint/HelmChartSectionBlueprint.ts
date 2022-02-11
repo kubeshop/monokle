@@ -46,6 +46,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         return scope.isFolderOpen && rawItems.length === 0;
       },
     },
+    customization: {
+      counterDisplayMode: 'items',
+    },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
@@ -78,6 +81,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     childSectionIds: [valuesFilesSectionBlueprint.id],
     getScope: () => {
       return {};
+    },
+    customization: {
+      counterDisplayMode: 'none',
     },
   };
 

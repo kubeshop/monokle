@@ -46,6 +46,9 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmCharts
     },
     shouldBeVisibleBeforeInitialized: true,
   },
+  customization: {
+    counterDisplayMode: 'subsections',
+  },
 };
 
 sectionBlueprintMap.register(HelmChartSectionBlueprint);
