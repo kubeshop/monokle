@@ -2,7 +2,7 @@ import {PlaywrightTestConfig} from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
   testDir: './tests',
-  timeout: 100000,
+  timeout: 200000,
   expect: {
     toMatchSnapshot: {threshold: 0.2},
   },

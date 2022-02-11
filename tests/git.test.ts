@@ -92,8 +92,6 @@ const testData = [
 ];
 
 test('all files should be loaded', async () => {
-  // todo checkout project
-
   await startProjectPane.createProjectFromFolder(electronApp, projectPath);
   await pause(10000);
 
