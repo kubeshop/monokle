@@ -7,6 +7,7 @@ import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq, parseAllDocuments, p
 import {
   CLUSTER_DIFF_PREFIX,
   KUSTOMIZATION_API_GROUP,
+  KUSTOMIZATION_API_VERSION,
   KUSTOMIZATION_KIND,
   PREVIEW_PREFIX,
   UNSAVED_PREFIX,
@@ -457,8 +458,17 @@ export function reprocessResources(
         resource.name = `Patch: ${resource.name}`;
       }
 
-      resource.kind = resource.content.kind;
-      resource.version = resource.content.apiVersion;
+      const isKustomziationFile = resource.filePath.endsWith('kustomization.yaml');
+      const kindHandler = resource.content.kind ? getResourceKindHandler(resource.content.kind) : undefined;
+
+      resource.kind = resource.content.kind || isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown';
+      resource.version =
+        resource.content.apiVersion || isKustomziationFile
+          ? KUSTOMIZATION_API_VERSION
+          : kindHandler
+          ? kindHandler.clusterApiVersion
+          : 'Unknown';
+
       resource.namespace = extractNamespace(resource.content);
 
       // clear caches
@@ -700,7 +710,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             isHighlighted: false,
             isSelected: false,
             kind: KUSTOMIZATION_KIND,
-            version: `${KUSTOMIZATION_API_GROUP}/v1beta1`,
+            version: KUSTOMIZATION_API_VERSION,
             content,
             text: fileContent,
           };
