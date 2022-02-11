@@ -35,7 +35,7 @@ import {isKustomizationPatch} from '@redux/services/kustomize';
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
-import {KUBESHOP_INVALID_MONACO_THEME, KUBESHOP_MONACO_THEME} from '@utils/monaco';
+import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -304,7 +304,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
           width={containerWidth}
           height={containerHeight}
           language="yaml"
-          theme={isValid ? KUBESHOP_MONACO_THEME : KUBESHOP_INVALID_MONACO_THEME}
+          theme={KUBESHOP_MONACO_THEME}
           value={code}
           options={options}
           onChange={onChange}
