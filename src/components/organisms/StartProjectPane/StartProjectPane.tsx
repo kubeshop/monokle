@@ -25,29 +25,28 @@ const StartProjectPane = () => {
       <TitleBar title="Start a Project" />
 
       <S.StartBackground>
-        <div>
-          <S.ActionTitle>How would you like to begin?</S.ActionTitle>
-          <div style={{display: 'flex'}}>
-            <S.ActionContainer id="select-existing-folder" onClick={handleOpenFolderExplorer}>
-              <S.IconWrapper>
-                <S.FolderOpenOutlined src={SelectAnExistingFolder} />
-              </S.IconWrapper>
-              <S.ActionText>Select an existing folder</S.ActionText>
-            </S.ActionContainer>
-            <S.ActionContainer id="create-empty-project" onClick={() => handleCreateProject(false)}>
-              <S.IconWrapper>
-                <S.FolderAddOutlined src={SelectAnEmptyProject} />
-              </S.IconWrapper>
-              <S.ActionText>Create an empty project</S.ActionText>
-            </S.ActionContainer>
-            <S.ActionContainer id="start-from-template" onClick={() => handleCreateProject(true)}>
-              <S.IconWrapper>
-                <S.FormatPainterOutlined src={StartFromTemplate} />
-              </S.IconWrapper>
-              <S.ActionText>Start from a template</S.ActionText>
-            </S.ActionContainer>
-          </div>
-        </div>
+        <S.ActionTitle>How would you like to begin?</S.ActionTitle>
+
+        <S.ActionsContainer>
+          <S.ActionContainer id="select-existing-folder" onClick={handleOpenFolderExplorer}>
+            <S.IconWrapper>
+              <S.FolderOpenOutlined src={SelectAnExistingFolder} />
+            </S.IconWrapper>
+            <S.ActionText>Select an existing folder</S.ActionText>
+          </S.ActionContainer>
+          <S.ActionContainer id="create-empty-project" onClick={() => handleCreateProject(false)}>
+            <S.IconWrapper>
+              <S.FolderAddOutlined src={SelectAnEmptyProject} />
+            </S.IconWrapper>
+            <S.ActionText>Create an empty project</S.ActionText>
+          </S.ActionContainer>
+          <S.ActionContainer id="start-from-template" onClick={() => handleCreateProject(true)}>
+            <S.IconWrapper>
+              <S.FormatPainterOutlined src={StartFromTemplate} />
+            </S.IconWrapper>
+            <S.ActionText>Start from a template</S.ActionText>
+          </S.ActionContainer>
+        </S.ActionsContainer>
       </S.StartBackground>
     </S.StartProjectPaneContainer>
   );

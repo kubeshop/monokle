@@ -8,7 +8,6 @@ export const ActionContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 0 40px;
   cursor: pointer;
 `;
 
@@ -24,13 +23,9 @@ export const ActionTitle = styled.div`
   margin-bottom: 150px;
 `;
 
-export const Container = styled.div`
-  width: 100%;
-  height: calc(100vh - 112px);
+export const ActionsContainer = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 150px;
+  gap: 80px;
 `;
 
 export const FolderAddOutlined = styled.img`
@@ -56,9 +51,17 @@ export const IconWrapper = styled.div`
   flex: 1;
 `;
 
-export const StartBackground = styled(Container)`
+export const StartBackground = styled.div`
   background: url('${StartBackgrojnd}') no-repeat;
   background-position: 55% 35%;
+
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 150px;
 `;
 
 export const StartProjectPaneContainer = styled.div`

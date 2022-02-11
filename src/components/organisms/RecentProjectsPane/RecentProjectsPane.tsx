@@ -1,6 +1,6 @@
-import {LegacyRef, useCallback} from 'react';
+import {LegacyRef, useCallback, useMemo} from 'react';
 import {ResizableBox} from 'react-resizable';
-import {useMeasure} from 'react-use';
+import {useMeasure, useWindowSize} from 'react-use';
 
 import {Tooltip} from 'antd';
 
@@ -22,6 +22,12 @@ const RecentProjectsPane = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
   const projects = useAppSelector(state => state.config.projects);
+
+  const size = useWindowSize();
+
+  const recentProjectsPaneMaxWidth = useMemo(() => {
+    return 0.5 * size.width;
+  }, [size.width]);
 
   const [recentProjectsPaneRef, {height: recentProjectsPaneHeight, width: recentProjectsPaneWidth}] =
     useMeasure<HTMLDivElement>();
@@ -57,7 +63,7 @@ const RecentProjectsPane = () => {
         width={paneConfiguration.recentProjectsPaneWidth || 450}
         height={recentProjectsPaneHeight}
         minConstraints={[350, recentProjectsPaneHeight]}
-        maxConstraints={[1000, recentProjectsPaneHeight]}
+        maxConstraints={[recentProjectsPaneMaxWidth, recentProjectsPaneHeight]}
         axis="x"
         resizeHandles={['w']}
         handle={(h: number, ref: LegacyRef<HTMLSpanElement>) => <span className="custom-modal-handle" ref={ref} />}

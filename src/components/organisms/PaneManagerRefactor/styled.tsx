@@ -3,9 +3,10 @@ import {Skeleton as RawSkeleton} from 'antd';
 import styled from 'styled-components';
 
 export const GettingStartedContainer = styled.div`
+  height: 100%;
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr max-content;
-  height: 100%;
 `;
 
 export const PaneManagerContainer = styled.div<{$gridTemplateColumns: string}>`
