@@ -2,12 +2,20 @@ import ReactMarkdown from 'react-markdown';
 
 import {openUrlInExternalBrowser} from '@utils/shell';
 
-const NotificationMarkdown = ({message}: any) => {
+type NotificationProps = {
+  message: string;
+};
+
+const NotificationMarkdown = ({message}: NotificationProps) => {
   return (
     <ReactMarkdown
       components={{
-        a(prps: any) {
-          return <a onClick={() => openUrlInExternalBrowser(prps.href)}>{prps.children}</a>;
+        a({href, children, ...props}) {
+          return (
+            <a onClick={() => openUrlInExternalBrowser(href)} {...props}>
+              {children}
+            </a>
+          );
         },
       }}
     >

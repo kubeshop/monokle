@@ -26,8 +26,10 @@ export function openDiscord() {
   shell.openExternal('https://discord.gg/kMJxmuYTMu');
 }
 
-export function openUrlInExternalBrowser(url: string) {
-  shell.openExternal(url);
+export function openUrlInExternalBrowser(url?: string) {
+  if (url) {
+    shell.openExternal(url);
+  }
 }
 
 export function openDocumentation() {
