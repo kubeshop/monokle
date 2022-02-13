@@ -9,7 +9,7 @@ import {AlertEnum} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {seenNotifications} from '@redux/reducers/main';
 
-import NotificationMarkdown from '@organisms/NotificationsManager/NotificationMarkdown';
+import NotificationMarkdown from '@molecules/NotificationMarkdown';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 
