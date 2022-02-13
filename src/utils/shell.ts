@@ -26,6 +26,10 @@ export function openDiscord() {
   shell.openExternal('https://discord.gg/kMJxmuYTMu');
 }
 
+export function openUrlInExternalBrowser(url: string) {
+  shell.openExternal(url);
+}
+
 export function openDocumentation() {
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
 }
