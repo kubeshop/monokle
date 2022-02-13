@@ -4,7 +4,7 @@ import {FileSearchOutlined, GithubOutlined, QuestionCircleOutlined} from '@ant-d
 
 import styled from 'styled-components';
 
-import {openDiscord, openDocumentation, openGitHub} from '@utils/shell';
+import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
 
 import DiscordLogo from '@assets/DiscordLogo.svg';
 
@@ -33,37 +33,49 @@ const HelpMenu = () => {
     <Menu inlineIndent={25}>
       <MenuItem onClick={openDocumentation} key="documentation" style={{paddingRight: '20px'}}>
         <Row align="middle">
-          <Col span={7}>
+          <Col span={5}>
             <IconContainerSpan>
               <FileSearchOutlined />
             </IconContainerSpan>
           </Col>
 
-          <Col span={17}>Documentation</Col>
+          <Col span={19}>Documentation</Col>
+        </Row>
+      </MenuItem>
+
+      <MenuItem onClick={openKeyboardShortcuts} key="hotkeys" style={{paddingRight: '20px'}}>
+        <Row align="middle">
+          <Col span={5}>
+            <IconContainerSpan>
+              <FileSearchOutlined />
+            </IconContainerSpan>
+          </Col>
+
+          <Col span={19}>Keyboard Shortcuts</Col>
         </Row>
       </MenuItem>
 
       <MenuItem onClick={openGitHub} key="github">
         <Row align="middle">
-          <Col span={7}>
+          <Col span={5}>
             <IconContainerSpan>
               <GithubOutlined />
             </IconContainerSpan>
           </Col>
 
-          <Col span={17}>GitHub</Col>
+          <Col span={19}>GitHub</Col>
         </Row>
       </MenuItem>
 
       <MenuItem onClick={openDiscord} key="discord">
         <Row align="middle">
-          <Col span={7}>
+          <Col span={5}>
             <IconContainerSpan>
               <img src={DiscordLogo} style={{height: '18px', width: '18px'}} />
             </IconContainerSpan>
           </Col>
 
-          <Col span={17}>Discord</Col>
+          <Col span={19}>Discord</Col>
         </Row>
       </MenuItem>
     </Menu>

@@ -30,6 +30,10 @@ export function openDocumentation() {
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
 }
 
+export function openKeyboardShortcuts() {
+  shell.openExternal(`https://kubeshop.github.io/monokle/hotkeys?os=${os.type}`);
+}
+
 export function openUniqueObjectNameTopic() {
   shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names');
 }
