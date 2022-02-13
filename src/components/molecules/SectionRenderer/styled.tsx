@@ -124,7 +124,7 @@ export const Skeleton = styled(RawSkeleton)`
   width: 90%;
 `;
 
-export const ItemsLength = styled.span<{selected: boolean}>`
+export const Counter = styled.span<{selected: boolean}>`
   margin-left: 8px;
   font-size: 14px;
   ${props => (props.selected ? `color: ${Colors.blackPure};` : `color: ${FontColors.grey};`)}

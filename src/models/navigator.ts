@@ -63,6 +63,8 @@ export interface SectionCustomization {
   nameContext?: {
     component: SectionCustomComponent;
   };
+  /** If no value is provided, default value will be "descendants" */
+  counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
   emptyGroupText?: string;
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;

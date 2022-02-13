@@ -1,5 +1,6 @@
 export function promiseTimeout<T = any>(promise: Promise<T>, timeoutMs: number) {
   let timeout: NodeJS.Timeout;
+  // @ts-ignore
   return Promise.race<Promise<T>>([
     promise,
     new Promise((_, reject) => {

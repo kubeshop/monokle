@@ -13,6 +13,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {
+  HelmChartEventEmitter,
   getHelmChartFromFileEntry,
   getHelmValuesFile,
   isHelmChartFolder,
@@ -384,6 +385,7 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
       valueFileIds: [],
     };
     state.helmChartMap[helmChart.id] = helmChart;
+    HelmChartEventEmitter.emit('create', helmChart);
 
     parentFolderEntry?.children?.forEach(fileName => {
       if (!parentFolderEntry) {
