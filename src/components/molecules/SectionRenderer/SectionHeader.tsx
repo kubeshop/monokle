@@ -91,7 +91,6 @@ function SectionHeader(props: SectionHeaderProps) {
       <S.NameContainer
         isHovered={isHovered}
         isCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
-        $nameColor={sectionBlueprint.customization?.nameColor}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
         $indentation={indentation}
       >
@@ -119,6 +118,7 @@ function SectionHeader(props: SectionHeaderProps) {
               $isSelected={sectionInstance.isSelected && isCollapsed}
               $isHighlighted={sectionInstance.isSelected && isCollapsed}
               $isCheckable={Boolean(sectionInstance.checkable)}
+              $nameColor={sectionBlueprint.customization?.nameColor}
               $level={level}
               onClick={toggleCollapse}
             >

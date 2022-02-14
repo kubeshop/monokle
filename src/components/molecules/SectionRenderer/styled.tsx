@@ -9,7 +9,6 @@ type NameContainerProps = {
   $indentation: number;
   isHovered?: boolean;
   isCheckable?: boolean;
-  $nameColor?: string;
 };
 
 type SectionContainerProps = {
@@ -36,7 +35,6 @@ export const NameContainer = styled.span<NameContainerProps>`
   }}
   ${props => !props.isHovered && 'padding-right: 30px;'}
   ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
-  ${props => props.$nameColor && `color: ${props.$nameColor};`}
 `;
 
 export const SectionContainer = styled.li<SectionContainerProps>`
@@ -86,6 +84,7 @@ type NameProps = {
   $isHighlighted?: boolean;
   $isCheckable?: boolean;
   $level: number;
+  $nameColor?: string;
 };
 
 export const Name = styled.span<NameProps>`
@@ -110,7 +109,7 @@ export const Name = styled.span<NameProps>`
     if (props.$isSelected) {
       return `color: ${Colors.blackPure};`;
     }
-    return `color: ${Colors.whitePure};`;
+    return props.$nameColor ? `color: ${props.$nameColor}` : `color: ${Colors.whitePure};`;
   }}
 `;
 

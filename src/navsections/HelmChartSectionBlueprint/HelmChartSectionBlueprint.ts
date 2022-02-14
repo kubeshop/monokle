@@ -6,6 +6,8 @@ import {SectionBlueprint} from '@models/navigator';
 
 import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
 
+import Colors from '@styles/Colors';
+
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import HelmChartQuickAction from './HelmChartQuickAction';
 
@@ -56,6 +58,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     customization: {
       counterDisplayMode: 'items',
       indentation: 8,
+      nameColor: Colors.grey400,
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,

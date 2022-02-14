@@ -219,7 +219,7 @@ function SectionRenderer(props: SectionRendererProps) {
             itemId={itemId}
             blueprint={itemBlueprint}
             level={level + 1}
-            isLastItem={isLastVisibleItemId(itemId)}
+            isLastItem={isLastVisibleItemId(itemId) && !childSectionIds}
             isSectionCheckable={Boolean(sectionInstance.checkable)}
             sectionContainerElementId={sectionBlueprint.containerElementId}
             options={itemRendererOptions}
