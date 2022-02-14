@@ -15,13 +15,23 @@ interface SectionHeaderProps {
   isCollapsed: boolean;
   isLastSection: boolean;
   level: number;
+  indentation: number;
   expandSection: () => void;
   collapseSection: () => void;
 }
 
 function SectionHeader(props: SectionHeaderProps) {
-  const {name, sectionInstance, sectionBlueprint, isCollapsed, isLastSection, level, expandSection, collapseSection} =
-    props;
+  const {
+    name,
+    sectionInstance,
+    sectionBlueprint,
+    isCollapsed,
+    isLastSection,
+    level,
+    indentation,
+    expandSection,
+    collapseSection,
+  } = props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -82,6 +92,7 @@ function SectionHeader(props: SectionHeaderProps) {
         isHovered={isHovered}
         isCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
+        $indentation={indentation}
       >
         {sectionInstance.checkable &&
           sectionInstance.isInitialized &&
@@ -107,6 +118,7 @@ function SectionHeader(props: SectionHeaderProps) {
               $isSelected={sectionInstance.isSelected && isCollapsed}
               $isHighlighted={sectionInstance.isSelected && isCollapsed}
               $isCheckable={Boolean(sectionInstance.checkable)}
+              $nameColor={sectionBlueprint.customization?.nameColor}
               $level={level}
               onClick={toggleCollapse}
             >
