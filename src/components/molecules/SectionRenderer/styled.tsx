@@ -8,6 +8,7 @@ type NameContainerProps = {
   isHovered?: boolean;
   isCheckable?: boolean;
   $hasCustomNameDisplay: boolean;
+  $indentation: number;
 };
 
 type SectionContainerProps = {
@@ -28,7 +29,10 @@ export const NameContainer = styled.span<NameContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
-  ${props => props.isCheckable && `padding-left: 24px;`}
+  ${props => {
+    const defaultIndentation = props.isCheckable ? 24 : 0;
+    return `padding-left: ${defaultIndentation + props.$indentation}px;`;
+  }}
   ${props => !props.isHovered && 'padding-right: 30px;'}
   ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
 `;

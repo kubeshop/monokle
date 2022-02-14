@@ -17,11 +17,12 @@ type SectionRendererProps = {
   sectionBlueprint: SectionBlueprint<any>;
   level: number;
   isLastSection: boolean;
+  parentIndentation?: number;
   itemRendererOptions?: ItemRendererOptions;
 };
 
 function SectionRenderer(props: SectionRendererProps) {
-  const {sectionBlueprint, level, isLastSection, itemRendererOptions} = props;
+  const {sectionBlueprint, level, isLastSection, itemRendererOptions, parentIndentation} = props;
 
   const {itemBlueprint, name: sectionName, id: sectionId} = sectionBlueprint;
 
@@ -45,6 +46,23 @@ function SectionRenderer(props: SectionRendererProps) {
   const {EmptyDisplay} = useSectionCustomization(sectionBlueprint.customization);
 
   const collapsedSectionIds = useAppSelector(state => state.navigator.collapsedSectionIds);
+
+  const sectionIndentation = useMemo(() => {
+    const indentation = sectionBlueprint.customization?.indentation;
+    if (!parentIndentation && !indentation) {
+      return undefined;
+    }
+    if (parentIndentation && !indentation) {
+      return parentIndentation;
+    }
+    if (!parentIndentation && indentation) {
+      return indentation;
+    }
+    if (parentIndentation && indentation) {
+      return parentIndentation + indentation;
+    }
+    return undefined;
+  }, [parentIndentation, sectionBlueprint.customization?.indentation]);
 
   const isCollapsedMode = useMemo(() => {
     if (!sectionInstance?.id) {
@@ -188,6 +206,7 @@ function SectionRenderer(props: SectionRendererProps) {
         level={level}
         expandSection={expandSection}
         collapseSection={collapseSection}
+        indentation={sectionIndentation || 0}
       />
       {sectionInstance &&
         sectionInstance.isVisible &&
@@ -204,6 +223,7 @@ function SectionRenderer(props: SectionRendererProps) {
             isSectionCheckable={Boolean(sectionInstance.checkable)}
             sectionContainerElementId={sectionBlueprint.containerElementId}
             options={itemRendererOptions}
+            indentation={sectionIndentation || 0}
           />
         ))}
       {sectionInstance?.isVisible &&
@@ -231,6 +251,7 @@ function SectionRenderer(props: SectionRendererProps) {
                     isSectionCheckable={Boolean(sectionInstance.checkable)}
                     sectionContainerElementId={sectionBlueprint.containerElementId}
                     options={itemRendererOptions}
+                    indentation={sectionIndentation || 0}
                   />
                 ))
               ) : (
@@ -248,6 +269,7 @@ function SectionRenderer(props: SectionRendererProps) {
             sectionBlueprint={child}
             level={level + 1}
             isLastSection={child.id === lastVisibleChildSectionId}
+            parentIndentation={sectionIndentation}
           />
         ))}
     </>
