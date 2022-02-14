@@ -8,6 +8,8 @@ export class MainWindow {
   private readonly _projectsDropdown: Locator;
   private readonly _backToProject: Locator;
   private readonly _fileExplorerButton: Locator;
+  private readonly _kustomizeButton: Locator;
+  private readonly _helmButton: Locator;
 
   constructor(page: Page) {
     this._page = page;
@@ -17,6 +19,8 @@ export class MainWindow {
     this._backToProject = page.locator('#projects-dropdown-container > button:last-child');
 
     this._fileExplorerButton = page.locator('#file-explorer');
+    this._kustomizeButton = page.locator('#kustomize-pane');
+    this._helmButton = page.locator('#helm-pane');
   }
 
   async clickLogo() {
@@ -33,6 +37,14 @@ export class MainWindow {
 
   async clickFileExplorer() {
     await this._fileExplorerButton.click();
+  }
+
+  async clickKustomizeButton() {
+    await this._kustomizeButton.click();
+  }
+
+  async clickHelmButton() {
+    await this._helmButton.click();
   }
 
 }
