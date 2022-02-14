@@ -58,13 +58,11 @@ export async function startApp(): Promise<StartAppResponse> {
   });
 
   for (const modalName of modalsToWait) {
-    console.log(`trying to hide ${modalName}`);
     if (await waitForModalToShow(appWindow, modalName, 20000)) {
       await clickOnMonokleLogo(appWindow);
       await pause(500);
       await waitForModalToHide(appWindow, modalName);
     }
-    console.log(`hid ${modalName}`);
     await appWindow.screenshot({
       path: getRecordingPath(appInfo.platform, `modal-gone-${modalName}.png`)
     });

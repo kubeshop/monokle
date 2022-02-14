@@ -6,6 +6,7 @@ const config: PlaywrightTestConfig = {
   expect: {
     toMatchSnapshot: {threshold: 0.2},
   },
+  retries: 3
 };
 
 export default config;
