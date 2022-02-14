@@ -7,6 +7,8 @@ import {AlertEnum} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {clearAlert} from '@redux/reducers/alert';
 
+import NotificationMarkdown from '@components/molecules/NotificationMarkdown';
+
 const MessageBox: React.FC = () => {
   const dispatch = useAppDispatch();
   const alert = useAppSelector(state => state.alert.alert);
@@ -28,7 +30,7 @@ const MessageBox: React.FC = () => {
     // @ts-ignore
     notification[type]({
       message: alert.title,
-      description: alert.message,
+      description: <NotificationMarkdown message={alert.message} />,
       duration: 2,
     });
 
