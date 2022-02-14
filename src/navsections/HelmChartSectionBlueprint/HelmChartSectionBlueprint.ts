@@ -55,6 +55,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
     customization: {
       counterDisplayMode: 'items',
+      indentation: 8,
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
@@ -128,6 +129,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
     customization: {
       counterDisplayMode: 'none',
+      indentation: 8,
     },
   };
 
