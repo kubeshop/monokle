@@ -59,6 +59,7 @@ test('Validate ClusterContainer', async () => {
 });
 
 test('Validate settings drawer', async () => {
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'before-settings-drawer.png')});
   let drawer = await findDrawer(appWindow, 'Settings');
   expect(drawer).toBeFalsy();
 
