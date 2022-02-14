@@ -1,10 +1,10 @@
 import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {HelmValuesMapType} from '@models/appstate';
+import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
 
-import {selectHelmValuesFile} from '@redux/reducers/main';
+import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import HelmChartQuickAction from './HelmChartQuickAction';
@@ -14,6 +14,13 @@ export type ValuesFilesScopeType = {
   previewValuesFileId: string | undefined;
   isInClusterMode: boolean;
   isFolderOpen: boolean;
+};
+
+type HelmChartScopeType = {
+  helmChartMap: HelmChartMapType;
+  selectedPath: string | undefined;
+  previewValuesFileId: string | undefined;
+  isInClusterMode: boolean;
 };
 
 export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
@@ -73,14 +80,51 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
   };
 
-  const helmChartSectionBlueprint: SectionBlueprint<any, any> = {
+  const helmChartSectionBlueprint: SectionBlueprint<HelmChart, HelmChartScopeType> = {
     name: helmChart.name,
     id: helmChart.id,
     containerElementId: 'helm-sections-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     childSectionIds: [valuesFilesSectionBlueprint.id],
-    getScope: () => {
-      return {};
+    getScope: state => {
+      const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
+      return {
+        helmChartMap: state.main.helmChartMap,
+        isInClusterMode: kubeConfigPath
+          ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
+          : false,
+        previewValuesFileId: state.main.previewValuesFileId,
+        selectedPath: state.main.selectedPath,
+      };
+    },
+    builder: {
+      getRawItems: scope => {
+        const chart: HelmChart | undefined = scope.helmChartMap[helmChart.id];
+        return chart ? [chart] : [];
+      },
+    },
+    itemBlueprint: {
+      getName: () => 'Chart.yaml',
+      getInstanceId: chart => chart.id,
+      builder: {
+        getMeta: chart => ({
+          filePath: chart.filePath,
+        }),
+        isSelected: (chart, scope) => {
+          return scope.selectedPath === chart.filePath;
+        },
+        isDisabled: (rawItem, scope) =>
+          Boolean((scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) || scope.isInClusterMode),
+      },
+      instanceHandler: {
+        onClick: (instance, dispatch) => {
+          const filePath: string | undefined = instance.meta?.filePath;
+          if (!filePath) {
+            return;
+          }
+          dispatch(selectFile({filePath}));
+        },
+      },
     },
     customization: {
       counterDisplayMode: 'none',
