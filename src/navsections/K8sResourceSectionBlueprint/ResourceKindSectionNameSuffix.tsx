@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 
-import {Button} from 'antd';
+import {Button, Tooltip} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
@@ -65,14 +65,16 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
   return (
     <SuffixContainer>
       <ButtonContainer>
-        <Button
-          icon={<PlusOutlined />}
-          type="link"
-          onClick={createResource}
-          size="small"
-          disabled={isInPreviewMode}
-          style={{color: sectionInstance.isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
-        />
+        <Tooltip title={`Create a new ${resourceKind}`}>
+          <Button
+            icon={<PlusOutlined />}
+            type="link"
+            onClick={createResource}
+            size="small"
+            disabled={isInPreviewMode}
+            style={{color: sectionInstance.isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
+          />
+        </Tooltip>
       </ButtonContainer>
     </SuffixContainer>
   );

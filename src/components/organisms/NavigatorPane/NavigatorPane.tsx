@@ -10,7 +10,7 @@ import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {NAVIGATOR_HEIGHT_OFFSET, ROOT_FILE_ENTRY} from '@constants/constants';
-import {QuickFilterTooltip} from '@constants/tooltips';
+import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
 
 import {ResourceFilterType} from '@models/appstate';
 
@@ -120,17 +120,19 @@ const NavPane: React.FC = () => {
             </div>
           </MonoPaneTitle>
           <S.TitleBarRightButtons>
-            <S.PlusButton
-              id="create-resource-button"
-              $disabled={!isFolderOpen || isInPreviewMode}
-              $highlighted={highlightedItems.createResource}
-              className={highlightedItems.createResource ? 'animated-highlight' : ''}
-              disabled={!isFolderOpen || isInPreviewMode}
-              icon={<PlusOutlined />}
-              size="small"
-              type="link"
-              onClick={onClickNewResource}
-            />
+            <Tooltip title={NewResourceTooltip}>
+              <S.PlusButton
+                id="create-resource-button"
+                $disabled={!isFolderOpen || isInPreviewMode}
+                $highlighted={highlightedItems.createResource}
+                className={highlightedItems.createResource ? 'animated-highlight' : ''}
+                disabled={!isFolderOpen || isInPreviewMode}
+                icon={<PlusOutlined />}
+                size="small"
+                type="link"
+                onClick={onClickNewResource}
+              />
+            </Tooltip>
             <Tooltip title={QuickFilterTooltip}>
               <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
                 <Button

@@ -349,7 +349,7 @@ const NewResourceWizard = () => {
 
   return (
     <Modal
-      title="Add New Resource"
+      title="Create Resource"
       visible={newResourceWizardState.isOpen}
       onOk={onOk}
       onCancel={onCancel}

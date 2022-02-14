@@ -1,11 +1,12 @@
 import {Page} from 'playwright';
 import {expect, test} from '@playwright/test';
 import {
+  findDrawer,
   waitForDrawerToHide,
   waitForDrawerToShow,
 } from './antdHelpers';
 import {clickOnMonokleLogo, ElectronAppInfo, startApp} from './electronHelpers';
-import {pause} from './utils';
+import {getRecordingPath, pause} from './utils';
 
 let appWindow: Page = {} as any;
 let appInfo: ElectronAppInfo = {} as any;
@@ -58,24 +59,28 @@ test('Validate ClusterContainer', async () => {
 });
 
 test('Validate settings drawer', async () => {
-  const settingsTitle = appWindow.locator('.ant-drawer-open .ant-drawer-title');
-  expect(await settingsTitle.isVisible()).toBe(false);
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'before-settings-drawer.png')});
+  let drawer = await findDrawer(appWindow, 'Settings');
+  expect(drawer).toBeFalsy();
 
   await appWindow.click("span[aria-label='setting']", {noWaitAfter: true, force: true});
-  await pause(20000);
-  expect(await settingsTitle.isVisible()).toBe(true);
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'settings-drawer.png')});
+  drawer = await waitForDrawerToShow(appWindow, 'Settings', 40000);
+
+  expect(drawer).toBeTruthy();
 
   await clickOnMonokleLogo(appWindow);
-  await pause(20000);
-  expect(await settingsTitle.isVisible()).toBe(false);
+
+  expect(await waitForDrawerToHide(appWindow, 'Settings')).toBeTruthy();
 });
 
 test('Validate notifications drawer', async () => {
-  appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
+  await appWindow.click("//span[@aria-label='bell' and contains(@class,'anticon')]", {
     noWaitAfter: true,
     force: true,
   });
 
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'notifications-drawer.png')});
   expect(await waitForDrawerToShow(appWindow, 'Notifications', 5000)).toBeTruthy();
   await clickOnMonokleLogo(appWindow);
 
@@ -83,7 +88,7 @@ test('Validate notifications drawer', async () => {
 });
 
 test.afterAll(async () => {
-  await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/final-screen.png`});
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'final-screen.png')});
   await appWindow.context().close();
   await appWindow.close();
 });
