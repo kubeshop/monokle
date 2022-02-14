@@ -91,6 +91,7 @@ function SectionHeader(props: SectionHeaderProps) {
       <S.NameContainer
         isHovered={isHovered}
         isCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
+        $nameColor={sectionBlueprint.customization?.nameColor}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
         $indentation={indentation}
       >

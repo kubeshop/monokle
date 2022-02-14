@@ -5,10 +5,11 @@ import styled from 'styled-components';
 import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
-  isHovered?: boolean;
-  isCheckable?: boolean;
   $hasCustomNameDisplay: boolean;
   $indentation: number;
+  isHovered?: boolean;
+  isCheckable?: boolean;
+  $nameColor?: string;
 };
 
 type SectionContainerProps = {
@@ -35,6 +36,7 @@ export const NameContainer = styled.span<NameContainerProps>`
   }}
   ${props => !props.isHovered && 'padding-right: 30px;'}
   ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
+  ${props => props.$nameColor && `color: ${props.$nameColor};`}
 `;
 
 export const SectionContainer = styled.li<SectionContainerProps>`
