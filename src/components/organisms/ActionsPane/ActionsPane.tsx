@@ -40,7 +40,7 @@ import {
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
-import {getResourceSchema} from '@redux/services/schema';
+import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -102,6 +102,7 @@ const ActionsPane: React.FC<IProps> = props => {
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
+  const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
@@ -329,14 +330,19 @@ const ActionsPane: React.FC<IProps> = props => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (activeTabKey === 'form' && !isKustomization && !resourceKindHandler?.formEditorOptions?.editorSchema) {
+    if (
+      activeTabKey === 'form' &&
+      !selectedPath &&
+      !isKustomization &&
+      !resourceKindHandler?.formEditorOptions?.editorSchema
+    ) {
       setActiveTabKey('source');
     }
 
     if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
       setActiveTabKey('source');
     }
-  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization]);
+  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedPath]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
@@ -350,6 +356,10 @@ const ActionsPane: React.FC<IProps> = props => {
       getDistanceBetweenTwoComponents();
     }
   }, [actionsPaneWidth, tabsList, paneConfiguration, selectedResource, getDistanceBetweenTwoComponents]);
+
+  useEffect(() => {
+    setSchemaForSelectedPath(selectedPath ? getSchemaForPath(selectedPath, fileMap) : undefined);
+  }, [selectedPath, fileMap]);
 
   return (
     <S.ActionsPaneMainContainer ref={actionsPaneRef}>
@@ -457,28 +467,34 @@ const ActionsPane: React.FC<IProps> = props => {
             ) : null}
           </TabPane>
 
-          {selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema) && (
+          {schemaForSelectedPath ||
+          (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
             <TabPane
-              disabled={!selectedResourceId}
               key="form"
-              tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
+              tab={
+                <TabHeader icon={<ContainerOutlined />}>{selectedResource ? selectedResource.kind : 'Form'}</TabHeader>
+              }
             >
               {isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
               ) : activeTabKey === 'form' ? (
-                isKustomization ? (
+                selectedPath && schemaForSelectedPath ? (
+                  <FormEditor
+                    formSchema={extractFormSchema(schemaForSelectedPath)}
+                    formUiSchema={getUiSchemaForPath(selectedPath, fileMap)}
+                  />
+                ) : isKustomization && selectedResource ? (
                   <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
-                ) : (
-                  resourceKindHandler?.formEditorOptions && (
-                    <FormEditor
-                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                    />
-                  )
-                )
+                ) : resourceKindHandler?.formEditorOptions ? (
+                  <FormEditor
+                    formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                    formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                  />
+                ) : null
               ) : null}
             </TabPane>
-          )}
+          ) : null}
+
           {selectedResource && resourceKindHandler && !isKustomization && (
             <TabPane key="metadataForm" tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}>
               {isFolderLoading || previewLoader.isLoading ? (
