@@ -64,6 +64,7 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     path: state.projectConfig?.kubeConfig?.path,
     currentContext: state.projectConfig?.kubeConfig?.currentContext,
   };
+  applicationConfig.k8sVersion = state.projectConfig?.k8sVersion;
   return applicationConfig;
 };
 
@@ -89,6 +90,7 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     contexts: state.kubeConfig.contexts,
     currentContext: state.kubeConfig.currentContext,
   };
+  applicationConfig.k8sVersion = state.k8sVersion;
   return applicationConfig;
 };
 

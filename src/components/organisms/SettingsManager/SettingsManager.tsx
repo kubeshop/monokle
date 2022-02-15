@@ -49,6 +49,7 @@ const SettingsManager: React.FC = () => {
 
   const [activePanels, setActivePanels] = useState<number[]>([3]);
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
 
   const [settingsForm] = useForm();
 

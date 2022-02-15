@@ -101,6 +101,7 @@ interface AppConfig {
   userTempDir?: string;
   isProjectLoading?: boolean;
   projectsRootPath: string;
+  k8sVersion: string;
 }
 
 export type {AppConfig};

@@ -44,12 +44,12 @@ function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | unde
   };
 }
 
-export function validateResource(resource: K8sResource, schemaVersion: string) {
+export function validateResource(resource: K8sResource, schemaVersion: string, userDataDir: string) {
   if (isKustomizationPatch(resource)) {
     return;
   }
 
-  const resourceSchema = getResourceSchema(resource, schemaVersion);
+  const resourceSchema = getResourceSchema(resource, schemaVersion, userDataDir);
   if (!resourceSchema) {
     return;
   }

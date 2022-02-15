@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, {readFileSync} from 'fs';
 import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
@@ -29,9 +29,11 @@ const HELM_CHART_UI_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-ui
 /**
  * Returns a JSON Schema for the specified resource kind
  */
-export function getResourceSchema(resource: K8sResource, schemaVersion: string) {
+export function getResourceSchema(resource: K8sResource, schemaVersion: string, userDataDir: string) {
   // @ts-ignore
-  const k8sSchema = JSON.parse(loadResource(`schemas/${schemaVersion}.json`));
+  const k8sSchema = JSON.parse(
+    readFileSync(path.join(String(userDataDir), path.sep, 'schemas', `${schemaVersion}.json`), 'utf-8')
+  );
 
   if (isKustomizationResource(resource)) {
     return kustomizeSchema;

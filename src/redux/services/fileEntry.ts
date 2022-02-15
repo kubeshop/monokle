@@ -318,6 +318,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
     reprocessResources(
       PREDEFINED_K8S_VERSION,
+      '',
       resourcesFromFile.map(r => r.id),
       state.resourceMap,
       state.fileMap,
@@ -364,6 +365,7 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   });
   reprocessResources(
     PREDEFINED_K8S_VERSION,
+    '',
     resourcesFromFile.map(r => r.id),
     state.resourceMap,
     state.fileMap,

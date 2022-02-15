@@ -4,8 +4,6 @@ import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import path from 'path';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
 import {
   AppConfig,
   KubeConfig,
@@ -62,7 +60,6 @@ export const setOpenProject = createAsyncThunk(
     // First open the project so state.selectedProjectRootFolder is set
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     const config: ProjectConfig | null = projectConfig || populateProjectConfig(appConfig);
-    config.k8sVersion = config.k8sVersion || PREDEFINED_K8S_VERSION;
     // Then set project config by reading .monokle or populating it
     thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config, fromConfigFile: false}));
     // Last set rootFolder so function can read the latest projectConfig

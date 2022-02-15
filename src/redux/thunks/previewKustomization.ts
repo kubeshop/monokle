@@ -36,6 +36,7 @@ export const previewKustomization = createAsyncThunk<
   const state = thunkAPI.getState().main;
   const appConfig = thunkAPI.getState().config;
   const k8sVersion = thunkAPI.getState().config.projectConfig?.k8sVersion;
+  const userDataDir = thunkAPI.getState().config.userDataDir;
   const resource = state.resourceMap[resourceId];
   if (resource && resource.filePath) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
@@ -51,6 +52,7 @@ export const previewKustomization = createAsyncThunk<
     if (result.stdout) {
       return createPreviewResult(
         String(k8sVersion),
+        String(userDataDir),
         result.stdout,
         resource.id,
         'Kustomize Preview',

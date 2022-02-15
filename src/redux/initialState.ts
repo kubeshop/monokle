@@ -1,5 +1,7 @@
 import os from 'os';
 
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
@@ -85,6 +87,7 @@ const initialAppConfigState: AppConfig = {
   projectConfig: null,
   isProjectLoading: true,
   projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
+  k8sVersion: PREDEFINED_K8S_VERSION,
 };
 
 const initialAlertState: AlertState = {};
