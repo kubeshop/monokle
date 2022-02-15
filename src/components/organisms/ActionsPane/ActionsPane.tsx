@@ -354,7 +354,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
     if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
       setActiveTabKey('source');
     }
-  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization]);
+  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedPath]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
