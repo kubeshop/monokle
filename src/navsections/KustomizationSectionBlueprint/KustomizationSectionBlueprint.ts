@@ -75,6 +75,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
       component: KustomizationSectionEmptyDisplay,
     },
     beforeInitializationText: 'Get started by browsing a folder in the File Explorer.',
+    counterDisplayMode: 'items',
   },
   itemBlueprint: {
     getName: rawItem => rawItem.name,

@@ -145,6 +145,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     isInPreviewMode ? undefined : createResource,
     filterResources
   );
+
   const {registerStaticActions} = useEditorKeybindings(
     editor,
     hiddenInputRef,
@@ -152,10 +153,14 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     applySelection,
     diffSelectedResource
   );
+
   useResourceYamlSchema(
     yaml,
-    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined)
+    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
+    selectedPath,
+    fileMap
   );
+
   useDebouncedCodeSave(
     editor,
     orgCode,
@@ -167,6 +172,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     selectedPath,
     setOrgCode
   );
+
   useMonacoUiState(editor, selectedResourceId, selectedPath);
 
   const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {

@@ -196,6 +196,14 @@ export function getAbsoluteResourcePath(resource: K8sResource, fileMap: FileMapT
 }
 
 /**
+ * Returns the absolute path for the specified relative path
+ */
+
+export function getAbsoluteFilePath(relativePath: string, fileMap: FileMapType) {
+  return path.join(fileMap[ROOT_FILE_ENTRY].filePath, relativePath);
+}
+
+/**
  * Returns the absolute path to the specified FileEntry
  */
 
