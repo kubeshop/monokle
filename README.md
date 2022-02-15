@@ -51,7 +51,7 @@
 
 Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) document or the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview.
 
-Read about the [latest 1.5.0 release](https://medium.com/kubeshop-i/monokle-1-5-0-release-kubeshop-95f574563c79)
+Read about the [latest 1.5.0 release](https://medium.com/kubeshop-i/monokle-1-5-0-release-kubeshop-95f574563c79).
 
 ## Download & Install
 
@@ -64,15 +64,15 @@ Read about the [latest 1.5.0 release](https://medium.com/kubeshop-i/monokle-1-5-
 
 There is a lot of functionality currently being considered:
 
-- Creation of resources/projects - see [Resource creation/manipulation](https://github.com/kubeshop/monokle/projects/4)
-- Improved Cluster functionality - see [Cluster integration](https://github.com/kubeshop/monokle/projects/8)
-- Plugin/extension mechanism - see [Extension mechanism for plugins](https://github.com/kubeshop/monokle/issues/177)
-- Improved resource filtering/navigation - see [Resource Navigation](https://github.com/kubeshop/monokle/projects/2)
-- Improved Helm integration - see [Helm integration](https://github.com/kubeshop/monokle/projects/12)
+- Creation of resources/projects - see [Resource creation/manipulation](https://github.com/kubeshop/monokle/projects/4).
+- Improved Cluster functionality - see [Cluster integration](https://github.com/kubeshop/monokle/projects/8).
+- Plugin/extension mechanism - see [Extension mechanism for plugins](https://github.com/kubeshop/monokle/issues/177).
+- Improved resource filtering/navigation - see [Resource Navigation](https://github.com/kubeshop/monokle/projects/2).
+- Improved Helm integration - see [Helm integration](https://github.com/kubeshop/monokle/projects/12).
 
 Don't hesitate to provide any feedback you might have to help us prioritize and improve our backlog!
 
 ## Getting involved
 
-- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn)
-- Read about how to contribute [in our Documentation](https://kubeshop.github.io/monokle/contributing)
+- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn).
+- Read about how to contribute [in our Documentation](https://kubeshop.github.io/monokle/contributing).
