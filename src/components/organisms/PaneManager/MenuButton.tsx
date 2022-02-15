@@ -55,10 +55,6 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
     shallowEqual
   );
 
-  const isAnyHelmValuesFileSelected = useMemo(() => {
-    return Object.values(helmValuesMap).some(v => v.isSelected);
-  }, [helmValuesMap]);
-
   const isAnySectionSelected = useMemo(() => {
     if (!sectionInstanceByName) {
       return false;
@@ -69,11 +65,8 @@ const MenuButton: React.FC<IMenuButtonProps> = props => {
   const style: React.CSSProperties = {};
 
   const hasGradientBackground = useMemo(() => {
-    return Boolean(
-      (isAnySectionSelected || (shouldWatchSelectedPath && selectedPath && !isAnyHelmValuesFileSelected)) &&
-        (!isSelected || !isActive)
-    );
-  }, [isAnySectionSelected, shouldWatchSelectedPath, selectedPath, isAnyHelmValuesFileSelected, isSelected, isActive]);
+    return Boolean((isAnySectionSelected || (shouldWatchSelectedPath && selectedPath)) && (!isSelected || !isActive));
+  }, [isAnySectionSelected, shouldWatchSelectedPath, selectedPath, isSelected, isActive]);
 
   if (hasGradientBackground) {
     if (isHovered) {

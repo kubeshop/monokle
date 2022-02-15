@@ -5,9 +5,10 @@ import styled from 'styled-components';
 import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
+  $hasCustomNameDisplay: boolean;
+  $indentation: number;
   isHovered?: boolean;
   isCheckable?: boolean;
-  $hasCustomNameDisplay: boolean;
 };
 
 type SectionContainerProps = {
@@ -28,7 +29,10 @@ export const NameContainer = styled.span<NameContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
-  ${props => props.isCheckable && `padding-left: 24px;`}
+  ${props => {
+    const defaultIndentation = props.isCheckable ? 24 : 0;
+    return `padding-left: ${defaultIndentation + props.$indentation}px;`;
+  }}
   ${props => !props.isHovered && 'padding-right: 30px;'}
   ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
 `;
@@ -80,6 +84,7 @@ type NameProps = {
   $isHighlighted?: boolean;
   $isCheckable?: boolean;
   $level: number;
+  $nameColor?: string;
 };
 
 export const Name = styled.span<NameProps>`
@@ -104,7 +109,7 @@ export const Name = styled.span<NameProps>`
     if (props.$isSelected) {
       return `color: ${Colors.blackPure};`;
     }
-    return `color: ${Colors.whitePure};`;
+    return props.$nameColor ? `color: ${props.$nameColor}` : `color: ${Colors.whitePure};`;
   }}
 `;
 
