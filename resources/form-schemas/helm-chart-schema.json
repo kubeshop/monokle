@@ -1,0 +1,149 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "description": "The chart API version"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the chart"
+    },
+    "version": {
+      "type": "string",
+      "description": "A SemVer 2 version"
+    },
+    "kubeVersion": {
+      "type": "string",
+      "description": "A SemVer range of compatible Kubernetes versions"
+    },
+    "description": {
+      "type": "string",
+      "description": "A single-sentence description of this project"
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of the chart",
+      "enum": ["application","library"]
+    },
+    "keywords": {
+      "type": "array",
+      "description": "A list of keywords about this project",
+      "items":
+      {
+        "type": "string"
+      }
+
+    },
+    "home": {
+      "type": "string",
+      "description": "The URL of this projects home page"
+    },
+    "sources": {
+      "type": "array",
+      "description": "A list of URLs to source code for this project",
+      "items":
+      {
+        "type": "string"
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "A list of the chart requirements",
+      "items":
+      {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the chart (nginx)"
+          },
+          "version": {
+            "type": "string",
+            "description": "The version of the chart (\"1.2.3\")"
+          },
+          "repository": {
+            "type": "string",
+            "description": "The repository URL (\"https://example.com/charts\") or alias (\"@repo-name\")"
+          },
+          "condition": {
+            "type": "string",
+            "description": "A yaml path that resolves to a boolean, used for enabling/disabling charts (e.g. subchart1.enabled )"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags can be used to group charts for enabling/disabling together",
+            "items":
+            {
+              "type": "string"
+            }
+          },
+          "import-values": {
+            "type": "array",
+            "description": "ImportValues holds the mapping of source values to parent key to be imported. Each item can be a string or pair of child/parent sublist items.",
+            "items":
+            {
+              "type": "string"
+            }
+          },
+          "alias": {
+            "description": "Alias to be used for the chart. Useful when you have to add the same chart multiple times",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version"
+        ]
+      }
+    },
+    "maintainers": {
+      "type": "array",
+      "items":
+      {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The maintainers name"
+          },
+          "email": {
+            "type": "string",
+            "description": "The maintainers email"
+          },
+          "url": {
+            "type": "string",
+            "description": "A URL for the maintainer"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    "icon": {
+      "type": "string",
+      "description": "A URL to an SVG or PNG image to be used as an icon"
+    },
+    "appVersion": {
+      "type": "string",
+      "description": "The version of the app that this contains. Needn't be SemVer. Quotes recommended."
+    },
+    "deprecated": {
+      "type": "boolean",
+      "description": "Whether this chart is deprecated"
+    },
+    "annotations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "apiVersion",
+    "name",
+    "version"
+  ],
+  "additionalProperties": false
+}

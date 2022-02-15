@@ -25,11 +25,11 @@ export function getFileTimestamp(filePath: string): number | undefined {
   }
 }
 
-export function getFileStats(filePath: string): fs.Stats | undefined {
+export function getFileStats(filePath: string, silent?: boolean): fs.Stats | undefined {
   try {
     return fs.statSync(filePath);
   } catch (err) {
-    if (err instanceof Error) {
+    if (!silent && err instanceof Error) {
       log.warn(`[getFileStats]: ${err.message}`);
     }
   }
