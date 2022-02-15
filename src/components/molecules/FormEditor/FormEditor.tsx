@@ -164,7 +164,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, selectedPath]);
+  }, [selectedResource, selectedPath, fileMap]);
 
   useEffect(() => {
     if (!settings.createDefaultObjects || !settings.setDefaultPrimitiveValues) {

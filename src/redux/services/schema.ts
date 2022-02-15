@@ -75,7 +75,7 @@ export function getSchemaForPath(filePath: string, fileMap: FileMapType): any | 
   if (fileMap && filePath && isHelmValuesFile(filePath)) {
     // look for values.schema.json file in same folder as values file
     const valuesSchemaFileName = getAbsoluteFilePath(path.join(path.dirname(filePath), 'values.schema.json'), fileMap);
-    if (getFileStats(valuesSchemaFileName)?.isFile()) {
+    if (getFileStats(valuesSchemaFileName, true)?.isFile()) {
       try {
         // @ts-ignore
         return JSON.parse(fs.readFileSync(valuesSchemaFileName, 'UTF-8'));
