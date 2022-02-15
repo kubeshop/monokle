@@ -24,7 +24,7 @@ import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/r
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
-import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManagerRefactor} from '@organisms';
+import {HotKeysHandler, LazyDrawer, MessageBox, PageFooter, PageHeader, PaneManager} from '@organisms';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -245,7 +245,7 @@ const App = () => {
         <MessageBox />
         <MainContainer>
           <PageHeader />
-          <PaneManagerRefactor />
+          <PaneManager />
           <PageFooter />
         </MainContainer>
         <FileExplorer {...fileExplorerProps} />

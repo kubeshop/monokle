@@ -13,7 +13,7 @@ import PaneManagerSplitView from './PaneMangerSplitView';
 
 import * as S from './styled';
 
-const PaneManagerRefactor: React.FC = () => {
+const PaneManager: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
@@ -50,4 +50,4 @@ const PaneManagerRefactor: React.FC = () => {
   );
 };
 
-export default PaneManagerRefactor;
+export default PaneManager;

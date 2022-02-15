@@ -15,7 +15,7 @@ export {default as NewResourceWizard} from './NewResourceWizard';
 export {default as NotificationsManager} from './NotificationsManager';
 export {default as PageFooter} from './PageFooter';
 export {default as PageHeader} from './PageHeader';
-export {default as PaneManagerRefactor} from './PaneManagerRefactor';
+export {default as PaneManager} from './PaneManager';
 export {default as PluginManager} from './PluginManager';
 export {default as QuickSearchActions} from './QuickSearchActions';
 export {default as RenameEntityModal} from './RenameEntityModal';
