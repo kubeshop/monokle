@@ -65,9 +65,11 @@ const UpdateModal = () => {
         )
       }
     >
-      {newVersion.code === NewVersionCode.Errored ? getErrorMessage(newVersion.data?.errorCode) : null}
-      {newVersion.code === NewVersionCode.NotAvailable ? <div>New version is not available!</div> : null}
-      {newVersion.code === NewVersionCode.Downloaded ? <div>New version is downloaded!</div> : null}
+      <span id="UpdateModal">
+        {newVersion.code === NewVersionCode.Errored ? getErrorMessage(newVersion.data?.errorCode) : null}
+        {newVersion.code === NewVersionCode.NotAvailable ? <div>New version is not available!</div> : null}
+        {newVersion.code === NewVersionCode.Downloaded ? <div>New version is downloaded!</div> : null}
+      </span>
     </StyledModal>
   );
 };

@@ -19,6 +19,7 @@ nav:
   - Getting Started: getting-started.md
   - Feature Overview: features.md
   - UI Overview: overview.md
+  - Keyboard Shortcuts: hotkeys.md
   - Navigating Resources: resource-navigation.md
   - Resource Editing: resource-editing.md
   - Working with Kustomize: kustomize.md

@@ -9,6 +9,8 @@ import {AlertEnum} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {seenNotifications} from '@redux/reducers/main';
 
+import NotificationMarkdown from '@molecules/NotificationMarkdown';
+
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 
 import * as S from './styled';
@@ -47,7 +49,9 @@ const Notification: React.FC<NotificationProps> = props => {
         </Tooltip>
         <S.MessageBodyContainer>
           <S.TitleSpan>{title}</S.TitleSpan>
-          <S.MessageSpan>{message}</S.MessageSpan>
+          <S.MessageSpan>
+            <NotificationMarkdown message={message} />
+          </S.MessageSpan>
         </S.MessageBodyContainer>
       </S.MessageContainer>
     </S.StyledDiv>

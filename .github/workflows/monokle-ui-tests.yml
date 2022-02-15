@@ -3,7 +3,7 @@ name: monokle-ui-tests
 on:
   push:
     branches:
-      - andreiv1992/test/more-tests-around-projects
+      - andreiv1992/feat/work-with-git-folder
 
   workflow_dispatch:
 

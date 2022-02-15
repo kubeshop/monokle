@@ -45,7 +45,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
     },
     getGroups: scope => {
       const patchResources = Object.values(scope.resourceMap).filter(resource => resource.name.startsWith('Patch:'));
-      const patcheResourcesByKind: Record<string, K8sResource[]> = patchResources.reduce<Record<string, K8sResource[]>>(
+      const patchResourcesByKind: Record<string, K8sResource[]> = patchResources.reduce<Record<string, K8sResource[]>>(
         (acc, resource) => {
           if (acc[resource.kind]) {
             acc[resource.kind].push(resource);
@@ -56,7 +56,7 @@ const KustomizePatchSectionBlueprint: SectionBlueprint<K8sResource, KustomizePat
         },
         {}
       );
-      return Object.entries(patcheResourcesByKind)
+      return Object.entries(patchResourcesByKind)
         .map(([resourceKind, resources]) => {
           return {
             id: resourceKind,

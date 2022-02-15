@@ -63,6 +63,11 @@ export interface SectionCustomization {
   nameContext?: {
     component: SectionCustomComponent;
   };
+  /** If no value is provided, default value will be "descendants" */
+  counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
+  /** Number of pixels to indent this section, by default all sections/susections are aligned */
+  indentation?: number;
+  nameColor?: string;
   emptyGroupText?: string;
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;

@@ -167,7 +167,7 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
 
     try {
       result += vm.run(js);
-    } catch (e) {
+    } catch (e: any) {
       console.error(`Failed to interpolate [${js}]`, e.message);
     }
     text = text.substring(ix2 + 2);

@@ -24,11 +24,13 @@ export type ItemRendererProps<ItemType, ScopeType> = {
   isLastItem: boolean;
   isSectionCheckable: boolean;
   sectionContainerElementId: string;
+  indentation: number;
   options?: ItemRendererOptions;
 };
 
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
-  const {itemId, blueprint, level, isLastItem, isSectionCheckable, sectionContainerElementId, options} = props;
+  const {itemId, blueprint, level, isLastItem, isSectionCheckable, sectionContainerElementId, indentation, options} =
+    props;
   const {instanceHandler} = blueprint;
 
   const dispatch = useAppDispatch();
@@ -80,6 +82,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         level={level}
         isLastItem={isLastItem}
         hasOnClick={Boolean(instanceHandler?.onClick)}
+        $indentation={indentation}
         $isSectionCheckable={isSectionCheckable}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
       >

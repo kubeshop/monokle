@@ -7,6 +7,8 @@ import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq, parseAllDocuments, p
 import {
   CLUSTER_DIFF_PREFIX,
   KUSTOMIZATION_API_GROUP,
+  KUSTOMIZATION_API_VERSION,
+  KUSTOMIZATION_FILE_NAME,
   KUSTOMIZATION_KIND,
   PREVIEW_PREFIX,
   UNSAVED_PREFIX,
@@ -457,8 +459,14 @@ export function reprocessResources(
         resource.name = `Patch: ${resource.name}`;
       }
 
-      resource.kind = resource.content.kind;
-      resource.version = resource.content.apiVersion;
+      const isKustomziationFile = resource.filePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME);
+      const kindHandler = resource.content.kind ? getResourceKindHandler(resource.content.kind) : undefined;
+
+      resource.kind = resource.content.kind || (isKustomziationFile ? KUSTOMIZATION_KIND : 'Unknown');
+      resource.version =
+        resource.content.apiVersion ||
+        (isKustomziationFile ? KUSTOMIZATION_API_VERSION : kindHandler ? kindHandler.clusterApiVersion : 'Unknown');
+
       resource.namespace = extractNamespace(resource.content);
 
       // clear caches
@@ -692,7 +700,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           result.push(resource);
         }
         // handle special case of untyped kustomization.yaml files
-        else if (content && relativePath.endsWith('/kustomization.yaml') && documents.length === 1) {
+        else if (content && relativePath.toLowerCase().endsWith(KUSTOMIZATION_FILE_NAME) && documents.length === 1) {
           let resource: K8sResource = {
             name: createResourceName(relativePath, content, KUSTOMIZATION_KIND),
             filePath: relativePath,
@@ -700,7 +708,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
             isHighlighted: false,
             isSelected: false,
             kind: KUSTOMIZATION_KIND,
-            version: `${KUSTOMIZATION_API_GROUP}/v1beta1`,
+            version: KUSTOMIZATION_API_VERSION,
             content,
             text: fileContent,
           };

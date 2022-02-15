@@ -26,8 +26,18 @@ export function openDiscord() {
   shell.openExternal('https://discord.gg/kMJxmuYTMu');
 }
 
+export function openUrlInExternalBrowser(url?: string) {
+  if (url) {
+    shell.openExternal(url);
+  }
+}
+
 export function openDocumentation() {
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
+}
+
+export function openKeyboardShortcuts() {
+  shell.openExternal(`https://kubeshop.github.io/monokle/hotkeys?os=${os.type}`);
 }
 
 export function openUniqueObjectNameTopic() {
