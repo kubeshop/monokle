@@ -43,7 +43,7 @@ import {
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
-import {getResourceSchema} from '@redux/services/schema';
+import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -110,6 +110,7 @@ const ActionsPane = (props: {contentHeight: string}) => {
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
+  const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
 
   const dispatch = useAppDispatch();
 
@@ -372,6 +373,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionsPaneFooterHeight, paneConfiguration.actionsPaneFooterExpandedHeight]);
 
+  useEffect(() => {
+    setSchemaForSelectedPath(selectedPath ? getSchemaForPath(selectedPath, fileMap) : undefined);
+  }, [selectedPath, fileMap]);
+
+  console.log('schemaForSelectedPath', schemaForSelectedPath);
+
   return (
     <>
       <Row>
@@ -485,26 +492,30 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 )
               ) : null}
             </TabPane>
-            {selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema) && (
+            {((selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ||
+              schemaForSelectedPath) && (
               <TabPane
-                disabled={!selectedResourceId}
                 key="form"
                 style={{height: editorTabPaneHeight}}
-                tab={<TabHeader icon={<ContainerOutlined />}>{selectedResource.kind}</TabHeader>}
+                tab={
+                  <TabHeader icon={<ContainerOutlined />}>
+                    {selectedResource ? selectedResource.kind : 'Form'}
+                  </TabHeader>
+                }
               >
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : activeTabKey === 'form' ? (
-                  isKustomization ? (
+                  isKustomization && selectedResource ? (
                     <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
-                  ) : (
-                    resourceKindHandler?.formEditorOptions && (
-                      <FormEditor
-                        formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                        formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                      />
-                    )
-                  )
+                  ) : resourceKindHandler?.formEditorOptions ? (
+                    <FormEditor
+                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                    />
+                  ) : schemaForSelectedPath ? (
+                    <FormEditor formSchema={schemaForSelectedPath} />
+                  ) : null
                 ) : null}
               </TabPane>
             )}

@@ -1,10 +1,16 @@
 import {cloneDeep} from 'lodash';
 import log from 'loglevel';
+import path from 'path';
 
+import {FileMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {loadResource} from '@redux/services';
+import {getAbsoluteFilePath} from '@redux/services/fileEntry';
+import {isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
+
+import {getFileStats} from '@utils/files';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -15,6 +21,9 @@ const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.jso
 // @ts-ignore
 const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
 const schemaCache = new Map<string, any | undefined>();
+
+// @ts-ignore
+const HELM_CHART_SCHEMA = JSON.parse(loadResource('schemas/helm-chart-yaml.json'));
 
 /**
  * Returns a JSON Schema for the specified resource kind
@@ -56,6 +65,24 @@ export function getResourceSchema(resource: K8sResource) {
   }
 
   return schemaCache.get(resource.kind);
+}
+
+export function getSchemaForPath(filePath: string, fileMap: FileMapType): any | undefined {
+  if (filePath?.toLowerCase().endsWith('/chart.yaml')) {
+    return HELM_CHART_SCHEMA;
+  }
+  if (fileMap && filePath && isHelmValuesFile(filePath)) {
+    // look for values.schema.json file in same folder as values file
+    const valuesSchemaFileName = getAbsoluteFilePath(path.join(path.dirname(filePath), 'values.schema.json'), fileMap);
+    if (getFileStats(valuesSchemaFileName)?.isFile()) {
+      try {
+        // @ts-ignore
+        return JSON.parse(loadResource(valuesSchemaFileName));
+      } catch (e) {
+        log.warn('Failed to load values schema file', e);
+      }
+    }
+  }
 }
 
 export function loadCustomSchema(schemaPath: string, resourceKind: string): any | undefined {

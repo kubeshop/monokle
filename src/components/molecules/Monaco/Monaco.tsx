@@ -152,10 +152,14 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     applySelection,
     diffSelectedResource
   );
+
   useResourceYamlSchema(
     yaml,
-    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined)
+    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
+    selectedPath,
+    fileMap
   );
+
   useDebouncedCodeSave(
     editor,
     orgCode,

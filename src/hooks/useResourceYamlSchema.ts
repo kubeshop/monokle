@@ -1,14 +1,15 @@
 import {useEffect} from 'react';
 
+import {FileMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
 import {isSupportedHelmResource} from '@redux/services/helm';
 import {isKustomizationPatch} from '@redux/services/kustomize';
-import {getResourceSchema} from '@redux/services/schema';
+import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
-function useResourceYamlSchema(yaml: any, resource: K8sResource | undefined) {
+function useResourceYamlSchema(yaml: any, resource?: K8sResource, selectedPath?: string, fileMap?: FileMapType) {
   useEffect(() => {
-    if (!resource) {
+    if (!resource && !selectedPath) {
       yaml &&
         yaml.yamlDefaults.setDiagnosticsOptions({
           validate: false,
@@ -22,6 +23,9 @@ function useResourceYamlSchema(yaml: any, resource: K8sResource | undefined) {
     if (resource) {
       resourceSchema = getResourceSchema(resource);
       validate = !isKustomizationPatch(resource) && isSupportedHelmResource(resource);
+    } else if (selectedPath && fileMap) {
+      resourceSchema = getSchemaForPath(selectedPath, fileMap);
+      validate = resourceSchema !== undefined;
     }
 
     yaml &&
@@ -30,7 +34,7 @@ function useResourceYamlSchema(yaml: any, resource: K8sResource | undefined) {
         enableSchemaRequest: true,
         hover: true,
         completion: true,
-        isKubernetes: true,
+        isKubernetes: resource,
         format: true,
         schemas: [
           {
@@ -41,7 +45,7 @@ function useResourceYamlSchema(yaml: any, resource: K8sResource | undefined) {
         ],
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resource]);
+  }, [resource, selectedPath, fileMap]);
 }
 
 export default useResourceYamlSchema;
