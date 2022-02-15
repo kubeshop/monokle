@@ -8,7 +8,6 @@ import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
 
 import Colors from '@styles/Colors';
 
-import sectionBlueprintMap from '../sectionBlueprintMap';
 import HelmChartQuickAction from './HelmChartQuickAction';
 
 export type ValuesFilesScopeType = {
@@ -136,8 +135,5 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
   };
 
-  sectionBlueprintMap.register(valuesFilesSectionBlueprint);
-  sectionBlueprintMap.register(helmChartSectionBlueprint);
-
-  return helmChartSectionBlueprint;
+  return {helmChartSectionBlueprint, valuesFilesSectionBlueprint};
 }
