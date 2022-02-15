@@ -1,6 +1,5 @@
 {
   "ShowGraphView": false,
   "ShowRightMenu": false,
-  "ActionsPaneFooter": false,
-  "PaneManagerRefactor": true
+  "ActionsPaneFooter": false
 }
