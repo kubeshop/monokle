@@ -6,25 +6,33 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import Colors from '@styles/Colors';
 
-export const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
+export const BackToProjectButton = styled(Button)`
+  font-size: 12px;
+  color: ${Colors.lightSeaGreen};
 `;
 
-export const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
+export const Container = styled.div`
+  height: 100%;
+  display: grid;
+  grid-template-rows: max-content 1fr;
 `;
 
 export const ProjectsContainer = styled.div`
   padding: 8px 12px;
-  height: calc(100vh - 112px);
-  overflow-y: scroll;
+  height: 100%;
   width: 100%;
+  overflow-y: auto;
+
   ${GlobalScrollbarStyle}
+`;
+
+export const ProjectLastOpened = styled.div`
+  color: ${Colors.grey5};
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 `;
 
 export const ProjectItem = styled.div<{activeproject: boolean}>`
@@ -61,16 +69,19 @@ export const ProjectPath = styled.div`
   width: 100%;
 `;
 
-export const ProjectLastOpened = styled.div`
-  color: ${Colors.grey5};
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-`;
+export const RecentProjectsPaneContainer = styled.div`
+  height: 100%;
+  border-left: 1px solid ${Colors.grey3};
+  position: relative;
 
-export const BackToProjectButton = styled(Button)`
-  font-size: 12px;
-  color: ${Colors.lightSeaGreen};
+  & .custom-modal-handle {
+    position: absolute;
+    top: 50%;
+    left: -5px;
+    height: 100%;
+    width: 10px;
+    background-color: transparent;
+    cursor: col-resize;
+    transform: translateY(-50%);
+  }
 `;

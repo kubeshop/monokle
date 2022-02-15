@@ -153,6 +153,10 @@ const initialUiState: UiState = {
     collapsedNavSectionNames: [],
   },
   paneConfiguration: electronStore.get('ui.paneConfiguration'),
+  layoutSize: {
+    footer: 0,
+    header: 0,
+  },
   shouldExpandAllNodes: false,
   resetLayout: false,
   isActionsPaneFooterExpanded: false,

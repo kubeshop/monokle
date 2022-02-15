@@ -35,6 +35,7 @@ const ActionsPaneFooter: React.FC<IProps> = props => {
         <S.TitleBarTabs>
           {Object.entries(tabs).map(([key, value]) => (
             <S.TitleLabel
+              key={key}
               className={activeTab === key && isExpanded ? 'selected-tab' : ''}
               onClick={() => onClickTabLabel(key)}
             >
