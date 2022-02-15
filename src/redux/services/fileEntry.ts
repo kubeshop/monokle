@@ -14,6 +14,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {
   HelmChartEventEmitter,
+  addHelmValuesFile,
   getHelmChartFromFileEntry,
   getHelmValuesFile,
   isHelmChartFolder,
@@ -83,7 +84,8 @@ export function readFiles(
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
   depth: number = 1,
-  isSupportedResource: (resource: K8sResource) => boolean = () => true
+  isSupportedResource: (resource: K8sResource) => boolean = () => true,
+  helmChart?: HelmChart
 ) {
   const files = fs.readdirSync(folder);
   const result: string[] = [];
@@ -133,6 +135,8 @@ export function readFiles(
             depth + 1
           );
         }
+      } else if (helmChart && isHelmValuesFile(fileEntry.name)) {
+        addHelmValuesFile(fileEntryPath, helmChart, helmValuesMap, fileEntry);
       } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
           extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {

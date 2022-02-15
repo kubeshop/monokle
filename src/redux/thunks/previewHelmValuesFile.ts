@@ -36,12 +36,13 @@ export const previewHelmValuesFile = createAsyncThunk<
 
   if (valuesFile && valuesFile.filePath) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-    const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
+    const folder = path.join(rootFolder, valuesFile.filePath.substring(0, valuesFile.filePath.lastIndexOf(path.sep)));
     const chart = state.helmChartMap[valuesFile.helmChartId];
 
     // sanity check
-    if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
-      log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
+    const valuesFileName = path.basename(valuesFile.name);
+    if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFileName))) {
+      log.info(`previewing ${valuesFileName} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
       const helmPreviewMode =
         configState.projectConfig?.settings?.helmPreviewMode || configState.settings.helmPreviewMode;
@@ -49,8 +50,8 @@ export const previewHelmValuesFile = createAsyncThunk<
       const args = {
         helmCommand:
           helmPreviewMode === 'template'
-            ? `helm template -f "${folder}${path.sep}${valuesFile.name}" ${chart.name} "${folder}"`
-            : `helm install --kube-context ${currentContext} -f "${folder}${path.sep}${valuesFile.name}" ${chart.name} "${folder}" --dry-run`,
+            ? `helm template -f "${folder}${path.sep}${valuesFileName}" ${chart.name} "${folder}"`
+            : `helm install --kube-context ${currentContext} -f "${folder}${path.sep}${valuesFileName}" ${chart.name} "${folder}" --dry-run`,
         kubeconfig,
       };
 

@@ -57,8 +57,30 @@ export function isHelmChartFolder(files: string[]) {
  */
 export function isSupportedHelmResource(resource: K8sResource): boolean {
   const helmVariableRegex = /{{.*}}/g;
-
   return Boolean(resource.text.match(helmVariableRegex)?.length) === false;
+}
+
+/**
+ * Adds the values file at the given path to the specified HelmChart
+ */
+
+export function addHelmValuesFile(
+  fileEntryPath: string,
+  helmChart: HelmChart,
+  helmValuesMap: HelmValuesMapType,
+  fileEntry: FileEntry
+) {
+  const helmValues: HelmValuesFile = {
+    id: uuidv4(),
+    filePath: fileEntryPath,
+    name: fileEntryPath.substring(path.dirname(helmChart.filePath).length + 1),
+    isSelected: false,
+    helmChartId: helmChart.id,
+  };
+
+  helmValuesMap[helmValues.id] = helmValues;
+  helmChart.valueFileIds.push(helmValues.id);
+  fileEntry.isSupported = true;
 }
 
 /**
@@ -106,21 +128,12 @@ export function processHelmChartFolder(
           helmChartMap,
           helmValuesMap,
           depth + 1,
-          isSupportedHelmResource
+          isSupportedHelmResource,
+          helmChart
         );
       }
     } else if (isHelmValuesFile(file)) {
-      const helmValues: HelmValuesFile = {
-        id: uuidv4(),
-        filePath: fileEntryPath,
-        name: file,
-        isSelected: false,
-        helmChartId: helmChart.id,
-      };
-
-      helmValuesMap[helmValues.id] = helmValues;
-      helmChart.valueFileIds.push(helmValues.id);
-      fileEntry.isSupported = true;
+      addHelmValuesFile(fileEntryPath, helmChart, helmValuesMap, fileEntry);
     } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
       try {
         extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
