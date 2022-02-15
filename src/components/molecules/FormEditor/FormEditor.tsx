@@ -148,7 +148,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [formData, selectedResource]
+    [formData, selectedResource, selectedPath]
   );
 
   useEffect(() => {

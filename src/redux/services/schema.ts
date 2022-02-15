@@ -1,3 +1,4 @@
+import fs from 'fs';
 import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
@@ -77,7 +78,7 @@ export function getSchemaForPath(filePath: string, fileMap: FileMapType): any | 
     if (getFileStats(valuesSchemaFileName)?.isFile()) {
       try {
         // @ts-ignore
-        return JSON.parse(loadResource(valuesSchemaFileName));
+        return JSON.parse(fs.readFileSync(valuesSchemaFileName, 'UTF-8'));
       } catch (e) {
         log.warn('Failed to load values schema file', e);
       }

@@ -22,7 +22,7 @@ function useResourceYamlSchema(yaml: any, resource?: K8sResource, selectedPath?:
 
     if (resource) {
       resourceSchema = getResourceSchema(resource);
-      validate = !isKustomizationPatch(resource) && isSupportedHelmResource(resource);
+      validate = resourceSchema && !isKustomizationPatch(resource) && isSupportedHelmResource(resource);
     } else if (selectedPath && fileMap) {
       resourceSchema = getSchemaForPath(selectedPath, fileMap);
       validate = resourceSchema !== undefined;

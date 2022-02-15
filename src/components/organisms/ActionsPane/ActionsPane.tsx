@@ -342,7 +342,12 @@ const ActionsPane = (props: {contentHeight: string}) => {
   }, [selectedResourceId, resourceMap]);
 
   useEffect(() => {
-    if (activeTabKey === 'form' && !isKustomization && !resourceKindHandler?.formEditorOptions?.editorSchema) {
+    if (
+      activeTabKey === 'form' &&
+      !selectedPath &&
+      !isKustomization &&
+      !resourceKindHandler?.formEditorOptions?.editorSchema
+    ) {
       setActiveTabKey('source');
     }
 
@@ -376,8 +381,6 @@ const ActionsPane = (props: {contentHeight: string}) => {
   useEffect(() => {
     setSchemaForSelectedPath(selectedPath ? getSchemaForPath(selectedPath, fileMap) : undefined);
   }, [selectedPath, fileMap]);
-
-  console.log('schemaForSelectedPath', schemaForSelectedPath);
 
   return (
     <>
@@ -492,8 +495,8 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 )
               ) : null}
             </TabPane>
-            {((selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ||
-              schemaForSelectedPath) && (
+            {schemaForSelectedPath ||
+            (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
               <TabPane
                 key="form"
                 style={{height: editorTabPaneHeight}}
@@ -506,19 +509,19 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : activeTabKey === 'form' ? (
-                  isKustomization && selectedResource ? (
+                  schemaForSelectedPath ? (
+                    <FormEditor formSchema={extractFormSchema(schemaForSelectedPath)} />
+                  ) : isKustomization && selectedResource ? (
                     <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
                   ) : resourceKindHandler?.formEditorOptions ? (
                     <FormEditor
                       formSchema={resourceKindHandler.formEditorOptions.editorSchema}
                       formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
                     />
-                  ) : schemaForSelectedPath ? (
-                    <FormEditor formSchema={schemaForSelectedPath} />
                   ) : null
                 ) : null}
               </TabPane>
-            )}
+            ) : null}
             {selectedResource && resourceKindHandler && !isKustomization && (
               <TabPane
                 key="metadataForm"
