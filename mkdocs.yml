@@ -27,12 +27,14 @@ nav:
   - Cluster Integration: cluster-integration.md
   - Cluster Compare: cluster-compare.md
   - Deploy/Diff: apply-and-diff.md
+  - Monokle Pluings:
+    - Plugins: plugins.md
+    - Templates: templates.md
   - Development:
     - Development: development.md
     - Architecture: architecture.md
-    - Plugins: plugins.md
-    - Templates: templates.md
     - Testing: testing.md
+    - Contributing: contributing.md
   - FAQ: faq.md
   - Tutorials:
       - tutorials/how-to-navigate-and-edit-manifests.md

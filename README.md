@@ -51,6 +51,8 @@
 
 Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) document or the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview.
 
+Read about the [latest 1.5.0 release](https://medium.com/kubeshop-i/monokle-1-5-0-release-kubeshop-95f574563c79)
+
 ## Download & Install
 
 | <p align="center">Windows                                                                  | <p align="center">macOS                                                                    | <p align="center">Linux                                                                                                  |
@@ -72,11 +74,5 @@ Don't hesitate to provide any feedback you might have to help us prioritize and 
 
 ## Getting involved
 
-- We WANT and NEED your feedback please. Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn)
-- Check out our [Contributor Guide](https://github.com/kubeshop/.github/blob/main/CONTRIBUTING.md) and
-  [Code of Conduct](https://github.com/kubeshop/.github/blob/main/CODE_OF_CONDUCT.md)
-- Fork/Clone the repo and make sure you can run it as shown above
-- Check out the [Development](docs/development.md) document for how to build and run Monokle from its source
-- Check out the [Testing](docs/testing.md) document for how to build and run Monokle tests
-- Check out the [Architecture](docs/architecture.md) document to get a high-level understanding of how Monokle works
-- Check out the Roadmap above and open [issues](https://github.com/kubeshop/monokle/issues) here on GitHub
+- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn)
+- Read about how to contribute [in our Documentation](https://kubeshop.github.io/monokle/contributing)
