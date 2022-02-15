@@ -2,6 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {Size} from '@models/window';
 
+import {useAppSelector} from '@redux/hooks';
+
 export function useFocus<T>(): [React.RefObject<T>, () => void] {
   const htmlElRef = useRef<T>(null);
   const focus = () => {
@@ -11,6 +13,24 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
   };
 
   return [htmlElRef, focus];
+}
+
+export function useMainPaneHeight(): number {
+  const layoutSize = useAppSelector(state => state.ui.layoutSize);
+  const [mainPaneHeight, setMainPaneHeight] = useState<number>(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setMainPaneHeight(window.innerHeight - layoutSize.footer - layoutSize.header);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    // Remove event listener on cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, [layoutSize]);
+
+  return mainPaneHeight;
 }
 
 export function useWindowSize(): Size {

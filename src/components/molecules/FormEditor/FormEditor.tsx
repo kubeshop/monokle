@@ -35,7 +35,7 @@ const FormContainer = styled.div`
   width: 100%;
   padding: 20px 15px 0px 15px;
   margin: 0px;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 
   ${GlobalScrollbarStyle}

@@ -3,7 +3,6 @@ export enum StartupFlags {
 }
 
 export class StartupFlag {
-
   private static _instance: StartupFlag;
 
   private _automationFlag = false;

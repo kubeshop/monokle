@@ -5,6 +5,7 @@ import {useEffect} from 'react';
 import log from 'loglevel';
 
 import {getChannelName} from '@utils/ipc';
+
 import {FileExplorerOptions} from './FileExplorerOptions';
 
 export type FileExplorerProps = {
