@@ -1,0 +1,109 @@
+{
+  "ui:title": "Helm Chart Definition",
+  "apiVersion": {
+    "ui:title": "API Version",
+    "ui:help": "The chart API version"
+  },
+  "name": {
+    "ui:title": "Name",
+    "ui:help": "The name of the chart"
+  },
+  "version": {
+    "ui:title": "Version",
+    "ui:help": "A SemVer 2 version"
+  },
+  "kubeVersion": {
+    "ui:title": "Kubernetes Version",
+    "ui:help": "A SemVer range of compatible Kubernetes versions"
+  },
+  "description": {
+    "ui:title": "Description",
+    "ui:help": "A single-sentence description of this project"
+  },
+  "type": {
+    "ui:title": "Type",
+    "ui:help": "The type of the chart",
+    "ui:widget": "radio"
+  },
+  "keywords": {
+    "ui:title": "Keywords",
+    "ui:help": "A list of keywords about this project"
+  },
+  "home": {
+    "ui:title": "Kubernetes Version",
+    "ui:help": "A SemVer range of compatible Kubernetes versions"
+  },
+  "sources": {
+    "ui:title": "Description",
+    "ui:help": "A single-sentence description of this project"
+  },
+  "dependencies": {
+    "ui:title": "Dependencies",
+    "ui:help": "A list of the chart requirements",
+    "items": {
+      "name": {
+        "ui:title": "Name",
+        "ui:help": "The name of the chart, i.e. nginx"
+      },
+      "version": {
+        "ui:title": "Version",
+        "ui:help": "The version of the chart, i.e. \"1.2.3\""
+      },
+      "repository": {
+        "ui:title": "Repository",
+        "ui:help": "The repository URL (\"https://example.com/charts\") or alias (\"@repo-name\")"
+      },
+      "condition": {
+        "ui:title": "Condition",
+        "ui:help": "A yaml path that resolves to a boolean, used for enabling/disabling charts (e.g. subchart1.enabled )"
+      },
+      "tags": {
+        "ui:title": "Tags",
+        "ui:help": "Tags can be used to group charts for enabling/disabling together"
+      },
+      "import-values": {
+        "ui:title": "Import Values",
+        "ui:help": "ImportValues holds the mapping of source values to parent key to be imported. Each item can be a string or pair of child/parent sublist items."
+      },
+      "alias": {
+        "ui:title": "Alias",
+        "ui:help": "Alias to be used for the chart. Useful when you have to add the same chart multiple times"
+      }
+    }
+
+  },
+  "maintainers": {
+    "ui:title": "Maintainers",
+    "ui:description": "A list of mainteners for this project",
+    "items": {
+      "name": {
+        "ui:title": "Name",
+        "ui:help": "The maintainers name"
+      },
+      "email": {
+        "ui:title": "Email",
+        "ui:help": "The maintainers email"
+      },
+      "url": {
+        "ui:title": "URL",
+        "ui:help": "A URL for the maintainer"
+      }
+    }
+  },
+  "icon": {
+    "ui:title": "Icon",
+    "ui:help": "A URL to an SVG or PNG image to be used as an icon"
+  },
+  "appVersion": {
+    "ui:title": "appVersion",
+    "ui:help": "The version of the app that this contains. Needn't be SemVer. Quotes recommended."
+  },
+  "deprecated": {
+    "ui:title": "Deprecated",
+    "ui:help": "Whether this chart is deprecated"
+  },
+  "annotations": {
+    "ui:title": "Annotations",
+    "ui:help": "A list of annotations keyed by name "
+  }
+}

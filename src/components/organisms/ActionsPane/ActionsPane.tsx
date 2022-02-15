@@ -43,7 +43,7 @@ import {
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
-import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
+import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
@@ -509,8 +509,11 @@ const ActionsPane = (props: {contentHeight: string}) => {
                 {uiState.isFolderLoading || previewLoader.isLoading ? (
                   <S.Skeleton active />
                 ) : activeTabKey === 'form' ? (
-                  schemaForSelectedPath ? (
-                    <FormEditor formSchema={extractFormSchema(schemaForSelectedPath)} />
+                  selectedPath && schemaForSelectedPath ? (
+                    <FormEditor
+                      formSchema={extractFormSchema(schemaForSelectedPath)}
+                      formUiSchema={getUiSchemaForPath(selectedPath, fileMap)}
+                    />
                   ) : isKustomization && selectedResource ? (
                     <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
                   ) : resourceKindHandler?.formEditorOptions ? (

@@ -34,7 +34,7 @@ function useResourceYamlSchema(yaml: any, resource?: K8sResource, selectedPath?:
         enableSchemaRequest: true,
         hover: true,
         completion: true,
-        isKubernetes: resource,
+        isKubernetes: Boolean(resource),
         format: true,
         schemas: [
           {

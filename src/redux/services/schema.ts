@@ -24,7 +24,9 @@ const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
 const schemaCache = new Map<string, any | undefined>();
 
 // @ts-ignore
-const HELM_CHART_SCHEMA = JSON.parse(loadResource('schemas/helm-chart-yaml.json'));
+const HELM_CHART_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-schema.json'));
+// @ts-ignore
+const HELM_CHART_UI_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-ui-schema.json'));
 
 /**
  * Returns a JSON Schema for the specified resource kind
@@ -69,7 +71,7 @@ export function getResourceSchema(resource: K8sResource) {
 }
 
 export function getSchemaForPath(filePath: string, fileMap: FileMapType): any | undefined {
-  if (filePath?.toLowerCase().endsWith('/chart.yaml')) {
+  if (path.basename(filePath.toLowerCase()) === 'chart.yaml') {
     return HELM_CHART_SCHEMA;
   }
   if (fileMap && filePath && isHelmValuesFile(filePath)) {
@@ -83,6 +85,12 @@ export function getSchemaForPath(filePath: string, fileMap: FileMapType): any | 
         log.warn('Failed to load values schema file', e);
       }
     }
+  }
+}
+
+export function getUiSchemaForPath(filePath: string, fileMap: FileMapType): any | undefined {
+  if (path.basename(filePath.toLowerCase()) === 'chart.yaml') {
+    return HELM_CHART_UI_SCHEMA;
   }
 }
 
