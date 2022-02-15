@@ -7,6 +7,7 @@ import {HelmChartEventEmitter} from '@redux/services/helm';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import {makeHelmChartSectionBlueprint} from './HelmChartSectionBlueprint';
+import RootHelmChartsSectionEmptyDisplay from './RootHelmChartsSectionEmptyDisplay';
 
 export type RootHelmChartsScopeType = {
   isInClusterMode: boolean;
@@ -14,6 +15,7 @@ export type RootHelmChartsScopeType = {
   isFolderLoading: boolean;
   isPreviewLoading: boolean;
   isHelmChartPreview: boolean;
+  helmChartsLength: number;
 };
 
 const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmChartsScopeType> = {
@@ -32,6 +34,7 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmCharts
       isFolderLoading: state.ui.isFolderLoading,
       isPreviewLoading: state.main.previewLoader.isLoading,
       isHelmChartPreview: state.main.previewType === 'helm',
+      helmChartsLength: Object.values(state.main.helmChartMap).length,
     };
   },
   builder: {
@@ -44,10 +47,16 @@ const HelmChartSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmCharts
     isInitialized: scope => {
       return scope.isFolderOpen;
     },
+    isEmpty: scope => {
+      return scope.helmChartsLength === 0;
+    },
     shouldBeVisibleBeforeInitialized: true,
   },
   customization: {
     counterDisplayMode: 'subsections',
+    emptyDisplay: {
+      component: RootHelmChartsSectionEmptyDisplay,
+    },
   },
 };
 
