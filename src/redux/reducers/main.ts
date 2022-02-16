@@ -12,7 +12,7 @@ import {parseDocument} from 'yaml';
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
-import {AppConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {
   AppState,
   ClusterToLocalResourcesMatch,
@@ -70,7 +70,7 @@ import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
 export type SetRootFolderPayload = {
-  appConfig: AppConfig;
+  projectConfig: ProjectConfig;
   fileMap: FileMapType;
   resourceMap: ResourceMapType;
   helmChartMap: HelmChartMapType;
@@ -225,10 +225,10 @@ export const mainSlice = createSlice({
      */
     multiplePathsAdded: (
       state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
+      action: PayloadAction<{paths: Array<string>; projectConfig: ProjectConfig}>
     ) => {
       let filePaths: Array<string> = action.payload.paths;
-      const appConfig = action.payload.appConfig;
+      const projectConfig = action.payload.projectConfig;
       filePaths.forEach((filePath: string) => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
@@ -237,7 +237,7 @@ export const mainSlice = createSlice({
             reloadFile(filePath, fileEntry, state);
           }
         } else {
-          addPath(filePath, state, appConfig);
+          addPath(filePath, state, projectConfig);
         }
       });
     },
@@ -246,16 +246,16 @@ export const mainSlice = createSlice({
      */
     multipleFilesChanged: (
       state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
+      action: PayloadAction<{paths: Array<string>; projectConfig: ProjectConfig}>
     ) => {
       let filePaths = action.payload.paths;
-      const appConfig = action.payload.appConfig;
+      const projectConfig = action.payload.projectConfig;
       filePaths.forEach((filePath: string) => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
           reloadFile(filePath, fileEntry, state);
         } else {
-          addPath(filePath, state, appConfig);
+          addPath(filePath, state, projectConfig);
         }
       });
     },

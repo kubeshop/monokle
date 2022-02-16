@@ -6,7 +6,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
-import {AppConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
@@ -69,7 +69,7 @@ export function processHelmChartFolder(
   folder: string,
   rootFolder: string,
   files: string[],
-  appConfig: AppConfig,
+  projectConfig: ProjectConfig,
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
@@ -90,17 +90,17 @@ export function processHelmChartFolder(
     const fileEntryPath = filePath.substr(rootFolder.length);
     const fileEntry = createFileEntry(fileEntryPath);
 
-    if (fileIsExcluded(appConfig, fileEntry)) {
+    if (fileIsExcluded(projectConfig, fileEntry)) {
       fileEntry.isExcluded = true;
     } else if (getFileStats(filePath)?.isDirectory()) {
-      const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+      const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
 
       if (depth === folderReadsMaxDepth) {
         log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
       } else {
         fileEntry.children = readFiles(
           filePath,
-          appConfig,
+          projectConfig,
           resourceMap,
           fileMap,
           helmChartMap,
@@ -121,7 +121,7 @@ export function processHelmChartFolder(
       helmValuesMap[helmValues.id] = helmValues;
       helmChart.valueFileIds.push(helmValues.id);
       fileEntry.isSupported = true;
-    } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+    } else if (projectConfig.fileIncludes?.some(e => micromatch.isMatch(fileEntry.name, e))) {
       try {
         extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
           resourceMap[resource.id] = resource;

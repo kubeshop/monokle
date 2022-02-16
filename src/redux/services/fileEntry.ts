@@ -6,7 +6,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AppConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
@@ -55,9 +55,8 @@ export function createFileEntry(fileEntryPath: string) {
  * Checks if the specified filename should be excluded per the global exclusion config
  */
 
-export function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
-  const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
-  return scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
+export function fileIsExcluded(projectConfig: ProjectConfig, fileEntry: FileEntry) {
+  return projectConfig.scanExcludes?.some(e => micromatch.isMatch(fileEntry.filePath, e));
 }
 
 /**
@@ -77,7 +76,7 @@ export function getRootFolder(fileMap: FileMapType) {
 
 export function readFiles(
   folder: string,
-  appConfig: AppConfig,
+  projectConfig: ProjectConfig,
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
@@ -101,7 +100,7 @@ export function readFiles(
       folder,
       rootFolder,
       files,
-      appConfig,
+      projectConfig,
       resourceMap,
       fileMap,
       helmChartMap,
@@ -116,16 +115,16 @@ export function readFiles(
       const fileEntry = createFileEntry(fileEntryPath);
       fileEntry.timestamp = getFileTimestamp(filePath);
 
-      if (fileIsExcluded(appConfig, fileEntry)) {
+      if (fileIsExcluded(projectConfig, fileEntry)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
-        const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+        const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
         if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
         } else {
           fileEntry.children = readFiles(
             filePath,
-            appConfig,
+            projectConfig,
             resourceMap,
             fileMap,
             helmChartMap,
@@ -133,7 +132,7 @@ export function readFiles(
             depth + 1
           );
         }
-      } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+      } else if (projectConfig.fileIncludes?.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
           extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
             if (!isSupportedResource(resource)) {
@@ -346,13 +345,13 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
  * Adds the file at the specified path with the specified parent
  */
 
-function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
+function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substr(rootFolderEntry.filePath.length);
   const fileEntry = createFileEntry(relativePath);
 
-  if (!appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+  if (!projectConfig.fileIncludes?.some(e => micromatch.isMatch(fileEntry.name, e))) {
     return fileEntry;
   }
   fileEntry.isSupported = true;
@@ -440,14 +439,14 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
  * Adds the folder at the specified path with the specified parent
  */
 
-function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) {
+function addFolder(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   log.info(`adding folder ${absolutePath}`);
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
     const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
     folderEntry.children = readFiles(
       absolutePath,
-      appConfig,
+      projectConfig,
       state.resourceMap,
       state.fileMap,
       state.helmChartMap,
@@ -463,7 +462,7 @@ function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) 
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState, appConfig: AppConfig) {
+export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -477,7 +476,9 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
       }
       return undefined;
     }
-    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state, appConfig);
+    const fileEntry = isDirectory
+      ? addFolder(absolutePath, state, projectConfig)
+      : addFile(absolutePath, state, projectConfig);
 
     if (fileEntry) {
       state.fileMap[fileEntry.filePath] = fileEntry;
