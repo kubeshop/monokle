@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 
 import api from './api';
 import {Container, ErrorMessage, Form, List, SubmitButton} from './styles';
@@ -88,7 +88,7 @@ const Main = () => {
               <span>{repo.name}</span>
             </div>
             <button type="button" onClick={() => handleDelete(repo)}>
-              <FaTrash />
+              Delete
             </button>
           </li>
         ))}
