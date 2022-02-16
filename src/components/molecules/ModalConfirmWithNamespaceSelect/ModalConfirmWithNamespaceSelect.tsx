@@ -65,6 +65,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources);
   const [namespaces] = useTargetClusterNamespaces();
 
+  const [disableNamespaces, setDisableNamespaces] = useState<boolean>();
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedNamespace, setSelectedNamespace] = useState(defaultNamespace);
@@ -115,11 +116,13 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     }
   }, [defaultOption, defaultNamespace, namespaces]);
 
+  useEffect(() => {
+    setDisableNamespaces(!resources.some(r => r.kind !== 'Namespace'));
+  }, [resources]);
+
   if (!selectedOption) {
     return null;
   }
-
-  const disableNamespaces = !resources.some(r => r.kind !== 'Namespace');
 
   return (
     <Modal
