@@ -119,6 +119,8 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     return null;
   }
 
+  const disableNamespaces = !resources.some(r => r.kind !== 'Namespace');
+
   return (
     <Modal
       centered
@@ -136,6 +138,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         <HeadlineLabel>Select namespace:</HeadlineLabel>
         <Radio.Group
           key={selectedOption}
+          disabled={disableNamespaces}
           onChange={e => {
             setSelectedOption(e.target.value);
             setErrorMessage('');
@@ -152,6 +155,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           <NamespaceContainer>
             <span>Namespace:</span>
             <Select
+              disabled={disableNamespaces}
               value={selectedNamespace}
               showSearch
               defaultValue={defaultNamespace}
@@ -171,6 +175,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
             <NamespaceContainer>
               <span>Namespace name:</span>
               <Input
+                disabled={disableNamespaces}
                 autoFocus
                 defaultValue={createNamespaceName}
                 placeholder="Enter namespace name"
