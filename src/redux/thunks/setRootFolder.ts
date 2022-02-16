@@ -9,6 +9,7 @@ import {FileEntry} from '@models/fileentry';
 import {RootState} from '@models/rootstate';
 
 import {SetRootFolderPayload} from '@redux/reducers/main';
+import {currentConfigSelector} from '@redux/selectors';
 import {createFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {processKustomizations} from '@redux/services/kustomize';
@@ -29,7 +30,7 @@ export const setRootFolder = createAsyncThunk<
     state: RootState;
   }
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
-  const appConfig = thunkAPI.getState().config;
+  const projectConfig = currentConfigSelector(thunkAPI.getState());
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const resourceMap: ResourceMapType = {};
   const fileMap: FileMapType = {};
@@ -38,7 +39,7 @@ export const setRootFolder = createAsyncThunk<
 
   if (!rootFolder) {
     return {
-      appConfig,
+      projectConfig,
       fileMap,
       resourceMap,
       helmChartMap,
@@ -60,7 +61,7 @@ export const setRootFolder = createAsyncThunk<
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
   const readFilesPromise = new Promise<string[]>(resolve => {
     setImmediate(() => {
-      resolve(readFiles(rootFolder, appConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
+      resolve(readFiles(rootFolder, projectConfig, resourceMap, fileMap, helmChartMap, helmValuesMap));
     });
   });
   const files = await readFilesPromise;
@@ -70,7 +71,7 @@ export const setRootFolder = createAsyncThunk<
   processKustomizations(resourceMap, fileMap);
   processParsedResources(resourceMap, resourceRefsProcessingOptions);
 
-  monitorRootFolder(rootFolder, appConfig, thunkAPI.dispatch);
+  monitorRootFolder(rootFolder, projectConfig, thunkAPI.dispatch);
 
   const generatedAlert = {
     title: 'Folder Import',
@@ -81,7 +82,7 @@ export const setRootFolder = createAsyncThunk<
   };
 
   return {
-    appConfig,
+    projectConfig,
     fileMap,
     resourceMap,
     helmChartMap,
