@@ -336,7 +336,7 @@ const ActionsPane: React.FC<IProps> = props => {
   useEffect(() => {
     if (
       activeTabKey === 'form' &&
-      !selectedPath &&
+      (!selectedPath || !schemaForSelectedPath) &&
       !isKustomization &&
       !resourceKindHandler?.formEditorOptions?.editorSchema
     ) {
@@ -346,7 +346,7 @@ const ActionsPane: React.FC<IProps> = props => {
     if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
       setActiveTabKey('source');
     }
-  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedPath]);
+  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedPath, schemaForSelectedPath]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
