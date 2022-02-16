@@ -101,13 +101,14 @@ export interface ItemGroupBlueprint {
 }
 
 export interface SectionBlueprint<RawItemType, ScopeType = any> {
-  name: string;
   id: string;
+  name: string;
   getScope: (state: RootState) => ScopeType;
   containerElementId: string;
   rootSectionId: string;
   childSectionIds?: string[];
   builder?: {
+    transformName?: (originalName: string, scope: ScopeType) => string;
     getRawItems?: (scope: ScopeType) => RawItemType[];
     getGroups?: (scope: ScopeType) => ItemGroupBlueprint[];
     getMeta?: (scope: ScopeType, items: RawItemType[]) => any;
@@ -148,6 +149,7 @@ export interface ItemInstance {
 
 export interface SectionInstance {
   id: string;
+  name: string;
   rootSectionId: string;
   itemIds: string[];
   groups: ItemGroupInstance[];
