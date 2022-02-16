@@ -3,6 +3,7 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
+import {parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -293,11 +294,11 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
     let wasFileSelected = state.selectedPath === fileEntry.filePath;
 
-    const resourcesInFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
+    const existingResourcesFromFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
     let wasAnyResourceSelected = false;
 
     // delete old resources in file since we can't be sure the updated file contains the same resource(s)
-    resourcesInFile.forEach(resource => {
+    existingResourcesFromFile.forEach(resource => {
       if (state.selectedResourceId === resource.id) {
         updateSelectionAndHighlights(state, resource);
         wasAnyResourceSelected = true;
@@ -311,21 +312,21 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
       clearResourceSelections(state.resourceMap);
     }
 
-    const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
-    resourcesFromFile.forEach(resource => {
+    const newResourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
+    newResourcesFromFile.forEach(resource => {
       state.resourceMap[resource.id] = resource;
     });
 
     reprocessResources(
-      resourcesFromFile.map(r => r.id),
+      newResourcesFromFile.map(r => r.id),
       state.resourceMap,
       state.fileMap,
       state.resourceRefsProcessingOptions
     );
 
     if (wasAnyResourceSelected) {
-      if (resourcesInFile.length === 1 && resourcesFromFile.length === 1) {
-        updateSelectionAndHighlights(state, resourcesFromFile[0]);
+      if (existingResourcesFromFile.length === 1 && newResourcesFromFile.length === 1) {
+        updateSelectionAndHighlights(state, newResourcesFromFile[0]);
       } else {
         state.selectedPath = undefined;
         state.selectedResourceId = undefined;
@@ -336,6 +337,27 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     if (wasFileSelected) {
       selectFilePath(fileEntry.filePath, state);
       state.shouldEditorReloadSelectedPath = true;
+    }
+
+    // if this file is the Helm chart entry file, update the name of the helm chart
+    if (path.basename(absolutePath) === HELM_CHART_ENTRY_FILE) {
+      const helmChart = Object.values(state.helmChartMap).find(chart => chart.filePath === fileEntry.filePath);
+      if (helmChart) {
+        try {
+          const fileText = fs.readFileSync(absolutePath, 'utf8');
+          const fileContent = parse(fileText);
+
+          if (typeof fileContent?.name !== 'string') {
+            throw new Error(`Couldn't get the name property of the helm chart at path: ${absolutePath}.`);
+          }
+
+          helmChart.name = fileContent.name;
+        } catch (e) {
+          if (e instanceof Error) {
+            log.warn(`[reloadFile]: ${e.message}`);
+          }
+        }
+      }
     }
   } else {
     log.info(`ignoring changed file ${absolutePath} because of timestamp`);
@@ -384,35 +406,48 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   // if this file is the Helm Chart entry file, create a new helm chart and search for exising values files
   const isHelmChartFile = path.basename(absolutePath) === HELM_CHART_ENTRY_FILE;
   if (isHelmChartFile) {
-    const helmChart: HelmChart = {
-      id: uuidv4(),
-      filePath: fileEntry.filePath,
-      name: parentFolderAbsPath.trim() !== '' ? path.basename(parentFolderAbsPath) : 'Unnamed Chart',
-      valueFileIds: [],
-    };
-    state.helmChartMap[helmChart.id] = helmChart;
-    HelmChartEventEmitter.emit('create', helmChart);
+    try {
+      const fileText = fs.readFileSync(absolutePath, 'utf8');
+      const fileContent = parse(fileText);
 
-    parentFolderEntry?.children?.forEach(fileName => {
-      if (!parentFolderEntry) {
-        return;
+      if (typeof fileContent?.name !== 'string') {
+        throw new Error(`Couldn't get the name property of the helm chart at path: ${absolutePath}`);
       }
-      if (isHelmValuesFile(fileName)) {
-        const valuesFilePath =
-          parentFolderEntry.filePath === rootFolderEntry.filePath
-            ? `${path.sep}${fileName}`
-            : path.join(parentFolderEntry.filePath, fileName);
-        const helmValuesFile: HelmValuesFile = {
-          id: uuidv4(),
-          filePath: valuesFilePath,
-          name: fileName,
-          isSelected: false,
-          helmChartId: helmChart.id,
-        };
-        helmChart.valueFileIds.push(helmValuesFile.id);
-        state.helmValuesMap[helmValuesFile.id] = helmValuesFile;
+
+      const helmChart: HelmChart = {
+        id: uuidv4(),
+        filePath: fileEntry.filePath,
+        name: parentFolderAbsPath.trim() !== '' ? path.basename(parentFolderAbsPath) : 'Unnamed Chart',
+        valueFileIds: [],
+      };
+      state.helmChartMap[helmChart.id] = helmChart;
+      HelmChartEventEmitter.emit('create', helmChart);
+
+      parentFolderEntry?.children?.forEach(fileName => {
+        if (!parentFolderEntry) {
+          return;
+        }
+        if (isHelmValuesFile(fileName)) {
+          const valuesFilePath =
+            parentFolderEntry.filePath === rootFolderEntry.filePath
+              ? `${path.sep}${fileName}`
+              : path.join(parentFolderEntry.filePath, fileName);
+          const helmValuesFile: HelmValuesFile = {
+            id: uuidv4(),
+            filePath: valuesFilePath,
+            name: fileName,
+            isSelected: false,
+            helmChartId: helmChart.id,
+          };
+          helmChart.valueFileIds.push(helmValuesFile.id);
+          state.helmValuesMap[helmValuesFile.id] = helmValuesFile;
+        }
+      });
+    } catch (e) {
+      if (e instanceof Error) {
+        log.warn(`[addFile]: ${e.message}`);
       }
-    });
+    }
   }
 
   // if this new file is a values file, search for it's helm chart and update it

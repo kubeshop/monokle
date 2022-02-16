@@ -1,8 +1,10 @@
 import {EventEmitter} from 'events';
+import fs from 'fs';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
+import {parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
@@ -77,13 +79,29 @@ export function processHelmChartFolder(
   result: string[],
   depth: number
 ) {
-  const helmChart: HelmChart = {
-    id: uuidv4(),
-    filePath: path.join(folder, HELM_CHART_ENTRY_FILE).substr(rootFolder.length),
-    name: folder.substr(folder.lastIndexOf(path.sep) + 1),
-    valueFileIds: [],
-  };
-  HelmChartEventEmitter.emit('create', helmChart);
+  let helmChart: HelmChart | undefined;
+
+  try {
+    const helmChartFilePath = path.join(folder, HELM_CHART_ENTRY_FILE);
+    const fileText = fs.readFileSync(helmChartFilePath, 'utf8');
+    const fileContent = parse(fileText);
+
+    if (typeof fileContent?.name !== 'string') {
+      throw new Error(`Couldn't get the name property of the helm chart at path: ${helmChartFilePath}`);
+    }
+
+    helmChart = {
+      id: uuidv4(),
+      filePath: helmChartFilePath.substr(rootFolder.length),
+      name: fileContent.name,
+      valueFileIds: [],
+    };
+    HelmChartEventEmitter.emit('create', helmChart);
+  } catch (e) {
+    if (e instanceof Error) {
+      log.warn(`[processHelmChartFolder]: ${e.message}`);
+    }
+  }
 
   files.forEach(file => {
     const filePath = path.join(folder, file);
@@ -109,7 +127,7 @@ export function processHelmChartFolder(
           isSupportedHelmResource
         );
       }
-    } else if (isHelmValuesFile(file)) {
+    } else if (isHelmValuesFile(file) && helmChart) {
       const helmValues: HelmValuesFile = {
         id: uuidv4(),
         filePath: fileEntryPath,
@@ -137,5 +155,7 @@ export function processHelmChartFolder(
     result.push(fileEntry.name);
   });
 
-  helmChartMap[helmChart.id] = helmChart;
+  if (helmChart) {
+    helmChartMap[helmChart.id] = helmChart;
+  }
 }

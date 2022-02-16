@@ -1,6 +1,6 @@
 import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {HelmChartMapType, HelmValuesMapType} from '@models/appstate';
+import {HelmValuesMapType} from '@models/appstate';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
 
@@ -18,10 +18,10 @@ export type ValuesFilesScopeType = {
 };
 
 type HelmChartScopeType = {
-  helmChartMap: HelmChartMapType;
   selectedPath: string | undefined;
   previewValuesFileId: string | undefined;
   isInClusterMode: boolean;
+  [currentHelmChart: string]: HelmChart | unknown;
 };
 
 export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
@@ -84,26 +84,37 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
   };
 
   const helmChartSectionBlueprint: SectionBlueprint<HelmChart, HelmChartScopeType> = {
-    name: helmChart.name,
     id: helmChart.id,
+    name: helmChart.name,
     containerElementId: 'helm-sections-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     childSectionIds: [valuesFilesSectionBlueprint.id],
     getScope: state => {
       const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
       return {
-        helmChartMap: state.main.helmChartMap,
         isInClusterMode: kubeConfigPath
           ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
           : false,
         previewValuesFileId: state.main.previewValuesFileId,
         selectedPath: state.main.selectedPath,
+        [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
+
     builder: {
+      transformName: (_, scope) => {
+        const currentHelmChart = scope[helmChart.id] as HelmChart | undefined;
+        if (!currentHelmChart) {
+          return 'Unnamed';
+        }
+        return currentHelmChart.name;
+      },
       getRawItems: scope => {
-        const chart: HelmChart | undefined = scope.helmChartMap[helmChart.id];
-        return chart ? [chart] : [];
+        const currentHelmChart = scope[helmChart.id] as HelmChart | undefined;
+        if (!currentHelmChart) {
+          return [];
+        }
+        return [currentHelmChart];
       },
     },
     itemBlueprint: {
