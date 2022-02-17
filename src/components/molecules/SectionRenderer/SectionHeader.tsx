@@ -119,6 +119,8 @@ function SectionHeader(props: SectionHeaderProps) {
               $isHighlighted={sectionInstance.isSelected && isCollapsed}
               $isCheckable={Boolean(sectionInstance.checkable)}
               $nameColor={sectionBlueprint.customization?.nameColor}
+              $nameSize={sectionBlueprint.customization?.nameSize}
+              $nameWeight={sectionBlueprint.customization?.nameWeight}
               $level={level}
               onClick={toggleCollapse}
             >

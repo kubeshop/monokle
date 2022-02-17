@@ -68,6 +68,8 @@ export interface SectionCustomization {
   /** Number of pixels to indent this section, by default all sections/susections are aligned */
   indentation?: number;
   nameColor?: string;
+  nameSize?: number;
+  nameWeight?: number;
   emptyGroupText?: string;
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
