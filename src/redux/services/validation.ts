@@ -72,8 +72,6 @@ export function validateResource(resource: K8sResource, schemaVersion: string, u
 
       const errors = [];
 
-      console.log(validatorCacheKey, validate.errors);
-
       if (validate.errors) {
         errors.push(
           ...validate.errors
