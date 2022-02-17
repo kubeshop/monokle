@@ -67,7 +67,7 @@ export function ResourceSelection(props: any) {
     } else {
       setResourceNames([]);
     }
-  }, [resourceMap,options.resourceKinds]);
+  }, [resourceMap, options.resourceKinds]);
 
   return (
     <Select
