@@ -7,12 +7,13 @@ import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AppConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {KustomizeCommandType} from '@models/kustomize';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
+import {currentConfigSelector} from '@redux/selectors';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 export type KustomizeCommandOptions = {
@@ -34,14 +35,14 @@ export const previewKustomization = createAsyncThunk<
   }
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
   const state = thunkAPI.getState().main;
-  const appConfig = thunkAPI.getState().config;
+  const projectConfig = currentConfigSelector(thunkAPI.getState());
   const resource = state.resourceMap[resourceId];
   if (resource && resource.filePath) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
     const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
 
     log.info(`previewing ${resource.id} in folder ${folder}`);
-    const result = await runKustomize(folder, appConfig);
+    const result = await runKustomize(folder, projectConfig);
 
     if (result.error) {
       return createRejectionWithAlert(thunkAPI, 'Kustomize Error', result.error);
@@ -59,14 +60,14 @@ export const previewKustomization = createAsyncThunk<
  * Invokes kustomize in main thread
  */
 
-function runKustomize(folder: string, appConfig: AppConfig): any {
+function runKustomize(folder: string, projectConfig: ProjectConfig): any {
   return new Promise(resolve => {
     ipcRenderer.once('kustomize-result', (event, arg) => {
       resolve(arg);
     });
-    const kustomizeCommand = appConfig.projectConfig?.settings?.kustomizeCommand || appConfig.settings.kustomizeCommand;
-    const enableHelmWithKustomize =
-      appConfig.projectConfig?.settings?.enableHelmWithKustomize || appConfig.settings.enableHelmWithKustomize;
+    const kustomizeCommand = projectConfig?.settings?.kustomizeCommand || 'kubectl';
+    const enableHelmWithKustomize = projectConfig?.settings?.enableHelmWithKustomize || false;
+
     ipcRenderer.send('run-kustomize', {
       folder,
       kustomizeCommand,

@@ -10,6 +10,7 @@ import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
+import {currentConfigSelector} from '@redux/selectors';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {runHelm} from '@utils/helm';
@@ -36,16 +37,16 @@ export const previewHelmValuesFile = createAsyncThunk<
 
   if (valuesFile && valuesFile.filePath) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-    const folder = path.join(rootFolder, valuesFile.filePath.substring(0, valuesFile.filePath.lastIndexOf(path.sep)));
     const chart = state.helmChartMap[valuesFile.helmChartId];
+    const folder = path.join(rootFolder, path.dirname(chart.filePath));
 
     // sanity check
     const valuesFileName = path.basename(valuesFile.name);
     if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFileName))) {
       log.info(`previewing ${valuesFileName} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
-      const helmPreviewMode =
-        configState.projectConfig?.settings?.helmPreviewMode || configState.settings.helmPreviewMode;
+      const projectConfig = currentConfigSelector(thunkAPI.getState());
+      const helmPreviewMode = projectConfig.settings ? projectConfig.settings.helmPreviewMode : 'template';
 
       const args = {
         helmCommand:
