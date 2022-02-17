@@ -11,6 +11,7 @@ import Colors from '@styles/Colors';
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import FileItemPrefix from './FileItemPrefix';
 import HelmChartQuickAction from './HelmChartQuickAction';
+import PreviewConfigurationNameSuffix from './PreviewConfigurationQuickAction';
 
 export type ValuesFilesScopeType = {
   helmValuesMap: HelmValuesMapType;
@@ -52,6 +53,12 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         component: CollapseSectionPrefix,
       },
       sectionMarginBottom: 12,
+      nameSuffix: {
+        component: PreviewConfigurationNameSuffix,
+        options: {
+          isVisibleOnHover: true,
+        },
+      },
     },
   };
 
