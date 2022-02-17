@@ -5,7 +5,7 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {parse} from 'yaml';
 
-import {HELM_CHART_ENTRY_FILE, PREDEFINED_K8S_VERSION, ROOT_FILE_ENTRY} from '@constants/constants';
+import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
@@ -285,7 +285,13 @@ export function getFileEntryForAbsolutePath(filePath: string, fileMap: FileMapTy
  * Updates the fileEntry from the specified path - and its associated resources
  */
 
-export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState) {
+export function reloadFile(
+  absolutePath: string,
+  fileEntry: FileEntry,
+  state: AppState,
+  schemaVersion: string,
+  userDataDir: string
+) {
   let absolutePathTimestamp = getFileTimestamp(absolutePath);
 
   if (!fileEntry.timestamp || (absolutePathTimestamp && absolutePathTimestamp > fileEntry.timestamp)) {
@@ -317,8 +323,8 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
     });
 
     reprocessResources(
-      PREDEFINED_K8S_VERSION,
-      '',
+      schemaVersion,
+      userDataDir,
       newResourcesFromFile.map(r => r.id),
       state.resourceMap,
       state.fileMap,
@@ -369,7 +375,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
  * Adds the file at the specified path with the specified parent
  */
 
-function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
+function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substr(rootFolderEntry.filePath.length);
@@ -385,8 +391,8 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
     state.resourceMap[resource.id] = resource;
   });
   reprocessResources(
-    PREDEFINED_K8S_VERSION,
-    '',
+    String(projectConfig.k8sVersion),
+    userDataDir,
     resourcesFromFile.map(r => r.id),
     state.resourceMap,
     state.fileMap,
@@ -501,7 +507,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
+export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
   const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -517,7 +523,7 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
     }
     const fileEntry = isDirectory
       ? addFolder(absolutePath, state, projectConfig)
-      : addFile(absolutePath, state, projectConfig);
+      : addFile(absolutePath, state, projectConfig, userDataDir);
 
     if (fileEntry) {
       state.fileMap[fileEntry.filePath] = fileEntry;

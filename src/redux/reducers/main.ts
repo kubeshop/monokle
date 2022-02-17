@@ -149,10 +149,10 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   async (shouldIgnore: boolean, thunkAPI: {getState: Function; dispatch: Function}) => {
     const config: AppConfig = thunkAPI.getState().config;
     const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userHomeDir = String(config.userDataDir);
+    const userDataDir = String(config.userDataDir);
     electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
     thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
-    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinksAction({schemaVersion, userHomeDir}));
+    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinksAction({schemaVersion, userDataDir}));
   }
 );
 
@@ -161,8 +161,8 @@ export const addResource = createAsyncThunk(
   async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
     const config: AppConfig = thunkAPI.getState().config;
     const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userHomeDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.addResourceAction({resource, schemaVersion, userHomeDir}));
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.addResourceAction({resource, schemaVersion, userDataDir}));
   }
 );
 export const updateFileEntry = createAsyncThunk(
@@ -170,8 +170,8 @@ export const updateFileEntry = createAsyncThunk(
   async (payload: UpdateFileEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
     const config: AppConfig = thunkAPI.getState().config;
     const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userHomeDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.updateFileEntryAction({payload, schemaVersion, userHomeDir}));
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.updateFileEntryAction({payload, schemaVersion, userDataDir}));
   }
 );
 export const reprocessResourcesForOptionalLinks = createAsyncThunk(
@@ -179,8 +179,8 @@ export const reprocessResourcesForOptionalLinks = createAsyncThunk(
   async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
     const config: AppConfig = thunkAPI.getState().config;
     const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userHomeDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinksAction({schemaVersion, userHomeDir}));
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinksAction({schemaVersion, userDataDir}));
   }
 );
 export const reprocessResource = createAsyncThunk(
@@ -188,8 +188,8 @@ export const reprocessResource = createAsyncThunk(
   async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
     const config: AppConfig = thunkAPI.getState().config;
     const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userHomeDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.reprocessResourceAction({resource, schemaVersion, userHomeDir}));
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.reprocessResourceAction({resource, schemaVersion, userDataDir}));
   }
 );
 export const updateResource = createAsyncThunk(
@@ -197,8 +197,8 @@ export const updateResource = createAsyncThunk(
   async (payload: UpdateResourcePayload, thunkAPI: {getState: Function; dispatch: Function}) => {
     const config: AppConfig = thunkAPI.getState().config;
     const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userHomeDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.updateResourceAction({payload, schemaVersion, userHomeDir}));
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.updateResourceAction({payload, schemaVersion, userDataDir}));
   }
 );
 export const updateManyResources = createAsyncThunk(
@@ -206,8 +206,8 @@ export const updateManyResources = createAsyncThunk(
   async (payload: UpdateManyResourcesPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
     const config: AppConfig = thunkAPI.getState().config;
     const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userHomeDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.updateManyResourcesAction({payload, schemaVersion, userHomeDir}));
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.updateManyResourcesAction({payload, schemaVersion, userDataDir}));
   }
 );
 
@@ -216,10 +216,37 @@ export const reprocessAllResources = createAsyncThunk(
   async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
     const config: AppConfig = thunkAPI.getState().config;
     const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userHomeDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.reprocessAllResourcesAction({schemaVersion, userHomeDir}));
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.reprocessAllResourcesAction({schemaVersion, userDataDir}));
   }
 );
+
+export const multipleFilesChanged = createAsyncThunk(
+  'main/multipleFilesChanged',
+  async (
+    payload: {paths: Array<string>; projectConfig: ProjectConfig},
+    thunkAPI: {getState: Function; dispatch: Function}
+  ) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.multipleFilesChangedAction({...payload, schemaVersion, userDataDir}));
+  }
+);
+
+export const multiplePathsAdded = createAsyncThunk(
+  'main/multiplePathsAdded',
+  async (
+    payload: {paths: Array<string>; projectConfig: ProjectConfig},
+    thunkAPI: {getState: Function; dispatch: Function}
+  ) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.multiplePathsAddedAction({...payload, schemaVersion, userDataDir}));
+  }
+);
+
 const clearSelectedResourceOnPreviewExit = (state: AppState) => {
   if (state.selectedResourceId) {
     const selectedResource = state.resourceMap[state.selectedResourceId];
@@ -278,16 +305,16 @@ export const mainSlice = createSlice({
     },
     addResourceAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{resource: K8sResource; schemaVersion: string; userHomeDir: string}>
+      action: PayloadAction<{resource: K8sResource; schemaVersion: string; userDataDir: string}>
     ) => {
-      const {resource, schemaVersion, userHomeDir} = action.payload;
+      const {resource, schemaVersion, userDataDir} = action.payload;
       state.resourceMap[resource.id] = resource;
 
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
       processParsedResources(
         schemaVersion,
-        userHomeDir,
+        userDataDir,
         getActiveResourceMap(state),
         state.resourceRefsProcessingOptions,
         {
@@ -299,9 +326,14 @@ export const mainSlice = createSlice({
     /**
      * called by the file monitor when multiple paths are added to the file system
      */
-    multiplePathsAdded: (
+    multiplePathsAddedAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; projectConfig: ProjectConfig}>
+      action: PayloadAction<{
+        paths: Array<string>;
+        projectConfig: ProjectConfig;
+        schemaVersion: string;
+        userDataDir: string;
+      }>
     ) => {
       let filePaths: Array<string> = action.payload.paths;
       const projectConfig = action.payload.projectConfig;
@@ -310,28 +342,33 @@ export const mainSlice = createSlice({
         if (fileEntry) {
           if (getFileStats(filePath)?.isDirectory() === false) {
             log.info(`added file ${filePath} already exists - updating`);
-            reloadFile(filePath, fileEntry, state);
+            reloadFile(filePath, fileEntry, state, action.payload.schemaVersion, action.payload.userDataDir);
           }
         } else {
-          addPath(filePath, state, projectConfig);
+          addPath(filePath, state, projectConfig, action.payload.userDataDir);
         }
       });
     },
     /**
      * called by the file monitor when multiple files are changed in the file system
      */
-    multipleFilesChanged: (
+    multipleFilesChangedAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; projectConfig: ProjectConfig}>
+      action: PayloadAction<{
+        paths: Array<string>;
+        projectConfig: ProjectConfig;
+        schemaVersion: string;
+        userDataDir: string;
+      }>
     ) => {
       let filePaths = action.payload.paths;
       const projectConfig = action.payload.projectConfig;
       filePaths.forEach((filePath: string) => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
-          reloadFile(filePath, fileEntry, state);
+          reloadFile(filePath, fileEntry, state, action.payload.schemaVersion, action.payload.userDataDir);
         } else {
-          addPath(filePath, state, projectConfig);
+          addPath(filePath, state, projectConfig, action.payload.userDataDir);
         }
       });
     },
@@ -355,10 +392,10 @@ export const mainSlice = createSlice({
      */
     updateFileEntryAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{payload: UpdateFileEntryPayload; schemaVersion: string; userHomeDir: string}>
+      action: PayloadAction<{payload: UpdateFileEntryPayload; schemaVersion: string; userDataDir: string}>
     ) => {
       try {
-        const {payload, schemaVersion, userHomeDir} = action.payload;
+        const {payload, schemaVersion, userDataDir} = action.payload;
         const fileEntry = state.fileMap[payload.path];
         if (fileEntry) {
           let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
@@ -408,7 +445,7 @@ export const mainSlice = createSlice({
 
               reprocessResources(
                 schemaVersion,
-                userHomeDir,
+                userDataDir,
                 resourceIds,
                 state.resourceMap,
                 state.fileMap,
@@ -432,9 +469,9 @@ export const mainSlice = createSlice({
      */
     reprocessResourcesForOptionalLinksAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{schemaVersion: string; userHomeDir: string}>
+      action: PayloadAction<{schemaVersion: string; userDataDir: string}>
     ) => {
-      const {schemaVersion, userHomeDir} = action.payload;
+      const {schemaVersion, userDataDir} = action.payload;
 
       // find all resourceKinds with optional refmappers
       const resourceKindsWithOptionalRefs = getKnownResourceKinds().filter(kind => {
@@ -447,7 +484,7 @@ export const mainSlice = createSlice({
 
       processParsedResources(
         schemaVersion,
-        userHomeDir,
+        userDataDir,
         getActiveResourceMap(state),
         state.resourceRefsProcessingOptions,
         {
@@ -461,14 +498,14 @@ export const mainSlice = createSlice({
      */
     reprocessResourceAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{resource: K8sResource; schemaVersion: string; userHomeDir: string}>
+      action: PayloadAction<{resource: K8sResource; schemaVersion: string; userDataDir: string}>
     ) => {
-      const {resource, schemaVersion, userHomeDir} = action.payload;
+      const {resource, schemaVersion, userDataDir} = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
       processParsedResources(
         schemaVersion,
-        userHomeDir,
+        userDataDir,
         getActiveResourceMap(state),
         state.resourceRefsProcessingOptions,
         {
@@ -483,10 +520,10 @@ export const mainSlice = createSlice({
      */
     updateResourceAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{payload: UpdateResourcePayload; schemaVersion: string; userHomeDir: string}>
+      action: PayloadAction<{payload: UpdateResourcePayload; schemaVersion: string; userDataDir: string}>
     ) => {
       try {
-        const {payload, schemaVersion, userHomeDir} = action.payload;
+        const {payload, schemaVersion, userDataDir} = action.payload;
         const isInClusterMode = payload.isInClusterMode;
 
         const currentResourceMap = isInClusterMode ? getLocalResourceMap(state) : getActiveResourceMap(state);
@@ -499,7 +536,7 @@ export const mainSlice = createSlice({
           let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
           reprocessResources(
             schemaVersion,
-            userHomeDir,
+            userDataDir,
             resourceIds,
             currentResourceMap,
             state.fileMap,
@@ -534,10 +571,10 @@ export const mainSlice = createSlice({
      */
     updateManyResourcesAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{payload: UpdateManyResourcesPayload; schemaVersion: string; userHomeDir: string}>
+      action: PayloadAction<{payload: UpdateManyResourcesPayload; schemaVersion: string; userDataDir: string}>
     ) => {
       try {
-        const {payload, schemaVersion, userHomeDir} = action.payload;
+        const {payload, schemaVersion, userDataDir} = action.payload;
         let resourceIdsToReprocess: string[] = [];
         const activeResources = getActiveResourceMap(state);
 
@@ -551,7 +588,7 @@ export const mainSlice = createSlice({
         });
         reprocessResources(
           schemaVersion,
-          userHomeDir,
+          userDataDir,
           resourceIdsToReprocess,
           activeResources,
           state.fileMap,
@@ -825,10 +862,10 @@ export const mainSlice = createSlice({
     },
     reprocessAllResourcesAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{schemaVersion: string; userHomeDir: string}>
+      action: PayloadAction<{schemaVersion: string; userDataDir: string}>
     ) => {
-      const {schemaVersion, userHomeDir} = action.payload;
-      processParsedResources(schemaVersion, userHomeDir, state.resourceMap, state.resourceRefsProcessingOptions);
+      const {schemaVersion, userDataDir} = action.payload;
+      processParsedResources(schemaVersion, userDataDir, state.resourceMap, state.resourceRefsProcessingOptions);
     },
   },
   extraReducers: builder => {
@@ -1237,8 +1274,6 @@ export const {
   selectFile,
   setSelectingFile,
   setApplyingResource,
-  multiplePathsAdded,
-  multipleFilesChanged,
   multiplePathsRemoved,
   selectHelmValuesFile,
   clearPreview,
