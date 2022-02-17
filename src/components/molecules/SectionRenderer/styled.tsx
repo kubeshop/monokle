@@ -85,18 +85,27 @@ type NameProps = {
   $isCheckable?: boolean;
   $level: number;
   $nameColor?: string;
+  $nameSize?: number;
+  $nameWeight?: number;
+  $nameVerticalPadding?: number;
+  $nameHorizontalPadding?: number;
 };
 
 export const Name = styled.span<NameProps>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-left: 5px;
+  ${props =>
+    `padding: ${props.$nameVerticalPadding !== undefined ? props.$nameVerticalPadding : 0}px ${
+      props.$nameHorizontalPadding !== undefined ? props.$nameHorizontalPadding : 5
+    }px;`}
   cursor: pointer;
   ${props => {
+    if (props.$nameSize) {
+      return `font-size: ${props.$nameSize}px;`;
+    }
     return `font-size: ${24 - 4 * props.$level}px;`;
   }}
-
   ${props => {
     if (props.$isSelected) {
       return `font-weight: 700;`;
@@ -109,8 +118,9 @@ export const Name = styled.span<NameProps>`
     if (props.$isSelected) {
       return `color: ${Colors.blackPure};`;
     }
-    return props.$nameColor ? `color: ${props.$nameColor}` : `color: ${Colors.whitePure};`;
+    return props.$nameColor ? `color: ${props.$nameColor};` : `color: ${Colors.whitePure};`;
   }}
+  ${props => props.$nameWeight && `font-weight: ${props.$nameWeight};`}
 `;
 
 export const EmptyGroupText = styled.p`

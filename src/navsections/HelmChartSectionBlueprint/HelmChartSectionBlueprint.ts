@@ -8,6 +8,8 @@ import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
 
 import Colors from '@styles/Colors';
 
+import CollapseSectionPrefix from './CollapseSectionPrefix';
+import FileItemPrefix from './FileItemPrefix';
 import HelmChartQuickAction from './HelmChartQuickAction';
 
 export type ValuesFilesScopeType = {
@@ -15,6 +17,7 @@ export type ValuesFilesScopeType = {
   previewValuesFileId: string | undefined;
   isInClusterMode: boolean;
   isFolderOpen: boolean;
+  selectedPath: string | undefined;
 };
 
 type HelmChartScopeType = {
@@ -39,6 +42,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           : false,
         previewValuesFileId: state.main.previewValuesFileId,
         isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
+        selectedPath: state.main.selectedPath,
       };
     },
     builder: {
@@ -56,18 +60,31 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
     customization: {
       counterDisplayMode: 'items',
-      indentation: 8,
-      nameColor: Colors.grey400,
+      indentation: 10,
+      nameWeight: 400,
+      nameSize: 14,
+      nameColor: Colors.grey9,
+      nameHorizontalPadding: 0,
+      namePrefix: {
+        component: CollapseSectionPrefix,
+      },
     },
     itemBlueprint: {
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
       builder: {
-        isSelected: rawItem => {
-          return rawItem.isSelected;
+        isSelected: (rawItem, scope) => {
+          return rawItem.filePath === scope.selectedPath;
         },
         isDisabled: (rawItem, scope) =>
           Boolean((scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) || scope.isInClusterMode),
+        getMeta: () => {
+          return {
+            fileItemPrefixStyle: {
+              paddingLeft: 10,
+            },
+          };
+        },
       },
       instanceHandler: {
         onClick: (itemInstance, dispatch) => {
@@ -78,6 +95,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         quickAction: {
           component: HelmChartQuickAction,
           options: {isVisibleOnHover: true},
+        },
+        prefix: {
+          component: FileItemPrefix,
         },
       },
     },
@@ -100,7 +120,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
-
     builder: {
       transformName: (_, scope) => {
         const currentHelmChart = scope[helmChart.id] as HelmChart | undefined;
@@ -139,10 +158,16 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           dispatch(selectFile({filePath}));
         },
       },
+      customization: {
+        prefix: {component: FileItemPrefix},
+      },
     },
     customization: {
       counterDisplayMode: 'none',
-      indentation: 8,
+      indentation: 0,
+      nameWeight: 600,
+      nameSize: 14,
+      nameColor: Colors.grey9,
     },
   };
 

@@ -43,6 +43,7 @@ export interface ItemCustomization {
 
 export type SectionCustomComponentProps = {
   sectionInstance: SectionInstance;
+  onClick?: () => void;
 };
 
 export type SectionCustomComponent = React.ComponentType<SectionCustomComponentProps>;
@@ -63,11 +64,18 @@ export interface SectionCustomization {
   nameContext?: {
     component: SectionCustomComponent;
   };
+  namePrefix?: {
+    component: SectionCustomComponent;
+  };
   /** If no value is provided, default value will be "descendants" */
   counterDisplayMode?: 'descendants' | 'items' | 'subsections' | 'none';
   /** Number of pixels to indent this section, by default all sections/susections are aligned */
   indentation?: number;
   nameColor?: string;
+  nameSize?: number;
+  nameWeight?: number;
+  nameHorizontalPadding?: number;
+  nameVerticalPadding?: number;
   emptyGroupText?: string;
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
