@@ -137,7 +137,7 @@ export function readFiles(
         }
       } else if (helmChart && isHelmValuesFile(fileEntry.name)) {
         addHelmValuesFile(fileEntryPath, helmChart, helmValuesMap, fileEntry);
-      } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+      } else if (projectConfig.fileIncludes?.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
           extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
             if (!isSupportedResource(resource)) {
