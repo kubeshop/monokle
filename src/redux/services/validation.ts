@@ -161,28 +161,6 @@ export function validateResource(resource: K8sResource) {
     isValid: errors.length === 0,
     errors,
   };
-
-  /**
-   * {
-   *     "name": "YAMLParseError",
-   *     "code": "DUPLICATE_KEY",
-   *     "message": "Map keys must be unique at line 42, column 11:\n\n          imagePullPolicy: IfNotPresent\n          name: kube-rbac-proxy\n          ^\n",
-   *     "pos": [
-   *         1169,
-   *         1170
-   *     ],
-   *     "linePos": [
-   *         {
-   *             "line": 42,
-   *             "col": 11
-   *         },
-   *         {
-   *             "line": 42,
-   *             "col": 12
-   *         }
-   *     ]
-   * }
-   */
 }
 
 function findJsonPointerNode(valuesDoc: Document.Parsed<ParsedNode>, path: string[]) {
