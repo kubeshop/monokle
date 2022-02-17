@@ -57,6 +57,7 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
     emptyDisplay: {
       component: RootHelmChartsSectionEmptyDisplay,
     },
+    nameSize: 16,
   },
 };
 

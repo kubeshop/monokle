@@ -288,6 +288,9 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
           .value();
     const sectionInstance: SectionInstance = {
       id: sectionBlueprint.id,
+      name: sectionBuilder?.transformName
+        ? sectionBuilder.transformName(sectionBlueprint.name, sectionScope)
+        : sectionBlueprint.name,
       rootSectionId: sectionBlueprint.rootSectionId,
       itemIds: itemInstances?.map(i => i.id) || [],
       groups: sectionInstanceGroups,

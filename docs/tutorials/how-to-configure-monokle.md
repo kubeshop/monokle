@@ -1,4 +1,4 @@
-# **How to Configure Monokle**
+# How to Configure Monokle
 
 In this tutorial, we will show the steps to configure the Monokle Environment. 
 

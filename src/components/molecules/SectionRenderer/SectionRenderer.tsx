@@ -24,7 +24,7 @@ type SectionRendererProps = {
 function SectionRenderer(props: SectionRendererProps) {
   const {sectionBlueprint, level, isLastSection, itemRendererOptions, parentIndentation} = props;
 
-  const {itemBlueprint, name: sectionName, id: sectionId} = sectionBlueprint;
+  const {itemBlueprint, id: sectionId} = sectionBlueprint;
 
   const sectionInstance: SectionInstance | undefined = useAppSelector(
     state => state.navigator.sectionInstanceMap[sectionId]
@@ -189,7 +189,7 @@ function SectionRenderer(props: SectionRendererProps) {
     }
     return (
       <S.EmptyDisplayContainer level={level}>
-        <h1>{sectionBlueprint.name}</h1>
+        <h1>{sectionInstance.name}</h1>
         <p>Section is empty.</p>
       </S.EmptyDisplayContainer>
     );
@@ -198,7 +198,7 @@ function SectionRenderer(props: SectionRendererProps) {
   return (
     <>
       <SectionHeader
-        name={sectionName}
+        name={sectionInstance.name}
         sectionInstance={sectionInstance}
         sectionBlueprint={sectionBlueprint}
         isCollapsed={isCollapsed}

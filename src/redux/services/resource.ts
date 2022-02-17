@@ -274,20 +274,25 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
-export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string) {
-  const kubeClient = createKubeClient(kubeconfigPath, context);
-  const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient);
+export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string): Promise<string[]> {
+  try {
+    const kubeClient = createKubeClient(kubeconfigPath, context);
+    const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient);
 
-  const ns: string[] = [];
-  namespaces.forEach(namespace => {
-    const namespaceName = namespace.metadata?.name;
+    const ns: string[] = [];
+    namespaces.forEach(namespace => {
+      const namespaceName = namespace.metadata?.name;
 
-    if (namespaceName && !ns.includes(namespaceName)) {
-      ns.push(namespaceName);
-    }
-  });
+      if (namespaceName && !ns.includes(namespaceName)) {
+        ns.push(namespaceName);
+      }
+    });
 
-  return ns;
+    return ns;
+  } catch (e: any) {
+    log.warn(`Failed to get namespaces in selected context. ${e.message}`);
+    return [];
+  }
 }
 
 /**

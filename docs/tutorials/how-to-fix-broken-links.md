@@ -1,4 +1,4 @@
-# **How to Fix Broken Links**
+# How to Fix Broken Links
 
 In this Monokle tutorial, we will illustrate the steps to fix broken links. 
 

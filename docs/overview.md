@@ -21,9 +21,9 @@ The top right contains the following buttons:
 - Open Plugins Manager
 - Open Settings (see below)
 - Help:
-  - Documentation -> opens the Monokle documentation in your system browser.
-  - GitHub -> opens the Monokle GitHub repo in your system browser.
-  - Discord -> Open Discord to talk to us about your Monokle experience.
+    - Documentation -> opens the Monokle documentation in your system browser.
+    - GitHub -> opens the Monokle GitHub repo in your system browser.
+    - Discord -> Open Discord to talk to us about your Monokle experience.
 
 ## Settings
 

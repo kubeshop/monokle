@@ -10,6 +10,8 @@ import {K8sResource} from '@models/k8sresource';
 import {useAppSelector} from '@redux/hooks';
 import {selectedResourceSelector} from '@redux/selectors';
 
+import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
+
 const Option = Select.Option;
 
 const NEW_ITEM = 'CREATE_NEW_ITEM';
@@ -22,8 +24,7 @@ export const NamespaceSelection = (params: any) => {
   const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
-
-  console.log('Creating namespace selection with params', params);
+  const [clusterNamespaces] = useTargetClusterNamespaces();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
@@ -58,17 +59,15 @@ export const NamespaceSelection = (params: any) => {
 
   useEffect(() => {
     if (resourceMap) {
-      setNamespaces(
-        uniq(
-          Object.values(resourceMap)
-            .map((resource: K8sResource) => resource.namespace)
-            .filter(namespace => Boolean(namespace))
-        ).sort()
-      );
+      const items = Object.values(resourceMap)
+        .map((resource: K8sResource) => resource.namespace)
+        .filter(namespace => Boolean(namespace));
+      items.push(...clusterNamespaces);
+      setNamespaces(uniq(items).sort());
     } else {
-      setNamespaces([]);
+      setNamespaces(clusterNamespaces);
     }
-  }, [resourceMap]);
+  }, [resourceMap, clusterNamespaces]);
 
   return (
     <Select

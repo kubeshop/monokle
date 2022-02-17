@@ -1,4 +1,4 @@
-# **How to work with Manifests**
+# How to work with Manifests
 
 In this Monokle tutorial, we will illustrate the steps to help you navigate K8s resources and edit their manifests. 
 
