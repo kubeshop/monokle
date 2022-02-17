@@ -115,7 +115,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     }
   }, [defaultOption, defaultNamespace, namespaces]);
 
-  const onlyNamespaces = useMemo(() => !resources.some(r => r.kind !== 'Namespace'), [resources]);
+  const onlyNamespaces = useMemo(() => resources.every(r => r.kind === 'Namespace'), [resources]);
   const hasNamespaces = useMemo(() => resources.some(r => r.kind === 'Namespace'), [resources]);
 
   if (!selectedOption) {
