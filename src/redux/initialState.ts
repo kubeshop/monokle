@@ -101,6 +101,7 @@ const initialUiState: UiState = {
   isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
+  isPreviewConfigurationEditorOpen: false,
   quickSearchActionsPopup: {
     isOpen: false,
   },

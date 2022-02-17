@@ -8,7 +8,8 @@ import styled from 'styled-components';
 
 import {SectionCustomComponentProps} from '@models/navigator';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openPreviewConfigurationEditor} from '@redux/reducers/ui';
 
 import Colors from '@styles/Colors';
 
@@ -31,6 +32,12 @@ const PreviewConfigurationNameSuffix: React.FC<SectionCustomComponentProps> = pr
   const {sectionInstance} = props;
   const isSectionCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(sectionInstance.id));
 
+  const dispatch = useAppDispatch();
+
+  const onClick = () => {
+    dispatch(openPreviewConfigurationEditor());
+  };
+
   return (
     <SuffixContainer>
       <ButtonContainer>
@@ -38,7 +45,7 @@ const PreviewConfigurationNameSuffix: React.FC<SectionCustomComponentProps> = pr
           <Button
             icon={<PlusOutlined />}
             type="link"
-            onClick={() => {}}
+            onClick={onClick}
             size="small"
             style={{color: sectionInstance.isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
           />
