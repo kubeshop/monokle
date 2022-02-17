@@ -158,7 +158,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
       try {
         const filePath = getAbsoluteFilePath(selectedPath, fileMap);
         const fileContent = fs.readFileSync(filePath, 'utf8');
-        setFormData(parseDocument(fileContent).toJS());
+        setFormData(parseDocument(fileContent, {uniqueKeys: false, strict: false}).toJS());
       } catch (e) {
         log.error(`Failed to read file [${selectedPath}]`, e);
       }

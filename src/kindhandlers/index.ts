@@ -175,7 +175,7 @@ async function readBundledCrdKindHandlers() {
     try {
       const crdContent = fs.readFileSync(crdPath, 'utf-8');
       if (crdContent) {
-        const documents = parseAllDocuments(crdContent, {prettyErrors: true});
+        const documents = parseAllDocuments(crdContent, {prettyErrors: true, uniqueKeys: false, strict: false});
         documents.forEach(doc => {
           const crd = doc.toJS({maxAliasCount: -1});
           if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {

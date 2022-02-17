@@ -193,7 +193,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
     if (selectedResourceId) {
       // this will slow things down if document gets large - need to find a better solution...
-      const documents = parseAllDocuments(newValue);
+      const documents = parseAllDocuments(newValue, {uniqueKeys: false, strict: false});
       // only accept single document changes for now
       setValid(documents.length === 1 && isValidResourceDocument(documents[0]));
     } else {
@@ -288,18 +288,19 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     previewType,
   ]);
 
-  const options = useMemo(
-    () => ({
+  const options = useMemo(() => {
+    const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
       selectOnLineNumbers: true,
       readOnly: isReadOnlyMode,
+      renderValidationDecorations: 'on',
       fontWeight: 'bold',
       glyphMargin: true,
       minimap: {
         enabled: false,
       },
-    }),
-    [isReadOnlyMode]
-  );
+    };
+    return editorOptions;
+  }, [isReadOnlyMode]);
 
   return (
     <S.MonacoContainer ref={containerRef}>

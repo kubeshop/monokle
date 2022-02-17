@@ -194,7 +194,7 @@ interface PossibleResource {
 
 export function extractObjectsFromYaml(yamlText: string) {
   const lineCounter: LineCounter = new LineCounter();
-  const documents = parseAllDocuments(yamlText, {lineCounter});
+  const documents = parseAllDocuments(yamlText, {lineCounter, uniqueKeys: false, strict: false});
   const result: PossibleResource[] = [];
   if (documents) {
     let docIndex = 0;

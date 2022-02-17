@@ -57,7 +57,7 @@ const parsedDocCache = new Map<string, ParsedDocCacheEntry>();
 export function getParsedDoc(resource: K8sResource) {
   if (!parsedDocCache.has(resource.id)) {
     const lineCounter = new LineCounter();
-    const parsedDoc = parseDocument(resource.text, {lineCounter});
+    const parsedDoc = parseDocument(resource.text, {lineCounter, uniqueKeys: false, strict: false});
     parsedDocCache.set(resource.id, {parsedDoc, lineCounter});
   }
 
@@ -645,7 +645,7 @@ function extractNamespace(content: any) {
 
 export function extractK8sResources(fileContent: string, relativePath: string) {
   const lineCounter: LineCounter = new LineCounter();
-  const documents = parseAllDocuments(fileContent, {lineCounter});
+  const documents = parseAllDocuments(fileContent, {lineCounter, uniqueKeys: false, strict: false});
   const result: K8sResource[] = [];
 
   if (documents) {
@@ -657,6 +657,10 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           documents[docIndex]
         );
       } else {
+        if (doc.warnings.length > 0) {
+          log.warn('Doc has warnings', doc.warnings, doc);
+        }
+
         const content = doc.toJS();
         if (content && content.apiVersion && content.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);

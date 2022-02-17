@@ -136,11 +136,11 @@ const performResourceContentUpdate = (state: AppState, resource: K8sResource, ne
   if (isFileResource(resource)) {
     const updatedFileText = saveResource(resource, newText, state.fileMap);
     resource.text = updatedFileText;
-    resource.content = parseDocument(updatedFileText).toJS();
+    resource.content = parseDocument(updatedFileText, {uniqueKeys: false, strict: false}).toJS();
     recalculateResourceRanges(resource, state);
   } else {
     resource.text = newText;
-    resource.content = parseDocument(newText).toJS();
+    resource.content = parseDocument(newText, {uniqueKeys: false, strict: false}).toJS();
   }
 };
 

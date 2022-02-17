@@ -1,9 +1,9 @@
 import Ajv, {ValidateFunction} from 'ajv';
 // @ts-ignore
 import log from 'loglevel';
-import {Document, LineCounter, ParsedNode, isCollection} from 'yaml';
+import {Document, LineCounter, ParsedNode, isCollection, parseDocument} from 'yaml';
 
-import {K8sResource, RefPosition} from '@models/k8sresource';
+import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sresource';
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getLineCounter, getParsedDoc} from '@redux/services/resource';
@@ -54,6 +54,35 @@ export function validateResource(resource: K8sResource) {
     return;
   }
 
+  const errors = [];
+
+  // parse for YAML errors that were allowed by non-strict parsing
+  const doc = parseDocument(resource.text);
+  if (doc.errors.length > 0) {
+    const lines = resource.text.split('\n');
+    if (lines[0] === '---') {
+      lines.shift();
+    }
+
+    errors.push(
+      ...doc.errors.map(err => {
+        const line = err.linePos ? lines[err.linePos[0].line].trim() : '';
+        const error: ResourceValidationError = {
+          property: err.name,
+          message: err.code,
+          description: err.message,
+          errorPos: {
+            line: err.linePos ? err.linePos[0].line : 0,
+            column: err.linePos ? err.linePos[0].col : 0,
+            length: line.length,
+          },
+        };
+
+        return error;
+      })
+    );
+  }
+
   const validatorCacheKey = resource.kind + resource.version;
   if (!validatorCache.has(validatorCacheKey)) {
     const ajv = new Ajv({
@@ -71,7 +100,6 @@ export function validateResource(resource: K8sResource) {
   if (validate) {
     try {
       validate(resource.content);
-      const errors = [];
 
       if (validate.errors) {
         errors.push(
@@ -91,7 +119,7 @@ export function validateResource(resource: K8sResource) {
               // @ts-ignore
               const valueNode = findJsonPointerNode(parsedDoc, err.dataPath.substring(1).split('/'));
 
-              const error = {
+              const error: ResourceValidationError = {
                 property: err.dataPath,
                 message: err.message || 'message',
                 errorPos: valueNode ? getErrorPosition(valueNode, getLineCounter(resource)) : undefined,
@@ -124,15 +152,37 @@ export function validateResource(resource: K8sResource) {
         // @ts-ignore
         return e1.errorPos.line - e2.errorPos.line;
       });
-
-      resource.validation = {
-        isValid: errors.length === 0,
-        errors,
-      };
     } catch (e) {
       log.warn('Failed to validate', e);
     }
   }
+
+  resource.validation = {
+    isValid: errors.length === 0,
+    errors,
+  };
+
+  /**
+   * {
+   *     "name": "YAMLParseError",
+   *     "code": "DUPLICATE_KEY",
+   *     "message": "Map keys must be unique at line 42, column 11:\n\n          imagePullPolicy: IfNotPresent\n          name: kube-rbac-proxy\n          ^\n",
+   *     "pos": [
+   *         1169,
+   *         1170
+   *     ],
+   *     "linePos": [
+   *         {
+   *             "line": 42,
+   *             "col": 11
+   *         },
+   *         {
+   *             "line": 42,
+   *             "col": 12
+   *         }
+   *     ]
+   * }
+   */
 }
 
 function findJsonPointerNode(valuesDoc: Document.Parsed<ParsedNode>, path: string[]) {

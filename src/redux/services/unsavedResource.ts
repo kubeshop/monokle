@@ -44,7 +44,7 @@ export function createUnsavedResource(
     newResourceText = stringify(newResourceContent);
   } else {
     newResourceText = createDefaultResourceText(input);
-    newResourceContent = parseDocument(newResourceText).toJS();
+    newResourceContent = parseDocument(newResourceText, {uniqueKeys: false, strict: false}).toJS();
   }
 
   const newResource: K8sResource = {
