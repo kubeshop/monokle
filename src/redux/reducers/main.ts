@@ -7,12 +7,12 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {parseDocument} from 'yaml';
+import {parse, parseDocument} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, HELM_CHART_ENTRY_FILE, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
-import {AppConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {
   AppState,
   ClusterToLocalResourcesMatch,
@@ -70,7 +70,7 @@ import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
 export type SetRootFolderPayload = {
-  appConfig: AppConfig;
+  projectConfig: ProjectConfig;
   fileMap: FileMapType;
   resourceMap: ResourceMapType;
   helmChartMap: HelmChartMapType;
@@ -225,10 +225,10 @@ export const mainSlice = createSlice({
      */
     multiplePathsAdded: (
       state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
+      action: PayloadAction<{paths: Array<string>; projectConfig: ProjectConfig}>
     ) => {
       let filePaths: Array<string> = action.payload.paths;
-      const appConfig = action.payload.appConfig;
+      const projectConfig = action.payload.projectConfig;
       filePaths.forEach((filePath: string) => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
@@ -237,7 +237,7 @@ export const mainSlice = createSlice({
             reloadFile(filePath, fileEntry, state);
           }
         } else {
-          addPath(filePath, state, appConfig);
+          addPath(filePath, state, projectConfig);
         }
       });
     },
@@ -246,16 +246,16 @@ export const mainSlice = createSlice({
      */
     multipleFilesChanged: (
       state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; appConfig: AppConfig}>
+      action: PayloadAction<{paths: Array<string>; projectConfig: ProjectConfig}>
     ) => {
       let filePaths = action.payload.paths;
-      const appConfig = action.payload.appConfig;
+      const projectConfig = action.payload.projectConfig;
       filePaths.forEach((filePath: string) => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
           reloadFile(filePath, fileEntry, state);
         } else {
-          addPath(filePath, state, appConfig);
+          addPath(filePath, state, projectConfig);
         }
       });
     },
@@ -288,31 +288,51 @@ export const mainSlice = createSlice({
             fs.writeFileSync(filePath, action.payload.content);
             fileEntry.timestamp = getFileTimestamp(filePath);
 
-            getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
-              deleteResource(r, state.resourceMap);
-            });
+            if (path.basename(fileEntry.filePath) === HELM_CHART_ENTRY_FILE) {
+              try {
+                const helmChart = Object.values(state.helmChartMap).find(
+                  chart => chart.filePath === fileEntry.filePath
+                );
+                if (!helmChart) {
+                  throw new Error(`Couldn't find the helm chart for path: ${fileEntry.filePath}`);
+                }
+                const fileContent = parse(action.payload.content);
+                if (typeof fileContent?.name !== 'string') {
+                  throw new Error(`Couldn't get the name property of the helm chart at path: ${fileEntry.filePath}`);
+                }
+                helmChart.name = fileContent.name;
+              } catch (e) {
+                if (e instanceof Error) {
+                  log.warn(`[updateFileEntry]: ${e.message}`);
+                }
+              }
+            } else {
+              getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
+                deleteResource(r, state.resourceMap);
+              });
 
-            const extractedResources = extractK8sResources(
-              action.payload.content,
-              filePath.substring(rootFolder.length)
-            );
+              const extractedResources = extractK8sResources(
+                action.payload.content,
+                filePath.substring(rootFolder.length)
+              );
 
-            let resourceIds: string[] = [];
+              let resourceIds: string[] = [];
 
-            // only recalculate refs for resources that already have refs
-            Object.values(state.resourceMap)
-              .filter(r => r.refs)
-              .forEach(r => resourceIds.push(r.id));
+              // only recalculate refs for resources that already have refs
+              Object.values(state.resourceMap)
+                .filter(r => r.refs)
+                .forEach(r => resourceIds.push(r.id));
 
-            Object.values(extractedResources).forEach(r => {
-              state.resourceMap[r.id] = r;
-              r.isHighlighted = true;
-              resourceIds.push(r.id);
-            });
+              Object.values(extractedResources).forEach(r => {
+                state.resourceMap[r.id] = r;
+                r.isHighlighted = true;
+                resourceIds.push(r.id);
+              });
 
-            reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
-              resourceKinds: extractedResources.map(r => r.kind),
-            });
+              reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
+                resourceKinds: extractedResources.map(r => r.kind),
+              });
+            }
           }
         } else {
           log.error(`Could not find FileEntry for ${action.payload.path}`);

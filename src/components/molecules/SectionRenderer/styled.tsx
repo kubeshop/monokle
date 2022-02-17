@@ -5,9 +5,10 @@ import styled from 'styled-components';
 import Colors, {FontColors} from '@styles/Colors';
 
 type NameContainerProps = {
+  $hasCustomNameDisplay: boolean;
+  $indentation: number;
   isHovered?: boolean;
   isCheckable?: boolean;
-  $hasCustomNameDisplay: boolean;
 };
 
 type SectionContainerProps = {
@@ -28,7 +29,10 @@ export const NameContainer = styled.span<NameContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
-  ${props => props.isCheckable && `padding-left: 24px;`}
+  ${props => {
+    const defaultIndentation = props.isCheckable ? 24 : 0;
+    return `padding-left: ${defaultIndentation + props.$indentation}px;`;
+  }}
   ${props => !props.isHovered && 'padding-right: 30px;'}
   ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
 `;
@@ -80,18 +84,28 @@ type NameProps = {
   $isHighlighted?: boolean;
   $isCheckable?: boolean;
   $level: number;
+  $nameColor?: string;
+  $nameSize?: number;
+  $nameWeight?: number;
+  $nameVerticalPadding?: number;
+  $nameHorizontalPadding?: number;
 };
 
 export const Name = styled.span<NameProps>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-left: 5px;
+  ${props =>
+    `padding: ${props.$nameVerticalPadding !== undefined ? props.$nameVerticalPadding : 0}px ${
+      props.$nameHorizontalPadding !== undefined ? props.$nameHorizontalPadding : 5
+    }px;`}
   cursor: pointer;
   ${props => {
+    if (props.$nameSize) {
+      return `font-size: ${props.$nameSize}px;`;
+    }
     return `font-size: ${24 - 4 * props.$level}px;`;
   }}
-
   ${props => {
     if (props.$isSelected) {
       return `font-weight: 700;`;
@@ -104,8 +118,9 @@ export const Name = styled.span<NameProps>`
     if (props.$isSelected) {
       return `color: ${Colors.blackPure};`;
     }
-    return `color: ${Colors.whitePure};`;
+    return props.$nameColor ? `color: ${props.$nameColor};` : `color: ${Colors.whitePure};`;
   }}
+  ${props => props.$nameWeight && `font-weight: ${props.$nameWeight};`}
 `;
 
 export const EmptyGroupText = styled.p`
@@ -124,7 +139,7 @@ export const Skeleton = styled(RawSkeleton)`
   width: 90%;
 `;
 
-export const ItemsLength = styled.span<{selected: boolean}>`
+export const Counter = styled.span<{selected: boolean}>`
   margin-left: 8px;
   font-size: 14px;
   ${props => (props.selected ? `color: ${Colors.blackPure};` : `color: ${FontColors.grey};`)}

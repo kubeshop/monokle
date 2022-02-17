@@ -224,7 +224,7 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
     const hasSectionScopeChanged = Object.entries(isChangedByScopeKey).some(
       ([key, value]) => sectionScopeKeys.includes(key) && value === true
     );
-    if (!hasSectionScopeChanged) {
+    if (!hasSectionScopeChanged && sectionScopeKeys.length > 0) {
       log.debug(`Section ${sectionBlueprint.id} scope did not change`);
       return;
     }
@@ -288,6 +288,9 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
           .value();
     const sectionInstance: SectionInstance = {
       id: sectionBlueprint.id,
+      name: sectionBuilder?.transformName
+        ? sectionBuilder.transformName(sectionBlueprint.name, sectionScope)
+        : sectionBlueprint.name,
       rootSectionId: sectionBlueprint.rootSectionId,
       itemIds: itemInstances?.map(i => i.id) || [],
       groups: sectionInstanceGroups,

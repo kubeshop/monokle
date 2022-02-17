@@ -2,27 +2,28 @@
 
 In this Monokle tutorial, we will illustrate the steps to fix broken links. 
 
-Let’s get started. 
+Let’s get started!
 
 ## **1. Launch Monokle**
 
 <em>**Note:** Please follow this [Getting Started](../getting-started.md) guide to install Monokle 🚀</em>
 
-Launch Monokle and, on the welcome screen, there are three options to start working with projects: 
+Launch Monokle and, on the welcome screen, there are three options to start working with projects:
 
-- Select an existing folder.
-- Create an empty project.
-- Start from a template.
+ - Select an exisiting folder.
+ - Create an empty project.
+ - Start from a template.
+ 
+ Click **Select an existing project** to add your project folder containing K8 resources. 
 
-Click **Select an existing project** to add your project folder containg K8s resources.
 
-![Browse](img/image-1-1.5.0.png)
+![Image 1](img/image-1-1.5.0.png)
 
 ## **2. Select Folder**
 
 Select your folder to parse its manifest in the file explorer. 
 
- ![Select Folder](img/image-2-1.5.0.png)
+![Image 2](img/image-2-1.5.0.png)
 
 In the file explorer, you can view manifests, including their resources, and their relationships.
 
@@ -32,7 +33,7 @@ Scroll up & down to navigate and select the required manifests.
 
 ![Image 3](img/imaged-3-1.5.0.gif)
 
-Once you select a manifest, its related resources shall be highlighted automatically in the navigator. 
+Once you select a manifest, its related resources will be highlighted automatically in the navigator. 
 
 ![Image 4](img/imaged-4-1.5.0.png)
 
@@ -40,7 +41,7 @@ Once you select a manifest, its related resources shall be highlighted automatic
 
 Scroll down in the navigator and hover over a resource link with a warning signal.
 
-<em>**Note:** The link with a warning signal indicates that it’s broken.</em>  
+<em>**Note:** The link with a warning signal indicates that the link is broken.</em>  
 
 ![Image 5](img/imaged-5-1.5.0.png)
 
@@ -52,17 +53,18 @@ Click on the link provided in the tooltip.
 
 ![Image 6](img/imaged-6-1.5.0.png)
 
-## **6. Update the Link in the Source Editor**
+## **6. Update the link in the source editor**
 
-Manually update the name of the highlighted dead endpoint with a working endpoint to fix the broken links. 
+Manually update the name of the highlighted dead endpoint with a working endpoint to fix the broken link. 
 
 ![Image 7](img/imaged-7-1.5.0.png)
 
-<em> **Note:** The warning triangle will automatically go away once a valid link is provided. </em>
+<em>**Note:** The warning triangle will automatically go away once a valid link is provided.</em>
 
 ## **Questions or Comments?**
 
-Please feel free to join our open source community on Discord with this [Invite Link](https://discord.gg/6zupCZFQbe) and start your discussion.
+Please feel free to join our open source community on Discord with this [Invite Link](https://discord.gg/6zupCZFQbe) and start your discussion. 
+
 
 
 

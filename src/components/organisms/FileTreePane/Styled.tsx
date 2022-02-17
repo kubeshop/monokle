@@ -2,6 +2,7 @@ import {Button, Skeleton as RawSkeleton, Tree} from 'antd';
 
 import styled from 'styled-components';
 
+import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors, FontColors} from '@styles/Colors';
 
 export const FileTreeContainer = styled.div`
@@ -107,46 +108,29 @@ export const FileTreeContainer = styled.div`
   }
 `;
 
+export const ContextMenuDivider = styled.div`
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+`;
+
 export const NoFilesContainer = styled.div`
   margin-left: 16px;
   margin-top: 10px;
 `;
 
-export const TreeContainer = styled.div`
-  margin-left: 2px;
-  margin-top: 10px;
+export const NodeContainer = styled.div`
+  position: relative;
 `;
 
-export const RootFolderText = styled.div`
-  font-size: 12px;
-  line-height: 22px;
+export const NodeTitleContainer = styled.div`
+  padding-right: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const NumberOfResources = styled.span`
+  margin-left: 12px;
   color: ${Colors.grey7};
-  margin-left: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
-  margin-top: 10px;
-  .ant-tree-switcher svg {
-    color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
-  }
-
-  opacity: ${props => (props.disabled ? '70%' : '100%')};
-`;
-
-export const TitleBarContainer = styled.div`
-  display: flex;
-  height: 24px;
-  justify-content: space-between;
-`;
-
-export const Title = styled.span`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 10px;
 `;
 
 export const RightButtons = styled.div`
@@ -163,31 +147,20 @@ export const RightButtons = styled.div`
   }
 `;
 
-export const TreeTitleWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  height: 100%;
-
-  & .ant-dropdown-trigger {
-    height: inherit;
-    margin-right: 10px;
-  }
-`;
-
-export const TreeTitleText = styled.span`
-  flex: 1;
+export const RootFolderText = styled.div`
+  font-size: 12px;
+  line-height: 22px;
+  color: ${Colors.grey7};
+  margin-left: 14px;
   overflow: hidden;
-  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const Skeleton = styled(RawSkeleton)`
   margin: 20px;
   width: 90%;
 `;
-
-export const ReloadButton = styled(Button)``;
 
 export const SpinnerWrapper = styled.div`
   position: absolute;
@@ -208,24 +181,53 @@ export const SpinnerWrapper = styled.div`
   }
 `;
 
-export const ContextMenuDivider = styled.div`
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+export const Title = styled.span`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 10px;
 `;
 
-export const NumberOfResources = styled.span`
-  margin-left: 12px;
-  color: ${Colors.grey7};
+export const TitleBarContainer = styled.div`
+  border-bottom: ${AppBorders.sectionDivider};
 `;
 
-export const NodeContainer = styled.div`
+export const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const TreeContainer = styled.div`
+  margin-left: 2px;
+  margin-top: 10px;
+`;
+
+export const TreeDirectoryTree = styled(Tree.DirectoryTree)`
+  margin-top: 10px;
+  .ant-tree-switcher svg {
+    color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
+  }
+
+  opacity: ${props => (props.disabled ? '70%' : '100%')};
+`;
+
+export const TreeTitleText = styled.span`
+  flex: 1;
+  overflow: hidden;
   position: relative;
 `;
 
-export const NodeTitleContainer = styled.div`
-  padding-right: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+export const TreeTitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 100%;
+
+  & .ant-dropdown-trigger {
+    height: inherit;
+    margin-right: 10px;
+  }
 `;
 
 export const PreviewButton = styled(Button)<{$isItemSelected: boolean}>`

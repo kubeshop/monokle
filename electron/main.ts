@@ -19,7 +19,13 @@ import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
-import {APP_MIN_HEIGHT, APP_MIN_WIDTH, DEFAULT_PLUGINS, ROOT_FILE_ENTRY} from '@constants/constants';
+import {
+  APP_MIN_HEIGHT,
+  APP_MIN_WIDTH,
+  DEFAULT_PLUGINS,
+  DEPENDENCIES_HELP_URL,
+  ROOT_FILE_ENTRY,
+} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
@@ -356,7 +362,8 @@ export const createWindow = (givenPath?: string) => {
       const alert: AlertType = {
         type: AlertEnum.Warning,
         title: 'Missing dependency',
-        message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available`,
+        message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available.
+        [Read more](${DEPENDENCIES_HELP_URL})`,
       };
       dispatchToWindow(win, setAlert(alert));
     }

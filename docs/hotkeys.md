@@ -1,4 +1,5 @@
-## **Monokle Keyboard Shortcuts**
+# Monokle Keyboard Shortcuts
+
 
 Monokle currently supports the following keyboard shortcuts:
 

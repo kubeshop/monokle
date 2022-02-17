@@ -31,14 +31,15 @@ nav:
     - Cluster Integration: cluster-integration.md
     - Cluster Compare: cluster-compare.md
   - Deploy/Diff: apply-and-diff.md
+  - Monokle Pluings:
+    - Plugins: plugins.md
+    - Templates: templates.md
   - Development:
     - Development: development.md
     - Architecture: architecture.md
-    - Plugins: plugins.md
-    - Templates: templates.md
     - Testing: testing.md
-  - Keyboard Shortcuts: hotkeys.md  
-  - FAQ: faq.md
+    - Contributing: contributing.md
+  - Keyboard Shortcuts: hotkeys.md  - FAQ: faq.md
   - Tutorials:
       - tutorials/how-to-configure-monokle.md
       - tutorials/how-to-navigate-and-edit-manifests.md

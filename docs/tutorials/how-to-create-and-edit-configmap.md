@@ -9,51 +9,50 @@ Let’s get started!
 
 <em>**Note:** Please follow this [Getting Started](../getting-started.md) guide to install Monokle 🚀</em>
 
-Launch Monokle and, on the welcome screen, there are three options to start working with projects: 
+Launch Monokle and, on the welcome screen, there are three options to start working with projects:
 
-- Select an existing folder.
-- Create an empty project.
-- Start from a template.
+ - Select an exisiting folder.
+ - Create an empty project.
+ - Start from a template.
+ 
+ Click **Select an existing project** to add your project folder containing K8 resources. 
 
-Click **Select an existing project** to add your project folder containg K8s resources.
-
-![Browse](img/image-1-1.5.0.png)
+![Image 1](img/image-1-1.5.0.png)
 
 ## **Select Folder**
 
 Select your folder to parse its manifest in the file explorer. 
 
- ![Select Folder](img/image-2-1.5.0.png)
+![Image 2](img/image-2-1.5.0.png)
 
 In the file explorer, you can view manifests, including their resources and their relationships.
 
 ## **Select Manifests**
 
-Scroll up & down to navigate and select the required manifests. 
+Scroll up and down to navigate and select the required manifests. 
 
 ![Image 3](img/image-3-1.5.0.gif)
 
-Once you select a manifest, its related resources shall be highlighted automatically in the navigator.
+Once you select a manifest, its related resources will be highlighted automatically in the navigator.
 
 ## **Create a New Resource**
 
 Click on the **Add** button (plus sign) in the Navigator to launch the **Add New Resource** dialog for creating resources. 
 
-![Add Resource](img/add-resource-1.5.0.png)
+![Add Resource](img/config-map-add-resource-1.5.0.png)
 
 At the bottom of the dialog, you can select the option to:
-
 - Save to folder.
-- Add to file
-- Don't save
+- Add to file.
+- Don't save.
 
 ![Resource save](img/add-resource-save-options-1.5.0.png)
 
-## **Using the Source Editor** 
+## **Use the Source Editor** 
 
 **Step 1:** Navigate and select the ConfigMap resources in the Navigator.  
 
-Once you select a resource, its source code will be launched automatically in the Source Editor.
+Once you select a resource, its source code will be launched automatically in the Source Editor. 
 
 ![Image 4](img/image-4-1.5.0.png)
 
@@ -83,11 +82,11 @@ The ConfigMap Editor collects the required information and passes it to another 
 
 ![Image 9](img/image-9.png)
 
-### **For Binary Configuration Data**
+### **For Binary Configuration Data** 
 
 **Step 1:** Click on the **Add Item** button to create a new binary data field for binary data configuration.
 
-![Image 10](img/image-10.png)
+![Image 10](img/image-10-1.5.0.png)
 
 **Step 2:** Enter the binary configuration data in key-value pair fields.
 
@@ -99,15 +98,13 @@ The ConfigMap Editor collects the required information and passes it to another 
 
 ![Image 12](img/image-12.png)
 
-Now you can start editing the object metadata. 
+## **Using the Object Metadata Editor**
 
-### **Using the Object Metadata Editor**
-
-To launch the Metadator Editor, click on the **Metadata** button.
+To launch the Metadata Editor, click on the **Metadata** button.
 
 ![Metadata Button](img/metadata-button-image-1.5.0.png)
 
-For editing object metadata you need to provide a specific name, namespace, annotations, labels, cluster name, generate name, and finalizers to uniquely identify the object.  
+For editing object metadata, you need to provide a specific name, namespace, annotations, labels, cluster name, generate name, and finalizers to uniquely identify the object.  
 
 ### **Name**
 
@@ -123,7 +120,7 @@ For editing object metadata you need to provide a specific name, namespace, anno
 
 ![Image 14](img/image-14-1.5.0.png)
 
-<em>**Note:** Provide a unique namespace within the ConfigMap. If left empty, then the default namespace value shall be assigned automatically.</em> 
+<em>**Note:** Provide a unique namespace within the ConfigMap. If left empty, the default namespace value shall be assigned automatically.</em> 
 
 ### **Annotations**
 
@@ -145,7 +142,7 @@ For editing object metadata you need to provide a specific name, namespace, anno
 
 **Step 2:** Enter the label's details in the key-value pair field.
 
-<em>**Note:**  you also can edit the existing label data in the fields.</em> 
+<em>**Note:**  You also can edit existing label data in the fields.</em> 
 
 ![Image 18](img/image-18.png)
 
@@ -159,7 +156,7 @@ Enter the name of the cluster in the **Cluster Name** field to which the object 
 
 Enter a prefix in the **Generate Name** field.
 
-<em>**Note:** You can also edit the existing data in the **Generate Name** fields.</em> 
+<em>**Note:** You can also edit the existing data in the **Generate Name** field.</em> 
 
 ![Image 20](img/image-20-1.5.0.png)
 
@@ -179,8 +176,8 @@ Kubernetes is prompted to wait until specific conditions are met before it fully
 
 <em>**Note:** Finalizer must be empty before the object is deleted from the registry.</em> 
 
-The source editor provides autocomplete and autosave options, and hence you don’t have to manually save your edits. 
-                
+The source editor provides autocomplete and autosave options to automatically save your edits. 
+                 
 ## **Questions or Comments?**
 
 Please feel free to join our open source community on Discord with this [Invite Link](https://discord.gg/6zupCZFQbe) and start your discussion. 

@@ -1,7 +1,7 @@
 import {Page} from 'playwright';
 import {expect, test} from '@playwright/test';
 import {ElectronApplication} from 'playwright-core';
-import {startApp} from './electronHelpers';
+import {ElectronAppInfo, startApp} from './electronHelpers';
 import {pause} from './utils';
 import {StartProjectPane} from './models/startProjectPane';
 import {MainWindow} from './models/mainWindow';
@@ -14,6 +14,8 @@ import {FileExplorerPane} from './models/fileExplorerPane';
 
 let appWindow: Page;
 let electronApp: ElectronApplication;
+let appInfo: ElectronAppInfo;
+
 let startPane: StartProjectPane;
 let mainWindow: MainWindow;
 let projectsDropdown: ProjectsDropdown;
@@ -27,6 +29,7 @@ test.beforeAll(async () => {
   const startAppResponse = await startApp();
   appWindow = startAppResponse.appWindow;
   electronApp = startAppResponse.electronApp;
+  appInfo = startAppResponse.appInfo;
   startPane = new StartProjectPane(appWindow);
   mainWindow = new MainWindow(appWindow);
   projectsDropdown = new ProjectsDropdown(appWindow);
@@ -80,4 +83,10 @@ test('should create new resource', async () => {
   expect((await fileExplorerPane.projectName.textContent())?.includes(projectName)).toBe(true);
   expect(await fileExplorerPane.fileCount.textContent()).toEqual('1 files');
   expect((await fileExplorerPane.tree.textContent())?.includes(fileName)).toBe(true);
+});
+
+test.afterAll(async () => {
+  await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/final-screen.png`});
+  await appWindow.context().close();
+  await appWindow.close();
 });

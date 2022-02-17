@@ -1,29 +1,20 @@
-import React, {useContext} from 'react';
+import React from 'react';
 
-import {NAVIGATOR_HEIGHT_OFFSET} from '@constants/constants';
+import {SectionRenderer, TitleBar} from '@molecules';
 
-import {MonoPaneTitle} from '@components/atoms';
-import {SectionRenderer} from '@components/molecules';
-
-import AppContext from '@src/AppContext';
-import HelmChartSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
+import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
 
 import * as S from './styled';
 
 const HelmPane: React.FC = () => {
-  const {windowSize} = useContext(AppContext);
-  const windowHeight = windowSize.height;
-  const navigatorHeight = windowHeight - NAVIGATOR_HEIGHT_OFFSET;
-
   return (
-    <span id="HelmPane">
-      <S.TitleBar>
-        <MonoPaneTitle>Helm</MonoPaneTitle>
-      </S.TitleBar>
-      <S.List id="helm-sections-container" height={navigatorHeight}>
-        <SectionRenderer sectionBlueprint={HelmChartSectionBlueprint} level={0} isLastSection={false} />
+    <S.HelmPaneContainer id="HelmPane">
+      <TitleBar title="Helm" />
+
+      <S.List id="helm-sections-container">
+        <SectionRenderer sectionBlueprint={RootHelmChartsSectionBlueprint} level={0} isLastSection={false} />
       </S.List>
-    </span>
+    </S.HelmPaneContainer>
   );
 };
 

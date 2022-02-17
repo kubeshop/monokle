@@ -13,9 +13,9 @@ interface SectionHeaderProps {
   sectionInstance: SectionInstance;
   sectionBlueprint: SectionBlueprint<any>;
   isCollapsed: boolean;
-  isCollapsedMode: 'collapsed' | 'expanded' | 'mixed';
   isLastSection: boolean;
   level: number;
+  indentation: number;
   expandSection: () => void;
   collapseSection: () => void;
 }
@@ -27,15 +27,15 @@ function SectionHeader(props: SectionHeaderProps) {
     sectionBlueprint,
     isCollapsed,
     isLastSection,
-    isCollapsedMode,
     level,
+    indentation,
     expandSection,
     collapseSection,
   } = props;
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {NameDisplay, NameSuffix, NameContext} = useSectionCustomization(sectionBlueprint.customization);
+  const {NameDisplay, NamePrefix, NameSuffix, NameContext} = useSectionCustomization(sectionBlueprint.customization);
 
   const toggleCollapse = useCallback(() => {
     if (isCollapsed) {
@@ -45,9 +45,19 @@ function SectionHeader(props: SectionHeaderProps) {
     }
   }, [isCollapsed, expandSection, collapseSection]);
 
-  const itemsLength = useMemo(() => {
-    return sectionInstance?.visibleDescendantItemIds?.length || 0;
-  }, [sectionInstance.visibleDescendantItemIds]);
+  const counter = useMemo(() => {
+    const counterDisplayMode = sectionBlueprint.customization?.counterDisplayMode;
+    if (!counterDisplayMode || counterDisplayMode === 'descendants') {
+      return sectionInstance?.visibleDescendantItemIds?.length || 0;
+    }
+    if (counterDisplayMode === 'items') {
+      return sectionInstance?.visibleItemIds.length;
+    }
+    if (counterDisplayMode === 'subsections') {
+      return sectionInstance?.visibleChildSectionIds?.length || 0;
+    }
+    return undefined;
+  }, [sectionInstance, sectionBlueprint]);
 
   const onCheck = useCallback(() => {
     if (!sectionInstance.checkable || !sectionInstance.visibleDescendantItemIds) {
@@ -82,6 +92,7 @@ function SectionHeader(props: SectionHeaderProps) {
         isHovered={isHovered}
         isCheckable={Boolean(sectionBlueprint.builder?.makeCheckable)}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
+        $indentation={indentation}
       >
         {sectionInstance.checkable &&
           sectionInstance.isInitialized &&
@@ -100,30 +111,38 @@ function SectionHeader(props: SectionHeaderProps) {
             </span>
           )}
         {NameDisplay.Component ? (
-          <NameDisplay.Component sectionInstance={sectionInstance} />
+          <NameDisplay.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
         ) : (
           <>
+            {NamePrefix.Component && (
+              <NamePrefix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
+            )}
             <S.Name
               $isSelected={sectionInstance.isSelected && isCollapsed}
               $isHighlighted={sectionInstance.isSelected && isCollapsed}
               $isCheckable={Boolean(sectionInstance.checkable)}
+              $nameColor={sectionBlueprint.customization?.nameColor}
+              $nameSize={sectionBlueprint.customization?.nameSize}
+              $nameWeight={sectionBlueprint.customization?.nameWeight}
+              $nameVerticalPadding={sectionBlueprint.customization?.nameVerticalPadding}
+              $nameHorizontalPadding={sectionBlueprint.customization?.nameHorizontalPadding}
               $level={level}
               onClick={toggleCollapse}
             >
               {name}
             </S.Name>
-            {itemsLength > 0 && (
-              <S.ItemsLength selected={sectionInstance.isSelected && isCollapsed}>{itemsLength}</S.ItemsLength>
-            )}
+            {counter && <S.Counter selected={sectionInstance.isSelected && isCollapsed}>{counter}</S.Counter>}
             <S.BlankSpace level={level} onClick={toggleCollapse} />
-            {NameSuffix.Component && NameSuffix.options?.isVisibleOnHover && isHovered && (
-              <NameSuffix.Component sectionInstance={sectionInstance} />
+            {NameSuffix.Component && (NameSuffix.options?.isVisibleOnHover ? isHovered : true) && (
+              <NameSuffix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
             )}
           </>
         )}
       </S.NameContainer>
       <S.NameDisplayContainer>
-        {!NameDisplay.Component && NameContext.Component && <NameContext.Component sectionInstance={sectionInstance} />}
+        {!NameDisplay.Component && NameContext.Component && (
+          <NameContext.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
+        )}
       </S.NameDisplayContainer>
     </S.SectionContainer>
   );

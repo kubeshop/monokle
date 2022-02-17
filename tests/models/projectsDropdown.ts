@@ -2,6 +2,7 @@ import {Locator, Page} from 'playwright';
 import {v4 as uuidV4} from 'uuid';
 import {ElectronApplication} from 'playwright-core';
 import {getChannelName} from '../../src/utils/ipc';
+import {mockHandle} from './util';
 
 export class ProjectsDropdown {
 
@@ -21,13 +22,8 @@ export class ProjectsDropdown {
 
   async createNewProject(electronApp: ElectronApplication, name = `project-${uuidV4()}`) {
     await this._projectsDropdown.click();
-
     const chanel = getChannelName('select-file', true);
-    await electronApp.evaluate(({ ipcMain }, params) => {
-      ipcMain.handle(params.chanel, () => {
-        return [params.name];
-      });
-    }, { chanel, name });
+    await mockHandle(electronApp, chanel, name);
 
     await this._openProjectFromFolder.click();
 

@@ -1,11 +1,14 @@
+import {EventEmitter} from 'events';
+import fs from 'fs';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
+import {parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
-import {AppConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
@@ -14,6 +17,8 @@ import {K8sResource} from '@models/k8sresource';
 import {createFileEntry, extractK8sResourcesFromFile, fileIsExcluded, readFiles} from '@redux/services/fileEntry';
 
 import {getFileStats} from '@utils/files';
+
+export const HelmChartEventEmitter = new EventEmitter();
 
 /**
  * Gets the HelmValuesFile for a specific FileEntry
@@ -66,7 +71,7 @@ export function processHelmChartFolder(
   folder: string,
   rootFolder: string,
   files: string[],
-  appConfig: AppConfig,
+  projectConfig: ProjectConfig,
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
@@ -74,29 +79,46 @@ export function processHelmChartFolder(
   result: string[],
   depth: number
 ) {
-  const helmChart: HelmChart = {
-    id: uuidv4(),
-    filePath: path.join(folder, HELM_CHART_ENTRY_FILE).substr(rootFolder.length),
-    name: folder.substr(folder.lastIndexOf(path.sep) + 1),
-    valueFileIds: [],
-  };
+  let helmChart: HelmChart | undefined;
+
+  try {
+    const helmChartFilePath = path.join(folder, HELM_CHART_ENTRY_FILE);
+    const fileText = fs.readFileSync(helmChartFilePath, 'utf8');
+    const fileContent = parse(fileText);
+
+    if (typeof fileContent?.name !== 'string') {
+      throw new Error(`Couldn't get the name property of the helm chart at path: ${helmChartFilePath}`);
+    }
+
+    helmChart = {
+      id: uuidv4(),
+      filePath: helmChartFilePath.substr(rootFolder.length),
+      name: fileContent.name,
+      valueFileIds: [],
+    };
+    HelmChartEventEmitter.emit('create', helmChart);
+  } catch (e) {
+    if (e instanceof Error) {
+      log.warn(`[processHelmChartFolder]: ${e.message}`);
+    }
+  }
 
   files.forEach(file => {
     const filePath = path.join(folder, file);
     const fileEntryPath = filePath.substr(rootFolder.length);
     const fileEntry = createFileEntry(fileEntryPath);
 
-    if (fileIsExcluded(appConfig, fileEntry)) {
+    if (fileIsExcluded(projectConfig, fileEntry)) {
       fileEntry.isExcluded = true;
     } else if (getFileStats(filePath)?.isDirectory()) {
-      const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+      const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
 
       if (depth === folderReadsMaxDepth) {
         log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
       } else {
         fileEntry.children = readFiles(
           filePath,
-          appConfig,
+          projectConfig,
           resourceMap,
           fileMap,
           helmChartMap,
@@ -105,7 +127,7 @@ export function processHelmChartFolder(
           isSupportedHelmResource
         );
       }
-    } else if (isHelmValuesFile(file)) {
+    } else if (isHelmValuesFile(file) && helmChart) {
       const helmValues: HelmValuesFile = {
         id: uuidv4(),
         filePath: fileEntryPath,
@@ -117,7 +139,7 @@ export function processHelmChartFolder(
       helmValuesMap[helmValues.id] = helmValues;
       helmChart.valueFileIds.push(helmValues.id);
       fileEntry.isSupported = true;
-    } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+    } else if (projectConfig.fileIncludes?.some(e => micromatch.isMatch(fileEntry.name, e))) {
       try {
         extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
           resourceMap[resource.id] = resource;
@@ -133,5 +155,7 @@ export function processHelmChartFolder(
     result.push(fileEntry.name);
   });
 
-  helmChartMap[helmChart.id] = helmChart;
+  if (helmChart) {
+    helmChartMap[helmChart.id] = helmChart;
+  }
 }

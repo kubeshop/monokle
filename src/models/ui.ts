@@ -47,12 +47,13 @@ export type MonacoUiState = {
   selection?: MonacoUiSelection;
 };
 
-export type LeftMenuSelectionType =
-  | 'file-explorer'
-  | 'helm-pane'
-  | 'kustomize-pane'
-  | 'cluster-explorer'
-  | 'templates-pane';
+export type LeftMenuSelectionType = 'file-explorer' | 'helm-pane' | 'kustomize-pane' | 'templates-pane';
+export type RightMenuSelectionType = 'logs' | 'graph';
+
+export type LayoutSizeType = {
+  footer: number;
+  header: number;
+};
 
 export type UiState = {
   isResourceFiltersOpen: boolean;
@@ -85,6 +86,7 @@ export type UiState = {
     entityName: string;
     absolutePathToEntity: string;
   };
+  layoutSize: LayoutSizeType;
   isFolderLoading: boolean;
   leftMenu: {
     selection: LeftMenuSelectionType;
@@ -94,7 +96,7 @@ export type UiState = {
     isOpen: boolean;
   };
   rightMenu: {
-    selection?: string;
+    selection?: RightMenuSelectionType;
     isActive: boolean;
   };
   navPane: {
@@ -122,4 +124,5 @@ export type PaneConfiguration = {
   editWidth: number;
   rightWidth: number;
   actionsPaneFooterExpandedHeight: number;
+  recentProjectsPaneWidth: number;
 };

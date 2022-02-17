@@ -1,6 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
@@ -97,7 +97,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (selectedOption === 'none') {
       onOk();
     }
-  }, [kubeConfigContext, createNamespaceName, kubeConfigPath, selectedNamespace, selectedOption, onOk]);
+  }, [kubeConfigContext, createNamespaceName, kubeConfigPath, selectedNamespace, selectedOption, onOk, configState]);
 
   useEffect(() => {
     if (defaultOption && defaultOption === 'none') {
@@ -114,6 +114,9 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setCreateNamespaceName('');
     }
   }, [defaultOption, defaultNamespace, namespaces]);
+
+  const onlyNamespaces = useMemo(() => resources.every(r => r.kind === 'Namespace'), [resources]);
+  const hasNamespaces = useMemo(() => resources.some(r => r.kind === 'Namespace'), [resources]);
 
   if (!selectedOption) {
     return null;
@@ -133,9 +136,12 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       onCancel={onCancel}
     >
       <>
-        <HeadlineLabel>Select namespace:</HeadlineLabel>
+        <HeadlineLabel>
+          Select namespace {hasNamespaces && !onlyNamespaces && ' for all non-Namespace resources'}:
+        </HeadlineLabel>
         <Radio.Group
           key={selectedOption}
+          disabled={onlyNamespaces}
           onChange={e => {
             setSelectedOption(e.target.value);
             setErrorMessage('');
@@ -152,6 +158,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           <NamespaceContainer>
             <span>Namespace:</span>
             <Select
+              disabled={onlyNamespaces}
               value={selectedNamespace}
               showSearch
               defaultValue={defaultNamespace}
@@ -171,6 +178,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
             <NamespaceContainer>
               <span>Namespace name:</span>
               <Input
+                disabled={onlyNamespaces}
                 autoFocus
                 defaultValue={createNamespaceName}
                 placeholder="Enter namespace name"

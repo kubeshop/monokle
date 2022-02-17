@@ -23,7 +23,7 @@ import {
 import {isInPreviewModeSelector} from '@redux/selectors';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
-import {openDocumentation, openGitHub} from '@utils/shell';
+import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipcMainRedux';
@@ -355,10 +355,19 @@ const helpMenu = (
       label: 'Documentation',
       click: openDocumentation,
     },
+    {
+      label: 'Keyboard Shortcuts',
+      click: openKeyboardShortcuts,
+    },
     {type: 'separator'},
     {
       label: 'GitHub',
       click: openGitHub,
+    },
+    {type: 'separator'},
+    {
+      label: 'Discord',
+      click: openDiscord,
     },
   ];
 

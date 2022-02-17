@@ -3,7 +3,7 @@ import {ipcRenderer} from 'electron';
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 
-import {Button, Modal, Row, Tooltip} from 'antd';
+import {Button, Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -34,7 +34,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview, stopPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {MonoPaneTitle, MonoPaneTitleCol} from '@atoms';
+import {MonoPaneTitle} from '@atoms';
 
 import Icon from '@components/atoms/Icon';
 
@@ -43,7 +43,7 @@ import {uniqueArr} from '@utils/index';
 import AppContext from '@src/AppContext';
 
 import * as S from './Styled';
-import {TreeItem} from './TreeItem';
+import TreeItem from './TreeItem';
 import {ProcessingEntity, TreeNode} from './types';
 
 const createNode = (
@@ -202,7 +202,7 @@ const FileTreePane = () => {
 
     let node: TreeNode | undefined = tree || undefined;
     for (let c = 0; c < keys.length && node; c += 1) {
-      node = node.children.find(i => i.key === keys[c]);
+      node = node.children.find((i: any) => i.key === keys[c]);
     }
 
     if (node) {
@@ -446,44 +446,43 @@ const FileTreePane = () => {
 
   return (
     <S.FileTreeContainer id="FileExplorer">
-      <Row>
-        <MonoPaneTitleCol>
-          <MonoPaneTitle>
-            <S.TitleBarContainer>
-              <S.Title>
-                File Explorer{' '}
-                {isScanExcludesUpdated === 'outdated' ? (
-                  <Tooltip title={FileExplorerChanged}>
-                    <ExclamationCircleOutlined />
-                  </Tooltip>
-                ) : (
-                  ''
-                )}
-              </S.Title>
-              <S.RightButtons>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                  <S.ReloadButton
-                    size="small"
-                    onClick={refreshFolder}
-                    icon={<ReloadOutlined />}
-                    type="link"
-                    disabled={isButtonDisabled}
-                  />
+      <S.TitleBarContainer>
+        <MonoPaneTitle>
+          <S.TitleContainer>
+            <S.Title>
+              File Explorer{' '}
+              {isScanExcludesUpdated === 'outdated' && (
+                <Tooltip title={FileExplorerChanged}>
+                  <ExclamationCircleOutlined />
                 </Tooltip>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
-                  <Button
-                    icon={<Icon name="collapse" />}
-                    onClick={onToggleTree}
-                    type="link"
-                    size="small"
-                    disabled={isButtonDisabled}
-                  />
-                </Tooltip>
-              </S.RightButtons>
-            </S.TitleBarContainer>
-          </MonoPaneTitle>
-        </MonoPaneTitleCol>
-      </Row>
+              )}
+            </S.Title>
+
+            <S.RightButtons>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                <Button
+                  size="small"
+                  onClick={refreshFolder}
+                  icon={<ReloadOutlined />}
+                  type="link"
+                  disabled={isButtonDisabled}
+                />
+              </Tooltip>
+
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ToggleTreeTooltip}>
+                <Button
+                  icon={<Icon name="collapse" />}
+                  onClick={onToggleTree}
+                  type="link"
+                  size="small"
+                  disabled={isButtonDisabled}
+                />
+              </Tooltip>
+            </S.RightButtons>
+          </S.TitleContainer>
+        </MonoPaneTitle>
+      </S.TitleBarContainer>
+
       {uiState.isFolderLoading ? (
         <S.Skeleton active />
       ) : tree ? (

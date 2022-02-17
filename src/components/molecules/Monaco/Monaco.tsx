@@ -60,10 +60,7 @@ window.MonacoEnvironment = {
 const {yaml} = languages || {};
 
 function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
-  return (
-    // @ts-ignore
-    d.errors.length === 0 && d.contents && isMap(d.contents) && d.contents.has('apiVersion') && d.contents.has('kind')
-  );
+  return d.errors.length === 0 && isMap(d.contents);
 }
 
 const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => void}) => {
@@ -148,6 +145,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     isInPreviewMode ? undefined : createResource,
     filterResources
   );
+
   const {registerStaticActions} = useEditorKeybindings(
     editor,
     hiddenInputRef,
@@ -155,10 +153,14 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     applySelection,
     diffSelectedResource
   );
+
   useResourceYamlSchema(
     yaml,
-    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined)
+    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
+    selectedPath,
+    fileMap
   );
+
   useDebouncedCodeSave(
     editor,
     orgCode,
@@ -170,6 +172,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     selectedPath,
     setOrgCode
   );
+
   useMonacoUiState(editor, selectedResourceId, selectedPath);
 
   const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
@@ -191,7 +194,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     if (selectedResourceId) {
       // this will slow things down if document gets large - need to find a better solution...
       const documents = parseAllDocuments(newValue);
-      setValid(documents.length > 0 && !documents.some(d => !isValidResourceDocument(d)));
+      // only accept single document changes for now
+      setValid(documents.length === 1 && isValidResourceDocument(documents[0]));
     } else {
       setValid(true);
     }
@@ -276,6 +280,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   }, [
     isInPreviewMode,
     selectedResourceId,
+    selectedResource,
     previewResourceId,
     selectedValuesFileId,
     previewValuesFileId,

@@ -6,14 +6,17 @@ import {useDebounce} from 'react-use';
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
 
+import fs from 'fs';
+import log from 'loglevel';
 import styled from 'styled-components';
-import {stringify} from 'yaml';
+import {parseDocument, stringify} from 'yaml';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector, settingsSelector} from '@redux/selectors';
+import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
 
@@ -32,7 +35,7 @@ const FormContainer = styled.div`
   width: 100%;
   padding: 20px 15px 0px 15px;
   margin: 0px;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 
   ${GlobalScrollbarStyle}
@@ -110,6 +113,8 @@ const FormContainer = styled.div`
 const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const {formSchema, formUiSchema} = props;
   const selectedResource = useSelector(selectedResourceSelector);
+  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const [formData, setFormData] = useState<any>();
   const dispatch = useAppDispatch();
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
@@ -122,25 +127,44 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
 
   useDebounce(
     () => {
-      if (selectedResource) {
-        let formString = stringify(formData);
-        const content = mergeManifests(selectedResource.text, formString);
+      let formString = stringify(formData);
 
+      if (selectedResource) {
+        const content = mergeManifests(selectedResource.text, formString);
         if (content.trim() !== selectedResource.text.trim()) {
           dispatch(updateResource({resourceId: selectedResource.id, content}));
+        }
+      } else if (selectedPath) {
+        try {
+          const filePath = getAbsoluteFilePath(selectedPath, fileMap);
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          const content = mergeManifests(fileContent, formString);
+          if (content.trim() !== fileContent.trim()) {
+            fs.writeFileSync(filePath, content);
+          }
+        } catch (e) {
+          log.error(`Failed to update file [${selectedPath}]`, e);
         }
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [formData, selectedResource]
+    [formData, selectedResource, selectedPath]
   );
 
   useEffect(() => {
     if (selectedResource) {
       setFormData(selectedResource.content);
+    } else if (selectedPath) {
+      try {
+        const filePath = getAbsoluteFilePath(selectedPath, fileMap);
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        setFormData(parseDocument(fileContent).toJS());
+      } catch (e) {
+        log.error(`Failed to read file [${selectedPath}]`, e);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource]);
+  }, [selectedResource, selectedPath, fileMap]);
 
   useEffect(() => {
     if (!settings.createDefaultObjects || !settings.setDefaultPrimitiveValues) {
@@ -150,7 +174,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
     }
   }, [formSchema, settings]);
 
-  if (!selectedResource) {
+  if (!selectedResource && !selectedPath) {
     return <div>Nothing selected...</div>;
   }
 

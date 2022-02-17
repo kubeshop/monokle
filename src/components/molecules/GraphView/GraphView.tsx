@@ -79,9 +79,13 @@ const getLayoutedElements = (elements: any[]): any => {
   });
 };
 
-const GraphView = (props: {editorHeight: string}) => {
+interface IProps {
+  editorHeight: number;
+}
+
+const GraphView: React.FC<IProps> = props => {
   const {editorHeight} = props;
-  const graphAreaHeight = parseInt(editorHeight, 10) - 150;
+  const graphAreaHeight = editorHeight - 150;
   const fileMap = useAppSelector(state => state.main.fileMap);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const activeResources = useSelector(activeResourcesSelector);

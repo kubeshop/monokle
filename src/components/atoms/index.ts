@@ -14,3 +14,4 @@ export {default as KeyValueInput} from './KeyValueInput';
 export {default as Dots} from './Dots';
 export {default as Spinner} from './Spinner';
 export {default as Icon} from './Icon';
+export {default as TabHeader} from './TabHeader';
