@@ -1,4 +1,4 @@
-# **How to Work with ConfigMaps**
+# How to Work with ConfigMaps
 
 In this Monokle tutorial, we will illustrate how to create and edit ConfigMap resources to store non-confidential 
 data in key-value pairs.       

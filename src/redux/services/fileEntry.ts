@@ -3,10 +3,11 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
+import {parse} from 'yaml';
 
 import {HELM_CHART_ENTRY_FILE, PREDEFINED_K8S_VERSION, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {AppConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
@@ -55,9 +56,8 @@ export function createFileEntry(fileEntryPath: string) {
  * Checks if the specified filename should be excluded per the global exclusion config
  */
 
-export function fileIsExcluded(appConfig: AppConfig, fileEntry: FileEntry) {
-  const scanExcludes = appConfig.projectConfig?.scanExcludes || appConfig.scanExcludes;
-  return scanExcludes.some(e => micromatch.isMatch(fileEntry.filePath, e));
+export function fileIsExcluded(projectConfig: ProjectConfig, fileEntry: FileEntry) {
+  return projectConfig.scanExcludes?.some(e => micromatch.isMatch(fileEntry.filePath, e));
 }
 
 /**
@@ -77,7 +77,7 @@ export function getRootFolder(fileMap: FileMapType) {
 
 export function readFiles(
   folder: string,
-  appConfig: AppConfig,
+  projectConfig: ProjectConfig,
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
@@ -101,7 +101,7 @@ export function readFiles(
       folder,
       rootFolder,
       files,
-      appConfig,
+      projectConfig,
       resourceMap,
       fileMap,
       helmChartMap,
@@ -116,16 +116,16 @@ export function readFiles(
       const fileEntry = createFileEntry(fileEntryPath);
       fileEntry.timestamp = getFileTimestamp(filePath);
 
-      if (fileIsExcluded(appConfig, fileEntry)) {
+      if (fileIsExcluded(projectConfig, fileEntry)) {
         fileEntry.isExcluded = true;
       } else if (getFileStats(filePath)?.isDirectory()) {
-        const folderReadsMaxDepth = appConfig.projectConfig?.folderReadsMaxDepth || appConfig.folderReadsMaxDepth;
+        const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
         if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
         } else {
           fileEntry.children = readFiles(
             filePath,
-            appConfig,
+            projectConfig,
             resourceMap,
             fileMap,
             helmChartMap,
@@ -133,7 +133,7 @@ export function readFiles(
             depth + 1
           );
         }
-      } else if (appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+      } else if (projectConfig.fileIncludes?.some(e => micromatch.isMatch(fileEntry.name, e))) {
         try {
           extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
             if (!isSupportedResource(resource)) {
@@ -293,11 +293,11 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
 
     let wasFileSelected = state.selectedPath === fileEntry.filePath;
 
-    const resourcesInFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
+    const existingResourcesFromFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
     let wasAnyResourceSelected = false;
 
     // delete old resources in file since we can't be sure the updated file contains the same resource(s)
-    resourcesInFile.forEach(resource => {
+    existingResourcesFromFile.forEach(resource => {
       if (state.selectedResourceId === resource.id) {
         updateSelectionAndHighlights(state, resource);
         wasAnyResourceSelected = true;
@@ -311,23 +311,23 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
       clearResourceSelections(state.resourceMap);
     }
 
-    const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
-    resourcesFromFile.forEach(resource => {
+    const newResourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
+    newResourcesFromFile.forEach(resource => {
       state.resourceMap[resource.id] = resource;
     });
 
     reprocessResources(
       PREDEFINED_K8S_VERSION,
       '',
-      resourcesFromFile.map(r => r.id),
+      newResourcesFromFile.map(r => r.id),
       state.resourceMap,
       state.fileMap,
       state.resourceRefsProcessingOptions
     );
 
     if (wasAnyResourceSelected) {
-      if (resourcesInFile.length === 1 && resourcesFromFile.length === 1) {
-        updateSelectionAndHighlights(state, resourcesFromFile[0]);
+      if (existingResourcesFromFile.length === 1 && newResourcesFromFile.length === 1) {
+        updateSelectionAndHighlights(state, newResourcesFromFile[0]);
       } else {
         state.selectedPath = undefined;
         state.selectedResourceId = undefined;
@@ -339,6 +339,27 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
       selectFilePath(fileEntry.filePath, state);
       state.shouldEditorReloadSelectedPath = true;
     }
+
+    // if this file is the Helm chart entry file, update the name of the helm chart
+    if (path.basename(absolutePath) === HELM_CHART_ENTRY_FILE) {
+      const helmChart = Object.values(state.helmChartMap).find(chart => chart.filePath === fileEntry.filePath);
+      if (helmChart) {
+        try {
+          const fileText = fs.readFileSync(absolutePath, 'utf8');
+          const fileContent = parse(fileText);
+
+          if (typeof fileContent?.name !== 'string') {
+            throw new Error(`Couldn't get the name property of the helm chart at path: ${absolutePath}.`);
+          }
+
+          helmChart.name = fileContent.name;
+        } catch (e) {
+          if (e instanceof Error) {
+            log.warn(`[reloadFile]: ${e.message}`);
+          }
+        }
+      }
+    }
   } else {
     log.info(`ignoring changed file ${absolutePath} because of timestamp`);
   }
@@ -348,13 +369,13 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
  * Adds the file at the specified path with the specified parent
  */
 
-function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
+function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substr(rootFolderEntry.filePath.length);
   const fileEntry = createFileEntry(relativePath);
 
-  if (!appConfig.fileIncludes.some(e => micromatch.isMatch(fileEntry.name, e))) {
+  if (!projectConfig.fileIncludes?.some(e => micromatch.isMatch(fileEntry.name, e))) {
     return fileEntry;
   }
   fileEntry.isSupported = true;
@@ -388,35 +409,48 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
   // if this file is the Helm Chart entry file, create a new helm chart and search for exising values files
   const isHelmChartFile = path.basename(absolutePath) === HELM_CHART_ENTRY_FILE;
   if (isHelmChartFile) {
-    const helmChart: HelmChart = {
-      id: uuidv4(),
-      filePath: fileEntry.filePath,
-      name: parentFolderAbsPath.trim() !== '' ? path.basename(parentFolderAbsPath) : 'Unnamed Chart',
-      valueFileIds: [],
-    };
-    state.helmChartMap[helmChart.id] = helmChart;
-    HelmChartEventEmitter.emit('create', helmChart);
+    try {
+      const fileText = fs.readFileSync(absolutePath, 'utf8');
+      const fileContent = parse(fileText);
 
-    parentFolderEntry?.children?.forEach(fileName => {
-      if (!parentFolderEntry) {
-        return;
+      if (typeof fileContent?.name !== 'string') {
+        throw new Error(`Couldn't get the name property of the helm chart at path: ${absolutePath}`);
       }
-      if (isHelmValuesFile(fileName)) {
-        const valuesFilePath =
-          parentFolderEntry.filePath === rootFolderEntry.filePath
-            ? `${path.sep}${fileName}`
-            : path.join(parentFolderEntry.filePath, fileName);
-        const helmValuesFile: HelmValuesFile = {
-          id: uuidv4(),
-          filePath: valuesFilePath,
-          name: fileName,
-          isSelected: false,
-          helmChartId: helmChart.id,
-        };
-        helmChart.valueFileIds.push(helmValuesFile.id);
-        state.helmValuesMap[helmValuesFile.id] = helmValuesFile;
+
+      const helmChart: HelmChart = {
+        id: uuidv4(),
+        filePath: fileEntry.filePath,
+        name: parentFolderAbsPath.trim() !== '' ? path.basename(parentFolderAbsPath) : 'Unnamed Chart',
+        valueFileIds: [],
+      };
+      state.helmChartMap[helmChart.id] = helmChart;
+      HelmChartEventEmitter.emit('create', helmChart);
+
+      parentFolderEntry?.children?.forEach(fileName => {
+        if (!parentFolderEntry) {
+          return;
+        }
+        if (isHelmValuesFile(fileName)) {
+          const valuesFilePath =
+            parentFolderEntry.filePath === rootFolderEntry.filePath
+              ? `${path.sep}${fileName}`
+              : path.join(parentFolderEntry.filePath, fileName);
+          const helmValuesFile: HelmValuesFile = {
+            id: uuidv4(),
+            filePath: valuesFilePath,
+            name: fileName,
+            isSelected: false,
+            helmChartId: helmChart.id,
+          };
+          helmChart.valueFileIds.push(helmValuesFile.id);
+          state.helmValuesMap[helmValuesFile.id] = helmValuesFile;
+        }
+      });
+    } catch (e) {
+      if (e instanceof Error) {
+        log.warn(`[addFile]: ${e.message}`);
       }
-    });
+    }
   }
 
   // if this new file is a values file, search for it's helm chart and update it
@@ -444,14 +478,14 @@ function addFile(absolutePath: string, state: AppState, appConfig: AppConfig) {
  * Adds the folder at the specified path with the specified parent
  */
 
-function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) {
+function addFolder(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   log.info(`adding folder ${absolutePath}`);
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
     const folderEntry = createFileEntry(absolutePath.substr(rootFolder.length));
     folderEntry.children = readFiles(
       absolutePath,
-      appConfig,
+      projectConfig,
       state.resourceMap,
       state.fileMap,
       state.helmChartMap,
@@ -467,7 +501,7 @@ function addFolder(absolutePath: string, state: AppState, appConfig: AppConfig) 
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState, appConfig: AppConfig) {
+export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
   const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -481,7 +515,9 @@ export function addPath(absolutePath: string, state: AppState, appConfig: AppCon
       }
       return undefined;
     }
-    const fileEntry = isDirectory ? addFolder(absolutePath, state, appConfig) : addFile(absolutePath, state, appConfig);
+    const fileEntry = isDirectory
+      ? addFolder(absolutePath, state, projectConfig)
+      : addFile(absolutePath, state, projectConfig);
 
     if (fileEntry) {
       state.fileMap[fileEntry.filePath] = fileEntry;

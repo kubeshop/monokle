@@ -1,4 +1,4 @@
-# **How to Browse Clusters**
+# How to Browse Clusters
 
 In this Monokle tutorial, we will illustrate the steps to connect to a cluster and navigate/update contained resources.
 

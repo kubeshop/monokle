@@ -284,6 +284,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   }, [
     isInPreviewMode,
     selectedResourceId,
+    selectedResource,
     previewResourceId,
     selectedValuesFileId,
     previewValuesFileId,

@@ -38,6 +38,7 @@ import {
   settingsSelector,
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
+import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
@@ -326,15 +327,18 @@ const ActionsPane: React.FC<IProps> = props => {
   useEffect(() => {
     if (selectedResourceId && resourceMap[selectedResourceId]) {
       setSelectedResource(resourceMap[selectedResourceId]);
+    } else if (selectedPath) {
+      const resources = getResourcesForPath(selectedPath, resourceMap);
+      setSelectedResource(resources.length === 1 ? resources[0] : undefined);
     } else {
       setSelectedResource(undefined);
     }
-  }, [selectedResourceId, resourceMap]);
+  }, [selectedResourceId, resourceMap, selectedPath]);
 
   useEffect(() => {
     if (
       activeTabKey === 'form' &&
-      !selectedPath &&
+      (!selectedPath || !schemaForSelectedPath) &&
       !isKustomization &&
       !resourceKindHandler?.formEditorOptions?.editorSchema
     ) {
@@ -344,7 +348,7 @@ const ActionsPane: React.FC<IProps> = props => {
     if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
       setActiveTabKey('source');
     }
-  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedPath]);
+  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedPath, schemaForSelectedPath]);
 
   const isSelectedResourceUnsaved = useCallback(() => {
     if (!selectedResource) {
@@ -405,6 +409,7 @@ const ActionsPane: React.FC<IProps> = props => {
                 disabled={
                   (!selectedResourceId && !selectedPath) ||
                   (selectedResource &&
+                    !isKustomizationResource(selectedResource) &&
                     (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
                 }
                 icon={<Icon name="kubernetes" />}
@@ -480,7 +485,7 @@ const ActionsPane: React.FC<IProps> = props => {
               {isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
               ) : activeTabKey === 'form' ? (
-                selectedPath && schemaForSelectedPath ? (
+                selectedPath && schemaForSelectedPath && !selectedResource ? (
                   <FormEditor
                     formSchema={extractFormSchema(schemaForSelectedPath)}
                     formUiSchema={getUiSchemaForPath(selectedPath, fileMap)}

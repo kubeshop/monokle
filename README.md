@@ -51,6 +51,8 @@
 
 Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) document or the [introductory blog-post](https://medium.com/kubeshop-i/hello-monokle-83ecb42f5d96) to get a quick intro and overview.
 
+Read about the [latest 1.5.0 release](https://medium.com/kubeshop-i/monokle-1-5-0-release-kubeshop-95f574563c79).
+
 ## Download & Install
 
 | <p align="center">Windows                                                                  | <p align="center">macOS                                                                    | <p align="center">Linux                                                                                                  |
@@ -62,21 +64,15 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
 
 There is a lot of functionality currently being considered:
 
-- Creation of resources/projects - see [Resource creation/manipulation](https://github.com/kubeshop/monokle/projects/4)
-- Improved Cluster functionality - see [Cluster integration](https://github.com/kubeshop/monokle/projects/8)
-- Plugin/extension mechanism - see [Extension mechanism for plugins](https://github.com/kubeshop/monokle/issues/177)
-- Improved resource filtering/navigation - see [Resource Navigation](https://github.com/kubeshop/monokle/projects/2)
-- Improved Helm integration - see [Helm integration](https://github.com/kubeshop/monokle/projects/12)
+- Creation of resources/projects - see [Resource creation/manipulation](https://github.com/kubeshop/monokle/projects/4).
+- Improved Cluster functionality - see [Cluster integration](https://github.com/kubeshop/monokle/projects/8).
+- Plugin/extension mechanism - see [Extension mechanism for plugins](https://github.com/kubeshop/monokle/issues/177).
+- Improved resource filtering/navigation - see [Resource Navigation](https://github.com/kubeshop/monokle/projects/2).
+- Improved Helm integration - see [Helm integration](https://github.com/kubeshop/monokle/projects/12).
 
 Don't hesitate to provide any feedback you might have to help us prioritize and improve our backlog!
 
 ## Getting involved
 
-- We WANT and NEED your feedback please. Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn)
-- Check out our [Contributor Guide](https://github.com/kubeshop/.github/blob/main/CONTRIBUTING.md) and
-  [Code of Conduct](https://github.com/kubeshop/.github/blob/main/CODE_OF_CONDUCT.md)
-- Fork/Clone the repo and make sure you can run it as shown above
-- Check out the [Development](docs/development.md) document for how to build and run Monokle from its source
-- Check out the [Testing](docs/testing.md) document for how to build and run Monokle tests
-- Check out the [Architecture](docs/architecture.md) document to get a high-level understanding of how Monokle works
-- Check out the Roadmap above and open [issues](https://github.com/kubeshop/monokle/issues) here on GitHub
+- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn).
+- Read about how to contribute [in our Documentation](https://kubeshop.github.io/monokle/contributing).
