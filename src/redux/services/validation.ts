@@ -50,12 +50,9 @@ export function validateResource(resource: K8sResource, schemaVersion: string, u
   }
 
   const resourceSchema = getResourceSchema(resource, schemaVersion, userDataDir);
-  if (!resourceSchema) {
-    return;
-  }
 
-  const validatorCacheKey = resource.kind + resource.version;
-  if (!validatorCache.has(validatorCacheKey)) {
+  const validatorCacheKey = `${schemaVersion}-${resource.kind}-${resource.version}`;
+  if (resourceSchema && !validatorCache.has(validatorCacheKey)) {
     const ajv = new Ajv({
       unknownFormats: 'ignore',
       validateSchema: false,
@@ -68,10 +65,14 @@ export function validateResource(resource: K8sResource, schemaVersion: string, u
   }
 
   const validate = validatorCache.get(validatorCacheKey);
+
   if (validate) {
     try {
       validate(resource.content);
+
       const errors = [];
+
+      console.log(validatorCacheKey, validate.errors);
 
       if (validate.errors) {
         errors.push(
@@ -127,11 +128,16 @@ export function validateResource(resource: K8sResource, schemaVersion: string, u
 
       resource.validation = {
         isValid: errors.length === 0,
-        errors,
+        errors: errors && errors.length > 0 ? errors : [],
       };
     } catch (e) {
       log.warn('Failed to validate', e);
     }
+  } else {
+    resource.validation = {
+      isValid: false,
+      errors: [{property: '', message: 'Native K8s schema not found!'}],
+    };
   }
 }
 
