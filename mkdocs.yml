@@ -19,12 +19,17 @@ nav:
   - Getting Started: getting-started.md
   - Feature Overview: features.md
   - UI Overview: overview.md
-  - Navigating Resources: resource-navigation.md
-  - Resource Editing: resource-editing.md
+  - Working with File Explorer: file-explorer.md
+  - Working with Resources:
+    - Navigating Resources: resource-navigation.md
+    - Creating Resources: creating-resources.md
+    - Editing Resources: resource-editing.md
+    - Validating Resources: resource-validation.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
-  - Cluster Integration: cluster-integration.md
-  - Cluster Compare: cluster-compare.md
+  - Working with Resources:
+    - Cluster Integration: cluster-integration.md
+    - Cluster Compare: cluster-compare.md
   - Deploy/Diff: apply-and-diff.md
   - Development:
     - Development: development.md
@@ -32,11 +37,12 @@ nav:
     - Plugins: plugins.md
     - Templates: templates.md
     - Testing: testing.md
+  - Keyboard Shortcuts: hotkeys.md  
   - FAQ: faq.md
   - Tutorials:
+      - tutorials/how-to-configure-monokle.md
       - tutorials/how-to-navigate-and-edit-manifests.md
       - tutorials/how-to-browse-clusters.md
-      - tutorials/how-to-configure-monokle.md
       - tutorials/how-to-create-and-edit-configmap.md
       - tutorials/how-to-fix-broken-links.md
 

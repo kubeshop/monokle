@@ -1,8 +1,8 @@
-## What is a Plugin?
+# What is a Plugin?
 
 Simply, any GitHub repository that contains a `package.json` file (the plugin entry file) can be installed as a plugin if the entry file follows the structure of a Monokle plugin.
 
-## What is the structure of `package.json` for a valid Monokle plugin?
+## **What is the structure of `package.json` for a valid Monokle plugin?**
 
 Monokle uses the following properties: `name`, `author`, `version` `repository`, `description`, and `monoklePlugin`.
 
@@ -23,7 +23,7 @@ Here’s an example of a `package.json` for a Monokle plugin:
 }
 ```
 
-## What types of modules does a Plugin support or what does a module look like?
+## **What types of modules does a Plugin support or what does a module look like?**
 
 With the release of 1.5.0 we are only supporting Template modules.  
 More module types will be added in future versions.
@@ -45,7 +45,7 @@ Here is how you can reference a template module:
 
 [Read more about templates here.](./templates.md)
 
-## How do I install a Plugin?
+## **How do I install a Plugin?**
 
 Open the Plugins manager from the top right icon.
 
@@ -55,7 +55,7 @@ Open the Plugins manager from the top right icon.
 - The URL must be a valid GitHub repository url in the format https://github.com/[user]/[repository].
 - The primary branch should be `main`. The plugin installer will search there for the `package.json` file.
 
-## How do I manually install a Plugin?
+## **How do I manually install a Plugin?**
 
 This should be used only as a workaround for developing plugins.
 

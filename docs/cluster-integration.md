@@ -7,15 +7,15 @@ Choose a cluster to work with by using the Cluster Selector:
 
 ![Clusters Tab](img/clusters-tab-1.5.0.png)
 
-If the Cluster Selector does not appear, ensure that the "Show Cluster Selector" option is checked in the Settings menu:
+If the Cluster Selector does not appear, ensure that the **Show Cluster Selector** option is checked in the Settings menu:
 
 ![Cluster Preview](img/cluster-selector-1.5.0.png)
 
-Selecting the "Load" button will attempt to populate the Resource Navigator with objects from the configured cluster:
+Selecting the **Load** button will attempt to populate the Resource Navigator with objects from the configured cluster:
 
 ![Cluster Preview](img/cluster-preview-1.5.0.png)
 
-Monokle is now in "Cluster Mode" (as indicated by the header at the top):
+Monokle is now in **Cluster Mode** (as indicated by the header at the top):
 
 ![Cluster Preview](img/cluster-preview2-1.5.0.png)
 
@@ -23,4 +23,4 @@ Monokle is now in "Cluster Mode" (as indicated by the header at the top):
 - The Navigator contains all resources retrieved from the configured cluster:
   - Resource navigation works as with files; selecting a resource shows its content in the source editor.
   - Resource links are shown as before with corresponding popups/links/etc.
-- Selecting "Exit" in the top right restores the contents of the Resource Navigator to the currently selected folder.
+- Selecting **Exit** in the top right restores the contents of the Resource Navigator to the currently selected folder.

@@ -16,7 +16,7 @@ Check out the [Feature Overview](features.md) or watch the [Monokle 1.0 walkthro
 
 [![Monokle 1.0 Walkthrough](img/monokle-overview.gif)](https://youtu.be/9c80qj9NkQk)
 
-## Blog-posts
+## **Blog-posts**
 
 Check out the following blog-posts with Monokle-related content:
 
