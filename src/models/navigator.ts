@@ -39,6 +39,7 @@ export interface ItemCustomization {
   };
   disableHoverStyle?: boolean;
   isCheckVisibleOnHover?: boolean;
+  lastItemMarginBottom?: number;
 }
 
 export type SectionCustomComponentProps = {
@@ -80,6 +81,7 @@ export interface SectionCustomization {
   disableHoverStyle?: boolean;
   beforeInitializationText?: string;
   isCheckVisibleOnHover?: boolean;
+  sectionMarginBottom?: number;
 }
 
 export interface ItemBlueprint<RawItemType, ScopeType> {

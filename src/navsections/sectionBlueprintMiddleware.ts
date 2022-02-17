@@ -299,8 +299,11 @@ const processSectionBlueprints = async (state: RootState, dispatch: AppDispatch)
         Boolean(sectionBuilder?.shouldBeVisibleBeforeInitialized === true && !isSectionInitialized) ||
         (sectionBlueprint && sectionBlueprint.customization?.emptyDisplay && isSectionEmpty) ||
         (isSectionInitialized &&
-          Boolean(sectionBuilder?.isVisible ? sectionBuilder.isVisible(sectionScope, rawItems) : true) &&
-          (visibleItemIds.length > 0 || visibleGroupIds.length > 0)),
+          Boolean(
+            sectionBuilder?.isVisible
+              ? sectionBuilder.isVisible(sectionScope, rawItems)
+              : visibleItemIds.length > 0 || visibleGroupIds.length > 0
+          )),
       isInitialized: isSectionInitialized,
       isSelected: isSectionSelected,
       isHighlighted: isSectionHighlighted,
