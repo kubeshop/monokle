@@ -7,7 +7,7 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {parse, parseDocument} from 'yaml';
+import {parse} from 'yaml';
 
 import {CLUSTER_DIFF_PREFIX, HELM_CHART_ENTRY_FILE, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -40,6 +40,7 @@ import electronStore from '@utils/electronStore';
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
+import {parseYamlDocument} from '@utils/yaml';
 
 import {getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -136,11 +137,11 @@ const performResourceContentUpdate = (state: AppState, resource: K8sResource, ne
   if (isFileResource(resource)) {
     const updatedFileText = saveResource(resource, newText, state.fileMap);
     resource.text = updatedFileText;
-    resource.content = parseDocument(updatedFileText, {uniqueKeys: false, strict: false}).toJS();
+    resource.content = parseYamlDocument(updatedFileText).toJS();
     recalculateResourceRanges(resource, state);
   } else {
     resource.text = newText;
-    resource.content = parseDocument(newText, {uniqueKeys: false, strict: false}).toJS();
+    resource.content = parseYamlDocument(newText).toJS();
   }
 };
 

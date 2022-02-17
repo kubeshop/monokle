@@ -2,7 +2,7 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq, parseAllDocuments, parseDocument} from 'yaml';
+import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq} from 'yaml';
 
 import {
   CLUSTER_DIFF_PREFIX,
@@ -24,6 +24,7 @@ import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux
 
 import {getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
+import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
 import {
   getDependentResourceKinds,
@@ -57,7 +58,7 @@ const parsedDocCache = new Map<string, ParsedDocCacheEntry>();
 export function getParsedDoc(resource: K8sResource) {
   if (!parsedDocCache.has(resource.id)) {
     const lineCounter = new LineCounter();
-    const parsedDoc = parseDocument(resource.text, {lineCounter, uniqueKeys: false, strict: false});
+    const parsedDoc = parseYamlDocument(resource.text, lineCounter);
     parsedDocCache.set(resource.id, {parsedDoc, lineCounter});
   }
 
@@ -645,7 +646,7 @@ function extractNamespace(content: any) {
 
 export function extractK8sResources(fileContent: string, relativePath: string) {
   const lineCounter: LineCounter = new LineCounter();
-  const documents = parseAllDocuments(fileContent, {lineCounter, uniqueKeys: false, strict: false});
+  const documents = parseAllYamlDocuments(fileContent, lineCounter);
   const result: K8sResource[] = [];
 
   if (documents) {

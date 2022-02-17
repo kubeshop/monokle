@@ -9,7 +9,7 @@ import {withTheme} from '@rjsf/core';
 import fs from 'fs';
 import log from 'loglevel';
 import styled from 'styled-components';
-import {parseDocument, stringify} from 'yaml';
+import {stringify} from 'yaml';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
@@ -21,6 +21,7 @@ import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
+import {parseYamlDocument} from '@utils/yaml';
 
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
@@ -158,7 +159,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
       try {
         const filePath = getAbsoluteFilePath(selectedPath, fileMap);
         const fileContent = fs.readFileSync(filePath, 'utf8');
-        setFormData(parseDocument(fileContent, {uniqueKeys: false, strict: false}).toJS());
+        setFormData(parseYamlDocument(fileContent).toJS());
       } catch (e) {
         log.error(`Failed to read file [${selectedPath}]`, e);
       }

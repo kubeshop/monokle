@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import {parseDocument, stringify} from 'yaml';
+import {stringify} from 'yaml';
 
 import {UNSAVED_PREFIX} from '@constants/constants';
 
@@ -7,6 +7,8 @@ import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
 import {addResource, selectK8sResource} from '@redux/reducers/main';
+
+import {parseYamlDocument} from '@utils/yaml';
 
 function createDefaultResourceText(input: {name: string; kind: string; apiVersion?: string; namespace?: string}) {
   return `
@@ -44,7 +46,7 @@ export function createUnsavedResource(
     newResourceText = stringify(newResourceContent);
   } else {
     newResourceText = createDefaultResourceText(input);
-    newResourceContent = parseDocument(newResourceText, {uniqueKeys: false, strict: false}).toJS();
+    newResourceContent = parseYamlDocument(newResourceText).toJS();
   }
 
   const newResource: K8sResource = {

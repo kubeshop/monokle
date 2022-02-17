@@ -4,13 +4,14 @@ import {readdir} from 'fs/promises';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
-import {parseAllDocuments} from 'yaml';
 
 import {K8sResource} from '@models/k8sresource';
 import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {getStaticResourcePath} from '@redux/services';
 import {refMapperMatchesKind} from '@redux/services/resourceRefs';
+
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
@@ -175,7 +176,7 @@ async function readBundledCrdKindHandlers() {
     try {
       const crdContent = fs.readFileSync(crdPath, 'utf-8');
       if (crdContent) {
-        const documents = parseAllDocuments(crdContent, {prettyErrors: true, uniqueKeys: false, strict: false});
+        const documents = parseAllYamlDocuments(crdContent);
         documents.forEach(doc => {
           const crd = doc.toJS({maxAliasCount: -1});
           if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
