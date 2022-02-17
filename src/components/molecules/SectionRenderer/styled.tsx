@@ -87,13 +87,18 @@ type NameProps = {
   $nameColor?: string;
   $nameSize?: number;
   $nameWeight?: number;
+  $nameVerticalPadding?: number;
+  $nameHorizontalPadding?: number;
 };
 
 export const Name = styled.span<NameProps>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-left: 5px;
+  ${props =>
+    `padding: ${props.$nameVerticalPadding !== undefined ? props.$nameVerticalPadding : 0}px ${
+      props.$nameHorizontalPadding !== undefined ? props.$nameHorizontalPadding : 5
+    }px;`}
   cursor: pointer;
   ${props => {
     if (props.$nameSize) {
