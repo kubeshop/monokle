@@ -211,6 +211,15 @@ export const updateManyResources = createAsyncThunk(
   }
 );
 
+export const reprocessAllResources = createAsyncThunk(
+  'main/reprocessAllResources',
+  async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userHomeDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.reprocessAllResourcesAction({schemaVersion, userHomeDir}));
+  }
+);
 const clearSelectedResourceOnPreviewExit = (state: AppState) => {
   if (state.selectedResourceId) {
     const selectedResource = state.resourceMap[state.selectedResourceId];
@@ -813,6 +822,13 @@ export const mainSlice = createSlice({
       state.notifications.forEach(notification => {
         notification.hasSeen = true;
       });
+    },
+    reprocessAllResourcesAction: (
+      state: Draft<AppState>,
+      action: PayloadAction<{schemaVersion: string; userHomeDir: string}>
+    ) => {
+      const {schemaVersion, userHomeDir} = action.payload;
+      processParsedResources(schemaVersion, userHomeDir, state.resourceMap, state.resourceRefsProcessingOptions);
     },
   },
   extraReducers: builder => {

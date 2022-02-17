@@ -20,7 +20,7 @@ import {useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
-import {triggerReprocessResources} from '@redux/reducers/main';
+import {reprocessAllResources} from '@redux/reducers/main';
 import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
@@ -242,7 +242,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    dispatch(triggerReprocessResources(null));
+    dispatch(reprocessAllResources(null));
   }, [k8sVersion]);
 
   return (
