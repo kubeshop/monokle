@@ -266,6 +266,7 @@ const DiffModal = () => {
     resourceFilter.namespace,
     targetResource,
     isDiffModalVisible,
+    configState
   ]);
 
   useEffect(() => {

@@ -97,7 +97,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (selectedOption === 'none') {
       onOk();
     }
-  }, [kubeConfigContext, createNamespaceName, kubeConfigPath, selectedNamespace, selectedOption, onOk]);
+  }, [kubeConfigContext, createNamespaceName, kubeConfigPath, selectedNamespace, selectedOption, onOk, configState]);
 
   useEffect(() => {
     if (defaultOption && defaultOption === 'none') {

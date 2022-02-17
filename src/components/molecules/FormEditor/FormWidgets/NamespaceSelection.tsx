@@ -23,8 +23,6 @@ export const NamespaceSelection = (params: any) => {
   const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
 
-  console.log('Creating namespace selection with params', params);
-
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
       setSelectValue(inputValue);
