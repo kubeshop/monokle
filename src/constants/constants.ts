@@ -14,6 +14,7 @@ export const KUSTOMIZATION_KIND = 'Kustomization';
 export const KUSTOMIZATION_API_GROUP = 'kustomize.config.k8s.io';
 export const KUSTOMIZATION_API_VERSION = `${KUSTOMIZATION_API_GROUP}/v1beta1`;
 export const KUSTOMIZE_HELP_URL = 'https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/';
+export const HELM_CHART_HELP_URL = 'https://helm.sh/docs/topics/charts/';
 export const DEPENDENCIES_HELP_URL = 'https://kubeshop.github.io/monokle/getting-started/#install-dependencies';
 export const DEFAULT_EDITOR_DEBOUNCE = 500;
 export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;

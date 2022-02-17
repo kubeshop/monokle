@@ -40,15 +40,23 @@ export function getHelmChartFromFileEntry(fileEntry: FileEntry, helmChartMap: He
  * Checks if the specified path is a helm values file
  */
 
-export function isHelmValuesFile(filePath: string) {
-  return micromatch.isMatch(path.basename(filePath), '*values*.yaml');
+export function isHelmValuesFile(filePath: string): boolean {
+  return micromatch.isMatch(path.basename(filePath).toLowerCase(), '*values*.yaml');
+}
+
+/**
+ * Checks if the specified path is a helm chart file
+ */
+
+export function isHelmChartFile(filePath: string): boolean {
+  return path.basename(filePath).toLowerCase() === 'chart.yaml';
 }
 
 /**
  * Checks if the specified files are a Helm Chart folder
  */
 
-export function isHelmChartFolder(files: string[]) {
+export function isHelmChartFolder(files: string[]): boolean {
   return files.indexOf(HELM_CHART_ENTRY_FILE) !== -1;
 }
 
