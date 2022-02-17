@@ -205,15 +205,26 @@ export const Settings = ({
 
   const handleK8SVersionChange = (k8sVersion: string) => {
     setSelectedK8SVersion(k8sVersion);
+    if (doesSchemaExists(k8sVersion)) {
+      setLocalConfig({...localConfig, k8sVersion});
+    }
   };
 
   const handleDownloadVersionSchema = async () => {
-    setIsSchemaDownloading(true);
-    await downloadSchema(
-      `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${selectedK8SVersion}/_definitions.json`,
-      path.join(String(userDataDir), path.sep, 'schemas', `${selectedK8SVersion}.json`)
-    );
-    setIsSchemaDownloading(false);
+    try {
+      setIsSchemaDownloading(true);
+      await downloadSchema(
+        `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${selectedK8SVersion}/_definitions.json`,
+        path.join(String(userDataDir), path.sep, 'schemas', `${selectedK8SVersion}.json`)
+      );
+      setIsSchemaDownloading(false);
+      setLocalConfig({
+        ...localConfig,
+        k8sVersion: selectedK8SVersion,
+      });
+    } catch (error: any) {
+      console.error(error.message);
+    }
   };
 
   const doesSchemaExists = useCallback(
@@ -222,13 +233,6 @@ export const Settings = ({
     },
     [isSchemaDownloading, userDataDir]
   );
-
-  const onK8SVersionChange = () => {
-    setLocalConfig({
-      ...localConfig,
-      k8sVersion: selectedK8SVersion,
-    });
-  };
 
   return (
     <>
@@ -263,8 +267,12 @@ export const Settings = ({
       <S.Div>
         <S.Span>K8S Version</S.Span>
         <div>
-          <Tooltip title="sdfsdfs">
-            <Select value={selectedK8SVersion} onChange={handleK8SVersionChange} style={{width: 'calc(100% - 112px)'}}>
+          <Tooltip title="">
+            <Select
+              value={selectedK8SVersion}
+              onChange={handleK8SVersionChange}
+              style={{width: doesSchemaExists(selectedK8SVersion) ? '100%' : 'calc(100% - 172px)'}}
+            >
               {k8sVersions.map(version => (
                 <Select.Option key={version} value={version}>
                   {version}
@@ -273,21 +281,13 @@ export const Settings = ({
             </Select>
           </Tooltip>
 
-          {doesSchemaExists(selectedK8SVersion) ? (
+          {!doesSchemaExists(selectedK8SVersion) && (
             <Button
-              style={{width: '100px', marginLeft: '12px'}}
-              onClick={onK8SVersionChange}
-              disabled={localConfig?.k8sVersion === selectedK8SVersion}
-            >
-              Use
-            </Button>
-          ) : (
-            <Button
-              style={{width: '100px', marginLeft: '12px'}}
+              style={{width: '160px', marginLeft: '12px'}}
               onClick={handleDownloadVersionSchema}
               loading={isSchemaDownloading}
             >
-              Download
+              Download & Use
             </Button>
           )}
         </div>

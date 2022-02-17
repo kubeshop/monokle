@@ -29,7 +29,7 @@ export const DEFAULT_PLUGINS = [
 ];
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 
-export const PREDEFINED_K8S_VERSION = '1.22.1';
+export const PREDEFINED_K8S_VERSION = '1.23.3';
 
 export const K8S_VERSIONS = [
   '1.23.3',

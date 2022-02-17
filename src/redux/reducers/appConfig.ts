@@ -2,7 +2,9 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
-import path from 'path';
+import path, {join} from 'path';
+
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {
   AppConfig,
@@ -60,6 +62,16 @@ export const setOpenProject = createAsyncThunk(
     // First open the project so state.selectedProjectRootFolder is set
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
     const config: ProjectConfig | null = projectConfig || populateProjectConfig(appConfig);
+
+    if (
+      projectConfig &&
+      !(
+        projectConfig.k8sVersion &&
+        existsSync(join(String(appConfig.userDataDir), path.sep, 'schemas', `${projectConfig?.k8sVersion}.json`))
+      )
+    ) {
+      projectConfig.k8sVersion = PREDEFINED_K8S_VERSION;
+    }
     // Then set project config by reading .monokle or populating it
     thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config, fromConfigFile: false}));
     // Last set rootFolder so function can read the latest projectConfig
