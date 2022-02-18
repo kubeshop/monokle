@@ -1,6 +1,6 @@
 # Testing
 
-Monokle tests are written with Playwright: https://playwright.dev/docs/api/class-electron
+Monokle tests are written with [Playwright](https://playwright.dev/docs/api/class-electron).
 
 ## **Run Tests**
 
