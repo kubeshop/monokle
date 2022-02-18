@@ -26,7 +26,7 @@ const helmCommonOptions = {
   '--skip-crds': 'boolean',
   '--timeout': 'duration',
   '--username': 'string',
-  '--values': 'strings',
+  '--values': 'string',
   '--verify': 'boolean',
   '--version': 'string',
   '--wait': 'boolean',
