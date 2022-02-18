@@ -2,7 +2,7 @@
 
 ## **Launch Monokle**
 
-<em>**Note:** Please follow this [Getting Started](../getting-started.md) guide to install Monokle 🚀</em>
+<em>**Note:** Please follow this [Getting Started](getting-started.md) guide to install Monokle 🚀</em>
 
 Launch Monokle and on the welcome screen, there are three options to start working with projects:
 
