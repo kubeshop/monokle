@@ -3,34 +3,80 @@ import {useEffect, useState} from 'react';
 import {Space, Typography} from 'antd';
 import {Radio} from 'antd';
 
-import api from './api';
+import {api} from './api';
 import {Container, FilterList, IssueList, Loading, Owner, OwnerProfile, PageNav, RepoInfo} from './styles';
 
+interface Owner {
+  html_url: string;
+  avatar_url: string;
+  login: string;
+  stargazers_count: string;
+}
+
+interface Repo {
+  owner: Owner;
+  license: {name: string};
+  html_url: string;
+  stargazers_count: string;
+  name: string;
+  forks_count: string;
+  forks: string;
+  description: string;
+}
+
+interface Filters {
+  state: string;
+  label: string;
+  active: boolean;
+}
+
+interface Branch {
+  name: string;
+  id: string;
+}
+
+enum Action {
+  next = 'next',
+  back = 'back',
+}
+
 const {Title} = Typography;
-export const Repository = ({repoName}) => {
-  const [state, setComponentState] = useState({
+
+export const Repository = ({repoName}: {repoName: string}) => {
+  const [state, setComponentState] = useState<
+    | {
+        repo: Repo;
+        loading: boolean;
+        filters: [Filters];
+        filterIndex: number;
+        page: number;
+        branches: Branch[] | null;
+      }
+    | undefined
+  >({
     repo: {},
     loading: true,
     filters: [{state: 'all', label: 'All Branches', active: true}],
     filterIndex: 0,
     page: 1,
+    branches: [],
   });
 
-  const fetchRepo = async filters => {
-    return Promise.all([
-      await api.get(`/repos/${repoName}`),
-      await api.get(`/repos/${repoName}/branches`, {
+  const fetchRepo: any = async (filters: Filters[] | [] = []) => {
+    const res = await Promise.all([
+      await api(`/repos/${repoName}`),
+      await api(`/repos/${repoName}/branches`, {
         params: {
           state: filters.find(filter => filter.active).state,
           per_page: 8,
         },
       }),
     ]);
+    return res;
   };
 
   useEffect(() => {
     const {filters} = state;
-
     const [repo, branches] = fetchRepo(filters);
 
     setComponentState({
@@ -42,9 +88,9 @@ export const Repository = ({repoName}) => {
   }, []);
 
   const loadFilters = async () => {
-    const {filters, filterIndex, page} = state;
+    const {page} = state;
 
-    const branches = await api.get(`/repos/${repoName}/branches`, {
+    const branches: any = await api(`/repos/${repoName}/branches`, {
       params: {
         per_page: 4,
         page,
@@ -54,12 +100,7 @@ export const Repository = ({repoName}) => {
     setComponentState({...state, branches: branches.data});
   };
 
-  const handleFilters = async filterIndex => {
-    await setComponentState({...state, filterIndex});
-    loadFilters();
-  };
-
-  const handlePage = async action => {
+  const handlePage = async (action: Action) => {
     const {page} = state;
     await setComponentState({...state, page: action === 'back' ? page - 1 : page + 1});
     loadFilters();
@@ -93,15 +134,17 @@ export const Repository = ({repoName}) => {
           </h1>
           <div>
             {repo.license && <span>{repo.license.name}</span>}
-            {repo.stargazers_count !== 0 && (
+            {repo.stargazers_count !== '0' && (
               <span>
                 {`${Number(repo.stargazers_count).toLocaleString(undefined, {
                   minimumIntegerDigits: 2,
-                })} ${repo.stargazers_count === 1 ? 'star' : 'stars'}`}
+                })} ${repo.stargazers_count === '1' ? 'star' : 'stars'}`}
               </span>
             )}
             {repo.forks !== 0 && (
-              <span>{`${Number(repo.forks_count).toLocaleString()} ${repo.forks_count === 1 ? 'fork' : 'forks'}`}</span>
+              <span>{`${Number(repo.forks_count).toLocaleString()} ${
+                repo.forks_count === '1' ? 'fork' : 'forks'
+              }`}</span>
             )}
           </div>
           <p>{repo.description}</p>
@@ -110,15 +153,15 @@ export const Repository = ({repoName}) => {
 
       <IssueList>
         <FilterList active={filterIndex}>
-          {filters.map((filter, index) => (
-            <button type="button" key={filter.state} onClick={() => handleFilters(index)}>
+          {filters.map(filter => (
+            <button type="button" key={filter.state}>
               {filter.label}
             </button>
           ))}
         </FilterList>
         <Radio.Group>
           <Space direction="vertical">
-            {branches.map(issue => (
+            {branches.map((issue: Branch) => (
               <Radio key={String(issue.id)} value={issue.name}>
                 <Title level={5}>{issue.name}</Title>
               </Radio>

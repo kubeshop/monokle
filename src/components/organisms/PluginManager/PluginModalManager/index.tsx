@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import api from './api';
+import {api} from './api';
 import {Container, ErrorMessage, Form, List, SubmitButton} from './styles';
 
 const Main = () => {
@@ -34,7 +34,7 @@ const Main = () => {
 
       if (newRepo === '') throw new Error('You need to inform one repository');
 
-      const response = await api.get(`/repos/${newRepo}`);
+      const response = await api(`/repos/${newRepo}`);
 
       const data = {
         name: response.data.full_name,
@@ -49,7 +49,7 @@ const Main = () => {
       if (hasRepo) throw new Error('Duplicated Repository');
 
       setStateComponent({...state, repositories: [...repositories, data], newRepo: '', errorMessage: ''});
-    } catch (Error) {
+    } catch (Error: any) {
       setStateComponent({
         ...state,
         error: true,
@@ -60,7 +60,7 @@ const Main = () => {
     }
   };
 
-  const handleDelete = repo => {
+  const handleDelete = (repo: any) => {
     const {repositories} = state;
     setStateComponent({...state, repositories: repositories.filter(repository => repository.name !== repo.name)});
   };

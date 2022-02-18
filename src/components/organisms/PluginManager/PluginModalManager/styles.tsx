@@ -7,14 +7,14 @@ export const Form = styled.form`
 
   input {
     flex: 1;
-    border: solid ${props => (props.error ? '2px #e41111' : '1px #eee')};
+    border: solid ${(props: {error: string}) => (props.error ? '2px #e41111' : '1px #eee')};
     padding: 10px 15px;
     border-radius: 4px;
     font-size: 16px;
   }
 `;
 
-export const SubmitButton = styled.button.attrs(props => ({
+export const SubmitButton = styled.button.attrs((props: {loading: boolean; empty: any}) => ({
   type: 'submit',
   disabled: props.loading || props.empty,
 }))`
@@ -33,7 +33,7 @@ export const SubmitButton = styled.button.attrs(props => ({
     background: rgba(113, 89, 193, 0.2);
   }
 
-  ${props =>
+  ${(props: {loading: boolean}) =>
     props.loading &&
     css`
       svg {
@@ -150,7 +150,7 @@ export const Loading = styled.div`
   align-items: center;
   height: 731px;
 
-  ${props =>
+  ${(props: {loading: boolean}) =>
     props.loading &&
     css`
       svg {
@@ -273,7 +273,7 @@ export const FilterList = styled.div`
     border-bottom: 2px solid transparent;
     text-transform: uppercase;
 
-    &:nth-child(${props => props.active + 1}) {
+    &:nth-child(${(props: {active: number}) => props.active + 1}) {
       font-weight: bold;
       color: #7159c1;
       border-bottom: 2px solid #7159c1;
@@ -342,19 +342,6 @@ export const IssueList = styled.ul`
       }
     }
   }
-`;
-
-export const IssueLabel = styled.span`
-  background: ${({color}) => `#${color}`};
-  color: ${({color}) => colorContrast(color)};
-  display: inline-block;
-  border-radius: 2px;
-  font-size: 12px;
-  font-weight: 600;
-  height: 20px;
-  padding: 3px 8px;
-  margin-right: 10px;
-  line-height: 12px;
 `;
 
 export const PageNav = styled.div`
