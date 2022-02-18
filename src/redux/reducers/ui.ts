@@ -223,12 +223,6 @@ export const uiSlice = createSlice({
       state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
       state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
     },
-    openPreviewConfigurationEditor: (state: Draft<UiState>) => {
-      state.isPreviewConfigurationEditorOpen = true;
-    },
-    closePreviewConfigurationEditor: (state: Draft<UiState>) => {
-      state.isPreviewConfigurationEditorOpen = false;
-    },
   },
   extraReducers: builder => {
     builder
@@ -294,7 +288,5 @@ export const {
   closeSaveResourcesToFileFolderModal,
   zoomIn,
   zoomOut,
-  openPreviewConfigurationEditor,
-  closePreviewConfigurationEditor,
 } = uiSlice.actions;
 export default uiSlice.reducer;

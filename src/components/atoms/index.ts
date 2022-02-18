@@ -15,3 +15,4 @@ export {default as Dots} from './Dots';
 export {default as Spinner} from './Spinner';
 export {default as Icon} from './Icon';
 export {default as TabHeader} from './TabHeader';
+export {default as OrderedList} from './OrderedList';

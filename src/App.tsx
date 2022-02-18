@@ -20,12 +20,8 @@ import {useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
-import {
-  closeFolderExplorer,
-  closePreviewConfigurationEditor,
-  toggleNotifications,
-  toggleSettings,
-} from '@redux/reducers/ui';
+import {closePreviewConfigurationEditor} from '@redux/reducers/main';
+import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
@@ -78,7 +74,7 @@ const App = () => {
   const dispatch = useDispatch();
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
-  const isPreviewConfigurationEditorOpen = useAppSelector(state => state.ui.isPreviewConfigurationEditorOpen);
+  const isPreviewConfigurationEditorOpen = useAppSelector(state => state.main.prevConfEditor.isOpen);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isCreateFolderModalVisible = useAppSelector(state => state.ui.createFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);

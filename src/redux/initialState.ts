@@ -46,6 +46,9 @@ const initialAppState: AppState = {
   shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
   registeredKindHandlers: [],
+  prevConfEditor: {
+    isOpen: false,
+  },
 };
 
 const initialAppConfigState: AppConfig = {
@@ -101,7 +104,6 @@ const initialUiState: UiState = {
   isClusterDiffVisible: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
-  isPreviewConfigurationEditorOpen: false,
   quickSearchActionsPopup: {
     isOpen: false,
   },
