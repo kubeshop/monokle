@@ -453,7 +453,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
     }
   }
 
-  // if this new file is a values file, search for it's helm chart and update it
+  // if this new file is a values file, search for its helm chart and update it
   if (isHelmValuesFile(absolutePath)) {
     const helmChart = Object.values(state.helmChartMap).find(chart => {
       return path.dirname(chart.filePath) === parentFolderEntry?.filePath;
