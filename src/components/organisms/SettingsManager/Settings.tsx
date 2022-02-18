@@ -7,7 +7,13 @@ import {useForm} from 'antd/lib/form/Form';
 import _ from 'lodash';
 import path from 'path';
 
-import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, K8S_VERSIONS, TOOLTIP_DELAY} from '@constants/constants';
+import {
+  DEFAULT_EDITOR_DEBOUNCE,
+  DEFAULT_KUBECONFIG_DEBOUNCE,
+  K8S_VERSIONS,
+  TOOLTIP_DELAY,
+  TOOLTIP_K8S_SELECTION,
+} from '@constants/constants';
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
@@ -223,6 +229,7 @@ export const Settings = ({
         k8sVersion: selectedK8SVersion,
       });
     } catch (error: any) {
+      // eslint-disable-next-line no-console
       console.error(error.message);
     }
   };
@@ -265,9 +272,9 @@ export const Settings = ({
         </Form>
       )}
       <S.Div>
-        <S.Span>K8S Version</S.Span>
+        <S.Span>Kubernetes Version</S.Span>
         <div>
-          <Tooltip title="">
+          <Tooltip title={TOOLTIP_K8S_SELECTION}>
             <Select
               value={selectedK8SVersion}
               onChange={handleK8SVersionChange}

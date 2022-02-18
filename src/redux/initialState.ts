@@ -87,7 +87,7 @@ const initialAppConfigState: AppConfig = {
   projectConfig: null,
   isProjectLoading: true,
   projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
-  k8sVersion: PREDEFINED_K8S_VERSION,
+  k8sVersion: electronStore.get('appConfig.k8sVersion') || PREDEFINED_K8S_VERSION,
 };
 
 const initialAlertState: AlertState = {};

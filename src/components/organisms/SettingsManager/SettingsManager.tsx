@@ -6,7 +6,7 @@ import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
 
-import {DEFAULT_KUBECONFIG_DEBOUNCE} from '@constants/constants';
+import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION} from '@constants/constants';
 import {AutoLoadLastProjectTooltip} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
@@ -21,6 +21,7 @@ import {
   updateClusterSelectorVisibilty,
   updateFileIncludes,
   updateFolderReadsMaxDepth,
+  updateK8sVersion,
   updateLoadLastProjectOnStartup,
   updateProjectConfig,
   updateScanExcludes,
@@ -49,7 +50,6 @@ const SettingsManager: React.FC = () => {
 
   const [activePanels, setActivePanels] = useState<number[]>([3]);
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
-  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
 
   const [settingsForm] = useForm();
 
@@ -82,6 +82,9 @@ const SettingsManager: React.FC = () => {
     }
     if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
       dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
+    }
+    if (!_.isEqual(config?.k8sVersion, appConfig.k8sVersion)) {
+      dispatch(updateK8sVersion(config?.k8sVersion || PREDEFINED_K8S_VERSION));
     }
     if (!_.isEqual(_.sortBy(config?.scanExcludes), _.sortBy(appConfig.scanExcludes))) {
       dispatch(setScanExcludesStatus('outdated'));

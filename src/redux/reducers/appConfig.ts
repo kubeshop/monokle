@@ -147,6 +147,10 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
       state.folderReadsMaxDepth = action.payload;
     },
+    updateK8sVersion: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      electronStore.set('appConfig.k8sVersion', action.payload);
+      state.k8sVersion = action.payload;
+    },
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       state.kubeConfig.currentContext = action.payload;
     },
@@ -333,5 +337,6 @@ export const {
   changeCurrentProjectName,
   changeProjectsRootPath,
   updateApplicationSettings,
+  updateK8sVersion,
 } = configSlice.actions;
 export default configSlice.reducer;

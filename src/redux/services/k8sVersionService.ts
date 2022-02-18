@@ -12,6 +12,7 @@ export const downloadSchema = async (url: string, path: string) => {
       await writeFileAsync(path, body, {encoding: 'utf-8'});
     }
   } catch (error: any) {
+    // eslint-disable-next-line no-console
     console.log(error.message);
   }
 };
