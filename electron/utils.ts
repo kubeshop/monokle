@@ -1,6 +1,6 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {existsSync, writeFileSync} from 'fs';
+import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import _ from 'lodash';
 import path, {join} from 'path';
 
@@ -100,7 +100,13 @@ export const getSerializedProcessEnv = () => {
 };
 
 export const saveInitialK8sSchema = (userDataDir: string) => {
-  const schemaPath = join(String(userDataDir), path.sep, 'schemas', `${PREDEFINED_K8S_VERSION}.json`);
+  const dirName = join(String(userDataDir), path.sep, 'schemas');
+  const schemaPath = join(dirName, path.sep, `${PREDEFINED_K8S_VERSION}.json`);
+
+  if (!existsSync(dirName)) {
+    mkdirSync(dirName, {recursive: true});
+  }
+
   if (!existsSync(schemaPath)) {
     const data = loadResource(`schemas/${PREDEFINED_K8S_VERSION}.json`);
     writeFileSync(schemaPath, String(data));
