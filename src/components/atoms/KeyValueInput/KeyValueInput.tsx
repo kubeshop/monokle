@@ -52,11 +52,13 @@ function KeyValueInput(props: KeyValueInputProps) {
           return;
         }
 
+        const availableValues: string[] | undefined = data[key];
+
         if (value === null) {
           newEntries.push({
             id: uuidv4(),
             key,
-            value: ANY_VALUE,
+            value: availableValues?.length ? ANY_VALUE : undefined,
           });
         } else {
           newEntries.push({
@@ -93,10 +95,13 @@ function KeyValueInput(props: KeyValueInputProps) {
   const updateEntryKey = (entryId: string, key: string) => {
     const newEntries = Array.from(entries);
     const entryIndex = newEntries.findIndex(e => e.id === entryId);
+
+    const availableValues: string[] | undefined = data[key];
+
     newEntries[entryIndex] = {
       id: entryId,
       key,
-      value: ANY_VALUE,
+      value: availableValues?.length ? ANY_VALUE : undefined,
     };
     setEntries(newEntries);
     updateKeyValue(newEntries);
