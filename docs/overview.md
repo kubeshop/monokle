@@ -1,10 +1,26 @@
 # UI Overview
 
+## **Launch Monokle**
+
+<em>**Note:** Please follow this [Getting Started](../getting-started.md) guide to install Monokle 🚀</em>
+
+Launch Monokle and on the welcome screen, there are three options to start working with projects:
+
+ - Select an exisiting folder.
+ - Create an empty project.
+ - Start from a template.
+ 
+ 
+
+![Welcome](img/welcome-1.5.0.png)
+
+Click **Select an existing project** to add your project folder containing K8 resources. 
+
 Monokle is laid out like many other desktop applications:
 
 ![Monokle UI](img/monokle-ui-1.5.0.png)
 
-On start-up, Monokle automatically loads the most recently selected folder if the corresponding "Load recent folder on Startup" setting has been enabled.
+On subsequent start-ups, Monokle automatically loads the most recently selected folder, if the corresponding "Load recent folder on Startup" setting has been enabled.
 
 Left to right:
 
@@ -25,7 +41,7 @@ The top right contains the following buttons:
     - GitHub -> opens the Monokle GitHub repo in your system browser.
     - Discord -> Open Discord to talk to us about your Monokle experience.
 
-## Settings
+## **Settings**
 
 Clicking the Settings icon on the top right opens the settings:
 
@@ -65,7 +81,7 @@ Clicking the Settings icon on the top right opens the settings:
   - **Resource links processing**:
     - Ignore optional unsatisfied links.
 
-## System Menu
+## **System Menu**
 
 Monokle provides a system menu with common File/Edit/View/Window/Help functionality.
 
@@ -77,7 +93,7 @@ Windows System Menu:
 
 ![Windows Monokle System Menu](img/windows-system-menu.png)
 
-## Multiple Windows
+## **Multiple Windows**
 
 You can launch multiple project windows using the New Monokle Windows option. This allows you to work on multiple folders or clusters simultaneously. Thus visual navigation for the recently used pages becomes simpler and faster.
 
@@ -85,11 +101,11 @@ You can launch multiple project windows using the New Monokle Windows option. Th
 
 ![Multiple Window](img/multiple-window-1.5.0.png)
 
-## Keyboard Shortcuts
+## **Keyboard Shortcuts**
 
 Please visit [Monokle Keyboard Shortcuts](hotkeys.md) for a complete list of keyboard shortcuts.
 
-## Auto-update
+## **Auto-update**
 
 The Monokle (on Mac) / Help (on Windows) system menus provide a "Check for Update" action that will check for an update
 and prompt to download, if available.

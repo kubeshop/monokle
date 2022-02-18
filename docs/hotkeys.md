@@ -1,5 +1,6 @@
 # Monokle Keyboard Shortcuts
 
+
 Monokle currently supports the following keyboard shortcuts:
 
 - Cluster Preview: Ctrl/Cmd I

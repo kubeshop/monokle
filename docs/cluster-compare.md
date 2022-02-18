@@ -13,7 +13,7 @@ To use Cluster Compare follow these steps:
 - Browse to a folder containing manifests / kustomizations / Helm charts.
 - Preview the desired kustomization or helm values file.
 - Select the desired cluster context in the Cluster tab to the left.
-- Press the "Cluster Compare" button at the top of the Resource Navigator:
+- Press the **Cluster Compare** button at the top of the Resource Navigator:
 
 ![Cluster Compare](img/cluster-compare-button-1.5.0.png)
 
