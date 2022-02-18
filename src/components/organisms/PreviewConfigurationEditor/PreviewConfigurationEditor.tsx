@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import {Input, Select} from 'antd';
+import {Button, Input, Select} from 'antd';
 
 import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
 
@@ -72,6 +72,15 @@ const PreviewConfigurationEditor = () => {
           onChange={setHelmOptions}
         />
       </S.Field>
+      <S.ActionsContainer>
+        <Button type="primary" ghost>
+          Discard
+        </Button>
+        <Button type="primary" ghost>
+          Save
+        </Button>
+        <Button type="primary">Save and Preview</Button>
+      </S.ActionsContainer>
     </div>
   );
 };

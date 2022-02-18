@@ -20,3 +20,10 @@ export const Description = styled.p`
   font-size: 14px;
   color: ${Colors.grey7};
 `;
+
+export const ActionsContainer = styled.div`
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+`;
