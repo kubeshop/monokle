@@ -1,4 +1,5 @@
 import {EventEmitter} from 'events';
+import log from 'loglevel';
 
 import {SectionBlueprint} from '@models/navigator';
 
@@ -18,8 +19,7 @@ const resizeObserver = new window.ResizeObserver(entries => {
 
 const register = (sectionBlueprint: SectionBlueprint<any, any>) => {
   if (SectionBlueprintMap[sectionBlueprint.id]) {
-    // eslint-disable-next-line no-console
-    console.warn(`Overriding existing sectionBlueprint with id ${sectionBlueprint.id}`);
+    log.warn(`Overriding existing sectionBlueprint with id ${sectionBlueprint.id}`);
   }
   SectionBlueprintMap[sectionBlueprint.id] = sectionBlueprint;
   eventEmitter.emit('register', sectionBlueprint);

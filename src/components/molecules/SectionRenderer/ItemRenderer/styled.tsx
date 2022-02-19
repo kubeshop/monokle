@@ -15,6 +15,7 @@ type ItemContainerProps = {
   $indentation: number;
   $isSectionCheckable: boolean;
   $hasCustomNameDisplay: boolean;
+  $lastItemMarginBottom?: number;
 };
 
 export const ItemContainer = styled.span<ItemContainerProps>`
@@ -31,6 +32,9 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   ${props => props.hasOnClick && `cursor: pointer;`}
   ${props => {
     if (props.isLastItem) {
+      if (props.$lastItemMarginBottom !== undefined) {
+        return `margin-bottom: ${props.$lastItemMarginBottom}px;`;
+      }
       return `margin-bottom: 12px;`;
     }
   }}

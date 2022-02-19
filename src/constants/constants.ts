@@ -30,3 +30,5 @@ export const DEFAULT_PLUGINS = [
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';
 export const HELM_CHART_SECTION_NAME = 'Helm Charts';
+export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_template/#options';
+export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
