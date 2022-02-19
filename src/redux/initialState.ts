@@ -46,6 +46,9 @@ const initialAppState: AppState = {
   shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
   registeredKindHandlers: [],
+  prevConfEditor: {
+    isOpen: false,
+  },
 };
 
 const initialAppConfigState: AppConfig = {

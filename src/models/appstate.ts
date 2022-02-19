@@ -146,6 +146,10 @@ interface AppState {
   /** type/value of filters that will be changed */
   filtersToBeChanged?: ResourceFilterType;
   registeredKindHandlers: string[];
+  prevConfEditor: {
+    isOpen: boolean;
+    helmChartId?: string;
+  };
 }
 
 export type {
