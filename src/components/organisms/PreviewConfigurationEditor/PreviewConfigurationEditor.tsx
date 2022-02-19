@@ -1,7 +1,8 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {Button, Input, Select} from 'antd';
 
+import {HELM_INSTALL_OPTIONS_DOCS_URL, HELM_TEMPLATE_OPTIONS_DOCS_URL} from '@constants/constants';
 import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
 
 import {HelmValuesFile} from '@models/helm';
@@ -39,7 +40,15 @@ const PreviewConfigurationEditor = () => {
   const [helmOptions, setHelmOptions] = useState({});
   const [helmCommand, setHelmCommand] = useState<'template' | 'install'>(helmPreviewMode || 'template');
 
-  const keyValueInputSchema = helmCommand === 'template' ? helmTemplateOptions : helmInstallOptions;
+  const keyValueInputSchema = useMemo(
+    () => (helmCommand === 'template' ? helmTemplateOptions : helmInstallOptions),
+    [helmCommand]
+  );
+
+  const helmOptionsDocsUrl = useMemo(
+    () => (helmCommand === 'template' ? HELM_TEMPLATE_OPTIONS_DOCS_URL : HELM_INSTALL_OPTIONS_DOCS_URL),
+    [helmCommand]
+  );
 
   if (!helmChart) {
     return <p>Something went wrong, could not find the helm chart.</p>;
@@ -69,6 +78,7 @@ const PreviewConfigurationEditor = () => {
           value={helmOptions}
           schema={keyValueInputSchema}
           data={{}}
+          docsUrl={helmOptionsDocsUrl}
           onChange={setHelmOptions}
         />
       </S.Field>

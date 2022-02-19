@@ -7,6 +7,8 @@ import {PlusOutlined} from '@ant-design/icons';
 import isDeepEqual from 'fast-deep-equal/es6/react';
 import {v4 as uuidv4} from 'uuid';
 
+import {openUrlInExternalBrowser} from '@utils/shell';
+
 import KeyValueEntryRenderer from './KeyValueEntryRenderer';
 import {ANY_VALUE} from './constants';
 import {KeyValueData, KeyValueEntry} from './types';
@@ -20,6 +22,7 @@ type KeyValueInputProps = {
   schema: Record<string, string>;
   data: Record<string, string[]>;
   value: KeyValueData;
+  docsUrl?: string;
   onChange: (keyValueData: KeyValueData) => void;
 };
 
@@ -39,7 +42,7 @@ function makeKeyValueDataFromEntries(keyValueEntries: KeyValueEntry[]): KeyValue
 }
 
 function KeyValueInput(props: KeyValueInputProps) {
-  const {disabled = false, label, labelStyle, data, value: parentKeyValueData, schema, onChange} = props;
+  const {disabled = false, label, labelStyle, data, value: parentKeyValueData, schema, docsUrl, onChange} = props;
   const [entries, setEntries] = useState<KeyValueEntry[]>([]);
   const [currentKeyValueData, setCurrentKeyValueData] = useState<KeyValueData>(parentKeyValueData);
 
@@ -143,6 +146,11 @@ function KeyValueInput(props: KeyValueInputProps) {
           Add
         </Button>
       </S.TitleContainer>
+      {docsUrl && (
+        <Button type="link" onClick={() => openUrlInExternalBrowser(docsUrl)} style={{padding: 0}}>
+          Documentation
+        </Button>
+      )}
       {entries.map(entry => (
         <KeyValueEntryRenderer
           key={entry.id}
