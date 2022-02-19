@@ -6,10 +6,12 @@ import {PlusOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {NewPreviewConfigurationTooltip} from '@constants/tooltips';
+
 import {SectionCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openPreviewConfigurationEditor} from '@redux/reducers/ui';
+import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 
 import Colors from '@styles/Colors';
 
@@ -35,13 +37,13 @@ const PreviewConfigurationNameSuffix: React.FC<SectionCustomComponentProps> = pr
   const dispatch = useAppDispatch();
 
   const onClick = () => {
-    dispatch(openPreviewConfigurationEditor());
+    dispatch(openPreviewConfigurationEditor(sectionInstance.id.replace('-configurations', '')));
   };
 
   return (
     <SuffixContainer>
       <ButtonContainer>
-        <Tooltip title="Create a new Preview Configuration">
+        <Tooltip title={NewPreviewConfigurationTooltip}>
           <Button
             icon={<PlusOutlined />}
             type="link"
