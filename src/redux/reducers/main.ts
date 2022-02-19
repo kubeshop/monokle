@@ -235,7 +235,7 @@ export const mainSlice = createSlice({
         if (fileEntry) {
           if (getFileStats(filePath)?.isDirectory() === false) {
             log.info(`added file ${filePath} already exists - updating`);
-            reloadFile(filePath, fileEntry, state);
+            reloadFile(filePath, fileEntry, state, projectConfig);
           }
         } else {
           addPath(filePath, state, projectConfig);
@@ -254,7 +254,7 @@ export const mainSlice = createSlice({
       filePaths.forEach((filePath: string) => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
-          reloadFile(filePath, fileEntry, state);
+          reloadFile(filePath, fileEntry, state, projectConfig);
         } else {
           addPath(filePath, state, projectConfig);
         }
@@ -831,9 +831,8 @@ export const mainSlice = createSlice({
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
         } else {
-          const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
+          const newFileEntry = {...createFileEntry(relativeFilePath, state.fileMap), isSupported: true};
           newFileEntry.timestamp = resourcePayload.fileTimestamp;
-          state.fileMap[relativeFilePath] = newFileEntry;
           const childFileName = path.basename(relativeFilePath);
           const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
           if (parentPath === path.sep) {

@@ -249,7 +249,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldEditorReloadSelectedPath]);
+  }, [selectedPath, shouldEditorReloadSelectedPath]);
 
   useEffect(() => {
     if (selectedResource && selectedResource.text !== code) {
