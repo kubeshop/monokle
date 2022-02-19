@@ -6,6 +6,8 @@ import {PlusOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {NewPreviewConfigurationTooltip} from '@constants/tooltips';
+
 import {SectionCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -41,7 +43,7 @@ const PreviewConfigurationNameSuffix: React.FC<SectionCustomComponentProps> = pr
   return (
     <SuffixContainer>
       <ButtonContainer>
-        <Tooltip title="Create a new Preview Configuration">
+        <Tooltip title={NewPreviewConfigurationTooltip}>
           <Button
             icon={<PlusOutlined />}
             type="link"
