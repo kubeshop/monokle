@@ -3,8 +3,8 @@ import {useEffect} from 'react';
 import {FileMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
-import {isSupportedHelmResource} from '@redux/services/helm';
 import {isKustomizationPatch} from '@redux/services/kustomize';
+import {hasSupportedResourceContent} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
 function useResourceYamlSchema(yaml: any, resource?: K8sResource, selectedPath?: string, fileMap?: FileMapType) {
@@ -22,7 +22,7 @@ function useResourceYamlSchema(yaml: any, resource?: K8sResource, selectedPath?:
 
     if (resource) {
       resourceSchema = getResourceSchema(resource);
-      validate = resourceSchema && !isKustomizationPatch(resource) && isSupportedHelmResource(resource);
+      validate = resourceSchema && !isKustomizationPatch(resource) && hasSupportedResourceContent(resource);
     } else if (selectedPath && fileMap) {
       resourceSchema = getSchemaForPath(selectedPath, fileMap);
       validate = resourceSchema !== undefined;

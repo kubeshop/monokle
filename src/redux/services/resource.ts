@@ -659,7 +659,7 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
         );
       } else {
         if (doc.warnings.length > 0) {
-          log.warn('Doc has warnings', doc.warnings, doc);
+          log.warn('[extractK8sResources]: Doc has warnings', doc.warnings, doc);
         }
 
         const content = doc.toJS();
@@ -780,4 +780,15 @@ export function getResourceKindsWithTargetingRefs(resource: K8sResource) {
     targetResourceKindCache.set(resource.kind, resourceKinds);
   }
   return targetResourceKindCache.get(resource.kind);
+}
+
+/**
+ * check if the k8sResource is supported - currently excludes any files
+ * that seem to contain Helm template or Monokle Vanilla template content
+ */
+
+export function hasSupportedResourceContent(resource: K8sResource): boolean {
+  const helmVariableRegex = /{{.*}}/g;
+  const vanillaTemplateVariableRegex = /\[\[.*]]/g;
+  return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }

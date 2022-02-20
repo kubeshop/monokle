@@ -12,7 +12,6 @@ import {ProjectConfig} from '@models/appconfig';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
 
 import {
   createFileEntry,
@@ -64,17 +63,6 @@ export function isHelmChartFile(filePath: string): boolean {
 
 export function isHelmChartFolder(files: string[]): boolean {
   return files.indexOf(HELM_CHART_ENTRY_FILE) !== -1;
-}
-
-/**
- * check if the k8sResource is supported - currently excludes any files
- * that seem to contain Helm template or Monokle Vanilla template content
- */
-
-export function isSupportedHelmResource(resource: K8sResource): boolean {
-  const helmVariableRegex = /{{.*}}/g;
-  const vanillaTemplateVariableRegex = /\[\[.*]]/g;
-  return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }
 
 /**
@@ -141,14 +129,13 @@ export function processHelmChartFolder(
             helmChartMap,
             helmValuesMap,
             depth + 1,
-            isSupportedHelmResource,
             helmChart
           );
         }
       } else if (isHelmValuesFile(file)) {
         createHelmValuesFile(fileEntry, helmChart, helmValuesMap);
       } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry, projectConfig)) {
-        extractResourcesForFileEntry(fileEntry, fileMap, isSupportedHelmResource, resourceMap);
+        extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       }
 
       result.push(fileEntry.name);

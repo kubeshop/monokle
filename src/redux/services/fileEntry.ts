@@ -31,7 +31,13 @@ import {
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
-import {deleteResource, extractK8sResources, reprocessKustomizations, reprocessResources} from './resource';
+import {
+  deleteResource,
+  extractK8sResources,
+  hasSupportedResourceContent,
+  reprocessKustomizations,
+  reprocessResources,
+} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: K8sResource[];
@@ -104,16 +110,11 @@ export function getRootFolder(fileMap: FileMapType) {
  * if all contained resources are supported
  */
 
-export function extractResourcesForFileEntry(
-  fileEntry: FileEntry,
-  fileMap: FileMapType,
-  isSupportedResource: (resource: K8sResource) => boolean,
-  resourceMap: ResourceMapType
-) {
+export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) {
   try {
     fileEntry.isSupported = true;
     extractK8sResourcesFromFile(getAbsoluteFilePath(fileEntry.filePath, fileMap), fileMap).forEach(resource => {
-      if (!isSupportedResource(resource)) {
+      if (!hasSupportedResourceContent(resource)) {
         fileEntry.isSupported = false;
         return;
       }
@@ -141,7 +142,6 @@ export function readFiles(
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
   depth: number = 1,
-  isSupportedResource: (resource: K8sResource) => boolean = () => true,
   helmChart?: HelmChart
 ) {
   const files = fs.readdirSync(folder);
@@ -195,7 +195,7 @@ export function readFiles(
       } else if (helmChart && isHelmValuesFile(fileEntry.name)) {
         createHelmValuesFile(fileEntry, helmChart, helmValuesMap);
       } else if (fileIsIncluded(fileEntry, projectConfig)) {
-        extractResourcesForFileEntry(fileEntry, fileMap, isSupportedResource, resourceMap);
+        extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       }
 
       result.push(fileEntry.name);

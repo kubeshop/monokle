@@ -72,8 +72,8 @@ export function validateResource(resource: K8sResource) {
           message: err.code,
           description: err.message,
           errorPos: {
-            line: err.linePos ? err.linePos[0].line : 0,
-            column: err.linePos ? err.linePos[0].col : 0,
+            line: err.linePos && err.linePos.length > 0 && err.linePos[0].line ? err.linePos[0].line : 0,
+            column: err.linePos && err.linePos.length > 0 && err.linePos[0].col ? err.linePos[0].col : 0,
             length: line.length,
           },
         };
