@@ -18,6 +18,7 @@ export type ValuesFilesScopeType = {
   isInClusterMode: boolean;
   isFolderOpen: boolean;
   selectedPath: string | undefined;
+  [currentHelmChart: string]: HelmChart | unknown;
 };
 
 type HelmChartScopeType = {
@@ -43,11 +44,16 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         previewValuesFileId: state.main.previewValuesFileId,
         isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
         selectedPath: state.main.selectedPath,
+        [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
     builder: {
       getRawItems: scope => {
-        return helmChart.valueFileIds
+        const currentHelmChart = scope[helmChart.id] as HelmChart | undefined;
+        if (!currentHelmChart) {
+          return [];
+        }
+        return currentHelmChart.valueFileIds
           .map(id => scope.helmValuesMap[id])
           .filter((v): v is HelmValuesFile => v !== undefined);
       },
