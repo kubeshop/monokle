@@ -174,6 +174,6 @@ export function createHelmChart(fileEntry: FileEntry, absolutePath: string, helm
   fileEntry.isSupported = true;
 
   helmChartMap[helmChart.id] = helmChart;
-  HelmChartEventEmitter.emit('create', helmChart);
+  setImmediate(() => HelmChartEventEmitter.emit('create', helmChart));
   return helmChart;
 }
