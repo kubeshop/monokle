@@ -76,4 +76,10 @@ HelmChartEventEmitter.on('create', helmChart => {
   sectionBlueprintMap.register(helmChartSectionBlueprint);
 });
 
+HelmChartEventEmitter.on('remove', helmChartId => {
+  sectionBlueprintMap.remove(`${helmChartId}-configurations`, [RootHelmChartsSectionBlueprint.id, helmChartId]);
+  sectionBlueprintMap.remove(`${helmChartId}-values`, [RootHelmChartsSectionBlueprint.id, helmChartId]);
+  sectionBlueprintMap.remove(helmChartId, [RootHelmChartsSectionBlueprint.id]);
+});
+
 export default RootHelmChartsSectionBlueprint;

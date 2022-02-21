@@ -26,12 +26,16 @@ const HELM_CHART_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-schem
 // @ts-ignore
 const HELM_CHART_UI_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-ui-schema.json'));
 
-let k8sSchemaCache = new Map<string, any | undefined>();
+const k8sSchemaCache = new Map<string, any | undefined>();
 /**
  * Returns a JSON Schema for the specified resource kind
  */
 export function getResourceSchema(resource: K8sResource, schemaVersion: string, userDataDir: string) {
   let k8sSchema: any;
+
+  if (isKustomizationResource(resource)) {
+    return kustomizeSchema;
+  }
 
   if (k8sSchemaCache.get(schemaVersion)) {
     k8sSchema = k8sSchemaCache.get(schemaVersion);
@@ -41,10 +45,6 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
       readFileSync(path.join(String(userDataDir), path.sep, 'schemas', `${schemaVersion}.json`), 'utf-8')
     );
     k8sSchemaCache.set(schemaVersion, k8sSchema);
-  }
-
-  if (isKustomizationResource(resource)) {
-    return kustomizeSchema;
   }
 
   const resourceKindHandler = getResourceKindHandler(resource.kind);

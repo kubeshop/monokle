@@ -71,7 +71,7 @@ export const Settings = ({
   const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
   const [currentProjectName, setCurrentProjectName] = useState(projectName);
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
-  const [k8sVersions] = useState(K8S_VERSIONS);
+  const [k8sVersions] = useState<Array<string>>(K8S_VERSIONS);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
   const [selectedK8SVersion, setSelectedK8SVersion] = useState<string>(String(config?.k8sVersion));
   const [isSchemaDownloading, setIsSchemaDownloading] = useState<boolean>(false);
@@ -209,10 +209,10 @@ export const Settings = ({
     }
   };
 
-  const handleK8SVersionChange = ({value}: {value: string}) => {
-    setSelectedK8SVersion(value);
-    if (doesSchemaExists(value)) {
-      setLocalConfig({...localConfig, k8sVersion: value});
+  const handleK8SVersionChange = (k8sVersion: string) => {
+    setSelectedK8SVersion(k8sVersion);
+    if (doesSchemaExist(k8sVersion)) {
+      setLocalConfig({...localConfig, k8sVersion});
     }
   };
 
@@ -234,22 +234,11 @@ export const Settings = ({
     }
   };
 
-  const doesSchemaExists = useCallback(
+  const doesSchemaExist = useCallback(
     (k8sVersion: string) => {
       return schemaExists(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
     },
-    [isSchemaDownloading, userDataDir]
-  );
-
-  const getK8sOptionTemplate = useCallback(
-    (version: string) => {
-      return (
-        <div style={{display: 'flex'}}>
-          <div style={{width: '60px'}}>{version}</div>
-          {doesSchemaExists(version) && <div style={{color: 'green'}}>Downloaded</div>}
-        </div>
-      );
-    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isSchemaDownloading]
   );
 
@@ -288,38 +277,25 @@ export const Settings = ({
         <div>
           <Tooltip title={TOOLTIP_K8S_SELECTION}>
             <Select
-              value={{value: selectedK8SVersion}}
+              value={selectedK8SVersion}
               onChange={handleK8SVersionChange}
-              style={{width: doesSchemaExists(selectedK8SVersion) ? '100%' : 'calc(100% - 172px)'}}
-              optionLabelProp="template"
-              dropdownRender={value => <span>{value},</span>}
-              labelInValue
-              options={k8sVersions.map(version => ({
-                value: version,
-                label: (
+              style={{width: doesSchemaExist(selectedK8SVersion) ? '100%' : 'calc(100% - 172px)'}}
+              optionLabelProp="label"
+            >
+              {k8sVersions.map(version => (
+                <Select.Option key={version} value={version} label={version}>
                   <S.OptionContainer>
                     <S.OptionLabel>{version}</S.OptionLabel>
-                    {doesSchemaExists(version) && (
+                    {doesSchemaExist(version) && (
                       <S.OptionDownloadedText style={{color: 'green'}}>Downloaded</S.OptionDownloadedText>
                     )}
                   </S.OptionContainer>
-                ),
-                template: (
-                  <S.OptionContainer>
-                    <S.OptionLabel>{version}</S.OptionLabel>
-                  </S.OptionContainer>
-                ),
-              }))}
-            >
-              {/* {k8sVersions.map(version => (
-                <Select.Option key={version} value={version}>
-                  {getK8sOptionTemplate(version)}
                 </Select.Option>
-              ))} */}
+              ))}
             </Select>
           </Tooltip>
 
-          {!doesSchemaExists(selectedK8SVersion) && (
+          {!doesSchemaExist(selectedK8SVersion) && (
             <Button
               style={{width: '160px', marginLeft: '12px'}}
               onClick={handleDownloadVersionSchema}

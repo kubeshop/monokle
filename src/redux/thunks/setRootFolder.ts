@@ -1,16 +1,13 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {AlertEnum} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
 import {RootState} from '@models/rootstate';
 
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
-import {createFileEntry, readFiles} from '@redux/services/fileEntry';
+import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {processKustomizations} from '@redux/services/kustomize';
 import {processParsedResources} from '@redux/services/resource';
@@ -55,9 +52,7 @@ export const setRootFolder = createAsyncThunk<
   if (!stats.isDirectory()) {
     return createRejectionWithAlert(thunkAPI, 'Invalid path', `Specified path ${rootFolder} is not a folder`);
   }
-
-  const rootEntry: FileEntry = createFileEntry(rootFolder);
-  fileMap[ROOT_FILE_ENTRY] = rootEntry;
+  const rootEntry = createRootFileEntry(rootFolder, fileMap);
 
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
   const readFilesPromise = new Promise<string[]>(resolve => {

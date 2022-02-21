@@ -12,9 +12,14 @@ import {ProjectConfig} from '@models/appconfig';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
 import {FileEntry} from '@models/fileentry';
 import {HelmChart, HelmValuesFile} from '@models/helm';
-import {K8sResource} from '@models/k8sresource';
 
-import {createFileEntry, extractK8sResourcesFromFile, fileIsExcluded, readFiles} from '@redux/services/fileEntry';
+import {
+  createFileEntry,
+  extractResourcesForFileEntry,
+  fileIsExcluded,
+  fileIsIncluded,
+  readFiles,
+} from '@redux/services/fileEntry';
 
 import {getFileStats} from '@utils/files';
 
@@ -40,27 +45,42 @@ export function getHelmChartFromFileEntry(fileEntry: FileEntry, helmChartMap: He
  * Checks if the specified path is a helm values file
  */
 
-export function isHelmValuesFile(filePath: string) {
-  return micromatch.isMatch(path.basename(filePath), '*values*.yaml');
+export function isHelmValuesFile(filePath: string): boolean {
+  return micromatch.isMatch(path.basename(filePath).toLowerCase(), '*values*.yaml');
+}
+
+/**
+ * Checks if the specified path is a helm chart file
+ */
+
+export function isHelmChartFile(filePath: string): boolean {
+  return path.basename(filePath).toLowerCase() === 'chart.yaml';
 }
 
 /**
  * Checks if the specified files are a Helm Chart folder
  */
 
-export function isHelmChartFolder(files: string[]) {
+export function isHelmChartFolder(files: string[]): boolean {
   return files.indexOf(HELM_CHART_ENTRY_FILE) !== -1;
 }
 
 /**
- * check if the k8sResource is supported
- * @param resource
- * @returns @boolean
+ * Adds the values file at the given path to the specified HelmChart
  */
-export function isSupportedHelmResource(resource: K8sResource): boolean {
-  const helmVariableRegex = /{{.*}}/g;
 
-  return Boolean(resource.text.match(helmVariableRegex)?.length) === false;
+export function createHelmValuesFile(fileEntry: FileEntry, helmChart: HelmChart, helmValuesMap: HelmValuesMapType) {
+  const helmValues: HelmValuesFile = {
+    id: uuidv4(),
+    filePath: fileEntry.filePath,
+    name: fileEntry.filePath.substring(path.dirname(helmChart.filePath).length + 1),
+    isSelected: false,
+    helmChartId: helmChart.id,
+  };
+
+  helmValuesMap[helmValues.id] = helmValues;
+  helmChart.valueFileIds.push(helmValues.id);
+  fileEntry.isSupported = true;
 }
 
 /**
@@ -76,86 +96,84 @@ export function processHelmChartFolder(
   fileMap: FileMapType,
   helmChartMap: HelmChartMapType,
   helmValuesMap: HelmValuesMapType,
-  result: string[],
   depth: number
 ) {
-  let helmChart: HelmChart | undefined;
+  const result: string[] = [];
 
-  try {
-    const helmChartFilePath = path.join(folder, HELM_CHART_ENTRY_FILE);
-    const fileText = fs.readFileSync(helmChartFilePath, 'utf8');
-    const fileContent = parse(fileText);
+  // pre-emptively create helm chart file entry
+  const helmChartFilePath = path.join(folder, HELM_CHART_ENTRY_FILE);
+  const helmChartFileEntry = createFileEntry(helmChartFilePath.substring(rootFolder.length), fileMap);
+  const helmChart = createHelmChart(helmChartFileEntry, helmChartFilePath, helmChartMap);
+  result.push(helmChartFileEntry.name);
 
-    if (typeof fileContent?.name !== 'string') {
-      throw new Error(`Couldn't get the name property of the helm chart at path: ${helmChartFilePath}`);
-    }
+  files
+    .filter(file => !isHelmChartFile(file))
+    .forEach(file => {
+      const filePath = path.join(folder, file);
+      const fileEntryPath = filePath.substring(rootFolder.length);
+      const fileEntry = createFileEntry(fileEntryPath, fileMap);
 
-    helmChart = {
-      id: uuidv4(),
-      filePath: helmChartFilePath.substr(rootFolder.length),
-      name: fileContent.name,
-      valueFileIds: [],
-    };
-    HelmChartEventEmitter.emit('create', helmChart);
-  } catch (e) {
-    if (e instanceof Error) {
-      log.warn(`[processHelmChartFolder]: ${e.message}`);
-    }
-  }
+      if (fileIsExcluded(fileEntry, projectConfig)) {
+        fileEntry.isExcluded = true;
+      } else if (getFileStats(filePath)?.isDirectory()) {
+        const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
 
-  files.forEach(file => {
-    const filePath = path.join(folder, file);
-    const fileEntryPath = filePath.substr(rootFolder.length);
-    const fileEntry = createFileEntry(fileEntryPath);
-
-    if (fileIsExcluded(projectConfig, fileEntry)) {
-      fileEntry.isExcluded = true;
-    } else if (getFileStats(filePath)?.isDirectory()) {
-      const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
-
-      if (depth === folderReadsMaxDepth) {
-        log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
-      } else {
-        fileEntry.children = readFiles(
-          filePath,
-          projectConfig,
-          resourceMap,
-          fileMap,
-          helmChartMap,
-          helmValuesMap,
-          depth + 1,
-          isSupportedHelmResource
-        );
-      }
-    } else if (isHelmValuesFile(file) && helmChart) {
-      const helmValues: HelmValuesFile = {
-        id: uuidv4(),
-        filePath: fileEntryPath,
-        name: file,
-        isSelected: false,
-        helmChartId: helmChart.id,
-      };
-
-      helmValuesMap[helmValues.id] = helmValues;
-      helmChart.valueFileIds.push(helmValues.id);
-      fileEntry.isSupported = true;
-    } else if (projectConfig.fileIncludes?.some(e => micromatch.isMatch(fileEntry.name, e))) {
-      try {
-        extractK8sResourcesFromFile(filePath, fileMap).forEach(resource => {
-          resourceMap[resource.id] = resource;
-        });
-      } catch (e) {
-        log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
+        if (depth === folderReadsMaxDepth) {
+          log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
+        } else {
+          fileEntry.children = readFiles(
+            filePath,
+            projectConfig,
+            resourceMap,
+            fileMap,
+            helmChartMap,
+            helmValuesMap,
+            depth + 1,
+            helmChart
+          );
+        }
+      } else if (isHelmValuesFile(file)) {
+        createHelmValuesFile(fileEntry, helmChart, helmValuesMap);
+      } else if (!isHelmChartFile(filePath) && fileIsIncluded(fileEntry, projectConfig)) {
+        extractResourcesForFileEntry(fileEntry, fileMap, resourceMap);
       }
 
-      fileEntry.isSupported = true;
-    }
+      result.push(fileEntry.name);
+    });
 
-    fileMap[fileEntry.filePath] = fileEntry;
-    result.push(fileEntry.name);
-  });
+  return result;
+}
 
-  if (helmChart) {
-    helmChartMap[helmChart.id] = helmChart;
+/**
+ * Extract the name of the provided helm chart file
+ */
+
+export function getHelmChartName(chartFilePath: string) {
+  const fileText = fs.readFileSync(chartFilePath, 'utf8');
+  const fileContent = parse(fileText);
+
+  if (typeof fileContent?.name !== 'string') {
+    return `Unamed Chart: ${path.dirname(chartFilePath)}`;
   }
+
+  return fileContent.name;
+}
+
+/**
+ * Creates a HelmChart for the specified fileEntry
+ */
+
+export function createHelmChart(fileEntry: FileEntry, absolutePath: string, helmChartMap: HelmChartMapType) {
+  const helmChart: HelmChart = {
+    id: uuidv4(),
+    filePath: fileEntry.filePath,
+    name: getHelmChartName(absolutePath),
+    valueFileIds: [],
+  };
+
+  fileEntry.isSupported = true;
+
+  helmChartMap[helmChart.id] = helmChart;
+  setImmediate(() => HelmChartEventEmitter.emit('create', helmChart));
+  return helmChart;
 }

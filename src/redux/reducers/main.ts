@@ -7,7 +7,7 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {parse, parseDocument} from 'yaml';
+import {parse} from 'yaml';
 
 import {CLUSTER_DIFF_PREFIX, HELM_CHART_ENTRY_FILE, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -40,6 +40,7 @@ import electronStore from '@utils/electronStore';
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
+import {parseYamlDocument} from '@utils/yaml';
 
 import {getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -136,11 +137,11 @@ const performResourceContentUpdate = (state: AppState, resource: K8sResource, ne
   if (isFileResource(resource)) {
     const updatedFileText = saveResource(resource, newText, state.fileMap);
     resource.text = updatedFileText;
-    resource.content = parseDocument(updatedFileText).toJS();
+    resource.content = parseYamlDocument(updatedFileText).toJS();
     recalculateResourceRanges(resource, state);
   } else {
     resource.text = newText;
-    resource.content = parseDocument(newText).toJS();
+    resource.content = parseYamlDocument(newText).toJS();
   }
 };
 
@@ -342,10 +343,17 @@ export const mainSlice = createSlice({
         if (fileEntry) {
           if (getFileStats(filePath)?.isDirectory() === false) {
             log.info(`added file ${filePath} already exists - updating`);
-            reloadFile(filePath, fileEntry, state, action.payload.schemaVersion, action.payload.userDataDir);
+            reloadFile(
+              filePath,
+              fileEntry,
+              state,
+              projectConfig,
+              action.payload.schemaVersion,
+              action.payload.userDataDir
+            );
           }
         } else {
-          addPath(filePath, state, projectConfig, action.payload.userDataDir);
+          addPath(filePath, state, projectConfig, action.payload.schemaVersion, action.payload.userDataDir);
         }
       });
     },
@@ -366,9 +374,16 @@ export const mainSlice = createSlice({
       filePaths.forEach((filePath: string) => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
-          reloadFile(filePath, fileEntry, state, action.payload.schemaVersion, action.payload.userDataDir);
+          reloadFile(
+            filePath,
+            fileEntry,
+            state,
+            projectConfig,
+            action.payload.schemaVersion,
+            action.payload.userDataDir
+          );
         } else {
-          addPath(filePath, state, projectConfig, action.payload.userDataDir);
+          addPath(filePath, state, projectConfig, action.payload.schemaVersion, action.payload.userDataDir);
         }
       });
     },
@@ -1014,9 +1029,8 @@ export const mainSlice = createSlice({
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
         } else {
-          const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
+          const newFileEntry = {...createFileEntry(relativeFilePath, state.fileMap), isSupported: true};
           newFileEntry.timestamp = resourcePayload.fileTimestamp;
-          state.fileMap[relativeFilePath] = newFileEntry;
           const childFileName = path.basename(relativeFilePath);
           const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
           if (parentPath === path.sep) {
