@@ -20,7 +20,7 @@ import {useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
-import {closePreviewConfigurationEditor} from '@redux/reducers/main';
+import {closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
 import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
@@ -97,6 +97,7 @@ const App = () => {
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
 
   const size: Size = useWindowSize();
 
@@ -241,6 +242,10 @@ const App = () => {
   const settingsDrawerOnClose = () => {
     dispatch(toggleSettings());
   };
+
+  useEffect(() => {
+    dispatch(reprocessAllResources(null));
+  }, [k8sVersion]);
 
   const previewConfigurationDrawerOnClose = () => {
     dispatch(closePreviewConfigurationEditor());

@@ -108,6 +108,8 @@ const ActionsPane: React.FC<IProps> = props => {
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
@@ -507,7 +509,11 @@ const ActionsPane: React.FC<IProps> = props => {
                     formUiSchema={getUiSchemaForPath(selectedPath, fileMap)}
                   />
                 ) : isKustomization && selectedResource ? (
-                  <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
+                  <FormEditor
+                    formSchema={extractFormSchema(
+                      getResourceSchema(selectedResource, String(k8sVersion), String(userDataDir))
+                    )}
+                  />
                 ) : resourceKindHandler?.formEditorOptions ? (
                   <FormEditor
                     formSchema={resourceKindHandler.formEditorOptions.editorSchema}

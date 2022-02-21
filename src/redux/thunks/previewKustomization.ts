@@ -35,6 +35,8 @@ export const previewKustomization = createAsyncThunk<
   }
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
   const state = thunkAPI.getState().main;
+  const k8sVersion = thunkAPI.getState().config.projectConfig?.k8sVersion;
+  const userDataDir = thunkAPI.getState().config.userDataDir;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const resource = state.resourceMap[resourceId];
   if (resource && resource.filePath) {
@@ -49,7 +51,14 @@ export const previewKustomization = createAsyncThunk<
     }
 
     if (result.stdout) {
-      return createPreviewResult(result.stdout, resource.id, 'Kustomize Preview', state.resourceRefsProcessingOptions);
+      return createPreviewResult(
+        String(k8sVersion),
+        String(userDataDir),
+        result.stdout,
+        resource.id,
+        'Kustomize Preview',
+        state.resourceRefsProcessingOptions
+      );
     }
   }
 

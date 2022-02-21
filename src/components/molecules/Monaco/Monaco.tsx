@@ -75,6 +75,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
   const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
@@ -157,6 +159,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
   useResourceYamlSchema(
     yaml,
+    String(userDataDir),
+    String(k8sVersion),
     selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     selectedPath,
     fileMap

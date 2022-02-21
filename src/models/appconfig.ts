@@ -68,6 +68,7 @@ export type ProjectConfig = {
   scanExcludes?: string[];
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
+  k8sVersion?: string;
 };
 
 interface AppConfig {
@@ -100,6 +101,7 @@ interface AppConfig {
   userTempDir?: string;
   isProjectLoading?: boolean;
   projectsRootPath: string;
+  k8sVersion: string;
 }
 
 export type {AppConfig};

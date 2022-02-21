@@ -358,7 +358,12 @@ function reloadHelmChartFile(fileEntry: FileEntry, fileMap: FileMapType, helmCha
   }
 }
 
-function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
+function reloadResourcesFromFileEntry(
+  fileEntry: FileEntry,
+  state: AppState,
+  schemaVersion: string,
+  userDataDir: string
+) {
   const existingResourcesFromFile = getResourcesForPath(fileEntry.filePath, state.resourceMap);
   let wasAnyResourceSelected = false;
 
@@ -380,6 +385,8 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
   const newResourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
   if (newResourcesFromFile.length > 0) {
     reprocessResources(
+      schemaVersion,
+      userDataDir,
       newResourcesFromFile.map(r => r.id),
       state.resourceMap,
       state.fileMap,
@@ -402,7 +409,14 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
  * Updates the fileEntry from the specified path - and its associated resources
  */
 
-export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: AppState, projectConfig: ProjectConfig) {
+export function reloadFile(
+  absolutePath: string,
+  fileEntry: FileEntry,
+  state: AppState,
+  projectConfig: ProjectConfig,
+  schemaVersion: string,
+  userDataDir: string
+) {
   let absolutePathTimestamp = getFileTimestamp(absolutePath);
 
   if (fileEntry.timestamp && absolutePathTimestamp && absolutePathTimestamp <= fileEntry.timestamp) {
@@ -416,7 +430,7 @@ export function reloadFile(absolutePath: string, fileEntry: FileEntry, state: Ap
   if (isHelmChartFile(absolutePath)) {
     reloadHelmChartFile(fileEntry, state.fileMap, state.helmChartMap);
   } else if (shouldReloadResourcesFromFile(fileEntry, projectConfig)) {
-    reloadResourcesFromFileEntry(fileEntry, state);
+    reloadResourcesFromFileEntry(fileEntry, state, schemaVersion, userDataDir);
   }
 
   if (wasFileSelected) {
@@ -503,7 +517,13 @@ function addHelmChartFile(
  * Helm Charts/Values and regular resource files
  */
 
-function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
+function addFile(
+  absolutePath: string,
+  state: AppState,
+  projectConfig: ProjectConfig,
+  schemaVersion: string,
+  userDataDir: string
+) {
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
@@ -526,6 +546,8 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
     const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
     if (resourcesFromFile.length > 0) {
       reprocessResources(
+        schemaVersion,
+        userDataDir,
         resourcesFromFile.map(r => r.id),
         state.resourceMap,
         state.fileMap,
@@ -564,7 +586,13 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig) {
+export function addPath(
+  absolutePath: string,
+  state: AppState,
+  projectConfig: ProjectConfig,
+  schemaVersion: string,
+  userDataDir: string
+) {
   const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -580,7 +608,7 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
     }
     const fileEntry = isDirectory
       ? addFolder(absolutePath, state, projectConfig)
-      : addFile(absolutePath, state, projectConfig);
+      : addFile(absolutePath, state, projectConfig, schemaVersion, userDataDir);
 
     if (fileEntry) {
       parentEntry.children = parentEntry.children || [];

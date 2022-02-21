@@ -1,5 +1,5 @@
 {
-  "description": "Standalong Object Metadata schema merged into custom schemas when necessary",
+  "description": "Standalone Object Metadata schema merged into custom schemas when necessary",
   "properties": {
     "apiVersion": {
       "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
@@ -139,12 +139,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "apiVersion",
-              "kind",
-              "name",
-              "uid"
-            ],
+            "required": ["apiVersion", "kind", "name", "uid"],
             "type": "object",
             "x-kubernetes-map-type": "atomic",
             "additionalProperties": false

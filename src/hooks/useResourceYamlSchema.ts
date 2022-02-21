@@ -7,7 +7,14 @@ import {isKustomizationPatch} from '@redux/services/kustomize';
 import {hasSupportedResourceContent} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
-function useResourceYamlSchema(yaml: any, resource?: K8sResource, selectedPath?: string, fileMap?: FileMapType) {
+function useResourceYamlSchema(
+  yaml: any,
+  userDataDir: string,
+  k8sVersion: string,
+  resource?: K8sResource,
+  selectedPath?: string,
+  fileMap?: FileMapType
+) {
   useEffect(() => {
     if (!resource && !selectedPath) {
       yaml &&
@@ -21,7 +28,7 @@ function useResourceYamlSchema(yaml: any, resource?: K8sResource, selectedPath?:
     let validate = true;
 
     if (resource) {
-      resourceSchema = getResourceSchema(resource);
+      resourceSchema = getResourceSchema(resource, k8sVersion, userDataDir);
       validate = resourceSchema && !isKustomizationPatch(resource) && hasSupportedResourceContent(resource);
     } else if (selectedPath && fileMap) {
       resourceSchema = getSchemaForPath(selectedPath, fileMap);
@@ -45,7 +52,7 @@ function useResourceYamlSchema(yaml: any, resource?: K8sResource, selectedPath?:
         ],
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resource, selectedPath, fileMap]);
+  }, [resource, selectedPath, fileMap, k8sVersion]);
 }
 
 export default useResourceYamlSchema;
