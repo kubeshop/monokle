@@ -46,7 +46,6 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
     }
     const promises = namespaces?.map((namespace: any) => getNonCustomClusterObjects(kc, namespace));
     const results: any = await Promise.allSettled<any>(promises);
-    log.info('resoresultsaasd', results);
     const fulfilledResults1: any = results.filter((r: any) => r.status === 'fulfilled' && r.value);
     const resources: any = [];
     fulfilledResults1.forEach((fulfilledResult: any) => {
@@ -54,8 +53,6 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
     });
 
     const fulfilledResults = resources.filter((r: any) => r.status === 'fulfilled' && r.value);
-    log.info('fulfilledResultwefwefs', fulfilledResults);
-    log.info('resourcesasaasd', resources);
     if (fulfilledResults.length === 0) {
       return createRejectionWithAlert(
         thunkAPI,

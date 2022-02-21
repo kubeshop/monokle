@@ -43,6 +43,7 @@ const DiffModal = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const namespaces = useAppSelector(state => state.config.projectConfig?.settings?.clusterNamespaces);
 
   const targetResource = useAppSelector(state =>
     state.main.resourceDiff.targetResourceId
@@ -57,7 +58,6 @@ const DiffModal = () => {
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [matchingResourcesById, setMatchingResourcesById] = useState<Record<string, any>>();
   const [matchingResourceText, setMatchingResourceText] = useState<string>();
-  const [namespaces, setNamespaces] = useState<string[]>();
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
   const [selectedMatchingResourceId, setSelectedMathingResourceId] = useState<string>();
   const [targetResourceText, setTargetResourceText] = useState<string>();
@@ -211,7 +211,6 @@ const DiffModal = () => {
         return;
       }
 
-      setNamespaces(resourcesFromCluster.map(r => r.metadata.namespace));
       setMatchingResourcesById(
         resourcesFromCluster?.reduce((matchingResources, r) => {
           delete r.metadata?.managedFields;
