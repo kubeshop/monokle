@@ -603,29 +603,47 @@ export function addPath(absolutePath: string, state: AppState, projectConfig: Pr
 
 export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEffect: PathRemovalSideEffect) {
   log.info(`removing file ${fileEntry.filePath}`);
-  getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(resource => {
-    removalSideEffect.removedResources.push(resource);
-    deleteResource(resource, state.resourceMap);
-  });
+  const resourcesForPath = getResourcesForPath(fileEntry.filePath, state.resourceMap);
+  if (resourcesForPath.length > 0) {
+    resourcesForPath.forEach(resource => {
+      removalSideEffect.removedResources.push(resource);
+      deleteResource(resource, state.resourceMap);
+    });
+
+    return;
+  }
 
   const valuesFile = getHelmValuesFile(fileEntry, state.helmValuesMap);
   if (valuesFile) {
-    removalSideEffect.removedHelmValuesFiles.push(valuesFile);
     if (state.helmValuesMap[valuesFile.id]) {
+      removalSideEffect.removedHelmValuesFiles.push(valuesFile);
       delete state.helmValuesMap[valuesFile.id];
-    }
-    Object.values(state.helmChartMap).forEach(helmChart => {
-      const valuesIndex = helmChart.valueFileIds.findIndex(id => valuesFile.id === id);
-      if (valuesIndex !== -1) {
-        helmChart.valueFileIds.splice(valuesIndex, 1);
+
+      const helmChart = state.helmChartMap[valuesFile.helmChartId];
+      if (helmChart) {
+        const valuesIndex = helmChart.valueFileIds.findIndex(id => valuesFile.id === id);
+        if (valuesIndex !== -1) {
+          helmChart.valueFileIds.splice(valuesIndex, 1);
+        }
       }
-    });
+    }
+
+    return;
   }
 
   const chart = getHelmChartFromFileEntry(fileEntry, state.helmChartMap);
   if (chart) {
-    removalSideEffect.removedHelmCharts.push(chart);
     if (state.helmChartMap[chart.id]) {
+      removalSideEffect.removedHelmCharts.push(chart);
+
+      chart.valueFileIds.forEach(valueFileId => {
+        const values = state.helmValuesMap[valueFileId];
+        if (values) {
+          removalSideEffect.removedHelmValuesFiles.push(values);
+          delete state.helmValuesMap[valueFileId];
+        }
+      });
+
       delete state.helmChartMap[chart.id];
     }
   }
