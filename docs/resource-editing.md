@@ -1,8 +1,8 @@
-# Resource Editing
+# Working with Resources
 
 Monokle allows you to edit resource manifests either in a Source Editor or a Form-based Editor which hides the underlying YAML complexity.
 
-## Source Editor
+## **Source Editor**
 
 Selecting either a file or resource will show its contents in the Source Editor to the right. The editor will syntax-highlight for
 YAML and provide context-sensitive help and auto-complete functionality for standard Kubernetes objects.
@@ -11,7 +11,7 @@ Right-clicking in the editor shows a list of available commands. Pressing F1 ope
 
 ![Source Editor Command Palette](img/source-editor-command-palette-1.5.0.png)
 
-### Editing Resources
+### **Editing Resources**
 
 When editing resources (not files), the editor is schema-aware for all native Kubernetes resources, which provides
 auto-complete (Ctrl-Space) and context-sensitive hover documentation.
@@ -20,7 +20,11 @@ auto-complete (Ctrl-Space) and context-sensitive hover documentation.
 
 ![Source Editor Context Hover](img/source-editor-context-hover.png)
 
-### Resource Links
+When editing a resource, click on the document icon at the top right of the Editor pane to open the corresponding kubernetes documentation in a browser window:
+
+![Source Editor Broken Links](img/resource-open-k8s-documentation-1.5.0.png) 
+
+<!---### **Resource Links**
 
 Resource links are marked in the gutter and underlined in the Editor, with corresponding hover/popup windows to show linked resources:
 
@@ -32,21 +36,17 @@ Broken links are shown with yellow triangles in the Editor as in the Navigator:
 
 While hovering over a broken link in the Editor, a pop-up window will allow you to create that resource:
 
-![Create Resource Broken Links](img/create-resource-unsatisfied-link-1.5.0.png)
+![Create Resource Broken Links](img/create-resource-unsatisfied-link-1.5.0.png)-->
 
-When editing a resource, click on the document icon at the top right of the Editor pane to open the corresponding kubernetes documentation in a browser window:
+### **Working with Multiple Resources**
 
-![Source Editor Broken Links](img/resource-open-k8s-documentation-1.5.0.png) 
-
-### Working with Multiple Resources
-
-Select multiple resources by clicking the checkbox to the left of the resource name. Below, two resources are selected and the "delete" or "deploy" actions are available for both resources.
+Select multiple resources by clicking the checkbox to the left of the resource name. Below, two resources are selected and the **Delete** or **Deploy** actions are available for both resources.
 
 ![Working with Multiple Resources](img/select-multi-resource-1.5.0.png) 
 
-## Add Resource
+## **Add Resource**
 
-While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the “New Resource” button at the top of the navigator to launch the “Add New Resource” dialog.
+While using Monokle, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **New Resource** button at the top of the navigator to launch the **Add New Resource** dialog.
 
 ![Add Resource](img/add-resource-1.5.0.png)
 
@@ -60,22 +60,22 @@ While creating a resource, it is possible to select an existing resource as a te
 
 
 
-## Edit Resources in Cluster
+## **Edit Resources in Cluster**
 
 You can easily view and edit resources from clusters. After making changes in a resource, you can quickly apply them back to the cluster.
 
 ![Resource cluster](img/resource-cluster.png)
 
-### Saving changes
+### **Saving Changes**
 
-The [Save] button on top of the editor will be enabled only if valid changes have been made - invalid YAML will not be savable. Saving a resource will update the containing file correspondingly and recalculate all affected ingoing/outging links for
+The **Save** button on top of the editor will be enabled only if valid changes have been made - invalid YAML will not be savable. Saving a resource will update the containing file correspondingly and recalculate all affected ingoing/outging links for
 the resource.
 
-### Editing Files
+### **Editing Files**
 
 When editing files directly by selecting them in the File Explorer, the editor will not show any links or provide context-sensitive editing functionality.
 
-## ConfigMap Properties Form
+## **ConfigMap Properties Form**
 
 In version 1.4.0, Monokle shows properties for ConfigMap resources only:
 
@@ -88,19 +88,19 @@ are written back to the underlying YAML.
 **Check out [this tutorial](tutorials/how-to-create-and-edit-configmap.md) for more details 
 on how to use the Form Editor for ConfigMaps.**
 
-## Rename Resource
+## **Rename Resource**
 
 You can rename resources and update all the references associated with that resource to ensure the integrity of that link.
 
 ![Rename Resource](img/rename.png)
 
-## Clone Resource
+## **Clone Resource**
 
 You can use the Clone action to create a new resource by using existing resources as a template. 
 
 ![Clone Resource](img/clone.png)
 
-## Delete Resource
+## **Delete Resource**
 
 You can use the Delete action in the cluster mode to delete the resource from the actual cluster. 
 

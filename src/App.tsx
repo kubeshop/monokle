@@ -20,7 +20,7 @@ import {useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
-import {reprocessAllResources} from '@redux/reducers/main';
+import {closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
 import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
@@ -54,6 +54,7 @@ const SaveResourceToFileFolderModal = React.lazy(() => import('@molecules/SaveRe
 const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
+const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
 
 const AppContainer = styled.div`
   height: 100%;
@@ -73,6 +74,7 @@ const App = () => {
   const dispatch = useDispatch();
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
+  const isPreviewConfigurationEditorOpen = useAppSelector(state => state.main.prevConfEditor.isOpen);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isCreateFolderModalVisible = useAppSelector(state => state.ui.createFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
@@ -245,6 +247,10 @@ const App = () => {
     dispatch(reprocessAllResources(null));
   }, [k8sVersion]);
 
+  const previewConfigurationDrawerOnClose = () => {
+    dispatch(closePreviewConfigurationEditor());
+  };
+
   return (
     <AppContext.Provider value={{windowSize: size}}>
       <AppContainer>
@@ -272,6 +278,14 @@ const App = () => {
 
         <LazyDrawer noPadding onClose={settingsDrawerOnClose} title="Settings" visible={isSettingsDrawerVisible}>
           <SettingsManager />
+        </LazyDrawer>
+
+        <LazyDrawer
+          onClose={previewConfigurationDrawerOnClose}
+          title="Preview Configuration"
+          visible={isPreviewConfigurationEditorOpen}
+        >
+          <PreviewConfigurationEditor />
         </LazyDrawer>
 
         <Suspense fallback={null}>

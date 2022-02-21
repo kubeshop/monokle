@@ -85,6 +85,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         $indentation={indentation}
         $isSectionCheckable={isSectionCheckable}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
+        $lastItemMarginBottom={blueprint.customization?.lastItemMarginBottom}
       >
         {itemInstance.isCheckable &&
           (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (

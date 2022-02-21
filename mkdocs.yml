@@ -19,29 +19,34 @@ nav:
   - Getting Started: getting-started.md
   - Feature Overview: features.md
   - UI Overview: overview.md
-  - Keyboard Shortcuts: hotkeys.md
-  - Navigating Resources: resource-navigation.md
-  - Resource Editing: resource-editing.md
+  - Working with File Explorer: file-explorer.md
+  - Working with Resources: 
+    - Navigating Resources: resource-navigation.md
+    - Creating Resources: creating-resources.md
+    - Editing Resources: resource-editing.md
+    - Validating Resources: resource-validation.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
-  - Cluster Integration: cluster-integration.md
-  - Cluster Compare: cluster-compare.md
+  - Working with Resources:
+    - Cluster Integration: cluster-integration.md
+    - Cluster Compare: cluster-compare.md
   - Deploy/Diff: apply-and-diff.md
-  - Monokle Pluings:
-    - Plugins: plugins.md
-    - Templates: templates.md
-  - Development:
+  - Development: 
     - Development: development.md
     - Architecture: architecture.md
     - Testing: testing.md
     - Contributing: contributing.md
+  - Monokle Plugins: 
+    - Plugins: plugins.md
+    - Templates: templates.md
+  - Keyboard Shortcuts: hotkeys.md
   - FAQ: faq.md
-  - Tutorials:
-      - tutorials/how-to-navigate-and-edit-manifests.md
-      - tutorials/how-to-browse-clusters.md
-      - tutorials/how-to-configure-monokle.md
-      - tutorials/how-to-create-and-edit-configmap.md
-      - tutorials/how-to-fix-broken-links.md
+  - Tutorials: 
+    - How to Configure Monokle: tutorials/how-to-configure-monokle.md
+    - How to Work with Manifests: tutorials/how-to-navigate-and-edit-manifests.md
+    - How to Browse Clusters: tutorials/how-to-browse-clusters.md
+    - How to Work with ConfigMaps: tutorials/how-to-create-and-edit-configmap.md
+    - How to Fix Broken Links: tutorials/how-to-fix-broken-links.md
 
 extra:
   analytics:

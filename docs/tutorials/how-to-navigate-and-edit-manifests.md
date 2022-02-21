@@ -1,4 +1,4 @@
-# How to work with Manifests
+# How to Work with Manifests
 
 In this Monokle tutorial, we will illustrate the steps to help you navigate K8s resources and edit their manifests. 
 
@@ -35,7 +35,9 @@ Scroll up & down to navigate and select the required manifests.
 
 Once you select a manifest, its related resources will be highlighted automatically in the navigator. 
 
-## **4. Navigate Resource Links**
+> See [Resource Navigation](../resource-navigation.md) for more information on how to navigate resources.
+
+## **4. Navigate resource links**
 
 Click on outgoing and incoming links to navigate the corresponding resources. 
 
@@ -66,7 +68,7 @@ Right-click on the editor to launch the editing menu.
 The editing menu includes the following options:
 
 - **Go to Symbols:** Select the Go to Symbol option to perform a focused search of code for finding specified symbols quickly.
-- **Change all Occurrences:** Select the Change all Occurrences option to replace all string occurrences in the code with any other regular expression.
+- **Change All occurrences:** Select the Change All Occurrences option to replace all string occurrences in the code with any other regular expression.
 - **Format Document:** Select the Format Document option to organize the source code for better readability.  It addresses font size, spacing, margins, alignment, columns, indentation, and lists.
 - **Cut:** Select the Cut option to delete the unnecessary data. After you cut the text, it gets stored in the clipboard so you can use it later.
 - **Copy:** Select the Copy option to copy a piece of code and reuse the code to save development time.
@@ -74,7 +76,6 @@ The editing menu includes the following options:
 - **Command Palette:** Select the Command Palette option to access keyboard shortcuts quickly for the most common operations.
 
 <em>**Note:** The editor provides autocomplete and autosave options.</em>
-
 
 ## **Questions or Comments?** 
 

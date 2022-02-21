@@ -867,6 +867,19 @@ export const mainSlice = createSlice({
       const {schemaVersion, userDataDir} = action.payload;
       processParsedResources(schemaVersion, userDataDir, state.resourceMap, state.resourceRefsProcessingOptions);
     },
+    openPreviewConfigurationEditor: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      const helmChartId = action.payload;
+      state.prevConfEditor = {
+        helmChartId,
+        isOpen: true,
+      };
+    },
+    closePreviewConfigurationEditor: (state: Draft<AppState>) => {
+      state.prevConfEditor = {
+        isOpen: false,
+        helmChartId: undefined,
+      };
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -1305,5 +1318,7 @@ export const {
   addMultipleKindHandlers,
   addKindHandler,
   seenNotifications,
+  openPreviewConfigurationEditor,
+  closePreviewConfigurationEditor,
 } = mainSlice.actions;
 export default mainSlice.reducer;

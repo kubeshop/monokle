@@ -1,4 +1,4 @@
-## What is a Monokle Template?
+# What is a Monokle Template?
 
 A Monokle Template is a mechanism for creating visual forms and interpolating the data 
 from those forms into one or multiple manifests.
@@ -13,7 +13,7 @@ on how to further work with forms, schemas and ui-schemas.
 
 Any folder that contains a `monokle-template.json` file can be a template.
 
-## What is the structure of `monokle-template.json` for a valid Monokle Template?
+## **What is the structure of `monokle-template.json` for a valid Monokle Template?**
 
 Here’s an example of a template that creates a Pod:
 https://github.com/kubeshop/monokle-default-templates-plugin/blob/main/basic-pod-template/monokle-template.json
@@ -49,7 +49,7 @@ The `name`, `id`, `author`, `version`, `description`, `type` and `forms` propert
 
 In the above example, the type of the template is `"vanilla"`.
 
-## What does a form schema look like?
+## **What does a form schema look like?**
 
 The format of form schemas is [JSON schema](https://json-schema.org/).
 This defines which data that will be sent to the template manifests.
@@ -73,7 +73,7 @@ This defines which data that will be sent to the template manifests.
 }
 ```
 
-## What does a form UI schema look like?
+## **What does a form UI schema look like?**
 
 Example:
 
@@ -98,7 +98,7 @@ Example:
 The role of this form is to specify information about how to render the form - read more about ui-schemas in the 
 [UI-Schema Documentation](https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/) 
 
-### Custom Form Widgets 
+### **Custom Form Widgets** 
 
 Monokle 1.5.0 provides a number of [custom form widgets](https://react-jsonschema-form.readthedocs.io/en/latest/advanced-customization/custom-widgets-fields/) to provide a better user experience:
 
@@ -125,7 +125,7 @@ For example:
 
 All these widgets allow entry of custom values - i.e. none require you to select a known value.
 
-## Property interpolation
+## **Property Interpolation**
 
 Monokle uses `[[` and `]]` as escape delimiters for script interpolation. 
 
@@ -147,11 +147,11 @@ selected verbs in the corresponding form.
       - [[ forms[0].verbs.join("\n      - ") ]]
 ```
 
-## What types of templates exist?
+## **What types of templates exist?**
 
 Monokle 1.5.0 introduces vanilla templates and referenced Helm Chart templates.
 
-### Vanilla Templates
+### **Vanilla Templates**
 
 The `type` property from `monokle-template.json` is "vanilla".
 
@@ -183,7 +183,7 @@ Using the `manifests` property from the monokle-template file, specify the above
 }
 ```
 
-### Referenced Helm Chart Templates
+### **Referenced Helm Chart Templates**
  
 The value of the `type` property from `monokle-template.json` is `"helm-chart"`.
 
@@ -236,7 +236,7 @@ Templates can be installed via Plugins.
 Read the [How to install a Plugin](./plugins.md#installation) section from [Plugins Overview](./plugins.md).
 Note: A plugin can contain one or multiple templates.
 
-## Default Monokle Templates
+## **Default Monokle Templates**
 
 Monokle includes a default set of templates which are installed automatically when starting Monokle
 for the first time and available in the Templates Explorer when working with your Monokle projects:

@@ -64,12 +64,14 @@ const RootHelmChartsSectionBlueprint: SectionBlueprint<HelmValuesFile, RootHelmC
 sectionBlueprintMap.register(RootHelmChartsSectionBlueprint);
 
 HelmChartEventEmitter.on('create', helmChart => {
-  const {valuesFilesSectionBlueprint, helmChartSectionBlueprint} = makeHelmChartSectionBlueprint(helmChart);
+  const {valuesFilesSectionBlueprint, helmChartSectionBlueprint, previewConfigurationsSectionBlueprint} =
+    makeHelmChartSectionBlueprint(helmChart);
   if (RootHelmChartsSectionBlueprint.childSectionIds) {
     RootHelmChartsSectionBlueprint.childSectionIds?.push(helmChartSectionBlueprint.id);
   } else {
     RootHelmChartsSectionBlueprint.childSectionIds = [helmChartSectionBlueprint.id];
   }
+  sectionBlueprintMap.register(previewConfigurationsSectionBlueprint);
   sectionBlueprintMap.register(valuesFilesSectionBlueprint);
   sectionBlueprintMap.register(helmChartSectionBlueprint);
 });

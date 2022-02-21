@@ -17,11 +17,11 @@ Launch Monokle and click on the **Settings** button to access the Settings widge
 Enter the kubeconfig file path in the KUBECONFIG text field. The kubeconfig parameter is used when viewing cluster
 resources and deploying/diffing local resources to a cluster.
 
-![Kubeconfig](img/kubeconfig-2.png)
+![Kubeconfig](img/kubeconfig-2-1.5.0.png)
 
-Alternatively, you can click on the Browse button to fetch the kubeconfig file for configuring cluster access. 
+Alternatively, you can click on the **Browse** button to fetch the kubeconfig file for configuring cluster access. 
 
-![Browse](img/browse-3.png)
+![Browse](img/browse-3-1.5.0.png)
 
 Select the required folder to configure the cluster. 
 
@@ -65,7 +65,6 @@ Click on the Helm Preview Mode dropdown to select any of the viewing states. The
 Tick the **Automatically Load Last Folder** checkbox to reload the last reviewed folder when launching Monokle. 
 
 ![Startup](img/startup-10-1.5.0.png)
-
 
 ## **Questions or Comments?**
 
