@@ -11,7 +11,7 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 import {isInPreviewModeSelector} from '@redux/selectors';
-import {getHelmValuesFile} from '@redux/services/helm';
+import {getHelmValuesFile, isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
 
 import {Spinner} from '@components/atoms';
@@ -134,7 +134,12 @@ const TreeItem: React.FC<TreeItemProps> = props => {
       ) : null}
 
       <Menu.Item
-        disabled={isInPreviewMode || (!isFolder && (isExcluded || !isSupported))}
+        disabled={
+          isInPreviewMode ||
+          isHelmChartFile(relativePath) ||
+          isHelmValuesFile(relativePath) ||
+          (!isFolder && (isExcluded || !isSupported))
+        }
         onClick={e => {
           e.domEvent.stopPropagation();
           onCreateResource(isFolder ? {targetFolder: target} : {targetFile: target});
