@@ -10,12 +10,13 @@ export const NO_NAMESPACE = '<none>';
 export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction<string[]>>] {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
 
   const [namespaces, setNamespaces] = useState<string[]>([]);
 
   useEffect(() => {
     const setClusterNamespaces = async () => {
-      let clusterNamespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext);
+      let clusterNamespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext, clusterAccess);
       clusterNamespaces.sort((a, b) => {
         if (a === 'default') {
           return -1;

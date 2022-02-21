@@ -221,7 +221,7 @@ const createNamespacedCustomObjectKindHandler = (
         resource.name
       );
     },
-    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, crd?: K8sResource) {
+    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options, crd?: K8sResource) {
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {
@@ -297,7 +297,7 @@ const createClusterCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
       return customObjectsApi.getClusterCustomObject(group, version, kindPlural, resource.name);
     },
-    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, crd?: K8sResource) {
+    async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options, crd?: K8sResource) {
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {

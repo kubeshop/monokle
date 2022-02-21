@@ -17,13 +17,14 @@ import {
 
 import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
+import {ClusterAccess} from '@models/appconfig';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
-import {createKubeClient} from '@utils/kubeclient';
+import {createKubeClient, hasAccessToResource} from '@utils/kubeclient';
 import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
 import {
@@ -275,7 +276,11 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
-export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string): Promise<string[]> {
+export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string, clusterAccess?: ClusterAccess): Promise<string[]> {
+  if (!hasAccessToResource('namespace', 'get', clusterAccess)) {
+    return [];
+  }
+
   try {
     const kubeClient = createKubeClient(kubeconfigPath, context);
     const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient);

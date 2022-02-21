@@ -187,11 +187,14 @@ const DiffModal = () => {
     }
 
     const getClusterResources = async () => {
+      if (!namespaces || !namespaces.length) {
+        return;
+      }
       const kc = createKubeClient(configState);
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const resourcesFromCluster =
-        (await resourceKindHandler?.listResourcesInCluster(kc))?.filter(r => r.metadata.name === targetResource.name) ||
+        (await resourceKindHandler?.listResourcesInCluster(kc, { namespace: namespaces[0] }))?.filter(r => r.metadata.name === targetResource.name) ||
         [];
 
       // matching resource was not found

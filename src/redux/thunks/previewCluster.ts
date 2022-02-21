@@ -21,24 +21,41 @@ import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
+const getNonCustomClusterObjects = async (kc: any, namespace: string) => {
+  return Promise.allSettled(
+    getRegisteredKindHandlers()
+      .filter(handler => !handler.isCustom)
+      .map(resourceKindHandler =>
+        resourceKindHandler
+          .listResourcesInCluster(kc, { namespace })
+          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
+    )
+  );
+};
+
 const previewClusterHandler = async (context: string, thunkAPI: any) => {
+  // TODO fix-types
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const k8sVersion = thunkAPI.getState().config.projectConfig?.k8sVersion;
   const userDataDir = thunkAPI.getState().config.userDataDir;
   try {
     const kc = createKubeClient(thunkAPI.getState().config, context);
+    const namespaces = thunkAPI.getState().config.projectConfig?.settings?.clusterNamespaces;
+    if (!namespaces || !namespaces.length) {
+      return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', 'Please configure a namespace');
+    }
+    const promises = namespaces?.map((namespace: any) => getNonCustomClusterObjects(kc, namespace));
+    const results: any = await Promise.allSettled<any>(promises);
+    log.info('resoresultsaasd', results);
+    const fulfilledResults1: any = results.filter((r: any) => r.status === 'fulfilled' && r.value);
+    const resources: any = [];
+    fulfilledResults1.forEach((fulfilledResult: any) => {
+      resources.push(...fulfilledResult.value);
+    });
 
-    const results = await Promise.allSettled(
-      getRegisteredKindHandlers()
-        .filter(handler => !handler.isCustom)
-        .map(resourceKindHandler =>
-          resourceKindHandler
-            .listResourcesInCluster(kc)
-            .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
-        )
-    );
-
-    const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+    const fulfilledResults = resources.filter((r: any) => r.status === 'fulfilled' && r.value);
+    log.info('fulfilledResultwefwefs', fulfilledResults);
+    log.info('resourcesasaasd', resources);
     if (fulfilledResults.length === 0) {
       return createRejectionWithAlert(
         thunkAPI,
@@ -89,7 +106,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
     }
 
     if (fulfilledResults.length < results.length) {
-      const rejectedResult = results.find(r => r.status === 'rejected');
+      const rejectedResult = results.find((r: any) => r.status === 'rejected');
       if (rejectedResult) {
         // @ts-ignore
         const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
@@ -197,7 +214,8 @@ async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitio
       .map(crd => {
         const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
         if (kindHandler) {
-          return kindHandler.listResourcesInCluster(kc, crd).then(response =>
+          // TODO fix-types
+          return kindHandler.listResourcesInCluster(kc, { namespace: 'test' }, crd).then(response =>
             // @ts-ignore
             getK8sObjectsAsYaml(response.body.items)
           );

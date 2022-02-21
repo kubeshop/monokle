@@ -17,9 +17,9 @@ const ClusterRoleHandler: ResourceKindHandler = {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
     return k8sRbacV1Api.readClusterRole(resource.name);
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, { namespace }) {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
-    const response = await k8sRbacV1Api.listClusterRole();
+    const response = await k8sRbacV1Api.listNamespacedRole(namespace);
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

@@ -9,7 +9,19 @@ import {AlertEnum} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {updateProjectKubeConfig} from '@redux/reducers/appConfig';
+import {updateProjectKubeConfig, updateProjectKubeAccess, updateClusterNamespaces} from '@redux/reducers/appConfig';
+import {getKubeAccess} from '@utils/kubeclient';
+
+function getSelectedContext(contexts: k8s.Context[], currentContext?: string): k8s.Context | undefined {
+  let selectedContext = contexts.find(c => c.name === currentContext);
+  if (selectedContext) {
+    return selectedContext;
+  }
+
+  if (contexts && contexts.length) {
+    return contexts[0];
+  }
+}
 
 export const loadContexts = async (
   configPath: string,
@@ -23,12 +35,12 @@ export const loadContexts = async (
       try {
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
+        let namespace: string | undefined;
 
-        const selectedContext = kc.contexts.find(c => c.name === currentContext);
+        let selectedContext = getSelectedContext(kc.contexts, currentContext);
         if (selectedContext) {
-          kc.setCurrentContext(selectedContext && selectedContext.name);
-        } else {
-          kc.setCurrentContext((kc.contexts && kc.contexts.length > 0 && kc.contexts[0].name) || '');
+          kc.setCurrentContext(selectedContext.name);
+          namespace = selectedContext.namespace;
         }
 
         const kubeConfig: KubeConfig = {
@@ -38,6 +50,10 @@ export const loadContexts = async (
         };
 
         dispatch(updateProjectKubeConfig(kubeConfig));
+        if (namespace) {
+          dispatch(updateProjectKubeAccess(getKubeAccess(namespace, kc.currentContext)));
+          dispatch(updateClusterNamespaces([namespace]));
+        }
       } catch (e: any) {
         if (e instanceof Error) {
           log.warn(`[loadContexts]: ${e.message}`);

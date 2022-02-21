@@ -19,6 +19,7 @@ import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/make
 import {
   ApplyFileTooltip,
   ApplyTooltip,
+  CannotDeployFileTooltip,
   DiffTooltip,
   EditPreviewConfigurationTooltip,
   InstallValuesFileTooltip,
@@ -66,6 +67,7 @@ import {
 import {Icon, TabHeader} from '@atoms';
 
 import {openExternalResourceKindDocumentation} from '@utils/shell';
+import {hasAccessToResource} from '@utils/kubeclient';
 
 import featureFlags from '@src/feature-flags.json';
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -101,6 +103,7 @@ const ActionsPane: React.FC<IProps> = props => {
   const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const previewType = useAppSelector(state => state.main.previewType);
+  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
@@ -386,6 +389,29 @@ const ActionsPane: React.FC<IProps> = props => {
     setSchemaForSelectedPath(selectedPath ? getSchemaForPath(selectedPath, fileMap) : undefined);
   }, [selectedPath, fileMap]);
 
+  const canDeployResource = hasAccessToResource(selectedResource ? selectedResource?.kind?.toLowerCase() : '', 'deploy', clusterAccess);
+  const getDeployTooltip = () => {
+    if (!canDeployResource) {
+      return CannotDeployFileTooltip;
+    }
+
+    return selectedPath
+      ? isHelmValuesFile(selectedPath)
+        ? InstallValuesFileTooltip
+        : ApplyFileTooltip
+      : ApplyTooltip;
+  };
+  const isDeployButtonDisabled = () => {
+    if (!canDeployResource) {
+      return true;
+    }
+
+    return (!selectedResourceId && !selectedPath) ||
+      (selectedResource &&
+        !isKustomizationResource(selectedResource) &&
+        (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)));
+  };
+
   const onClickRunPreviewConfiguration = useCallback(() => {
     if (!selectedPreviewConfiguration) {
       return;
@@ -451,48 +477,36 @@ const ActionsPane: React.FC<IProps> = props => {
                 </Tooltip>
               )}
 
-              <Tooltip
-                mouseEnterDelay={TOOLTIP_DELAY}
-                title={
-                  selectedPath
-                    ? isHelmValuesFile(selectedPath)
-                      ? InstallValuesFileTooltip
-                      : ApplyFileTooltip
-                    : ApplyTooltip
-                }
-                placement="bottomLeft"
+            <Tooltip
+              mouseEnterDelay={TOOLTIP_DELAY}
+              title={getDeployTooltip()}
+              placement="bottomLeft"
+            >
+              <Button
+                loading={Boolean(applyingResource)}
+                type="primary"
+                size="small"
+                ghost
+                onClick={applySelection}
+                disabled={isDeployButtonDisabled()}
+                icon={<Icon name="kubernetes" />}
               >
-                <Button
-                  loading={Boolean(applyingResource)}
-                  type="primary"
-                  size="small"
-                  ghost
-                  onClick={applySelection}
-                  disabled={
-                    (!selectedResourceId && !selectedPath) ||
-                    (selectedResource &&
-                      !isKustomizationResource(selectedResource) &&
-                      (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
-                  }
-                  icon={<Icon name="kubernetes" />}
-                >
-                  {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
-                </Button>
-              </Tooltip>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
-                <S.DiffButton
-                  size="small"
-                  type="primary"
-                  ghost
-                  onClick={diffSelectedResource}
-                  disabled={isDiffButtonDisabled}
-                >
-                  Diff
-                </S.DiffButton>
-              </Tooltip>
-            </>
-          </TitleBar>
-        )}
+                {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
+              </Button>
+            </Tooltip>
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
+              <S.DiffButton
+                size="small"
+                type="primary"
+                ghost
+                onClick={diffSelectedResource}
+                disabled={isDiffButtonDisabled}
+              >
+                Diff
+              </S.DiffButton>
+            </Tooltip>
+          </>
+        </TitleBar>
       </div>
 
       {!selectedPreviewConfigurationId ? (

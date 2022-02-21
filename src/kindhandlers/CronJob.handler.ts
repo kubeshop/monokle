@@ -19,9 +19,9 @@ const CronJobHandler: ResourceKindHandler = {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
     return k8sBatchV1Api.readNamespacedCronJob(resource.name, resource.namespace || 'default', 'true');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, { namespace }) {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
-    const response = await k8sBatchV1Api.listCronJobForAllNamespaces();
+    const response = await k8sBatchV1Api.listNamespacedCronJob(namespace);
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

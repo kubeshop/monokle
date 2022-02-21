@@ -3,12 +3,15 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
+import path from 'path';
+import {execSync} from 'child_process';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {
   AppConfig,
+  ClusterAccess,
   KubeConfig,
   Languages,
   NewVersionCode,
@@ -149,11 +152,16 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
       state.folderReadsMaxDepth = action.payload;
     },
+    updateClusterNamespaces: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
+      electronStore.set('appConfig.settings.clusterNamespaces', action.payload);
+      state.settings.clusterNamespaces = action.payload;
+    },
     updateK8sVersion: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('appConfig.k8sVersion', action.payload);
       state.k8sVersion = action.payload;
     },
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      execSync(`kubectl config use-context ${action.payload}`);
       state.kubeConfig.currentContext = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
@@ -235,6 +243,17 @@ export const configSlice = createSlice({
       if (keys.length > 0) {
         writeProjectConfigFile(state);
       }
+    },
+    updateProjectKubeAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess>) => {
+      if (!state.selectedProjectRootFolder) {
+        return;
+      }
+
+      if (!state.projectConfig) {
+        state.projectConfig = {};
+      }
+
+      state.projectConfig.clusterAccess = action.payload;
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
@@ -368,6 +387,8 @@ export const {
   changeCurrentProjectName,
   changeProjectsRootPath,
   updateApplicationSettings,
+  updateProjectKubeAccess,
+  updateClusterNamespaces,
   updateK8sVersion,
   handleFavoriteTemplate,
   toggleEventTracking,
