@@ -2,7 +2,7 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq, parseAllDocuments, parseDocument} from 'yaml';
+import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq} from 'yaml';
 
 import {
   CLUSTER_DIFF_PREFIX,
@@ -24,6 +24,7 @@ import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux
 
 import {getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
+import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
 import {
   getDependentResourceKinds,
@@ -57,7 +58,7 @@ const parsedDocCache = new Map<string, ParsedDocCacheEntry>();
 export function getParsedDoc(resource: K8sResource) {
   if (!parsedDocCache.has(resource.id)) {
     const lineCounter = new LineCounter();
-    const parsedDoc = parseDocument(resource.text, {lineCounter});
+    const parsedDoc = parseYamlDocument(resource.text, lineCounter);
     parsedDocCache.set(resource.id, {parsedDoc, lineCounter});
   }
 
@@ -645,7 +646,7 @@ function extractNamespace(content: any) {
 
 export function extractK8sResources(fileContent: string, relativePath: string) {
   const lineCounter: LineCounter = new LineCounter();
-  const documents = parseAllDocuments(fileContent, {lineCounter});
+  const documents = parseAllYamlDocuments(fileContent, lineCounter);
   const result: K8sResource[] = [];
 
   if (documents) {
@@ -657,6 +658,10 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
           documents[docIndex]
         );
       } else {
+        if (doc.warnings.length > 0) {
+          log.warn('[extractK8sResources]: Doc has warnings', doc.warnings, doc);
+        }
+
         const content = doc.toJS();
         if (content && content.apiVersion && content.kind) {
           const text = fileContent.slice(doc.range[0], doc.range[1]);
@@ -775,4 +780,15 @@ export function getResourceKindsWithTargetingRefs(resource: K8sResource) {
     targetResourceKindCache.set(resource.kind, resourceKinds);
   }
   return targetResourceKindCache.get(resource.kind);
+}
+
+/**
+ * check if the k8sResource is supported - currently excludes any files
+ * that seem to contain Helm template or Monokle Vanilla template content
+ */
+
+export function hasSupportedResourceContent(resource: K8sResource): boolean {
+  const helmVariableRegex = /{{.*}}/g;
+  const vanillaTemplateVariableRegex = /\[\[.*]]/g;
+  return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
 }

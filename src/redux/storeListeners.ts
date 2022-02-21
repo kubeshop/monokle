@@ -1,7 +1,7 @@
 import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
-import {registerSectionBlueprint} from '@redux/reducers/navigator';
+import {registerSectionBlueprint, removeSectionBlueprint} from '@redux/reducers/navigator';
 
 import {KindHandlersEventEmitter, ResourceKindHandlers} from '@src/kindhandlers';
 import sectionBlueprintMap from '@src/navsections/sectionBlueprintMap';
@@ -18,4 +18,8 @@ KindHandlersEventEmitter.on('register', (kindHandler: ResourceKindHandler) => {
 
 sectionBlueprintMap.eventEmitter.on('register', (blueprint: SectionBlueprint<any, any>) => {
   store.dispatch(registerSectionBlueprint(blueprint.id));
+});
+
+sectionBlueprintMap.eventEmitter.on('remove', (blueprintId: string) => {
+  store.dispatch(removeSectionBlueprint(blueprintId));
 });
