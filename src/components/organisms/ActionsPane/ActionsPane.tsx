@@ -27,6 +27,7 @@ import {
 } from '@constants/tooltips';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -309,12 +310,16 @@ const ActionsPane: React.FC<IProps> = props => {
     if (!selectedValuesFileId) {
       return '';
     }
+    const helmValuesFile: HelmValuesFile | undefined = helmValuesMap[selectedValuesFileId];
 
-    const helmValuesFile = helmValuesMap[selectedValuesFileId];
-
-    return `Install the ${helmChartMap[helmValuesFile.helmChartId].name} Chart using ${
-      helmValuesFile.name
-    } in cluster [${kubeConfigContext}]?`;
+    if (!helmValuesFile) {
+      return '';
+    }
+    const helmChart: HelmChart | undefined = helmChartMap[helmValuesFile.helmChartId];
+    if (!helmChart) {
+      return '';
+    }
+    return `Install the ${helmChart.name} Chart using ${helmValuesFile.name} in cluster [${kubeConfigContext}]?`;
   }, [helmChartMap, helmValuesMap, kubeConfigContext, selectedValuesFileId]);
 
   // called from main thread because thunks cannot be dispatched by main
