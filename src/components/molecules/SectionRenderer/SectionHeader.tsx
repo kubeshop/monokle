@@ -85,6 +85,7 @@ function SectionHeader(props: SectionHeaderProps) {
       hasCustomNameDisplay={Boolean(NameDisplay.Component)}
       isLastSection={isLastSection}
       isCollapsed={isCollapsed}
+      $marginBottom={sectionBlueprint.customization?.sectionMarginBottom}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -131,7 +132,9 @@ function SectionHeader(props: SectionHeaderProps) {
             >
               {name}
             </S.Name>
-            {counter && <S.Counter selected={sectionInstance.isSelected && isCollapsed}>{counter}</S.Counter>}
+            {counter !== undefined && (
+              <S.Counter selected={sectionInstance.isSelected && isCollapsed}>{counter}</S.Counter>
+            )}
             <S.BlankSpace level={level} onClick={toggleCollapse} />
             {NameSuffix.Component && (NameSuffix.options?.isVisibleOnHover ? isHovered : true) && (
               <NameSuffix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />

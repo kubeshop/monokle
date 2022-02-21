@@ -16,7 +16,7 @@ For further details on working with Monokle, read the [Feature Overview](feature
 
 <!--[![Monokle Walkthrough](img/monokle-overview.gif)](https://youtu.be/SPmLfmDztTc)-->
 
-## Blog-posts
+## **Blog-posts**
 
 Check out the following blog-posts with Monokle-related content:
 

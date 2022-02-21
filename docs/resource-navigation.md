@@ -9,7 +9,7 @@ Once selected, a folder the File Explorer and Navigator will be populated accord
 automatically with any external file/folder changes made in the selected folder, but the Refresh button next to the Browse button
 allows for manual reloading of the folder, if needed.
 
-## File Explorer
+<!---## **File Explorer**
 
 - The File Explorer now shows all files parsed in the specified folder:
   - Excluded files are greyed out.
@@ -54,9 +54,9 @@ In the Folder Actions pop up menu, the following actions are available:
 - Copy Relative Path
 - Rename
 - Delete
-- Reveal in Finder
+- Reveal in Finder -->
 
-## Resource Navigator
+## **Resource Navigator**
 
 The Navigator shows all resources found recursively in the selected folder. Resources are grouped into sections/subsections based
 on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
@@ -71,7 +71,7 @@ In this screenshot:
 - The linked `argo-rollouts` Deployment (via the selector in the Service manifest) is highlighted. 
 - The Service manifest is shown in the editor to the right (with highlighting of the link to the Deployment on line 16).
 
-## Resource Links
+## **Resource Links**
 
 Links between resources are indicated by link icons to the left and right each resource name:
 
@@ -85,7 +85,7 @@ a link to take you to that resource in the navigator:
 
 ![Resource Links Popup](img/resource-links-popup.png)
 
-In the following image, the popup shows the outgoing link from the `argo-rollouts-metrics` Service to the `argo-rollouts Deployment 
+In the following image, the popup shows the outgoing link from the `argo-rollouts-metrics` Service to the `argo-rollouts` Deployment 
 (via the selector in the Service manifest).
 
 If a link is "unfulfilled", i.e. not referring to any object currently in the navigator, it is marked with a warning 
@@ -95,15 +95,15 @@ triangle - making it easy to identify broken resource-links in your manifests:
 
 In this screenshot the `rollouts-demo-root` RoleBinding contains a reference to an `rollouts-demo` Role, which
 doesn't exist in the current manifests. Clicking on broken links will open the corresponding reference in the editor so you 
-can easily fix it.
+can easily fix it. 
 
-## Resource Validation
+<!--- ## **Resource Validation**
 
 Monokle automatically validates all resources of the corresponding kubernetes 1.22.1 schemas. A resource which is not validated is shown with a red error icon in the navigator. You can click on the error information button to check the error details.
 
-![Resource Validation](img/resource-validation.png)
+![Resource Validation](img/resource-validation.png) -->
 
-## Resource Filtering
+## **Resource Filtering**
 
 Resource filters allow you to filter the resources based on various properties such as:
 
@@ -121,32 +121,38 @@ Users can also add or remove filters by highlighting and hovering over labels, a
 
 ![Filter from Editor](img/filter-from-editor-1.5.0.png)
 
-## Reload Folder On Startup
+The **Quick Filter** popup is available with the **Cmd+P** keyboard shortcut:
+
+![Quick Filter](img/quick-filter-popup-1.5.0.png)
+
+## **Reload Folder On Startup**
 
 You can choose to reload the last reviewed folder while launching Monokle. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
 
 ![Reload](img/reload.png)
 
-## Navigation History
+## **Navigation History**
 
 You can easily navigate back and forth between the selected resources with the help of the Navigation button. The highlight arrow will indicate when navigation to previous or next resource is available.
 
 
 ![Navigation History](img/navigation-history-1.5.0.png)
 
-## Expand/Collapse Sections
+## **Expand/Collapse Sections**
 
-In the resource navigator, you can expand or collapse individual or all sections.
+In the resource navigator, clicking on the section name will expand or collapse individual sections.
 
-![Expand](img/expand.png)
-## Recent Folders
+![Expand](img/expand.gif)
+
+## **Recent Folders**
 
 The Recent Folders option has been added to the system menu to make it easy to switch between your favorite resource-manifest folders. 
 
 **Action:** File > Recent Folders
 
 ![Recent Folders](img/recent-folders-1.5.0.png)
-## Supported Resource links
+
+## **Supported Resource Links**
 
 Monokle currently finds and visualizes the following links between Kubernetes resources - please let us know if
 we missed something or got it wrong!

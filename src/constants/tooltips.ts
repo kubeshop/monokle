@@ -57,3 +57,4 @@ export const SearchProjectTooltip = 'Search for project by name or path';
 export const PluginDrawerTooltip = 'Open Plugins Manager';
 export const QuickFilterTooltip = `Filter results – Hint: quick-filter using ${KEY_CTRL_CMD} + P`;
 export const NewResourceTooltip = `Create new resource (${KEY_CTRL_CMD} + N)`;
+export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';

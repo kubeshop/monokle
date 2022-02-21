@@ -11,6 +11,7 @@ import Colors from '@styles/Colors';
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import FileItemPrefix from './FileItemPrefix';
 import HelmChartQuickAction from './HelmChartQuickAction';
+import PreviewConfigurationNameSuffix from './PreviewConfigurationQuickAction';
 
 export type ValuesFilesScopeType = {
   helmValuesMap: HelmValuesMapType;
@@ -29,6 +30,39 @@ type HelmChartScopeType = {
 };
 
 export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
+  // TODO: replace 'any' type after implementing the state for preview configurations
+  const previewConfigurationsSectionBlueprint: SectionBlueprint<any, any> = {
+    name: 'Preview Configurations',
+    id: `${helmChart.id}-configurations`,
+    containerElementId: 'helm-section-container',
+    rootSectionId: HELM_CHART_SECTION_NAME,
+    getScope: () => {
+      return {};
+    },
+    builder: {
+      isInitialized: () => true,
+      isVisible: () => true,
+    },
+    customization: {
+      counterDisplayMode: 'items',
+      indentation: 10,
+      nameWeight: 400,
+      nameSize: 14,
+      nameColor: Colors.grey9,
+      nameHorizontalPadding: 0,
+      namePrefix: {
+        component: CollapseSectionPrefix,
+      },
+      sectionMarginBottom: 12,
+      nameSuffix: {
+        component: PreviewConfigurationNameSuffix,
+        options: {
+          isVisibleOnHover: true,
+        },
+      },
+    },
+  };
+
   const valuesFilesSectionBlueprint: SectionBlueprint<HelmValuesFile, ValuesFilesScopeType> = {
     name: 'Values Files',
     id: `${helmChart.id}-values`,
@@ -105,6 +139,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         prefix: {
           component: FileItemPrefix,
         },
+        lastItemMarginBottom: 0,
       },
     },
   };
@@ -114,7 +149,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     name: helmChart.name,
     containerElementId: 'helm-sections-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
-    childSectionIds: [valuesFilesSectionBlueprint.id],
+    childSectionIds: [valuesFilesSectionBlueprint.id, previewConfigurationsSectionBlueprint.id],
     getScope: state => {
       const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
       return {
@@ -166,6 +201,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
       customization: {
         prefix: {component: FileItemPrefix},
+        lastItemMarginBottom: 0,
       },
     },
     customization: {
@@ -177,5 +213,5 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     },
   };
 
-  return {helmChartSectionBlueprint, valuesFilesSectionBlueprint};
+  return {helmChartSectionBlueprint, valuesFilesSectionBlueprint, previewConfigurationsSectionBlueprint};
 }

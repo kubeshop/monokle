@@ -8,7 +8,8 @@ Let’s get started!
  
 Launch Monokle and ensure that the setting **Show Cluster Selector** box is checked.
 
-![Cluster mode](img/cluster-selector-1.5.0.png)
+![Cluster selector](img/cluster-selector-1.5.0.png)
+
 
 If this is the first time to configure a cluster in Monokle, you will see **No Cluster Configured** and the **Configure** button at the top of the screen:
 

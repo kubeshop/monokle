@@ -9,7 +9,7 @@ Let’s get started!
 
 <em>**Note:** Please follow this [Getting Started](../getting-started.md) guide to install Monokle 🚀</em>
 
-Launch Monokle and on the welcome screen, there are three options to start working with projects:
+Launch Monokle and, on the welcome screen, there are three options to start working with projects:
 
  - Select an exisiting folder.
  - Create an empty project.
@@ -58,17 +58,14 @@ Once you select a resource, its source code will be launched automatically in th
 
 The Source Editor allows you to view and edit the source code easily. 
 
-<!--**Step 2:** Click on the Source button to view and edit the source code. 
-
-![Image 5](img/image-5.png)-->
-
-**Step 2:** Right-click anywhere on the source editor to launch the menu to select the required editing option from the drop-down list. 
+**Step 2:** Right click anywhere in the Source Editor to launch the menu to select the required editing option from the drop-down list.
 
 ![Image 6](img/image-6-1.5.0.png)
 
 You can also edit the source code using the Form Editor, which does not require any coding effort.
 
 ## **Using the ConfigMap Editor**
+
 The ConfigMap Editor collects the required information and passes it to another entity. To launch the ConfigMap Editor, click on the **ConfigMap** button. 
 
 ![Image 7](img/image-7-1.5.0.png)
@@ -181,7 +178,6 @@ Kubernetes is prompted to wait until specific conditions are met before it fully
 
 The source editor provides autocomplete and autosave options to automatically save your edits. 
                  
-
 ## **Questions or Comments?**
 
 Please feel free to join our open source community on Discord with this [Invite Link](https://discord.gg/6zupCZFQbe) and start your discussion. 
