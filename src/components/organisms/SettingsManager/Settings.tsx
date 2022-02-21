@@ -281,6 +281,7 @@ export const Settings = ({
               onChange={handleK8SVersionChange}
               style={{width: doesSchemaExist(selectedK8SVersion) ? '100%' : 'calc(100% - 172px)'}}
               optionLabelProp="label"
+              showSearch
             >
               {k8sVersions.map(version => (
                 <Select.Option key={version} value={version} label={version}>

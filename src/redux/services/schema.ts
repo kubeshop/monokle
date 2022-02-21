@@ -26,7 +26,7 @@ const HELM_CHART_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-schem
 // @ts-ignore
 const HELM_CHART_UI_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-ui-schema.json'));
 
-const k8sSchemaCache = new Map<string, any | undefined>();
+let k8sSchemaCache = new Map<string, any | undefined>();
 /**
  * Returns a JSON Schema for the specified resource kind
  */
@@ -44,6 +44,7 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
     k8sSchema = JSON.parse(
       readFileSync(path.join(String(userDataDir), path.sep, 'schemas', `${schemaVersion}.json`), 'utf-8')
     );
+    k8sSchemaCache = new Map<string, any | undefined>();
     k8sSchemaCache.set(schemaVersion, k8sSchema);
   }
 
