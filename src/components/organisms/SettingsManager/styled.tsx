@@ -37,6 +37,18 @@ export const Collapse = styled(RawCollapse)`
   ${GlobalScrollbarStyle};
 `;
 
+export const OptionContainer = styled.div`
+  display: flex;
+`;
+
+export const OptionLabel = styled.div`
+  width: 60px;
+`;
+
+export const OptionDownloadedText = styled.div`
+  color: ${Colors.greenOkayCompliment};
+`;
+
 export const WarningOutlined = styled(
   (props: {isKubeconfigPathValid: boolean; highlighted?: boolean; className: string}) => (
     <RawWarningOutlined className={props.className} />

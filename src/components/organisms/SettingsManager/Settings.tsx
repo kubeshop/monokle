@@ -209,10 +209,10 @@ export const Settings = ({
     }
   };
 
-  const handleK8SVersionChange = (k8sVersion: string) => {
-    setSelectedK8SVersion(k8sVersion);
-    if (doesSchemaExists(k8sVersion)) {
-      setLocalConfig({...localConfig, k8sVersion});
+  const handleK8SVersionChange = ({value}: {value: string}) => {
+    setSelectedK8SVersion(value);
+    if (doesSchemaExists(value)) {
+      setLocalConfig({...localConfig, k8sVersion: value});
     }
   };
 
@@ -239,6 +239,18 @@ export const Settings = ({
       return schemaExists(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
     },
     [isSchemaDownloading, userDataDir]
+  );
+
+  const getK8sOptionTemplate = useCallback(
+    (version: string) => {
+      return (
+        <div style={{display: 'flex'}}>
+          <div style={{width: '60px'}}>{version}</div>
+          {doesSchemaExists(version) && <div style={{color: 'green'}}>Downloaded</div>}
+        </div>
+      );
+    },
+    [isSchemaDownloading]
   );
 
   return (
@@ -276,15 +288,34 @@ export const Settings = ({
         <div>
           <Tooltip title={TOOLTIP_K8S_SELECTION}>
             <Select
-              value={selectedK8SVersion}
+              value={{value: selectedK8SVersion}}
               onChange={handleK8SVersionChange}
               style={{width: doesSchemaExists(selectedK8SVersion) ? '100%' : 'calc(100% - 172px)'}}
+              optionLabelProp="template"
+              dropdownRender={value => <span>{value},</span>}
+              labelInValue
+              options={k8sVersions.map(version => ({
+                value: version,
+                label: (
+                  <S.OptionContainer>
+                    <S.OptionLabel>{version}</S.OptionLabel>
+                    {doesSchemaExists(version) && (
+                      <S.OptionDownloadedText style={{color: 'green'}}>Downloaded</S.OptionDownloadedText>
+                    )}
+                  </S.OptionContainer>
+                ),
+                template: (
+                  <S.OptionContainer>
+                    <S.OptionLabel>{version}</S.OptionLabel>
+                  </S.OptionContainer>
+                ),
+              }))}
             >
-              {k8sVersions.map(version => (
+              {/* {k8sVersions.map(version => (
                 <Select.Option key={version} value={version}>
-                  {version}
+                  {getK8sOptionTemplate(version)}
                 </Select.Option>
-              ))}
+              ))} */}
             </Select>
           </Tooltip>
 

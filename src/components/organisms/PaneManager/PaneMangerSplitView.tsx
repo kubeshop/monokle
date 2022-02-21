@@ -91,7 +91,7 @@ const PaneManagerSplitView: React.FC = () => {
     }
 
     if (!leftActive) {
-      dispatch(setPaneConfiguration({...paneConfiguration, navWidth: navPaneWidth / splitViewContainerWidth}));
+      dispatch(setPaneConfiguration({...paneConfiguration, navWidth: navPaneWidth / (splitViewContainerWidth || 1)}));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
