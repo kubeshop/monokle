@@ -12,6 +12,7 @@ import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {
+  HelmChartEventEmitter,
   createHelmChart,
   createHelmValuesFile,
   getHelmChartFromFileEntry,
@@ -635,6 +636,8 @@ export function removeFile(fileEntry: FileEntry, state: AppState, removalSideEff
   if (chart) {
     if (state.helmChartMap[chart.id]) {
       removalSideEffect.removedHelmCharts.push(chart);
+      const chartIdCopy = JSON.parse(JSON.stringify(chart.id));
+      setImmediate(() => HelmChartEventEmitter.emit('remove', chartIdCopy));
 
       chart.valueFileIds.forEach(valueFileId => {
         const values = state.helmValuesMap[valueFileId];
