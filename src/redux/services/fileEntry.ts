@@ -111,6 +111,8 @@ export function getRootFolder(fileMap: FileMapType) {
  */
 
 export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: FileMapType, resourceMap: ResourceMapType) {
+  const result: K8sResource[] = [];
+
   try {
     fileEntry.isSupported = true;
     extractK8sResourcesFromFile(getAbsoluteFilePath(fileEntry.filePath, fileMap), fileMap).forEach(resource => {
@@ -120,11 +122,14 @@ export function extractResourcesForFileEntry(fileEntry: FileEntry, fileMap: File
       }
 
       resourceMap[resource.id] = resource;
+      result.push(resource);
     });
   } catch (e) {
     fileEntry.isSupported = false;
     log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
   }
+
+  return result;
 }
 
 /**
@@ -371,20 +376,15 @@ function reloadResourcesFromFileEntry(fileEntry: FileEntry, state: AppState) {
     clearResourceSelections(state.resourceMap);
   }
 
-  const newResourcesFromFile = extractK8sResourcesFromFile(
-    getAbsoluteFilePath(fileEntry.filePath, state.fileMap),
-    state.fileMap
-  );
-  newResourcesFromFile.forEach(resource => {
-    state.resourceMap[resource.id] = resource;
-  });
-
-  reprocessResources(
-    newResourcesFromFile.map(r => r.id),
-    state.resourceMap,
-    state.fileMap,
-    state.resourceRefsProcessingOptions
-  );
+  const newResourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
+  if (newResourcesFromFile.length > 0) {
+    reprocessResources(
+      newResourcesFromFile.map(r => r.id),
+      state.resourceMap,
+      state.fileMap,
+      state.resourceRefsProcessingOptions
+    );
+  }
 
   if (wasAnyResourceSelected) {
     if (existingResourcesFromFile.length === 1 && newResourcesFromFile.length === 1) {
@@ -460,6 +460,7 @@ function addHelmValuesFile(fileEntry: FileEntry, helmChartMap: HelmChartMapType,
 
   if (charts.length > 0) {
     createHelmValuesFile(fileEntry, charts[0], helmValuesMap);
+    log.info(`Added values file at ${fileEntry.filePath} to helm chart ${charts[0].name}`);
   } else {
     log.warn(`Could not find Helm Chart for values file ${fileEntry.filePath}, ignoring..`);
   }
@@ -510,7 +511,6 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   if (!fileIsIncluded(fileEntry, projectConfig)) {
     return fileEntry;
   }
-  fileEntry.isSupported = true;
 
   // Add a Helm values file
   if (isHelmValuesFile(fileEntry.filePath)) {
@@ -522,16 +522,15 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   }
   // seems to be a regular manifest file
   else {
-    const resourcesFromFile = extractK8sResourcesFromFile(absolutePath, state.fileMap);
-    resourcesFromFile.forEach(resource => {
-      state.resourceMap[resource.id] = resource;
-    });
-    reprocessResources(
-      resourcesFromFile.map(r => r.id),
-      state.resourceMap,
-      state.fileMap,
-      state.resourceRefsProcessingOptions
-    );
+    const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
+    if (resourcesFromFile.length > 0) {
+      reprocessResources(
+        resourcesFromFile.map(r => r.id),
+        state.resourceMap,
+        state.fileMap,
+        state.resourceRefsProcessingOptions
+      );
+    }
   }
 
   return fileEntry;
