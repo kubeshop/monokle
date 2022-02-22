@@ -2,7 +2,7 @@
 
 ## **Launch Monokle**
 
-<em>**Note:** Please follow this [Getting Started](../getting-started.md) guide to install Monokle 🚀</em>
+<em>**Note:** Please follow this [Getting Started](getting-started.md) guide to install Monokle 🚀</em>
 
 Launch Monokle and on the welcome screen, there are three options to start working with projects:
 
@@ -10,8 +10,6 @@ Launch Monokle and on the welcome screen, there are three options to start worki
  - Create an empty project.
  - Start from a template.
  
- 
-
 ![Welcome](img/welcome-1.5.0.png)
 
 Click **Select an existing project** to add your project folder containing K8 resources. 
@@ -37,9 +35,9 @@ The top right contains the following buttons:
 - Open Plugins Manager
 - Open Settings (see below)
 - Help:
-    - Documentation -> opens the Monokle documentation in your system browser.
-    - GitHub -> opens the Monokle GitHub repo in your system browser.
-    - Discord -> Open Discord to talk to us about your Monokle experience.
+    - **Documentation** -> opens the Monokle documentation in your system browser.
+    - **GitHub** -> opens the Monokle GitHub repo in your system browser.
+    - **Discord** -> Opens Discord to talk to us about your Monokle experience.
 
 ## **Settings**
 
@@ -47,13 +45,13 @@ Clicking the Settings icon on the top right opens the settings:
 
 ![Monokle Settings](img/monokle-settings-1.5.0.gif)
 
-- ### **Global Settings**
+### **Global Settings** 
   - **Projects Root Path**
   - **On Startup**: 
     - Automatically load last project.
     - Show Cluster Selector.
 
-- ### **Default Project Settings**  
+### **Default Project Settings**  
   - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
   - **Files: Include**: Sets which files to parse for kubernetes resources when scanning folders.
   - **Files: Exclude**: Sets which files/folders to exclude when scanning folders for resources.
@@ -67,7 +65,7 @@ Clicking the Settings icon on the top right opens the settings:
   - **Resource links processing**:
     - Ignore optional unsatisfied links.
     
-- ### **Active Project Settings**
+### **Active Project Settings**
    - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
   - **Files: Include**: Sets which files to parse for kubernetes resources when scanning folders.
   - **Files: Exclude**: Sets which files/folders to exclude when scanning folders for resources.
@@ -83,7 +81,7 @@ Clicking the Settings icon on the top right opens the settings:
 
 ## **System Menu**
 
-Monokle provides a system menu with common File/Edit/View/Window/Help functionality.
+Monokle provides a system menu with the common File/Edit/View/Window/Help functionality.
 
 Mac System Menu:
 
