@@ -77,6 +77,14 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
   }
 };
 
+export const setDeviceID = (deviceID: string) => {
+  const ID: string = electronStore.get('main.deviceID');
+
+  if (!ID) {
+    electronStore.set('main.deviceID', deviceID);
+  }
+};
+
 export const getSerializedProcessEnv = () => {
   const serializedProcessEnv: Record<string, string> = {};
   const processEnv = _.isObject(PROCESS_ENV) ? PROCESS_ENV : _.isObject(process.env) ? process.env : {};

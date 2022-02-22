@@ -1,4 +1,5 @@
 import {ipcRenderer} from 'electron';
+import 'electron-cookies';
 
 import React, {Suspense, useCallback, useEffect, useMemo} from 'react';
 import {useDispatch} from 'react-redux';
@@ -98,6 +99,7 @@ const App = () => {
   const rootFile = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const deviceID = useAppSelector(state => state.main.deviceID);
 
   const size: Size = useWindowSize();
 
@@ -250,6 +252,11 @@ const App = () => {
   const previewConfigurationDrawerOnClose = () => {
     dispatch(closePreviewConfigurationEditor());
   };
+
+  useEffect(() => {
+    // @ts-ignore
+    heap.identify(deviceID);
+  }, []);
 
   return (
     <AppContext.Provider value={{windowSize: size}}>

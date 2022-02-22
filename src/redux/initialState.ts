@@ -51,6 +51,7 @@ const initialAppState: AppState = {
   prevConfEditor: {
     isOpen: false,
   },
+  deviceID: electronStore.get('main.deviceID'),
 };
 
 const initialAppConfigState: AppConfig = {

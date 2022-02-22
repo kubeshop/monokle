@@ -14,6 +14,9 @@ const schema = {
           },
         },
       },
+      deviceID: {
+        type: 'string',
+      },
     },
   },
   appConfig: {

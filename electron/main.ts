@@ -2,6 +2,8 @@
 /* eslint-disable import/first */
 import moduleAlias from 'module-alias';
 import * as ElectronLog from 'electron-log';
+import {machineIdSync} from 'node-machine-id';
+
 
 Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
@@ -64,7 +66,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
+import { convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setDeviceID, setProjectsRootFolder } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 
@@ -84,6 +86,7 @@ const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
+setDeviceID(machineIdSync());
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
