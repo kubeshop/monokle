@@ -5,8 +5,15 @@ export const List = styled.ol`
   margin-top: 8px;
 `;
 
-export const ListItem = styled.li`
-  display: flex;
+export const ListItem = styled.li<{$opacity: number}>`
+  margin-left: 12px;
+  margin-bottom: 8px;
   width: 100%;
-  justify-content: space-between;
+  opacity: ${props => props.$opacity};
+`;
+
+export const DragHandle = styled.span`
+  display: inline-block;
+  margin-left: auto;
+  cursor: move;
 `;

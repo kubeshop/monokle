@@ -1,26 +1,21 @@
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
 
-import {Checkbox} from 'antd';
-
-import {ArrowDownOutlined, ArrowUpOutlined} from '@ant-design/icons';
-
-import {arrayMove} from '@utils/array';
+import SortableListItem from './SortableListItem';
+import {ListItem} from './types';
 
 import * as S from './styled';
 
-export type SortableListItem = {
-  id: string;
-  text: string;
-  isChecked: boolean;
-};
-
 type SortableListProps = {
-  items: SortableListItem[];
-  onChange: (items: SortableListItem[]) => void;
+  items: ListItem[];
+  onChange: (items: ListItem[]) => void;
 };
 
 const SortableList: React.FC<SortableListProps> = props => {
   const {items, onChange} = props;
+
+  const [isDragging, setIsDragging] = useState(false);
 
   const checkItem = useCallback(
     (itemId: string) => {
@@ -30,36 +25,32 @@ const SortableList: React.FC<SortableListProps> = props => {
   );
 
   const moveItem = useCallback(
-    (itemId: string, direction: 'up' | 'down') => {
-      const coefficient = direction === 'up' ? -1 : 1;
-      const itemIndex = items.findIndex(i => i.id === itemId);
-      if (!itemIndex) {
-        return;
-      }
-      onChange(arrayMove(items, itemIndex, itemIndex + coefficient));
+    (dragIndex: number, hoverIndex: number) => {
+      const itemsCopy = items.slice();
+      const [draggedItem] = itemsCopy.splice(dragIndex, 1);
+      itemsCopy.splice(hoverIndex, 0, draggedItem);
+      onChange(itemsCopy);
     },
     [items, onChange]
   );
 
   return (
-    <S.List>
-      {items.map((item, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <S.ListItem key={`${item.id}-${index}`}>
-          <span>
-            <span style={{marginRight: 8}}>{index + 1}.</span>
-            <span onClick={() => checkItem(item.id)}>
-              <Checkbox checked={item.isChecked} />
-              <span style={{marginLeft: 8, cursor: 'pointer'}}>{item.text}</span>
-            </span>
-          </span>
-          <span>
-            <ArrowUpOutlined onClick={() => moveItem(item.id, 'up')} />
-            <ArrowDownOutlined style={{marginLeft: 8}} onClick={() => moveItem(item.id, 'down')} />
-          </span>
-        </S.ListItem>
-      ))}
-    </S.List>
+    <DndProvider backend={HTML5Backend}>
+      <S.List>
+        {items.map((item, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <SortableListItem
+            key={item.id}
+            item={item}
+            index={index}
+            checkItem={checkItem}
+            moveItem={moveItem}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setIsDragging(false)}
+          />
+        ))}
+      </S.List>
+    </DndProvider>
   );
 };
 
