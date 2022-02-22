@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, {readFileSync} from 'fs';
 import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
@@ -16,8 +16,6 @@ import {getFileStats} from '@utils/files';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 // @ts-ignore
-const k8sSchema = JSON.parse(loadResource('schemas/k8sschemas.json'));
-// @ts-ignore
 const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.json'));
 // @ts-ignore
 const kustomizeSchema = JSON.parse(loadResource('schemas/kustomization.json'));
@@ -28,12 +26,26 @@ const HELM_CHART_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-schem
 // @ts-ignore
 const HELM_CHART_UI_SCHEMA = JSON.parse(loadResource('form-schemas/helm-chart-ui-schema.json'));
 
+let k8sSchemaCache = new Map<string, any | undefined>();
 /**
  * Returns a JSON Schema for the specified resource kind
  */
-export function getResourceSchema(resource: K8sResource) {
+export function getResourceSchema(resource: K8sResource, schemaVersion: string, userDataDir: string) {
+  let k8sSchema: any;
+
   if (isKustomizationResource(resource)) {
     return kustomizeSchema;
+  }
+
+  if (k8sSchemaCache.get(schemaVersion)) {
+    k8sSchema = k8sSchemaCache.get(schemaVersion);
+  } else {
+    // @ts-ignore
+    k8sSchema = JSON.parse(
+      readFileSync(path.join(String(userDataDir), path.sep, 'schemas', `${schemaVersion}.json`), 'utf-8')
+    );
+    k8sSchemaCache = new Map<string, any | undefined>();
+    k8sSchemaCache.set(schemaVersion, k8sSchema);
   }
 
   const resourceKindHandler = getResourceKindHandler(resource.kind);
@@ -41,7 +53,8 @@ export function getResourceSchema(resource: K8sResource) {
 
   if (prefix) {
     const schemaKey = `${prefix}.${resource.kind}`;
-    if (!schemaCache.has(schemaKey)) {
+    const schemaCacheKey = `${schemaVersion}-${prefix}.${resource.kind}`;
+    if (!schemaCache.has(schemaCacheKey)) {
       const kindSchema = k8sSchema['definitions'][schemaKey];
       if (kindSchema) {
         Object.keys(k8sSchema).forEach(key => {
@@ -54,20 +67,20 @@ export function getResourceSchema(resource: K8sResource) {
           k8sSchema[key] = JSON.parse(JSON.stringify(kindSchema[key]));
         });
 
-        schemaCache.set(schemaKey, JSON.parse(JSON.stringify(k8sSchema)));
+        schemaCache.set(schemaCacheKey, JSON.parse(JSON.stringify(k8sSchema)));
       }
     }
 
-    if (schemaCache.has(schemaKey)) {
-      return schemaCache.get(schemaKey);
+    if (schemaCache.has(schemaCacheKey)) {
+      return schemaCache.get(schemaCacheKey);
     }
-  } else if (!schemaCache.has(resource.kind)) {
+  } else if (!schemaCache.has(`${schemaVersion}-${resource.kind}`)) {
     if (resourceKindHandler?.sourceEditorOptions?.editorSchema) {
-      schemaCache.set(resource.kind, resourceKindHandler?.sourceEditorOptions?.editorSchema);
+      schemaCache.set(`${schemaVersion}-${resource.kind}`, resourceKindHandler?.sourceEditorOptions?.editorSchema);
     }
   }
 
-  return schemaCache.get(resource.kind);
+  return schemaCache.get(`${schemaVersion}-${resource.kind}`);
 }
 
 export function getSchemaForPath(filePath: string, fileMap: FileMapType): any | undefined {

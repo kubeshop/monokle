@@ -3,6 +3,7 @@ import {useDebounce} from 'react-use';
 
 import {Button, Input, Select} from 'antd';
 
+import {mapValues} from 'lodash';
 import styled from 'styled-components';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
@@ -104,13 +105,15 @@ const ResourceFilter = () => {
     ].sort();
   }, [knownResourceKinds, resourceMap]);
 
-  const allLabels = useMemo<Record<string, string[]>>(() => {
+  const allLabelsData = useMemo<Record<string, string[]>>(() => {
     return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.labels);
   }, [resourceMap]);
+  const allLabelsSchema = useMemo(() => mapValues(allLabelsData, () => 'string'), [allLabelsData]);
 
-  const allAnnotations = useMemo<Record<string, string[]>>(() => {
+  const allAnnotationsData = useMemo<Record<string, string[]>>(() => {
     return makeKeyValuesFromObjectList(Object.values(resourceMap), resource => resource.content?.metadata?.annotations);
   }, [resourceMap]);
+  const allAnnotationsSchema = useMemo(() => mapValues(allAnnotationsData, () => 'string'), [allAnnotationsData]);
 
   const fileOrFolderContainedInOptions = useMemo(() => {
     return Object.keys(fileMap).map(option => (
@@ -275,7 +278,8 @@ const ResourceFilter = () => {
       <FieldContainer>
         <KeyValueInput
           label="Labels:"
-          data={allLabels}
+          schema={allLabelsSchema}
+          data={allLabelsData}
           value={labels}
           onChange={updateLabels}
           disabled={areFiltersDisabled}
@@ -286,7 +290,8 @@ const ResourceFilter = () => {
         <KeyValueInput
           disabled={areFiltersDisabled}
           label="Annotations:"
-          data={allAnnotations}
+          schema={allAnnotationsSchema}
+          data={allAnnotationsData}
           value={annotations}
           onChange={updateAnnotations}
         />

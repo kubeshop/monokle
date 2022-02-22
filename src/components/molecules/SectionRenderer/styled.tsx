@@ -11,6 +11,18 @@ type NameContainerProps = {
   isCheckable?: boolean;
 };
 
+export const NameContainer = styled.span<NameContainerProps>`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  ${props => {
+    const defaultIndentation = props.isCheckable ? 24 : 0;
+    return `padding-left: ${defaultIndentation + props.$indentation}px;`;
+  }}
+  ${props => !props.isHovered && 'padding-right: 30px;'}
+  ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
+`;
+
 type SectionContainerProps = {
   isSelected?: boolean;
   isHighlighted?: boolean;
@@ -23,19 +35,8 @@ type SectionContainerProps = {
   disableHoverStyle?: boolean;
   isSectionCheckable?: boolean;
   hasCustomNameDisplay?: boolean;
+  $marginBottom?: number;
 };
-
-export const NameContainer = styled.span<NameContainerProps>`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  ${props => {
-    const defaultIndentation = props.isCheckable ? 24 : 0;
-    return `padding-left: ${defaultIndentation + props.$indentation}px;`;
-  }}
-  ${props => !props.isHovered && 'padding-right: 30px;'}
-  ${props => props.$hasCustomNameDisplay && 'padding: 0;'}
-`;
 
 export const SectionContainer = styled.li<SectionContainerProps>`
   display: flex;
@@ -77,6 +78,7 @@ export const SectionContainer = styled.li<SectionContainerProps>`
       return `background: ${Colors.blackPearl};`;
     }
   }};
+  ${props => props.$marginBottom && `margin-bottom: ${props.$marginBottom}px;`}
 `;
 
 type NameProps = {

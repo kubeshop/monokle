@@ -11,6 +11,7 @@ import {ArrowLeftOutlined, ArrowRightOutlined, BookOutlined, CodeOutlined, Conta
 import {
   ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT,
   ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT,
+  HELM_CHART_HELP_URL,
   KUSTOMIZE_HELP_URL,
   TOOLTIP_DELAY,
 } from '@constants/constants';
@@ -20,11 +21,13 @@ import {
   ApplyTooltip,
   DiffTooltip,
   OpenExternalDocumentationTooltip,
+  OpenHelmChartDocumentationTooltip,
   OpenKustomizeDocumentationTooltip,
   SaveUnsavedResourceTooltip,
 } from '@constants/tooltips';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {HelmChart, HelmValuesFile} from '@models/helm';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -39,6 +42,7 @@ import {
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getResourcesForPath} from '@redux/services/fileEntry';
+import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
@@ -104,6 +108,8 @@ const ActionsPane: React.FC<IProps> = props => {
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [selectedResource, setSelectedResource] = useState<K8sResource>();
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
@@ -306,12 +312,16 @@ const ActionsPane: React.FC<IProps> = props => {
     if (!selectedValuesFileId) {
       return '';
     }
+    const helmValuesFile: HelmValuesFile | undefined = helmValuesMap[selectedValuesFileId];
 
-    const helmValuesFile = helmValuesMap[selectedValuesFileId];
-
-    return `Install the ${helmChartMap[helmValuesFile.helmChartId].name} Chart using ${
-      helmValuesFile.name
-    } in cluster [${kubeConfigContext}]?`;
+    if (!helmValuesFile) {
+      return '';
+    }
+    const helmChart: HelmChart | undefined = helmChartMap[helmValuesFile.helmChartId];
+    if (!helmChart) {
+      return '';
+    }
+    return `Install the ${helmChart.name} Chart using ${helmValuesFile.name} in cluster [${kubeConfigContext}]?`;
   }, [helmChartMap, helmValuesMap, kubeConfigContext, selectedValuesFileId]);
 
   // called from main thread because thunks cannot be dispatched by main
@@ -458,6 +468,16 @@ const ActionsPane: React.FC<IProps> = props => {
                   {isButtonShrinked ? '' : `See Kustomization documentation`} <BookOutlined />
                 </S.ExtraRightButton>
               </Tooltip>
+            ) : selectedPath && isHelmChartFile(selectedPath) ? (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={OpenHelmChartDocumentationTooltip}>
+                <S.ExtraRightButton
+                  onClick={() => openExternalResourceKindDocumentation(HELM_CHART_HELP_URL)}
+                  type="link"
+                  ref={extraButton}
+                >
+                  {isButtonShrinked ? '' : `See Helm Chart documentation`} <BookOutlined />
+                </S.ExtraRightButton>
+              </Tooltip>
             ) : null
           }
         >
@@ -489,7 +509,11 @@ const ActionsPane: React.FC<IProps> = props => {
                     formUiSchema={getUiSchemaForPath(selectedPath, fileMap)}
                   />
                 ) : isKustomization && selectedResource ? (
-                  <FormEditor formSchema={extractFormSchema(getResourceSchema(selectedResource))} />
+                  <FormEditor
+                    formSchema={extractFormSchema(
+                      getResourceSchema(selectedResource, String(k8sVersion), String(userDataDir))
+                    )}
+                  />
                 ) : resourceKindHandler?.formEditorOptions ? (
                   <FormEditor
                     formSchema={resourceKindHandler.formEditorOptions.editorSchema}

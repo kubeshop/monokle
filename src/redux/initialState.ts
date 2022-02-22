@@ -1,5 +1,7 @@
 import os from 'os';
 
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 import {AlertState} from '@models/alert';
 import {AppConfig, NewVersionCode} from '@models/appconfig';
 import {AppState} from '@models/appstate';
@@ -46,6 +48,9 @@ const initialAppState: AppState = {
   shouldEditorReloadSelectedPath: false,
   checkedResourceIds: [],
   registeredKindHandlers: [],
+  prevConfEditor: {
+    isOpen: false,
+  },
 };
 
 const initialAppConfigState: AppConfig = {
@@ -85,6 +90,7 @@ const initialAppConfigState: AppConfig = {
   projectConfig: null,
   isProjectLoading: true,
   projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
+  k8sVersion: electronStore.get('appConfig.k8sVersion') || PREDEFINED_K8S_VERSION,
 };
 
 const initialAlertState: AlertState = {};

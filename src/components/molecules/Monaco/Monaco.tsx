@@ -17,7 +17,7 @@ import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worke
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
-import {Document, ParsedNode, isMap, parseAllDocuments} from 'yaml';
+import {Document, ParsedNode, isMap} from 'yaml';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
@@ -36,6 +36,7 @@ import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -74,6 +75,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
   const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
 
@@ -156,6 +159,8 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
   useResourceYamlSchema(
     yaml,
+    String(userDataDir),
+    String(k8sVersion),
     selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     selectedPath,
     fileMap
@@ -193,7 +198,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
 
     if (selectedResourceId) {
       // this will slow things down if document gets large - need to find a better solution...
-      const documents = parseAllDocuments(newValue);
+      const documents = parseAllYamlDocuments(newValue);
       // only accept single document changes for now
       setValid(documents.length === 1 && isValidResourceDocument(documents[0]));
     } else {
@@ -248,7 +253,7 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
       log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldEditorReloadSelectedPath]);
+  }, [selectedPath, shouldEditorReloadSelectedPath]);
 
   useEffect(() => {
     if (selectedResource && selectedResource.text !== code) {
@@ -288,18 +293,19 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     previewType,
   ]);
 
-  const options = useMemo(
-    () => ({
+  const options = useMemo(() => {
+    const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
       selectOnLineNumbers: true,
       readOnly: isReadOnlyMode,
+      renderValidationDecorations: 'on',
       fontWeight: 'bold',
       glyphMargin: true,
       minimap: {
         enabled: false,
       },
-    }),
-    [isReadOnlyMode]
-  );
+    };
+    return editorOptions;
+  }, [isReadOnlyMode]);
 
   return (
     <S.MonacoContainer ref={containerRef}>

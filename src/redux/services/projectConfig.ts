@@ -4,6 +4,8 @@ import log from 'loglevel';
 import {sep} from 'path';
 import {AnyAction} from 'redux';
 
+import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 import {AppConfig, ProjectConfig} from '@models/appconfig';
 
 import {updateProjectConfig} from '@redux/reducers/appConfig';
@@ -48,6 +50,7 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     scanExcludes: state.projectConfig?.scanExcludes,
     fileIncludes: state.projectConfig?.fileIncludes,
     folderReadsMaxDepth: state.projectConfig?.folderReadsMaxDepth,
+    k8sVersion: state.projectConfig?.k8sVersion,
   };
   applicationConfig.settings = {
     helmPreviewMode: state.projectConfig?.settings?.helmPreviewMode,
@@ -61,6 +64,7 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     path: state.projectConfig?.kubeConfig?.path,
     currentContext: state.projectConfig?.kubeConfig?.currentContext,
   };
+  applicationConfig.k8sVersion = state.projectConfig?.k8sVersion;
   return applicationConfig;
 };
 
@@ -86,6 +90,7 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     contexts: state.kubeConfig.contexts,
     currentContext: state.kubeConfig.currentContext,
   };
+  applicationConfig.k8sVersion = state.k8sVersion;
   return applicationConfig;
 };
 
@@ -95,9 +100,8 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
   }
 
   try {
-    const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth}: ProjectConfig = JSON.parse(
-      readFileSync(CONFIG_PATH(projectRootPath), 'utf8')
-    );
+    const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth, k8sVersion}: ProjectConfig =
+      JSON.parse(readFileSync(CONFIG_PATH(projectRootPath), 'utf8'));
     const projectConfig: ProjectConfig = {};
     projectConfig.settings = settings
       ? {
@@ -129,6 +133,7 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
     projectConfig.scanExcludes = _.isArray(scanExcludes) ? scanExcludes : undefined;
     projectConfig.fileIncludes = _.isArray(fileIncludes) ? fileIncludes : undefined;
     projectConfig.folderReadsMaxDepth = _.isNumber(folderReadsMaxDepth) ? folderReadsMaxDepth : undefined;
+    projectConfig.k8sVersion = _.includes(K8S_VERSIONS, k8sVersion) ? k8sVersion : PREDEFINED_K8S_VERSION;
 
     return projectConfig;
   } catch (error) {

@@ -1,3 +1,5 @@
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
+
 const ElectronStore = require('electron-store');
 
 const schema = {
@@ -78,6 +80,9 @@ const schema = {
       },
       newVersion: {
         type: 'number',
+      },
+      k8sVersion: {
+        type: 'string',
       },
       projects: {
         type: 'array',
@@ -187,6 +192,7 @@ const defaults = {
     },
     recentFolders: [],
     newVersion: 0,
+    k8sVersion: PREDEFINED_K8S_VERSION,
   },
   ui: {
     isSettingsOpen: false,

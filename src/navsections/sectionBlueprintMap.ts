@@ -1,4 +1,6 @@
 import {EventEmitter} from 'events';
+import _ from 'lodash';
+import log from 'loglevel';
 
 import {SectionBlueprint} from '@models/navigator';
 
@@ -18,8 +20,7 @@ const resizeObserver = new window.ResizeObserver(entries => {
 
 const register = (sectionBlueprint: SectionBlueprint<any, any>) => {
   if (SectionBlueprintMap[sectionBlueprint.id]) {
-    // eslint-disable-next-line no-console
-    console.warn(`Overriding existing sectionBlueprint with id ${sectionBlueprint.id}`);
+    log.warn(`Overriding existing sectionBlueprint with id ${sectionBlueprint.id}`);
   }
   SectionBlueprintMap[sectionBlueprint.id] = sectionBlueprint;
   eventEmitter.emit('register', sectionBlueprint);
@@ -28,6 +29,12 @@ const register = (sectionBlueprint: SectionBlueprint<any, any>) => {
   if (element) {
     resizeObserver.observe(element);
   }
+};
+
+const remove = (sectionBlueprintId: string, ancestorIds: string[]) => {
+  _.unset(SectionBlueprintMap, [...ancestorIds.map(id => [id, 'childSectionIds']).flat(), sectionBlueprintId]);
+  _.unset(SectionBlueprintMap, sectionBlueprintId);
+  eventEmitter.emit('remove', sectionBlueprintId);
 };
 
 const getAll = () => {
@@ -54,6 +61,7 @@ export default {
   getAll,
   getById,
   register,
+  remove,
   getSectionContainerElementHeight,
   eventEmitter,
 };

@@ -64,7 +64,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { convertRecentFilesToRecentProjects, getSerializedProcessEnv, setProjectsRootFolder } from './utils';
+import { convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 
@@ -83,6 +83,7 @@ const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
 setProjectsRootFolder(userHomeDir);
+saveInitialK8sSchema(userDataDir);
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;

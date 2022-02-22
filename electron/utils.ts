@@ -1,11 +1,15 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
+import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import _ from 'lodash';
-import path from 'path';
+import path, {join} from 'path';
+
+import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {AnyExtension} from '@models/extension';
 
 import {createProject} from '@redux/reducers/appConfig';
+import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
 import {PROCESS_ENV} from '@utils/env';
@@ -92,5 +96,19 @@ export const getSerializedProcessEnv = () => {
     return JSON.stringify(serializedProcessEnv);
   } catch {
     return undefined;
+  }
+};
+
+export const saveInitialK8sSchema = (userDataDir: string) => {
+  const dirName = join(String(userDataDir), path.sep, 'schemas');
+  const schemaPath = join(dirName, path.sep, `${PREDEFINED_K8S_VERSION}.json`);
+
+  if (!existsSync(dirName)) {
+    mkdirSync(dirName, {recursive: true});
+  }
+
+  if (!existsSync(schemaPath)) {
+    const data = loadResource(`schemas/${PREDEFINED_K8S_VERSION}.json`);
+    writeFileSync(schemaPath, String(data));
   }
 };

@@ -22,6 +22,8 @@ import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandle
 
 const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
+  const k8sVersion = thunkAPI.getState().config.projectConfig?.k8sVersion;
+  const userDataDir = thunkAPI.getState().config.userDataDir;
   try {
     const kc = createKubeClient(thunkAPI.getState().config, context);
 
@@ -49,6 +51,8 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
     const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
 
     const previewResult = createPreviewResult(
+      k8sVersion,
+      userDataDir,
       allYaml,
       context,
       'Get Cluster Resources',
@@ -73,7 +77,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
         });
 
         // only process newly added custom resources
-        processParsedResources(previewResult.previewResources, resourceRefsProcessingOptions, {
+        processParsedResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
           resourceIds: customResources.map(r => r.id),
         });
 

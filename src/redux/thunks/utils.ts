@@ -37,6 +37,8 @@ export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: st
  */
 
 export function createPreviewResult(
+  schemaVersion: string,
+  userDataDir: string,
   resourcesYaml: string,
   previewResourceId: string,
   title: string,
@@ -50,7 +52,7 @@ export function createPreviewResult(
     return rm;
   }, {});
 
-  processParsedResources(resourceMap, resourceRefsProcessingOptions);
+  processParsedResources(schemaVersion, userDataDir, resourceMap, resourceRefsProcessingOptions);
   return {
     previewResourceId,
     previewResources: resourceMap,

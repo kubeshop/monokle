@@ -10,6 +10,7 @@ import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
+import {currentConfigSelector} from '@redux/selectors';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {runHelm} from '@utils/helm';
@@ -29,6 +30,8 @@ export const previewHelmValuesFile = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
   const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
+  const k8sVersion = configState.projectConfig?.k8sVersion;
+  const userDataDir = configState.userDataDir;
   const currentContext =
     thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
     thunkAPI.getState().config.kubeConfig.currentContext;
@@ -36,15 +39,15 @@ export const previewHelmValuesFile = createAsyncThunk<
 
   if (valuesFile && valuesFile.filePath) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-    const folder = path.join(rootFolder, valuesFile.filePath.substr(0, valuesFile.filePath.lastIndexOf(path.sep)));
     const chart = state.helmChartMap[valuesFile.helmChartId];
+    const folder = path.join(rootFolder, path.dirname(chart.filePath));
 
     // sanity check
     if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
       log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
-      const helmPreviewMode =
-        configState.projectConfig?.settings?.helmPreviewMode || configState.settings.helmPreviewMode;
+      const projectConfig = currentConfigSelector(thunkAPI.getState());
+      const helmPreviewMode = projectConfig.settings ? projectConfig.settings.helmPreviewMode : 'template';
 
       const args = {
         helmCommand:
@@ -61,7 +64,14 @@ export const previewHelmValuesFile = createAsyncThunk<
       }
 
       if (result.stdout) {
-        return createPreviewResult(result.stdout, valuesFile.id, 'Helm Preview', state.resourceRefsProcessingOptions);
+        return createPreviewResult(
+          String(k8sVersion),
+          String(userDataDir),
+          result.stdout,
+          valuesFile.id,
+          'Helm Preview',
+          state.resourceRefsProcessingOptions
+        );
       }
     }
 

@@ -100,8 +100,10 @@ const ResourceDiff = (props: {
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
+  const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
 
-  useResourceYamlSchema(yaml, localResource);
+  useResourceYamlSchema(yaml, String(userDataDir), String(k8sVersion), localResource);
 
   const options = {
     renderSideBySide: true,

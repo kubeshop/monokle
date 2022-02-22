@@ -1,12 +1,19 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Checkbox, Form, Input, InputNumber, Select, Tooltip} from 'antd';
+import {Button, Checkbox, Form, Input, InputNumber, Select, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
+import path from 'path';
 
-import {DEFAULT_EDITOR_DEBOUNCE, DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
+import {
+  DEFAULT_EDITOR_DEBOUNCE,
+  DEFAULT_KUBECONFIG_DEBOUNCE,
+  K8S_VERSIONS,
+  TOOLTIP_DELAY,
+  TOOLTIP_K8S_SELECTION,
+} from '@constants/constants';
 import {
   AddExclusionPatternTooltip,
   AddInclusionPatternTooltip,
@@ -22,6 +29,7 @@ import {ProjectConfig} from '@models/appconfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
+import {downloadSchema, schemaExists} from '@redux/services/k8sVersionService';
 
 import FilePatternList from '@molecules/FilePatternList';
 
@@ -63,7 +71,10 @@ export const Settings = ({
   const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
   const [currentProjectName, setCurrentProjectName] = useState(projectName);
   const isEditingDisabled = uiState.isClusterDiffVisible || isInClusterMode;
-
+  const [k8sVersions] = useState<Array<string>>(K8S_VERSIONS);
+  const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const [selectedK8SVersion, setSelectedK8SVersion] = useState<string>(String(config?.k8sVersion));
+  const [isSchemaDownloading, setIsSchemaDownloading] = useState<boolean>(false);
   const [localConfig, setLocalConfig] = useState<ProjectConfig | null | undefined>(config);
 
   const handleConfigChange = () => {
@@ -192,11 +203,44 @@ export const Settings = ({
     if (fileInput.current?.files && fileInput.current.files.length > 0) {
       const file: any = fileInput.current.files[0];
       if (file.path) {
-        const path = file.path;
-        setCurrentKubeConfig(path);
+        const filePath = file.path;
+        setCurrentKubeConfig(filePath);
       }
     }
   };
+
+  const handleK8SVersionChange = (k8sVersion: string) => {
+    setSelectedK8SVersion(k8sVersion);
+    if (doesSchemaExist(k8sVersion)) {
+      setLocalConfig({...localConfig, k8sVersion});
+    }
+  };
+
+  const handleDownloadVersionSchema = async () => {
+    try {
+      setIsSchemaDownloading(true);
+      await downloadSchema(
+        `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v${selectedK8SVersion}/_definitions.json`,
+        path.join(String(userDataDir), path.sep, 'schemas', `${selectedK8SVersion}.json`)
+      );
+      setIsSchemaDownloading(false);
+      setLocalConfig({
+        ...localConfig,
+        k8sVersion: selectedK8SVersion,
+      });
+    } catch (error: any) {
+      // eslint-disable-next-line no-console
+      console.error(error.message);
+    }
+  };
+
+  const doesSchemaExist = useCallback(
+    (k8sVersion: string) => {
+      return schemaExists(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isSchemaDownloading]
+  );
 
   return (
     <>
@@ -228,6 +272,41 @@ export const Settings = ({
           </>
         </Form>
       )}
+      <S.Div>
+        <S.Span>Kubernetes Version</S.Span>
+        <div>
+          <Tooltip title={TOOLTIP_K8S_SELECTION}>
+            <Select
+              value={selectedK8SVersion}
+              onChange={handleK8SVersionChange}
+              style={{width: doesSchemaExist(selectedK8SVersion) ? '100%' : 'calc(100% - 172px)'}}
+              optionLabelProp="label"
+              showSearch
+            >
+              {k8sVersions.map(version => (
+                <Select.Option key={version} value={version} label={version}>
+                  <S.OptionContainer>
+                    <S.OptionLabel>{version}</S.OptionLabel>
+                    {doesSchemaExist(version) && (
+                      <S.OptionDownloadedText style={{color: 'green'}}>Downloaded</S.OptionDownloadedText>
+                    )}
+                  </S.OptionContainer>
+                </Select.Option>
+              ))}
+            </Select>
+          </Tooltip>
+
+          {!doesSchemaExist(selectedK8SVersion) && (
+            <Button
+              style={{width: '160px', marginLeft: '12px'}}
+              onClick={handleDownloadVersionSchema}
+              loading={isSchemaDownloading}
+            >
+              Download & Use
+            </Button>
+          )}
+        </div>
+      </S.Div>
       <S.Div>
         <S.Heading>
           KUBECONFIG

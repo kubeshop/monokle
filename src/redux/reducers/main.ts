@@ -7,12 +7,12 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {parse, parseDocument} from 'yaml';
+import {parse} from 'yaml';
 
 import {CLUSTER_DIFF_PREFIX, HELM_CHART_ENTRY_FILE, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
-import {ProjectConfig} from '@models/appconfig';
+import {AppConfig, ProjectConfig} from '@models/appconfig';
 import {
   AppState,
   ClusterToLocalResourcesMatch,
@@ -40,6 +40,7 @@ import electronStore from '@utils/electronStore';
 import {getFileStats, getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
+import {parseYamlDocument} from '@utils/yaml';
 
 import {getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -136,20 +137,114 @@ const performResourceContentUpdate = (state: AppState, resource: K8sResource, ne
   if (isFileResource(resource)) {
     const updatedFileText = saveResource(resource, newText, state.fileMap);
     resource.text = updatedFileText;
-    resource.content = parseDocument(updatedFileText).toJS();
+    resource.content = parseYamlDocument(updatedFileText).toJS();
     recalculateResourceRanges(resource, state);
   } else {
     resource.text = newText;
-    resource.content = parseDocument(newText).toJS();
+    resource.content = parseYamlDocument(newText).toJS();
   }
 };
 
 export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
-  async (shouldIgnore: boolean, thunkAPI) => {
+  async (shouldIgnore: boolean, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
     electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
     thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
-    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinks());
+    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinksAction({schemaVersion, userDataDir}));
+  }
+);
+
+export const addResource = createAsyncThunk(
+  'main/addResource',
+  async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.addResourceAction({resource, schemaVersion, userDataDir}));
+  }
+);
+export const updateFileEntry = createAsyncThunk(
+  'main/updateFileEntry',
+  async (payload: UpdateFileEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.updateFileEntryAction({payload, schemaVersion, userDataDir}));
+  }
+);
+export const reprocessResourcesForOptionalLinks = createAsyncThunk(
+  'main/reprocessResourcesForOptionalLinks',
+  async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinksAction({schemaVersion, userDataDir}));
+  }
+);
+export const reprocessResource = createAsyncThunk(
+  'main/reprocessResource',
+  async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.reprocessResourceAction({resource, schemaVersion, userDataDir}));
+  }
+);
+export const updateResource = createAsyncThunk(
+  'main/updateResource',
+  async (payload: UpdateResourcePayload, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.updateResourceAction({payload, schemaVersion, userDataDir}));
+  }
+);
+export const updateManyResources = createAsyncThunk(
+  'main/updateManyResources',
+  async (payload: UpdateManyResourcesPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.updateManyResourcesAction({payload, schemaVersion, userDataDir}));
+  }
+);
+
+export const reprocessAllResources = createAsyncThunk(
+  'main/reprocessAllResources',
+  async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.reprocessAllResourcesAction({schemaVersion, userDataDir}));
+  }
+);
+
+export const multipleFilesChanged = createAsyncThunk(
+  'main/multipleFilesChanged',
+  async (
+    payload: {paths: Array<string>; projectConfig: ProjectConfig},
+    thunkAPI: {getState: Function; dispatch: Function}
+  ) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.multipleFilesChangedAction({...payload, schemaVersion, userDataDir}));
+  }
+);
+
+export const multiplePathsAdded = createAsyncThunk(
+  'main/multiplePathsAdded',
+  async (
+    payload: {paths: Array<string>; projectConfig: ProjectConfig},
+    thunkAPI: {getState: Function; dispatch: Function}
+  ) => {
+    const config: AppConfig = thunkAPI.getState().config;
+    const schemaVersion = String(config.projectConfig?.k8sVersion);
+    const userDataDir = String(config.userDataDir);
+    thunkAPI.dispatch(mainSlice.actions.multiplePathsAddedAction({...payload, schemaVersion, userDataDir}));
   }
 );
 
@@ -209,23 +304,37 @@ export const mainSlice = createSlice({
         state.wasRehydrated = !action.payload;
       }
     },
-    addResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
-      const resource = action.payload;
+    addResourceAction: (
+      state: Draft<AppState>,
+      action: PayloadAction<{resource: K8sResource; schemaVersion: string; userDataDir: string}>
+    ) => {
+      const {resource, schemaVersion, userDataDir} = action.payload;
       state.resourceMap[resource.id] = resource;
 
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
-        resourceIds: [resource.id],
-        resourceKinds,
-      });
+      processParsedResources(
+        schemaVersion,
+        userDataDir,
+        getActiveResourceMap(state),
+        state.resourceRefsProcessingOptions,
+        {
+          resourceIds: [resource.id],
+          resourceKinds,
+        }
+      );
     },
     /**
      * called by the file monitor when multiple paths are added to the file system
      */
-    multiplePathsAdded: (
+    multiplePathsAddedAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; projectConfig: ProjectConfig}>
+      action: PayloadAction<{
+        paths: Array<string>;
+        projectConfig: ProjectConfig;
+        schemaVersion: string;
+        userDataDir: string;
+      }>
     ) => {
       let filePaths: Array<string> = action.payload.paths;
       const projectConfig = action.payload.projectConfig;
@@ -234,28 +343,47 @@ export const mainSlice = createSlice({
         if (fileEntry) {
           if (getFileStats(filePath)?.isDirectory() === false) {
             log.info(`added file ${filePath} already exists - updating`);
-            reloadFile(filePath, fileEntry, state);
+            reloadFile(
+              filePath,
+              fileEntry,
+              state,
+              projectConfig,
+              action.payload.schemaVersion,
+              action.payload.userDataDir
+            );
           }
         } else {
-          addPath(filePath, state, projectConfig);
+          addPath(filePath, state, projectConfig, action.payload.schemaVersion, action.payload.userDataDir);
         }
       });
     },
     /**
      * called by the file monitor when multiple files are changed in the file system
      */
-    multipleFilesChanged: (
+    multipleFilesChangedAction: (
       state: Draft<AppState>,
-      action: PayloadAction<{paths: Array<string>; projectConfig: ProjectConfig}>
+      action: PayloadAction<{
+        paths: Array<string>;
+        projectConfig: ProjectConfig;
+        schemaVersion: string;
+        userDataDir: string;
+      }>
     ) => {
       let filePaths = action.payload.paths;
       const projectConfig = action.payload.projectConfig;
       filePaths.forEach((filePath: string) => {
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
-          reloadFile(filePath, fileEntry, state);
+          reloadFile(
+            filePath,
+            fileEntry,
+            state,
+            projectConfig,
+            action.payload.schemaVersion,
+            action.payload.userDataDir
+          );
         } else {
-          addPath(filePath, state, projectConfig);
+          addPath(filePath, state, projectConfig, action.payload.schemaVersion, action.payload.userDataDir);
         }
       });
     },
@@ -277,15 +405,19 @@ export const mainSlice = createSlice({
     /**
      * updates the content of the specified path to the specified value
      */
-    updateFileEntry: (state: Draft<AppState>, action: PayloadAction<UpdateFileEntryPayload>) => {
+    updateFileEntryAction: (
+      state: Draft<AppState>,
+      action: PayloadAction<{payload: UpdateFileEntryPayload; schemaVersion: string; userDataDir: string}>
+    ) => {
       try {
-        const fileEntry = state.fileMap[action.payload.path];
+        const {payload, schemaVersion, userDataDir} = action.payload;
+        const fileEntry = state.fileMap[payload.path];
         if (fileEntry) {
           let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-          const filePath = path.join(rootFolder, action.payload.path);
+          const filePath = path.join(rootFolder, payload.path);
 
           if (getFileStats(filePath)?.isDirectory() === false) {
-            fs.writeFileSync(filePath, action.payload.content);
+            fs.writeFileSync(filePath, payload.content);
             fileEntry.timestamp = getFileTimestamp(filePath);
 
             if (path.basename(fileEntry.filePath) === HELM_CHART_ENTRY_FILE) {
@@ -296,7 +428,7 @@ export const mainSlice = createSlice({
                 if (!helmChart) {
                   throw new Error(`Couldn't find the helm chart for path: ${fileEntry.filePath}`);
                 }
-                const fileContent = parse(action.payload.content);
+                const fileContent = parse(payload.content);
                 if (typeof fileContent?.name !== 'string') {
                   throw new Error(`Couldn't get the name property of the helm chart at path: ${fileEntry.filePath}`);
                 }
@@ -311,10 +443,7 @@ export const mainSlice = createSlice({
                 deleteResource(r, state.resourceMap);
               });
 
-              const extractedResources = extractK8sResources(
-                action.payload.content,
-                filePath.substring(rootFolder.length)
-              );
+              const extractedResources = extractK8sResources(payload.content, filePath.substring(rootFolder.length));
 
               let resourceIds: string[] = [];
 
@@ -329,13 +458,21 @@ export const mainSlice = createSlice({
                 resourceIds.push(r.id);
               });
 
-              reprocessResources(resourceIds, state.resourceMap, state.fileMap, state.resourceRefsProcessingOptions, {
-                resourceKinds: extractedResources.map(r => r.kind),
-              });
+              reprocessResources(
+                schemaVersion,
+                userDataDir,
+                resourceIds,
+                state.resourceMap,
+                state.fileMap,
+                state.resourceRefsProcessingOptions,
+                {
+                  resourceKinds: extractedResources.map(r => r.kind),
+                }
+              );
             }
           }
         } else {
-          log.error(`Could not find FileEntry for ${action.payload.path}`);
+          log.error(`Could not find FileEntry for ${payload.path}`);
         }
       } catch (e) {
         log.error(e);
@@ -345,7 +482,12 @@ export const mainSlice = createSlice({
     /**
      * Reprocess all resources - called when changing processing-related options
      */
-    reprocessResourcesForOptionalLinks: (state: Draft<AppState>) => {
+    reprocessResourcesForOptionalLinksAction: (
+      state: Draft<AppState>,
+      action: PayloadAction<{schemaVersion: string; userDataDir: string}>
+    ) => {
+      const {schemaVersion, userDataDir} = action.payload;
+
       // find all resourceKinds with optional refmappers
       const resourceKindsWithOptionalRefs = getKnownResourceKinds().filter(kind => {
         const handler = getResourceKindHandler(kind);
@@ -355,46 +497,72 @@ export const mainSlice = createSlice({
         return false;
       });
 
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
-        resourceKinds: resourceKindsWithOptionalRefs,
-        skipValidation: true,
-      });
+      processParsedResources(
+        schemaVersion,
+        userDataDir,
+        getActiveResourceMap(state),
+        state.resourceRefsProcessingOptions,
+        {
+          resourceKinds: resourceKindsWithOptionalRefs,
+          skipValidation: true,
+        }
+      );
     },
     /**
      * Reprocesses a resource
      */
-    reprocessResource: (state: Draft<AppState>, action: PayloadAction<K8sResource>) => {
-      const resource = action.payload;
+    reprocessResourceAction: (
+      state: Draft<AppState>,
+      action: PayloadAction<{resource: K8sResource; schemaVersion: string; userDataDir: string}>
+    ) => {
+      const {resource, schemaVersion, userDataDir} = action.payload;
       const resourceKinds = getResourceKindsWithTargetingRefs(resource);
 
-      processParsedResources(getActiveResourceMap(state), state.resourceRefsProcessingOptions, {
-        resourceIds: [resource.id],
-        resourceKinds,
-      });
+      processParsedResources(
+        schemaVersion,
+        userDataDir,
+        getActiveResourceMap(state),
+        state.resourceRefsProcessingOptions,
+        {
+          resourceIds: [resource.id],
+          resourceKinds,
+        }
+      );
     },
     /**
     /**
      * Updates the content of the specified resource to the specified value
      */
-    updateResource: (state: Draft<AppState>, action: PayloadAction<UpdateResourcePayload>) => {
+    updateResourceAction: (
+      state: Draft<AppState>,
+      action: PayloadAction<{payload: UpdateResourcePayload; schemaVersion: string; userDataDir: string}>
+    ) => {
       try {
-        const isInClusterMode = action.payload.isInClusterMode;
+        const {payload, schemaVersion, userDataDir} = action.payload;
+        const isInClusterMode = payload.isInClusterMode;
 
         const currentResourceMap = isInClusterMode ? getLocalResourceMap(state) : getActiveResourceMap(state);
         const resource = isInClusterMode
-          ? state.resourceMap[action.payload.resourceId]
-          : currentResourceMap[action.payload.resourceId];
+          ? state.resourceMap[payload.resourceId]
+          : currentResourceMap[payload.resourceId];
 
         if (resource) {
-          performResourceContentUpdate(state, resource, action.payload.content);
+          performResourceContentUpdate(state, resource, payload.content);
           let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
-          reprocessResources(resourceIds, currentResourceMap, state.fileMap, state.resourceRefsProcessingOptions);
-          if (!action.payload.preventSelectionAndHighlightsUpdate) {
+          reprocessResources(
+            schemaVersion,
+            userDataDir,
+            resourceIds,
+            currentResourceMap,
+            state.fileMap,
+            state.resourceRefsProcessingOptions
+          );
+          if (!payload.preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;
             updateSelectionAndHighlights(state, resource);
           }
         } else {
-          const r = state.resourceMap[action.payload.resourceId];
+          const r = state.resourceMap[payload.resourceId];
           // check if this was a kustomization resource updated during a kustomize preview
           if (
             r &&
@@ -402,10 +570,10 @@ export const mainSlice = createSlice({
             state.previewResourceId &&
             isKustomizationResource(state.resourceMap[state.previewResourceId])
           ) {
-            performResourceContentUpdate(state, r, action.payload.content);
+            performResourceContentUpdate(state, r, payload.content);
             processKustomizations(state.resourceMap, state.fileMap);
           } else {
-            log.warn('Failed to find updated resource during preview', action.payload.resourceId);
+            log.warn('Failed to find updated resource during preview', payload.resourceId);
           }
         }
       } catch (e) {
@@ -416,12 +584,16 @@ export const mainSlice = createSlice({
     /**
      * Updates the content of the specified resources to the specified values
      */
-    updateManyResources: (state: Draft<AppState>, action: PayloadAction<UpdateManyResourcesPayload>) => {
+    updateManyResourcesAction: (
+      state: Draft<AppState>,
+      action: PayloadAction<{payload: UpdateManyResourcesPayload; schemaVersion: string; userDataDir: string}>
+    ) => {
       try {
+        const {payload, schemaVersion, userDataDir} = action.payload;
         let resourceIdsToReprocess: string[] = [];
         const activeResources = getActiveResourceMap(state);
 
-        action.payload.forEach(({resourceId, content}) => {
+        payload.forEach(({resourceId, content}) => {
           const resource = activeResources[resourceId];
           if (resource) {
             performResourceContentUpdate(state, resource, content);
@@ -429,7 +601,14 @@ export const mainSlice = createSlice({
             resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
           }
         });
-        reprocessResources(resourceIdsToReprocess, activeResources, state.fileMap, state.resourceRefsProcessingOptions);
+        reprocessResources(
+          schemaVersion,
+          userDataDir,
+          resourceIdsToReprocess,
+          activeResources,
+          state.fileMap,
+          state.resourceRefsProcessingOptions
+        );
       } catch (e) {
         log.error(e);
         return original(state);
@@ -696,6 +875,26 @@ export const mainSlice = createSlice({
         notification.hasSeen = true;
       });
     },
+    reprocessAllResourcesAction: (
+      state: Draft<AppState>,
+      action: PayloadAction<{schemaVersion: string; userDataDir: string}>
+    ) => {
+      const {schemaVersion, userDataDir} = action.payload;
+      processParsedResources(schemaVersion, userDataDir, state.resourceMap, state.resourceRefsProcessingOptions);
+    },
+    openPreviewConfigurationEditor: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      const helmChartId = action.payload;
+      state.prevConfEditor = {
+        helmChartId,
+        isOpen: true,
+      };
+    },
+    closePreviewConfigurationEditor: (state: Draft<AppState>) => {
+      state.prevConfEditor = {
+        isOpen: false,
+        helmChartId: undefined,
+      };
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -830,9 +1029,8 @@ export const mainSlice = createSlice({
         if (resourceFileEntry) {
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
         } else {
-          const newFileEntry = {...createFileEntry(relativeFilePath), isSupported: true};
+          const newFileEntry = {...createFileEntry(relativeFilePath, state.fileMap), isSupported: true};
           newFileEntry.timestamp = resourcePayload.fileTimestamp;
-          state.fileMap[relativeFilePath] = newFileEntry;
           const childFileName = path.basename(relativeFilePath);
           const parentPath = path.join(path.sep, relativeFilePath.replace(`${path.sep}${childFileName}`, '')).trim();
           if (parentPath === path.sep) {
@@ -1099,16 +1297,10 @@ function setPreviewData(payload: SetPreviewDataPayload, state: AppState) {
 
 export const {
   setAppRehydrating,
-  addResource,
   selectK8sResource,
   selectFile,
   setSelectingFile,
   setApplyingResource,
-  updateResource,
-  updateManyResources,
-  updateFileEntry,
-  multiplePathsAdded,
-  multipleFilesChanged,
   multiplePathsRemoved,
   selectHelmValuesFile,
   clearPreview,
@@ -1127,7 +1319,6 @@ export const {
   reloadClusterDiff,
   toggleClusterOnlyResourcesInClusterDiff,
   setSelectionHistory,
-  reprocessResource,
   editorHasReloadedSelectedPath,
   checkResourceId,
   uncheckAllResourceIds,
@@ -1141,5 +1332,7 @@ export const {
   addMultipleKindHandlers,
   addKindHandler,
   seenNotifications,
+  openPreviewConfigurationEditor,
+  closePreviewConfigurationEditor,
 } = mainSlice.actions;
 export default mainSlice.reducer;
