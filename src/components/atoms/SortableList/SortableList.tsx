@@ -8,18 +8,18 @@ import {arrayMove} from '@utils/array';
 
 import * as S from './styled';
 
-export type OrderedListItem = {
+export type SortableListItem = {
   id: string;
   text: string;
   isChecked: boolean;
 };
 
-type OrderedListProps = {
-  items: OrderedListItem[];
-  onChange: (items: OrderedListItem[]) => void;
+type SortableListProps = {
+  items: SortableListItem[];
+  onChange: (items: SortableListItem[]) => void;
 };
 
-const OrderedList: React.FC<OrderedListProps> = props => {
+const SortableList: React.FC<SortableListProps> = props => {
   const {items, onChange} = props;
 
   const checkItem = useCallback(
@@ -63,4 +63,4 @@ const OrderedList: React.FC<OrderedListProps> = props => {
   );
 };
 
-export default OrderedList;
+export default SortableList;
