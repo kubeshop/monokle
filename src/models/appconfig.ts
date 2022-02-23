@@ -1,3 +1,5 @@
+import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
+
 import {KustomizeCommandType} from '@models/kustomize';
 
 export enum Themes {
@@ -62,6 +64,27 @@ export type Project = {
   lastOpened?: string;
 };
 
+interface PreviewConfigurationBase {
+  id: string;
+  name: string;
+}
+
+interface HelmInstallPreviewConfiguration extends PreviewConfigurationBase {
+  command: 'install';
+  options: {
+    [key in keyof typeof helmInstallOptions]: null | string;
+  };
+}
+
+interface HelmTemplatePreviewConfiguration extends PreviewConfigurationBase {
+  command: 'install';
+  options: {
+    [key in keyof typeof helmTemplateOptions]: null | string;
+  };
+}
+
+export type HelmPreviewConfiguration = HelmInstallPreviewConfiguration | HelmTemplatePreviewConfiguration;
+
 export type ProjectConfig = {
   settings?: Settings;
   kubeConfig?: KubeConfig;
@@ -69,6 +92,9 @@ export type ProjectConfig = {
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
   k8sVersion?: string;
+  helm?: {
+    previewConfigurationMap?: Record<string, HelmPreviewConfiguration>;
+  };
 };
 
 interface AppConfig {

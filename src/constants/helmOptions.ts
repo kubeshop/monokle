@@ -31,12 +31,12 @@ const helmCommonOptions = {
   '--version': 'string',
   '--wait': 'boolean',
   '--wait-for-jobs': 'boolean',
-};
+} as const;
 
 export const helmInstallOptions = {
   ...helmCommonOptions,
   '--output': 'string', // ['table', 'json', 'yaml'],
-};
+} as const;
 
 export const helmTemplateOptions = {
   ...helmCommonOptions,
@@ -50,4 +50,4 @@ export const helmTemplateOptions = {
   '--show-only': 'stringArray',
   '--skip-tests': 'boolean',
   '--validate': 'boolean',
-};
+} as const;
