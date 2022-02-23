@@ -1,4 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+import {flatten} from 'lodash';
 
 import {CLUSTER_DIFF_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
@@ -35,50 +36,52 @@ export const loadClusterDiff = createAsyncThunk<
   }
   try {
     const clusterAccess = state.config.projectConfig?.clusterAccess;
+    if (!clusterAccess || !clusterAccess.length) {
+      return {};
+    }
     const kc = createKubeClient(state.config);
-    return getClusterObjects(kc, clusterAccess?.namespace as string).then(
-      results => {
-        const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+    try {
+      const res = await Promise.all(clusterAccess.map((ca) => getClusterObjects(kc, ca.namespace)));
+      const results = flatten(res);
+      const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
-        if (fulfilledResults.length === 0) {
-          return createRejectionWithAlert(
-            thunkAPI,
-            CLUSTER_DIFF_FAILED,
-            // @ts-ignore
-            results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
-          );
-        }
-
-        // @ts-ignore
-        const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-        const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + String(kc.currentContext));
-        const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
-          rm[r.id] = r;
-          return rm;
-        }, {});
-
-        if (fulfilledResults.length < results.length) {
-          const rejectedResult = results.find(r => r.status === 'rejected');
-          if (rejectedResult) {
-            // @ts-ignore
-            const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
-
-            const alert = {
-              title: 'Cluster Diff',
-              message: `Failed to get all cluster resources: ${reason}`,
-              type: AlertEnum.Warning,
-            };
-
-            return {resourceMap, alert};
-          }
-        }
-
-        return {resourceMap};
-      },
-      reason => {
-        return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, reason.message);
+      if (fulfilledResults.length === 0) {
+        return createRejectionWithAlert(
+          thunkAPI,
+          CLUSTER_DIFF_FAILED,
+          // @ts-ignore
+          results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
+        );
       }
-    );
+
+      // @ts-ignore
+      const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+      const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + String(kc.currentContext));
+      const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
+        rm[r.id] = r;
+        return rm;
+      }, {});
+
+      if (fulfilledResults.length < results.length) {
+        const rejectedResult = results.find(r => r.status === 'rejected');
+        if (rejectedResult) {
+          // @ts-ignore
+          const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
+
+          const alert = {
+            title: 'Cluster Diff',
+            message: `Failed to get all cluster resources: ${reason}`,
+            type: AlertEnum.Warning,
+          };
+
+          return {resourceMap, alert};
+        }
+      }
+
+      return {resourceMap};
+    } catch (reason: any) {
+      return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, reason.message);
+    }
   } catch (e: any) {
     return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, e.message);
   }

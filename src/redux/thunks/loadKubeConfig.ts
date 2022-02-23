@@ -10,7 +10,7 @@ import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
 import {updateProjectKubeConfig, updateProjectKubeAccess} from '@redux/reducers/appConfig';
-import {getKubeAccess} from '@utils/kubeclient';
+import {addNamespace, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 import electronStore from '@utils/electronStore';
 
 function getSelectedContext(contexts: k8s.Context[]): k8s.Context | undefined {
@@ -52,9 +52,23 @@ export const loadContexts = async (
           isPathValid: kc.contexts.length > 0,
         };
 
+        kc.contexts.forEach((context) => {
+          if (!context.namespace) {
+            return;
+          }
+
+          addNamespace({
+            namespaceName: context.namespace,
+            clusterName: context.cluster,
+          });
+        });
+
         dispatch(updateProjectKubeConfig(kubeConfig));
         if (namespace) {
-          dispatch(updateProjectKubeAccess(getKubeAccess(namespace)));
+          dispatch(updateProjectKubeAccess(
+            getNamespaces(selectedContext?.name as string)
+              .map((ns) => getKubeAccess(ns.namespaceName)))
+          );
         }
       } catch (e: any) {
         if (e instanceof Error) {

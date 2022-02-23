@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Dropdown, Menu, Tooltip} from 'antd';
+import {Dropdown, Tooltip} from 'antd';
 
 import {LoadingOutlined} from '@ant-design/icons';
 
@@ -10,9 +10,11 @@ import {ClusterModeTooltip} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
+import {addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
+import FilePatternList from '@molecules/FilePatternList';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCurrentContext, updateProjectConfig} from '@redux/reducers/appConfig';
+import {setCurrentContext, updateProjectConfig, updateProjectKubeAccess} from '@redux/reducers/appConfig';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
@@ -48,6 +50,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
   );
   const [isClusterDropdownOpen, setIsClusterDropdownOpen] = useState(false);
+  const [appNamespaces, setAppNamespaces] = useState(getNamespaces());
 
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -123,7 +126,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     } else if (previewType === 'cluster' && previewLoader.isLoading) {
       content = <LoadingOutlined />;
     } else {
-      content = 'LOAD';
+      content = 'LOAsD';
       className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
     }
 
@@ -134,31 +137,69 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
-  const clusterMenu = (
-    <Menu>
-      {kubeConfigContexts.map((context: any) => (
-        <Menu.Item key={context.name} onClick={handleClusterChange}>
-          {context.name}
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
+  const onClusterChange = (clusterName: string, namespaces: string[]) => {
+    const otherClusterNamespaces = appNamespaces.filter((appNs) => appNs.clusterName !== clusterName);
+    const existingClusterNamespaces = namespaces.map((ns) => ({
+      namespaceName: ns,
+      clusterName,
+    }));
+
+    setAppNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
+    addNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
+
+    if (clusterName === kubeConfigContext) {
+      dispatch(updateProjectKubeAccess(namespaces.map((ns) => getKubeAccess(ns))));
+    }
+  };
+
+  const clusterMenu = () => {
+    const data: any = kubeConfigContexts.map((context) => {
+      const contextNamespaces = appNamespaces.filter((appNs) => appNs.clusterName === context.name);
+      return {
+        namespaces: contextNamespaces.map((ctxNs) => ctxNs.namespaceName),
+        name: context.name,
+      };
+    });
+    return (
+      <S.ClusterDropdownContainer>
+        {
+          data.map((x: any) => {
+            return (
+              <div key={x.name}>
+                <S.ClusterDropdownClusterName
+                  onClick={() => handleClusterChange({key: x.name})}
+                >Cluster: {x.name}</S.ClusterDropdownClusterName>
+                <span>Namespaces:</span>
+                <FilePatternList
+                  value={x.namespaces}
+                  onChange={(namespaces) => onClusterChange(x.name, namespaces)}
+                  tooltip="Add new namespace"
+                  addButtonLabel="Add namespace"
+                />
+              </div>
+            );
+          })
+        }
+      </S.ClusterDropdownContainer>
+    );
+  };
 
   if (!isClusterSelectorVisible) {
     return null;
   }
 
   const clusterAccessInfo = () => {
-    if (clusterAccess?.hasFullAccess) {
+    const hasFullAccess = clusterAccess?.some((ca) => ca.hasFullAccess);
+    if (hasFullAccess) {
       return {
         icon: <S.CheckCircleOutlined />,
-        tooltip: `You have full access to this cluster and namespace: ${clusterAccess?.namespace}`
+        tooltip: 'You have full access to this cluster',
       };
     }
 
     return {
       icon: <S.ExclamationCircleOutlinedWarning />,
-      tooltip: `You do not have full access to this cluster and namespace: ${clusterAccess?.namespace}`
+      tooltip: 'You do not have full access to this cluster',
     };
   };
 

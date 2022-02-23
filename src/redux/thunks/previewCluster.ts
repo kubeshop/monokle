@@ -4,13 +4,14 @@ import {KubeConfig} from '@kubernetes/client-node';
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
+import {flatten} from 'lodash';
 
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {AlertEnum} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
+import {ClusterAccess} from '@models/appconfig';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {extractK8sResources, processResources} from '@redux/services/resource';
@@ -21,24 +22,28 @@ import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
+const getNonCustomClusterObjects = async (kc: any, namespace: string) => {
+  return Promise.allSettled(
+    getRegisteredKindHandlers()
+      .filter(handler => !handler.isCustom)
+      .map(resourceKindHandler =>
+        resourceKindHandler
+          .listResourcesInCluster(kc, { namespace })
+          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
+      )
+  );
+};
+
 const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const state = thunkAPI.getState();
   const resourceRefsProcessingOptions = state.main.resourceRefsProcessingOptions;
   const clusterAccess = state.config.projectConfig?.clusterAccess;
   try {
     const kc = createKubeClient(state.config, context);
+    const res = await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)));
+    const results = flatten(res);
 
-    const results = await Promise.allSettled(
-      getRegisteredKindHandlers()
-        .filter(handler => !handler.isCustom)
-        .map(resourceKindHandler =>
-          resourceKindHandler
-            .listResourcesInCluster(kc, { namespace: clusterAccess?.namespace })
-            .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
-        )
-    );
-
-const previewClusterHandler = async (context: string, thunkAPI: any) => {
+    const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const k8sVersion = thunkAPI.getState().config.projectConfig?.k8sVersion;
   const userDataDir = thunkAPI.getState().config.userDataDir;
@@ -103,22 +108,6 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
         trackEvent(CLUSTER_VIEW, {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
 
         previewResult.alert.message = `Previewing ${Object.keys(previewResult.previewResources).length} resources`;
-      }
-    }
-
-    if (fulfilledResults.length < results.length) {
-      const rejectedResult = results.find(r => r.status === 'rejected');
-      if (rejectedResult) {
-        // @ts-ignore
-        const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
-
-        previewResult.alert = {
-          title: 'Get Cluster Resources',
-          message: `Failed to get all cluster resources: ${reason}`,
-          type: AlertEnum.Warning,
-        };
-
-        return previewResult;
       }
     }
     return previewResult;

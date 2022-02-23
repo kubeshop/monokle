@@ -185,6 +185,25 @@ const schema = {
       },
     },
   },
+  kubeConfig: {
+    type: 'object',
+    properties: {
+      namespaces: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            namespaceName: {
+              type: 'string',
+            },
+            clusterName: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
 const defaults = {
@@ -223,6 +242,9 @@ const defaults = {
       editWidth: 0.3333,
       rightWidth: 0,
     },
+  },
+  kubeConfig: {
+    namespaces: [],
   },
 };
 

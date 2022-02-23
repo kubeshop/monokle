@@ -88,7 +88,7 @@ export type ProjectConfig = {
   scanExcludes?: string[];
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
-  clusterAccess?: ClusterAccess;
+  clusterAccess?: ClusterAccess[];
   k8sVersion?: string;
   helm?: {
     previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;

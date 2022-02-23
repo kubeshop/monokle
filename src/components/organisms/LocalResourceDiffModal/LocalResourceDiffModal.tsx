@@ -2,6 +2,7 @@ import {LegacyRef, useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
+import {flatten} from 'lodash';
 
 import {Button, Select, Skeleton, Switch} from 'antd';
 
@@ -43,6 +44,8 @@ const DiffModal = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const configState = useAppSelector(state => state.config);
+  const namespaces = configState.projectConfig?.clusterAccess?.map((cl) => cl.namespace);
 
   const targetResource = useAppSelector(state =>
     state.main.resourceDiff.targetResourceId
@@ -57,11 +60,9 @@ const DiffModal = () => {
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [matchingResourcesById, setMatchingResourcesById] = useState<Record<string, any>>();
   const [matchingResourceText, setMatchingResourceText] = useState<string>();
-  const [namespaces, setNamespaces] = useState<string[]>();
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
   const [selectedMatchingResourceId, setSelectedMathingResourceId] = useState<string>();
   const [targetResourceText, setTargetResourceText] = useState<string>();
-  const configState = useAppSelector(state => state.config);
 
   const windowSize = useWindowSize();
 
@@ -190,12 +191,15 @@ const DiffModal = () => {
       const kc = createKubeClient(configState);
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
-      const currentNamespace = configState.projectConfig?.clusterAccess?.namespace as string;
-      const resourcesFromCluster =
-        (
-          await resourceKindHandler
-            ?.listResourcesInCluster(kc, { namespace: currentNamespace })
-        )?.filter(r => r.metadata.name === targetResource.name) || [];
+      const getResources = async () => {
+        if (!resourceKindHandler || !namespaces) {
+          return [];
+        }
+        const resources = await Promise.all(namespaces.map((ns) => resourceKindHandler.listResourcesInCluster(kc, { namespace: ns })));
+        return flatten(resources);
+      };
+
+      const resourcesFromCluster = (await getResources()).filter(r => r.metadata.name === targetResource.name);
 
       // matching resource was not found
       if (!resourcesFromCluster.length) {
@@ -211,7 +215,6 @@ const DiffModal = () => {
         return;
       }
 
-      setNamespaces(resourcesFromCluster.map(r => r.metadata.namespace));
       setMatchingResourcesById(
         resourcesFromCluster?.reduce((matchingResources, r) => {
           delete r.metadata?.managedFields;

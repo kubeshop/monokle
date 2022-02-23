@@ -1,6 +1,7 @@
 import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
+import {uniq} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq} from 'yaml';
 
@@ -24,7 +25,7 @@ import {isKustomizationPatch, isKustomizationResource, processKustomizations} fr
 import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
 
 import {getFileTimestamp} from '@utils/files';
-import {createKubeClient, hasAccessToResource} from '@utils/kubeclient';
+import {createKubeClient} from '@utils/kubeclient';
 import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
 import {
@@ -276,9 +277,11 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
-export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string, clusterAccess?: ClusterAccess): Promise<string[]> {
-  if (!hasAccessToResource('namespace', 'get', clusterAccess)) {
-    return [];
+export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string, clusterAccess?: ClusterAccess[]): Promise<string[]> {
+  const hasFullAccess = clusterAccess?.some((ca) => ca.hasFullAccess);
+  const clusterAccessNamespaces = clusterAccess?.map((ca) => ca.namespace) || [];
+  if (!hasFullAccess) {
+    return clusterAccessNamespaces;
   }
 
   try {
@@ -294,7 +297,8 @@ export async function getTargetClusterNamespaces(kubeconfigPath: string, context
       }
     });
 
-    return ns;
+    ns.push(...clusterAccessNamespaces);
+    return uniq(ns);
   } catch (e: any) {
     log.warn(`Failed to get namespaces in selected context. ${e.message}`);
     return [];

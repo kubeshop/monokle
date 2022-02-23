@@ -61,6 +61,20 @@ export const ClusterContainer = styled.div`
   }
 `;
 
+export const ClusterDropdownContainer = styled.div`
+  background-color: ${Colors.grey1};
+  padding: 10px;
+  margin-bottom: 5px;
+`;
+
+export const ClusterDropdownClusterName = styled.div`
+  cursor: pointer;
+  padding: 5px;
+  &:hover {
+    background-color: ${Colors.grey3};
+  }
+`;
+
 export const ClusterContextName = styled.span`
   max-width: 200px;
   text-overflow: ellipsis;

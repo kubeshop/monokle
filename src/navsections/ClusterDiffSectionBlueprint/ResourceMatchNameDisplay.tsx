@@ -39,6 +39,7 @@ import {
 
 import Colors from '@styles/Colors';
 import {hasAccessToResource} from '@utils/kubeclient';
+import {ClusterAccess} from '@models/appconfig';
 
 const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
   width: 100%;
@@ -195,8 +196,12 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     }
   };
 
-  const canGet = hasAccessToResource(matchMeta.resourceKind.toLowerCase(), 'get', clusterAccess);
-  const canCreate = hasAccessToResource(matchMeta.resourceKind.toLowerCase(), 'create', clusterAccess);
+  // TODO change-to-multiple-cluster-access
+  const resourceNamespace = (clusterAccess ?? [])?.find((access: ClusterAccess) => {
+    return access.namespace === matchMeta.resourceNamespace;
+  });
+  const canGet = hasAccessToResource(matchMeta.resourceKind.toLowerCase(), 'get', resourceNamespace);
+  const canCreate = hasAccessToResource(matchMeta.resourceKind.toLowerCase(), 'create', resourceNamespace);
 
   if (!clusterResource && !localResources) {
     return null;
