@@ -161,7 +161,8 @@ export const configSlice = createSlice({
       state.k8sVersion = action.payload;
     },
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      execSync(`kubectl config use-context ${action.payload}`);
+      const stdOut = execSync(`kubectl config use-context ${action.payload}`);
+      electronStore.set('kubeConfig.currentContext', action.payload);
       state.kubeConfig.currentContext = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {

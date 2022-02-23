@@ -21,45 +21,6 @@ export type LoadClusterDiffPayload = {
 
 const CLUSTER_DIFF_FAILED = 'Cluster Compare Failed';
 
-function parseClusterResources(results: any[], thunkAPI: any, kc: any) {
-  const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
-
-  if (fulfilledResults.length === 0) {
-    return createRejectionWithAlert(
-      thunkAPI,
-      CLUSTER_DIFF_FAILED,
-      // @ts-ignore
-      results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
-    );
-  }
-
-  // @ts-ignore
-  const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
-  const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + String(kc.currentContext));
-  const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
-    rm[r.id] = r;
-    return rm;
-  }, {});
-
-  if (fulfilledResults.length < results.length) {
-    const rejectedResult = results.find(r => r.status === 'rejected');
-    if (rejectedResult) {
-      // @ts-ignore
-      const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
-
-      const alert = {
-        title: 'Cluster Diff',
-        message: `Failed to get all cluster resources: ${reason}`,
-        type: AlertEnum.Warning,
-      };
-
-      return {resourceMap, alert};
-    }
-  }
-
-  return {resourceMap};
-}
-
 export const loadClusterDiff = createAsyncThunk<
   LoadClusterDiffPayload,
   undefined,
@@ -73,25 +34,51 @@ export const loadClusterDiff = createAsyncThunk<
     return;
   }
   try {
-    const namespaces = state.config.projectConfig?.settings?.clusterNamespaces;
-    if (!namespaces || !namespaces.length) {
-      return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, 'Please configure a namespace');
-    }
-
+    const clusterAccess = state.config.projectConfig?.clusterAccess;
     const kc = createKubeClient(state.config);
-    const promises = namespaces?.map((namespace) => getClusterObjects(kc, namespace));
-    // TODO fix-types
-    return Promise.allSettled<any>(promises)
-      .then((results: any) => {
-        const fulfilledResults: any = results.filter((r: any) => r.status === 'fulfilled' && r.value);
-        const resources: any = [];
-        fulfilledResults.forEach((fulfilledResult: any) => {
-          resources.push(...fulfilledResult.value);
-        });
-        return parseClusterResources(results, thunkAPI, kc);
-      }).catch(reason => {
-        return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, reason[0].message);
-      });
+    return getClusterObjects(kc, clusterAccess?.namespace as string).then(
+      results => {
+        const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
+
+        if (fulfilledResults.length === 0) {
+          return createRejectionWithAlert(
+            thunkAPI,
+            CLUSTER_DIFF_FAILED,
+            // @ts-ignore
+            results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
+          );
+        }
+
+        // @ts-ignore
+        const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+        const resources = extractK8sResources(allYaml, CLUSTER_DIFF_PREFIX + String(kc.currentContext));
+        const resourceMap = resources.reduce((rm: ResourceMapType, r) => {
+          rm[r.id] = r;
+          return rm;
+        }, {});
+
+        if (fulfilledResults.length < results.length) {
+          const rejectedResult = results.find(r => r.status === 'rejected');
+          if (rejectedResult) {
+            // @ts-ignore
+            const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
+
+            const alert = {
+              title: 'Cluster Diff',
+              message: `Failed to get all cluster resources: ${reason}`,
+              type: AlertEnum.Warning,
+            };
+
+            return {resourceMap, alert};
+          }
+        }
+
+        return {resourceMap};
+      },
+      reason => {
+        return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, reason.message);
+      }
+    );
   } catch (e: any) {
     return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, e.message);
   }

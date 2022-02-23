@@ -21,20 +21,24 @@ import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-const getNonCustomClusterObjects = async (kc: any, namespace: string) => {
-  return Promise.allSettled(
-    getRegisteredKindHandlers()
-      .filter(handler => !handler.isCustom)
-      .map(resourceKindHandler =>
-        resourceKindHandler
-          .listResourcesInCluster(kc, { namespace })
-          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
-    )
-  );
-};
+const previewClusterHandler = async (context: string, thunkAPI: any) => {
+  const state = thunkAPI.getState();
+  const resourceRefsProcessingOptions = state.main.resourceRefsProcessingOptions;
+  const clusterAccess = state.config.projectConfig?.clusterAccess;
+  try {
+    const kc = createKubeClient(state.config, context);
+
+    const results = await Promise.allSettled(
+      getRegisteredKindHandlers()
+        .filter(handler => !handler.isCustom)
+        .map(resourceKindHandler =>
+          resourceKindHandler
+            .listResourcesInCluster(kc, { namespace: clusterAccess?.namespace })
+            .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
+        )
+    );
 
 const previewClusterHandler = async (context: string, thunkAPI: any) => {
-  // TODO fix-types
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const k8sVersion = thunkAPI.getState().config.projectConfig?.k8sVersion;
   const userDataDir = thunkAPI.getState().config.userDataDir;
@@ -81,7 +85,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
       r => r.kind === 'CustomResourceDefinition'
     );
     if (customResourceDefinitions.length > 0) {
-      const customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions);
+      const customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, clusterAccess.namespace as string);
 
       // if any were found we need to merge them into the preview-result
       if (customResourceObjects.length > 0) {
@@ -103,7 +107,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
     }
 
     if (fulfilledResults.length < results.length) {
-      const rejectedResult = results.find((r: any) => r.status === 'rejected');
+      const rejectedResult = results.find(r => r.status === 'rejected');
       if (rejectedResult) {
         // @ts-ignore
         const reason = rejectedResult.reason ? rejectedResult.reason.toString() : JSON.stringify(rejectedResult);
@@ -202,7 +206,7 @@ export function findDefaultVersion(crd: any) {
  * Load custom resource objects for CRDs found in cluster
  */
 
-async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitions: K8sResource[]): Promise<string[]> {
+async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitions: K8sResource[], namespace: string): Promise<string[]> {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
   try {
@@ -211,8 +215,7 @@ async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitio
       .map(crd => {
         const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
         if (kindHandler) {
-          // TODO fix-types
-          return kindHandler.listResourcesInCluster(kc, { namespace: 'test' }, crd).then(response =>
+          return kindHandler.listResourcesInCluster(kc, { namespace }, crd).then(response =>
             // @ts-ignore
             getK8sObjectsAsYaml(response.body.items)
           );

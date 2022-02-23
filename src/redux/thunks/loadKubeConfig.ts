@@ -9,11 +9,13 @@ import {AlertEnum} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {updateProjectKubeConfig, updateProjectKubeAccess, updateClusterNamespaces} from '@redux/reducers/appConfig';
+import {updateProjectKubeConfig, updateProjectKubeAccess} from '@redux/reducers/appConfig';
 import {getKubeAccess} from '@utils/kubeclient';
+import electronStore from '@utils/electronStore';
 
-function getSelectedContext(contexts: k8s.Context[], currentContext?: string): k8s.Context | undefined {
-  let selectedContext = contexts.find(c => c.name === currentContext);
+function getSelectedContext(contexts: k8s.Context[]): k8s.Context | undefined {
+  const contextName = electronStore.get('kubeConfig.currentContext');
+  let selectedContext = contexts.find(c => c.name === contextName);
   if (selectedContext) {
     return selectedContext;
   }
@@ -37,12 +39,13 @@ export const loadContexts = async (
         kc.loadFromFile(configPath);
         let namespace: string | undefined;
 
-        let selectedContext = getSelectedContext(kc.contexts, currentContext);
+        let selectedContext = getSelectedContext(kc.contexts);
         if (selectedContext) {
           kc.setCurrentContext(selectedContext.name);
           namespace = selectedContext.namespace;
         }
 
+        electronStore.get('kubeConfig.currentContext');
         const kubeConfig: KubeConfig = {
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
@@ -51,8 +54,7 @@ export const loadContexts = async (
 
         dispatch(updateProjectKubeConfig(kubeConfig));
         if (namespace) {
-          dispatch(updateProjectKubeAccess(getKubeAccess(namespace, kc.currentContext)));
-          dispatch(updateClusterNamespaces([namespace]));
+          dispatch(updateProjectKubeAccess(getKubeAccess(namespace)));
         }
       } catch (e: any) {
         if (e instanceof Error) {

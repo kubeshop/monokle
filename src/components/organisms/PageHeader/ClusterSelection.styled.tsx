@@ -5,6 +5,10 @@ import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} 
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
+import {
+  CheckCircleOutlined as RawCheckCircleOutlined,
+  ExclamationCircleOutlined as RawExclamationCircleOutlined
+} from '@ant-design/icons/lib/icons';
 
 export const Button = styled(RawButton)`
   padding: 0;
@@ -64,6 +68,10 @@ export const ClusterContextName = styled.span`
   white-space: nowrap;
 `;
 
+export const ClusterAccessContainer = styled.span`
+  padding: 5px;
+`;
+
 export const ClusterOutlined = styled(RawClusterOutlined)`
   font-size: 10px;
   margin-right: 4px;
@@ -95,4 +103,14 @@ export const Divider = styled(RawDivider)`
 
 export const DownOutlined = styled(RawDownOutlined)`
   padding-top: 2px;
+`;
+
+export const CheckCircleOutlined = styled(RawCheckCircleOutlined)`
+  color: ${Colors.greenOkay};
+  font-size: 13px;
+`;
+
+export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutlined)`
+  color: ${Colors.yellowWarning};
+  font-size: 13px;
 `;

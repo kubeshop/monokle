@@ -96,8 +96,7 @@ function parseCanI(stdout: string, namespace: string): ClusterAccess {
   };
 }
 
-export function getKubeAccess(namespace: string, currentContext: string): ClusterAccess {
-  log.info('currentContext', currentContext, namespace);
+export function getKubeAccess(namespace: string): ClusterAccess {
   // execSync(`kubectl config use-context ${currentContext}`);
   const command = `kubectl auth can-i --list --namespace=${namespace}`;
   const canStdOut = execSync(command).toString();
@@ -114,7 +113,7 @@ export function hasAccessToResource(resourceName: string, verb: string, clusterA
   }
 
   const resourceAccess = clusterAccess.permissions.find((access) => {
-    return access.resourceName === resourceName && access.verbs.includes(verb);
+    return access.resourceName === resourceName.toLowerCase() && access.verbs.includes(verb);
   });
 
   return Boolean(resourceAccess);

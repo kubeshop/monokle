@@ -283,7 +283,7 @@ export async function getTargetClusterNamespaces(kubeconfigPath: string, context
 
   try {
     const kubeClient = createKubeClient(kubeconfigPath, context);
-    const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient);
+    const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient, { namespace: '' });
 
     const ns: string[] = [];
     namespaces.forEach(namespace => {

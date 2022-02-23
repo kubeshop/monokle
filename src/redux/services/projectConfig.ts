@@ -60,7 +60,6 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     enableHelmWithKustomize: state.projectConfig?.settings?.enableHelmWithKustomize,
     createDefaultObjects: state.projectConfig?.settings?.createDefaultObjects,
     setDefaultPrimitiveValues: state.projectConfig?.settings?.setDefaultPrimitiveValues,
-    clusterNamespaces: state.projectConfig?.settings?.clusterNamespaces,
   };
   applicationConfig.kubeConfig = {
     path: state.projectConfig?.kubeConfig?.path,
@@ -86,7 +85,6 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
     createDefaultObjects: state.settings.createDefaultObjects,
     setDefaultPrimitiveValues: state.settings.setDefaultPrimitiveValues,
-    clusterNamespaces: state.projectConfig?.settings?.clusterNamespaces,
   };
   applicationConfig.kubeConfig = {
     path: state.kubeConfig.path,
