@@ -882,10 +882,14 @@ export const mainSlice = createSlice({
       const {schemaVersion, userDataDir} = action.payload;
       processParsedResources(schemaVersion, userDataDir, state.resourceMap, state.resourceRefsProcessingOptions);
     },
-    openPreviewConfigurationEditor: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      const helmChartId = action.payload;
+    openPreviewConfigurationEditor: (
+      state: Draft<AppState>,
+      action: PayloadAction<{helmChartId: string; previewConfigurationId?: string}>
+    ) => {
+      const {helmChartId, previewConfigurationId} = action.payload;
       state.prevConfEditor = {
         helmChartId,
+        previewConfigurationId,
         isOpen: true,
       };
     },
@@ -893,6 +897,7 @@ export const mainSlice = createSlice({
       state.prevConfEditor = {
         isOpen: false,
         helmChartId: undefined,
+        previewConfigurationId: undefined,
       };
     },
   },

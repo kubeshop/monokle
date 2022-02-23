@@ -149,6 +149,7 @@ interface AppState {
   prevConfEditor: {
     isOpen: boolean;
     helmChartId?: string;
+    previewConfigurationId?: string;
   };
 }
 
