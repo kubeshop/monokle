@@ -2,7 +2,7 @@
 
 ## **Resource Navigator**
 
-The Navigator shows all resources found recursively in the folder selected in the File Explorer. Resources are grouped into sections/subsections based
+The Navigator shows all resources found in the current project. Resources are grouped into sections/subsections based
 on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
 any other resourced linked to the selected one:
 
