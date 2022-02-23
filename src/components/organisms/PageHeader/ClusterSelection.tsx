@@ -126,7 +126,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     } else if (previewType === 'cluster' && previewLoader.isLoading) {
       content = <LoadingOutlined />;
     } else {
-      content = 'LOAsD';
+      content = 'LOAD';
       className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
     }
 

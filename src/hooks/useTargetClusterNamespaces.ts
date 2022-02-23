@@ -32,7 +32,7 @@ export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction
     };
 
     setClusterNamespaces();
-  }, [kubeConfigContext, kubeConfigPath]);
+  }, [kubeConfigContext, kubeConfigPath, clusterAccess]);
 
   return [namespaces, setNamespaces];
 }

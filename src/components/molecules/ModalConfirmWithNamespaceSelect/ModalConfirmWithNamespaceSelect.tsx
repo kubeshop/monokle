@@ -116,7 +116,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setSelectedNamespace(defaultNamespace);
       setCreateNamespaceName('');
     }
-  }, [defaultOption, defaultNamespace, namespaces]);
+  }, [defaultOption, defaultNamespace, namespaces, hasOneNamespaceWithFullAccess]);
 
   const onlyClusterScopedResources = useMemo(
     () => resources.every(r => !getResourceKindHandler(r.kind)?.isNamespaced),
