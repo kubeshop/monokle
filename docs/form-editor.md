@@ -1,12 +1,12 @@
 # Using the Form Editor
 
-## **Using the ConfigMap Properties Form**
+## **Using the Resources Properties Form**
 
-Monokle shows properties for ConfigMap resources:
+Monokle shows properties for Kubernetes resources:
 
 ![Form Editor](img/form-editor-1.5.0.png)
 
-Clicking "ConfigMap" at the top of the Editor opens the  form fields editor for key ConfigMap properties, allowing you to edit/discover all available properties without having to learn or lookup the corresponding YAML/resource documentation. Any changes made and saved (with the Save button on the top right)
+For example, clicking "ConfigMap" at the top of the Editor opens the  form fields editor for key ConfigMap properties, allowing you to edit/discover all available properties without having to learn or lookup the corresponding YAML/resource documentation. Any changes made and saved (with the Save button on the top right)
 are written back to the underlying YAML. 
 
 ## **Using the Object Metadata Editor**
