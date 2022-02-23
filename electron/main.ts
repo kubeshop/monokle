@@ -32,7 +32,7 @@ import ElectronStore from 'electron-store';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
-import {isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
@@ -64,7 +64,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
+import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 
@@ -245,6 +245,10 @@ ipcMain.on('quit-and-install', () => {
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
 
+ipcMain.on('confirm-action', (event, args) => {
+  event.returnValue = askActionConfirmation(args);
+});
+
 export const createWindow = (givenPath?: string) => {
   const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -276,6 +280,7 @@ export const createWindow = (givenPath?: string) => {
   };
 
   const win: BrowserWindow = Splashscreen.initSplashScreen(splashscreenConfig);
+  let unsavedResourceCount = 0;
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -331,6 +336,7 @@ export const createWindow = (givenPath?: string) => {
     subscribeToStoreStateChanges(win.webContents, (storeState) => {
       createMenu(storeState, dispatch);
       setWindowTitle(storeState, win);
+      unsavedResourceCount = unsavedResourcesSelector(storeState).length;
     });
 
     dispatch(setAppRehydrating(true));
@@ -390,6 +396,17 @@ export const createWindow = (givenPath?: string) => {
     dispatch(setTemplatePackMap(templatePackMap));
     dispatch(setTemplateMap(templateMap));
     convertRecentFilesToRecentProjects(dispatch);
+  });
+
+  win.on('close', (e) => {
+    const confirmed = askActionConfirmation({
+      unsavedResourceCount,
+      action: "close this window"
+    });
+
+    if (!confirmed) {
+      e.preventDefault();
+    }
   });
 
   return win;

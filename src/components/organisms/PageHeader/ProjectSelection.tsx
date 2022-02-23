@@ -1,3 +1,5 @@
+import {ipcRenderer} from 'electron';
+
 import {useEffect, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
@@ -23,7 +25,7 @@ import {Project} from '@models/appconfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject, setDeleteProject, setOpenProject} from '@redux/reducers/appConfig';
 import {openCreateProjectModal, toggleStartProjectPane} from '@redux/reducers/ui';
-import {activeProjectSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {activeProjectSelector, isInPreviewModeSelector, unsavedResourcesSelector} from '@redux/selectors';
 
 import FileExplorer from '@components/atoms/FileExplorer';
 
@@ -38,6 +40,7 @@ const ProjectSelection = () => {
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
   const projects: Project[] = useAppSelector(state => state.config.projects);
+  const unsavedResourceCount = useAppSelector(unsavedResourcesSelector).length;
 
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
@@ -80,6 +83,15 @@ const ProjectSelection = () => {
   const handleProjectChange = (project: Project) => {
     setIsDropdownMenuVisible(false);
     if (activeProject?.rootFolder !== project.rootFolder) {
+      const confirmed = ipcRenderer.sendSync('confirm-action', {
+        unsavedResourceCount,
+        action: 'change the active project',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
       setTimeout(() => dispatch(setOpenProject(project.rootFolder)), 400);
     }
   };
