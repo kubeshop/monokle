@@ -48,14 +48,14 @@ Easily switch in between projects to more efficiently work with multiple project
 
 ## **Diff Multiple Resources**
 
-When a resource is selected in the navigator, the Editor contains a "Diff" button at the top right.
+When a resource is selected in the navigator, the Editor contains a **Diff** button at the top right.
 
 ![Diff Button](img/diff-button-1.5.0.png)
 
-Selecting "Diff" will compare the selected resource against the currently configured cluster:
+Selecting **Diff** will compare the selected resource against the currently configured cluster:
 
   - If the resource does not exist in the cluster an error will be shown.
-  - If the resource _does_ exist a Diff dialog will be shown.
+  - If the resource _does_ exist the Diff dialog will be shown.
 
 ![Resource Diff](img/diff-tble-8-1.5.0.png)
 
@@ -81,10 +81,10 @@ Name your project, select its location and click **Next: Select a Template**.
 Monokle includes a default set of templates which are installed automatically when starting Monokle
 for the first time and available in the Templates Explorer when working with your Monokle projects:
 
+![Default Templates](img/template-selection-1.5.0.png)
+
 Check out the [Monokle Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to 
 see the complete list of templates that are included along with their corresponding schemas and manifests.
-
-![Default Templates](img/template-selection-1.5.0.png)
 
 
 

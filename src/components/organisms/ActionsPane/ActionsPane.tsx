@@ -494,12 +494,7 @@ const ActionsPane: React.FC<IProps> = props => {
 
           {schemaForSelectedPath ||
           (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
-            <TabPane
-              key="form"
-              tab={
-                <TabHeader icon={<ContainerOutlined />}>{selectedResource ? selectedResource.kind : 'Form'}</TabHeader>
-              }
-            >
+            <TabPane key="form" tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}>
               {isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
               ) : activeTabKey === 'form' ? (
