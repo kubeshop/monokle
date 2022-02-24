@@ -6,7 +6,7 @@ Monokle shows properties for diverse Kubernetes resources. These resources are i
 
 ![Form Editor](img/form-editor-1.5.0.png)
 
-For example, clicking on "Form" at the top of the Editor, opens the form fields editor for key ConfigMap properties, allowing you to edit/discover all available properties without having to learn or lookup the corresponding YAML/resource documentation. Any changes made and saved (with the Save button on the top right)
+For example in the case of a ConfigMap Kubernetes resource, clicking on "Form" at the top of the Editor, opens the form fields editor for key ConfigMap properties, allowing you to edit/discover all available properties without having to learn or lookup the corresponding YAML/resource documentation. Any changes made and saved (with the Save button on the top right)
 are written back to the underlying YAML. 
 
 ## **Using the Object Metadata Editor**
