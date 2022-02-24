@@ -2,7 +2,7 @@
 
 ## **Edit Resources Properties via Form**
 
-Monokle shows properties for diverse Kubernetes resources. These resources are identified according to the official Kubernetes API definitions. If it's defined here, Monokle will find it, and allow you to edit it.
+Monokle shows form editors for diverse Kubernetes resources which allows you to interactively change the specification of your resources using visual controls/inputs.
 
 ![Form Editor](img/form-editor-1.5.0.png)
 
