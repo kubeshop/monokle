@@ -6,8 +6,9 @@ import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 import {ResourceMapType} from '@models/appstate';
 
 import {useAppDispatch} from '@redux/hooks';
-import {updateFileEntry, updateResource} from '@redux/reducers/main';
 import {logMessage} from '@redux/services/log';
+import {updateFileEntry} from '@redux/thunks/updateFileEntry';
+import {updateResource} from '@redux/thunks/updateResource';
 
 function useDebouncedCodeSave(
   editor: monaco.editor.IStandaloneCodeEditor | null,

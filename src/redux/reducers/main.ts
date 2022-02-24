@@ -1,18 +1,14 @@
 // eslint-disable-next-line
-import * as k8s from '@kubernetes/client-node';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import {Draft, PayloadAction, createAsyncThunk, createSlice, original} from '@reduxjs/toolkit';
-
-import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {parse} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, HELM_CHART_ENTRY_FILE, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREDEFINED_K8S_VERSION, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
-import {AppConfig, ProjectConfig} from '@models/appconfig';
+import {ProjectConfig} from '@models/appconfig';
 import {
   AppState,
   ClusterToLocalResourcesMatch,
@@ -24,9 +20,11 @@ import {
   SelectionHistoryEntry,
 } from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
+import {RootState} from '@models/rootstate';
 
-import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
-import {findResourcesToReprocess, updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
+import {currentConfigSelector} from '@redux/selectors';
+import {isKustomizationResource} from '@redux/services/kustomize';
+import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
@@ -37,36 +35,20 @@ import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
-import {getFileStats, getFileTimestamp} from '@utils/files';
-import {createKubeClient} from '@utils/kubeclient';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {parseYamlDocument} from '@utils/yaml';
 
-import {getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
-
 import initialState from '../initialState';
-import {
-  addPath,
-  createFileEntry,
-  getFileEntryForAbsolutePath,
-  getResourcesForPath,
-  reloadFile,
-  removePath,
-  selectFilePath,
-} from '../services/fileEntry';
+import {createFileEntry, getFileEntryForAbsolutePath, removePath, selectFilePath} from '../services/fileEntry';
 import {
   deleteResource,
-  extractK8sResources,
   getResourceKindsWithTargetingRefs,
   isFileResource,
-  isUnsavedResource,
-  processParsedResources,
+  processResources,
   recalculateResourceRanges,
-  removeResourceFromFile,
-  reprocessResources,
   saveResource,
 } from '../services/resource';
-import {clearResourceSelections, updateSelectionAndHighlights} from '../services/selection';
+import {updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
@@ -133,12 +115,17 @@ function updateSelectionHistory(type: 'resource' | 'path', isVirtualSelection: b
   state.currentSelectionHistoryIndex = undefined;
 }
 
-const performResourceContentUpdate = (state: AppState, resource: K8sResource, newText: string) => {
+export const performResourceContentUpdate = (
+  resource: K8sResource,
+  newText: string,
+  fileMap: FileMapType,
+  resourceMap: ResourceMapType
+) => {
   if (isFileResource(resource)) {
-    const updatedFileText = saveResource(resource, newText, state.fileMap);
+    const updatedFileText = saveResource(resource, newText, fileMap);
     resource.text = updatedFileText;
     resource.content = parseYamlDocument(updatedFileText).toJS();
-    recalculateResourceRanges(resource, state);
+    recalculateResourceRanges(resource, fileMap, resourceMap);
   } else {
     resource.text = newText;
     resource.content = parseYamlDocument(newText).toJS();
@@ -148,103 +135,89 @@ const performResourceContentUpdate = (state: AppState, resource: K8sResource, ne
 export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
   'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
   async (shouldIgnore: boolean, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
+    const state: RootState = thunkAPI.getState();
+
     electronStore.set('main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnore);
-    thunkAPI.dispatch(mainSlice.actions.setShouldIgnoreOptionalUnsatisfiedRefs(shouldIgnore));
-    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinksAction({schemaVersion, userDataDir}));
+    state.main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = shouldIgnore;
+
+    const projectConfig = currentConfigSelector(state);
+    const schemaVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+    const userDataDir = String(state.config.userDataDir);
+    const resourceMap = getActiveResourceMap(state.main);
+
+    reprocessOptionalRefs(schemaVersion, userDataDir, resourceMap, state.main.resourceRefsProcessingOptions);
   }
 );
 
 export const addResource = createAsyncThunk(
   'main/addResource',
   async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.addResourceAction({resource, schemaVersion, userDataDir}));
+    const state: RootState = thunkAPI.getState();
+    const projectConfig = currentConfigSelector(state);
+    const schemaVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+    const userDataDir = String(state.config.userDataDir);
+
+    state.main.resourceMap[resource.id] = resource;
+    const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+    processResources(
+      schemaVersion,
+      userDataDir,
+      getActiveResourceMap(state.main),
+      state.main.resourceRefsProcessingOptions,
+      {
+        resourceIds: [resource.id],
+        resourceKinds,
+      }
+    );
   }
 );
-export const updateFileEntry = createAsyncThunk(
-  'main/updateFileEntry',
-  async (payload: UpdateFileEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.updateFileEntryAction({payload, schemaVersion, userDataDir}));
-  }
-);
-export const reprocessResourcesForOptionalLinks = createAsyncThunk(
-  'main/reprocessResourcesForOptionalLinks',
-  async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.reprocessResourcesForOptionalLinksAction({schemaVersion, userDataDir}));
-  }
-);
+
 export const reprocessResource = createAsyncThunk(
   'main/reprocessResource',
   async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.reprocessResourceAction({resource, schemaVersion, userDataDir}));
-  }
-);
-export const updateResource = createAsyncThunk(
-  'main/updateResource',
-  async (payload: UpdateResourcePayload, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.updateResourceAction({payload, schemaVersion, userDataDir}));
-  }
-);
-export const updateManyResources = createAsyncThunk(
-  'main/updateManyResources',
-  async (payload: UpdateManyResourcesPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.updateManyResourcesAction({payload, schemaVersion, userDataDir}));
+    const state: RootState = thunkAPI.getState();
+    const projectConfig = currentConfigSelector(state);
+    const schemaVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+    const userDataDir = String(state.config.userDataDir);
+
+    const resourceKinds = getResourceKindsWithTargetingRefs(resource);
+
+    processResources(
+      schemaVersion,
+      userDataDir,
+      getActiveResourceMap(state.main),
+      state.main.resourceRefsProcessingOptions,
+      {
+        resourceIds: [resource.id],
+        resourceKinds,
+      }
+    );
   }
 );
 
 export const reprocessAllResources = createAsyncThunk(
   'main/reprocessAllResources',
   async (_: any, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.reprocessAllResourcesAction({schemaVersion, userDataDir}));
+    const state: RootState = thunkAPI.getState();
+    const projectConfig = currentConfigSelector(state);
+    const userDataDir = String(state.config.userDataDir);
+    const schemaVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+
+    processResources(schemaVersion, userDataDir, state.main.resourceMap, state.main.resourceRefsProcessingOptions);
   }
 );
 
-export const multipleFilesChanged = createAsyncThunk(
-  'main/multipleFilesChanged',
-  async (
-    payload: {paths: Array<string>; projectConfig: ProjectConfig},
-    thunkAPI: {getState: Function; dispatch: Function}
-  ) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.multipleFilesChangedAction({...payload, schemaVersion, userDataDir}));
-  }
-);
-
-export const multiplePathsAdded = createAsyncThunk(
-  'main/multiplePathsAdded',
-  async (
-    payload: {paths: Array<string>; projectConfig: ProjectConfig},
-    thunkAPI: {getState: Function; dispatch: Function}
-  ) => {
-    const config: AppConfig = thunkAPI.getState().config;
-    const schemaVersion = String(config.projectConfig?.k8sVersion);
-    const userDataDir = String(config.userDataDir);
-    thunkAPI.dispatch(mainSlice.actions.multiplePathsAddedAction({...payload, schemaVersion, userDataDir}));
+export const multiplePathsRemoved = createAsyncThunk(
+  'main/multiplePathsRemoved',
+  async (filePaths: Array<string>, thunkAPI: {getState: Function; dispatch: Function}) => {
+    const state: AppState = thunkAPI.getState().main;
+    filePaths.forEach((filePath: string) => {
+      let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
+      if (fileEntry) {
+        removePath(filePath, state, fileEntry);
+      }
+    });
   }
 );
 
@@ -261,7 +234,7 @@ const clearSelectedResourceOnPreviewExit = (state: AppState) => {
  * Returns a resourceMap containing only active resources depending if we are in preview mode
  */
 
-function getActiveResourceMap(state: Draft<AppState>) {
+export function getActiveResourceMap(state: AppState) {
   if (state.previewResourceId || state.previewValuesFileId) {
     let activeResourceMap: ResourceMapType = {};
     Object.values(state.resourceMap)
@@ -279,7 +252,7 @@ function getActiveResourceMap(state: Draft<AppState>) {
  * Returns a resourceMap containing only local resources
  */
 
-function getLocalResourceMap(state: Draft<AppState>) {
+export function getLocalResourceMap(state: AppState) {
   let localResourceMap: ResourceMapType = {};
   Object.values(state.resourceMap)
     .filter(r => !r.filePath.startsWith(PREVIEW_PREFIX) && !r.filePath.startsWith(CLUSTER_DIFF_PREFIX))
@@ -304,90 +277,6 @@ export const mainSlice = createSlice({
         state.wasRehydrated = !action.payload;
       }
     },
-    addResourceAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{resource: K8sResource; schemaVersion: string; userDataDir: string}>
-    ) => {
-      const {resource, schemaVersion, userDataDir} = action.payload;
-      state.resourceMap[resource.id] = resource;
-
-      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
-
-      processParsedResources(
-        schemaVersion,
-        userDataDir,
-        getActiveResourceMap(state),
-        state.resourceRefsProcessingOptions,
-        {
-          resourceIds: [resource.id],
-          resourceKinds,
-        }
-      );
-    },
-    /**
-     * called by the file monitor when multiple paths are added to the file system
-     */
-    multiplePathsAddedAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{
-        paths: Array<string>;
-        projectConfig: ProjectConfig;
-        schemaVersion: string;
-        userDataDir: string;
-      }>
-    ) => {
-      let filePaths: Array<string> = action.payload.paths;
-      const projectConfig = action.payload.projectConfig;
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-        if (fileEntry) {
-          if (getFileStats(filePath)?.isDirectory() === false) {
-            log.info(`added file ${filePath} already exists - updating`);
-            reloadFile(
-              filePath,
-              fileEntry,
-              state,
-              projectConfig,
-              action.payload.schemaVersion,
-              action.payload.userDataDir
-            );
-          }
-        } else {
-          addPath(filePath, state, projectConfig, action.payload.schemaVersion, action.payload.userDataDir);
-        }
-      });
-    },
-    /**
-     * called by the file monitor when multiple files are changed in the file system
-     */
-    multipleFilesChangedAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{
-        paths: Array<string>;
-        projectConfig: ProjectConfig;
-        schemaVersion: string;
-        userDataDir: string;
-      }>
-    ) => {
-      let filePaths = action.payload.paths;
-      const projectConfig = action.payload.projectConfig;
-      filePaths.forEach((filePath: string) => {
-        let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
-        if (fileEntry) {
-          reloadFile(
-            filePath,
-            fileEntry,
-            state,
-            projectConfig,
-            action.payload.schemaVersion,
-            action.payload.userDataDir
-          );
-        } else {
-          addPath(filePath, state, projectConfig, action.payload.schemaVersion, action.payload.userDataDir);
-        }
-      });
-    },
-
     /**
      * called by the file monitor when a path is removed from the file system
      */
@@ -397,258 +286,8 @@ export const mainSlice = createSlice({
         let fileEntry = getFileEntryForAbsolutePath(filePath, state.fileMap);
         if (fileEntry) {
           removePath(filePath, state, fileEntry);
-        } else {
-          log.warn(`removed file ${filePath} not known - ignoring..`);
         }
       });
-    },
-    /**
-     * updates the content of the specified path to the specified value
-     */
-    updateFileEntryAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{payload: UpdateFileEntryPayload; schemaVersion: string; userDataDir: string}>
-    ) => {
-      try {
-        const {payload, schemaVersion, userDataDir} = action.payload;
-        const fileEntry = state.fileMap[payload.path];
-        if (fileEntry) {
-          let rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-          const filePath = path.join(rootFolder, payload.path);
-
-          if (getFileStats(filePath)?.isDirectory() === false) {
-            fs.writeFileSync(filePath, payload.content);
-            fileEntry.timestamp = getFileTimestamp(filePath);
-
-            if (path.basename(fileEntry.filePath) === HELM_CHART_ENTRY_FILE) {
-              try {
-                const helmChart = Object.values(state.helmChartMap).find(
-                  chart => chart.filePath === fileEntry.filePath
-                );
-                if (!helmChart) {
-                  throw new Error(`Couldn't find the helm chart for path: ${fileEntry.filePath}`);
-                }
-                const fileContent = parse(payload.content);
-                if (typeof fileContent?.name !== 'string') {
-                  throw new Error(`Couldn't get the name property of the helm chart at path: ${fileEntry.filePath}`);
-                }
-                helmChart.name = fileContent.name;
-              } catch (e) {
-                if (e instanceof Error) {
-                  log.warn(`[updateFileEntry]: ${e.message}`);
-                }
-              }
-            } else {
-              getResourcesForPath(fileEntry.filePath, state.resourceMap).forEach(r => {
-                deleteResource(r, state.resourceMap);
-              });
-
-              const extractedResources = extractK8sResources(payload.content, filePath.substring(rootFolder.length));
-
-              let resourceIds: string[] = [];
-
-              // only recalculate refs for resources that already have refs
-              Object.values(state.resourceMap)
-                .filter(r => r.refs)
-                .forEach(r => resourceIds.push(r.id));
-
-              Object.values(extractedResources).forEach(r => {
-                state.resourceMap[r.id] = r;
-                r.isHighlighted = true;
-                resourceIds.push(r.id);
-              });
-
-              reprocessResources(
-                schemaVersion,
-                userDataDir,
-                resourceIds,
-                state.resourceMap,
-                state.fileMap,
-                state.resourceRefsProcessingOptions,
-                {
-                  resourceKinds: extractedResources.map(r => r.kind),
-                }
-              );
-            }
-          }
-        } else {
-          log.error(`Could not find FileEntry for ${payload.path}`);
-        }
-      } catch (e) {
-        log.error(e);
-        return original(state);
-      }
-    },
-    /**
-     * Reprocess all resources - called when changing processing-related options
-     */
-    reprocessResourcesForOptionalLinksAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{schemaVersion: string; userDataDir: string}>
-    ) => {
-      const {schemaVersion, userDataDir} = action.payload;
-
-      // find all resourceKinds with optional refmappers
-      const resourceKindsWithOptionalRefs = getKnownResourceKinds().filter(kind => {
-        const handler = getResourceKindHandler(kind);
-        if (handler && handler.outgoingRefMappers) {
-          return handler.outgoingRefMappers.some(mapper => mapper.source.isOptional);
-        }
-        return false;
-      });
-
-      processParsedResources(
-        schemaVersion,
-        userDataDir,
-        getActiveResourceMap(state),
-        state.resourceRefsProcessingOptions,
-        {
-          resourceKinds: resourceKindsWithOptionalRefs,
-          skipValidation: true,
-        }
-      );
-    },
-    /**
-     * Reprocesses a resource
-     */
-    reprocessResourceAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{resource: K8sResource; schemaVersion: string; userDataDir: string}>
-    ) => {
-      const {resource, schemaVersion, userDataDir} = action.payload;
-      const resourceKinds = getResourceKindsWithTargetingRefs(resource);
-
-      processParsedResources(
-        schemaVersion,
-        userDataDir,
-        getActiveResourceMap(state),
-        state.resourceRefsProcessingOptions,
-        {
-          resourceIds: [resource.id],
-          resourceKinds,
-        }
-      );
-    },
-    /**
-    /**
-     * Updates the content of the specified resource to the specified value
-     */
-    updateResourceAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{payload: UpdateResourcePayload; schemaVersion: string; userDataDir: string}>
-    ) => {
-      try {
-        const {payload, schemaVersion, userDataDir} = action.payload;
-        const isInClusterMode = payload.isInClusterMode;
-
-        const currentResourceMap = isInClusterMode ? getLocalResourceMap(state) : getActiveResourceMap(state);
-        const resource = isInClusterMode
-          ? state.resourceMap[payload.resourceId]
-          : currentResourceMap[payload.resourceId];
-
-        if (resource) {
-          performResourceContentUpdate(state, resource, payload.content);
-          let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
-          reprocessResources(
-            schemaVersion,
-            userDataDir,
-            resourceIds,
-            currentResourceMap,
-            state.fileMap,
-            state.resourceRefsProcessingOptions
-          );
-          if (!payload.preventSelectionAndHighlightsUpdate) {
-            resource.isSelected = false;
-            updateSelectionAndHighlights(state, resource);
-          }
-        } else {
-          const r = state.resourceMap[payload.resourceId];
-          // check if this was a kustomization resource updated during a kustomize preview
-          if (
-            r &&
-            (isKustomizationResource(r) || isKustomizationPatch(r)) &&
-            state.previewResourceId &&
-            isKustomizationResource(state.resourceMap[state.previewResourceId])
-          ) {
-            performResourceContentUpdate(state, r, payload.content);
-            processKustomizations(state.resourceMap, state.fileMap);
-          } else {
-            log.warn('Failed to find updated resource during preview', payload.resourceId);
-          }
-        }
-      } catch (e) {
-        log.error(e);
-        return original(state);
-      }
-    },
-    /**
-     * Updates the content of the specified resources to the specified values
-     */
-    updateManyResourcesAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{payload: UpdateManyResourcesPayload; schemaVersion: string; userDataDir: string}>
-    ) => {
-      try {
-        const {payload, schemaVersion, userDataDir} = action.payload;
-        let resourceIdsToReprocess: string[] = [];
-        const activeResources = getActiveResourceMap(state);
-
-        payload.forEach(({resourceId, content}) => {
-          const resource = activeResources[resourceId];
-          if (resource) {
-            performResourceContentUpdate(state, resource, content);
-            let resourceIds = findResourcesToReprocess(resource, state.resourceMap);
-            resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
-          }
-        });
-        reprocessResources(
-          schemaVersion,
-          userDataDir,
-          resourceIdsToReprocess,
-          activeResources,
-          state.fileMap,
-          state.resourceRefsProcessingOptions
-        );
-      } catch (e) {
-        log.error(e);
-        return original(state);
-      }
-    },
-    removeResource: (state: Draft<AppState>, action: PayloadAction<string>) => {
-      const resourceId = action.payload;
-      const resource = state.resourceMap[resourceId];
-      if (!resource) {
-        return;
-      }
-
-      updateReferringRefsOnDelete(resource, state.resourceMap);
-
-      if (state.selectedResourceId === resourceId) {
-        clearResourceSelections(state.resourceMap);
-        state.selectedResourceId = undefined;
-      }
-      if (isUnsavedResource(resource)) {
-        deleteResource(resource, state.resourceMap);
-        return;
-      }
-      if (isFileResource(resource)) {
-        removeResourceFromFile(resource, state.fileMap, state.resourceMap);
-        return;
-      }
-      if (state.previewType === 'cluster' && state.previewKubeConfigPath && state.previewKubeConfigContext) {
-        try {
-          const kubeClient = createKubeClient(state.previewKubeConfigPath, state.previewKubeConfigContext);
-
-          const kindHandler = getResourceKindHandler(resource.kind);
-          if (kindHandler?.deleteResourceInCluster) {
-            kindHandler.deleteResourceInCluster(kubeClient, resource);
-            deleteResource(resource, state.resourceMap);
-          }
-        } catch (err) {
-          log.error(err);
-          return original(state);
-        }
-      }
     },
     /**
      * Marks the specified resource as selected and highlights all related resources
@@ -787,9 +426,6 @@ export const mainSlice = createSlice({
       });
       state.resourceFilter = newFilter;
     },
-    setShouldIgnoreOptionalUnsatisfiedRefs: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
-      state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = action.payload;
-    },
     setDiffResourceInClusterDiff: (state: Draft<AppState>, action: PayloadAction<string | undefined>) => {
       state.clusterDiff.diffResourceId = action.payload;
     },
@@ -874,13 +510,6 @@ export const mainSlice = createSlice({
       state.notifications.forEach(notification => {
         notification.hasSeen = true;
       });
-    },
-    reprocessAllResourcesAction: (
-      state: Draft<AppState>,
-      action: PayloadAction<{schemaVersion: string; userDataDir: string}>
-    ) => {
-      const {schemaVersion, userDataDir} = action.payload;
-      processParsedResources(schemaVersion, userDataDir, state.resourceMap, state.resourceRefsProcessingOptions);
     },
     openPreviewConfigurationEditor: (state: Draft<AppState>, action: PayloadAction<string>) => {
       const helmChartId = action.payload;
@@ -1301,13 +930,11 @@ export const {
   selectFile,
   setSelectingFile,
   setApplyingResource,
-  multiplePathsRemoved,
   selectHelmValuesFile,
   clearPreview,
   clearPreviewAndSelectionHistory,
   startPreviewLoader,
   stopPreviewLoader,
-  removeResource,
   updateResourceFilter,
   extendResourceFilter,
   setDiffResourceInClusterDiff,

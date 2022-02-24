@@ -6,7 +6,8 @@ import {parse, stringify} from 'yaml';
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
-import {UpdateManyResourcesPayload, reloadClusterDiff, updateManyResources} from '@redux/reducers/main';
+import {UpdateManyResourcesPayload, reloadClusterDiff} from '@redux/reducers/main';
+import {updateManyResources} from '@redux/thunks/updateManyResources';
 
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 

@@ -10,7 +10,7 @@ import {currentConfigSelector} from '@redux/selectors';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {processKustomizations} from '@redux/services/kustomize';
-import {processParsedResources} from '@redux/services/resource';
+import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
@@ -65,14 +65,9 @@ export const setRootFolder = createAsyncThunk<
   rootEntry.children = files;
 
   processKustomizations(resourceMap, fileMap);
-  processParsedResources(
-    String(projectConfig?.k8sVersion),
-    String(userDataDir),
-    resourceMap,
-    resourceRefsProcessingOptions
-  );
+  processResources(String(projectConfig?.k8sVersion), String(userDataDir), resourceMap, resourceRefsProcessingOptions);
 
-  monitorRootFolder(rootFolder, projectConfig, thunkAPI.dispatch);
+  monitorRootFolder(rootFolder, thunkAPI.dispatch);
 
   const generatedAlert = {
     title: 'Folder Import',

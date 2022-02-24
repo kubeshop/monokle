@@ -15,8 +15,8 @@ import {AnyTemplate, isReferencedHelmChartTemplate, isVanillaTemplate} from '@mo
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCreateProject} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
-import {previewReferencedHelmChart} from '@redux/services/previewReferencedHelmChart';
 import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templates';
+import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmChart';
 
 import {TemplateFormRenderer} from '@components/molecules';
 
@@ -98,7 +98,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
           setIsLoading(false);
         });
     },
-    [template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch]
+    [template, userTempDir, kubeConfigPath, kubeConfigContext, dispatch, onClose, projectToCreate]
   );
 
   const setFormData = useCallback(

@@ -11,7 +11,6 @@ import styled from 'styled-components';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -58,9 +57,6 @@ interface IProps {
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resources = [], title, onCancel, onOk} = props;
 
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-
   const configState = useAppSelector(state => state.config);
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources);
   const [namespaces] = useTargetClusterNamespaces();
@@ -97,7 +93,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (selectedOption === 'none') {
       onOk();
     }
-  }, [kubeConfigContext, createNamespaceName, kubeConfigPath, selectedNamespace, selectedOption, onOk, configState]);
+  }, [createNamespaceName, selectedNamespace, selectedOption, onOk, configState]);
 
   useEffect(() => {
     if (defaultOption && defaultOption === 'none') {

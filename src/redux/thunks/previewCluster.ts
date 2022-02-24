@@ -13,7 +13,7 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {extractK8sResources, processParsedResources} from '@redux/services/resource';
+import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {createKubeClient} from '@utils/kubeclient';
@@ -77,7 +77,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
         });
 
         // only process newly added custom resources
-        processParsedResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
+        processResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
           resourceIds: customResources.map(r => r.id),
         });
 

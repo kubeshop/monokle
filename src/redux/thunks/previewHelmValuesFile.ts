@@ -29,12 +29,11 @@ export const previewHelmValuesFile = createAsyncThunk<
 >('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
-  const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
-  const k8sVersion = configState.projectConfig?.k8sVersion;
-  const userDataDir = configState.userDataDir;
-  const currentContext =
-    thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
-    thunkAPI.getState().config.kubeConfig.currentContext;
+  const projectConfig = currentConfigSelector(thunkAPI.getState());
+
+  const kubeconfig = projectConfig.kubeConfig?.path;
+  const currentContext = projectConfig.kubeConfig?.currentContext;
+
   const valuesFile = state.helmValuesMap[valuesFileId];
 
   if (valuesFile && valuesFile.filePath) {
@@ -46,7 +45,6 @@ export const previewHelmValuesFile = createAsyncThunk<
     if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
       log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
-      const projectConfig = currentConfigSelector(thunkAPI.getState());
       const helmPreviewMode = projectConfig.settings ? projectConfig.settings.helmPreviewMode : 'template';
 
       const args = {
@@ -65,8 +63,8 @@ export const previewHelmValuesFile = createAsyncThunk<
 
       if (result.stdout) {
         return createPreviewResult(
-          String(k8sVersion),
-          String(userDataDir),
+          String(projectConfig.k8sVersion),
+          String(configState.userDataDir),
           result.stdout,
           valuesFile.id,
           'Helm Preview',

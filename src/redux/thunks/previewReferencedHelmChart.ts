@@ -6,11 +6,11 @@ import {v4 as uuidv4} from 'uuid';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
-import {runHelm} from '@utils/helm';
+import {extractObjectsFromYaml} from '@redux/services/manifest-utils';
+import {interpolateTemplate} from '@redux/services/templates';
+import {createUnsavedResource} from '@redux/services/unsavedResource';
 
-import {extractObjectsFromYaml} from './manifest-utils';
-import {interpolateTemplate} from './templates';
-import {createUnsavedResource} from './unsavedResource';
+import {runHelm} from '@utils/helm';
 
 const fsWriteFilePromise = promisify(fs.writeFile);
 const fsReadFilePromise = promisify(fs.readFile);

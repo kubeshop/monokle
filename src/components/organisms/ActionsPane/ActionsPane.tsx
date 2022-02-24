@@ -506,7 +506,7 @@ const ActionsPane: React.FC<IProps> = props => {
                 selectedPath && schemaForSelectedPath && !selectedResource ? (
                   <FormEditor
                     formSchema={extractFormSchema(schemaForSelectedPath)}
-                    formUiSchema={getUiSchemaForPath(selectedPath, fileMap)}
+                    formUiSchema={getUiSchemaForPath(selectedPath)}
                   />
                 ) : isKustomization && selectedResource ? (
                   <FormEditor

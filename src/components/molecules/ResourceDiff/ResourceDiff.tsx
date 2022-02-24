@@ -16,10 +16,10 @@ import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/make
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateResource} from '@redux/reducers/main';
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
+import {updateResource} from '@redux/thunks/updateResource';
 
 import Icon from '@components/atoms/Icon';
 

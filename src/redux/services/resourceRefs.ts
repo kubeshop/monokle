@@ -9,7 +9,14 @@ import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kus
 import {getIncomingRefMappers, getKnownResourceKinds, getResourceKindHandler} from '@src/kindhandlers';
 
 import {traverseDocument} from './manifest-utils';
-import {NodeWrapper, createResourceRef, getLineCounter, getParsedDoc, linkResources} from './resource';
+import {
+  NodeWrapper,
+  createResourceRef,
+  getLineCounter,
+  getParsedDoc,
+  linkResources,
+  processResources,
+} from './resource';
 
 const NAME_REFNODE_PATH = `metadata${REF_PATH_SEPARATOR}name`;
 
@@ -693,4 +700,29 @@ export function findResourcesToReprocess(resource: K8sResource, resourceMap: Res
     .forEach(r => resources.push(r.id));
 
   return resources;
+}
+
+/**
+ * Reprocess all optoinal refs for the specified resources
+ */
+
+export function reprocessOptionalRefs(
+  schemaVersion: string,
+  userDataDir: string,
+  resourceMap: ResourceMapType,
+  resourceRefsProcessingOptions: ResourceRefsProcessingOptions
+) {
+  // find all resourceKinds with optional refmappers
+  const resourceKindsWithOptionalRefs = getKnownResourceKinds().filter(kind => {
+    const handler = getResourceKindHandler(kind);
+    if (handler && handler.outgoingRefMappers) {
+      return handler.outgoingRefMappers.some(mapper => mapper.source.isOptional);
+    }
+    return false;
+  });
+
+  processResources(schemaVersion, userDataDir, resourceMap, resourceRefsProcessingOptions, {
+    resourceKinds: resourceKindsWithOptionalRefs,
+    skipValidation: true,
+  });
 }
