@@ -18,4 +18,4 @@ To launch the Metadata Editor, click on the **Metadata** button.
 For editing object metadata, you need to provide a specific name, namespace, annotations, labels, cluster name, generate name, and finalizers to uniquely identify the object.  
 
 **Check out [this tutorial](tutorials/how-to-create-and-edit-configmap.md) for more details 
-on how to use the Form Editor for ConfigMaps and Metadata.**
+on how to use the Form Editor and Metadata.**
