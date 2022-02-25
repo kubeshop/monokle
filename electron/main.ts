@@ -94,6 +94,11 @@ Nucleus.init('6218cf3ef5e5d2023724d89b',{
   autoUserId: true, 
   debug: true, 
 });
+Nucleus.setProps({
+  version: app.getVersion(),
+  languaage: app.getLocale()
+}, true);
+// Nucleus.identify(machineIdSync(),{});
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
