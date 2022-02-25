@@ -386,12 +386,7 @@ const ActionsPane: React.FC<IProps> = props => {
     setSchemaForSelectedPath(selectedPath ? getSchemaForPath(selectedPath, fileMap) : undefined);
   }, [selectedPath, fileMap]);
 
-  // const canDeployResource = hasAccessToResource(selectedResource ? selectedResource?.kind?.toLowerCase() : '', 'deploy', clusterAccess);
   const getDeployTooltip = () => {
-    // if (!canDeployResource) {
-    //   return CannotDeployFileTooltip;
-    // }
-
     return selectedPath
       ? isHelmValuesFile(selectedPath)
         ? InstallValuesFileTooltip
@@ -399,10 +394,6 @@ const ActionsPane: React.FC<IProps> = props => {
       : ApplyTooltip;
   };
   const isDeployButtonDisabled = () => {
-    // if (!canDeployResource) {
-    //   return true;
-    // }
-
     return (!selectedResourceId && !selectedPath) ||
       (selectedResource &&
         !isKustomizationResource(selectedResource) &&

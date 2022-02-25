@@ -212,10 +212,12 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
           <S.ClusterStatusText connected={isKubeConfigPathValid}>
             <S.ClusterOutlined />
             <span>{isKubeConfigPathValid ? 'Configured' : 'No Cluster Configured'}</span>
-
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
-              <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
-            </Tooltip>
+            {
+              isKubeConfigPathValid &&
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
+                  <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
+                </Tooltip>
+            }
           </S.ClusterStatusText>
 
           <S.Divider type="vertical" />

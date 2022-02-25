@@ -26,7 +26,7 @@ import Icon from '@components/atoms/Icon';
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';
-import {createKubeClient} from '@utils/kubeclient';
+import {createKubeClient, hasAccessToResource} from '@utils/kubeclient';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
@@ -192,10 +192,14 @@ const DiffModal = () => {
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {
-        if (!resourceKindHandler || !namespaces) {
+        if (!resourceKindHandler || !configState.projectConfig?.clusterAccess) {
           return [];
         }
-        const resources = await Promise.all(namespaces.map((ns) => resourceKindHandler.listResourcesInCluster(kc, { namespace: ns })));
+
+        const namespacesWithAccess = configState.projectConfig?.clusterAccess
+          .filter((ca) => hasAccessToResource(targetResource.kind, 'get', ca))
+          .map((ca) => ca.namespace);
+        const resources = await Promise.all(namespacesWithAccess.map((ns) => resourceKindHandler.listResourcesInCluster(kc, { namespace: ns })));
         return flatten(resources);
       };
 
