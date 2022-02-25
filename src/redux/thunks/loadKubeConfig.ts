@@ -37,12 +37,10 @@ export const loadContexts = async (
       try {
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
-        let namespace: string | undefined;
 
         let selectedContext = getSelectedContext(kc.contexts);
         if (selectedContext) {
           kc.setCurrentContext(selectedContext.name);
-          namespace = selectedContext.namespace;
         }
 
         electronStore.get('kubeConfig.currentContext');
@@ -64,12 +62,10 @@ export const loadContexts = async (
         });
 
         dispatch(updateProjectKubeConfig(kubeConfig));
-        if (namespace) {
-          dispatch(updateProjectKubeAccess(
-            getNamespaces(selectedContext?.name as string)
-              .map((ns) => getKubeAccess(ns.namespaceName)))
-          );
-        }
+        dispatch(updateProjectKubeAccess(
+          getNamespaces(selectedContext?.name as string)
+            .map((ns) => getKubeAccess(ns.namespaceName)))
+        );
       } catch (e: any) {
         if (e instanceof Error) {
           log.warn(`[loadContexts]: ${e.message}`);
