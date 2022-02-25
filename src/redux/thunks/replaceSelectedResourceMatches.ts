@@ -52,7 +52,6 @@ export const replaceSelectedResourceMatches = createAsyncThunk<
         .filter((id): id is {resourceId: string; content: string} => Boolean(id) === true);
 
       thunkAPI.dispatch(updateManyResources(updateManyResourcesPayload));
-      thunkAPI.dispatch(reloadClusterDiff());
     } catch (e) {
       log.error('Failed to replace selected resources');
       log.error(e);
