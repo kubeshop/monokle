@@ -41,7 +41,7 @@ export const updateManyResources = createAsyncThunk(
       );
 
       // relaod cluster diff if that's where we are
-      if( state.ui.isClusterDiffVisible ){
+      if (state.ui.isClusterDiffVisible) {
         state.main.clusterDiff.shouldReload = true;
       }
     } catch (e) {
