@@ -122,6 +122,10 @@ const TemplatesManagerPane: React.FC<IProps> = props => {
               />
             </S.SearchInputContainer>
 
+            <div style={{background: 'red'}}>
+              <p>Favorites</p>
+            </div>
+
             {!visibleTemplateEntries.length ? (
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
             ) : (
