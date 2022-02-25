@@ -35,31 +35,14 @@ const getNonCustomClusterObjects = async (kc: any, namespace: string) => {
 };
 
 const previewClusterHandler = async (context: string, thunkAPI: any) => {
-  const state = thunkAPI.getState();
-  const resourceRefsProcessingOptions = state.main.resourceRefsProcessingOptions;
-  const clusterAccess = state.config.projectConfig?.clusterAccess;
-  try {
-    const kc = createKubeClient(state.config, context);
-    const res = await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)));
-    const results = flatten(res);
-
-    const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const k8sVersion = thunkAPI.getState().config.projectConfig?.k8sVersion;
   const userDataDir = thunkAPI.getState().config.userDataDir;
+  const clusterAccess = thunkAPI.getState().config?.projectConfig?.clusterAccess;
   try {
     const kc = createKubeClient(thunkAPI.getState().config, context);
-    const namespaces = thunkAPI.getState().config.projectConfig?.settings?.clusterNamespaces;
-    if (!namespaces || !namespaces.length) {
-      return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', 'Please configure a namespace');
-    }
-    const promises = namespaces?.map((namespace: any) => getNonCustomClusterObjects(kc, namespace));
-    const results: any = await Promise.allSettled<any>(promises);
-    const fulfilledResults1: any = results.filter((r: any) => r.status === 'fulfilled' && r.value);
-    const resources: any = [];
-    fulfilledResults1.forEach((fulfilledResult: any) => {
-      resources.push(...fulfilledResult.value);
-    });
+    const res = await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)));
+    const resources = flatten(res);
 
     const fulfilledResults = resources.filter((r: any) => r.status === 'fulfilled' && r.value);
     if (fulfilledResults.length === 0) {

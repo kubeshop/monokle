@@ -3,7 +3,6 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
-import path from 'path';
 import {execSync} from 'child_process';
 import path, {join} from 'path';
 
@@ -152,9 +151,12 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
       state.folderReadsMaxDepth = action.payload;
     },
-    updateClusterNamespaces: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
+    updateClusterNamespaces: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess[]>) => {
+      if (!state.projectConfig) {
+        return;
+      }
       electronStore.set('appConfig.settings.clusterNamespaces', action.payload);
-      state.settings.clusterNamespaces = action.payload;
+      state.projectConfig.clusterAccess = action.payload;
     },
     updateK8sVersion: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('appConfig.k8sVersion', action.payload);
