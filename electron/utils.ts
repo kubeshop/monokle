@@ -1,3 +1,5 @@
+import {dialog} from 'electron';
+
 import {AnyAction} from '@reduxjs/toolkit';
 
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
@@ -120,3 +122,31 @@ export const saveInitialK8sSchema = (userDataDir: string) => {
     writeFileSync(schemaPath, String(data));
   }
 };
+
+export function askActionConfirmation({
+  action,
+  unsavedResourceCount,
+}: {
+  action: string;
+  unsavedResourceCount: number;
+}): boolean {
+  if (unsavedResourceCount === 0) {
+    return true;
+  }
+
+  const shortAction = _.capitalize(action.split(' ')[0]);
+  const message =
+    unsavedResourceCount === 1 ? 'You have an unsaved resource' : `You have ${unsavedResourceCount} unsaved resources`;
+
+  const choice = dialog.showMessageBoxSync({
+    type: 'info',
+    title: 'Confirmation',
+    message,
+    detail: `Progress will be lost if you choose to ${action}. You can't undo this action.`,
+    buttons: [shortAction, 'Cancel'],
+    defaultId: 0,
+    cancelId: 1,
+  });
+
+  return choice === 0;
+}
