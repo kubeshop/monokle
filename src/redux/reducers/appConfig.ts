@@ -2,6 +2,7 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
+import Nucleus from 'nucleus-nodejs';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
@@ -51,6 +52,7 @@ export const setDeleteProject = createAsyncThunk('config/setDeleteProject', asyn
 export const setOpenProject = createAsyncThunk(
   'config/setOpenProject',
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
+    Nucleus.track('PROJECT_OPENED');
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
     if (projectRootPath && appUi.isStartProjectPaneVisible) {

@@ -2,8 +2,8 @@
 /* eslint-disable import/first */
 import moduleAlias from 'module-alias';
 import * as ElectronLog from 'electron-log';
-import {machineIdSync} from 'node-machine-id';
-
+import { machineIdSync } from 'node-machine-id';
+import Nucleus from 'nucleus-nodejs';
 
 Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
@@ -87,6 +87,7 @@ const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
 setDeviceID(machineIdSync());
+Nucleus.init('6218cf3ef5e5d2023724d89b');
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
@@ -334,6 +335,7 @@ export const createWindow = (givenPath?: string) => {
   });
 
   win.webContents.on('dom-ready', async () => {
+    Nucleus.appStarted();
     const dispatch = createDispatchForWindow(win);
 
     subscribeToStoreStateChanges(win.webContents, (storeState) => {

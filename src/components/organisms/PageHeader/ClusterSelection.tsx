@@ -5,6 +5,8 @@ import {Dropdown, Menu, Tooltip} from 'antd';
 
 import {LoadingOutlined} from '@ant-design/icons';
 
+import Nucleus from 'nucleus-nodejs';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterModeTooltip} from '@constants/tooltips';
 
@@ -58,6 +60,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const handleClusterChange = ({key}: {key: string}) => {
     setIsClusterDropdownOpen(false);
     if (key !== kubeConfigContext) {
+      Nucleus.track('CLUSTER_CHANGED');
       dispatch(setCurrentContext(key));
       dispatch(
         updateProjectConfig({

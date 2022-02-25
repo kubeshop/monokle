@@ -115,6 +115,7 @@
     "monaco-yaml": "3.2.1",
     "node-fetch": "2.6.7",
     "node-machine-id": "^1.1.12",
+    "nucleus-nodejs": "^3.0.9",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-flow-renderer": "9.7.3",
