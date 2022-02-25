@@ -53,6 +53,7 @@ export const setOpenProject = createAsyncThunk(
   'config/setOpenProject',
   async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
     Nucleus.track('PROJECT_OPENED');
+
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
     if (projectRootPath && appUi.isStartProjectPaneVisible) {

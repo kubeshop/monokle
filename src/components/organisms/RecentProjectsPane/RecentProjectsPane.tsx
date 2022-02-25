@@ -5,6 +5,7 @@ import {useMeasure, useWindowSize} from 'react-use';
 import {Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
+import Nucleus from 'nucleus-nodejs';
 
 import {Project} from '@models/appconfig';
 
@@ -33,6 +34,8 @@ const RecentProjectsPane = () => {
     useMeasure<HTMLDivElement>();
 
   const openProject = (project: Project) => {
+    Nucleus.track('OPEN_PROJECT', {from: 'RECENT_PROJECTS'});
+    Nucleus.trackError('TEST_ERROR', new Error('Test purposes'));
     dispatch(setOpenProject(project.rootFolder));
   };
 

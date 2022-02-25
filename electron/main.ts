@@ -88,6 +88,7 @@ setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
 setDeviceID(machineIdSync());
 Nucleus.init('6218cf3ef5e5d2023724d89b');
+Nucleus.setUserId(machineIdSync());
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
