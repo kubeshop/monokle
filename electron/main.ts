@@ -87,8 +87,13 @@ const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
 setDeviceID(machineIdSync());
-Nucleus.init('6218cf3ef5e5d2023724d89b');
-Nucleus.setUserId(machineIdSync());
+Nucleus.init('6218cf3ef5e5d2023724d89b',{
+  disableInDev: false, 
+  disableTracking: false, 
+  disableErrorReports: false, 
+  autoUserId: true, 
+  debug: true, 
+});
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
