@@ -13,6 +13,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import ResourceKindContextMenu from '../K8sResourceSectionBlueprint/ResourceKindContextMenu';
+import ResourceKindContextMenuWrapper from '../K8sResourceSectionBlueprint/ResourceKindContextMenuWrapper';
 import ResourceKindPrefix from '../K8sResourceSectionBlueprint/ResourceKindPrefix';
 import ResourceKindSuffix from '../K8sResourceSectionBlueprint/ResourceKindSuffix';
 import sectionBlueprintMap from '../sectionBlueprintMap';
@@ -107,6 +108,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       },
     },
     customization: {
+      contextMenuWrapper:{component: ResourceKindContextMenuWrapper},
       contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
       prefix: {component: ResourceKindPrefix},
       suffix: {component: ResourceKindSuffix},

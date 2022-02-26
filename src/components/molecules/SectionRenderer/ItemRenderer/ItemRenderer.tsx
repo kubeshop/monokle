@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {ItemBlueprint} from '@models/navigator';
 
@@ -39,7 +39,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay} = useItemCustomization(blueprint.customization);
+  const {Prefix, Suffix, QuickAction, ContextMenu, ContextMenuWrapper, NameDisplay} = useItemCustomization(blueprint.customization);
 
   const previouslyCheckedResourcesLength = useRef(checkedResourceIds.length);
   const scrollContainer = useRef<ScrollContainerRef>(null);
@@ -72,6 +72,8 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
 
   return (
     <ScrollIntoView id={itemInstance.id} ref={scrollContainer} parentContainerElementId={sectionContainerElementId}>
+      {ContextMenuWrapper.Component &&(
+    <ContextMenuWrapper.Component itemInstance={itemInstance} options={ContextMenuWrapper.options} >
       <S.ItemContainer
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -86,7 +88,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
         $isSectionCheckable={isSectionCheckable}
         $hasCustomNameDisplay={Boolean(NameDisplay.Component)}
         $lastItemMarginBottom={blueprint.customization?.lastItemMarginBottom}
-      >
+        >
         {itemInstance.isCheckable &&
           (blueprint.customization?.isCheckVisibleOnHover ? itemInstance.isChecked || isHovered : true) && (
             <span>
@@ -95,7 +97,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
                 disabled={itemInstance.isDisabled}
                 onChange={() => onCheck()}
                 $level={level}
-              />
+                />
             </span>
           )}
 
@@ -107,15 +109,15 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
 
         {NameDisplay.Component ? (
           <NameDisplay.Component itemInstance={itemInstance} />
-        ) : (
-          <S.ItemName
+          ) : (
+            <S.ItemName
             level={level}
             isSelected={itemInstance.isSelected}
             isDirty={itemInstance.isDirty}
             isHighlighted={itemInstance.isHighlighted}
             isDisabled={itemInstance.isDisabled}
             onClick={onClick}
-          >
+            >
             {itemInstance.name}
             {itemInstance.isDirty && <span>*</span>}
           </S.ItemName>
@@ -136,7 +138,6 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
               <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
             </S.QuickActionContainer>
           )}
-
         {ContextMenu.Component &&
           !options?.disableContextMenu &&
           (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
@@ -145,6 +146,9 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
             </S.ContextMenuContainer>
           )}
       </S.ItemContainer>
+    </ContextMenuWrapper.Component>
+      )
+}
     </ScrollIntoView>
   );
 }
