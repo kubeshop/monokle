@@ -10,6 +10,8 @@ import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteFileEntryPath} from '@redux/services/fileEntry';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
+import {errorAlert} from '@utils/alert';
+
 /**
  * Invokes kubectl for the content of the specified resource
  */
@@ -64,14 +66,14 @@ export async function applyFile(
           dispatch(setApplyingResource(false));
         });
       } catch (e: any) {
-        log.error(e.message);
-        dispatch(setApplyingResource(true));
+        log.error(e);
+        dispatch(setAlert(errorAlert('Deploy failed', e.message)));
+        dispatch(setApplyingResource(false));
       }
     }
-  } catch (e) {
-    log.error('Failed to apply file');
+  } catch (e: any) {
     log.error(e);
-
+    dispatch(setAlert(errorAlert('Deploy failed', e.message)));
     dispatch(setApplyingResource(false));
   }
 }

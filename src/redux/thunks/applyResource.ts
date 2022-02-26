@@ -25,6 +25,7 @@ import {extractK8sResources} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
+import {errorAlert} from '@utils/alert';
 import {PROCESS_ENV} from '@utils/env';
 import {getShellPath} from '@utils/shell';
 
@@ -131,7 +132,9 @@ export async function applyResource(
           : applyK8sResource(resource, kubeconfig, context, namespace);
 
         child.on('exit', (code, signal) => {
-          log.info(`kubectl exited with code ${code} and signal ${signal}`);
+          if (code !== null && code !== 0) {
+            log.warn(`apply exited with code ${code} and signal ${signal}`);
+          }
           dispatch(setApplyingResource(false));
         });
 
@@ -185,27 +188,24 @@ export async function applyResource(
         });
 
         child.stderr.on('data', async data => {
-          const alert: AlertType = {
-            type: AlertEnum.Error,
-            title: `Applying ${resource.name} to cluster ${context} failed`,
-            message: data.toString(),
-          };
-
           if (namespace && namespace.new) {
             await removeNamespaceFromCluster(namespace.name, kubeconfig, context);
           }
+
+          const alert = errorAlert(`Applying ${resource.name} to cluster ${context} failed`, data.toString());
+
           dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
         });
       } catch (e: any) {
-        log.error(e.message);
-        dispatch(setApplyingResource(true));
+        log.error(e);
+        dispatch(setAlert(errorAlert('Deploy failed', e.message)));
+        dispatch(setApplyingResource(false));
       }
     }
-  } catch (e) {
-    log.error('Failed to apply resource');
+  } catch (e: any) {
     log.error(e);
-
+    dispatch(setAlert(errorAlert('Deploy failed', e.message)));
     dispatch(setApplyingResource(false));
   }
 }

@@ -26,8 +26,12 @@ export function applyYamlToCluster(
       PATH: getShellPath(),
       KUBECONFIG: kubeconfig,
     },
+    shell: true,
+    windowsHide: true,
   });
+
   child.stdin.write(yaml);
   child.stdin.end();
+
   return child;
 }
