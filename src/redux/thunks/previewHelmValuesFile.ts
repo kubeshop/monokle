@@ -4,7 +4,7 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {PREDEFINED_K8S_VERSION, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
@@ -63,7 +63,7 @@ export const previewHelmValuesFile = createAsyncThunk<
 
       if (result.stdout) {
         return createPreviewResult(
-          String(projectConfig.k8sVersion),
+          projectConfig.k8sVersion || PREDEFINED_K8S_VERSION,
           String(configState.userDataDir),
           result.stdout,
           valuesFile.id,
