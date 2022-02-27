@@ -92,8 +92,6 @@ const TemplatesManagerPane: React.FC<IProps> = props => {
     }
   }, [searchedValue, templateMap]);
 
-  console.log(favoriteTemplates);
-
   return (
     <S.TemplateManagerPaneContainer id="TemplateManagerPane">
       <div ref={titleBarRef}>

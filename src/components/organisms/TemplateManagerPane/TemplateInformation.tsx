@@ -43,7 +43,6 @@ const TemplateInformation: React.FC<IProps> = props => {
               <Icon name="helm" />
             </Tooltip>
           )}
-          <Tooltip title={favoriteTemplates.includes(template.id) ? 'Unpin from favorites' : 'Pin to favorites'}>
             {favoriteTemplates.includes(template.id) ? (
               <S.UnPinTemplateButton onClick={onClickPinTemplate}>
                 <DeliveredProcedureOutlined />
@@ -53,7 +52,6 @@ const TemplateInformation: React.FC<IProps> = props => {
                 <Icon name="helm" />
               </S.PinTemplateButton>
             )}
-          </Tooltip>
         </S.NameContainer>
         <S.Description>{_.truncate(template.description, {length: 140})}</S.Description>
 
