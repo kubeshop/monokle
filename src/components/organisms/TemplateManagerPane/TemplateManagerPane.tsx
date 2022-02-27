@@ -49,6 +49,7 @@ const TemplatesManagerPane: React.FC<IProps> = props => {
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const pluginMap = useAppSelector(state => state.extension.pluginMap);
   const templatePackMap = useAppSelector(state => state.extension.templatePackMap);
+  const favoriteTemplates = useAppSelector(state => state.config.favoriteTemplates);
 
   const [searchedValue, setSearchedValue] = useState<string>();
   const [visibleTemplateEntries, setVisibleTemplateEntries] = useState<[string, AnyTemplate][]>();
@@ -91,6 +92,8 @@ const TemplatesManagerPane: React.FC<IProps> = props => {
     }
   }, [searchedValue, templateMap]);
 
+  console.log(favoriteTemplates);
+
   return (
     <S.TemplateManagerPaneContainer id="TemplateManagerPane">
       <div ref={titleBarRef}>
@@ -122,22 +125,34 @@ const TemplatesManagerPane: React.FC<IProps> = props => {
               />
             </S.SearchInputContainer>
 
-            <div style={{background: 'red'}}>
-              <p>Favorites</p>
-            </div>
-
             {!visibleTemplateEntries.length ? (
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
             ) : (
               <S.TemplatesContainer>
-                {visibleTemplateEntries.map(([path, template]) => (
-                  <TemplateInformation
-                    key={path}
-                    template={template}
-                    disabled={isInPreviewMode}
-                    onClickOpenTemplate={() => onClickOpenTemplate(template)}
-                  />
-                ))}
+                {visibleTemplateEntries.map(([path, template]) =>
+                  favoriteTemplates.includes(template.id) ? (
+                    <TemplateInformation
+                      key={path}
+                      template={template}
+                      disabled={isInPreviewMode}
+                      onClickOpenTemplate={() => onClickOpenTemplate(template)}
+                    />
+                  ) : (
+                    ''
+                  )
+                )}
+                {visibleTemplateEntries.map(([path, template]) =>
+                  !favoriteTemplates.includes(template.id) ? (
+                    <TemplateInformation
+                      key={path}
+                      template={template}
+                      disabled={isInPreviewMode}
+                      onClickOpenTemplate={() => onClickOpenTemplate(template)}
+                    />
+                  ) : (
+                    ''
+                  )
+                )}
               </S.TemplatesContainer>
             )}
           </>
