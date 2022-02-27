@@ -129,29 +129,19 @@ const TemplatesManagerPane: React.FC<IProps> = props => {
               <S.NotFoundLabel>No templates found.</S.NotFoundLabel>
             ) : (
               <S.TemplatesContainer>
-                {visibleTemplateEntries.map(([path, template]) =>
-                  favoriteTemplates.includes(template.id) ? (
+                {visibleTemplateEntries.sort((a,b) =>{
+                  if(favoriteTemplates.includes(a[1].id))
+                    return -1;
+                  if(favoriteTemplates.includes(b[1].id))
+                    return 1;
+                  return 0; 
+                }).map(([path, template]) =>
                     <TemplateInformation
                       key={path}
                       template={template}
                       disabled={isInPreviewMode}
                       onClickOpenTemplate={() => onClickOpenTemplate(template)}
                     />
-                  ) : (
-                    ''
-                  )
-                )}
-                {visibleTemplateEntries.map(([path, template]) =>
-                  !favoriteTemplates.includes(template.id) ? (
-                    <TemplateInformation
-                      key={path}
-                      template={template}
-                      disabled={isInPreviewMode}
-                      onClickOpenTemplate={() => onClickOpenTemplate(template)}
-                    />
-                  ) : (
-                    ''
-                  )
                 )}
               </S.TemplatesContainer>
             )}
