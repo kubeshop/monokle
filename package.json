@@ -111,6 +111,7 @@
     "loglevel": "1.8.0",
     "luxon": "2.3.0",
     "micromatch": "4.0.4",
+    "mixpanel": "0.14.0",
     "module-alias": "2.2.2",
     "monaco-yaml": "3.2.1",
     "node-fetch": "2.6.7",

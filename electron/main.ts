@@ -87,18 +87,21 @@ const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
 setDeviceID(machineIdSync());
-Nucleus.init('6218cf3ef5e5d2023724d89b',{
-  disableInDev: false, 
-  disableTracking: false, 
-  disableErrorReports: false, 
-  autoUserId: true, 
-  debug: true, 
+
+
+Nucleus.init('6218cf3ef5e5d2023724d89b', {
+  disableInDev: false,
+  disableTracking: false,
+  disableErrorReports: false,
+  autoUserId: true,
+  debug: true,
 });
-Nucleus.setProps({
+Nucleus.setProps( {
+  deviceID:machineIdSync(),
+  os: process.platform,
   version: app.getVersion(),
-  languaage: app.getLocale()
-}, true);
-// Nucleus.identify(machineIdSync(),{});
+  language: app.getLocale(),
+},true);
 
 ipcMain.on('get-user-home-dir', event => {
   event.returnValue = userHomeDir;
@@ -346,8 +349,9 @@ export const createWindow = (givenPath?: string) => {
   });
 
   win.webContents.on('dom-ready', async () => {
-    Nucleus.appStarted();
     const dispatch = createDispatchForWindow(win);
+
+    Nucleus.appStarted();
 
     subscribeToStoreStateChanges(win.webContents, (storeState) => {
       createMenu(storeState, dispatch);

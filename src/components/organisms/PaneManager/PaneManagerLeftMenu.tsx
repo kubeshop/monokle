@@ -12,6 +12,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, toggleLeftMenu, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
+import {trackEvent} from '@utils/telemetry';
+
 import Colors from '@styles/Colors';
 
 import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprint';
@@ -50,6 +52,7 @@ const PaneManagerLeftMenu: React.FC = () => {
       if (isStartProjectPaneVisible) {
         dispatch(toggleStartProjectPane());
       }
+      trackEvent('SELECT_LEFT_TOOL_PANEL', {panelID: selectedMenu});
       dispatch(setLeftMenuSelection(selectedMenu));
 
       if (!leftActive) {
