@@ -32,7 +32,7 @@ import ElectronStore from 'electron-store';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
-import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector, activeProjectSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
@@ -335,7 +335,8 @@ export const createWindow = (givenPath?: string) => {
 
     subscribeToStoreStateChanges(win.webContents, (storeState) => {
       createMenu(storeState, dispatch);
-      setWindowTitle(storeState, win);
+      let projectName = activeProjectSelector(storeState)?.name;
+      setWindowTitle(storeState, win, projectName);
       unsavedResourceCount = unsavedResourcesSelector(storeState).length;
     });
 
@@ -466,7 +467,7 @@ if (MONOKLE_RUN_AS_NODE) {
 
 terminal().catch(e => log.error(e));
 
-export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
+export const setWindowTitle = (state: RootState, window: BrowserWindow, projectName?: String) => {
   if (window.isDestroyed()) {
     return;
   }
@@ -513,7 +514,7 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   }
   if (fileMap && fileMap[ROOT_FILE_ENTRY] && fileMap[ROOT_FILE_ENTRY].filePath) {
     windowTitle = fileMap[ROOT_FILE_ENTRY].filePath;
-    window.setTitle(`Monokle - ${windowTitle}`);
+    window.setTitle(`Monokle - ${projectName} -${windowTitle}`);
     return;
   }
   window.setTitle(windowTitle);
