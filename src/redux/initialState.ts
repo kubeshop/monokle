@@ -72,8 +72,9 @@ const initialAppConfigState: AppConfig = {
   isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
-  isScanExcludesUpdated: 'outdated',
+  isScanExcludesUpdated: 'applied',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
+  isScanIncludesUpdated: 'applied',
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,

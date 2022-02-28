@@ -13,6 +13,7 @@ import {
   K8S_VERSIONS,
   TOOLTIP_DELAY,
   TOOLTIP_K8S_SELECTION,
+  ROOT_FILE_ENTRY,
 } from '@constants/constants';
 import {
   AddExclusionPatternTooltip,
@@ -30,6 +31,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadSchema, schemaExists} from '@redux/services/k8sVersionService';
+import {setScanExcludesStatus, setScanIncludesStatus} from '@redux/reducers/appConfig';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import FilePatternList from '@molecules/FilePatternList';
 
@@ -60,6 +63,8 @@ export const Settings = ({
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const uiState = useAppSelector(state => state.ui);
+  const appConfig = useAppSelector(state => state.config);
+  const fileMap = useAppSelector(state => state.main.fileMap);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -341,6 +346,11 @@ export const Settings = ({
           onChange={onChangeFileIncludes}
           tooltip={AddInclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
+          showApplyButton={appConfig.isScanIncludesUpdated === 'outdated'}
+          onApplyClick={() => {
+            dispatch(setScanIncludesStatus('applied'));
+            dispatch(setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath));
+          }}
         />
       </S.Div>
       <S.Div>
@@ -350,7 +360,11 @@ export const Settings = ({
           onChange={onChangeScanExcludes}
           tooltip={AddExclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
-          type="excludes"
+          showApplyButton={appConfig.isScanExcludesUpdated === 'outdated'}
+          onApplyClick={() => {
+            dispatch(setScanExcludesStatus('applied'));
+            dispatch(setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath));
+          }}
         />
       </S.Div>
       <S.Div>

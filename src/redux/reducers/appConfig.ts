@@ -157,6 +157,9 @@ export const configSlice = createSlice({
     setScanExcludesStatus: (state: Draft<AppConfig>, action: PayloadAction<'outdated' | 'applied'>) => {
       state.isScanExcludesUpdated = action.payload;
     },
+    setScanIncludesStatus: (state: Draft<AppConfig>, action: PayloadAction<'outdated' | 'applied'>) => {
+      state.isScanIncludesUpdated = action.payload;
+    },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
     },
@@ -338,6 +341,7 @@ export const {
   setAutoZoom,
   setCurrentContext,
   setScanExcludesStatus,
+  setScanIncludesStatus,
   updateFolderReadsMaxDepth,
   updateLanguage,
   updateNewVersion,

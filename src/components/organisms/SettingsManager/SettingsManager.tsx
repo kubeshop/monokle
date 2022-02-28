@@ -23,6 +23,7 @@ import {
   changeProjectsRootPath,
   setKubeConfig,
   setScanExcludesStatus,
+  setScanIncludesStatus,
   toggleErrorReporting,
   toggleEventTracking,
   updateApplicationSettings,
@@ -76,6 +77,13 @@ const SettingsManager: React.FC = () => {
 
   const changeProjectConfig = (config: ProjectConfig) => {
     dispatch(updateProjectConfig({config, fromConfigFile: false}));
+
+    if (!_.isEqual(_.sortBy(config?.scanExcludes), _.sortBy(mergedConfig.scanExcludes))) {
+      dispatch(setScanExcludesStatus('outdated'));
+    }
+    if (!_.isEqual(_.sortBy(config?.fileIncludes), _.sortBy(mergedConfig.fileIncludes))) {
+      dispatch(setScanIncludesStatus('outdated'));
+    }
   };
 
   const changeApplicationConfig = (config: ProjectConfig) => {
@@ -101,6 +109,7 @@ const SettingsManager: React.FC = () => {
       dispatch(updateScanExcludes(config?.scanExcludes || []));
     }
     if (!_.isEqual(_.sortBy(config?.fileIncludes), _.sortBy(appConfig.fileIncludes))) {
+      dispatch(setScanIncludesStatus('outdated'));
       dispatch(updateFileIncludes(config?.fileIncludes || []));
     }
   };
