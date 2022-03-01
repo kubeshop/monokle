@@ -1,5 +1,6 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import path, {join} from 'path';
@@ -24,7 +25,6 @@ import {
   keysToUpdateStateBulk,
   populateProjectConfig,
   readProjectConfig,
-  serializeObject,
   writeProjectConfigFile,
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
@@ -222,8 +222,8 @@ export const configSlice = createSlice({
         state.projectConfig.kubeConfig = {};
       }
 
-      const serializedIncomingConfig = serializeObject(action.payload);
-      const serializedState = serializeObject(state.projectConfig.kubeConfig);
+      const serializedIncomingConfig = flatten<any, any>(action.payload);
+      const serializedState = flatten<any, any>(state.projectConfig.kubeConfig);
       const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
 
       keys.forEach(key => {
@@ -246,8 +246,8 @@ export const configSlice = createSlice({
         state.projectConfig = {};
       }
 
-      const serializedIncomingConfig = serializeObject(action.payload.config);
-      const serializedState = serializeObject(state.projectConfig);
+      const serializedIncomingConfig = flatten<any, any>(action.payload.config);
+      const serializedState = flatten<any, any>(state.projectConfig);
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
 
       if (action.payload.fromConfigFile) {
@@ -298,8 +298,8 @@ export const configSlice = createSlice({
         state.settings = {};
       }
 
-      const serializedIncomingSettings = serializeObject(action.payload);
-      const serializedState = serializeObject(state.settings);
+      const serializedIncomingSettings = flatten<any, any>(action.payload);
+      const serializedState = flatten<any, any>(state.settings);
       let keys = keysToUpdateStateBulk(serializedState, serializedIncomingSettings);
 
       keys.forEach(key => {

@@ -1,3 +1,4 @@
+import flatten from 'flat';
 import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
 import log from 'loglevel';
@@ -165,8 +166,8 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     return baseConfig;
   }
 
-  const serializedBaseConfig: SerializableObject = serializeObject(baseConfig);
-  const serializedConfig: SerializableObject = serializeObject(config);
+  const serializedBaseConfig: SerializableObject = flatten<any, any>(baseConfig);
+  const serializedConfig: SerializableObject = flatten<any, any>(config);
 
   Object.keys(serializedBaseConfig).forEach((key: string) => {
     if (!_.isUndefined(serializedConfig[key])) {
@@ -174,41 +175,7 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     }
   });
 
-  return deserializeObject(serializedBaseConfig);
-};
-
-export const serializeObject = (objectToSerialize?: SerializableObject | null, prefix?: string): SerializableObject => {
-  let serialized: any = {};
-
-  if (!objectToSerialize) {
-    return serialized;
-  }
-  Object.keys(objectToSerialize).forEach(key => {
-    if (_.isObject(objectToSerialize[key]) && !_.isArray(objectToSerialize[key])) {
-      const result: any = serializeObject(objectToSerialize[key], key);
-      serialized = {
-        ...serialized,
-        ...result,
-      };
-    } else {
-      const objectKey = prefix ? `${prefix}.${key}` : key;
-      serialized[objectKey] = objectToSerialize[key];
-    }
-  });
-  return serialized;
-};
-
-export const deserializeObject = (objectToDeserialize?: SerializableObject | null): SerializableObject => {
-  const deserialized = {};
-
-  if (!objectToDeserialize) {
-    return deserialized;
-  }
-
-  Object.keys(objectToDeserialize).forEach(key => {
-    _.set(deserialized, key, objectToDeserialize[key]);
-  });
-  return deserialized;
+  return flatten.unflatten(serializedBaseConfig);
 };
 
 export const keysToUpdateStateBulk = (
