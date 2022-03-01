@@ -35,6 +35,7 @@ const CreateProjectModal: React.FC = () => {
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const templateMap = useAppSelector(state => state.extension.templateMap);
   const uiState = useAppSelector(state => state.ui.createProjectModal);
+  const favoriteTemplates = useAppSelector(state => state.config.favoriteTemplates);
 
   const [formStep, setFormStep] = useState(FormSteps.STEP_ONE);
   const [formValues, setFormValues] = useState({name: '', rootFolder: projectsRootPath});
@@ -264,13 +265,20 @@ const CreateProjectModal: React.FC = () => {
             <TemplateModal template={selectedTemplate} projectToCreate={formValues} onClose={onTemplateModalClose} />
           )}
 
-          {Object.values(templateMap).map(template => (
+          {Object.values(templateMap).sort((a,b) =>{
+            if(favoriteTemplates.includes(a.id))
+              return -1;
+            if(favoriteTemplates.includes(b.id))
+              return 1;
+            return 0;
+          }).map(template => (
             <TemplateInformation
               key={template.id}
               template={template}
               onClickOpenTemplate={() => onClickOpenTemplate(template)}
             />
           ))}
+
         </S.TemplatesContainer>
       )}
 
