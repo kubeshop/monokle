@@ -65,6 +65,7 @@ export type Project = {
 export type HelmPreviewConfiguration = {
   id: string;
   name: string;
+  helmChartFilePath: string;
   orderedValuesFilePaths: string[];
   command: 'install' | 'template';
   options: Record<string, string | null>;

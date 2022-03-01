@@ -1,5 +1,6 @@
 import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {HelmPreviewConfiguration} from '@models/appconfig';
 import {HelmValuesMapType} from '@models/appstate';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
@@ -29,19 +30,63 @@ type HelmChartScopeType = {
   [currentHelmChart: string]: HelmChart | unknown;
 };
 
+type PreviewConfigurationScopeType = {
+  previewConfigurationMap: Record<string, HelmPreviewConfiguration> | undefined;
+  [currentHelmChart: string]: HelmChart | unknown;
+};
+
 export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
-  // TODO: replace 'any' type after implementing the state for preview configurations
-  const previewConfigurationsSectionBlueprint: SectionBlueprint<any, any> = {
+  const previewConfigurationsSectionBlueprint: SectionBlueprint<
+    HelmPreviewConfiguration,
+    PreviewConfigurationScopeType
+  > = {
     name: 'Preview Configurations',
     id: `${helmChart.id}-configurations`,
     containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
-    getScope: () => {
-      return {};
+    getScope: state => {
+      return {
+        previewConfigurationMap: state.config.projectConfig?.helm?.previewConfigurationMap,
+        [helmChart.id]: state.main.helmChartMap[helmChart.id],
+      };
     },
     builder: {
+      getRawItems: scope => {
+        const currentHelmChart = scope[helmChart.id] as HelmChart | undefined;
+        if (!currentHelmChart) {
+          return [];
+        }
+        return scope.previewConfigurationMap
+          ? Object.values(scope.previewConfigurationMap).filter(
+              pc => pc.helmChartFilePath === currentHelmChart.filePath
+            )
+          : [];
+      },
       isInitialized: () => true,
       isVisible: () => true,
+    },
+    itemBlueprint: {
+      getInstanceId: rawItem => rawItem.id,
+      getName: rawItem => rawItem.name,
+      builder: {
+        getMeta: () => {
+          return {
+            fileItemPrefixStyle: {
+              paddingLeft: 10,
+            },
+          };
+        },
+      },
+      customization: {
+        quickAction: {
+          component: HelmChartQuickAction,
+          options: {isVisibleOnHover: true},
+        },
+        prefix: {
+          component: FileItemPrefix,
+        },
+        lastItemMarginBottom: 0,
+      },
     },
     customization: {
       counterDisplayMode: 'items',

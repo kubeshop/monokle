@@ -12,6 +12,7 @@ import {HelmValuesFile} from '@models/helm';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {closePreviewConfigurationEditor} from '@redux/reducers/main';
 
 import {KeyValueInput, OrderedList} from '@components/atoms';
 import {OrderedListItem} from '@components/atoms/OrderedList';
@@ -97,9 +98,13 @@ const PreviewConfigurationEditor = () => {
   );
 
   const onSave = useCallback(() => {
+    if (!helmChart) {
+      return;
+    }
     const input: HelmPreviewConfiguration = {
       id: previewConfiguration ? previewConfiguration.id : uuidv4(),
       name,
+      helmChartFilePath: helmChart?.filePath,
       command: helmCommand,
       options: helmOptions,
       orderedValuesFilePaths: valuesFileItems
@@ -114,12 +119,14 @@ const PreviewConfigurationEditor = () => {
       updateProjectConfig({
         config: {
           helm: {
-            previewConfigurationMap,
+            previewConfigurationMap: updatedPreviewConfigurationMap,
           },
         },
         fromConfigFile: false,
       })
     );
+
+    dispatch(closePreviewConfigurationEditor());
   }, [
     dispatch,
     name,
@@ -129,6 +136,7 @@ const PreviewConfigurationEditor = () => {
     helmValuesMap,
     previewConfiguration,
     valuesFileItems,
+    helmChart,
   ]);
 
   if (!helmChart) {
