@@ -35,7 +35,6 @@ type SectionContainerProps = {
   disableHoverStyle?: boolean;
   isSectionCheckable?: boolean;
   hasCustomNameDisplay?: boolean;
-  $marginBottom?: number;
 };
 
 export const SectionContainer = styled.li<SectionContainerProps>`
@@ -78,7 +77,6 @@ export const SectionContainer = styled.li<SectionContainerProps>`
       return `background: ${Colors.blackPearl};`;
     }
   }};
-  ${props => props.$marginBottom && `margin-bottom: ${props.$marginBottom}px;`}
 `;
 
 type NameProps = {
