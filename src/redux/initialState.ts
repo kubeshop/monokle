@@ -92,6 +92,7 @@ const initialAppConfigState: AppConfig = {
   isProjectLoading: true,
   projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
   k8sVersion: electronStore.get('appConfig.k8sVersion') || PREDEFINED_K8S_VERSION,
+  favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
 };
 
 const initialAlertState: AlertState = {};

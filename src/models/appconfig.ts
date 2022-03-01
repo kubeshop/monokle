@@ -102,6 +102,7 @@ interface AppConfig {
   isProjectLoading?: boolean;
   projectsRootPath: string;
   k8sVersion: string;
+  favoriteTemplates: string[];
 }
 
 export type {AppConfig};

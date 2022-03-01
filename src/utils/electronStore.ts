@@ -110,6 +110,9 @@ const schema = {
       projectsRootFolder: {
         type: 'string',
       },
+      favoriteTemplates: {
+        type: 'array',
+      },
     },
   },
   ui: {

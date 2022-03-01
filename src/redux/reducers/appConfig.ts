@@ -311,6 +311,12 @@ export const configSlice = createSlice({
 
       electronStore.set('appConfig.settings', state.settings);
     },
+    handleFavoriteTemplate: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
+      if (!state.favoriteTemplates.includes(action.payload))
+        state.favoriteTemplates = [...state.favoriteTemplates, action.payload];
+      else state.favoriteTemplates = state.favoriteTemplates.filter(template => template !== action.payload);
+      electronStore.set('appConfig.favoriteTemplates', state.favoriteTemplates);
+    },
   },
 });
 
@@ -338,5 +344,6 @@ export const {
   changeProjectsRootPath,
   updateApplicationSettings,
   updateK8sVersion,
+  handleFavoriteTemplate,
 } = configSlice.actions;
 export default configSlice.reducer;
