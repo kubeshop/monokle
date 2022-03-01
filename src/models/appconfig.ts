@@ -1,5 +1,3 @@
-import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
-
 import {KustomizeCommandType} from '@models/kustomize';
 
 export enum Themes {
@@ -64,27 +62,13 @@ export type Project = {
   lastOpened?: string;
 };
 
-interface PreviewConfigurationBase {
+export type HelmPreviewConfiguration = {
   id: string;
   name: string;
   orderedValuesFilePaths: string[];
-}
-
-interface HelmInstallPreviewConfiguration extends PreviewConfigurationBase {
-  command: 'install';
-  options: {
-    [key in keyof typeof helmInstallOptions]: null | string;
-  };
-}
-
-interface HelmTemplatePreviewConfiguration extends PreviewConfigurationBase {
-  command: 'install';
-  options: {
-    [key in keyof typeof helmTemplateOptions]: null | string;
-  };
-}
-
-export type HelmPreviewConfiguration = HelmInstallPreviewConfiguration | HelmTemplatePreviewConfiguration;
+  command: 'install' | 'template';
+  options: Record<string, string | null>;
+};
 
 export type ProjectConfig = {
   settings?: Settings;

@@ -1,13 +1,17 @@
-import {useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 import {Button, Input, Select} from 'antd';
+
+import {v4 as uuidv4} from 'uuid';
 
 import {HELM_INSTALL_OPTIONS_DOCS_URL, HELM_TEMPLATE_OPTIONS_DOCS_URL} from '@constants/constants';
 import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
 
+import {HelmPreviewConfiguration} from '@models/appconfig';
 import {HelmValuesFile} from '@models/helm';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateProjectConfig} from '@redux/reducers/appConfig';
 
 import {KeyValueInput, OrderedList} from '@components/atoms';
 import {OrderedListItem} from '@components/atoms/OrderedList';
@@ -15,8 +19,15 @@ import {OrderedListItem} from '@components/atoms/OrderedList';
 import * as S from './styled';
 
 const PreviewConfigurationEditor = () => {
+  const dispatch = useAppDispatch();
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+
   const helmPreviewMode = useAppSelector(
     state => state.config.projectConfig?.settings?.helmPreviewMode || state.config.settings.helmPreviewMode
+  );
+
+  const previewConfigurationMap = useAppSelector(
+    state => state.config.projectConfig?.helm?.previewConfigurationMap || {}
   );
 
   const previewConfiguration = useAppSelector(state => {
@@ -24,8 +35,7 @@ const PreviewConfigurationEditor = () => {
     if (!previewConfigurationId) {
       return undefined;
     }
-    const previewConfigurationMap = state.config.projectConfig?.helm?.previewConfigurationMap;
-    return previewConfigurationMap ? previewConfigurationMap[previewConfigurationId] : undefined;
+    return previewConfigurationMap[previewConfigurationId];
   });
 
   const helmChart = useAppSelector(state => {
@@ -86,6 +96,41 @@ const PreviewConfigurationEditor = () => {
     [helmCommand]
   );
 
+  const onSave = useCallback(() => {
+    const input: HelmPreviewConfiguration = {
+      id: previewConfiguration ? previewConfiguration.id : uuidv4(),
+      name,
+      command: helmCommand,
+      options: helmOptions,
+      orderedValuesFilePaths: valuesFileItems
+        .map(v => helmValuesMap[v.id])
+        .filter((v): v is HelmValuesFile => v !== undefined)
+        .map(v => v.filePath),
+    };
+    const updatedPreviewConfigurationMap = JSON.parse(JSON.stringify(previewConfigurationMap));
+    updatedPreviewConfigurationMap[input.id] = input;
+
+    dispatch(
+      updateProjectConfig({
+        config: {
+          helm: {
+            previewConfigurationMap,
+          },
+        },
+        fromConfigFile: false,
+      })
+    );
+  }, [
+    dispatch,
+    name,
+    helmCommand,
+    helmOptions,
+    previewConfigurationMap,
+    helmValuesMap,
+    previewConfiguration,
+    valuesFileItems,
+  ]);
+
   if (!helmChart) {
     return <p>Something went wrong, could not find the helm chart.</p>;
   }
@@ -122,10 +167,12 @@ const PreviewConfigurationEditor = () => {
         <Button type="primary" ghost>
           Discard
         </Button>
-        <Button type="primary" ghost>
+        <Button onClick={() => onSave()} type="primary" ghost>
           Save
         </Button>
-        <Button type="primary">Save and Preview</Button>
+        <Button onClick={() => onSave()} type="primary">
+          Save and Preview
+        </Button>
       </S.ActionsContainer>
     </div>
   );
