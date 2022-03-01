@@ -19,6 +19,15 @@ const PreviewConfigurationEditor = () => {
     state => state.config.projectConfig?.settings?.helmPreviewMode || state.config.settings.helmPreviewMode
   );
 
+  const previewConfiguration = useAppSelector(state => {
+    const previewConfigurationId = state.main.prevConfEditor.previewConfigurationId;
+    if (!previewConfigurationId) {
+      return undefined;
+    }
+    const previewConfigurationMap = state.config.projectConfig?.helm?.previewConfigurationMap;
+    return previewConfigurationMap ? previewConfigurationMap[previewConfigurationId] : undefined;
+  });
+
   const helmChart = useAppSelector(state => {
     const helmChartId = state.main.prevConfEditor.helmChartId;
     if (!helmChartId) {
@@ -27,18 +36,45 @@ const PreviewConfigurationEditor = () => {
     return state.main.helmChartMap[helmChartId];
   });
 
-  const valuesFiles = useAppSelector(
+  const [name, setName] = useState<string>(() => previewConfiguration?.name || '');
+
+  const valuesFilesByPath = useAppSelector(
     state =>
       helmChart?.valueFileIds
         .map(id => state.main.helmValuesMap[id])
-        .filter((v): v is HelmValuesFile => v !== undefined) || []
+        .filter((v): v is HelmValuesFile => v !== undefined)
+        .reduce((acc: Record<string, HelmValuesFile>, curr: HelmValuesFile) => {
+          acc[curr.filePath] = curr;
+          return acc;
+        }, {}) || {}
   );
 
-  const [valuesFileItems, setValuesFileItems] = useState<OrderedListItem[]>(
-    valuesFiles.map(vf => ({id: vf.id, text: vf.name, isChecked: false}))
-  );
-  const [helmOptions, setHelmOptions] = useState({});
-  const [helmCommand, setHelmCommand] = useState<'template' | 'install'>(helmPreviewMode || 'template');
+  const [valuesFileItems, setValuesFileItems] = useState<OrderedListItem[]>(() => {
+    if (!previewConfiguration?.orderedValuesFilePaths) {
+      return [];
+    }
+    return previewConfiguration.orderedValuesFilePaths
+      .map(filePath => valuesFilesByPath[filePath])
+      .filter((v): v is HelmValuesFile => v !== undefined)
+      .map(vf => ({id: vf.id, text: vf.name, isChecked: true}))
+      .concat(
+        Object.values(valuesFilesByPath)
+          .filter(vf => previewConfiguration.orderedValuesFilePaths.includes(vf.filePath))
+          .map(vf => ({id: vf.id, text: vf.name, isChecked: false}))
+      );
+  });
+  const [helmOptions, setHelmOptions] = useState<Record<string, string | null>>(() => {
+    return previewConfiguration?.options || {};
+  });
+  const [helmCommand, setHelmCommand] = useState<'template' | 'install'>(() => {
+    if (previewConfiguration) {
+      return previewConfiguration.command;
+    }
+    if (helmPreviewMode) {
+      return helmPreviewMode;
+    }
+    return 'template';
+  });
 
   const keyValueInputSchema = useMemo(
     () => (helmCommand === 'template' ? helmTemplateOptions : helmInstallOptions),
@@ -58,7 +94,7 @@ const PreviewConfigurationEditor = () => {
     <div>
       <S.Field>
         <S.Label>Name your configuration:</S.Label>
-        <Input placeholder="Enter the configuration name" />
+        <Input value={name} onChange={e => setName(e.target.value)} placeholder="Enter the configuration name" />
       </S.Field>
       <S.Field>
         <S.Label style={{marginBottom: 0}}>Select which values files to use:</S.Label>

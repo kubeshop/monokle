@@ -37,7 +37,7 @@ const PreviewConfigurationNameSuffix: React.FC<SectionCustomComponentProps> = pr
   const dispatch = useAppDispatch();
 
   const onClick = () => {
-    dispatch(openPreviewConfigurationEditor(sectionInstance.id.replace('-configurations', '')));
+    dispatch(openPreviewConfigurationEditor({helmChartId: sectionInstance.id.replace('-configurations', '')}));
   };
 
   return (

@@ -67,6 +67,7 @@ export type Project = {
 interface PreviewConfigurationBase {
   id: string;
   name: string;
+  orderedValuesFilePaths: string[];
 }
 
 interface HelmInstallPreviewConfiguration extends PreviewConfigurationBase {
