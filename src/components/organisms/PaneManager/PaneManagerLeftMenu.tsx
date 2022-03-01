@@ -83,6 +83,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         placement="right"
       >
         <MenuButton
+          id="file-explorer"
           isSelected={leftMenuSelection === 'file-explorer'}
           isActive={Boolean(activeProject) && leftActive}
           shouldWatchSelectedPath
@@ -104,6 +105,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         placement="right"
       >
         <MenuButton
+          id="kustomize-pane"
           isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
           isActive={Boolean(activeProject) && leftActive}
           onClick={() => setLeftActiveMenu('kustomize-pane')}
@@ -131,6 +133,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         placement="right"
       >
         <MenuButton
+          id="helm-pane"
           isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
           isActive={Boolean(activeProject) && leftActive}
           onClick={() => setLeftActiveMenu('helm-pane')}

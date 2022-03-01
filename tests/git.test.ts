@@ -92,6 +92,7 @@ const testData = [
 ];
 
 test('all files should be loaded', async () => {
+  await mainWindow.clickLogo();
   await startProjectPane.createProjectFromFolder(electronApp, projectPath);
   await pause(10000);
 
@@ -99,6 +100,7 @@ test('all files should be loaded', async () => {
   for (const data of testData) {
     console.log(`testing commit hash: ${data.hash}`);
     await goToCommit(data.hash);
+    await pause(10000);
 
     expect(parseInt(await navigatorPane.resourcesCount.textContent(), 10)).toEqual(data.navigatorCount);
 
