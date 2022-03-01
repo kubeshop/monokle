@@ -10,9 +10,10 @@ import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
 import Colors from '@styles/Colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
-import FileItemPrefix from './FileItemPrefix';
 import HelmChartQuickAction from './HelmChartQuickAction';
-import PreviewConfigurationNameSuffix from './PreviewConfigurationQuickAction';
+import ItemPrefix from './ItemPrefix';
+import PreviewConfigurationNameSuffix from './PreviewConfigurationNameSuffix';
+import PreviewConfigurationQuickAction from './PreviewConfigurationQuickAction';
 
 export type ValuesFilesScopeType = {
   helmValuesMap: HelmValuesMapType;
@@ -71,19 +72,20 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       builder: {
         getMeta: () => {
           return {
-            fileItemPrefixStyle: {
+            itemPrefixStyle: {
               paddingLeft: 10,
             },
+            itemPrefixIcon: 'preview',
           };
         },
       },
       customization: {
         quickAction: {
-          component: HelmChartQuickAction,
+          component: PreviewConfigurationQuickAction,
           options: {isVisibleOnHover: true},
         },
         prefix: {
-          component: FileItemPrefix,
+          component: ItemPrefix,
         },
         lastItemMarginBottom: 0,
       },
@@ -165,9 +167,10 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           Boolean((scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) || scope.isInClusterMode),
         getMeta: () => {
           return {
-            fileItemPrefixStyle: {
+            itemPrefixStyle: {
               paddingLeft: 10,
             },
+            itemPrefixIcon: 'file',
           };
         },
       },
@@ -182,7 +185,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           options: {isVisibleOnHover: true},
         },
         prefix: {
-          component: FileItemPrefix,
+          component: ItemPrefix,
         },
         lastItemMarginBottom: 0,
       },
@@ -228,6 +231,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       builder: {
         getMeta: chart => ({
           filePath: chart.filePath,
+          itemPrefixIcon: 'file',
         }),
         isSelected: (chart, scope) => {
           return scope.selectedPath === chart.filePath;
@@ -245,7 +249,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
-        prefix: {component: FileItemPrefix},
+        prefix: {component: ItemPrefix},
         lastItemMarginBottom: 0,
       },
     },
