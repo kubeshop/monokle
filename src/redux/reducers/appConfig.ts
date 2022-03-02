@@ -317,6 +317,14 @@ export const configSlice = createSlice({
       else state.favoriteTemplates = state.favoriteTemplates.filter(template => template !== action.payload);
       electronStore.set('appConfig.favoriteTemplates', state.favoriteTemplates);
     },
+    toggleEventTracking: (state: Draft<AppConfig>) => {
+      state.disableEventTracking = !state.disableEventTracking;
+      electronStore.set('appConfig.disableEventTracking', state.disableEventTracking);
+    },
+    toggleErrorReporting: (state: Draft<AppConfig>) => {
+      state.disableErrorReporting = !state.disableErrorReporting;
+      electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
+    },
   },
 });
 
@@ -345,5 +353,7 @@ export const {
   updateApplicationSettings,
   updateK8sVersion,
   handleFavoriteTemplate,
+  toggleEventTracking,
+  toggleErrorReporting,
 } = configSlice.actions;
 export default configSlice.reducer;

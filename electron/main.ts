@@ -2,6 +2,9 @@
 /* eslint-disable import/first */
 import moduleAlias from 'module-alias';
 import * as ElectronLog from 'electron-log';
+import { machineIdSync } from 'node-machine-id';
+import Nucleus from 'nucleus-nodejs';
+import unhandled from 'electron-unhandled';
 
 Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
@@ -64,7 +67,7 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
+import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder, setDeviceID, initNucleus } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 
@@ -82,14 +85,31 @@ const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
+
+let {disableErrorReports,disableTracking} =  initNucleus(isDev, app);
+unhandled({
+  logger: (error) => {
+      console.error(error);
+      if (!disableErrorReports) {
+        Nucleus.trackError((error && error.name) || 'Unnamed error', error);
+      }
+    },
+    showDialog: false
+});
+
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
+setDeviceID(machineIdSync());
 
-ipcMain.on('get-user-home-dir', event => {
+ipcMain.on('track-event', async (event: any, { eventName, payload }: any) => {
+    Nucleus.track(eventName, {...payload});
+});
+
+ipcMain.on('get-user-home-dir', (event:any) => {
   event.returnValue = userHomeDir;
 });
 
-ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
+ipcMain.on(DOWNLOAD_PLUGIN, async (event:any, pluginUrl: string) => {
   try {
     const pluginExtension = await downloadPlugin(pluginUrl, pluginsDir);
     const templateExtensions = await loadTemplatesFromPlugin(pluginExtension.extension);
@@ -104,7 +124,7 @@ ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   }
 });
 
-ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
+ipcMain.on(DOWNLOAD_TEMPLATE, async (event:any, templateUrl: string) => {
   try {
     const templateExtension = await downloadTemplate(templateUrl, templatesDir);
     const downloadTemplateResult: DownloadTemplateResult = {templateExtension};
@@ -118,7 +138,7 @@ ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
   }
 });
 
-ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event, templatePackUrl: string) => {
+ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event:any, templatePackUrl: string) => {
   try {
     const templatePackExtension = await downloadTemplatePack(templatePackUrl, templatePacksDir);
     const templateExtensions = await loadTemplatesFromTemplatePack(templatePackExtension.extension);
@@ -139,7 +159,7 @@ type UpdateExtensionsPayload = {
   pluginMap: Record<string, AnyPlugin>;
 };
 
-ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) => {
+ipcMain.on(UPDATE_EXTENSIONS, async (event:any, payload: UpdateExtensionsPayload) => {
   const {templateMap, pluginMap, templatePackMap} = payload;
   let errorMessage = '';
 
@@ -212,19 +232,19 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
   event.sender.send(UPDATE_EXTENSIONS_RESULT, updateExtensionsResult);
 });
 
-ipcMain.on('interpolate-vanilla-template', (event, args: InterpolateTemplateOptions) => {
+ipcMain.on('interpolate-vanilla-template', (event:any, args: InterpolateTemplateOptions) => {
   interpolateTemplate(args, event);
 });
 
-ipcMain.on('run-kustomize', (event, cmdOptions: KustomizeCommandOptions) => {
+ipcMain.on('run-kustomize', (event:any, cmdOptions: KustomizeCommandOptions) => {
   runKustomize(cmdOptions, event);
 });
 
-ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
+ipcMain.handle('select-file', async (event:any, options: FileExplorerOptions) => {
   return selectFileDialog(event, options);
 });
 
-ipcMain.handle('save-file', async (event, options: FileOptions) => {
+ipcMain.handle('save-file', async (event:any, options: FileOptions) => {
   return saveFileDialog(event, options);
 });
 
@@ -245,7 +265,7 @@ ipcMain.on('quit-and-install', () => {
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
 
-ipcMain.on('confirm-action', (event, args) => {
+ipcMain.on('confirm-action', (event:any, args) => {
   event.returnValue = askActionConfirmation(args);
 });
 
@@ -333,6 +353,8 @@ export const createWindow = (givenPath?: string) => {
   win.webContents.on('dom-ready', async () => {
     const dispatch = createDispatchForWindow(win);
 
+  Nucleus.appStarted();
+
     subscribeToStoreStateChanges(win.webContents, (storeState) => {
       createMenu(storeState, dispatch);
       setWindowTitle(storeState, win);
@@ -412,6 +434,7 @@ export const createWindow = (givenPath?: string) => {
   return win;
 };
 
+
 export const openApplication = async (givenPath?: string) => {
   await app.whenReady();
 
@@ -479,6 +502,14 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   const helmValuesMap = state.main.helmValuesMap;
   const helmChartMap = state.main.helmChartMap;
   const fileMap = state.main.fileMap;
+  disableTracking = state.config.disableEventTracking;
+  disableErrorReports = state.config.disableErrorReporting;
+
+  if (disableTracking) {
+    Nucleus.disableTracking();
+  } else {
+    Nucleus.enableTracking();
+  }
 
   let previewResource: K8sResource | undefined;
   let previewValuesFile: HelmValuesFile | undefined;

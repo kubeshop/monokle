@@ -18,6 +18,7 @@ import FileExplorer from '@components/atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFocus} from '@utils/hooks';
+import {trackEvent} from '@utils/telemetry';
 
 import Colors from '@styles/Colors';
 
@@ -104,6 +105,7 @@ const CreateProjectModal: React.FC = () => {
       setFormStep(FormSteps.STEP_TWO);
     }
     if (!uiState.fromTemplate && values.rootFolder && values.name) {
+      trackEvent('CREATE_EMPTY_PROJECT');
       dispatch(setCreateProject({...values}));
       closeModal();
     }

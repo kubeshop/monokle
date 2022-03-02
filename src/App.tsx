@@ -309,3 +309,12 @@ const App = () => {
 };
 
 export default App;
+
+export const ErrorFallback = ({error}: any) => {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+    </div>
+  );
+};

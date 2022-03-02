@@ -4,6 +4,8 @@ import {AnyAction} from '@reduxjs/toolkit';
 
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import _ from 'lodash';
+import {machineIdSync} from 'node-machine-id';
+import Nucleus from 'nucleus-nodejs';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
@@ -79,6 +81,14 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
   }
 };
 
+export const setDeviceID = (deviceID: string) => {
+  const ID: string = electronStore.get('main.deviceID');
+
+  if (!ID) {
+    electronStore.set('main.deviceID', deviceID);
+  }
+};
+
 export const getSerializedProcessEnv = () => {
   const serializedProcessEnv: Record<string, string> = {};
   const processEnv = _.isObject(PROCESS_ENV) ? PROCESS_ENV : _.isObject(process.env) ? process.env : {};
@@ -142,3 +152,28 @@ export function askActionConfirmation({
 
   return choice === 0;
 }
+
+export const initNucleus = (isDev: boolean, app: any) => {
+  Nucleus.init('6218cf3ef5e5d2023724d89b', {
+    disableInDev: false,
+    disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
+    disableErrorReports: true,
+    debug: false,
+  });
+
+  Nucleus.setUserId(machineIdSync());
+
+  Nucleus.setProps(
+    {
+      os: process.platform,
+      version: app.getVersion(),
+      language: app.getLocale(),
+    },
+    true
+  );
+
+  return {
+    disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
+    disableErrorReports: Boolean(electronStore.get('appConfig.disableErrorReporting')),
+  };
+};

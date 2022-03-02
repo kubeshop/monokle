@@ -14,6 +14,9 @@ const schema = {
           },
         },
       },
+      deviceID: {
+        type: 'string',
+      },
     },
   },
   appConfig: {
@@ -109,6 +112,12 @@ const schema = {
       },
       favoriteTemplates: {
         type: 'array',
+      },
+      disableEventTracking: {
+        type: 'boolean',
+      },
+      disableErrorReporting: {
+        type: 'boolean',
       },
     },
   },
