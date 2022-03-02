@@ -73,7 +73,7 @@ test('should create new resource', async () => {
   const fileName = 'test-cluster-role';
   await newResourceModal.createResource(fileName, kind);
 
-  expect(await editorPane.formTab.textContent()).toEqual(kind);
+  expect(await editorPane.formTab.textContent()).toEqual('Form');
 
   await editorPane.saveResource();
   await saveResourceModal.clickSave();
