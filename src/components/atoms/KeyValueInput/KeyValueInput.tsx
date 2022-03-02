@@ -32,7 +32,7 @@ function makeKeyValueDataFromEntries(keyValueEntries: KeyValueEntry[]): KeyValue
     if (!key || !value) {
       return;
     }
-    if (value === ANY_VALUE) {
+    if (value === ANY_VALUE || value === undefined) {
       keyValue[key] = null;
     } else {
       keyValue[key] = value;
@@ -87,6 +87,7 @@ function KeyValueInput(props: KeyValueInputProps) {
     };
     const newEntries = [...entries, newEntry];
     setEntries(newEntries);
+    updateKeyValue(newEntries);
   };
 
   const removeEntry = (entryId: string) => {
