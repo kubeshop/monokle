@@ -58,3 +58,5 @@ export const PluginDrawerTooltip = 'Open Plugins Manager';
 export const QuickFilterTooltip = `Filter results – Hint: quick-filter using ${KEY_CTRL_CMD} + P`;
 export const NewResourceTooltip = `Create new resource (${KEY_CTRL_CMD} + N)`;
 export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
+export const DisableEventTrackingTooltip = 'Disables collection of usage metrics';
+export const DisableErrorReportingTooltip = 'Disables collection of error reports';

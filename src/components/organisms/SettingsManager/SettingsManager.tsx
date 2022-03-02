@@ -4,10 +4,16 @@ import {useDebounce} from 'react-use';
 import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import {InfoCircleOutlined} from '@ant-design/icons';
+
 import _ from 'lodash';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION} from '@constants/constants';
-import {AutoLoadLastProjectTooltip} from '@constants/tooltips';
+import {
+  AutoLoadLastProjectTooltip,
+  DisableErrorReportingTooltip,
+  DisableEventTrackingTooltip,
+} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
 
@@ -154,8 +160,8 @@ const SettingsManager: React.FC = () => {
             form={settingsForm}
             initialValues={() => ({projectsRootPath})}
             autoComplete="off"
-            onFieldsChange={(field, allFields) => {
-              const rootPath = allFields.filter(f => _.includes(f.name.toString(), 'projectsRootPath'))[0].value;
+            onFieldsChange={(field: any, allFields: any) => {
+              const rootPath = allFields.filter((f: any) => _.includes(f.name.toString(), 'projectsRootPath'))[0].value;
               setCurrentProjectsRootPath(rootPath);
             }}
           >
@@ -196,16 +202,19 @@ const SettingsManager: React.FC = () => {
             </Checkbox>
           </S.Div>
           <S.Div>
-            <S.Span>Telemetry</S.Span>
+            <S.Span style={{display: 'inline-block', marginRight: '8px'}}>Telemetry</S.Span>
+            <Tooltip title="DOCUMENTATION URL">
+              <InfoCircleOutlined style={{display: 'inline-block'}} />
+            </Tooltip>
             <S.Div style={{marginBottom: '8px'}}>
-              <Tooltip title={AutoLoadLastProjectTooltip}>
+              <Tooltip title={DisableEventTrackingTooltip}>
                 <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
                   Disable Event Tracking
                 </Checkbox>
               </Tooltip>
             </S.Div>
             <S.Div>
-              <Tooltip title={AutoLoadLastProjectTooltip}>
+              <Tooltip title={DisableErrorReportingTooltip}>
                 <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
                   Disable Error Reports
                 </Checkbox>
