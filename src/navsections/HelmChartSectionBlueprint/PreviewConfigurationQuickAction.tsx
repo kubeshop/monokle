@@ -6,6 +6,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
+import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
@@ -21,6 +22,13 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
       : undefined
   );
 
+  const onClickRun = useCallback(() => {
+    if (!previewConfiguration) {
+      return;
+    }
+    dispatch(runPreviewConfiguration(previewConfiguration));
+  }, [dispatch, previewConfiguration]);
+
   const onClickEdit = useCallback(() => {
     if (!previewConfiguration || !helmChart) {
       return;
@@ -35,9 +43,14 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
   }
 
   return (
-    <Button onClick={() => onClickEdit()} type="link" size="small" style={{fontSize: 12}}>
-      Edit
-    </Button>
+    <>
+      <Button onClick={() => onClickRun()} type="link" size="small" style={{fontSize: 12}}>
+        Run
+      </Button>
+      <Button onClick={() => onClickEdit()} type="link" size="small" style={{fontSize: 12}}>
+        Edit
+      </Button>
+    </>
   );
 };
 

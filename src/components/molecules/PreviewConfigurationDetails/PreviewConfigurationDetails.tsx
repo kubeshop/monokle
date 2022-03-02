@@ -50,8 +50,8 @@ const PreviwConfigurationDetails: React.FC = () => {
       previewConfiguration.orderedValuesFilePaths,
       previewConfiguration.command,
       previewConfiguration.options,
-      currentContext,
-      rootFolderPath
+      rootFolderPath,
+      currentContext
     );
   }, [previewConfiguration, helmChart, currentContext, rootFolderPath]);
 
