@@ -113,6 +113,12 @@ const schema = {
       favoriteTemplates: {
         type: 'array',
       },
+      disableEventTracking: {
+        type: 'boolean',
+      },
+      disableErrorReporting: {
+        type: 'boolean',
+      },
     },
   },
   ui: {

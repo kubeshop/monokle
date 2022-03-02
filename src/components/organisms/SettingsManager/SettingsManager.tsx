@@ -17,6 +17,8 @@ import {
   changeProjectsRootPath,
   setKubeConfig,
   setScanExcludesStatus,
+  toggleErrorReporting,
+  toggleEventTracking,
   updateApplicationSettings,
   updateClusterSelectorVisibilty,
   updateFileIncludes,
@@ -47,6 +49,8 @@ const SettingsManager: React.FC = () => {
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
+  const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
+  const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
   const [activePanels, setActivePanels] = useState<number[]>([3]);
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
@@ -101,6 +105,14 @@ const SettingsManager: React.FC = () => {
 
   const handleChangeClusterSelectorVisibilty = (e: any) => {
     dispatch(updateClusterSelectorVisibilty(e.target.checked));
+  };
+
+  const handleToggleEventTracking = () => {
+    dispatch(toggleEventTracking());
+  };
+
+  const handleToggleErrorReporting = () => {
+    dispatch(toggleErrorReporting());
   };
 
   const onProjectNameChange = (projectName: string) => {
@@ -182,6 +194,23 @@ const SettingsManager: React.FC = () => {
             <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
               Show Cluster Selector
             </Checkbox>
+          </S.Div>
+          <S.Div>
+            <S.Span>Telemetry</S.Span>
+            <S.Div style={{marginBottom: '8px'}}>
+              <Tooltip title={AutoLoadLastProjectTooltip}>
+                <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
+                  Disable Event Tracking
+                </Checkbox>
+              </Tooltip>
+            </S.Div>
+            <S.Div>
+              <Tooltip title={AutoLoadLastProjectTooltip}>
+                <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
+                  Disable Error Reports
+                </Checkbox>
+              </Tooltip>
+            </S.Div>
           </S.Div>
         </Panel>
         <Panel header="Default Project Settings" key="2">

@@ -1,13 +1,8 @@
-import * as Mixpanel from 'mixpanel';
-import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
-
-const mixpanel = Mixpanel.init('51467136dd49f26dbd94427631cc843e');
-mixpanel.people.set(machineIdSync(), {
-  os: process.platform,
-});
+import {ipcRenderer} from 'electron';
 
 export const trackEvent = (eventName: string, payload?: any) => {
-  Nucleus.track(eventName, {...payload});
-  mixpanel.track(eventName, {...payload});
+  ipcRenderer.send('track-event', {eventName, payload});
+};
+export const trackError = (error: any) => {
+  ipcRenderer.send('track-event', {error});
 };
