@@ -63,8 +63,8 @@ export const Settings = ({
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const uiState = useAppSelector(state => state.ui);
-  const appConfig = useAppSelector(state => state.config);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const {isScanIncludesUpdated, isScanExcludesUpdated} = useAppSelector(state => state.config);
+  const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -208,8 +208,8 @@ export const Settings = ({
     if (fileInput.current?.files && fileInput.current.files.length > 0) {
       const file: any = fileInput.current.files[0];
       if (file.path) {
-        const filePath = file.path;
-        setCurrentKubeConfig(filePath);
+        const selectedFilePath = file.path;
+        setCurrentKubeConfig(selectedFilePath);
       }
     }
   };
@@ -346,10 +346,10 @@ export const Settings = ({
           onChange={onChangeFileIncludes}
           tooltip={AddInclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
-          showApplyButton={appConfig.isScanIncludesUpdated === 'outdated'}
+          showApplyButton={isScanIncludesUpdated === 'outdated'}
           onApplyClick={() => {
             dispatch(setScanIncludesStatus('applied'));
-            dispatch(setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath));
+            dispatch(setRootFolder(filePath));
           }}
         />
       </S.Div>
@@ -360,10 +360,10 @@ export const Settings = ({
           onChange={onChangeScanExcludes}
           tooltip={AddExclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
-          showApplyButton={appConfig.isScanExcludesUpdated === 'outdated'}
+          showApplyButton={isScanExcludesUpdated === 'outdated'}
           onApplyClick={() => {
             dispatch(setScanExcludesStatus('applied'));
-            dispatch(setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath));
+            dispatch(setRootFolder(filePath));
           }}
         />
       </S.Div>
