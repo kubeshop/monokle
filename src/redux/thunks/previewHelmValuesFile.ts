@@ -43,7 +43,7 @@ export const previewHelmValuesFile = createAsyncThunk<
     const folder = path.join(rootFolder, path.dirname(chart.filePath));
 
     // sanity check
-    if (fs.existsSync(folder) && fs.existsSync(path.join(folder, valuesFile.name))) {
+    if (fs.existsSync(folder) && fs.existsSync(path.join(rootFolder, valuesFile.filePath))) {
       log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
       const projectConfig = currentConfigSelector(thunkAPI.getState());
