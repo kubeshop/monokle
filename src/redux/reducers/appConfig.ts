@@ -2,7 +2,6 @@ import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/tool
 
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
-import log from 'loglevel';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
