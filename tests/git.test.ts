@@ -66,7 +66,7 @@ const testData = [
     fileExplorerCount: 53,
     kustomizeCount: 22,
     helmCount: 4,
-    navigatorCount: 55,
+    navigatorCount: 54,
   },
   {
     hash: removeSomeFiles,
@@ -87,7 +87,7 @@ const testData = [
     fileExplorerCount: 53,
     kustomizeCount: 22,
     helmCount: 4,
-    navigatorCount: 55,
+    navigatorCount: 54,
   },
 ];
 
@@ -119,8 +119,8 @@ test('all files should be loaded', async () => {
 });
 
 test.afterAll(async () => {
-  fs.rmSync(projectPath, { recursive: true, force: true });
   await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/final-screen.png`});
   await appWindow.context().close();
   await appWindow.close();
+  fs.rmSync(projectPath, { recursive: true, force: true });
 });
