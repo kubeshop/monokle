@@ -13,6 +13,7 @@ import {HelmValuesFile} from '@models/helm';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closePreviewConfigurationEditor} from '@redux/reducers/main';
+import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 import {KeyValueInput, OrderedList} from '@components/atoms';
 import {OrderedListItem} from '@components/atoms/OrderedList';
@@ -97,48 +98,58 @@ const PreviewConfigurationEditor = () => {
     [helmCommand]
   );
 
-  const onSave = useCallback(() => {
-    if (!helmChart) {
-      return;
-    }
-    const input: HelmPreviewConfiguration = {
-      id: previewConfiguration ? previewConfiguration.id : uuidv4(),
-      name,
-      helmChartFilePath: helmChart?.filePath,
-      command: helmCommand,
-      options: helmOptions,
-      orderedValuesFilePaths: valuesFileItems
-        .filter(i => i.isChecked)
-        .map(v => helmValuesMap[v.id])
-        .filter((v): v is HelmValuesFile => v !== undefined)
-        .map(v => v.filePath),
-    };
-    const updatedPreviewConfigurationMap = JSON.parse(JSON.stringify(previewConfigurationMap));
-    updatedPreviewConfigurationMap[input.id] = input;
-
-    dispatch(
-      updateProjectConfig({
-        config: {
-          helm: {
-            previewConfigurationMap: updatedPreviewConfigurationMap,
-          },
-        },
-        fromConfigFile: false,
-      })
-    );
-
+  const onClose = useCallback(() => {
     dispatch(closePreviewConfigurationEditor());
-  }, [
-    dispatch,
-    name,
-    helmCommand,
-    helmOptions,
-    previewConfigurationMap,
-    helmValuesMap,
-    previewConfiguration,
-    valuesFileItems,
-    helmChart,
-  ]);
+  }, [dispatch]);
+
+  const onSave = useCallback(
+    (shouldRunPreview?: boolean) => {
+      if (!helmChart) {
+        return;
+      }
+      const input: HelmPreviewConfiguration = {
+        id: previewConfiguration ? previewConfiguration.id : uuidv4(),
+        name,
+        helmChartFilePath: helmChart?.filePath,
+        command: helmCommand,
+        options: helmOptions,
+        orderedValuesFilePaths: valuesFileItems
+          .filter(i => i.isChecked)
+          .map(v => helmValuesMap[v.id])
+          .filter((v): v is HelmValuesFile => v !== undefined)
+          .map(v => v.filePath),
+      };
+      const updatedPreviewConfigurationMap = JSON.parse(JSON.stringify(previewConfigurationMap));
+      updatedPreviewConfigurationMap[input.id] = input;
+
+      dispatch(
+        updateProjectConfig({
+          config: {
+            helm: {
+              previewConfigurationMap: updatedPreviewConfigurationMap,
+            },
+          },
+          fromConfigFile: false,
+        })
+      );
+
+      dispatch(closePreviewConfigurationEditor());
+      if (shouldRunPreview) {
+        dispatch(runPreviewConfiguration(input));
+      }
+    },
+    [
+      dispatch,
+      name,
+      helmCommand,
+      helmOptions,
+      previewConfigurationMap,
+      helmValuesMap,
+      previewConfiguration,
+      valuesFileItems,
+      helmChart,
+    ]
+  );
 
   if (!helmChart) {
     return <p>Something went wrong, could not find the helm chart.</p>;
@@ -173,13 +184,13 @@ const PreviewConfigurationEditor = () => {
         />
       </S.Field>
       <S.ActionsContainer>
-        <Button type="primary" ghost>
+        <Button onClick={onClose} type="primary" ghost>
           Discard
         </Button>
         <Button onClick={() => onSave()} type="primary" ghost>
           Save
         </Button>
-        <Button onClick={() => onSave()} type="primary">
+        <Button onClick={() => onSave(true)} type="primary">
           Save and Preview
         </Button>
       </S.ActionsContainer>
