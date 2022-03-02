@@ -14,3 +14,4 @@ export {default as TitleBar} from './TitleBar';
 export {default as ValidationErrorsPopover} from './ValidationErrorsPopover';
 export {default as HelmChartModalConfirmWithNamespaceSelect} from './HelmChartModalConfirmWithNamespaceSelect';
 export {default as ModalConfirmWithNamespaceSelect} from './ModalConfirmWithNamespaceSelect';
+export {default as PreviewConfigurationDetails} from './PreviewConfigurationDetails';

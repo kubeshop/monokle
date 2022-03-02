@@ -115,6 +115,8 @@ interface AppState {
   selectedPath?: string;
   /** the currently selected values file */
   selectedValuesFileId?: string;
+  /** the currently selected preview configuration */
+  selectedPreviewConfigurationId?: string;
   /** the current type of preview */
   previewType?: PreviewType;
   /** information used to load the preview */

@@ -689,6 +689,12 @@ export const mainSlice = createSlice({
         updateSelectionHistory('path', Boolean(action.payload.isVirtualSelection), state);
       }
     },
+    selectPreviewConfiguration: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.selectedPreviewConfigurationId = action.payload;
+      state.selectedPath = undefined;
+      state.selectedResourceId = undefined;
+      state.selectedValuesFileId = undefined;
+    },
     setSelectingFile: (state: Draft<AppState>, action: PayloadAction<boolean>) => {
       state.isSelectingFile = action.payload;
     },
@@ -919,6 +925,7 @@ export const mainSlice = createSlice({
         state.selectedResourceId = action.payload.previewResourceId;
         state.selectedPath = undefined;
         state.selectedValuesFileId = undefined;
+        state.selectedPreviewConfigurationId = undefined;
         state.clusterDiff.shouldReload = true;
         state.checkedResourceIds = [];
       })
@@ -957,6 +964,7 @@ export const mainSlice = createSlice({
         state.selectedResourceId = undefined;
         state.selectedPath = undefined;
         state.selectedValuesFileId = undefined;
+        state.selectedPreviewConfigurationId = undefined;
         state.checkedResourceIds = [];
         Object.values(state.resourceMap).forEach(resource => {
           resource.isSelected = false;
@@ -1001,6 +1009,7 @@ export const mainSlice = createSlice({
       state.previewResourceId = undefined;
       state.previewType = undefined;
       state.previewValuesFileId = undefined;
+      state.selectedPreviewConfigurationId = undefined;
       state.previewLoader = {
         isLoading: false,
         targetResourceId: undefined,
@@ -1339,5 +1348,6 @@ export const {
   seenNotifications,
   openPreviewConfigurationEditor,
   closePreviewConfigurationEditor,
+  selectPreviewConfiguration,
 } = mainSlice.actions;
 export default mainSlice.reducer;

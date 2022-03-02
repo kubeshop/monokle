@@ -766,5 +766,6 @@ export function selectFilePath(filePath: string, state: AppState) {
   }
 
   state.selectedResourceId = undefined;
+  state.selectedPreviewConfigurationId = undefined;
   state.selectedPath = filePath;
 }

@@ -5,7 +5,7 @@ import {HelmValuesMapType} from '@models/appstate';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
 
-import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
+import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
 
 import Colors from '@styles/Colors';
 
@@ -77,6 +77,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
             },
             itemPrefixIcon: 'preview',
           };
+        },
+      },
+      instanceHandler: {
+        onClick: (itemInstance, dispatch) => {
+          dispatch(selectPreviewConfiguration(itemInstance.id));
         },
       },
       customization: {
