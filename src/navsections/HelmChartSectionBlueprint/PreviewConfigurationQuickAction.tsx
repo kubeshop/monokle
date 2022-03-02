@@ -1,12 +1,22 @@
 import {useCallback} from 'react';
 
-import {Button} from 'antd';
+import styled from 'styled-components';
 
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
+
+import Colors from '@styles/Colors';
+
+const StyledButton = styled.span<{isItemSelected: boolean}>`
+  margin-right: 15px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)};
+`;
 
 const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
@@ -44,12 +54,12 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
 
   return (
     <>
-      <Button onClick={() => onClickRun()} type="link" size="small" style={{fontSize: 12}}>
+      <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickRun()}>
         Run
-      </Button>
-      <Button onClick={() => onClickEdit()} type="link" size="small" style={{fontSize: 12}}>
+      </StyledButton>
+      <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickEdit()}>
         Edit
-      </Button>
+      </StyledButton>
     </>
   );
 };

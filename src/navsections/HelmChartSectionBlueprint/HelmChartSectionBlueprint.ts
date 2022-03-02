@@ -33,6 +33,7 @@ type HelmChartScopeType = {
 
 type PreviewConfigurationScopeType = {
   previewConfigurationMap: Record<string, HelmPreviewConfiguration> | undefined;
+  selectedPreviewConfigurationId: string | undefined;
   [currentHelmChart: string]: HelmChart | unknown;
 };
 
@@ -48,6 +49,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     getScope: state => {
       return {
         previewConfigurationMap: state.config.projectConfig?.helm?.previewConfigurationMap,
+        selectedPreviewConfigurationId: state.main.selectedPreviewConfigurationId,
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
@@ -77,6 +79,9 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
             },
             itemPrefixIcon: 'preview',
           };
+        },
+        isSelected: (item, scope) => {
+          return item.id === scope.selectedPreviewConfigurationId;
         },
       },
       instanceHandler: {
