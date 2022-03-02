@@ -279,7 +279,7 @@ const ResourceFilter = () => {
         <KeyValueInput
           label="Labels:"
           schema={allLabelsSchema}
-          data={allLabelsData}
+          availableValuesByKey={allLabelsData}
           value={labels}
           onChange={updateLabels}
           disabled={areFiltersDisabled}
@@ -291,7 +291,7 @@ const ResourceFilter = () => {
           disabled={areFiltersDisabled}
           label="Annotations:"
           schema={allAnnotationsSchema}
-          data={allAnnotationsData}
+          availableValuesByKey={allAnnotationsData}
           value={annotations}
           onChange={updateAnnotations}
         />

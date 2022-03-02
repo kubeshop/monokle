@@ -62,7 +62,7 @@ const PreviewConfigurationEditor = () => {
 
   const [valuesFileItems, setValuesFileItems] = useState<OrderedListItem[]>(() => {
     if (!previewConfiguration?.orderedValuesFilePaths) {
-      return [];
+      return Object.values(valuesFilesByPath).map(vf => ({id: vf.id, text: vf.name, isChecked: false}));
     }
     return previewConfiguration.orderedValuesFilePaths
       .map(filePath => valuesFilesByPath[filePath])
@@ -70,13 +70,13 @@ const PreviewConfigurationEditor = () => {
       .map(vf => ({id: vf.id, text: vf.name, isChecked: true}))
       .concat(
         Object.values(valuesFilesByPath)
-          .filter(vf => previewConfiguration.orderedValuesFilePaths.includes(vf.filePath))
+          .filter(vf => !previewConfiguration.orderedValuesFilePaths.includes(vf.filePath))
           .map(vf => ({id: vf.id, text: vf.name, isChecked: false}))
       );
   });
-  const [helmOptions, setHelmOptions] = useState<Record<string, string | null>>(() => {
-    return previewConfiguration?.options || {};
-  });
+
+  const [helmOptions, setHelmOptions] = useState<Record<string, string | null>>(previewConfiguration?.options || {});
+
   const [helmCommand, setHelmCommand] = useState<'template' | 'install'>(() => {
     if (previewConfiguration) {
       return previewConfiguration.command;
@@ -108,6 +108,7 @@ const PreviewConfigurationEditor = () => {
       command: helmCommand,
       options: helmOptions,
       orderedValuesFilePaths: valuesFileItems
+        .filter(i => i.isChecked)
         .map(v => helmValuesMap[v.id])
         .filter((v): v is HelmValuesFile => v !== undefined)
         .map(v => v.filePath),
@@ -166,7 +167,7 @@ const PreviewConfigurationEditor = () => {
           label="Specify options:"
           value={helmOptions}
           schema={keyValueInputSchema}
-          data={{}}
+          availableValuesByKey={{}}
           docsUrl={helmOptionsDocsUrl}
           onChange={setHelmOptions}
         />

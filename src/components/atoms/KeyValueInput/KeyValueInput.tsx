@@ -20,7 +20,7 @@ type KeyValueInputProps = {
   label: string;
   labelStyle?: React.CSSProperties;
   schema: Record<string, string>;
-  data: Record<string, string[]>;
+  availableValuesByKey: Record<string, string[]>;
   value: KeyValueData;
   docsUrl?: string;
   onChange: (keyValueData: KeyValueData) => void;
@@ -29,7 +29,7 @@ type KeyValueInputProps = {
 function makeKeyValueDataFromEntries(keyValueEntries: KeyValueEntry[]): KeyValueData {
   const keyValue: KeyValueData = {};
   keyValueEntries.forEach(({key, value}) => {
-    if (!key || !value) {
+    if (!key) {
       return;
     }
     if (value === ANY_VALUE || value === undefined) {
@@ -41,39 +41,58 @@ function makeKeyValueDataFromEntries(keyValueEntries: KeyValueEntry[]): KeyValue
   return keyValue;
 }
 
+function createEntriesFromParentKeyValueData(
+  parentKeyValueData: KeyValueData,
+  availableValuesByKey: Record<string, string[]>
+): KeyValueEntry[] {
+  const newEntries: KeyValueEntry[] = [];
+  Object.entries(parentKeyValueData).forEach(([key, value]) => {
+    if (newEntries.some(e => e.key === key)) {
+      return;
+    }
+
+    const availableValues: string[] | undefined = availableValuesByKey[key];
+
+    if (value === null) {
+      newEntries.push({
+        id: uuidv4(),
+        key,
+        value: availableValues?.length ? ANY_VALUE : undefined,
+      });
+    } else {
+      newEntries.push({
+        id: uuidv4(),
+        key,
+        value,
+      });
+    }
+  });
+  return newEntries;
+}
+
 function KeyValueInput(props: KeyValueInputProps) {
-  const {disabled = false, label, labelStyle, data, value: parentKeyValueData, schema, docsUrl, onChange} = props;
-  const [entries, setEntries] = useState<KeyValueEntry[]>([]);
+  const {
+    disabled = false,
+    label,
+    labelStyle,
+    availableValuesByKey,
+    value: parentKeyValueData,
+    schema,
+    docsUrl,
+    onChange,
+  } = props;
   const [currentKeyValueData, setCurrentKeyValueData] = useState<KeyValueData>(parentKeyValueData);
+  const [entries, setEntries] = useState<KeyValueEntry[]>(
+    createEntriesFromParentKeyValueData(parentKeyValueData, availableValuesByKey)
+  );
 
   useEffect(() => {
     if (!isDeepEqual(parentKeyValueData, currentKeyValueData)) {
       setCurrentKeyValueData(parentKeyValueData);
-      const newEntries: KeyValueEntry[] = [];
-      Object.entries(parentKeyValueData).forEach(([key, value]) => {
-        if (newEntries.some(e => e.key === key)) {
-          return;
-        }
-
-        const availableValues: string[] | undefined = data[key];
-
-        if (value === null) {
-          newEntries.push({
-            id: uuidv4(),
-            key,
-            value: availableValues?.length ? ANY_VALUE : undefined,
-          });
-        } else {
-          newEntries.push({
-            id: uuidv4(),
-            key,
-            value,
-          });
-        }
-      });
+      const newEntries = createEntriesFromParentKeyValueData(parentKeyValueData, availableValuesByKey);
       setEntries(newEntries);
     }
-  }, [parentKeyValueData, currentKeyValueData, data]); // do we need "data" as dep?
+  }, [parentKeyValueData, currentKeyValueData, availableValuesByKey]);
 
   const updateKeyValue = (newEntries: KeyValueEntry[]) => {
     const newKeyValueData = makeKeyValueDataFromEntries(newEntries);
@@ -100,7 +119,7 @@ function KeyValueInput(props: KeyValueInputProps) {
     const newEntries = Array.from(entries);
     const entryIndex = newEntries.findIndex(e => e.id === entryId);
 
-    const availableValues: string[] | undefined = data[key];
+    const availableValues: string[] | undefined = availableValuesByKey[key];
 
     newEntries[entryIndex] = {
       id: entryId,
@@ -131,12 +150,12 @@ function KeyValueInput(props: KeyValueInputProps) {
 
   const getEntryAvailableValues = useCallback(
     (entry: KeyValueEntry) => {
-      if (entry.key && data[entry.key]) {
-        return data[entry.key];
+      if (entry.key && availableValuesByKey[entry.key]) {
+        return availableValuesByKey[entry.key];
       }
       return undefined;
     },
-    [data]
+    [availableValuesByKey]
   );
 
   return (
