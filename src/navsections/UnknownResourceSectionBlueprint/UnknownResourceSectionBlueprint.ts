@@ -1,16 +1,12 @@
-import {PREVIEW_PREFIX} from '@constants/constants';
-
-import {ResourceFilterType, ResourceMapType} from '@models/appstate';
+import {ResourceFilterType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 import {SectionBlueprint} from '@models/navigator';
 
 import {selectK8sResource} from '@redux/reducers/main';
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {unknownResourcesSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
-
-import {getResourceKindHandler} from '@src/kindhandlers';
 
 import ResourceKindContextMenu from '../K8sResourceSectionBlueprint/ResourceKindContextMenu';
 import ResourceKindPrefix from '../K8sResourceSectionBlueprint/ResourceKindPrefix';
@@ -18,11 +14,8 @@ import ResourceKindSuffix from '../K8sResourceSectionBlueprint/ResourceKindSuffi
 import sectionBlueprintMap from '../sectionBlueprintMap';
 
 export type UnknownResourceScopeType = {
-  resourceMap: ResourceMapType;
+  unknownResources: K8sResource[];
   resourceFilter: ResourceFilterType;
-  selectedPath?: string;
-  selectedResourceId?: string;
-  isInPreviewMode: boolean;
   isPreviewLoading: boolean;
   isFolderLoading: boolean;
 };
@@ -36,33 +29,16 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
   rootSectionId: UNKNOWN_RESOURCE_SECTION_NAME,
   getScope: state => {
     return {
-      resourceMap: state.main.resourceMap,
+      unknownResources: unknownResourcesSelector(state),
       resourceFilter: state.main.resourceFilter,
-      selectedPath: state.main.selectedPath,
-      selectedResourceId: state.main.selectedResourceId,
-      isInPreviewMode: Boolean(state.main.previewResourceId) || Boolean(state.main.previewValuesFileId),
       isPreviewLoading: state.main.previewLoader.isLoading,
       isFolderLoading: state.ui.isFolderLoading,
     };
   },
   builder: {
-    getRawItems: scope => {
-      return Object.values(scope.resourceMap).filter(
-        resource =>
-          !isKustomizationResource(resource) &&
-          !getResourceKindHandler(resource.kind) &&
-          (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
-      );
-    },
+    getRawItems: scope => scope.unknownResources,
     getGroups: scope => {
-      const unknownResources = Object.values(scope.resourceMap).filter(
-        resource =>
-          !isKustomizationResource(resource) &&
-          !getResourceKindHandler(resource.kind) &&
-          !resource.name.startsWith('Patch:') &&
-          (scope.isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
-      );
-      const unknownResourcesByKind: Record<string, K8sResource[]> = unknownResources.reduce<
+      const unknownResourcesByKind: Record<string, K8sResource[]> = scope.unknownResources.reduce<
         Record<string, K8sResource[]>
       >((acc, resource) => {
         if (acc[resource.kind]) {

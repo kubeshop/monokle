@@ -1,4 +1,4 @@
-import {PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
 import {ResourceFilterType} from '@models/appstate';
@@ -7,6 +7,7 @@ import {SectionBlueprint} from '@models/navigator';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 
 import {checkMultipleResourceIds, uncheckMultipleResourceIds} from '@redux/reducers/main';
+import {activeResourcesSelector} from '@redux/selectors';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -45,11 +46,7 @@ const makeSubsection = (subsectionName: string, childSectionIds?: string[]) => {
     childSectionIds,
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
-      const activeResources = Object.values(state.main.resourceMap).filter(
-        r =>
-          (state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
-          r.filePath.startsWith(PREVIEW_PREFIX)
-      );
+      const activeResources = activeResourcesSelector(state);
       return {activeResourcesLength: activeResources.length, checkedResourceIds: state.main.checkedResourceIds};
     },
     builder: {
@@ -110,11 +107,7 @@ const K8sResourceSectionBlueprint: SectionBlueprint<K8sResource, K8sResourceScop
       isFolderLoading: state.ui.isFolderLoading,
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
       isPreviewLoading: state.main.previewLoader.isLoading,
-      activeResources: Object.values(state.main.resourceMap).filter(
-        r =>
-          (state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
-          r.filePath.startsWith(PREVIEW_PREFIX)
-      ),
+      activeResources: activeResourcesSelector(state),
       resourceFilter: state.main.resourceFilter,
       checkedResourceIds: state.main.checkedResourceIds,
     };
