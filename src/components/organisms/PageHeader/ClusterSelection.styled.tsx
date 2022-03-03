@@ -1,4 +1,4 @@
-import {Button as RawButton, Divider as RawDivider} from 'antd';
+import {Button as RawButton, Divider as RawDivider, Table as RawTable} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
 
@@ -9,6 +9,7 @@ import {
   CheckCircleOutlined as RawCheckCircleOutlined,
   ExclamationCircleOutlined as RawExclamationCircleOutlined
 } from '@ant-design/icons/lib/icons';
+import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 export const Button = styled(RawButton)`
   padding: 0;
@@ -127,4 +128,11 @@ export const CheckCircleOutlined = styled(RawCheckCircleOutlined)`
 export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutlined)`
   color: ${Colors.yellowWarning};
   font-size: 13px;
+`;
+
+export const Table = styled(props => <RawTable {...props} />)`
+  width: 800px;
+  border-top: 1px solid ${Colors.grey3};
+  padding-top: 18px;
+  ${GlobalScrollbarStyle}
 `;

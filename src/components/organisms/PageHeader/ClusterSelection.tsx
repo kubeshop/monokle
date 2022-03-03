@@ -1,9 +1,11 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Dropdown, Tooltip} from 'antd';
+import {Dropdown, Tooltip, Form} from 'antd';
+import log from 'loglevel';
 
 import {LoadingOutlined} from '@ant-design/icons';
+import Column from 'antd/lib/table/Column';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterModeTooltip} from '@constants/tooltips';
@@ -11,7 +13,6 @@ import {ClusterModeTooltip} from '@constants/tooltips';
 import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
 import {addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
-import FilePatternList from '@molecules/FilePatternList';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setCurrentContext, updateProjectConfig, updateProjectKubeAccess} from '@redux/reducers/appConfig';
@@ -28,6 +29,13 @@ import {
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
 import * as S from './ClusterSelection.styled';
+
+interface ClusterTableRow {
+  name: string;
+  namespaces: string[];
+  hasFullAccess: boolean;
+  editable: boolean;
+}
 
 const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) => {
   const dispatch = useAppDispatch();
@@ -59,17 +67,24 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     dropdownButtonRef.current?.blur();
   });
 
-  const handleClusterChange = ({key}: {key: string}) => {
+  const handleClusterChange = (clusterName: string) => {
     setIsClusterDropdownOpen(false);
-    if (key !== kubeConfigContext) {
-      dispatch(setCurrentContext(key));
-      dispatch(
-        updateProjectConfig({
-          config: {...projectConfig, kubeConfig: {...projectConfig?.kubeConfig, currentContext: key}},
-          fromConfigFile: false,
-        })
-      );
+    if (clusterName === kubeConfigContext) {
+      return;
     }
+    dispatch(setCurrentContext(clusterName));
+    dispatch(
+      updateProjectConfig({
+        config: {
+          ...projectConfig,
+          kubeConfig: {
+            ...projectConfig?.kubeConfig,
+            currentContext: clusterName,
+          },
+        },
+        fromConfigFile: false,
+      })
+    );
   };
 
   const handleClusterConfigure = () => {
@@ -138,6 +153,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
   const onClusterChange = (clusterName: string, namespaces: string[]) => {
+    setIsClusterDropdownOpen(false);
     const otherClusterNamespaces = appNamespaces.filter((appNs) => appNs.clusterName !== clusterName);
     const existingClusterNamespaces = namespaces.map((ns) => ({
       namespaceName: ns,
@@ -152,36 +168,143 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     }
   };
 
-  const clusterMenu = () => {
-    const data: any = kubeConfigContexts.map((context) => {
-      const contextNamespaces = appNamespaces.filter((appNs) => appNs.clusterName === context.name);
-      return {
-        namespaces: contextNamespaces.map((ctxNs) => ctxNs.namespaceName),
-        name: context.name,
-      };
-    });
+  const clusterNamespaceRender = (namespaces: string[]) => {
+    log.info('ms', namespaces);
+    const namespacesTooltip = namespaces.map((ns) => (<span key={ns}>{ns}</span>));
     return (
-      <S.ClusterDropdownContainer>
-        {
-          data.map((x: any) => {
-            return (
-              <div key={x.name}>
-                <S.ClusterDropdownClusterName
-                  onClick={() => handleClusterChange({key: x.name})}
-                >Cluster: {x.name}</S.ClusterDropdownClusterName>
-                <span>Namespaces:</span>
-                <FilePatternList
-                  value={x.namespaces}
-                  onChange={(namespaces) => onClusterChange(x.name, namespaces)}
-                  tooltip="Add new namespace"
-                  addButtonLabel="Add namespace"
-                />
-              </div>
-            );
-          })
-        }
-      </S.ClusterDropdownContainer>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={<div>{namespacesTooltip}</div>}>
+        <S.ClusterAccessContainer>{namespaces.length}</S.ClusterAccessContainer>
+      </Tooltip>
     );
+  };
+
+  const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map((context) => {
+    const contextNamespaces = appNamespaces.filter((appNs) => appNs.clusterName === context.name);
+    return {
+      namespaces: contextNamespaces.map((ctxNs) => ctxNs.namespaceName),
+      name: context.name,
+      hasFullAccess: true,
+      editable: true,
+    };
+  });
+
+  const [form] = Form.useForm();
+  const [data, setData] = useState(clusterTableRows);
+  const [editingKey, setEditingKey] = useState('');
+  const isEditing = (record: ClusterTableRow) => record.name === editingKey;
+
+  const edit = (record: Partial<ClusterTableRow>) => {
+    form.setFieldsValue({ name: '', namespaces: [], hasFullAccess: false, ...record });
+    setEditingKey(record.name as string);
+  };
+
+  const cancel = () => {
+    setEditingKey('');
+  };
+
+  const save = async (clusterName: string) => {
+    try {
+      const row = (await form.validateFields()) as ClusterTableRow;
+
+      const newData = [...data];
+      const index = newData.findIndex(item => clusterName === item.name);
+      if (index > -1) {
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });
+        setData(newData);
+        setEditingKey('');
+      }
+    } catch (errInfo) {
+      log.error('Validate Failed:', errInfo);
+    }
+  };
+
+  const clusterMenu = () => {
+
+
+    return (
+      <Form form={form} component={false}>
+        <S.Table
+          size="small"
+          showSorterTooltip={false}
+          dataSource={clusterTableRows}
+          pagination={false}
+          scroll={{y: 300}}
+          rowKey="name"
+          onRow={(cluster: ClusterTableRow) => ({
+            onClick: () => handleClusterChange(cluster.name),
+          })}
+        >
+          <Column
+            className="cluster-table-column-name"
+            title="Cluster name"
+            dataIndex="name"
+            key="name"
+            ellipsis
+            width={350}
+          />
+          <Column
+            className="cluster-table-column-namespaces"
+            title="Namespaces"
+            dataIndex="namespaces"
+            key="namespaces"
+            ellipsis
+            render={(value: string[]) => (value ? clusterNamespaceRender(value) : '-')}
+            width={100}
+          />
+          <Column
+            className="cluster-table-column-access"
+            title="Access"
+            dataIndex="hasFullAccess"
+            key="hasFullAccess"
+            render={(value: boolean) => (value ? 'Full Access' : 'Restricted Access')}
+            ellipsis
+            width={100}
+          />
+          <Column
+            className="cluster-table-column-actions"
+            ellipsis
+            width={100}
+            render={(_: any, record: ClusterTableRow) => {
+              const editing = isEditing(record);
+              if (editing) {
+                return (
+                  <span onClick={() => save(record.name)}>save</span>
+                );
+              }
+              return (
+                <span onClick={() => edit(record)}>edit</span>
+              );
+            }}
+          />
+        </S.Table>
+      </Form>
+    );
+    // return (
+    //   <S.ClusterDropdownContainer>
+    //     {
+    //       data.map((x: any) => {
+    //         return (
+    //           <div key={x.name}>
+    //             <S.ClusterDropdownClusterName
+    //               onClick={() => handleClusterChange({key: x.name})}
+    //             >Cluster: {x.name}</S.ClusterDropdownClusterName>
+    //             <span>Namespaces:</span>
+    //             <FilePatternList
+    //               value={x.namespaces}
+    //               onChange={(namespaces) => onClusterChange(x.name, namespaces)}
+    //               tooltip="Add new namespace"
+    //               addButtonLabel="Add namespace"
+    //             />
+    //           </div>
+    //         );
+    //       })
+    //     }
+    //   </S.ClusterDropdownContainer>
+    // );
   };
 
   if (!isClusterSelectorVisible) {
