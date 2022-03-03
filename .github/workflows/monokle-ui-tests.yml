@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fix-nightly-test
+      - main
 
   workflow_dispatch:
 
@@ -83,6 +84,13 @@ jobs:
         with:
           name: playwright-output
           path: test-output/**
+
+      - name: Notify slack failure
+        env:
+          TEST_UI_AUTOMATION_WEBHOOK: ${{ secrets.TEST_UI_AUTOMATION_WEBHOOK }}
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Automation tests failed on mac"}' $TEST_UI_AUTOMATION_WEBHOOK
 
   ui-tests-windows:
     runs-on: windows-latest
@@ -164,3 +172,10 @@ jobs:
         with:
           name: playwright-output
           path: test-output/**
+
+      - name: Notify slack failure
+        env:
+          TEST_UI_AUTOMATION_WEBHOOK: ${{ secrets.TEST_UI_AUTOMATION_WEBHOOK }}
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Automation tests failed on windows"}' $TEST_UI_AUTOMATION_WEBHOOK
