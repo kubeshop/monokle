@@ -35,11 +35,11 @@ Monokle uses Helm, Kubectl and Kustomize for corresponding preview functionality
 
 Check out one of our tutorials to get started:
 
-- [How to work with Manifests](tutorials/how-to-navigate-and-edit-manifests.md) to get you started with basic concepts.
+- [How to Work with Manifests](tutorials/how-to-navigate-and-edit-manifests.md) to get you started with basic concepts.
 - [How to Browse Clusters](tutorials/how-to-browse-clusters.md) to help you interact with your cluster(s).
 - [How to Configure Monokle](tutorials/how-to-configure-monokle.md) to see how you can set up Monokle to your needs.
 - [How to Fix Broken Links](tutorials/how-to-fix-broken-links.md) to give you an idea of how Monokle can be used for resource validation and correction.
-- [How to work with ConfigMaps](tutorials/how-to-create-and-edit-configmap.md) to see how the Form editor for ConfigMaps helps you edit resources without having to write any YAML.
+- [How to Work with ConfigMaps](tutorials/how-to-create-and-edit-configmap.md) to see how the Form editor for ConfigMaps helps you edit resources without having to write any YAML.
 
 
 ## **Get in Touch!**

@@ -102,6 +102,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     if (isStartProjectPaneVisible) {
       dispatch(toggleStartProjectPane());
     }
+
     if (isInClusterMode) {
       reconnectToCluster();
     } else {

@@ -27,7 +27,7 @@ nav:
     - Validating Resources: resource-validation.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
-  - Working with Resources:
+  - Working with Clusters: 
     - Cluster Integration: cluster-integration.md
     - Cluster Compare: cluster-compare.md
   - Deploy/Diff: apply-and-diff.md

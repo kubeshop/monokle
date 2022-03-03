@@ -114,6 +114,9 @@ interface AppConfig {
   isProjectLoading?: boolean;
   projectsRootPath: string;
   k8sVersion: string;
+  favoriteTemplates: string[];
+  disableEventTracking: boolean;
+  disableErrorReporting: boolean;
 }
 
 export type {AppConfig};

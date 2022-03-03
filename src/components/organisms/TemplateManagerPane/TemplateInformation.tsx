@@ -8,6 +8,9 @@ import _ from 'lodash';
 
 import {AnyTemplate} from '@models/template';
 
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {handleFavoriteTemplate} from '@redux/reducers/appConfig';
+
 import {Icon} from '@components/atoms';
 
 import TemplateIcon from '@assets/TemplateIcon.svg';
@@ -22,7 +25,12 @@ interface IProps {
 
 const TemplateInformation: React.FC<IProps> = props => {
   const {template, onClickOpenTemplate, disabled} = props;
+  const dispatch = useAppDispatch();
+  const favoriteTemplates = useAppSelector(state => state.config.favoriteTemplates);
 
+  const onClickPinTemplate = () => {
+    dispatch(handleFavoriteTemplate(template.id));
+  };
   return (
     <S.Container>
       <S.Image src={template.icon ? template.icon : TemplateIcon} alt="Template_Icon" />
@@ -35,6 +43,15 @@ const TemplateInformation: React.FC<IProps> = props => {
               <Icon name="helm" />
             </Tooltip>
           )}
+            {favoriteTemplates.includes(template.id) ? (
+              <S.UnPinTemplateButton onClick={onClickPinTemplate}>
+                <DeliveredProcedureOutlined />
+              </S.UnPinTemplateButton>
+            ) : (
+              <S.PinTemplateButton onClick={onClickPinTemplate}>
+                <Icon name="helm" />
+              </S.PinTemplateButton>
+            )}
         </S.NameContainer>
         <S.Description>{_.truncate(template.description, {length: 140})}</S.Description>
 

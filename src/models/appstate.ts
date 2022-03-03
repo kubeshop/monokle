@@ -155,6 +155,7 @@ interface AppState {
     helmChartId?: string;
     previewConfigurationId?: string;
   };
+  deviceID: string;
 }
 
 export type {
