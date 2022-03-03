@@ -54,7 +54,13 @@ jobs:
 
       - name: Test
         run: |
-          npm run test
+          npm run test11
+      - name: Notify slack failure
+        env:
+          TEST_UI_AUTOMATION_WEBHOOK: ${{ secrets.TEST_UI_AUTOMATION_WEBHOOK }}
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' $TEST_UI_AUTOMATION_WEBHOOK
 
   tests-windows:
     runs-on: windows-latest
