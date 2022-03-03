@@ -1,4 +1,3 @@
-import {spawn} from 'child_process';
 import log from 'loglevel';
 import path from 'path';
 
@@ -11,8 +10,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
-import {PROCESS_ENV} from '@utils/env';
-import {getShellPath} from '@utils/shell';
+import {runHelmInMainThread} from '@utils/helm';
 
 /**
  * Invokes helm install for the specified helm chart and values file
@@ -30,6 +28,7 @@ function applyHelmChartToCluster(
   const chartPath = path.dirname(getAbsoluteHelmChartPath(helmChart, fileMap));
 
   let helmArgs = [
+    'helm',
     'install',
     '-f',
     getAbsoluteValuesFilePath(valuesFile, fileMap),
@@ -47,16 +46,10 @@ function applyHelmChartToCluster(
     }
   }
 
-  const child = spawn('helm', helmArgs, {
-    env: {
-      NODE_ENV: PROCESS_ENV.NODE_ENV,
-      PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-      PATH: getShellPath(),
-      KUBECONFIG: kubeconfig,
-    },
+  return runHelmInMainThread({
+    helmCommand: helmArgs.join(' '),
+    kubeconfig,
   });
-
-  return child;
 }
 
 /**
@@ -79,7 +72,7 @@ export async function applyHelmChart(
     dispatch(setApplyingResource(true));
 
     try {
-      const child = applyHelmChartToCluster(
+      const result = await applyHelmChartToCluster(
         valuesFile,
         helmChart,
         fileMap,
@@ -89,30 +82,27 @@ export async function applyHelmChart(
         shouldCreateNamespace
       );
 
-      child.on('exit', (code, signal) => {
-        log.info(`Helm exited with code ${code} and signal ${signal}`);
-        dispatch(setApplyingResource(false));
-      });
+      if (result.exitCode && result.exitCode !== 0) {
+        log.info(`Helm exited with code ${result.exitCode} and signal ${result.signal}`);
+      }
 
-      child.stdout.on('data', data => {
+      if (result.stdout) {
         const alert: AlertType = {
           type: AlertEnum.Success,
           title: `Installing Helm Chart ${helmChart.name} in cluster ${context} completed`,
-          message: data.toString(),
+          message: result.stdout,
         };
         dispatch(setAlert(alert));
         dispatch(setApplyingResource(false));
-      });
-
-      child.stderr.on('data', data => {
+      } else if (result.stderr) {
         const alert: AlertType = {
           type: AlertEnum.Error,
           title: `Installing Helm Chart ${helmChart.name} in cluster ${context} failed`,
-          message: data.toString(),
+          message: result.stderr,
         };
         dispatch(setAlert(alert));
         dispatch(setApplyingResource(false));
-      });
+      }
     } catch (e) {
       if (e instanceof Error) {
         log.error(e.message);

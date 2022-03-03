@@ -27,7 +27,6 @@ import {
   ROOT_FILE_ENTRY,
 } from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
-import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
 import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
@@ -35,7 +34,6 @@ import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
-import {PROCESS_ENV} from '@utils/env';
 import asyncLib from "async";
 
 import {createMenu, getDockMenu} from './menu';
@@ -47,7 +45,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {
   checkNewVersion,
   interpolateTemplate,
-  runHelm,
+  runHelm, runKubectl,
   runKustomize,
   saveFileDialog,
   selectFileDialog,
@@ -64,15 +62,22 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
+import {
+  askActionConfirmation,
+  checkMissingDependencies,
+  convertRecentFilesToRecentProjects,
+  getSerializedProcessEnv,
+  saveInitialK8sSchema,
+  setProjectsRootFolder,
+} from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
+import {KubectlOptions} from '@utils/kubectl';
 
 Object.assign(console, ElectronLog.functions);
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
-
-const isDev = PROCESS_ENV.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
@@ -230,6 +235,10 @@ ipcMain.handle('save-file', async (event, options: FileOptions) => {
 
 ipcMain.on('run-helm', (event, args: any) => {
   runHelm(args, event);
+});
+
+ipcMain.on('run-kubectl', (event, args: KubectlOptions) => {
+  runKubectl(args, event);
 });
 
 ipcMain.on('app-version', event => {

@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
@@ -17,7 +17,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -93,7 +93,7 @@ const ResourceDiff = (props: {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
@@ -161,18 +161,21 @@ const ResourceDiff = (props: {
     );
   };
 
-  const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
-    if (onApply) {
-      onApply();
-    }
+  const onClickApplyResource = useCallback(
+    (namespace?: {name: string; new: boolean}) => {
+      if (onApply) {
+        onApply();
+      }
 
-    applyResource(localResource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
-      isClusterPreview: previewType === 'cluster',
-      shouldPerformDiff: true,
-      isInClusterDiff,
-    });
-    setIsApplyModalVisible(false);
-  };
+      applyResource(localResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
+        isClusterPreview: previewType === 'cluster',
+        shouldPerformDiff: true,
+        isInClusterDiff,
+      });
+      setIsApplyModalVisible(false);
+    },
+    [resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, isInClusterDiff, localResource]
+  );
 
   return (
     <>

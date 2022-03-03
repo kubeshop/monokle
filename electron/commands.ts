@@ -1,6 +1,6 @@
 import {BrowserWindow, dialog} from 'electron';
 
-import {execSync} from 'child_process';
+import {exec, execSync, spawn} from 'child_process';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 
@@ -12,7 +12,9 @@ import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {PROCESS_ENV} from '@utils/env';
+import {HelmCommand} from '@utils/helm';
+import {KubectlOptions, SpawnResult} from '@utils/kubectl';
+import {ensureMainThread} from '@utils/thread';
 
 import autoUpdater from './auto-update';
 
@@ -21,25 +23,65 @@ import autoUpdater from './auto-update';
  */
 
 export const runKustomize = (options: KustomizeCommandOptions, event: Electron.IpcMainEvent) => {
+  ensureMainThread();
+
+  const result: SpawnResult = {exitCode: null, signal: null};
+
   try {
-    let cmd = options.kustomizeCommand === 'kubectl' ? 'kubectl kustomize ' : 'kustomize build ';
-    if (options.enableHelm) {
-      cmd += '--enable-helm ';
+    if (options.applyArgs) {
+      const args = options.applyArgs;
+
+      if (options.kustomizeCommand === 'kubectl') {
+        args.push(...['apply', '-k', `"${options.folder}"`]);
+      } else {
+        if (options.enableHelm) {
+          args.splice(0, 0, '--enable-helm ');
+        }
+
+        args.splice(0, 0, ...['build', `"${options.folder}"`, '|', 'kubectl']);
+        args.push(...['apply', '-k']);
+      }
+
+      const child = spawn(options.kustomizeCommand, args, {
+        env: {
+          KUBECONFIG: options.kubeconfig,
+          ...process.env,
+        },
+        shell: true,
+        windowsHide: true,
+      });
+
+      child.on('exit', (code, signal) => {
+        result.exitCode = code;
+        result.signal = signal && signal.toString();
+        event.sender.send('kustomize-result', result);
+      });
+
+      child.stdout.on('data', data => {
+        result.stdout = result.stdout ? result + data.toString() : data.toString();
+      });
+
+      child.stderr.on('data', data => {
+        result.stderr = result.stderr ? result + data.toString() : data.toString();
+      });
+    } else {
+      let cmd = options.kustomizeCommand === 'kubectl' ? 'kubectl kustomize ' : 'kustomize build ';
+      if (options.enableHelm) {
+        cmd += '--enable-helm ';
+      }
+
+      let stdout = execSync(`${cmd} "${options.folder}"`, {
+        env: process.env,
+        maxBuffer: 1024 * 1024 * 10,
+        windowsHide: true,
+      });
+
+      result.stdout = stdout.toString();
+      event.sender.send('kustomize-result', result);
     }
-
-    let stdout = execSync(`${cmd} "${options.folder}"`, {
-      env: {
-        NODE_ENV: PROCESS_ENV.NODE_ENV,
-        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-        PATH: PROCESS_ENV.PATH,
-      },
-      maxBuffer: 1024 * 1024 * 10,
-      windowsHide: true,
-    });
-
-    event.sender.send('kustomize-result', {stdout: stdout.toString()});
   } catch (e: any) {
-    event.sender.send('kustomize-result', {error: e.toString()});
+    result.error = e.message;
+    event.sender.send('kustomize-result', result);
   }
 };
 
@@ -104,22 +146,32 @@ export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: File
  * called by thunk to preview a helm chart with values file
  */
 
-export const runHelm = (args: any, event: Electron.IpcMainEvent) => {
-  try {
-    let stdout = execSync(args.helmCommand, {
-      env: {
-        NODE_ENV: PROCESS_ENV.NODE_ENV,
-        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-        KUBECONFIG: args.kubeconfig,
-        PATH: PROCESS_ENV.PATH,
-      },
-      maxBuffer: 1024 * 1024 * 10,
-      windowsHide: true,
-    });
+export const runHelm = (args: HelmCommand, event: Electron.IpcMainEvent) => {
+  ensureMainThread();
+  const result: SpawnResult = {exitCode: null, signal: null};
 
-    event.sender.send('helm-result', {stdout: stdout.toString()});
+  try {
+    const child = exec(
+      args.helmCommand,
+      {
+        env: {
+          KUBECONFIG: args.kubeconfig,
+          ...process.env,
+        },
+        maxBuffer: 1024 * 1024 * 10,
+        windowsHide: true,
+      },
+      (error, stdout, stderr) => {
+        result.stdout = stdout;
+        result.stderr = stderr;
+        result.error = error?.message;
+
+        event.sender.send('helm-result', result);
+      }
+    );
   } catch (e: any) {
-    event.sender.send('helm-result', {error: e.toString()});
+    result.error = e.message;
+    event.sender.send('helm-result', result);
   }
 };
 
@@ -179,4 +231,47 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
   result += text;
 
   event.sender.send('interpolate-vanilla-template-result', result);
+};
+
+/**
+ * called by thunk to preview a helm chart with values file
+ */
+
+export const runKubectl = (args: KubectlOptions, event: Electron.IpcMainEvent) => {
+  ensureMainThread();
+
+  const result: SpawnResult = {exitCode: null, signal: null};
+
+  try {
+    const child = spawn('kubectl', args.kubectlArgs, {
+      env: {
+        KUBECONFIG: args.kubeconfig,
+        ...process.env,
+      },
+      shell: true,
+      windowsHide: true,
+    });
+
+    if (args.yaml) {
+      child.stdin.write(args.yaml);
+      child.stdin.end();
+    }
+
+    child.on('exit', (code, signal) => {
+      result.exitCode = code;
+      result.signal = signal && signal.toString();
+      event.sender.send('kubectl-result', result);
+    });
+
+    child.stdout.on('data', data => {
+      result.stdout = result.stdout ? result + data.toString() : data.toString();
+    });
+
+    child.stderr.on('data', data => {
+      result.stderr = result.stderr ? result + data.toString() : data.toString();
+    });
+  } catch (e: any) {
+    result.error = e.message;
+    event.sender.send('kubectl-result', result);
+  }
 };

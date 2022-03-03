@@ -18,10 +18,10 @@ import {
   toggleStartProjectPane,
 } from '@redux/reducers/ui';
 import {
+  currentConfigSelector,
   isInPreviewModeSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
-  settingsSelector,
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -45,7 +45,7 @@ const HotKeysHandler = () => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const {kustomizeCommand} = useAppSelector(settingsSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -126,12 +126,11 @@ const HotKeysHandler = () => {
       mainState.resourceMap,
       mainState.fileMap,
       dispatch,
-      kubeConfigPath,
+      projectConfig,
       kubeConfigContext,
       namespace,
       {
         isClusterPreview,
-        kustomizeCommand,
       }
     );
     setIsApplyModalVisible(false);

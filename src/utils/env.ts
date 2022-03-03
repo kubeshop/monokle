@@ -62,12 +62,12 @@ function shellEnvSync() {
 let mainProcessEnv: any | undefined;
 
 export function getMainProcessEnv() {
+  if (!mainProcessEnv) {
+    mainProcessEnv = shellEnvSync();
+  }
   return mainProcessEnv;
 }
 
 export function setMainProcessEnv(env: any) {
   mainProcessEnv = env;
 }
-
-export const PROCESS_ENV: any = shellEnvSync();
-export const RESOURCES_PATH = process.resourcesPath;

@@ -33,47 +33,44 @@ export async function applyFile(
   kubeconfig: string,
   context: string
 ) {
+  dispatch(setApplyingResource(true));
+
   try {
     const fileEntry = fileMap[filePath];
     if (fileEntry && !fileEntry.children) {
-      dispatch(setApplyingResource(true));
-
       try {
-        const child = applyFileToCluster(getAbsoluteFileEntryPath(fileEntry, fileMap), kubeconfig, context);
+        const result = await applyFileToCluster(getAbsoluteFileEntryPath(fileEntry, fileMap), kubeconfig, context);
 
-        child.on('exit', (code, signal) => {
-          log.info(`kubectl exited with code ${code} and signal ${signal}`);
-          dispatch(setApplyingResource(false));
-        });
+        if (result.exitCode && result.exitCode !== 0) {
+          log.info(`Apply exited with code ${result.exitCode} and signal ${result.signal}`);
+        }
 
-        child.stdout.on('data', data => {
+        if (result.stdout) {
           const alert: AlertType = {
             type: AlertEnum.Success,
             title: 'Apply completed',
-            message: data.toString(),
+            message: result.stdout,
           };
           dispatch(setAlert(alert));
-          dispatch(setApplyingResource(false));
-        });
+        }
 
-        child.stderr.on('data', data => {
+        if (result.stderr) {
           const alert: AlertType = {
             type: AlertEnum.Error,
             title: 'Apply failed',
-            message: data.toString(),
+            message: result.stderr,
           };
           dispatch(setAlert(alert));
-          dispatch(setApplyingResource(false));
-        });
+        }
       } catch (e: any) {
         log.error(e);
         dispatch(setAlert(errorAlert('Deploy failed', e.message)));
-        dispatch(setApplyingResource(false));
       }
     }
   } catch (e: any) {
     log.error(e);
     dispatch(setAlert(errorAlert('Deploy failed', e.message)));
-    dispatch(setApplyingResource(false));
   }
+
+  dispatch(setApplyingResource(false));
 }

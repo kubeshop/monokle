@@ -35,6 +35,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal, setMonacoEditor, setPaneConfiguration} from '@redux/reducers/ui';
 import {
+  currentConfigSelector,
   knownResourceKindsSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -90,6 +91,7 @@ const ActionsPane: React.FC<IProps> = props => {
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
   const {kustomizeCommand} = useAppSelector(settingsSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
@@ -259,21 +261,17 @@ const ActionsPane: React.FC<IProps> = props => {
     return false;
   }, [selectedResource, knownResourceKinds]);
 
-  const onClickApplyResource = useCallback(
-    (namespace?: {name: string; new: boolean}) => {
-      if (!selectedResource) {
-        setIsApplyModalVisible(false);
-        return;
-      }
-      const isClusterPreview = previewType === 'cluster';
-      applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
-        isClusterPreview,
-        kustomizeCommand,
-      });
+  const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
+    if (!selectedResource) {
       setIsApplyModalVisible(false);
-    },
-    [dispatch, fileMap, kubeConfigContext, kubeConfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
-  );
+      return;
+    }
+    const isClusterPreview = previewType === 'cluster';
+    applyResource(selectedResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
+      isClusterPreview,
+    });
+    setIsApplyModalVisible(false);
+  };
 
   const onClickApplyHelmChart = useCallback(
     (namespace?: string, shouldCreateNamespace?: boolean) => {

@@ -6,7 +6,7 @@ import {v4 as uuidv4} from 'uuid';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
-import {runHelm} from '@utils/helm';
+import {HelmCommand, runHelmInMainThread} from '@utils/helm';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {interpolateTemplate} from './templates';
@@ -34,12 +34,12 @@ export const previewReferencedHelmChart = async (
   const parsedValuesFileContent: string = await interpolateTemplate(valuesFileContent, formsData);
   await fsWriteFilePromise(newTempValuesFilePath, parsedValuesFileContent);
 
-  const helmArgs = {
+  const helmArgs: HelmCommand = {
     helmCommand: `helm install --kube-context ${kubeconfigContext} -f "${newTempValuesFilePath}" --repo ${chartRepo} ${chartName} --version ${chartVersion} --generate-name --dry-run`,
     kubeconfig: kubeconfigPath,
   };
 
-  const result = await runHelm(helmArgs);
+  const result = await runHelmInMainThread(helmArgs);
 
   if (result.error) {
     throw new Error(result.error);

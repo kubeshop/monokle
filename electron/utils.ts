@@ -2,8 +2,10 @@ import {dialog} from 'electron';
 
 import {AnyAction} from '@reduxjs/toolkit';
 
+import {execSync} from 'child_process';
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import _ from 'lodash';
+import log from 'loglevel';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
@@ -14,7 +16,6 @@ import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
-import {PROCESS_ENV} from '@utils/env';
 
 const GITHUB_URL = 'https://github.com';
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
@@ -81,7 +82,7 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
 
 export const getSerializedProcessEnv = () => {
   const serializedProcessEnv: Record<string, string> = {};
-  const processEnv = _.isObject(PROCESS_ENV) ? PROCESS_ENV : _.isObject(process.env) ? process.env : {};
+  const processEnv = _.isObject(process.env) ? process.env : {};
   Object.entries(processEnv).forEach(([key, value]) => {
     if (typeof value === 'string') {
       serializedProcessEnv[key] = value;
@@ -142,3 +143,19 @@ export function askActionConfirmation({
 
   return choice === 0;
 }
+
+export const checkMissingDependencies = (dependencies: Array<string>): Array<string> => {
+  log.info(`checking dependencies with process path: ${process.env.PATH}`);
+
+  return dependencies.filter(d => {
+    try {
+      execSync(d, {
+        env: process.env,
+        windowsHide: true,
+      });
+      return false;
+    } catch (e: any) {
+      return true;
+    }
+  });
+};
