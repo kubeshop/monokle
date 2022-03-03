@@ -2,7 +2,7 @@ import {Page} from 'playwright';
 import {expect, test} from '@playwright/test';
 import {ElectronApplication} from 'playwright-core';
 import {ElectronAppInfo, startApp} from './electronHelpers';
-import {pause} from './utils';
+import {getRecordingPath, pause} from './utils';
 import {StartProjectPane} from './models/startProjectPane';
 import {MainWindow} from './models/mainWindow';
 import {ProjectsDropdown} from './models/projectsDropdown';
@@ -67,6 +67,9 @@ test('should create empty project from projects dropdown', async () => {
 test('should create new resource', async () => {
   const projectName = await startPane.createEmptyProject();
 
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'after-project-creation.png')});
+  // pause for 2 sec to wait for project load
+  await pause(2000);
   await navigatorPane.clickOnNewResource();
 
   const kind = 'ClusterRole';
