@@ -21,14 +21,15 @@ import {buildHelmCommand, runHelm} from '@utils/helm';
 
 export const runPreviewConfiguration = createAsyncThunk<
   SetPreviewDataPayload,
-  HelmPreviewConfiguration,
+  string,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/runPreviewConfiguration', async (previewConfiguration, thunkAPI) => {
+>('main/runPreviewConfiguration', async (previewConfigurationId, thunkAPI) => {
   const configState = thunkAPI.getState().config;
-  const state = thunkAPI.getState().main;
+  const mainState = thunkAPI.getState().main;
+  const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
   const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
   const k8sVersion = configState.projectConfig?.k8sVersion;
   const userDataDir = configState.userDataDir;
@@ -36,9 +37,23 @@ export const runPreviewConfiguration = createAsyncThunk<
     thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
     thunkAPI.getState().config.kubeConfig.currentContext;
 
-  const rootFolderPath = state.fileMap[ROOT_FILE_ENTRY].filePath;
+  const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
-  const chart = Object.values(state.helmChartMap).find(c => c.filePath === previewConfiguration.helmChartFilePath);
+  let previewConfiguration: HelmPreviewConfiguration | undefined;
+  if (previewConfigurationMap) {
+    previewConfiguration = previewConfigurationMap[previewConfigurationId];
+  }
+  if (!previewConfiguration) {
+    return createRejectionWithAlert(
+      thunkAPI,
+      'Preview Configuration Error',
+      `Could not find the Preview Configuration with id ${previewConfigurationId}`
+    );
+  }
+
+  const chart = Object.values(mainState.helmChartMap).find(
+    c => previewConfiguration && c.filePath === previewConfiguration.helmChartFilePath
+  );
 
   let chartFolderPath: string | undefined;
   let chartFilePath: string | undefined;
@@ -103,7 +118,7 @@ export const runPreviewConfiguration = createAsyncThunk<
       result.stdout,
       previewConfiguration.id,
       'Helm Preview',
-      state.resourceRefsProcessingOptions
+      mainState.resourceRefsProcessingOptions
     );
   }
 

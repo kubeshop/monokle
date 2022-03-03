@@ -13,7 +13,7 @@ import {HelmValuesFile} from '@models/helm';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closePreviewConfigurationEditor} from '@redux/reducers/main';
-import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
+import {startPreview} from '@redux/services/preview';
 
 import {KeyValueInput, OrderedList} from '@components/atoms';
 import {OrderedListItem} from '@components/atoms/OrderedList';
@@ -135,7 +135,7 @@ const PreviewConfigurationEditor = () => {
 
       dispatch(closePreviewConfigurationEditor());
       if (shouldRunPreview) {
-        dispatch(runPreviewConfiguration(input));
+        startPreview(input.id, 'helm-preview-config', dispatch);
       }
     },
     [

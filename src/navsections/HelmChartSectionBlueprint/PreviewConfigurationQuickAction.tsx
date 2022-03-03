@@ -6,7 +6,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
-import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
+import {startPreview} from '@redux/services/preview';
 
 import Colors from '@styles/Colors';
 
@@ -36,7 +36,7 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
     if (!previewConfiguration) {
       return;
     }
-    dispatch(runPreviewConfiguration(previewConfiguration));
+    startPreview(previewConfiguration.id, 'helm-preview-config', dispatch);
   }, [dispatch, previewConfiguration]);
 
   const onClickEdit = useCallback(() => {

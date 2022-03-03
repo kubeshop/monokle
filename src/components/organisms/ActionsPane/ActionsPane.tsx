@@ -46,11 +46,11 @@ import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
+import {startPreview} from '@redux/services/preview';
 import {isUnsavedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
-import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';
 
 import {
@@ -390,7 +390,7 @@ const ActionsPane: React.FC<IProps> = props => {
     if (!selectedPreviewConfiguration) {
       return;
     }
-    dispatch(runPreviewConfiguration(selectedPreviewConfiguration));
+    startPreview(selectedPreviewConfiguration.id, 'helm-preview-config', dispatch);
   }, [dispatch, selectedPreviewConfiguration]);
 
   const onClickEditPreviewConfiguration = useCallback(() => {
