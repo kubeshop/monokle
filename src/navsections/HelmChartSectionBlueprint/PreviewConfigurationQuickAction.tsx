@@ -74,8 +74,8 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
       <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickEdit()}>
         <EditOutlined />
       </StyledButton>
-      <Popconfirm title={DeletePreviewConfigurationTooltip}>
-        <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickDelete()}>
+      <Popconfirm title={DeletePreviewConfigurationTooltip} onConfirm={() => onClickDelete()}>
+        <StyledButton isItemSelected={itemInstance.isSelected}>
           <DeleteOutlined />
         </StyledButton>
       </Popconfirm>

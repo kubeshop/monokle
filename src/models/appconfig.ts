@@ -79,7 +79,7 @@ export type ProjectConfig = {
   folderReadsMaxDepth?: number;
   k8sVersion?: string;
   helm?: {
-    previewConfigurationMap?: Record<string, HelmPreviewConfiguration>;
+    previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;
   };
 };
 

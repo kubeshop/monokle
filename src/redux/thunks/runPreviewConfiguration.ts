@@ -39,7 +39,7 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
-  let previewConfiguration: HelmPreviewConfiguration | undefined;
+  let previewConfiguration: HelmPreviewConfiguration | null | undefined;
   if (previewConfigurationMap) {
     previewConfiguration = previewConfigurationMap[previewConfigurationId];
   }

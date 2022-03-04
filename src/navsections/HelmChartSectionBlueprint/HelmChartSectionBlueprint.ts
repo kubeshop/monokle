@@ -32,7 +32,7 @@ type HelmChartScopeType = {
 };
 
 type PreviewConfigurationScopeType = {
-  previewConfigurationMap: Record<string, HelmPreviewConfiguration> | undefined;
+  previewConfigurationMap: Record<string, HelmPreviewConfiguration | null> | undefined;
   selectedPreviewConfigurationId: string | undefined;
   [currentHelmChart: string]: HelmChart | unknown;
 };
@@ -60,8 +60,8 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           return [];
         }
         return scope.previewConfigurationMap
-          ? Object.values(scope.previewConfigurationMap).filter(
-              pc => pc.helmChartFilePath === currentHelmChart.filePath
+          ? Object.values(scope.previewConfigurationMap).filter((pc): pc is HelmPreviewConfiguration =>
+              Boolean(pc && pc.helmChartFilePath === currentHelmChart.filePath)
             )
           : [];
       },

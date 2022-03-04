@@ -246,16 +246,15 @@ export const configSlice = createSlice({
         state.projectConfig = {};
       }
 
+      const projectConfig = state.projectConfig;
       const serializedIncomingConfig = flatten<any, any>(action.payload.config);
       const serializedState = flatten<any, any>(state.projectConfig);
-      let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
 
+      let keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
       if (action.payload.fromConfigFile) {
         _.remove(keys, k => _.includes(['kubeConfig.contexts', 'kubeConfig.isPathValid'], k));
       }
-
       keys.forEach(key => {
-        const projectConfig = state.projectConfig;
         if (projectConfig) {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
         }
