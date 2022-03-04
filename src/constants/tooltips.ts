@@ -60,5 +60,6 @@ export const NewResourceTooltip = `Create new resource (${KEY_CTRL_CMD} + N)`;
 export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
 export const RunPreviewConfigurationTooltip = 'Run this Preview Configuration';
 export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration';
+export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
 export const DisableEventTrackingTooltip = 'Disables collection of usage metrics';
 export const DisableErrorReportingTooltip = 'Disables collection of error reports';

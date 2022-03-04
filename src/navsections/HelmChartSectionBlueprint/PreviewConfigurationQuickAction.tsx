@@ -1,12 +1,19 @@
 import {useCallback} from 'react';
 
+import {Popconfirm} from 'antd';
+
+import {DeleteOutlined, EditOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
+
+import {DeletePreviewConfigurationTooltip} from '@constants/tooltips';
 
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
+import {deletePreviewConfiguration} from '@redux/thunks/previewConfiguration';
 
 import Colors from '@styles/Colors';
 
@@ -48,6 +55,13 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
     );
   }, [previewConfiguration, helmChart, dispatch]);
 
+  const onClickDelete = useCallback(() => {
+    if (!previewConfiguration) {
+      return;
+    }
+    dispatch(deletePreviewConfiguration(previewConfiguration.id));
+  }, [previewConfiguration, dispatch]);
+
   if (!previewConfiguration || !helmChart) {
     return null;
   }
@@ -58,8 +72,13 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
         Preview
       </StyledButton>
       <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickEdit()}>
-        Edit
+        <EditOutlined />
       </StyledButton>
+      <Popconfirm title={DeletePreviewConfigurationTooltip}>
+        <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickDelete()}>
+          <DeleteOutlined />
+        </StyledButton>
+      </Popconfirm>
     </>
   );
 };
