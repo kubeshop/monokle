@@ -90,11 +90,9 @@ const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
-
 let {disableErrorReports,disableTracking} =  initNucleus(isDev, app);
 unhandled({
   logger: (error) => {
-      console.error(error);
       if (!disableErrorReports) {
         Nucleus.trackError((error && error.name) || 'Unnamed error', error);
       }

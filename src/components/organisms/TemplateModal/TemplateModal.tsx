@@ -20,7 +20,7 @@ import {createUnsavedResourcesFromVanillaTemplate} from '@redux/services/templat
 
 import {TemplateFormRenderer} from '@components/molecules';
 
-import {trackEvent} from '@utils/telemetry';
+import {START_FROM_A_TEMPLATE, USE_TEMPLATE, trackEvent} from '@utils/telemetry';
 
 import * as S from './styled';
 
@@ -53,7 +53,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
   const onClickSubmit = useCallback(
     (formDataList: Record<string, Primitive>[]) => {
       if (projectToCreate) {
-        trackEvent('START_FROM_A_TEMPLATE', {templateID: template.id});
+        trackEvent(START_FROM_A_TEMPLATE, {templateID: template.id});
         dispatch(setCreateProject({...projectToCreate}));
         onClose('PREVIEW');
       }
@@ -62,7 +62,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
       formDataList.shift();
 
       if (isVanillaTemplate(template)) {
-        trackEvent('USE_TEMPLATE', {templateID: template.id});
+        trackEvent(USE_TEMPLATE, {templateID: template.id});
         setIsLoading(true);
         createUnsavedResourcesFromVanillaTemplate(template, formDataList, dispatch)
           .then(({message, resources}) => {
@@ -81,7 +81,7 @@ const TemplateModal: React.FC<TemplateModalProps> = props => {
         return;
       }
       setIsLoading(true);
-      trackEvent('USE_TEMPLATE', {templateID: template.id});
+      trackEvent(USE_TEMPLATE, {templateID: template.id});
       previewReferencedHelmChart(
         template.chartName,
         template.chartVersion,
