@@ -31,7 +31,7 @@ export function buildHelmCommand(
     command,
     ...valuesFilePaths.map(filePath => ['-f', `"${path.join(rootFolderPath, filePath)}"`]).flat(),
     helmChart.name,
-    `${chartFolderPath}`,
+    `"${chartFolderPath}"`,
     ...Object.entries(options)
       .map(([key, value]) => (!value ? [key] : [key, `"${value}"`]))
       .flat(),
