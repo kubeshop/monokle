@@ -1,8 +1,11 @@
 import {ipcRenderer, shell} from 'electron';
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
-import {Button, Input, Modal} from 'antd';
+import {Button, Form, Input, Modal} from 'antd';
+import {useForm} from 'antd/lib/form/Form';
+
+import gitUrlParse from 'git-url-parse';
 
 import {PLUGIN_DOCS_URL} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
@@ -11,6 +14,8 @@ import {DownloadPluginResult, isDownloadPluginResult} from '@models/extension';
 
 import {useAppDispatch} from '@redux/hooks';
 import {addMultipleTemplates, addPlugin} from '@redux/reducers/extension';
+
+import {useFocus} from '@utils/hooks';
 
 import Colors from '@styles/Colors';
 
@@ -35,11 +40,13 @@ const downloadPlugin = (pluginUrl: string) => {
 function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   const dispatch = useAppDispatch();
   const {isVisible, onClose} = props;
-  const [pluginUrl, setPluginUrl] = useState<string>('');
+  const [formValues, setFormValues] = useState({pluginUrl: ''});
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [createProjectForm] = useForm();
+  const [inputRef, focus] = useFocus<any>();
 
-  const onClickDownload = async () => {
+  const download = async (pluginUrl: string) => {
     try {
       setIsDownloading(true);
       const downloadPluginResult = await downloadPlugin(pluginUrl);
@@ -60,10 +67,56 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   };
 
   const close = () => {
-    setPluginUrl('');
+    createProjectForm.setFields([
+      {
+        name: 'pluginUrl',
+        value: '',
+        errors: [],
+      },
+    ]);
     setIsDownloading(false);
     onClose();
   };
+
+  const handlePluginURLChange = async (url: string) => {
+    try {
+      const parsedURL = gitUrlParse(url);
+      if (!parsedURL.owner || !parsedURL.name) {
+        setErrorMessage('Please enter a valid git URL!');
+        return;
+      }
+      if (!parsedURL.protocols.includes('https')) {
+        setErrorMessage('Currently we support only HTTPS protocol');
+        return;
+      }
+      await download(`${parsedURL.protocol}://${parsedURL.resource}/${parsedURL.owner}/${parsedURL.name}`);
+    } catch (error: any) {
+      setErrorMessage(error.message);
+    }
+  };
+
+  const onFinish = async (values: {pluginUrl: string}) => {
+    setFormValues(values);
+    await handlePluginURLChange(values.pluginUrl);
+  };
+
+  useEffect(() => {
+    if (isVisible) {
+      focus();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible]);
+
+  useEffect(() => {
+    createProjectForm.setFields([
+      {
+        name: 'pluginUrl',
+        value: formValues.pluginUrl,
+        errors: errorMessage ? [errorMessage] : [],
+      },
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errorMessage]);
 
   return (
     <Modal
@@ -72,7 +125,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
         <Button key="back" onClick={close}>
           Close
         </Button>,
-        <Button key="submit" type="primary" loading={isDownloading} onClick={onClickDownload}>
+        <Button key="submit" type="primary" loading={isDownloading} onClick={() => createProjectForm.submit()}>
           Download and install plugin
         </Button>,
       ]}
@@ -85,12 +138,22 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
           See Plugin&apos;s documentation for more information.
         </Button>
       </p>
-      <Input placeholder="Enter Plugin URL" defaultValue={pluginUrl} onChange={e => setPluginUrl(e.target.value)} />
-      {errorMessage && (
-        <div>
-          <p>{errorMessage}</p>
-        </div>
-      )}
+      <Form layout="vertical" form={createProjectForm} onFinish={onFinish} initialValues={() => formValues}>
+        <Form.Item
+          name="pluginUrl"
+          label="URL"
+          required
+          tooltip="pluginUrl"
+          rules={[
+            {
+              required: true,
+              message: 'Please provide your plugin URL!',
+            },
+          ]}
+        >
+          <Input ref={inputRef} placeholder="Enter Plugin URL" />
+        </Form.Item>
+      </Form>
     </Modal>
   );
 }
