@@ -162,15 +162,12 @@ function KeyValueInput(props: KeyValueInputProps) {
     <S.Container>
       <S.TitleContainer>
         <S.TitleLabel style={labelStyle}>{label}</S.TitleLabel>
-        <Button onClick={createEntry} type="link" icon={<PlusOutlined />} disabled={disabled}>
-          Add
-        </Button>
+        {docsUrl && (
+          <Button type="link" onClick={() => openUrlInExternalBrowser(docsUrl)} style={{padding: 0}}>
+            Documentation
+          </Button>
+        )}
       </S.TitleContainer>
-      {docsUrl && (
-        <Button type="link" onClick={() => openUrlInExternalBrowser(docsUrl)} style={{padding: 0}}>
-          Documentation
-        </Button>
-      )}
       {entries.map(entry => (
         <KeyValueEntryRenderer
           key={entry.id}
@@ -183,6 +180,9 @@ function KeyValueInput(props: KeyValueInputProps) {
           availableValues={getEntryAvailableValues(entry)}
         />
       ))}
+      <Button onClick={createEntry} type="link" icon={<PlusOutlined />} disabled={disabled} style={{paddingLeft: 0}}>
+        Add
+      </Button>
     </S.Container>
   );
 }
