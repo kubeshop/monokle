@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {Typography} from 'antd';
+import {Breadcrumb, Typography} from 'antd';
 
 import styled from 'styled-components';
 
@@ -65,6 +65,12 @@ const PreviwConfigurationDetails: React.FC = () => {
 
   return (
     <Container>
+      {helmChart && previewConfiguration && (
+        <Breadcrumb style={{marginBottom: 12}}>
+          <Breadcrumb.Item>{helmChart.name}</Breadcrumb.Item>
+          <Breadcrumb.Item>{previewConfiguration.name}</Breadcrumb.Item>
+        </Breadcrumb>
+      )}
       <Text code copyable>
         {builtCommand}
       </Text>
