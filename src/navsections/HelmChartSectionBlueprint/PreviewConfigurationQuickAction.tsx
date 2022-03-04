@@ -55,7 +55,7 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
   return (
     <>
       <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickRun()}>
-        Run
+        Preview
       </StyledButton>
       <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickEdit()}>
         Edit

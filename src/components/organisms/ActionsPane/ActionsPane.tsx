@@ -416,7 +416,7 @@ const ActionsPane: React.FC<IProps> = props => {
           <TitleBar title="Helm Command">
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RunPreviewConfigurationTooltip} placement="bottomLeft">
               <Button type="primary" size="small" ghost onClick={onClickRunPreviewConfiguration}>
-                Run
+                Preview
               </Button>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">
