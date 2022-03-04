@@ -168,7 +168,7 @@ const PreviewConfigurationEditor = () => {
       </S.Field>
       <S.Field>
         <S.Label>Select which helm command to use for this Preview:</S.Label>
-        <Select value={helmCommand} onChange={setHelmCommand} style={{width: 100}}>
+        <Select value={helmCommand} onChange={setHelmCommand} style={{width: 150}}>
           <Select.Option value="template">Template</Select.Option>
           <Select.Option value="install">Install</Select.Option>
         </Select>
