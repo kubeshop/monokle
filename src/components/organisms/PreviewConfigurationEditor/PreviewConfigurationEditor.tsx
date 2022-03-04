@@ -107,17 +107,18 @@ const PreviewConfigurationEditor = () => {
       if (!helmChart) {
         return;
       }
+      const orderedValuesFilePaths = valuesFileItems
+        .filter(i => i.isChecked)
+        .map(v => helmValuesMap[v.id])
+        .filter((v): v is HelmValuesFile => v !== undefined)
+        .map(v => v.filePath);
       const input: HelmPreviewConfiguration = {
         id: previewConfiguration ? previewConfiguration.id : uuidv4(),
         name,
         helmChartFilePath: helmChart?.filePath,
         command: helmCommand,
         options: helmOptions,
-        orderedValuesFilePaths: valuesFileItems
-          .filter(i => i.isChecked)
-          .map(v => helmValuesMap[v.id])
-          .filter((v): v is HelmValuesFile => v !== undefined)
-          .map(v => v.filePath),
+        orderedValuesFilePaths,
       };
       const updatedPreviewConfigurationMap = JSON.parse(JSON.stringify(previewConfigurationMap));
       updatedPreviewConfigurationMap[input.id] = input;
