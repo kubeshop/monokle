@@ -37,12 +37,12 @@ export function openUrlInExternalBrowser(url?: string) {
 }
 
 export function openDocumentation() {
-  trackEvent(WINDOW_HELP_LINK, {linkID: 'documentation', osType: os.type});
+  trackEvent(WINDOW_HELP_LINK, {linkID: 'documentation'});
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
 }
 
 export function openKeyboardShortcuts() {
-  trackEvent(WINDOW_HELP_LINK, {linkID: 'shortcuts', osType: os.type});
+  trackEvent(WINDOW_HELP_LINK, {linkID: 'shortcuts'});
   shell.openExternal(`https://kubeshop.github.io/monokle/hotkeys?os=${os.type}`);
 }
 
