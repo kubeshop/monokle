@@ -282,12 +282,18 @@ export const configSlice = createSlice({
         (p: Project) => p.rootFolder === state.selectedProjectRootFolder
       );
 
-      if (project) {
-        project.name = action.payload;
-        state.selectedProjectRootFolder = project.rootFolder;
-        state.projects = _.uniq([project, ...state.projects]);
-        electronStore.set('appConfig.projects', state.projects);
+      if (!project) {
+        return;
       }
+
+      if (project.name === action.payload) {
+        return;
+      }
+
+      project.name = action.payload;
+      state.selectedProjectRootFolder = project.rootFolder;
+      state.projects = _.uniq([project, ...state.projects]);
+      electronStore.set('appConfig.projects', state.projects);
     },
     changeProjectsRootPath: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       state.projectsRootPath = action.payload;
