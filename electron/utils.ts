@@ -154,7 +154,7 @@ export function askActionConfirmation({
 }
 
 export const initNucleus = (isDev: boolean, app: any) => {
-  Nucleus.init('6218cf3ef5e5d2023724d89b', {
+  Nucleus.init(PROCESS_ENV.NUCLEUS_SH_APP_ID || '6218cf3ef5e5d2023724d89b', {
     disableInDev: false,
     disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
     disableErrorReports: true,

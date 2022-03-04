@@ -32,7 +32,11 @@ import {
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
-import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
+import {
+  changeCurrentProjectName,
+  setUserDirs,
+  updateNewVersion,
+} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector, activeProjectSelector} from '@redux/selectors';
@@ -70,6 +74,7 @@ import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder, setDeviceID, initNucleus } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
+import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -85,11 +90,9 @@ const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
-
 let {disableErrorReports,disableTracking} =  initNucleus(isDev, app);
 unhandled({
   logger: (error) => {
-      console.error(error);
       if (!disableErrorReports) {
         Nucleus.trackError((error && error.name) || 'Unnamed error', error);
       }
@@ -267,6 +270,15 @@ ipcMain.on('quit-and-install', () => {
 
 ipcMain.on('confirm-action', (event:any, args) => {
   event.returnValue = askActionConfirmation(args);
+});
+
+ipcMain.on('global-electron-store-update', (event, args: any) => {
+  if (args.eventType === StorePropagation.ChangeProjectName) {
+    const payload: ProjectNameChange = args.payload;
+    dispatchToAllWindows(changeCurrentProjectName(payload.newName));
+  } else {
+    log.warn(`received invalid event type for global electron store update ${args.eventType}`);
+  }
 });
 
 export const createWindow = (givenPath?: string) => {

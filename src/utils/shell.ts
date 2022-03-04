@@ -4,7 +4,7 @@ import * as os from 'os';
 // @ts-ignore
 import shellPath from 'shell-path';
 
-import {trackEvent} from './telemetry';
+import {WINDOW_HELP_LINK, trackEvent} from './telemetry';
 
 let cachedShellPath: string | undefined;
 
@@ -21,12 +21,12 @@ export function showItemInFolder(fullPath: string) {
 }
 
 export function openGitHub() {
-  trackEvent('WINDOW_HELP_LINK', {linkID: 'github'});
+  trackEvent(WINDOW_HELP_LINK, {linkID: 'github'});
   shell.openExternal('https://github.com/kubeshop/monokle');
 }
 
 export function openDiscord() {
-  trackEvent('WINDOW_HELP_LINK', {linkID: 'discord'});
+  trackEvent(WINDOW_HELP_LINK, {linkID: 'discord'});
   shell.openExternal('https://discord.gg/kMJxmuYTMu');
 }
 
@@ -37,12 +37,12 @@ export function openUrlInExternalBrowser(url?: string) {
 }
 
 export function openDocumentation() {
-  trackEvent('WINDOW_HELP_LINK', {linkID: 'documentation', osType: os.type});
+  trackEvent(WINDOW_HELP_LINK, {linkID: 'documentation'});
   shell.openExternal(`https://kubeshop.github.io/monokle?os=${os.type}`);
 }
 
 export function openKeyboardShortcuts() {
-  trackEvent('WINDOW_HELP_LINK', {linkID: 'shortcuts', osType: os.type});
+  trackEvent(WINDOW_HELP_LINK, {linkID: 'shortcuts'});
   shell.openExternal(`https://kubeshop.github.io/monokle/hotkeys?os=${os.type}`);
 }
 
