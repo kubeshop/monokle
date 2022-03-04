@@ -43,7 +43,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   const [formValues, setFormValues] = useState({pluginUrl: ''});
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
-  const [createProjectForm] = useForm();
+  const [pluginForm] = useForm();
   const [inputRef, focus] = useFocus<any>();
 
   const download = async (pluginUrl: string) => {
@@ -67,7 +67,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   };
 
   const close = () => {
-    createProjectForm.setFields([
+    pluginForm.setFields([
       {
         name: 'pluginUrl',
         value: '',
@@ -108,7 +108,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   }, [isVisible]);
 
   useEffect(() => {
-    createProjectForm.setFields([
+    pluginForm.setFields([
       {
         name: 'pluginUrl',
         value: formValues.pluginUrl,
@@ -125,7 +125,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
         <Button key="back" onClick={close}>
           Close
         </Button>,
-        <Button key="submit" type="primary" loading={isDownloading} onClick={() => createProjectForm.submit()}>
+        <Button key="submit" type="primary" loading={isDownloading} onClick={() => pluginForm.submit()}>
           Download and install plugin
         </Button>,
       ]}
@@ -138,7 +138,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
           See Plugin&apos;s documentation for more information.
         </Button>
       </p>
-      <Form layout="vertical" form={createProjectForm} onFinish={onFinish} initialValues={() => formValues}>
+      <Form layout="vertical" form={pluginForm} onFinish={onFinish} initialValues={() => formValues}>
         <Form.Item
           name="pluginUrl"
           label="URL"
