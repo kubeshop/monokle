@@ -101,7 +101,7 @@
     "electron-devtools-installer": "3.2.0",
     "electron-log": "4.4.6",
     "electron-store": "8.0.1",
-    "electron-unhandled": "^4.0.0",
+    "electron-unhandled": "4.0.0",
     "electron-updater": "4.6.5",
     "es6-tween": "5.5.11",
     "execa": "5.1.1",

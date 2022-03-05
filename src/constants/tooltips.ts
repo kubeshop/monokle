@@ -60,3 +60,4 @@ export const NewResourceTooltip = `Create new resource (${KEY_CTRL_CMD} + N)`;
 export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuration';
 export const DisableEventTrackingTooltip = 'Disables collection of usage metrics';
 export const DisableErrorReportingTooltip = 'Disables collection of error reports';
+export const PLUGIN_URL_INPUT_TOOLTIP = 'Enter the repository/branch url of the plugin you want to add!';

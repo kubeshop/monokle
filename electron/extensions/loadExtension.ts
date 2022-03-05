@@ -23,8 +23,9 @@ async function loadExtension<ExtensionEntryType, ExtensionType>(
     return undefined;
   }
   const entryFileContent = await readFile(entryFilePath);
-  const parsedEntryFileContent = parseEntryFileContent(entryFileContent);
+  let parsedEntryFileContent;
   try {
+    parsedEntryFileContent = parseEntryFileContent(entryFileContent);
     validateEntryFileContent(parsedEntryFileContent);
   } catch (e) {
     if (e instanceof Error) {

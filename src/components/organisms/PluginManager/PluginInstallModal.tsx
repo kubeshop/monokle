@@ -5,10 +5,9 @@ import React, {useEffect, useState} from 'react';
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import gitUrlParse from 'git-url-parse';
-
 import {PLUGIN_DOCS_URL} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
+import {PLUGIN_URL_INPUT_TOOLTIP} from '@constants/tooltips';
 
 import {DownloadPluginResult, isDownloadPluginResult} from '@models/extension';
 
@@ -80,16 +79,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
 
   const handlePluginURLChange = async (url: string) => {
     try {
-      const parsedURL = gitUrlParse(url);
-      if (!parsedURL.owner || !parsedURL.name) {
-        setErrorMessage('Please enter a valid git URL!');
-        return;
-      }
-      if (!parsedURL.protocols.includes('https')) {
-        setErrorMessage('Currently we support only HTTPS protocol');
-        return;
-      }
-      await download(`${parsedURL.protocol}://${parsedURL.resource}/${parsedURL.owner}/${parsedURL.name}`);
+      await download(url);
     } catch (error: any) {
       setErrorMessage(error.message);
     }
@@ -143,7 +133,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
           name="pluginUrl"
           label="URL"
           required
-          tooltip="pluginUrl"
+          tooltip={PLUGIN_URL_INPUT_TOOLTIP}
           rules={[
             {
               required: true,
