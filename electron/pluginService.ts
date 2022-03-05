@@ -33,7 +33,7 @@ function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderP
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
-      branch: repositoryBranch, // TODO: handle the branch name
+      branch: repositoryBranch,
     },
     modules: packageJson.monoklePlugin.modules.map(module => {
       if (isTemplatePluginModule(module)) {

@@ -30,8 +30,6 @@ async function downloadExtension<ExtensionEntryType, ExtensionType>(
     {skipEntryFileSave: true}
   );
 
-  console.log('extensionEntry', extensionEntry);
-
   const extensionFolderPath = makeExtensionFolderPath(extensionEntry);
   await createOrRecreateFolder(extensionFolderPath);
 
