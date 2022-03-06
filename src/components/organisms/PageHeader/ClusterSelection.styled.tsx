@@ -1,15 +1,14 @@
-import {Button as RawButton, Divider as RawDivider, Table as RawTable} from 'antd';
+import {Button as RawButton, Divider as RawDivider} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
+import {
+  CheckCircleOutlined as RawCheckCircleOutlined,
+  ExclamationCircleOutlined as RawExclamationCircleOutlined,
+} from '@ant-design/icons/lib/icons';
 
 import styled from 'styled-components';
 
 import Colors from '@styles/Colors';
-import {
-  CheckCircleOutlined as RawCheckCircleOutlined,
-  ExclamationCircleOutlined as RawExclamationCircleOutlined
-} from '@ant-design/icons/lib/icons';
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 export const Button = styled(RawButton)`
   padding: 0;
@@ -85,10 +84,11 @@ export const ClusterContextName = styled.span`
 
 export const ClusterAccessContainer = styled.span`
   padding: 5px;
+  margin-right: 5px;
 `;
 
 export const ClusterOutlined = styled(RawClusterOutlined)`
-  font-size: 10px;
+  font-size: 12px;
   margin-right: 4px;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -105,10 +105,9 @@ export const ClusterStatus = styled.div`
 `;
 
 export const ClusterStatusText = styled.span<{connected: Boolean}>`
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  ${props => `color: ${props.connected ? Colors.greenOkayCompliment : Colors.grey7}`};
+  padding-left: 5px;
+  font-size: 14px;
+  color: ${Colors.grey7};
 `;
 
 export const Divider = styled(RawDivider)`
@@ -128,11 +127,4 @@ export const CheckCircleOutlined = styled(RawCheckCircleOutlined)`
 export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutlined)`
   color: ${Colors.yellowWarning};
   font-size: 13px;
-`;
-
-export const Table = styled(props => <RawTable {...props} />)`
-  width: 800px;
-  border-top: 1px solid ${Colors.grey3};
-  padding-top: 18px;
-  ${GlobalScrollbarStyle}
 `;

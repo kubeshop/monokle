@@ -105,8 +105,10 @@ const FilePatternList = (props: FilePatternListProps) => {
             onChange={e => setPatternInput(e.target.value)}
             onPressEnter={addPattern}
           />
-          <StyledButton onClick={addPattern}>OK</StyledButton>
-          <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
+          <div>
+            <StyledButton onClick={addPattern}>OK</StyledButton>
+            <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
+          </div>
         </div>
       ) : (
         <>
