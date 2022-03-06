@@ -7,7 +7,6 @@ import {useForm} from 'antd/lib/form/Form';
 
 import {PLUGIN_DOCS_URL} from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT} from '@constants/ipcEvents';
-import {PLUGIN_URL_INPUT_TOOLTIP} from '@constants/tooltips';
 
 import {DownloadPluginResult, isDownloadPluginResult} from '@models/extension';
 
@@ -133,7 +132,16 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
           name="pluginUrl"
           label="URL"
           required
-          tooltip={PLUGIN_URL_INPUT_TOOLTIP}
+          tooltip={{
+            title: (
+              <div>
+                <div>Enter the repository/branch url of the plugin you want to add! ie:</div>
+                <div>https://github.com/kubeshop/monokle-default-templates-plugin,</div>
+                <div>https://github.com/kubeshop/monokle-default-templates-plugin/tree/test</div>
+              </div>
+            ),
+            overlayInnerStyle: {width: '500px'},
+          }}
           rules={[
             {
               required: true,
@@ -141,7 +149,10 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
             },
           ]}
         >
-          <Input ref={inputRef} placeholder="Enter Plugin URL" />
+          <Input
+            ref={inputRef}
+            placeholder="Plugin URL ie: https://github.com/kubeshop/monokle-default-templates-plugin"
+          />
         </Form.Item>
       </Form>
     </Modal>
