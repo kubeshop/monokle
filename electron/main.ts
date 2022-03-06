@@ -71,10 +71,11 @@ import {
   checkMissingDependencies,
   convertRecentFilesToRecentProjects,
   getSerializedProcessEnv,
+  initNucleus,
   saveInitialK8sSchema,
+  setDeviceID,
   setProjectsRootFolder,
 } from './utils';
-import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder, setDeviceID, initNucleus } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
@@ -445,7 +446,6 @@ export const createWindow = (givenPath?: string) => {
 
   return win;
 };
-
 
 export const openApplication = async (givenPath?: string) => {
   await app.whenReady();
