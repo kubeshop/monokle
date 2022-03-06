@@ -44,9 +44,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {
   checkNewVersion,
-  interpolateTemplate,
-  runHelm, runKubectl,
-  runKustomize,
+  interpolateTemplate, runCommand,
   saveFileDialog,
   selectFileDialog,
 } from '@root/electron/commands';
@@ -61,7 +59,6 @@ import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplat
 import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
-import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 import {
   askActionConfirmation,
   checkMissingDependencies,
@@ -72,7 +69,7 @@ import {
 } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
-import {KubectlOptions} from '@utils/kubectl';
+import {CommandOptions} from '@utils/command';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -221,10 +218,6 @@ ipcMain.on('interpolate-vanilla-template', (event, args: InterpolateTemplateOpti
   interpolateTemplate(args, event);
 });
 
-ipcMain.on('run-kustomize', (event, cmdOptions: KustomizeCommandOptions) => {
-  runKustomize(cmdOptions, event);
-});
-
 ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
   return selectFileDialog(event, options);
 });
@@ -233,12 +226,8 @@ ipcMain.handle('save-file', async (event, options: FileOptions) => {
   return saveFileDialog(event, options);
 });
 
-ipcMain.on('run-helm', (event, args: any) => {
-  runHelm(args, event);
-});
-
-ipcMain.on('run-kubectl', (event, args: KubectlOptions) => {
-  runKubectl(args, event);
+ipcMain.on('run-command', (event, args: CommandOptions) => {
+  runCommand(args, event);
 });
 
 ipcMain.on('app-version', event => {

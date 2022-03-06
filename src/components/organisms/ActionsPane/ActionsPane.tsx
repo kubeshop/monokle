@@ -39,7 +39,6 @@ import {
   knownResourceKindsSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
-  settingsSelector,
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getResourcesForPath} from '@redux/services/fileEntry';
@@ -92,7 +91,6 @@ const ActionsPane: React.FC<IProps> = props => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
-  const {kustomizeCommand} = useAppSelector(settingsSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);

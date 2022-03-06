@@ -1,4 +1,4 @@
-import {runKubectlInMainThread} from '@utils/kubectl';
+import {runCommandInMainThread} from '@utils/command';
 
 /**
  * Invokes kubectl apply for the specified yaml
@@ -15,5 +15,5 @@ export function applyYamlToCluster(
   if (namespace) {
     kubectlArgs.unshift(...['--namespace', namespace.name]);
   }
-  return runKubectlInMainThread(kubectlArgs, kubeconfig, yaml);
+  return runCommandInMainThread({args: kubectlArgs, cmd: 'kubectl', input: yaml, env: {KUBECONFIG: kubeconfig}});
 }

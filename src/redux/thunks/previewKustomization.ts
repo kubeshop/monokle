@@ -1,5 +1,3 @@
-import {ipcRenderer} from 'electron';
-
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
@@ -9,23 +7,13 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
-import {KustomizeCommandType} from '@models/kustomize';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {SpawnResult} from '@utils/kubectl';
-import {ensureRendererThread} from '@utils/thread';
-
-export type KustomizeCommandOptions = {
-  folder: string;
-  kustomizeCommand: KustomizeCommandType;
-  applyArgs?: string[];
-  enableHelm: boolean;
-  kubeconfig?: string;
-};
+import {CommandResult, runCommandInMainThread} from '@utils/command';
 
 /**
  * Thunk to preview kustomizations
@@ -46,10 +34,10 @@ export const previewKustomization = createAsyncThunk<
   const resource = state.resourceMap[resourceId];
   if (resource && resource.filePath) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
-    const folder = path.join(rootFolder, resource.filePath.substr(0, resource.filePath.lastIndexOf(path.sep)));
+    const folder = path.join(rootFolder, path.dirname(resource.filePath));
 
     log.info(`previewing ${resource.id} in folder ${folder}`);
-    const result = await runKustomizeInMainThread(folder, projectConfig);
+    const result = await runKustomize(folder, projectConfig);
 
     if (result.error) {
       return createRejectionWithAlert(thunkAPI, 'Kustomize Error', result.error);
@@ -74,23 +62,42 @@ export const previewKustomization = createAsyncThunk<
  * Invokes kustomize in main thread
  */
 
-export function runKustomizeInMainThread(folder: string, projectConfig: ProjectConfig, applyArgs?: string[]) {
-  ensureRendererThread();
+export function runKustomize(
+  folder: string,
+  projectConfig: ProjectConfig,
+  applyArgs?: string[]
+): Promise<CommandResult> {
+  const args: string[] = [];
 
-  return new Promise<SpawnResult>(resolve => {
-    ipcRenderer.once('kustomize-result', (event, arg) => {
-      resolve(arg);
-    });
-    const kustomizeCommand = projectConfig?.settings?.kustomizeCommand || 'kubectl';
-    const enableHelmWithKustomize = projectConfig?.settings?.enableHelmWithKustomize || false;
-    const kubeconfig = projectConfig.kubeConfig?.path;
+  // use kustomize?
+  if (projectConfig?.settings?.kustomizeCommand === 'kustomize') {
+    args.push('build');
+    if (projectConfig.settings?.enableHelmWithKustomize) {
+      args.push('--enable-helm ');
+    }
+    args.push(`"${folder}"`);
+  } else {
+    // preview using kubectl
+    args.push('kustomize');
+    args.push(`"${folder}"`);
 
-    ipcRenderer.send('run-kustomize', {
-      folder,
-      kustomizeCommand,
-      enableHelm: enableHelmWithKustomize,
-      applyArgs,
-      kubeconfig,
-    } as KustomizeCommandOptions);
+    if (projectConfig.settings?.enableHelmWithKustomize) {
+      args.push('--enable-helm ');
+    }
+  }
+
+  // apply using kubectl
+  if (applyArgs) {
+    args.push(...['|', 'kubectl']);
+    args.push(...applyArgs);
+    args.push(...['apply', '-f', '-']);
+  }
+
+  return runCommandInMainThread({
+    cmd: projectConfig?.settings?.kustomizeCommand ? String(projectConfig.settings.kustomizeCommand) : 'kubectl',
+    args,
+    env: {
+      KUBECONFIG: projectConfig.kubeConfig?.path,
+    },
   });
 }

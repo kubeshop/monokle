@@ -13,7 +13,7 @@ import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {HelmCommand, runHelmInMainThread} from '@utils/helm';
+import {CommandOptions, runCommandInMainThread} from '@utils/command';
 
 /**
  * Thunk to preview a Helm Chart
@@ -36,7 +36,7 @@ export const previewHelmValuesFile = createAsyncThunk<
   const currentContext = projectConfig.kubeConfig?.currentContext;
   const valuesFile = state.helmValuesMap[valuesFileId];
 
-  if (kubeconfig && valuesFile && valuesFile.filePath) {
+  if (kubeconfig && valuesFile && valuesFile.filePath && currentContext) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
     const chart = state.helmChartMap[valuesFile.helmChartId];
     const folder = path.join(rootFolder, path.dirname(chart.filePath));
@@ -47,18 +47,33 @@ export const previewHelmValuesFile = createAsyncThunk<
 
       const helmPreviewMode = projectConfig.settings ? projectConfig.settings.helmPreviewMode : 'template';
 
-      const args: HelmCommand = {
-        helmCommand:
+      const options: CommandOptions = {
+        cmd: 'helm',
+        args:
           helmPreviewMode === 'template'
-            ? `helm template -f "${folder}${path.sep}${valuesFile.name}" ${chart.name} "${folder}"`
-            : `helm install --kube-context ${currentContext} -f "${folder}${path.sep}${valuesFile.name}" ${chart.name} "${folder}" --dry-run`,
-        kubeconfig,
+            ? ['template', '-f', `"${path.join(folder, valuesFile.name)}"`, chart.name, `"${folder}"`]
+            : [
+                'install',
+                '--kube-context',
+                currentContext,
+                '-f',
+                `"${path.join(folder, valuesFile.name)}"`,
+                chart.name,
+                `"${folder}"`,
+                '--dry-run',
+              ],
+        env: {KUBECONFIG: kubeconfig},
       };
 
-      const result = await runHelmInMainThread(args);
+      const result = await runCommandInMainThread(options);
+      console.log('got helm result', result);
 
-      if (result.error) {
-        return createRejectionWithAlert(thunkAPI, 'Helm Error', result.error);
+      if (result.error || result.stderr) {
+        return createRejectionWithAlert(
+          thunkAPI,
+          'Helm Error',
+          result.error || result.stderr || `Unknown error ${result.exitCode}`
+        );
       }
 
       if (result.stdout) {
@@ -71,6 +86,8 @@ export const previewHelmValuesFile = createAsyncThunk<
           state.resourceRefsProcessingOptions
         );
       }
+
+      return createRejectionWithAlert(thunkAPI, 'Helm Error', 'Helm returned no resources');
     }
 
     return createRejectionWithAlert(

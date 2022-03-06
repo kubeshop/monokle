@@ -22,7 +22,7 @@ import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {extractK8sResources} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
-import {runKustomizeInMainThread} from '@redux/thunks/previewKustomization';
+import {runKustomize} from '@redux/thunks/previewKustomization';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {errorAlert, successAlert} from '@utils/alert';
@@ -63,7 +63,7 @@ function applyKustomization(
     args.push(...['--namespace', namespace.name]);
   }
 
-  return runKustomizeInMainThread(folder, projectConfig, args);
+  return runKustomize(folder, projectConfig, args);
 }
 
 /**

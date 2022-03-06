@@ -10,7 +10,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteHelmChartPath, getAbsoluteValuesFilePath} from '@redux/services/fileEntry';
 
-import {runHelmInMainThread} from '@utils/helm';
+import {runCommandInMainThread} from '@utils/command';
 
 /**
  * Invokes helm install for the specified helm chart and values file
@@ -27,8 +27,7 @@ function applyHelmChartToCluster(
 ) {
   const chartPath = path.dirname(getAbsoluteHelmChartPath(helmChart, fileMap));
 
-  let helmArgs = [
-    'helm',
+  let args = [
     'install',
     '-f',
     getAbsoluteValuesFilePath(valuesFile, fileMap),
@@ -39,16 +38,19 @@ function applyHelmChartToCluster(
   ];
 
   if (namespace) {
-    helmArgs.push(...['--namespace', namespace]);
+    args.push(...['--namespace', namespace]);
 
     if (shouldCreateNamespace) {
-      helmArgs.push('--create-namespace');
+      args.push('--create-namespace');
     }
   }
 
-  return runHelmInMainThread({
-    helmCommand: helmArgs.join(' '),
-    kubeconfig,
+  return runCommandInMainThread({
+    cmd: 'helm',
+    args,
+    env: {
+      KUBECONFIG: kubeconfig,
+    },
   });
 }
 
