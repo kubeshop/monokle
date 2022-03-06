@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
 
@@ -161,21 +161,18 @@ const ResourceDiff = (props: {
     );
   };
 
-  const onClickApplyResource = useCallback(
-    (namespace?: {name: string; new: boolean}) => {
-      if (onApply) {
-        onApply();
-      }
+  const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
+    if (onApply) {
+      onApply();
+    }
 
-      applyResource(localResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-        isClusterPreview: previewType === 'cluster',
-        shouldPerformDiff: true,
-        isInClusterDiff,
-      });
-      setIsApplyModalVisible(false);
-    },
-    [resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, isInClusterDiff, localResource]
-  );
+    applyResource(localResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
+      isClusterPreview: previewType === 'cluster',
+      shouldPerformDiff: true,
+      isInClusterDiff,
+    });
+    setIsApplyModalVisible(false);
+  };
 
   return (
     <>

@@ -16,7 +16,6 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 import {CommandResult, runCommandInMainThread} from '@utils/command';
 import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
 
-
 /**
  * Thunk to preview kustomizations
  */

@@ -273,28 +273,25 @@ const ActionsPane: React.FC<IProps> = props => {
     setIsApplyModalVisible(false);
   };
 
-  const onClickApplyHelmChart = useCallback(
-    (namespace?: string, shouldCreateNamespace?: boolean) => {
-      if (!selectedValuesFileId) {
-        setIsHelmChartApplyModalVisible(false);
-        return;
-      }
-
-      const helmValuesFile = helmValuesMap[selectedValuesFileId];
-      applyHelmChart(
-        helmValuesFile,
-        helmChartMap[helmValuesFile.helmChartId],
-        fileMap,
-        dispatch,
-        kubeConfigPath,
-        kubeConfigContext,
-        namespace,
-        shouldCreateNamespace
-      );
+  const onClickApplyHelmChart = (namespace?: string, shouldCreateNamespace?: boolean) => {
+    if (!selectedValuesFileId) {
       setIsHelmChartApplyModalVisible(false);
-    },
-    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeConfigPath, kubeConfigContext, selectedValuesFileId]
-  );
+      return;
+    }
+
+    const helmValuesFile = helmValuesMap[selectedValuesFileId];
+    applyHelmChart(
+      helmValuesFile,
+      helmChartMap[helmValuesFile.helmChartId],
+      fileMap,
+      dispatch,
+      kubeConfigPath,
+      kubeConfigContext,
+      namespace,
+      shouldCreateNamespace
+    );
+    setIsHelmChartApplyModalVisible(false);
+  };
 
   const confirmModalTitle = useMemo(() => {
     if (!selectedResource) {

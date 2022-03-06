@@ -132,7 +132,7 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
 };
 
 /**
- * called by thunk to preview a helm chart with values file
+ * called by the renderer thread to run a command and capture its output
  */
 
 export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent) => {
