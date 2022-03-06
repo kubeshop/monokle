@@ -11,6 +11,7 @@ import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 const VolumeAttachmentHandler: ResourceKindHandler = {
   kind: 'VolumeAttachment',
   apiVersionMatcher: '**',
+  isNamespaced: false,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.STORAGE, 'VolumeAttachments'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'storage.k8s.io.v1',

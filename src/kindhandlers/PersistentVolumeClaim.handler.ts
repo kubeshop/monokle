@@ -8,6 +8,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const PersistentVolumeClaimHandler: ResourceKindHandler = {
   kind: 'PersistentVolumeClaim',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.STORAGE, 'PersistentVolumeClaims'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
