@@ -19,9 +19,7 @@ import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/make
 import {
   ApplyFileTooltip,
   ApplyTooltip,
-  DeployKustomizationTooltip,
   DiffTooltip,
-  InstallValuesFileTooltip,
   OpenExternalDocumentationTooltip,
   OpenHelmChartDocumentationTooltip,
   OpenKustomizeDocumentationTooltip,
@@ -44,7 +42,7 @@ import {
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
+import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
@@ -261,37 +259,43 @@ const ActionsPane: React.FC<IProps> = props => {
     return false;
   }, [selectedResource, knownResourceKinds]);
 
-  const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
-    if (!selectedResource) {
+  const onClickApplyResource = useCallback(
+    (namespace?: {name: string; new: boolean}) => {
+      if (!selectedResource) {
+        setIsApplyModalVisible(false);
+        return;
+      }
+      const isClusterPreview = previewType === 'cluster';
+      applyResource(selectedResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
+        isClusterPreview,
+      });
       setIsApplyModalVisible(false);
-      return;
-    }
-    const isClusterPreview = previewType === 'cluster';
-    applyResource(selectedResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-      isClusterPreview,
-    });
-    setIsApplyModalVisible(false);
-  };
+    },
+    [dispatch, fileMap, kubeConfigContext, kubeConfigPath, projectConfig, previewType, resourceMap, selectedResource]
+  );
 
-  const onClickApplyHelmChart = (namespace?: string, shouldCreateNamespace?: boolean) => {
-    if (!selectedValuesFileId) {
+  const onClickApplyHelmChart = useCallback(
+    (namespace?: string, shouldCreateNamespace?: boolean) => {
+      if (!selectedValuesFileId) {
+        setIsHelmChartApplyModalVisible(false);
+        return;
+      }
+
+      const helmValuesFile = helmValuesMap[selectedValuesFileId];
+      applyHelmChart(
+        helmValuesFile,
+        helmChartMap[helmValuesFile.helmChartId],
+        fileMap,
+        dispatch,
+        kubeConfigPath,
+        kubeConfigContext,
+        namespace,
+        shouldCreateNamespace
+      );
       setIsHelmChartApplyModalVisible(false);
-      return;
-    }
-
-    const helmValuesFile = helmValuesMap[selectedValuesFileId];
-    applyHelmChart(
-      helmValuesFile,
-      helmChartMap[helmValuesFile.helmChartId],
-      fileMap,
-      dispatch,
-      kubeConfigPath,
-      kubeConfigContext,
-      namespace,
-      shouldCreateNamespace
-    );
-    setIsHelmChartApplyModalVisible(false);
-  };
+    },
+    [dispatch, fileMap, helmChartMap, helmValuesMap, kubeConfigPath, kubeConfigContext, selectedValuesFileId]
+  );
 
   const confirmModalTitle = useMemo(() => {
     if (!selectedResource) {
@@ -400,15 +404,7 @@ const ActionsPane: React.FC<IProps> = props => {
 
             <Tooltip
               mouseEnterDelay={TOOLTIP_DELAY}
-              title={
-                isKustomization
-                  ? DeployKustomizationTooltip
-                  : selectedPath
-                  ? isHelmValuesFile(selectedPath)
-                    ? InstallValuesFileTooltip
-                    : ApplyFileTooltip
-                  : ApplyTooltip
-              }
+              title={selectedPath ? ApplyFileTooltip : ApplyTooltip}
               placement="bottomLeft"
             >
               <Button
@@ -425,7 +421,7 @@ const ActionsPane: React.FC<IProps> = props => {
                 }
                 icon={<Icon name="kubernetes" />}
               >
-                {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
+                Deploy
               </Button>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
