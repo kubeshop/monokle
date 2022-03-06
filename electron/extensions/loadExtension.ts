@@ -23,13 +23,12 @@ async function loadExtension<ExtensionEntryType, ExtensionType>(
     return undefined;
   }
   const entryFileContent = await readFile(entryFilePath);
-  let parsedEntryFileContent;
+  const parsedEntryFileContent = parseEntryFileContent(entryFileContent);
   try {
-    parsedEntryFileContent = parseEntryFileContent(entryFileContent);
     validateEntryFileContent(parsedEntryFileContent);
   } catch (e) {
     if (e instanceof Error) {
-      log.warn(`[LoadExtension]: Invalid ${entryFileName} in ${folderPath}: `, e.message);
+      log.warn(`[LoadExtension]: Invalid ${entryFileName} in ${folderPath}: `);
     }
     return undefined;
   }
