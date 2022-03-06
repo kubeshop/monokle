@@ -1,4 +1,5 @@
 import {readFileSync} from 'fs';
+import log from 'loglevel';
 import path from 'path';
 import tar from 'tar';
 
@@ -39,6 +40,7 @@ async function downloadExtension<ExtensionEntryType, ExtensionType>(
 
   const tarballFilePath = `${extensionFolderPath}.tgz`;
   const doesTarballFileExist = await doesPathExist(tarballFilePath);
+
   if (doesTarballFileExist) {
     await deleteFile(tarballFilePath);
   }
@@ -71,6 +73,7 @@ export const checkAllJSONFilesOfExtensionAreValid = (folderPath: string) => {
   } catch (error: any) {
     deleteFolder(folderPath);
     const paths: Array<string> = currentFile.split(path.sep);
+    log.warn(`[${paths[paths.length - 1]}]: ${error.message} `);
     throw new Error(`[${paths[paths.length - 1]}]: ${error.message}`);
   }
 };

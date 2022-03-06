@@ -47,6 +47,7 @@ function PluginInstallModal(props: {isVisible: boolean; onClose: () => void}) {
   const download = async (pluginUrl: string) => {
     try {
       setIsDownloading(true);
+      setErrorMessage('');
       const downloadPluginResult = await downloadPlugin(pluginUrl);
       const {pluginExtension, templateExtensions} = downloadPluginResult;
       dispatch(addPlugin(pluginExtension));
