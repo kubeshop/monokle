@@ -26,10 +26,11 @@ interface ElectronStoreChangePropagate<P, T> {
 const projectNameChange: ElectronStoreChangePropagate<Project[], ProjectNameChange> = {
   keyName: 'appConfig.projects',
   action: (newProjects, oldProjects) => {
-    const triggeredForProject = newProjects
-      .find((project, index) => project.name !== oldProjects[index].name);
+    const triggeredForProject = newProjects.find(
+      (project, index) => oldProjects[index] && project.name !== oldProjects[index].name
+    );
     if (!triggeredForProject) {
-      return { shouldTriggerAcrossWindows: false };
+      return {shouldTriggerAcrossWindows: false};
     }
 
     return {
@@ -44,6 +45,4 @@ const projectNameChange: ElectronStoreChangePropagate<Project[], ProjectNameChan
   },
 };
 
-export const globalElectronStoreChanges: ElectronStoreChangePropagate<any, any>[] = [
-  projectNameChange,
-];
+export const globalElectronStoreChanges: ElectronStoreChangePropagate<any, any>[] = [projectNameChange];

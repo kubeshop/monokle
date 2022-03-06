@@ -14,7 +14,7 @@ export const ConfigMapTarget = {
 
 export const SecretTarget = {
   target: {
-    kind: 'Secret',
+    kind: '$(Secret|SealedSecret)',
   },
 };
 
