@@ -35,6 +35,8 @@ import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
 import {useWindowSize} from '@utils/hooks';
 import {StartupFlag} from '@utils/startupFlag';
+import electronStore from '@utils/electronStore';
+import {globalElectronStoreChanges} from '@utils/global-electron-store';
 
 import AppContext from './AppContext';
 
@@ -155,6 +157,19 @@ const App = () => {
       dispatch(setOpenProject(project.rootFolder));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    globalElectronStoreChanges.forEach((globalElectronStoreChange) => {
+      electronStore.onDidChange(globalElectronStoreChange.keyName, (newData: any, oldData: any) => {
+        const { shouldTriggerAcrossWindows, eventData } = globalElectronStoreChange.action(newData, oldData);
+        if (!shouldTriggerAcrossWindows || !eventData) {
+          return;
+        }
+
+        ipcRenderer.send('global-electron-store-update', eventData);
+      });
+    });
   }, []);
 
   useEffect(() => {
@@ -309,3 +324,12 @@ const App = () => {
 };
 
 export default App;
+
+export const ErrorFallback = ({error}: any) => {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+    </div>
+  );
+};

@@ -6,6 +6,8 @@ import {execSync} from 'child_process';
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import _ from 'lodash';
 import log from 'loglevel';
+import {machineIdSync} from 'node-machine-id';
+import Nucleus from 'nucleus-nodejs';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
@@ -77,6 +79,14 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
 
   if (!projectsRootPath) {
     electronStore.set('appConfig.projectsRootPath', path.join(userHomeDir, 'Monokle'));
+  }
+};
+
+export const setDeviceID = (deviceID: string) => {
+  const ID: string = electronStore.get('main.deviceID');
+
+  if (!ID) {
+    electronStore.set('main.deviceID', deviceID);
   }
 };
 
@@ -158,4 +168,30 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
       return true;
     }
   });
+};
+
+
+export const initNucleus = (isDev: boolean, app: any) => {
+  Nucleus.init(process.env.NUCLEUS_SH_APP_ID || '6218cf3ef5e5d2023724d89b', {
+    disableInDev: false,
+    disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
+    disableErrorReports: true,
+    debug: false,
+  });
+
+  Nucleus.setUserId(machineIdSync());
+
+  Nucleus.setProps(
+    {
+      os: process.platform,
+      version: app.getVersion(),
+      language: app.getLocale(),
+    },
+    true
+  );
+
+  return {
+    disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
+    disableErrorReports: Boolean(electronStore.get('appConfig.disableErrorReporting')),
+  };
 };

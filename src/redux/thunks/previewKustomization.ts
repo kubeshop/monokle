@@ -14,6 +14,8 @@ import {currentConfigSelector} from '@redux/selectors';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {CommandResult, runCommandInMainThread} from '@utils/command';
+import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
+
 
 /**
  * Thunk to preview kustomizations
@@ -38,6 +40,8 @@ export const previewKustomization = createAsyncThunk<
 
     log.info(`previewing ${resource.id} in folder ${folder}`);
     const result = await runKustomize(folder, projectConfig);
+
+    trackEvent(DO_KUSTOMIZE_PREVIEW);
 
     if (result.error) {
       return createRejectionWithAlert(thunkAPI, 'Kustomize Error', result.error);

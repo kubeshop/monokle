@@ -1,6 +1,10 @@
 import {Button} from 'antd';
 
-import {FormOutlined as RawFormOutlined} from '@ant-design/icons';
+import {
+  FormOutlined as RawFormOutlined,
+  PushpinFilled as RawPushPinFilled,
+  PushpinOutlined as RawPushPinOutlined,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -42,8 +46,26 @@ export const NameContainer = styled.div`
   justify-content: flex-start;
   width: 100%;
   gap: 6px;
+  justify-content: space-between;
 `;
 
+export const PinTemplateButton = styled(RawPushPinOutlined)`
+  font-size: 24px;
+  opacity: 0.8;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+`;
+
+export const UnPinTemplateButton = styled(RawPushPinFilled)`
+  font-size: 24px;
+  opacity: 0.8;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+`;
 export const Name = styled.span`
   color: ${Colors.whitePure};
   white-space: nowrap;

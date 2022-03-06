@@ -14,6 +14,7 @@ import {currentConfigSelector} from '@redux/selectors';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {CommandOptions, runCommandInMainThread} from '@utils/command';
+import {DO_HELM_PREVIEW, trackEvent} from '@utils/telemetry';
 
 /**
  * Thunk to preview a Helm Chart
@@ -66,7 +67,8 @@ export const previewHelmValuesFile = createAsyncThunk<
       };
 
       const result = await runCommandInMainThread(options);
-      console.log('got helm result', result);
+
+      trackEvent(DO_HELM_PREVIEW);
 
       if (result.error || result.stderr) {
         return createRejectionWithAlert(

@@ -51,6 +51,7 @@ const initialAppState: AppState = {
   prevConfEditor: {
     isOpen: false,
   },
+  deviceID: electronStore.get('main.deviceID'),
 };
 
 const initialAppConfigState: AppConfig = {
@@ -91,6 +92,9 @@ const initialAppConfigState: AppConfig = {
   isProjectLoading: true,
   projectsRootPath: electronStore.get('appConfig.projectsRootPath'),
   k8sVersion: electronStore.get('appConfig.k8sVersion') || PREDEFINED_K8S_VERSION,
+  favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
+  disableEventTracking: electronStore.get('appConfig.disableEventTracking') || false,
+  disableErrorReporting: electronStore.get('appConfig.disableErrorReporting') || false,
 };
 
 const initialAlertState: AlertState = {};

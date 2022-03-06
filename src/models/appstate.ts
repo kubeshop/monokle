@@ -150,6 +150,7 @@ interface AppState {
     isOpen: boolean;
     helmChartId?: string;
   };
+  deviceID: string;
 }
 
 export type {
