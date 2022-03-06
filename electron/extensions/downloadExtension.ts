@@ -1,9 +1,11 @@
+import {readFileSync} from 'fs';
+import path from 'path';
 import tar from 'tar';
 
 import {downloadFile} from '@utils/http';
 
 import downloadExtensionEntry from './downloadExtensionEntry';
-import {createOrRecreateFolder, deleteFile, doesPathExist} from './fileSystem';
+import {createOrRecreateFolder, deleteFile, deleteFolder, doesPathExist, getAllFiles} from './fileSystem';
 import {DownloadExtensionOptions} from './types';
 
 async function downloadExtension<ExtensionEntryType, ExtensionType>(
@@ -50,7 +52,25 @@ async function downloadExtension<ExtensionEntryType, ExtensionType>(
 
   await deleteFile(tarballFilePath);
 
+  checkAllJSONFilesOfExtensionAreValid(extensionFolderPath);
+
   return extension;
 }
 
 export default downloadExtension;
+
+export const checkAllJSONFilesOfExtensionAreValid = (folderPath: string) => {
+  const allFiles = getAllFiles(folderPath).filter(file => path.extname(file) === '.json');
+  let currentFile: string = '';
+  try {
+    allFiles.forEach(file => {
+      currentFile = file;
+      const fileData = readFileSync(file);
+      JSON.parse(fileData.toString());
+    });
+  } catch (error: any) {
+    deleteFolder(folderPath);
+    const paths: Array<string> = currentFile.split(path.sep);
+    throw new Error(`[${paths[paths.length - 1]}]: ${error.message}`);
+  }
+};

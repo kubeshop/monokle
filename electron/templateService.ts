@@ -141,7 +141,7 @@ const makeLoadTemplateOptions = (folderPath: string) => {
   return {
     folderPath,
     entryFileName: TEMPLATE_ENTRY_FILE_NAME,
-    parseEntryFileContent: JSON.parse,
+    parseEntryFileContent: parseEntryFileContentHandler.bind(null),
     validateEntryFileContent: validateAnyTemplate,
     transformEntryFileContentToExtension: parseTemplate,
   };
@@ -307,3 +307,11 @@ export async function updateTemplatePack(
   }
   return undefined;
 }
+
+export const parseEntryFileContentHandler = (entryFileContent: any) => {
+  try {
+    return JSON.parse(entryFileContent);
+  } catch (error: any) {
+    log.error(`[${entryFileContent.name}]: ${error.message}`);
+  }
+};
