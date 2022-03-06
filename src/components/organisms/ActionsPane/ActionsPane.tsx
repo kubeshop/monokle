@@ -19,7 +19,9 @@ import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/make
 import {
   ApplyFileTooltip,
   ApplyTooltip,
+  DeployKustomizationTooltip,
   DiffTooltip,
+  InstallValuesFileTooltip,
   OpenExternalDocumentationTooltip,
   OpenHelmChartDocumentationTooltip,
   OpenKustomizeDocumentationTooltip,
@@ -42,7 +44,7 @@ import {
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isHelmChartFile} from '@redux/services/helm';
+import {isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
@@ -401,7 +403,15 @@ const ActionsPane: React.FC<IProps> = props => {
 
             <Tooltip
               mouseEnterDelay={TOOLTIP_DELAY}
-              title={selectedPath ? ApplyFileTooltip : ApplyTooltip}
+              title={
+                isKustomization
+                  ? DeployKustomizationTooltip
+                  : selectedPath
+                  ? isHelmValuesFile(selectedPath)
+                    ? InstallValuesFileTooltip
+                    : ApplyFileTooltip
+                  : ApplyTooltip
+              }
               placement="bottomLeft"
             >
               <Button
@@ -418,7 +428,7 @@ const ActionsPane: React.FC<IProps> = props => {
                 }
                 icon={<Icon name="kubernetes" />}
               >
-                Deploy
+                {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
               </Button>
             </Tooltip>
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
