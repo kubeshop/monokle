@@ -11,6 +11,7 @@ import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 const ServiceAccountHandler: ResourceKindHandler = {
   kind: 'ServiceAccount',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.ACCESS_CONTROL, 'ServiceAccounts'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
