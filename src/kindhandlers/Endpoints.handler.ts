@@ -8,6 +8,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const EndpointsHandler: ResourceKindHandler = {
   kind: 'Endpoints',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'Endpoints'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',

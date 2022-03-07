@@ -10,6 +10,7 @@ import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outg
 const ServiceHandler: ResourceKindHandler = {
   kind: 'Service',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'Services'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',

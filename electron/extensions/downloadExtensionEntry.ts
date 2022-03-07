@@ -47,7 +47,7 @@ async function downloadExtensionEntry<ExtensionEntryType>(
   if (doesEntryFileExist) {
     await deleteFile(entryFilePath);
   }
-  await writeFile(entryFilePath, entryFileContent);
+  await writeFile(entryFilePath, JSON.stringify(parsedEntryFileContent));
 
   return parsedEntryFileContent;
 }

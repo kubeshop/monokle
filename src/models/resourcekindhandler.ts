@@ -56,6 +56,12 @@ interface ResourceKindHandler {
   apiVersionMatcher: string;
 
   /**
+   * If this resource kind is namespaced
+   */
+
+  isNamespaced: boolean;
+
+  /**
    * API version used by cluster preview
    */
 

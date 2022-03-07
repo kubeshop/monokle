@@ -10,6 +10,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const DaemonSetHandler: ResourceKindHandler = {
   kind: 'DaemonSet',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'DaemonSets'],
   clusterApiVersion: 'apps/v1',
   validationSchemaPrefix: 'io.k8s.api.apps.v1',
