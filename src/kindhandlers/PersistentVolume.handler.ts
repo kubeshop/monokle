@@ -11,6 +11,7 @@ import {SecretTarget} from '@src/kindhandlers/common/outgoingRefMappers';
 const PersistentVolumeHandler: ResourceKindHandler = {
   kind: 'PersistentVolume',
   apiVersionMatcher: '**',
+  isNamespaced: false,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.STORAGE, 'PersistentVolumes'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',

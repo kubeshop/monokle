@@ -8,6 +8,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const RoleHandler: ResourceKindHandler = {
   kind: 'Role',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.ACCESS_CONTROL, 'Roles'],
   clusterApiVersion: 'rbac.authorization.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.rbac.v1',

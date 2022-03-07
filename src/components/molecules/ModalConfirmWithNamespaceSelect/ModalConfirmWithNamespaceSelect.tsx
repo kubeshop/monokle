@@ -19,6 +19,8 @@ import {getDefaultNamespaceForApply} from '@utils/resources';
 
 import Colors from '@styles/Colors';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 const ErrorMessageLabel = styled.div`
   color: ${Colors.redError};
   margin-top: 10px;
@@ -111,8 +113,14 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     }
   }, [defaultOption, defaultNamespace, namespaces]);
 
-  const onlyNamespaces = useMemo(() => resources.every(r => r.kind === 'Namespace'), [resources]);
-  const hasNamespaces = useMemo(() => resources.some(r => r.kind === 'Namespace'), [resources]);
+  const onlyClusterScopedResources = useMemo(
+    () => resources.every(r => !getResourceKindHandler(r.kind)?.isNamespaced),
+    [resources]
+  );
+  const hasClusterScopedResources = useMemo(
+    () => resources.some(r => !getResourceKindHandler(r.kind)?.isNamespaced),
+    [resources]
+  );
 
   if (!selectedOption) {
     return null;
@@ -133,11 +141,12 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     >
       <>
         <HeadlineLabel>
-          Select namespace {hasNamespaces && !onlyNamespaces && ' for all non-Namespace resources'}:
+          Select namespace {hasClusterScopedResources && !onlyClusterScopedResources && ' for all namespaced resources'}
+          :
         </HeadlineLabel>
         <Radio.Group
           key={selectedOption}
-          disabled={onlyNamespaces}
+          disabled={onlyClusterScopedResources}
           onChange={e => {
             setSelectedOption(e.target.value);
             setErrorMessage('');
@@ -154,7 +163,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           <NamespaceContainer>
             <span>Namespace:</span>
             <Select
-              disabled={onlyNamespaces}
+              disabled={onlyClusterScopedResources}
               value={selectedNamespace}
               showSearch
               defaultValue={defaultNamespace}
@@ -174,7 +183,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
             <NamespaceContainer>
               <span>Namespace name:</span>
               <Input
-                disabled={onlyNamespaces}
+                disabled={onlyClusterScopedResources}
                 autoFocus
                 defaultValue={createNamespaceName}
                 placeholder="Enter namespace name"

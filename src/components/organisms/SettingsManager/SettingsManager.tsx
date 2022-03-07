@@ -4,10 +4,16 @@ import {useDebounce} from 'react-use';
 import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import {InfoCircleOutlined} from '@ant-design/icons';
+
 import _ from 'lodash';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, PREDEFINED_K8S_VERSION} from '@constants/constants';
-import {AutoLoadLastProjectTooltip} from '@constants/tooltips';
+import {
+  AutoLoadLastProjectTooltip,
+  DisableErrorReportingTooltip,
+  DisableEventTrackingTooltip,
+} from '@constants/tooltips';
 
 import {Project, ProjectConfig} from '@models/appconfig';
 
@@ -17,6 +23,8 @@ import {
   changeProjectsRootPath,
   setKubeConfig,
   setScanExcludesStatus,
+  toggleErrorReporting,
+  toggleEventTracking,
   updateApplicationSettings,
   updateClusterSelectorVisibilty,
   updateFileIncludes,
@@ -47,6 +55,8 @@ const SettingsManager: React.FC = () => {
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
+  const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
+  const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
   const [activePanels, setActivePanels] = useState<number[]>([3]);
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
@@ -103,6 +113,14 @@ const SettingsManager: React.FC = () => {
     dispatch(updateClusterSelectorVisibilty(e.target.checked));
   };
 
+  const handleToggleEventTracking = () => {
+    dispatch(toggleEventTracking());
+  };
+
+  const handleToggleErrorReporting = () => {
+    dispatch(toggleErrorReporting());
+  };
+
   const onProjectNameChange = (projectName: string) => {
     if (projectName) {
       dispatch(changeCurrentProjectName(projectName));
@@ -142,8 +160,8 @@ const SettingsManager: React.FC = () => {
             form={settingsForm}
             initialValues={() => ({projectsRootPath})}
             autoComplete="off"
-            onFieldsChange={(field, allFields) => {
-              const rootPath = allFields.filter(f => _.includes(f.name.toString(), 'projectsRootPath'))[0].value;
+            onFieldsChange={(field: any, allFields: any) => {
+              const rootPath = allFields.filter((f: any) => _.includes(f.name.toString(), 'projectsRootPath'))[0].value;
               setCurrentProjectsRootPath(rootPath);
             }}
           >
@@ -182,6 +200,26 @@ const SettingsManager: React.FC = () => {
             <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
               Show Cluster Selector
             </Checkbox>
+          </S.Div>
+          <S.Div>
+            <S.Span style={{display: 'inline-block', marginRight: '8px'}}>Telemetry</S.Span>
+            <Tooltip title="DOCUMENTATION URL">
+              <InfoCircleOutlined style={{display: 'inline-block'}} />
+            </Tooltip>
+            <S.Div style={{marginBottom: '8px'}}>
+              <Tooltip title={DisableEventTrackingTooltip}>
+                <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
+                  Disable Event Tracking
+                </Checkbox>
+              </Tooltip>
+            </S.Div>
+            <S.Div>
+              <Tooltip title={DisableErrorReportingTooltip}>
+                <Checkbox checked={disableErrorReporting} onChange={handleToggleErrorReporting}>
+                  Disable Error Reports
+                </Checkbox>
+              </Tooltip>
+            </S.Div>
           </S.Div>
         </Panel>
         <Panel header="Default Project Settings" key="2">

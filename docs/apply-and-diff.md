@@ -7,8 +7,8 @@ When a resource is selected in the navigator, the Editor contains **Deploy** and
 - Selecting **Deploy** will deploy the selected resource to the currently configured Cluster. A status message will be
   shown in the top right after deploying.
 - Selecting **Diff** will diff the selected resource against the currently configured cluster;
-    - If the resource does not exist in the cluster an error will be shown.
-    - If the resource _does_ exist a Diff dialog will be shown.
+    - If the resource does not exist in the cluster, an error will be shown.
+    - If the resource _does_ exist, the Diff dialog will be shown.
 
 ![Resource Diff](img/diff-tble-8-1.5.0.png)
 
@@ -22,5 +22,17 @@ Refreshing the diff is done with the **Refresh** button and deploying your local
 
 ## **Editing a Resource in Cluster Mode**
 
-Monokle allows you to edit any resource viewed in [Cluster Mode](cluster-integration.md) and use the Deploy button to apply those changes back
+Monokle allows you to edit any resource viewed in [Cluster Mode](cluster-integration.md) and use the **Deploy** button to apply those changes back
 to the cluster. This immediately applies "hot fixes" to your cluster during browsing.
+
+## **Deploy Resource Changes to Cluster**
+
+After editing a resource in Monokle, click the **Diff** button:
+
+![Deploy Button](img/deploy-to-cluster-1.5.0.png)
+
+ The following modal appears for selecting the namesapce for deployment:
+
+![Namespace Selector](img/namespace-selector-1.5.0.png)
+
+Select an existing namespace from the cluster, create a new namespace, or don't specify a namespace, which will deploy into namespaces already declared in the resource.

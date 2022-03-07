@@ -14,6 +14,9 @@ const schema = {
           },
         },
       },
+      deviceID: {
+        type: 'string',
+      },
     },
   },
   appConfig: {
@@ -106,6 +109,15 @@ const schema = {
       },
       projectsRootFolder: {
         type: 'string',
+      },
+      favoriteTemplates: {
+        type: 'array',
+      },
+      disableEventTracking: {
+        type: 'boolean',
+      },
+      disableErrorReporting: {
+        type: 'boolean',
       },
     },
   },

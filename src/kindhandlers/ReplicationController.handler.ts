@@ -10,6 +10,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const ReplicationControllerHandler: ResourceKindHandler = {
   kind: 'ReplicationController',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'ReplicationControllers'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',

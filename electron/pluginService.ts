@@ -20,7 +20,9 @@ import {convertExtensionsToRecord, extractRepositoryOwnerAndNameFromUrl, makeExt
 const PLUGIN_ENTRY_FILE_NAME = 'package.json';
 
 function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderPath: string): AnyPlugin {
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(packageJson.repository);
+  const {repositoryOwner, repositoryName, repositoryBranch} = extractRepositoryOwnerAndNameFromUrl(
+    packageJson.repository
+  );
   const plugin: AnyPlugin = {
     id: packageJson.monoklePlugin.id,
     name: packageJson.name,
@@ -31,7 +33,7 @@ function transformPackageJsonToAnyPlugin(packageJson: PluginPackageJson, folderP
     repository: {
       owner: repositoryOwner,
       name: repositoryName,
-      branch: 'main', // TODO: handle the branch name
+      branch: repositoryBranch,
     },
     modules: packageJson.monoklePlugin.modules.map(module => {
       if (isTemplatePluginModule(module)) {
@@ -60,7 +62,7 @@ export async function downloadPlugin(
     extensionTarballUrl: tarballUrl,
     entryFileName: 'package.json',
     entryFileUrl,
-    parseEntryFileContent: JSON.parse,
+    parseEntryFileContent: parseEntryFileContentHandler.bind(null, pluginUrl),
     validateEntryFileContent: validatePluginPackageJson,
     transformEntryFileContentToExtension: transformPackageJsonToAnyPlugin,
     makeExtensionFolderPath: () => {
@@ -97,7 +99,14 @@ export async function updatePlugin(
   pluginsDir: string,
   userTempDir: string
 ): Promise<AnyExtension<AnyPlugin> | undefined> {
-  const repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
+  let repositoryUrl;
+
+  if (plugin.repository.branch) {
+    repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}/tree/${plugin.repository.branch}`;
+  } else {
+    repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
+  }
+
   const {entryFileUrl, folderPath} = makeExtensionDownloadData(repositoryUrl, PLUGIN_ENTRY_FILE_NAME, userTempDir);
   let tempPluginEntry: PluginPackageJson;
   try {
@@ -114,6 +123,7 @@ export async function updatePlugin(
     }
     return;
   }
+
   if (semver.lt(plugin.version, tempPluginEntry.version)) {
     try {
       const pluginExtension = await downloadPlugin(repositoryUrl, pluginsDir);
@@ -128,3 +138,11 @@ export async function updatePlugin(
   }
   return undefined;
 }
+
+export const parseEntryFileContentHandler = (pluginUrl: string, entryFileContext: string) => {
+  const entryFile = JSON.parse(entryFileContext);
+  if (pluginUrl) {
+    entryFile.repository = pluginUrl;
+  }
+  return entryFile;
+};

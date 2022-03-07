@@ -2,6 +2,9 @@
 /* eslint-disable import/first */
 import moduleAlias from 'module-alias';
 import * as ElectronLog from 'electron-log';
+import { machineIdSync } from 'node-machine-id';
+import Nucleus from 'nucleus-nodejs';
+import unhandled from 'electron-unhandled';
 
 Object.assign(console, ElectronLog.functions);
 moduleAlias.addAliases({
@@ -29,10 +32,14 @@ import {
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
-import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
+import {
+  changeCurrentProjectName,
+  setUserDirs,
+  updateNewVersion,
+} from '@redux/reducers/appConfig';
 import {NewVersionCode} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
-import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector} from '@redux/selectors';
+import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector, activeProjectSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
 import {PROCESS_ENV} from '@utils/env';
@@ -64,9 +71,10 @@ import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
 import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder } from './utils';
+import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder, setDeviceID, initNucleus } from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
+import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -82,14 +90,29 @@ const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize'];
 
+let {disableErrorReports,disableTracking} =  initNucleus(isDev, app);
+unhandled({
+  logger: (error) => {
+      if (!disableErrorReports) {
+        Nucleus.trackError((error && error.name) || 'Unnamed error', error);
+      }
+    },
+    showDialog: false
+});
+
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
+setDeviceID(machineIdSync());
 
-ipcMain.on('get-user-home-dir', event => {
+ipcMain.on('track-event', async (event: any, { eventName, payload }: any) => {
+    Nucleus.track(eventName, {...payload});
+});
+
+ipcMain.on('get-user-home-dir', (event:any) => {
   event.returnValue = userHomeDir;
 });
 
-ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
+ipcMain.on(DOWNLOAD_PLUGIN, async (event:any, pluginUrl: string) => {
   try {
     const pluginExtension = await downloadPlugin(pluginUrl, pluginsDir);
     const templateExtensions = await loadTemplatesFromPlugin(pluginExtension.extension);
@@ -104,7 +127,7 @@ ipcMain.on(DOWNLOAD_PLUGIN, async (event, pluginUrl: string) => {
   }
 });
 
-ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
+ipcMain.on(DOWNLOAD_TEMPLATE, async (event:any, templateUrl: string) => {
   try {
     const templateExtension = await downloadTemplate(templateUrl, templatesDir);
     const downloadTemplateResult: DownloadTemplateResult = {templateExtension};
@@ -118,7 +141,7 @@ ipcMain.on(DOWNLOAD_TEMPLATE, async (event, templateUrl: string) => {
   }
 });
 
-ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event, templatePackUrl: string) => {
+ipcMain.on(DOWNLOAD_TEMPLATE_PACK, async (event:any, templatePackUrl: string) => {
   try {
     const templatePackExtension = await downloadTemplatePack(templatePackUrl, templatePacksDir);
     const templateExtensions = await loadTemplatesFromTemplatePack(templatePackExtension.extension);
@@ -139,7 +162,7 @@ type UpdateExtensionsPayload = {
   pluginMap: Record<string, AnyPlugin>;
 };
 
-ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) => {
+ipcMain.on(UPDATE_EXTENSIONS, async (event:any, payload: UpdateExtensionsPayload) => {
   const {templateMap, pluginMap, templatePackMap} = payload;
   let errorMessage = '';
 
@@ -212,19 +235,19 @@ ipcMain.on(UPDATE_EXTENSIONS, async (event, payload: UpdateExtensionsPayload) =>
   event.sender.send(UPDATE_EXTENSIONS_RESULT, updateExtensionsResult);
 });
 
-ipcMain.on('interpolate-vanilla-template', (event, args: InterpolateTemplateOptions) => {
+ipcMain.on('interpolate-vanilla-template', (event:any, args: InterpolateTemplateOptions) => {
   interpolateTemplate(args, event);
 });
 
-ipcMain.on('run-kustomize', (event, cmdOptions: KustomizeCommandOptions) => {
+ipcMain.on('run-kustomize', (event:any, cmdOptions: KustomizeCommandOptions) => {
   runKustomize(cmdOptions, event);
 });
 
-ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
+ipcMain.handle('select-file', async (event:any, options: FileExplorerOptions) => {
   return selectFileDialog(event, options);
 });
 
-ipcMain.handle('save-file', async (event, options: FileOptions) => {
+ipcMain.handle('save-file', async (event:any, options: FileOptions) => {
   return saveFileDialog(event, options);
 });
 
@@ -245,8 +268,17 @@ ipcMain.on('quit-and-install', () => {
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
 
-ipcMain.on('confirm-action', (event, args) => {
+ipcMain.on('confirm-action', (event:any, args) => {
   event.returnValue = askActionConfirmation(args);
+});
+
+ipcMain.on('global-electron-store-update', (event, args: any) => {
+  if (args.eventType === StorePropagation.ChangeProjectName) {
+    const payload: ProjectNameChange = args.payload;
+    dispatchToAllWindows(changeCurrentProjectName(payload.newName));
+  } else {
+    log.warn(`received invalid event type for global electron store update ${args.eventType}`);
+  }
 });
 
 export const createWindow = (givenPath?: string) => {
@@ -333,9 +365,12 @@ export const createWindow = (givenPath?: string) => {
   win.webContents.on('dom-ready', async () => {
     const dispatch = createDispatchForWindow(win);
 
+  Nucleus.appStarted();
+
     subscribeToStoreStateChanges(win.webContents, (storeState) => {
       createMenu(storeState, dispatch);
-      setWindowTitle(storeState, win);
+      let projectName = activeProjectSelector(storeState)?.name;
+      setWindowTitle(storeState, win, projectName);
       unsavedResourceCount = unsavedResourcesSelector(storeState).length;
     });
 
@@ -412,6 +447,7 @@ export const createWindow = (givenPath?: string) => {
   return win;
 };
 
+
 export const openApplication = async (givenPath?: string) => {
   await app.whenReady();
 
@@ -466,7 +502,7 @@ if (MONOKLE_RUN_AS_NODE) {
 
 terminal().catch(e => log.error(e));
 
-export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
+export const setWindowTitle = (state: RootState, window: BrowserWindow, projectName?: String) => {
   if (window.isDestroyed()) {
     return;
   }
@@ -479,6 +515,14 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   const helmValuesMap = state.main.helmValuesMap;
   const helmChartMap = state.main.helmChartMap;
   const fileMap = state.main.fileMap;
+  disableTracking = state.config.disableEventTracking;
+  disableErrorReports = state.config.disableErrorReporting;
+
+  if (disableTracking) {
+    Nucleus.disableTracking();
+  } else {
+    Nucleus.enableTracking();
+  }
 
   let previewResource: K8sResource | undefined;
   let previewValuesFile: HelmValuesFile | undefined;
@@ -513,7 +557,7 @@ export const setWindowTitle = (state: RootState, window: BrowserWindow) => {
   }
   if (fileMap && fileMap[ROOT_FILE_ENTRY] && fileMap[ROOT_FILE_ENTRY].filePath) {
     windowTitle = fileMap[ROOT_FILE_ENTRY].filePath;
-    window.setTitle(`Monokle - ${windowTitle}`);
+    window.setTitle(`Monokle - ${projectName} -${windowTitle}`);
     return;
   }
   window.setTitle(windowTitle);

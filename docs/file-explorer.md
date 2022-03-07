@@ -1,19 +1,19 @@
 # File Explorer
 
-- The File Explorer shows all files parsed in the folder selected:
-  - Excluded files are greyed out.
-  - Files containing resource manifests have a number displayed after them, showing the number of 
-    resources found in that file.
+The File Explorer shows all files parsed in the folder selected:
+
+- Excluded files are greyed out.
+- Files containing resource manifests have a number displayed after them, showing the number of resources found in that file.
 
 Selecting a file will highlight contained resources in the Navigator and attempt to scroll them into view. The contents of the 
-file will be shown in the source editor to the right - allowing for direct editing of the file.
+file will be shown in the source editor to the right, allowing for direct editing of the file.
 
 ![File Explorer Navigation](img/resource-navigation-2-1.5.0.png)
 
 In this screenshot:
 
 - The argo-rollouts-aggregate-roles.yaml file is selected - the "3" after the filename indicates it contains 3 kubernetes resources.
-- The 3 ClusterRole resources in thie file are highlighed in the Navigator in the middle.
+- The 3 ClusterRole resources in the file are highlighed in the Navigator in the middle of the screen.
 - The contents of the file are shown in the editor to the right.
 
 While in the File Explorer, the File Action drop down list is available by clicking the ellipsis to the right of the file name.

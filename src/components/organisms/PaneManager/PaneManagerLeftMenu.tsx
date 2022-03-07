@@ -12,6 +12,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection, toggleLeftMenu, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeProjectSelector, kustomizationsSelector} from '@redux/selectors';
 
+import {SELECT_LEFT_TOOL_PANEL, trackEvent} from '@utils/telemetry';
+
 import Colors from '@styles/Colors';
 
 import {HELM_CHART_SECTION_NAME} from '@src/navsections/HelmChartSectionBlueprint';
@@ -50,6 +52,7 @@ const PaneManagerLeftMenu: React.FC = () => {
       if (isStartProjectPaneVisible) {
         dispatch(toggleStartProjectPane());
       }
+      trackEvent(SELECT_LEFT_TOOL_PANEL, {panelID: selectedMenu});
       dispatch(setLeftMenuSelection(selectedMenu));
 
       if (!leftActive) {
@@ -80,6 +83,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         placement="right"
       >
         <MenuButton
+          id="file-explorer"
           isSelected={leftMenuSelection === 'file-explorer'}
           isActive={Boolean(activeProject) && leftActive}
           shouldWatchSelectedPath
@@ -101,6 +105,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         placement="right"
       >
         <MenuButton
+          id="kustomize-pane"
           isSelected={Boolean(activeProject) && leftMenuSelection === 'kustomize-pane'}
           isActive={Boolean(activeProject) && leftActive}
           onClick={() => setLeftActiveMenu('kustomize-pane')}
@@ -128,6 +133,7 @@ const PaneManagerLeftMenu: React.FC = () => {
         placement="right"
       >
         <MenuButton
+          id="helm-pane"
           isSelected={Boolean(activeProject) && leftMenuSelection === 'helm-pane'}
           isActive={Boolean(activeProject) && leftActive}
           onClick={() => setLeftActiveMenu('helm-pane')}

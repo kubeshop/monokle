@@ -397,7 +397,7 @@ const ActionsPane: React.FC<IProps> = props => {
 
             {isSelectedResourceUnsaved() && (
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={SaveUnsavedResourceTooltip}>
-                <S.SaveButton type="primary" size="small" onClick={onSaveHandler}>
+                <S.SaveButton id="save-button" type="primary" size="small" onClick={onSaveHandler}>
                   Save
                 </S.SaveButton>
               </Tooltip>
@@ -494,12 +494,7 @@ const ActionsPane: React.FC<IProps> = props => {
 
           {schemaForSelectedPath ||
           (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
-            <TabPane
-              key="form"
-              tab={
-                <TabHeader icon={<ContainerOutlined />}>{selectedResource ? selectedResource.kind : 'Form'}</TabHeader>
-              }
-            >
+            <TabPane key="form" tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}>
               {isFolderLoading || previewLoader.isLoading ? (
                 <S.Skeleton active />
               ) : activeTabKey === 'form' ? (

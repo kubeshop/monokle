@@ -17,6 +17,7 @@ import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {createKubeClient} from '@utils/kubeclient';
+import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -80,6 +81,8 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
         processResources(k8sVersion, userDataDir, previewResult.previewResources, resourceRefsProcessingOptions, {
           resourceIds: customResources.map(r => r.id),
         });
+
+        trackEvent(CLUSTER_VIEW, {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
 
         previewResult.alert.message = `Previewing ${Object.keys(previewResult.previewResources).length} resources`;
       }

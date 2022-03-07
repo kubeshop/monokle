@@ -16,6 +16,7 @@ import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
+import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 
 /**
  * Thunk to set the specified root folder
@@ -83,6 +84,11 @@ export const setRootFolder = createAsyncThunk<
     } files`,
     type: AlertEnum.Success,
   };
+
+  trackEvent(OPEN_EXISTING_PROJECT, {
+    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
+    numberOfResources: Object.values(resourceMap).length,
+  });
 
   return {
     projectConfig,
