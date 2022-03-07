@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Dropdown, Tooltip} from 'antd';
@@ -119,11 +119,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
-  if (!isClusterSelectorVisible) {
-    return null;
-  }
-
-  const clusterAccessInfo = () => {
+  const {icon, tooltip} = useMemo(() => {
     const hasFullAccess = clusterAccess?.some(ca => ca.hasFullAccess);
     if (hasFullAccess) {
       return {
@@ -136,9 +132,11 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
       icon: <S.ExclamationCircleOutlinedWarning />,
       tooltip: 'You do not have full access to this cluster',
     };
-  };
+  }, [clusterAccess]);
 
-  const {icon, tooltip} = clusterAccessInfo();
+  if (!isClusterSelectorVisible) {
+    return null;
+  }
 
   return (
     <S.ClusterContainer id="ClusterContainer">

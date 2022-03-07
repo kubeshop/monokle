@@ -386,19 +386,22 @@ const ActionsPane: React.FC<IProps> = props => {
     setSchemaForSelectedPath(selectedPath ? getSchemaForPath(selectedPath, fileMap) : undefined);
   }, [selectedPath, fileMap]);
 
-  const getDeployTooltip = () => {
+  const deployTooltip = useMemo(() => {
     return selectedPath
       ? isHelmValuesFile(selectedPath)
         ? InstallValuesFileTooltip
         : ApplyFileTooltip
       : ApplyTooltip;
-  };
-  const isDeployButtonDisabled = () => {
-    return (!selectedResourceId && !selectedPath) ||
+  }, [selectedPath]);
+
+  const isDeployButtonDisabled = useMemo(() => {
+    return (
+      (!selectedResourceId && !selectedPath) ||
       (selectedResource &&
         !isKustomizationResource(selectedResource) &&
-        (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)));
-  };
+        (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
+    );
+  }, [selectedResource, knownResourceKinds, selectedResourceId, selectedPath]);
 
   const onClickRunPreviewConfiguration = useCallback(() => {
     if (!selectedPreviewConfiguration) {
@@ -465,18 +468,14 @@ const ActionsPane: React.FC<IProps> = props => {
                 </Tooltip>
               )}
 
-            <Tooltip
-              mouseEnterDelay={TOOLTIP_DELAY}
-              title={getDeployTooltip()}
-              placement="bottomLeft"
-            >
+            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={deployTooltip} placement="bottomLeft">
               <Button
                 loading={Boolean(applyingResource)}
                 type="primary"
                 size="small"
                 ghost
                 onClick={applySelection}
-                disabled={isDeployButtonDisabled()}
+                disabled={isDeployButtonDisabled}
                 icon={<Icon name="kubernetes" />}
               >
                 {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}

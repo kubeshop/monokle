@@ -1,12 +1,12 @@
 import * as k8s from '@kubernetes/client-node';
 
-import log from 'loglevel';
 import {execSync} from 'child_process';
+import log from 'loglevel';
 
 import {AppConfig, ClusterAccess, KubePermissions} from '@models/appconfig';
 
-import {getMainProcessEnv} from '@utils/env';
 import electronStore from '@utils/electronStore';
+import {getMainProcessEnv} from '@utils/env';
 
 export function createKubeClient(config: string | AppConfig, context?: string) {
   const kc = new k8s.KubeConfig();
@@ -68,15 +68,17 @@ function parseCanI(stdout: string, namespace: string): ClusterAccess {
     }
     const columns = line.split(/\s{2,100}/);
 
+    /**
+     * an output line looks like this "selfsubjectrulesreviews.authorization.k8s.io [] [] [create]"
+     * and we need only the first and last items(resource name and verbs allowed)
+     */
     const [resourceName, , , rawVerbs] = columns;
 
     if (!resourceName) {
       return;
     }
 
-    const cleanVerbs = (rawVerbs as string)
-      .replace('[', '')
-      .replace(']', '');
+    const cleanVerbs = (rawVerbs as string).replace('[', '').replace(']', '');
 
     if (resourceName === '*.*' && cleanVerbs === '*') {
       hasFullAccess = true;
@@ -98,7 +100,6 @@ function parseCanI(stdout: string, namespace: string): ClusterAccess {
 }
 
 export function getKubeAccess(namespace: string): ClusterAccess {
-  // execSync(`kubectl config use-context ${currentContext}`);
   const command = `kubectl auth can-i --list --namespace=${namespace}`;
   const canStdOut = execSync(command).toString();
   return parseCanI(canStdOut, namespace);
@@ -113,7 +114,7 @@ export function hasAccessToResource(resourceName: string, verb: string, clusterA
     return true;
   }
 
-  const resourceAccess = clusterAccess.permissions.find((access) => {
+  const resourceAccess = clusterAccess.permissions.find(access => {
     return access.resourceName === resourceName.toLowerCase() && access.verbs.includes(verb);
   });
 
@@ -129,22 +130,23 @@ export function addNamespaces(namespaces: ConfigNamespaceStore[]) {
   electronStore.set('kubeConfig.namespaces', namespaces);
 }
 
-export function addNamespace({ namespaceName, clusterName }: ConfigNamespaceStore) {
+export function addNamespace({namespaceName, clusterName}: ConfigNamespaceStore) {
   const appNamespaces: ConfigNamespaceStore[] = electronStore.get('kubeConfig.namespaces') ?? [];
-  const existingNamespace = appNamespaces
-    .find((appNs) => appNs.namespaceName === namespaceName && appNs.clusterName === clusterName);
+  const existingNamespace = appNamespaces.find(
+    appNs => appNs.namespaceName === namespaceName && appNs.clusterName === clusterName
+  );
   if (existingNamespace) {
     return;
   }
 
-  appNamespaces.push({ namespaceName, clusterName });
+  appNamespaces.push({namespaceName, clusterName});
   electronStore.set('kubeConfig.namespaces', appNamespaces);
 }
 
 export function getNamespaces(clusterName?: string): ConfigNamespaceStore[] {
   const appNamespaces: ConfigNamespaceStore[] = electronStore.get('kubeConfig.namespaces') ?? [];
   if (clusterName) {
-    return appNamespaces.filter((appNamespace) => appNamespace.clusterName === clusterName);
+    return appNamespaces.filter(appNamespace => appNamespace.clusterName === clusterName);
   }
 
   return appNamespaces;

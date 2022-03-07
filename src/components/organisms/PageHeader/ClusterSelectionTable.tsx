@@ -81,7 +81,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
           value={cluster.namespaces}
           onChange={ns => onNamespacesChange(cluster.name, ns)}
           tooltip="Add new namespace"
-          addButtonLabel="Add namespace"
+          showButtonLabel="Add namespace"
         />
       );
     }

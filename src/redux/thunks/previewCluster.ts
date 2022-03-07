@@ -3,15 +3,15 @@ import {KubeConfig} from '@kubernetes/client-node';
 
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import log from 'loglevel';
 import {flatten} from 'lodash';
+import log from 'loglevel';
 
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
+import {ClusterAccess} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
-import {ClusterAccess} from '@models/appconfig';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {extractK8sResources, processResources} from '@redux/services/resource';
@@ -28,7 +28,7 @@ const getNonCustomClusterObjects = async (kc: any, namespace: string) => {
       .filter(handler => !handler.isCustom)
       .map(resourceKindHandler =>
         resourceKindHandler
-          .listResourcesInCluster(kc, { namespace })
+          .listResourcesInCluster(kc, {namespace})
           .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
       )
   );
@@ -41,7 +41,9 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const clusterAccess = thunkAPI.getState().config?.projectConfig?.clusterAccess;
   try {
     const kc = createKubeClient(thunkAPI.getState().config, context);
-    const res = await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)));
+    const res = await Promise.all(
+      clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace))
+    );
     const resources = flatten(res);
 
     const fulfilledResults = resources.filter((r: any) => r.status === 'fulfilled' && r.value);
@@ -73,7 +75,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
       r => r.kind === 'CustomResourceDefinition'
     );
     if (customResourceDefinitions.length > 0) {
-      const customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, clusterAccess.namespace as string);
+      const customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, '');
 
       // if any were found we need to merge them into the preview-result
       if (customResourceObjects.length > 0) {
@@ -178,7 +180,11 @@ export function findDefaultVersion(crd: any) {
  * Load custom resource objects for CRDs found in cluster
  */
 
-async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitions: K8sResource[], namespace: string): Promise<string[]> {
+async function loadCustomResourceObjects(
+  kc: KubeConfig,
+  customResourceDefinitions: K8sResource[],
+  namespace: string
+): Promise<string[]> {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
   try {
@@ -187,7 +193,7 @@ async function loadCustomResourceObjects(kc: KubeConfig, customResourceDefinitio
       .map(crd => {
         const kindHandler = getResourceKindHandler(crd.content.spec.names?.kind);
         if (kindHandler) {
-          return kindHandler.listResourcesInCluster(kc, { namespace }, crd).then(response =>
+          return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(response =>
             // @ts-ignore
             getK8sObjectsAsYaml(response.body.items)
           );

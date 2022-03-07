@@ -2,12 +2,12 @@ import {LegacyRef, useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
 import {ResizableBox} from 'react-resizable';
 import {useMeasure} from 'react-use';
-import {flatten} from 'lodash';
 
 import {Button, Select, Skeleton, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
+import {flatten} from 'lodash';
 import {stringify} from 'yaml';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -45,7 +45,7 @@ const DiffModal = () => {
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const configState = useAppSelector(state => state.config);
-  const namespaces = configState.projectConfig?.clusterAccess?.map((cl) => cl.namespace);
+  const namespaces = useAppSelector(state => state.config.projectConfig?.clusterAccess?.map(cl => cl.namespace));
 
   const targetResource = useAppSelector(state =>
     state.main.resourceDiff.targetResourceId
@@ -197,9 +197,11 @@ const DiffModal = () => {
         }
 
         const namespacesWithAccess = configState.projectConfig?.clusterAccess
-          .filter((ca) => hasAccessToResource(targetResource.kind, 'get', ca))
-          .map((ca) => ca.namespace);
-        const resources = await Promise.all(namespacesWithAccess.map((ns) => resourceKindHandler.listResourcesInCluster(kc, { namespace: ns })));
+          .filter(ca => hasAccessToResource(targetResource.kind, 'get', ca))
+          .map(ca => ca.namespace);
+        const resources = await Promise.all(
+          namespacesWithAccess.map(ns => resourceKindHandler.listResourcesInCluster(kc, {namespace: ns}))
+        );
         return flatten(resources);
       };
 
