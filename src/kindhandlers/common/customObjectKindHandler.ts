@@ -40,6 +40,18 @@ export function extractFormSchema(editorSchema: any) {
     delete schema.properties['apiVersion'];
     delete schema.properties['kind'];
     delete schema.properties['metadata'];
+
+    // delete incomplete properties at root level, see sealed-secret.yaml
+    Object.keys(schema.properties).forEach(key => {
+      // property without type?
+      if (!schema.properties[key].type) {
+        delete schema.properties[key];
+      }
+      // object without properties?
+      else if (schema.properties[key].type === 'object' && !schema.properties[key].properties) {
+        delete schema.properties[key];
+      }
+    });
   }
 
   return schema;
