@@ -79,6 +79,8 @@ export type SetRootFolderPayload = {
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
   alert?: AlertType;
+  isScanExcludesUpdated: 'outdated' | 'applied',
+  isScanIncludesUpdated: 'outdated' | 'applied',
 };
 
 export type UpdateResourcePayload = {

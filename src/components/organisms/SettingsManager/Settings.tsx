@@ -31,7 +31,6 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadSchema, schemaExists} from '@redux/services/k8sVersionService';
-import {setScanExcludesStatus, setScanIncludesStatus} from '@redux/reducers/appConfig';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import FilePatternList from '@molecules/FilePatternList';
@@ -348,7 +347,6 @@ export const Settings = ({
           isSettingsOpened={isSettingsOpened}
           showApplyButton={isScanIncludesUpdated === 'outdated'}
           onApplyClick={() => {
-            dispatch(setScanIncludesStatus('applied'));
             dispatch(setRootFolder(filePath));
           }}
         />
@@ -362,7 +360,6 @@ export const Settings = ({
           isSettingsOpened={isSettingsOpened}
           showApplyButton={isScanExcludesUpdated === 'outdated'}
           onApplyClick={() => {
-            dispatch(setScanExcludesStatus('applied'));
             dispatch(setRootFolder(filePath));
           }}
         />

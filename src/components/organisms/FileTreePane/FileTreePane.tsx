@@ -19,7 +19,7 @@ import {FileEntry} from '@models/fileentry';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setScanExcludesStatus, updateProjectConfig} from '@redux/reducers/appConfig';
+import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {selectFile, setSelectingFile, updateResourceFilter} from '@redux/reducers/main';
 import {
   openCreateFolderModal,
@@ -150,7 +150,6 @@ const FileTreePane = () => {
 
   const setFolder = useCallback(
     (folder: string) => {
-      dispatch(setScanExcludesStatus('applied'));
       dispatch(setRootFolder(folder));
     },
     [dispatch]
@@ -287,11 +286,7 @@ const FileTreePane = () => {
       icon: <ExclamationCircleOutlined />,
       cancelText: 'Not now',
       onOk: () => {
-        setScanExcludesStatus('applied');
         refreshFolder();
-      },
-      onCancel: () => {
-        dispatch(setScanExcludesStatus('outdated'));
       },
     });
   };
