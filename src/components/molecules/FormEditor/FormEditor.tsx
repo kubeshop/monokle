@@ -176,11 +176,15 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   }, [formSchema, settings]);
 
   if (!selectedResource && !selectedPath) {
-    return <div>Nothing selected...</div>;
+    return <div>Nothing selected..</div>;
   }
 
   if (!formSchema) {
     return <div>Not supported resource type..</div>;
+  }
+
+  if (!schema.properties || Object.keys(schema.properties).length === 0) {
+    return <div>Missing form properties for this resource kind</div>;
   }
 
   return (
