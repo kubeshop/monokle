@@ -15,13 +15,14 @@ import {
   HelmChartEventEmitter,
   createHelmChart,
   createHelmValuesFile,
+  findContainingHelmCharts,
   getHelmChartFromFileEntry,
   getHelmChartName,
   getHelmValuesFile,
   isHelmChartFile,
   isHelmChartFolder,
   isHelmValuesFile,
-  processHelmChartFolder, findContainingHelmCharts,
+  processHelmChartFolder,
 } from '@redux/services/helm';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {
