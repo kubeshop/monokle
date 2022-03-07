@@ -5,7 +5,7 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {reloadClusterDiff} from '@redux/reducers/main';
-import applyMultipleResources from '@redux/services/applyMultipleResources';
+import applyMultipleResources from '@redux/thunks/applyMultipleResources';
 
 export const applySelectedResourceMatches = createAsyncThunk<
   void,

@@ -10,10 +10,9 @@ import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
 import {setAlert} from '@redux/reducers/alert';
+import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {removeNamespaceFromCluster} from '@redux/thunks/utils';
-
-import {doesTextStartWithYamlDocumentDelimiter} from './resource';
 
 const applyMultipleResources = (
   config: AppConfig,

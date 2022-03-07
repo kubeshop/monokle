@@ -4,7 +4,7 @@ import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
-import applyMultipleResources from '@redux/services/applyMultipleResources';
+import applyMultipleResources from '@redux/thunks/applyMultipleResources';
 
 export const applyCheckedResources = createAsyncThunk<
   void,

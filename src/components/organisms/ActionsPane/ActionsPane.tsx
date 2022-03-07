@@ -40,12 +40,12 @@ import {
   kubeConfigPathSelector,
   settingsSelector,
 } from '@redux/selectors';
-import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getResourcesForPath} from '@redux/services/fileEntry';
 import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {isUnsavedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
+import {applyFileWithConfirm} from '@redux/support/applyFileWithConfirm';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
 import {applyResource} from '@redux/thunks/applyResource';
 import {selectFromHistory} from '@redux/thunks/selectionHistory';

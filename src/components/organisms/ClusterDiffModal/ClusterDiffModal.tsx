@@ -16,7 +16,7 @@ import {setClusterDiffRefreshDiffResource, setDiffResourceInClusterDiff} from '@
 import {closeClusterDiff} from '@redux/reducers/ui';
 import {isInPreviewModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {getClusterResourceText} from '@redux/services/clusterResource';
-import {replaceSelectedMatchesWithConfirm} from '@redux/services/replaceSelectedMatchesWithConfirm';
+import {replaceSelectedMatchesWithConfirm} from '@redux/support/replaceSelectedMatchesWithConfirm';
 import {applySelectedResourceMatches} from '@redux/thunks/applySelectedResourceMatches';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
 
