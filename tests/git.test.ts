@@ -63,7 +63,7 @@ async function goToCommit(hash: string) {
 const testData = [
   {
     hash: startCommit,
-    fileExplorerCount: 53,
+    fileExplorerCount: 200,
     kustomizeCount: 13,
     helmCount: 9,
     navigatorCount: 54,
