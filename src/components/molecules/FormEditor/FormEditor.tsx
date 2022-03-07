@@ -183,8 +183,12 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
     return <div>Not supported resource type..</div>;
   }
 
+  // no properties in schema?
   if (!schema.properties || Object.keys(schema.properties).length === 0) {
-    return <div>Missing form properties for this resource kind</div>;
+    // no custom form field?
+    if (!formUiSchema || !formUiSchema['ui:field'] || !getCustomFormFields()[formUiSchema['ui:field']]) {
+      return <div>Missing Form configuration for this resource kind.</div>;
+    }
   }
 
   return (
