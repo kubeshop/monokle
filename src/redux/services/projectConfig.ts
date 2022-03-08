@@ -1,3 +1,4 @@
+import flatten from 'flat';
 import {readFileSync, writeFileSync} from 'fs';
 import _ from 'lodash';
 import log from 'loglevel';
@@ -65,6 +66,7 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     currentContext: state.projectConfig?.kubeConfig?.currentContext,
   };
   applicationConfig.k8sVersion = state.projectConfig?.k8sVersion;
+  applicationConfig.helm = state.projectConfig?.helm;
   return applicationConfig;
 };
 
@@ -91,6 +93,7 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     currentContext: state.kubeConfig.currentContext,
   };
   applicationConfig.k8sVersion = state.k8sVersion;
+  applicationConfig.helm = state.projectConfig?.helm;
   return applicationConfig;
 };
 
@@ -100,7 +103,7 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
   }
 
   try {
-    const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth, k8sVersion}: ProjectConfig =
+    const {settings, kubeConfig, scanExcludes, fileIncludes, folderReadsMaxDepth, k8sVersion, helm}: ProjectConfig =
       JSON.parse(readFileSync(CONFIG_PATH(projectRootPath), 'utf8'));
     const projectConfig: ProjectConfig = {};
     projectConfig.settings = settings
@@ -134,6 +137,7 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
     projectConfig.fileIncludes = _.isArray(fileIncludes) ? fileIncludes : undefined;
     projectConfig.folderReadsMaxDepth = _.isNumber(folderReadsMaxDepth) ? folderReadsMaxDepth : undefined;
     projectConfig.k8sVersion = _.includes(K8S_VERSIONS, k8sVersion) ? k8sVersion : PREDEFINED_K8S_VERSION;
+    projectConfig.helm = helm;
 
     return projectConfig;
   } catch (error) {
@@ -162,8 +166,8 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     return baseConfig;
   }
 
-  const serializedBaseConfig: SerializableObject = serializeObject(baseConfig);
-  const serializedConfig: SerializableObject = serializeObject(config);
+  const serializedBaseConfig: SerializableObject = flatten<any, any>(baseConfig);
+  const serializedConfig: SerializableObject = flatten<any, any>(config);
 
   Object.keys(serializedBaseConfig).forEach((key: string) => {
     if (!_.isUndefined(serializedConfig[key])) {
@@ -171,41 +175,7 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
     }
   });
 
-  return deserializeObject(serializedBaseConfig);
-};
-
-export const serializeObject = (objectToSerialize?: SerializableObject | null, prefix?: string): SerializableObject => {
-  let serialized: any = {};
-
-  if (!objectToSerialize) {
-    return serialized;
-  }
-  Object.keys(objectToSerialize).forEach(key => {
-    if (_.isObject(objectToSerialize[key]) && !_.isArray(objectToSerialize[key])) {
-      const result: any = serializeObject(objectToSerialize[key], key);
-      serialized = {
-        ...serialized,
-        ...result,
-      };
-    } else {
-      const objectKey = prefix ? `${prefix}.${key}` : key;
-      serialized[objectKey] = objectToSerialize[key];
-    }
-  });
-  return serialized;
-};
-
-export const deserializeObject = (objectToDeserialize?: SerializableObject | null): SerializableObject => {
-  const deserialized = {};
-
-  if (!objectToDeserialize) {
-    return deserialized;
-  }
-
-  Object.keys(objectToDeserialize).forEach(key => {
-    _.set(deserialized, key, objectToDeserialize[key]);
-  });
-  return deserialized;
+  return flatten.unflatten(serializedBaseConfig);
 };
 
 export const keysToUpdateStateBulk = (

@@ -25,17 +25,32 @@ export const allResourcesSelector = createSelector(
   resourceMap => Object.values(resourceMap)
 );
 
-export const activeResourcesSelector = createSelector(
-  allResourcesSelector,
-  (state: RootState) => state.main.previewResourceId,
-  (state: RootState) => state.main.previewValuesFileId,
-  (resources, previewResource, previewValuesFile) =>
-    resources.filter(
-      r =>
-        ((previewResource === undefined && previewValuesFile === undefined) || r.filePath.startsWith(PREVIEW_PREFIX)) &&
-        !r.filePath.startsWith(CLUSTER_DIFF_PREFIX)
-    )
-);
+export const activeResourcesSelector = (state: RootState) => {
+  const resources = Object.values(state.main.resourceMap);
+  const previewResourceId = state.main.previewResourceId;
+  const previewValuesFileId = state.main.previewValuesFileId;
+  const previewConfigurationId = state.main.previewConfigurationId;
+
+  return resources.filter(
+    r =>
+      ((previewResourceId === undefined && previewValuesFileId === undefined && previewConfigurationId === undefined) ||
+        r.filePath.startsWith(PREVIEW_PREFIX)) &&
+      !r.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
+      !r.name.startsWith('Patch:')
+  );
+};
+
+export const unknownResourcesSelector = (state: RootState) => {
+  const isInPreviewMode = isInPreviewModeSelector(state);
+  const unknownResources = Object.values(state.main.resourceMap).filter(
+    resource =>
+      !isKustomizationResource(resource) &&
+      !getResourceKindHandler(resource.kind) &&
+      !resource.name.startsWith('Patch:') &&
+      (isInPreviewMode ? resource.filePath.startsWith(PREVIEW_PREFIX) : true)
+  );
+  return unknownResources;
+};
 
 export const unsavedResourcesSelector = createSelector(
   (state: RootState) => state.main.resourceMap,
@@ -62,10 +77,10 @@ export const helmValuesSelector = createSelector(
   helmValuesMap => helmValuesMap
 );
 
-export const isInPreviewModeSelector = createSelector(
-  (state: RootState) => state.main,
-  appState => Boolean(appState.previewResourceId) || Boolean(appState.previewValuesFileId)
-);
+export const isInPreviewModeSelector = (state: RootState) =>
+  Boolean(state.main.previewResourceId) ||
+  Boolean(state.main.previewValuesFileId) ||
+  Boolean(state.main.previewConfigurationId);
 
 export const isInClusterModeSelector = createSelector(
   (state: RootState) => state,

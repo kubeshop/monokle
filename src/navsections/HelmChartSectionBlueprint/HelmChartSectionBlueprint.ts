@@ -1,17 +1,19 @@
 import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
 
+import {HelmPreviewConfiguration} from '@models/appconfig';
 import {HelmValuesMapType} from '@models/appstate';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import {SectionBlueprint} from '@models/navigator';
 
-import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
+import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
 
 import Colors from '@styles/Colors';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
-import FileItemPrefix from './FileItemPrefix';
 import HelmChartQuickAction from './HelmChartQuickAction';
-import PreviewConfigurationNameSuffix from './PreviewConfigurationQuickAction';
+import ItemPrefix from './ItemPrefix';
+import PreviewConfigurationNameSuffix from './PreviewConfigurationNameSuffix';
+import PreviewConfigurationQuickAction from './PreviewConfigurationQuickAction';
 
 export type ValuesFilesScopeType = {
   helmValuesMap: HelmValuesMapType;
@@ -29,19 +31,74 @@ type HelmChartScopeType = {
   [currentHelmChart: string]: HelmChart | unknown;
 };
 
+type PreviewConfigurationScopeType = {
+  previewConfigurationMap: Record<string, HelmPreviewConfiguration | null> | undefined;
+  selectedPreviewConfigurationId: string | undefined;
+  [currentHelmChart: string]: HelmChart | unknown;
+};
+
 export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
-  // TODO: replace 'any' type after implementing the state for preview configurations
-  const previewConfigurationsSectionBlueprint: SectionBlueprint<any, any> = {
+  const previewConfigurationsSectionBlueprint: SectionBlueprint<
+    HelmPreviewConfiguration,
+    PreviewConfigurationScopeType
+  > = {
     name: 'Preview Configurations',
     id: `${helmChart.id}-configurations`,
     containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
-    getScope: () => {
-      return {};
+    getScope: state => {
+      return {
+        previewConfigurationMap: state.config.projectConfig?.helm?.previewConfigurationMap,
+        selectedPreviewConfigurationId: state.main.selectedPreviewConfigurationId,
+        [helmChart.id]: state.main.helmChartMap[helmChart.id],
+      };
     },
     builder: {
+      getRawItems: scope => {
+        const currentHelmChart = scope[helmChart.id] as HelmChart | undefined;
+        if (!currentHelmChart) {
+          return [];
+        }
+        return scope.previewConfigurationMap
+          ? Object.values(scope.previewConfigurationMap).filter((pc): pc is HelmPreviewConfiguration =>
+              Boolean(pc && pc.helmChartFilePath === currentHelmChart.filePath)
+            )
+          : [];
+      },
       isInitialized: () => true,
       isVisible: () => true,
+    },
+    itemBlueprint: {
+      getInstanceId: rawItem => rawItem.id,
+      getName: rawItem => rawItem.name,
+      builder: {
+        getMeta: () => {
+          return {
+            itemPrefixStyle: {
+              paddingLeft: 10,
+            },
+            itemPrefixIcon: 'preview',
+          };
+        },
+        isSelected: (item, scope) => {
+          return item.id === scope.selectedPreviewConfigurationId;
+        },
+      },
+      instanceHandler: {
+        onClick: (itemInstance, dispatch) => {
+          dispatch(selectPreviewConfiguration(itemInstance.id));
+        },
+      },
+      customization: {
+        quickAction: {
+          component: PreviewConfigurationQuickAction,
+          options: {isVisibleOnHover: true},
+        },
+        prefix: {
+          component: ItemPrefix,
+        },
+        lastItemMarginBottom: 0,
+      },
     },
     customization: {
       counterDisplayMode: 'items',
@@ -120,9 +177,10 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           Boolean((scope.previewValuesFileId && scope.previewValuesFileId !== rawItem.id) || scope.isInClusterMode),
         getMeta: () => {
           return {
-            fileItemPrefixStyle: {
+            itemPrefixStyle: {
               paddingLeft: 10,
             },
+            itemPrefixIcon: 'file',
           };
         },
       },
@@ -137,7 +195,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           options: {isVisibleOnHover: true},
         },
         prefix: {
-          component: FileItemPrefix,
+          component: ItemPrefix,
         },
         lastItemMarginBottom: 0,
       },
@@ -183,6 +241,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       builder: {
         getMeta: chart => ({
           filePath: chart.filePath,
+          itemPrefixIcon: 'file',
         }),
         isSelected: (chart, scope) => {
           return scope.selectedPath === chart.filePath;
@@ -200,7 +259,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         },
       },
       customization: {
-        prefix: {component: FileItemPrefix},
+        prefix: {component: ItemPrefix},
         lastItemMarginBottom: 0,
       },
     },

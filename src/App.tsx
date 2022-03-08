@@ -76,7 +76,7 @@ const App = () => {
   const dispatch = useDispatch();
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
-  const isPreviewConfigurationEditorOpen = useAppSelector(state => state.main.prevConfEditor.isOpen);
+  const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isCreateFolderModalVisible = useAppSelector(state => state.ui.createFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
@@ -298,9 +298,9 @@ const App = () => {
         <LazyDrawer
           onClose={previewConfigurationDrawerOnClose}
           title="Preview Configuration"
-          visible={isPreviewConfigurationEditorOpen}
+          visible={previewConfigurationEditorState.isOpen}
         >
-          <PreviewConfigurationEditor />
+          <PreviewConfigurationEditor key={previewConfigurationEditorState.helmChartId} />
         </LazyDrawer>
 
         <Suspense fallback={null}>
