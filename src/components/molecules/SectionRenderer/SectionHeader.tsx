@@ -85,7 +85,6 @@ function SectionHeader(props: SectionHeaderProps) {
       hasCustomNameDisplay={Boolean(NameDisplay.Component)}
       isLastSection={isLastSection}
       isCollapsed={isCollapsed}
-      $marginBottom={sectionBlueprint.customization?.sectionMarginBottom}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

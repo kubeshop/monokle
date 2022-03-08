@@ -39,6 +39,21 @@ export class MainWindow {
     await this._fileExplorerButton.click();
   }
 
+  async showFileExplorerIfNotVisible() {
+    let isVisible: boolean;
+    try {
+      isVisible = await this._page.locator('#FileExplorer').isVisible();
+    } catch (e) {
+      isVisible = false;
+    }
+
+    if (isVisible) {
+      return;
+    }
+
+    await this._fileExplorerButton.click();
+  }
+
   async clickKustomizeButton() {
     await this._kustomizeButton.click();
   }

@@ -48,6 +48,13 @@ const PageHeader = () => {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
 
+  const runningPreviewConfiguration = useAppSelector(state => {
+    if (!state.main.previewConfigurationId) {
+      return undefined;
+    }
+    return state.config.projectConfig?.helm?.previewConfigurationMap?.[state.main.previewConfigurationId];
+  });
+
   const [helmChart, setHelmChart] = useState<HelmChart>();
   const [previewResource, setPreviewResource] = useState<K8sResource>();
   const [previewValuesFile, setPreviewValuesFile] = useState<HelmValuesFile>();
@@ -91,7 +98,12 @@ const PageHeader = () => {
       setPreviewValuesFile(undefined);
       setHelmChart(undefined);
     }
-  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap]);
+
+    if (runningPreviewConfiguration) {
+      const chart = Object.values(helmChartMap).find(c => c.filePath === runningPreviewConfiguration.helmChartFilePath);
+      setHelmChart(chart);
+    }
+  }, [previewResourceId, previewValuesFileId, helmValuesMap, resourceMap, helmChartMap, runningPreviewConfiguration]);
 
   useEffect(() => {
     if (pageHeaderHeight) {
@@ -133,6 +145,19 @@ const PageHeader = () => {
           {previewValuesFileId && (
             <S.ResourceSpan>
               Previewing {previewValuesFile?.name} for {helmChart?.name} Helm chart - {activeResources.length} resources
+            </S.ResourceSpan>
+          )}
+          <ExitButton onClick={onClickExit} />
+        </S.PreviewRow>
+      )}
+
+      {isInPreviewMode && previewType === 'helm-preview-config' && (
+        <S.PreviewRow noborder="true">
+          <S.ModeSpan>HELM MODE</S.ModeSpan>
+          {previewValuesFileId && (
+            <S.ResourceSpan>
+              Running the preview configuration {runningPreviewConfiguration?.name} for {helmChart?.name} Helm chart
+              {activeResources.length} resources
             </S.ResourceSpan>
           )}
           <ExitButton onClick={onClickExit} />
