@@ -10,6 +10,7 @@ import {PodOutgoingRefMappers} from './common/outgoingRefMappers';
 const CronJobHandler: ResourceKindHandler = {
   kind: 'CronJob',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.WORKLOADS, 'CronJobs'],
   clusterApiVersion: 'batch/v1',
   validationSchemaPrefix: 'io.k8s.api.batch.v1',

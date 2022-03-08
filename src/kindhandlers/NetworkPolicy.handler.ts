@@ -10,6 +10,7 @@ import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outg
 const NetworkPolicyHandler: ResourceKindHandler = {
   kind: 'NetworkPolicy',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.NETWORK, 'NetworkPolicies'],
   clusterApiVersion: 'networking.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.api.networking.v1',

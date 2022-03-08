@@ -177,3 +177,18 @@ export function createHelmChart(fileEntry: FileEntry, absolutePath: string, helm
   setImmediate(() => HelmChartEventEmitter.emit('create', helmChart));
   return helmChart;
 }
+
+/**
+ * Returns a list of Helm charts "containing" the specified fileEntry, with the most immediate Helm
+ * chart first
+ */
+
+export function findContainingHelmCharts(helmChartMap: HelmChartMapType, fileEntry: FileEntry) {
+  const charts = Object.values(helmChartMap)
+    .filter(chart => fileEntry.filePath.startsWith(path.dirname(chart.filePath)))
+    .sort((chart1: HelmChart, chart2: HelmChart) => {
+      // sort by path -> longest path must be the most immediate parent
+      return chart2.filePath.length - chart1.filePath.length;
+    });
+  return charts;
+}

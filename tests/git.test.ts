@@ -5,7 +5,7 @@ import {execSync} from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 import {ElectronAppInfo, startApp} from './electronHelpers';
-import {pause} from './utils';
+import {getRecordingPath, pause} from './utils';
 import {MainWindow} from './models/mainWindow';
 import {FileExplorerPane} from './models/fileExplorerPane';
 import {KustomizePane} from './models/kustomizePane';
@@ -64,34 +64,35 @@ const testData = [
   {
     hash: startCommit,
     fileExplorerCount: 53,
-    kustomizeCount: 22,
-    helmCount: 4,
-    navigatorCount: 55,
+    kustomizeCount: 13,
+    helmCount: 9,
+    navigatorCount: 54,
   },
   {
     hash: removeSomeFiles,
     fileExplorerCount: 32,
-    kustomizeCount: 5,
-    helmCount: 4,
-    navigatorCount: 48,
+    kustomizeCount: 6,
+    helmCount: 9,
+    navigatorCount: 47,
   },
   {
     hash: removeMoreFiles,
     fileExplorerCount: 15,
-    kustomizeCount: 2,
-    helmCount: 4,
-    navigatorCount: 35,
+    kustomizeCount: 3,
+    helmCount: 9,
+    navigatorCount: 34,
   },
   {
     hash: startCommit,
     fileExplorerCount: 53,
-    kustomizeCount: 22,
-    helmCount: 4,
-    navigatorCount: 55,
+    kustomizeCount: 13,
+    helmCount: 9,
+    navigatorCount: 54,
   },
 ];
 
 test('all files should be loaded', async () => {
+  await mainWindow.clickLogo();
   await startProjectPane.createProjectFromFolder(electronApp, projectPath);
   await pause(10000);
 
@@ -99,10 +100,13 @@ test('all files should be loaded', async () => {
   for (const data of testData) {
     console.log(`testing commit hash: ${data.hash}`);
     await goToCommit(data.hash);
+    await pause(10000);
 
     expect(parseInt(await navigatorPane.resourcesCount.textContent(), 10)).toEqual(data.navigatorCount);
 
-    await mainWindow.clickFileExplorer();
+    await mainWindow.showFileExplorerIfNotVisible();
+
+    await appWindow.screenshot({path: getRecordingPath(appInfo.platform, `before-project-check-${data.hash}.png`)});
     expect((await fileExplorerPane.projectName.textContent())?.includes(projectPath)).toBe(true);
     expect(await fileExplorerPane.fileCount.textContent()).toEqual(`${data.fileExplorerCount} files`);
 
@@ -117,8 +121,8 @@ test('all files should be loaded', async () => {
 });
 
 test.afterAll(async () => {
-  fs.rmSync(projectPath, { recursive: true, force: true });
-  await appWindow.screenshot({path: `test-output/${appInfo.platform}/screenshots/final-screen.png`});
+  await appWindow.screenshot({path: getRecordingPath(appInfo.platform, 'final-screen.png')});
   await appWindow.context().close();
   await appWindow.close();
+  fs.rmSync(projectPath, { recursive: true, force: true });
 });

@@ -34,7 +34,7 @@ type HelmValuesMapType = {
 
 type PreviewLoaderType = {
   isLoading: boolean;
-  targetResourceId?: string;
+  targetId?: string;
 };
 
 type ResourceDiffType = {
@@ -53,7 +53,7 @@ type PathSelectionHistoryEntry = {
 
 type SelectionHistoryEntry = ResourceSelectionHistoryEntry | PathSelectionHistoryEntry;
 
-type PreviewType = 'kustomization' | 'cluster' | 'helm';
+type PreviewType = 'kustomization' | 'cluster' | 'helm' | 'helm-preview-config';
 
 type ResourceFilterType = {
   name?: string;
@@ -115,6 +115,8 @@ interface AppState {
   selectedPath?: string;
   /** the currently selected values file */
   selectedValuesFileId?: string;
+  /** the currently selected preview configuration */
+  selectedPreviewConfigurationId?: string;
   /** the current type of preview */
   previewType?: PreviewType;
   /** information used to load the preview */
@@ -127,6 +129,8 @@ interface AppState {
   previewKubeConfigContext?: string;
   /** the values file currently being previewed */
   previewValuesFileId?: string;
+  /** the preview configuration currently being previewed */
+  previewConfigurationId?: string;
   /** the resource currently being diffed */
   resourceDiff: ResourceDiffType;
   resourceRefsProcessingOptions: ResourceRefsProcessingOptions;
@@ -149,6 +153,7 @@ interface AppState {
   prevConfEditor: {
     isOpen: boolean;
     helmChartId?: string;
+    previewConfigurationId?: string;
   };
   deviceID: string;
 }

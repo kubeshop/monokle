@@ -4,6 +4,7 @@ import {AnyAction} from '@reduxjs/toolkit';
 
 import {execSync} from 'child_process';
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
+import gitUrlParse from 'git-url-parse';
 import _ from 'lodash';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
@@ -19,7 +20,6 @@ import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
 
-const GITHUB_URL = 'https://github.com';
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
 export function isValidRepositoryUrl(repositoryUrl: string) {
@@ -28,14 +28,24 @@ export function isValidRepositoryUrl(repositoryUrl: string) {
 
 export function extractRepositoryOwnerAndNameFromUrl(pluginUrl: string) {
   if (!isValidRepositoryUrl(pluginUrl)) {
-    throw new Error('Invalid repository URL');
+    throw new Error('Currently we support only Github as provider');
   }
-  const repositoryPath = pluginUrl.split(`${GITHUB_URL}/`)[1];
-  const [repositoryOwner, repositoryName] = repositoryPath.split('/');
-
+  const parsedURL = gitUrlParse(pluginUrl);
+  if (!parsedURL.owner || !parsedURL.name) {
+    throw new Error('Please enter a valid git URL!');
+  }
+  if (!parsedURL.protocols.includes('https')) {
+    throw new Error('Currently we support only HTTPS protocol!');
+  }
+  if (parsedURL.filepathtype && parsedURL.filepathtype !== 'tree') {
+    throw new Error('Please navigate main url of the branch!');
+  }
   return {
-    repositoryOwner,
-    repositoryName,
+    repositoryOwner: parsedURL.owner,
+    repositoryName: parsedURL.name,
+    repositoryBranch: !parsedURL.filepathtype
+      ? 'main'
+      : `${parsedURL.ref}${parsedURL.filepath ? `/${parsedURL.filepath}` : ''}`,
   };
 }
 
@@ -44,10 +54,15 @@ export function makeExtensionDownloadData(
   extensionEntryFileName: string,
   downloadPath: string
 ) {
-  const {repositoryOwner, repositoryName} = extractRepositoryOwnerAndNameFromUrl(extensionRepositoryUrl);
-  const entryFileUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/main/${extensionEntryFileName}`;
-  const tarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/main`;
-  const folderPath = path.join(downloadPath, `${repositoryOwner}-${repositoryName}`);
+  const {repositoryOwner, repositoryName, repositoryBranch} =
+    extractRepositoryOwnerAndNameFromUrl(extensionRepositoryUrl);
+  const entryFileUrl = `https://raw.githubusercontent.com/${repositoryOwner}/${repositoryName}/${repositoryBranch}/${extensionEntryFileName}`;
+  const tarballUrl = `https://api.github.com/repos/${repositoryOwner}/${repositoryName}/tarball/${repositoryBranch}`;
+  const folderPath = path.join(
+    downloadPath,
+    // @ts-ignore
+    `${repositoryOwner}-${repositoryName}-${repositoryBranch.replaceAll(path.sep, '-')}`
+  );
   return {entryFileUrl, tarballUrl, folderPath};
 }
 

@@ -8,6 +8,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const SecretHandler: ResourceKindHandler = {
   kind: 'Secret',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CONFIGURATION, 'Secrets'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',

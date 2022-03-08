@@ -24,7 +24,7 @@ const OrderedList: React.FC<OrderedListProps> = props => {
 
   const checkItem = useCallback(
     (itemId: string) => {
-      onChange(items.slice().map(item => (item.id === itemId ? {...item, isChecked: !item.isChecked} : item)));
+      onChange([...items.map(item => (item.id === itemId ? {...item, isChecked: !item.isChecked} : {...item}))]);
     },
     [items, onChange]
   );

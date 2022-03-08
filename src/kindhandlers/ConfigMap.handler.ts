@@ -8,6 +8,7 @@ import {ResourceKindHandler} from '@models/resourcekindhandler';
 const ConfigMapHandler: ResourceKindHandler = {
   kind: 'ConfigMap',
   apiVersionMatcher: '**',
+  isNamespaced: true,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CONFIGURATION, 'ConfigMaps'],
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',

@@ -158,7 +158,8 @@ export function extractSchema(crd: any, versionName: string) {
           delete prop['additionalProperties'];
         }
 
-        prop['additionalProperties'] = false;
+        prop['additionalProperties'] = prop['x-kubernetes-preserve-unknown-fields'];
+        delete prop['x-kubernetes-preserve-unknown-fields'];
       } catch (e) {
         // this could fail - ignore
       }
