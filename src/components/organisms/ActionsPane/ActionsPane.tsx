@@ -451,47 +451,48 @@ const ActionsPane: React.FC<IProps> = props => {
                 </Tooltip>
               )}
 
-            <Tooltip
-              mouseEnterDelay={TOOLTIP_DELAY}
-              title={
-                selectedPath
-                  ? isHelmValuesFile(selectedPath)
-                    ? InstallValuesFileTooltip
-                    : ApplyFileTooltip
-                  : ApplyTooltip
-              }
-              placement="bottomLeft"
-            >
-              <Button
-                loading={Boolean(applyingResource)}
-                type="primary"
-                size="small"
-                ghost
-                onClick={applySelection}
-                disabled={
-                  (!selectedResourceId && !selectedPath) ||
-                  (selectedResource &&
-                    !isKustomizationResource(selectedResource) &&
-                    (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
+              <Tooltip
+                mouseEnterDelay={TOOLTIP_DELAY}
+                title={
+                  selectedPath
+                    ? isHelmValuesFile(selectedPath)
+                      ? InstallValuesFileTooltip
+                      : ApplyFileTooltip
+                    : ApplyTooltip
                 }
-                icon={<Icon name="kubernetes" />}
+                placement="bottomLeft"
               >
-                {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
-              </Button>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
-              <S.DiffButton
-                size="small"
-                type="primary"
-                ghost
-                onClick={diffSelectedResource}
-                disabled={isDiffButtonDisabled}
-              >
-                Diff
-              </S.DiffButton>
-            </Tooltip>
-          </>
-        </TitleBar>
+                <Button
+                  loading={Boolean(applyingResource)}
+                  type="primary"
+                  size="small"
+                  ghost
+                  onClick={applySelection}
+                  disabled={
+                    (!selectedResourceId && !selectedPath) ||
+                    (selectedResource &&
+                      !isKustomizationResource(selectedResource) &&
+                      (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
+                  }
+                  icon={<Icon name="kubernetes" />}
+                >
+                  {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
+                </Button>
+              </Tooltip>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
+                <S.DiffButton
+                  size="small"
+                  type="primary"
+                  ghost
+                  onClick={diffSelectedResource}
+                  disabled={isDiffButtonDisabled}
+                >
+                  Diff
+                </S.DiffButton>
+              </Tooltip>
+            </>
+          </TitleBar>
+        )}
       </div>
 
       {!selectedPreviewConfigurationId ? (
