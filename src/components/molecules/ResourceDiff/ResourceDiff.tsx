@@ -17,7 +17,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResource} from '@redux/reducers/main';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -93,7 +93,7 @@ const ResourceDiff = (props: {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const previewType = useAppSelector(state => state.main.previewType);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
 
@@ -166,7 +166,7 @@ const ResourceDiff = (props: {
       onApply();
     }
 
-    applyResource(localResource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
+    applyResource(localResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
       isClusterPreview: previewType === 'cluster',
       shouldPerformDiff: true,
       isInClusterDiff,

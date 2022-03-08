@@ -13,7 +13,7 @@ import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {runHelm} from '@utils/helm';
+import {CommandOptions, runCommandInMainThread} from '@utils/command';
 import {DO_HELM_PREVIEW, trackEvent} from '@utils/telemetry';
 
 /**
@@ -30,15 +30,14 @@ export const previewHelmValuesFile = createAsyncThunk<
 >('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   const configState = thunkAPI.getState().config;
   const state = thunkAPI.getState().main;
-  const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
-  const k8sVersion = configState.projectConfig?.k8sVersion;
+  const projectConfig = currentConfigSelector(thunkAPI.getState());
+  const kubeconfig = projectConfig.kubeConfig?.path;
+  const k8sVersion = projectConfig.k8sVersion;
   const userDataDir = configState.userDataDir;
-  const currentContext =
-    thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
-    thunkAPI.getState().config.kubeConfig.currentContext;
+  const currentContext = projectConfig.kubeConfig?.currentContext;
   const valuesFile = state.helmValuesMap[valuesFileId];
 
-  if (valuesFile && valuesFile.filePath) {
+  if (kubeconfig && valuesFile && valuesFile.filePath && currentContext) {
     const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
     const chart = state.helmChartMap[valuesFile.helmChartId];
     const folder = path.join(rootFolder, path.dirname(chart.filePath));
@@ -47,25 +46,36 @@ export const previewHelmValuesFile = createAsyncThunk<
     if (fs.existsSync(folder) && fs.existsSync(path.join(rootFolder, valuesFile.filePath))) {
       log.info(`previewing ${valuesFile.name} in folder ${folder} using ${configState.settings.helmPreviewMode} mode`);
 
-      const projectConfig = currentConfigSelector(thunkAPI.getState());
       const helmPreviewMode = projectConfig.settings ? projectConfig.settings.helmPreviewMode : 'template';
 
-      const args = {
-        helmCommand:
+      const options: CommandOptions = {
+        cmd: 'helm',
+        args:
           helmPreviewMode === 'template'
-            ? `helm template -f "${path.join(rootFolder, valuesFile.filePath)}" ${chart.name} "${folder}"`
-            : `helm install --kube-context ${currentContext} -f "${path.join(rootFolder, valuesFile.filePath)}" ${
-                chart.name
-              } "${folder}" --dry-run`,
-        kubeconfig,
+            ? ['template', '-f', `"${path.join(folder, valuesFile.name)}"`, chart.name, `"${folder}"`]
+            : [
+                'install',
+                '--kube-context',
+                currentContext,
+                '-f',
+                `"${path.join(folder, valuesFile.name)}"`,
+                chart.name,
+                `"${folder}"`,
+                '--dry-run',
+              ],
+        env: {KUBECONFIG: kubeconfig},
       };
 
-      const result = await runHelm(args);
+      const result = await runCommandInMainThread(options);
 
       trackEvent(DO_HELM_PREVIEW);
 
-      if (result.error) {
-        return createRejectionWithAlert(thunkAPI, 'Helm Error', result.error);
+      if (result.error || result.stderr) {
+        return createRejectionWithAlert(
+          thunkAPI,
+          'Helm Error',
+          result.error || result.stderr || `Unknown error ${result.exitCode}`
+        );
       }
 
       if (result.stdout) {
@@ -78,6 +88,8 @@ export const previewHelmValuesFile = createAsyncThunk<
           state.resourceRefsProcessingOptions
         );
       }
+
+      return createRejectionWithAlert(thunkAPI, 'Helm Error', 'Helm returned no resources');
     }
 
     return createRejectionWithAlert(

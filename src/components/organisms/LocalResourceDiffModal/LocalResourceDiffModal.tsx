@@ -16,7 +16,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal, updateResource} from '@redux/reducers/main';
-import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -38,7 +38,7 @@ const DiffModal = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
@@ -97,7 +97,7 @@ const DiffModal = () => {
     if (targetResource?.id) {
       const resource = resourceMap[targetResource.id];
       if (resource) {
-        applyResource(resource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
+        applyResource(resource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
           isClusterPreview: previewType === 'cluster',
           shouldPerformDiff: true,
         });
@@ -261,7 +261,7 @@ const DiffModal = () => {
   }, [
     kubeConfigContext,
     dispatch,
-    kubeConfigPath,
+    projectConfig.kubeConfig?.path,
     resourceMap,
     resourceFilter.namespace,
     targetResource,

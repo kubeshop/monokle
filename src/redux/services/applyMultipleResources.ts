@@ -15,7 +15,7 @@ import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {doesTextStartWithYamlDocumentDelimiter} from './resource';
 
-const applyMultipleResources = (
+const applyMultipleResources = async (
   config: AppConfig,
   resourcesToApply: K8sResource[],
   dispatch: AppDispatch,
@@ -46,16 +46,10 @@ const applyMultipleResources = (
     }, '');
 
   try {
-    const child = applyYamlToCluster(yamlToApply, kubeConfigPath, currentContext, namespace);
-    child.on('exit', (code, signal) => {
-      log.info(`kubectl exited with code ${code} and signal ${signal}`);
-    });
+    const result = await applyYamlToCluster(yamlToApply, kubeConfigPath, currentContext, namespace);
+    log.info(`kubectl exited with code ${result.exitCode} and signal ${result.signal}`);
 
-    let alertMessage: string = '';
-
-    child.stdout.on('data', data => {
-      alertMessage += `\n${data.toString()}`;
-
+    if (result.stdout) {
       if (namespace && namespace.new) {
         const namespaceAlert: AlertType = {
           type: AlertEnum.Success,
@@ -69,7 +63,7 @@ const applyMultipleResources = (
       const alert: AlertType = {
         type: AlertEnum.Success,
         title: `Applied selected resources to cluster ${currentContext} successfully`,
-        message: alertMessage,
+        message: result.stdout,
       };
 
       if (onSuccessCallback) {
@@ -77,13 +71,12 @@ const applyMultipleResources = (
       }
 
       setTimeout(() => dispatch(setAlert(alert)), 400);
-    });
-
-    child.stderr.on('data', async data => {
+    }
+    if (result.stderr) {
       const alert: AlertType = {
         type: AlertEnum.Error,
         title: `Applying selected resources to cluster ${currentContext} failed`,
-        message: data.toString(),
+        message: result.stderr,
       };
 
       if (namespace && namespace.new) {
@@ -91,7 +84,7 @@ const applyMultipleResources = (
       }
 
       dispatch(setAlert(alert));
-    });
+    }
   } catch (e) {
     log.error('Failed to apply selected resources');
     log.error(e);

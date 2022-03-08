@@ -1,7 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import fs from 'fs';
-import log from 'loglevel';
 import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
@@ -13,7 +12,8 @@ import {RootState} from '@models/rootstate';
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {buildHelmCommand, runHelm} from '@utils/helm';
+import {CommandOptions, runCommandInMainThread} from '@utils/command';
+import {buildHelmCommand} from '@utils/helm';
 
 /**
  * Thunk to preview a Helm Chart
@@ -89,9 +89,7 @@ export const runPreviewConfiguration = createAsyncThunk<
     );
   }
 
-  log.info(`Running the following Preview Configuration: ${previewConfiguration.id}`);
-
-  const helmCommand = buildHelmCommand(
+  const args = buildHelmCommand(
     chart,
     previewConfiguration.orderedValuesFilePaths,
     previewConfiguration.command,
@@ -100,12 +98,13 @@ export const runPreviewConfiguration = createAsyncThunk<
     currentContext
   );
 
-  const args = {
-    helmCommand,
-    kubeconfig,
+  const commandOptions: CommandOptions = {
+    cmd: 'helm',
+    args: args.splice(1),
+    env: {KUBECONFIG: kubeconfig},
   };
 
-  const result = await runHelm(args);
+  const result = await runCommandInMainThread(commandOptions);
 
   if (result.error) {
     return createRejectionWithAlert(thunkAPI, 'Helm Error', result.error);

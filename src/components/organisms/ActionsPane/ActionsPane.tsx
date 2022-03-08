@@ -21,6 +21,7 @@ import {
   ApplyTooltip,
   DiffTooltip,
   EditPreviewConfigurationTooltip,
+  InstallValuesFileTooltip,
   OpenExternalDocumentationTooltip,
   OpenHelmChartDocumentationTooltip,
   OpenKustomizeDocumentationTooltip,
@@ -37,14 +38,14 @@ import {setAlert} from '@redux/reducers/alert';
 import {openPreviewConfigurationEditor, openResourceDiffModal} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal, setMonacoEditor, setPaneConfiguration} from '@redux/reducers/ui';
 import {
+  currentConfigSelector,
   knownResourceKindsSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
-  settingsSelector,
 } from '@redux/selectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isHelmChartFile} from '@redux/services/helm';
+import {isHelmChartFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 import {isUnsavedResource} from '@redux/services/resource';
@@ -94,7 +95,7 @@ const ActionsPane: React.FC<IProps> = props => {
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const {kustomizeCommand} = useAppSelector(settingsSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const monacoEditor = useAppSelector(state => state.ui.monacoEditor);
   const paneConfiguration = useAppSelector(state => state.ui.paneConfiguration);
@@ -277,13 +278,12 @@ const ActionsPane: React.FC<IProps> = props => {
         return;
       }
       const isClusterPreview = previewType === 'cluster';
-      applyResource(selectedResource.id, resourceMap, fileMap, dispatch, kubeConfigPath, kubeConfigContext, namespace, {
+      applyResource(selectedResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
         isClusterPreview,
-        kustomizeCommand,
       });
       setIsApplyModalVisible(false);
     },
-    [dispatch, fileMap, kubeConfigContext, kubeConfigPath, kustomizeCommand, previewType, resourceMap, selectedResource]
+    [dispatch, fileMap, kubeConfigContext, kubeConfigPath, projectConfig, previewType, resourceMap, selectedResource]
   );
 
   const onClickApplyHelmChart = useCallback(
@@ -453,7 +453,13 @@ const ActionsPane: React.FC<IProps> = props => {
 
               <Tooltip
                 mouseEnterDelay={TOOLTIP_DELAY}
-                title={selectedPath ? ApplyFileTooltip : ApplyTooltip}
+                title={
+                  selectedPath
+                    ? isHelmValuesFile(selectedPath)
+                      ? InstallValuesFileTooltip
+                      : ApplyFileTooltip
+                    : ApplyTooltip
+                }
                 placement="bottomLeft"
               >
                 <Button
@@ -470,7 +476,7 @@ const ActionsPane: React.FC<IProps> = props => {
                   }
                   icon={<Icon name="kubernetes" />}
                 >
-                  Deploy
+                  {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
                 </Button>
               </Tooltip>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">

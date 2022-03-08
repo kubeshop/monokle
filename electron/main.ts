@@ -30,7 +30,6 @@ import {
   ROOT_FILE_ENTRY,
 } from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
-import {checkMissingDependencies} from '@utils/index';
 import ElectronStore from 'electron-store';
 import {
   changeCurrentProjectName,
@@ -42,7 +41,6 @@ import {K8sResource} from '@models/k8sresource';
 import {isInPreviewModeSelector, kubeConfigContextSelector, unsavedResourcesSelector, activeProjectSelector} from '@redux/selectors';
 import {HelmChart, HelmValuesFile} from '@models/helm';
 import log from 'loglevel';
-import {PROCESS_ENV} from '@utils/env';
 import asyncLib from "async";
 
 import {createMenu, getDockMenu} from './menu';
@@ -53,9 +51,7 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {setAlert} from '@redux/reducers/alert';
 import {
   checkNewVersion,
-  interpolateTemplate,
-  runHelm,
-  runKustomize,
+  interpolateTemplate, runCommand,
   saveFileDialog,
   selectFileDialog,
 } from '@root/electron/commands';
@@ -70,17 +66,25 @@ import {downloadTemplate, downloadTemplatePack, loadTemplatePackMap, loadTemplat
 import {AnyTemplate, TemplatePack} from '@models/template';
 import {AnyPlugin} from '@models/plugin';
 import {AnyExtension, DownloadPluginResult, DownloadTemplatePackResult, DownloadTemplateResult, UpdateExtensionsResult} from '@models/extension';
-import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
-import { askActionConfirmation, convertRecentFilesToRecentProjects, getSerializedProcessEnv, saveInitialK8sSchema, setProjectsRootFolder, setDeviceID, initNucleus } from './utils';
+import {
+  askActionConfirmation,
+  checkMissingDependencies,
+  convertRecentFilesToRecentProjects,
+  getSerializedProcessEnv,
+  initNucleus,
+  saveInitialK8sSchema,
+  setDeviceID,
+  setProjectsRootFolder,
+} from './utils';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
+import {CommandOptions} from '@utils/command';
 
 Object.assign(console, ElectronLog.functions);
 
 const {MONOKLE_RUN_AS_NODE} = process.env;
-
-const isDev = PROCESS_ENV.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
@@ -239,11 +243,7 @@ ipcMain.on('interpolate-vanilla-template', (event:any, args: InterpolateTemplate
   interpolateTemplate(args, event);
 });
 
-ipcMain.on('run-kustomize', (event:any, cmdOptions: KustomizeCommandOptions) => {
-  runKustomize(cmdOptions, event);
-});
-
-ipcMain.handle('select-file', async (event:any, options: FileExplorerOptions) => {
+ipcMain.handle('select-file', async (event, options: FileExplorerOptions) => {
   return selectFileDialog(event, options);
 });
 
@@ -251,8 +251,8 @@ ipcMain.handle('save-file', async (event:any, options: FileOptions) => {
   return saveFileDialog(event, options);
 });
 
-ipcMain.on('run-helm', (event, args: any) => {
-  runHelm(args, event);
+ipcMain.on('run-command', (event, args: CommandOptions) => {
+  runCommand(args, event);
 });
 
 ipcMain.on('app-version', event => {
@@ -446,7 +446,6 @@ export const createWindow = (givenPath?: string) => {
 
   return win;
 };
-
 
 export const openApplication = async (givenPath?: string) => {
   await app.whenReady();
