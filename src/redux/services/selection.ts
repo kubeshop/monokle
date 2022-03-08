@@ -57,6 +57,7 @@ export function updateSelectionAndHighlights(state: AppState, resource: K8sResou
 
   state.selectedPath = undefined;
   state.selectedResourceId = undefined;
+  state.selectedPreviewConfigurationId = undefined;
 
   if (resource) {
     resource.isSelected = true;

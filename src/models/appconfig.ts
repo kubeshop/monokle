@@ -62,6 +62,15 @@ export type Project = {
   lastOpened?: string;
 };
 
+export type HelmPreviewConfiguration = {
+  id: string;
+  name: string;
+  helmChartFilePath: string;
+  orderedValuesFilePaths: string[];
+  command: 'install' | 'template';
+  options: Record<string, string | null>;
+};
+
 export type ProjectConfig = {
   settings?: Settings;
   kubeConfig?: KubeConfig;
@@ -69,6 +78,9 @@ export type ProjectConfig = {
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
   k8sVersion?: string;
+  helm?: {
+    previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;
+  };
 };
 
 interface AppConfig {

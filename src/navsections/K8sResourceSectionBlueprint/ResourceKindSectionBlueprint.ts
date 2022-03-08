@@ -1,4 +1,3 @@
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
 import navSectionNames from '@constants/navSectionNames';
 
 import {ResourceFilterType} from '@models/appstate';
@@ -13,6 +12,7 @@ import {
   uncheckMultipleResourceIds,
   uncheckResourceId,
 } from '@redux/reducers/main';
+import {activeResourcesSelector} from '@redux/selectors';
 import {isUnsavedResource} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
@@ -43,13 +43,7 @@ export function makeResourceKindNavSection(
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
       return {
-        activeResources: Object.values(state.main.resourceMap).filter(
-          r =>
-            ((state.main.previewResourceId === undefined && state.main.previewValuesFileId === undefined) ||
-              r.filePath.startsWith(PREVIEW_PREFIX)) &&
-            !r.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-            !r.name.startsWith('Patch:')
-        ),
+        activeResources: activeResourcesSelector(state),
         resourceFilter: state.main.resourceFilter,
         selectedResourceId: state.main.selectedResourceId,
         selectedPath: state.main.selectedPath,
