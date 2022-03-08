@@ -1,6 +1,6 @@
 import {BrowserWindow, dialog} from 'electron';
 
-import {execSync} from 'child_process';
+import {spawn} from 'child_process';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 
@@ -8,40 +8,13 @@ import {NewVersionCode} from '@models/appconfig';
 
 import {updateNewVersion} from '@redux/reducers/appConfig';
 import {InterpolateTemplateOptions} from '@redux/services/templates';
-import {KustomizeCommandOptions} from '@redux/thunks/previewKustomization';
 
 import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
 
-import {PROCESS_ENV} from '@utils/env';
+import {CommandOptions, CommandResult} from '@utils/command';
+import {ensureMainThread} from '@utils/thread';
 
 import autoUpdater from './auto-update';
-
-/**
- * called by thunk to preview a kustomization
- */
-
-export const runKustomize = (options: KustomizeCommandOptions, event: Electron.IpcMainEvent) => {
-  try {
-    let cmd = options.kustomizeCommand === 'kubectl' ? 'kubectl kustomize ' : 'kustomize build ';
-    if (options.enableHelm) {
-      cmd += '--enable-helm ';
-    }
-
-    let stdout = execSync(`${cmd} "${options.folder}"`, {
-      env: {
-        NODE_ENV: PROCESS_ENV.NODE_ENV,
-        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-        PATH: PROCESS_ENV.PATH,
-      },
-      maxBuffer: 1024 * 1024 * 10,
-      windowsHide: true,
-    });
-
-    event.sender.send('kustomize-result', {stdout: stdout.toString()});
-  } catch (e: any) {
-    event.sender.send('kustomize-result', {error: e.toString()});
-  }
-};
 
 /**
  * prompts to select a file using the native dialogs
@@ -101,29 +74,6 @@ export const saveFileDialog = (event: Electron.IpcMainInvokeEvent, options: File
 };
 
 /**
- * called by thunk to preview a helm chart with values file
- */
-
-export const runHelm = (args: any, event: Electron.IpcMainEvent) => {
-  try {
-    let stdout = execSync(args.helmCommand, {
-      env: {
-        NODE_ENV: PROCESS_ENV.NODE_ENV,
-        PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-        KUBECONFIG: args.kubeconfig,
-        PATH: PROCESS_ENV.PATH,
-      },
-      maxBuffer: 1024 * 1024 * 10,
-      windowsHide: true,
-    });
-
-    event.sender.send('helm-result', {stdout: stdout.toString()});
-  } catch (e: any) {
-    event.sender.send('helm-result', {error: e.toString()});
-  }
-};
-
-/**
  * Checks for a new version of monokle
  */
 
@@ -179,4 +129,47 @@ export const interpolateTemplate = (args: InterpolateTemplateOptions, event: Ele
   result += text;
 
   event.sender.send('interpolate-vanilla-template-result', result);
+};
+
+/**
+ * called by the renderer thread to run a command and capture its output
+ */
+
+export const runCommand = (options: CommandOptions, event: Electron.IpcMainEvent) => {
+  ensureMainThread();
+
+  const result: CommandResult = {exitCode: null, signal: null};
+
+  try {
+    const child = spawn(options.cmd, options.args, {
+      env: {
+        ...options.env,
+        ...process.env,
+      },
+      shell: true,
+      windowsHide: true,
+    });
+
+    if (options.input) {
+      child.stdin.write(options.input);
+      child.stdin.end();
+    }
+
+    child.on('exit', (code, signal) => {
+      result.exitCode = code;
+      result.signal = signal && signal.toString();
+      event.sender.send('command-result', result);
+    });
+
+    child.stdout.on('data', data => {
+      result.stdout = result.stdout ? result.stdout + data.toString() : data.toString();
+    });
+
+    child.stderr.on('data', data => {
+      result.stderr = result.stderr ? result.stderr + data.toString() : data.toString();
+    });
+  } catch (e: any) {
+    result.error = e.message;
+    event.sender.send('command-result', result);
+  }
 };

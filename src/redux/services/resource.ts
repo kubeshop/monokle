@@ -652,18 +652,24 @@ export function extractK8sResources(fileContent: string, relativePath: string) {
   const lineCounter: LineCounter = new LineCounter();
   const documents = parseAllYamlDocuments(fileContent, lineCounter);
   const result: K8sResource[] = [];
+  let splitDocs: any;
 
   if (documents) {
     let docIndex = 0;
     documents.forEach(doc => {
       if (doc.errors.length > 0) {
+        if (!splitDocs) {
+          splitDocs = fileContent.split('---');
+        }
+
         log.warn(
           `Ignoring document ${docIndex} in ${path.parse(relativePath).name} due to ${doc.errors.length} error(s)`,
-          documents[docIndex]
+          documents[docIndex],
+          splitDocs && docIndex < splitDocs.length ? splitDocs[docIndex] : ''
         );
       } else {
         if (doc.warnings.length > 0) {
-          log.warn('[extractK8sResources]: Doc has warnings', doc.warnings, doc);
+          log.warn('[extractK8sResources]: Doc has warnings', doc);
         }
 
         const content = doc.toJS();

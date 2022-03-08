@@ -1,20 +1,7 @@
 import {shell} from 'electron';
 
 import * as os from 'os';
-// @ts-ignore
-import shellPath from 'shell-path';
-
 import {WINDOW_HELP_LINK, trackEvent} from './telemetry';
-
-let cachedShellPath: string | undefined;
-
-export function getShellPath() {
-  if (cachedShellPath === undefined) {
-    cachedShellPath = shellPath.sync();
-  }
-
-  return cachedShellPath;
-}
 
 export function showItemInFolder(fullPath: string) {
   shell.showItemInFolder(fullPath);

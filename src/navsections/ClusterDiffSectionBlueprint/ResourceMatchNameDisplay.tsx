@@ -15,8 +15,12 @@ import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectClusterDiffMatch, setDiffResourceInClusterDiff, unselectClusterDiffMatch} from '@redux/reducers/main';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {
+  selectClusterDiffMatch,
+  setDiffResourceInClusterDiff,
+  unselectClusterDiffMatch,
+} from '@redux/reducers/main';
+import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -85,7 +89,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -139,16 +143,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       return;
     }
 
-    applyResource(
-      firstLocalResource.id,
-      resourceMap,
-      fileMap,
-      dispatch,
-
-      kubeConfigPath,
-      kubeConfigContext,
-      namespace
-    );
+    applyResource(firstLocalResource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace);
     setIsApplyModalVisible(false);
   };
 

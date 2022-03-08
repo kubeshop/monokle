@@ -1,4 +1,3 @@
-import {spawn} from 'child_process';
 import _ from 'lodash';
 import log from 'loglevel';
 import {stringify} from 'yaml';
@@ -6,10 +5,10 @@ import {stringify} from 'yaml';
 import {PREVIEW_PREFIX} from '@constants/constants';
 
 import {AlertEnum, AlertType} from '@models/alert';
+import {ProjectConfig} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {FileMapType, ResourceMapType} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
-import {KustomizeCommandType} from '@models/kustomize';
 
 import {setAlert} from '@redux/reducers/alert';
 import {
@@ -22,11 +21,11 @@ import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {extractK8sResources} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
+import {runKustomize} from '@redux/thunks/previewKustomization';
 import {updateResource} from '@redux/thunks/updateResource';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import {PROCESS_ENV} from '@utils/env';
-import {getShellPath} from '@utils/shell';
+import {errorAlert, successAlert} from '@utils/alert';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -34,8 +33,8 @@ import {getShellPath} from '@utils/shell';
 
 function applyK8sResource(
   resource: K8sResource,
-  kubeconfig: string,
   context: string,
+  kubeconfig?: string,
   namespace?: {name: string; new: boolean}
 ) {
   const resourceContent = _.cloneDeep(resource.content);
@@ -43,7 +42,7 @@ function applyK8sResource(
     delete resourceContent.metadata.namespace;
   }
 
-  return applyYamlToCluster(stringify(resourceContent), kubeconfig, context, namespace);
+  return applyYamlToCluster(stringify(resourceContent), context, kubeconfig, namespace);
 }
 
 /**
@@ -53,43 +52,18 @@ function applyK8sResource(
 function applyKustomization(
   resource: K8sResource,
   fileMap: FileMapType,
-  kubeconfig: string,
   context: string,
-  kustomizeCommand: KustomizeCommandType,
+  projectConfig: ProjectConfig,
   namespace?: {name: string; new: boolean}
 ) {
   const folder = getAbsoluteResourceFolder(resource, fileMap);
 
-  const args =
-    kustomizeCommand === 'kubectl'
-      ? namespace
-        ? `kubectl --context ${context} --namespace ${namespace.name} apply -k "${folder}"`
-        : `kubectl --context ${context} apply -k "${folder}"`
-      : namespace
-      ? `kustomize build "${folder}" | kubectl --context ${context} --namespace ${namespace.name} apply -k -`
-      : `kustomize build "${folder}" | kubectl --context ${context} apply -k -`;
+  const args: string[] = ['--context', context];
+  if (namespace) {
+    args.push(...['--namespace', namespace.name]);
+  }
 
-  const child =
-    kustomizeCommand === 'kubectl'
-      ? spawn(args, {
-          shell: true,
-          env: {
-            NODE_ENV: PROCESS_ENV.NODE_ENV,
-            PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-            PATH: getShellPath(),
-            KUBECONFIG: kubeconfig,
-          },
-        })
-      : spawn(args, {
-          shell: true,
-          env: {
-            NODE_ENV: PROCESS_ENV.NODE_ENV,
-            PUBLIC_URL: PROCESS_ENV.PUBLIC_URL,
-            PATH: getShellPath(),
-            KUBECONFIG: kubeconfig,
-          },
-        });
-  return child;
+  return runKustomize(folder, projectConfig, args);
 }
 
 /**
@@ -103,14 +77,13 @@ export async function applyResource(
   resourceMap: ResourceMapType,
   fileMap: FileMapType,
   dispatch: AppDispatch,
-  kubeconfig: string,
+  projectConfig: ProjectConfig,
   context: string,
   namespace?: {name: string; new: boolean},
   options?: {
     isClusterPreview?: boolean;
     isInClusterDiff?: boolean;
     shouldPerformDiff?: boolean;
-    kustomizeCommand?: 'kubectl' | 'kustomize';
   }
 ) {
   try {
@@ -119,25 +92,20 @@ export async function applyResource(
       dispatch(setApplyingResource(true));
 
       try {
-        const child = isKustomizationResource(resource)
-          ? applyKustomization(
-              resource,
-              fileMap,
-              kubeconfig,
-              context,
-              options && options.kustomizeCommand ? options.kustomizeCommand : 'kubectl',
-              namespace
-            )
-          : applyK8sResource(resource, kubeconfig, context, namespace);
+        const kubeconfigPath = projectConfig.kubeConfig?.path;
+        const result = isKustomizationResource(resource)
+          ? await applyKustomization(resource, fileMap, context, projectConfig, namespace)
+          : await applyK8sResource(resource, context, kubeconfigPath, namespace);
 
-        child.on('exit', (code, signal) => {
-          log.info(`kubectl exited with code ${code} and signal ${signal}`);
-          dispatch(setApplyingResource(false));
-        });
+        if (result.exitCode !== null && result.exitCode !== 0) {
+          log.warn(`apply exited with code ${result.exitCode} and signal ${result.signal}`);
+        }
 
-        child.stdout.on('data', data => {
-          if (options?.isClusterPreview) {
-            getResourceFromCluster(resource, kubeconfig, context).then(resourceFromCluster => {
+        dispatch(setApplyingResource(false));
+
+        if (result.stdout) {
+          if (options?.isClusterPreview && kubeconfigPath) {
+            getResourceFromCluster(resource, kubeconfigPath, context).then(resourceFromCluster => {
               delete resourceFromCluster.body.metadata?.managedFields;
               const updatedResourceText = stringify(resourceFromCluster.body, {sortMapEntries: true});
               if (resourceMap[resourceFromCluster.body.metadata?.uid]) {
@@ -148,7 +116,7 @@ export async function applyResource(
                   })
                 );
               } else {
-                const newK8sResource = extractK8sResources(updatedResourceText, PREVIEW_PREFIX + kubeconfig)[0];
+                const newK8sResource = extractK8sResources(updatedResourceText, PREVIEW_PREFIX + kubeconfigPath)[0];
                 dispatch(addResource(newK8sResource));
               }
 
@@ -163,7 +131,6 @@ export async function applyResource(
               dispatch(openResourceDiffModal(resource.id));
             }
           }
-          dispatch(setApplyingResource(false));
 
           if (namespace && namespace.new) {
             const namespaceAlert: AlertType = {
@@ -175,37 +142,29 @@ export async function applyResource(
             dispatch(setAlert(namespaceAlert));
           }
 
-          const alert: AlertType = {
-            type: AlertEnum.Success,
-            title: `Applied ${resource.name} to cluster ${context} successfully`,
-            message: data.toString(),
-          };
-
+          const alert = successAlert(`Applied ${resource.name} to cluster ${context} successfully`, result.stdout);
           setTimeout(() => dispatch(setAlert(alert)), 400);
-        });
+        }
 
-        child.stderr.on('data', async data => {
-          const alert: AlertType = {
-            type: AlertEnum.Error,
-            title: `Applying ${resource.name} to cluster ${context} failed`,
-            message: data.toString(),
-          };
-
-          if (namespace && namespace.new) {
-            await removeNamespaceFromCluster(namespace.name, kubeconfig, context);
+        if (result.stderr) {
+          if (namespace && namespace.new && kubeconfigPath) {
+            await removeNamespaceFromCluster(namespace.name, kubeconfigPath, context);
           }
+
+          const alert = errorAlert(`Applying ${resource.name} to cluster ${context} failed`, result.stderr);
+
           dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
-        });
+        }
       } catch (e: any) {
-        log.error(e.message);
-        dispatch(setApplyingResource(true));
+        log.error(e);
+        dispatch(setAlert(errorAlert('Deploy failed', e.message)));
+        dispatch(setApplyingResource(false));
       }
     }
-  } catch (e) {
-    log.error('Failed to apply resource');
+  } catch (e: any) {
     log.error(e);
-
+    dispatch(setAlert(errorAlert('Deploy failed', e.message)));
     dispatch(setApplyingResource(false));
   }
 }

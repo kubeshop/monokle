@@ -15,6 +15,7 @@ import {
   HelmChartEventEmitter,
   createHelmChart,
   createHelmValuesFile,
+  findContainingHelmCharts,
   getHelmChartFromFileEntry,
   getHelmChartName,
   getHelmValuesFile,
@@ -465,13 +466,7 @@ function findParentFolderEntry(absolutePath: string, fileMap: FileMapType) {
  */
 
 function addHelmValuesFile(fileEntry: FileEntry, helmChartMap: HelmChartMapType, helmValuesMap: HelmValuesMapType) {
-  // find helm chart containing this file - take subcharts into account
-  const charts = Object.values(helmChartMap)
-    .filter(chart => fileEntry.filePath.startsWith(path.dirname(chart.filePath)))
-    .sort((chart1: HelmChart, chart2: HelmChart) => {
-      // sort by path -> longest path must be the most immediate parent
-      return chart2.filePath.length - chart1.filePath.length;
-    });
+  const charts = findContainingHelmCharts(helmChartMap, fileEntry);
 
   if (charts.length > 0) {
     createHelmValuesFile(fileEntry, charts[0], helmValuesMap);
