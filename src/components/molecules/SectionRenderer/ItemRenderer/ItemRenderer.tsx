@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {ItemBlueprint} from '@models/navigator';
 
@@ -72,7 +72,11 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
     scrollContainer.current?.scrollIntoView();
   }, [checkedResourceIds.length, itemInstance.shouldScrollIntoView]);
 
-  const Wrapper = ContextMenuWrapper.Component ? ContextMenuWrapper.Component : 'div';
+  const Wrapper = useMemo(
+    () => (ContextMenuWrapper.Component ? ContextMenuWrapper.Component : 'div'),
+    [ContextMenuWrapper.Component]
+  );
+
   return (
     <ScrollIntoView id={itemInstance.id} ref={scrollContainer} parentContainerElementId={sectionContainerElementId}>
       {Wrapper && (
