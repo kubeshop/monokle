@@ -5,7 +5,7 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
-import {CLUSTER_DIFF_PREFIX, PREDEFINED_K8S_VERSION, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
+import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AlertType} from '@models/alert';
 import {ProjectConfig} from '@models/appconfig';
@@ -24,6 +24,7 @@ import {RootState} from '@models/rootstate';
 
 import {currentConfigSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
+import {getK8sVersion} from '@redux/services/projectConfig';
 import {reprocessOptionalRefs} from '@redux/services/resourceRefs';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterDiff} from '@redux/thunks/loadClusterDiff';
@@ -141,7 +142,7 @@ export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk(
     state.main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs = shouldIgnore;
 
     const projectConfig = currentConfigSelector(state);
-    const schemaVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+    const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
     const resourceMap = getActiveResourceMap(state.main);
 
@@ -154,7 +155,7 @@ export const addResource = createAsyncThunk(
   async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
-    const schemaVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+    const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
 
     state.main.resourceMap[resource.id] = resource;
@@ -178,7 +179,7 @@ export const reprocessResource = createAsyncThunk(
   async (resource: K8sResource, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
-    const schemaVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+    const schemaVersion = getK8sVersion(projectConfig);
     const userDataDir = String(state.config.userDataDir);
 
     const resourceKinds = getResourceKindsWithTargetingRefs(resource);
@@ -202,7 +203,7 @@ export const reprocessAllResources = createAsyncThunk(
     const state: RootState = thunkAPI.getState();
     const projectConfig = currentConfigSelector(state);
     const userDataDir = String(state.config.userDataDir);
-    const schemaVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+    const schemaVersion = getK8sVersion(projectConfig);
 
     processResources(schemaVersion, userDataDir, state.main.resourceMap, state.main.resourceRefsProcessingOptions);
   }

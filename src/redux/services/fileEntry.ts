@@ -3,7 +3,7 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {PREDEFINED_K8S_VERSION, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
 import {AppState, FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
@@ -23,6 +23,7 @@ import {
   isHelmValuesFile,
   processHelmChartFolder,
 } from '@redux/services/helm';
+import {getK8sVersion} from '@redux/services/projectConfig';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {
   clearResourceSelections,
@@ -429,7 +430,7 @@ export function reloadFile(
   if (isHelmChartFile(absolutePath)) {
     reloadHelmChartFile(fileEntry, state.fileMap, state.helmChartMap);
   } else if (shouldReloadResourcesFromFile(fileEntry, projectConfig)) {
-    reloadResourcesFromFileEntry(fileEntry, state, projectConfig.k8sVersion || PREDEFINED_K8S_VERSION, userDataDir);
+    reloadResourcesFromFileEntry(fileEntry, state, getK8sVersion(projectConfig), userDataDir);
   }
 
   if (wasFileSelected) {
@@ -539,7 +540,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
     const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
     if (resourcesFromFile.length > 0) {
       reprocessResources(
-        projectConfig.k8sVersion || PREDEFINED_K8S_VERSION,
+        getK8sVersion(projectConfig),
         userDataDir,
         resourcesFromFile.map(r => r.id),
         state.resourceMap,

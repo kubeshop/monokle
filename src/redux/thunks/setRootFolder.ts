@@ -1,7 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
 import {AlertEnum} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
 import {FileMapType, HelmChartMapType, HelmValuesMapType, ResourceMapType} from '@models/appstate';
@@ -12,6 +10,7 @@ import {currentConfigSelector} from '@redux/selectors';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {processKustomizations} from '@redux/services/kustomize';
+import {getK8sVersion} from '@redux/services/projectConfig';
 import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
@@ -68,12 +67,7 @@ export const setRootFolder = createAsyncThunk<
   rootEntry.children = files;
 
   processKustomizations(resourceMap, fileMap);
-  processResources(
-    projectConfig.k8sVersion || PREDEFINED_K8S_VERSION,
-    String(userDataDir),
-    resourceMap,
-    resourceRefsProcessingOptions
-  );
+  processResources(getK8sVersion(projectConfig), String(userDataDir), resourceMap, resourceRefsProcessingOptions);
 
   monitorRootFolder(rootFolder, thunkAPI.dispatch);
 

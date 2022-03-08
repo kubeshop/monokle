@@ -4,13 +4,14 @@ import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
 
-import {PREDEFINED_K8S_VERSION, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
+import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {runHelm} from '@utils/helm';
@@ -66,7 +67,7 @@ export const previewHelmValuesFile = createAsyncThunk<
 
       if (result.stdout) {
         return createPreviewResult(
-          projectConfig.k8sVersion || PREDEFINED_K8S_VERSION,
+          getK8sVersion(projectConfig),
           String(configState.userDataDir),
           result.stdout,
           valuesFile.id,

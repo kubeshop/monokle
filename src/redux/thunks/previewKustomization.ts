@@ -5,7 +5,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import log from 'loglevel';
 import path from 'path';
 
-import {PREDEFINED_K8S_VERSION, ROOT_FILE_ENTRY} from '@constants/constants';
+import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {ProjectConfig} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
@@ -14,6 +14,7 @@ import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
+import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {DO_KUSTOMIZE_PREVIEW, trackEvent} from '@utils/telemetry';
@@ -38,7 +39,7 @@ export const previewKustomization = createAsyncThunk<
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
   const state = thunkAPI.getState().main;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
-  const k8sVersion = projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+  const k8sVersion = getK8sVersion(projectConfig);
   const userDataDir = thunkAPI.getState().config.userDataDir;
   const resource = state.resourceMap[resourceId];
 
