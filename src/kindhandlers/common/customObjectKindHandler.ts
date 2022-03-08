@@ -109,7 +109,7 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
 
   if (kindVersion) {
     const kindPlural = spec.names.plural;
-    const editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
+    let editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
     let kindHandler: ResourceKindHandler | undefined;
     let helpLink: string | undefined;
     let refMappers: any[] = [];
@@ -145,6 +145,10 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
               handler.podSelectors.forEach((selector: string[]) => {
                 refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
               });
+            }
+
+            if (handler.editorSchema) {
+              editorSchema = handler.editorSchema;
             }
           }
         }
