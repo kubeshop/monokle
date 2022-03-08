@@ -89,6 +89,7 @@ export const ClusterAccessContainer = styled.span`
 
 export const ClusterOutlined = styled(RawClusterOutlined)`
   font-size: 12px;
+  margin-top: 4px;
   margin-right: 4px;
   letter-spacing: 0.05em;
   font-weight: 600;

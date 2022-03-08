@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
+import {kubeConfigPathSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -59,9 +60,11 @@ interface IProps {
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resources = [], title, onCancel, onOk} = props;
 
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+
   const configState = useAppSelector(state => state.config);
   const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
-  const clusterNamespaces = clusterAccess?.map((cl) => cl.namespace);
+  const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
   const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources, defaultClusterNamespace);
   const [namespaces] = useTargetClusterNamespaces();
@@ -160,7 +163,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           value={selectedOption}
         >
           <Radio value="existing">Use existing namespace</Radio>
-          { hasOneNamespaceWithFullAccess && <Radio value="create">Create namespace</Radio> }
+          {hasOneNamespaceWithFullAccess && <Radio value="create">Create namespace</Radio>}
           <Radio value="none">None</Radio>
         </Radio.Group>
 

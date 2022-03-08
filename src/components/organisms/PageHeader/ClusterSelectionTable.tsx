@@ -22,7 +22,7 @@ interface CLusterSelectionTableProps {
 interface ClusterTableRow {
   name: string;
   namespaces: string[];
-  hasFullAccess: boolean;
+  hasFullAccess?: boolean;
   editable: boolean;
 }
 
@@ -30,13 +30,18 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
   const dispatch = useAppDispatch();
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
+  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
 
   const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
     const contextNamespaces = getNamespaces().filter(appNs => appNs.clusterName === context.name);
+    let hasFullAccess: boolean | undefined;
+    if (context.name === kubeConfigContext) {
+      hasFullAccess = clusterAccess?.some(ca => ca.hasFullAccess);
+    }
     return {
       namespaces: contextNamespaces.map(ctxNs => ctxNs.namespaceName),
       name: context.name,
-      hasFullAccess: true,
+      hasFullAccess,
       editable: true,
     };
   });
@@ -97,6 +102,14 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     );
   };
 
+  const clusterAccessRender = (hasFullAccess?: boolean) => {
+    if (hasFullAccess === undefined) {
+      return 'Unknown';
+    }
+
+    return hasFullAccess ? 'Full Access' : 'Restricted Access';
+  };
+
   const onNamespacesChange = (clusterName: string, namespaces: string[]) => {
     const localClusterIndex = localClusters.findIndex(c => c.name === clusterName);
     const localCluster = localClusters[localClusterIndex];
@@ -132,6 +145,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
         pagination={false}
         scroll={{y: 300}}
         rowKey="name"
+        className="asdasdasd"
         rowClassName={(cluster: ClusterTableRow) => {
           if (kubeConfigContext === cluster.name) {
             return 'table-active-row';
@@ -147,7 +161,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
           key="name"
           ellipsis
           width={350}
-          // onCellClick={(cluster : ClusterTableRow) => handleClusterChange(cluster.name)}
           onCell={(cluster: ClusterTableRow) => ({onClick: () => handleClusterChange(cluster.name)})}
         />
         <Column
@@ -164,9 +177,9 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
           title="Access"
           dataIndex="hasFullAccess"
           key="hasFullAccess"
-          render={(value: boolean) => (value ? 'Full Access' : 'Restricted Access')}
+          render={(_: any, record: ClusterTableRow) => clusterAccessRender(record.hasFullAccess)}
           ellipsis
-          width={100}
+          width={140}
         />
         <Column
           className="table-column-actions"

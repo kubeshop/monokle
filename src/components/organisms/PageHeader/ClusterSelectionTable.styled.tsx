@@ -9,9 +9,13 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import Colors from '@styles/Colors';
 
 export const Table = styled(props => <RawTable {...props} />)`
-  width: 800px;
+  width: 840px;
   border-top: 1px solid ${Colors.grey3};
   ${GlobalScrollbarStyle}
+
+  tbody {
+    vertical-align: top;
+  }
 `;
 
 export const ClusterAccessContainer = styled.span`
