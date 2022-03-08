@@ -40,6 +40,18 @@ export function extractFormSchema(editorSchema: any) {
     delete schema.properties['apiVersion'];
     delete schema.properties['kind'];
     delete schema.properties['metadata'];
+
+    // delete incomplete properties at root level, see sealed-secret.yaml
+    Object.keys(schema.properties).forEach(key => {
+      // property without type?
+      if (!schema.properties[key].type) {
+        delete schema.properties[key];
+      }
+      // object without properties?
+      else if (schema.properties[key].type === 'object' && !schema.properties[key].properties) {
+        delete schema.properties[key];
+      }
+    });
   }
 
   return schema;
@@ -97,7 +109,7 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
 
   if (kindVersion) {
     const kindPlural = spec.names.plural;
-    const editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
+    let editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
     let kindHandler: ResourceKindHandler | undefined;
     let helpLink: string | undefined;
     let refMappers: any[] = [];
@@ -133,6 +145,10 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
               handler.podSelectors.forEach((selector: string[]) => {
                 refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
               });
+            }
+
+            if (handler.editorSchema) {
+              editorSchema = handler.editorSchema;
             }
           }
         }
