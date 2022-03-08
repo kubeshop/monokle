@@ -43,7 +43,7 @@ const PreviwConfigurationDetails: React.FC = () => {
 
   const builtCommand = useMemo(() => {
     if (!previewConfiguration || !helmChart) {
-      return '';
+      return [''];
     }
     return buildHelmCommand(
       helmChart,
@@ -72,7 +72,7 @@ const PreviwConfigurationDetails: React.FC = () => {
         </Breadcrumb>
       )}
       <Text code copyable>
-        {builtCommand}
+        {builtCommand.join(' ')}
       </Text>
     </Container>
   );

@@ -1,20 +1,6 @@
-import {ipcRenderer} from 'electron';
-
 import path from 'path';
 
 import {HelmChart} from '@models/helm';
-
-/**
- * Invokes Helm in main thread
- */
-export function runHelm(cmd: any): any {
-  return new Promise(resolve => {
-    ipcRenderer.once('helm-result', (event, arg) => {
-      resolve(arg);
-    });
-    ipcRenderer.send('run-helm', cmd);
-  });
-}
 
 export function buildHelmCommand(
   helmChart: HelmChart,
@@ -23,7 +9,7 @@ export function buildHelmCommand(
   options: Record<string, string | null>,
   rootFolderPath: string,
   clusterContext?: string
-): string {
+): string[] {
   const chartFolderPath = path.join(rootFolderPath, path.dirname(helmChart.filePath));
 
   const args = [
@@ -44,5 +30,5 @@ export function buildHelmCommand(
     args.push('--dry-run');
   }
 
-  return args.join(' ');
+  return args;
 }
