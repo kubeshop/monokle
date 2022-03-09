@@ -15,7 +15,7 @@ import {setLayoutSize, toggleNotifications, toggleSettings, toggleStartProjectPa
 import {activeResourcesSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
-import MonokleKubeshopLogo from '@assets/MonokleKubeshopLogo.svg';
+import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
 import ClusterSelection from './ClusterSelection';
 import HelpMenu from './HelpMenu';
