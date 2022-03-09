@@ -33,8 +33,6 @@ export const previewHelmValuesFile = createAsyncThunk<
   const state = thunkAPI.getState().main;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const kubeconfig = projectConfig.kubeConfig?.path;
-  const k8sVersion = projectConfig.k8sVersion;
-  const userDataDir = configState.userDataDir;
   const currentContext = projectConfig.kubeConfig?.currentContext;
   const valuesFile = state.helmValuesMap[valuesFileId];
 

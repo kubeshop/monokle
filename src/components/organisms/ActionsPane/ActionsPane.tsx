@@ -283,7 +283,7 @@ const ActionsPane: React.FC<IProps> = props => {
       });
       setIsApplyModalVisible(false);
     },
-    [dispatch, fileMap, kubeConfigContext, kubeConfigPath, projectConfig, previewType, resourceMap, selectedResource]
+    [dispatch, fileMap, kubeConfigContext, projectConfig, previewType, resourceMap, selectedResource]
   );
 
   const onClickApplyHelmChart = useCallback(
@@ -548,32 +548,32 @@ const ActionsPane: React.FC<IProps> = props => {
               ) : null}
             </TabPane>
 
-          {schemaForSelectedPath ||
-          (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
-            <TabPane key="form" tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}>
-              {isFolderLoading || previewLoader.isLoading ? (
-                <S.Skeleton active />
-              ) : activeTabKey === 'form' ? (
-                selectedPath && schemaForSelectedPath && !selectedResource ? (
-                  <FormEditor
-                    formSchema={extractFormSchema(schemaForSelectedPath)}
-                    formUiSchema={getUiSchemaForPath(selectedPath)}
-                  />
-                ) : isKustomization && selectedResource ? (
-                  <FormEditor
-                    formSchema={extractFormSchema(
-                      getResourceSchema(selectedResource, String(k8sVersion), String(userDataDir))
-                    )}
-                  />
-                ) : resourceKindHandler?.formEditorOptions ? (
-                  <FormEditor
-                    formSchema={resourceKindHandler.formEditorOptions.editorSchema}
-                    formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
-                  />
-                ) : null
-              ) : null}
-            </TabPane>
-          ) : null}
+            {schemaForSelectedPath ||
+            (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)) ? (
+              <TabPane key="form" tab={<TabHeader icon={<ContainerOutlined />}>Form</TabHeader>}>
+                {isFolderLoading || previewLoader.isLoading ? (
+                  <S.Skeleton active />
+                ) : activeTabKey === 'form' ? (
+                  selectedPath && schemaForSelectedPath && !selectedResource ? (
+                    <FormEditor
+                      formSchema={extractFormSchema(schemaForSelectedPath)}
+                      formUiSchema={getUiSchemaForPath(selectedPath)}
+                    />
+                  ) : isKustomization && selectedResource ? (
+                    <FormEditor
+                      formSchema={extractFormSchema(
+                        getResourceSchema(selectedResource, String(k8sVersion), String(userDataDir))
+                      )}
+                    />
+                  ) : resourceKindHandler?.formEditorOptions ? (
+                    <FormEditor
+                      formSchema={resourceKindHandler.formEditorOptions.editorSchema}
+                      formUiSchema={resourceKindHandler.formEditorOptions.editorUiSchema}
+                    />
+                  ) : null
+                ) : null}
+              </TabPane>
+            ) : null}
 
             {selectedResource && resourceKindHandler && !isKustomization && (
               <TabPane key="metadataForm" tab={<TabHeader icon={<ContainerOutlined />}>Metadata</TabHeader>}>
