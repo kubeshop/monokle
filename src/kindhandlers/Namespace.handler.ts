@@ -17,7 +17,7 @@ const NamespaceHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespace(resource.name, 'true');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, { namespace }) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = await k8sCoreV1Api.listNamespace();
     return response.body.items;

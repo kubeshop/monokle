@@ -20,7 +20,7 @@ const VolumeAttachmentHandler: ResourceKindHandler = {
     const k8sStorageApi = kubeconfig.makeApiClient(k8s.StorageV1Api);
     return k8sStorageApi.readVolumeAttachment(resource.name);
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, { namespace }) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sStorageApi = kubeconfig.makeApiClient(k8s.StorageV1Api);
     const response = await k8sStorageApi.listVolumeAttachment();
     return response.body.items;

@@ -44,7 +44,7 @@ interface RefMapper {
 export type ResourceKind = string;
 
 export type ClusterResourceOptions = {
-  namespace: string;
+  namespace?: string;
 };
 
 interface ResourceKindHandler {

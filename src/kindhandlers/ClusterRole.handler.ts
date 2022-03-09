@@ -17,7 +17,7 @@ const ClusterRoleHandler: ResourceKindHandler = {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
     return k8sRbacV1Api.readClusterRole(resource.name);
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, { namespace }) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
     const response = await k8sRbacV1Api.listClusterRole();
     return response.body.items;

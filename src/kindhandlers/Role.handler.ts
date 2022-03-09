@@ -17,9 +17,9 @@ const RoleHandler: ResourceKindHandler = {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
     return k8sRbacV1Api.readNamespacedRole(resource.name, resource.namespace || 'default');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, { namespace }) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
-    const response = await k8sRbacV1Api.listNamespacedRole(namespace);
+    const response = await k8sRbacV1Api.listNamespacedRole(namespace as string);
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

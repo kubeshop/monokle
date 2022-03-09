@@ -17,7 +17,7 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
     return k8sExtensionsV1Api.readCustomResourceDefinition(resource.name);
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, { namespace }) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
     const response = await k8sExtensionsV1Api.listCustomResourceDefinition();
     return response.body.items;

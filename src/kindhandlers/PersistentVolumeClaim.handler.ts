@@ -17,9 +17,9 @@ const PersistentVolumeClaimHandler: ResourceKindHandler = {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespacedPersistentVolumeClaim(resource.name, resource.namespace || 'default', 'true');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, { namespace }) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    const response = await k8sCoreV1Api.listNamespacedPersistentVolumeClaim(namespace);
+    const response = await k8sCoreV1Api.listNamespacedPersistentVolumeClaim(namespace as string);
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

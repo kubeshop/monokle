@@ -1,7 +1,7 @@
 import fs from 'fs';
+import {uniq} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
-import {uniq} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 import {Document, LineCounter, ParsedNode, Scalar, YAMLSeq} from 'yaml';
 
@@ -16,9 +16,9 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
+import {ClusterAccess} from '@models/appconfig';
 import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
-import {ClusterAccess} from '@models/appconfig';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
@@ -277,16 +277,20 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
-export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string, clusterAccess?: ClusterAccess[]): Promise<string[]> {
-  const hasFullAccess = clusterAccess?.some((ca) => ca.hasFullAccess);
-  const clusterAccessNamespaces = clusterAccess?.map((ca) => ca.namespace) || [];
+export async function getTargetClusterNamespaces(
+  kubeconfigPath: string,
+  context: string,
+  clusterAccess?: ClusterAccess[]
+): Promise<string[]> {
+  const hasFullAccess = clusterAccess?.some(ca => ca.hasFullAccess);
+  const clusterAccessNamespaces = clusterAccess?.map(ca => ca.namespace) || [];
   if (!hasFullAccess) {
     return clusterAccessNamespaces;
   }
 
   try {
     const kubeClient = createKubeClient(kubeconfigPath, context);
-    const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient, { namespace: '' });
+    const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient, {});
 
     const ns: string[] = [];
     namespaces.forEach(namespace => {
