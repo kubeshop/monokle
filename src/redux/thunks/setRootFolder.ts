@@ -94,6 +94,8 @@ export const setRootFolder = createAsyncThunk<
     resourceMap,
     helmChartMap,
     helmValuesMap,
+    isScanExcludesUpdated: 'applied',
+    isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
   };
 });

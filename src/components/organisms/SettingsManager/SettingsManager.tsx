@@ -22,7 +22,6 @@ import {
   changeCurrentProjectName,
   changeProjectsRootPath,
   setKubeConfig,
-  setScanExcludesStatus,
   toggleErrorReporting,
   toggleEventTracking,
   updateApplicationSettings,
@@ -97,7 +96,6 @@ const SettingsManager: React.FC = () => {
       dispatch(updateK8sVersion(config?.k8sVersion || PREDEFINED_K8S_VERSION));
     }
     if (!_.isEqual(_.sortBy(config?.scanExcludes), _.sortBy(appConfig.scanExcludes))) {
-      dispatch(setScanExcludesStatus('outdated'));
       dispatch(updateScanExcludes(config?.scanExcludes || []));
     }
     if (!_.isEqual(_.sortBy(config?.fileIncludes), _.sortBy(appConfig.fileIncludes))) {

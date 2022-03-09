@@ -4,12 +4,6 @@ import {Button, Input, Tooltip} from 'antd';
 
 import styled from 'styled-components';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setScanExcludesStatus} from '@redux/reducers/appConfig';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
-
 import {useOnClickOutside} from '@hooks/useOnClickOutside';
 
 import {useFocus} from '@utils/hooks';
@@ -21,7 +15,8 @@ type FilePatternListProps = {
   onChange: (patterns: string[]) => void;
   tooltip: string;
   isSettingsOpened?: boolean;
-  type?: 'excludes' | 'includes';
+  showApplyButton?: boolean;
+  onApplyClick: () => void;
 };
 
 const StyledUl = styled.ul`
@@ -35,16 +30,12 @@ const StyledButton = styled(Button)`
 `;
 
 const FilePatternList = (props: FilePatternListProps) => {
-  const {value, onChange, tooltip, isSettingsOpened, type} = props;
-
-  const dispatch = useAppDispatch();
+  const {value, onChange, tooltip, isSettingsOpened, showApplyButton, onApplyClick} = props;
 
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<Input>();
   const filePatternInputRef = useRef<any>();
-  const appConfig = useAppSelector(state => state.config);
-  const fileMap = useAppSelector(state => state.main.fileMap);
 
   useOnClickOutside(filePatternInputRef, () => {
     setIsAddingPattern(false);
@@ -124,16 +115,12 @@ const FilePatternList = (props: FilePatternListProps) => {
               Add Pattern
             </Button>
           </Tooltip>
-          {appConfig.isScanExcludesUpdated === 'outdated' && type === 'excludes' ? (
-            <Button
-              onClick={() => {
-                dispatch(setScanExcludesStatus('applied'));
-                dispatch(setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath));
-              }}
-            >
-              Apply changes
-            </Button>
-          ) : null}
+          {
+            showApplyButton &&
+              <Button onClick={onApplyClick}>
+                Apply changes
+              </Button>
+          }
         </>
       )}
     </div>

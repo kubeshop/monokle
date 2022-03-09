@@ -110,10 +110,12 @@ export const configSlice = createSlice({
     updateScanExcludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       electronStore.set('appConfig.scanExcludes', action.payload);
       state.scanExcludes = action.payload;
+      state.isScanExcludesUpdated = 'outdated';
     },
     updateFileIncludes: (state: Draft<AppConfig>, action: PayloadAction<string[]>) => {
       electronStore.set('appConfig.fileIncludes', action.payload);
       state.fileIncludes = action.payload;
+      state.isScanIncludesUpdated = 'outdated';
     },
     updateTheme: (state: Draft<AppConfig>, action: PayloadAction<Themes>) => {
       electronStore.set('appConfig.settings.theme', action.payload);
@@ -153,9 +155,6 @@ export const configSlice = createSlice({
     },
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       state.kubeConfig.currentContext = action.payload;
-    },
-    setScanExcludesStatus: (state: Draft<AppConfig>, action: PayloadAction<'outdated' | 'applied'>) => {
-      state.isScanExcludesUpdated = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
@@ -254,6 +253,14 @@ export const configSlice = createSlice({
       if (action.payload.fromConfigFile) {
         _.remove(keys, k => _.includes(['kubeConfig.contexts', 'kubeConfig.isPathValid'], k));
       }
+
+      if (!_.isEqual(_.sortBy(state.projectConfig?.scanExcludes), _.sortBy(action.payload.config?.scanExcludes))) {
+        state.isScanExcludesUpdated = 'outdated';
+      }
+      if (!_.isEqual(_.sortBy(state.projectConfig?.fileIncludes), _.sortBy(action.payload.config?.fileIncludes))) {
+        state.isScanIncludesUpdated = 'outdated';
+      }
+
       keys.forEach(key => {
         if (projectConfig) {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
@@ -330,6 +337,12 @@ export const configSlice = createSlice({
       state.disableErrorReporting = !state.disableErrorReporting;
       electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
     },
+  },extraReducers: builder => {
+    builder
+      .addCase(setRootFolder.fulfilled, (state, action) => {
+        state.isScanExcludesUpdated = action.payload.isScanIncludesUpdated;
+        state.isScanIncludesUpdated = action.payload.isScanIncludesUpdated;
+      });
   },
 });
 
@@ -337,7 +350,6 @@ export const {
   setFilterObjects,
   setAutoZoom,
   setCurrentContext,
-  setScanExcludesStatus,
   updateFolderReadsMaxDepth,
   updateLanguage,
   updateNewVersion,

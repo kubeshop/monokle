@@ -13,6 +13,7 @@ import {
   K8S_VERSIONS,
   TOOLTIP_DELAY,
   TOOLTIP_K8S_SELECTION,
+  ROOT_FILE_ENTRY,
 } from '@constants/constants';
 import {
   AddExclusionPatternTooltip,
@@ -30,6 +31,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadSchema, schemaExists} from '@redux/services/k8sVersionService';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import FilePatternList from '@molecules/FilePatternList';
 
@@ -60,6 +62,8 @@ export const Settings = ({
 
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const uiState = useAppSelector(state => state.ui);
+  const {isScanIncludesUpdated, isScanExcludesUpdated} = useAppSelector(state => state.config);
+  const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -203,8 +207,8 @@ export const Settings = ({
     if (fileInput.current?.files && fileInput.current.files.length > 0) {
       const file: any = fileInput.current.files[0];
       if (file.path) {
-        const filePath = file.path;
-        setCurrentKubeConfig(filePath);
+        const selectedFilePath = file.path;
+        setCurrentKubeConfig(selectedFilePath);
       }
     }
   };
@@ -341,6 +345,10 @@ export const Settings = ({
           onChange={onChangeFileIncludes}
           tooltip={AddInclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
+          showApplyButton={isScanIncludesUpdated === 'outdated'}
+          onApplyClick={() => {
+            dispatch(setRootFolder(filePath));
+          }}
         />
       </S.Div>
       <S.Div>
@@ -350,7 +358,10 @@ export const Settings = ({
           onChange={onChangeScanExcludes}
           tooltip={AddExclusionPatternTooltip}
           isSettingsOpened={isSettingsOpened}
-          type="excludes"
+          showApplyButton={isScanExcludesUpdated === 'outdated'}
+          onApplyClick={() => {
+            dispatch(setRootFolder(filePath));
+          }}
         />
       </S.Div>
       <S.Div>
