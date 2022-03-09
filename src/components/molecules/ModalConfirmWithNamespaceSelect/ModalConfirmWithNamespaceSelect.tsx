@@ -11,7 +11,6 @@ import styled from 'styled-components';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
-import {kubeConfigPathSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -59,8 +58,6 @@ interface IProps {
 
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resources = [], title, onCancel, onOk} = props;
-
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
 
   const configState = useAppSelector(state => state.config);
   const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);

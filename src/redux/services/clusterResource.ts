@@ -19,7 +19,7 @@ export const getClusterResourceText = async (localResource: K8sResource, kubecon
         return {clusterResourceText: stringify(res.body, {sortMapEntries: true})};
       }
 
-      throw new Error(`Failed to get ${localResource.content.kind} from clusteraaaa`);
+      throw new Error(`Failed to get ${localResource.content.kind} from cluster`);
     };
 
     const handleRejection = () => {

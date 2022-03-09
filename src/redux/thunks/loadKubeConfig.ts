@@ -9,9 +9,10 @@ import {AlertEnum} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
-import {updateProjectKubeConfig, updateProjectKubeAccess} from '@redux/reducers/appConfig';
-import {addNamespace, getKubeAccess, getNamespaces} from '@utils/kubeclient';
+import {updateProjectKubeAccess, updateProjectKubeConfig} from '@redux/reducers/appConfig';
+
 import electronStore from '@utils/electronStore';
+import {addNamespace, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 
 function getSelectedContext(contexts: k8s.Context[]): k8s.Context | undefined {
   const contextName = electronStore.get('kubeConfig.currentContext');
@@ -43,14 +44,13 @@ export const loadContexts = async (
           kc.setCurrentContext(selectedContext.name);
         }
 
-        electronStore.get('kubeConfig.currentContext');
         const kubeConfig: KubeConfig = {
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.currentContext,
           isPathValid: kc.contexts.length > 0,
         };
 
-        kc.contexts.forEach((context) => {
+        kc.contexts.forEach(context => {
           if (!context.namespace) {
             return;
           }
@@ -62,9 +62,10 @@ export const loadContexts = async (
         });
 
         dispatch(updateProjectKubeConfig(kubeConfig));
-        dispatch(updateProjectKubeAccess(
-          getNamespaces(selectedContext?.name as string)
-            .map((ns) => getKubeAccess(ns.namespaceName)))
+        dispatch(
+          updateProjectKubeAccess(
+            getNamespaces(selectedContext?.name as string).map(ns => getKubeAccess(ns.namespaceName))
+          )
         );
       } catch (e: any) {
         if (e instanceof Error) {

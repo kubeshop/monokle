@@ -43,9 +43,9 @@ interface RefMapper {
 
 export type ResourceKind = string;
 
-export type ResourceInClusterOptions = {
+export type ClusterResourceOptions = {
   namespace: string;
-}
+};
 
 interface ResourceKindHandler {
   /**
@@ -94,7 +94,11 @@ interface ResourceKindHandler {
    * Get all resources of this type using the provided kubeconfig
    */
 
-  listResourcesInCluster(kubeconfig: k8s.KubeConfig, options: ResourceInClusterOptions, crd?: K8sResource): Promise<any[]>;
+  listResourcesInCluster(
+    kubeconfig: k8s.KubeConfig,
+    options: ClusterResourceOptions,
+    crd?: K8sResource
+  ): Promise<any[]>;
 
   /**
    * Delete the specified resource from the cluster
