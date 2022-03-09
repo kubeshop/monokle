@@ -1,6 +1,6 @@
 <p align="center">
   <img src="src/assets/MonokleLogoLight.svg#gh-light-mode-only" alt="Monokle Logo Light"/>
-  <img src="src/assets/MonokleLogoDark.svg" alt="Monokle Logo Dark" />
+  <img src="src/assets/MonokleLogoDark.svg#gh-dark-mode-only" alt="Monokle Logo Dark" />
 </p>
 
 <p align="center">
