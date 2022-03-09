@@ -63,7 +63,7 @@ export const Settings = ({
   const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
   const uiState = useAppSelector(state => state.ui);
   const {isScanIncludesUpdated, isScanExcludesUpdated} = useAppSelector(state => state.config);
-  const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
+  const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const fileInput = useRef<HTMLInputElement>(null);
