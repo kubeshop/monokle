@@ -387,11 +387,7 @@ const ActionsPane: React.FC<IProps> = props => {
   }, [selectedPath, fileMap]);
 
   const deployTooltip = useMemo(() => {
-    return selectedPath
-      ? isHelmValuesFile(selectedPath)
-        ? InstallValuesFileTooltip
-        : ApplyFileTooltip
-      : ApplyTooltip;
+    return selectedPath ? (isHelmValuesFile(selectedPath) ? InstallValuesFileTooltip : ApplyFileTooltip) : ApplyTooltip;
   }, [selectedPath]);
 
   const isDeployButtonDisabled = useMemo(() => {
@@ -468,32 +464,33 @@ const ActionsPane: React.FC<IProps> = props => {
                 </Tooltip>
               )}
 
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={deployTooltip} placement="bottomLeft">
-              <Button
-                loading={Boolean(applyingResource)}
-                type="primary"
-                size="small"
-                ghost
-                onClick={applySelection}
-                disabled={isDeployButtonDisabled}
-                icon={<Icon name="kubernetes" />}
-              >
-                {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
-              </Button>
-            </Tooltip>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
-              <S.DiffButton
-                size="small"
-                type="primary"
-                ghost
-                onClick={diffSelectedResource}
-                disabled={isDiffButtonDisabled}
-              >
-                Diff
-              </S.DiffButton>
-            </Tooltip>
-          </>
-        </TitleBar>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={deployTooltip} placement="bottomLeft">
+                <Button
+                  loading={Boolean(applyingResource)}
+                  type="primary"
+                  size="small"
+                  ghost
+                  onClick={applySelection}
+                  disabled={isDeployButtonDisabled}
+                  icon={<Icon name="kubernetes" />}
+                >
+                  {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}
+                </Button>
+              </Tooltip>
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={DiffTooltip} placement="bottomLeft">
+                <S.DiffButton
+                  size="small"
+                  type="primary"
+                  ghost
+                  onClick={diffSelectedResource}
+                  disabled={isDiffButtonDisabled}
+                >
+                  Diff
+                </S.DiffButton>
+              </Tooltip>
+            </>
+          </TitleBar>
+        )}
       </div>
 
       {!selectedPreviewConfigurationId ? (
