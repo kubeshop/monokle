@@ -14,11 +14,11 @@ import {stringify} from 'yaml';
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateResource} from '@redux/reducers/main';
 import {isInPreviewModeSelector, selectedResourceSelector, settingsSelector} from '@redux/selectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
+import {updateResource} from '@redux/thunks/updateResource';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import {parseYamlDocument} from '@utils/yaml';

@@ -15,7 +15,7 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
-import {AppState, FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
+import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
@@ -483,7 +483,7 @@ export function reprocessResources(
     }
   });
 
-  processParsedResources(schemaVersion, userDataDir, resourceMap, processingOptions, {
+  processResources(schemaVersion, userDataDir, resourceMap, processingOptions, {
     resourceIds,
     resourceKinds: resourceKindsToReprocess,
   });
@@ -496,7 +496,7 @@ export function reprocessResources(
  * Establishes refs for all resources in specified resourceMap
  */
 
-export function processParsedResources(
+export function processResources(
   schemaVersion: string,
   userHomeDir: string,
   resourceMap: ResourceMapType,
@@ -538,14 +538,14 @@ export function processParsedResources(
  * resource
  */
 
-export function recalculateResourceRanges(resource: K8sResource, state: AppState) {
+export function recalculateResourceRanges(resource: K8sResource, fileMap: FileMapType, resourceMap: ResourceMapType) {
   // if length of value has changed we need to recalculate document ranges for
   // subsequent resource so future saves will be at correct place in document
   if (resource.range && resource.range.length !== resource.text.length) {
-    const fileEntry = state.fileMap[resource.filePath];
+    const fileEntry = fileMap[resource.filePath];
     if (fileEntry) {
       // get list of resourceIds in file sorted by startPosition
-      const resourceIds = getResourcesForPath(resource.filePath, state.resourceMap)
+      const resourceIds = getResourcesForPath(resource.filePath, resourceMap)
         .sort((a, b) => {
           return a.range && b.range ? a.range.start - b.range.start : 0;
         })
@@ -559,7 +559,7 @@ export function recalculateResourceRanges(resource: K8sResource, state: AppState
         while (resourceIndex < resourceIds.length - 1) {
           resourceIndex += 1;
           let rid = resourceIds[resourceIndex];
-          const r = state.resourceMap[rid];
+          const r = resourceMap[rid];
           if (r && r.range) {
             r.range.start += diff;
           } else {

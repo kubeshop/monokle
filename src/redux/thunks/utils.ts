@@ -8,7 +8,7 @@ import {AlertEnum} from '@models/alert';
 import {ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource} from '@models/k8sresource';
 
-import {extractK8sResources, processParsedResources} from '@redux/services/resource';
+import {extractK8sResources, processResources} from '@redux/services/resource';
 
 import {createKubeClient} from '@utils/kubeclient';
 
@@ -52,7 +52,7 @@ export function createPreviewResult(
     return rm;
   }, {});
 
-  processParsedResources(schemaVersion, userDataDir, resourceMap, resourceRefsProcessingOptions);
+  processResources(schemaVersion, userDataDir, resourceMap, resourceRefsProcessingOptions);
   return {
     previewResourceId,
     previewResources: resourceMap,

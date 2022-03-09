@@ -192,3 +192,7 @@ export const keysToUpdateStateBulk = (
 
   return keys;
 };
+
+export function getK8sVersion(projectConfig: ProjectConfig) {
+  return projectConfig.k8sVersion || PREDEFINED_K8S_VERSION;
+}

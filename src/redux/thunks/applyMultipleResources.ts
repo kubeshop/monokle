@@ -15,7 +15,7 @@ import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {doesTextStartWithYamlDocumentDelimiter} from './resource';
 
-const applyMultipleResources = async (
+const applyMultipleResources = (
   config: AppConfig,
   resourcesToApply: K8sResource[],
   dispatch: AppDispatch,

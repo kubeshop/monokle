@@ -24,6 +24,7 @@ import {
   isHelmValuesFile,
   processHelmChartFolder,
 } from '@redux/services/helm';
+import {getK8sVersion} from '@redux/services/projectConfig';
 import {updateReferringRefsOnDelete} from '@redux/services/resourceRefs';
 import {
   clearResourceSelections,
@@ -415,7 +416,6 @@ export function reloadFile(
   fileEntry: FileEntry,
   state: AppState,
   projectConfig: ProjectConfig,
-  schemaVersion: string,
   userDataDir: string
 ) {
   let absolutePathTimestamp = getFileTimestamp(absolutePath);
@@ -431,7 +431,7 @@ export function reloadFile(
   if (isHelmChartFile(absolutePath)) {
     reloadHelmChartFile(fileEntry, state.fileMap, state.helmChartMap);
   } else if (shouldReloadResourcesFromFile(fileEntry, projectConfig)) {
-    reloadResourcesFromFileEntry(fileEntry, state, schemaVersion, userDataDir);
+    reloadResourcesFromFileEntry(fileEntry, state, getK8sVersion(projectConfig), userDataDir);
   }
 
   if (wasFileSelected) {
@@ -512,13 +512,7 @@ function addHelmChartFile(
  * Helm Charts/Values and regular resource files
  */
 
-function addFile(
-  absolutePath: string,
-  state: AppState,
-  projectConfig: ProjectConfig,
-  schemaVersion: string,
-  userDataDir: string
-) {
+function addFile(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
   log.info(`adding file ${absolutePath}`);
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
@@ -541,7 +535,7 @@ function addFile(
     const resourcesFromFile = extractResourcesForFileEntry(fileEntry, state.fileMap, state.resourceMap);
     if (resourcesFromFile.length > 0) {
       reprocessResources(
-        schemaVersion,
+        getK8sVersion(projectConfig),
         userDataDir,
         resourcesFromFile.map(r => r.id),
         state.resourceMap,
@@ -581,13 +575,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
  * Adds the file/folder at specified path - and its contained resources
  */
 
-export function addPath(
-  absolutePath: string,
-  state: AppState,
-  projectConfig: ProjectConfig,
-  schemaVersion: string,
-  userDataDir: string
-) {
+export function addPath(absolutePath: string, state: AppState, projectConfig: ProjectConfig, userDataDir: string) {
   const parentPath = absolutePath.substr(0, absolutePath.lastIndexOf(path.sep));
   const parentEntry = getFileEntryForAbsolutePath(parentPath, state.fileMap);
 
@@ -603,7 +591,7 @@ export function addPath(
     }
     const fileEntry = isDirectory
       ? addFolder(absolutePath, state, projectConfig)
-      : addFile(absolutePath, state, projectConfig, schemaVersion, userDataDir);
+      : addFile(absolutePath, state, projectConfig, userDataDir);
 
     if (fileEntry) {
       parentEntry.children = parentEntry.children || [];

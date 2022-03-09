@@ -44,7 +44,8 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
     k8sSchema = JSON.parse(
       readFileSync(path.join(String(userDataDir), path.sep, 'schemas', `${schemaVersion}.json`), 'utf-8')
     );
-    k8sSchemaCache = new Map<string, any | undefined>();
+    k8sSchemaCache.clear();
+    schemaCache.clear();
     k8sSchemaCache.set(schemaVersion, k8sSchema);
   }
 
@@ -101,7 +102,7 @@ export function getSchemaForPath(filePath: string, fileMap: FileMapType): any | 
   }
 }
 
-export function getUiSchemaForPath(filePath: string, fileMap: FileMapType): any | undefined {
+export function getUiSchemaForPath(filePath: string): any | undefined {
   if (path.basename(filePath.toLowerCase()) === 'chart.yaml') {
     return HELM_CHART_UI_SCHEMA;
   }

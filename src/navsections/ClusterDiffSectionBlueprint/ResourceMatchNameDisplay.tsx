@@ -19,11 +19,11 @@ import {
   selectClusterDiffMatch,
   setDiffResourceInClusterDiff,
   unselectClusterDiffMatch,
-  updateResource,
 } from '@redux/reducers/main';
 import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
+import {updateResource} from '@redux/thunks/updateResource';
 
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 

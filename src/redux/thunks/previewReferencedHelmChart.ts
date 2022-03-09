@@ -7,10 +7,9 @@ import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 
 import {CommandOptions, runCommandInMainThread} from '@utils/command';
-
-import {extractObjectsFromYaml} from './manifest-utils';
-import {interpolateTemplate} from './templates';
-import {createUnsavedResource} from './unsavedResource';
+import {extractObjectsFromYaml} from '@redux/services/manifest-utils';
+import {interpolateTemplate} from '@redux/services/templates';
+import {createUnsavedResource} from '@redux/services/unsavedResource';
 
 const fsWriteFilePromise = promisify(fs.writeFile);
 const fsReadFilePromise = promisify(fs.readFile);

@@ -8,7 +8,7 @@ import {K8sResource} from '@models/k8sresource';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
-import {renameResource} from '@redux/services/renameResource';
+import {renameResource} from '@redux/thunks/renameResource';
 
 const CheckboxContainer = styled.div`
   margin-top: 10px;

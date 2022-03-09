@@ -11,6 +11,7 @@ import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {currentConfigSelector} from '@redux/selectors';
+import {getK8sVersion} from '@redux/services/projectConfig';
 import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {CommandOptions, runCommandInMainThread} from '@utils/command';
@@ -80,8 +81,8 @@ export const previewHelmValuesFile = createAsyncThunk<
 
       if (result.stdout) {
         return createPreviewResult(
-          String(k8sVersion),
-          String(userDataDir),
+          getK8sVersion(projectConfig),
+          String(configState.userDataDir),
           result.stdout,
           valuesFile.id,
           'Helm Preview',

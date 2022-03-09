@@ -16,10 +16,11 @@ import {AlertEnum, AlertType} from '@models/alert';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {closeResourceDiffModal, updateResource} from '@redux/reducers/main';
+import {closeResourceDiffModal} from '@redux/reducers/main';
 import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
+import {updateResource} from '@redux/thunks/updateResource';
 
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 

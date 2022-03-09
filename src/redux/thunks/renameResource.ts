@@ -3,9 +3,8 @@ import {stringify} from 'yaml';
 import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
 
-import {updateResource} from '@redux/reducers/main';
-
-import {isIncomingRef} from './resourceRefs';
+import {isIncomingRef} from '@redux/services/resourceRefs';
+import {updateResource} from '@redux/thunks/updateResource';
 
 export const renameResource = (
   resourceId: string,

@@ -7,6 +7,7 @@ import {Button, Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
+import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
@@ -331,7 +332,7 @@ const FileTreePane = () => {
   const onSelectRootFolderFromMainThread = useCallback(
     (_: any, data: string) => {
       if (data) {
-        console.log('setting root folder from main thread', data);
+        log.info('setting root folder from main thread', data);
         setFolder(data);
       }
     },

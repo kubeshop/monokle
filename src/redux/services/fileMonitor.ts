@@ -1,9 +1,10 @@
 import {FSWatcher, watch} from 'chokidar';
 
-import {ProjectConfig} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 
-import {multipleFilesChanged, multiplePathsAdded, multiplePathsRemoved} from '@redux/reducers/main';
+import {multiplePathsRemoved} from '@redux/reducers/main';
+import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
+import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 
 import {debounceWithPreviousArgs} from '@utils/helpers';
 
@@ -13,15 +14,12 @@ let watcher: FSWatcher;
  * Creates a monitor for the specified folder and dispatches folder events using the specified dispatch
  */
 
-export function monitorRootFolder(folder: string, projectConfig: ProjectConfig, dispatch: AppDispatch) {
+export function monitorRootFolder(folder: string, dispatch: AppDispatch) {
   if (watcher) {
     watcher.close();
   }
 
-  const scanExcludes = projectConfig.scanExcludes;
-
   watcher = watch(folder, {
-    ignored: scanExcludes,
     ignoreInitial: true,
     persistent: true,
     usePolling: true,
@@ -33,21 +31,21 @@ export function monitorRootFolder(folder: string, projectConfig: ProjectConfig, 
       'add',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        dispatch(multiplePathsAdded({paths, projectConfig}));
+        dispatch(multiplePathsAdded(paths));
       }, 1000)
     )
     .on(
       'addDir',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        dispatch(multiplePathsAdded({paths, projectConfig}));
+        dispatch(multiplePathsAdded(paths));
       }, 1000)
     )
     .on(
       'change',
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
-        dispatch(multipleFilesChanged({paths, projectConfig}));
+        dispatch(multiplePathsChanged(paths));
       }, 1000)
     )
     .on(
