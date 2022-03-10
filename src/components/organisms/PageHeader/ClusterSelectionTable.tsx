@@ -39,7 +39,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
       const contextNamespaces = getNamespaces().filter(appNs => appNs.clusterName === context.name);
       let hasFullAccess: boolean | undefined;
       if (context.name === kubeConfigContext) {
-        hasFullAccess = !clusterAccess?.some(ca => !ca.hasFullAccess);
+        hasFullAccess = clusterAccess?.every(ca => ca.hasFullAccess);
       }
       return {
         namespaces: contextNamespaces.map(ctxNs => ctxNs.namespaceName),

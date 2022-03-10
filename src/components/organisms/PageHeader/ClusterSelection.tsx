@@ -120,7 +120,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
   const {icon, tooltip} = useMemo(() => {
-    const hasFullAccess = !clusterAccess?.some(ca => !ca.hasFullAccess);
+    const hasFullAccess = clusterAccess?.some(ca => ca.hasFullAccess);
     if (hasFullAccess) {
       return {
         icon: <S.CheckCircleOutlined />,
