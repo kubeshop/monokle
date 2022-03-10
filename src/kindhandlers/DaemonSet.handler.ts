@@ -19,9 +19,9 @@ const DaemonSetHandler: ResourceKindHandler = {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
     return k8sAppV1Api.readNamespacedDaemonSet(resource.name, resource.namespace || 'default', 'true');
   },
-  async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
+  async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
-    const response = await k8sAppV1Api.listDaemonSetForAllNamespaces();
+    const response = await k8sAppV1Api.listNamespacedDaemonSet(namespace as string);
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

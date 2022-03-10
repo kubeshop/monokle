@@ -386,6 +386,19 @@ const ActionsPane: React.FC<IProps> = props => {
     setSchemaForSelectedPath(selectedPath ? getSchemaForPath(selectedPath, fileMap) : undefined);
   }, [selectedPath, fileMap]);
 
+  const deployTooltip = useMemo(() => {
+    return selectedPath ? (isHelmValuesFile(selectedPath) ? InstallValuesFileTooltip : ApplyFileTooltip) : ApplyTooltip;
+  }, [selectedPath]);
+
+  const isDeployButtonDisabled = useMemo(() => {
+    return (
+      (!selectedResourceId && !selectedPath) ||
+      (selectedResource &&
+        !isKustomizationResource(selectedResource) &&
+        (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
+    );
+  }, [selectedResource, knownResourceKinds, selectedResourceId, selectedPath]);
+
   const onClickRunPreviewConfiguration = useCallback(() => {
     if (!selectedPreviewConfiguration) {
       return;
@@ -451,29 +464,14 @@ const ActionsPane: React.FC<IProps> = props => {
                 </Tooltip>
               )}
 
-              <Tooltip
-                mouseEnterDelay={TOOLTIP_DELAY}
-                title={
-                  selectedPath
-                    ? isHelmValuesFile(selectedPath)
-                      ? InstallValuesFileTooltip
-                      : ApplyFileTooltip
-                    : ApplyTooltip
-                }
-                placement="bottomLeft"
-              >
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={deployTooltip} placement="bottomLeft">
                 <Button
                   loading={Boolean(applyingResource)}
                   type="primary"
                   size="small"
                   ghost
                   onClick={applySelection}
-                  disabled={
-                    (!selectedResourceId && !selectedPath) ||
-                    (selectedResource &&
-                      !isKustomizationResource(selectedResource) &&
-                      (isKustomizationPatch(selectedResource) || !knownResourceKinds.includes(selectedResource.kind)))
-                  }
+                  disabled={isDeployButtonDisabled}
                   icon={<Icon name="kubernetes" />}
                 >
                   {selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'}

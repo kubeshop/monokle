@@ -9,7 +9,11 @@ import {stringify} from 'yaml';
 
 import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
-import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
+import {
+  ClusterDiffApplyTooltip,
+  ClusterDiffCompareTooltip,
+  ClusterDiffSaveTooltip
+} from '@constants/tooltips';
 
 import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
@@ -34,6 +38,8 @@ import {
 } from '@utils/resources';
 
 import Colors from '@styles/Colors';
+import {hasAccessToResource} from '@utils/kubeclient';
+import {ClusterAccess} from '@models/appconfig';
 
 const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
   width: 100%;
@@ -88,6 +94,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
+  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
@@ -189,6 +196,13 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
     }
   };
 
+  // TODO change-to-multiple-cluster-access
+  const resourceNamespace = (clusterAccess ?? [])?.find((access: ClusterAccess) => {
+    return access.namespace === matchMeta.resourceNamespace;
+  });
+  const canGet = hasAccessToResource(matchMeta.resourceKind.toLowerCase(), 'get', resourceNamespace);
+  const canCreate = hasAccessToResource(matchMeta.resourceKind.toLowerCase(), 'create', resourceNamespace);
+
   if (!clusterResource && !localResources) {
     return null;
   }
@@ -211,19 +225,19 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
       </LabelContainer>
 
       <IconsContainer $clusterOnly={Boolean(clusterResource && !firstLocalResource)}>
-        {firstLocalResource && (
+        {canCreate && firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffApplyTooltip}>
             <ArrowRightOutlined style={{color: Colors.blue6}} onClick={onClickApply} />
           </Tooltip>
         )}
-        {clusterResource && firstLocalResource && (
+        {canGet && clusterResource && firstLocalResource && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffCompareTooltip}>
             <StyledDiffSpan style={{color: Colors.blue6}} onClick={onClickDiff}>
               Diff
             </StyledDiffSpan>
           </Tooltip>
         )}
-        {clusterResource && !firstLocalResource?.filePath.startsWith(PREVIEW_PREFIX) && (
+        {canGet && clusterResource && !firstLocalResource?.filePath.startsWith(PREVIEW_PREFIX) && (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ClusterDiffSaveTooltip}>
             <ArrowLeftOutlined style={{color: Colors.blue6}} onClick={onClickSave} />
           </Tooltip>

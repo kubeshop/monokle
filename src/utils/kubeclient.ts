@@ -1,9 +1,11 @@
 import * as k8s from '@kubernetes/client-node';
 
+import {execSync} from 'child_process';
 import log from 'loglevel';
 
-import {AppConfig} from '@models/appconfig';
+import {AppConfig, ClusterAccess, KubePermissions} from '@models/appconfig';
 
+import electronStore from '@utils/electronStore';
 import {getMainProcessEnv} from '@utils/env';
 
 export function createKubeClient(config: string | AppConfig, context?: string) {
@@ -52,4 +54,100 @@ export function createKubeClient(config: string | AppConfig, context?: string) {
   }
 
   return kc;
+}
+
+function parseCanI(stdout: string, namespace: string): ClusterAccess {
+  const lines = stdout.split('\n');
+
+  const permissions: KubePermissions[] = [];
+  let hasFullAccess = false;
+
+  lines.forEach((line, index) => {
+    if (!index) {
+      return;
+    }
+    const columns = line.split(/\s{2,100}/);
+
+    /**
+     * an output line looks like this "selfsubjectrulesreviews.authorization.k8s.io [] [] [create]"
+     * and we need only the first and last items(resource name and verbs allowed)
+     */
+    const [resourceName, , , rawVerbs] = columns;
+
+    if (!resourceName) {
+      return;
+    }
+
+    const cleanVerbs = (rawVerbs as string).replace('[', '').replace(']', '');
+
+    if (resourceName === '*.*' && cleanVerbs === '*') {
+      hasFullAccess = true;
+    }
+
+    const verbs = cleanVerbs ? cleanVerbs.split(' ') : [];
+
+    permissions.push({
+      resourceName,
+      verbs,
+    });
+  });
+
+  return {
+    permissions,
+    hasFullAccess,
+    namespace,
+  };
+}
+
+export function getKubeAccess(namespace: string): ClusterAccess {
+  const command = `kubectl auth can-i --list --namespace=${namespace}`;
+  const canStdOut = execSync(command).toString();
+  return parseCanI(canStdOut, namespace);
+}
+
+export function hasAccessToResource(resourceName: string, verb: string, clusterAccess?: ClusterAccess) {
+  if (!clusterAccess) {
+    return false;
+  }
+
+  if (clusterAccess.hasFullAccess) {
+    return true;
+  }
+
+  const resourceAccess = clusterAccess.permissions.find(access => {
+    return access.resourceName === resourceName.toLowerCase() && access.verbs.includes(verb);
+  });
+
+  return Boolean(resourceAccess);
+}
+
+interface ConfigNamespaceStore {
+  namespaceName: string;
+  clusterName: string;
+}
+
+export function addNamespaces(namespaces: ConfigNamespaceStore[]) {
+  electronStore.set('kubeConfig.namespaces', namespaces);
+}
+
+export function addNamespace({namespaceName, clusterName}: ConfigNamespaceStore) {
+  const appNamespaces: ConfigNamespaceStore[] = electronStore.get('kubeConfig.namespaces') ?? [];
+  const existingNamespace = appNamespaces.find(
+    appNs => appNs.namespaceName === namespaceName && appNs.clusterName === clusterName
+  );
+  if (existingNamespace) {
+    return;
+  }
+
+  appNamespaces.push({namespaceName, clusterName});
+  electronStore.set('kubeConfig.namespaces', appNamespaces);
+}
+
+export function getNamespaces(clusterName?: string): ConfigNamespaceStore[] {
+  const appNamespaces: ConfigNamespaceStore[] = electronStore.get('kubeConfig.namespaces') ?? [];
+  if (clusterName) {
+    return appNamespaces.filter(appNamespace => appNamespace.clusterName === clusterName);
+  }
+
+  return appNamespaces;
 }

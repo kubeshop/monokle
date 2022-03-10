@@ -15,8 +15,9 @@ type FilePatternListProps = {
   onChange: (patterns: string[]) => void;
   tooltip: string;
   isSettingsOpened?: boolean;
+  showButtonLabel?: string;
   showApplyButton?: boolean;
-  onApplyClick: () => void;
+  onApplyClick?: () => void;
 };
 
 const StyledUl = styled.ul`
@@ -30,7 +31,7 @@ const StyledButton = styled(Button)`
 `;
 
 const FilePatternList = (props: FilePatternListProps) => {
-  const {value, onChange, tooltip, isSettingsOpened, showApplyButton, onApplyClick} = props;
+  const {value, onChange, tooltip, isSettingsOpened, showButtonLabel, showApplyButton, onApplyClick} = props;
 
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
@@ -105,22 +106,19 @@ const FilePatternList = (props: FilePatternListProps) => {
             onChange={e => setPatternInput(e.target.value)}
             onPressEnter={addPattern}
           />
-          <StyledButton onClick={addPattern}>OK</StyledButton>
-          <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
+          <div>
+            <StyledButton onClick={addPattern}>OK</StyledButton>
+            <StyledButton onClick={onClickCancel}>Cancel</StyledButton>
+          </div>
         </div>
       ) : (
         <>
           <Tooltip title={tooltip}>
             <Button onClick={() => setIsAddingPattern(true)} style={{marginRight: 10}}>
-              Add Pattern
+              {showButtonLabel || 'Add Pattern'}
             </Button>
           </Tooltip>
-          {
-            showApplyButton &&
-              <Button onClick={onApplyClick}>
-                Apply changes
-              </Button>
-          }
+          {showApplyButton && <Button onClick={onApplyClick}>Apply changes</Button>}
         </>
       )}
     </div>

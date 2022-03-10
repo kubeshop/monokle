@@ -1,4 +1,5 @@
 import fs from 'fs';
+import {uniq} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -15,6 +16,7 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
+import {ClusterAccess} from '@models/appconfig';
 import {FileMapType, ResourceMapType, ResourceRefsProcessingOptions} from '@models/appstate';
 import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 
@@ -275,10 +277,20 @@ export function getNamespaces(resourceMap: ResourceMapType) {
   return namespaces;
 }
 
-export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string): Promise<string[]> {
+export async function getTargetClusterNamespaces(
+  kubeconfigPath: string,
+  context: string,
+  clusterAccess?: ClusterAccess[]
+): Promise<string[]> {
+  const hasFullAccess = clusterAccess?.some(ca => ca.hasFullAccess);
+  const clusterAccessNamespaces = clusterAccess?.map(ca => ca.namespace) || [];
+  if (!hasFullAccess) {
+    return clusterAccessNamespaces;
+  }
+
   try {
     const kubeClient = createKubeClient(kubeconfigPath, context);
-    const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient);
+    const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient, {});
 
     const ns: string[] = [];
     namespaces.forEach(namespace => {
@@ -289,7 +301,8 @@ export async function getTargetClusterNamespaces(kubeconfigPath: string, context
       }
     });
 
-    return ns;
+    ns.push(...clusterAccessNamespaces);
+    return uniq(ns);
   } catch (e: any) {
     log.warn(`Failed to get namespaces in selected context. ${e.message}`);
     return [];

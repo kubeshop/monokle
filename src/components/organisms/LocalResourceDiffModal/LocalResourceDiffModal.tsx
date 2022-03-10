@@ -7,6 +7,7 @@ import {Button, Select, Skeleton, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
+import {flatten} from 'lodash';
 import {stringify} from 'yaml';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -25,7 +26,7 @@ import Icon from '@components/atoms/Icon';
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
 import {useWindowSize} from '@utils/hooks';
-import {createKubeClient} from '@utils/kubeclient';
+import {createKubeClient, hasAccessToResource} from '@utils/kubeclient';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
 
@@ -43,6 +44,8 @@ const DiffModal = () => {
   const previewType = useAppSelector(state => state.main.previewType);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const configState = useAppSelector(state => state.config);
+  const namespaces = useAppSelector(state => state.config.projectConfig?.clusterAccess?.map(cl => cl.namespace));
 
   const targetResource = useAppSelector(state =>
     state.main.resourceDiff.targetResourceId
@@ -57,11 +60,9 @@ const DiffModal = () => {
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [matchingResourcesById, setMatchingResourcesById] = useState<Record<string, any>>();
   const [matchingResourceText, setMatchingResourceText] = useState<string>();
-  const [namespaces, setNamespaces] = useState<string[]>();
   const [shouldDiffIgnorePaths, setShouldDiffIgnorePaths] = useState<boolean>(true);
   const [selectedMatchingResourceId, setSelectedMathingResourceId] = useState<string>();
   const [targetResourceText, setTargetResourceText] = useState<string>();
-  const configState = useAppSelector(state => state.config);
 
   const windowSize = useWindowSize();
 
@@ -190,9 +191,21 @@ const DiffModal = () => {
       const kc = createKubeClient(configState);
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
-      const resourcesFromCluster =
-        (await resourceKindHandler?.listResourcesInCluster(kc))?.filter(r => r.metadata.name === targetResource.name) ||
-        [];
+      const getResources = async () => {
+        if (!resourceKindHandler || !configState.projectConfig?.clusterAccess) {
+          return [];
+        }
+
+        const namespacesWithAccess = configState.projectConfig?.clusterAccess
+          .filter(ca => hasAccessToResource(targetResource.kind, 'get', ca))
+          .map(ca => ca.namespace);
+        const resources = await Promise.all(
+          namespacesWithAccess.map(ns => resourceKindHandler.listResourcesInCluster(kc, {namespace: ns}))
+        );
+        return flatten(resources);
+      };
+
+      const resourcesFromCluster = (await getResources()).filter(r => r.metadata.name === targetResource.name);
 
       // matching resource was not found
       if (!resourcesFromCluster.length) {
@@ -208,7 +221,6 @@ const DiffModal = () => {
         return;
       }
 
-      setNamespaces(resourcesFromCluster.map(r => r.metadata.namespace));
       setMatchingResourcesById(
         resourcesFromCluster?.reduce((matchingResources, r) => {
           delete r.metadata?.managedFields;
@@ -268,6 +280,7 @@ const DiffModal = () => {
     targetResource,
     isDiffModalVisible,
     configState,
+    namespaces,
   ]);
 
   useEffect(() => {

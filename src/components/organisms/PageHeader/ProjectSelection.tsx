@@ -177,14 +177,14 @@ const ProjectSelection = () => {
           })}
           rowClassName={(project: Project) => {
             if (activeProject?.rootFolder === project?.rootFolder) {
-              return 'project-table-active-project';
+              return 'table-active-row';
             }
 
             return '';
           }}
         >
           <Column
-            className="projects-table-column-name"
+            className="table-column-name projects-table-column-name"
             title="All Projects"
             dataIndex="name"
             key="name"
@@ -229,7 +229,7 @@ const ProjectSelection = () => {
             render={(value: string) => (value ? getRelativeDate(value) : '-')}
           />
           <Column
-            className="projects-table-column-actions"
+            className="table-column-actions"
             key="projectActions"
             width={1}
             render={(value: any, project: Project) => (

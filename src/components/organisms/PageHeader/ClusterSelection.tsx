@@ -1,7 +1,7 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Dropdown, Menu, Tooltip} from 'antd';
+import {Dropdown, Tooltip} from 'antd';
 
 import {LoadingOutlined} from '@ant-design/icons';
 
@@ -12,18 +12,18 @@ import {K8sResource} from '@models/k8sresource';
 import {HighlightItems} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCurrentContext, updateProjectConfig} from '@redux/reducers/appConfig';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
   isInClusterModeSelector,
   isInPreviewModeSelector,
   kubeConfigContextSelector,
-  kubeConfigContextsSelector,
   kubeConfigPathSelector,
   kubeConfigPathValidSelector,
 } from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
+
+import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable';
 
 import * as S from './ClusterSelection.styled';
 
@@ -37,11 +37,10 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
+  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
   const previewType = useAppSelector(state => state.main.previewType);
-  const projectConfig = useAppSelector(state => state.config.projectConfig);
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!kubeConfigPath) || !isKubeConfigPathValid
@@ -54,19 +53,6 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     setIsClusterDropdownOpen(false);
     dropdownButtonRef.current?.blur();
   });
-
-  const handleClusterChange = ({key}: {key: string}) => {
-    setIsClusterDropdownOpen(false);
-    if (key !== kubeConfigContext) {
-      dispatch(setCurrentContext(key));
-      dispatch(
-        updateProjectConfig({
-          config: {...projectConfig, kubeConfig: {...projectConfig?.kubeConfig, currentContext: key}},
-          fromConfigFile: false,
-        })
-      );
-    }
-  };
 
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
@@ -118,11 +104,11 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     let content: any;
     let className = '';
     if (isInClusterMode) {
-      content = 'RELOAD';
+      content = 'Reload';
     } else if (previewType === 'cluster' && previewLoader.isLoading) {
       content = <LoadingOutlined />;
     } else {
-      content = 'LOAD';
+      content = 'Load';
       className = highlightedItems.connectToCluster ? 'animated-highlight' : '';
     }
 
@@ -133,47 +119,57 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
     );
   }, [previewType, previewLoader, isInClusterMode, highlightedItems]);
 
-  const clusterMenu = (
-    <Menu>
-      {kubeConfigContexts.map((context: any) => (
-        <Menu.Item key={context.name} onClick={handleClusterChange}>
-          {context.name}
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
+  const {icon, tooltip} = useMemo(() => {
+    const hasFullAccess = clusterAccess?.every(ca => ca.hasFullAccess);
+    if (hasFullAccess) {
+      return {
+        icon: <S.CheckCircleOutlined />,
+        tooltip: 'You have full access to this cluster',
+      };
+    }
+
+    return {
+      icon: <S.ExclamationCircleOutlinedWarning />,
+      tooltip: 'You do not have full access to this cluster',
+    };
+  }, [clusterAccess]);
 
   if (!isClusterSelectorVisible) {
     return null;
   }
+
   return (
     <S.ClusterContainer id="ClusterContainer">
       {activeProject && (
         <S.ClusterStatus>
+          {isKubeConfigPathValid && (
+            <>
+              <S.ClusterOutlined />
+              <Dropdown
+                overlay={<ClusterSelectionTable setIsClusterDropdownOpen={setIsClusterDropdownOpen} />}
+                overlayClassName="cluster-dropdown-item"
+                placement="bottomCenter"
+                arrow
+                trigger={['click']}
+                disabled={previewLoader.isLoading || isInClusterMode}
+                visible={isClusterDropdownOpen}
+                onVisibleChange={setIsClusterDropdownOpen}
+              >
+                <S.ClusterButton type="link" ref={dropdownButtonRef}>
+                  <S.ClusterContextName>{kubeConfigContext}</S.ClusterContextName>
+                  <S.DownOutlined />
+                </S.ClusterButton>
+              </Dropdown>
+            </>
+          )}
           <S.ClusterStatusText connected={isKubeConfigPathValid}>
-            <S.ClusterOutlined />
+            {isKubeConfigPathValid && (
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
+                <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
+              </Tooltip>
+            )}
             <span>{isKubeConfigPathValid ? 'Configured' : 'No Cluster Configured'}</span>
           </S.ClusterStatusText>
-
-          <S.Divider type="vertical" />
-
-          {isKubeConfigPathValid && (
-            <Dropdown
-              overlay={clusterMenu}
-              overlayClassName="cluster-dropdown-item"
-              placement="bottomCenter"
-              arrow
-              trigger={['click']}
-              disabled={previewLoader.isLoading || isInClusterMode}
-              visible={isClusterDropdownOpen}
-              onVisibleChange={setIsClusterDropdownOpen}
-            >
-              <S.ClusterButton type="link" ref={dropdownButtonRef}>
-                <S.ClusterContextName>{kubeConfigContext}</S.ClusterContextName>
-                <S.DownOutlined />
-              </S.ClusterButton>
-            </Dropdown>
-          )}
 
           {isKubeConfigPathValid ? (
             <>

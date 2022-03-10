@@ -60,8 +60,13 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resources = [], title, onCancel, onOk} = props;
 
   const configState = useAppSelector(state => state.config);
-  const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources);
+  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
+  const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
+  const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
+  const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources, defaultClusterNamespace);
   const [namespaces] = useTargetClusterNamespaces();
+
+  const hasOneNamespaceWithFullAccess = clusterAccess?.length === 1 && clusterAccess[0].hasFullAccess;
 
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
   const [errorMessage, setErrorMessage] = useState('');
@@ -102,7 +107,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setSelectedOption('none');
       setSelectedNamespace('default');
       setCreateNamespaceName('');
-    } else if (!namespaces.includes(defaultNamespace)) {
+    } else if (!namespaces.includes(defaultNamespace) && hasOneNamespaceWithFullAccess) {
       setSelectedOption('create');
       setSelectedNamespace('default');
       setCreateNamespaceName(defaultNamespace);
@@ -111,7 +116,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setSelectedNamespace(defaultNamespace);
       setCreateNamespaceName('');
     }
-  }, [defaultOption, defaultNamespace, namespaces]);
+  }, [defaultOption, defaultNamespace, namespaces, hasOneNamespaceWithFullAccess]);
 
   const onlyClusterScopedResources = useMemo(
     () => resources.every(r => !getResourceKindHandler(r.kind)?.isNamespaced),
@@ -155,7 +160,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           value={selectedOption}
         >
           <Radio value="existing">Use existing namespace</Radio>
-          <Radio value="create">Create namespace</Radio>
+          {hasOneNamespaceWithFullAccess && <Radio value="create">Create namespace</Radio>}
           <Radio value="none">None</Radio>
         </Radio.Group>
 

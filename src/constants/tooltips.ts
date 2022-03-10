@@ -25,6 +25,7 @@ export const ExitHelmPreviewTooltip = 'Exit Helm Chart preview (Escape)';
 export const ApplyFileTooltip = `Deploy this file to your selected cluster (${KEY_CTRL_CMD}+ALT+S)`;
 export const DeployKustomizationTooltip = `Deploy this kustomization to your selected cluster (${KEY_CTRL_CMD}+ALT+S)`;
 export const InstallValuesFileTooltip = `Install Helm Chart using this values file in your selected cluster (${KEY_CTRL_CMD}+ALT+S)`;
+export const CannotDeployFileTooltip = 'You do not have permissions to deploy this resource';
 export const ApplyTooltip = `Deploy this resource to your selected cluster (${KEY_CTRL_CMD}+ALT+S)`;
 export const DiffTooltip = `Diff this resource against your selected cluster (${KEY_CTRL_CMD}+ALT+D)`;
 export const NamespacesFilterTooltip = 'Filter visible resources on selected namespace';
