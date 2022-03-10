@@ -2,9 +2,12 @@ import {useMemo} from 'react';
 
 import {Breadcrumb, Typography} from 'antd';
 
+import {sortBy} from 'lodash';
 import styled from 'styled-components';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
+
+import {PreviewConfigValuesFileItem, PreviewConfigValuesFileItemPropsDefinition} from '@models/appconfig';
 
 import {useAppSelector} from '@redux/hooks';
 import {kubeConfigContextSelector} from '@redux/selectors';
@@ -41,19 +44,33 @@ const PreviwConfigurationDetails: React.FC = () => {
     );
   });
 
+  const orderedValuesFilePaths = useMemo(
+    () =>
+      previewConfiguration
+        ? sortBy(
+            Object.values(previewConfiguration.valuesFileItemMap).filter(
+              (item): item is PreviewConfigValuesFileItem => item != null
+            ),
+            [PreviewConfigValuesFileItemPropsDefinition.orderPropName]
+          ).map(i => i.filePath)
+        : [],
+    [previewConfiguration]
+  );
+
   const builtCommand = useMemo(() => {
     if (!previewConfiguration || !helmChart) {
       return [''];
     }
+
     return buildHelmCommand(
       helmChart,
-      previewConfiguration.orderedValuesFilePaths,
+      orderedValuesFilePaths,
       previewConfiguration.command,
       previewConfiguration.options,
       rootFolderPath,
       currentContext
     );
-  }, [previewConfiguration, helmChart, currentContext, rootFolderPath]);
+  }, [previewConfiguration, helmChart, currentContext, rootFolderPath, orderedValuesFilePaths]);
 
   if (!previewConfiguration || !helmChart) {
     return (

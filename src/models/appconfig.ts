@@ -73,12 +73,27 @@ export type Project = {
   lastOpened?: string;
 };
 
+export const PreviewConfigValuesFileItemPropsDefinition = {
+  idPropName: 'id',
+  orderPropName: 'order',
+  checkedPropName: 'isChecked',
+  textPropName: 'name',
+} as const;
+
+export type PreviewConfigValuesFileItem = {
+  filePath: string;
+  [PreviewConfigValuesFileItemPropsDefinition.idPropName]: string;
+  [PreviewConfigValuesFileItemPropsDefinition.orderPropName]: number;
+  [PreviewConfigValuesFileItemPropsDefinition.checkedPropName]: boolean;
+  [PreviewConfigValuesFileItemPropsDefinition.textPropName]: string;
+};
+
 export type HelmPreviewConfiguration = {
   id: string;
   name: string;
   helmChartFilePath: string;
-  orderedValuesFilePaths: string[];
   command: 'install' | 'template';
+  valuesFileItemMap: Record<string, PreviewConfigValuesFileItem | null>;
   options: Record<string, string | null>;
 };
 

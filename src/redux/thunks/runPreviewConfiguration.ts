@@ -1,11 +1,16 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import fs from 'fs';
+import {sortBy} from 'lodash';
 import path from 'path';
 
 import {ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {HelmPreviewConfiguration} from '@models/appconfig';
+import {
+  HelmPreviewConfiguration,
+  PreviewConfigValuesFileItem,
+  PreviewConfigValuesFileItemPropsDefinition,
+} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {RootState} from '@models/rootstate';
 
@@ -71,8 +76,15 @@ export const runPreviewConfiguration = createAsyncThunk<
     );
   }
 
+  const orderedValuesFilePaths = sortBy(
+    Object.values(previewConfiguration.valuesFileItemMap).filter(
+      (item): item is PreviewConfigValuesFileItem => item != null
+    ),
+    [PreviewConfigValuesFileItemPropsDefinition.orderPropName]
+  ).map(i => i.filePath);
+
   const valuesFilePathsNotFound: string[] = [];
-  previewConfiguration.orderedValuesFilePaths.forEach(filePath => {
+  orderedValuesFilePaths.forEach(filePath => {
     const absoluteFilePath = path.join(rootFolderPath, filePath);
     if (!fs.existsSync(absoluteFilePath)) {
       valuesFilePathsNotFound.push(absoluteFilePath);
@@ -91,7 +103,7 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   const args = buildHelmCommand(
     chart,
-    previewConfiguration.orderedValuesFilePaths,
+    orderedValuesFilePaths,
     previewConfiguration.command,
     previewConfiguration.options,
     rootFolderPath,
