@@ -1,66 +1,98 @@
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {Checkbox} from 'antd';
 
 import {ArrowDownOutlined, ArrowUpOutlined} from '@ant-design/icons';
 
-import {arrayMove} from '@utils/array';
+import {isObjectLike, orderBy} from 'lodash';
 
 import * as S from './styled';
 
-export type OrderedListItem = {
-  id: string;
-  text: string;
-  isChecked: boolean;
-};
+interface OrderedListProps<ItemType> {
+  itemMap: Record<string, ItemType>;
+  onChange: (itemMap: Record<string, ItemType>) => void;
+  idPropName: string;
+  checkedPropName: string;
+  orderPropName: string;
+  textPropName: string;
+}
 
-type OrderedListProps = {
-  items: OrderedListItem[];
-  onChange: (items: OrderedListItem[]) => void;
-};
-
-const OrderedList: React.FC<OrderedListProps> = props => {
-  const {items, onChange} = props;
+function OrderedList<ItemType>(props: OrderedListProps<ItemType>) {
+  const {itemMap, onChange, idPropName, checkedPropName, orderPropName, textPropName} = props;
 
   const checkItem = useCallback(
     (itemId: string) => {
-      onChange([...items.map(item => (item.id === itemId ? {...item, isChecked: !item.isChecked} : {...item}))]);
+      const item = itemMap[itemId] as any;
+      if (!isObjectLike(item)) {
+        return;
+      }
+      onChange({...itemMap, [itemId]: {...item, [checkedPropName]: !item[checkedPropName]}});
     },
-    [items, onChange]
+    [itemMap, checkedPropName, onChange]
   );
 
   const moveItem = useCallback(
-    (itemId: string, direction: 'up' | 'down') => {
-      const coefficient = direction === 'up' ? -1 : 1;
-      const itemIndex = items.findIndex(i => i.id === itemId);
-      if (!itemIndex) {
+    (itemId: string, dropIndex: number) => {
+      const item = itemMap[itemId] as any;
+      const dropItem = Object.values(itemMap).find(
+        (i: any) => isObjectLike(i) && i[orderPropName] === dropIndex
+      ) as any;
+      if (!isObjectLike(item) || !isObjectLike(dropItem)) {
         return;
       }
-      onChange(arrayMove(items, itemIndex, itemIndex + coefficient));
+      const dropItemId = dropItem[idPropName];
+      if (!dropItemId) {
+        return;
+      }
+      onChange({
+        ...itemMap,
+        [itemId]: {
+          ...item,
+          [orderPropName]: dropItem[orderPropName],
+        },
+        [dropItemId]: {
+          ...dropItem,
+          [orderPropName]: item[orderPropName],
+        },
+      });
     },
-    [items, onChange]
+    [itemMap, onChange, idPropName, orderPropName]
   );
+
+  const orderedItems = useMemo(() => {
+    return orderBy(Object.values(itemMap), [orderPropName]).filter(
+      (item: any) =>
+        isObjectLike(item) &&
+        typeof item[idPropName] === 'string' &&
+        typeof item[orderPropName] === 'number' &&
+        typeof item[checkedPropName] === 'boolean'
+    ) as Record<string, any>[];
+  }, [itemMap, idPropName, checkedPropName, orderPropName]);
 
   return (
     <S.List>
-      {items.map((item, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <S.ListItem key={`${item.id}-${index}`}>
-          <span>
-            <span style={{marginRight: 8}}>{index + 1}.</span>
-            <span onClick={() => checkItem(item.id)}>
-              <Checkbox checked={item.isChecked} />
-              <span style={{marginLeft: 8, cursor: 'pointer'}}>{item.text}</span>
+      {orderedItems.map(item => {
+        return (
+          <S.ListItem key={item[orderPropName]}>
+            <span>
+              <span style={{marginRight: 8}}>{item[orderPropName] + 1}.</span>
+              <span onClick={() => checkItem(item[idPropName])}>
+                <Checkbox checked={item[checkedPropName]} />
+                <span style={{marginLeft: 8, cursor: 'pointer'}}>{item[textPropName]}</span>
+              </span>
             </span>
-          </span>
-          <span>
-            <ArrowUpOutlined onClick={() => moveItem(item.id, 'up')} />
-            <ArrowDownOutlined style={{marginLeft: 8}} onClick={() => moveItem(item.id, 'down')} />
-          </span>
-        </S.ListItem>
-      ))}
+            <span>
+              <ArrowUpOutlined onClick={() => moveItem(item[idPropName], item[orderPropName] - 1)} />
+              <ArrowDownOutlined
+                style={{marginLeft: 8}}
+                onClick={() => moveItem(item[idPropName], item[orderPropName] + 1)}
+              />
+            </span>
+          </S.ListItem>
+        );
+      })}
     </S.List>
   );
-};
+}
 
 export default OrderedList;
