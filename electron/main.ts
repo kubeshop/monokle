@@ -83,8 +83,8 @@ import {CommandOptions} from '@utils/command';
 
 Object.assign(console, ElectronLog.functions);
 
-const {MONOKLE_RUN_AS_NODE} = process.env;
-const isDev = process.env.NODE_ENV === 'development';
+const {MONOKLE_RUN_AS_NODE, NODE_ENV} = process.env;
+const isDev = NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
