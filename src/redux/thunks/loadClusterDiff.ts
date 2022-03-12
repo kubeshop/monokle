@@ -80,12 +80,12 @@ export const loadClusterDiff = createAsyncThunk<
             type: AlertEnum.Warning,
           };
 
-          trackEvent(CLUSTER_COMPARE, {numberOfResourcesBeingCompared: Object.keys(resourceMap), fail: reason});
+          trackEvent(CLUSTER_COMPARE, {numberOfResourcesBeingCompared: Object.keys(resourceMap).length, fail: reason});
 
           return {resourceMap, alert};
         }
       }
-      trackEvent(CLUSTER_COMPARE, {numberOfResourcesBeingCompared: Object.keys(resourceMap)});
+      trackEvent(CLUSTER_COMPARE, {numberOfResourcesBeingCompared: Object.keys(resourceMap).length});
       return {resourceMap};
     } catch (reason: any) {
       trackEvent(CLUSTER_COMPARE, {fail: reason.message});
