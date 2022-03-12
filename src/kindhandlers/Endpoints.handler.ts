@@ -20,7 +20,7 @@ const EndpointsHandler: ResourceKindHandler = {
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = namespace
-      ? await k8sCoreV1Api.listNamespacedEndpoints(namespace as string)
+      ? await k8sCoreV1Api.listNamespacedEndpoints(namespace)
       : await k8sCoreV1Api.listEndpointsForAllNamespaces();
     return response.body.items;
   },

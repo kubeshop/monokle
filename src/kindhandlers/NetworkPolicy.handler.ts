@@ -22,7 +22,7 @@ const NetworkPolicyHandler: ResourceKindHandler = {
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
     const response = namespace
-      ? await k8sNetworkingV1Api.listNamespacedNetworkPolicy(namespace as string)
+      ? await k8sNetworkingV1Api.listNamespacedNetworkPolicy(namespace)
       : await k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces();
     return response.body.items;
   },

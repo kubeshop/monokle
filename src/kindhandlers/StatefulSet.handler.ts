@@ -22,7 +22,7 @@ const StatefulSetHandler: ResourceKindHandler = {
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
     const response = namespace
-      ? await k8sAppV1Api.listNamespacedStatefulSet(namespace as string)
+      ? await k8sAppV1Api.listNamespacedStatefulSet(namespace)
       : await k8sAppV1Api.listStatefulSetForAllNamespaces();
     return response.body.items;
   },

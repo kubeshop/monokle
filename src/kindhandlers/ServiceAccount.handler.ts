@@ -23,7 +23,7 @@ const ServiceAccountHandler: ResourceKindHandler = {
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = namespace
-      ? await k8sCoreV1Api.listNamespacedServiceAccount(namespace as string)
+      ? await k8sCoreV1Api.listNamespacedServiceAccount(namespace)
       : await k8sCoreV1Api.listServiceAccountForAllNamespaces();
     return response.body.items;
   },

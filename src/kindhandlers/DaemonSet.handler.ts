@@ -22,7 +22,7 @@ const DaemonSetHandler: ResourceKindHandler = {
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
     const response = namespace
-      ? await k8sAppV1Api.listNamespacedDaemonSet(namespace as string)
+      ? await k8sAppV1Api.listNamespacedDaemonSet(namespace)
       : await k8sAppV1Api.listDaemonSetForAllNamespaces();
     return response.body.items;
   },

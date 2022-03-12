@@ -22,7 +22,7 @@ const PodHandler: ResourceKindHandler = {
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     const response = namespace
-      ? await k8sCoreV1Api.listNamespacedPod(namespace as string)
+      ? await k8sCoreV1Api.listNamespacedPod(namespace)
       : await k8sCoreV1Api.listPodForAllNamespaces();
     return response.body.items;
   },

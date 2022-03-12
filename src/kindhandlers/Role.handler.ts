@@ -20,7 +20,7 @@ const RoleHandler: ResourceKindHandler = {
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
     const response = namespace
-      ? await k8sRbacV1Api.listNamespacedRole(namespace as string)
+      ? await k8sRbacV1Api.listNamespacedRole(namespace)
       : await k8sRbacV1Api.listRoleForAllNamespaces();
     return response.body.items;
   },
