@@ -14,6 +14,8 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
+import {currentConfigSelector} from '@redux/selectors';
+import {getK8sVersion} from '@redux/services/projectConfig';
 import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
@@ -22,7 +24,9 @@ import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-const getNonCustomClusterObjects = async (kc: any, namespace: string) => {
+const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
+  console.log(`getting non-cluster objects for namespace ${namespace}`);
+
   return Promise.allSettled(
     getRegisteredKindHandlers()
       .filter(handler => !handler.isCustom)
@@ -36,15 +40,19 @@ const getNonCustomClusterObjects = async (kc: any, namespace: string) => {
 
 const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
-  const k8sVersion = thunkAPI.getState().config.projectConfig?.k8sVersion;
+  const projectConfig = currentConfigSelector(thunkAPI.getState());
+  const k8sVersion = getK8sVersion(projectConfig);
   const userDataDir = thunkAPI.getState().config.userDataDir;
-  const clusterAccess = thunkAPI.getState().config?.projectConfig?.clusterAccess;
+  const clusterAccess = projectConfig.clusterAccess;
   try {
     const kc = createKubeClient(thunkAPI.getState().config, context);
-    const res = await Promise.all(
-      clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace))
-    );
-    const resources = flatten(res);
+    const results =
+      clusterAccess && clusterAccess.length > 0
+        ? await Promise.all(clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace)))
+        : await getNonCustomClusterObjects(kc);
+
+    const resources = flatten(results);
+    console.log('results:', results, resources);
 
     const fulfilledResults = resources.filter((r: any) => r.status === 'fulfilled' && r.value);
     if (fulfilledResults.length === 0) {
@@ -97,6 +105,7 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
     }
     return previewResult;
   } catch (e: any) {
+    log.error(e);
     return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', e.message);
   }
 };
