@@ -25,8 +25,6 @@ import {CLUSTER_VIEW, trackEvent} from '@utils/telemetry';
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string) => {
-  console.log(`getting non-cluster objects for namespace ${namespace}`);
-
   return Promise.allSettled(
     getRegisteredKindHandlers()
       .filter(handler => !handler.isCustom)
@@ -52,7 +50,6 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
         : await getNonCustomClusterObjects(kc);
 
     const resources = flatten(results);
-    console.log('results:', results, resources);
 
     const fulfilledResults = resources.filter((r: any) => r.status === 'fulfilled' && r.value);
     if (fulfilledResults.length === 0) {
@@ -78,12 +75,21 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
       kc.currentContext
     );
 
-    // if the cluster contains CRDs we need to check if there any corresponding resources also
+    // if the cluster contains CRDs we need to check if there are any corresponding resources also
     const customResourceDefinitions = Object.values(previewResult.previewResources).filter(
       r => r.kind === 'CustomResourceDefinition'
     );
     if (customResourceDefinitions.length > 0) {
-      const customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, '');
+      const customResourceObjects =
+        clusterAccess && clusterAccess.length > 0
+          ? flatten(
+              await Promise.all(
+                clusterAccess.map((ca: ClusterAccess) =>
+                  loadCustomResourceObjects(kc, customResourceDefinitions, ca.namespace)
+                )
+              )
+            )
+          : await loadCustomResourceObjects(kc, customResourceDefinitions);
 
       // if any were found we need to merge them into the preview-result
       if (customResourceObjects.length > 0) {
@@ -98,11 +104,10 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
           resourceIds: customResources.map(r => r.id),
         });
 
-        trackEvent(CLUSTER_VIEW, {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
-
         previewResult.alert.message = `Previewing ${Object.keys(previewResult.previewResources).length} resources`;
       }
     }
+    trackEvent(CLUSTER_VIEW, {numberOfResourcesInCluster: Object.keys(previewResult.previewResources).length});
     return previewResult;
   } catch (e: any) {
     log.error(e);
@@ -172,7 +177,7 @@ export function findDefaultVersion(crd: any) {
           return m1[3] ? 1 : -1;
         }
         // compare version numbers
-        return parseInt(m1[2], 10) - parseInt(m2[2], 10);
+        return parseInt(m2[2], 10) - parseInt(m1[2], 10);
       }
       return m1[2] ? 1 : -1;
     }
@@ -192,7 +197,7 @@ export function findDefaultVersion(crd: any) {
 async function loadCustomResourceObjects(
   kc: KubeConfig,
   customResourceDefinitions: K8sResource[],
-  namespace: string
+  namespace?: string
 ): Promise<string[]> {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
@@ -209,17 +214,20 @@ async function loadCustomResourceObjects(
         }
 
         // retrieve objects using latest version name
-        // @ts-ignore
-        return k8sApi
-          .listClusterCustomObject(
-            crd.content.spec.group,
-            findDefaultVersion(crd.content) || 'v1',
-            crd.content.spec.names.plural
-          )
-          .then(response =>
-            // @ts-ignore
-            getK8sObjectsAsYaml(response.body.items)
-          );
+        const version = findDefaultVersion(crd.content) || 'v1';
+        return namespace
+          ? k8sApi
+              .listNamespacedCustomObject(crd.content.spec.group, version, namespace, crd.content.spec.names.plural)
+              .then(response =>
+                // @ts-ignore
+                getK8sObjectsAsYaml(response.body.items)
+              )
+          : k8sApi
+              .listClusterCustomObject(crd.content.spec.group, version, crd.content.spec.names.plural)
+              .then(response =>
+                // @ts-ignore
+                getK8sObjectsAsYaml(response.body.items)
+              );
       });
 
     const customResults = await Promise.allSettled(customObjects);
