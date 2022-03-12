@@ -1,9 +1,9 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import {execSync} from 'child_process';
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
-import {execSync} from 'child_process';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
@@ -33,6 +33,7 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
+import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
@@ -286,6 +287,7 @@ export const configSlice = createSlice({
       keys.forEach(key => {
         if (projectConfig) {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
+          trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: key});
         }
       });
 
@@ -340,6 +342,7 @@ export const configSlice = createSlice({
         const projectSettings = state.settings;
         if (projectSettings) {
           _.set(projectSettings, key, serializedIncomingSettings[key]);
+          trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: key});
         }
       });
 
@@ -359,12 +362,12 @@ export const configSlice = createSlice({
       state.disableErrorReporting = !state.disableErrorReporting;
       electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
     },
-  },extraReducers: builder => {
-    builder
-      .addCase(setRootFolder.fulfilled, (state, action) => {
-        state.isScanExcludesUpdated = action.payload.isScanIncludesUpdated;
-        state.isScanIncludesUpdated = action.payload.isScanIncludesUpdated;
-      });
+  },
+  extraReducers: builder => {
+    builder.addCase(setRootFolder.fulfilled, (state, action) => {
+      state.isScanExcludesUpdated = action.payload.isScanIncludesUpdated;
+      state.isScanIncludesUpdated = action.payload.isScanIncludesUpdated;
+    });
   },
 });
 
