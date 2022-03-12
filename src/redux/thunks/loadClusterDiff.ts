@@ -48,6 +48,10 @@ export const loadClusterDiff = createAsyncThunk<
       const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
       if (fulfilledResults.length === 0) {
+        trackEvent(CLUSTER_COMPARE, {
+          // @ts-ignore
+          fail: results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]),
+        });
         return createRejectionWithAlert(
           thunkAPI,
           CLUSTER_DIFF_FAILED,
@@ -76,15 +80,19 @@ export const loadClusterDiff = createAsyncThunk<
             type: AlertEnum.Warning,
           };
 
+          trackEvent(CLUSTER_COMPARE, {numberOfResourcesBeingCompared: Object.keys(resourceMap), fail: reason});
+
           return {resourceMap, alert};
         }
       }
       trackEvent(CLUSTER_COMPARE, {numberOfResourcesBeingCompared: Object.keys(resourceMap)});
       return {resourceMap};
     } catch (reason: any) {
+      trackEvent(CLUSTER_COMPARE, {fail: reason.message});
       return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, reason.message);
     }
   } catch (e: any) {
+    trackEvent(CLUSTER_COMPARE, {fail: e.message});
     return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, e.message);
   }
 });

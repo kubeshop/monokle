@@ -39,6 +39,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
+import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
 import initialState from '../initialState';
@@ -62,8 +63,8 @@ export type SetRootFolderPayload = {
   helmChartMap: HelmChartMapType;
   helmValuesMap: HelmValuesMapType;
   alert?: AlertType;
-  isScanExcludesUpdated: 'outdated' | 'applied',
-  isScanIncludesUpdated: 'outdated' | 'applied',
+  isScanExcludesUpdated: 'outdated' | 'applied';
+  isScanIncludesUpdated: 'outdated' | 'applied';
 };
 
 export type UpdateResourcePayload = {
@@ -496,6 +497,7 @@ export const mainSlice = createSlice({
       state.checkedResourceIds = state.checkedResourceIds.filter(resourceId => !action.payload.includes(resourceId));
     },
     openResourceDiffModal: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      trackEvent(DIFF);
       state.resourceDiff.targetResourceId = action.payload;
     },
     closeResourceDiffModal: (state: Draft<AppState>) => {

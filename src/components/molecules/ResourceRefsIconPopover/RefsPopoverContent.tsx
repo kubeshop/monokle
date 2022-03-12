@@ -15,6 +15,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {areRefPosEqual} from '@redux/services/resource';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
+import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
 
 import RefLink from './RefLink';
 
@@ -167,6 +168,7 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
   };
 
   const onLinkClick = (ref: ResourceRef) => {
+    trackEvent(FOLLOW_LINK, {type: ref.type});
     if (ref.type !== ResourceRefType.Incoming) {
       if (selectedResourceId !== resource.id) {
         selectResource(resource.id);
