@@ -135,7 +135,6 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
         const content = mergeManifests(selectedResource.text, formString);
         if (content.trim() !== selectedResource.text.trim()) {
           dispatch(updateResource({resourceId: selectedResource.id, content}));
-          trackEvent(CHANGES_BY_FORM_EDITOR, {resourceKind: selectedResource.kind});
         }
       } else if (selectedPath) {
         try {
@@ -166,6 +165,12 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
         log.error(`Failed to read file [${selectedPath}]`, e);
       }
     }
+
+    return () => {
+      if (selectedResource) {
+        trackEvent(CHANGES_BY_FORM_EDITOR, {resourceKind: selectedResource.kind});
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource, selectedPath, fileMap]);
 

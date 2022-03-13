@@ -90,23 +90,23 @@ const SettingsManager: React.FC = () => {
 
     if (!_.isEqual(config.kubeConfig?.path, appConfig.kubeConfig.path)) {
       dispatch(setKubeConfig({...appConfig.kubeConfig, path: config.kubeConfig?.path}));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: 'kubeConfig'});
+      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'kubeConfig'});
     }
     if (!_.isEqual(config?.folderReadsMaxDepth, appConfig.folderReadsMaxDepth)) {
       dispatch(updateFolderReadsMaxDepth(config?.folderReadsMaxDepth || 10));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: 'folderReadsMaxDepth'});
+      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'folderReadsMaxDepth'});
     }
     if (!_.isEqual(config?.k8sVersion, appConfig.k8sVersion)) {
       dispatch(updateK8sVersion(config?.k8sVersion || PREDEFINED_K8S_VERSION));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: 'k8sVersion'});
+      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'k8sVersion'});
     }
     if (!_.isEqual(_.sortBy(config?.scanExcludes), _.sortBy(appConfig.scanExcludes))) {
       dispatch(updateScanExcludes(config?.scanExcludes || []));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: 'scanExcludes'});
+      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'scanExcludes'});
     }
     if (!_.isEqual(_.sortBy(config?.fileIncludes), _.sortBy(appConfig.fileIncludes))) {
       dispatch(updateFileIncludes(config?.fileIncludes || []));
-      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: 'fileIncludes'});
+      trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: 'fileIncludes'});
     }
   };
 

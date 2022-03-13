@@ -284,10 +284,14 @@ export const configSlice = createSlice({
         state.isScanIncludesUpdated = 'outdated';
       }
 
+      const cloneProjectConfig = projectConfig ? {...projectConfig} : null;
+
       keys.forEach(key => {
         if (projectConfig) {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
-          trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: key});
+          if (cloneProjectConfig && !_.isEmpty(cloneProjectConfig)) {
+            trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: key});
+          }
         }
       });
 
