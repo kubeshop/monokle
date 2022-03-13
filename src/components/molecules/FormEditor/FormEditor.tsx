@@ -122,6 +122,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const settings = useSelector(settingsSelector);
   const [schema, setSchema] = useState<any>({});
+  const [isResourceUpdated, setIsResourceUpdated] = useState<boolean>(false);
 
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
@@ -130,9 +131,11 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   useDebounce(
     () => {
       let formString = stringify(formData);
+      setIsResourceUpdated(false);
 
       if (selectedResource) {
         const content = mergeManifests(selectedResource.text, formString);
+        setIsResourceUpdated(content.trim() !== selectedResource.text.trim());
         if (content.trim() !== selectedResource.text.trim()) {
           dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
@@ -141,6 +144,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
           const filePath = getAbsoluteFilePath(selectedPath, fileMap);
           const fileContent = fs.readFileSync(filePath, 'utf8');
           const content = mergeManifests(fileContent, formString);
+          setIsResourceUpdated(content.trim() !== fileContent.trim());
           if (content.trim() !== fileContent.trim()) {
             fs.writeFileSync(filePath, content);
           }
@@ -167,8 +171,8 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
     }
 
     return () => {
-      if (selectedResource) {
-        trackEvent(CHANGES_BY_FORM_EDITOR, {resourceKind: selectedResource.kind});
+      if ((selectedResource || selectedPath) && isResourceUpdated) {
+        trackEvent(CHANGES_BY_FORM_EDITOR, {resourceKind: selectedResource?.kind});
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
