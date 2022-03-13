@@ -135,8 +135,9 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
 
       if (selectedResource) {
         const content = mergeManifests(selectedResource.text, formString);
-        setIsResourceUpdated(content.trim() !== selectedResource.text.trim());
-        if (content.trim() !== selectedResource.text.trim()) {
+        const isChanged = content.trim() !== selectedResource.text.trim();
+        setIsResourceUpdated(isChanged);
+        if (isChanged) {
           dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
       } else if (selectedPath) {
@@ -144,8 +145,9 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
           const filePath = getAbsoluteFilePath(selectedPath, fileMap);
           const fileContent = fs.readFileSync(filePath, 'utf8');
           const content = mergeManifests(fileContent, formString);
-          setIsResourceUpdated(content.trim() !== fileContent.trim());
-          if (content.trim() !== fileContent.trim()) {
+          const isChanged = content.trim() !== fileContent.trim();
+          setIsResourceUpdated(isChanged);
+          if (isChanged) {
             fs.writeFileSync(filePath, content);
           }
         } catch (e) {
