@@ -193,8 +193,6 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
 };
 
 export const initNucleus = (isDev: boolean, app: any) => {
-  console.log('NUCLEUS_SH_APP_ID', NUCLEUS_SH_APP_ID, isDev);
-
   if (NUCLEUS_SH_APP_ID) {
     Nucleus.init(NUCLEUS_SH_APP_ID, {
       disableInDev: isDev,
