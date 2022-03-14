@@ -14,8 +14,7 @@ import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {currentKubeContext} from '@redux/selectors';
-import {currentConfigSelector} from '@redux/selectors';
+import {currentConfigSelector, currentKubeContext} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
