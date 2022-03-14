@@ -27,3 +27,7 @@ export const ActionsContainer = styled.div`
   justify-content: flex-end;
   gap: 8px;
 `;
+
+export const Error = styled.p`
+  color: ${Colors.redError};
+`;
