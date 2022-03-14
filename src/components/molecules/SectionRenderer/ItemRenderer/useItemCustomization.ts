@@ -15,6 +15,10 @@ export function useItemCustomization(customization: ItemCustomization = {}) {
     () => ({Component: customization.quickAction?.component, options: customization.quickAction?.options}),
     [customization.quickAction]
   );
+  const ContextMenuWrapper = useMemo(
+    () => ({Component: customization.contextMenuWrapper?.component, options: customization.contextMenuWrapper?.options}),
+    [customization.contextMenuWrapper]
+  );
   const ContextMenu = useMemo(
     () => ({Component: customization.contextMenu?.component, options: customization.contextMenu?.options}),
     [customization.contextMenu]
@@ -24,5 +28,5 @@ export function useItemCustomization(customization: ItemCustomization = {}) {
     [customization.nameDisplay]
   );
 
-  return {Prefix, Suffix, QuickAction, ContextMenu, NameDisplay};
+  return {Prefix, Suffix, QuickAction, ContextMenu, ContextMenuWrapper, NameDisplay};
 }
