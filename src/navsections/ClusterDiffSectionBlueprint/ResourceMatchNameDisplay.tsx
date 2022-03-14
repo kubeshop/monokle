@@ -9,28 +9,22 @@ import {stringify} from 'yaml';
 
 import {PREVIEW_PREFIX, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
-import {
-  ClusterDiffApplyTooltip,
-  ClusterDiffCompareTooltip,
-  ClusterDiffSaveTooltip
-} from '@constants/tooltips';
+import {ClusterDiffApplyTooltip, ClusterDiffCompareTooltip, ClusterDiffSaveTooltip} from '@constants/tooltips';
 
+import {ClusterAccess} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  selectClusterDiffMatch,
-  setDiffResourceInClusterDiff,
-  unselectClusterDiffMatch,
-} from '@redux/reducers/main';
-import {currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {selectClusterDiffMatch, setDiffResourceInClusterDiff, unselectClusterDiffMatch} from '@redux/reducers/main';
+import {currentClusterAccessSelector, currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import ModalConfirmWithNamespaceSelect from '@components/molecules/ModalConfirmWithNamespaceSelect';
 
+import {hasAccessToResource} from '@utils/kubeclient';
 import {
   diffLocalToClusterResources,
   makeResourceNameKindNamespaceIdentifier,
@@ -38,8 +32,6 @@ import {
 } from '@utils/resources';
 
 import Colors from '@styles/Colors';
-import {hasAccessToResource} from '@utils/kubeclient';
-import {ClusterAccess} from '@models/appconfig';
 
 const Container = styled.div<{highlightdiff: boolean; hovered: boolean}>`
   width: 100%;
@@ -94,7 +86,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
+  const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
