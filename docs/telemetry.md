@@ -4,7 +4,7 @@ To improve the end-user experience, Monokle collects telemetry data.
 
 Participation in this program is optional, and you may [opt-out](#how-to-opt-out) if you'd prefer not to share any information.
 
-The data collected is always anonymous, not traceable to the source, and only used in aggregate form. You can learn more about how we treat your data by reading our [privacy statement](https://monokle.kubeshop.io). 
+The data collected is always anonymous, not traceable to the source, and only used in aggregate form. You can learn more about how we treat your data by reading our [privacy statement](https://monokle.kubeshop.io/privacy-policy). 
 
 ## **What We Collect**
 
