@@ -1,9 +1,10 @@
 import {useCallback, useMemo, useState} from 'react';
 
-import {Button, Skeleton, Tooltip} from 'antd';
+import {Button, Skeleton, Tooltip, Typography} from 'antd';
 
 import {PlusOutlined, ReloadOutlined} from '@ant-design/icons';
 
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
 import {PluginManagerDrawerReloadTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -12,6 +13,8 @@ import {checkForExtensionsUpdates} from '@redux/services/extension';
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
 import * as S from './PluginManager.styled';
+
+const {Text} = Typography;
 
 const PluginManagerDrawer: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -67,7 +70,22 @@ const PluginManagerDrawer: React.FC = () => {
       </S.ButtonsContainer>
       <S.Container>
         {sortedPluginEntries.length === 0 ? (
-          <>{isLoadingExistingPlugins ? <Skeleton /> : <p>No plugins installed yet.</p>}</>
+          <>
+            {isLoadingExistingPlugins ? (
+              <Skeleton />
+            ) : (
+              <div>
+                <p>No plugins installed yet.</p>
+                <p>
+                  Reinstall the default Templates plugin using the below URL in the Plugin Installation modal by
+                  clicking on the Install button.
+                </p>
+                <Text code copyable>
+                  {DEFAULT_TEMPLATES_PLUGIN_URL}
+                </Text>
+              </div>
+            )}
+          </>
         ) : (
           <>
             {sortedPluginEntries.length > 0 &&
