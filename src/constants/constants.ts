@@ -22,11 +22,12 @@ export const DEFAULT_KUBECONFIG_DEBOUNCE = 1000;
 export const ACTIONS_PANE_FOOTER_DEFAULT_HEIGHT = 43;
 export const ACTIONS_PANE_FOOTER_EXPANDED_DEFAULT_HEIGHT = 150;
 export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
+export const DEFAULT_TEMPLATES_PLUGIN_URL = 'https://github.com/kubeshop/monokle-default-templates-plugin';
 export const DEFAULT_PLUGINS = [
   {
     owner: 'kubeshop',
     name: 'monokle-default-templates-plugin',
-    url: 'https://github.com/kubeshop/monokle-default-templates-plugin',
+    url: DEFAULT_TEMPLATES_PLUGIN_URL,
   },
 ];
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';

@@ -224,6 +224,7 @@ const defaults = {
     recentFolders: [],
     newVersion: 0,
     k8sVersion: PREDEFINED_K8S_VERSION,
+    hasDeletedDefaultTemplatesPlugin: false,
   },
   ui: {
     isSettingsOpen: false,
