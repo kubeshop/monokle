@@ -32,7 +32,7 @@ import {
 } from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import ElectronStore from 'electron-store';
-import utilsElectronStore from "@utils/electronStore";
+import utilsElectronStore from '@utils/electronStore';
 import {
   changeCurrentProjectName,
   setUserDirs,
