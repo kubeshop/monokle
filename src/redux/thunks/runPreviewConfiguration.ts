@@ -19,6 +19,7 @@ import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils
 
 import {CommandOptions, runCommandInMainThread} from '@utils/command';
 import {buildHelmCommand} from '@utils/helm';
+import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@utils/telemetry';
 
 /**
  * Thunk to preview a Helm Chart
@@ -32,6 +33,7 @@ export const runPreviewConfiguration = createAsyncThunk<
     state: RootState;
   }
 >('main/runPreviewConfiguration', async (previewConfigurationId, thunkAPI) => {
+  trackEvent(RUN_PREVIEW_CONFIGURATION);
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
