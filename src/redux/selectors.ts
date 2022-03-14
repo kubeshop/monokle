@@ -3,7 +3,7 @@ import {createSelector} from 'reselect';
 
 import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
 
-import {ProjectConfig} from '@models/appconfig';
+import {AppConfig, ProjectConfig} from '@models/appconfig';
 import {K8sResource} from '@models/k8sresource';
 import {ResourceKindHandler} from '@models/resourcekindhandler';
 import {RootState} from '@models/rootstate';
@@ -136,16 +136,20 @@ export const fileIncludesSelector = createSelector(
   }
 );
 
+export const currentKubeContext = (configState: AppConfig) => {
+  if (configState.projectConfig?.kubeConfig?.currentContext) {
+    return configState.projectConfig?.kubeConfig?.currentContext;
+  }
+  if (configState.kubeConfig.currentContext) {
+    return configState.kubeConfig.currentContext;
+  }
+  return '';
+};
+
 export const kubeConfigContextSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    if (config.projectConfig?.kubeConfig?.currentContext) {
-      return config.projectConfig?.kubeConfig?.currentContext;
-    }
-    if (config.kubeConfig.currentContext) {
-      return config.kubeConfig.currentContext;
-    }
-    return '';
+    return currentKubeContext(config);
   }
 );
 
@@ -159,6 +163,22 @@ export const kubeConfigContextsSelector = createSelector(
       return config.kubeConfig.contexts;
     }
     return [];
+  }
+);
+
+export const getCurrentClusterAccessSelector = createSelector(
+  (state: RootState) => state.config,
+  config => {
+    let currentContext = currentKubeContext(config);
+    if (!currentContext) {
+      return [];
+    }
+
+    if (!config.projectConfig?.kubeConfig?.currentContext) {
+      return [];
+    }
+
+    return config.projectConfig.clusterAccess?.filter(ca => ca.context === currentContext) || [];
   }
 );
 

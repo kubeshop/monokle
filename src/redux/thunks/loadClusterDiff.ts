@@ -1,4 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {flatten} from 'lodash';
 
 import {CLUSTER_DIFF_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
@@ -8,6 +9,7 @@ import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
 import {RootState} from '@models/rootstate';
 
+import {currentKubeContext} from '@redux/selectors';
 import getClusterObjects from '@redux/services/getClusterObjects';
 import {extractK8sResources} from '@redux/services/resource';
 
@@ -35,13 +37,14 @@ export const loadClusterDiff = createAsyncThunk<
     return;
   }
   try {
-    const clusterAccess = state.config.projectConfig?.clusterAccess;
+    const currentContext = currentKubeContext(state.config);
+    const clusterAccess = state.config.projectConfig?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
     if (!clusterAccess || !clusterAccess.length) {
       return {};
     }
     const kc = createKubeClient(state.config);
     try {
-      const res = await Promise.all(clusterAccess.map((ca) => getClusterObjects(kc, ca.namespace)));
+      const res = await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)));
       const results = flatten(res);
       const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 

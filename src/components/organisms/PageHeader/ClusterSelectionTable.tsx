@@ -37,10 +37,10 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
   useEffect(() => {
     const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
       const contextNamespaces = getNamespaces().filter(appNs => appNs.clusterName === context.name);
-      let hasFullAccess: boolean | undefined;
-      if (context.name === kubeConfigContext) {
-        hasFullAccess = clusterAccess?.every(ca => ca.hasFullAccess);
-      }
+      const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
+      const hasFullAccess = clusterSpecificAccess.length
+        ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
+        : undefined;
       return {
         namespaces: contextNamespaces.map(ctxNs => ctxNs.namespaceName),
         name: context.name,
@@ -50,7 +50,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     });
 
     setLocalClusters(clusterTableRows);
-  }, [kubeConfigContext, kubeConfigContexts, clusterAccess]);
+  }, [kubeConfigContexts, clusterAccess]);
 
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
@@ -76,7 +76,7 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     addNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
 
     if (clusterName === kubeConfigContext) {
-      dispatch(updateProjectKubeAccess(localCluster.namespaces.map(ns => getKubeAccess(ns))));
+      dispatch(updateProjectKubeAccess(localCluster.namespaces.map(ns => getKubeAccess(ns, kubeConfigContext))));
     }
 
     setEditingKey('');

@@ -42,13 +42,17 @@ export enum NewVersionCode {
 export type KubePermissions = {
   resourceName: string;
   verbs: string[];
-}
+};
+
+export type ClusterAccessWithContext = ClusterAccess & {
+  context: string;
+};
 
 export type ClusterAccess = {
   permissions: KubePermissions[];
   hasFullAccess: boolean;
   namespace: string;
-}
+};
 
 // Parsed from kubernetes config file
 export type KubeConfigContext = {
@@ -88,7 +92,7 @@ export type ProjectConfig = {
   scanExcludes?: string[];
   fileIncludes?: string[];
   folderReadsMaxDepth?: number;
-  clusterAccess?: ClusterAccess[];
+  clusterAccess?: ClusterAccessWithContext[];
   k8sVersion?: string;
   helm?: {
     previewConfigurationMap?: Record<string, HelmPreviewConfiguration | null>;

@@ -1,7 +1,7 @@
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {getCurrentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {getTargetClusterNamespaces} from '@redux/services/resource';
 
 export const ALL_NAMESPACES = '<all>';
@@ -10,7 +10,7 @@ export const NO_NAMESPACE = '<none>';
 export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction<string[]>>] {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const clusterAccess = useAppSelector(state => state.config.projectConfig?.clusterAccess);
+  const clusterAccess = useAppSelector(getCurrentClusterAccessSelector);
 
   const [namespaces, setNamespaces] = useState<string[]>([]);
 

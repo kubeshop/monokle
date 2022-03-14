@@ -62,9 +62,10 @@ export const loadContexts = async (
         });
 
         dispatch(updateProjectKubeConfig(kubeConfig));
+
         dispatch(
           updateProjectKubeAccess(
-            getNamespaces(selectedContext?.name as string).map(ns => getKubeAccess(ns.namespaceName))
+            getNamespaces(selectedContext?.name as string).map(ns => getKubeAccess(ns.namespaceName, kc.currentContext))
           )
         );
       } catch (e: any) {
