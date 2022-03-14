@@ -250,41 +250,45 @@ const TreeItem: React.FC<TreeItemProps> = props => {
   );
 
   return (
-    <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-      <S.TitleWrapper>
-        <S.TreeTitleText>{title}</S.TreeTitleText>
-        {canPreview(relativePath) && <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />}
-      </S.TitleWrapper>
-      {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' && (
-        <S.SpinnerWrapper>
-          <Spinner />
-        </S.SpinnerWrapper>
-      )}
-      {isTitleHovered && !processingEntity.processingType ? (
-        <S.ActionsWrapper>
+    <ContextMenu overlay={menu} triggerOnRightClick>
+      <S.TreeTitleWrapper onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
+        <S.TitleWrapper>
+          <S.TreeTitleText>{title}</S.TreeTitleText>
           {canPreview(relativePath) && (
-            <S.PreviewButton
-              type="text"
-              size="small"
-              disabled={isInPreviewMode}
-              $isItemSelected={isFileSelected}
-              onClick={handlePreview}
-            >
-              Preview
-            </S.PreviewButton>
+            <EyeOutlined style={{color: isFileSelected ? Colors.blackPure : Colors.grey7}} />
           )}
-          <ContextMenu overlay={menu}>
-            <div
-              onClick={e => {
-                e.stopPropagation();
-              }}
-            >
-              <Dots color={isFileSelected ? Colors.blackPure : undefined} />
-            </div>
-          </ContextMenu>
-        </S.ActionsWrapper>
-      ) : null}
-    </S.TreeTitleWrapper>
+        </S.TitleWrapper>
+        {processingEntity.processingEntityID === treeKey && processingEntity.processingType === 'delete' && (
+          <S.SpinnerWrapper>
+            <Spinner />
+          </S.SpinnerWrapper>
+        )}
+        {isTitleHovered && !processingEntity.processingType ? (
+          <S.ActionsWrapper>
+            {canPreview(relativePath) && (
+              <S.PreviewButton
+                type="text"
+                size="small"
+                disabled={isInPreviewMode}
+                $isItemSelected={isFileSelected}
+                onClick={handlePreview}
+              >
+                Preview
+              </S.PreviewButton>
+            )}
+            <ContextMenu overlay={menu}>
+              <div
+                onClick={e => {
+                  e.stopPropagation();
+                }}
+              >
+                <Dots color={isFileSelected ? Colors.blackPure : undefined} />
+              </div>
+            </ContextMenu>
+          </S.ActionsWrapper>
+        ) : null}
+      </S.TreeTitleWrapper>
+    </ContextMenu>
   );
 };
 

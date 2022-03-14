@@ -9,6 +9,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
+import KustomizationContextMenuWrapper from './KustomizationContextMenuWrapper';
 import KustomizationContextMenu from './KustomizationContextMenu';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationQuickAction from './KustomizationQuickAction';
@@ -94,6 +95,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<K8sResource, Kustomization
     customization: {
       prefix: {component: KustomizationPrefix},
       suffix: {component: KustomizationSuffix},
+      contextMenuWrapper: {component: KustomizationContextMenuWrapper, options: {isVisibleOnHover: false}},
       contextMenu: {component: KustomizationContextMenu, options: {isVisibleOnHover: true}},
       quickAction: {component: KustomizationQuickAction, options: {isVisibleOnHover: true}},
     },

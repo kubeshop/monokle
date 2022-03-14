@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
@@ -8,6 +8,7 @@ import {RootState} from '@models/rootstate';
 export type ItemCustomComponentProps = {
   itemInstance: ItemInstance;
   options?: ItemCustomComponentOptions;
+  children?: ReactNode;
 };
 
 export type ItemCustomComponent = React.ComponentType<ItemCustomComponentProps>;
@@ -26,6 +27,10 @@ export interface ItemCustomization {
     options?: ItemCustomComponentOptions;
   };
   quickAction?: {
+    component: ItemCustomComponent;
+    options?: ItemCustomComponentOptions;
+  };
+  contextMenuWrapper?:{
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
   };
