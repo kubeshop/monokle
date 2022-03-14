@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {ItemBlueprint} from '@models/navigator';
+import {ItemBlueprint, ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -26,6 +26,11 @@ export type ItemRendererProps<ItemType, ScopeType> = {
   sectionContainerElementId: string;
   indentation: number;
   options?: ItemRendererOptions;
+};
+
+const WrapperPlacehoder: React.FC<ItemCustomComponentProps> = props => {
+  const {children} = props;
+  return <div>{children}</div>;
 };
 
 function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, ScopeType>) {
@@ -73,7 +78,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
   }, [checkedResourceIds.length, itemInstance.shouldScrollIntoView]);
 
   const Wrapper = useMemo(
-    () => (ContextMenuWrapper.Component ? ContextMenuWrapper.Component : 'div'),
+    () => (ContextMenuWrapper.Component ? ContextMenuWrapper.Component : WrapperPlacehoder),
     [ContextMenuWrapper.Component]
   );
 
