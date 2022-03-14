@@ -11,6 +11,7 @@ import {getAbsoluteFileEntryPath} from '@redux/services/fileEntry';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 
 import {errorAlert} from '@utils/alert';
+import {APPLY_FILE, trackEvent} from '@utils/telemetry';
 
 /**
  * Invokes kubectl for the content of the specified resource
@@ -36,6 +37,7 @@ export async function applyFile(
   dispatch(setApplyingResource(true));
 
   try {
+    trackEvent(APPLY_FILE);
     const fileEntry = fileMap[filePath];
     if (fileEntry && !fileEntry.children) {
       try {

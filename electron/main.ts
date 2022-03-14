@@ -80,6 +80,7 @@ import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
 import {CommandOptions} from '@utils/command';
+import { trackEvent, UPDATE_APPLICATION } from '@utils/telemetry';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -264,6 +265,7 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
+  trackEvent(UPDATE_APPLICATION);
   autoUpdater.quitAndInstall();
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
