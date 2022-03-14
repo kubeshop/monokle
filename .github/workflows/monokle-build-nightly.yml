@@ -213,7 +213,7 @@ jobs:
       - name: Build
         shell: PowerShell
         run: |
-          ($contents=jq --arg NUCLEUS_SH_APP_ID $env:NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src\utils\env.json) -and (echo $contents > src\utils\env.json)
+          ($contents=jq --arg NUCLEUS_SH_APP_ID $env:NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src\utils\env.json) -and ($contents | set-content src\utils\env.json -Encoding Ascii)
           cat src\utils\env.json
           npm run electron:build:ci
         env:
