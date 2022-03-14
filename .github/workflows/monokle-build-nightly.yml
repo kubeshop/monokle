@@ -244,15 +244,15 @@ jobs:
           cmd /r dir .\dist
         if: ${{ success() }}
 
-      - name: E2E Test for Electron 🧪
-        run: npm run ui-test
+      # - name: E2E Test for Electron 🧪
+      #   run: npm run ui-test
 
-      - name: Upload Test Results 🗃
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: playwright-output
-          path: test-output/**
+      # - name: Upload Test Results 🗃
+      #   if: always()
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: playwright-output
+      #     path: test-output/**
 
       - name: Build Failed - Archive Build Logs
         uses: actions/upload-artifact@v2
