@@ -52,7 +52,8 @@ const createNode = (
   fileMap: FileMapType,
   resourceMap: ResourceMapType,
   hideExcludedFilesInFileExplorer: boolean,
-  fileOrFolderContainedInFilter: string | undefined
+  fileOrFolderContainedInFilter: string | undefined,
+  rootFolderName: string
 ): TreeNode => {
   const resources = getResourcesForPath(fileEntry.filePath, resourceMap);
 
@@ -71,7 +72,7 @@ const createNode = (
                 : 'not-supported-file-entry-name'
             }
           >
-            {fileEntry.name}
+            {fileEntry.name === ROOT_FILE_ENTRY ? rootFolderName : fileEntry.name}
           </span>
           {resources.length > 0 ? (
             <Tooltip title={`${resources.length} resource${resources.length !== 1 ? 's' : ''} in this file`}>
@@ -93,7 +94,14 @@ const createNode = (
         .map(child => fileMap[getChildFilePath(child, fileEntry, fileMap)])
         .filter(childEntry => childEntry)
         .map(childEntry =>
-          createNode(childEntry, fileMap, resourceMap, hideExcludedFilesInFileExplorer, fileOrFolderContainedInFilter)
+          createNode(
+            childEntry,
+            fileMap,
+            resourceMap,
+            hideExcludedFilesInFileExplorer,
+            fileOrFolderContainedInFilter,
+            rootFolderName
+          )
         )
         .filter(childEntry => {
           if (!hideExcludedFilesInFileExplorer) {
@@ -149,6 +157,10 @@ const FileTreePane = () => {
 
   const isButtonDisabled = !fileMap[ROOT_FILE_ENTRY];
 
+  const rootFolderName = useMemo(() => {
+    return fileMap[ROOT_FILE_ENTRY] ? path.basename(fileMap[ROOT_FILE_ENTRY].filePath) : ROOT_FILE_ENTRY;
+  }, [fileMap]);
+
   const setFolder = useCallback(
     (folder: string) => {
       dispatch(setRootFolder(folder));
@@ -169,7 +181,8 @@ const FileTreePane = () => {
         fileMap,
         resourceMap,
         Boolean(hideExcludedFilesInFileExplorer),
-        fileOrFolderContainedInFilter
+        fileOrFolderContainedInFilter,
+        rootFolderName
       );
 
     setTree(treeData);
@@ -184,6 +197,7 @@ const FileTreePane = () => {
     shouldExpandAllNodes,
     hideExcludedFilesInFileExplorer,
     fileOrFolderContainedInFilter,
+    rootFolderName,
     dispatch,
   ]);
 
