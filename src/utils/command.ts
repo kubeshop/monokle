@@ -25,7 +25,6 @@ export function runCommandInMainThread(options: CommandOptions): Promise<Command
 
   return new Promise<CommandResult>(resolve => {
     ipcRenderer.once('command-result', (event, arg: CommandResult) => {
-      log.info('arg', arg);
       return resolve(arg);
     });
     ipcRenderer.send('run-command', options);

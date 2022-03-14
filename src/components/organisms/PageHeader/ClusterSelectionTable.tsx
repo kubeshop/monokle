@@ -11,6 +11,7 @@ import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/sele
 
 import FilePatternList from '@molecules/FilePatternList';
 
+import {runCommandInMainThread} from '@utils/command';
 import {addNamespaces, getKubeAccess, getNamespaces} from '@utils/kubeclient';
 
 import * as S from './ClusterSelectionTable.styled';
@@ -138,7 +139,13 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     if (clusterName === kubeConfigContext) {
       return;
     }
-    dispatch(setCurrentContext(clusterName));
+
+    runCommandInMainThread({
+      cmd: `kubectl config use-context ${clusterName}`,
+      args: [],
+    }).then(() => {
+      dispatch(setCurrentContext(clusterName));
+    });
   };
 
   return (

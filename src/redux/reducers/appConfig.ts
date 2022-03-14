@@ -31,7 +31,6 @@ import {
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {runCommandInMainThread} from '@utils/command';
 import electronStore from '@utils/electronStore';
 
 import initialState from '../initialState';
@@ -156,17 +155,8 @@ export const configSlice = createSlice({
       state.k8sVersion = action.payload;
     },
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      runCommandInMainThread({
-        cmd: `kubectl config use-context ${action.payload}`,
-        args: [],
-      })
-        .then(() => {
-          electronStore.set('kubeConfig.currentContext', action.payload);
-          state.kubeConfig.currentContext = action.payload;
-        })
-        .catch(e => {
-          console.log(e, 'error', e.stack, JSON.stringify(e));
-        });
+      electronStore.set('kubeConfig.currentContext', action.payload);
+      state.kubeConfig.currentContext = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
