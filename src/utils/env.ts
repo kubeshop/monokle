@@ -4,11 +4,14 @@
 import execa from 'execa';
 import stripAnsi from 'strip-ansi';
 
+import additionalEnvs from './env.json';
+
 const args = ['-ilc', 'echo -n "_SHELL_ENV_DELIMITER_"; env; echo -n "_SHELL_ENV_DELIMITER_"; exit'];
 
 const ENV = {
   // Disables Oh My Zsh auto-update thing that can block the process.
   DISABLE_AUTO_UPDATE: 'true',
+  ...additionalEnvs,
 };
 
 const detectShell = () => {

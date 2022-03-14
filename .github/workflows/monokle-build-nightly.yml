@@ -81,7 +81,6 @@ jobs:
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
@@ -97,6 +96,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           USE_HARD_LINKS: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -208,7 +208,6 @@ jobs:
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
@@ -222,6 +221,7 @@ jobs:
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -319,7 +319,6 @@ jobs:
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
@@ -330,6 +329,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -348,16 +348,16 @@ jobs:
           ls -alh dist | grep Monokle && du -sh dist || true
         if: ${{ success() }}
 
-# todo fix linux tests first and then run them
-#      - name: E2E Test for Electron 🧪
-#        run: npm run ui-test
-#
-#      - name: Upload Test Results 🗃
-#        if: always()
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: playwright-output
-#          path: test-output/**
+      # todo fix linux tests first and then run them
+      #      - name: E2E Test for Electron 🧪
+      #        run: npm run ui-test
+      #
+      #      - name: Upload Test Results 🗃
+      #        if: always()
+      #        uses: actions/upload-artifact@v2
+      #        with:
+      #          name: playwright-output
+      #          path: test-output/**
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
