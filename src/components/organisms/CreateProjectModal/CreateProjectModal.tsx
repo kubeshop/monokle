@@ -196,15 +196,19 @@ const CreateProjectModal: React.FC = () => {
             Back
           </Button>
         ),
-        <Button
-          id="empty-project-save"
-          key="submit"
-          type="primary"
-          disabled={!isSubmitEnabled}
-          onClick={() => createProjectForm.submit()}
-        >
-          {uiState.fromTemplate && formStep === FormSteps.STEP_ONE ? 'Next: Select a Template' : 'Create Project'}
-        </Button>,
+        <>
+          {formStep !== FormSteps.STEP_TWO && (
+            <Button
+              id="empty-project-save"
+              key="submit"
+              type="primary"
+              disabled={!isSubmitEnabled}
+              onClick={() => createProjectForm.submit()}
+            >
+              {uiState.fromTemplate && formStep === FormSteps.STEP_ONE ? 'Next: Select a Template' : 'Create Project'}
+            </Button>
+          )}
+        </>,
       ]}
     >
       {formStep === FormSteps.STEP_ONE ? (
@@ -277,6 +281,8 @@ const CreateProjectModal: React.FC = () => {
               <TemplateInformation
                 key={template.id}
                 template={template}
+                actionType="button"
+                actionLabel="Use this Template"
                 onClickOpenTemplate={() => onClickOpenTemplate(template)}
               />
             ))}
