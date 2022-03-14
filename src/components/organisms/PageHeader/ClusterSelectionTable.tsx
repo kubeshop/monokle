@@ -141,8 +141,8 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     }
 
     runCommandInMainThread({
-      cmd: `kubectl config use-context ${clusterName}`,
-      args: [],
+      cmd: `kubectl`,
+      args: ['config', 'use-context', clusterName],
     }).then(() => {
       dispatch(setCurrentContext(clusterName));
     });

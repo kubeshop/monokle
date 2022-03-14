@@ -18,8 +18,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
 import {
+  currentClusterAccessSelector,
   currentConfigSelector,
-  getCurrentClusterAccessSelector,
   isInClusterModeSelector,
   kubeConfigContextSelector,
 } from '@redux/selectors';
@@ -50,8 +50,8 @@ const DiffModal = () => {
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const configState = useAppSelector(state => state.config);
-  const clusterAccess = useAppSelector(getCurrentClusterAccessSelector);
-  const namespaces = clusterAccess?.map(cl => cl.namespace);
+  const clusterAccess = useAppSelector(currentClusterAccessSelector);
+  const namespaces = useMemo(() => clusterAccess?.map(cl => cl.namespace), [clusterAccess]);
 
   const targetResource = useAppSelector(state =>
     state.main.resourceDiff.targetResourceId

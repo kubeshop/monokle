@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import {K8sResource} from '@models/k8sresource';
 
 import {useAppSelector} from '@redux/hooks';
-import {getCurrentClusterAccessSelector} from '@redux/selectors';
+import {currentClusterAccessSelector} from '@redux/selectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -61,7 +61,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resources = [], title, onCancel, onOk} = props;
 
   const configState = useAppSelector(state => state.config);
-  const clusterAccess = useAppSelector(getCurrentClusterAccessSelector);
+  const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
   const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resources, defaultClusterNamespace);

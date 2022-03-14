@@ -17,7 +17,7 @@ import {ItemCustomComponentProps} from '@models/navigator';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectClusterDiffMatch, setDiffResourceInClusterDiff, unselectClusterDiffMatch} from '@redux/reducers/main';
-import {currentConfigSelector, getCurrentClusterAccessSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {currentClusterAccessSelector, currentConfigSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -86,7 +86,7 @@ function ResourceMatchNameDisplay(props: ItemCustomComponentProps) {
   const dispatch = useAppDispatch();
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const clusterAccess = useAppSelector(getCurrentClusterAccessSelector);
+  const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
   const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);

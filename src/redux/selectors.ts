@@ -166,7 +166,7 @@ export const kubeConfigContextsSelector = createSelector(
   }
 );
 
-export const getCurrentClusterAccessSelector = createSelector(
+export const currentClusterAccessSelector = createSelector(
   (state: RootState) => state.config,
   config => {
     let currentContext = currentKubeContext(config);

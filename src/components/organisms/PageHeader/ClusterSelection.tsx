@@ -15,7 +15,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
   activeProjectSelector,
-  getCurrentClusterAccessSelector,
+  currentClusterAccessSelector,
   isInClusterModeSelector,
   isInPreviewModeSelector,
   kubeConfigContextSelector,
@@ -40,7 +40,7 @@ const ClusterSelection = ({previewResource}: {previewResource?: K8sResource}) =>
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const previewLoader = useAppSelector(state => state.main.previewLoader);
-  const clusterAccess = useAppSelector(getCurrentClusterAccessSelector);
+  const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const previewType = useAppSelector(state => state.main.previewType);
 
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
