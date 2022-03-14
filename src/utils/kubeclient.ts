@@ -3,7 +3,7 @@ import * as k8s from '@kubernetes/client-node';
 import {execSync} from 'child_process';
 import log from 'loglevel';
 
-import {AppConfig, ClusterAccess, KubePermissions} from '@models/appconfig';
+import {AppConfig, ClusterAccess, ClusterAccessWithContext, KubePermissions} from '@models/appconfig';
 
 import electronStore from '@utils/electronStore';
 import {getMainProcessEnv} from '@utils/env';
@@ -99,10 +99,13 @@ function parseCanI(stdout: string, namespace: string): ClusterAccess {
   };
 }
 
-export function getKubeAccess(namespace: string): ClusterAccess {
+export function getKubeAccess(namespace: string, currentContext: string): ClusterAccessWithContext {
   const command = `kubectl auth can-i --list --namespace=${namespace}`;
   const canStdOut = execSync(command).toString();
-  return parseCanI(canStdOut, namespace);
+  return {
+    ...parseCanI(canStdOut, namespace),
+    context: currentContext,
+  };
 }
 
 export function hasAccessToResource(resourceName: string, verb: string, clusterAccess?: ClusterAccess) {

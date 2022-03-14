@@ -4,6 +4,8 @@ import asyncLib from 'async';
 import fs from 'fs';
 import log from 'loglevel';
 
+import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@constants/constants';
+
 import {AlertEnum, AlertType} from '@models/alert';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
@@ -12,6 +14,8 @@ import {TemplateManifest, TemplatePack, VanillaTemplate} from '@models/template'
 
 import {setAlert} from '@redux/reducers/alert';
 import {removePlugin, removeTemplate, removeTemplatePack} from '@redux/reducers/extension';
+
+import electronStore from '@utils/electronStore';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createUnsavedResource} from './unsavedResource';
@@ -40,6 +44,12 @@ export const deletePlugin = async (plugin: AnyPlugin, pluginPath: string, dispat
     }
   });
   dispatch(removePlugin(pluginPath));
+
+  let repositoryUrl = `https://github.com/${plugin.repository.owner}/${plugin.repository.name}`;
+
+  if (repositoryUrl === DEFAULT_TEMPLATES_PLUGIN_URL) {
+    electronStore.set('appConfig.hasDeletedDefaultTemplatesPlugin', true);
+  }
 
   const alert: AlertType = {
     title: `Deleted templates (${deletedTemplates}) successfully`,

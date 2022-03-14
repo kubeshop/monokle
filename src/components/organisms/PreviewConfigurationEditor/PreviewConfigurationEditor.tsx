@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Button, Input, Select} from 'antd';
 
@@ -50,6 +50,7 @@ const PreviewConfigurationEditor = () => {
   });
 
   const [name, setName] = useState<string>(() => previewConfiguration?.name || '');
+  const [showNameError, setShowNameError] = useState(false);
 
   const [valuesFileItemMap, setValuesFileItemMap] = useState<Record<string, PreviewConfigValuesFileItem>>(() => {
     // get the existing items saved in the preview configuration
@@ -131,9 +132,19 @@ const PreviewConfigurationEditor = () => {
     dispatch(closePreviewConfigurationEditor());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (name.trim().length) {
+      setShowNameError(false);
+    }
+  }, [name]);
+
   const onSave = useCallback(
     (shouldRunPreview?: boolean) => {
       if (!helmChart) {
+        return;
+      }
+      if (!name.trim().length) {
+        setShowNameError(true);
         return;
       }
       const input: HelmPreviewConfiguration = {
@@ -184,6 +195,7 @@ const PreviewConfigurationEditor = () => {
       <S.Field>
         <S.Label>Name your configuration:</S.Label>
         <Input value={name} onChange={e => setName(e.target.value)} placeholder="Enter the configuration name" />
+        {showNameError && <S.Error>You must enter a name for this Preview Configuration.</S.Error>}
       </S.Field>
       <S.Field>
         <S.Label style={{marginBottom: 0}}>Select which values files to use:</S.Label>
