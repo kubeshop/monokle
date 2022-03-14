@@ -119,15 +119,15 @@ jobs:
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
 
-      - name: E2E Test for Electron 🧪
-        run: npm run ui-test
+      # - name: E2E Test for Electron 🧪
+      #   run: npm run ui-test
 
-      - name: Upload Test Results 🗃
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: playwright-output
-          path: test-output/**
+      # - name: Upload Test Results 🗃
+      #   if: always()
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: playwright-output
+      #     path: test-output/**
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
