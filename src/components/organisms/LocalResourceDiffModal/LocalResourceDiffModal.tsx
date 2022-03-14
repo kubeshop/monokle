@@ -17,7 +17,12 @@ import {AlertEnum, AlertType} from '@models/alert';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
-import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextSelector} from '@redux/selectors';
+import {
+  currentClusterAccessSelector,
+  currentConfigSelector,
+  isInClusterModeSelector,
+  kubeConfigContextSelector,
+} from '@redux/selectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -45,7 +50,8 @@ const DiffModal = () => {
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const resourceMap = useAppSelector(state => state.main.resourceMap);
   const configState = useAppSelector(state => state.config);
-  const namespaces = useAppSelector(state => state.config.projectConfig?.clusterAccess?.map(cl => cl.namespace));
+  const clusterAccess = useAppSelector(currentClusterAccessSelector);
+  const namespaces = useMemo(() => clusterAccess?.map(cl => cl.namespace), [clusterAccess]);
 
   const targetResource = useAppSelector(state =>
     state.main.resourceDiff.targetResourceId
@@ -192,11 +198,11 @@ const DiffModal = () => {
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {
-        if (!resourceKindHandler || !configState.projectConfig?.clusterAccess) {
+        if (!resourceKindHandler || !clusterAccess) {
           return [];
         }
 
-        const namespacesWithAccess = configState.projectConfig?.clusterAccess
+        const namespacesWithAccess = clusterAccess
           .filter(ca => hasAccessToResource(targetResource.kind, 'get', ca))
           .map(ca => ca.namespace);
         const resources = await Promise.all(
@@ -281,6 +287,7 @@ const DiffModal = () => {
     isDiffModalVisible,
     configState,
     namespaces,
+    clusterAccess,
   ]);
 
   useEffect(() => {

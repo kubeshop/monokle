@@ -1,4 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {flatten} from 'lodash';
 
 import {CLUSTER_DIFF_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
@@ -8,10 +9,12 @@ import {AppDispatch} from '@models/appdispatch';
 import {ResourceMapType} from '@models/appstate';
 import {RootState} from '@models/rootstate';
 
+import {currentKubeContext} from '@redux/selectors';
 import getClusterObjects from '@redux/services/getClusterObjects';
 import {extractK8sResources} from '@redux/services/resource';
 
 import {createKubeClient} from '@utils/kubeclient';
+import {CLUSTER_COMPARE, trackEvent} from '@utils/telemetry';
 
 import {createRejectionWithAlert} from './utils';
 
@@ -35,17 +38,22 @@ export const loadClusterDiff = createAsyncThunk<
     return;
   }
   try {
-    const clusterAccess = state.config.projectConfig?.clusterAccess;
+    const currentContext = currentKubeContext(state.config);
+    const clusterAccess = state.config.projectConfig?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
     if (!clusterAccess || !clusterAccess.length) {
       return {};
     }
     const kc = createKubeClient(state.config);
     try {
-      const res = await Promise.all(clusterAccess.map((ca) => getClusterObjects(kc, ca.namespace)));
+      const res = await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)));
       const results = flatten(res);
       const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 
       if (fulfilledResults.length === 0) {
+        trackEvent(CLUSTER_COMPARE, {
+          // @ts-ignore
+          fail: results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]),
+        });
         return createRejectionWithAlert(
           thunkAPI,
           CLUSTER_DIFF_FAILED,
@@ -74,15 +82,19 @@ export const loadClusterDiff = createAsyncThunk<
             type: AlertEnum.Warning,
           };
 
+          trackEvent(CLUSTER_COMPARE, {numberOfResourcesBeingCompared: Object.keys(resourceMap).length, fail: reason});
+
           return {resourceMap, alert};
         }
       }
-
+      trackEvent(CLUSTER_COMPARE, {numberOfResourcesBeingCompared: Object.keys(resourceMap).length});
       return {resourceMap};
     } catch (reason: any) {
+      trackEvent(CLUSTER_COMPARE, {fail: reason.message});
       return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, reason.message);
     }
   } catch (e: any) {
+    trackEvent(CLUSTER_COMPARE, {fail: e.message});
     return createRejectionWithAlert(thunkAPI, CLUSTER_DIFF_FAILED, e.message);
   }
 });

@@ -20,11 +20,13 @@ import * as S from './TemplateInformation.styled';
 interface IProps {
   template: AnyTemplate;
   onClickOpenTemplate: () => void;
+  actionType?: 'link' | 'button';
+  actionLabel?: string;
   disabled?: boolean;
 }
 
 const TemplateInformation: React.FC<IProps> = props => {
-  const {template, onClickOpenTemplate, disabled} = props;
+  const {template, onClickOpenTemplate, actionType = 'link', actionLabel, disabled} = props;
   const dispatch = useAppDispatch();
   const favoriteTemplates = useAppSelector(state => state.config.favoriteTemplates);
 
@@ -43,15 +45,15 @@ const TemplateInformation: React.FC<IProps> = props => {
               <Icon name="helm" />
             </Tooltip>
           )}
-            {favoriteTemplates.includes(template.id) ? (
-              <S.UnPinTemplateButton onClick={onClickPinTemplate}>
-                <DeliveredProcedureOutlined />
-              </S.UnPinTemplateButton>
-            ) : (
-              <S.PinTemplateButton onClick={onClickPinTemplate}>
-                <Icon name="helm" />
-              </S.PinTemplateButton>
-            )}
+          {favoriteTemplates.includes(template.id) ? (
+            <S.UnPinTemplateButton onClick={onClickPinTemplate}>
+              <DeliveredProcedureOutlined />
+            </S.UnPinTemplateButton>
+          ) : (
+            <S.PinTemplateButton onClick={onClickPinTemplate}>
+              <Icon name="helm" />
+            </S.PinTemplateButton>
+          )}
         </S.NameContainer>
         <S.Description>{_.truncate(template.description, {length: 140})}</S.Description>
 
@@ -64,11 +66,12 @@ const TemplateInformation: React.FC<IProps> = props => {
           <S.OpenButton
             disabled={disabled}
             icon={<DeliveredProcedureOutlined />}
-            type="link"
-            size="small"
+            $noPadding={actionType === 'link'}
+            type={actionType === 'button' ? 'primary' : 'link'}
+            size={actionType === 'button' ? 'middle' : 'small'}
             onClick={onClickOpenTemplate}
           >
-            Use Template
+            {actionLabel || 'Use Template'}
           </S.OpenButton>
         </S.Footer>
       </S.InfoContainer>

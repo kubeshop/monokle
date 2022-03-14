@@ -21,6 +21,7 @@ import {removeSchemaDefaults} from '@redux/services/schema';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import {GlobalScrollbarStyle} from '@utils/scrollbar';
+import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
 
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
@@ -121,6 +122,7 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const settings = useSelector(settingsSelector);
   const [schema, setSchema] = useState<any>({});
+  const [isResourceUpdated, setIsResourceUpdated] = useState<boolean>(false);
 
   const onFormUpdate = (e: any) => {
     setFormData(e.formData);
@@ -129,10 +131,13 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
   useDebounce(
     () => {
       let formString = stringify(formData);
+      setIsResourceUpdated(false);
 
       if (selectedResource) {
         const content = mergeManifests(selectedResource.text, formString);
-        if (content.trim() !== selectedResource.text.trim()) {
+        const isChanged = content.trim() !== selectedResource.text.trim();
+        setIsResourceUpdated(isChanged);
+        if (isChanged) {
           dispatch(updateResource({resourceId: selectedResource.id, content}));
         }
       } else if (selectedPath) {
@@ -140,7 +145,9 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
           const filePath = getAbsoluteFilePath(selectedPath, fileMap);
           const fileContent = fs.readFileSync(filePath, 'utf8');
           const content = mergeManifests(fileContent, formString);
-          if (content.trim() !== fileContent.trim()) {
+          const isChanged = content.trim() !== fileContent.trim();
+          setIsResourceUpdated(isChanged);
+          if (isChanged) {
             fs.writeFileSync(filePath, content);
           }
         } catch (e) {
@@ -164,6 +171,12 @@ const FormEditor = (props: {formSchema: any; formUiSchema?: any}) => {
         log.error(`Failed to read file [${selectedPath}]`, e);
       }
     }
+
+    return () => {
+      if ((selectedResource || selectedPath) && isResourceUpdated) {
+        trackEvent(CHANGES_BY_FORM_EDITOR, {resourceKind: selectedResource?.kind});
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResource, selectedPath, fileMap]);
 

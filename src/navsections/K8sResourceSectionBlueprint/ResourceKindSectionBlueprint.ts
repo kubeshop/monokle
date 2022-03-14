@@ -20,6 +20,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
+import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';
 import ResourceKindPrefix from './ResourceKindPrefix';
 import ResourceKindSectionNameSuffix from './ResourceKindSectionNameSuffix';
 import ResourceKindSuffix from './ResourceKindSuffix';
@@ -122,6 +123,7 @@ export function makeResourceKindNavSection(
       customization: {
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
+        contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
         contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
         isCheckVisibleOnHover: true,
       },

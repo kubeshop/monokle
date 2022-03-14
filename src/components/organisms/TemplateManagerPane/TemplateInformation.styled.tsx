@@ -78,9 +78,9 @@ export const FormOutlined = styled(RawFormOutlined)`
   font-size: 30px;
 `;
 
-export const OpenButton = styled(Button)`
+export const OpenButton = styled(Button)<{$noPadding: boolean}>`
   width: max-content;
-  padding: 0px;
+  ${props => props.$noPadding && 'padding: 0px;'}
 `;
 
 export const Footer = styled.div`

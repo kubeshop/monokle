@@ -1,16 +1,16 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
+import {execSync} from 'child_process';
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
-import {execSync} from 'child_process';
 import path, {join} from 'path';
 
 import {PREDEFINED_K8S_VERSION} from '@constants/constants';
 
 import {
   AppConfig,
-  ClusterAccess,
+  ClusterAccessWithContext,
   KubeConfig,
   Languages,
   NewVersionCode,
@@ -33,6 +33,7 @@ import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import electronStore from '@utils/electronStore';
+import {CHANGES_BY_SETTINGS_PANEL, trackEvent} from '@utils/telemetry';
 
 import initialState from '../initialState';
 import {toggleStartProjectPane} from './ui';
@@ -151,19 +152,11 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
       state.folderReadsMaxDepth = action.payload;
     },
-    updateClusterNamespaces: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess[]>) => {
-      if (!state.projectConfig) {
-        return;
-      }
-      electronStore.set('appConfig.settings.clusterNamespaces', action.payload);
-      state.projectConfig.clusterAccess = action.payload;
-    },
     updateK8sVersion: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('appConfig.k8sVersion', action.payload);
       state.k8sVersion = action.payload;
     },
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
-      execSync(`kubectl config use-context ${action.payload}`);
       electronStore.set('kubeConfig.currentContext', action.payload);
       state.kubeConfig.currentContext = action.payload;
     },
@@ -247,8 +240,12 @@ export const configSlice = createSlice({
         writeProjectConfigFile(state);
       }
     },
-    updateProjectKubeAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess[]>) => {
+    updateProjectKubeAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccessWithContext[]>) => {
       if (!state.selectedProjectRootFolder) {
+        return;
+      }
+
+      if (!action.payload || !action.payload.length) {
         return;
       }
 
@@ -256,7 +253,17 @@ export const configSlice = createSlice({
         state.projectConfig = {};
       }
 
-      state.projectConfig.clusterAccess = action.payload;
+      // check that update is just for one cluster
+      const updateForContext = action.payload[0].context;
+      const isUpdatingOneContext = action.payload.every(ca => ca.context === updateForContext);
+      if (!isUpdatingOneContext) {
+        return;
+      }
+
+      const otherClusterAccesses =
+        state.projectConfig.clusterAccess?.filter(ca => ca.context !== updateForContext) || [];
+
+      state.projectConfig.clusterAccess = [...otherClusterAccesses, ...action.payload];
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
@@ -283,9 +290,14 @@ export const configSlice = createSlice({
         state.isScanIncludesUpdated = 'outdated';
       }
 
+      const cloneProjectConfig = projectConfig ? {...projectConfig} : null;
+
       keys.forEach(key => {
         if (projectConfig) {
           _.set(projectConfig, key, serializedIncomingConfig[key]);
+          if (cloneProjectConfig && !_.isEmpty(cloneProjectConfig)) {
+            trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'project', settingKey: key});
+          }
         }
       });
 
@@ -340,6 +352,7 @@ export const configSlice = createSlice({
         const projectSettings = state.settings;
         if (projectSettings) {
           _.set(projectSettings, key, serializedIncomingSettings[key]);
+          trackEvent(CHANGES_BY_SETTINGS_PANEL, {type: 'application', settingKey: key});
         }
       });
 
@@ -359,12 +372,12 @@ export const configSlice = createSlice({
       state.disableErrorReporting = !state.disableErrorReporting;
       electronStore.set('appConfig.disableErrorReporting', state.disableErrorReporting);
     },
-  },extraReducers: builder => {
-    builder
-      .addCase(setRootFolder.fulfilled, (state, action) => {
-        state.isScanExcludesUpdated = action.payload.isScanIncludesUpdated;
-        state.isScanIncludesUpdated = action.payload.isScanIncludesUpdated;
-      });
+  },
+  extraReducers: builder => {
+    builder.addCase(setRootFolder.fulfilled, (state, action) => {
+      state.isScanExcludesUpdated = action.payload.isScanIncludesUpdated;
+      state.isScanIncludesUpdated = action.payload.isScanIncludesUpdated;
+    });
   },
 });
 
@@ -391,7 +404,6 @@ export const {
   changeProjectsRootPath,
   updateApplicationSettings,
   updateProjectKubeAccess,
-  updateClusterNamespaces,
   updateK8sVersion,
   handleFavoriteTemplate,
   toggleEventTracking,

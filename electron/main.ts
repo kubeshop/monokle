@@ -26,11 +26,13 @@ import {
   APP_MIN_HEIGHT,
   APP_MIN_WIDTH,
   DEFAULT_PLUGINS,
+  DEFAULT_TEMPLATES_PLUGIN_URL,
   DEPENDENCIES_HELP_URL,
   ROOT_FILE_ENTRY,
 } from '@constants/constants';
 import {DOWNLOAD_PLUGIN, DOWNLOAD_PLUGIN_RESULT, DOWNLOAD_TEMPLATE, DOWNLOAD_TEMPLATE_RESULT, DOWNLOAD_TEMPLATE_PACK, DOWNLOAD_TEMPLATE_PACK_RESULT, UPDATE_EXTENSIONS, UPDATE_EXTENSIONS_RESULT} from '@constants/ipcEvents';
 import ElectronStore from 'electron-store';
+import utilsElectronStore from '@utils/electronStore';
 import {
   changeCurrentProjectName,
   setUserDirs,
@@ -80,6 +82,7 @@ import {InterpolateTemplateOptions} from '@redux/services/templates';
 import {StartupFlags} from '@utils/startupFlag';
 import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
 import {CommandOptions} from '@utils/command';
+import { trackEvent, UPDATE_APPLICATION } from '@utils/telemetry';
 
 Object.assign(console, ElectronLog.functions);
 
@@ -264,6 +267,7 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
+  trackEvent(UPDATE_APPLICATION);
   autoUpdater.quitAndInstall();
   dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
 });
@@ -365,7 +369,7 @@ export const createWindow = (givenPath?: string) => {
   win.webContents.on('dom-ready', async () => {
     const dispatch = createDispatchForWindow(win);
 
-  Nucleus.appStarted();
+    Nucleus.appStarted();
 
     subscribeToStoreStateChanges(win.webContents, (storeState) => {
       createMenu(storeState, dispatch);
@@ -415,7 +419,11 @@ export const createWindow = (givenPath?: string) => {
     const pluginMap = await loadPluginMap(pluginsDir);
     const uniquePluginNames = Object.values(pluginMap).map((plugin) => `${plugin.repository.owner}-${plugin.repository.name}`);
 
+    const hasDeletedDefaultTemplatesPlugin = Boolean(utilsElectronStore.get('appConfig.hasDeletedDefaultTemplatesPlugin'));
     const defaultPluginsToLoad = DEFAULT_PLUGINS.filter((defaultPlugin) => {
+      if (hasDeletedDefaultTemplatesPlugin && defaultPlugin.url === DEFAULT_TEMPLATES_PLUGIN_URL) {
+        return false;
+      }
       return !uniquePluginNames.includes(`${defaultPlugin.owner}-${defaultPlugin.name}`);
     });
 
