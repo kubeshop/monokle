@@ -219,7 +219,7 @@ const SettingsManager: React.FC = () => {
             <S.Div style={{marginBottom: '8px'}}>
               <Tooltip title={DisableEventTrackingTooltip}>
                 <Checkbox checked={disableEventTracking} onChange={handleToggleEventTracking}>
-                  Disable Event Tracking
+                  Disable Usage Data
                 </Checkbox>
               </Tooltip>
             </S.Div>

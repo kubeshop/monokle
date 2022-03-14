@@ -80,16 +80,16 @@ jobs:
 
       - name: Build
         run: |
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
         run: |
-          echo $NUCLEUS_SH_APP_ID
-          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
           echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:
@@ -101,7 +101,6 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           USE_HARD_LINKS: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -217,6 +216,7 @@ jobs:
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
@@ -230,7 +230,6 @@ jobs:
           WIN_CSC_KEY_PASSWORD: ${{ secrets.CERT_MSFT_KUBESHOP_P12_PASSWORD }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
@@ -324,22 +323,22 @@ jobs:
 
       - name: Build
         run: |
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
         run: |
-          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
           echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
           EP_PRE_RELEASE: true
           USE_HARD_LINKS: false
-          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Create release and upload artifacts
         uses: ncipollo/release-action@v1
