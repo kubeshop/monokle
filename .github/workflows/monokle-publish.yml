@@ -81,7 +81,7 @@ jobs:
       - name: Package
         id: build
         run: |
-          contents="$(jq '.NUCLEUS_SH_APP_ID = "$NUCLEUS_SH_APP_ID"' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
           echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:
@@ -283,7 +283,7 @@ jobs:
       - name: Package
         id: package
         run: |
-          contents="$(jq '.NUCLEUS_SH_APP_ID = "$NUCLEUS_SH_APP_ID"' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
           echo "::set-output name=TAG::v$(cat package.json | jq -r '.version')"
           npm exec -c "electron-builder --publish \"never\""
         env:

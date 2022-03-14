@@ -24,8 +24,6 @@ import {APP_INSTALLED} from '@utils/telemetry';
 
 const {NUCLEUS_SH_APP_ID} = getMainProcessEnv();
 
-console.log('NUCLEUS_SH_APP_ID', NUCLEUS_SH_APP_ID);
-
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
 export function isValidRepositoryUrl(repositoryUrl: string) {

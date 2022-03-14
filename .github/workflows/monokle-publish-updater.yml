@@ -85,7 +85,7 @@ jobs:
 
       - name: Package
         run: |
-          contents="$(jq '.NUCLEUS_SH_APP_ID = "$NUCLEUS_SH_APP_ID"' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
           contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           npm exec -c "electron-builder --publish \"never\""
@@ -302,7 +302,7 @@ jobs:
 
       - name: Package
         run: |
-          contents="$(jq '.NUCLEUS_SH_APP_ID = "$NUCLEUS_SH_APP_ID"' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' src/utils/env.json)" && echo "${contents}" > src/utils/env.json
           contents="$(jq '.build.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           contents="$(jq '.build.appImage.artifactName = "${productName}-${os}-${arch}.${ext}"' package.json)" && echo "${contents}" > package.json
           npm exec -c "electron-builder --publish \"never\""
