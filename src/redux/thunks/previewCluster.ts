@@ -8,13 +8,13 @@ import log from 'loglevel';
 
 import {PREVIEW_PREFIX, YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {ClusterAccess, ClusterAccessWithContext} from '@models/appconfig';
+import {ClusterAccess} from '@models/appconfig';
 import {AppDispatch} from '@models/appdispatch';
 import {K8sResource} from '@models/k8sresource';
 import {RootState} from '@models/rootstate';
 
 import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {currentConfigSelector, currentKubeContext} from '@redux/selectors';
+import {currentClusterAccessSelector, currentConfigSelector} from '@redux/selectors';
 import {getK8sVersion} from '@redux/services/projectConfig';
 import {extractK8sResources, processResources} from '@redux/services/resource';
 import {createPreviewResult, createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
@@ -41,12 +41,8 @@ const previewClusterHandler = async (context: string, thunkAPI: any) => {
   const projectConfig = currentConfigSelector(thunkAPI.getState());
   const k8sVersion = getK8sVersion(projectConfig);
   const userDataDir = thunkAPI.getState().config.userDataDir;
-  const currentContext = currentKubeContext(thunkAPI.getState().config);
-  const clusterAccess =
-    thunkAPI
-      .getState()
-      .config?.projectConfig?.clusterAccess?.filter((ca: ClusterAccessWithContext) => ca.context === currentContext) ||
-    [];
+  const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
+
   try {
     const kc = createKubeClient(thunkAPI.getState().config, context);
     const results =
