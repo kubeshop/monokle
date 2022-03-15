@@ -3,6 +3,9 @@ name: monokle-build-nightly
 on:
   schedule:
     - cron: '0 2 * * *'
+  push:
+    branches:
+      - erdikose/feature/add-analytics-token
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
