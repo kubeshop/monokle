@@ -19,6 +19,9 @@ import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
+import {APP_INSTALLED} from '@utils/telemetry';
+
+const {NUCLEUS_SH_APP_ID} = process.env;
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -101,6 +104,9 @@ export const setDeviceID = (deviceID: string) => {
   const ID: string = electronStore.get('main.deviceID');
 
   if (!ID) {
+    if (NUCLEUS_SH_APP_ID) {
+      Nucleus.track(APP_INSTALLED);
+    }
     electronStore.set('main.deviceID', deviceID);
   }
 };
@@ -185,28 +191,33 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
   });
 };
 
-
 export const initNucleus = (isDev: boolean, app: any) => {
-  Nucleus.init(process.env.NUCLEUS_SH_APP_ID || '6218cf3ef5e5d2023724d89b', {
-    disableInDev: false,
-    disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
-    disableErrorReports: true,
-    debug: false,
-  });
+  if (NUCLEUS_SH_APP_ID) {
+    Nucleus.init(NUCLEUS_SH_APP_ID, {
+      disableInDev: isDev,
+      disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
+      disableErrorReports: true,
+      debug: false,
+    });
 
-  Nucleus.setUserId(machineIdSync());
+    Nucleus.setUserId(machineIdSync());
 
-  Nucleus.setProps(
-    {
-      os: process.platform,
-      version: app.getVersion(),
-      language: app.getLocale(),
-    },
-    true
-  );
+    Nucleus.setProps(
+      {
+        os: process.platform,
+        version: app.getVersion(),
+        language: app.getLocale(),
+      },
+      true
+    );
+    return {
+      disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
+      disableErrorReports: Boolean(electronStore.get('appConfig.disableErrorReporting')),
+    };
+  }
 
   return {
-    disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
-    disableErrorReports: Boolean(electronStore.get('appConfig.disableErrorReporting')),
+    disableTracking: true,
+    disableErrorReports: true,
   };
 };

@@ -3,6 +3,9 @@ name: monokle-build-nightly
 on:
   schedule:
     - cron: '0 2 * * *'
+  push:
+    branches:
+      - erdikose/feature/add-analytics-token
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -77,10 +80,12 @@ jobs:
 
       - name: Build
         run: |
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
@@ -114,15 +119,15 @@ jobs:
           ls -alh dist | grep Monokle && du -sh dist/mac || true
         if: ${{ success() }}
 
-      - name: E2E Test for Electron 🧪
-        run: npm run ui-test
+      # - name: E2E Test for Electron 🧪
+      #   run: npm run ui-test
 
-      - name: Upload Test Results 🗃
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: playwright-output
-          path: test-output/**
+      # - name: Upload Test Results 🗃
+      #   if: always()
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: playwright-output
+      #     path: test-output/**
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2
@@ -156,6 +161,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
         uses: actions/checkout@v2
+
+      - name: Install Tools
+        run: |
+          choco install jq
 
       - name: Get Node Version
         run: |
@@ -202,11 +211,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
       - name: Build
+        shell: PowerShell
         run: |
+          ($contents=jq --arg NUCLEUS_SH_APP_ID $env:NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron\env.json) -and ($contents | set-content electron\env.json -Encoding Ascii)
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
@@ -238,15 +250,15 @@ jobs:
           cmd /r dir .\dist
         if: ${{ success() }}
 
-      - name: E2E Test for Electron 🧪
-        run: npm run ui-test
+      # - name: E2E Test for Electron 🧪
+      #   run: npm run ui-test
 
-      - name: Upload Test Results 🗃
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: playwright-output
-          path: test-output/**
+      # - name: Upload Test Results 🗃
+      #   if: always()
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: playwright-output
+      #     path: test-output/**
 
       - name: Build Failed - Archive Build Logs
         uses: actions/upload-artifact@v2
@@ -313,10 +325,12 @@ jobs:
 
       - name: Build
         run: |
+          contents="$(jq --arg NUCLEUS_SH_APP_ID $NUCLEUS_SH_APP_ID '.NUCLEUS_SH_APP_ID = $NUCLEUS_SH_APP_ID' electron/env.json)" && echo "${contents}" > electron/env.json
           npm run electron:build:ci
         env:
           # Set CI flag to false, or the build fails on all warnings, not just errors as locally.
           CI: false
+          NUCLEUS_SH_APP_ID: ${{ secrets.NUCLEUS_SH_APP_ID }}
 
       - name: Package
         id: package
@@ -345,16 +359,16 @@ jobs:
           ls -alh dist | grep Monokle && du -sh dist || true
         if: ${{ success() }}
 
-# todo fix linux tests first and then run them
-#      - name: E2E Test for Electron 🧪
-#        run: npm run ui-test
-#
-#      - name: Upload Test Results 🗃
-#        if: always()
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: playwright-output
-#          path: test-output/**
+      # todo fix linux tests first and then run them
+      #      - name: E2E Test for Electron 🧪
+      #        run: npm run ui-test
+      #
+      #      - name: Upload Test Results 🗃
+      #        if: always()
+      #        uses: actions/upload-artifact@v2
+      #        with:
+      #          name: playwright-output
+      #          path: test-output/**
 
       - name: Archive Binary
         uses: actions/upload-artifact@v2

@@ -1,5 +1,12 @@
 /* eslint-disable import/order */
 /* eslint-disable import/first */
+import additionalEnvironmentVariables from './env.json';
+
+Object.keys(additionalEnvironmentVariables).forEach((key: string) => {
+  // @ts-ignore
+  process.env[key] = additionalEnvironmentVariables[key];
+});
+
 import moduleAlias from 'module-alias';
 import * as ElectronLog from 'electron-log';
 import { machineIdSync } from 'node-machine-id';
@@ -86,8 +93,8 @@ import { trackEvent, UPDATE_APPLICATION } from '@utils/telemetry';
 
 Object.assign(console, ElectronLog.functions);
 
-const {MONOKLE_RUN_AS_NODE} = process.env;
-const isDev = process.env.NODE_ENV === 'development';
+const {MONOKLE_RUN_AS_NODE, NODE_ENV} = process.env;
+const isDev = NODE_ENV === 'development';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
