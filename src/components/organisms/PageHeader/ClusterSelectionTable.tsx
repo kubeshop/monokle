@@ -80,18 +80,20 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     addNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
 
     if (clusterName === kubeConfigContext) {
-      try {
-        dispatch(updateProjectKubeAccess(localCluster.namespaces.map(ns => getKubeAccess(ns, kubeConfigContext))));
-      } catch (e) {
-        dispatch(
-          setAlert({
-            title: 'Cluster access failed',
-            message: "Couldn't get cluster access for namespaces",
-            type: AlertEnum.Warning,
-            duration: 100000,
-          })
-        );
-      }
+      getKubeAccess(localCluster.namespaces, kubeConfigContext)
+        .then(currentClusterAccess => {
+          dispatch(updateProjectKubeAccess(currentClusterAccess));
+        })
+        .catch(() => {
+          dispatch(
+            setAlert({
+              title: 'Cluster access failed',
+              message: "Couldn't get cluster access for namespaces",
+              type: AlertEnum.Warning,
+              duration: 100000,
+            })
+          );
+        });
     }
 
     setEditingKey('');
