@@ -84,7 +84,7 @@ const UnknownResourceSectionBlueprint: SectionBlueprint<K8sResource, UnknownReso
       },
     },
     customization: {
-      contextMenuWrapper:{component: ResourceKindContextMenuWrapper},
+      contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
       contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
       prefix: {component: ResourceKindPrefix},
       suffix: {component: ResourceKindSuffix},

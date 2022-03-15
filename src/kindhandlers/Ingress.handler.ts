@@ -19,7 +19,9 @@ const IngressHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
-    const response = await k8sNetworkingV1Api.listNamespacedIngress(namespace as string);
+    const response = namespace
+      ? await k8sNetworkingV1Api.listNamespacedIngress(namespace)
+      : await k8sNetworkingV1Api.listIngressForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

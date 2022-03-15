@@ -9,8 +9,8 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
-import KustomizationContextMenuWrapper from './KustomizationContextMenuWrapper';
 import KustomizationContextMenu from './KustomizationContextMenu';
+import KustomizationContextMenuWrapper from './KustomizationContextMenuWrapper';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationQuickAction from './KustomizationQuickAction';
 import KustomizationSectionEmptyDisplay from './KustomizationSectionEmptyDisplay';

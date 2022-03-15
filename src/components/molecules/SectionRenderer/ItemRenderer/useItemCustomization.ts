@@ -16,7 +16,10 @@ export function useItemCustomization(customization: ItemCustomization = {}) {
     [customization.quickAction]
   );
   const ContextMenuWrapper = useMemo(
-    () => ({Component: customization.contextMenuWrapper?.component, options: customization.contextMenuWrapper?.options}),
+    () => ({
+      Component: customization.contextMenuWrapper?.component,
+      options: customization.contextMenuWrapper?.options,
+    }),
     [customization.contextMenuWrapper]
   );
   const ContextMenu = useMemo(

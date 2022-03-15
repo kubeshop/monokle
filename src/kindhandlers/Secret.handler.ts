@@ -19,7 +19,9 @@ const SecretHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    const response = await k8sCoreV1Api.listNamespacedSecret(namespace as string);
+    const response = namespace
+      ? await k8sCoreV1Api.listNamespacedSecret(namespace)
+      : await k8sCoreV1Api.listSecretForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

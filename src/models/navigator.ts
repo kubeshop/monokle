@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, {ReactNode} from 'react';
 
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
@@ -30,7 +30,7 @@ export interface ItemCustomization {
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
   };
-  contextMenuWrapper?:{
+  contextMenuWrapper?: {
     component: ItemCustomComponent;
     options?: ItemCustomComponentOptions;
   };

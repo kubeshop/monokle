@@ -227,7 +227,14 @@ const createNamespacedCustomObjectKindHandler = (
       if (crd) {
         const defaultVersion = findDefaultVersion(crd.content);
         if (defaultVersion) {
-          return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
+          return options.namespace
+            ? customObjectsApi.listNamespacedCustomObject(
+                kindGroup,
+                defaultVersion || kindVersion,
+                options.namespace,
+                kindPlural
+              )
+            : customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
         }
       }
 
@@ -238,8 +245,14 @@ const createNamespacedCustomObjectKindHandler = (
         const result = await k8sCoreV1Api.readCustomResourceDefinition(crdName).then(
           response => {
             const defaultVersion = findDefaultVersion(response.body);
-            // use listClusterCustomObject to get objects in all namespaces
-            return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
+            return options.namespace
+              ? customObjectsApi.listNamespacedCustomObject(
+                  kindGroup,
+                  defaultVersion || kindVersion,
+                  options.namespace,
+                  kindPlural
+                )
+              : customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
           () => {
             log.warn(`Failed to get CRD for ${crdName}, ignoring`);
