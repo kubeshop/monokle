@@ -25,6 +25,7 @@ nav:
     - Creating Resources: creating-resources.md
     - Editing Resources: resource-editing.md
     - Validating Resources: resource-validation.md
+  - Working with Projects: projects.md
   - Working with Kustomize: kustomize.md
   - Working with Helm Charts: helm.md
   - Working with Clusters: 
@@ -41,6 +42,7 @@ nav:
     - Templates: templates.md
   - Keyboard Shortcuts: hotkeys.md
   - FAQ: faq.md
+  - Telemetry: telemetry.md
   - Tutorials: 
     - How to Configure Monokle: tutorials/how-to-configure-monokle.md
     - How to Work with Manifests: tutorials/how-to-navigate-and-edit-manifests.md

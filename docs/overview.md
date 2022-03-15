@@ -4,7 +4,7 @@
 
 <em>**Note:** Please follow this [Getting Started](getting-started.md) guide to install Monokle 🚀</em>
 
-Launch Monokle and on the welcome screen, there are three options to start working with projects:
+Launch Monokle and, on the welcome screen, there are three options to start working with projects:
 
  - Select an exisiting folder.
  - Create an empty project.
@@ -12,7 +12,7 @@ Launch Monokle and on the welcome screen, there are three options to start worki
  
 ![Welcome](img/welcome-1.5.0.png)
 
-Click **Select an existing project** to add your project folder containing K8 resources. 
+Click **Select an existing folder** to add your project folder containing K8 resources. 
 
 Monokle is laid out like many other desktop applications:
 
