@@ -1,6 +1,5 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import {execSync} from 'child_process';
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
@@ -20,7 +19,6 @@ import {
   TextSizes,
   Themes,
 } from '@models/appconfig';
-import {AppDispatch} from '@models/appdispatch';
 import {UiState} from '@models/ui';
 
 import {
@@ -53,7 +51,7 @@ export const setDeleteProject = createAsyncThunk('config/setDeleteProject', asyn
 
 export const setOpenProject = createAsyncThunk(
   'config/setOpenProject',
-  async (projectRootPath: string | null, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
+  async (projectRootPath: string | null, thunkAPI: any) => {
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
@@ -82,12 +80,9 @@ export const setOpenProject = createAsyncThunk(
   }
 );
 
-export const setLoadingProject = createAsyncThunk(
-  'config/loadingProject',
-  async (loading: boolean, thunkAPI: {dispatch: AppDispatch; getState: Function}) => {
-    thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
-  }
-);
+export const setLoadingProject = createAsyncThunk('config/loadingProject', async (loading: boolean, thunkAPI: any) => {
+  thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
+});
 
 type UpdateProjectConfigPayload = {config: ProjectConfig | null; fromConfigFile: boolean};
 

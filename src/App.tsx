@@ -1,13 +1,15 @@
 import {ipcRenderer} from 'electron';
 
-import React, {Suspense, useCallback, useEffect, useMemo} from 'react';
+import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {useDebounce} from 'react-use';
 
+import {Button, Modal} from 'antd';
 import 'antd/dist/antd.less';
 
 import log from 'loglevel';
 import path from 'path';
+import semver from 'semver';
 import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
@@ -31,12 +33,13 @@ import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {fetchAppVersion} from '@utils/appVersion';
+import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
+import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {StartupFlag} from '@utils/startupFlag';
-import electronStore from '@utils/electronStore';
-import {globalElectronStoreChanges} from '@utils/global-electron-store';
 
 import AppContext from './AppContext';
 
@@ -57,6 +60,7 @@ const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
+const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
 
 const AppContainer = styled.div`
   height: 100%;
@@ -74,6 +78,10 @@ const MainContainer = styled.div`
 
 const App = () => {
   const dispatch = useDispatch();
+
+  const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
+  const [appVersion, setAppVersion] = useState<string>();
+
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
@@ -151,6 +159,21 @@ const App = () => {
     };
   }, [onExecutedFrom]);
 
+  useEffect(() => {
+    fetchAppVersion().then(version => {
+      const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
+      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.lt(lastSeenReleaseNotesVersion, version)) {
+        setAppVersion(version);
+        setShowReleaseNotes(true);
+      }
+    });
+  }, []);
+
+  const onCloseReleaseNotes = useCallback(() => {
+    setShowReleaseNotes(false);
+    electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
+  }, [appVersion]);
+
   // called from main thread because thunks cannot be dispatched by main
   const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
     if (project) {
@@ -160,9 +183,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    globalElectronStoreChanges.forEach((globalElectronStoreChange) => {
+    globalElectronStoreChanges.forEach(globalElectronStoreChange => {
       electronStore.onDidChange(globalElectronStoreChange.keyName, (newData: any, oldData: any) => {
-        const { shouldTriggerAcrossWindows, eventData } = globalElectronStoreChange.action(newData, oldData);
+        const {shouldTriggerAcrossWindows, eventData} = globalElectronStoreChange.action(newData, oldData);
         if (!shouldTriggerAcrossWindows || !eventData) {
           return;
         }
@@ -317,6 +340,20 @@ const App = () => {
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
           {isStartupModalVisible && <StartupModal />}
           {isUpdateModalVisible && <UpdateModal />}
+          {showReleaseNotes && (
+            <Modal
+              visible={showReleaseNotes}
+              onCancel={onCloseReleaseNotes}
+              footer={[
+                <Button type="ghost">Learn more</Button>,
+                <Button onClick={onCloseReleaseNotes} type="primary">
+                  Got it
+                </Button>,
+              ]}
+            >
+              <ReleaseNotes />
+            </Modal>
+          )}
         </Suspense>
       </AppContainer>
     </AppContext.Provider>

@@ -22,6 +22,12 @@ const schema = {
   appConfig: {
     type: 'object',
     properties: {
+      hasDeletedDefaultTemplatesPlugin: {
+        type: 'boolean',
+      },
+      lastSeenReleaseNotesVersion: {
+        type: 'string',
+      },
       startupModalVisible: {
         type: 'boolean',
       },

@@ -1,6 +1,4 @@
-import {ipcRenderer} from 'electron';
-
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import styled from 'styled-components';
@@ -9,6 +7,8 @@ import {ROOT_FILE_ENTRY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLayoutSize} from '@redux/reducers/ui';
+
+import {fetchAppVersion} from '@utils/appVersion';
 
 import {AppBorders} from '@styles/Borders';
 import Colors, {BackgroundColors} from '@styles/Colors';
@@ -44,12 +44,11 @@ const PageFooter = () => {
   }, [footerHeight]);
 
   // not counting the root
-  const nrOfFiles = Object.values(fileMap).filter(f => !f.children).length;
+  const nrOfFiles = useMemo(() => Object.values(fileMap).filter(f => !f.children).length, [fileMap]);
 
-  ipcRenderer.send('app-version');
-  ipcRenderer.once('app-version', (_, {version}) => {
-    setAppVersion(version);
-  });
+  useEffect(() => {
+    fetchAppVersion().then(version => setAppVersion(version));
+  }, []);
 
   useEffect(() => {
     setFooterText(
