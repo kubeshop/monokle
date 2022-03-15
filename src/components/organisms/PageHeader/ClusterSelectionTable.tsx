@@ -5,7 +5,10 @@ import Column from 'antd/lib/table/Column';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {AlertEnum} from '@models/alert';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {setCurrentContext, updateProjectKubeAccess} from '@redux/reducers/appConfig';
 import {kubeConfigContextSelector, kubeConfigContextsSelector} from '@redux/selectors';
 
@@ -77,7 +80,18 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
     addNamespaces([...otherClusterNamespaces, ...existingClusterNamespaces]);
 
     if (clusterName === kubeConfigContext) {
-      dispatch(updateProjectKubeAccess(localCluster.namespaces.map(ns => getKubeAccess(ns, kubeConfigContext))));
+      try {
+        dispatch(updateProjectKubeAccess(localCluster.namespaces.map(ns => getKubeAccess(ns, kubeConfigContext))));
+      } catch (e) {
+        dispatch(
+          setAlert({
+            title: 'Cluster access failed',
+            message: "Couldn't get cluster access for namespaces",
+            type: AlertEnum.Warning,
+            duration: 100000,
+          })
+        );
+      }
     }
 
     setEditingKey('');
