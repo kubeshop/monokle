@@ -21,7 +21,9 @@ const ReplicaSetHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
-    const response = await k8sAppV1Api.listNamespacedReplicaSet(namespace as string);
+    const response = namespace
+      ? await k8sAppV1Api.listNamespacedReplicaSet(namespace)
+      : await k8sAppV1Api.listReplicaSetForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

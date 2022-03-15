@@ -169,8 +169,16 @@ export const mergeConfigs = (baseConfig: ProjectConfig, config?: ProjectConfig |
   const serializedBaseConfig: SerializableObject = flatten<any, any>(baseConfig);
   const serializedConfig: SerializableObject = flatten<any, any>(config);
 
+  // override base properties
   Object.keys(serializedBaseConfig).forEach((key: string) => {
     if (!_.isUndefined(serializedConfig[key])) {
+      serializedBaseConfig[key] = serializedConfig[key];
+    }
+  });
+
+  // add missing base properties
+  Object.keys(serializedConfig).forEach((key: string) => {
+    if (_.isUndefined(serializedBaseConfig[key])) {
       serializedBaseConfig[key] = serializedConfig[key];
     }
   });

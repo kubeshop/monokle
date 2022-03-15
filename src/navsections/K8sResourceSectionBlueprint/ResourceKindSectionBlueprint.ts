@@ -123,7 +123,7 @@ export function makeResourceKindNavSection(
       customization: {
         prefix: {component: ResourceKindPrefix},
         suffix: {component: ResourceKindSuffix},
-        contextMenuWrapper: { component: ResourceKindContextMenuWrapper},
+        contextMenuWrapper: {component: ResourceKindContextMenuWrapper},
         contextMenu: {component: ResourceKindContextMenu, options: {isVisibleOnHover: true}},
         isCheckVisibleOnHover: true,
       },

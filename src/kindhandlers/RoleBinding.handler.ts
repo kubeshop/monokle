@@ -21,7 +21,9 @@ const RoleBindingHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sRbacV1Api = kubeconfig.makeApiClient(k8s.RbacAuthorizationV1Api);
-    const response = await k8sRbacV1Api.listNamespacedRoleBinding(namespace as string);
+    const response = namespace
+      ? await k8sRbacV1Api.listNamespacedRoleBinding(namespace)
+      : await k8sRbacV1Api.listRoleBindingForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

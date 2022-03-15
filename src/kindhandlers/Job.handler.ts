@@ -21,7 +21,9 @@ const JobHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
-    const response = await k8sBatchV1Api.listNamespacedJob(namespace as string);
+    const response = namespace
+      ? await k8sBatchV1Api.listNamespacedJob(namespace)
+      : await k8sBatchV1Api.listJobForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {

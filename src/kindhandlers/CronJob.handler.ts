@@ -21,7 +21,9 @@ const CronJobHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
-    const response = await k8sBatchV1Api.listNamespacedCronJob(namespace as string);
+    const response = namespace
+      ? await k8sBatchV1Api.listNamespacedCronJob(namespace)
+      : await k8sBatchV1Api.listCronJobForAllNamespaces();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
