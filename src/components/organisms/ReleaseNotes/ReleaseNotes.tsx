@@ -14,9 +14,10 @@ import * as S from './styled';
 
 type ReleaseNotesProps = {
   onClose: () => void;
+  singleColumn?: boolean;
 };
 
-const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose}) => {
+const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
   const [title, setTitle] = useState<string>();
   const [learnMoreUrl, setLearnMoreUrl] = useState<string>();
   const [markdown, setMarkdown] = useState<string>();
@@ -46,7 +47,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose}) => {
 
   return (
     <div>
-      <S.Container>
+      <S.Container $singleColumn={singleColumn}>
         <S.Content>
           <S.Title>{title}</S.Title>
           <ReactMarkdown
@@ -63,18 +64,20 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose}) => {
             {markdown}
           </ReactMarkdown>
         </S.Content>
-        <S.Illustration>
+        <S.Illustration $singleColumn={singleColumn}>
           <S.Image src={`data:image/svg+xml;base64,${base64svg}`} alt="Release illustration" />
         </S.Illustration>
       </S.Container>
-      <S.Actions>
-        <Button type="ghost" onClick={() => openUrlInExternalBrowser(learnMoreUrl)}>
-          Learn more
-        </Button>
-        <Button onClick={onClose} type="primary" style={{marginLeft: 8}}>
-          Got it
-        </Button>
-      </S.Actions>
+      {!singleColumn && (
+        <S.Actions>
+          <Button type="ghost" onClick={() => openUrlInExternalBrowser(learnMoreUrl)}>
+            Learn more
+          </Button>
+          <Button onClick={onClose} type="primary" style={{marginLeft: 8}}>
+            Got it
+          </Button>
+        </S.Actions>
+      )}
     </div>
   );
 };

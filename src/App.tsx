@@ -90,6 +90,7 @@ const App = () => {
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
+  const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
@@ -289,6 +290,10 @@ const App = () => {
     dispatch(closePreviewConfigurationEditor());
   };
 
+  const onCloseReleaseNotesDrawer = () => {
+    dispatch(onCloseReleaseNotesDrawer());
+  };
+
   return (
     <AppContext.Provider value={{windowSize: size}}>
       <AppContainer>
@@ -324,6 +329,10 @@ const App = () => {
           visible={previewConfigurationEditorState.isOpen}
         >
           <PreviewConfigurationEditor key={previewConfigurationEditorState.helmChartId} />
+        </LazyDrawer>
+
+        <LazyDrawer title="New Release" visible={isReleaseNotesDrawerOpen} onClose={onCloseReleaseNotesDrawer}>
+          <ReleaseNotes onClose={onCloseReleaseNotesDrawer} singleColumn />
         </LazyDrawer>
 
         <Suspense fallback={null}>

@@ -4,13 +4,22 @@ import {GlobalScrollbarStyle} from '@utils/scrollbar';
 
 import Colors from '@styles/Colors';
 
-export const Container = styled.div`
+export const Container = styled.div<{$singleColumn?: boolean}>`
   display: flex;
   margin-bottom: 20px;
   max-height: 600px;
   overflow: auto;
   ${GlobalScrollbarStyle}
   min-height: min-content;
+
+  ${props =>
+    props.$singleColumn &&
+    `
+    height: 100%;
+    max-height: 100%;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+  `}
 
   @media (max-width: 800px) {
     flex-direction: column-reverse;
@@ -28,10 +37,16 @@ export const Title = styled.div`
   color: ${Colors.yellow6};
 `;
 
-export const Illustration = styled.div`
+export const Illustration = styled.div<{$singleColumn?: boolean}>`
   display: flex;
   align-items: center;
   width: 700px;
+  ${props =>
+    props.$singleColumn &&
+    `
+    width: 350px;
+    margin-bottom: 20px;
+  `}
 `;
 
 export const Image = styled.img`

@@ -108,6 +108,7 @@ const uiLeftMenuSelection = electronStore.get('ui.leftMenu.selection');
 
 const initialUiState: UiState = {
   isResourceFiltersOpen: false,
+  isReleaseNotesDrawerOpen: false,
   isSettingsOpen: false,
   isClusterDiffVisible: false,
   isNotificationsOpen: false,

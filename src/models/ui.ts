@@ -57,6 +57,7 @@ export type LayoutSizeType = {
 
 export type UiState = {
   isResourceFiltersOpen: boolean;
+  isReleaseNotesDrawerOpen: boolean;
   isSettingsOpen: boolean;
   isClusterDiffVisible: boolean;
   isNotificationsOpen: boolean;

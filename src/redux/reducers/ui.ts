@@ -223,6 +223,12 @@ export const uiSlice = createSlice({
       state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
       state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
     },
+    openReleaseNotesDrawer: (state: Draft<UiState>) => {
+      state.isReleaseNotesDrawerOpen = true;
+    },
+    closeReleaseNotesDrawer: (state: Draft<UiState>) => {
+      state.isReleaseNotesDrawerOpen = false;
+    },
   },
   extraReducers: builder => {
     builder
@@ -288,5 +294,7 @@ export const {
   closeSaveResourcesToFileFolderModal,
   zoomIn,
   zoomOut,
+  openReleaseNotesDrawer,
+  closeReleaseNotesDrawer,
 } = uiSlice.actions;
 export default uiSlice.reducer;
