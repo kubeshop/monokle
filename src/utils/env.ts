@@ -47,7 +47,7 @@ const parseEnv = env => {
 
 function shellEnvSync() {
   if (process.platform === 'win32') {
-    return process.env;
+    return {...process.env, ...ENV};
   }
 
   try {
