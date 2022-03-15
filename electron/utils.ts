@@ -19,10 +19,9 @@ import {createProject} from '@redux/reducers/appConfig';
 import {loadResource} from '@redux/services';
 
 import electronStore from '@utils/electronStore';
-import {getMainProcessEnv} from '@utils/env';
 import {APP_INSTALLED} from '@utils/telemetry';
 
-const {NUCLEUS_SH_APP_ID} = getMainProcessEnv();
+const {NUCLEUS_SH_APP_ID} = process.env;
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 

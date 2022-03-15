@@ -1,5 +1,12 @@
 /* eslint-disable import/order */
 /* eslint-disable import/first */
+import additionalEnvironmentVariables from './env.json';
+
+Object.keys(additionalEnvironmentVariables).forEach((key: string) => {
+  // @ts-ignore
+  process.env[key] = additionalEnvironmentVariables[key];
+});
+
 import moduleAlias from 'module-alias';
 import * as ElectronLog from 'electron-log';
 import { machineIdSync } from 'node-machine-id';
