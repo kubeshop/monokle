@@ -4,7 +4,7 @@ import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react'
 import {useDispatch} from 'react-redux';
 import {useDebounce} from 'react-use';
 
-import {Button, Modal} from 'antd';
+import {Modal} from 'antd';
 import 'antd/dist/antd.less';
 
 import log from 'loglevel';
@@ -342,16 +342,14 @@ const App = () => {
           {isUpdateModalVisible && <UpdateModal />}
           {showReleaseNotes && (
             <Modal
+              width="900px"
+              title="New Release"
               visible={showReleaseNotes}
               onCancel={onCloseReleaseNotes}
-              footer={[
-                <Button type="ghost">Learn more</Button>,
-                <Button onClick={onCloseReleaseNotes} type="primary">
-                  Got it
-                </Button>,
-              ]}
+              centered
+              footer={null}
             >
-              <ReleaseNotes />
+              <ReleaseNotes onClose={onCloseReleaseNotes} />
             </Modal>
           )}
         </Suspense>
