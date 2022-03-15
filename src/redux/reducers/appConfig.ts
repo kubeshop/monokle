@@ -1,6 +1,5 @@
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import {execSync} from 'child_process';
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
