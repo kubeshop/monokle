@@ -62,12 +62,9 @@ export const loadContexts = async (
         });
 
         dispatch(updateProjectKubeConfig(kubeConfig));
-
-        dispatch(
-          updateProjectKubeAccess(
-            getNamespaces(selectedContext?.name as string).map(ns => getKubeAccess(ns.namespaceName, kc.currentContext))
-          )
-        );
+        const namespaces = getNamespaces(selectedContext?.name as string).map(ctx => ctx.namespaceName);
+        const clusterAccess = await getKubeAccess(namespaces, kc.currentContext);
+        dispatch(updateProjectKubeAccess(clusterAccess));
       } catch (e: any) {
         if (e instanceof Error) {
           log.warn(`[loadContexts]: ${e.message}`);

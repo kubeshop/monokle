@@ -215,3 +215,7 @@ code {
 .cluster-dropdown-item li:hover {
   background: #111d2c;
 }
+
+.ant-notification.ant-notification-topRight {
+  z-index: 1051;
+}

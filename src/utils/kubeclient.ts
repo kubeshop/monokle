@@ -1,10 +1,10 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {execSync} from 'child_process';
 import log from 'loglevel';
 
 import {AppConfig, ClusterAccess, ClusterAccessWithContext, KubePermissions} from '@models/appconfig';
 
+import {runCommandInMainThread} from '@utils/command';
 import electronStore from '@utils/electronStore';
 import {getMainProcessEnv} from '@utils/env';
 
@@ -62,6 +62,14 @@ function parseCanI(stdout: string, namespace: string): ClusterAccess {
   const permissions: KubePermissions[] = [];
   let hasFullAccess = false;
 
+  if (!stdout) {
+    return {
+      permissions,
+      hasFullAccess,
+      namespace,
+    };
+  }
+
   lines.forEach((line, index) => {
     if (!index) {
       return;
@@ -99,13 +107,28 @@ function parseCanI(stdout: string, namespace: string): ClusterAccess {
   };
 }
 
-export function getKubeAccess(namespace: string, currentContext: string): ClusterAccessWithContext {
-  const command = `kubectl auth can-i --list --namespace=${namespace}`;
-  const canStdOut = execSync(command).toString();
-  return {
-    ...parseCanI(canStdOut, namespace),
-    context: currentContext,
-  };
+export async function getKubeAccess(namespaces: string[], currentContext: string): Promise<ClusterAccessWithContext[]> {
+  const promises = namespaces.map(namespace => {
+    return runCommandInMainThread({
+      cmd: 'kubectl',
+      args: ['auth', 'can-i', '--list', `--namespace=${namespace}`],
+    });
+  });
+
+  const results = await Promise.all(promises);
+  const hasErrors = results.length && results.every(result => result.exitCode !== 0);
+  if (hasErrors) {
+    throw new Error("Couldn't get cluster access for namespaces");
+  }
+
+  return results.map((result, index) => {
+    const namespace = namespaces[index];
+
+    return {
+      ...parseCanI(result.stdout as string, namespace),
+      context: currentContext,
+    };
+  });
 }
 
 export function hasAccessToResource(resourceName: string, verb: string, clusterAccess?: ClusterAccess) {
