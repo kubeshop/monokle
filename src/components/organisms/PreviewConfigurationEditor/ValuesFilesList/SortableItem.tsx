@@ -33,11 +33,11 @@ export function SortableItem(props: SortableItemProps) {
     <div ref={setNodeRef} style={style} {...attributes}>
       <S.ListItem key={item.order}>
         <span>
-          <S.ItemOrder style={{marginRight: 8}}>{item.order + 1}.</S.ItemOrder>
-          <S.ItemName onClick={() => checkItem(item.id)}>
+          <S.ItemOrder {...listeners}>{item.order + 1}.</S.ItemOrder>
+          <span onClick={() => checkItem(item.id)}>
             <Checkbox checked={item.isChecked} />
-            <span style={{marginLeft: 8, cursor: 'pointer'}}>{getItemName(item)}</span>
-          </S.ItemName>
+            <S.ItemName>{getItemName(item)}</S.ItemName>
+          </span>
         </span>
         <S.DragHandle {...listeners}>
           <MenuOutlined />
