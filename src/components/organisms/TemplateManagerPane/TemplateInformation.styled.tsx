@@ -19,11 +19,12 @@ export const AdditionalInformation = styled.div`
   flex-direction: column;
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{$shouldHaveMarginBottom?: boolean}>`
   display: grid;
   grid-template-columns: max-content 1fr;
   grid-column-gap: 18px;
   position: relative;
+  ${({$shouldHaveMarginBottom}) => $shouldHaveMarginBottom && 'margin-bottom: 16px;'}
 `;
 
 export const Description = styled.span`

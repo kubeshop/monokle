@@ -1,9 +1,15 @@
+import {useEffect, useState} from 'react';
+
 import {Col, Dropdown, Menu, Row} from 'antd';
 
-import {FileSearchOutlined, GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import {FileSearchOutlined, FireOutlined, GithubOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
+import {useAppDispatch} from '@redux/hooks';
+import {openReleaseNotesDrawer} from '@redux/reducers/ui';
+
+import {fetchAppVersion} from '@utils/appVersion';
 import {openDiscord, openDocumentation, openGitHub, openKeyboardShortcuts} from '@utils/shell';
 
 import DiscordLogo from '@assets/DiscordLogo.svg';
@@ -29,9 +35,20 @@ const MenuItem = styled(Menu.Item)`
 `;
 
 const HelpMenu = () => {
+  const dispatch = useAppDispatch();
+
+  const [appVersion, setAppVersion] = useState<string>();
+  useEffect(() => {
+    fetchAppVersion().then(version => setAppVersion(version));
+  }, []);
+
+  const onClickReleaseNotes = () => {
+    dispatch(openReleaseNotesDrawer());
+  };
+
   const menu = (
     <Menu inlineIndent={25}>
-      <MenuItem onClick={openDocumentation} key="documentation" style={{paddingRight: '20px'}}>
+      <MenuItem onClick={openDocumentation} key="documentation">
         <Row align="middle">
           <Col span={5}>
             <IconContainerSpan>
@@ -43,7 +60,19 @@ const HelpMenu = () => {
         </Row>
       </MenuItem>
 
-      <MenuItem onClick={openKeyboardShortcuts} key="hotkeys" style={{paddingRight: '20px'}}>
+      <MenuItem onClick={onClickReleaseNotes} key="releasenotes">
+        <Row align="middle">
+          <Col span={5}>
+            <IconContainerSpan>
+              <FireOutlined />
+            </IconContainerSpan>
+          </Col>
+
+          <Col span={19}>New in {appVersion || 'this version'}</Col>
+        </Row>
+      </MenuItem>
+
+      <MenuItem onClick={openKeyboardShortcuts} key="hotkeys">
         <Row align="middle">
           <Col span={5}>
             <IconContainerSpan>

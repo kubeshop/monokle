@@ -1,13 +1,15 @@
 import {ipcRenderer} from 'electron';
 
-import React, {Suspense, useCallback, useEffect, useMemo} from 'react';
+import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {useDebounce} from 'react-use';
 
+import {Modal} from 'antd';
 import 'antd/dist/antd.less';
 
 import log from 'loglevel';
 import path from 'path';
+import semver from 'semver';
 import styled from 'styled-components';
 
 import {DEFAULT_KUBECONFIG_DEBOUNCE, ROOT_FILE_ENTRY} from '@constants/constants';
@@ -21,7 +23,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {closePluginsDrawer} from '@redux/reducers/extension';
 import {closePreviewConfigurationEditor, reprocessAllResources} from '@redux/reducers/main';
-import {closeFolderExplorer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {closeFolderExplorer, closeReleaseNotesDrawer, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {loadContexts} from '@redux/thunks/loadKubeConfig';
 
@@ -31,12 +33,13 @@ import FileExplorer from '@components/atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {fetchAppVersion} from '@utils/appVersion';
+import electronStore from '@utils/electronStore';
 import {setMainProcessEnv} from '@utils/env';
 import {getFileStats} from '@utils/files';
+import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {StartupFlag} from '@utils/startupFlag';
-import electronStore from '@utils/electronStore';
-import {globalElectronStoreChanges} from '@utils/global-electron-store';
 
 import AppContext from './AppContext';
 
@@ -57,6 +60,7 @@ const SettingsManager = React.lazy(() => import('@organisms/SettingsManager'));
 const StartupModal = React.lazy(() => import('@organisms/StartupModal'));
 const UpdateModal = React.lazy(() => import('@organisms/UpdateModal'));
 const PreviewConfigurationEditor = React.lazy(() => import('@components/organisms/PreviewConfigurationEditor'));
+const ReleaseNotes = React.lazy(() => import('@components/organisms/ReleaseNotes'));
 
 const AppContainer = styled.div`
   height: 100%;
@@ -74,6 +78,10 @@ const MainContainer = styled.div`
 
 const App = () => {
   const dispatch = useDispatch();
+
+  const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
+  const [appVersion, setAppVersion] = useState<string>();
+
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isClusterDiffModalVisible = useAppSelector(state => state.ui.isClusterDiffVisible);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
@@ -82,6 +90,7 @@ const App = () => {
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
+  const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
   const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const isPluginManagerDrawerVisible = useAppSelector(state => state.extension.isPluginsDrawerVisible);
@@ -151,6 +160,21 @@ const App = () => {
     };
   }, [onExecutedFrom]);
 
+  useEffect(() => {
+    fetchAppVersion().then(version => {
+      const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
+      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.lt(lastSeenReleaseNotesVersion, version)) {
+        setAppVersion(version);
+        setShowReleaseNotes(true);
+      }
+    });
+  }, []);
+
+  const onCloseReleaseNotes = useCallback(() => {
+    setShowReleaseNotes(false);
+    electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
+  }, [appVersion]);
+
   // called from main thread because thunks cannot be dispatched by main
   const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
     if (project) {
@@ -160,9 +184,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    globalElectronStoreChanges.forEach((globalElectronStoreChange) => {
+    globalElectronStoreChanges.forEach(globalElectronStoreChange => {
       electronStore.onDidChange(globalElectronStoreChange.keyName, (newData: any, oldData: any) => {
-        const { shouldTriggerAcrossWindows, eventData } = globalElectronStoreChange.action(newData, oldData);
+        const {shouldTriggerAcrossWindows, eventData} = globalElectronStoreChange.action(newData, oldData);
         if (!shouldTriggerAcrossWindows || !eventData) {
           return;
         }
@@ -266,6 +290,10 @@ const App = () => {
     dispatch(closePreviewConfigurationEditor());
   };
 
+  const onCloseReleaseNotesDrawer = () => {
+    dispatch(closeReleaseNotesDrawer());
+  };
+
   return (
     <AppContext.Provider value={{windowSize: size}}>
       <AppContainer>
@@ -303,6 +331,10 @@ const App = () => {
           <PreviewConfigurationEditor key={previewConfigurationEditorState.helmChartId} />
         </LazyDrawer>
 
+        <LazyDrawer title="New Release" visible={isReleaseNotesDrawerOpen} onClose={onCloseReleaseNotesDrawer}>
+          <ReleaseNotes onClose={onCloseReleaseNotesDrawer} singleColumn />
+        </LazyDrawer>
+
         <Suspense fallback={null}>
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
           {isClusterDiffModalVisible && <ClusterDiffModal />}
@@ -317,6 +349,18 @@ const App = () => {
           {isSaveResourcesToFileFolderModalVisible && <SaveResourceToFileFolderModal />}
           {isStartupModalVisible && <StartupModal />}
           {isUpdateModalVisible && <UpdateModal />}
+          {showReleaseNotes && (
+            <Modal
+              width="900px"
+              title="New Release"
+              visible={showReleaseNotes}
+              onCancel={onCloseReleaseNotes}
+              centered
+              footer={null}
+            >
+              <ReleaseNotes onClose={onCloseReleaseNotes} />
+            </Modal>
+          )}
         </Suspense>
       </AppContainer>
     </AppContext.Provider>

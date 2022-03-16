@@ -34,7 +34,7 @@ const TemplateInformation: React.FC<IProps> = props => {
     dispatch(handleFavoriteTemplate(template.id));
   };
   return (
-    <S.Container>
+    <S.Container $shouldHaveMarginBottom={actionType === 'button'}>
       <S.Image src={template.icon ? template.icon : TemplateIcon} alt="Template_Icon" />
 
       <S.InfoContainer>
