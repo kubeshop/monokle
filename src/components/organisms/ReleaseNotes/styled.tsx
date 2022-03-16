@@ -1,26 +1,18 @@
 import styled from 'styled-components';
 
-import {GlobalScrollbarStyle} from '@utils/scrollbar';
-
+// import {GlobalScrollbarStyle} from '@utils/scrollbar';
 import Colors from '@styles/Colors';
 
 export const Container = styled.div<{$singleColumn?: boolean}>`
   display: flex;
-  margin-bottom: 20px;
   max-height: 600px;
-  overflow: auto;
-  ${GlobalScrollbarStyle}
-  min-height: min-content;
-
+  ${props => !props.$singleColumn && 'max-height: 600px;≈'}
   ${props =>
     props.$singleColumn &&
     `
-    height: 100%;
-    max-height: 100%;
     flex-direction: column-reverse;
-    justify-content: center;
+    justify-content: flex-end;
   `}
-
   @media (max-width: 800px) {
     flex-direction: column-reverse;
     justify-content: flex-end;

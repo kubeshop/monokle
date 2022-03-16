@@ -46,7 +46,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
   }
 
   return (
-    <div>
+    <>
       <S.Container $singleColumn={singleColumn}>
         <S.Content>
           <S.Title>{title}</S.Title>
@@ -81,7 +81,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
           </Button>
         </S.Actions>
       )}
-    </div>
+    </>
   );
 };
 
