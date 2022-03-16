@@ -18,7 +18,7 @@ export const Container = styled.div<{$singleColumn?: boolean}>`
     height: 100%;
     max-height: 100%;
     flex-direction: column-reverse;
-    justify-content: flex-end;
+    justify-content: center;
   `}
 
   @media (max-width: 800px) {
@@ -45,7 +45,8 @@ export const Illustration = styled.div<{$singleColumn?: boolean}>`
     props.$singleColumn &&
     `
     width: 350px;
-    margin-bottom: 20px;
+    margin-top: 16px;
+    margin-bottom: 40px;
   `}
 `;
 

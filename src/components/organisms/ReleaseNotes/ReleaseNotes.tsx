@@ -52,6 +52,9 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
           <S.Title>{title}</S.Title>
           <ReactMarkdown
             components={{
+              li({children}) {
+                return <li style={{padding: '2.5px 0'}}>{children}</li>;
+              },
               a({href, children, ...props}) {
                 return (
                   <a onClick={() => openUrlInExternalBrowser(href)} {...props}>
