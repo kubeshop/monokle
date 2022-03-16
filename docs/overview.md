@@ -50,6 +50,9 @@ Clicking the Settings icon on the top right opens the settings:
   - **On Startup**: 
     - Automatically load last project.
     - Show Cluster Selector.
+  - **Telemetry**:
+    - Disable Usage Data
+    - Disable Error Reports
 
 ### **Default Project Settings**  
   - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
@@ -66,7 +69,8 @@ Clicking the Settings icon on the top right opens the settings:
     - Ignore optional unsatisfied links.
     
 ### **Active Project Settings**
-   - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
+  - **Kubernetes Version**: Sets Kubernetes' schema version for validation.
+  - **Kubeconfig**: Sets which kubeconfig Monokle should use for all cluster interactions.
   - **Files: Include**: Sets which files to parse for kubernetes resources when scanning folders.
   - **Files: Exclude**: Sets which files/folders to exclude when scanning folders for resources.
   - **Helm Preview Mode**: Sets which Helm command to use for generating previews (see [Working with Helm Charts](helm.md)).
