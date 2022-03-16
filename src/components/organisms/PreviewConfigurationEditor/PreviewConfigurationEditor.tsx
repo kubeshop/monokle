@@ -3,17 +3,12 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button, Input, Select} from 'antd';
 
 import _ from 'lodash';
-import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
 import {HELM_INSTALL_OPTIONS_DOCS_URL, HELM_TEMPLATE_OPTIONS_DOCS_URL} from '@constants/constants';
 import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
 
-import {
-  HelmPreviewConfiguration,
-  PreviewConfigValuesFileItem,
-  PreviewConfigValuesFileItemPropsDefinition,
-} from '@models/appconfig';
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@models/appconfig';
 import {HelmValuesFile} from '@models/helm';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -21,7 +16,9 @@ import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 
-import {KeyValueInput, OrderedList} from '@components/atoms';
+import {KeyValueInput} from '@components/atoms';
+
+import ValuesFilesList from './ValuesFilesList';
 
 import * as S from './styled';
 
@@ -74,7 +71,7 @@ const PreviewConfigurationEditor = () => {
     _.remove(items, item => removedFilePaths.includes(item.filePath));
 
     // fix the order numbers
-    items = _.sortBy(items, [PreviewConfigValuesFileItemPropsDefinition.orderPropName]).map((item, index) => {
+    items = _.sortBy(items, ['order']).map((item, index) => {
       return {
         ...item,
         order: index,
@@ -93,7 +90,6 @@ const PreviewConfigurationEditor = () => {
           filePath,
           isChecked: false,
           order: nextOrderIndex,
-          name: path.basename(filePath),
         };
         nextOrderIndex += 1;
         return item;
@@ -200,11 +196,7 @@ const PreviewConfigurationEditor = () => {
       <S.Field>
         <S.Label style={{marginBottom: 0}}>Select which values files to use:</S.Label>
         <S.Description>Drag and drop to specify order</S.Description>
-        <OrderedList
-          itemMap={valuesFileItemMap}
-          onChange={itemMap => setValuesFileItemMap(itemMap)}
-          {...PreviewConfigValuesFileItemPropsDefinition}
-        />
+        <ValuesFilesList itemMap={valuesFileItemMap} onChange={itemMap => setValuesFileItemMap(itemMap)} />
       </S.Field>
       <S.Field>
         <S.Label>Select which helm command to use for this Preview:</S.Label>
