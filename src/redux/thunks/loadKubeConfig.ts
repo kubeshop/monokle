@@ -5,7 +5,7 @@ import {AnyAction} from '@reduxjs/toolkit';
 import fs from 'fs';
 import log from 'loglevel';
 
-import {AlertEnum} from '@models/alert';
+import {AlertEnum, AlertType} from '@models/alert';
 import {KubeConfig, KubeConfigContext} from '@models/appconfig';
 
 import {setAlert} from '@redux/reducers/alert';
@@ -13,6 +13,7 @@ import {updateProjectKubeAccess, updateProjectKubeConfig} from '@redux/reducers/
 
 import electronStore from '@utils/electronStore';
 import {addNamespace, getKubeAccess, getNamespaces} from '@utils/kubeclient';
+import {isRendererThread} from '@utils/thread';
 
 function getSelectedContext(contexts: k8s.Context[]): k8s.Context | undefined {
   const contextName = electronStore.get('kubeConfig.currentContext');
@@ -25,6 +26,11 @@ function getSelectedContext(contexts: k8s.Context[]): k8s.Context | undefined {
     return contexts[0];
   }
 }
+
+const showError = (dispatch: (action: AnyAction) => void, alert: AlertType) => {
+  log.warn(`[loadContexts]: ${alert.message}`);
+  dispatch(setAlert(alert));
+};
 
 export const loadContexts = async (
   configPath: string,
@@ -62,20 +68,25 @@ export const loadContexts = async (
         });
 
         dispatch(updateProjectKubeConfig(kubeConfig));
-        const namespaces = getNamespaces(selectedContext?.name as string).map(ctx => ctx.namespaceName);
-        const clusterAccess = await getKubeAccess(namespaces, kc.currentContext);
-        dispatch(updateProjectKubeAccess(clusterAccess));
-      } catch (e: any) {
-        if (e instanceof Error) {
-          log.warn(`[loadContexts]: ${e.message}`);
+        try {
+          if (isRendererThread()) {
+            const namespaces = getNamespaces(selectedContext?.name as string).map(ctx => ctx.namespaceName);
+            const clusterAccess = await getKubeAccess(namespaces, kc.currentContext);
+            dispatch(updateProjectKubeAccess(clusterAccess));
+          }
+        } catch (e) {
+          showError(dispatch, {
+            title: 'Cluster access failed',
+            message: (e as Error).message,
+            type: AlertEnum.Warning,
+          });
         }
-        dispatch(
-          setAlert({
-            title: 'Loading kubeconfig file failed',
-            message: e.message,
-            type: AlertEnum.Error,
-          })
-        );
+      } catch (e: any) {
+        showError(dispatch, {
+          title: 'Loading kubeconfig file failed',
+          message: (e as Error).message,
+          type: AlertEnum.Error,
+        });
       }
     }
   } catch (e) {
