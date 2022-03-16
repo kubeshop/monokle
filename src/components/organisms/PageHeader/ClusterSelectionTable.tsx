@@ -90,7 +90,6 @@ export const ClusterSelectionTable: FC<CLusterSelectionTableProps> = ({setIsClus
               title: 'Cluster access failed',
               message: "Couldn't get cluster access for namespaces",
               type: AlertEnum.Warning,
-              duration: 100000,
             })
           );
         });
