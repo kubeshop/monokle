@@ -53,7 +53,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
           <ReactMarkdown
             components={{
               li({children}) {
-                return <li style={{padding: '2.5px 0'}}>{children}</li>;
+                return <S.ListItem>{children}</S.ListItem>;
               },
               a({href, children, ...props}) {
                 return (
@@ -76,9 +76,9 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
           <Button type="ghost" onClick={() => openUrlInExternalBrowser(learnMoreUrl)}>
             Learn more
           </Button>
-          <Button onClick={onClose} type="primary" style={{marginLeft: 8}}>
+          <S.ConfirmButton onClick={onClose} type="primary">
             Got it
-          </Button>
+          </S.ConfirmButton>
         </S.Actions>
       )}
     </>

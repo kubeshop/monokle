@@ -48,7 +48,7 @@ const HelpMenu = () => {
 
   const menu = (
     <Menu inlineIndent={25}>
-      <MenuItem onClick={openDocumentation} key="documentation" style={{paddingRight: '20px'}}>
+      <MenuItem onClick={openDocumentation} key="documentation">
         <Row align="middle">
           <Col span={5}>
             <IconContainerSpan>
@@ -60,7 +60,7 @@ const HelpMenu = () => {
         </Row>
       </MenuItem>
 
-      <MenuItem onClick={onClickReleaseNotes} key="releasenotes" style={{paddingRight: '20px'}}>
+      <MenuItem onClick={onClickReleaseNotes} key="releasenotes">
         <Row align="middle">
           <Col span={5}>
             <IconContainerSpan>
@@ -72,7 +72,7 @@ const HelpMenu = () => {
         </Row>
       </MenuItem>
 
-      <MenuItem onClick={openKeyboardShortcuts} key="hotkeys" style={{paddingRight: '20px'}}>
+      <MenuItem onClick={openKeyboardShortcuts} key="hotkeys">
         <Row align="middle">
           <Col span={5}>
             <IconContainerSpan>

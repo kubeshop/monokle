@@ -1,3 +1,5 @@
+import {Button} from 'antd';
+
 import styled from 'styled-components';
 
 // import {GlobalScrollbarStyle} from '@utils/scrollbar';
@@ -49,4 +51,12 @@ export const Image = styled.img`
 export const Actions = styled.div`
   display: flex;
   justify-content: flex-end;
+`;
+
+export const ConfirmButton = styled(Button)`
+  margin-left: 8px;
+`;
+
+export const ListItem = styled.li`
+  padding: 2.5px 0;
 `;
