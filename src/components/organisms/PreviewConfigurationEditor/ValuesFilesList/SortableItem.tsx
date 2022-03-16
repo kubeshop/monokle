@@ -2,7 +2,7 @@ import React, {useCallback} from 'react';
 
 import {Checkbox} from 'antd';
 
-import {DragOutlined} from '@ant-design/icons';
+import {MenuOutlined} from '@ant-design/icons';
 
 import path from 'path';
 
@@ -40,7 +40,7 @@ export function SortableItem(props: SortableItemProps) {
           </S.ItemName>
         </span>
         <S.DragHandle {...listeners}>
-          <DragOutlined />
+          <MenuOutlined />
         </S.DragHandle>
       </S.ListItem>
     </div>
