@@ -19,7 +19,7 @@ export const updateResource = createAsyncThunk(
         mainSlice.actions.updateResourceSubAction({userDataDir, schemaVersion, parentPayload: payload})
       );
     } catch (error) {
-      throw original(error);
+      return original(error);
     }
   }
 );
